@@ -45,6 +45,11 @@ const DRUPAL_EXTENSION_NAME_MAX_LENGTH = 50;
 define('DRUPAL_ROOT', dirname(__DIR__, 2));
 
 /**
+ * Keep backward compatibility for sites with references to TranslationWrapper.
+ */
+class_alias(TranslatableMarkup::class, '\Drupal\Core\StringTranslation\TranslationWrapper', TRUE);
+
+/**
  * Translates a string to the current language or to a given language.
  *
  * In order for strings to be localized, make them available in one of the ways
@@ -83,23 +88,22 @@ define('DRUPAL_ROOT', dirname(__DIR__, 2));
  * @ingroup sanitization
  */
 function t($string, array $args = [], array $options = []) {
-  // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
   return new TranslatableMarkup($string, $args, $options);
 }
 
 /**
  * Provides custom PHP error handling.
  *
- * @param int $error_level
+ * @param $error_level
  *   The level of the error raised.
- * @param string $message
+ * @param $message
  *   The error message.
- * @param string $filename
+ * @param $filename
  *   (optional) The filename that the error was raised in.
- * @param int $line
+ * @param $line
  *   (optional) The line number the error was raised at.
  */
-function _drupal_error_handler($error_level, $message, $filename = NULL, $line = NULL): void {
+function _drupal_error_handler($error_level, $message, $filename = NULL, $line = NULL) {
   require_once __DIR__ . '/errors.inc';
   _drupal_error_handler_real($error_level, $message, $filename, $line);
 }
@@ -114,7 +118,7 @@ function _drupal_error_handler($error_level, $message, $filename = NULL, $line =
  * @param \Exception|\Throwable $exception
  *   The exception object that was thrown.
  */
-function _drupal_exception_handler($exception): void {
+function _drupal_exception_handler($exception) {
   require_once __DIR__ . '/errors.inc';
 
   try {
@@ -135,7 +139,7 @@ function _drupal_exception_handler($exception): void {
  * @param \Exception|\Throwable $exception2
  *   The second exception object that was thrown.
  */
-function _drupal_exception_handler_additional($exception, $exception2): void {
+function _drupal_exception_handler_additional($exception, $exception2) {
   // Another uncaught exception was thrown while handling the first one.
   // If we are displaying errors, then do so with no possibility of a further
   // uncaught exception being thrown.
@@ -262,7 +266,7 @@ function drupal_generate_test_ua($prefix) {
  *
  * @see _drupal_maintenance_theme()
  */
-function drupal_maintenance_theme(): void {
+function drupal_maintenance_theme() {
   require_once __DIR__ . '/theme.maintenance.inc';
   _drupal_maintenance_theme();
 }
@@ -362,14 +366,14 @@ function drupal_maintenance_theme(): void {
  * }
  * @endcode
  *
- * @param string|null $name
+ * @param $name
  *   Globally unique name for the variable. For a function with only one static,
  *   variable, the function name (e.g. via the PHP magic __FUNCTION__ constant)
  *   is recommended. For a function with multiple static variables add a
  *   distinguishing suffix to the function name for each one.
- * @param mixed|null $default_value
+ * @param $default_value
  *   Optional default value.
- * @param bool $reset
+ * @param $reset
  *   TRUE to reset one or all variables(s). This parameter is only used
  *   internally and should not be passed in; use drupal_static_reset() instead.
  *   (This function's return value should not be used when TRUE is passed in.)
@@ -420,19 +424,12 @@ function &drupal_static($name, $default_value = NULL, $reset = FALSE) {
 /**
  * Resets one or all centrally stored static variable(s).
  *
- * @param string $name
+ * @param $name
  *   Name of the static variable to reset. Omit to reset all variables.
  *   Resetting all variables should only be used, for example, for running
  *   unit tests with a clean environment.
  */
-function drupal_static_reset($name = NULL): void {
-  switch ($name) {
-    case 'node_access_view_all_nodes':
-      @trigger_error('Calling drupal_static_reset() with "node_access_view_all_nodes" as argument is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal::service(\'node.view_all_nodes_memory_cache\')->deleteAll(); instead. See https://www.drupal.org/node/3038909', E_USER_DEPRECATED);
-      \Drupal::service('node.view_all_nodes_memory_cache')->deleteAll();
-      break;
-
-  }
+function drupal_static_reset($name = NULL) {
   drupal_static($name, NULL, TRUE);
 }
 
@@ -444,7 +441,7 @@ function drupal_static_reset($name = NULL): void {
  *
  * @param callable $callback
  *   The shutdown function to register.
- * @param mixed ...$args
+ * @param ...
  *   Additional arguments to pass to the shutdown function.
  *
  * @return array
@@ -453,7 +450,7 @@ function drupal_static_reset($name = NULL): void {
  * @see register_shutdown_function()
  * @ingroup php_wrappers
  */
-function &drupal_register_shutdown_function($callback = NULL, ...$args) {
+function &drupal_register_shutdown_function($callback = NULL) {
   // We cannot use drupal_static() here because the static cache is reset during
   // batch processing, which breaks batch handling.
   static $callbacks = [];
@@ -463,7 +460,10 @@ function &drupal_register_shutdown_function($callback = NULL, ...$args) {
     if (empty($callbacks)) {
       register_shutdown_function('_drupal_shutdown_function');
     }
-    // Save callback and arguments.
+    $args = func_get_args();
+    // Remove $callback from the arguments.
+    unset($args[0]);
+    // Save callback and arguments
     $callbacks[] = ['callback' => $callback, 'arguments' => $args];
   }
   return $callbacks;
@@ -472,7 +472,7 @@ function &drupal_register_shutdown_function($callback = NULL, ...$args) {
 /**
  * Executes registered shutdown functions.
  */
-function _drupal_shutdown_function(): void {
+function _drupal_shutdown_function() {
   $callbacks = &drupal_register_shutdown_function();
 
   // Set the CWD to DRUPAL_ROOT as it is not guaranteed to be the same as it
@@ -502,7 +502,7 @@ function _drupal_shutdown_function(): void {
  *
  * @see _drupal_shutdown_function()
  */
-function _drupal_shutdown_function_handle_exception($exception): void {
+function _drupal_shutdown_function_handle_exception($exception) {
   // If using PHP-FPM then fastcgi_finish_request() will have been fired
   // preventing further output to the browser.
   if (!function_exists('fastcgi_finish_request')) {

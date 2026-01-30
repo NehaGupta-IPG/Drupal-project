@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Kernel;
 
-use Drupal\comment\AnonymousContact;
+use Drupal\comment\CommentInterface;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Entity\CommentType;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
@@ -16,22 +16,22 @@ use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\Tests\Traits\Core\GeneratePermutationsTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests comment field level access.
+ *
+ * @group comment
+ * @group Access
  */
-#[Group('comment')]
-#[Group('Access')]
-#[RunTestsInSeparateProcesses]
 class CommentFieldAccessTest extends EntityKernelTestBase {
 
   use CommentTestTrait;
   use GeneratePermutationsTrait;
 
   /**
-   * {@inheritdoc}
+   * Modules to install.
+   *
+   * @var array
    */
   protected static $modules = ['comment', 'entity_test', 'user'];
 
@@ -151,7 +151,7 @@ class CommentFieldAccessTest extends EntityKernelTestBase {
     // Change the second field's anonymous contact setting.
     $instance = FieldConfig::loadByName('entity_test', 'entity_test', 'comment_other');
     // Default is 'May not contact', for this field - they may contact.
-    $instance->setSetting('anonymous', AnonymousContact::Allowed->value);
+    $instance->setSetting('anonymous', CommentInterface::ANONYMOUS_MAY_CONTACT);
     $instance->save();
 
     // Create three "Comments". One is owned by our edit-enabled user.
@@ -224,20 +224,8 @@ class CommentFieldAccessTest extends EntityKernelTestBase {
 
     // Generate permutations.
     $combinations = [
-      'comment' => [
-        $comment1,
-        $comment2,
-        $comment3,
-        $comment4,
-        $comment5,
-      ],
-      'user' => [
-        $comment_admin_user,
-        $comment_enabled_user,
-        $comment_no_edit_user,
-        $comment_disabled_user,
-        $anonymous_user,
-      ],
+      'comment' => [$comment1, $comment2, $comment3, $comment4, $comment5],
+      'user' => [$comment_admin_user, $comment_enabled_user, $comment_no_edit_user, $comment_disabled_user, $anonymous_user],
     ];
     $permutations = $this->generatePermutations($combinations);
 

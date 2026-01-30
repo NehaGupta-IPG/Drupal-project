@@ -8,18 +8,16 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 use Drupal\file\FileInterface;
-use Drupal\jsonapi\JsonApiSpec;
 use Drupal\Tests\jsonapi\Traits\CommonCollectionFilterAccessTestPatternsTrait;
 use Drupal\user\Entity\User;
 use GuzzleHttp\RequestOptions;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * JSON:API integration test for the "File" content entity type.
+ *
+ * @group jsonapi
+ * @group #slow
  */
-#[Group('jsonapi')]
-#[RunTestsInSeparateProcesses]
 class FileTest extends ResourceTestBase {
 
   use CommonCollectionFilterAccessTestPatternsTrait;
@@ -72,7 +70,7 @@ class FileTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method): void {
+  protected function setUpAuthorization($method) {
     switch ($method) {
       case 'GET':
         $this->grantPermissionsToTestedRole(['access content']);
@@ -95,7 +93,7 @@ class FileTest extends ResourceTestBase {
   /**
    * Makes the current user the file owner.
    */
-  protected function makeCurrentUserFileOwner(): void {
+  protected function makeCurrentUserFileOwner() {
     $account = User::load(2);
     $this->entity->setOwnerId($account->id());
     $this->entity->setOwner($account);
@@ -141,10 +139,10 @@ class FileTest extends ResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
+            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
           ],
         ],
-        'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
+        'version' => '1.0',
       ],
       'links' => [
         'self' => ['href' => $self_url],
@@ -203,16 +201,11 @@ class FileTest extends ResourceTestBase {
   }
 
   /**
-   * Tests POST/PATCH/DELETE for an individual resource.
+   * {@inheritdoc}
    */
-  public function testIndividual(): void {
+  public function testPostIndividual(): void {
     // @todo https://www.drupal.org/node/1927648
-    // Add doTestPostIndividual().
-    $this->doTestPatchIndividual();
-    $this->entity = $this->resaveEntity($this->entity, $this->account);
-    $this->revokePermissions();
-    $this->config('jsonapi.settings')->set('read_only', TRUE)->save(TRUE);
-    $this->doTestDeleteIndividual();
+    $this->markTestSkipped();
   }
 
   /**

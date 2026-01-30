@@ -192,6 +192,13 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function deleteMultiple(array $keys) {
+    parent::deleteMultiple($keys);
+  }
+
+  /**
    * Defines the schema for the key_value_expire table.
    */
   public static function schemaDefinition() {

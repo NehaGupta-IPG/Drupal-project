@@ -4,19 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Component\PhpStorage;
 
-use Drupal\Component\PhpStorage\FileReadOnlyStorage;
 use Drupal\Component\PhpStorage\FileStorage;
+use Drupal\Component\PhpStorage\FileReadOnlyStorage;
 use Drupal\Component\Utility\Random;
 use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 
 /**
- * Tests Drupal\Component\PhpStorage\FileReadOnlyStorage.
+ * @coversDefaultClass \Drupal\Component\PhpStorage\FileReadOnlyStorage
+ *
+ * @group Drupal
+ * @group PhpStorage
  */
-#[CoversClass(FileReadOnlyStorage::class)]
-#[Group('Drupal')]
-#[Group('PhpStorage')]
 class FileStorageReadOnlyTest extends PhpStorageTestBase {
 
   use ExpectDeprecationTrait;
@@ -85,7 +83,7 @@ class FileStorageReadOnlyTest extends PhpStorageTestBase {
   }
 
   /**
-   * Tests delete all.
+   * @covers ::deleteAll
    */
   public function testDeleteAll(): void {
     // Random generator.

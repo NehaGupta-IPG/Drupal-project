@@ -6,7 +6,6 @@ namespace Drupal\Tests\field_ui\Functional;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\node\Entity\NodeType;
-use Drupal\Tests\node\Traits\NodeAccessTrait;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
@@ -15,14 +14,15 @@ use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 /**
  * Tests the Field UI "Manage fields" screen.
  */
-abstract class ManageFieldsFunctionalTestBase extends BrowserTestBase {
+class ManageFieldsFunctionalTestBase extends BrowserTestBase {
 
-  use EntityReferenceFieldCreationTrait;
   use FieldUiTestTrait;
-  use NodeAccessTrait;
+  use EntityReferenceFieldCreationTrait;
 
   /**
-   * {@inheritdoc}
+   * Modules to install.
+   *
+   * @var array
    */
   protected static $modules = [
     'node',
@@ -138,7 +138,7 @@ abstract class ManageFieldsFunctionalTestBase extends BrowserTestBase {
 
     // Setup node access testing.
     node_access_rebuild();
-    $this->addPrivateField(NodeType::load('article'));
+    node_access_test_add_field(NodeType::load('article'));
     \Drupal::state()->set('node_access_test.private', TRUE);
 
   }

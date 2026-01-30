@@ -4,21 +4,22 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\config\Functional;
 
-use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Drupal\language\Entity\ConfigurableLanguage;
 
 // cspell:ignore antilop
+
 /**
  * Tests the listing of configuration entities in a multilingual scenario.
+ *
+ * @group config
  */
-#[Group('config')]
-#[RunTestsInSeparateProcesses]
 class ConfigEntityListMultilingualTest extends BrowserTestBase {
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['config_test', 'language', 'block'];
 
@@ -61,8 +62,7 @@ class ConfigEntityListMultilingualTest extends BrowserTestBase {
       'langcode' => 'hu',
     ];
     $this->submitForm($edit, 'Save');
-    // Ensure that operations for editing the Hungarian entity appear in
-    // English.
+    // Ensure that operations for editing the Hungarian entity appear in English.
     $this->assertSession()->linkByHrefExists('admin/structure/config_test/manage/antilop');
 
     // Get the list page in Hungarian and assert Hungarian admin links

@@ -124,9 +124,13 @@ class Container implements ContainerInterface, ResetInterface {
   /**
    * {@inheritdoc}
    */
-  public function get(string $id, int $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): ?object {
+  public function get($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): ?object {
+    if ($this->hasParameter('_deprecated_service_list')) {
+      if ($deprecation = $this->getParameter('_deprecated_service_list')[$id] ?? '') {
+        @trigger_error($deprecation, E_USER_DEPRECATED);
+      }
+    }
     if (isset($this->aliases[$id])) {
-      $alias = $id;
       $id = $this->aliases[$id];
     }
 
@@ -184,13 +188,6 @@ class Container implements ContainerInterface, ResetInterface {
     }
 
     unset($this->loading[$id]);
-
-    if (isset($this->parameters['_deprecated_service_list'][$id])) {
-      @trigger_error($this->parameters['_deprecated_service_list'][$id], E_USER_DEPRECATED);
-    }
-    if (isset($alias) && isset($this->parameters['_deprecated_service_list'][$alias])) {
-      @trigger_error($this->parameters['_deprecated_service_list'][$alias], E_USER_DEPRECATED);
-    }
 
     return $service;
   }
@@ -308,22 +305,26 @@ class Container implements ContainerInterface, ResetInterface {
   /**
    * {@inheritdoc}
    */
-  public function set(string $id, ?object $service): void {
+  public function set($id, $service): void {
     $this->services[$id] = $service;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function has(string $id): bool {
+  public function has($id): bool {
     return isset($this->aliases[$id]) || isset($this->services[$id]) || isset($this->serviceDefinitions[$id]) || $id === 'service_container';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null {
+  public function getParameter($name): array|bool|string|int|float|NULL {
     if (!\array_key_exists($name, $this->parameters)) {
+      if (!$name) {
+        throw new ParameterNotFoundException('');
+      }
+
       throw new ParameterNotFoundException($name, NULL, NULL, NULL, $this->getParameterAlternatives($name));
     }
 
@@ -333,14 +334,14 @@ class Container implements ContainerInterface, ResetInterface {
   /**
    * {@inheritdoc}
    */
-  public function hasParameter(string $name): bool {
+  public function hasParameter($name): bool {
     return \array_key_exists($name, $this->parameters);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function setParameter(string $name, array|bool|string|int|float|\UnitEnum|null $value): void {
+  public function setParameter($name, $value): void {
     if ($this->frozen) {
       throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
     }
@@ -351,7 +352,7 @@ class Container implements ContainerInterface, ResetInterface {
   /**
    * {@inheritdoc}
    */
-  public function initialized(string $id): bool {
+  public function initialized($id): bool {
     if (isset($this->aliases[$id])) {
       $id = $this->aliases[$id];
     }

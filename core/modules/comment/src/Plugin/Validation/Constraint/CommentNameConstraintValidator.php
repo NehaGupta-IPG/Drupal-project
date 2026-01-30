@@ -2,7 +2,6 @@
 
 namespace Drupal\comment\Plugin\Validation\Constraint;
 
-use Drupal\comment\AnonymousContact;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\user\UserStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -70,7 +69,7 @@ class CommentNameConstraintValidator extends ConstraintValidator implements Cont
     // can't validate this without a valid commented entity, which will fail
     // the validation elsewhere.
     if ($owner_id === 0 && empty($author_name) && $entity->getCommentedEntity() && $entity->getFieldName() &&
-      $this->getAnonymousContactDetailsSetting($entity) === AnonymousContact::Required) {
+      $this->getAnonymousContactDetailsSetting($entity) === CommentInterface::ANONYMOUS_MUST_CONTACT) {
       $this->context->buildViolation($constraint->messageRequired)
         ->atPath('name')
         ->addViolation();
@@ -83,15 +82,15 @@ class CommentNameConstraintValidator extends ConstraintValidator implements Cont
    * @param \Drupal\comment\CommentInterface $comment
    *   The entity.
    *
-   * @return \Drupal\comment\AnonymousContact
+   * @return int
    *   The anonymous contact setting.
    */
-  protected function getAnonymousContactDetailsSetting(CommentInterface $comment): AnonymousContact {
-    return AnonymousContact::tryFrom($comment
+  protected function getAnonymousContactDetailsSetting(CommentInterface $comment) {
+    return $comment
       ->getCommentedEntity()
       ->get($comment->getFieldName())
       ->getFieldDefinition()
-      ->getSetting('anonymous'));
+      ->getSetting('anonymous');
   }
 
 }

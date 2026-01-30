@@ -17,7 +17,9 @@ abstract class MediaJavascriptTestBase extends WebDriverTestBase {
   use MediaTypeCreationTrait;
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = [
     'system',

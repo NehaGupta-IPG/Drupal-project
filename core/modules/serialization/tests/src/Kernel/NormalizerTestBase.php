@@ -14,7 +14,9 @@ use Drupal\field\Entity\FieldStorageConfig;
 abstract class NormalizerTestBase extends KernelTestBase {
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = [
     'serialization',

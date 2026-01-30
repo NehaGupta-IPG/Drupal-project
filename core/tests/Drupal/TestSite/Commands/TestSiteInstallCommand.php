@@ -9,9 +9,9 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Test\FunctionalTestSetupTrait;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\Core\Test\TestSetupTrait;
-use Drupal\Tests\RandomGeneratorTrait;
 use Drupal\TestSite\TestPreinstallInterface;
 use Drupal\TestSite\TestSetupInterface;
+use Drupal\Tests\RandomGeneratorTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -51,6 +51,12 @@ class TestSiteInstallCommand extends Command {
    */
   protected array $originalShutdownCallbacks = [];
 
+  /**
+   * The translation file directory for the test environment.
+   *
+   * This is set in BrowserTestBase::prepareEnvironment().
+   */
+  protected string $translationFilesDirectory;
 
   /**
    * The config importer that can be used in a test.
@@ -79,6 +85,17 @@ class TestSiteInstallCommand extends Command {
    * @var string
    */
   protected $langcode = 'en';
+
+  /**
+   * {@inheritdoc}
+   *
+   * @todo Remove and fix test to not rely on super user.
+   * @see https://www.drupal.org/project/drupal/issues/3437620
+   */
+  public function __construct(?string $name = NULL) {
+    parent::__construct($name);
+    $this->usesSuperUserAccessPolicy = TRUE;
+  }
 
   /**
    * {@inheritdoc}
@@ -212,7 +229,7 @@ class TestSiteInstallCommand extends Command {
    * @param string $langcode
    *   (optional) The language to install the site in.
    */
-  public function setup($profile = 'testing', $setup_class = NULL, $langcode = 'en'): void {
+  public function setup($profile = 'testing', $setup_class = NULL, $langcode = 'en') {
     $this->profile = $profile;
     $this->langcode = $langcode;
     $this->setupBaseUrl();
@@ -280,18 +297,18 @@ class TestSiteInstallCommand extends Command {
   }
 
   /**
-   * Changes the database connection to the prefixed one.
+   * {@inheritdoc}
    */
-  protected function changeDatabasePrefix(): void {
+  protected function changeDatabasePrefix() {
     // Ensure that we use the database from SIMPLETEST_DB environment variable.
     Database::removeConnection('default');
     $this->changeDatabasePrefixTrait();
   }
 
   /**
-   * Generates a database prefix for the site installation.
+   * {@inheritdoc}
    */
-  protected function prepareDatabasePrefix(): void {
+  protected function prepareDatabasePrefix() {
     // Override this method so that we can force a lock to be created.
     $test_db = new TestDatabase(NULL, TRUE);
     $this->siteDirectory = $test_db->getTestSitePath();

@@ -17,9 +17,9 @@ class NodeTypeListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header['title'] = $this->t('Name');
+    $header['title'] = t('Name');
     $header['description'] = [
-      'data' => $this->t('Description'),
+      'data' => t('Description'),
       'class' => [RESPONSIVE_PRIORITY_MEDIUM],
     ];
     return $header + parent::buildHeader();
@@ -40,7 +40,7 @@ class NodeTypeListBuilder extends ConfigEntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  protected function getDefaultOperations(EntityInterface $entity/* , ?CacheableMetadata $cacheability = NULL */) {
+  public function getDefaultOperations(EntityInterface $entity) {
     $operations = parent::getDefaultOperations($entity);
     // Place the edit operation after the operations added by field_ui.module
     // which have the weights 15, 20, 25.

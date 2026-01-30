@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Drupal\block_test\Plugin\Block;
 
 use Drupal\Core\Block\Attribute\Block;
@@ -21,7 +19,7 @@ class TestCacheBlock extends BlockBase {
    * {@inheritdoc}
    */
   public function build() {
-    $content = \Drupal::keyValue('block_test')->get('content');
+    $content = \Drupal::state()->get('block_test.content');
 
     $build = [];
     if (!empty($content)) {

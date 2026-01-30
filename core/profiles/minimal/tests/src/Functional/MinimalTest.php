@@ -8,22 +8,17 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\RequirementsPageTrait;
 use Drupal\Tests\SchemaCheckTestTrait;
 use Drupal\user\UserInterface;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Minimal installation profile expectations.
+ *
+ * @group minimal
  */
-#[Group('minimal')]
-#[RunTestsInSeparateProcesses]
 class MinimalTest extends BrowserTestBase {
 
   use SchemaCheckTestTrait;
   use RequirementsPageTrait;
 
-  /**
-   * {@inheritdoc}
-   */
   protected $profile = 'minimal';
 
   /**

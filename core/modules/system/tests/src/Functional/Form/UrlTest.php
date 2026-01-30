@@ -6,20 +6,22 @@ namespace Drupal\Tests\system\Functional\Form;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Tests\BrowserTestBase;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the form API URL element.
+ *
+ * @group Form
  */
-#[Group('Form')]
-#[RunTestsInSeparateProcesses]
 class UrlTest extends BrowserTestBase {
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['form_test'];
+
+  protected $profile = 'testing';
 
   /**
    * {@inheritdoc}

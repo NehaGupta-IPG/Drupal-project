@@ -14,7 +14,7 @@ trait RequirementsPageTrait {
   /**
    * Handles the update requirements page.
    */
-  protected function updateRequirementsProblem(): void {
+  protected function updateRequirementsProblem() {
     // Assert a warning is shown on older test environments.
     $links = $this->getSession()->getPage()->findAll('named', ['link', 'try again']);
 
@@ -37,7 +37,7 @@ trait RequirementsPageTrait {
    *   next screen of the installer. If an expected warning is not found, or if
    *   a warning not in the list is present, a fail is raised.
    */
-  protected function continueOnExpectedWarnings($expected_warnings = []): void {
+  protected function continueOnExpectedWarnings($expected_warnings = []) {
     $this->assertSession()->pageTextNotContains('Errors found');
     $this->assertWarningSummaries($expected_warnings);
     $this->clickLink('continue anyway');
@@ -54,7 +54,7 @@ trait RequirementsPageTrait {
    *   A list of warning summaries to expect on the requirements screen (e.g.
    *   'PHP', 'PHP OPcode caching', etc.).
    */
-  protected function assertWarningSummaries(array $summaries): void {
+  protected function assertWarningSummaries(array $summaries) {
     $this->assertRequirementSummaries($summaries, 'warning');
   }
 
@@ -68,7 +68,7 @@ trait RequirementsPageTrait {
    *   A list of error summaries to expect on the requirements screen (e.g.
    *   'PHP', 'PHP OPcode caching', etc.).
    */
-  protected function assertErrorSummaries(array $summaries): void {
+  protected function assertErrorSummaries(array $summaries) {
     $this->assertRequirementSummaries($summaries, 'error');
   }
 
@@ -84,7 +84,7 @@ trait RequirementsPageTrait {
    * @param string $type
    *   The type of requirement, either 'warning' or 'error'.
    */
-  protected function assertRequirementSummaries(array $summaries, string $type): void {
+  protected function assertRequirementSummaries(array $summaries, string $type) {
     // The selectors are different for Claro.
     $is_claro = stripos($this->getSession()->getPage()->getContent(), 'claro/css/theme/maintenance-page.css') !== FALSE;
 

@@ -15,7 +15,9 @@ use Drupal\Tests\field\Functional\FieldTestBase;
 abstract class OptionsDynamicValuesTestBase extends FieldTestBase {
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['options', 'entity_test', 'options_test'];
 
@@ -58,7 +60,7 @@ abstract class OptionsDynamicValuesTestBase extends FieldTestBase {
       'type' => 'list_string',
       'cardinality' => 1,
       'settings' => [
-        'allowed_values_function' => '\Drupal\options_test\OptionsAllowedValues::dynamicValues',
+        'allowed_values_function' => 'options_test_dynamic_values_callback',
       ],
     ]);
     $this->fieldStorage->save();
@@ -77,7 +79,7 @@ abstract class OptionsDynamicValuesTestBase extends FieldTestBase {
       ->save();
 
     // Create an entity and prepare test data that will be used by
-    // \Drupal\options_test\OptionsAllowedValues::dynamicValues().
+    // options_test_dynamic_values_callback().
     $values = [
       'user_id' => mt_rand(1, 10),
       'name' => $this->randomMachineName(),

@@ -4,27 +4,28 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\contact\Functional;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Test\AssertMailTrait;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
 use Drupal\user\RoleInterface;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests personal contact form functionality.
+ *
+ * @group contact
  */
-#[Group('contact')]
-#[RunTestsInSeparateProcesses]
 class ContactPersonalTest extends BrowserTestBase {
 
   use AssertMailTrait;
   use AssertPageCacheContextsAndTagsTrait;
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['contact', 'dblog', 'mail_html_test'];
 
@@ -107,7 +108,12 @@ class ContactPersonalTest extends BrowserTestBase {
     $this->drupalLogin($this->adminUser);
     // Verify that the correct watchdog message has been logged.
     $this->drupalGet('/admin/reports/dblog');
-    $this->assertSession()->responseContains($this->webUser->getAccountName() . " (" . HTML::escape($this->webUser->getEmail()) . ") sent " . $this->contactUser->getAccountName() . " an email.");
+    $placeholders = [
+      '@sender_name' => $this->webUser->getAccountName(),
+      '@sender_email' => $this->webUser->getEmail(),
+      '@recipient_name' => $this->contactUser->getAccountName(),
+    ];
+    $this->assertSession()->responseContains(new FormattableMarkup('@sender_name (@sender_email) sent @recipient_name an email.', $placeholders));
     // Ensure an unescaped version of the email does not exist anywhere.
     $this->assertSession()->responseNotContains($this->webUser->getEmail());
 
@@ -123,7 +129,7 @@ class ContactPersonalTest extends BrowserTestBase {
     // Assert mail content.
     $this->assertMailString('body', 'Hello ' . $this->contactUser->getDisplayName(), 1);
     $this->assertMailString('body', $this->webUser->getDisplayName(), 1);
-    $this->assertMailString('body', Html::escape($message['message[0][value]']), 1);
+    $this->assertMailString('body', Html::Escape($message['message[0][value]']), 1);
   }
 
   /**
@@ -295,7 +301,7 @@ class ContactPersonalTest extends BrowserTestBase {
    * @param bool $contact_value
    *   (optional) The value the contact field should be set too.
    */
-  protected function checkContactAccess($response, $contact_value = NULL): void {
+  protected function checkContactAccess($response, $contact_value = NULL) {
     $this->drupalLogin($this->adminUser);
     $this->drupalGet('admin/people/create');
     if ($this->config('contact.settings')->get('user_default_enabled', TRUE)) {
@@ -389,8 +395,7 @@ class ContactPersonalTest extends BrowserTestBase {
 
     // Tests that the opt-out message is not included in admin user copy emails.
     $this->assertStringNotContainsString($opt_out_message, $user_copy_emails[0]['body'], 'Opt-out message not included in admin user copy email.');
-    // Tests that the opt-out message is not included in non-admin user copy
-    // emails.
+    // Tests that the opt-out message is not included in non-admin user copy emails.
     $this->assertStringNotContainsString($opt_out_message, $user_copy_emails[1]['body'], 'Opt-out message not included in non-admin user copy email.');
   }
 

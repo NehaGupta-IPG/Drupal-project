@@ -7,9 +7,9 @@ import { getMediaCaptionFromModelSelection } from './utils';
 /**
  * Gets the caption model element from the media model selection.
  *
- * @param {module:engine/model/element~ModelElement} drupalMediaModelElement
+ * @param {module:engine/model/element~Element} drupalMediaModelElement
  *   The model element from which caption should be retrieved.
- * @returns {module:engine/model/element~ModelElement|null}
+ * @returns {module:engine/model/element~Element|null}
  *   The caption element or `null` if the selection has no child caption
  *   element.
  */

@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
@@ -15,14 +14,12 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  */
 class RegisterServicesForDestructionPass implements CompilerPassInterface {
 
-  use PriorityTaggedServiceTrait;
-
   /**
    * {@inheritdoc}
    */
   public function process(ContainerBuilder $container): void {
-    $service_ids = array_values(array_map(strval(...), $this->findAndSortTaggedServices('needs_destruction', $container)));
-    $container->setParameter('kernel.destructable_services', $service_ids);
+    $services = $container->findTaggedServiceIds('needs_destruction');
+    $container->setParameter('kernel.destructable_services', array_keys($services));
   }
 
 }

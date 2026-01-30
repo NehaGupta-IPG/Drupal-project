@@ -18,16 +18,15 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
 use GuzzleHttp\RequestOptions;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * JSON:API regression tests.
  *
+ * @group jsonapi
+ * @group #slow
+ *
  * @internal
  */
-#[Group('jsonapi')]
-#[RunTestsInSeparateProcesses]
 class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
 
   use CommentTestTrait;
@@ -94,7 +93,7 @@ class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
       'node',
       'page',
       'field_test',
-      'Test',
+      NULL,
       'user',
       'default',
       [
@@ -146,7 +145,7 @@ class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
       'node',
       'journal_article',
       'field_issue',
-      'Issue',
+      NULL,
       'node',
       'default',
       [
@@ -454,7 +453,7 @@ class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
     $this->assertSame(422, $response->getStatusCode());
     $this->assertNotNull($data);
     // cSpell:disable-next-line
-    $this->assertSame("The properties 'form', 'sumary', 'foobar' do not exist on the 'body' field of type 'text_long'. Writable properties are: 'value', 'format'.", $data['errors'][0]['detail']);
+    $this->assertSame("The properties 'form', 'sumary', 'foobar' do not exist on the 'body' field of type 'text_with_summary'. Writable properties are: 'value', 'format', 'summary'.", $data['errors'][0]['detail']);
 
     $request_options = [
       RequestOptions::HEADERS => [
@@ -487,7 +486,7 @@ class JsonApiPatchRegressionTest extends JsonApiFunctionalTestBase {
     $this->assertSame(422, $response->getStatusCode());
     $this->assertNotNull($data);
     // cSpell:disable-next-line
-    $this->assertSame("The properties 'form', 'sumary' do not exist on the 'body' field of type 'text_long'. Writable properties are: 'value', 'format'.", $data['errors'][0]['detail']);
+    $this->assertSame("The properties 'form', 'sumary' do not exist on the 'body' field of type 'text_with_summary'. Did you mean 'format', 'summary'?", $data['errors'][0]['detail']);
   }
 
 }

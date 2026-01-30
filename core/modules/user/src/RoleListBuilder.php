@@ -65,7 +65,7 @@ class RoleListBuilder extends DraggableListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header['label'] = $this->t('Name');
+    $header['label'] = t('Name');
     return $header + parent::buildHeader();
   }
 
@@ -80,12 +80,12 @@ class RoleListBuilder extends DraggableListBuilder {
   /**
    * {@inheritdoc}
    */
-  protected function getDefaultOperations(EntityInterface $entity/* , ?CacheableMetadata $cacheability = NULL */) {
+  public function getDefaultOperations(EntityInterface $entity) {
     $operations = parent::getDefaultOperations($entity);
 
     if ($entity->hasLinkTemplate('edit-permissions-form')) {
       $operations['permissions'] = [
-        'title' => $this->t('Edit permissions'),
+        'title' => t('Edit permissions'),
         'weight' => 20,
         'url' => $entity->toUrl('edit-permissions-form'),
       ];

@@ -84,15 +84,6 @@ required_label:
 plural_label:
   type: label
   label: 'Plural variants'
-  constraints:
-    Regex:
-      # Normally, labels cannot contain invisible control characters. In this particular
-      # case, an invisible character (ASCII 3, 0x03) is used to encode translation
-      # information, so carve out an exception for that only.
-      # @see \Drupal\views\Plugin\views\field\NumericField
-      pattern: '/([^\PC\x03])/u'
-      match: false
-      message: 'Labels are not allowed to span multiple lines or contain control characters.'
 
 # Internal Drupal path
 path:
@@ -200,13 +191,11 @@ _core_config_info:
       label: 'Default configuration hash'
       constraints:
         NotNull: []
-        Regex:
-          pattern: '/^[a-zA-Z0-9\-_]+$/'
+        Regex: '/^[a-zA-Z0-9\-_]+$/'
         # The hash is a base64-encoded version of the config's SHA-256 hash. Given
         # the deterministic length of a SHA-256 hash, and the way base64 encoding
         # works, this is always going to be 43 characters long.
-        Length:
-          exactly: 43
+        Length: 43
   constraints:
     ValidKeys: ['default_config_hash']
 
@@ -456,14 +445,8 @@ block_settings:
       type: label
       label: 'Description'
     label_display:
-      type: string
+      type: label
       label: 'Display title'
-      constraints:
-        Choice:
-          choices:
-            - '0'
-            - visible
-        NotBlank: []
     provider:
       type: string
       label: 'Provider of this block plugin'
@@ -554,23 +537,12 @@ field_config_base:
     id:
       type: string
       label: 'ID'
-      constraints:
-        StringEqualsConcatenatedValues:
-          separator: .
-          values:
-            - '%parent.entity_type'
-            - '%parent.bundle'
-            - '%parent.field_name'
     field_name:
-      type: machine_name
+      type: string
       label: 'Field name'
     entity_type:
       type: string
       label: 'Entity type'
-      constraints:
-        PluginExists:
-          manager: 'entity_type.manager'
-          interface: '\Drupal\Core\Entity\FieldableEntityInterface'
     bundle:
       type: string
       label: 'Bundle'
@@ -606,14 +578,10 @@ field_config_base:
         PluginExists:
           manager: plugin.manager.field.field_type
           interface: '\Drupal\Core\Field\FieldItemInterface'
-  constraints:
-    FullyValidatable: ~
 
 core.base_field_override.*.*.*:
   type: field_config_base
   label: 'Base field bundle override'
-  constraints:
-    FullyValidatable: ~
 
 core.date_format.*:
   type: config_entity
@@ -972,18 +940,6 @@ field.value.timestamp:
       type: timestamp
       label: 'Value'
 
-field.value.language:
-  type: mapping
-  label: 'Language value'
-  mapping:
-    value:
-      # Not this doesn't make use of type: langcode because that doesn't allow null values.
-      type: string
-      label: 'Language value'
-      constraints:
-        Choice:
-          callback: 'Drupal\Core\TypedData\Plugin\DataType\LanguageReference::getAllValidLangcodes'
-
 # Text with a text format.
 text_format:
   type: mapping
@@ -1141,25 +1097,10 @@ mailer_dsn.options.smtp:
   type: mapping
   label: 'SMTP options'
   mapping:
-    auto_tls:
-      type: boolean
-      nullable: true
-      label: 'Whether or not to enable TLS opportunistically (defaults to true).'
-    require_tls:
-      type: boolean
-      nullable: true
-      label: 'Whether or not to enforce TLS (defaults to false).'
     verify_peer:
       type: boolean
       nullable: true
       label: 'TLS Peer Verification (defaults to true)'
-    source_ip:
-      type: string
-      nullable: true
-      label: 'Bind to a specific IPv4 or IPv6 address (no default).'
-      constraints:
-        UriHost:
-          message: 'The source IP should conform to RFC 3986 URI host component.'
     peer_fingerprint:
       type: string
       nullable: true
@@ -1184,25 +1125,29 @@ mailer_dsn.options.smtp:
       nullable: true
       label: 'Maximum number of messages to send before re-starting the transport (defaults to 100 messages)'
       constraints:
-        PositiveOrZero: ~
+        Range:
+          min: 0
     restart_threshold_sleep:
       type: float
       nullable: true
       label: 'Number of seconds to sleep between stopping and re-starting the transport (defaults to no delay)'
       constraints:
-        PositiveOrZero: ~
+        Range:
+          min: 0
     ping_threshold:
       type: integer
       nullable: true
       label: 'The minimum number of seconds between two messages required to ping the server (defaults to 100 seconds)'
       constraints:
-        PositiveOrZero: ~
+        Range:
+          min: 0
     max_per_second:
       type: integer
       nullable: true
       label: 'The number of messages to send per second (defaults to no limit)'
       constraints:
-        PositiveOrZero: ~
+        Range:
+          min: 0
 
 mailer_dsn.options.smtps:
   type: mailer_dsn.options.smtp

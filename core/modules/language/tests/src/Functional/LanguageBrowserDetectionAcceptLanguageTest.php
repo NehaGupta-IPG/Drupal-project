@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\language\Functional;
 
-use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Drupal\language\Entity\ConfigurableLanguage;
 
 /**
  * Tests browser language detection with different accept-language headers.
+ *
+ * @group language
  */
-#[Group('language')]
-#[RunTestsInSeparateProcesses]
 class LanguageBrowserDetectionAcceptLanguageTest extends BrowserTestBase {
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = [
     'language',
@@ -89,33 +89,32 @@ class LanguageBrowserDetectionAcceptLanguageTest extends BrowserTestBase {
 
     $this->drupalGet('/system-test/echo/language test', [], ['Accept-Language' => 'en']);
     $this->assertSession()->responseHeaderEquals('Content-Language', 'en');
-    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'UNCACHEABLE (response policy)');
+    $this->assertSession()->responseHeaderDoesNotExist('X-Drupal-Cache');
 
     // Check with UK browser.
     $this->drupalGet('/system-test/echo/language test', [], ['Accept-Language' => 'en-UK,en']);
     $this->assertSession()->responseHeaderEquals('Content-Language', 'en');
-    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'UNCACHEABLE (response policy)');
+    $this->assertSession()->responseHeaderDoesNotExist('X-Drupal-Cache');
 
     // Check with french browser.
     $this->drupalGet('/system-test/echo/language test', [], ['Accept-Language' => 'fr-FR,fr']);
     $this->assertSession()->responseHeaderEquals('Content-Language', 'fr');
-    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'UNCACHEABLE (response policy)');
+    $this->assertSession()->responseHeaderDoesNotExist('X-Drupal-Cache');
 
-    // Check with browser without language settings - should return fallback
-    // language.
+    // Check with browser without language settings - should return fallback language.
     $this->drupalGet('/system-test/echo/language test', [], ['Accept-Language' => '']);
     $this->assertSession()->responseHeaderEquals('Content-Language', 'en');
-    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'UNCACHEABLE (response policy)');
+    $this->assertSession()->responseHeaderDoesNotExist('X-Drupal-Cache');
 
     // Check with french browser again.
     $this->drupalGet('/system-test/echo/language test', [], ['Accept-Language' => 'fr-FR,fr']);
     $this->assertSession()->responseHeaderEquals('Content-Language', 'fr');
-    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'UNCACHEABLE (response policy)');
+    $this->assertSession()->responseHeaderDoesNotExist('X-Drupal-Cache');
 
     // Check with UK browser.
     $this->drupalGet('/system-test/echo/language test', [], ['Accept-Language' => 'en-UK,en']);
     $this->assertSession()->responseHeaderEquals('Content-Language', 'en');
-    $this->assertSession()->responseHeaderEquals('X-Drupal-Cache', 'UNCACHEABLE (response policy)');
+    $this->assertSession()->responseHeaderDoesNotExist('X-Drupal-Cache');
 
     // Check if prefixed URLs are still cached.
     $this->drupalGet('/en/system-test/echo/language test', [], ['Accept-Language' => 'en']);

@@ -19,7 +19,6 @@ use Drupal\Core\Render\Element;
  * - #pattern: A string for the native HTML5 pattern attribute.
  *
  * Usage example:
- *
  * @code
  * $form['title'] = [
  *   '#type' => 'textfield',
@@ -32,8 +31,15 @@ use Drupal\Core\Render\Element;
  * ];
  * @endcode
  *
- * @see \Drupal\Core\Render\Element
- * @see \Drupal\Core\Render\Element\Textarea
+ * @see \Drupal\Core\Render\Element\Color
+ * @see \Drupal\Core\Render\Element\Email
+ * @see \Drupal\Core\Render\Element\MachineName
+ * @see \Drupal\Core\Render\Element\Number
+ * @see \Drupal\Core\Render\Element\Password
+ * @see \Drupal\Core\Render\Element\PasswordConfirm
+ * @see \Drupal\Core\Render\Element\Range
+ * @see \Drupal\Core\Render\Element\Tel
+ * @see \Drupal\Core\Render\Element\Url
  */
 #[FormElement('textfield')]
 class Textfield extends FormElementBase {
@@ -42,20 +48,21 @@ class Textfield extends FormElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
+    $class = static::class;
     return [
       '#input' => TRUE,
       '#size' => 60,
       '#maxlength' => 128,
       '#autocomplete_route_name' => FALSE,
       '#process' => [
-        [static::class, 'processAutocomplete'],
-        [static::class, 'processAjaxForm'],
-        [static::class, 'processPattern'],
-        [static::class, 'processGroup'],
+        [$class, 'processAutocomplete'],
+        [$class, 'processAjaxForm'],
+        [$class, 'processPattern'],
+        [$class, 'processGroup'],
       ],
       '#pre_render' => [
-        [static::class, 'preRenderTextfield'],
-        [static::class, 'preRenderGroup'],
+        [$class, 'preRenderTextfield'],
+        [$class, 'preRenderGroup'],
       ],
       '#theme' => 'input__textfield',
       '#theme_wrappers' => ['form_element'],

@@ -4,22 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\content_translation\Functional;
 
-use Drupal\content_translation\Hook\ContentTranslationFormLanguageHooks;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\file\Entity\File;
 use Drupal\Tests\TestFileCreationTrait;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the field synchronization behavior for the image field.
+ *
+ * @covers ::_content_translation_form_language_content_settings_form_alter
+ * @group content_translation
  */
-#[Group('content_translation')]
-#[CoversClass(ContentTranslationFormLanguageHooks::class)]
-#[RunTestsInSeparateProcesses]
 class ContentTranslationSyncImageTest extends ContentTranslationTestBase {
 
   use TestFileCreationTrait {
@@ -46,7 +42,9 @@ class ContentTranslationSyncImageTest extends ContentTranslationTestBase {
   protected $files;
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = [
     'language',
@@ -68,7 +66,7 @@ class ContentTranslationSyncImageTest extends ContentTranslationTestBase {
   /**
    * Creates the test image field.
    */
-  protected function setupTestFields(): void {
+  protected function setupTestFields() {
     $this->fieldName = 'field_test_et_ui_image';
     $this->cardinality = 3;
 
@@ -266,7 +264,7 @@ class ContentTranslationSyncImageTest extends ContentTranslationTestBase {
    * @return \Drupal\Core\Entity\EntityInterface
    *   The saved entity.
    */
-  protected function saveEntity(EntityInterface $entity): EntityInterface {
+  protected function saveEntity(EntityInterface $entity) {
     $entity->save();
     $entity = \Drupal::entityTypeManager()->getStorage('entity_test_mul')->loadUnchanged($entity->id());
     return $entity;

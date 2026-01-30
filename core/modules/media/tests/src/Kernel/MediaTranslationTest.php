@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media\Kernel;
 
-use Drupal\content_translation\ContentTranslationHandler;
 use Drupal\language\Entity\ConfigurableLanguage;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Drupal\content_translation\ContentTranslationHandler;
 
 /**
  * Tests multilingual fields logic.
+ *
+ * @group media
  */
-#[Group('media')]
-#[RunTestsInSeparateProcesses]
 class MediaTranslationTest extends MediaKernelTestBase {
 
   /**
-   * {@inheritdoc}
+   * Modules to install.
+   *
+   * @var array
    */
   protected static $modules = ['language' , 'content_translation'];
 

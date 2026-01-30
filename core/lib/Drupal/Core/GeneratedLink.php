@@ -30,7 +30,6 @@ class GeneratedLink extends BubbleableMetadata implements MarkupInterface, \Coun
    * Gets the generated link.
    *
    * @return string
-   *   The generated link.
    */
   public function getGeneratedLink() {
     return $this->generatedLink;

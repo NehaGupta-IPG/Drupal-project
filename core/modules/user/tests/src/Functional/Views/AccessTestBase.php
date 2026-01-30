@@ -10,7 +10,9 @@ namespace Drupal\Tests\user\Functional\Views;
 abstract class AccessTestBase extends UserTestBase {
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['block'];
 

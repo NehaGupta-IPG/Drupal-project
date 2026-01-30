@@ -4,9 +4,6 @@ namespace Drupal\Core\Cache;
 
 use Drupal\Component\Datetime\TimeInterface;
 
-/**
- * Defines a PHP cache backend factory.
- */
 class PhpBackendFactory implements CacheFactoryInterface {
 
   /**
@@ -31,7 +28,7 @@ class PhpBackendFactory implements CacheFactoryInterface {
   /**
    * Gets PhpBackend for the specified cache bin.
    *
-   * @param string $bin
+   * @param $bin
    *   The cache bin for which the object is created.
    *
    * @return \Drupal\Core\Cache\PhpBackend

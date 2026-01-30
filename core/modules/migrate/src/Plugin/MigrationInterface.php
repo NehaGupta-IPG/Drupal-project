@@ -89,7 +89,7 @@ interface MigrationInterface extends PluginInspectionInterface, DerivativeInspec
    * An alias for getPluginId() for backwards compatibility reasons.
    *
    * @return string
-   *   The plugin ID of the plugin instance.
+   *   The plugin_id of the plugin instance.
    *
    * @see \Drupal\migrate\Plugin\MigrationInterface::getPluginId()
    */
@@ -107,7 +107,6 @@ interface MigrationInterface extends PluginInspectionInterface, DerivativeInspec
    * Get a list of required plugin IDs.
    *
    * @return string[]
-   *   An array of required plugin IDs.
    */
   public function getRequirements(): array;
 
@@ -122,11 +121,8 @@ interface MigrationInterface extends PluginInspectionInterface, DerivativeInspec
   /**
    * Returns the process plugins.
    *
-   * @param array|null $process
-   *   (Optional) A process configuration array. Defaults to NULL. If specified,
-   *   then the plugins from the given process array are returned. If not
-   *   specified, then the plugins from this migration's process array are
-   *   returned.
+   * @param array $process
+   *   A process configuration array.
    *
    * @return \Drupal\migrate\Plugin\MigrateProcessInterface[][]
    *   An associative array. The keys are the destination property names. Values
@@ -307,7 +303,6 @@ interface MigrationInterface extends PluginInspectionInterface, DerivativeInspec
    * Indicates if the migration is auditable.
    *
    * @return bool
-   *   TRUE if the migration is auditable, FALSE otherwise.
    */
   public function isAuditable();
 

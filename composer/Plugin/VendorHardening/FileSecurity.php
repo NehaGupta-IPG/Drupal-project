@@ -43,7 +43,7 @@ class FileSecurity {
    * @return string
    *   The desired contents of the .htaccess file.
    *
-   * @see \Drupal\Component\FileSecurity\FileSecurity::writeHtaccess()
+   * @see file_save_htaccess()
    */
   public static function htaccessLines($deny_public_access = TRUE) {
     $lines = static::htaccessPreventExecution();

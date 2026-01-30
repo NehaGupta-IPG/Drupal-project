@@ -35,20 +35,18 @@
  * - page.help: Dynamic help text, mostly for admin pages.
  * - page.content: The main content of the current page.
  *
- * @see \Drupal\Core\Theme\ThemePreprocess::preprocessPage()
+ * @see template_preprocess_page()
  * @see html.html.twig
  */
 #}
   <main>
     <div class="visually-hidden"><a id="main-content" tabindex="-1"></a></div>
-    {% if page.breadcrumb or page.header %}
-      <header class="content-header clearfix">
-        <div class="layout-container">
-          {{ page.breadcrumb }}
-          {{ page.header }}
-        </div>
-      </header>
-    {% endif %}
+    <header class="content-header clearfix">
+      <div class="layout-container">
+        {{ page.breadcrumb }}
+        {{ page.header }}
+      </div>
+    </header>
 
     <div class="layout-container">
       {{ page.pre_content }}

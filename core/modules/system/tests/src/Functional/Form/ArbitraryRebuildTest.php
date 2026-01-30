@@ -7,18 +7,18 @@ namespace Drupal\Tests\system\Functional\Form;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests altering forms to be rebuilt so there are multiple steps.
+ *
+ * @group Form
  */
-#[Group('Form')]
-#[RunTestsInSeparateProcesses]
 class ArbitraryRebuildTest extends BrowserTestBase {
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['text', 'form_test'];
 

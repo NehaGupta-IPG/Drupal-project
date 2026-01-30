@@ -169,7 +169,7 @@ class FileCopy extends FileProcessBase implements ContainerFactoryPluginInterfac
    *   (optional) FileExists::Replace (default) or
    *   FileExists::Rename.
    *
-   * @return string|false
+   * @return string|bool
    *   File destination on success, FALSE on failure.
    */
   protected function writeFile($source, $destination, FileExists|int $fileExists = FileExists::Replace) {
@@ -246,7 +246,6 @@ class FileCopy extends FileProcessBase implements ContainerFactoryPluginInterfac
    *   The URI or path to test.
    *
    * @return bool
-   *   TRUE if the URI is local, FALSE otherwise.
    */
   protected function isLocalUri($uri) {
     $scheme = StreamWrapperManager::getScheme($uri);

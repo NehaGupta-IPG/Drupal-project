@@ -30,7 +30,7 @@ use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\DependentWithRemovalPluginInterface;
 use Drupal\views\ResultRow;
 use Drupal\views\ViewExecutable;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * A field that displays entity field data.
@@ -148,7 +148,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
+   *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -168,20 +168,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle info service.
    */
-  public function __construct(
-    array $configuration,
-    $plugin_id,
-    $plugin_definition,
-    EntityTypeManagerInterface $entity_type_manager,
-    #[Autowire(service: 'plugin.manager.field.formatter')]
-    FormatterPluginManager $formatter_plugin_manager,
-    FieldTypePluginManagerInterface $field_type_plugin_manager,
-    LanguageManagerInterface $language_manager,
-    RendererInterface $renderer,
-    EntityRepositoryInterface $entity_repository,
-    EntityFieldManagerInterface $entity_field_manager,
-    EntityTypeBundleInfoInterface $entity_type_bundle_info,
-  ) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, FormatterPluginManager $formatter_plugin_manager, FieldTypePluginManagerInterface $field_type_plugin_manager, LanguageManagerInterface $language_manager, RendererInterface $renderer, EntityRepositoryInterface $entity_repository, EntityFieldManagerInterface $entity_field_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->entityTypeManager = $entity_type_manager;
@@ -204,6 +191,25 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
   /**
    * {@inheritdoc}
    */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('entity_type.manager'),
+      $container->get('plugin.manager.field.formatter'),
+      $container->get('plugin.manager.field.field_type'),
+      $container->get('language_manager'),
+      $container->get('renderer'),
+      $container->get('entity.repository'),
+      $container->get('entity_field.manager'),
+      $container->get('entity_type.bundle.info')
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function init(ViewExecutable $view, DisplayPluginBase $display, ?array &$options = NULL) {
     parent::init($view, $display, $options);
 
@@ -221,13 +227,13 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
         $this->limit_values = TRUE;
       }
 
-      // If "First and last only" is chosen, limit the values.
+      // If "First and last only" is chosen, limit the values
       if (!empty($this->options['delta_first_last'])) {
         $this->limit_values = TRUE;
       }
 
-      // Otherwise, we only limit values if the user hasn't selected "all", 0,
-      // or the value matching field cardinality.
+      // Otherwise, we only limit values if the user hasn't selected "all", 0, or
+      // the value matching field cardinality.
       if ((($this->options['delta_limit'] > 0) && ($this->options['delta_limit'] != $cardinality)) || intval($this->options['delta_offset'])) {
         $this->limit_values = TRUE;
       }
@@ -248,7 +254,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
    * By default, all needed data is taken from entities loaded by the query
    * plugin. Columns are added only if they are used in groupings.
    */
-  public function query($use_group_by = FALSE) {
+  public function query($use_groupby = FALSE) {
     $fields = $this->additional_fields;
     // No need to add the entity type.
     $entity_type_key = array_search('entity_type', $fields);
@@ -256,7 +262,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
       unset($fields[$entity_type_key]);
     }
 
-    if ($use_group_by) {
+    if ($use_groupby) {
       // Add the fields that we're actually grouping on.
       $options = [];
       if ($this->options['group_column'] != 'entity_id') {
@@ -264,8 +270,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
       }
       $options += is_array($this->options['group_columns']) ? $this->options['group_columns'] : [];
 
-      // Go through the list and determine the actual column name from field
-      // api.
+      // Go through the list and determine the actual column name from field api.
       $fields = [];
       $table_mapping = $this->getTableMapping();
       $field_definition = $this->getFieldStorageDefinition();
@@ -278,7 +283,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     }
 
     // Add additional fields (and the table join itself) if needed.
-    if ($this->add_field_table($use_group_by)) {
+    if ($this->add_field_table($use_groupby)) {
       $this->ensureMyTable();
       $this->addAdditionalFields($fields);
     }
@@ -290,9 +295,9 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
   /**
    * Determine if the field table should be added to the query.
    */
-  public function add_field_table($use_group_by) {
+  public function add_field_table($use_groupby) {
     // Grouping is enabled.
-    if ($use_group_by) {
+    if ($use_groupby) {
       return TRUE;
     }
     // This a multiple value field, but "group multiple values" is not checked.
@@ -352,8 +357,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
    *   The field storage definition used by this handler.
    *
    * @throws \Exception
-   *   If no field storage definition was found for the given entity type and
-   *   field name.
+   *   If no field storage definition was found for the given entity type and field name.
    */
   protected function getFieldStorageDefinition() {
     $entity_type_id = $this->definition['entity_type'];
@@ -675,7 +679,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
   }
 
   /**
-   * Extend the group by form with group columns.
+   * Extend the groupby form with group columns.
    */
   public function buildGroupByForm(&$form, FormStateInterface $form_state) {
     parent::buildGroupByForm($form, $form_state);
@@ -710,9 +714,6 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     ];
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function submitGroupByForm(&$form, FormStateInterface $form_state) {
     parent::submitGroupByForm($form, $form_state);
     $item = &$form_state->get('handler')->options;
@@ -748,7 +749,6 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
       }
       return $this->renderer->render($build);
     }
-    return NULL;
   }
 
   /**
@@ -966,16 +966,10 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     return $processed_entity;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function render_item($count, $item) {
     return $this->renderer->render($item['rendered']);
   }
 
-  /**
-   * {@inheritdoc}
-   */
   protected function documentSelfTokens(&$tokens) {
     $field = $this->getFieldDefinition();
     foreach ($field->getColumns() as $id => $column) {
@@ -983,9 +977,6 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
     }
   }
 
-  /**
-   * {@inheritdoc}
-   */
   protected function addSelfTokens(&$tokens, $item) {
     $field = $this->getFieldDefinition();
     foreach ($field->getColumns() as $id => $column) {

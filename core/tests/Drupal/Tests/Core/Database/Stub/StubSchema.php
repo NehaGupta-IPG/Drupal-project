@@ -16,7 +16,7 @@ class StubSchema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function getFieldTypeMap(): array {
+  public function getFieldTypeMap() {
     return [];
   }
 
@@ -29,7 +29,7 @@ class StubSchema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function dropTable($table): bool {
+  public function dropTable($table) {
     return TRUE;
   }
 
@@ -42,14 +42,14 @@ class StubSchema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function dropField($table, $field): bool {
+  public function dropField($table, $field) {
     return TRUE;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function indexExists($table, $name): bool {
+  public function indexExists($table, $name) {
     return TRUE;
   }
 
@@ -62,7 +62,7 @@ class StubSchema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function dropPrimaryKey($table): bool {
+  public function dropPrimaryKey($table) {
     return TRUE;
   }
 
@@ -75,7 +75,7 @@ class StubSchema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function dropUniqueKey($table, $name): bool {
+  public function dropUniqueKey($table, $name) {
     return TRUE;
   }
 
@@ -88,7 +88,7 @@ class StubSchema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function dropIndex($table, $name): bool {
+  public function dropIndex($table, $name) {
     return TRUE;
   }
 

@@ -6,15 +6,13 @@ namespace Drupal\BuildTests\TestSiteApplication;
 
 use Drupal\BuildTests\Framework\BuildTestBase;
 use Drupal\sqlite\Driver\Database\sqlite\Install\Tasks;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 /**
- * Tests.
+ * @group Build
+ * @group TestSiteApplication
  */
-#[Group('Build')]
-#[Group('TestSiteApplication')]
 class InstallTest extends BuildTestBase {
 
   public function testInstall(): void {

@@ -18,12 +18,12 @@ class BadPluginDefinitionException extends InvalidPluginDefinitionException {
    *   The name of the property that is missing from the plugin.
    * @param int $code
    *   (optional) The exception code. Defaults to 0.
-   * @param \Throwable|null $previous
+   * @param \Exception|null $previous
    *   The previous throwable used for exception chaining.
    *
    * @see \Exception
    */
-  public function __construct($plugin_id, $property, $code = 0, ?\Throwable $previous = NULL) {
+  public function __construct($plugin_id, $property, $code = 0, ?\Exception $previous = NULL) {
     $message = sprintf('The %s plugin must define the %s property.', $plugin_id, $property);
     parent::__construct($plugin_id, $message, $code, $previous);
   }

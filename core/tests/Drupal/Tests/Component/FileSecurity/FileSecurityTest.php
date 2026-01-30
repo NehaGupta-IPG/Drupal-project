@@ -6,19 +6,18 @@ namespace Drupal\Tests\Component\FileSecurity;
 
 use Drupal\Component\FileSecurity\FileSecurity;
 use org\bovigo\vfs\vfsStream;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Tests the file security component.
+ *
+ * @coversDefaultClass \Drupal\Component\FileSecurity\FileSecurity
+ * @group FileSecurity
  */
-#[CoversClass(FileSecurity::class)]
-#[Group('FileSecurity')]
 class FileSecurityTest extends TestCase {
 
   /**
-   * Tests write htaccess private.
+   * @covers ::writeHtaccess
    */
   public function testWriteHtaccessPrivate(): void {
     vfsStream::setup('root');
@@ -31,7 +30,7 @@ class FileSecurityTest extends TestCase {
   }
 
   /**
-   * Tests write htaccess public.
+   * @covers ::writeHtaccess
    */
   public function testWriteHtaccessPublic(): void {
     vfsStream::setup('root');
@@ -44,7 +43,7 @@ class FileSecurityTest extends TestCase {
   }
 
   /**
-   * Tests write htaccess force overwrite.
+   * @covers ::writeHtaccess
    */
   public function testWriteHtaccessForceOverwrite(): void {
     vfsStream::setup('root');
@@ -57,7 +56,7 @@ class FileSecurityTest extends TestCase {
   }
 
   /**
-   * Tests write htaccess failure.
+   * @covers ::writeHtaccess
    */
   public function testWriteHtaccessFailure(): void {
     vfsStream::setup('root');

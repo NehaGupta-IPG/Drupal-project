@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Kernel\Theme;
 
 use Drupal\KernelTests\KernelTestBase;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal's Twig filters.
+ *
+ * @group Theme
  */
-#[Group('Theme')]
-#[RunTestsInSeparateProcesses]
 class TwigFilterTest extends KernelTestBase {
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['twig_theme_test'];
 

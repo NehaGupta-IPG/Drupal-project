@@ -12,7 +12,6 @@ use Drupal\Tests\UnitTestCase;
 use PhpParser\Node;
 use PHPStan\Analyser\Scope;
 use PHPStan\Node\InClassNode;
-use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Rules\Rule;
 use PHPStan\Rules\RuleErrorBuilder;
 
@@ -24,11 +23,6 @@ use PHPStan\Rules\RuleErrorBuilder;
  * @internal
  */
 final class ComponentTestDoesNotExtendCoreTest implements Rule {
-
-  public function __construct(
-    private ReflectionProvider $reflectionProvider,
-  ) {
-  }
 
   /**
    * {@inheritdoc}
@@ -48,16 +42,16 @@ final class ComponentTestDoesNotExtendCoreTest implements Rule {
     }
 
     $invalidParents = [
-      $this->reflectionProvider->getClass(UnitTestCase::class),
-      $this->reflectionProvider->getClass(BuildTestBase::class),
-      $this->reflectionProvider->getClass(KernelTestBase::class),
-      $this->reflectionProvider->getClass(BrowserTestBase::class),
+      UnitTestCase::class,
+      BuildTestBase::class,
+      KernelTestBase::class,
+      BrowserTestBase::class,
     ];
 
     foreach ($invalidParents as $invalidParent) {
-      if ($class->isSubclassOfClass($invalidParent)) {
+      if ($class->isSubclassOf($invalidParent)) {
         return [
-          RuleErrorBuilder::message("Component tests should not extend {$invalidParent->getName()}.")
+          RuleErrorBuilder::message("Component tests should not extend {$invalidParent}.")
             ->line($node->getStartLine())
             ->build(),
         ];

@@ -22,11 +22,8 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Default main content renderer for HTML requests.
  *
- * Attachments in HTML responses are handled by
- * \Drupal\Core\Render\AttachmentsResponseProcessorInterface and
- * \Drupal\Core\Render\HtmlResponseAttachmentsProcessor
- *
- * @see \Drupal\Core\Theme\ThemePreprocess::preprocessHtml()
+ * For attachment handling of HTML responses:
+ * @see template_preprocess_html()
  * @see \Drupal\Core\Render\AttachmentsResponseProcessorInterface
  * @see \Drupal\Core\Render\BareHtmlPageRenderer
  * @see \Drupal\Core\Render\HtmlResponse
@@ -145,8 +142,7 @@ class HtmlRenderer implements MainContentRendererInterface {
     ];
 
     // The special page regions will appear directly in html.html.twig, not in
-    // page.html.twig, hence add them here, just before rendering
-    // html.html.twig.
+    // page.html.twig, hence add them here, just before rendering html.html.twig.
     $this->buildPageTopAndBottom($html);
 
     // Render, but don't replace placeholders yet, because that happens later in
@@ -177,7 +173,7 @@ class HtmlRenderer implements MainContentRendererInterface {
     $content['#cache']['tags'][] = 'rendered';
 
     $response = new HtmlResponse($content, 200, [
-      'Content-Type' => 'text/html; charset=utf-8',
+      'Content-Type' => 'text/html; charset=UTF-8',
     ]);
 
     return $response;

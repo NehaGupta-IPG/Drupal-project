@@ -25,21 +25,17 @@ class EntityAccessCheck implements AccessInterface {
    *
    * For example, this route configuration invokes a permissions check for
    * 'update' access to entities of type 'node':
-   *
    * @code
-   * example.route:
-   *   path: '/foo/{node}/bar'
-   *   requirements:
-   *     _entity_access: 'node.update'
+   * pattern: '/foo/{node}/bar'
+   * requirements:
+   *   _entity_access: 'node.update'
    * @endcode
-   *
    * And this will check 'delete' access to a dynamic entity type:
-   *
    * @code
    * example.route:
-   *   path: '/foo/{entity_type}/{example}'
+   *   path: foo/{entity_type}/{example}
    *   requirements:
-   *     _entity_access: 'example.delete'
+   *     _entity_access: example.delete
    *   options:
    *     parameters:
    *       example:
@@ -51,7 +47,7 @@ class EntityAccessCheck implements AccessInterface {
    * @param \Symfony\Component\Routing\Route $route
    *   The route to check against.
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The parametrized route.
+   *   The parametrized route
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The currently logged in account.
    *

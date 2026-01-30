@@ -7,6 +7,7 @@ const { globSync } = require('glob');
 // Drupal-specific mapping between CKEditor 5 name and Drupal library name.
 const ckeditor5PluginMapping = {
   'block-quote': 'blockquote',
+  essentials: 'internal',
   'basic-styles': 'basic',
 };
 

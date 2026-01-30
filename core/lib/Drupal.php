@@ -15,9 +15,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * The container is built by the kernel and passed in to this class which stores
  * it statically. The container always contains the services from
- * \Drupal\Core\CoreServiceProvider, the service providers of enabled modules
- * and any other service providers defined in
- * $GLOBALS['conf']['container_service_providers'].
+ * \Drupal\Core\CoreServiceProvider, the service providers of enabled modules and any other
+ * service providers defined in $GLOBALS['conf']['container_service_providers'].
  *
  * This class exists only to support legacy code that cannot be dependency
  * injected. If your code needs it, consider refactoring it to be object
@@ -76,7 +75,7 @@ class Drupal {
   /**
    * The current system version.
    */
-  const VERSION = '12.0-dev';
+  const VERSION = '11.0-dev';
 
   /**
    * Core API compatibility.
@@ -132,14 +131,7 @@ class Drupal {
    * message, but Drupal can still be installed. Used for (e.g.) PHP versions
    * that have reached their EOL or will in the near future.
    */
-  const RECOMMENDED_PHP = '8.4';
-
-  /**
-   * Default location of gettext file on the translation server.
-   *
-   * @see locale_translation_default_translation_server()
-   */
-  const TRANSLATION_DEFAULT_SERVER_PATTERN = 'https://ftp.drupal.org/files/translations/%core/%project/%project-%version.%language.po';
+  const RECOMMENDED_PHP = '8.3.0';
 
   /**
    * The currently active container object, or NULL if not initialized yet.
@@ -169,7 +161,6 @@ class Drupal {
    * Returns the currently active global container.
    *
    * @return \Drupal\Component\DependencyInjection\ContainerInterface
-   *   The currently active global container.
    *
    * @throws \Drupal\Core\DependencyInjection\ContainerNotInitializedException
    */
@@ -184,7 +175,6 @@ class Drupal {
    * Returns TRUE if the container has been initialized, FALSE otherwise.
    *
    * @return bool
-   *   TRUE if the container is initialized, FALSE otherwise.
    */
   public static function hasContainer() {
     return static::$container !== NULL;
@@ -193,15 +183,17 @@ class Drupal {
   /**
    * Retrieves a service from the container.
    *
-   * @param class-string<T>|string $id
+   * Use this method if the desired service is not one of those with a dedicated
+   * accessor method below. If it is listed below, those methods are preferred
+   * as they can return useful type hints.
+   *
+   * @param string $id
    *   The ID of the service to retrieve.
    *
-   * @template T of object
-   *
-   * @return ($id is class-string<T> ? T : object)
+   * @return mixed
    *   The specified service.
    */
-  public static function service(string $id): object {
+  public static function service($id) {
     return static::getContainer()->get($id);
   }
 
@@ -223,7 +215,6 @@ class Drupal {
    * Gets the app root.
    *
    * @return string
-   *   The app root directory path.
    */
   public static function root() {
     return static::getContainer()->getParameter('app.root');
@@ -309,7 +300,6 @@ class Drupal {
    * @endcode
    *
    * @return \Drupal\Core\Session\AccountProxyInterface
-   *   The current user account proxy.
    */
   public static function currentUser() {
     return static::getContainer()->get('current_user');
@@ -395,7 +385,6 @@ class Drupal {
    * Returns the locking layer instance.
    *
    * @return \Drupal\Core\Lock\LockBackendInterface
-   *   The locking layer instance.
    *
    * @ingroup lock
    */
@@ -407,14 +396,16 @@ class Drupal {
    * Retrieves a configuration object.
    *
    * This is the main entry point to the configuration API. Calling
-   * \Drupal::config('my_module.admin') will return a configuration object the
-   * my_module module can use to read its administrative settings.
+   * @code \Drupal::config('my_module.admin') @endcode will return a
+   * configuration object the my_module module can use to read its
+   * administrative settings.
    *
    * @param string $name
    *   The name of the configuration object to retrieve, which typically
    *   corresponds to a configuration file. For
-   *   \Drupal::config('my_module.admin'), the configuration object returned
-   *   will contain the content of the my_module.admin configuration file.
+   *   @code \Drupal::config('my_module.admin') @endcode, the configuration
+   *   object returned will contain the content of the my_module.admin
+   *   configuration file.
    *
    * @return \Drupal\Core\Config\ImmutableConfig
    *   An immutable configuration object.
@@ -470,7 +461,6 @@ class Drupal {
    *   Name of the key/value collection to return.
    *
    * @return \Drupal\Core\KeyValueStore\KeyValueStoreInterface
-   *   The key/value storage collection for the specified name.
    */
   public static function keyValue($collection) {
     return static::getContainer()->get('keyvalue')->get($collection);
@@ -482,12 +472,10 @@ class Drupal {
    * Use this to store machine-generated data, local to a specific environment
    * that does not need deploying and does not need human editing; for example,
    * the last time cron was run. Data which needs to be edited by humans and
-   * needs to be the same across development, production, etc. environments (for
-   * example, the system maintenance message) should use \Drupal::config()
-   * instead.
+   * needs to be the same across development, production, etc. environments
+   * (for example, the system maintenance message) should use \Drupal::config() instead.
    *
    * @return \Drupal\Core\State\StateInterface
-   *   The state storage service.
    */
   public static function state() {
     return static::getContainer()->get('state');
@@ -541,7 +529,6 @@ class Drupal {
    * Returns the flood instance.
    *
    * @return \Drupal\Core\Flood\FloodInterface
-   *   The flood instance.
    */
   public static function flood() {
     return static::getContainer()->get('flood');
@@ -551,7 +538,6 @@ class Drupal {
    * Returns the module handler.
    *
    * @return \Drupal\Core\Extension\ModuleHandlerInterface
-   *   The module handler interface.
    */
   public static function moduleHandler() {
     return static::getContainer()->get('module_handler');
@@ -595,7 +581,6 @@ class Drupal {
    * Returns the link generator service.
    *
    * @return \Drupal\Core\Utility\LinkGeneratorInterface
-   *   The link generator service.
    */
   public static function linkGenerator() {
     return static::getContainer()->get('link_generator');
@@ -624,10 +609,10 @@ class Drupal {
   /**
    * Returns the CSRF token manager service.
    *
-   * The generated token is based on the session ID of the current user.
-   * Normally, anonymous users do not have a session, so the generated token
-   * will be different on every page request. To generate a token for users
-   * without a session, manually start a session prior to calling this function.
+   * The generated token is based on the session ID of the current user. Normally,
+   * anonymous users do not have a session, so the generated token will be
+   * different on every page request. To generate a token for users without a
+   * session, manually start a session prior to calling this function.
    *
    * @return \Drupal\Core\Access\CsrfTokenGenerator
    *   The CSRF token manager.
@@ -662,7 +647,6 @@ class Drupal {
    * Gets the theme service.
    *
    * @return \Drupal\Core\Theme\ThemeManagerInterface
-   *   The theme manager service.
    */
   public static function theme() {
     return static::getContainer()->get('theme.manager');
@@ -706,7 +690,6 @@ class Drupal {
    * Returns the path validator.
    *
    * @return \Drupal\Core\Path\PathValidatorInterface
-   *   The path validator service.
    */
   public static function pathValidator() {
     return static::getContainer()->get('path.validator');

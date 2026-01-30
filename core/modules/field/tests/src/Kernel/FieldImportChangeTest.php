@@ -4,20 +4,17 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Kernel;
 
-use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Update field storage and fields during config change method invocation.
+ *
+ * @group field
  */
-#[Group('field')]
-#[RunTestsInSeparateProcesses]
 class FieldImportChangeTest extends FieldKernelTestBase {
 
   /**
-   * Modules to install.
+   * Modules to enable.
    *
    * The default configuration provided by field_test_config is imported by
    * \Drupal\Tests\field\Kernel\FieldKernelTestBase::setUp() when it installs
@@ -31,7 +28,7 @@ class FieldImportChangeTest extends FieldKernelTestBase {
    * Tests importing an updated field.
    */
   public function testImportChange(): void {
-    EntityTestHelper::createBundle('test_bundle');
+    entity_test_create_bundle('test_bundle');
 
     $this->installConfig(['field_test_config']);
     $field_storage_id = 'field_test_import';

@@ -83,9 +83,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
    * {@inheritdoc}
    */
   public function isEmpty() {
-    $value = $this->get('value')->getValue();
-
-    return empty($value) && (string) $value !== '0';
+    return empty($this->value) && (string) $this->value !== '0';
   }
 
   /**
@@ -336,14 +334,12 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
   abstract protected function allowedValuesDescription();
 
   /**
-   * Render API callback: Validates the allowed values of an options field.
+   * #element_validate callback for options field allowed values.
    *
-   * This function is assigned as a #element_validate callback.
-   *
-   * @param array $element
+   * @param $element
    *   An associative array containing the properties and children of the
    *   generic form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param $form_state
    *   The current state of the form for the form this element belongs to.
    *
    * @see \Drupal\Core\Render\Element\FormElementBase::processPattern()
@@ -351,17 +347,13 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
   public static function validateAllowedValues($element, FormStateInterface $form_state) {
     $items = array_filter(array_map(function ($item) use ($element) {
       $current_element = $element['table'][$item];
-      $key_has_input = isset($current_element['item']['key']['#value']) && $current_element['item']['key']['#value'] !== '';
-      $label_has_input = isset($current_element['item']['label']['#value']) && $current_element['item']['label']['#value'] !== '';
-      if ($key_has_input) {
-        if ($label_has_input) {
-          return $current_element['item']['key']['#value'] . '|' . $current_element['item']['label']['#value'];
-        }
-
+      if ($current_element['item']['key']['#value'] !== NULL && $current_element['item']['label']['#value']) {
+        return $current_element['item']['key']['#value'] . '|' . $current_element['item']['label']['#value'];
+      }
+      elseif ($current_element['item']['key']['#value']) {
         return $current_element['item']['key']['#value'];
       }
-
-      if ($label_has_input) {
+      elseif ($current_element['item']['label']['#value']) {
         return $current_element['item']['label']['#value'];
       }
 
@@ -452,12 +444,10 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
    * @param string $option
    *   The option value entered by the user.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup|string|null
+   * @return string
    *   The error message if the specified value is invalid, NULL otherwise.
    */
-  protected static function validateAllowedValue($option) {
-    return NULL;
-  }
+  protected static function validateAllowedValue($option) {}
 
   /**
    * Generates a string representation of an array of 'allowed values'.

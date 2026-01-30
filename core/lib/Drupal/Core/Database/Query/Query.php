@@ -119,10 +119,6 @@ abstract class Query implements PlaceholderInterface {
    *
    * @return string
    *   A prepared statement query string for this object.
-   *
-   * @throws \BadMethodCallException
-   *   Thrown when the operation is a Merge or the operation is not implemented,
-   *   as in test.
    */
   abstract public function __toString();
 
@@ -154,7 +150,7 @@ abstract class Query implements PlaceholderInterface {
    * The comment string will be sanitized to remove * / and other characters
    * that may terminate the string early so as to avoid SQL injection attacks.
    *
-   * @param string $comment
+   * @param $comment
    *   The comment string to be inserted into the query.
    *
    * @return $this

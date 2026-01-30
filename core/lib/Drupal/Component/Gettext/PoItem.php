@@ -67,8 +67,7 @@ class PoItem {
   /**
    * Gets the language code of the currently used language.
    *
-   * @return string
-   *   The language code for this item.
+   * @return string with langcode
    */
   public function getLangcode() {
     return $this->langcode;
@@ -87,8 +86,7 @@ class PoItem {
   /**
    * Gets the context this translation belongs to.
    *
-   * @return string
-   *   The context for this translation.
+   * @return string $context
    */
   public function getContext() {
     return $this->context;
@@ -107,8 +105,7 @@ class PoItem {
   /**
    * Gets the source string(s) if the translation has plurals.
    *
-   * @return string|array
-   *   The source string or array of strings if it has plurals.
+   * @return string or array $translation
    */
   public function getSource() {
     return $this->source;
@@ -127,8 +124,7 @@ class PoItem {
   /**
    * Gets the translation string(s) if the translation has plurals.
    *
-   * @return string|array
-   *   The translation string or array of strings if it has plurals.
+   * @return string or array $translation
    */
   public function getTranslation() {
     return $this->translation;
@@ -159,7 +155,6 @@ class PoItem {
    * Get if the translation has plural values.
    *
    * @return bool
-   *   TRUE if the translation has plurals, otherwise FALSE.
    */
   public function isPlural() {
     return $this->plural;
@@ -168,8 +163,7 @@ class PoItem {
   /**
    * Gets the comment of this translation.
    *
-   * @return string
-   *   The comment of this translation.
+   * @return String $comment
    */
   public function getComment() {
     return $this->comment;
@@ -271,7 +265,7 @@ class PoItem {
   private function formatSingular() {
     $output = '';
     $output .= 'msgid ' . $this->formatString($this->source);
-    $output .= 'msgstr ' . (isset($this->translation) ? $this->formatString($this->translation) : '""' . "\n");
+    $output .= 'msgstr ' . (isset($this->translation) ? $this->formatString($this->translation) : '""');
     return $output;
   }
 

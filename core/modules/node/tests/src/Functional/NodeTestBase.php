@@ -15,7 +15,9 @@ use Drupal\Tests\BrowserTestBase;
 abstract class NodeTestBase extends BrowserTestBase {
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['node', 'datetime'];
 

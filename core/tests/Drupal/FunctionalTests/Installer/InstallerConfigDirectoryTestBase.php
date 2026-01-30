@@ -17,13 +17,11 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
    * This is set by the profile in the core.extension extracted.
    *
    * If set to FALSE, then the install will proceed without an install profile.
-   *
-   * @var string|null|bool
    */
   protected $profile = NULL;
 
   /**
-   * @var bool
+   * @todo Fill out docblock.
    */
   protected $existingSyncDirectory = FALSE;
 
@@ -67,9 +65,8 @@ abstract class InstallerConfigDirectoryTestBase extends InstallerTestBase {
     }
 
     if ($this->profile !== FALSE) {
-      // Create a profile for testing. We set core_version_requirement to '*'
-      // for the test so that it does not need to be updated between major
-      // versions.
+      // Create a profile for testing. We set core_version_requirement to '*' for
+      // the test so that it does not need to be updated between major versions.
       $info = [
         'type' => 'profile',
         'core_version_requirement' => '*',

@@ -18,7 +18,6 @@ trait InstallerRedirectTrait {
    * Returns whether the current PHP process runs on CLI.
    *
    * @return bool
-   *   TRUE if the current PHP process is running on CLI, otherwise FALSE.
    */
   protected function isCli() {
     return PHP_SAPI === 'cli';

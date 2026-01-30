@@ -4,22 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Kernel;
 
-use Drupal\KernelTests\KernelTestBase;
-use Drupal\migrate\Event\MigrateEvents;
 use Drupal\migrate\Event\MigrateImportEvent;
 use Drupal\migrate\Event\MigrateMapDeleteEvent;
 use Drupal\migrate\Event\MigrateMapSaveEvent;
 use Drupal\migrate\Event\MigratePostRowSaveEvent;
 use Drupal\migrate\Event\MigratePreRowSaveEvent;
+use Drupal\migrate\Event\MigrateEvents;
 use Drupal\migrate\MigrateExecutable;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Drupal\KernelTests\KernelTestBase;
 
 /**
  * Tests events fired on migrations.
+ *
+ * @group migrate
  */
-#[Group('migrate')]
-#[RunTestsInSeparateProcesses]
 class MigrateEventsTest extends KernelTestBase {
 
   /**
@@ -30,7 +28,9 @@ class MigrateEventsTest extends KernelTestBase {
   protected $state;
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['migrate', 'migrate_events_test'];
 
@@ -129,7 +129,7 @@ class MigrateEventsTest extends KernelTestBase {
    * @param string $name
    *   The event name.
    */
-  public function mapSaveEventRecorder(MigrateMapSaveEvent $event, $name): void {
+  public function mapSaveEventRecorder(MigrateMapSaveEvent $event, $name) {
     $this->state->set('migrate_events_test.map_save_event', [
       'event_name' => $name,
       'map' => $event->getMap(),
@@ -145,7 +145,7 @@ class MigrateEventsTest extends KernelTestBase {
    * @param string $name
    *   The event name.
    */
-  public function mapDeleteEventRecorder(MigrateMapDeleteEvent $event, $name): void {
+  public function mapDeleteEventRecorder(MigrateMapDeleteEvent $event, $name) {
     $this->state->set('migrate_events_test.map_delete_event', [
       'event_name' => $name,
       'map' => $event->getMap(),
@@ -161,7 +161,7 @@ class MigrateEventsTest extends KernelTestBase {
    * @param string $name
    *   The event name.
    */
-  public function preImportEventRecorder(MigrateImportEvent $event, $name): void {
+  public function preImportEventRecorder(MigrateImportEvent $event, $name) {
     $this->state->set('migrate_events_test.pre_import_event', [
       'event_name' => $name,
       'migration' => $event->getMigration(),
@@ -176,7 +176,7 @@ class MigrateEventsTest extends KernelTestBase {
    * @param string $name
    *   The event name.
    */
-  public function postImportEventRecorder(MigrateImportEvent $event, $name): void {
+  public function postImportEventRecorder(MigrateImportEvent $event, $name) {
     $this->state->set('migrate_events_test.post_import_event', [
       'event_name' => $name,
       'migration' => $event->getMigration(),
@@ -191,7 +191,7 @@ class MigrateEventsTest extends KernelTestBase {
    * @param string $name
    *   The event name.
    */
-  public function preRowSaveEventRecorder(MigratePreRowSaveEvent $event, $name): void {
+  public function preRowSaveEventRecorder(MigratePreRowSaveEvent $event, $name) {
     $this->state->set('migrate_events_test.pre_row_save_event', [
       'event_name' => $name,
       'migration' => $event->getMigration(),
@@ -207,7 +207,7 @@ class MigrateEventsTest extends KernelTestBase {
    * @param string $name
    *   The event name.
    */
-  public function postRowSaveEventRecorder(MigratePostRowSaveEvent $event, $name): void {
+  public function postRowSaveEventRecorder(MigratePostRowSaveEvent $event, $name) {
     $this->state->set('migrate_events_test.post_row_save_event', [
       'event_name' => $name,
       'migration' => $event->getMigration(),

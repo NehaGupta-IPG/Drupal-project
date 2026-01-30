@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Drupal\Tests\Core\DependencyInjection\Fixture;
 
 use Symfony\Component\HttpFoundation\Request;
@@ -13,9 +11,6 @@ use Symfony\Component\HttpKernel\TerminableInterface;
  * Stub of http_middleware class that is declared final.
  */
 final class FinalTestHttpMiddlewareClass implements HttpKernelInterface, TerminableInterface {
-
-  public function __construct(protected readonly HttpKernelInterface $inner) {
-  }
 
   /**
    * {@inheritdoc}

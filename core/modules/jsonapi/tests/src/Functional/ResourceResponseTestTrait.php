@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
-use Drupal\jsonapi\JsonApiSpec;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Access\AccessResultInterface;
@@ -80,10 +79,10 @@ trait ResourceResponseTestTrait {
     $merged_document['jsonapi'] = [
       'meta' => [
         'links' => [
-          'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
+          'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
         ],
       ],
-      'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
+      'version' => '1.0',
     ];
     // Until we can reasonably know what caused an error, we shouldn't include
     // 'self' links in error documents. For example, a 404 shouldn't have a
@@ -245,7 +244,7 @@ trait ResourceResponseTestTrait {
       $cacheability->addCacheContexts(explode(' ', $response->getHeader('X-Drupal-Cache-Contexts')[0]));
     }
     if ($dynamic_cache = $response->getHeader('X-Drupal-Dynamic-Cache')) {
-      $cacheability->setCacheMaxAge((str_contains($dynamic_cache[0], 'UNCACHEABLE') && $response->getStatusCode() < 400) ? 0 : Cache::PERMANENT);
+      $cacheability->setCacheMaxAge(($dynamic_cache[0] === 'UNCACHEABLE' && $response->getStatusCode() < 400) ? 0 : Cache::PERMANENT);
     }
     $related_document = Json::decode($response->getBody());
     $resource_response = new CacheableResourceResponse($related_document, $response->getStatusCode());
@@ -307,7 +306,7 @@ trait ResourceResponseTestTrait {
    * @return bool
    *   TRUE if the needle exists is present in the haystack, FALSE otherwise.
    */
-  protected static function collectionHasResourceIdentifier(array $needle, array $haystack): bool {
+  protected static function collectionHasResourceIdentifier(array $needle, array $haystack) {
     foreach ($haystack as $resource) {
       if ($resource['type'] == $needle['type'] && $resource['id'] == $needle['id']) {
         return TRUE;
@@ -399,7 +398,7 @@ trait ResourceResponseTestTrait {
    * @return string
    *   The relationship link.
    */
-  protected static function getRelationshipLink(array $resource_identifier, $relationship_field_name): string {
+  protected static function getRelationshipLink(array $resource_identifier, $relationship_field_name) {
     return static::getResourceLink($resource_identifier) . "/relationships/$relationship_field_name";
   }
 
@@ -414,7 +413,7 @@ trait ResourceResponseTestTrait {
    * @return string
    *   The related resource link.
    */
-  protected static function getRelatedLink(array $resource_identifier, $relationship_field_name): string {
+  protected static function getRelatedLink(array $resource_identifier, $relationship_field_name) {
     return static::getResourceLink($resource_identifier) . "/$relationship_field_name";
   }
 
@@ -495,7 +494,7 @@ trait ResourceResponseTestTrait {
    *   for testing related/relationship routes and includes.
    * @param string|null $detail
    *   (optional) Details for the JSON:API error object.
-   * @param string|false|null $pointer
+   * @param string|bool|null $pointer
    *   (optional) Document pointer for the JSON:API error object. FALSE to omit
    *   the pointer.
    *
@@ -526,9 +525,7 @@ trait ResourceResponseTestTrait {
       'jsonapi' => static::$jsonApiMember,
       'errors' => [$error],
     ], 403))
-      ->addCacheableDependency((new CacheableMetadata())
-        ->addCacheTags(['4xx-response', 'http_response'])
-        ->addCacheContexts(['url.query_args', 'url.site']))
+      ->addCacheableDependency((new CacheableMetadata())->addCacheTags(['4xx-response', 'http_response'])->addCacheContexts(['url.query_args', 'url.site']))
       ->addCacheableDependency($access);
   }
 

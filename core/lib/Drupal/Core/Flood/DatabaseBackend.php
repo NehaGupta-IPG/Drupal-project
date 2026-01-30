@@ -179,7 +179,7 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
    * yet the query failed, then the flood is stale and the exception needs to
    * propagate.
    *
-   * @param \Exception $e
+   * @param $e
    *   The exception.
    *
    * @throws \Exception

@@ -8,7 +8,6 @@ use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -17,8 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @see \Drupal\system\Entity\DateFormat
  */
 class DateFormatListBuilder extends ConfigEntityListBuilder {
-
-  use StringTranslationTrait;
 
   /**
    * Constructs a new DateFormatListBuilder object.
@@ -57,8 +54,8 @@ class DateFormatListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header['label'] = $this->t('Name');
-    $header['pattern'] = $this->t('Pattern');
+    $header['label'] = t('Name');
+    $header['pattern'] = t('Pattern');
     return $header + parent::buildHeader();
   }
 

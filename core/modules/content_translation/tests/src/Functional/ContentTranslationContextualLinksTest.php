@@ -8,14 +8,12 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that contextual links are available for content translation.
+ *
+ * @group content_translation
  */
-#[Group('content_translation')]
-#[RunTestsInSeparateProcesses]
 class ContentTranslationContextualLinksTest extends BrowserTestBase {
 
   use ContentTranslationTestTrait;
@@ -54,7 +52,9 @@ class ContentTranslationContextualLinksTest extends BrowserTestBase {
   protected $langcodes;
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['content_translation', 'contextual', 'node'];
 

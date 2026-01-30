@@ -4,7 +4,6 @@ namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Validation\Attribute\Constraint;
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraints\Length;
 
 /**
@@ -24,7 +23,6 @@ class LengthConstraint extends Length {
   /**
    * {@inheritdoc}
    */
-  #[HasNamedArguments]
   public function __construct(...$args) {
     $this->maxMessage = 'This value is too long. It should have %limit character or less.|This value is too long. It should have %limit characters or less.';
     $this->minMessage = 'This value is too short. It should have %limit character or more.|This value is too short. It should have %limit characters or more.';

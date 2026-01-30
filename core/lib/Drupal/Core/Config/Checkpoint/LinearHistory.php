@@ -126,21 +126,7 @@ final class LinearHistory implements CheckpointListInterface {
         break;
       }
     }
-
-    $first = reset($this->checkpoints);
-    if ($first instanceof Checkpoint) {
-      // Make sure the first checkpoint does not have a parent set.
-      $fixed = new Checkpoint($first->id, $first->label, $first->timestamp, NULL);
-      $this->checkpoints[$fixed->id] = $fixed;
-    }
-    $this->activeCheckpoint = end($this->checkpoints) ?: NULL;
-
-    if (!empty($this->checkpoints)) {
-      $this->state->set(self::CHECKPOINT_KEY, $this->checkpoints);
-    }
-    else {
-      $this->state->delete(self::CHECKPOINT_KEY);
-    }
+    $this->state->set(self::CHECKPOINT_KEY, $this->checkpoints);
 
     return $this;
   }

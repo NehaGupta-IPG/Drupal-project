@@ -17,9 +17,8 @@ trait OEmbedTestTrait {
    * Returns the relative path to the oEmbed fixtures directory.
    *
    * @return string
-   *   The relative path to the oEmbed fixtures directory.
    */
-  protected function getFixturesDirectory(): string {
+  protected function getFixturesDirectory() {
     return \Drupal::service('extension.list.module')->getPath('media') . '/tests/fixtures/oembed';
   }
 
@@ -27,9 +26,8 @@ trait OEmbedTestTrait {
    * Returns the absolute URL of the oEmbed fixtures directory.
    *
    * @return string
-   *   The absolute URL of the oEmbed fixtures directory.
    */
-  protected function getFixturesUrl(): string {
+  protected function getFixturesUrl() {
     return $this->baseUrl . '/' . $this->getFixturesDirectory();
   }
 

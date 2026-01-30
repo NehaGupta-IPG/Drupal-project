@@ -4,24 +4,23 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media\FunctionalJavascript;
 
-use Drupal\Core\Database\Database;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Database\Database;
 use Drupal\dblog\Controller\DbLogController;
 use Drupal\media\Entity\Media;
 use Drupal\media\Entity\MediaType;
 use Drupal\media_test_oembed\Controller\ResourceController;
 use Drupal\Tests\media\Traits\OEmbedTestTrait;
 use Drupal\user\Entity\Role;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 // cspell:ignore dailymotion Schipulcon
+
 /**
  * Tests the oembed:video media source.
+ *
+ * @group media
  */
-#[Group('media')]
-#[RunTestsInSeparateProcesses]
 class MediaSourceOEmbedVideoTest extends MediaSourceTestBase {
 
   /**
@@ -47,7 +46,7 @@ class MediaSourceOEmbedVideoTest extends MediaSourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function initConfig(ContainerInterface $container): void {
+  protected function initConfig(ContainerInterface $container) {
     parent::initConfig($container);
 
     // Enable twig debugging to make testing template usage easy.
@@ -151,7 +150,6 @@ class MediaSourceOEmbedVideoTest extends MediaSourceTestBase {
     // correctly, regardless of whatever its width attribute may be (the fixture
     // hard-codes it to 480).
     $inner_frame = 'frames[0].document.querySelector("iframe")';
-    $page->waitFor(10, fn () => $session->evaluateScript("$inner_frame !== null"));
     $this->assertSame('480', $session->evaluateScript("$inner_frame.getAttribute('width')"));
     $this->assertLessThanOrEqual(240, $session->evaluateScript("$inner_frame.clientWidth"));
 
@@ -221,7 +219,7 @@ class MediaSourceOEmbedVideoTest extends MediaSourceTestBase {
     $no_hash_query = array_diff_key($query, ['hash' => '']);
     $this->drupalGet('media/oembed', ['query' => $no_hash_query]);
     $assert_session->pageTextNotContains('Vimeo works!');
-    $assert_session->pageTextContains('This resource is not available');
+    $assert_session->pageTextContains('Client error');
 
     // A correct query should be allowed because the anonymous role has the
     // 'view media' permission.

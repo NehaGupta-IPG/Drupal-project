@@ -2,6 +2,7 @@
 
 namespace Drupal\taxonomy;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 use Drupal\Core\Entity\Sql\TableMappingInterface;
 
@@ -92,6 +93,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
    */
   public function loadParents($tid) {
     $terms = [];
+    /** @var \Drupal\taxonomy\TermInterface $term */
     if ($tid && $term = $this->load($tid)) {
       foreach ($this->getParents($term) as $id => $parent) {
         // This method currently doesn't return the <root> parent.
@@ -322,6 +324,22 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
       ->fields(['weight' => 0])
       ->condition('vid', $vid)
       ->execute();
+
+    // Reset terms for this vocabulary. We don't use loadMultiple for
+    // performance reasons and limit memory consumption.
+    $entity_type_key = $this->getEntityType()->getKey('bundle');
+    $term_ids = $this->getQuery()
+      ->accessCheck(FALSE)
+      ->condition($entity_type_key, $vid)
+      ->execute();
+    $this->resetCache($term_ids);
+
+    // Invalidate the taxonomy term cache tags.
+    array_walk($term_ids, function (&$tid) {
+      $tid = 'taxonomy_term:' . $tid;
+    });
+
+    Cache::invalidateTags($term_ids);
   }
 
   /**

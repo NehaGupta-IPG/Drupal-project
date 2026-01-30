@@ -80,10 +80,7 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
       // This gets rid of migrations with explicit providers set if one of the
       // providers do not exist before we try to use a potentially non-existing
       // deriver. This is a rare case.
-      $filtered_discovery = new ProviderFilterDecorator($only_with_source_discovery, [
-        $this->moduleHandler,
-        'moduleExists',
-      ]);
+      $filtered_discovery = new ProviderFilterDecorator($only_with_source_discovery, [$this->moduleHandler, 'moduleExists']);
       $this->discovery = new ContainerDerivativeDiscoveryDecorator($filtered_discovery);
     }
     return $this->discovery;
@@ -221,7 +218,7 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
    *
    * @param array $graph
    *   The graph so far, passed by reference.
-   * @param string $id
+   * @param int $id
    *   The migration ID.
    * @param string $dependency
    *   The dependency string.
@@ -250,10 +247,9 @@ class MigrationPluginManager extends DefaultPluginManager implements MigrationPl
    * @return array
    *   List of definitions to store in cache.
    *
-   * @todo This provides backwards compatibility for migration source plugins
-   *   using annotations and having more than one provider. This functionality
-   *   will be deprecated and removed with plugin discovery by annotations in
-   *   https://www.drupal.org/project/drupal/issues/3522409.
+   * @todo This is a temporary solution to the fact that migration source
+   *   plugins have more than one provider. This functionality will be moved to
+   *   core in https://www.drupal.org/node/2786355.
    */
   protected function findDefinitions() {
     $definitions = $this->getDiscovery()->getDefinitions();

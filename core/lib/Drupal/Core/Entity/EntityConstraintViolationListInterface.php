@@ -64,8 +64,10 @@ interface EntityConstraintViolationListInterface extends ConstraintViolationList
   /**
    * Filters this violation list by the given fields.
    *
-   * Violations for the provided fields are removed so the returned object just
-   * has the remaining violations.
+   * The returned object just has violations attached to the provided fields.
+   *
+   * When violations should be displayed for a sub-set of visible fields only,
+   * this method may be used to filter the set of visible violations first.
    *
    * @param string[] $field_names
    *   The names of the fields to filter violations for.

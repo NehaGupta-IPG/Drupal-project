@@ -6,15 +6,13 @@ namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\KernelTests\KernelTestBase;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests validation of mailer dsn config.
+ *
+ * @group config
+ * @group Validation
  */
-#[Group('config')]
-#[Group('Validation')]
-#[RunTestsInSeparateProcesses]
 class MailerDsnConfigValidationTest extends KernelTestBase {
 
   /**
@@ -36,9 +34,6 @@ class MailerDsnConfigValidationTest extends KernelTestBase {
     $this->configManager = $this->container->get(TypedConfigManagerInterface::class);
   }
 
-  /**
-   * Tests the validation of the mailer scheme.
-   */
   public function testMailerSchemeValidation(): void {
     $config = $this->config('system.mail');
     $this->assertFalse($config->isNew());
@@ -95,9 +90,6 @@ class MailerDsnConfigValidationTest extends KernelTestBase {
     $this->assertCount(0, $violations);
   }
 
-  /**
-   * Tests the validation of the mailer host.
-   */
   public function testMailerHostValidation(): void {
     $config = $this->config('system.mail');
     $this->assertFalse($config->isNew());
@@ -160,9 +152,6 @@ class MailerDsnConfigValidationTest extends KernelTestBase {
     $this->assertCount(0, $violations);
   }
 
-  /**
-   * Tests the validation of the password for the mailer user.
-   */
   public function testMailerUserPasswordValidation(): void {
     $config = $this->config('system.mail');
     $this->assertFalse($config->isNew());
@@ -181,9 +170,6 @@ class MailerDsnConfigValidationTest extends KernelTestBase {
     $this->assertCount(0, $violations);
   }
 
-  /**
-   * Tests the validation of the port used by the mailer.
-   */
   public function testMailerPortValidation(): void {
     $config = $this->config('system.mail');
     $this->assertFalse($config->isNew());
@@ -212,9 +198,6 @@ class MailerDsnConfigValidationTest extends KernelTestBase {
     $this->assertCount(0, $violations);
   }
 
-  /**
-   * Tests the validation of the default options of the mailer.
-   */
   public function testMailerTransportDefaultOptionsValidation(): void {
     $config = $this->config('system.mail');
     $this->assertFalse($config->isNew());
@@ -235,9 +218,6 @@ class MailerDsnConfigValidationTest extends KernelTestBase {
     $this->assertCount(0, $violations);
   }
 
-  /**
-   * Tests the validation of the options for the 'native' mailer scheme.
-   */
   public function testMailerTransportNativeOptionsValidation(): void {
     $config = $this->config('system.mail');
     $this->assertFalse($config->isNew());
@@ -261,9 +241,6 @@ class MailerDsnConfigValidationTest extends KernelTestBase {
     $this->assertCount(0, $violations);
   }
 
-  /**
-   * Tests the validation of the options for the 'null' mailer scheme.
-   */
   public function testMailerTransportNullOptionsValidation(): void {
     $config = $this->config('system.mail');
     $this->assertFalse($config->isNew());
@@ -287,9 +264,6 @@ class MailerDsnConfigValidationTest extends KernelTestBase {
     $this->assertCount(0, $violations);
   }
 
-  /**
-   * Tests the validation of the options for the 'sendmail' mailer scheme.
-   */
   public function testMailerTransportSendmailOptionsValidation(): void {
     $config = $this->config('system.mail');
     $this->assertFalse($config->isNew());
@@ -327,9 +301,6 @@ class MailerDsnConfigValidationTest extends KernelTestBase {
     $this->assertCount(0, $violations);
   }
 
-  /**
-   * Tests the validation of the options for the 'smtps' mailer scheme.
-   */
   public function testMailerTransportSMTPOptionsValidation(): void {
     $config = $this->config('system.mail');
     $this->assertFalse($config->isNew());
@@ -338,8 +309,7 @@ class MailerDsnConfigValidationTest extends KernelTestBase {
     // Set scheme to smtps.
     $data['mailer_dsn']['scheme'] = 'smtps';
 
-    // If the options contain an invalid peer_fingerprint, it should be an
-    // error.
+    // If the options contain an invalid peer_fingerprint, it should be an error.
     $data['mailer_dsn']['options'] = [
       'verify_peer' => FALSE,
       'peer_fingerprint' => 'BE:F7:B9:CA:0F:6E:0F:29:9B:E9:B4:64:99:35:D6:27',
@@ -368,8 +338,7 @@ class MailerDsnConfigValidationTest extends KernelTestBase {
       ->validate();
     $this->assertCount(0, $violations);
 
-    // If the options contain a local_domain with a newline, it should be an
-    // error.
+    // If the options contain a local_domain with a newline, it should be an error.
     $data['mailer_dsn']['options'] = ['local_domain' => "host\nwith\nnewline"];
     $violations = $this->configManager->createFromNameAndData($config->getName(), $data)
       ->validate();
@@ -377,8 +346,7 @@ class MailerDsnConfigValidationTest extends KernelTestBase {
     $this->assertSame('mailer_dsn.options.local_domain', $violations[0]->getPropertyPath());
     $this->assertSame('The local_domain is not allowed to span multiple lines or contain control characters.', (string) $violations[0]->getMessage());
 
-    // If the options contain a local_domain with unexpected characters, it
-    // should be an error.
+    // If the options contain a local_domain with unexpected characters, it should be an error.
     $data['mailer_dsn']['options'] = ['local_domain' => "host\rwith\tcontrol-chars"];
     $violations = $this->configManager->createFromNameAndData($config->getName(), $data)
       ->validate();

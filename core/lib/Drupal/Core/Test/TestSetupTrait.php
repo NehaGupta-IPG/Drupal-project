@@ -2,13 +2,10 @@
 
 namespace Drupal\Core\Test;
 
-use Drupal\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Database\Database;
 
 /**
  * Provides a trait for shared test setup functionality.
- *
- * @property \Drupal\Component\DependencyInjection\ContainerInterface $container
  */
 trait TestSetupTrait {
 
@@ -29,11 +26,11 @@ trait TestSetupTrait {
   ];
 
   /**
-   * Stores the container in case it is set before available with \Drupal.
+   * The dependency injection container used in the test.
    *
-   * @see \Drupal::getContainer()
+   * @var \Symfony\Component\DependencyInjection\ContainerInterface
    */
-  private ?ContainerInterface $privateContainer = NULL;
+  protected $container;
 
   /**
    * The site directory of this test run.
@@ -137,7 +134,7 @@ trait TestSetupTrait {
    * @see \Drupal\Tests\BrowserTestBase::prepareEnvironment()
    * @see drupal_valid_test_ua()
    */
-  protected function prepareDatabasePrefix(): void {
+  protected function prepareDatabasePrefix() {
     $test_db = new TestDatabase();
     $this->siteDirectory = $test_db->getTestSitePath();
     $this->databasePrefix = $test_db->getDatabasePrefix();
@@ -146,7 +143,7 @@ trait TestSetupTrait {
   /**
    * Changes the database connection to the prefixed one.
    */
-  protected function changeDatabasePrefix(): void {
+  protected function changeDatabasePrefix() {
     if (empty($this->databasePrefix)) {
       $this->prepareDatabasePrefix();
     }
@@ -157,7 +154,7 @@ trait TestSetupTrait {
       // Ensure no existing database gets in the way. If a default database
       // exists already it must be removed.
       Database::removeConnection('default');
-      $database = Database::convertDbUrlToConnectionInfo($db_url, TRUE);
+      $database = Database::convertDbUrlToConnectionInfo($db_url, $this->root ?? DRUPAL_ROOT, TRUE);
       Database::addConnectionInfo('default', 'default', $database);
     }
 
@@ -195,42 +192,6 @@ trait TestSetupTrait {
     }
     // Filter out any duplicates.
     return array_unique(array_merge(...$exceptions));
-  }
-
-  /**
-   * Implements the magic method for getting object properties.
-   *
-   * Ensures \Drupal::getContainer() is used when getting the container
-   * property, if possible.
-   */
-  public function __get($name): mixed {
-    if ($name === 'container') {
-      return \Drupal::hasContainer() ? \Drupal::getContainer() : $this->privateContainer;
-    }
-
-    trigger_error('Undefined property ' . __CLASS__ . "::\${$name}", E_USER_WARNING);
-    return NULL;
-  }
-
-  /**
-   * Implements the magic method for setting object properties.
-   *
-   * Ensures \Drupal::getContainer() is used when getting the container
-   * property, if possible.
-   */
-  public function __set($name, $value): void {
-    if ($name === 'container') {
-      $this->privateContainer = $value;
-      return;
-    }
-
-    // This deprecation message is intended to match the one PHP 8.2+ emits for
-    // dynamic properties. The magic setter and this deprecation message will
-    // be removed once property hooks can be used.
-    // @see https://www.drupal.org/project/drupal/issues/3558863
-    // @phpcs:ignore Drupal.Semantics.FunctionTriggerError.TriggerErrorTextLayoutRelaxed
-    trigger_error('Creation of dynamic property ' . __CLASS__ . "::\${$name} is deprecated", E_USER_DEPRECATED);
-    $this->$name = $value;
   }
 
 }

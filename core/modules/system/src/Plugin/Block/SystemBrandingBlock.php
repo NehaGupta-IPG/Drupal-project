@@ -6,12 +6,12 @@ use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Extension\ThemeSettingsProvider;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\system\Form\SystemBrandingOffCanvasForm;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a block to display 'Site branding' elements.
@@ -24,20 +24,39 @@ use Drupal\system\Form\SystemBrandingOffCanvasForm;
 class SystemBrandingBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   /**
-   * Creates a SystemBrandingBlock instance.
+   * Stores the configuration factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
-  public function __construct(
-    array $configuration,
-    $plugin_id,
-    $plugin_definition,
-    protected ConfigFactoryInterface $configFactory,
-    protected ?ThemeSettingsProvider $themeSettingsProvider = NULL,
-  ) {
+  protected $configFactory;
+
+  /**
+   * Creates a SystemBrandingBlock instance.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The factory for configuration objects.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ConfigFactoryInterface $config_factory) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
-    if ($themeSettingsProvider === NULL) {
-      @trigger_error('Calling ' . __CLASS__ . ' constructor without the $themeSettingsProvider argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3035289', E_USER_DEPRECATED);
-      $this->themeSettingsProvider = \Drupal::service(ThemeSettingsProvider::class);
-    }
+    $this->configFactory = $config_factory;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('config.factory')
+    );
   }
 
   /**
@@ -48,7 +67,7 @@ class SystemBrandingBlock extends BlockBase implements ContainerFactoryPluginInt
       'use_site_logo' => TRUE,
       'use_site_name' => TRUE,
       'use_site_slogan' => TRUE,
-      'label_display' => '0',
+      'label_display' => FALSE,
     ];
   }
 
@@ -134,7 +153,7 @@ class SystemBrandingBlock extends BlockBase implements ContainerFactoryPluginInt
 
     $build['site_logo'] = [
       '#theme' => 'image',
-      '#uri' => $this->themeSettingsProvider->getSetting('logo.url'),
+      '#uri' => theme_get_setting('logo.url'),
       '#alt' => $this->t('Home'),
       '#access' => $this->configuration['use_site_logo'],
     ];

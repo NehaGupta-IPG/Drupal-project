@@ -30,7 +30,7 @@ class NodeTermData extends RelationshipPluginBase {
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin ID for the plugin instance.
+   *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\taxonomy\VocabularyStorageInterface $vocabulary_storage
@@ -53,18 +53,12 @@ class NodeTermData extends RelationshipPluginBase {
     );
   }
 
-  /**
-   * {@inheritdoc}
-   */
   protected function defineOptions() {
     $options = parent::defineOptions();
     $options['vids'] = ['default' => []];
     return $options;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     $vocabularies = $this->vocabularyStorage->loadMultiple();
     $options = [];
@@ -109,7 +103,7 @@ class NodeTermData extends RelationshipPluginBase {
       $def['type'] = empty($this->options['required']) ? 'LEFT' : 'INNER';
     }
     else {
-      // If vocabularies are supplied join a subselect instead.
+      // If vocabularies are supplied join a subselect instead
       $def['left_table'] = $this->tableAlias;
       $def['left_field'] = 'nid';
       $def['field'] = 'nid';

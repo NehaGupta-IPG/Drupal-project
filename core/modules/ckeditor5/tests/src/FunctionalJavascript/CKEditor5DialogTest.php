@@ -9,17 +9,14 @@ use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\ckeditor5\Traits\CKEditor5TestTrait;
 use Drupal\user\RoleInterface;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\ConstraintViolation;
 
 /**
  * Tests for CKEditor 5 to ensure correct focus management in dialogs.
  *
+ * @group ckeditor5
  * @internal
  */
-#[Group('ckeditor5')]
-#[RunTestsInSeparateProcesses]
 class CKEditor5DialogTest extends CKEditor5TestBase {
 
   use CKEditor5TestTrait;
@@ -56,7 +53,7 @@ class CKEditor5DialogTest extends CKEditor5TestBase {
     ])->save();
 
     $this->assertSame([], array_map(
-      function (ConstraintViolationInterface $v) {
+      function (ConstraintViolation $v) {
         return (string) $v->getMessage();
       },
       iterator_to_array(CKEditor5::validatePair(
@@ -84,7 +81,7 @@ class CKEditor5DialogTest extends CKEditor5TestBase {
     // Make sure the input field can have focus and we can type into it.
     $input->setValue($link_url);
     // Save the new link.
-    $page->find('xpath', "//button[span[text()='Insert']]")->click();
+    $page->find('css', '.ck-balloon-panel .ck-button-save')->click();
     // Make sure something was added to the text.
     $this->assertNotEmpty($content_area->getText());
   }

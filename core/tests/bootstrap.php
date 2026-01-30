@@ -7,8 +7,6 @@
  * @see phpunit.xml.dist
  */
 
-declare(strict_types=1);
-
 use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
 use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
 use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
@@ -48,7 +46,7 @@ function drupal_phpunit_find_extension_directories($scan_directory) {
  * @return array
  *   An array of directories under which contributed extensions may exist.
  */
-function drupal_phpunit_contrib_extension_directory_roots($root = NULL): array {
+function drupal_phpunit_contrib_extension_directory_roots($root = NULL) {
   if ($root === NULL) {
     $root = dirname(__DIR__, 2);
   }
@@ -144,7 +142,7 @@ function drupal_phpunit_populate_class_loader() {
 }
 
 // Do class loader population.
-drupal_phpunit_populate_class_loader();
+$loader = drupal_phpunit_populate_class_loader();
 class_alias('\Drupal\Tests\DocumentElement', '\Behat\Mink\Element\DocumentElement', TRUE);
 
 // Set sane locale settings, to ensure consistent string, dates, times and
@@ -164,7 +162,7 @@ mb_language('uni');
 date_default_timezone_set('Australia/Sydney');
 
 // Bootstrap the DeprecationHandler extension and the DebugClassloader to report
-// deprecations.
+// deprecations in PHPUnit 10+.
 if ($deprecationBridgeConfiguration = DeprecationHandler::getConfiguration()) {
   DeprecationHandler::init($deprecationBridgeConfiguration['ignoreFile'] ?? NULL);
 

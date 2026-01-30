@@ -24,14 +24,6 @@ interface FieldTypeCategoryInterface {
   public function getDescription(): string|\Stringable;
 
   /**
-   * Returns the field group summary.
-   *
-   * @return string|\Stringable
-   *   The category summary.
-   */
-  public function getSummary(): string|\Stringable;
-
-  /**
    * Returns the field group weight.
    *
    * @return int

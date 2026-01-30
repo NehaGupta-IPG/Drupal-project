@@ -142,11 +142,7 @@ abstract class LazyPluginCollection implements \IteratorAggregate, \Countable {
     $this->remove($instance_id);
   }
 
-  /**
-   * @return \Traversable<string, mixed>
-   *   A traversable generator.
-   */
-  public function getIterator(): \Traversable {
+  public function getIterator(): \ArrayIterator {
     $instances = [];
     foreach ($this->getInstanceIds() as $instance_id) {
       $instances[$instance_id] = $this->get($instance_id);

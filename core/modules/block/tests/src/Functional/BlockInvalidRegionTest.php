@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block\Functional;
 
-use Drupal\block\Entity\Block;
 use Drupal\Tests\BrowserTestBase;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Drupal\block\Entity\Block;
 
 /**
  * Tests that blocks assigned to invalid regions are disabled with a warning.
+ *
+ * @group block
  */
-#[Group('block')]
-#[RunTestsInSeparateProcesses]
 class BlockInvalidRegionTest extends BrowserTestBase {
 
   /**
-   * {@inheritdoc}
+   * Modules to install.
+   *
+   * @var array
    */
   protected static $modules = ['block', 'block_test'];
 
@@ -61,8 +61,7 @@ class BlockInvalidRegionTest extends BrowserTestBase {
 
     $warning_message = 'The block ' . $block->id() . ' was assigned to the invalid region invalid_region and has been disabled.';
 
-    // Clearing the cache should disable the test block placed in the invalid
-    // region.
+    // Clearing the cache should disable the test block placed in the invalid region.
     $this->drupalGet('admin/config/development/performance');
     $this->submitForm([], 'Clear all caches');
     $this->assertSession()->statusMessageContains($warning_message, 'warning');

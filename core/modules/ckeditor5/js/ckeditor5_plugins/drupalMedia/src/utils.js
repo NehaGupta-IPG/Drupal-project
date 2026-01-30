@@ -5,7 +5,7 @@ import { isWidget } from 'ckeditor5/src/widget';
 /**
  * Checks if the provided model element is `drupalMedia`.
  *
- * @param {module:engine/model/element~ModelElement} modelElement
+ * @param {module:engine/model/element~Element} modelElement
  *   The model element to be checked.
  * @return {boolean}
  *   A boolean indicating if the element is a drupalMedia element.
@@ -19,7 +19,7 @@ export function isDrupalMedia(modelElement) {
 /**
  * Checks if view element is <drupal-media> element.
  *
- * @param {module:engine/view/element~ModelElement} viewElement
+ * @param {module:engine/view/element~Element} viewElement
  *   The view element.
  * @return {boolean}
  *   A boolean indicating if the element is a <drupal-media> element.
@@ -37,7 +37,7 @@ export function isDrupalMediaWidget(viewElement) {
  *
  * @param {module:engine/model/selection~Selection|module:engine/model/documentselection~DocumentSelection} selection
  *   The current selection.
- * @return {module:engine/model/element~ModelElement|null}
+ * @return {module:engine/model/element~Element|null}
  *   The `drupalMedia` element which could be either the current selected an
  *   ancestor of the selection. Returns null if the selection has no Drupal
  *   Media element.
@@ -57,7 +57,7 @@ export function getClosestSelectedDrupalMediaElement(selection) {
  *
  * @param {module:engine/model/selection~Selection} selection
  *   The current selection.
- * @return {module:engine/view/element~ModelElement|null}
+ * @return {module:engine/view/element~Element|null}
  *   The currently selected Drupal Media widget or null.
  *
  * @private
@@ -105,9 +105,9 @@ export function isObject(value) {
 /**
  * Gets the preview container element from the media element.
  *
- * @param {Iterable.<module:engine/view/element~ModelElement>} children
+ * @param {Iterable.<module:engine/view/element~Element>} children
  *   The child elements.
- * @return {null|module:engine/view/element~ModelElement}
+ * @return {null|module:engine/view/element~Element}
  *   The preview child element if available.
  */
 export function getPreviewContainer(children) {

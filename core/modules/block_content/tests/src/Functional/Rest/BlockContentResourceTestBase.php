@@ -7,15 +7,12 @@ namespace Drupal\Tests\block_content\Functional\Rest;
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Core\Cache\Cache;
-use Drupal\Tests\block_content\Traits\BlockContentCreationTrait;
 use Drupal\Tests\rest\Functional\EntityResource\EntityResourceTestBase;
 
 /**
- * Resource test base for BlockContent entity.
+ * ResourceTestBase for BlockContent entity.
  */
 abstract class BlockContentResourceTestBase extends EntityResourceTestBase {
-
-  use BlockContentCreationTrait;
 
   /**
    * {@inheritdoc}
@@ -68,11 +65,13 @@ abstract class BlockContentResourceTestBase extends EntityResourceTestBase {
    */
   protected function createEntity() {
     if (!BlockContentType::load('basic')) {
-      $this->createBlockContentType([
+      $block_content_type = BlockContentType::create([
         'id' => 'basic',
         'label' => 'basic',
         'revision' => TRUE,
-      ], TRUE);
+      ]);
+      $block_content_type->save();
+      block_content_add_body_field($block_content_type->id());
     }
 
     // Create a "Llama" content block.
@@ -163,6 +162,7 @@ abstract class BlockContentResourceTestBase extends EntityResourceTestBase {
         [
           'value' => 'The name "llama" was adopted by European settlers from native Peruvians.',
           'format' => 'plain_text',
+          'summary' => NULL,
           'processed' => "<p>The name &quot;llama&quot; was adopted by European settlers from native Peruvians.</p>\n",
         ],
       ],

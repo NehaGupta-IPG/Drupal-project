@@ -18,20 +18,75 @@ use Drupal\Core\Validation\BasicRecursiveValidatorFactory;
 use Drupal\file\Entity\File;
 use Drupal\file\FileRepositoryInterface;
 use Drupal\file\Validation\FileValidatorInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
 
 /**
  * Handles validating and creating file entities from file uploads.
  */
-class FileUploadHandler implements FileUploadHandlerInterface {
+class FileUploadHandler {
 
   /**
    * The default extensions if none are provided.
    */
   const DEFAULT_EXTENSIONS = 'jpg jpeg gif png txt doc xls pdf ppt pps odt ods odp';
+
+  /**
+   * The file system service.
+   *
+   * @var \Drupal\Core\File\FileSystemInterface
+   */
+  protected $fileSystem;
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * The stream wrapper manager.
+   *
+   * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface
+   */
+  protected $streamWrapperManager;
+
+  /**
+   * The event dispatcher.
+   *
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  protected $eventDispatcher;
+
+  /**
+   * The current user.
+   *
+   * @var \Drupal\Core\Session\AccountInterface
+   */
+  protected $currentUser;
+
+  /**
+   * The MIME type guesser.
+   *
+   * @var \Symfony\Component\Mime\MimeTypeGuesserInterface
+   */
+  protected $mimeTypeGuesser;
+
+  /**
+   * The request stack.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
+  protected $requestStack;
+
+  /**
+   * The file Repository.
+   *
+   * @var \Drupal\file\FileRepositoryInterface
+   */
+  protected $fileRepository;
 
   /**
    * The file validator.
@@ -41,17 +96,15 @@ class FileUploadHandler implements FileUploadHandlerInterface {
   protected FileValidatorInterface $fileValidator;
 
   public function __construct(
-    protected FileSystemInterface $fileSystem,
-    protected EntityTypeManagerInterface $entityTypeManager,
-    protected StreamWrapperManagerInterface $streamWrapperManager,
-    protected EventDispatcherInterface $eventDispatcher,
-    #[Autowire(service: 'file.mime_type.guesser')]
-    protected MimeTypeGuesserInterface $mimeTypeGuesser,
-    protected AccountInterface $currentUser,
-    protected RequestStack $requestStack,
-    protected FileRepositoryInterface $fileRepository,
-    protected FileValidatorInterface $file_validator,
-    #[Autowire(service: 'lock')]
+    FileSystemInterface $fileSystem,
+    EntityTypeManagerInterface $entityTypeManager,
+    StreamWrapperManagerInterface $streamWrapperManager,
+    EventDispatcherInterface $eventDispatcher,
+    MimeTypeGuesserInterface $mimeTypeGuesser,
+    AccountInterface $currentUser,
+    RequestStack $requestStack,
+    FileRepositoryInterface $fileRepository,
+    FileValidatorInterface $file_validator,
     protected LockBackendInterface $lock,
     protected BasicRecursiveValidatorFactory $validatorFactory,
   ) {
@@ -67,7 +120,32 @@ class FileUploadHandler implements FileUploadHandlerInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Creates a file from an upload.
+   *
+   * @param \Drupal\file\Upload\UploadedFileInterface $uploadedFile
+   *   The uploaded file object.
+   * @param array $validators
+   *   The validators to run against the uploaded file.
+   * @param string $destination
+   *   The destination directory.
+   * @param \Drupal\Core\File\FileExists|int $fileExists
+   *   The behavior when the destination file already exists.
+   *
+   * @return \Drupal\file\Upload\FileUploadResult
+   *   The created file entity.
+   *
+   * @throws \Symfony\Component\HttpFoundation\File\Exception\FileException
+   *    Thrown when a file upload error occurred and $throws is TRUE.
+   * @throws \Drupal\Core\File\Exception\FileWriteException
+   *    Thrown when there is an error moving the file and $throws is TRUE.
+   * @throws \Drupal\Core\File\Exception\FileException
+   *    Thrown when a file system error occurs and $throws is TRUE.
+   * @throws \Drupal\file\Upload\FileValidationException
+   *    Thrown when file validation fails and $throws is TRUE.
+   * @throws \Drupal\Core\Lock\LockAcquiringException
+   *   Thrown when a lock cannot be acquired.
+   * @throws \ValueError
+   *   Thrown if $fileExists is a legacy int and not a valid value.
    */
   public function handleFileUpload(UploadedFileInterface $uploadedFile, array $validators = [], string $destination = 'temporary://', /*FileExists*/$fileExists = FileExists::Replace): FileUploadResult {
     if (!$fileExists instanceof FileExists) {
@@ -153,7 +231,7 @@ class FileUploadHandler implements FileUploadHandlerInterface {
 
       // Update the filename with any changes as a result of security or
       // renaming due to an existing file.
-      $file->setFilename(basename($file->getFileUri()));
+      $file->setFilename($this->fileSystem->basename($file->getFileUri()));
 
       if ($fileExists === FileExists::Replace) {
         $existingFile = $this->fileRepository->loadByUri($file->getFileUri());

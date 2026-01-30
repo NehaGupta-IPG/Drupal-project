@@ -26,10 +26,10 @@ class InstallerException extends \RuntimeException {
    *   (optional) The page title. Defaults to 'Error'.
    * @param int $code
    *   (optional) The exception code. Defaults to 0.
-   * @param \Throwable $previous
+   * @param \Exception $previous
    *   (optional) A previous exception.
    */
-  public function __construct($message, $title = 'Error', $code = 0, ?\Throwable $previous = NULL) {
+  public function __construct($message, $title = 'Error', $code = 0, ?\Exception $previous = NULL) {
     parent::__construct($message, $code, $previous);
     $this->title = $title;
   }
@@ -38,7 +38,6 @@ class InstallerException extends \RuntimeException {
    * Returns the exception page title.
    *
    * @return string
-   *   The page title.
    */
   public function getTitle() {
     return $this->title;

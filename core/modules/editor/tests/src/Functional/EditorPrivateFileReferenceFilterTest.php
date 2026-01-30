@@ -9,18 +9,18 @@ use Drupal\node\NodeInterface;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Editor module's file reference filter with private files.
+ *
+ * @group editor
  */
-#[Group('editor')]
-#[RunTestsInSeparateProcesses]
 class EditorPrivateFileReferenceFilterTest extends BrowserTestBase {
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = [
     'editor_test',

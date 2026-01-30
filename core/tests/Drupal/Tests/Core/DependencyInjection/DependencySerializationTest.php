@@ -8,22 +8,17 @@ use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Test\TestKernel;
 use Drupal\Tests\UnitTestCase;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Tests Drupal\Core\DependencyInjection\DependencySerializationTrait.
+ * @coversDefaultClass \Drupal\Core\DependencyInjection\DependencySerializationTrait
+ * @group DependencyInjection
  */
-#[CoversClass(DependencySerializationTrait::class)]
-#[Group('DependencyInjection')]
 class DependencySerializationTest extends UnitTestCase {
 
   /**
-   * Tests serialization.
-   *
-   * @legacy-covers ::__sleep
-   * @legacy-covers ::__wakeup
+   * @covers ::__sleep
+   * @covers ::__wakeup
    */
   public function testSerialization(): void {
     // Create a pseudo service and dependency injected object.

@@ -178,9 +178,6 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
     return $this->valueOptions;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   protected function defineOptions() {
     $options = parent::defineOptions();
 
@@ -189,9 +186,6 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
     return $options;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   protected function valueForm(&$form, FormStateInterface $form_state) {
     $form['value'] = [];
 
@@ -248,19 +242,12 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
     }
   }
 
-  /**
-   * {@inheritdoc}
-   */
   protected function valueValidate($form, FormStateInterface $form_state) {
-    if ($form_state->getValue(['options', 'value']) == 'All'
-      && !$form_state->isValueEmpty(['options', 'expose', 'required'])) {
+    if ($form_state->getValue(['options', 'value']) == 'All' && !$form_state->isValueEmpty(['options', 'expose', 'required'])) {
       $form_state->setErrorByName('value', $this->t('You must select a value unless this is an non-required exposed filter.'));
     }
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function adminSummary() {
     if ($this->isAGroup()) {
       return $this->t('grouped');
@@ -283,9 +270,6 @@ class BooleanOperator extends FilterPluginBase implements FilterOperatorsInterfa
     return $this->operator;
   }
 
-  /**
-   * {@inheritdoc}
-   */
   public function defaultExposeOptions() {
     parent::defaultExposeOptions();
     $this->options['expose']['operator_id'] = '';

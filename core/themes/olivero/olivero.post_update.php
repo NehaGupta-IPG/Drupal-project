@@ -8,7 +8,7 @@
 /**
  * Implements hook_removed_post_updates().
  */
-function olivero_removed_post_updates(): array {
+function olivero_removed_post_updates() {
   return [
     'olivero_post_update_add_olivero_primary_color' => '11.0.0',
   ];

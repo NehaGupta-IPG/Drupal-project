@@ -2,12 +2,6 @@
 
 /**
  * @file
- */
-
-use Drupal\file\FileInterface;
-
-/**
- * @file
  * Hooks for file module.
  */
 
@@ -75,7 +69,7 @@ use Drupal\file\FileInterface;
  *
  * @see \Drupal\file\FileRepositoryInterface::copy()
  */
-function hook_file_copy(FileInterface $file, FileInterface $source): void {
+function hook_file_copy(\Drupal\file\FileInterface $file, \Drupal\file\FileInterface $source) {
   // Make sure that the file name starts with the owner's user name.
   if (!str_starts_with($file->getFilename(), $file->getOwner()->name)) {
     $file->setFilename($file->getOwner()->name . '_' . $file->getFilename());
@@ -95,7 +89,7 @@ function hook_file_copy(FileInterface $file, FileInterface $source): void {
  *
  * @see \Drupal\file\FileRepositoryInterface::move()
  */
-function hook_file_move(FileInterface $file, FileInterface $source): void {
+function hook_file_move(\Drupal\file\FileInterface $file, \Drupal\file\FileInterface $source) {
   // Make sure that the file name starts with the owner's user name.
   if (!str_starts_with($file->getFilename(), $file->getOwner()->name)) {
     $file->setFilename($file->getOwner()->name . '_' . $file->getFilename());

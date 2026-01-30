@@ -57,14 +57,7 @@ abstract class EntityReferenceFormatterBase extends FormatterBase {
         $item->_accessCacheability = CacheableMetadata::createFromObject($access);
         if ($access->isAllowed()) {
           // Add the referring item, in case the formatter needs it.
-          if (isset($entity->_referringItem) && ($entity->_referringItem !== $item)) {
-            // If the entity is already being referenced by another field item,
-            // clone the entity so that _referringItem is set to the correct
-            // item in each instance.
-            $entity = clone $entity;
-            $item->entity = $entity;
-          }
-          $entity->_referringItem = $item;
+          $entity->_referringItem = $items[$delta];
           $entities[$delta] = $entity;
         }
       }
@@ -150,7 +143,7 @@ abstract class EntityReferenceFormatterBase extends FormatterBase {
     // the 'loaded' flag.
     foreach ($entities_items as $items) {
       foreach ($items as $item) {
-        if (isset($item->target_id, $target_entities[$item->target_id])) {
+        if (isset($target_entities[$item->target_id])) {
           $item->entity = $target_entities[$item->target_id];
           $item->_loaded = TRUE;
         }

@@ -27,9 +27,9 @@ interface FormSubmitterInterface {
    * Button-specific handlers are checked first. If none exist, the function
    * falls back to form-level handlers.
    *
-   * @param array $form
+   * @param $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param $form_state
    *   The current state of the form. If the user submitted the form by clicking
    *   a button with custom handler functions defined, those handlers will be
    *   stored here.
@@ -69,8 +69,6 @@ interface FormSubmitterInterface {
    *   The current state of the form.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse|null
-   *   The HTTP response if the form submission results in a redirect, otherwise
-   *   NULL.
    *
    * @see \Drupal\Core\Form\FormBuilderInterface::processForm()
    * @see \Drupal\Core\Form\FormBuilderInterface::buildForm()

@@ -5,7 +5,6 @@ namespace Drupal\Core\Security;
 use Drupal\Component\Utility\UrlHelper;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Sanitizes user input.
@@ -41,9 +40,6 @@ class RequestSanitizer {
    *   The sanitized request.
    */
   public static function sanitize(Request $request, array $safe_keys, $log_sanitized_keys = FALSE) {
-    if ($request->getMethod() !== $request->getRealMethod() && $request->isMethodSafe()) {
-      throw new BadRequestHttpException("Changing a request's method to a safe method is not supported.");
-    }
     if (!$request->attributes->get(self::SANITIZED, FALSE)) {
       $update_globals = FALSE;
       $bags = [

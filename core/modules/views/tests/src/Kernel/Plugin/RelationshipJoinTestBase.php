@@ -17,7 +17,9 @@ use Drupal\views\Views;
 abstract class RelationshipJoinTestBase extends PluginKernelTestBase {
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['system', 'user', 'field'];
 

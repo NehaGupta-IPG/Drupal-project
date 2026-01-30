@@ -24,19 +24,12 @@ trait UpdatePathTestTrait {
   protected $checkFailedUpdates = TRUE;
 
   /**
-   * Fail the test if there are entity field definition updates needed.
-   *
-   * @var bool
-   */
-  protected $checkEntityFieldDefinitionUpdates = TRUE;
-
-  /**
    * Helper function to run pending database updates.
    *
    * @param string|null $update_url
    *   The update URL.
    */
-  protected function runUpdates($update_url = NULL): void {
+  protected function runUpdates($update_url = NULL) {
     if (!$update_url) {
       $update_url = Url::fromRoute('system.db_update');
     }
@@ -98,7 +91,12 @@ trait UpdatePathTestTrait {
       $modules_installed = FALSE;
       // Modules that are in configuration but not the module handler have been
       // installed.
-      $modules_installed = !empty(array_diff_key($config_module_list, $module_handler_list));
+      /** @var \Drupal\Core\Extension\ModuleExtensionList $module_list */
+      $module_list = $this->container->get('extension.list.module');
+      foreach (array_keys(array_diff_key($config_module_list, $module_handler_list)) as $module) {
+        $module_handler->addModule($module, $module_list->getPath($module));
+        $modules_installed = TRUE;
+      }
       $modules_uninstalled = FALSE;
       $module_handler_list = $module_handler->getModuleList();
       // Modules that are in the module handler but not configuration have been
@@ -147,19 +145,17 @@ trait UpdatePathTestTrait {
       }
 
       // Ensure that the update hooks updated all entity schema.
-      if ($this->checkEntityFieldDefinitionUpdates) {
-        $needs_updates = \Drupal::entityDefinitionUpdateManager()->needsUpdates();
-        if ($needs_updates) {
-          foreach (\Drupal::entityDefinitionUpdateManager()->getChangeSummary() as $entity_type_id => $summary) {
-            $entity_type_label = \Drupal::entityTypeManager()->getDefinition($entity_type_id)->getLabel();
-            foreach ($summary as $message) {
-              $this->fail("$entity_type_label: $message");
-            }
+      $needs_updates = \Drupal::entityDefinitionUpdateManager()->needsUpdates();
+      if ($needs_updates) {
+        foreach (\Drupal::entityDefinitionUpdateManager()->getChangeSummary() as $entity_type_id => $summary) {
+          $entity_type_label = \Drupal::entityTypeManager()->getDefinition($entity_type_id)->getLabel();
+          foreach ($summary as $message) {
+            $this->fail("$entity_type_label: $message");
           }
-          // The above calls to `fail()` should prevent this from ever being
-          // called, but it is here in case something goes really wrong.
-          $this->assertFalse($needs_updates, 'After all updates ran, entity schema is up to date.');
         }
+        // The above calls to `fail()` should prevent this from ever being
+        // called, but it is here in case something goes really wrong.
+        $this->assertFalse($needs_updates, 'After all updates ran, entity schema is up to date.');
       }
     }
   }
@@ -167,7 +163,7 @@ trait UpdatePathTestTrait {
   /**
    * Tests the selection page.
    */
-  protected function doSelectionTest(): void {
+  protected function doSelectionTest() {
     // No-op. Tests wishing to do test the selection page or the general
     // update.php environment before running update.php can override this method
     // and implement their required tests.
@@ -176,7 +172,7 @@ trait UpdatePathTestTrait {
   /**
    * Installs the update_script_test module and makes an update available.
    */
-  protected function ensureUpdatesToRun(): void {
+  protected function ensureUpdatesToRun() {
     \Drupal::service('module_installer')->install(['update_script_test']);
     // Reset the schema so there is an update to run.
     \Drupal::service('update.update_hook_registry')->setInstalledVersion('update_script_test', 8000);

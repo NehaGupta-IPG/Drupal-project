@@ -5,16 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Core\Url;
-use Drupal\jsonapi\JsonApiSpec;
 use Drupal\taxonomy\Entity\Vocabulary;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * JSON:API integration test for the "vocabulary" config entity type.
+ *
+ * @group jsonapi
+ * @group #slow
  */
-#[Group('jsonapi')]
-#[RunTestsInSeparateProcesses]
 class VocabularyTest extends ConfigEntityResourceTestBase {
 
   /**
@@ -47,7 +45,7 @@ class VocabularyTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method): void {
+  protected function setUpAuthorization($method) {
     $this->grantPermissionsToTestedRole(['administer taxonomy']);
   }
 
@@ -73,10 +71,10 @@ class VocabularyTest extends ConfigEntityResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
+            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
           ],
         ],
-        'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
+        'version' => '1.0',
       ],
       'links' => [
         'self' => ['href' => $self_url],

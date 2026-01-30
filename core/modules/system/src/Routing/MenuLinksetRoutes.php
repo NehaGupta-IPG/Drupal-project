@@ -103,7 +103,6 @@ class MenuLinksetRoutes extends RouteSubscriberBase implements ContainerInjectio
         ],
         [
           '_access' => 'TRUE',
-          '_format' => 'json',
         ],
         [
           'parameters' => [

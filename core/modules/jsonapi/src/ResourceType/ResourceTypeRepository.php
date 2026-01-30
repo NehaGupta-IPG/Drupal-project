@@ -492,11 +492,9 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
     /** @var \Drupal\Core\Field\TypedData\FieldItemDataDefinition $item_definition */
     $item_definition = $field_definition->getItemDefinition();
     $main_property = $item_definition->getMainPropertyName();
-    if ($main_property !== NULL) {
-      $property_definition = $item_definition->getPropertyDefinition($main_property);
-    }
+    $property_definition = $item_definition->getPropertyDefinition($main_property);
 
-    return $field_type_is_reference[$field_definition->getType()] = isset($property_definition) && $property_definition instanceof DataReferenceTargetDefinition;
+    return $field_type_is_reference[$field_definition->getType()] = $property_definition instanceof DataReferenceTargetDefinition;
   }
 
   /**

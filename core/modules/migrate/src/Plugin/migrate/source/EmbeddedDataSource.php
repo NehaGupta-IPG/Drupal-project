@@ -2,7 +2,6 @@
 
 namespace Drupal\migrate\Plugin\migrate\source;
 
-use Drupal\migrate\Attribute\MigrateSource;
 use Drupal\migrate\Plugin\MigrationInterface;
 
 /**
@@ -41,8 +40,12 @@ use Drupal\migrate\Plugin\MigrationInterface;
  *
  * For additional configuration keys, refer to the parent class:
  * @see \Drupal\migrate\Plugin\migrate\source\SourcePluginBase
+ *
+ * @MigrateSource(
+ *   id = "embedded_data",
+ *   source_module = "migrate"
+ * )
  */
-#[MigrateSource('embedded_data')]
 class EmbeddedDataSource extends SourcePluginBase {
 
   /**

@@ -95,14 +95,13 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
    * {@inheritdoc}
    */
   public function removeResults(TestRun $test_run): int {
-    $transaction = $this->connection->startTransaction('delete_test_run');
+    $this->connection->startTransaction('delete_test_run');
     $this->connection->delete('simpletest')
       ->condition('test_id', $test_run->id())
       ->execute();
     $count = $this->connection->delete('simpletest_test_id')
       ->condition('test_id', $test_run->id())
       ->execute();
-    $transaction->commitOrRelease();
     return $count;
   }
 
@@ -170,10 +169,9 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
    */
   public function cleanUp(): int {
     // Clear test results.
-    $transaction = $this->connection->startTransaction('delete_simpletest');
+    $this->connection->startTransaction('delete_simpletest');
     $this->connection->delete('simpletest')->execute();
     $count = $this->connection->delete('simpletest_test_id')->execute();
-    $transaction->commitOrRelease();
     return $count;
   }
 
@@ -210,7 +208,7 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
           'length' => 9,
           'not null' => TRUE,
           'default' => '',
-          'description' => 'Message status.',
+          'description' => 'Message status. Core understands pass, fail, exception.',
         ],
         'message' => [
           'type' => 'text',
@@ -243,18 +241,6 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
           'not null' => TRUE,
           'default' => '',
           'description' => 'Name of the file where the function is called.',
-        ],
-        'time' => [
-          'type' => 'float',
-          'not null' => TRUE,
-          'default' => 0,
-          'description' => 'Time elapsed for the execution of the test.',
-        ],
-        'exit_code' => [
-          'type' => 'int',
-          'not null' => TRUE,
-          'default' => 0,
-          'description' => 'The exit code of the test executed.',
         ],
       ],
       'primary key' => ['message_id'],

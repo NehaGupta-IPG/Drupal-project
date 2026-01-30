@@ -191,6 +191,14 @@ system.file_system_settings:
   requirements:
     _permission: 'administer site configuration'
 
+system.rss_feeds_settings:
+  path: '/admin/config/services/rss-publishing'
+  defaults:
+    _form: '\Drupal\system\Form\RssFeedsForm'
+    _title: 'RSS publishing'
+  requirements:
+    _permission: 'administer site configuration'
+
 system.regional_settings:
   path: '/admin/config/regional/settings'
   defaults:
@@ -332,7 +340,6 @@ system.files:
     scheme: private
   requirements:
     _access: 'TRUE'
-    scheme: '^(?!(module|theme)).*'
 
 system.private_file_download:
   path: '/system/files/{filepath}'

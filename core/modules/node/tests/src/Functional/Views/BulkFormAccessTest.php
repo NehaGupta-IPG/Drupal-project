@@ -6,26 +6,22 @@ namespace Drupal\Tests\node\Functional\Views;
 
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
-use Drupal\Tests\node\Traits\NodeAccessTrait;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests if entity access is respected on a node bulk operations form.
  *
+ * @group node
  * @see \Drupal\node\Plugin\views\field\BulkForm
  * @see \Drupal\node\Tests\NodeTestBase
  * @see \Drupal\node\Tests\NodeAccessBaseTableTest
  * @see \Drupal\node\Tests\Views\BulkFormTest
  */
-#[Group('node')]
-#[RunTestsInSeparateProcesses]
 class BulkFormAccessTest extends NodeTestBase {
 
-  use NodeAccessTrait;
-
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['node_test_views', 'node_access_test'];
 
@@ -59,7 +55,7 @@ class BulkFormAccessTest extends NodeTestBase {
 
     $this->accessHandler = \Drupal::entityTypeManager()->getAccessControlHandler('node');
 
-    $this->addPrivateField(NodeType::load('article'));
+    node_access_test_add_field(NodeType::load('article'));
 
     // After enabling a node access module, the access table has to be rebuild.
     node_access_rebuild();

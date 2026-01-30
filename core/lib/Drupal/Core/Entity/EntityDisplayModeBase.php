@@ -29,7 +29,7 @@ abstract class EntityDisplayModeBase extends ConfigEntityBase implements EntityD
    *
    * @var string|null
    */
-  protected ?string $description = NULL;
+  protected ?string $description;
 
   /**
    * The entity type this form or view mode is used for.

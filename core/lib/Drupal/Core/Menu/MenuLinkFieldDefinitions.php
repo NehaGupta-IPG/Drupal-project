@@ -3,7 +3,7 @@
 namespace Drupal\Core\Menu;
 
 /**
- * Provides default values for menu link plugin definitions.
+ * Provides base field definitions for an entity type.
  *
  * @package Drupal\Core\Menu
  */

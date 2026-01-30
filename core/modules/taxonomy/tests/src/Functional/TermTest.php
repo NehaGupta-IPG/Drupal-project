@@ -6,19 +6,17 @@ namespace Drupal\Tests\taxonomy\Functional;
 
 use Drupal\Component\Utility\Tags;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\TermInterface;
 use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests load, save and delete for taxonomy terms.
+ * Tests load, save, reorder and delete for taxonomy terms.
+ *
+ * @group taxonomy
+ * @group #slow
  */
-#[Group('taxonomy')]
-#[RunTestsInSeparateProcesses]
 class TermTest extends TaxonomyTestBase {
 
   use AssertBreadcrumbTrait;
@@ -38,9 +36,11 @@ class TermTest extends TaxonomyTestBase {
   protected $field;
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var string[]
    */
-  protected static $modules = ['block', 'taxonomy_test'];
+  protected static $modules = ['block'];
 
   /**
    * {@inheritdoc}
@@ -72,7 +72,7 @@ class TermTest extends TaxonomyTestBase {
       ],
       'auto_create' => TRUE,
     ];
-    $this->createEntityReferenceField('node', 'article', $field_name, '', 'taxonomy_term', 'default', $handler_settings, FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
+    $this->createEntityReferenceField('node', 'article', $field_name, NULL, 'taxonomy_term', 'default', $handler_settings, FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED);
     $this->field = FieldConfig::loadByName('node', 'article', $field_name);
 
     /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
@@ -140,6 +140,8 @@ class TermTest extends TaxonomyTestBase {
     $term1 = $this->createTerm($this->vocabulary);
     $terms_array = [];
 
+    $taxonomy_storage = $this->container->get('entity_type.manager')->getStorage('taxonomy_term');
+
     // Create 40 terms. Terms 1-12 get parent of $term1. All others are
     // individual terms.
     for ($x = 1; $x <= 40; $x++) {
@@ -152,6 +154,8 @@ class TermTest extends TaxonomyTestBase {
         $edit['parent'] = $term1->id();
       }
       $term = $this->createTerm($this->vocabulary, $edit);
+      $children = $taxonomy_storage->loadChildren($term1->id());
+      $parents = $taxonomy_storage->loadParents($term->id());
       $terms_array[$x] = Term::load($term->id());
     }
 
@@ -439,66 +443,101 @@ class TermTest extends TaxonomyTestBase {
   }
 
   /**
-   * Save, edit and delete a term using the user interface.
+   * Change order of terms & update a term using the user interface.
    */
   public function testTermReorder(): void {
     $assert = $this->assertSession();
-    $this->createTerm($this->vocabulary);
-    $this->createTerm($this->vocabulary);
-    $this->createTerm($this->vocabulary);
+    $this->createTerm($this->vocabulary, ['name' => 'Alpha']);
+    $this->createTerm($this->vocabulary, ['name' => 'Beta']);
+    $this->createTerm($this->vocabulary, ['name' => 'Charlie']);
+    $this->createTerm($this->vocabulary, ['name' => 'Delta']);
 
     $taxonomy_storage = $this->container->get('entity_type.manager')->getStorage('taxonomy_term');
 
-    // Fetch the created terms in the default alphabetical order, i.e. term1
-    // precedes term2 alphabetically, and term2 precedes term3.
-    $taxonomy_storage->resetCache();
-    [$term1, $term2, $term3] = $taxonomy_storage->loadTree($this->vocabulary->id(), 0, NULL, TRUE);
+    // Fetch the created terms in the default alphabetical order, i.e. term1,
+    // term2, term3 & term4.
+    [$term1, $term2, $term3, $term4] = $taxonomy_storage->loadTree($this->vocabulary->id(), 0, NULL, TRUE);
 
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/overview');
 
+    $page = $this->getSession()->getPage();
+
     // Each term has four hidden fields, "tid:1:0[tid]", "tid:1:0[parent]",
-    // "tid:1:0[depth]", and "tid:1:0[weight]". Change the order to term2,
-    // term3, term1 by setting weight property, make term3 a child of term2 by
-    // setting the parent and depth properties, and update all hidden fields.
-    $hidden_edit = [
+    // "tid:1:0[depth]", and "tid:1:0[weight]". Change the order to
+    // term4 (Delta), term2 (Beta), term3 (Charlie), term1 (Alpha), by setting
+    // weight property. Make term3 a child of term2 by setting the parent
+    // and depth properties, and update all hidden fields.
+    $fields = [
       'terms[tid:' . $term2->id() . ':0][term][tid]' => $term2->id(),
       'terms[tid:' . $term2->id() . ':0][term][parent]' => 0,
       'terms[tid:' . $term2->id() . ':0][term][depth]' => 0,
+      'terms[tid:' . $term2->id() . ':0][weight]' => 1,
       'terms[tid:' . $term3->id() . ':0][term][tid]' => $term3->id(),
       'terms[tid:' . $term3->id() . ':0][term][parent]' => $term2->id(),
       'terms[tid:' . $term3->id() . ':0][term][depth]' => 1,
+      'terms[tid:' . $term3->id() . ':0][weight]' => 0,
+      'terms[tid:' . $term4->id() . ':0][term][tid]' => 0,
+      'terms[tid:' . $term4->id() . ':0][term][parent]' => 0,
+      'terms[tid:' . $term4->id() . ':0][term][depth]' => 0,
+      'terms[tid:' . $term4->id() . ':0][weight]' => 0,
       'terms[tid:' . $term1->id() . ':0][term][tid]' => $term1->id(),
       'terms[tid:' . $term1->id() . ':0][term][parent]' => 0,
       'terms[tid:' . $term1->id() . ':0][term][depth]' => 0,
-    ];
-    // Because we can't post hidden form elements, we have to change them in
-    // code here, and then submit.
-    foreach ($hidden_edit as $field => $value) {
-      $node = $assert->hiddenFieldExists($field);
-      $node->setValue($value);
-    }
-    // Edit non-hidden elements within submitForm().
-    $edit = [
-      'terms[tid:' . $term2->id() . ':0][weight]' => 0,
-      'terms[tid:' . $term3->id() . ':0][weight]' => 1,
       'terms[tid:' . $term1->id() . ':0][weight]' => 2,
     ];
-    $this->submitForm($edit, 'Save');
 
+    foreach ($fields as $field => $value) {
+      $page->find('css', '[name="' . $field . '"]')->setValue($value);
+    }
+
+    $page->pressButton((string) t('Save'));
+
+    // Asserts the order & hierarchy has been saved & show new order in the UI.
+    $assert->fieldValueEquals('terms[tid:4:0][weight]', '1');
+    $assert->fieldValueEquals('terms[tid:2:0][weight]', '2');
+    $assert->fieldValueEquals('terms[tid:3:0][weight]', '0');
+    $assert->hiddenFieldValueEquals('terms[tid:3:0][term][parent]', '2');
+    $assert->fieldValueEquals('terms[tid:1:0][weight]', '3');
+
+    // Reload terms to prevent usage of cached loaded terms.
     $taxonomy_storage->resetCache();
+
+    // Asserts, loadTree return the new order.
     $terms = $taxonomy_storage->loadTree($this->vocabulary->id());
-    $this->assertEquals($term2->id(), $terms[0]->tid, 'Term 2 was moved above term 1.');
-    $this->assertEquals([$term2->id()], $terms[1]->parents, 'Term 3 was made a child of term 2.');
-    $this->assertEquals($term1->id(), $terms[2]->tid, 'Term 1 was moved below term 2.');
+    $this->assertEquals($term4->id(), $terms[0]->tid, 'Term 4 is the first term.');
+    $this->assertEquals($term2->id(), $terms[1]->tid, 'Term 2 was moved above term 4.');
+    $this->assertEquals([$term2->id()], $terms[2]->parents, 'Term 3 was made a child of term 2.');
+    $this->assertEquals($term1->id(), $terms[3]->tid, 'Term 1 was moved below term 2.');
 
+    // Then reset terms to alphabetical order.
     $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/overview');
-    $this->submitForm([], 'Reset to alphabetical');
+    $this->submitForm([], t('Reset to alphabetical'));
     // Submit confirmation form.
-    $this->submitForm([], 'Reset to alphabetical');
+    $this->submitForm([], t('Reset to alphabetical'));
     // Ensure form redirected back to overview.
-    $this->assertSession()->addressEquals('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/overview');
+    $assert->addressEquals('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/overview');
 
+    // Updating the Term2 (Beta) should not alter the order.
+    // By updating the Term2 we asserts the previous "Reset to alphabetical"
+    // action has reset the term cache & prevent usage of cached terms weight.
+    $this->drupalGet('taxonomy/term/' . $term2->id() . '/edit');
+    $this->submitForm([], t('Save'));
+
+    // Return on the vocabulary overview page.
+    $this->drupalGet('admin/structure/taxonomy/manage/' . $this->vocabulary->id() . '/overview');
+    $page = $this->getSession()->getPage();
+
+    // Asserts the new weight are set to 0 on the UI & order stay unchanged.
+    $assert->fieldValueEquals('terms[tid:2:0][weight]', '0');
+    $assert->fieldValueEquals('terms[tid:3:0][weight]', '0');
+    $assert->hiddenFieldValueEquals('terms[tid:3:0][term][parent]', '2');
+    $assert->fieldValueEquals('terms[tid:4:0][weight]', '0');
+    $assert->fieldValueEquals('terms[tid:1:0][weight]', '0');
+
+    // Reload terms to prevent usage of cached loaded terms.
     $taxonomy_storage->resetCache();
+
+    // Asserts, after reset the internal cache, loadTree return the new order.
     $terms = $taxonomy_storage->loadTree($this->vocabulary->id(), 0, NULL, TRUE);
     $this->assertEquals($term1->id(), $terms[0]->id(), 'Term 1 was moved to back above term 2.');
     $this->assertEquals($term2->id(), $terms[1]->id(), 'Term 2 was moved to back below term 1.');
@@ -565,43 +604,6 @@ class TermTest extends TaxonomyTestBase {
     // Check that we have the expected parents.
     $term = $this->reloadTermByName($edit['name[0][value]']);
     $this->assertEquals([1, 2], $this->getParentTids($term), 'Term parents (two real) were successfully saved.');
-  }
-
-  /**
-   * Tests destination after saving terms.
-   */
-  public function testRedirects(): void {
-    // Save a new term.
-    $addUrl = Url::fromRoute('entity.taxonomy_term.add_form', ['taxonomy_vocabulary' => $this->vocabulary->id()]);
-    $this->drupalGet($addUrl);
-    $this->submitForm([
-      'name[0][value]' => $this->randomMachineName(),
-    ], 'Save');
-
-    // Adding a term reloads the form.
-    $this->assertSession()->addressEquals($addUrl->toString());
-    $this->assertSession()->pageTextContains('Created new term');
-
-    // Update a term.
-    $term = Term::create(['vid' => $this->vocabulary->id(), 'name' => $this->randomMachineName()]);
-    $term->save();
-    $this->drupalGet($term->toUrl('edit-form'));
-    $this->submitForm(edit: [], submit: 'Save');
-
-    // Updating a term sends user to view the term.
-    $this->assertSession()->addressEquals($term->toUrl()->setAbsolute());
-    $this->assertSession()->pageTextContains('Updated term');
-
-    // Unless the term is not accessible to the user.
-    // Label triggers forbidden in taxonomy_test_entity_access().
-    $term = Term::create(['vid' => $this->vocabulary->id(), 'name' => 'Inaccessible view']);
-    $term->save();
-    $this->drupalGet($term->toUrl('edit-form'));
-    $this->submitForm(edit: [], submit: 'Save');
-
-    // In which case, the edit form is reloaded.
-    $this->assertSession()->addressEquals($term->toUrl('edit-form')->setAbsolute());
-    $this->assertSession()->pageTextContains('Updated term');
   }
 
   /**
@@ -704,26 +706,6 @@ class TermTest extends TaxonomyTestBase {
     ];
     $this->assertBreadcrumb('taxonomy/term/' . $term->id() . '/delete', $trail);
     $this->assertSession()->assertEscaped($term->label());
-  }
-
-  /**
-   * Tests the order of primary tabs on the term edit page.
-   */
-  public function testPrimaryTabsOrder(): void {
-    $term = $this->createTerm($this->vocabulary);
-    $this->drupalGet($term->toUrl('edit-form'));
-    $this->assertSession()->statusCodeEquals(200);
-
-    // Getting primary tab items.
-    $tab_links = $this->xpath('//h2[text()[contains(.,"Primary tabs")]]/following-sibling::ul[1]/li/a');
-    $labels = array_map(fn($link) => $link->getText(), $tab_links);
-    $edit_index = array_search('Edit', $labels);
-    $delete_index = array_search('Delete', $labels);
-
-    // Check that "Edit" comes before "Delete".
-    $this->assertIsInt($edit_index, '"Edit" tab found');
-    $this->assertIsInt($delete_index, '"Delete" tab found');
-    $this->assertLessThan($delete_index, $edit_index, '"Edit" tab appears before "Delete" tab');
   }
 
 }

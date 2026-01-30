@@ -13,12 +13,10 @@ use Drupal\Core\TypedData\DataDefinition;
  */
 #[FieldType(
   id: "integer",
-  label: new TranslatableMarkup("Integer"),
+  label: new TranslatableMarkup("Number (integer)"),
   description: [
-    new TranslatableMarkup("Number without decimal part or fraction"),
-    new TranslatableMarkup("Values are positive, negative, or zero"),
-    new TranslatableMarkup("Maximum values depend on the system"),
-    new TranslatableMarkup("Examples: 123, -123, 0, 3 (pi)"),
+    new TranslatableMarkup("Number without decimals"),
+    new TranslatableMarkup("For example, 123"),
   ],
   category: "number",
   weight: -50,

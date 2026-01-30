@@ -6,14 +6,10 @@ namespace Drupal\Tests\media\Functional\Rest;
 
 use Drupal\Tests\rest\Functional\BasicAuthResourceTestTrait;
 use Drupal\Tests\rest\Functional\EntityResource\XmlEntityNormalizationQuirksTrait;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests Media Xml Basic Auth.
+ * @group rest
  */
-#[Group('rest')]
-#[RunTestsInSeparateProcesses]
 class MediaXmlBasicAuthTest extends MediaResourceTestBase {
 
   use BasicAuthResourceTestTrait;
@@ -37,7 +33,7 @@ class MediaXmlBasicAuthTest extends MediaResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $mimeType = 'text/xml; charset=utf-8';
+  protected static $mimeType = 'text/xml; charset=UTF-8';
 
   /**
    * {@inheritdoc}

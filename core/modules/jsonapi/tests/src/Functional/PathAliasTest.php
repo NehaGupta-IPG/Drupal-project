@@ -4,18 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
-use Drupal\Core\Url;
-use Drupal\jsonapi\JsonApiSpec;
 use Drupal\path_alias\Entity\PathAlias;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Drupal\Core\Url;
 
 /**
  * JSON:API integration test for the "PathAlias" content entity type.
+ *
+ * @group jsonapi
+ * @group path
+ * @group #slow
  */
-#[Group('jsonapi')]
-#[Group('path')]
-#[RunTestsInSeparateProcesses]
 class PathAliasTest extends ResourceTestBase {
 
   /**
@@ -58,7 +56,7 @@ class PathAliasTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method): void {
+  protected function setUpAuthorization($method) {
     $this->grantPermissionsToTestedRole(['administer url aliases']);
   }
 
@@ -87,10 +85,10 @@ class PathAliasTest extends ResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
+            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
           ],
         ],
-        'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
+        'version' => '1.0',
       ],
       'links' => [
         'self' => ['href' => $base_url->toString()],

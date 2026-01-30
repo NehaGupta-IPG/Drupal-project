@@ -11,15 +11,12 @@ use Drupal\file\Entity\File;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
 use org\bovigo\vfs\vfsStream;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that files referenced in file and image fields are always validated.
+ *
+ * @group file
  */
-#[Group('file')]
-#[RunTestsInSeparateProcesses]
 class FileItemValidationTest extends KernelTestBase {
 
   /**
@@ -31,6 +28,7 @@ class FileItemValidationTest extends KernelTestBase {
     'entity_test',
     'field',
     'user',
+    'system',
   ];
 
   /**
@@ -60,12 +58,10 @@ class FileItemValidationTest extends KernelTestBase {
   }
 
   /**
-   * Tests file validation constraint.
-   *
-   * @legacy-covers \Drupal\file\Plugin\Validation\Constraint\FileValidationConstraint
-   * @legacy-covers \Drupal\file\Plugin\Validation\Constraint\FileValidationConstraintValidator
+   * @covers \Drupal\file\Plugin\Validation\Constraint\FileValidationConstraint
+   * @covers \Drupal\file\Plugin\Validation\Constraint\FileValidationConstraintValidator
+   * @dataProvider getFileTypes
    */
-  #[DataProvider('getFileTypes')]
   public function testFileValidationConstraint($file_type): void {
     $field_storage = FieldStorageConfig::create([
       'field_name' => 'field_test_file',
@@ -110,22 +106,13 @@ class FileItemValidationTest extends KernelTestBase {
         'target_id' => $file->id(),
       ],
     ]);
-
-    // Enforce the file to be new as file size is checked only for new files.
-    $entity_test->field_test_file->entity->enforceIsNew();
     $result = $entity_test->validate();
     $this->assertCount(2, $result);
+
     $this->assertEquals('field_test_file.0', $result->get(0)->getPropertyPath());
     $this->assertEquals('The file is <em class="placeholder">2.93 KB</em> exceeding the maximum file size of <em class="placeholder">2 KB</em>.', (string) $result->get(0)->getMessage());
     $this->assertEquals('field_test_file.0', $result->get(1)->getPropertyPath());
     $this->assertEquals('Only files with the following extensions are allowed: <em class="placeholder">jpg|png</em>.', (string) $result->get(1)->getMessage());
-
-    // File size is not checked for already existing files.
-    $entity_test->field_test_file->entity->enforceIsNew(FALSE);
-    $result = $entity_test->validate();
-    $this->assertCount(1, $result);
-    $this->assertEquals('field_test_file.0', $result->get(0)->getPropertyPath());
-    $this->assertEquals('Only files with the following extensions are allowed: <em class="placeholder">jpg|png</em>.', (string) $result->get(0)->getMessage());
 
     // Refer to a file that does not exist.
     $entity_test = EntityTest::create([

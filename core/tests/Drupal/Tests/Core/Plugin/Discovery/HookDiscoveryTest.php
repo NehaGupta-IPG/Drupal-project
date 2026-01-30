@@ -7,14 +7,11 @@ namespace Drupal\Tests\Core\Plugin\Discovery;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Plugin\Discovery\HookDiscovery;
 use Drupal\Tests\UnitTestCase;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
 
 /**
- * Tests Drupal\Core\Plugin\Discovery\HookDiscovery.
+ * @coversDefaultClass \Drupal\Core\Plugin\Discovery\HookDiscovery
+ * @group Plugin
  */
-#[CoversClass(HookDiscovery::class)]
-#[Group('Plugin')]
 class HookDiscoveryTest extends UnitTestCase {
 
   /**
@@ -59,7 +56,7 @@ class HookDiscoveryTest extends UnitTestCase {
     $this->moduleHandler->expects($this->atLeastOnce())
       ->method('invokeAllWith')
       ->with('test_plugin')
-      ->willReturnCallback(function (string $hook, callable $callback): void {
+      ->willReturnCallback(function (string $hook, callable $callback) {
         $callback(\Closure::fromCallable([$this, 'hookDiscoveryTestTestPlugin']), 'hook_discovery_test');
         $callback(\Closure::fromCallable([$this, 'hookDiscoveryTest2TestPlugin']), 'hook_discovery_test2');
       });
@@ -88,7 +85,7 @@ class HookDiscoveryTest extends UnitTestCase {
     $this->moduleHandler->expects($this->exactly(4))
       ->method('invokeAllWith')
       ->with('test_plugin')
-      ->willReturnCallback(function (string $hook, callable $callback): void {
+      ->willReturnCallback(function (string $hook, callable $callback) {
         $callback(\Closure::fromCallable([$this, 'hookDiscoveryTestTestPlugin']), 'hook_discovery_test');
         $callback(\Closure::fromCallable([$this, 'hookDiscoveryTest2TestPlugin']), 'hook_discovery_test2');
       });

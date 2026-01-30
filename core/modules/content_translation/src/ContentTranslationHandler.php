@@ -487,7 +487,7 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
         '#default_value' => User::load($uid),
         // Validation is done by static::entityFormValidate().
         '#validate_reference' => FALSE,
-        '#maxlength' => 1024,
+        '#maxlength' => 60,
         '#description' => $this->t('Leave blank for %anonymous.', ['%anonymous' => \Drupal::config('user.settings')->get('anonymous')]),
       ];
 

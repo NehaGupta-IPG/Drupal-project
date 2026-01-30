@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\views_ui\Functional;
 
 use Drupal\views\Views;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests creation, retrieval, updating, and deletion of displays in the Web UI.
+ *
+ * @group views_ui
  */
-#[Group('views_ui')]
-#[RunTestsInSeparateProcesses]
 class DisplayCRUDTest extends UITestBase {
 
   /**
@@ -23,7 +21,9 @@ class DisplayCRUDTest extends UITestBase {
   public static $testViews = ['test_display'];
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = ['contextual'];
 

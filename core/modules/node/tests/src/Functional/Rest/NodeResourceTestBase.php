@@ -11,9 +11,6 @@ use Drupal\user\Entity\User;
 use GuzzleHttp\RequestOptions;
 use PHPUnit\Framework\Attributes\Before;
 
-/**
- * Resource test base for the node entity.
- */
 abstract class NodeResourceTestBase extends EntityResourceTestBase {
 
   /**
@@ -158,7 +155,7 @@ abstract class NodeResourceTestBase extends EntityResourceTestBase {
       ],
       'promote' => [
         [
-          'value' => FALSE,
+          'value' => TRUE,
         ],
       ],
       'sticky' => [

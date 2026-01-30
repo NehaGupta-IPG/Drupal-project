@@ -2,18 +2,17 @@
 
 /**
  * @file
+ * Callbacks and related functions invoked by authorize.php to update projects.
  *
- * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0.
- *   Functions have been deprecated.
- *
- * @see https://www.drupal.org/node/3512364
+ * We use the Batch API to actually update each individual project on the site.
+ * All of the code in this file is run at a low bootstrap level (modules are not
+ * loaded), so these functions cannot assume access to the rest of the code of
+ * the Update Manager module.
  */
 
 use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\Updater\UpdaterException;
 use Drupal\Core\Url;
-
-@trigger_error(__FILE__ . ' is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Functions have been deprecated. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
 
 /**
  * Updates existing projects when invoked by authorize.php.
@@ -21,10 +20,10 @@ use Drupal\Core\Url;
  * Callback for system_authorized_init() in
  * update_manager_update_ready_form_submit().
  *
- * @param \Drupal\Core\FileTransfer\FileTransfer $filetransfer
+ * @param $filetransfer
  *   The FileTransfer object created by authorize.php for use during this
  *   operation.
- * @param array $projects
+ * @param $projects
  *   A nested array of projects to install into the live webroot, keyed by
  *   project name. Each subarray contains the following keys:
  *   - project: The canonical project short name.
@@ -38,8 +37,6 @@ use Drupal\Core\Url;
  *   should use that response for the current page request.
  */
 function update_authorize_run_update($filetransfer, $projects) {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
-
   $batch_builder = (new BatchBuilder())
     ->setFile(\Drupal::service('extension.list.module')->getPath('update') . '/update.authorize.inc')
     ->setInitMessage(t('Preparing to update your site'))
@@ -83,8 +80,7 @@ function update_authorize_run_update($filetransfer, $projects) {
  * @param array $context
  *   Reference to an array used for Batch API storage.
  */
-function update_authorize_batch_copy_project($project, $updater_name, $local_url, $filetransfer, &$context): void {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
+function update_authorize_batch_copy_project($project, $updater_name, $local_url, $filetransfer, &$context) {
 
   // Initialize some variables in the Batch API $context array.
   if (!isset($context['results']['log'])) {
@@ -105,7 +101,6 @@ function update_authorize_batch_copy_project($project, $updater_name, $local_url
   // though the connection itself is now gone. So, although it's ugly, we have
   // to unset the connection variable at this point so that the FileTransfer
   // object will re-initiate the actual connection.
-  // @phpstan-ignore property.deprecatedClass
   unset($filetransfer->connection);
 
   if (!empty($context['results']['log'][$project]['#abort'])) {
@@ -113,7 +108,6 @@ function update_authorize_batch_copy_project($project, $updater_name, $local_url
     return;
   }
 
-  // @phpstan-ignore getDeprecatedService.deprecated
   $updater = new $updater_name($local_url, \Drupal::getContainer()->get('update.root'));
 
   try {
@@ -150,14 +144,12 @@ function update_authorize_batch_copy_project($project, $updater_name, $local_url
  * authorize.php will render a report. Also responsible for putting the site
  * back online and clearing the update status storage after a successful update.
  *
- * @param bool $success
+ * @param $success
  *   TRUE if the batch operation was successful; FALSE if there were errors.
- * @param array $results
+ * @param $results
  *   An associative array of results from the batch operation.
  */
-function update_authorize_update_batch_finished($success, $results): void {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
-
+function update_authorize_update_batch_finished($success, $results) {
   foreach ($results['log'] as $messages) {
     if (!empty($messages['#abort'])) {
       $success = FALSE;
@@ -239,9 +231,7 @@ function update_authorize_update_batch_finished($success, $results): void {
  *   (optional) TRUE if the operation the message is about was a success, FALSE
  *   if there were errors. Defaults to TRUE.
  */
-function _update_batch_create_message(&$project_results, $message, $success = TRUE): void {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
-
+function _update_batch_create_message(&$project_results, $message, $success = TRUE) {
   $project_results[] = ['message' => $message, 'success' => $success];
 }
 
@@ -258,9 +248,7 @@ function _update_batch_create_message(&$project_results, $message, $success = TR
  * @see update_authorize_update_batch_finished()
  * @see update_storage_clear()
  */
-function _update_authorize_clear_update_status(): void {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
-
+function _update_authorize_clear_update_status() {
   \Drupal::keyValueExpirable('update')->deleteAll();
   \Drupal::keyValueExpirable('update_available_release')->deleteAll();
 }

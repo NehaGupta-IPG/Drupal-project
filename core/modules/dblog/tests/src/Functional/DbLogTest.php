@@ -4,28 +4,31 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\dblog\Functional;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Link;
 use Drupal\Core\Logger\RfcLogLevel;
+use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\dblog\Controller\DbLogController;
+use Drupal\error_test\Controller\ErrorTestController;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Menu\AssertBreadcrumbTrait;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Verifies log entries and user access based on permissions.
+ *
+ * @group dblog
+ * @group #slow
  */
-#[Group('dblog')]
-#[RunTestsInSeparateProcesses]
 class DbLogTest extends BrowserTestBase {
   use FakeLogEntries;
   use AssertBreadcrumbTrait;
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = [
     'dblog',
@@ -102,12 +105,6 @@ class DbLogTest extends BrowserTestBase {
     // Log in the regular user.
     $this->drupalLogin($this->webUser);
     $this->verifyReports(403);
-
-    $this->testLogEventNotFoundPage();
-    $this->testLogEventPageWithMissingInfo();
-    $this->test403LogEventPage();
-    $this->testMessageParsing();
-    $this->testOverviewLinks();
   }
 
   /**
@@ -181,7 +178,7 @@ class DbLogTest extends BrowserTestBase {
   /**
    * Tests that a 403 event is logged with the exception triggering it.
    */
-  protected function test403LogEventPage(): void {
+  public function test403LogEventPage(): void {
     $assert_session = $this->assertSession();
     $uri = 'admin/reports';
 
@@ -221,7 +218,7 @@ class DbLogTest extends BrowserTestBase {
   /**
    * Tests not-existing log event page.
    */
-  protected function testLogEventNotFoundPage(): void {
+  public function testLogEventNotFoundPage(): void {
     // Login the admin user.
     $this->drupalLogin($this->adminUser);
 
@@ -240,7 +237,7 @@ class DbLogTest extends BrowserTestBase {
    * - Incorrect location: When location attribute is incorrect uri which can
    *   not be used to generate a valid link.
    */
-  protected function testLogEventPageWithMissingInfo(): void {
+  public function testLogEventPageWithMissingInfo(): void {
     $this->drupalLogin($this->adminUser);
     $connection = Database::getConnection();
 
@@ -283,7 +280,7 @@ class DbLogTest extends BrowserTestBase {
   /**
    * Test that twig errors are displayed correctly.
    */
-  protected function testMessageParsing(): void {
+  public function testMessageParsing(): void {
     $this->drupalLogin($this->adminUser);
     // Log a common twig error with {{ }} and { } variables.
     \Drupal::service('logger.factory')->get("php")
@@ -291,9 +288,7 @@ class DbLogTest extends BrowserTestBase {
         ['foo' => 'bar', 'path' => '/baz', 'value' => 'horse']
       );
     // View the log page to verify it's correct.
-    $query = Database::getConnection()->select('watchdog');
-    $query->addExpression('MAX([wid])');
-    $wid = $query->execute()->fetchField();
+    $wid = \Drupal::database()->query('SELECT MAX(wid) FROM {watchdog}')->fetchField();
     $this->drupalGet('admin/reports/dblog/event/' . $wid);
     $this->assertSession()
       ->responseContains('Incorrect parameter {bar} in path /baz: horse');
@@ -305,7 +300,7 @@ class DbLogTest extends BrowserTestBase {
    * @param int $row_limit
    *   The row limit.
    */
-  private function verifyRowLimit($row_limit): void {
+  private function verifyRowLimit($row_limit) {
     // Change the database log row limit.
     $edit = [];
     $edit['dblog_row_limit'] = $row_limit;
@@ -322,7 +317,7 @@ class DbLogTest extends BrowserTestBase {
   /**
    * Clear the entry logs by clicking on 'Clear log messages' button.
    */
-  protected function clearLogsEntries(): void {
+  protected function clearLogsEntries() {
     $this->drupalGet(Url::fromRoute('dblog.confirm'));
   }
 
@@ -334,7 +329,7 @@ class DbLogTest extends BrowserTestBase {
    * @param string $severity
    *   (optional) The log entry severity.
    */
-  protected function filterLogsEntries($type = NULL, $severity = NULL): void {
+  protected function filterLogsEntries($type = NULL, $severity = NULL) {
     $edit = [];
     if (isset($type)) {
       $edit['type[]'] = $type;
@@ -351,7 +346,7 @@ class DbLogTest extends BrowserTestBase {
    * @param int $response
    *   (optional) HTTP response code. Defaults to 200.
    */
-  private function verifyReports($response = 200): void {
+  private function verifyReports($response = 200) {
     // View the database log help page.
     $this->drupalGet('admin/help/dblog');
     $this->assertSession()->statusCodeEquals($response);
@@ -400,7 +395,7 @@ class DbLogTest extends BrowserTestBase {
   /**
    * Generates and then verifies breadcrumbs.
    */
-  private function verifyBreadcrumbs(): void {
+  private function verifyBreadcrumbs() {
     // View the database log event page.
     $query = Database::getConnection()->select('watchdog');
     $query->addExpression('MIN([wid])');
@@ -417,7 +412,7 @@ class DbLogTest extends BrowserTestBase {
   /**
    * Generates and then verifies various types of events.
    */
-  private function verifyEvents(): void {
+  private function verifyEvents() {
     // Invoke events.
     $this->doUser();
     $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
@@ -438,7 +433,7 @@ class DbLogTest extends BrowserTestBase {
    * @param string $order
    *   The order by which the table should be sorted.
    */
-  public function verifySort($sort = 'asc', $order = 'Date'): void {
+  public function verifySort($sort = 'asc', $order = 'Date') {
     $this->drupalGet('admin/reports/dblog', ['query' => ['sort' => $sort, 'order' => $order]]);
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains('Recent log messages');
@@ -447,7 +442,7 @@ class DbLogTest extends BrowserTestBase {
   /**
    * Tests link escaping in the operation row of a database log detail page.
    */
-  private function verifyLinkEscaping(): void {
+  private function verifyLinkEscaping() {
     $link = Link::fromTextAndUrl('View', Url::fromRoute('entity.node.canonical', ['node' => 1]))->toString();
     $message = 'Log entry added to do the verifyLinkEscaping test.';
     $this->generateLogEntries(1, [
@@ -465,7 +460,7 @@ class DbLogTest extends BrowserTestBase {
   /**
    * Generates and then verifies some user events.
    */
-  private function doUser(): void {
+  private function doUser() {
     // Set user variables.
     $name = $this->randomMachineName();
     $pass = \Drupal::service('password_generator')->generate();
@@ -551,7 +546,7 @@ class DbLogTest extends BrowserTestBase {
    * @param string $type
    *   A node type (e.g., 'article' or 'page').
    */
-  private function doNode($type): void {
+  private function doNode($type) {
     // Create user.
     $perm = ['create ' . $type . ' content', 'edit own ' . $type . ' content', 'delete own ' . $type . ' content'];
     $user = $this->drupalCreateUser($perm);
@@ -864,7 +859,7 @@ class DbLogTest extends BrowserTestBase {
   /**
    * Make sure HTML tags are filtered out in the log overview links.
    */
-  protected function testOverviewLinks(): void {
+  public function testOverviewLinks(): void {
     $this->drupalLogin($this->adminUser);
     // cSpell:disable-next-line
     $this->generateLogEntries(1, ['message' => "&lt;script&gt;alert('foo');&lt;/script&gt;<strong>Lorem</strong> ipsum dolor sit amet, consectetur adipiscing & elit."]);
@@ -914,9 +909,16 @@ class DbLogTest extends BrowserTestBase {
     $wid = $query->execute()->fetchField();
     $this->drupalGet('admin/reports/dblog/event/' . $wid);
 
+    $error_user_notice = [
+      '%type' => 'User warning',
+      '@message' => 'Drupal & awesome',
+      '%function' => ErrorTestController::class . '->generateWarnings()',
+      '%file' => $this->getModulePath('error_test') . '/error_test.module',
+    ];
+
     // Check if the full message displays on the details page and backtrace is a
     // pre-formatted text.
-    $message = '<em class="placeholder">User warning</em>: Drupal &amp; awesome in <em class="placeholder">Drupal\error_test\Controller\ErrorTestController-&gt;generateWarnings()</em> (line';
+    $message = new FormattableMarkup('%type: @message in %function (line', $error_user_notice);
     $this->assertSession()->responseContains($message);
     $this->assertSession()->responseContains('<pre class="backtrace">');
   }

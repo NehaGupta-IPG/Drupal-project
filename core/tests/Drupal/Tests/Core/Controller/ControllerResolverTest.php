@@ -8,22 +8,17 @@ use Drupal\Core\Controller\ControllerResolver;
 use Drupal\Core\DependencyInjection\ClassResolver;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Tests Drupal\Core\Controller\ControllerResolver.
+ * @coversDefaultClass \Drupal\Core\Controller\ControllerResolver
+ * @group Controller
  */
-#[CoversClass(ControllerResolver::class)]
-#[Group('Controller')]
 class ControllerResolverTest extends UnitTestCase {
 
   /**
@@ -54,8 +49,9 @@ class ControllerResolverTest extends UnitTestCase {
 
   /**
    * Tests createController().
+   *
+   * @dataProvider providerTestCreateController
    */
-  #[DataProvider('providerTestCreateController')]
   public function testCreateController($controller, $class, $output): void {
     $this->container->set('some_service', new MockController());
     $result = $this->controllerResolver->getControllerFromDefinition($controller);
@@ -65,26 +61,14 @@ class ControllerResolverTest extends UnitTestCase {
   /**
    * Provides test data for testCreateController().
    */
-  public static function providerTestCreateController(): array {
+  public static function providerTestCreateController() {
     return [
       // Tests class::method.
-      [
-        'Drupal\Tests\Core\Controller\MockController::getResult',
-        'Drupal\Tests\Core\Controller\MockController',
-        'This is a regular controller.',
-      ],
+      ['Drupal\Tests\Core\Controller\MockController::getResult', 'Drupal\Tests\Core\Controller\MockController', 'This is a regular controller.'],
       // Tests service:method.
-      [
-        'some_service:getResult',
-        'Drupal\Tests\Core\Controller\MockController',
-        'This is a regular controller.',
-      ],
+      ['some_service:getResult', 'Drupal\Tests\Core\Controller\MockController', 'This is a regular controller.'],
       // Tests a class with injection.
-      [
-        'Drupal\Tests\Core\Controller\MockContainerInjection::getResult',
-        'Drupal\Tests\Core\Controller\MockContainerInjection',
-        'This used injection.',
-      ],
+      ['Drupal\Tests\Core\Controller\MockContainerInjection::getResult', 'Drupal\Tests\Core\Controller\MockContainerInjection', 'This used injection.'],
     ];
   }
 
@@ -106,8 +90,9 @@ class ControllerResolverTest extends UnitTestCase {
 
   /**
    * Tests getController().
+   *
+   * @dataProvider providerTestGetController
    */
-  #[DataProvider('providerTestGetController')]
   public function testGetController($attributes, $class, $output = NULL): void {
     $request = new Request([], [], $attributes);
     $result = $this->controllerResolver->getController($request);
@@ -122,11 +107,11 @@ class ControllerResolverTest extends UnitTestCase {
   /**
    * Provides test data for testGetController().
    */
-  public static function providerTestGetController(): array {
+  public static function providerTestGetController() {
     return [
       // Tests passing a controller via the request.
       [
-        [RouteObjectInterface::CONTROLLER_NAME => MockContainerInjection::class . '::getResult'],
+        ['_controller' => MockContainerInjection::class . '::getResult'],
         MockContainerInjection::class,
         'This used injection.',
       ],
@@ -137,8 +122,9 @@ class ControllerResolverTest extends UnitTestCase {
 
   /**
    * Tests getControllerFromDefinition().
+   *
+   * @dataProvider providerTestGetControllerFromDefinition
    */
-  #[DataProvider('providerTestGetControllerFromDefinition')]
   public function testGetControllerFromDefinition($definition, $output): void {
     $this->container->set('invoke_service', new MockInvokeController());
     $controller = $this->controllerResolver->getControllerFromDefinition($definition);
@@ -148,7 +134,7 @@ class ControllerResolverTest extends UnitTestCase {
   /**
    * Provides test data for testGetControllerFromDefinition().
    */
-  public static function providerTestGetControllerFromDefinition(): array {
+  public static function providerTestGetControllerFromDefinition() {
     return [
       // Tests a method on an object.
       [[new MockController(), 'getResult'], 'This is a regular controller.'],
@@ -195,53 +181,37 @@ class ControllerResolverTest extends UnitTestCase {
 
 }
 
-/**
- * Mock for the controller.
- */
 class MockController {
 
-  public function getResult(): string {
+  public function getResult() {
     return 'This is a regular controller.';
   }
 
-  public function getControllerWithRequestAndRouteMatch(RouteMatchInterface $route_match, Request $request): string {
+  public function getControllerWithRequestAndRouteMatch(RouteMatchInterface $route_match, Request $request) {
     return 'this is another example controller';
   }
 
 }
-
-/**
- * Mock for the PSR-7 controller.
- */
 class MockControllerPsr7 {
 
-  public function getResult(): array {
+  public function getResult() {
     return ['#markup' => 'This is a regular controller'];
   }
 
-  public function getControllerWithRequestAndRouteMatch(RouteMatchInterface $route_match, ServerRequestInterface $request): array {
+  public function getControllerWithRequestAndRouteMatch(RouteMatchInterface $route_match, ServerRequestInterface $request) {
     return ['#markup' => 'this is another example controller'];
   }
 
 }
 
-/**
- * Mock for the injected service.
- */
 class MockContainerInjection implements ContainerInjectionInterface {
-
-  /**
-   * The test value saved during construction.
-   *
-   * @var string
-   */
   protected $result;
 
   public function __construct($result) {
     $this->result = $result;
   }
 
-  public static function create(ContainerInterface $container): static {
+  public static function create(ContainerInterface $container) {
     return new static('This used injection.');
   }
 
@@ -251,12 +221,9 @@ class MockContainerInjection implements ContainerInjectionInterface {
 
 }
 
-/**
- * Test class used for testing the Controller resolver class.
- */
 class MockInvokeController {
 
-  public function __invoke(): string {
+  public function __invoke() {
     return 'This used __invoke().';
   }
 

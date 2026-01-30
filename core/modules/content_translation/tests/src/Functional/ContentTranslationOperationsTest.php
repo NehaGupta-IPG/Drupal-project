@@ -7,14 +7,12 @@ namespace Drupal\Tests\content_translation\Functional;
 use Drupal\Tests\language\Traits\LanguageTestTrait;
 use Drupal\Tests\node\Functional\NodeTestBase;
 use Drupal\user\Entity\Role;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the content translation operations available in the content listing.
+ *
+ * @group content_translation
  */
-#[Group('content_translation')]
-#[RunTestsInSeparateProcesses]
 class ContentTranslationOperationsTest extends NodeTestBase {
 
   use LanguageTestTrait;
@@ -39,7 +37,9 @@ class ContentTranslationOperationsTest extends NodeTestBase {
   protected $baseUser2;
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = [
     'language',

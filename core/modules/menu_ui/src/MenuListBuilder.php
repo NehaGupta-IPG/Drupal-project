@@ -23,9 +23,9 @@ class MenuListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header['title'] = $this->t('Title');
+    $header['title'] = t('Title');
     $header['description'] = [
-      'data' => $this->t('Description'),
+      'data' => t('Description'),
       'class' => [RESPONSIVE_PRIORITY_MEDIUM],
     ];
     return $header + parent::buildHeader();
@@ -46,13 +46,13 @@ class MenuListBuilder extends ConfigEntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  protected function getDefaultOperations(EntityInterface $entity/* , ?CacheableMetadata $cacheability = NULL */) {
+  public function getDefaultOperations(EntityInterface $entity) {
     $operations = parent::getDefaultOperations($entity);
 
     if (isset($operations['edit'])) {
-      $operations['edit']['title'] = $this->t('Edit menu');
+      $operations['edit']['title'] = t('Edit menu');
       $operations['add'] = [
-        'title' => $this->t('Add link'),
+        'title' => t('Add link'),
         'weight' => 20,
         'url' => $entity->toUrl('add-link-form'),
         'query' => [
@@ -61,7 +61,7 @@ class MenuListBuilder extends ConfigEntityListBuilder {
       ];
     }
     if (isset($operations['delete'])) {
-      $operations['delete']['title'] = $this->t('Delete menu');
+      $operations['delete']['title'] = t('Delete menu');
     }
     return $operations;
   }

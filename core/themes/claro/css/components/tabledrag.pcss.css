@@ -53,16 +53,16 @@ body.drag-y {
 
 .tabledrag-changed {
   /* Don't display the abbreviation of 'add-new' table rows. */
-  .add-new & {
+  @nest .add-new & {
     display: none;
   }
 
-  .draggable & {
+  @nest .draggable & {
     position: relative;
     inset-inline-start: calc(var(--space-xs) * -1);
   }
 
-  .tabledrag-cell--only-drag & {
+  @nest .tabledrag-cell--only-drag & {
     width: var(--space-l);
     min-width: var(--space-l);
   }
@@ -189,7 +189,7 @@ body.drag-y {
   text-align: end;
 
   /* Hide nested weight toggles as they are redundant. */
-  .draggable-table & {
+  @nest .draggable-table & {
     display: none;
   }
 }
@@ -251,7 +251,7 @@ body.drag-y {
   background: none !important;
   line-height: 0;
 
-  .tabledrag-cell-content & {
+  @nest .tabledrag-cell-content & {
     /* Fixes Safari bug (16.1 at least) where table rows are overly large when
       using indentation (e.g. re-ordering menu items. */
     display: inline-flex;
@@ -261,7 +261,7 @@ body.drag-y {
     height: 100%;
   }
 
-  [dir="rtl"] & {
+  @nest [dir="rtl"] & {
     float: right;
   }
 }

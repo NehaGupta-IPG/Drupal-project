@@ -60,7 +60,9 @@ abstract class ModerationStateTestBase extends BrowserTestBase {
   protected $workflow;
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = [
     'content_moderation',

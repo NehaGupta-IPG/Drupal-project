@@ -6,17 +6,17 @@ namespace Drupal\Tests\Component\Utility;
 
 use Drupal\Component\Utility\Random;
 use Drupal\Component\Utility\UserAgent;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 // cspell:ignore Teletubbies
+
 /**
  * Tests bytes size parsing helper methods.
+ *
+ * @group Utility
+ *
+ * @coversDefaultClass \Drupal\Component\Utility\UserAgent
  */
-#[CoversClass(UserAgent::class)]
-#[Group('Utility')]
 class UserAgentTest extends TestCase {
 
   /**
@@ -70,8 +70,10 @@ class UserAgentTest extends TestCase {
 
   /**
    * Tests matching language from user agent.
+   *
+   * @dataProvider providerTestGetBestMatchingLangcode
+   * @covers ::getBestMatchingLangcode
    */
-  #[DataProvider('providerTestGetBestMatchingLangcode')]
   public function testGetBestMatchingLangcode($accept_language, $expected): void {
     $result = UserAgent::getBestMatchingLangcode($accept_language, $this->getLanguages(), $this->getMappings());
     $this->assertSame($expected, $result);
@@ -84,7 +86,7 @@ class UserAgentTest extends TestCase {
    *   - An accept-language string.
    *   - Expected best matching language code.
    */
-  public static function providerTestGetBestMatchingLangcode(): array {
+  public static function providerTestGetBestMatchingLangcode() {
     // Random generator.
     $random = new Random();
 

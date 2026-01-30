@@ -6,15 +6,21 @@ namespace Drupal\Tests\content_translation\Functional;
 
 use Drupal\Core\Url;
 use Drupal\language\Entity\ConfigurableLanguage;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that revision translation deletion is handled correctly.
+ *
+ * @group content_translation
  */
-#[Group('content_translation')]
-#[RunTestsInSeparateProcesses]
 class ContentTranslationRevisionTranslationDeletionTest extends ContentTranslationPendingRevisionTestBase {
+
+  /**
+   * {@inheritdoc}
+   *
+   * @todo Remove and fix test to not rely on super user.
+   * @see https://www.drupal.org/project/drupal/issues/3437620
+   */
+  protected bool $usesSuperUserAccessPolicy = TRUE;
 
   /**
    * {@inheritdoc}
@@ -52,7 +58,7 @@ class ContentTranslationRevisionTranslationDeletionTest extends ContentTranslati
    * @param int $index
    *   The test run index.
    */
-  public function doTestOverview($index): void {
+  public function doTestOverview($index) {
     $this->drupalLogin($this->currentAccount);
 
     // Create a test node.

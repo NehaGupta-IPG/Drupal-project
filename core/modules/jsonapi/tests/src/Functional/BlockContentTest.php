@@ -8,20 +8,16 @@ use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Url;
-use Drupal\jsonapi\JsonApiSpec;
-use Drupal\Tests\block_content\Traits\BlockContentCreationTrait;
 use Drupal\Tests\jsonapi\Traits\CommonCollectionFilterAccessTestPatternsTrait;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * JSON:API integration test for the "BlockContent" content entity type.
+ *
+ * @group jsonapi
+ * @group #slow
  */
-#[Group('jsonapi')]
-#[RunTestsInSeparateProcesses]
 class BlockContentTest extends ResourceTestBase {
 
-  use BlockContentCreationTrait;
   use CommonCollectionFilterAccessTestPatternsTrait;
 
   /**
@@ -71,7 +67,7 @@ class BlockContentTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method): void {
+  protected function setUpAuthorization($method) {
     switch ($method) {
       case 'GET':
         $this->grantPermissionsToTestedRole([
@@ -99,7 +95,7 @@ class BlockContentTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpRevisionAuthorization($method): void {
+  protected function setUpRevisionAuthorization($method) {
     parent::setUpRevisionAuthorization($method);
     $this->grantPermissionsToTestedRole(['view any basic block content history']);
   }
@@ -109,11 +105,13 @@ class BlockContentTest extends ResourceTestBase {
    */
   public function createEntity() {
     if (!BlockContentType::load('basic')) {
-      $this->createBlockContentType([
+      $block_content_type = BlockContentType::create([
         'id' => 'basic',
         'label' => 'basic',
         'revision' => TRUE,
-      ], TRUE);
+      ]);
+      $block_content_type->save();
+      block_content_add_body_field($block_content_type->id());
     }
 
     // Create a "Llama" content block.
@@ -143,10 +141,10 @@ class BlockContentTest extends ResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
+            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
           ],
         ],
-        'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
+        'version' => '1.0',
       ],
       'links' => [
         'self' => ['href' => $base_url->toString()],
@@ -161,6 +159,7 @@ class BlockContentTest extends ResourceTestBase {
           'body' => [
             'value' => 'The name "llama" was adopted by European settlers from native Peruvians.',
             'format' => 'plain_text',
+            'summary' => NULL,
             'processed' => "<p>The name &quot;llama&quot; was adopted by European settlers from native Peruvians.</p>\n",
           ],
           'changed' => (new \DateTime())->setTimestamp($this->entity->getChangedTime())->setTimezone(new \DateTimeZone('UTC'))->format(\DateTime::RFC3339),

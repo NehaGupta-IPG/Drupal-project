@@ -7,7 +7,7 @@ module.exports.assertion = function (expected) {
     const deprecationMessages =
       sessionStorageEntries !== null
         ? sessionStorageEntries.filter((message) =>
-            message.includes('[Deprecation]'),
+            new RegExp('[Deprecation]').test(message),
           )
         : [];
 

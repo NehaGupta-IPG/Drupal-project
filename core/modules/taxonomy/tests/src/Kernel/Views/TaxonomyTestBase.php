@@ -32,7 +32,9 @@ abstract class TaxonomyTestBase extends ViewsKernelTestBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Modules to enable.
+   *
+   * @var array
    */
   protected static $modules = [
     'taxonomy',

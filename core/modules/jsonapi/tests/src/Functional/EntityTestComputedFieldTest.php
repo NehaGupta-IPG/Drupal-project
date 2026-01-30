@@ -7,16 +7,14 @@ namespace Drupal\Tests\jsonapi\Functional;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTestComputedField;
-use Drupal\jsonapi\JsonApiSpec;
 use Drupal\user\Entity\User;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * JSON:API integration test for the "EntityTestComputedField" content entity type.
+ *
+ * @group jsonapi
+ * @group #slow
  */
-#[Group('jsonapi')]
-#[RunTestsInSeparateProcesses]
 class EntityTestComputedFieldTest extends ResourceTestBase {
 
   /**
@@ -54,7 +52,7 @@ class EntityTestComputedFieldTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUpAuthorization($method): void {
+  protected function setUpAuthorization($method) {
     $this->grantPermissionsToTestedRole(['administer entity_test content']);
 
     switch ($method) {
@@ -98,10 +96,10 @@ class EntityTestComputedFieldTest extends ResourceTestBase {
       'jsonapi' => [
         'meta' => [
           'links' => [
-            'self' => ['href' => JsonApiSpec::SUPPORTED_SPECIFICATION_PERMALINK],
+            'self' => ['href' => 'http://jsonapi.org/format/1.0/'],
           ],
         ],
-        'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
+        'version' => '1.0',
       ],
       'links' => [
         'self' => ['href' => $self_url],
@@ -172,9 +170,6 @@ class EntityTestComputedFieldTest extends ResourceTestBase {
     ]));
   }
 
-  /**
-   * Retrieves the expected cache contexts for the response.
-   */
   protected function getExpectedCacheContexts(?array $sparse_fieldset = NULL) {
     $cache_contexts = parent::getExpectedCacheContexts($sparse_fieldset);
     if ($sparse_fieldset === NULL || in_array('computed_test_cacheable_string_field', $sparse_fieldset)) {
@@ -184,9 +179,6 @@ class EntityTestComputedFieldTest extends ResourceTestBase {
     return $cache_contexts;
   }
 
-  /**
-   * Retrieves the expected cache tags for the response.
-   */
   protected function getExpectedCacheTags(?array $sparse_fieldset = NULL) {
     $expected_cache_tags = parent::getExpectedCacheTags($sparse_fieldset);
     if ($sparse_fieldset === NULL || in_array('computed_test_cacheable_string_field', $sparse_fieldset)) {

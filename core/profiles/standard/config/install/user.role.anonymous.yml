@@ -5,6 +5,7 @@ dependencies:
     - filter.format.restricted_html
   module:
     - comment
+    - contact
     - filter
     - search
     - system
@@ -15,5 +16,6 @@ is_admin: false
 permissions:
   - 'access comments'
   - 'access content'
+  - 'access site-wide contact form'
   - 'search content'
   - 'use text format restricted_html'

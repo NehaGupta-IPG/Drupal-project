@@ -4,9 +4,6 @@ namespace Drupal\Core\Cache;
 
 use Drupal\Component\Datetime\TimeInterface;
 
-/**
- * Defines the memory counter backend factory.
- */
 class MemoryCounterBackendFactory implements CacheFactoryInterface {
 
   /**
