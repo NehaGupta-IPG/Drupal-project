@@ -90,12 +90,12 @@ class PagerManager implements PagerManagerInterface {
     // For a single link within a pager, update its link whilst
     // remembering the current index of other pagers.
     $pagers_indexes = explode(',', $this->requestStack->getCurrentRequest()->query->get('page') ?? '');
-    $pagers_indexes[$element] = $index;
     // Fill missing array elements.
-    for ($i = min(array_keys($pagers_indexes)); $i <= max(array_keys($pagers_indexes)); $i++) {
+    $max = max(array_merge(array_keys($pagers_indexes), [$element]));
+    for ($i = 0; $i <= $max; $i++) {
       $pagers_indexes[$i] = $pagers_indexes[$i] ?? NULL;
     }
-    ksort($pagers_indexes);
+    $pagers_indexes[$element] = $index;
     $query['page'] = implode(',', $pagers_indexes);
 
     // Merge the query parameters passed to this function with the parameters
