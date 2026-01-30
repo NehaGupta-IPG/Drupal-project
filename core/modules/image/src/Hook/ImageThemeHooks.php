@@ -376,16 +376,16 @@ class ImageThemeHooks {
         '#style_name' => $variables['style_name'],
       ];
 
-      // If the current image toolkit supports this file type, prepare the URI for
-      // the derivative image. If not, just use the original image resized to the
-      // dimensions specified by the style.
+      // If the current image toolkit supports this file type, prepare the URI
+      // for the derivative image. If not, just use the original image resized
+      // to the dimensions specified by the style.
       if ($style->supportsUri($variables['uri'])) {
         $variables['image']['#uri'] = $style->buildUrl($variables['uri']);
       }
       else {
         $variables['image']['#uri'] = $variables['uri'];
-        // Don't render the image by default, but allow other preprocess functions
-        // to override that if they need to.
+        // Don't render the image by default, but allow other preprocess
+        // functions to override that if they need to.
         $variables['image']['#access'] = FALSE;
 
         // Inform the site builders why their image didn't work.
