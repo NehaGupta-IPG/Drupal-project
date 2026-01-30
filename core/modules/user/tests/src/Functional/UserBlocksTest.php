@@ -6,6 +6,7 @@ namespace Drupal\Tests\user\Functional;
 
 use Drupal\Core\Url;
 use Drupal\dynamic_page_cache\EventSubscriber\DynamicPageCacheSubscriber;
+use Drupal\node\NodeInterface;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -73,6 +74,17 @@ class UserBlocksTest extends BrowserTestBase {
    * Tests the user login block.
    */
   public function testUserLoginBlock(): void {
+    \Drupal::service('module_installer')->install(['node']);
+    $this->createContentType([
+      'type' => 'page',
+      'name' => 'Page',
+    ]);
+    $this->createNode([
+      'title' => 'The quick brown fox jumped over the lazy dog',
+      'uid' => 1,
+      'status' => NodeInterface::PUBLISHED,
+      'type' => 'page',
+    ]);
     // Create a user with some permission that anonymous users lack.
     $user = $this->drupalCreateUser(['administer permissions']);
 
@@ -89,12 +101,12 @@ class UserBlocksTest extends BrowserTestBase {
 
     // Now, log out and repeat with a non-403 page.
     $this->drupalLogout();
-    $this->drupalGet('filter/tips');
+    $this->drupalGet('node/1');
     $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'MISS');
     $this->submitForm($edit, 'Log in');
     $this->assertSession()->pageTextNotContains('User login');
     // Verify that we are still on the same page after login for allowed page.
-    $this->assertSession()->responseMatches('!<title.*?Compose tips.*?</title>!');
+    $this->assertSession()->responseMatches('/The quick brown fox jumped over the lazy dog./');
 
     // Log out again and repeat with a non-403 page including query arguments.
     $this->drupalLogout();
@@ -102,24 +114,24 @@ class UserBlocksTest extends BrowserTestBase {
     // cache has some clever redirect logic internally, we need to request the
     // page twice to see the cache HIT in the headers.
     // @see https://www.drupal.org/project/drupal/issues/2551419 #154
-    $this->drupalGet('filter/tips', ['query' => ['cat' => 'dog']]);
-    $this->drupalGet('filter/tips', ['query' => ['foo' => 'bar']]);
+    $this->drupalGet('node/1', ['query' => ['cat' => 'dog']]);
+    $this->drupalGet('node/1', ['query' => ['foo' => 'bar']]);
     $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'HIT');
     $this->submitForm($edit, 'Log in');
     $this->assertSession()->pageTextNotContains('User login');
     // Verify that we are still on the same page after login for allowed page.
-    $this->assertSession()->responseMatches('!<title.*?Compose tips.*?</title>!');
-    $this->assertStringContainsString('/filter/tips?foo=bar', $this->getUrl(), 'Correct query arguments are displayed after login');
+    $this->assertSession()->responseMatches('/The quick brown fox jumped over the lazy dog./');
+    $this->assertStringContainsString('/node/1?foo=bar', $this->getUrl(), 'Correct query arguments are displayed after login');
 
     // Repeat with different query arguments.
     $this->drupalLogout();
-    $this->drupalGet('filter/tips', ['query' => ['foo' => 'baz']]);
+    $this->drupalGet('node/1', ['query' => ['foo' => 'baz']]);
     $this->assertSession()->responseHeaderEquals(DynamicPageCacheSubscriber::HEADER, 'HIT');
     $this->submitForm($edit, 'Log in');
     $this->assertSession()->pageTextNotContains('User login');
     // Verify that we are still on the same page after login for allowed page.
-    $this->assertSession()->responseMatches('!<title.*?Compose tips.*?</title>!');
-    $this->assertStringContainsString('/filter/tips?foo=baz', $this->getUrl(), 'Correct query arguments are displayed after login');
+    $this->assertSession()->responseMatches('/The quick brown fox jumped over the lazy dog./');
+    $this->assertStringContainsString('/node/1?foo=baz', $this->getUrl(), 'Correct query arguments are displayed after login');
 
     // Check that the user login block is not vulnerable to information
     // disclosure to third party sites.
@@ -135,10 +147,10 @@ class UserBlocksTest extends BrowserTestBase {
     $edit = [];
     $edit['name'] = 'foo';
     $edit['pass'] = 'invalid password';
-    $this->drupalGet('filter/tips');
+    $this->drupalGet('node/1');
     $this->submitForm($edit, 'Log in');
     $this->assertSession()->pageTextContains('Unrecognized username or password. Forgot your password?');
-    $this->drupalGet('filter/tips');
+    $this->drupalGet('node/1');
     $this->assertSession()->pageTextNotContains('Unrecognized username or password. Forgot your password?');
   }
 

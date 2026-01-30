@@ -109,6 +109,7 @@ class FilterAdminTest extends BrowserTestBase {
 
     $this->adminUser = $this->drupalCreateUser([
       'administer filters',
+      'view filter tips page',
       $basic_html_format->getPermissionName(),
       $restricted_html_format->getPermissionName(),
       $full_html_format->getPermissionName(),

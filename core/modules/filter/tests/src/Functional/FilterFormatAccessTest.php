@@ -104,6 +104,7 @@ class FilterFormatAccessTest extends BrowserTestBase {
     $this->webUser = $this->drupalCreateUser([
       'create page content',
       'edit any page content',
+      'view filter tips page',
       $this->allowedFormat->getPermissionName(),
       $this->secondAllowedFormat->getPermissionName(),
     ]);
@@ -113,6 +114,7 @@ class FilterFormatAccessTest extends BrowserTestBase {
       'administer filters',
       'create page content',
       'edit any page content',
+      'view filter tips page',
       $this->allowedFormat->getPermissionName(),
       $this->secondAllowedFormat->getPermissionName(),
       $this->disallowedFormat->getPermissionName(),
@@ -155,6 +157,8 @@ class FilterFormatAccessTest extends BrowserTestBase {
     $this->assertSession()->optionNotExists('body[0][format]', filter_fallback_format());
 
     // Check regular user access to the filter tips pages.
+    $this->drupalGet('filter/tips');
+    $this->assertSession()->statusCodeEquals(200);
     $this->drupalGet('filter/tips/' . $this->allowedFormat->id());
     $this->assertSession()->statusCodeEquals(200);
     $this->drupalGet('filter/tips/' . $this->disallowedFormat->id());
@@ -174,6 +178,12 @@ class FilterFormatAccessTest extends BrowserTestBase {
     $this->assertSession()->statusCodeEquals(200);
     $this->drupalGet('filter/tips/invalid-format');
     $this->assertSession()->statusCodeEquals(404);
+
+    // Check a user can't access the generic tips page without the permission.
+    $this->drupalLogin($this->filterAdminUser);
+    $this->drupalGet('filter/tips');
+    $this->assertSession()->statusCodeEquals(403);
+
   }
 
   /**

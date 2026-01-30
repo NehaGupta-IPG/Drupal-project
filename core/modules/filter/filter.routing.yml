@@ -4,7 +4,7 @@ filter.tips_all:
     _controller: '\Drupal\filter\Controller\FilterController::filterTips'
     _title: 'Compose tips'
   requirements:
-    _access: 'TRUE'
+    _permission: 'view filter tips page'
 
 filter.tips:
   path: '/filter/tips/{filter_format}'
