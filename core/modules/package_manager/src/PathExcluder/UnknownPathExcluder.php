@@ -77,10 +77,10 @@ final class UnknownPathExcluder implements EventSubscriberInterface, LoggerAware
   private function getExcludedPaths(): array {
     // If this excluder is disabled, or the project root and web root are the
     // same, we are not excluding any paths.
-    $path_patterns = $this->configFactory->get('package_manager.settings')
+    $paths_to_include = $this->configFactory->get('package_manager.settings')
       ->get('include_unknown_files_in_project_root');
     $web_root = $this->pathLocator->getWebRoot();
-    if (empty($web_root) || in_array('*', $path_patterns)) {
+    if (empty($web_root) || in_array('*', $paths_to_include)) {
       return [];
     }
 
@@ -146,7 +146,7 @@ final class UnknownPathExcluder implements EventSubscriberInterface, LoggerAware
       throw new \RuntimeException("Could not scan for files in the project root.");
     }
     while ($entry = readdir($handle)) {
-      foreach ($path_patterns as $pattern) {
+      foreach ($paths_to_include as $pattern) {
         if (fnmatch($pattern, $entry)) {
           // If the path matches any of the patterns, skip to the next entry.
           continue 2;
