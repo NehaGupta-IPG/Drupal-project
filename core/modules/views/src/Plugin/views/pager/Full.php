@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Plugin\views\pager;
 
+use Drupal\Core\Ajax\AjaxHelperTrait;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsPager;
@@ -20,6 +21,8 @@ use Drupal\views\Attribute\ViewsPager;
   register_theme: FALSE
 )]
 class Full extends SqlBase {
+
+  use AjaxHelperTrait;
 
   /**
    * {@inheritdoc}
@@ -101,7 +104,7 @@ class Full extends SqlBase {
       '#pagination_heading_level' => parent::getHeadingLevel(),
       '#parameters' => $input,
       '#quantity' => $this->options['quantity'],
-      '#route_name' => !empty($this->view->live_preview) ? '<current>' : '<none>',
+      '#route_name' => (!empty($this->view->live_preview) || $this->isAjax()) ? '<current>' : '<none>',
     ];
   }
 
