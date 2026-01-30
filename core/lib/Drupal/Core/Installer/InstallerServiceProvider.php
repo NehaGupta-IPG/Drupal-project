@@ -38,11 +38,11 @@ class InstallerServiceProvider extends NormalInstallerServiceProvider implements
     ['install_path' => $project_root] = InstalledVersions::getRootPackage();
     $composer_json = Json::decode(file_get_contents($project_root . '/composer.json'));
     $hook_classes = $composer_json['extra']['drupal-installer']['hook-classes'] ?? NULL;
-    foreach ($hook_classes as $hook_class) {
+    foreach ($hook_classes ?? [] as $hook_class) {
       if (isset($hook_class) && class_exists($hook_class)) {
         $definition = $container->register($hook_class, $hook_class);
-        $container->set($hook_class, $hook_class);
-        $container->addCompilerPass(new InstallerHookCompilerPass($hook_class), priority: -100);
+        $container->set($hook_class, new $hook_class());
+        $container->addCompilerPass(new InstallerHookCompilerPass($definition), priority: -100);
       }
     }
 
