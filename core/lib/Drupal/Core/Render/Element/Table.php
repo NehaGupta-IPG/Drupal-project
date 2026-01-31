@@ -3,7 +3,7 @@
 namespace Drupal\Core\Render\Element;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Attribute\FormElement;
+use Drupal\Core\Render\Element\FormElementBase;
 use Drupal\Core\Render\Element;
 use Drupal\Component\Utility\Html as HtmlUtility;
 
@@ -15,15 +15,19 @@ use Drupal\Component\Utility\Html as HtmlUtility;
  *
  * Properties:
  * - #header: An array of table header labels.
- * - #rows: An array of the rows to be displayed. Each row is either an array
- *   of cell contents or an array of properties as described in table.html.twig.
- *   Each cell can be either a string, or an array with the following keys:
- *   - 'data': The string content of the cell, or a render array.
- *   - Any other key: Any other HTML attribute for the table cell, such as
- *     'class' or 'id'.
- *   Alternatively, specify the table data as child elements of the table
- *   element. Table elements would contain rows elements that would in turn
- *   contain column elements.
+ * - #rows: An array of table rows.
+ *   Each row may be one of the following:
+ *   - An indexed array of cell values (strings, render arrays, or cell definition arrays).
+ *   - An associative array of cell definitions. Each cell definition 
+ *     may include a 'data' key and optional HTML attributes.
+ *   Each cell value may be:
+ *   - A string.
+ *   - An associative array with:
+ *     - data: A string or renderable array representing the cell contents.
+ *     - attributes: (optional) An array of HTML attributes for the cell
+ *       (for example: class, id).
+ *   Alternatively, table data may be provided as child elements of the table
+ *   render element. In this case, rows contain column elements.
  * - #empty: Text to display when no rows are present.
  * - #responsive: Indicates whether to add the drupal.tableresponsive library
  *   providing responsive tables.  Defaults to TRUE.
