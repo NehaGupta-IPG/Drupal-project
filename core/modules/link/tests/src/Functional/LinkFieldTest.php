@@ -139,6 +139,8 @@ class LinkFieldTest extends BrowserTestBase {
       'http://www.example.com/numbers_(9999)' => 'http://www.example.com/numbers_(9999)',
     ];
     $valid_internal_entries = [
+      'route:entity.node.canonical;node=1' => 'route:entity.node.canonical;node=1',
+      'route:entity.user.canonical;user=999999' => 'route:entity.user.canonical;user=999999',
       '/entity_test/add' => '/entity_test/add',
       '/a/path/alias' => '/a/path/alias',
 
@@ -474,7 +476,7 @@ class LinkFieldTest extends BrowserTestBase {
   /**
    * Renders a test_entity and returns the output.
    *
-   * @param int $id
+   * @param int|string $id
    *   The test_entity ID to render.
    * @param string $view_mode
    *   (optional) The view mode to use for rendering.
