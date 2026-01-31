@@ -131,7 +131,7 @@ class Session implements HttpKernelInterface {
 
     $requestSessionCookieId = $request->cookies->get($sessionName);
 
-    $isSessionEmpty = $session instanceof HttpFoundationSession ? $session->isEmpty() : !$session->all();
+    $isSessionEmpty = ($session instanceof HttpFoundationSession ? $session->isEmpty() : !$session->all()) && empty($_SESSION);
     if ($requestSessionCookieId && $isSessionEmpty) {
       // PHP internally sets the session cookie value to "deleted" when
       // setcookie() is called with empty string $value argument which happens
