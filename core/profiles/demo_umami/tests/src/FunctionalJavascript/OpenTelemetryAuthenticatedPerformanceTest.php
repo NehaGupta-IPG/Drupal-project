@@ -28,9 +28,9 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
    * Logs authenticated tracing data.
    */
   public function testAuthenticatedPerformance(): void {
-    // Replace toolbar with navigation and uninstall history to avoid AJAX
-    // requests while recording performance data.
-    \Drupal::service('module_installer')->uninstall(['toolbar', 'history']);
+    // Replace toolbar with navigation to avoid AJAX requests while recording
+    // performance data.
+    \Drupal::service('module_installer')->uninstall(['toolbar']);
     \Drupal::service('module_installer')->install(['navigation']);
     $this->doTestFrontPageAuthenticatedWarmCache();
     $this->doTestNodePageAdministrator();
@@ -128,12 +128,12 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
     }, 'administratorNodePage');
 
     $expected = [
-      'QueryCount' => 331,
-      'CacheGetCount' => 349,
+      'QueryCount' => 304,
+      'CacheGetCount' => 311,
       'CacheGetCountByBin' => [
-        'config' => 91,
+        'config' => 66,
         'bootstrap' => 16,
-        'discovery' => 108,
+        'discovery' => 95,
         'data' => 23,
         'entity' => 25,
         'dynamic_page_cache' => 1,
@@ -141,14 +141,14 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
         'render' => 39,
         'menu' => 24,
       ],
-      'CacheSetCount' => 341,
+      'CacheSetCount' => 323,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 32,
+      'CacheTagLookupQueryCount' => 30,
       'ScriptCount' => 5,
       'ScriptBytes' => 198900,
       'StylesheetCount' => 8,
-      'StylesheetBytes' => 78297,
+      'StylesheetBytes' => 79412,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
