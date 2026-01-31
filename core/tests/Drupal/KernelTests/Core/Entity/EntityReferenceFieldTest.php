@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Component\Utility\OpenTelemetry;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -106,7 +107,7 @@ class EntityReferenceFieldTest extends EntityKernelTestBase {
 
     $entity = $storage->load($entity->id());
 
-    $fiber = new \Fiber(fn() => $entity->{$this->fieldName}->entity);
+    $fiber = new \Fiber(OpenTelemetry::bindContext(fn() => $entity->{$this->fieldName}->entity));
     $fiber->start();
     $referenced_entity = $entity->{$this->fieldName}->entity;
     $this->assertIsObject($referenced_entity);
@@ -131,7 +132,7 @@ class EntityReferenceFieldTest extends EntityKernelTestBase {
     $entity = $storage->load($entity->id());
     $field_item = $entity->get($this->fieldName)->first();
 
-    $fiber = new \Fiber(fn() => $field_item->entity);
+    $fiber = new \Fiber(OpenTelemetry::bindContext(fn() => $field_item->entity));
     $fiber->start();
     $referenced_entity = $field_item->entity;
     $this->assertIsObject($referenced_entity);
