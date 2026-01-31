@@ -101,7 +101,7 @@ class Session implements HttpKernelInterface {
    * is done by sending the necessary Set-Cookie response headers via the PHP
    * SAPI.
    *
-   * To support sessions in persistent runtimes like roadrunner or swoole, the
+   * To support sessions in persistent runtimes like e.g., roadrunner, the
    * session cookie needs to be present on the response object and must not be
    * sent by PHP itself.
    *
