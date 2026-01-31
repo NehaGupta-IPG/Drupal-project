@@ -19,7 +19,6 @@ use Drupal\entity_test\EntityTestViewBuilder as TestViewBuilder;
 use Drupal\entity_test\EntityTestViewsData;
 use Drupal\user\EntityOwnerInterface;
 use Drupal\user\UserInterface;
-use OpenTelemetry\Context\Context;
 
 /**
  * Defines the test entity class.
@@ -69,18 +68,6 @@ class EntityTest extends ContentEntityBase implements EntityOwnerInterface {
     parent::preCreate($storage, $values);
     if (empty($values['type'])) {
       $values['type'] = $storage->getEntityTypeId();
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * @phpstan-ignore missingType.return
-   */
-  public static function postLoad(EntityStorageInterface $storage, array &$entities) {
-    parent::postLoad($storage, $entities);
-    if (\Fiber::getCurrent()) {
-      Context::getCurrent();
     }
   }
 
