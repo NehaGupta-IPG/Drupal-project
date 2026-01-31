@@ -325,6 +325,21 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
       }
     }
     if (!$this->isSyncing()) {
+      // Check for deprecated configuration keys.
+      $schema = \Drupal::service('config.typed')->getDefinition($this->getConfigTarget());
+      foreach ($this->toArray() as $key => $value) {
+        if (isset($schema['mapping'][$key]['deprecated'])) {
+          $deprecated = $schema['mapping'][$key]['deprecated'];
+          $message = sprintf(
+            'The configuration key "%s" is deprecated as of Drupal %s: %s',
+            $key,
+            $deprecated['version'] ?? 'unknown',
+            $deprecated['message'] ?? 'No additional details provided.'
+          );
+          trigger_error($message, E_USER_DEPRECATED);
+        }
+      }
+
       // Ensure the correct dependencies are present. If the configuration is
       // being written during a configuration synchronization then there is no
       // need to recalculate the dependencies.

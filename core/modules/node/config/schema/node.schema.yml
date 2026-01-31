@@ -93,3 +93,15 @@ block.settings.node_syndicate_block:
     block_count:
       type: integer
       label: 'Block count'
+
+# Adding schema for default_argument_skip_url with deprecation metadata.
+core.entity_view_display.node.article.default:
+  type: config_entity
+  label: 'Node Article Default Display'
+  mapping:
+    default_argument_skip_url:
+      type: string
+      label: 'Default argument skip URL'
+      deprecated:
+        version: '11.3.0'
+        message: 'This configuration key is deprecated and will be removed in Drupal 12.'
