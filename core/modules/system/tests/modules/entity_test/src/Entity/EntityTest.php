@@ -74,10 +74,14 @@ class EntityTest extends ContentEntityBase implements EntityOwnerInterface {
 
   /**
    * {@inheritdoc}
+   *
+   * @phpstan-ignore missingType.return
    */
   public static function postLoad(EntityStorageInterface $storage, array &$entities) {
-    Context::getCurrent();
-    return parent::postLoad($storage, $entities);
+    parent::postLoad($storage, $entities);
+    if (\Fiber::getCurrent()) {
+      Context::getCurrent();
+    }
   }
 
   /**
