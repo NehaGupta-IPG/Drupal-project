@@ -2,10 +2,15 @@
 
 namespace Drupal\Core\StackMiddleware;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Session\ResponseKeepSessionOpenInterface;
+use Drupal\Core\Session\SessionConfigurationInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session as HttpFoundationSession;
+use Symfony\Component\HttpFoundation\Session\SessionUtils;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
@@ -30,11 +35,17 @@ class Session implements HttpKernelInterface {
    *   The decorated kernel.
    * @param \Closure $sessionClosure
    *   A closure that wraps the session service.
+   * @param \Drupal\Core\Session\SessionConfigurationInterface $sessionConfiguration
+   *   The session configuration.
+   * @param \Drupal\Component\Datetime\TimeInterface $time
+   *   The time service.
    */
   public function __construct(
     HttpKernelInterface $http_kernel,
     #[AutowireServiceClosure('session')]
     protected \Closure $sessionClosure,
+    protected readonly SessionConfigurationInterface $sessionConfiguration,
+    protected readonly TimeInterface $time,
   ) {
     $this->httpKernel = $http_kernel;
   }
@@ -54,6 +65,7 @@ class Session implements HttpKernelInterface {
 
     if ($type === self::MAIN_REQUEST && !$result instanceof ResponseKeepSessionOpenInterface && PHP_SAPI !== 'cli') {
       $request->getSession()->save();
+      $this->synchronizeResponseCookie($request, $result);
     }
 
     return $result;
@@ -80,6 +92,84 @@ class Session implements HttpKernelInterface {
     $session = ($this->sessionClosure)();
     $session->start();
     $request->setSession($session);
+  }
+
+  /**
+   * Synchronize PHP session related cookie response headers.
+   *
+   * The PHP session engine directly sets / removes session related cookie. This
+   * is done by sending the necessary Set-Cookie response headers via the PHP
+   * SAPI.
+   *
+   * To support sessions in persistent runtimes like roadrunner or swoole, the
+   * session cookie needs to be present on the response object and must not be
+   * sent by PHP itself.
+   *
+   * This method removes cookie related response headers sent by PHP and instead
+   * ensures sets / clears the cookie on the response object if necessary.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request.
+   * @param \Symfony\Component\HttpFoundation\Response $response
+   *   The response.
+   *
+   * @see https://github.com/php/php-src/blob/master/ext/session/session.c
+   * @see https://github.com/symfony/symfony/blob/8.1/src/Symfony/Component/HttpKernel/EventListener/AbstractSessionListener.php
+   */
+  protected function synchronizeResponseCookie(Request $request, Response $response): void {
+    $session = $request->getSession();
+    $sessionName = $session->getName();
+    $sessionId = $session->getId();
+    $sessionOptions = $this->sessionConfiguration->getOptions($request);
+    $sessionCookiePath = $sessionOptions['cookie_path'] ?? '/';
+    $sessionCookieDomain = $sessionOptions['cookie_domain'] ?? NULL;
+    $sessionCookieSecure = $sessionOptions['cookie_secure'] ?? FALSE;
+    $sessionCookieHttpOnly = $sessionOptions['cookie_httponly'] ?? TRUE;
+    $sessionCookieSameSite = $sessionOptions['cookie_samesite'] ?? Cookie::SAMESITE_LAX;
+
+    SessionUtils::popSessionCookie($sessionName, $sessionId);
+
+    $requestSessionCookieId = $request->cookies->get($sessionName);
+
+    $isSessionEmpty = $session instanceof HttpFoundationSession ? $session->isEmpty() : !$session->all();
+    if ($requestSessionCookieId && $isSessionEmpty) {
+      // PHP internally sets the session cookie value to "deleted" when
+      // setcookie() is called with empty string $value argument which happens
+      // in \Symfony\Component\HttpFoundation\Session\Storage\Handler\AbstractSessionHandler::destroy
+      // when the session gets invalidated (for example on logout) so we must
+      // handle this case here too otherwise we would send two Set-Cookie
+      // headers back with the response.
+      SessionUtils::popSessionCookie($sessionName, 'deleted');
+      $response->headers->clearCookie(
+        $sessionName,
+        $sessionCookiePath,
+        $sessionCookieDomain,
+        $sessionCookieSecure,
+        $sessionCookieHttpOnly,
+        $sessionCookieSameSite
+      );
+    }
+    elseif ($sessionId !== $requestSessionCookieId && !$isSessionEmpty) {
+      $expire = 0;
+      $lifetime = $sessionOptions['cookie_lifetime'] ?? NULL;
+      if ($lifetime) {
+        $expire = $this->time->getRequestTime() + $lifetime;
+      }
+
+      $response->headers->setCookie(
+        Cookie::create(
+          $sessionName,
+          $sessionId,
+          $expire,
+          $sessionCookiePath,
+          $sessionCookieDomain,
+          $sessionCookieSecure,
+          $sessionCookieHttpOnly,
+          FALSE,
+          $sessionCookieSameSite
+        )
+      );
+    }
   }
 
 }

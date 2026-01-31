@@ -132,22 +132,16 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
       return;
     }
 
-    if ($this->isSessionObsolete()) {
-      // There is no session data to store, destroy the session if it was
-      // previously started.
-      if ($this->getSaveHandler()->isActive()) {
-        $this->destroy();
-      }
-    }
-    else {
+    if (!$this->isSessionObsolete()) {
       // There is session data to store. Start the session if it is not already
       // started.
       if (!$this->getSaveHandler()->isActive()) {
         $this->startNow();
       }
-      // Write the session data.
-      parent::save();
     }
+
+    // Write the session data.
+    parent::save();
 
     $this->startedLazy = FALSE;
   }
@@ -186,12 +180,6 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
       return;
     }
 
-    // Symfony suggests using Session::invalidate() instead of session_destroy()
-    // however the former calls session_regenerate_id(TRUE), which while
-    // destroying the current session creates a new ID; Drupal has historically
-    // decided to only set sessions when absolutely necessary (e.g., to increase
-    // anonymous user cache hit rates) and as such we cannot use the Symfony
-    // convenience method here.
     session_destroy();
 
     // Unset the session cookies.

@@ -10,6 +10,7 @@ use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Session\SessionManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Finalize user logout.
@@ -22,6 +23,7 @@ final readonly class LogoutFinalizer {
     protected ModuleHandlerInterface $moduleHandler,
     #[Autowire(service: 'logger.channel.user')]
     protected LoggerInterface $logger,
+    protected RequestStack $requestStack,
   ) {}
 
   /**
@@ -32,12 +34,7 @@ final readonly class LogoutFinalizer {
 
     $this->moduleHandler->invokeAll('user_logout', [$this->accountProxy]);
 
-    // Destroy the current session, and reset $user to the anonymous user.
-    // Note: In Symfony the session is intended to be destroyed with
-    // Session::invalidate(). Regrettably this method is currently broken and
-    // may lead to the creation of spurious session records in the database.
-    // @see https://github.com/symfony/symfony/issues/12375
-    $this->sessionManager->destroy();
+    $this->requestStack->getSession()->invalidate();
     $this->accountProxy->setAccount(new AnonymousUserSession());
   }
 
