@@ -21,7 +21,7 @@ use Drupal\Component\Utility\Html as HtmlUtility;
  *   - 'data': The string content of the cell, or a render array.
  *   - Any other key: Any other HTML attribute for the table cell, such as
  *     'class' or 'id'.
- *   Alternatively specify the data for the table as child elements of the table
+ *   Alternatively, specify the table data as child elements of the table
  *   element. Table elements would contain rows elements that would in turn
  *   contain column elements.
  * - #empty: Text to display when no rows are present.
