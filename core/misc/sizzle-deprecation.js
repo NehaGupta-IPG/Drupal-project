@@ -9,9 +9,11 @@
     try {
       document.querySelector(selector);
     } catch (error) {
-      Drupal.deprecationError({
-        message: `Using jQuery-only selector "${selector}" is deprecated in 11.3.0 and is removed from Drupal:12.0.0.`,
-      });
+      if (error instanceof SyntaxError) {
+        Drupal.deprecationError({
+          message: `Using jQuery-only selector "${selector}" is deprecated in 11.4.0 and is removed from Drupal:12.0.0.`,
+        });
+      }
     }
   };
 
