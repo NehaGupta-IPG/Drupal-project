@@ -16,7 +16,11 @@ use Drupal\Component\Utility\Html as HtmlUtility;
  * Properties:
  * - #header: An array of table header labels.
  * - #rows: An array of the rows to be displayed. Each row is either an array
- *   of cell contents or an array of properties as described in table.html.twig
+ *   of cell contents or an array of properties as described in table.html.twig.
+ *   Each cell can be either a string, or an array with the following keys:
+ *   - 'data': The string content of the cell, or a render array.
+ *   - Any other key: Any other HTML attribute for the table cell, such as
+ *     'class' or 'id'.
  *   Alternatively specify the data for the table as child elements of the table
  *   element. Table elements would contain rows elements that would in turn
  *   contain column elements.
