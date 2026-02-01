@@ -11,29 +11,3 @@
 function rest_update_last_removed(): int {
   return 8401;
 }
-
-/**
- * Update views with "serializer" display adding pager setting if not set yet.
- */
-function rest_update_11001(): void {
-  $config_factory = \Drupal::configFactory();
-  $view_ids = $config_factory->listAll('views.view.');
-
-  foreach ($view_ids as $view_id) {
-    $views_config = $config_factory->get($view_id);
-    $displays = $views_config->get('display');
-
-    foreach ($displays as $display) {
-      $display_id = $display['id'];
-      $display_style_type = $views_config->get('display.' . $display_id . ".display_options.style.type");
-      $pager_conf = $views_config->get('display.' . $display_id . '.display_options.style.options.pager');
-
-      // Only add pager configuration if it is not already set.
-      if ($display_style_type === 'serializer' && is_null($pager_conf)) {
-        $editable_view_config = $config_factory->getEditable($view_id);
-        $editable_view_config->set('display.' . $display_id . '.display_options.style.options.pager', FALSE);
-        $editable_view_config->save();
-      }
-    }
-  }
-}

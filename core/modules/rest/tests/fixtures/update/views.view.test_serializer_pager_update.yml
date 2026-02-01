@@ -1,0 +1,82 @@
+uuid: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - rest
+    - user
+id: test_serializer_pager_update
+label: 'Test serializer pager update'
+module: rest
+description: ''
+tag: ''
+base_table: node_field_data
+base_field: nid
+display:
+  default:
+    id: default
+    display_title: Default
+    display_plugin: default
+    position: 0
+    display_options:
+      access:
+        type: none
+        options: {  }
+      cache:
+        type: tag
+        options: {  }
+      query:
+        type: views_query
+        options: {  }
+      exposed_form:
+        type: basic
+        options: {  }
+      pager:
+        type: full
+        options:
+          items_per_page: 10
+      style:
+        type: serializer
+        options: {  }
+      row:
+        type: data_entity
+        options:
+          relationship: none
+      fields:
+        title:
+          id: title
+          table: node_field_data
+          field: title
+          label: ''
+          plugin_id: field
+      sorts:
+        created:
+          id: created
+          table: node_field_data
+          field: created
+          order: DESC
+          plugin_id: date
+      title: 'Test serializer pager update'
+      arguments: {  }
+  rest_export_1:
+    id: rest_export_1
+    display_title: 'REST export'
+    display_plugin: rest_export
+    position: 1
+    display_options:
+      defaults:
+        access: false
+        style: false
+        row: false
+      path: test/serialize/pager-update
+      access:
+        type: none
+        options: {  }
+      style:
+        type: serializer
+        options: {  }
+      row:
+        type: data_entity
+        options:
+          relationship: none
