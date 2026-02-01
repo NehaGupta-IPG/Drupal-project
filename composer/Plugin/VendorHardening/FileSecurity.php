@@ -16,7 +16,7 @@ class FileSecurity {
   /**
    * CSP-header value for image/svg+xml files.
    */
-  public const CSP_SVG_HEADER = "default-src 'none'; img-src data:; style-src 'unsafe-inline'";
+  public const string CSP_SVG_HEADER = "default-src 'none'; img-src data:; style-src 'unsafe-inline'";
 
   /**
    * Writes an .htaccess file in the given directory, if it doesn't exist.
