@@ -16034,13 +16034,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/layout_builder/src/EventSubscriber/PrepareLayout.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Call to deprecated method get\\(\\) of class Symfony\\\\Component\\\\HttpFoundation\\\\Request\\:
-since Symfony 7\\.4, use properties `\\-\\>attributes`, `query` or `request` directly instead$#',
-	'identifier' => 'method.deprecated',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/src/EventSubscriber/SetInlineBlockDependency.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\layout_builder\\\\EventSubscriber\\\\SetInlineBlockDependency\\:\\:onGetDependency\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
