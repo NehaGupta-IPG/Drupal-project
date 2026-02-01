@@ -305,7 +305,7 @@ class TypedDataTest extends KernelTestBase {
     $this->assertNull($typed_data->getDuration());
 
     // URI type.
-    $uri = 'http://example.com/foo/';
+    $uri = 'https://example.com/foo/';
     $typed_data = $this->createTypedData(['type' => 'uri'], $uri);
     $this->assertInstanceOf(UriInterface::class, $typed_data);
     $this->assertSame($uri, $typed_data->getValue(), 'URI value was fetched.');

@@ -32,7 +32,7 @@ class EntityTestExternal extends EntityTest {
    */
   public function toUrl($rel = NULL, array $options = []) {
     if ($rel === 'canonical') {
-      return Url::fromUri('http://example.com', $options);
+      return Url::fromUri('https://example.com', $options);
     }
     return parent::toUrl($rel, $options);
   }

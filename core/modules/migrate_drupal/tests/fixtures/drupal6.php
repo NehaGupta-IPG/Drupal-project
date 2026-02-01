@@ -46746,7 +46746,7 @@ $connection->insert('profile_values')
 ->values(array(
   'fid' => '13',
   'uid' => '2',
-  'value' => 'http://example.com/blog',
+  'value' => 'https://example.com/blog',
 ))
 ->values(array(
   'fid' => '13',
@@ -46756,17 +46756,17 @@ $connection->insert('profile_values')
 ->values(array(
   'fid' => '13',
   'uid' => '15',
-  'value' => 'http://example.com/journal',
+  'value' => 'https://example.com/journal',
 ))
 ->values(array(
   'fid' => '13',
   'uid' => '16',
-  'value' => 'http://example.com/monkeys',
+  'value' => 'https://example.com/monkeys',
 ))
 ->values(array(
   'fid' => '13',
   'uid' => '17',
-  'value' => 'http://example.com/penguins',
+  'value' => 'https://example.com/penguins',
 ))
 ->values(array(
   'fid' => '14',

@@ -55,10 +55,10 @@ class SessionConfigurationTest extends UnitTestCase {
    */
   public static function providerTestGeneratedCookieDomain(): array {
     return [
-      ['http://example.com/path/index.php', '.example.com'],
+      ['https://example.com/path/index.php', '.example.com'],
       ['http://www.example.com/path/index.php', '.www.example.com'],
       ['http://subdomain.example.com/path/index.php', '.subdomain.example.com'],
-      ['http://example.com:8080/path/index.php', '.example.com'],
+      ['https://example.com:8080/path/index.php', '.example.com'],
       ['https://example.com/path/index.php', '.example.com'],
       ['http://localhost/path/index.php', ''],
       ['http://127.0.0.1/path/index.php', ''],
@@ -93,10 +93,10 @@ class SessionConfigurationTest extends UnitTestCase {
    */
   public static function providerTestEnforcedCookieDomain(): array {
     return [
-      ['http://example.com/path/index.php', '.example.com'],
+      ['https://example.com/path/index.php', '.example.com'],
       ['http://www.example.com/path/index.php', '.example.com'],
       ['http://subdomain.example.com/path/index.php', '.example.com'],
-      ['http://example.com:8080/path/index.php', '.example.com'],
+      ['https://example.com:8080/path/index.php', '.example.com'],
       ['https://example.com/path/index.php', '.example.com'],
       ['http://localhost/path/index.php', '.example.com'],
       ['http://127.0.0.1/path/index.php', '.example.com'],

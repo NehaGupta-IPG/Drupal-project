@@ -15,17 +15,17 @@ files:
 external:
   version: 1
   js:
-    http://example.com/script.js: { type: external }
+    https://example.com/script.js: { type: external }
   css:
     theme:
-      http://example.com/stylesheet.css: { type: external }
+      https://example.com/stylesheet.css: { type: external }
 
 # Library to test JS file asset attributes (both internal and external).
 js-attributes:
   version: 1
   js:
     deferred-internal.js: { attributes: { defer: true, bar: foo } }
-    http://example.com/deferred-external.js:
+    https://example.com/deferred-external.js:
       type: external
       attributes:
         foo: bar
@@ -51,7 +51,7 @@ order:
     weight_-8_1.js: { weight: -8 }
     weight_-8_2.js: { weight: -8 }
     weight_-8_3.js: { weight: -8 }
-    http://example.com/weight_-5_1.js: { type: external, weight: -5 }
+    https://example.com/weight_-5_1.js: { type: external, weight: -5 }
     weight_-8_4.js: { weight: -8 }
     weight_-3_2.js: { weight: -3 }
     weight_0_3.js: {}

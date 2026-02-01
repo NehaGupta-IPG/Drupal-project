@@ -155,7 +155,7 @@ class MenuLinkParentTest extends MigrateProcessTestCase {
     // The parent ID does not for the following tests.
     return [
       'parent link external and could not be loaded' => [
-        'source_value' => [1, 'admin', 'http://example.com'],
+        'source_value' => [1, 'admin', 'https://example.com'],
       ],
       'parent link path/menu name not passed' => [
         'source_value' => [1, NULL, NULL],
@@ -232,7 +232,7 @@ class MenuLinkParentTest extends MigrateProcessTestCase {
         'expected_result' => 'system.admin_structure',
       ],
       'external' => [
-        'source_value' => [9054, 'admin', 'http://example.com'],
+        'source_value' => [9054, 'admin', 'https://example.com'],
         'lookup_result' => 9054,
         'plugin_id' => 'menu_link_content:fe151460-dfa2-4133-8864-c1746f28ab27',
         'route_name' => NULL,

@@ -472,9 +472,9 @@ class UrlHelperTest extends TestCase {
       // Internal URL starting with a slash.
       ['/www.example.com', FALSE],
       // Simple external URLs.
-      ['http://example.com', TRUE],
       ['https://example.com', TRUE],
-      ['http://example.com/foo/bar?foo=bar&bar=baz&baz#foo', TRUE],
+      ['https://example.com', TRUE],
+      ['https://example.com/foo/bar?foo=bar&bar=baz&baz#foo', TRUE],
       ['//example.com', TRUE],
       // Some browsers ignore or strip leading control characters.
       ["\x00//www.example.com", TRUE],
@@ -533,7 +533,7 @@ class UrlHelperTest extends TestCase {
       // Test custom protocols.
       ['http://example.com?foo&bar', '//example.com?foo&amp;bar', ['https']],
       // Valid protocol.
-      ['http://example.com?foo&bar', 'http://example.com?foo&amp;bar', ['https', 'http']],
+      ['https://example.com?foo&bar', 'https://example.com?foo&amp;bar', ['https', 'http']],
       // Colon not part of the URL scheme.
       ['/test:8888?foo&bar', '/test:8888?foo&amp;bar', ['http']],
     ];
@@ -572,7 +572,7 @@ class UrlHelperTest extends TestCase {
       // Test custom protocols.
       ['http://example.com', '//example.com', ['https']],
       // Valid protocol.
-      ['http://example.com', 'http://example.com', ['https', 'http']],
+      ['https://example.com', 'https://example.com', ['https', 'http']],
       // Colon not part of the URL scheme.
       ['/test:8888', '/test:8888', ['http']],
     ];
@@ -642,32 +642,32 @@ class UrlHelperTest extends TestCase {
   public static function providerTestExternalIsLocal(): array {
     return [
       // Different mixes of trailing slash.
-      ['http://example.com', 'http://example.com', TRUE],
-      ['http://example.com/', 'http://example.com', TRUE],
-      ['http://example.com', 'http://example.com/', TRUE],
-      ['http://example.com/', 'http://example.com/', TRUE],
+      ['https://example.com', 'https://example.com', TRUE],
+      ['https://example.com/', 'https://example.com', TRUE],
+      ['https://example.com', 'https://example.com/', TRUE],
+      ['https://example.com/', 'https://example.com/', TRUE],
       // Sub directory of site.
-      ['http://example.com/foo', 'http://example.com/', TRUE],
-      ['http://example.com/foo/bar', 'http://example.com/foo', TRUE],
-      ['http://example.com/foo/bar', 'http://example.com/foo/', TRUE],
+      ['https://example.com/foo', 'https://example.com/', TRUE],
+      ['https://example.com/foo/bar', 'https://example.com/foo', TRUE],
+      ['https://example.com/foo/bar', 'https://example.com/foo/', TRUE],
       // Different sub-domain.
-      ['http://example.com', 'http://www.example.com/', FALSE],
-      ['http://example.com/', 'http://www.example.com/', FALSE],
-      ['http://example.com/foo', 'http://www.example.com/', FALSE],
+      ['https://example.com', 'http://www.example.com/', FALSE],
+      ['https://example.com/', 'http://www.example.com/', FALSE],
+      ['https://example.com/foo', 'http://www.example.com/', FALSE],
       // Different TLD.
-      ['http://example.com', 'http://example.ca', FALSE],
-      ['http://example.com', 'http://example.ca/', FALSE],
-      ['http://example.com/', 'http://example.ca/', FALSE],
-      ['http://example.com/foo', 'http://example.ca', FALSE],
-      ['http://example.com/foo', 'http://example.ca/', FALSE],
+      ['https://example.com', 'http://example.ca', FALSE],
+      ['https://example.com', 'http://example.ca/', FALSE],
+      ['https://example.com/', 'http://example.ca/', FALSE],
+      ['https://example.com/foo', 'http://example.ca', FALSE],
+      ['https://example.com/foo', 'http://example.ca/', FALSE],
       // Different site path.
-      ['http://example.com/foo', 'http://example.com/bar', FALSE],
-      ['http://example.com', 'http://example.com/bar', FALSE],
-      ['http://example.com/bar', 'http://example.com/bar/', FALSE],
+      ['https://example.com/foo', 'https://example.com/bar', FALSE],
+      ['https://example.com', 'https://example.com/bar', FALSE],
+      ['https://example.com/bar', 'https://example.com/bar/', FALSE],
       // Ensure \ is normalized to / since some browsers do that.
-      ['http://www.example.ca\@example.com', 'http://example.com', FALSE],
+      ['http://www.example.ca\@example.com', 'https://example.com', FALSE],
       // Some browsers ignore or strip leading control characters.
-      ["\x00//www.example.ca", 'http://example.com', FALSE],
+      ["\x00//www.example.ca", 'https://example.com', FALSE],
     ];
   }
 
@@ -692,15 +692,15 @@ class UrlHelperTest extends TestCase {
    */
   public static function providerTestExternalIsLocalInvalid(): array {
     return [
-      ['http://example.com/foo', ''],
-      ['http://example.com/foo', 'bar'],
-      ['http://example.com/foo', 'http://'],
+      ['https://example.com/foo', ''],
+      ['https://example.com/foo', 'bar'],
+      ['https://example.com/foo', 'http://'],
       // Invalid destination URLs.
-      ['', 'http://example.com/foo'],
-      ['bar', 'http://example.com/foo'],
-      ['/bar', 'http://example.com/foo'],
-      ['bar/', 'http://example.com/foo'],
-      ['http://', 'http://example.com/foo'],
+      ['', 'https://example.com/foo'],
+      ['bar', 'https://example.com/foo'],
+      ['/bar', 'https://example.com/foo'],
+      ['bar/', 'https://example.com/foo'],
+      ['http://', 'https://example.com/foo'],
     ];
   }
 

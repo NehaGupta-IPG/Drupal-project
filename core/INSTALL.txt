@@ -331,9 +331,9 @@ INSTALLATION
    crontab utility on Unix/Linux systems. The following crontab line uses the
    wget command to visit the cron page, and runs each hour, on the hour:
 
-   0 * * * * wget -O - -q -t 1 http://example.com/cron/YOURKEY
+   0 * * * * wget -O - -q -t 1 https://example.com/cron/YOURKEY
 
-   Replace the text "http://example.com/cron/YOURKEY" in the example with the
+   Replace the text "https://example.com/cron/YOURKEY" in the example with the
    full URL displayed under "Cron maintenance tasks" on the "Status report"
    page.
 
@@ -399,7 +399,7 @@ copy file 'default.settings.php' from the 'sites/default' directory into the
 new site directory with file name 'settings.php' and modify as appropriate.
 The new directory name is constructed from the site's URL. The configuration
 for www.example.com could be in 'sites/example.com/settings.php' (note that
-'www.' should be omitted if users can access your site at http://example.com/).
+'www.' should be omitted if users can access your site at https://example.com/).
 
   $ cp sites/default/default.settings.php sites/example.com/settings.php
 

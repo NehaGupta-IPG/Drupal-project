@@ -50,7 +50,7 @@ class NodeTestHooks {
   #[Hook('node_build_defaults_alter')]
   public function nodeBuildDefaultsAlter(array &$build, NodeInterface &$node, $view_mode = 'full'): void {
     if ($view_mode == 'rss') {
-      $node->rss_namespaces['xmlns:test'] = 'http://example.com/test-namespace';
+      $node->rss_namespaces['xmlns:test'] = 'https://example.com/test-namespace';
     }
   }
 

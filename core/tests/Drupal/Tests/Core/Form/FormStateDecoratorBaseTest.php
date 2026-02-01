@@ -1273,7 +1273,7 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
       [NULL],
       [FALSE],
       [new Url('foo')],
-      [new RedirectResponse('http://example.com')],
+      [new RedirectResponse('https://example.com')],
     ];
   }
 

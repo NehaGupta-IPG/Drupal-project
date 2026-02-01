@@ -75,12 +75,12 @@ class IconFinderTest extends UnitTestCase {
 
     yield 'url valid' => [
       [
-        'http://example.com/foo.png',
+        'https://example.com/foo.png',
         'https://example.com/bar.png',
         'https://example.com/fOO%20folder%20%C3%B9/FoO%21%20BaR%3D%281%29%20iCo-n.png%3Ftest%3DfOO%23bAz',
       ],
       [
-        'foo' => 'http://example.com/foo.png',
+        'foo' => 'https://example.com/foo.png',
         'bar' => 'https://example.com/bar.png',
         'FoO! BaR=(1) iCo-n' => 'https://example.com/fOO%20folder%20%C3%B9/FoO%21%20BaR%3D%281%29%20iCo-n.png%3Ftest%3DfOO%23bAz',
       ],
@@ -106,34 +106,34 @@ class IconFinderTest extends UnitTestCase {
 
     yield 'url valid with duplicate' => [
       [
-        'http://example.com/foo.png',
+        'https://example.com/foo.png',
         'https://example.com/bar.png',
-        'http://example.com/foo.svg',
+        'https://example.com/foo.svg',
         'https://example.com/bar.svg',
       ],
       [
-        'foo' => 'http://example.com/foo.svg',
+        'foo' => 'https://example.com/foo.svg',
         'bar' => 'https://example.com/bar.svg',
       ],
     ];
 
     yield 'url no extension' => [
       [
-        'http://example.com/foo',
+        'https://example.com/foo',
         'https://example.com/fOO folder ù/FoO BaR=(1) iCo-n?test=fOO#bAz',
       ],
       [
-        'foo' => 'http://example.com/foo',
+        'foo' => 'https://example.com/foo',
         'FoO BaR=(1) iCo-n' => 'https://example.com/fOO folder ù/FoO BaR=(1) iCo-n?test=fOO#bAz',
       ],
     ];
 
     yield 'url valid with special filename' => [
       [
-        'http://example.com/foo (è$ù5 6*$^ _ ù48 \'Bar\']=-n!.png',
+        'https://example.com/foo (è$ù5 6*$^ _ ù48 \'Bar\']=-n!.png',
       ],
       [
-        'foo (è$ù5 6*$^ _ ù48 \'Bar\']=-n!' => 'http://example.com/foo (è$ù5 6*$^ _ ù48 \'Bar\']=-n!.png',
+        'foo (è$ù5 6*$^ _ ù48 \'Bar\']=-n!' => 'https://example.com/foo (è$ù5 6*$^ _ ù48 \'Bar\']=-n!.png',
       ],
     ];
 

@@ -35,7 +35,7 @@ use Drupal\migrate\Row;
  *     (
  *       [language] => en
  * ...
- *       [domain] => http://example.com
+ *       [domain] => https://example.com
  *     )
  *   [1] => Array
  *     (
@@ -52,7 +52,7 @@ use Drupal\migrate\Row;
  * @code
  * domains: Array
  * (
- *   [en] => http://example.com
+ *   [en] => https://example.com
  *   [fr] => http://fr.example.com
  * ...
  * @endcode

@@ -117,7 +117,7 @@ class NavigationLinkBlockTest extends PageCacheTagsTestBase {
     // Add a link to an external URL.
     $external_label = 'External Link Block';
     $external_link_title = 'Link to example';
-    $this->appendNavigationLinkBlock($external_label, $external_link_title, 'http://example.com', 'external');
+    $this->appendNavigationLinkBlock($external_label, $external_link_title, 'https://example.com', 'external');
     // Create an entity and create a link to it.
     $entity_type_manager = \Drupal::entityTypeManager();
     $entity_test_storage = $entity_type_manager->getStorage('entity_test');

@@ -176,7 +176,7 @@ class WebAssertTest extends UnitTestCase {
    * @legacy-covers ::linkExists
    */
   public function testPipeCharInLocator(): void {
-    $this->visit('', '<a href="http://example.com">foo|bar|baz</a>');
+    $this->visit('', '<a href="https://example.com">foo|bar|baz</a>');
     $this->assertSession()->linkExists('foo|bar|baz');
     $this->addToAssertionCount(1);
   }
@@ -185,7 +185,7 @@ class WebAssertTest extends UnitTestCase {
    * Tests linkExistsExact() functionality.
    */
   public function testLinkExistsExact(): void {
-    $this->visit('', '<a href="http://example.com">foo|bar|baz</a>');
+    $this->visit('', '<a href="https://example.com">foo|bar|baz</a>');
     $this->assertSession()->linkExistsExact('foo|bar|baz');
     $this->addToAssertionCount(1);
   }
@@ -196,7 +196,7 @@ class WebAssertTest extends UnitTestCase {
    * @legacy-covers ::linkExistsExact
    */
   public function testInvalidLinkExistsExact(): void {
-    $this->visit('', '<a href="http://example.com">foo|bar|baz</a>');
+    $this->visit('', '<a href="https://example.com">foo|bar|baz</a>');
     $this->expectException(ExpectationException::class);
     $this->expectExceptionMessage('Link with label foo|bar not found');
     $this->assertSession()->linkExistsExact('foo|bar');
@@ -206,7 +206,7 @@ class WebAssertTest extends UnitTestCase {
    * Tests linkNotExistsExact() functionality.
    */
   public function testLinkNotExistsExact(): void {
-    $this->visit('', '<a href="http://example.com">foo|bar|baz</a>');
+    $this->visit('', '<a href="https://example.com">foo|bar|baz</a>');
     $this->assertSession()->linkNotExistsExact('foo|bar');
     $this->addToAssertionCount(1);
   }
@@ -217,7 +217,7 @@ class WebAssertTest extends UnitTestCase {
    * @legacy-covers ::linkNotExistsExact
    */
   public function testInvalidLinkNotExistsExact(): void {
-    $this->visit('', '<a href="http://example.com">foo|bar|baz</a>');
+    $this->visit('', '<a href="https://example.com">foo|bar|baz</a>');
     $this->expectException(ExpectationException::class);
     $this->expectExceptionMessage('Link with label foo|bar|baz found');
     $this->assertSession()->linkNotExistsExact('foo|bar|baz');

@@ -742,7 +742,7 @@ $settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
  *
  * If you are running multisite, or if you are running your site from
  * different domain names (eg, you don't redirect http://www.example.com to
- * http://example.com), you should specify all of the host patterns that are
+ * https://example.com), you should specify all of the host patterns that are
  * allowed by your site.
  *
  * For example:
@@ -821,7 +821,7 @@ $settings['migrate_node_migrate_type_classic'] = FALSE;
  * - migrate_file_public_path - The location of the source Drupal 6 or Drupal 7
  *   public files. This can be a local file directory containing the source
  *   Drupal 6 or Drupal 7 site (e.g /var/www/docroot), or the site address
- *   (e.g http://example.com).
+ *   (e.g https://example.com).
  * - migrate_file_private_path - The location of the source Drupal 7 private
  *   files. This can be a local file directory containing the source Drupal 7
  *   site (e.g /var/www/docroot), or empty to use the same value as Public

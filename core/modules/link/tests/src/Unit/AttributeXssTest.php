@@ -53,13 +53,13 @@ final class AttributeXssTest extends UnitTestCase {
     ];
 
     yield 'valueless, mangled with a space' => [
-      ['class' => ['foo', 'bar'], 'selected href' => 'http://example.com'],
-      ['class' => ['foo', 'bar'], 'selected' => 'selected', 'href' => 'http://example.com'],
+      ['class' => ['foo', 'bar'], 'selected href' => 'https://example.com'],
+      ['class' => ['foo', 'bar'], 'selected' => 'selected', 'href' => 'https://example.com'],
     ];
 
     yield 'valueless, mangled with a space, blocked' => [
-      ['class' => ['foo', 'bar'], 'selected onclick href' => 'http://example.com'],
-      ['class' => ['foo', 'bar'], 'selected' => 'selected', 'href' => 'http://example.com'],
+      ['class' => ['foo', 'bar'], 'selected onclick href' => 'https://example.com'],
+      ['class' => ['foo', 'bar'], 'selected' => 'selected', 'href' => 'https://example.com'],
     ];
 
     yield 'with encoding' => [
@@ -68,18 +68,18 @@ final class AttributeXssTest extends UnitTestCase {
     ];
 
     yield 'valueless, mangled with multiple spaces, blocked' => [
-      ['class' => ['foo', 'bar'], 'selected  onclick href' => 'http://example.com'],
-      ['class' => ['foo', 'bar'], 'selected' => 'selected', 'href' => 'http://example.com'],
+      ['class' => ['foo', 'bar'], 'selected  onclick href' => 'https://example.com'],
+      ['class' => ['foo', 'bar'], 'selected' => 'selected', 'href' => 'https://example.com'],
     ];
 
     yield 'valueless, mangled with multiple spaces, blocked, mangled first' => [
-      ['selected  onclick href' => 'http://example.com', 'class' => ['foo', 'bar']],
-      ['selected' => 'selected', 'href' => 'http://example.com', 'class' => ['foo', 'bar']],
+      ['selected  onclick href' => 'https://example.com', 'class' => ['foo', 'bar']],
+      ['selected' => 'selected', 'href' => 'https://example.com', 'class' => ['foo', 'bar']],
     ];
 
     yield 'valueless but with value' => [
-      ['class' => ['foo', 'bar'], 'selected' => 'selected', 'href' => 'http://example.com'],
-      ['class' => ['foo', 'bar'], 'selected' => 'selected', 'href' => 'http://example.com'],
+      ['class' => ['foo', 'bar'], 'selected' => 'selected', 'href' => 'https://example.com'],
+      ['class' => ['foo', 'bar'], 'selected' => 'selected', 'href' => 'https://example.com'],
     ];
 
     yield 'valueless but with value, bad protocol' => [
@@ -93,7 +93,7 @@ final class AttributeXssTest extends UnitTestCase {
     ];
 
     yield 'valueless, mangled with a space and bad protocol, repeated' => [
-      ['class' => ['foo', 'bar'], 'selected href' => 'javascript:alert()', 'href' => 'http://example.com'],
+      ['class' => ['foo', 'bar'], 'selected href' => 'javascript:alert()', 'href' => 'https://example.com'],
       ['class' => ['foo', 'bar'], 'selected' => 'selected', 'href' => 'alert()'],
     ];
 
@@ -113,8 +113,8 @@ final class AttributeXssTest extends UnitTestCase {
     ];
 
     yield 'xss onclick, valueless, mangled with a space' => [
-      ['class' => ['foo', 'bar'], 'selected onclick href' => 'http://example.com'],
-      ['class' => ['foo', 'bar'], 'selected' => 'selected', 'href' => 'http://example.com'],
+      ['class' => ['foo', 'bar'], 'selected onclick href' => 'https://example.com'],
+      ['class' => ['foo', 'bar'], 'selected' => 'selected', 'href' => 'https://example.com'],
     ];
 
     yield 'xss protocol' => [

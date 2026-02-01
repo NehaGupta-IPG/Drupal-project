@@ -18,11 +18,11 @@ use GuzzleHttp\Psr7\Uri;
  * process:
  *   new_url:
  *     plugin: urlencode
- *     source: 'http://example.com/a url with spaces.html'
+ *     source: 'https://example.com/a url with spaces.html'
  * @endcode
  *
- * This will convert the source URL 'http://example.com/a url with spaces.html'
- * into 'http://example.com/a%20url%20with%20spaces.html'.
+ * This will convert the source URL 'https://example.com/a url with spaces.html'
+ * into 'https://example.com/a%20url%20with%20spaces.html'.
  *
  * @see \Drupal\migrate\Plugin\MigrateProcessInterface
  */

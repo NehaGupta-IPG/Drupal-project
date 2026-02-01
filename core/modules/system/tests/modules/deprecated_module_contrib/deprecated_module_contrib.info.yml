@@ -4,4 +4,4 @@ description: 'Deprecated module contrib'
 package: Testing
 version: VERSION
 lifecycle: deprecated
-lifecycle_link: 'http://example.com/deprecated'
+lifecycle_link: 'https://example.com/deprecated'

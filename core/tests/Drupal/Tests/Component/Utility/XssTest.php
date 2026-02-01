@@ -503,8 +503,8 @@ class XssTest extends TestCase {
   public static function providerTestAttributes(): array {
     return [
       [
-        '<img src="http://example.com/foo.jpg" title="Example: title" alt="Example: alt" class="md:block">',
-        '<img src="http://example.com/foo.jpg" title="Example: title" alt="Example: alt" class="md:block">',
+        '<img src="https://example.com/foo.jpg" title="Example: title" alt="Example: alt" class="md:block">',
+        '<img src="https://example.com/foo.jpg" title="Example: title" alt="Example: alt" class="md:block">',
         'Image tag with alt and title attribute',
         ['img'],
       ],
@@ -521,8 +521,8 @@ class XssTest extends TestCase {
         ['span'],
       ],
       [
-        '<img src="http://example.com/foo.jpg" data-caption="Drupal 8: The best release ever.">',
-        '<img src="http://example.com/foo.jpg" data-caption="Drupal 8: The best release ever.">',
+        '<img src="https://example.com/foo.jpg" data-caption="Drupal 8: The best release ever.">',
+        '<img src="https://example.com/foo.jpg" data-caption="Drupal 8: The best release ever.">',
         'Image tag with data attribute',
         ['img'],
       ],

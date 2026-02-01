@@ -144,7 +144,7 @@ class DialogTest extends WebDriverTestBase {
     $this->assertNotNull($form_dialog_title, 'Dialog form has the expected title.');
     $button1_dialog->findButton('Close')->press();
     // Test external URL.
-    $dialog_obj = new OpenModalDialogWithUrl('http://example.com', []);
+    $dialog_obj = new OpenModalDialogWithUrl('https://example.com', []);
     try {
       $dialog_obj->render();
     }

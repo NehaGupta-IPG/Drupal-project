@@ -61,7 +61,7 @@ class UrlTransformRelativeTest extends KernelTestBase {
         '',
         '',
         TRUE,
-        'http://example.com/page',
+        'https://example.com/page',
         '/page',
       ],
       'http with base path and root relative' => [
@@ -70,7 +70,7 @@ class UrlTransformRelativeTest extends KernelTestBase {
         '',
         '/~foo',
         TRUE,
-        'http://example.com/~foo/page',
+        'https://example.com/~foo/page',
         '/~foo/page',
       ],
       'http with base path and not root relative' => [
@@ -79,7 +79,7 @@ class UrlTransformRelativeTest extends KernelTestBase {
         '',
         '/~foo',
         FALSE,
-        'http://example.com/~foo/page',
+        'https://example.com/~foo/page',
         '/page',
       ],
       'http with weird base path and root relative' => [
@@ -88,7 +88,7 @@ class UrlTransformRelativeTest extends KernelTestBase {
         '',
         '/~foo$.*!',
         TRUE,
-        'http://example.com/~foo$.*!/page',
+        'https://example.com/~foo$.*!/page',
         '/~foo$.*!/page',
       ],
       'http with weird base path and not root relative' => [
@@ -97,7 +97,7 @@ class UrlTransformRelativeTest extends KernelTestBase {
         '',
         '/~foo$.*!',
         FALSE,
-        'http://example.com/~foo$.*!/page',
+        'https://example.com/~foo$.*!/page',
         '/page',
       ],
       'http frontpage' => [
@@ -106,7 +106,7 @@ class UrlTransformRelativeTest extends KernelTestBase {
         '',
         '',
         TRUE,
-        'http://example.com',
+        'https://example.com',
         '/',
       ],
       'http frontpage with a slash' => [
@@ -115,7 +115,7 @@ class UrlTransformRelativeTest extends KernelTestBase {
         '',
         '',
         TRUE,
-        'http://example.com/',
+        'https://example.com/',
         '/',
       ],
       'https on http' => [
@@ -160,7 +160,7 @@ class UrlTransformRelativeTest extends KernelTestBase {
         '',
         '',
         TRUE,
-        'http://example.com/~page$.*!',
+        'https://example.com/~page$.*!',
         '/~page$.*!',
       ],
       'http 8080' => [
@@ -196,8 +196,8 @@ class UrlTransformRelativeTest extends KernelTestBase {
         '',
         '',
         TRUE,
-        'http://example.com:9000/page',
-        'http://example.com:9000/page',
+        'https://example.com:9000/page',
+        'https://example.com:9000/page',
       ],
       'https files on different port than the web request' => [
         'example.com',
@@ -214,8 +214,8 @@ class UrlTransformRelativeTest extends KernelTestBase {
         '',
         '',
         TRUE,
-        'http://example.com:9000/page',
-        'http://example.com:9000/page',
+        'https://example.com:9000/page',
+        'https://example.com:9000/page',
       ],
       'https files on different port than the web request on non default port' => [
         'example.com',
@@ -232,7 +232,7 @@ class UrlTransformRelativeTest extends KernelTestBase {
         '',
         '',
         TRUE,
-        'http://example.com:80/page',
+        'https://example.com:80/page',
         '/page',
       ],
       'https with default port explicit mentioned in URL' => [

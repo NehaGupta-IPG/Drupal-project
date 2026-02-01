@@ -263,8 +263,8 @@ class MailTest extends KernelTestBase {
       // Reset the state variable that holds sent messages.
       \Drupal::state()->set('system.test_mail_collector', []);
 
-      $html = "<$tag_name $attribute=\"http://example.com/absolute\">absolute url in mail test</$tag_name>";
-      $expected_html = "<$tag_name $attribute=\"http://example.com/absolute\">absolute url in mail test</$tag_name>";
+      $html = "<$tag_name $attribute=\"https://example.com/absolute\">absolute url in mail test</$tag_name>";
+      $expected_html = "<$tag_name $attribute=\"https://example.com/absolute\">absolute url in mail test</$tag_name>";
 
       // Prepare render array.
       $render = ['#markup' => Markup::create($html)];
@@ -314,7 +314,7 @@ class MailTest extends KernelTestBase {
     $path_pairs = [
       'root relative' => [$file->getFileUri(), "{$http_host}{$base_path}{$image_name}.png"],
       'protocol relative' => ['//example.com/image.png', '//example.com/image.png'],
-      'absolute' => ['http://example.com/image.png', 'http://example.com/image.png'],
+      'absolute' => ['https://example.com/image.png', 'https://example.com/image.png'],
     ];
 
     // Test images.
@@ -346,7 +346,7 @@ class MailTest extends KernelTestBase {
     $path_pairs = [
       'root relative' => [Url::fromUserInput('/path/to/something'), "{$http_host}{$base_path}path/to/something"],
       'protocol relative' => [Url::fromUri('//example.com/image.png'), '//example.com/image.png'],
-      'absolute' => [Url::fromUri('http://example.com/image.png'), 'http://example.com/image.png'],
+      'absolute' => [Url::fromUri('https://example.com/image.png'), 'https://example.com/image.png'],
     ];
 
     foreach ($path_pairs as $paths) {

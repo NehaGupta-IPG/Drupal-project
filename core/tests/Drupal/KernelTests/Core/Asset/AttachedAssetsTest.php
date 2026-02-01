@@ -132,15 +132,15 @@ class AttachedAssetsTest extends KernelTestBase {
 
     $css = $this->assetResolver->getCssAssets($assets, FALSE, \Drupal::languageManager()->getCurrentLanguage());
     $js = $this->assetResolver->getJsAssets($assets, FALSE, \Drupal::languageManager()->getCurrentLanguage())[1];
-    $this->assertArrayHasKey('http://example.com/stylesheet.css', $css);
-    $this->assertArrayHasKey('http://example.com/script.js', $js);
+    $this->assertArrayHasKey('https://example.com/stylesheet.css', $css);
+    $this->assertArrayHasKey('https://example.com/script.js', $js);
 
     $css_render_array = \Drupal::service('asset.css.collection_renderer')->render($css);
     $js_render_array = \Drupal::service('asset.js.collection_renderer')->render($js);
     $rendered_css = (string) $this->renderer->renderInIsolation($css_render_array);
     $rendered_js = (string) $this->renderer->renderInIsolation($js_render_array);
-    $this->assertStringContainsString('<link rel="stylesheet" media="all" href="http://example.com/stylesheet.css" />', $rendered_css, 'Rendering an external CSS file.');
-    $this->assertStringContainsString('<script src="http://example.com/script.js"></script>', $rendered_js, 'Rendering an external JavaScript file.');
+    $this->assertStringContainsString('<link rel="stylesheet" media="all" href="https://example.com/stylesheet.css" />', $rendered_css, 'Rendering an external CSS file.');
+    $this->assertStringContainsString('<script src="https://example.com/script.js"></script>', $rendered_js, 'Rendering an external JavaScript file.');
   }
 
   /**
@@ -153,7 +153,7 @@ class AttachedAssetsTest extends KernelTestBase {
     $js = $this->assetResolver->getJsAssets($assets, FALSE, \Drupal::languageManager()->getCurrentLanguage())[1];
     $js_render_array = \Drupal::service('asset.js.collection_renderer')->render($js);
     $rendered_js = (string) $this->renderer->renderInIsolation($js_render_array);
-    $expected_1 = '<script src="http://example.com/deferred-external.js" foo="bar" defer></script>';
+    $expected_1 = '<script src="https://example.com/deferred-external.js" foo="bar" defer></script>';
     $expected_2 = '<script src="' . $this->fileUrlGenerator->generateString('core/modules/system/tests/modules/common_test/deferred-internal.js') . '?v=1" defer bar="foo"></script>';
     $this->assertStringContainsString($expected_1, $rendered_js, 'Rendered external JavaScript with correct defer and random attributes.');
     $this->assertStringContainsString($expected_2, $rendered_js, 'Rendered internal JavaScript with correct defer and random attributes.');
@@ -169,7 +169,7 @@ class AttachedAssetsTest extends KernelTestBase {
     $js = $this->assetResolver->getJsAssets($assets, TRUE, \Drupal::languageManager()->getCurrentLanguage())[1];
     $js_render_array = \Drupal::service('asset.js.collection_renderer')->render($js);
     $rendered_js = (string) $this->renderer->renderInIsolation($js_render_array);
-    $expected_1 = '<script src="http://example.com/deferred-external.js" foo="bar" defer></script>';
+    $expected_1 = '<script src="https://example.com/deferred-external.js" foo="bar" defer></script>';
     $expected_2 = '<script src="' . $this->fileUrlGenerator->generateString('core/modules/system/tests/modules/common_test/deferred-internal.js') . '?v=1" defer bar="foo"></script>';
     $this->assertStringContainsString($expected_1, $rendered_js, 'Rendered external JavaScript with correct defer and random attributes.');
     $this->assertStringContainsString($expected_2, $rendered_js, 'Rendered internal JavaScript with correct defer and random attributes.');

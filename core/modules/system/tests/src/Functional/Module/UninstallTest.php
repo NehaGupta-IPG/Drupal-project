@@ -88,7 +88,7 @@ class UninstallTest extends BrowserTestBase {
 
     // Check that the deprecated module link was rendered correctly.
     $this->assertSession()->elementExists('xpath', "//a[contains(@aria-label, 'View information on the Deprecated status of the module Deprecated module')]");
-    $this->assertSession()->elementExists('xpath', "//a[contains(@href, 'http://example.com/deprecated')]");
+    $this->assertSession()->elementExists('xpath', "//a[contains(@href, 'https://example.com/deprecated')]");
 
     // Check that the obsolete module link was rendered correctly.
     $this->assertSession()->elementExists('xpath', "//a[contains(@aria-label, 'View information on the Obsolete status of the module System obsolete status test')]");

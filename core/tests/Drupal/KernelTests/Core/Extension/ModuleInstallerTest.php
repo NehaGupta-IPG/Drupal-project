@@ -221,7 +221,7 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
    */
   #[IgnoreDeprecations]
   public function testDeprecatedInstall(): void {
-    $this->expectDeprecation("The module 'deprecated_module' is deprecated. See http://example.com/deprecated");
+    $this->expectDeprecation("The module 'deprecated_module' is deprecated. See https://example.com/deprecated");
     \Drupal::service('module_installer')->install(['deprecated_module']);
     $this->assertTrue(\Drupal::service('module_handler')->moduleExists('deprecated_module'));
   }
