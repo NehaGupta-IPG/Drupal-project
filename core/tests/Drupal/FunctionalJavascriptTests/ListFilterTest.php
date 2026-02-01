@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalJavascriptTests;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 // cspell:ignore Lim lemo
 
 /**
  * Tests the ListFilter functionality.
- *
- * @group javascript
- * @coversClass \Drupal\Core\Render\Element\ListFilter
  */
+#[Group('javascript')]
+#[RunTestsInSeparateProcesses]
 class ListFilterTest extends WebDriverTestBase {
 
   /**
