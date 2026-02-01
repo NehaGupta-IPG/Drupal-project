@@ -25,6 +25,7 @@ class PreviewTest extends UITestBase {
     'test_pager_full',
     'test_mini_pager',
     'test_click_sort',
+    'test_page_display',
   ];
 
   /**
@@ -70,7 +71,7 @@ class PreviewTest extends UITestBase {
   /**
    * Tests arguments in the preview form.
    */
-  public function testPreviewUI(): void {
+  public function testPreviewUi(): void {
     $this->drupalGet('admin/structure/views/view/test_preview/edit');
     $this->assertSession()->statusCodeEquals(200);
 
@@ -180,6 +181,22 @@ SQL;
     $this->submitForm($edit = [], 'Update preview');
 
     $this->assertSession()->pageTextContains('Unable to preview due to validation errors.');
+  }
+
+  /**
+   * Test to ensure that original and new links are visible on page.
+   */
+  public function testPreviewPageLink(): void {
+    \Drupal::service('module_installer')->install(['views_test_data']);
+    $this->drupalGet('admin/structure/views/view/test_page_display/edit/page_3');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->linkExists('test_page_display_200');
+    $this->drupalGet('admin/structure/views/nojs/display/test_page_display/page_3/path');
+    $edit = ['path' => 'test_page_display_200_updated_path'];
+    $this->submitForm($edit, 'Apply');
+    $this->submitForm([], 'Update preview');
+    $this->assertSession()->pageTextContains('New path after view is saved:');
+    $this->assertSession()->pageTextContains('/test_page_display_200_updated_path');
   }
 
   /**
