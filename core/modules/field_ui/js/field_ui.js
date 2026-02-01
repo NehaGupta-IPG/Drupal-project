@@ -3,7 +3,7 @@
  * Attaches the behaviors for the Field UI module.
  */
 
-(function ($, Drupal, drupalSettings) {
+(function ($, Drupal) {
   /**
    * @type {Drupal~behavior}
    *
@@ -490,4 +490,4 @@
       }, 0);
     },
   };
-})(jQuery, Drupal, drupalSettings);
+})(jQuery, Drupal);

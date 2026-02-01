@@ -600,40 +600,11 @@ drupal.entity-form:
   dependencies:
     - core/drupal.form
 
-drupal.list-filter-class:
-  version: VERSION
-  js:
-    misc/list-filter/list-filter.js: {}
-  dependencies:
-    - core/drupal
-    - core/drupal.announce
-    - core/drupal.debounce
-    - core/transliteration
-
-drupal.list-filter:
-  version: VERSION
-  js:
-    misc/list-filter/drupal-list-filter.js: {}
-  dependencies:
-    - core/drupal
-    - core/once
-    - core/drupal.list-filter-class
-
 drupal.fieldgroup:
   version: VERSION
   css:
     component:
       misc/components/fieldgroup.module.css: {}
-
-drupal.list-filter:
-  version: VERSION
-  js:
-    misc/drupal-list-filter.js: {}
-  dependencies:
-    - core/drupal
-    - core/drupal.announce
-    - core/drupal.debounce
-    - core/once
 
 drupal.form:
   version: VERSION
@@ -663,6 +634,26 @@ drupal.htmx:
       theme: null
       theme_token: null
     ajaxTrustedUrl: {}
+
+drupal.list-filter:
+  version: VERSION
+  js:
+    misc/list-filter/drupal-list-filter.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupal.announce
+    - core/once
+    - core/drupal.list-filter-class
+
+drupal.list-filter-class:
+  version: VERSION
+  js:
+    misc/list-filter/list-filter.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupal.announce
+    - core/drupal.debounce
+    - core/transliteration
 
 drupal.item-list:
   version: VERSION
