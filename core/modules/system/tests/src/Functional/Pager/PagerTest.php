@@ -7,6 +7,7 @@ namespace Drupal\Tests\system\Functional\Pager;
 use Behat\Mink\Element\NodeElement;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\system\Functional\Cache\AssertPageCacheContextsAndTagsTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -114,23 +115,23 @@ class PagerTest extends BrowserTestBase {
    * Tests proper functioning of multiple pagers.
    */
   #[DataProvider('providerTestMultiplePagers')]
-  public function testMultiplePagers($test_data): void {
+  public function testMultiplePagers($input_query, $pagers): void {
     // First page.
     $this->drupalGet('pager-test/multiple-pagers');
 
     // We loop through the page with the test data query parameters, and check
     // that the active page for each pager element has the expected page
     // (1-indexed) and resulting query parameter.
-    $input_query = str_replace(' ', '%20', $data['input_query']);
+    $input_query = str_replace(' ', '%20', $input_query);
     $this->drupalGet($this->getAbsoluteUrl(parse_url($this->getUrl())['path'] . $input_query), ['external' => TRUE]);
     foreach ([0, 1, 4] as $pager_element) {
-      $active_page = $this->cssSelect("div.test-pager-{$pager_element} ul.pager__items li.is-active:contains('{$data['pagers'][$pager_element]['expected_page']}')");
+      $active_page = $this->cssSelect("div.test-pager-{$pager_element} ul.pager__items li.is-active:contains('{$pagers[$pager_element]['expected_page']}')");
       $destination = str_replace('%2C', ',', $active_page[0]->find('css', 'a')->getAttribute('href'));
-      $this->assertEquals($data['pagers'][$pager_element]['expected_query'], $destination);
+      $this->assertEquals($pagers[$pager_element]['expected_query'], $destination);
     }
   }
 
-  /** 
+  /**
    * Provides test cases for PagerTest::testMultiplePagers().
    */
   public function providerTestMultiplePagers(): array {
