@@ -166,22 +166,43 @@ class Serializer extends StylePluginBase implements CacheableDependencyInterface
    * @return array
    *   An array with the following keys:
    *   - rows: the original rows array.
-   *   - pager: the pager info, including the following keys:
-   *     - current_page: the current page number.
-   *     - total_items: the total items of the view.
-   *     - total_pages: the total number of pages of the view.
-   *     - total_items_per_page: the number of items displayed on each page.
+   *   - pager: an array with the following keys:
+   *     - current_page: the zero-based current page number.
+   *     - items_per_page: the number of items displayed per page.
+   *     - total_items: the total number of items in the view result.
+   *     - total_pages: the total number of pages.
    */
   protected function wrapRowsInPager(array $rows): array {
     $pager = $this->view->pager;
+    $items_per_page = (int) $pager->getItemsPerPage();
+
+    if ($pager->useCountQuery()) {
+      $current_page = (int) $pager->getCurrentPage();
+      $total_items = (int) $pager->getTotalItems();
+    }
+    else {
+      // Pagers without a count query (e.g. "some") do not track current page
+      // or total items accurately, so read them from the request and query.
+      $total_items = (int) $pager->getTotalItems();
+      if (isset($this->view->build_info['count_query'])) {
+        $count_query = clone $this->view->build_info['count_query'];
+        $count_query->preExecute();
+        $total_items = (int) $count_query->countQuery()->execute()->fetchField();
+      }
+      $current_page = $this->view->getRequest()->query->getInt('page');
+    }
+
+    $total_pages = ($items_per_page > 0)
+      ? (int) ceil($total_items / $items_per_page)
+      : 1;
 
     return [
       'rows' => $rows,
       'pager' => [
-        'current_page' => (int) $pager->getCurrentPage(),
-        'total_items' => (int) $pager->getTotalItems(),
-        'total_pages' => $pager->usePager() ? (int) $pager->getPagerTotal() : 0,
-        'items_per_page' => (int) $pager->getItemsPerPage(),
+        'current_page' => $current_page,
+        'items_per_page' => $items_per_page,
+        'total_items' => $total_items,
+        'total_pages' => $total_pages,
       ],
     ];
   }
@@ -210,7 +231,11 @@ class Serializer extends StylePluginBase implements CacheableDependencyInterface
    * {@inheritdoc}
    */
   public function getCacheContexts() {
-    return ['request_format'];
+    $contexts = ['request_format'];
+    if ($this->options['pager']) {
+      $contexts[] = 'url.query_args:page';
+    }
+    return $contexts;
   }
 
   /**

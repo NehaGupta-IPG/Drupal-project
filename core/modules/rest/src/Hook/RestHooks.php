@@ -6,6 +6,8 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\rest\Plugin\views\style\Serializer;
+use Drupal\views\ViewExecutable;
 
 /**
  * Hook implementations for rest.
@@ -59,6 +61,31 @@ class RestHooks {
         return $output;
     }
     return NULL;
+  }
+
+  /**
+   * Implements hook_views_pre_execute().
+   *
+   * Adds page-based offset support for REST serializer views whose pager does
+   * not natively handle pagination
+   * (e.g. "Display a specified number of items").
+   */
+  #[Hook('views_pre_execute')]
+  public function viewsPreExecute(ViewExecutable $view): void {
+    $style = $view->getStyle();
+    if (!$style instanceof Serializer || empty($style->options['pager'])) {
+      return;
+    }
+    $pager = $view->pager;
+    if (!$pager || $pager->usePager()) {
+      return;
+    }
+    $items_per_page = (int) $pager->getItemsPerPage();
+    $page = $view->getRequest()->query->getInt('page');
+    if ($items_per_page > 0 && $page > 0) {
+      $base_offset = (int) $pager->getOffset();
+      $view->query->setOffset($base_offset + ($page * $items_per_page));
+    }
   }
 
 }
