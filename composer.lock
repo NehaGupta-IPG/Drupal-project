@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c4bbfd82e79d2a47f18255306771d6a0",
+    "content-hash": "9d64589e1b2d6fb7ce93dbfaca1dc248",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -364,11 +364,11 @@
         },
         {
             "name": "drupal/core",
-            "version": "11.x-dev",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "core",
-                "reference": "ce2c7e30ea8783c19d79c1f312442f59f7ed8ae1"
+                "reference": "427dcc44caf1e2bb69247bd4948f3d78f83c19e0"
             },
             "require": {
                 "asm89/stack-cors": "^2.3",
@@ -397,7 +397,7 @@
                 "masterminds/html5": "^2.7",
                 "mck89/peast": "^1.17.4",
                 "pear/archive_tar": "^1.4.14",
-                "php": ">=8.3.0",
+                "php": ">=8.5.0",
                 "php-tuf/composer-stager": "^2.0",
                 "psr/log": "^3.0",
                 "revolt/event-loop": "^1.0",
@@ -412,8 +412,6 @@
                 "symfony/mailer": "^7.4",
                 "symfony/mime": "^7.4",
                 "symfony/polyfill-iconv": "^1.32",
-                "symfony/polyfill-php84": "^1.32",
-                "symfony/polyfill-php85": "^1.32",
                 "symfony/process": "^7.4",
                 "symfony/psr-http-message-bridge": "^7.4",
                 "symfony/routing": "^7.4",
@@ -459,6 +457,9 @@
             },
             "type": "drupal-core",
             "extra": {
+                "branch-alias": {
+                    "dev-main": "12.x-dev"
+                },
                 "drupal-scaffold": {
                     "file-mapping": {
                         "[project-root]/.editorconfig": "assets/scaffold/files/editorconfig",
@@ -535,11 +536,11 @@
         },
         {
             "name": "drupal/core-composer-scaffold",
-            "version": "11.x-dev",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "composer/Plugin/Scaffold",
-                "reference": "ede8fa67a9abaf6fb3ee327a1aed2e97a1d113cb"
+                "reference": "0fdec1a8ed622a9ed92bb80730a5337c390cc7fb"
             },
             "require": {
                 "composer-plugin-api": "^2",
@@ -555,7 +556,7 @@
             "extra": {
                 "class": "Drupal\\Composer\\Plugin\\Scaffold\\Plugin",
                 "branch-alias": {
-                    "dev-master": "1.0.x-dev"
+                    "dev-main": "12.x-dev"
                 }
             },
             "autoload": {
@@ -577,11 +578,11 @@
         },
         {
             "name": "drupal/core-project-message",
-            "version": "11.x-dev",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "composer/Plugin/ProjectMessage",
-                "reference": "56ffb5a4a8cab53a97554862ce1003541af3438d"
+                "reference": "569e7bfe4490e7e05d20a039956ef6e2d6c06968"
             },
             "require": {
                 "composer-plugin-api": "^2",
@@ -589,7 +590,10 @@
             },
             "type": "composer-plugin",
             "extra": {
-                "class": "Drupal\\Composer\\Plugin\\ProjectMessage\\MessagePlugin"
+                "class": "Drupal\\Composer\\Plugin\\ProjectMessage\\MessagePlugin",
+                "branch-alias": {
+                    "dev-main": "12.x-dev"
+                }
             },
             "autoload": {
                 "psr-4": {
@@ -610,11 +614,11 @@
         },
         {
             "name": "drupal/core-recipe-unpack",
-            "version": "11.x-dev",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "composer/Plugin/RecipeUnpack",
-                "reference": "42e58be1818866167bc27d4fce206dc1d7a40d4c"
+                "reference": "5a9effb8344fadff1820e394b4bd820f23472328"
             },
             "require": {
                 "composer-plugin-api": "^2",
@@ -625,7 +629,10 @@
             },
             "type": "composer-plugin",
             "extra": {
-                "class": "Drupal\\Composer\\Plugin\\RecipeUnpack\\Plugin"
+                "class": "Drupal\\Composer\\Plugin\\RecipeUnpack\\Plugin",
+                "branch-alias": {
+                    "dev-main": "12.x-dev"
+                }
             },
             "autoload": {
                 "psr-4": {
@@ -646,11 +653,11 @@
         },
         {
             "name": "drupal/core-vendor-hardening",
-            "version": "11.x-dev",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "composer/Plugin/VendorHardening",
-                "reference": "db4c3ed9b83937aa292951593a8e35176ef5f907"
+                "reference": "3e006d6d544e6c59a60b09f0d2608f906b60fe8a"
             },
             "require": {
                 "composer-plugin-api": "^2",
@@ -658,7 +665,10 @@
             },
             "type": "composer-plugin",
             "extra": {
-                "class": "Drupal\\Composer\\Plugin\\VendorHardening\\VendorHardeningPlugin"
+                "class": "Drupal\\Composer\\Plugin\\VendorHardening\\VendorHardeningPlugin",
+                "branch-alias": {
+                    "dev-main": "12.x-dev"
+                }
             },
             "autoload": {
                 "psr-4": {
@@ -3642,166 +3652,6 @@
             "time": "2024-12-23T08:48:59+00:00"
         },
         {
-            "name": "symfony/polyfill-php84",
-            "version": "v1.33.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/polyfill-php84.git",
-                "reference": "d8ced4d875142b6a7426000426b8abc631d6b191"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php84/zipball/d8ced4d875142b6a7426000426b8abc631d6b191",
-                "reference": "d8ced4d875142b6a7426000426b8abc631d6b191",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.2"
-            },
-            "type": "library",
-            "extra": {
-                "thanks": {
-                    "url": "https://github.com/symfony/polyfill",
-                    "name": "symfony/polyfill"
-                }
-            },
-            "autoload": {
-                "files": [
-                    "bootstrap.php"
-                ],
-                "psr-4": {
-                    "Symfony\\Polyfill\\Php84\\": ""
-                },
-                "classmap": [
-                    "Resources/stubs"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony polyfill backporting some PHP 8.4+ features to lower PHP versions",
-            "homepage": "https://symfony.com",
-            "keywords": [
-                "compatibility",
-                "polyfill",
-                "portable",
-                "shim"
-            ],
-            "support": {
-                "source": "https://github.com/symfony/polyfill-php84/tree/v1.33.0"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/nicolas-grekas",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2025-06-24T13:30:11+00:00"
-        },
-        {
-            "name": "symfony/polyfill-php85",
-            "version": "v1.33.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/polyfill-php85.git",
-                "reference": "d4e5fcd4ab3d998ab16c0db48e6cbb9a01993f91"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php85/zipball/d4e5fcd4ab3d998ab16c0db48e6cbb9a01993f91",
-                "reference": "d4e5fcd4ab3d998ab16c0db48e6cbb9a01993f91",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.2"
-            },
-            "type": "library",
-            "extra": {
-                "thanks": {
-                    "url": "https://github.com/symfony/polyfill",
-                    "name": "symfony/polyfill"
-                }
-            },
-            "autoload": {
-                "files": [
-                    "bootstrap.php"
-                ],
-                "psr-4": {
-                    "Symfony\\Polyfill\\Php85\\": ""
-                },
-                "classmap": [
-                    "Resources/stubs"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
-                },
-                {
-                    "name": "Symfony Community",
-                    "homepage": "https://symfony.com/contributors"
-                }
-            ],
-            "description": "Symfony polyfill backporting some PHP 8.5+ features to lower PHP versions",
-            "homepage": "https://symfony.com",
-            "keywords": [
-                "compatibility",
-                "polyfill",
-                "portable",
-                "shim"
-            ],
-            "support": {
-                "source": "https://github.com/symfony/polyfill-php85/tree/v1.33.0"
-            },
-            "funding": [
-                {
-                    "url": "https://symfony.com/sponsor",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/fabpot",
-                    "type": "github"
-                },
-                {
-                    "url": "https://github.com/nicolas-grekas",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2025-06-23T16:12:55+00:00"
-        },
-        {
             "name": "symfony/process",
             "version": "v7.4.0",
             "source": {
@@ -5248,16 +5098,16 @@
         },
         {
             "name": "composer/composer",
-            "version": "2.9.2",
+            "version": "2.9.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/composer.git",
-                "reference": "8d5358f147c63a3a681b002076deff8c90e0b19d"
+                "reference": "fb3bee27676fd852a8a11ebbb1de19b4dada5aba"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/composer/zipball/8d5358f147c63a3a681b002076deff8c90e0b19d",
-                "reference": "8d5358f147c63a3a681b002076deff8c90e0b19d",
+                "url": "https://api.github.com/repos/composer/composer/zipball/fb3bee27676fd852a8a11ebbb1de19b4dada5aba",
+                "reference": "fb3bee27676fd852a8a11ebbb1de19b4dada5aba",
                 "shasum": ""
             },
             "require": {
@@ -5345,7 +5195,7 @@
                 "irc": "ircs://irc.libera.chat:6697/composer",
                 "issues": "https://github.com/composer/composer/issues",
                 "security": "https://github.com/composer/composer/security/policy",
-                "source": "https://github.com/composer/composer/tree/2.9.2"
+                "source": "https://github.com/composer/composer/tree/2.9.3"
             },
             "funding": [
                 {
@@ -5357,7 +5207,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-11-19T20:57:25+00:00"
+            "time": "2025-12-30T12:40:17+00:00"
         },
         {
             "name": "composer/metadata-minifier",
@@ -7645,11 +7495,11 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "2.1.32",
+            "version": "2.1.38",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/e126cad1e30a99b137b8ed75a85a676450ebb227",
-                "reference": "e126cad1e30a99b137b8ed75a85a676450ebb227",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/dfaf1f530e1663aa167bc3e52197adb221582629",
+                "reference": "dfaf1f530e1663aa167bc3e52197adb221582629",
                 "shasum": ""
             },
             "require": {
@@ -7694,7 +7544,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-11-11T15:18:17+00:00"
+            "time": "2026-01-30T17:12:46+00:00"
         },
         {
             "name": "phpstan/phpstan-deprecation-rules",
@@ -7745,16 +7595,16 @@
         },
         {
             "name": "phpstan/phpstan-phpunit",
-            "version": "2.0.8",
+            "version": "2.0.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan-phpunit.git",
-                "reference": "2fe9fbeceaf76dd1ebaa7bbbb25e2fb5e59db2fe"
+                "reference": "5e30669bef866eff70db8b58d72a5c185aa82414"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan-phpunit/zipball/2fe9fbeceaf76dd1ebaa7bbbb25e2fb5e59db2fe",
-                "reference": "2fe9fbeceaf76dd1ebaa7bbbb25e2fb5e59db2fe",
+                "url": "https://api.github.com/repos/phpstan/phpstan-phpunit/zipball/5e30669bef866eff70db8b58d72a5c185aa82414",
+                "reference": "5e30669bef866eff70db8b58d72a5c185aa82414",
                 "shasum": ""
             },
             "require": {
@@ -7792,9 +7642,9 @@
             "description": "PHPUnit extensions and rules for PHPStan",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan-phpunit/issues",
-                "source": "https://github.com/phpstan/phpstan-phpunit/tree/2.0.8"
+                "source": "https://github.com/phpstan/phpstan-phpunit/tree/2.0.11"
             },
-            "time": "2025-11-11T07:55:22+00:00"
+            "time": "2025-12-19T09:05:35+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -10328,7 +10178,7 @@
     "platform": {},
     "platform-dev": {},
     "platform-overrides": {
-        "php": "8.3.0"
+        "php": "8.5.0"
     },
     "plugin-api-version": "2.9.0"
 }
