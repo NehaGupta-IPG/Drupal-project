@@ -6,6 +6,7 @@ namespace Drupal\Core\Batch;
 
 use Drupal\Core\Queue\QueueInterface;
 use Drupal\Core\Url;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -23,6 +24,7 @@ class BatchProcessor implements BatchProcessorInterface {
    *   The app root.
    */
   public function __construct(
+    #[Autowire(param: 'app.root')]
     protected readonly string $root,
   ) {
     require_once $root . '/core/includes/batch.inc';

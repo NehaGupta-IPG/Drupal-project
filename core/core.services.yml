@@ -1599,8 +1599,7 @@ services:
   Drupal\Core\Utility\Token: '@token'
   batch.processor:
     class: Drupal\Core\Batch\BatchProcessor
-    arguments:
-      - '%app.root%'
+    autowire: true
   Drupal\Core\Batch\BatchProcessorInterface: '@batch.processor'
   batch.storage:
     class: Drupal\Core\Batch\BatchStorage
