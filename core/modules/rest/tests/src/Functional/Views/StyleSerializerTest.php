@@ -397,97 +397,107 @@ class StyleSerializerTest extends ViewTestBase {
   }
 
   /**
-   * Data provider for testRestViewsPagerTotalItemsConsistency.
-   */
-  public static function pagerTotalItemsProvider(): array {
-    return [
-      'full pager, 7 nodes, 3 per page' => [
-        'pager_type' => 'full',
-        'node_count' => 7,
-        'items_per_page' => 3,
-      ],
-      'full pager, 10 nodes, 5 per page' => [
-        'pager_type' => 'full',
-        'node_count' => 10,
-        'items_per_page' => 5,
-      ],
-      'some pager, 7 nodes, 3 per page' => [
-        'pager_type' => 'some',
-        'node_count' => 7,
-        'items_per_page' => 3,
-      ],
-      'some pager, 10 nodes, 5 per page' => [
-        'pager_type' => 'some',
-        'node_count' => 10,
-        'items_per_page' => 5,
-      ],
-    ];
-  }
-
-  /**
    * Tests that pager metadata is consistent across paginated requests.
    *
    * Verifies that total_items, total_pages, and current_page are correct
    * regardless of which page is requested and whether the page parameter is
    * present. Covers both pagers with a count query ("full") and without
    * ("some").
-   *
-   * @dataProvider pagerTotalItemsProvider
    */
-  public function testRestViewsPagerTotalItemsConsistency(string $pager_type, int $node_count, int $items_per_page): void {
+  public function testRestViewsPagerTotalItemsConsistency(): void {
     $this->drupalCreateContentType(['type' => 'page']);
 
-    for ($i = 0; $i < $node_count; $i++) {
-      $this->drupalCreateNode(['title' => 'Node ' . $i]);
+    $cases = [
+      ['full', 7, 3],
+      ['full', 10, 5],
+      ['some', 7, 3],
+      ['some', 10, 5],
+    ];
+
+    foreach ($cases as [$pager_type, $node_count, $items_per_page]) {
+      // Clean up nodes from previous iteration.
+      foreach (\Drupal::entityTypeManager()->getStorage('node')->loadMultiple() as $node) {
+        $node->delete();
+      }
+
+      for ($i = 0; $i < $node_count; $i++) {
+        $this->drupalCreateNode(['title' => 'Node ' . $i]);
+      }
+
+      $view = Views::getView('test_serializer_node_display_field');
+      $view->setDisplay('rest_export_1');
+
+      $view->displayHandlers->get('rest_export_1')->overrideOption('pager', [
+        'type' => $pager_type,
+        'options' => ['items_per_page' => $items_per_page],
+      ]);
+      $view->displayHandlers->get('rest_export_1')->overrideOption('style', [
+        'type' => 'serializer',
+        'options' => [
+          'formats' => ['json'],
+          'pager' => TRUE,
+        ],
+      ]);
+      $view->save();
+
+      $expected_pages = (int) ceil($node_count / $items_per_page);
+      $query = ['_format' => 'json'];
+
+      // Request without page parameter (implicit page 0).
+      $result_without_page = Json::decode(
+        $this->drupalGet('test/serialize/node-field', ['query' => $query])
+      );
+
+      // Request with explicit page=1.
+      $result_with_page = Json::decode(
+        $this->drupalGet(
+          'test/serialize/node-field',
+          ['query' => $query + ['page' => 1]],
+        )
+      );
+
+      $msg = "pager=$pager_type, nodes=$node_count, per_page=$items_per_page";
+
+      // total_items and total_pages must be identical regardless of the
+      // page parameter.
+      $this->assertSame(
+        $result_without_page['pager']['total_items'],
+        $result_with_page['pager']['total_items'],
+        "total_items must match with and without page param ($msg).",
+      );
+      $this->assertSame(
+        $result_without_page['pager']['total_pages'],
+        $result_with_page['pager']['total_pages'],
+        "total_pages must match with and without page param ($msg).",
+      );
+
+      // total_items must equal the actual node count.
+      $this->assertNotEquals(
+        $items_per_page,
+        $result_without_page['pager']['total_items'],
+        "total_items must not equal items_per_page ($msg).",
+      );
+      $this->assertEquals($node_count, $result_without_page['pager']['total_items'], $msg);
+      $this->assertEquals($node_count, $result_with_page['pager']['total_items'], $msg);
+      $this->assertEquals($expected_pages, $result_without_page['pager']['total_pages'], $msg);
+
+      // current_page must reflect the requested page.
+      $this->assertEquals(0, $result_without_page['pager']['current_page'], $msg);
+      $this->assertEquals(1, $result_with_page['pager']['current_page'], $msg);
+
+      // Cross-check: sum of rows across all pages equals total_items.
+      $total_rows = 0;
+      for ($page = 0; $page < $expected_pages; $page++) {
+        $result = Json::decode(
+          $this->drupalGet(
+            'test/serialize/node-field',
+            ['query' => $query + ['page' => $page]],
+          )
+        );
+        $total_rows += count($result['rows']);
+      }
+      $this->assertEquals($node_count, $total_rows, "Row sum across pages ($msg).");
     }
-
-    $view = Views::getView('test_serializer_node_display_field');
-    $view->setDisplay('rest_export_1');
-
-    $view->displayHandlers->get('rest_export_1')->overrideOption('pager', [
-      'type' => $pager_type,
-      'options' => ['items_per_page' => $items_per_page],
-    ]);
-    $view->displayHandlers->get('rest_export_1')->overrideOption('style', [
-      'type' => 'serializer',
-      'options' => [
-        'formats' => ['json'],
-        'pager' => TRUE,
-      ],
-    ]);
-    $view->save();
-
-    $expected_pages = (int) ceil($node_count / $items_per_page);
-
-    // Request without page parameter (implicit page 0).
-    $result_without_page = Json::decode($this->drupalGet('test/serialize/node-field', ['query' => ['_format' => 'json']]));
-
-    // Request with explicit page=1.
-    $result_with_page = Json::decode($this->drupalGet('test/serialize/node-field', ['query' => ['_format' => 'json', 'page' => 1]]));
-
-    // total_items and total_pages must be identical regardless of the page
-    // parameter. This catches bugs where non-count-query pagers report the
-    // current page's row count instead of the real total.
-    $this->assertSame($result_without_page['pager']['total_items'], $result_with_page['pager']['total_items'], 'total_items must be the same with and without page parameter.');
-    $this->assertSame($result_without_page['pager']['total_pages'], $result_with_page['pager']['total_pages'], 'total_pages must be the same with and without page parameter.');
-
-    // total_items must equal the actual node count, not items_per_page.
-    $this->assertNotEquals($items_per_page, $result_without_page['pager']['total_items'], 'total_items must not equal items_per_page.');
-    $this->assertEquals($node_count, $result_without_page['pager']['total_items']);
-    $this->assertEquals($node_count, $result_with_page['pager']['total_items']);
-    $this->assertEquals($expected_pages, $result_without_page['pager']['total_pages']);
-
-    // current_page must reflect the requested page.
-    $this->assertEquals(0, $result_without_page['pager']['current_page']);
-    $this->assertEquals(1, $result_with_page['pager']['current_page']);
-
-    // Cross-check: the sum of rows across all pages must equal total_items.
-    $total_rows = 0;
-    for ($page = 0; $page < $expected_pages; $page++) {
-      $result = Json::decode($this->drupalGet('test/serialize/node-field', ['query' => ['_format' => 'json', 'page' => $page]]));
-      $total_rows += count($result['rows']);
-    }
-    $this->assertEquals($node_count, $total_rows, 'Sum of rows across all pages equals total_items.');
   }
 
   /**
