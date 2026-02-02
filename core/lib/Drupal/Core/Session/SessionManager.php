@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Session;
 
-use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
@@ -39,8 +38,8 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
    *   The session metadata bag.
    * @param \Drupal\Core\Session\SessionConfigurationInterface $sessionConfiguration
    *   The session configuration interface.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
+   * @param \Drupal\Component\Datetime\TimeInterface|null $time
+   *   (deprecated) The time service, pass null instead.
    *
    * @see \Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage::setSaveHandler()
    */
@@ -49,8 +48,11 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
     AbstractProxy|\SessionHandlerInterface|null $handler,
     MetadataBag $metadata_bag,
     protected SessionConfigurationInterface $sessionConfiguration,
-    protected TimeInterface $time,
+    $time = NULL,
   ) {
+    if ($time !== NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() with a $time argument is deprecated in drupal:11.4.0 and it will throw an error in drupal:13.0.0. Pass null instead. See https://www.drupal.org/node/3570844', E_USER_DEPRECATED);
+    }
     parent::__construct([], $handler, $metadata_bag);
   }
 
@@ -106,17 +108,9 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
       return;
     }
 
-    session_destroy();
-
-    // Unset the session cookies.
-    $session_name = $this->getName();
-    $cookies = $this->requestStack->getCurrentRequest()->cookies;
-    // setcookie() can only be called when headers are not yet sent.
-    if ($cookies->has($session_name) && !headers_sent()) {
-      $params = session_get_cookie_params();
-      setcookie($session_name, '', $this->time->getRequestTime() - 3600, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
-      $cookies->remove($session_name);
-    }
+    /** @see Symfony\Component\HttpFoundation\Session\Session::invalidate() */
+    $this->clear();
+    $this->regenerate(TRUE);
   }
 
   /**
