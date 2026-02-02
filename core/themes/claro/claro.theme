@@ -620,6 +620,17 @@ function claro_form_menu_link_content_form_alter(&$form, FormStateInterface $for
     ];
     unset($form['description']);
   }
+  if (isset($form['admin_description'])) {
+    $form['menu_link_admin_description'] = [
+      '#type' => 'details',
+      '#group' => 'advanced',
+      '#title' => t('Administration'),
+      '#tree' => TRUE,
+      '#accordion' => TRUE,
+      'description' => $form['admin_description'],
+    ];
+    unset($form['admin_description']);
+  }
 }
 
 /**

@@ -58,6 +58,7 @@ abstract class MenuLinkContentResourceTestBase extends EntityResourceTestBase {
       'id' => 'llama',
       'title' => 'Llama Gabilondo',
       'description' => 'Llama Gabilondo',
+      'admin_description' => 'Llama Gabilondo for admin',
       'link' => [
         'uri' => 'https://nl.wikipedia.org/wiki/Llama',
         'options' => [
@@ -164,6 +165,11 @@ abstract class MenuLinkContentResourceTestBase extends EntityResourceTestBase {
       'description' => [
         [
           'value' => 'Llama Gabilondo',
+        ],
+      ],
+      'admin_description' => [
+        [
+          'value' => 'Llama Gabilondo for admin',
         ],
       ],
       'external' => [

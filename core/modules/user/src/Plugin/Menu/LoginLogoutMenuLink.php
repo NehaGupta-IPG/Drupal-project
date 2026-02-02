@@ -53,6 +53,13 @@ class LoginLogoutMenuLink extends MenuLinkDefault {
   /**
    * {@inheritdoc}
    */
+  public function getAdminDescription() {
+    return $this->t('<q>Log in</q> for anonymous users.');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getRouteName() {
     if ($this->currentUser->isAuthenticated()) {
       return 'user.logout';

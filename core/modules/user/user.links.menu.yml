@@ -3,6 +3,7 @@ user.page:
   weight: -10
   route_name: user.page
   menu_name: account
+  admin_description: "Logged in users only."
 user.logout:
   weight: 10
   menu_name: account

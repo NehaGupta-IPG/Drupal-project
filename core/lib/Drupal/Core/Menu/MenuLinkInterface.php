@@ -37,6 +37,14 @@ interface MenuLinkInterface extends PluginInspectionInterface, DerivativeInspect
   public function getDescription();
 
   /**
+   * Returns the admin description of the menu link.
+   *
+   * @return string
+   *   The admin description of the menu link.
+   */
+  public function getAdminDescription();
+
+  /**
    * Returns the menu name of the menu link.
    *
    * @return string

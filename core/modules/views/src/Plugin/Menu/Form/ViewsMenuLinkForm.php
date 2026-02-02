@@ -27,7 +27,6 @@ class ViewsMenuLinkForm extends MenuLinkDefaultForm {
    * {@inheritdoc}
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-
     // Put the title field first.
     $form['title'] = [
       '#type' => 'textfield',
@@ -46,6 +45,16 @@ class ViewsMenuLinkForm extends MenuLinkDefaultForm {
       //   https://www.drupal.org/node/2309507
       '#default_value' => $this->menuLink->getDescription(),
       '#weight' => -5,
+    ];
+
+    $form['admin_description'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Admin description'),
+      '#description' => $this->t('Shown when displaying on the administrative interface.'),
+      // @todo Ensure that the view is not loaded with a localized description.
+      //   https://www.drupal.org/node/2309507
+      '#default_value' => $this->menuLink->getAdminDescription(),
+      '#weight' => -1,
     ];
 
     $form += parent::buildConfigurationForm($form, $form_state);

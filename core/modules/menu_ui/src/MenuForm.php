@@ -258,6 +258,7 @@ class MenuForm extends EntityForm {
       '#theme' => 'table__menu_overview',
       '#header' => [
         $this->t('Menu link'),
+        $this->t('Description'),
         [
           'data' => $this->t('Enabled'),
           'class' => ['checkbox'],
@@ -326,7 +327,6 @@ class MenuForm extends EntityForm {
     foreach (Element::children($links) as $id) {
       if (isset($links[$id]['#item'])) {
         $element = $links[$id];
-
         $is_pending_menu_link = isset($element['#item']->link->getMetaData()['entity_id'])
           && in_array($element['#item']->link->getMetaData()['entity_id'], $pending_menu_link_ids);
 
@@ -356,6 +356,9 @@ class MenuForm extends EntityForm {
             '#size' => $element['#item']->depth - 1,
           ],
           $element['title'],
+        ];
+        $form['links'][$id]['description'] = [
+          '#markup' => $element['#item']->link->getAdminDescription(),
         ];
         $form['links'][$id]['enabled'] = $element['enabled'];
         $form['links'][$id]['enabled']['#wrapper_attributes']['class'] = ['checkbox', 'menu-enabled'];
@@ -412,15 +415,6 @@ class MenuForm extends EntityForm {
         if (!$link->isEnabled()) {
           $form[$id]['title']['#suffix'] = ' (' . $this->t('disabled') . ')';
         }
-        // @todo Remove this in https://www.drupal.org/node/2568785.
-        elseif ($id === 'menu_plugin_id:user.logout') {
-          $form[$id]['title']['#suffix'] = ' (' . $this->t('<q>Log in</q> for anonymous users') . ')';
-        }
-        // @todo Remove this in https://www.drupal.org/node/2568785.
-        elseif (($url = $link->getUrlObject()) && $url->isRouted() && $url->getRouteName() == 'user.page') {
-          $form[$id]['title']['#suffix'] = ' (' . $this->t('logged in users only') . ')';
-        }
-
         $form[$id]['enabled'] = [
           '#type' => 'checkbox',
           '#title' => $this->t('Enable @title menu link', ['@title' => $link->getTitle()]),

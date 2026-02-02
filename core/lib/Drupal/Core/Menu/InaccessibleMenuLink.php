@@ -51,6 +51,13 @@ class InaccessibleMenuLink extends MenuLinkBase {
   /**
    * {@inheritdoc}
    */
+  public function getAdminDescription() {
+    return '';
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getCacheContexts() {
     return $this->wrappedLink->getCacheContexts();
   }
