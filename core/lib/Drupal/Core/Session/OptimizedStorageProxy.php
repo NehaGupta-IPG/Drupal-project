@@ -38,14 +38,14 @@ class OptimizedStorageProxy extends SessionHandlerProxy implements \SessionHandl
   /**
    * {@inheritdoc}
    */
-  public function read(string $sessionId): string|false {
+  public function read(#[\SensitiveParameter] string $sessionId): string|false {
     return $sessionId === $this->newSessionId ? '' : parent::read($sessionId);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function write(string $sessionId, string $data): bool {
+  public function write(#[\SensitiveParameter] string $sessionId, string $data): bool {
     if ($sessionId === $this->newSessionId && $data === '') {
       return TRUE;
     }
@@ -56,7 +56,7 @@ class OptimizedStorageProxy extends SessionHandlerProxy implements \SessionHandl
   /**
    * {@inheritdoc}
    */
-  public function destroy(string $sessionId): bool {
+  public function destroy(#[\SensitiveParameter] string $sessionId): bool {
     return $sessionId === $this->newSessionId ? TRUE : parent::destroy($sessionId);
   }
 
