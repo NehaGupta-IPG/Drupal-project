@@ -113,14 +113,31 @@ class PagerTest extends BrowserTestBase {
   /**
    * Tests proper functioning of multiple pagers.
    */
-  public function testMultiplePagers(): void {
+  #[DataProvider('providerTestMultiplePagers')]
+  public function testMultiplePagers($test_data): void {
     // First page.
     $this->drupalGet('pager-test/multiple-pagers');
 
+    // We loop through the page with the test data query parameters, and check
+    // that the active page for each pager element has the expected page
+    // (1-indexed) and resulting query parameter.
+    $input_query = str_replace(' ', '%20', $data['input_query']);
+    $this->drupalGet($this->getAbsoluteUrl(parse_url($this->getUrl())['path'] . $input_query), ['external' => TRUE]);
+    foreach ([0, 1, 4] as $pager_element) {
+      $active_page = $this->cssSelect("div.test-pager-{$pager_element} ul.pager__items li.is-active:contains('{$data['pagers'][$pager_element]['expected_page']}')");
+      $destination = str_replace('%2C', ',', $active_page[0]->find('css', 'a')->getAttribute('href'));
+      $this->assertEquals($data['pagers'][$pager_element]['expected_query'], $destination);
+    }
+  }
+
+  /** 
+   * Provides test cases for PagerTest::testMultiplePagers().
+   */
+  public function providerTestMultiplePagers(): array {
     // Test data.
     // Expected URL query string param is 0-indexed.
     // Expected page per pager is 1-indexed.
-    $test_data = [
+    return [
       // With no query, all pagers set to first page.
       [
         'input_query' => '',
@@ -285,19 +302,6 @@ class PagerTest extends BrowserTestBase {
         ],
       ],
     ];
-
-    // We loop through the page with the test data query parameters, and check
-    // that the active page for each pager element has the expected page
-    // (1-indexed) and resulting query parameter.
-    foreach ($test_data as $data) {
-      $input_query = str_replace(' ', '%20', $data['input_query']);
-      $this->drupalGet($this->getAbsoluteUrl(parse_url($this->getUrl())['path'] . $input_query), ['external' => TRUE]);
-      foreach ([0, 1, 4] as $pager_element) {
-        $active_page = $this->cssSelect("div.test-pager-{$pager_element} ul.pager__items li.is-active:contains('{$data['pagers'][$pager_element]['expected_page']}')");
-        $destination = str_replace('%2C', ',', $active_page[0]->find('css', 'a')->getAttribute('href'));
-        $this->assertEquals($data['pagers'][$pager_element]['expected_query'], $destination);
-      }
-    }
   }
 
   /**
