@@ -6,7 +6,9 @@ namespace Drupal\user_batch_action_test\Plugin\Action;
 
 use Drupal\Core\Action\ActionBase;
 use Drupal\Core\Action\Attribute\Action;
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
@@ -18,7 +20,28 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
   label: new TranslatableMarkup('Process user in batch'),
   type: 'user'
 )]
-class BatchUserAction extends ActionBase {
+class BatchUserAction extends ActionBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * Constructs a new BatchUserAction object.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Batch\BatchProcessorInterface $batchProcessor
+   *   Batch processor.
+   */
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    protected readonly BatchProcessorInterface $batchProcessor,
+  ) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  }
 
   /**
    * {@inheritdoc}
@@ -43,7 +66,7 @@ class BatchUserAction extends ActionBase {
         'operations' => $operations,
         'finished' => [static::class, 'finishBatch'],
       ];
-      batch_set($batch);
+      $this->batchProcessor->queue($batch);
     }
   }
 
