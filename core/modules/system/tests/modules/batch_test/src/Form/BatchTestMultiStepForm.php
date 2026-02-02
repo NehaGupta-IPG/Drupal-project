@@ -6,6 +6,8 @@ namespace Drupal\batch_test\Form;
 
 use Drupal\batch_test\BatchTestDefinitions;
 use Drupal\batch_test\BatchTestHelper;
+use Drupal\Core\Batch\BatchProcessorInterface;
+use Drupal\Core\DependencyInjection\AutowireTrait;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -15,6 +17,18 @@ use Drupal\Core\Form\FormStateInterface;
  * @internal
  */
 class BatchTestMultiStepForm extends FormBase {
+
+  use AutowireTrait;
+
+  /**
+   * Constructs a new BatchTestMultiStepForm object.
+   *
+   * @param \Drupal\Core\Batch\BatchProcessorInterface $batchProcessor
+   *   The batch processor.
+   */
+  public function __construct(
+    protected readonly BatchProcessorInterface $batchProcessor,
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -60,11 +74,11 @@ class BatchTestMultiStepForm extends FormBase {
     $step = $form_state->get('step');
     switch ($step) {
       case 1:
-        batch_set($batch_test_definitions->batch1());
+        $this->batchProcessor->queue($batch_test_definitions->batch1());
         break;
 
       case 2:
-        batch_set($batch_test_definitions->batch2());
+        $this->batchProcessor->queue($batch_test_definitions->batch2());
         break;
     }
 

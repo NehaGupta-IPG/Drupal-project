@@ -6,6 +6,7 @@ namespace Drupal\batch_test\Form;
 
 use Drupal\batch_test\BatchTestDefinitions;
 use Drupal\batch_test\BatchTestHelper;
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -65,7 +66,7 @@ class BatchTestChainedForm extends FormBase {
 
     $value = &$form_state->getValue('value');
     $value++;
-    batch_set($batch_test_definitions->batch1());
+    static::getBatchProcessor()->queue($batch_test_definitions->batch1());
 
     $form_state->setRedirect('batch_test.redirect');
   }
@@ -81,7 +82,7 @@ class BatchTestChainedForm extends FormBase {
 
     $value = &$form_state->getValue('value');
     $value++;
-    batch_set($batch_test_definitions->batch2());
+    static::getBatchProcessor()->queue($batch_test_definitions->batch2());
 
     $form_state->setRedirect('batch_test.redirect');
   }
@@ -111,9 +112,22 @@ class BatchTestChainedForm extends FormBase {
 
     $value = &$form_state->getValue('value');
     $value++;
-    batch_set($batch_test_definitions->batch3());
+    static::getBatchProcessor()->queue($batch_test_definitions->batch3());
 
     $form_state->setRedirect('batch_test.redirect');
+  }
+
+  /**
+   * Returns the batch processor.
+   *
+   * Moved batch processor in to the static method to keep test submit handler
+   * static.
+   *
+   * @return \Drupal\Core\Batch\BatchProcessorInterface
+   *   The batch processor.
+   */
+  public static function getBatchProcessor(): BatchProcessorInterface {
+    return \Drupal::service(BatchProcessorInterface::class);
   }
 
 }
