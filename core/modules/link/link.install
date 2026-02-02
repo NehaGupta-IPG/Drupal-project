@@ -1,11 +1,11 @@
 <?php
 
-use Drupal\Core\Entity\Entity\EntityFormDisplay;
-
 /**
  * @file
  * Install, update, and uninstall functions for the Link module.
  */
+
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
 
 /**
  * Set default link widget settings for title_url and title_title.
