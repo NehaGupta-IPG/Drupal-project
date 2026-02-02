@@ -1764,6 +1764,10 @@ services:
     arguments: ['@request_stack', '@database', '@datetime.time']
     tags:
       - { name: backend_overridable }
+  session_handler.optimized_storage:
+    class: Drupal\Core\Session\OptimizedStorageProxy
+    tags:
+      - { name: session_handler_proxy, priority: 1000 }
   session_handler.write_safe:
     class: Drupal\Core\Session\WriteSafeSessionHandler
     tags:
