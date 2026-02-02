@@ -72,6 +72,24 @@ class PathPluginBaseTest extends UnitTestCase {
     $container = new ContainerBuilder();
     $container->set('plugin.manager.views.access', $this->accessPluginManager);
 
+    $null_argument = $this->createMock('\Drupal\views\Plugin\views\argument\NullArgument');
+    $broken_argument = $this->createMock('\Drupal\views\Plugin\views\argument\Broken');
+    $null_argument->expects($this->any())
+      ->method('skipFromRouteParams')
+      ->willReturn(TRUE);
+    $argument_manager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $argument_manager->expects($this->any())
+      ->method('createInstance')
+      ->willReturnCallback(
+        fn($plugin_id, $configuration) => isset($configuration['plugin_id']) && $configuration['plugin_id'] === 'null'
+          ? $null_argument
+          : $broken_argument
+      );
+
+    $container->set('plugin.manager.views.argument', $argument_manager);
+
     $config = [
       'views.settings' => [
         'display_extenders' => [],
@@ -173,6 +191,14 @@ class PathPluginBaseTest extends UnitTestCase {
     $display['display_options'] = [
       'path' => 'test_route/%/example',
     ];
+    $display['display_options']['arguments'] = [
+      'test_null' => [
+        'plugin_id' => 'null',
+      ],
+      'test_id' => [
+        'plugin_id' => 'broken',
+      ],
+    ];
     $this->pathPlugin->initDisplay($view, $display);
 
     $collection = new RouteCollection();
@@ -181,6 +207,7 @@ class PathPluginBaseTest extends UnitTestCase {
 
     $route = $collection->get('view.test_id.page_1');
     $this->assertInstanceOf(Route::class, $route);
+    $this->assertEquals('/test_route/{arg_0}/example', $route->getPath());
     $this->assertEquals('test_id', $route->getDefault('view_id'));
     $this->assertEquals('page_1', $route->getDefault('display_id'));
     $this->assertEquals(['arg_0' => 'arg_0'], $route->getOption('_view_argument_map'));
