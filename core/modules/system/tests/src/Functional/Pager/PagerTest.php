@@ -137,7 +137,7 @@ class PagerTest extends BrowserTestBase {
             'expected_page' => '1',
             'expected_query' => '?page=,,,,0',
           ],
-        ]
+        ],
       ],
       // Blanks around page numbers should not be relevant.
       [
@@ -155,7 +155,7 @@ class PagerTest extends BrowserTestBase {
             'expected_page' => '6',
             'expected_query' => '?page=2,10,,,5,,',
           ],
-        ]
+        ],
       ],
       // Blanks within page numbers should lead to only the first integer
       // to be considered.
@@ -174,7 +174,7 @@ class PagerTest extends BrowserTestBase {
             'expected_page' => '5',
             'expected_query' => '?page=2,3,,,4,,',
           ],
-        ]
+        ],
       ],
       // If floats are passed as page numbers, only the integer part is
       [
@@ -192,7 +192,7 @@ class PagerTest extends BrowserTestBase {
             'expected_page' => '6',
             'expected_query' => '?page=2,6,,,5',
           ],
-        ]
+        ],
       ],
       // Partial page fragment, undefined pagers set to first page.
       [
@@ -210,7 +210,7 @@ class PagerTest extends BrowserTestBase {
             'expected_page' => '1',
             'expected_query' => '?page=5,2,,,0',
           ],
-        ]
+        ],
       ],
       // Partial page fragment, undefined pagers set to first page.
       [
@@ -228,7 +228,7 @@ class PagerTest extends BrowserTestBase {
             'expected_page' => '1',
             'expected_query' => '?page=,2,,,0',
           ],
-        ]
+        ],
       ],
       // Partial page fragment, undefined pagers set to first page.
       [
@@ -246,7 +246,7 @@ class PagerTest extends BrowserTestBase {
             'expected_page' => '1',
             'expected_query' => '?page=,,,,0',
           ],
-        ]
+        ],
       ],
       // With overflow pages, all pagers set to max page.
       [
@@ -264,7 +264,7 @@ class PagerTest extends BrowserTestBase {
             'expected_page' => '16',
             'expected_query' => '?page=99,99,,,15',
           ],
-        ]
+        ],
       ],
       // Wrong value for the page resets pager to first page.
       [
@@ -282,7 +282,7 @@ class PagerTest extends BrowserTestBase {
             'expected_page' => '1',
             'expected_query' => '?page=0,5,0,0,0',
           ],
-        ]
+        ],
       ],
     ];
 
