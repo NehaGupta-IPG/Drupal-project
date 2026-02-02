@@ -174,19 +174,14 @@ class Serializer extends StylePluginBase implements CacheableDependencyInterface
    */
   protected function wrapRowsInPager(array $rows): array {
     $pager = $this->view->pager;
-    $current_page = $pager->getCurrentPage();
-    $items_per_page = $pager->getItemsPerPage();
-    $total_items = $pager->getTotalItems();
-
-    $total_pages = $pager->usePager() ? $pager->getPagerTotal() : 0;
 
     return [
       'rows' => $rows,
       'pager' => [
-        'current_page' => (int) $current_page,
-        'total_items' => (int) $total_items,
-        'total_pages' => (int) $total_pages,
-        'items_per_page' => (int) $items_per_page,
+        'current_page' => (int) $pager->getCurrentPage(),
+        'total_items' => (int) $pager->getTotalItems(),
+        'total_pages' => $pager->usePager() ? (int) $pager->getPagerTotal() : 0,
+        'items_per_page' => (int) $pager->getItemsPerPage(),
       ],
     ];
   }
