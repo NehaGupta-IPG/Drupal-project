@@ -3,7 +3,8 @@
 namespace Drupal\Core\Cache\Context;
 
 use Drupal\Core\Cache\CacheableMetadata;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
  * Converts cache context tokens into cache keys.
@@ -23,20 +24,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class CacheContextsManager {
 
   /**
-   * The service container.
-   *
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface
-   */
-  protected $container;
-
-  /**
-   * Available cache context IDs and corresponding labels.
-   *
-   * @var string[]
-   */
-  protected $contexts;
-
-  /**
    * The set of valid context tokens.
    */
   protected array $validContextTokens;
@@ -44,15 +31,13 @@ class CacheContextsManager {
   /**
    * Constructs a CacheContextsManager object.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-   *   The current service container.
-   * @param string[] $contexts
-   *   An array of the available cache context IDs.
+   * @param \Symfony\Component\DependencyInjection\ServiceLocator $container
+   *   A service locator containing cache context services keyed by context ID.
    */
-  public function __construct(ContainerInterface $container, array $contexts) {
-    $this->container = $container;
-    $this->contexts = $contexts;
-  }
+  public function __construct(
+    #[AutowireLocator('cache.context', indexAttribute: 'id')]
+    protected readonly ServiceLocator $container,
+  ) {}
 
   /**
    * Provides an array of available cache contexts.
@@ -61,7 +46,7 @@ class CacheContextsManager {
    *   An array of available cache context IDs.
    */
   public function getAll() {
-    return $this->contexts;
+    return array_keys($this->container->getProvidedServices());
   }
 
   /**
@@ -77,7 +62,7 @@ class CacheContextsManager {
    */
   public function getLabels($include_calculated_cache_contexts = FALSE) {
     $with_labels = [];
-    foreach ($this->contexts as $context) {
+    foreach ($this->getAll() as $context) {
       $service = $this->getService($context);
       if (!$include_calculated_cache_contexts && $service instanceof CalculatedCacheContextInterface) {
         continue;
@@ -230,17 +215,16 @@ class CacheContextsManager {
   }
 
   /**
-   * Retrieves a cache context service from the container.
+   * Retrieves a cache context service from the service locator.
    *
    * @param string $context_id
-   *   The context ID, which together with the service ID prefix allows the
-   *   corresponding cache context service to be retrieved.
+   *   The context ID used to retrieve the corresponding cache context service.
    *
    * @return \Drupal\Core\Cache\Context\CacheContextInterface
    *   The requested cache context service.
    */
   protected function getService($context_id) {
-    return $this->container->get('cache_context.' . $context_id);
+    return $this->container->get($context_id);
   }
 
   /**
@@ -288,7 +272,7 @@ class CacheContextsManager {
 
     // Initialize the set of valid context tokens with the container's contexts.
     if (!isset($this->validContextTokens)) {
-      $this->validContextTokens = array_flip($this->contexts);
+      $this->validContextTokens = array_flip($this->getAll());
     }
 
     foreach ($context_tokens as $context_token) {
