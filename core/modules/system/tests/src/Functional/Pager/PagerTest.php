@@ -134,7 +134,7 @@ class PagerTest extends BrowserTestBase {
   /**
    * Provides test cases for PagerTest::testMultiplePagers().
    */
-  public function providerTestMultiplePagers(): array {
+  public static function providerTestMultiplePagers(): array {
     // Test data.
     // Expected URL query string param is 0-indexed.
     // Expected page per pager is 1-indexed.
