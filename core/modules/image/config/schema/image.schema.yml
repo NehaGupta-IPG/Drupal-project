@@ -81,6 +81,9 @@ image.effect.image_scale:
     upscale:
       type: boolean
       label: 'Upscale'
+    upscale_only:
+      type: boolean
+      label: 'Upscale only'
 
 # The image desaturate effect has no settings.
 image.effect.image_desaturate:
