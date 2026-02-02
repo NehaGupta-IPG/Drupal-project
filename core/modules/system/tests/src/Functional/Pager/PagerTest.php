@@ -124,58 +124,165 @@ class PagerTest extends BrowserTestBase {
       // With no query, all pagers set to first page.
       [
         'input_query' => '',
-        'expected_page' => [0 => '1', 1 => '1', 4 => '1'],
-        'expected_query' => '?page=0,0,,,0',
+        'pagers' => [
+          0 => [
+            'expected_page' => '1',
+            'expected_query' => '?page=0',
+          ],
+          1 => [
+            'expected_page' => '1',
+            'expected_query' => '?page=,0',
+          ],
+          4 => [
+            'expected_page' => '1',
+            'expected_query' => '?page=,,,,0',
+          ],
+        ]
       ],
       // Blanks around page numbers should not be relevant.
       [
         'input_query' => '?page=2  ,    10,,,   5     ,,',
-        'expected_page' => [0 => '3', 1 => '11', 4 => '6'],
-        'expected_query' => '?page=2,10,,,5',
+        'pagers' => [
+          0 => [
+            'expected_page' => '3',
+            'expected_query' => '?page=2,10,,,5,,',
+          ],
+          1 => [
+            'expected_page' => '11',
+            'expected_query' => '?page=2,10,,,5,,',
+          ],
+          4 => [
+            'expected_page' => '6',
+            'expected_query' => '?page=2,10,,,5,,',
+          ],
+        ]
       ],
       // Blanks within page numbers should lead to only the first integer
       // to be considered.
       [
         'input_query' => '?page=2  ,   3 0,,,   4  13    ,,',
-        'expected_page' => [0 => '3', 1 => '4', 4 => '5'],
-        'expected_query' => '?page=2,3,,,4',
+        'pagers' => [
+          0 => [
+            'expected_page' => '3',
+            'expected_query' => '?page=2,3,,,4,,',
+          ],
+          1 => [
+            'expected_page' => '4',
+            'expected_query' => '?page=2,3,,,4,,',
+          ],
+          4 => [
+            'expected_page' => '5',
+            'expected_query' => '?page=2,3,,,4,,',
+          ],
+        ]
       ],
       // If floats are passed as page numbers, only the integer part is
-      // returned.
       [
         'input_query' => '?page=2.1,6.999,,,5.',
-        'expected_page' => [0 => '3', 1 => '7', 4 => '6'],
-        'expected_query' => '?page=2,6,,,5',
+        'pagers' => [
+          0 => [
+            'expected_page' => '3',
+            'expected_query' => '?page=2,6,,,5',
+          ],
+          1 => [
+            'expected_page' => '7',
+            'expected_query' => '?page=2,6,,,5',
+          ],
+          4 => [
+            'expected_page' => '6',
+            'expected_query' => '?page=2,6,,,5',
+          ],
+        ]
       ],
       // Partial page fragment, undefined pagers set to first page.
       [
         'input_query' => '?page=5,2',
-        'expected_page' => [0 => '6', 1 => '3', 4 => '1'],
-        'expected_query' => '?page=5,2,,,0',
+        'pagers' => [
+          0 => [
+            'expected_page' => '6',
+            'expected_query' => '?page=5,2',
+          ],
+          1 => [
+            'expected_page' => '3',
+            'expected_query' => '?page=5,2',
+          ],
+          4 => [
+            'expected_page' => '1',
+            'expected_query' => '?page=5,2,,,0',
+          ],
+        ]
       ],
       // Partial page fragment, undefined pagers set to first page.
       [
         'input_query' => '?page=,2',
-        'expected_page' => [0 => '1', 1 => '3', 4 => '1'],
-        'expected_query' => '?page=0,2,,,0',
+        'pagers' => [
+          0 => [
+            'expected_page' => '1',
+            'expected_query' => '?page=0,2',
+          ],
+          1 => [
+            'expected_page' => '3',
+            'expected_query' => '?page=,2',
+          ],
+          4 => [
+            'expected_page' => '1',
+            'expected_query' => '?page=,2,,,0',
+          ],
+        ]
       ],
       // Partial page fragment, undefined pagers set to first page.
       [
         'input_query' => '?page=,',
-        'expected_page' => [0 => '1', 1 => '1', 4 => '1'],
-        'expected_query' => '?page=0,0,,,0',
+        'pagers' => [
+          0 => [
+            'expected_page' => '1',
+            'expected_query' => '?page=0,',
+          ],
+          1 => [
+            'expected_page' => '1',
+            'expected_query' => '?page=,0',
+          ],
+          4 => [
+            'expected_page' => '1',
+            'expected_query' => '?page=,,,,0',
+          ],
+        ]
       ],
       // With overflow pages, all pagers set to max page.
       [
         'input_query' => '?page=99,99,,,99',
-        'expected_page' => [0 => '16', 1 => '16', 4 => '16'],
-        'expected_query' => '?page=15,15,,,15',
+        'pagers' => [
+          0 => [
+            'expected_page' => '16',
+            'expected_query' => '?page=15,99,,,99',
+          ],
+          1 => [
+            'expected_page' => '16',
+            'expected_query' => '?page=99,15,,,99',
+          ],
+          4 => [
+            'expected_page' => '16',
+            'expected_query' => '?page=99,99,,,15',
+          ],
+        ]
       ],
       // Wrong value for the page resets pager to first page.
       [
         'input_query' => '?page=bar,5,foo,qux,bet',
-        'expected_page' => [0 => '1', 1 => '6', 4 => '1'],
-        'expected_query' => '?page=0,5,,,0',
+        'pagers' => [
+          0 => [
+            'expected_page' => '1',
+            'expected_query' => '?page=0,5,0,0,0',
+          ],
+          1 => [
+            'expected_page' => '6',
+            'expected_query' => '?page=0,5,0,0,0',
+          ],
+          4 => [
+            'expected_page' => '1',
+            'expected_query' => '?page=0,5,0,0,0',
+          ],
+        ]
       ],
     ];
 
@@ -186,9 +293,9 @@ class PagerTest extends BrowserTestBase {
       $input_query = str_replace(' ', '%20', $data['input_query']);
       $this->drupalGet($this->getAbsoluteUrl(parse_url($this->getUrl())['path'] . $input_query), ['external' => TRUE]);
       foreach ([0, 1, 4] as $pager_element) {
-        $active_page = $this->cssSelect("div.test-pager-{$pager_element} ul.pager__items li.is-active:contains('{$data['expected_page'][$pager_element]}')");
+        $active_page = $this->cssSelect("div.test-pager-{$pager_element} ul.pager__items li.is-active:contains('{$data['pagers'][$pager_element]['expected_page']}')");
         $destination = str_replace('%2C', ',', $active_page[0]->find('css', 'a')->getAttribute('href'));
-        $this->assertStringEndsWith($data['expected_query'], $destination);
+        $this->assertEquals($data['pagers'][$pager_element]['expected_query'], $destination);
       }
     }
   }
