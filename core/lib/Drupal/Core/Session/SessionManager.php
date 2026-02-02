@@ -29,13 +29,6 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
   use DependencySerializationTrait;
 
   /**
-   * Whether a lazy session has been started.
-   *
-   * @var bool
-   */
-  protected $startedLazy;
-
-  /**
    * Constructs a new session manager instance.
    *
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
@@ -65,62 +58,14 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
    * {@inheritdoc}
    */
   public function start(): bool {
-    if (($this->started || $this->startedLazy) && !$this->closed) {
-      return $this->started;
-    }
-
     $request = $this->requestStack->getCurrentRequest();
     $this->setOptions($this->sessionConfiguration->getOptions($request));
 
-    if ($this->sessionConfiguration->hasSession($request)) {
-      // If a session cookie exists, initialize the session. Otherwise the
-      // session is only started on demand in save(), making
-      // anonymous users not use a session cookie unless something is stored in
-      // $_SESSION. This allows HTTP proxies to cache anonymous page views.
-      $result = $this->startNow();
-    }
-
-    if (empty($result)) {
-      // Initialize the session global and attach the Symfony session bags.
-      $_SESSION = [];
-      $this->loadSession();
-
-      // NativeSessionStorage::loadSession() sets started to TRUE, reset it to
-      // FALSE here.
-      $this->started = FALSE;
-      $this->startedLazy = TRUE;
-
-      $result = FALSE;
-    }
-
-    return $result;
-  }
-
-  /**
-   * Forcibly start a PHP session.
-   *
-   * @return bool
-   *   TRUE if the session is started.
-   */
-  protected function startNow() {
     if ($this->isCli()) {
       return FALSE;
     }
 
-    if ($this->startedLazy) {
-      // Save current session data before starting it, as PHP will destroy it.
-      $session_data = $_SESSION;
-    }
-
-    $result = parent::start();
-
-    // Restore session data.
-    if ($this->startedLazy) {
-      $_SESSION = $session_data;
-      $this->loadSession();
-    }
-
-    return $result;
+    return parent::start();
   }
 
   /**
@@ -132,18 +77,8 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
       return;
     }
 
-    if (!$this->isSessionObsolete()) {
-      // There is session data to store. Start the session if it is not already
-      // started.
-      if (!$this->getSaveHandler()->isActive()) {
-        $this->startNow();
-      }
-    }
-
     // Write the session data.
     parent::save();
-
-    $this->startedLazy = FALSE;
   }
 
   /**
@@ -159,15 +94,6 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
     // session. This is inline with the recommendations of @link https://cheatsheetseries.owasp.org/cheatsheets/Session_Management_Cheat_Sheet.html#renew-the-session-id-after-any-privilege-level-change
     // OWASP session management cheat sheet. @endlink
     $destroy = TRUE;
-
-    // Cannot regenerate the session ID for non-active sessions.
-    if (\PHP_SESSION_ACTIVE !== session_status()) {
-      // Ensure the metadata bag has been stamped. If the parent::regenerate()
-      // is called prior to the session being started it will not refresh the
-      // metadata as expected.
-      $this->getMetadataBag()->stampNew($lifetime);
-      return FALSE;
-    }
 
     return parent::regenerate($destroy, $lifetime);
   }
@@ -203,46 +129,6 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
    */
   protected function isCli() {
     return PHP_SAPI === 'cli';
-  }
-
-  /**
-   * Determines whether the session contains user data.
-   *
-   * @return bool
-   *   TRUE when the session does not contain any values and therefore can be
-   *   destroyed.
-   */
-  protected function isSessionObsolete() {
-    $used_session_keys = array_filter($this->getSessionDataMask());
-    return empty($used_session_keys);
-  }
-
-  /**
-   * Returns a map specifying which session key is containing user data.
-   *
-   * @return array
-   *   An array where keys correspond to the session keys and the values are
-   *   booleans specifying whether the corresponding session key contains any
-   *   user data.
-   */
-  protected function getSessionDataMask() {
-    if (empty($_SESSION)) {
-      return [];
-    }
-
-    // Start out with a completely filled mask.
-    $mask = array_fill_keys(array_keys($_SESSION), TRUE);
-
-    // Ignore the metadata bag, it does not contain any user data.
-    $mask[$this->metadataBag->getStorageKey()] = FALSE;
-
-    // Ignore attribute bags when they do not contain any data.
-    foreach ($this->bags as $bag) {
-      $key = $bag->getStorageKey();
-      $mask[$key] = !empty($_SESSION[$key]);
-    }
-
-    return array_intersect_key($mask, $_SESSION);
   }
 
 }
