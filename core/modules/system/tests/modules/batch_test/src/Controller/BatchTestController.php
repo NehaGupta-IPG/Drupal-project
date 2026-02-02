@@ -45,7 +45,7 @@ class BatchTestController {
 
     return \Drupal::service(BatchProcessorInterface::class)
       ?->queue($batch_test_definitions->batch5())
-      ->process('batch-test/redirect');
+        ->process('batch-test/redirect');
   }
 
   /**
@@ -65,7 +65,7 @@ class BatchTestController {
       ->addOperation([$batch_test_helper, 'nestedDrupalFormSubmitCallback'], [$value]);
     return \Drupal::service(BatchProcessorInterface::class)
       ?->queue($batch_builder->toArray())
-      ->process('batch-test/redirect');
+        ->process('batch-test/redirect');
   }
 
   /**
@@ -81,7 +81,7 @@ class BatchTestController {
     $batch_test_helper->stack(NULL, TRUE);
     return \Drupal::service(BatchProcessorInterface::class)
       ?->queue($batch_test_definitions->batch1())
-      ->process('batch-test/redirect');
+        ->process('batch-test/redirect');
 
   }
 
@@ -100,7 +100,7 @@ class BatchTestController {
     $batch['finished'] = BatchTestCallbacks::class . ':finished1Finished';
     return \Drupal::service(BatchProcessorInterface::class)
       ?->queue($batch)
-      ->process('batch-test/redirect');
+        ->process('batch-test/redirect');
   }
 
   /**
@@ -142,7 +142,7 @@ class BatchTestController {
     ];
     return \Drupal::service(BatchProcessorInterface::class)
       ?->queue($batch)
-      ->process('batch-test/redirect');
+        ->process('batch-test/redirect');
   }
 
   /**
@@ -161,7 +161,7 @@ class BatchTestController {
     ];
     return \Drupal::service(BatchProcessorInterface::class)
       ?->queue($batch)
-      ->process('batch-test/redirect');
+        ->process('batch-test/redirect');
   }
 
 }

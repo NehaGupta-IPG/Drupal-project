@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Unit\Batch;
 
 use Drupal\Core\Batch\BatchProcessor;
-use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Batch\BatchStorageInterface;
 use Drupal\system\Controller\BatchController;
 use Drupal\Tests\UnitTestCase;

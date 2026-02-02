@@ -7,9 +7,9 @@ namespace Drupal\batch_test\Form;
 use Drupal\batch_test\BatchTestDefinitions;
 use Drupal\batch_test\BatchTestHelper;
 use Drupal\Core\Batch\BatchProcessorInterface;
+use Drupal\Core\DependencyInjection\AutowireTrait;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drush\Commands\AutowireTrait;
 
 /**
  * Generate form of id batch_test_simple_form.
