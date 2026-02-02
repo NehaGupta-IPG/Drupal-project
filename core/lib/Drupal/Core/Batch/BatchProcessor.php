@@ -32,8 +32,9 @@ class BatchProcessor implements BatchProcessorInterface {
   /**
    * {@inheritdoc}
    */
-  public function queue(array $batch_definition): void {
+  public function queue(array $batch_definition): self {
     batch_set($batch_definition);
+    return $this;
   }
 
   /**

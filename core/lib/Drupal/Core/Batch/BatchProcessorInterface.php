@@ -33,7 +33,7 @@ interface BatchProcessorInterface {
    *   An associative array defining the batch. The array can be built by using
    *   toArray() method of a populated \Drupal\Core\Batch\BatchBuilder object.
    */
-  public function queue(array $batch_definition): void;
+  public function queue(array $batch_definition): self;
 
   /**
    * Retrieves the current batch.
