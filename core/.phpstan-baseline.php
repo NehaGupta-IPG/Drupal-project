@@ -23136,6 +23136,24 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/modules/services_defaults_test/src/TestService.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\session_test\\\\Form\\\\SessionTestForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/tests/modules/session_test/src/Form/SessionTestForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\session_test\\\\Session\\\\TestSessionBag\\:\\:clearFlag\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/tests/modules/session_test/src/Session/TestSessionBag.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\session_test\\\\Session\\\\TestSessionBag\\:\\:setFlag\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/tests/modules/session_test/src/Session/TestSessionBag.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\system_test\\\\Controller\\\\SystemTestController\\:\\:getCacheableResponseWithCustomCacheControl\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
