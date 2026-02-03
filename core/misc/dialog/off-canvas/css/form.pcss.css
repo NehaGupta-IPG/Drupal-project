@@ -52,7 +52,7 @@
   }
 
   & .form-required::after {
-    content: "*" / "";
+    content: "*";
   }
 
   & .fieldset,
