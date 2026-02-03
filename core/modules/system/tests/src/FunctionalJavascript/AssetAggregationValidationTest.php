@@ -6,13 +6,13 @@ namespace Drupal\Tests\system\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\RunInSeparateProcesses;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the validation of server configuration for asset aggregation.
  */
 #[Group('system')]
-#[RunInSeparateProcesses]
+#[RunTestsInSeparateProcesses]
 class AssetAggregationValidationTest extends WebDriverTestBase {
 
   /**
