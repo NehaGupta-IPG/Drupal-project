@@ -38,6 +38,8 @@ services:
       - { name: stream_wrapper, scheme: translations }
   locale.config_subscriber:
     class: Drupal\locale\LocaleConfigSubscriber
+    tags:
+      - { name: container.public }
   locale.locale_translation_cache_tag:
     class: Drupal\locale\EventSubscriber\LocaleTranslationCacheTag
   Drupal\locale\EventSubscriber\ConfigSubscriber: ~
