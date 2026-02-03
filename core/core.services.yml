@@ -412,6 +412,7 @@ services:
     class: Drupal\Core\Config\ConfigFactory
     tags:
       - { name: service_collector, tag: 'config.factory.override', call: addOverride }
+      - { name: container.public }
     arguments: ['@config.storage', '@event_dispatcher', '@config.typed']
   Drupal\Core\Config\ConfigFactoryInterface: '@config.factory'
   Drupal\Core\Config\ConfigImporterFactory:
@@ -502,6 +503,8 @@ services:
   database.replica_kill_switch:
     class: Drupal\Core\Database\ReplicaKillSwitch
     arguments: ['@settings', '@datetime.time', '@session']
+    tags:
+      - { name: container.public }
   Drupal\Core\Database\ReplicaKillSwitch: '@database.replica_kill_switch'
   Drupal\Core\Database\EventSubscriber\StatementExecutionSubscriber: ~
   datetime.time:
@@ -1155,6 +1158,8 @@ services:
   entity.query.config:
     class: Drupal\Core\Config\Entity\Query\QueryFactory
     arguments: ['@config.factory', '@keyvalue', '@config.manager']
+    tags:
+      - { name: container.public }
   entity.query.sql:
     class: Drupal\Core\Entity\Query\Sql\QueryFactory
     arguments: ['@database']
