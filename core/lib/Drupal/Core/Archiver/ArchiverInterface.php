@@ -23,11 +23,14 @@ interface ArchiverInterface {
    * @param string $file_path
    *   The full system path of the file or directory to add. Only local files
    *   and directories are supported.
+   * @param string|null $entry_name
+   *   If supplied and not empty, this is the local name inside the ZIP archive
+   *   that will override the filepath.
    *
    * @return $this
    *   The called object.
    */
-  public function add($file_path);
+  public function add($file_path, $entry_name = NULL);
 
   /**
    * Removes the specified file from the archive.

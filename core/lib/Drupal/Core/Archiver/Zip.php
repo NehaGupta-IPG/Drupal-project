@@ -46,8 +46,8 @@ class Zip implements ArchiverInterface {
   /**
    * {@inheritdoc}
    */
-  public function add($file_path) {
-    $this->zip->addFile($file_path);
+  public function add($file_path, $entry_name = NULL) {
+    $this->zip->addFile($file_path, $entry_name);
 
     return $this;
   }
