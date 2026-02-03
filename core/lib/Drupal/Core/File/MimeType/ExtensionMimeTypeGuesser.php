@@ -365,7 +365,7 @@ class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface {
       320 => 'text/x-tcl',
       321 => 'text/x-tex',
       322 => 'text/x-vcalendar',
-      323 => 'text/x-vcard',
+      323 => 'text/vcard',
       324 => 'video/3gpp',
       325 => 'video/dl',
       326 => 'video/dv',
