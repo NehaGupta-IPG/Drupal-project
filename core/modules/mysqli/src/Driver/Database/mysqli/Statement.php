@@ -92,7 +92,10 @@ class Statement extends StatementBase {
           $this->clientStatement = $this->clientConnection->prepare($convertedQueryString);
         }
         else {
-          $args = array_map(fn (string $arg): string => "'" . $this->clientConnection->real_escape_string($arg) . "'", $args);
+          $args = array_map(
+            fn (?string $arg): string => $arg === NULL ? 'NULL' : "'" . $this->clientConnection->real_escape_string($arg) . "'",
+            $args,
+          );
           preg_match_all('/(?<!\?)\?(?!\?)/', $convertedQueryString, $matches, \PREG_OFFSET_CAPTURE);
           $executableQueryString = '';
           $iStart = 0;
