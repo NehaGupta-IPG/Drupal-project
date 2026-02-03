@@ -35,24 +35,24 @@ class AssetAggregationValidationTest extends WebDriverTestBase {
     $this->getSession()->executeScript("jQuery('#edit-preprocess-css').prop('checked', false).trigger('change');");
     $this->submitForm([], 'Save configuration');
 
-    // 1. Enable CSS aggregation.
+    // Enable CSS aggregation.
     // This should trigger the 'change' event listener in assets.validate.js.
     $page->checkField('preprocess_css');
 
-    // 2. Wait for the Success Message.
+    // Wait for the Success Message.
     $success_message_partial = 'Your server is configured properly';
 
     $result = $this->assertSession()->waitForText($success_message_partial);
     $this->assertNotNull($result, 'The success message did not appear after enabling aggregation.');
 
-    // 3. Ensure the Failure Message is NOT present.
+    // Ensure the Failure Message is NOT present.
     $this->assertSession()->pageTextNotContains('Your server is not configured properly');
     $this->assertSession()->elementNotExists('css', '.messages--error');
 
-    // 4. Save the form.
+    // Save the form.
     $this->submitForm([], 'Save configuration');
 
-    // 5. Verify the settings were saved successfully.
+    // Verify the settings were saved successfully.
     $this->assertSession()->pageTextContains('The configuration options have been saved.');
     $this->assertTrue($this->config('system.performance')->get('css.preprocess'), 'CSS aggregation was enabled.');
   }
