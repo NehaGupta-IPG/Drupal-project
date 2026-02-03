@@ -92,15 +92,15 @@ class Statement extends StatementBase {
           $this->clientStatement = $this->clientConnection->prepare($convertedQueryString);
         }
         else {
-          $args = array_map(fn (string $arg): string => "'". $this->clientConnection->real_escape_string($arg) . "'", $args);
+          $args = array_map(fn (string $arg): string => "'" . $this->clientConnection->real_escape_string($arg) . "'", $args);
           preg_match_all('/(?<!\?)\?(?!\?)/', $convertedQueryString, $matches, \PREG_OFFSET_CAPTURE);
           $executableQueryString = '';
           $iStart = 0;
           $iArg = 0;
           foreach ($matches[0] as $match) {
-              $iLength = $match[1] - $iStart;
-              $executableQueryString .= substr($convertedQueryString, $iStart, $iLength) . $args[$iArg++];
-              $iStart = $iStart + $iLength + 1;
+            $iLength = $match[1] - $iStart;
+            $executableQueryString .= substr($convertedQueryString, $iStart, $iLength) . $args[$iArg++];
+            $iStart = $iStart + $iLength + 1;
           }
           $executableQueryString .= substr($convertedQueryString, $iStart);
         }
@@ -126,6 +126,7 @@ class Statement extends StatementBase {
         );
       }
       else {
+        assert(isset($executableQueryString));
         $return = $this->clientConnection->query($executableQueryString);
         $this->result = new Result(
           $this->fetchMode,
