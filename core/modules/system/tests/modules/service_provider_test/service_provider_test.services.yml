@@ -5,6 +5,7 @@ services:
     class: Drupal\service_provider_test\TestClass
     tags:
       - { name: needs_destruction }
+      - { name: container.public }
     arguments: ['@state']
   # Used to test destructable service order.
   service_provider_test_class_1:

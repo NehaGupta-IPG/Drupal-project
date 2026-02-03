@@ -436,6 +436,8 @@ services:
   config.storage.checkpoint:
     class: Drupal\Core\Config\Checkpoint\CheckpointStorage
     arguments: [ '@config.storage', '@config.checkpoints', '@keyvalue' ]
+    tags:
+      - { name: container.public }
   Drupal\Core\Config\Checkpoint\CheckpointStorageInterface: '@config.storage.checkpoint'
   config.checkpoints:
     class: Drupal\Core\Config\Checkpoint\LinearHistory
