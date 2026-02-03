@@ -84,9 +84,6 @@ class ViewsConfigUpdater {
       if ($this->processRssViewModeUpdate($view)) {
         $changed = TRUE;
       }
-      if ($this->processSerializerPagerUpdate($view)) {
-        $changed = TRUE;
-      }
       return $changed;
     });
   }
@@ -465,50 +462,6 @@ class ViewsConfigUpdater {
           $display['display_options']['row']['options']['view_mode'] = $previous_view_mode;
           $changed = TRUE;
         }
-      }
-    }
-
-    if ($changed) {
-      $view->set('display', $displays);
-    }
-
-    return $changed;
-  }
-
-  /**
-   * Checks if a serializer display needs the pager option added.
-   *
-   * @param \Drupal\views\ViewEntityInterface $view
-   *   The view entity.
-   *
-   * @return bool
-   *   TRUE if the view has any serializer displays missing the pager option.
-   */
-  public function needsSerializerPagerUpdate(ViewEntityInterface $view): bool {
-    return $this->processSerializerPagerUpdate($view);
-  }
-
-  /**
-   * Adds the pager option to serializer style displays that are missing it.
-   *
-   * @param \Drupal\views\ViewEntityInterface $view
-   *   The view entity.
-   *
-   * @return bool
-   *   TRUE if the view was updated.
-   */
-  public function processSerializerPagerUpdate(ViewEntityInterface $view): bool {
-    $changed = FALSE;
-    $displays = $view->get('display');
-
-    foreach ($displays as &$display) {
-      if (
-        isset($display['display_options']['style']) &&
-        $display['display_options']['style']['type'] === 'serializer' &&
-        !isset($display['display_options']['style']['options']['pager'])
-      ) {
-        $display['display_options']['style']['options']['pager'] = FALSE;
-        $changed = TRUE;
       }
     }
 

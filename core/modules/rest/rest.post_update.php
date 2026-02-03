@@ -6,8 +6,8 @@
  */
 
 use Drupal\Core\Config\Entity\ConfigEntityUpdater;
+use Drupal\rest\RestConfigUpdater;
 use Drupal\views\ViewEntityInterface;
-use Drupal\views\ViewsConfigUpdater;
 
 /**
  * Implements hook_removed_post_updates().
@@ -28,10 +28,9 @@ function rest_post_update_add_serializer_pager(?array &$sandbox = NULL): void {
   if (!\Drupal::moduleHandler()->moduleExists('views')) {
     return;
   }
-  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
-  $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
-  $view_config_updater->setDeprecationsEnabled(FALSE);
-  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
-    return $view_config_updater->needsSerializerPagerUpdate($view);
+  /** @var \Drupal\rest\RestConfigUpdater $rest_config_updater */
+  $rest_config_updater = \Drupal::classResolver(RestConfigUpdater::class);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($rest_config_updater): bool {
+    return $rest_config_updater->processSerializerPagerUpdate($view);
   });
 }

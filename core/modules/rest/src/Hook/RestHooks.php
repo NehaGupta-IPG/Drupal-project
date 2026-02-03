@@ -67,8 +67,12 @@ class RestHooks {
    * Implements hook_views_pre_execute().
    *
    * Adds page-based offset support for REST serializer views whose pager does
-   * not natively handle pagination
-   * (e.g. "Display a specified number of items").
+   * not natively handle pagination (e.g. "some" pager).
+   *
+   * For pagers that do not use pagination (usePager() returns FALSE), this
+   * hook enables page-based navigation by adjusting the query offset. The
+   * pager's current page is also updated so that Serializer::wrapRowsInPager()
+   * can report the correct page number.
    */
   #[Hook('views_pre_execute')]
   public function viewsPreExecute(ViewExecutable $view): void {
@@ -81,10 +85,17 @@ class RestHooks {
       return;
     }
     $items_per_page = (int) $pager->getItemsPerPage();
-    $page = $view->getRequest()->query->getInt('page');
-    if ($items_per_page > 0 && $page > 0) {
+    if ($items_per_page <= 0) {
+      return;
+    }
+    // For pagers that don't natively support pagination, we need to manually
+    // handle page navigation. Update the pager's current page state so that
+    // getCurrentPage() returns the correct value for metadata reporting.
+    $current_page = $view->getRequest()->query->getInt('page');
+    $pager->setCurrentPage($current_page);
+    if ($current_page > 0) {
       $base_offset = (int) $pager->getOffset();
-      $view->query->setOffset($base_offset + ($page * $items_per_page));
+      $view->query->setOffset($base_offset + ($current_page * $items_per_page));
     }
   }
 

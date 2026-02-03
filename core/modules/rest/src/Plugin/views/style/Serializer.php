@@ -175,21 +175,20 @@ class Serializer extends StylePluginBase implements CacheableDependencyInterface
   protected function wrapRowsInPager(array $rows): array {
     $pager = $this->view->pager;
     $items_per_page = (int) $pager->getItemsPerPage();
+    $current_page = (int) $pager->getCurrentPage();
 
     if ($pager->useCountQuery()) {
-      $current_page = (int) $pager->getCurrentPage();
       $total_items = (int) $pager->getTotalItems();
     }
+    elseif (isset($this->view->build_info['count_query'])) {
+      // Pagers without a count query (e.g. "some") do not track total items
+      // accurately, so run the count query if available.
+      $count_query = clone $this->view->build_info['count_query'];
+      $count_query->preExecute();
+      $total_items = (int) $count_query->countQuery()->execute()->fetchField();
+    }
     else {
-      // Pagers without a count query (e.g. "some") do not track current page
-      // or total items accurately, so read them from the request and query.
       $total_items = (int) $pager->getTotalItems();
-      if (isset($this->view->build_info['count_query'])) {
-        $count_query = clone $this->view->build_info['count_query'];
-        $count_query->preExecute();
-        $total_items = (int) $count_query->countQuery()->execute()->fetchField();
-      }
-      $current_page = $this->view->getRequest()->query->getInt('page');
     }
 
     $total_pages = ($items_per_page > 0)
