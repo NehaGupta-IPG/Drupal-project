@@ -11,6 +11,7 @@ use PHPUnit\Framework\Attributes\Group;
  * Tests the validation of server configuration for asset aggregation.
  */
 #[Group('system')]
+#[RunInSeparateProcesses]
 class AssetAggregationValidationTest extends WebDriverTestBase {
 
   /**
