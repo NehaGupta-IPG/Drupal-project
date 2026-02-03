@@ -111,7 +111,11 @@ class OpenTelemetryFrontPagePerformanceTest extends PerformanceTestBase {
    * specific to the front page is cold.
    */
   protected function testFrontPageCoolCache(): void {
-    // First of all visit the front page to ensure the image style exists.
+    $this->clearCaches();
+    // Follow exactly the same steps to warm caches as just before collecting
+    // performance data to ensure image styles and css/js aggregates are warm.
+    $this->drupalGet('user/login');
+    sleep(2);
     $this->drupalGet('<front>');
     sleep(2);
     $this->clearCaches();
@@ -123,12 +127,12 @@ class OpenTelemetryFrontPagePerformanceTest extends PerformanceTestBase {
     }, 'umamiFrontPageCoolCache');
 
     $expected = [
-      'QueryCount' => 74,
-      'CacheGetCount' => 206,
-      'CacheSetCount' => 81,
+      'QueryCount' => 63,
+      'CacheGetCount' => 178,
+      'CacheSetCount' => 76,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 20,
+      'CacheTagLookupQueryCount' => 19,
       'ScriptCount' => 3,
       'ScriptBytes' => 72552,
       'StylesheetCount' => 3,
