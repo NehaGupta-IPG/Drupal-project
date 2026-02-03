@@ -74,6 +74,26 @@ class ContainerBuilder extends SymfonyContainerBuilder implements ContainerInter
 
   /**
    * {@inheritdoc}
+   *
+   * Overrides the parent method to properly handle aliases.
+   *
+   * Symfony's ContainerBuilder stores aliases in aliasDefinitions, but the
+   * inherited initialized() method from Container checks the aliases property
+   * which is not populated in ContainerBuilder. This override resolves aliases
+   * using aliasDefinitions before checking if the service is initialized.
+   *
+   * @todo Submit upstream patch to Symfony to fix this in ContainerBuilder.
+   */
+  public function initialized(string $id): bool {
+    if ($this->hasAlias($id)) {
+      $id = (string) $this->getAlias($id);
+    }
+
+    return parent::initialized($id);
+  }
+
+  /**
+   * {@inheritdoc}
    */
   public function __sleep(): array {
     assert(FALSE, 'The container was serialized.');
