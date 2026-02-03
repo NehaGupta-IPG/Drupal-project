@@ -373,8 +373,10 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     $row = [
       'sourceid1' => 'source_id_value_3',
       'sourceid2' => 'source_id_value_4',
-      'source_ids_hash' => $this->getIdMap()
-        ->getSourceIdsHash(['source_id_property' => 'source_id_value_3', 'sourceid2' => 'source_id_value_4']),
+      'source_ids_hash' => $this->getIdMap()->getSourceIdsHash([
+        'source_id_property' => 'source_id_value_3',
+        'sourceid2' => 'source_id_value_4',
+      ]),
       'destid1' => 'destination_id_value_2',
     ] + $this->idMapDefaults();
     $this->saveMap($row);
@@ -534,6 +536,11 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     // Lookup by partial associative list.
     $this->assertEquals([[101, 'en'], [101, 'fr'], [101, 'de']], $id_map->lookupDestinationIds(['nid' => 1]));
     $this->assertEquals([[102, 'en']], $id_map->lookupDestinationIds(['nid' => 2]));
+    $this->assertEquals([], $id_map->lookupDestinationIds(['nid' => 99]));
+    $this->assertEquals([[101, 'en'], [101, 'fr'], [101, 'de']], $id_map->lookupDestinationIds([
+      'nid' => 1,
+      'language' => NULL,
+    ]));
     $this->assertEquals([[102, 'en']], $id_map->lookupDestinationIds(['nid' => 2, 'language' => NULL]));
     $this->assertEquals([], $id_map->lookupDestinationIds(['nid' => 99]));
     $this->assertEquals(
@@ -1074,14 +1081,16 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   /**
    * Tests the delayed creation of the "map" and "message" migrate tables.
    */
-  public function testMapTableCreation(): void {
+  #[DataProvider('providerTestMapTableCreation')]
+  public function testMapTableCreation($configuration, $expected_map_table, $expected_message_table): void {
+    $this->migrationConfiguration = ['id' => $configuration];
     $id_map = $this->getIdMap();
     $map_table_name = $id_map->mapTableName();
     $message_table_name = $id_map->messageTableName();
 
     // Check that tables names do exist.
-    $this->assertEquals('migrate_map_sql_idmap_test', $map_table_name);
-    $this->assertEquals('migrate_message_sql_idmap_test', $message_table_name);
+    $this->assertEquals($expected_map_table, $map_table_name);
+    $this->assertEquals($expected_message_table, $message_table_name);
 
     // Check that tables don't exist.
     $this->assertFalse($this->database->schema()->tableExists($map_table_name));
@@ -1092,6 +1101,29 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
     // Check that tables do exist.
     $this->assertTrue($this->database->schema()->tableExists($map_table_name));
     $this->assertTrue($this->database->schema()->tableExists($message_table_name));
+  }
+
+  /**
+   * Provides data for testMapTableCreation.
+   */
+  public static function providerTestMapTableCreation(): array {
+    return [
+      'short_name' => [
+        'sql_idmap_test',
+        'migrate_map_sql_idmap_test',
+        'migrate_message_sql_idmap_test',
+      ],
+      'too long for message table' => [
+        'migration_with_a_long_id_for_testing_table_names',
+        'migrate_map_514fb9bb7f',
+        'migrate_message_514fb9bb7f',
+      ],
+      'too long for map and message table' => [
+        'migration_with_a_long_id_for_testing_migrate_table_names',
+        'migrate_map_b9b3d8d1ff',
+        'migrate_message_b9b3d8d1ff',
+      ],
+    ];
   }
 
   /**

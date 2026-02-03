@@ -1,0 +1,13 @@
+id: short_name
+source:
+  plugin: embedded_data
+  data_rows:
+    - id: 0
+  ids:
+    id:
+      type: integer
+process:
+  id: id
+destination:
+  plugin: config
+  config_name: system.site

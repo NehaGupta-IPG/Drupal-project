@@ -10,18 +10,18 @@ use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
-use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\Audit\HighestIdInterface;
-use Drupal\migrate\Plugin\MigrationInterface;
+use Drupal\migrate\Event\MigrateEvents;
 use Drupal\migrate\Event\MigrateIdMapMessageEvent;
+use Drupal\migrate\Event\MigrateMapDeleteEvent;
+use Drupal\migrate\Event\MigrateMapSaveEvent;
 use Drupal\migrate\MigrateException;
+use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\MigrateMessageInterface;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
+use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\MigrationPluginManagerInterface;
 use Drupal\migrate\Row;
-use Drupal\migrate\Event\MigrateEvents;
-use Drupal\migrate\Event\MigrateMapSaveEvent;
-use Drupal\migrate\Event\MigrateMapDeleteEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -175,20 +175,25 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->migration = $migration;
     $this->eventDispatcher = $event_dispatcher;
+    $this->migrationPluginManager = $migration_plugin_manager;
     $this->message = new MigrateMessage();
 
     if (!isset($this->database)) {
       $this->database = \Drupal::database();
     }
 
-    // Default generated table names, limited to 63 characters.
+    // Generate default table names and ensure they fit in the 48 characters
+    // limit, keeping a 16 characters margin for db prefixes. Do as a pair to
+    // keep the name the same. And ensureTables() only created a message table
+    // if the corresponding map table does not exit.
     $machine_name = str_replace(':', '__', $this->migration->id());
-    $prefix_length = strlen($this->database->getPrefix());
     $this->mapTableName = 'migrate_map_' . mb_strtolower($machine_name);
-    $this->mapTableName = mb_substr($this->mapTableName, 0, 63 - $prefix_length);
     $this->messageTableName = 'migrate_message_' . mb_strtolower($machine_name);
-    $this->messageTableName = mb_substr($this->messageTableName, 0, 63 - $prefix_length);
-    $this->migrationPluginManager = $migration_plugin_manager;
+    if (strlen($this->messageTableName) > 48) {
+      $hash = substr(hash('sha256', $machine_name), 0, 10);
+      $this->mapTableName = 'migrate_map_' . $hash;
+      $this->messageTableName = 'migrate_message_' . $hash;
+    }
   }
 
   /**

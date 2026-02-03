@@ -5,9 +5,19 @@
  * Contains install and update functions for Migrate.
  */
 
+use Drupal\Component\Render\FormattableMarkup;
+use Drupal\migrate\MigrateTableNamesUpdate;
+
 /**
  * Implements hook_update_last_removed().
  */
 function migrate_update_last_removed(): int {
   return 10100;
+}
+
+/**
+ * Update the names of migration tables to unique values.
+ */
+function migrate_update_110300(&$sandbox): ?FormattableMarkup {
+  return \Drupal::classResolver(MigrateTableNamesUpdate::class)->updateMapAndMessageTables($sandbox);
 }
