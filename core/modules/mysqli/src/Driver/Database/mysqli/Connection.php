@@ -64,6 +64,7 @@ class Connection extends BaseMySqlConnection {
     // Allow PDO options to be overridden.
     $connection_options += [
       'pdo' => [],
+      'use_prepared_statements' => FALSE,
     ];
 
     try {

@@ -23,7 +23,7 @@ class Result extends ResultBase {
    *   The fetch mode.
    * @param array{class: class-string, constructor_args: list<mixed>, column: int, cursor_orientation?: int, cursor_offset?: int} $fetchOptions
    *   The fetch options.
-   * @param \mysqli_result|false $mysqliResult
+   * @param \mysqli_result|bool $mysqliResult
    *   The MySQLi result object.
    * @param \mysqli $mysqliConnection
    *   Client database connection object.
@@ -31,7 +31,7 @@ class Result extends ResultBase {
   public function __construct(
     FetchAs $fetchMode,
     array $fetchOptions,
-    protected readonly \mysqli_result|false $mysqliResult,
+    protected readonly \mysqli_result|bool $mysqliResult,
     protected readonly \mysqli $mysqliConnection,
   ) {
     parent::__construct($fetchMode, $fetchOptions);

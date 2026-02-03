@@ -88,7 +88,22 @@ class Statement extends StatementBase {
         $converter = new NamedPlaceholderConverter();
         $converter->parse($this->queryString, $args);
         [$convertedQueryString, $args] = [$converter->getConvertedSQL(), $converter->getConvertedParameters()];
-        $this->clientStatement = $this->clientConnection->prepare($convertedQueryString);
+        if ($this->connection->getConnectionOptions()['use_prepared_statements']) {
+          $this->clientStatement = $this->clientConnection->prepare($convertedQueryString);
+        }
+        else {
+          $args = array_map(fn (string $arg): string => "'". $this->clientConnection->real_escape_string($arg) . "'", $args);
+          preg_match_all('/(?<!\?)\?(?!\?)/', $convertedQueryString, $matches, \PREG_OFFSET_CAPTURE);
+          $executableQueryString = '';
+          $iStart = 0;
+          $iArg = 0;
+          foreach ($matches[0] as $match) {
+              $iLength = $match[1] - $iStart;
+              $executableQueryString .= substr($convertedQueryString, $iStart, $iLength) . $args[$iArg++];
+              $iStart = $iStart + $iLength + 1;
+          }
+          $executableQueryString .= substr($convertedQueryString, $iStart);
+        }
       }
       else {
         // Transform the $args to positional.
@@ -101,13 +116,25 @@ class Statement extends StatementBase {
 
       // In mysqli, the results of the statement execution are returned in a
       // different object than the statement itself.
-      $return = $this->getClientStatement()->execute($args);
-      $this->result = new Result(
-        $this->fetchMode,
-        $this->fetchOptions,
-        $this->getClientStatement()->get_result(),
-        $this->clientConnection,
-      );
+      if ($this->connection->getConnectionOptions()['use_prepared_statements']) {
+        $return = $this->getClientStatement()->execute($args);
+        $this->result = new Result(
+          $this->fetchMode,
+          $this->fetchOptions,
+          $this->getClientStatement()->get_result(),
+          $this->clientConnection,
+        );
+      }
+      else {
+        $return = $this->clientConnection->query($executableQueryString);
+        $this->result = new Result(
+          $this->fetchMode,
+          $this->fetchOptions,
+          $return,
+          $this->clientConnection,
+        );
+        $return = (bool) $return;
+      }
       $this->markResultsetIterable($return);
     }
     catch (\Exception $e) {
