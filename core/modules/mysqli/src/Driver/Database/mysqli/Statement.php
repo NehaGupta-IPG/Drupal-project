@@ -125,7 +125,8 @@ class Statement extends StatementBase {
       }
       else {
         assert(isset($executableQueryString));
-        $result = $return = $this->clientConnection->query($executableQueryString);
+        $result = $this->clientConnection->query($executableQueryString);
+        $return = (bool) $result;
       }
       $this->result = new Result(
         $this->fetchMode,
@@ -142,7 +143,7 @@ class Statement extends StatementBase {
 
     $this->dispatchStatementExecutionEndEvent($startEvent);
 
-    return (bool) $return;
+    return $return;
   }
 
 }
