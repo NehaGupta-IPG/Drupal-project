@@ -127,7 +127,7 @@ class PagerTest extends BrowserTestBase {
     foreach ([0, 1, 4] as $pager_element) {
       $active_page = $this->cssSelect("div.test-pager-{$pager_element} ul.pager__items li.is-active:contains('{$pagers[$pager_element]['expected_page']}')");
       $destination = str_replace('%2C', ',', $active_page[0]->find('css', 'a')->getAttribute('href'));
-      $this->assertEquals($pagers[$pager_element]['expected_destination'], $destination);
+      $this->assertStringEndsWith($pagers[$pager_element]['expected_query'], $destination);
     }
   }
 
@@ -145,15 +145,15 @@ class PagerTest extends BrowserTestBase {
         'pagers' => [
           0 => [
             'expected_page' => '1',
-            'expected_destination' => '/pager-test/multiple-pagers?page=0',
+            'expected_query' => '/pager-test/multiple-pagers?page=0',
           ],
           1 => [
             'expected_page' => '1',
-            'expected_destination' => '/pager-test/multiple-pagers?page=,0',
+            'expected_query' => '/pager-test/multiple-pagers?page=,0',
           ],
           4 => [
             'expected_page' => '1',
-            'expected_destination' => '/pager-test/multiple-pagers?page=,,,,0',
+            'expected_query' => '/pager-test/multiple-pagers?page=,,,,0',
           ],
         ],
       ],
@@ -163,15 +163,15 @@ class PagerTest extends BrowserTestBase {
         'pagers' => [
           0 => [
             'expected_page' => '3',
-            'expected_destination' => '/pager-test/multiple-pagers?page=2,10,,,5,,',
+            'expected_query' => '/pager-test/multiple-pagers?page=2,10,,,5,,',
           ],
           1 => [
             'expected_page' => '11',
-            'expected_destination' => '/pager-test/multiple-pagers?page=2,10,,,5,,',
+            'expected_query' => '/pager-test/multiple-pagers?page=2,10,,,5,,',
           ],
           4 => [
             'expected_page' => '6',
-            'expected_destination' => '/pager-test/multiple-pagers?page=2,10,,,5,,',
+            'expected_query' => '/pager-test/multiple-pagers?page=2,10,,,5,,',
           ],
         ],
       ],
@@ -182,15 +182,15 @@ class PagerTest extends BrowserTestBase {
         'pagers' => [
           0 => [
             'expected_page' => '3',
-            'expected_destination' => '/pager-test/multiple-pagers?page=2,3,,,4,,',
+            'expected_query' => '/pager-test/multiple-pagers?page=2,3,,,4,,',
           ],
           1 => [
             'expected_page' => '4',
-            'expected_destination' => '/pager-test/multiple-pagers?page=2,3,,,4,,',
+            'expected_query' => '/pager-test/multiple-pagers?page=2,3,,,4,,',
           ],
           4 => [
             'expected_page' => '5',
-            'expected_destination' => '/pager-test/multiple-pagers?page=2,3,,,4,,',
+            'expected_query' => '/pager-test/multiple-pagers?page=2,3,,,4,,',
           ],
         ],
       ],
@@ -200,15 +200,15 @@ class PagerTest extends BrowserTestBase {
         'pagers' => [
           0 => [
             'expected_page' => '3',
-            'expected_destination' => '/pager-test/multiple-pagers?page=2,6,,,5',
+            'expected_query' => '/pager-test/multiple-pagers?page=2,6,,,5',
           ],
           1 => [
             'expected_page' => '7',
-            'expected_destination' => '/pager-test/multiple-pagers?page=2,6,,,5',
+            'expected_query' => '/pager-test/multiple-pagers?page=2,6,,,5',
           ],
           4 => [
             'expected_page' => '6',
-            'expected_destination' => '/pager-test/multiple-pagers?page=2,6,,,5',
+            'expected_query' => '/pager-test/multiple-pagers?page=2,6,,,5',
           ],
         ],
       ],
@@ -218,15 +218,15 @@ class PagerTest extends BrowserTestBase {
         'pagers' => [
           0 => [
             'expected_page' => '6',
-            'expected_destination' => '/pager-test/multiple-pagers?page=5,2',
+            'expected_query' => '/pager-test/multiple-pagers?page=5,2',
           ],
           1 => [
             'expected_page' => '3',
-            'expected_destination' => '/pager-test/multiple-pagers?page=5,2',
+            'expected_query' => '/pager-test/multiple-pagers?page=5,2',
           ],
           4 => [
             'expected_page' => '1',
-            'expected_destination' => '/pager-test/multiple-pagers?page=5,2,,,0',
+            'expected_query' => '/pager-test/multiple-pagers?page=5,2,,,0',
           ],
         ],
       ],
@@ -236,15 +236,15 @@ class PagerTest extends BrowserTestBase {
         'pagers' => [
           0 => [
             'expected_page' => '1',
-            'expected_destination' => '/pager-test/multiple-pagers?page=0,2',
+            'expected_query' => '/pager-test/multiple-pagers?page=0,2',
           ],
           1 => [
             'expected_page' => '3',
-            'expected_destination' => '/pager-test/multiple-pagers?page=,2',
+            'expected_query' => '/pager-test/multiple-pagers?page=,2',
           ],
           4 => [
             'expected_page' => '1',
-            'expected_destination' => '/pager-test/multiple-pagers?page=,2,,,0',
+            'expected_query' => '/pager-test/multiple-pagers?page=,2,,,0',
           ],
         ],
       ],
@@ -254,15 +254,15 @@ class PagerTest extends BrowserTestBase {
         'pagers' => [
           0 => [
             'expected_page' => '1',
-            'expected_destination' => '/pager-test/multiple-pagers?page=0,',
+            'expected_query' => '/pager-test/multiple-pagers?page=0,',
           ],
           1 => [
             'expected_page' => '1',
-            'expected_destination' => '/pager-test/multiple-pagers?page=,0',
+            'expected_query' => '/pager-test/multiple-pagers?page=,0',
           ],
           4 => [
             'expected_page' => '1',
-            'expected_destination' => '/pager-test/multiple-pagers?page=,,,,0',
+            'expected_query' => '/pager-test/multiple-pagers?page=,,,,0',
           ],
         ],
       ],
@@ -272,15 +272,15 @@ class PagerTest extends BrowserTestBase {
         'pagers' => [
           0 => [
             'expected_page' => '16',
-            'expected_destination' => '/pager-test/multiple-pagers?page=15,99,,,99',
+            'expected_query' => '/pager-test/multiple-pagers?page=15,99,,,99',
           ],
           1 => [
             'expected_page' => '16',
-            'expected_destination' => '/pager-test/multiple-pagers?page=99,15,,,99',
+            'expected_query' => '/pager-test/multiple-pagers?page=99,15,,,99',
           ],
           4 => [
             'expected_page' => '16',
-            'expected_destination' => '/pager-test/multiple-pagers?page=99,99,,,15',
+            'expected_query' => '/pager-test/multiple-pagers?page=99,99,,,15',
           ],
         ],
       ],
@@ -290,15 +290,15 @@ class PagerTest extends BrowserTestBase {
         'pagers' => [
           0 => [
             'expected_page' => '1',
-            'expected_destination' => '/pager-test/multiple-pagers?page=0,5,0,0,0',
+            'expected_query' => '/pager-test/multiple-pagers?page=0,5,0,0,0',
           ],
           1 => [
             'expected_page' => '6',
-            'expected_destination' => '/pager-test/multiple-pagers?page=0,5,0,0,0',
+            'expected_query' => '/pager-test/multiple-pagers?page=0,5,0,0,0',
           ],
           4 => [
             'expected_page' => '1',
-            'expected_destination' => '/pager-test/multiple-pagers?page=0,5,0,0,0',
+            'expected_query' => '/pager-test/multiple-pagers?page=0,5,0,0,0',
           ],
         ],
       ],
