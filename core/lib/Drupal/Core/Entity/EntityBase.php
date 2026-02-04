@@ -388,6 +388,8 @@ abstract class EntityBase implements EntityInterface {
     // Reset the entity ID and indicate that this is a new entity.
     $duplicate->{$entity_type->getKey('id')} = NULL;
     $duplicate->enforceIsNew();
+    // The duplicate hence also needs its own typed data object.
+    $duplicate->typedData = NULL;
 
     // Check if the entity type supports UUIDs and generate a new one if so.
     if ($entity_type->hasKey('uuid')) {
