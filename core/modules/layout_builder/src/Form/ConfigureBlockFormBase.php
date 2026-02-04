@@ -311,7 +311,7 @@ abstract class ConfigureBlockFormBase extends FormBase implements BaseFormIdInte
       $form['#sorted'] = FALSE;
       $response = new AjaxResponse();
       $response->addCommand(new ReplaceCommand('[data-drupal-selector="' . $form['#attributes']['data-drupal-selector'] . '"]', $form));
-      $response->addCommand(new ScrollTopCommand('#drupal-off-canvas'));
+      $response->addCommand(new LayoutBuilderScrollTopCommand('#drupal-off-canvas'));
     }
     else {
       $response = $this->successfulAjaxSubmit($form, $form_state);
