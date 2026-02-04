@@ -238,7 +238,7 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
    * Marks revision translations as outdated.
    *
    * @param \Drupal\Core\Entity\EntityInterface $translation
-   *   The entity translation making the other translations outdated.
+   *   The entity translation marking the other translations outdated.
    */
   protected function markRevisionTranslationsOutdated(EntityInterface $translation): void {
     /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
