@@ -322,7 +322,7 @@
           .find(`.${this.tableSettings[group][tableSetting].target}`)
           .eq(0);
         if (field.length && this.tableSettings[group][tableSetting].hidden) {
-          hidden = this.tableSettings[group][tableSetting].hidden;
+          ({ hidden } = this.tableSettings[group][tableSetting]);
           cell = field.closest('td');
           return true;
         }

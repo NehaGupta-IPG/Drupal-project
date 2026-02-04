@@ -102,7 +102,7 @@
     // to the edge of the viewport.
     placement -=
       window[`scroll${horizontal ? 'X' : 'Y'}`] ||
-      document.documentElement[`scroll${horizontal ? 'Left' : 'Top'}`] ||
+      documentElement[`scroll${horizontal ? 'Left' : 'Top'}`] ||
       0;
     // Find the displacement value according to the edge.
     switch (edge) {
