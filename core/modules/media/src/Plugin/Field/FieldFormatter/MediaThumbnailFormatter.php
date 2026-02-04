@@ -143,9 +143,23 @@ class MediaThumbnailFormatter extends ImageFormatter {
 
     /** @var \Drupal\media\MediaInterface[] $media_items */
     foreach ($media_items as $delta => $media) {
+      $thumbnail_item = $media->get('thumbnail')->first();
+
+      // Pre-load the thumbnail file entity, following ImageFormatterBase pattern.
+      // This ensures the entity property is populated before preprocessing.
+      if ($thumbnail_item && $thumbnail_item->target_id && !$thumbnail_item->_loaded) {
+        $file = \Drupal::entityTypeManager()
+          ->getStorage('file')
+          ->load($thumbnail_item->target_id);
+        if ($file) {
+          $thumbnail_item->entity = $file;
+          $thumbnail_item->_loaded = TRUE;
+        }
+      }
+
       $elements[$delta] = [
         '#theme' => 'image_formatter',
-        '#item' => $media->get('thumbnail')->first(),
+        '#item' => $thumbnail_item,
         '#attributes' => [
           'loading' => $this->getSetting('image_loading')['attribute'],
         ],
