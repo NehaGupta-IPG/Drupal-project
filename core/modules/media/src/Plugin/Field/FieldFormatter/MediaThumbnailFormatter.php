@@ -149,7 +149,7 @@ class MediaThumbnailFormatter extends ImageFormatter {
       // following ImageFormatterBase pattern.
       // This ensures the entity property is populated before preprocessing.
       if ($thumbnail_item && $thumbnail_item->target_id && !$thumbnail_item->_loaded) {
-        $file = \Drupal::entityTypeManager()
+        $file = $this->entityTypeManager
           ->getStorage('file')
           ->load($thumbnail_item->target_id);
         if ($file) {
