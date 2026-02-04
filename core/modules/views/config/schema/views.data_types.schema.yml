@@ -936,5 +936,5 @@ views_field_bulk_form:
       type: sequence
       label: 'Actions order'
       sequence:
-        type: machine_name
+        type: string
         label: 'Action'
