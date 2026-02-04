@@ -428,6 +428,8 @@ abstract class EntityBase implements EntityInterface {
    * {@inheritdoc}
    */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    // After saving, the statically cached (config) entity adapter is stale.
+    $this->typedData = NULL;
     $this->invalidateTagsOnSave($update);
   }
 
