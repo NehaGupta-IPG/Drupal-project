@@ -452,4 +452,19 @@
 
     return `<div class="layout-builder-block__content-preview-placeholder-label js-layout-builder-content-preview-placeholder-label">${contentPreviewPlaceholderText}</div>`;
   };
+
+  /**
+   * Layout Builder scroll to top ajax command.
+   *
+   * @param {Drupal.Ajax} [ajax]
+   *   A {@link Drupal.ajax} object.
+   * @param {object} response
+   *   Ajax response.
+   * @param {string} response.selector
+   *   Selector to use.
+   */
+  Drupal.AjaxCommands.prototype.lbScrollTop = (ajax, response) => {
+    $(response.selector).animate({ scrollTop: 0 }, 500);
+  };
+  
 })(jQuery, Drupal, Sortable);
