@@ -37,7 +37,7 @@ class NodeComplete extends NodeRevision {
     // Get any entity translation revision data.
     if ($this->getDatabase()->schema()
       ->tableExists('entity_translation_revision')) {
-      $query->leftJoin('entity_translation_revision', 'etr', '[nr].[nid] = [etr].[entity_id] AND [nr].[vid] = [etr].[revision_id]');
+      $query->leftJoin('entity_translation_revision', 'etr', '[nr].[nid] = [etr].[entity_id] AND [nr].[vid] = [etr].[revision_id] AND [etr].[entity_type] = :entity_type', [':entity_type' => 'node']);
       $query->fields('etr', [
         'entity_type',
         'entity_id',
@@ -45,10 +45,6 @@ class NodeComplete extends NodeRevision {
         'source',
         'translate',
       ]);
-      $conditions = $query->orConditionGroup();
-      $conditions->condition('etr.entity_type', 'node');
-      $conditions->isNull('etr.entity_type');
-      $query->condition($conditions);
       $query->addExpression("COALESCE([etr].[language], [n].[language])", 'language');
       $query->addField('etr', 'uid', 'etr_uid');
       $query->addField('etr', 'status', 'etr_status');
