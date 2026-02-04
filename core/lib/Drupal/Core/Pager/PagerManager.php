@@ -90,7 +90,8 @@ class PagerManager implements PagerManagerInterface {
     // For a single link within a pager, update its link whilst
     // remembering the current index of other pagers.
     $page_query = $this->requestStack->getCurrentRequest()->query->get('page');
-    if ($page_query) {
+    // Do not interpret an existing first pager index of 0 to be empty.
+    if ($page_query || $page_query === '0') {
       $pagers_indexes = explode(',', $page_query);
     }
     else {
