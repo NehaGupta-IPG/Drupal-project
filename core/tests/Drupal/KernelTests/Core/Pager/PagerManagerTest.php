@@ -50,6 +50,22 @@ class PagerManagerTest extends KernelTestBase {
   }
 
   /**
+   * Provides test cases for PagerManagerTest::testGetUpdatedParameters().
+   *
+   * @return array
+   *   An array of test cases, with an existing page parameter set.
+   */
+  public static function providerTestGetUpdatedParameters() {
+    return [
+      'no_existing_page_parameter' => [2, 5, '', ',,5'],
+      'existing_first_page_parameter' => [2, 5, '0', '0,,5'],
+      'existing_non_first_page_parameter' => [2, 5, ',1', ',1,5'],
+      'page_parameter_with_id_less_than_max_pager_id' => [2, 5, ',7', ',7,5'],
+      'page_parameter_with_id_greater_than_max_pager_id' => [2, 5, ',,,9', ',,5,9'],
+    ];
+  }
+
+  /**
    * Tests find page.
    */
   public function testFindPage(): void {
@@ -78,21 +94,6 @@ class PagerManagerTest extends KernelTestBase {
     }
 
     $this->assertEquals($expected_max_element_id, $pager_manager->getMaxPagerElementId());
-  }
-
-  /**
-   * Provides test cases for PagerManagerTest::testGetUpdatedParameters().
-   *
-   * @return array
-   *   An array of test cases, with an existing page parameter set.
-   */
-  public static function providerTestGetUpdatedParameters() {
-    return [
-      'no_existing_page_parameter' => [2, 5, '', ',,5'],
-      'single_existing_page_parameter' => [2, 5, '0', '0,,5'],
-      'page_parameter_with_id_less_than_max_pager_id' => [2, 5, ',7', ',7,5'],
-      'page_parameter_with_id_greater_than_max_pager_id' => [2, 5, ',,,9', ',,5,9'],
-    ];
   }
 
   /**
