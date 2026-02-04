@@ -21,8 +21,6 @@ class PathParentCacheContextTest extends UnitTestCase {
 
   /**
    * Tests get context.
-   *
-   * @legacy-covers ::getContext
    */
   #[DataProvider('providerTestGetContext')]
   public function testGetContext($original_path, $context): void {
@@ -36,7 +34,7 @@ class PathParentCacheContextTest extends UnitTestCase {
   /**
    * Provides a list of paths and expected cache contexts.
    */
-  public static function providerTestGetContext() {
+  public static function providerTestGetContext(): array {
     return [
       ['/some/path', 'some'],
       ['/some/other-path', 'some'],

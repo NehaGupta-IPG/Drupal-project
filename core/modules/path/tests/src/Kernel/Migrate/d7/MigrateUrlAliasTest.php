@@ -5,18 +5,19 @@ declare(strict_types=1);
 namespace Drupal\Tests\path\Kernel\Migrate\d7;
 
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests URL alias migration.
  */
 #[Group('path')]
+#[RunTestsInSeparateProcesses]
 class MigrateUrlAliasTest extends MigrateUrlAliasTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'path_alias',
     'content_translation',
   ];
 

@@ -8,12 +8,16 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\KernelTests\Core\Config\ConfigEntityValidationTestBase;
 use Drupal\views\Entity\View;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Tests validation of view entities.
  */
 #[Group('views')]
+#[Group('config')]
+#[Group('Validation')]
+#[RunTestsInSeparateProcesses]
 class ViewValidationTest extends ConfigEntityValidationTestBase {
 
   /**

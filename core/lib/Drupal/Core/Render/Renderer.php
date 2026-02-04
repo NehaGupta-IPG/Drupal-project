@@ -16,6 +16,7 @@ use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Security\DoTrustedCallbackTrait;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Utility\CallableResolver;
+use Drupal\Core\Utility\FiberResumeType;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -284,6 +285,12 @@ class Renderer implements RendererInterface {
 
     // Early-return nothing if user does not have access.
     if (isset($elements['#access'])) {
+      if (!is_bool($elements['#access']) && !($elements['#access'] instanceof AccessResultInterface)) {
+        @trigger_error(
+          'Using a #access value other than a boolean or an AccessResultInterface object is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3549344',
+          E_USER_DEPRECATED
+        );
+      }
       // If #access is an AccessResultInterface object, we must apply its
       // cacheability metadata to the render array.
       if ($elements['#access'] instanceof AccessResultInterface) {
@@ -478,16 +485,14 @@ class Renderer implements RendererInterface {
     // Assume that if #theme is set it represents an implemented hook.
     $theme_is_implemented = isset($elements['#theme']);
     // Check the elements for insecure HTML and pass through sanitization.
-    if (isset($elements)) {
-      $markup_keys = [
-        '#description',
-        '#field_prefix',
-        '#field_suffix',
-      ];
-      foreach ($markup_keys as $key) {
-        if (!empty($elements[$key]) && is_scalar($elements[$key])) {
-          $elements[$key] = $this->xssFilterAdminIfUnsafe($elements[$key]);
-        }
+    $markup_keys = [
+      '#description',
+      '#field_prefix',
+      '#field_suffix',
+    ];
+    foreach ($markup_keys as $key) {
+      if (!empty($elements[$key]) && is_scalar($elements[$key])) {
+        $elements[$key] = $this->xssFilterAdminIfUnsafe($elements[$key]);
       }
     }
 
@@ -632,6 +637,7 @@ class Renderer implements RendererInterface {
 
     $fiber = new \Fiber(static fn () => $callable());
     $fiber->start();
+    $resume_type = NULL;
     while (!$fiber->isTerminated()) {
       if ($fiber->isSuspended()) {
         // When ::executeInRenderContext() is executed within a Fiber, which is
@@ -644,12 +650,12 @@ class Renderer implements RendererInterface {
           \Fiber::suspend();
           $this->setCurrentRenderContext($context);
         }
-        $fiber->resume();
+        $resume_type = $fiber->resume();
       }
-      if (!$fiber->isTerminated()) {
-        // If we've reached this point, then the fiber has already been started
-        // and resumed at least once, so may be suspending repeatedly. Avoid
-        // a spin-lock by waiting for 0.5ms prior to continuing the while loop.
+      // If the fiber has been suspended and has not signaled that it can be
+      // immediately resumed, assume that the fiber is waiting on an async
+      // operation and wait a bit.
+      if (!$fiber->isTerminated() && $resume_type !== FiberResumeType::Immediate) {
         usleep(500);
       }
     }

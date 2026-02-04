@@ -7,14 +7,16 @@ namespace Drupal\Tests\layout_builder\Kernel;
 use Drupal\layout_builder\Section;
 use Drupal\layout_builder\SectionListInterface;
 use Drupal\layout_builder\SectionListTrait;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\layout_builder\SectionListTrait.
  */
-#[CoversClass(SectionListTrait::class)]
+#[CoversTrait(SectionListTrait::class)]
 #[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class SectionListTraitTest extends SectionListTestBase {
 
   /**
@@ -26,8 +28,6 @@ class SectionListTraitTest extends SectionListTestBase {
 
   /**
    * Tests add blank section.
-   *
-   * @legacy-covers ::addBlankSection
    */
   public function testAddBlankSection(): void {
     $this->expectException(\Exception::class);

@@ -20,6 +20,8 @@ use Prophecy\Prophecy\ObjectProphecy;
 
 /**
  * Tests the ProcessField migrate process plugin.
+ *
+ * @phpstan-ignore classConstant.deprecatedClass
  */
 #[CoversClass(ProcessField::class)]
 #[Group('field')]
@@ -89,8 +91,6 @@ class ProcessFieldTest extends MigrateTestCase {
    *   The MigrateException message to expect.
    * @param bool $plugin_not_found
    *   Whether the field plugin is not found.
-   *
-   * @legacy-covers ::transform
    */
   #[DataProvider('providerTestTransform')]
   public function testTransform($method, $value, $expected_value, $migrate_exception = '', $plugin_not_found = FALSE): void {

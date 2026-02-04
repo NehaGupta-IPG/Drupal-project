@@ -13,12 +13,14 @@ use Drupal\migrate\Plugin\RequirementsInterface;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the migration plugin manager.
  */
 #[CoversClass(MigratePluginManager::class)]
 #[Group('migrate')]
+#[RunTestsInSeparateProcesses]
 class MigrationPluginListTest extends KernelTestBase {
 
   use EntityReferenceFieldCreationTrait;
@@ -69,8 +71,6 @@ class MigrationPluginListTest extends KernelTestBase {
 
   /**
    * Tests get definitions.
-   *
-   * @legacy-covers ::getDefinitions
    */
   public function testGetDefinitions(): void {
     // Create an entity reference field to make sure that migrations derived by
