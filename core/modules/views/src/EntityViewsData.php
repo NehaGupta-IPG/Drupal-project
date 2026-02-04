@@ -380,10 +380,12 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
           ];
         }
       }
+    }
 
-      // Declare computed base fields.
-      // @todo Also declare computed bundle fields. See
-      //   https://www.drupal.org/project/drupal/issues/3404369.
+    // Declare computed base fields.
+    // @todo Also declare computed bundle fields. See
+    //   https://www.drupal.org/project/drupal/issues/3404369.
+    foreach ($field_definitions as $field_definition) {
       if ($field_definition->isComputed() && !$field_definition->isInternal()) {
         $views_field = [];
         $views_field['title'] = $field_definition->getLabel();
