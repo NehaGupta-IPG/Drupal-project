@@ -5,6 +5,8 @@ namespace Drupal\layout_builder\Form;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Ajax\AjaxFormHelperTrait;
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Form\BaseFormIdInterface;
@@ -17,6 +19,7 @@ use Drupal\Core\Plugin\ContextAwarePluginAssignmentTrait;
 use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\Core\Plugin\PluginFormFactoryInterface;
 use Drupal\Core\Plugin\PluginWithFormsInterface;
+use Drupal\layout_builder\Ajax\LayoutBuilderScrollTopCommand;
 use Drupal\layout_builder\Context\LayoutBuilderContextTrait;
 use Drupal\layout_builder\Controller\LayoutRebuildTrait;
 use Drupal\layout_builder\LayoutTempstoreRepositoryInterface;
@@ -286,5 +289,35 @@ abstract class ConfigureBlockFormBase extends FormBase implements BaseFormIdInte
   public function getCurrentComponent() {
     return $this->getCurrentSection()->getComponent($this->uuid);
   }
+
+  /**
+   * Overrides the AjaxFormHelperTrait::ajaxSubmit.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   *
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   *   An AJAX response that display validation error messages or represents a
+   *   successful submission.
+   */
+  public function ajaxSubmit(array &$form, FormStateInterface $form_state) {
+    if ($form_state->hasAnyErrors()) {
+      $form['status_messages'] = [
+        '#type' => 'status_messages',
+        '#weight' => -1000,
+      ];
+      $form['#sorted'] = FALSE;
+      $response = new AjaxResponse();
+      $response->addCommand(new ReplaceCommand('[data-drupal-selector="' . $form['#attributes']['data-drupal-selector'] . '"]', $form));
+      $response->addCommand(new ScrollTopCommand('#drupal-off-canvas'));
+    }
+    else {
+      $response = $this->successfulAjaxSubmit($form, $form_state);
+    }
+    return $response;
+  }
+
 
 }
