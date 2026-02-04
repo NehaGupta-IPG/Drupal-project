@@ -121,24 +121,18 @@ class Statement extends StatementBase {
       // different object than the statement itself.
       if ($this->connection->getConnectionOptions()['use_prepared_statements']) {
         $return = $this->getClientStatement()->execute($args);
-        $this->result = new Result(
-          $this->fetchMode,
-          $this->fetchOptions,
-          $this->getClientStatement()->get_result(),
-          $this->clientConnection,
-        );
+        $result = $this->getClientStatement()->get_result();
       }
       else {
         assert(isset($executableQueryString));
-        $return = $this->clientConnection->query($executableQueryString);
-        $this->result = new Result(
-          $this->fetchMode,
-          $this->fetchOptions,
-          $return,
-          $this->clientConnection,
-        );
-        $return = (bool) $return;
+        $result = $return = $this->clientConnection->query($executableQueryString);
       }
+      $this->result = new Result(
+        $this->fetchMode,
+        $this->fetchOptions,
+        $result,
+        $this->clientConnection,
+      );
       $this->markResultsetIterable($return);
     }
     catch (\Exception $e) {
@@ -148,7 +142,7 @@ class Statement extends StatementBase {
 
     $this->dispatchStatementExecutionEndEvent($startEvent);
 
-    return $return;
+    return (bool) $return;
   }
 
 }
