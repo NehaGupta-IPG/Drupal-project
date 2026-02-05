@@ -63,6 +63,14 @@
    * @fires event:dialogContentResize
    */
   function resetSize(event) {
+    if (!event?.data?.settings || !event?.data?.$element) {
+      return;
+    }
+    const $element = event.data.$element;
+    const settings = event.data.settings;
+    if (!$element.length || !document.contains($element[0])) {
+      return;
+    }
     const positionOptions = [
       'width',
       'height',
@@ -79,12 +87,12 @@
     let adjustedValue;
     for (let n = 0; n < positionOptions.length; n++) {
       option = positionOptions[n];
-      optionValue = event.data.settings[option];
+      optionValue = settings[option];
       if (optionValue) {
         // jQuery UI does not support percentages on heights, convert to pixels.
         if (
           typeof optionValue === 'string' &&
-          /%$/.test(optionValue) &&
+          optionValue.endsWith('%') &&
           /height/i.test(option)
         ) {
           // Take offsets in account.
@@ -96,7 +104,8 @@
           // Don't force the dialog to be bigger vertically than needed.
           if (
             option === 'height' &&
-            event.data.$element.parent().outerHeight() < adjustedValue
+            Math.round($element.parent().outerHeight()) <
+              adjustedValue
           ) {
             adjustedValue = 'auto';
           }
@@ -105,36 +114,74 @@
       }
     }
     // Offset the dialog center to be at the center of Drupal.displace.offsets.
-    if (!event.data.settings.modal) {
+    if (!settings.modal) {
       adjustedOptions = resetPosition(adjustedOptions);
     }
-    event.data.$element
-      .dialog('option', adjustedOptions)
-      .trigger('dialogContentResize');
+    $element.dialog('option', adjustedOptions);
+
+    $element
+      ?.get(0)
+      ?.dispatchEvent(
+        new CustomEvent('dialogContentResize', { bubbles: true }),
+      );
   }
 
-  $(window).on({
-    'dialog:aftercreate': function (event, dialog, $element, settings) {
-      const autoResize = debounce(resetSize, 20);
-      const eventData = { settings, $element };
-      if (settings.autoResize === true || settings.autoResize === 'true') {
-        const uiDialog = $element
-          .dialog('option', { resizable: false, draggable: false })
-          .dialog('widget');
-        uiDialog[0].style.position = 'fixed';
-        $(window)
-          .on('resize.dialogResize scroll.dialogResize', eventData, autoResize)
-          .trigger('resize.dialogResize');
-        $(document).on(
-          'drupalViewportOffsetChange.dialogResize',
-          eventData,
-          autoResize,
-        );
+  window.addEventListener('dialog:aftercreate', (e) => {
+    const autoResize = debounce(resetSize, 20);
+    const $element = $(e.target);
+    const { settings } = e;
+    const eventData = { settings, $element };
+
+    if (settings.autoResize === true || settings.autoResize === 'true') {
+      const uiDialog = $element
+        .dialog('option', { resizable: false, draggable: false })
+        .dialog('widget');
+      uiDialog[0].style.position = 'fixed';
+      $(window)
+        .on('resize.dialogResize scroll.dialogResize', eventData, autoResize)
+        .trigger('resize.dialogResize');
+      $(document).on(
+        'drupalViewportOffsetChange.dialogResize',
+        eventData,
+        autoResize,
+      );
+      // Defer reposition so modal centers correctly with AJAX content.
+      const deferredReposition = () => {
+        if (!$element.length || !document.contains($element[0])) {
+          return;
+        }
+        $(window).trigger('resize.dialogResize');
+      };
+      if (typeof requestAnimationFrame !== 'undefined') {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(deferredReposition);
+        });
       }
-    },
-    'dialog:beforeclose': function (event, dialog, $element) {
-      $(window).off('.dialogResize');
-      $(document).off('.dialogResize');
-    },
+      setTimeout(deferredReposition, 150);
+
+      // Reposition when dialog content changes (e.g. AJAX insert).
+      const contentNode = $element[0];
+      const resizeOnContentChange = () => {
+        deferredReposition();
+      };
+      const positionObserver = new MutationObserver(
+        debounce(resizeOnContentChange, 50),
+      );
+      positionObserver.observe(contentNode, {
+        childList: true,
+        subtree: true,
+      });
+      contentNode._dialogPositionObserver = positionObserver;
+    }
+  });
+
+  window.addEventListener('dialog:beforeclose', (e) => {
+    const dialogElement = e.target;
+    if (dialogElement._dialogPositionObserver) {
+      dialogElement._dialogPositionObserver.disconnect();
+      delete dialogElement._dialogPositionObserver;
+    }
+    $(window).off('.dialogResize');
+    $(document).off('.dialogResize');
   });
 })(jQuery, Drupal, drupalSettings, Drupal.debounce, Drupal.displace);
