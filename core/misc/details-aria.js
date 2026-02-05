@@ -4,7 +4,6 @@
  */
 
 (function ($, Drupal) {
-
   /**
    * Handles `aria-expanded` and `aria-pressed` attributes on details elements.
    *
@@ -30,5 +29,4 @@
       );
     },
   };
-
 })(jQuery, Drupal);
