@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\FunctionalJavascriptTests\Theme;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
@@ -7,12 +9,14 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\media_library\FunctionalJavascript\MediaLibraryTestBase;
 use Drupal\Tests\TestFileCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that buttons in modals are not in their button pane.
- *
- * @group claro
  */
+#[Group('claro')]
+#[RunTestsInSeparateProcesses]
 class ClaroModalDisplayTest extends MediaLibraryTestBase {
 
   use TestFileCreationTrait;
@@ -25,7 +29,7 @@ class ClaroModalDisplayTest extends MediaLibraryTestBase {
   /**
    * Tests the position f "add another" button in dialogs.
    */
-  public function testModalAddAnother() {
+  public function testModalAddAnother(): void {
 
     // Add unlimited field to the media type four.
     $unlimited_field_storage = FieldStorageConfig::create([

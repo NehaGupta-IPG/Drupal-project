@@ -1,24 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel\EntityReference;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Logger\RfcLogLevel;
+use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
-use Drupal\node\Entity\NodeType;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\node\Entity\NodeType;
 use Drupal\taxonomy\Entity\Vocabulary;
-use Drupal\Tests\field\Traits\EntityReferenceTestTrait;
+use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\ErrorHandler\BufferingLogger;
 
 /**
  * Tests entity reference field settings.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class EntityReferenceSettingsTest extends KernelTestBase {
 
-  use EntityReferenceTestTrait;
+  use EntityReferenceFieldCreationTrait;
 
   /**
    * {@inheritdoc}
@@ -30,7 +35,6 @@ class EntityReferenceSettingsTest extends KernelTestBase {
     'user',
     'text',
     'entity_test',
-    'system',
   ];
 
   /**
@@ -79,7 +83,7 @@ class EntityReferenceSettingsTest extends KernelTestBase {
 
     // Create a custom bundle.
     $this->customBundle = 'test_bundle_' . $this->randomMachineName();
-    entity_test_create_bundle($this->customBundle, NULL, 'entity_test');
+    EntityTestHelper::createBundle($this->customBundle, NULL, 'entity_test');
 
     // Prepare the logger for collecting the expected critical error.
     $this->container->get($this->testLogServiceName)->cleanLogs();
@@ -88,7 +92,7 @@ class EntityReferenceSettingsTest extends KernelTestBase {
   /**
    * Tests that config bundle deletions are mirrored in field config settings.
    */
-  public function testConfigTargetBundleDeletion() {
+  public function testConfigTargetBundleDeletion(): void {
     // Create two vocabularies.
     /** @var \Drupal\taxonomy\Entity\Vocabulary[] $vocabularies */
     $vocabularies = [];
@@ -148,7 +152,7 @@ class EntityReferenceSettingsTest extends KernelTestBase {
   /**
    * Tests that deletions of custom bundles are mirrored in field settings.
    */
-  public function testCustomTargetBundleDeletion() {
+  public function testCustomTargetBundleDeletion(): void {
     // Attach an entity reference field to $this->nodeType.
     $name = $this->randomMachineName();
     $label = $this->randomString();
@@ -161,7 +165,7 @@ class EntityReferenceSettingsTest extends KernelTestBase {
     $this->assertEquals($handler_settings, $actual_handler_settings);
 
     // Delete the custom bundle.
-    entity_test_delete_bundle($this->customBundle, 'entity_test');
+    EntityTestHelper::deleteBundle($this->customBundle, 'entity_test');
 
     // Ensure that field_field_config_presave() logs the expected critical
     // error.
@@ -182,7 +186,7 @@ class EntityReferenceSettingsTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
     $container
       ->register($this->testLogServiceName, BufferingLogger::class)

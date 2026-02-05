@@ -44,8 +44,7 @@
          */
         const toggleBlockEntry = (index, link) => {
           const $link = $(link);
-          const textMatch =
-            link.textContent.toLowerCase().indexOf(query) !== -1;
+          const textMatch = link.textContent.toLowerCase().includes(query);
           // Checks if a category is currently hidden.
           // Toggles the category on if so.
           if (
@@ -160,18 +159,16 @@
   behaviors.layoutBuilderBlockDrag = {
     attach(context) {
       const regionSelector = '.js-layout-builder-region';
-      Array.prototype.forEach.call(
-        context.querySelectorAll(regionSelector),
-        (region) => {
-          Sortable.create(region, {
-            draggable: '.js-layout-builder-block',
-            ghostClass: 'ui-state-drop',
-            group: 'builder-region',
-            onEnd: (event) =>
-              Drupal.layoutBuilderBlockUpdate(event.item, event.from, event.to),
-          });
-        },
-      );
+      context.querySelectorAll(regionSelector).forEach((region) => {
+        Sortable.create(region, {
+          draggable: '.js-layout-builder-block',
+          ghostClass: 'ui-state-drop',
+          group: 'builder-region',
+          filter: '.contextual',
+          onEnd: (event) =>
+            Drupal.layoutBuilderBlockUpdate(event.item, event.from, event.to),
+        });
+      });
     },
   };
 
@@ -219,7 +216,8 @@
   };
 
   // After a dialog opens, highlight element that the dialog is acting on.
-  $(window).on('dialog:aftercreate', (event, dialog, $element) => {
+  window.addEventListener('dialog:aftercreate', (e) => {
+    const $element = $(e.target);
     if (Drupal.offCanvas.isOffCanvas($element)) {
       // Start by removing any existing highlighted elements.
       $('.is-layout-builder-highlighted').removeClass(
@@ -293,23 +291,18 @@
           const viewportMiddle = (viewportBottom + viewportTop) / 2;
           const scrollAmount = targetTop - viewportMiddle;
 
-          // Check whether the browser supports scrollBy(options). If it does
-          // not, use scrollBy(x-coord, y-coord) instead.
-          if ('scrollBehavior' in document.documentElement.style) {
-            window.scrollBy({
-              top: scrollAmount,
-              left: 0,
-              behavior: 'smooth',
-            });
-          } else {
-            window.scrollBy(0, scrollAmount);
-          }
+          window.scrollBy({
+            top: scrollAmount,
+            left: 0,
+            behavior: 'smooth',
+          });
         }
       }
     });
   }
 
-  $(window).on('dialog:afterclose', (event, dialog, $element) => {
+  window.addEventListener('dialog:afterclose', (e) => {
+    const $element = $(e.target);
     if (Drupal.offCanvas.isOffCanvas($element)) {
       // Remove the highlight from all elements.
       $('.is-layout-builder-highlighted').removeClass(
@@ -456,4 +449,13 @@
 
     return `<div class="layout-builder-block__content-preview-placeholder-label js-layout-builder-content-preview-placeholder-label">${contentPreviewPlaceholderText}</div>`;
   };
+
+  // Remove all contextual links outside the layout.
+  $(window).on('drupalContextualLinkAdded', (event, data) => {
+    const element = data.$el;
+    const contextualId = element.attr('data-contextual-id');
+    if (contextualId && !contextualId.startsWith('layout_builder_block:')) {
+      element.remove();
+    }
+  });
 })(jQuery, Drupal, Sortable);

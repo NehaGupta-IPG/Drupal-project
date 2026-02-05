@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\system\Kernel\Migrate\d6;
 
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Migrates various configuration objects owned by the System module.
- *
- * @group migrate_drupal_6
  */
+#[Group('migrate_drupal_6')]
+#[RunTestsInSeparateProcesses]
 class MigrateSystemConfigurationTest extends MigrateDrupal6TestBase {
 
   /**
@@ -16,29 +20,34 @@ class MigrateSystemConfigurationTest extends MigrateDrupal6TestBase {
    */
   protected static $modules = ['file', 'system'];
 
+  /**
+   * The expected configuration after migration.
+   *
+   * @var array
+   */
   protected $expectedConfig = [
     'system.cron' => [
       'threshold' => [
         'requirements_warning' => 172800,
         'requirements_error' => 1209600,
       ],
-      // logging is not handled by the migration.
-      'logging' => 1,
+      // Logging is not handled by the migration.
+      'logging' => TRUE,
     ],
     'system.date' => [
       'first_day' => 4,
-      // country is not handled by the migration.
+      // Country is not handled by the migration.
       'country' => [
-        'default' => '',
+        'default' => NULL,
       ],
-      // timezone is not handled by the migration.
+      // Timezone is not handled by the migration.
       'timezone' => [
         'default' => 'Europe/Paris',
         'user' => [
           'configurable' => FALSE,
-          // default is not handled by the migration.
+          // Default is not handled by the migration.
           'default' => 0,
-          // warn is not handled by the migration.
+          // Warn is not handled by the migration.
           'warn' => FALSE,
         ],
       ],
@@ -60,7 +69,7 @@ class MigrateSystemConfigurationTest extends MigrateDrupal6TestBase {
       'error_level' => 'some',
     ],
     'system.maintenance' => [
-      // langcode is not handled by the migration.
+      // Langcode is not handled by the migration.
       'langcode' => 'en',
       'message' => 'Drupal is currently under maintenance. We should be back shortly. Thank you for your patience.',
     ],
@@ -72,7 +81,7 @@ class MigrateSystemConfigurationTest extends MigrateDrupal6TestBase {
       ],
       'css' => [
         'preprocess' => FALSE,
-        // gzip is not handled by the migration.
+        // Gzip is not handled by the migration.
         'gzip' => TRUE,
       ],
       // fast_404 is not handled by the migration.
@@ -84,19 +93,14 @@ class MigrateSystemConfigurationTest extends MigrateDrupal6TestBase {
       ],
       'js' => [
         'preprocess' => FALSE,
-        // gzip is not handled by the migration.
+        // Gzip is not handled by the migration.
         'gzip' => TRUE,
       ],
     ],
-    'system.rss' => [
-      'items' => [
-        'view_mode' => 'title',
-      ],
-    ],
     'system.site' => [
-      // langcode and default_langcode are not handled by the migration.
+      // Neither langcode nor default_langcode are not handled by the migration.
       'langcode' => 'en',
-      // uuid is not handled by the migration.
+      // UUID is not handled by the migration.
       'uuid' => '',
       'name' => 'site_name',
       'mail' => 'site_mail@example.com',
@@ -109,6 +113,7 @@ class MigrateSystemConfigurationTest extends MigrateDrupal6TestBase {
       'admin_compact_mode' => FALSE,
       'weight_select_max' => 100,
       'default_langcode' => 'en',
+      'mail_notification' => NULL,
     ],
   ];
 
@@ -133,7 +138,6 @@ class MigrateSystemConfigurationTest extends MigrateDrupal6TestBase {
       'system_logging',
       'system_maintenance',
       'd6_system_performance',
-      'system_rss',
       'system_site',
     ];
     $this->executeMigrations($migrations);
@@ -142,7 +146,7 @@ class MigrateSystemConfigurationTest extends MigrateDrupal6TestBase {
   /**
    * Tests that all expected configuration gets migrated.
    */
-  public function testConfigurationMigration() {
+  public function testConfigurationMigration(): void {
     foreach ($this->expectedConfig as $config_id => $values) {
       $actual = \Drupal::config($config_id)->get();
       unset($actual['_core']);

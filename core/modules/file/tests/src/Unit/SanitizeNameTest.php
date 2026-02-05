@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\file\Unit;
 
 use Drupal\Component\Transliteration\PhpTransliteration;
@@ -9,14 +11,14 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\file\EventSubscriber\FileEventSubscriber;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 // cSpell:ignore TÉXT äöüåøhello aouaohello aeoeueaohello Pácê
-
 /**
  * Filename sanitization tests.
- *
- * @group file
  */
+#[Group('file')]
 class SanitizeNameTest extends UnitTestCase {
 
   /**
@@ -36,12 +38,11 @@ class SanitizeNameTest extends UnitTestCase {
    * @param string $language_id
    *   Optional language code for transliteration. Defaults to 'en'.
    *
-   * @dataProvider provideFilenames
-   *
-   * @covers \Drupal\file\EventSubscriber\FileEventSubscriber::sanitizeFilename
-   * @covers \Drupal\Core\File\Event\FileUploadSanitizeNameEvent::__construct
+   * @legacy-covers \Drupal\file\EventSubscriber\FileEventSubscriber::sanitizeFilename
+   * @legacy-covers \Drupal\Core\File\Event\FileUploadSanitizeNameEvent::__construct
    */
-  public function testFileNameTransliteration($original, $expected, array $options, $language_id = 'en') {
+  #[DataProvider('provideFilenames')]
+  public function testFileNameTransliteration($original, $expected, array $options, $language_id = 'en'): void {
     $sanitization_options = [
       'transliterate' => $options[0],
       'replacement_character' => $options[1],
@@ -74,7 +75,7 @@ class SanitizeNameTest extends UnitTestCase {
    * @return array
    *   Arrays with original name, expected name, and sanitization options.
    */
-  public function provideFilenames() {
+  public static function provideFilenames() {
     return [
       'Test default options' => [
         'TÉXT-œ.txt',

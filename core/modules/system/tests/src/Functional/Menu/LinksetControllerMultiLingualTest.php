@@ -5,20 +5,22 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Menu;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\language\Entity\ContentLanguageSettings;
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationSelected;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the behavior of the linkset controller in multilingual setup.
  *
- * @group decoupled_menus
- *
  * @see https://tools.ietf.org/html/draft-ietf-httpapi-linkset-00
  */
+#[Group('decoupled_menus')]
+#[RunTestsInSeparateProcesses]
 final class LinksetControllerMultiLingualTest extends LinksetControllerTestBase {
 
   /**
@@ -151,7 +153,7 @@ final class LinksetControllerMultiLingualTest extends LinksetControllerTestBase 
     ]);
     foreach (['aa', 'bb', 'cc'] as $language_code) {
       $multi_lingual_menu_item->addTranslation($language_code, [
-        'title' => $language_code . '|' . 'A multi-lingual-node',
+        'title' => $language_code . '|A multi-lingual-node',
       ]);
       $multi_lingual_menu_item->save();
     }
@@ -170,7 +172,7 @@ final class LinksetControllerMultiLingualTest extends LinksetControllerTestBase 
     ]);
     foreach (['aa', 'bb'] as $language_code) {
       $multi_lingual_menu_item->addTranslation($language_code, [
-        'title' => $language_code . '|' . 'Second multi-lingual-node',
+        'title' => $language_code . '|Second multi-lingual-node',
       ]);
       $multi_lingual_menu_item->save();
     }
@@ -189,7 +191,7 @@ final class LinksetControllerMultiLingualTest extends LinksetControllerTestBase 
     ]);
     foreach (['aa', 'bb'] as $language_code) {
       $multi_lingual_menu_item->addTranslation($language_code, [
-        'title' => $language_code . '|' . 'Third multi-lingual-node',
+        'title' => $language_code . '|Third multi-lingual-node',
       ]);
       $multi_lingual_menu_item->save();
     }
@@ -201,7 +203,7 @@ final class LinksetControllerMultiLingualTest extends LinksetControllerTestBase 
    *
    * @throws \Exception
    */
-  public function testBasicMultilingualFunctions() {
+  public function testBasicMultilingualFunctions(): void {
     foreach (['aa', 'bb', 'cc', 'dd'] as $language_code) {
       $expected_linkset = $this->getReferenceLinksetDataFromFile(__DIR__ . '/../../../fixtures/linkset/linkset-menu-main-multilingual-' . $language_code . '.json');
       $response = $this->doRequest('GET', Url::fromUri('base:/' . $language_code . '/system/menu/main/linkset'));
@@ -214,7 +216,7 @@ final class LinksetControllerMultiLingualTest extends LinksetControllerTestBase 
    *
    * @throws \Exception
    */
-  public function testDefaultMultilingualFunctions() {
+  public function testDefaultMultilingualFunctions(): void {
     $expected_linkset = $this->getReferenceLinksetDataFromFile(__DIR__ . '/../../../fixtures/linkset/linkset-menu-main-multilingual-default.json');
     $response = $this->doRequest('GET', Url::fromUri('base:/system/menu/main/linkset'));
     $this->assertSame($expected_linkset, Json::decode((string) $response->getBody()));
