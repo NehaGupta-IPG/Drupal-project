@@ -139,13 +139,7 @@ class HookCollectorPass implements CompilerPassInterface {
    * {@inheritdoc}
    */
   public function process(ContainerBuilder $container): void {
-    $module_list = $container->getParameter('container.modules');
-    $parameters = $container->getParameterBag()->all();
-    $skip_procedural_modules = array_filter(
-      array_keys($module_list),
-      static fn (string $module) => !empty($parameters["$module.skip_procedural_hook_scan"]),
-    );
-    $collector = static::collectAllHookImplementations($module_list, $skip_procedural_modules);
+    $collector = static::collectAllHookImplementations($container);
 
     $collector->writeToContainer($container);
   }
@@ -195,15 +189,6 @@ class HookCollectorPass implements CompilerPassInterface {
       'group_includes' => $groupIncludes,
       'packed_order_operations' => $packed_order_operations,
     ]);
-
-    // Remove converted flags, they are only needed while building the
-    // container.
-    $parameters = $container->getParameterBag();
-    foreach ($parameters->all() as $name => $value) {
-      if (str_ends_with($name, '.skip_procedural_hook_scan')) {
-        $parameters->remove($name);
-      }
-    }
   }
 
   /**
@@ -296,7 +281,7 @@ class HookCollectorPass implements CompilerPassInterface {
       }
       foreach ($moduleImplements as $module => $v) {
         if (is_string($hook) && str_starts_with($hook, 'preprocess_') && str_contains($hook, '__')) {
-          $this->preprocessForSuggestions[$module . '_' . $hook] = TRUE;
+          $this->preprocessForSuggestions[$module . '_' . $hook] = 'module';
         }
         foreach (array_keys($implementationsByHookOrig[$hook], $module, TRUE) as $identifier) {
           $implementationsByHook[$hook][$identifier] = $module;
@@ -329,7 +314,6 @@ class HookCollectorPass implements CompilerPassInterface {
         }
       }
       $operations_by_hook[$hook] = array_values($order_operations);
-
     }
     return $operations_by_hook;
   }
@@ -394,28 +378,26 @@ class HookCollectorPass implements CompilerPassInterface {
   /**
    * Collects all hook implementations.
    *
-   * @param array<string, array{pathname: string}> $module_list
-   *   An associative array. Keys are the module names, values are relevant
-   *   info yml file path.
-   * @param list<string> $skipProceduralModules
-   *   Module names that are known to not have procedural hook implementations.
+   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   *   The ContainerBuilder to get module parameters from.
    *
    * @return static
    *   A HookCollectorPass instance holding all hook implementations and
    *   include file information.
-   *
-   * @internal
-   *   This method is only used by ModuleHandler.
-   *
-   * @todo Pass only $container and make protected when ModuleHandler::add() is
-   *   removed in Drupal 12.0.0.
    */
-  public static function collectAllHookImplementations(array $module_list, array $skipProceduralModules = []): static {
+  protected static function collectAllHookImplementations(ContainerBuilder $container): static {
+    $module_list = $container->getParameter('container.modules');
+    $parameters = $container->getParameterBag()->all();
+    $skip_procedural_modules = array_filter(
+      array_keys($module_list),
+      static fn (string $module) => !empty($parameters["$module.skip_procedural_hook_scan"]),
+    );
+
     $modules = array_keys($module_list);
     $all_modules_preg = static::getModuleListPattern($modules);
     $collector = new static($modules);
     foreach ($module_list as $module => $info) {
-      $skip_procedural = in_array($module, $skipProceduralModules);
+      $skip_procedural = in_array($module, $skip_procedural_modules);
       $current_module_preg = static::getModuleListPattern([$module]);
       $collector->collectModuleHookImplementations(dirname($info['pathname']), $module, $current_module_preg, $all_modules_preg, $skip_procedural);
     }
@@ -460,7 +442,11 @@ class HookCollectorPass implements CompilerPassInterface {
    */
   protected function collectModuleHookImplementations($dir, $module, $current_module_preg, $all_modules_preg, bool $skip_procedural): void {
     $hook_file_cache = FileCacheFactory::get('hook_implementations');
-    $procedural_hook_file_cache = FileCacheFactory::get('procedural_hook_implementations:' . $all_modules_preg);
+    // List of modules must be included in the cache key to ensure rediscovery
+    // takes place when a new module is installed. Some modules define hooks
+    // on behalf of other modules and those hooks need to be found.
+    // Hash to prevent massive key sizes.
+    $procedural_hook_file_cache = FileCacheFactory::get('procedural_hook_implementations:' . hash('xxh3', $all_modules_preg));
 
     $iterator = new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS | \FilesystemIterator::FOLLOW_SYMLINKS);
     $iterator = new \RecursiveCallbackFilterIterator($iterator, static::filterIterator(...));
@@ -641,19 +627,6 @@ class HookCollectorPass implements CompilerPassInterface {
     $this->proceduralImplementations[$hook][] = $module;
     if ($fileinfo->getExtension() !== 'module') {
       $this->includes[$function] = $fileinfo->getPathname();
-    }
-  }
-
-  /**
-   * This method is only to be used by ModuleHandler.
-   *
-   * @todo Remove when ModuleHandler::add() is removed in Drupal 12.0.0.
-   *
-   * @internal
-   */
-  public function loadAllIncludes(): void {
-    foreach ($this->includes as $include) {
-      include_once $include;
     }
   }
 
