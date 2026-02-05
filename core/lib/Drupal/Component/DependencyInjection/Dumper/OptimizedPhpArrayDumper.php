@@ -207,6 +207,7 @@ class OptimizedPhpArrayDumper extends Dumper {
    */
   protected function getServiceDefinition(Definition $definition) {
     $service = [];
+
     if ($definition->getClass()) {
       $service['class'] = $definition->getClass();
     }
@@ -281,36 +282,20 @@ class OptimizedPhpArrayDumper extends Dumper {
    *
    * @param mixed $collection
    *   A collection to process.
-   * @param bool &$resolve
-   *   Used for passing the information to the caller whether the given
-   *   collection needed to be resolved or not. This is used for optimizing
-   *   deep arrays that don't need to be traversed.
    *
-   * @return object|array
+   * @return array
    *   The collection in a suitable format.
    */
-  protected function dumpCollection($collection, &$resolve = FALSE) {
+  protected function dumpCollection($collection) {
     $code = [];
 
     foreach ($collection as $key => $value) {
       if (is_array($value)) {
-        $resolve_collection = FALSE;
-        $code[$key] = $this->dumpCollection($value, $resolve_collection);
-
-        if ($resolve_collection) {
-          $resolve = TRUE;
-        }
+        $code[$key] = $this->dumpCollection($value);
       }
       else {
         $code[$key] = $this->dumpValue($value);
-        if (is_object($code[$key]) || $code[$key] !== $value) {
-          $resolve = TRUE;
-        }
       }
-    }
-
-    if (!$resolve) {
-      return $collection;
     }
 
     return $code;
