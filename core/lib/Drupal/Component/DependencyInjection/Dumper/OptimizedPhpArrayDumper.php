@@ -211,10 +211,6 @@ class OptimizedPhpArrayDumper extends Dumper {
       $service['class'] = $definition->getClass();
     }
 
-    if (!$definition->isPublic()) {
-      $service['public'] = FALSE;
-    }
-
     if ($definition->getFile()) {
       $service['file'] = $definition->getFile();
     }
@@ -223,17 +219,8 @@ class OptimizedPhpArrayDumper extends Dumper {
       $service['synthetic'] = TRUE;
     }
 
-    if ($definition->isLazy()) {
-      $service['lazy'] = TRUE;
-    }
-
     if ($definition->getArguments()) {
-      $arguments = $definition->getArguments();
-      $service['arguments'] = $this->dumpCollection($arguments);
-      $service['arguments_count'] = count($arguments);
-    }
-    else {
-      $service['arguments_count'] = 0;
+      $service['arguments'] = $this->dumpCollection($definition->getArguments());
     }
 
     if ($definition->getProperties()) {
@@ -344,7 +331,6 @@ class OptimizedPhpArrayDumper extends Dumper {
   protected function dumpCallable($callable) {
     if (is_array($callable)) {
       $callable[0] = $this->dumpValue($callable[0]);
-      $callable = [$callable[0], $callable[1]];
     }
 
     return $callable;
