@@ -104,8 +104,7 @@
           // Don't force the dialog to be bigger vertically than needed.
           if (
             option === 'height' &&
-            Math.round($element.parent().outerHeight()) <
-              adjustedValue
+            Math.round($element.parent().outerHeight()) < adjustedValue
           ) {
             adjustedValue = 'auto';
           }
