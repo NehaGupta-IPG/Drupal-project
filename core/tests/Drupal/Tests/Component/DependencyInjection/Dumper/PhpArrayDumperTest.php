@@ -50,11 +50,4 @@ class PhpArrayDumperTest extends OptimizedPhpArrayDumperTest {
     return '%' . $name . '%';
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected static function getCollection($collection, $resolve = TRUE) {
-    return $collection;
-  }
-
 }

@@ -170,11 +170,6 @@ class PhpArrayContainer extends Container {
 
           continue;
         }
-        elseif ($type == 'raw') {
-          $arguments[$key] = $argument->value;
-
-          continue;
-        }
         elseif ($type == 'iterator') {
           $services = $argument->value;
           $arguments[$key] = new RewindableGenerator(function () use ($services) {

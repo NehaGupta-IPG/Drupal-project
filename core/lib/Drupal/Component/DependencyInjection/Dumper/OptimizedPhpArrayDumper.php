@@ -303,7 +303,7 @@ class OptimizedPhpArrayDumper extends Dumper {
       }
       else {
         $code[$key] = $this->dumpValue($value);
-        if (is_object($code[$key])) {
+        if (is_object($code[$key]) || $code[$key] !== $value) {
           $resolve = TRUE;
         }
       }
@@ -313,10 +313,7 @@ class OptimizedPhpArrayDumper extends Dumper {
       return $collection;
     }
 
-    return (object) [
-      'type' => 'collection',
-      'value' => $code,
-    ];
+    return $code;
   }
 
   /**
@@ -399,16 +396,8 @@ class OptimizedPhpArrayDumper extends Dumper {
         return $this->getParameterCall($matches[1]);
       }
       else {
-        $replaceParameters = function ($matches) {
-          return $this->getParameterCall($matches[2]);
-        };
-
-        // We cannot directly return the string value because it would
-        // potentially not always be resolved in the dumpCollection() method.
-        return (object) [
-          'type' => 'raw',
-          'value' => str_replace('%%', '%', preg_replace_callback('/(?<!%)(%)([^%]+)\1/', $replaceParameters, $value)),
-        ];
+        // Unescape doubled percent signs back to single percents.
+        return str_replace('%%', '%', $value);
       }
     }
     elseif ($value instanceof Expression) {

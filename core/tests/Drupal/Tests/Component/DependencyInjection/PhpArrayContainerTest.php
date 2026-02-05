@@ -46,11 +46,4 @@ class PhpArrayContainerTest extends ContainerTest {
     return '%' . $name . '%';
   }
 
-  /**
-   * Helper function to return a machine-optimized '@notation'.
-   */
-  protected function getCollection($collection, $resolve = TRUE) {
-    return $collection;
-  }
-
 }

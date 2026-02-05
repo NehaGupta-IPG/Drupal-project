@@ -234,11 +234,7 @@ class Container implements ContainerInterface, ResetInterface {
 
     $arguments = [];
     if (isset($definition['arguments'])) {
-      $arguments = $definition['arguments'];
-
-      if ($arguments instanceof \stdClass) {
-        $arguments = $this->resolveServicesAndParameters($arguments);
-      }
+      $arguments = $this->resolveServicesAndParameters($definition['arguments']);
     }
 
     if (isset($definition['file'])) {
@@ -271,19 +267,14 @@ class Container implements ContainerInterface, ResetInterface {
         $method = $call[0];
         $arguments = [];
         if (!empty($call[1])) {
-          $arguments = $call[1];
-          if ($arguments instanceof \stdClass) {
-            $arguments = $this->resolveServicesAndParameters($arguments);
-          }
+          $arguments = $this->resolveServicesAndParameters($call[1]);
         }
         call_user_func_array([$service, $method], $arguments);
       }
     }
 
     if (isset($definition['properties'])) {
-      if ($definition['properties'] instanceof \stdClass) {
-        $definition['properties'] = $this->resolveServicesAndParameters($definition['properties']);
-      }
+      $definition['properties'] = $this->resolveServicesAndParameters($definition['properties']);
       foreach ($definition['properties'] as $key => $value) {
         $service->{$key} = $value;
       }
@@ -374,16 +365,12 @@ class Container implements ContainerInterface, ResetInterface {
    *   If an unknown type is met while resolving parameters and services.
    */
   protected function resolveServicesAndParameters($arguments) {
-    // Check if this collection needs to be resolved.
-    if ($arguments instanceof \stdClass) {
-      if ($arguments->type !== 'collection') {
-        throw new InvalidArgumentException(sprintf('Undefined type "%s" while resolving parameters and services.', $arguments->type));
-      }
-      $arguments = $arguments->value;
-    }
-
     // Process the arguments.
     foreach ($arguments as $key => $argument) {
+      if (is_array($argument)) {
+        $arguments[$key] = $this->resolveServicesAndParameters($argument);
+        continue;
+      }
       // For this machine-optimized format, only \stdClass arguments are
       // processed and resolved. All other values are kept as is.
       if ($argument instanceof \stdClass) {
@@ -465,18 +452,6 @@ class Container implements ContainerInterface, ResetInterface {
 
           continue;
         }
-        // Check for collection.
-        elseif ($type == 'collection') {
-          $arguments[$key] = $this->resolveServicesAndParameters($argument->value);
-
-          continue;
-        }
-        elseif ($type == 'raw') {
-          $arguments[$key] = $argument->value;
-
-          continue;
-        }
-
         if ($type !== NULL) {
           throw new InvalidArgumentException(sprintf('Undefined type "%s" while resolving parameters and services.', $type));
         }

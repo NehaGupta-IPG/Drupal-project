@@ -588,23 +588,6 @@ class ContainerTest extends TestCase {
   }
 
   /**
-   * Tests that invalid arguments throw an Exception.
-   *
-   * @legacy-covers ::get
-   * @legacy-covers ::createService
-   * @legacy-covers ::resolveServicesAndParameters
-   */
-  public function testResolveServicesAndParametersForInvalidArguments(): void {
-    // In case the machine-optimized format is not used, we need to simulate the
-    // test failure.
-    $this->expectException(InvalidArgumentException::class);
-    if (!$this->machineFormat) {
-      throw new InvalidArgumentException('Simulating the test failure.');
-    }
-    $this->container->get('invalid_arguments_service');
-  }
-
-  /**
    * Tests that a parameter that points to a service works correctly.
    *
    * @legacy-covers ::get
@@ -726,23 +709,23 @@ class ContainerTest extends TestCase {
     ];
     $services['service.provider'] = [
       'class' => '\Drupal\Tests\Component\DependencyInjection\MockService',
-      'arguments' => $this->getCollection([
+      'arguments' => [
         $this->getServiceCall('other.service'),
         $this->getParameterCall('some_config'),
-      ]),
-      'properties' => $this->getCollection(['someProperty' => 'foo']),
+      ],
+      'properties' => ['someProperty' => 'foo'],
       'calls' => [
         [
           'setContainer',
-          $this->getCollection([
+          [
             $this->getServiceCall('service_container'),
-          ]),
+          ],
         ],
         [
           'setOtherConfigParameter',
-          $this->getCollection([
+          [
             $this->getParameterCall('some_other_config'),
-          ]),
+          ],
         ],
       ],
       'priority' => 0,
@@ -751,26 +734,26 @@ class ContainerTest extends TestCase {
     // Test private services.
     $private_service = [
       'class' => '\Drupal\Tests\Component\DependencyInjection\MockService',
-      'arguments' => $this->getCollection([
+      'arguments' => [
         $this->getServiceCall('other.service'),
         $this->getParameterCall('some_private_config'),
-      ]),
+      ],
       'public' => FALSE,
     ];
 
     $services['service_using_private'] = [
       'class' => '\Drupal\Tests\Component\DependencyInjection\MockService',
-      'arguments' => $this->getCollection([
+      'arguments' => [
         $this->getPrivateServiceCall(NULL, $private_service),
         $this->getParameterCall('some_config'),
-      ]),
+      ],
     ];
     $services['another_service_using_private'] = [
       'class' => '\Drupal\Tests\Component\DependencyInjection\MockService',
-      'arguments' => $this->getCollection([
+      'arguments' => [
         $this->getPrivateServiceCall(NULL, $private_service),
         $this->getParameterCall('some_config'),
-      ]),
+      ],
     ];
 
     // Test shared private services.
@@ -778,64 +761,56 @@ class ContainerTest extends TestCase {
 
     $services['service_using_shared_private'] = [
       'class' => '\Drupal\Tests\Component\DependencyInjection\MockService',
-      'arguments' => $this->getCollection([
+      'arguments' => [
         $this->getPrivateServiceCall($id, $private_service, TRUE),
         $this->getParameterCall('some_config'),
-      ]),
+      ],
     ];
     $services['another_service_using_shared_private'] = [
       'class' => '\Drupal\Tests\Component\DependencyInjection\MockService',
-      'arguments' => $this->getCollection([
+      'arguments' => [
         $this->getPrivateServiceCall($id, $private_service, TRUE),
         $this->getParameterCall('some_config'),
-      ]),
+      ],
     ];
 
     // Tests service with invalid argument.
     $services['invalid_argument_service'] = [
       'class' => '\Drupal\Tests\Component\DependencyInjection\MockService',
-      'arguments' => $this->getCollection([
+      'arguments' => [
         // Test passing non-strings, too.
         1,
         (object) [
           'type' => 'invalid',
         ],
-      ]),
-    ];
-
-    $services['invalid_arguments_service'] = [
-      'class' => '\Drupal\Tests\Component\DependencyInjection\MockService',
-      'arguments' => (object) [
-        'type' => 'invalid',
       ],
     ];
 
     // Test service that needs deep-traversal.
     $services['service_using_array'] = [
       'class' => '\Drupal\Tests\Component\DependencyInjection\MockService',
-      'arguments' => $this->getCollection([
-        $this->getCollection([
+      'arguments' => [
+        [
           $this->getServiceCall('other.service'),
-        ]),
+        ],
         $this->getParameterCall('some_private_config'),
-      ]),
+      ],
     ];
 
     $services['service_with_optional_dependency'] = [
       'class' => '\Drupal\Tests\Component\DependencyInjection\MockService',
-      'arguments' => $this->getCollection([
+      'arguments' => [
         $this->getServiceCall('service.does_not_exist', ContainerInterface::NULL_ON_INVALID_REFERENCE),
         $this->getParameterCall('some_private_config'),
-      ]),
-
+      ],
     ];
 
     $services['service_within_service_closure'] = [
       'class' => '\Drupal\Tests\Component\DependencyInjection\MockService',
-      'arguments' => $this->getCollection([
+      'arguments' => [
         $this->getServiceClosureCall('other.service', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE),
         $this->getParameterCall('some_private_config'),
-      ]),
+      ],
     ];
 
     $services['factory_service'] = [
@@ -844,9 +819,9 @@ class ContainerTest extends TestCase {
         $this->getServiceCall('service.provider'),
         'getFactoryMethod',
       ],
-      'arguments' => $this->getCollection([
+      'arguments' => [
         $this->getParameterCall('factory_service_class'),
-      ]),
+      ],
     ];
     $services['factory_class'] = [
       'class' => '\Drupal\service_container\ServiceContainer\ControllerInterface',
@@ -858,9 +833,9 @@ class ContainerTest extends TestCase {
       'calls' => [
         [
           'setContainer',
-          $this->getCollection([
+          [
             $this->getServiceCall('service_container'),
-          ]),
+          ],
         ],
       ],
     ];
@@ -872,9 +847,9 @@ class ContainerTest extends TestCase {
 
     $services['circular_dependency'] = [
       'class' => '\Drupal\Tests\Component\DependencyInjection\MockService',
-      'arguments' => $this->getCollection([
+      'arguments' => [
         $this->getServiceCall('circular_dependency'),
-      ]),
+      ],
     ];
     $services['synthetic'] = [
       'synthetic' => TRUE,
@@ -890,35 +865,35 @@ class ContainerTest extends TestCase {
       $services['service_test_instantiation_' . $i] = [
         'class' => '\Drupal\Tests\Component\DependencyInjection\MockInstantiationService',
         // Also test a collection that does not need resolving.
-        'arguments' => $this->getCollection($args, FALSE),
+        'arguments' => $args,
       ];
       $args[] = 'arg_' . $i;
     }
 
     $services['service_parameter_not_exists'] = [
       'class' => '\Drupal\Tests\Component\DependencyInjection\MockService',
-      'arguments' => $this->getCollection([
+      'arguments' => [
         $this->getServiceCall('service.provider'),
         $this->getParameterCall('not_exists'),
-      ]),
+      ],
     ];
     $services['service_dependency_not_exists'] = [
       'class' => '\Drupal\Tests\Component\DependencyInjection\MockService',
-      'arguments' => $this->getCollection([
+      'arguments' => [
         $this->getServiceCall('service_not_exists'),
         $this->getParameterCall('some_config'),
-      ]),
+      ],
     ];
 
     $services['service_with_parameter_service'] = [
       'class' => '\Drupal\Tests\Component\DependencyInjection\MockService',
-      'arguments' => $this->getCollection([
+      'arguments' => [
         $this->getParameterCall('service_from_parameter'),
         // Also test deep collections that don't need resolving.
-        $this->getCollection([
+        [
           1,
-        ], FALSE),
-      ]),
+        ],
+      ],
     ];
 
     // To ensure getAlternatives() finds something.
@@ -947,17 +922,17 @@ class ContainerTest extends TestCase {
     // Raw argument.
     $services['service_with_raw_argument'] = [
       'class' => '\Drupal\Tests\Component\DependencyInjection\MockInstantiationService',
-      'arguments' => $this->getCollection([$this->getRaw('ccc')]),
+      'arguments' => ['ccc'],
     ];
 
     // Iterator argument.
     $services['service_iterator'] = [
       'class' => '\Drupal\Tests\Component\DependencyInjection\MockInstantiationService',
-      'arguments' => $this->getCollection([
+      'arguments' => [
         $this->getIterator([
           $this->getServiceCall('other.service'),
         ]),
-      ]),
+      ],
     ];
 
     $aliases = [];
@@ -1028,27 +1003,6 @@ class ContainerTest extends TestCase {
       'id' => $id,
       'value' => $service_definition,
       'shared' => $shared,
-    ];
-  }
-
-  /**
-   * Helper function to return a machine-optimized collection.
-   */
-  protected function getCollection($collection, $resolve = TRUE) {
-    return (object) [
-      'type' => 'collection',
-      'value' => $collection,
-      'resolve' => $resolve,
-    ];
-  }
-
-  /**
-   * Helper function to return a raw value definition.
-   */
-  protected function getRaw($value) {
-    return (object) [
-      'type' => 'raw',
-      'value' => $value,
     ];
   }
 
