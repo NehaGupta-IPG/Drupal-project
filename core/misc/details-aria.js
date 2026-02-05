@@ -4,6 +4,7 @@
  */
 
 (function ($, Drupal) {
+
   /**
    * Handles `aria-expanded` and `aria-pressed` attributes on details elements.
    *
@@ -16,10 +17,11 @@
         'summary',
         (event) => {
           const $summary = $(event.currentTarget);
-          const open =
-            $(event.currentTarget.parentNode).attr('open') === 'open'
-              ? 'false'
-              : 'true';
+
+          // ✅ Correct logic: read the real current open state.
+          const open = event.currentTarget.parentNode.hasAttribute('open')
+            ? 'true'
+            : 'false';
 
           $summary.attr({
             'aria-expanded': open,
@@ -28,4 +30,5 @@
       );
     },
   };
+
 })(jQuery, Drupal);
