@@ -426,7 +426,7 @@ class Container implements ContainerInterface, ResetInterface {
           }
 
           // Return the service.
-          $arguments[$key] = $this->get($id, $argument->invalidBehavior);
+          $arguments[$key] = $this->get($id, $argument->invalidBehavior ?? ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
 
           continue;
         }
@@ -450,7 +450,7 @@ class Container implements ContainerInterface, ResetInterface {
         }
         elseif ($type == 'service_closure') {
           $arguments[$key] = function () use ($argument) {
-            return $this->get($argument->id, $argument->invalidBehavior);
+            return $this->get($argument->id, $argument->invalidBehavior ?? ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
           };
 
           continue;

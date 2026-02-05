@@ -484,11 +484,14 @@ class OptimizedPhpArrayDumper extends Dumper {
    *   A suitable representation of the service reference.
    */
   protected function getServiceCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
-    return (object) [
+    $service_call = (object) [
       'type' => 'service',
       'id' => $id,
-      'invalidBehavior' => $invalid_behavior,
     ];
+    if ($invalid_behavior !== ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
+      $service_call->invalidBehavior = $invalid_behavior;
+    }
+    return $service_call;
   }
 
   /**
@@ -529,11 +532,14 @@ class OptimizedPhpArrayDumper extends Dumper {
    *   A suitable representation of the service closure reference.
    */
   protected function getServiceClosureCall(string $id, int $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
-    return (object) [
+    $service_closure = (object) [
       'type' => 'service_closure',
       'id' => $id,
-      'invalidBehavior' => $invalid_behavior,
     ];
+    if ($invalid_behavior !== ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
+      $service_closure->invalidBehavior = $invalid_behavior;
+    }
+    return $service_closure;
   }
 
   /**

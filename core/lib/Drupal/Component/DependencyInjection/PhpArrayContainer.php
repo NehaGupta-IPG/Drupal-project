@@ -165,7 +165,7 @@ class PhpArrayContainer extends Container {
         }
         elseif ($type == 'service_closure') {
           $arguments[$key] = function () use ($argument) {
-            return $this->get($argument->id, $argument->invalidBehavior);
+            return $this->get($argument->id, $argument->invalidBehavior ?? ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
           };
 
           continue;

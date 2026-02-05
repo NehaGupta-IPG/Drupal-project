@@ -461,22 +461,28 @@ class OptimizedPhpArrayDumperTest extends TestCase {
    * Helper function to return a service definition.
    */
   protected static function getServiceCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
-    return (object) [
+    $service_call = (object) [
       'type' => 'service',
       'id' => $id,
-      'invalidBehavior' => $invalid_behavior,
     ];
+    if ($invalid_behavior !== ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
+      $service_call->invalidBehavior = $invalid_behavior;
+    }
+    return $service_call;
   }
 
   /**
    * Helper function to return a service closure definition.
    */
   protected static function getServiceClosureCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
-    return (object) [
+    $service_closure = (object) [
       'type' => 'service_closure',
       'id' => $id,
-      'invalidBehavior' => $invalid_behavior,
     ];
+    if ($invalid_behavior !== ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
+      $service_closure->invalidBehavior = $invalid_behavior;
+    }
+    return $service_closure;
   }
 
   /**
