@@ -110,6 +110,8 @@ class Mini extends SqlBase {
       '#pagination_heading_level' => parent::getHeadingLevel(),
       '#parameters' => $input,
       '#route_name' => !empty($this->view->live_preview) ? '<current>' : '<none>',
+      // Skip generic modal AJAX attributes when Views AJAX handles paging.
+      '#skip_modal_ajax' => $this->view->ajaxEnabled(),
     ];
   }
 
