@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\system;
 
-use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Provides a helper for generating module admin links.
@@ -23,12 +24,13 @@ class ModuleAdminLinksHelper {
    *
    * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menuLinkTree
    *   The menu link tree service.
-   * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memoryCache
-   *   The memory cache.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $memoryCache
+   *   The memory cache backend.
    */
   public function __construct(
     protected MenuLinkTreeInterface $menuLinkTree,
-    protected MemoryCacheInterface $memoryCache,
+    #[Autowire(service: 'cache.memory')]
+    protected CacheBackendInterface $memoryCache,
   ) {}
 
   /**
