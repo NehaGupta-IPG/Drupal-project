@@ -72,7 +72,7 @@ class FieldLayoutBuilder implements ContainerInjectionInterface {
         // could be set by other code at run-time; these should be ignored.
         // @todo Ideally the array structure would remain unchanged, see
         //   https://www.drupal.org/node/2846393.
-        if (isset($regions[$field['region']])) {
+        if (isset($field['region']) && isset($regions[$field['region']])) {
           $regions[$field['region']][$name] = $build[$name];
           unset($build[$name]);
         }
@@ -106,7 +106,7 @@ class FieldLayoutBuilder implements ContainerInjectionInterface {
         // avoids breaking hook_form_alter() implementations by not actually
         // moving the field in the form structure. If a #group is already set,
         // do not overwrite it.
-        if (isset($regions[$field['region']]) && !isset($build[$name]['#group'])) {
+        if (isset($field['region']) && isset($regions[$field['region']]) && !isset($build[$name]['#group'])) {
           if (!empty($build['#parents'])) {
             $build[$name]['#group'] = implode('][', array_merge($build['#parents'], ['_field_layout', $field['region']]));
           }
