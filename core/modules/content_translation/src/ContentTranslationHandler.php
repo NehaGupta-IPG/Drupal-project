@@ -748,11 +748,11 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
    *
    * Performs required tasks after the entity has been saved.
    */
-  public function entityFormPostSave($form, FormStateInterface $form_state) {
+  public function entityFormPostSave($form, FormStateInterface $form_state): void {
     $values = $form_state->getValue('content_translation');
     if (empty($values['retranslate'])) {
       return;
-		}
+    }
     $form_object = $form_state->getFormObject();
     $form_langcode = $form_object->getFormLangcode($form_state);
     $entity = $form_object->getEntity();
