@@ -200,7 +200,7 @@ class Ckeditor5Hooks {
      * @param array $plugins_config_form
      *   The plugins config subform render array.
      */
-    $add_listener = function (array &$plugins_config_form) use (&$add_listener) : void {
+    $add_listener = function (array &$plugins_config_form) : void {
       $field_types = ['checkbox', 'select', 'radios', 'textarea'];
       if (isset($plugins_config_form['#type']) && in_array($plugins_config_form['#type'], $field_types) && !isset($plugins_config_form['#ajax'])) {
         $plugins_config_form['#ajax'] = [
@@ -214,7 +214,7 @@ class Ckeditor5Hooks {
       }
       foreach ($plugins_config_form as $key => &$value) {
         if (is_array($value) && !str_contains((string) $key, '#')) {
-          $add_listener($value);
+          \Closure::getCurrent()($value);
         }
       }
     };
