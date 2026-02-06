@@ -1,28 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\link\Kernel;
 
 use Drupal\Component\Utility\UrlHelper;
-use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldItemInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use Drupal\link\LinkItemInterface;
+use Drupal\Tests\field\Kernel\FieldKernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the new entity API for the link field type.
- *
- * @group link
  */
+#[Group('link')]
+#[RunTestsInSeparateProcesses]
 class LinkItemTest extends FieldKernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['link'];
 
@@ -71,7 +73,7 @@ class LinkItemTest extends FieldKernelTestBase {
   /**
    * Tests using entity fields of the link field type.
    */
-  public function testLinkItem() {
+  public function testLinkItem(): void {
     // Create entity.
     $entity = EntityTest::create();
     $url = 'https://www.drupal.org?test_param=test_value';

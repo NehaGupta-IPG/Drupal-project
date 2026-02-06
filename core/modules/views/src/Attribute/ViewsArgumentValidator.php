@@ -26,10 +26,12 @@ class ViewsArgumentValidator extends Plugin {
    *   The plugin title used in the views UI.
    * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $short_title
    *   (optional) The short title used in the views UI.
-   * @param string $entity_type
+   * @param string|null $entity_type
    *   (optional) Entity type.
    * @param bool $no_ui
-   *   Whether the plugin is selectable in the UI.
+   *   (optional) Whether the plugin should be not selectable in the UI.
+   *   If set to TRUE, you can still use it via the API in config files.
+   *   Defaults to FALSE.
    * @param class-string|null $deriver
    *   (optional) The deriver class.
    */
@@ -39,7 +41,7 @@ class ViewsArgumentValidator extends Plugin {
     public readonly ?TranslatableMarkup $short_title = NULL,
     public readonly ?string $entity_type = NULL,
     public readonly bool $no_ui = FALSE,
-    public readonly ?string $deriver = NULL
+    public readonly ?string $deriver = NULL,
   ) {}
 
 }

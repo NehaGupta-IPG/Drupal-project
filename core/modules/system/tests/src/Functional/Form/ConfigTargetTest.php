@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Form;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests forms using #config_target.
- *
- * @group Form
  */
+#[Group('Form')]
+#[RunTestsInSeparateProcesses]
 class ConfigTargetTest extends BrowserTestBase {
 
   /**
@@ -97,6 +99,7 @@ class ConfigTargetTest extends BrowserTestBase {
     $assert_session->statusMessageContains('The configuration options have been saved.', 'status');
 
     $this->assertSame([
+      'langcode' => 'en',
       'favorite_fruits' => [
         $most_favorite_fruit,
         $second_favorite_fruit,
@@ -125,6 +128,7 @@ class ConfigTargetTest extends BrowserTestBase {
     $assert_session->statusMessageContains('The configuration options have been saved.', 'status');
 
     $this->assertSame([
+      'langcode' => 'en',
       'favorite_fruits' => [
         $most_favorite_fruit,
         $second_favorite_fruit,
@@ -144,6 +148,7 @@ class ConfigTargetTest extends BrowserTestBase {
     $assert_session->statusMessageContains('The configuration options have been saved.', 'status');
 
     $this->assertSame([
+      'langcode' => 'en',
       'favorite_fruits' => [
         $most_favorite_fruit,
         $second_favorite_fruit,

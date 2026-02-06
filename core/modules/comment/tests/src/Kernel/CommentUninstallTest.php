@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\comment\Kernel;
 
 use Drupal\comment\Tests\CommentTestTrait;
@@ -7,12 +9,14 @@ use Drupal\Core\Extension\ModuleUninstallValidatorException;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests comment module uninstall.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentUninstallTest extends KernelTestBase {
 
   use CommentTestTrait;
@@ -35,6 +39,7 @@ class CommentUninstallTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installEntitySchema('node');
     $this->installEntitySchema('comment');
     $this->installConfig(['comment']);
     $this->installSchema('user', ['users_data']);
@@ -56,7 +61,7 @@ class CommentUninstallTest extends KernelTestBase {
   /**
    * Tests if comment module uninstall fails if the field exists.
    */
-  public function testCommentUninstallWithField() {
+  public function testCommentUninstallWithField(): void {
     // Ensure that the field exists before uninstalling.
     $field_storage = FieldStorageConfig::loadByName('comment', 'comment_body');
     $this->assertNotNull($field_storage);
@@ -70,7 +75,7 @@ class CommentUninstallTest extends KernelTestBase {
   /**
    * Tests if uninstallation succeeds if the field has been deleted beforehand.
    */
-  public function testCommentUninstallWithoutField() {
+  public function testCommentUninstallWithoutField(): void {
     // Tests if uninstall succeeds if the field has been deleted beforehand.
     // Manually delete the comment_body field before module uninstall.
     FieldStorageConfig::loadByName('comment', 'comment_body')->delete();

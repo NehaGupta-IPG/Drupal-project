@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\field\Kernel;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
@@ -8,12 +10,14 @@ use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Ensure display modes are updated when fields are created.
- *
- * @group field
  */
+#[Group('field')]
+#[RunTestsInSeparateProcesses]
 class DisplayModeUpdateTest extends FieldKernelTestBase {
 
   /**
@@ -108,9 +112,10 @@ class DisplayModeUpdateTest extends FieldKernelTestBase {
   /**
    * Ensure display modes are updated when fields are created.
    */
-  public function testDisplayModeUpdateAfterFieldCreation() {
+  public function testDisplayModeUpdateAfterFieldCreation(): void {
 
-    // Sanity test: field has not been created yet, so should not exist in display.
+    // Sanity test: field has not been created yet, so should not exist in
+    // display.
     $this->assertArrayNotHasKey('field_test', \Drupal::config($this->defaultViewDisplayName)->get('hidden'));
     $this->assertArrayNotHasKey('field_test', \Drupal::config($this->defaultFormDisplayName)->get('hidden'));
     $this->assertArrayNotHasKey('field_test', \Drupal::config($this->foobarViewDisplayName)->get('hidden'));

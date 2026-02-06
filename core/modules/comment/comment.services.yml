@@ -1,4 +1,9 @@
+parameters:
+  comment.skip_procedural_hook_scan: false
+
 services:
+  _defaults:
+    autoconfigure: true
   comment.breadcrumb:
     class: Drupal\comment\CommentBreadcrumbBuilder
     arguments: ['@entity_type.manager']
@@ -25,5 +30,5 @@ services:
 
   comment.link_builder:
     class: Drupal\comment\CommentLinkBuilder
-    arguments: ['@current_user', '@comment.manager', '@module_handler', '@string_translation', '@entity_type.manager']
+    autowire: true
   Drupal\comment\CommentLinkBuilderInterface: '@comment.link_builder'

@@ -10,18 +10,20 @@ use Composer\Package\PackageInterface;
 use Composer\Package\RootPackageInterface;
 use Drupal\Composer\Plugin\VendorHardening\Config;
 use Drupal\Composer\Plugin\VendorHardening\VendorHardeningPlugin;
-use Drupal\Tests\Traits\PhpUnitWarnings;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
- * @coversDefaultClass \Drupal\Composer\Plugin\VendorHardening\VendorHardeningPlugin
- * @group VendorHardening
+ * Tests Drupal\Composer\Plugin\VendorHardening\VendorHardeningPlugin.
  */
+#[CoversClass(VendorHardeningPlugin::class)]
+#[Group('VendorHardening')]
 class VendorHardeningPluginTest extends TestCase {
 
-  use PhpUnitWarnings;
   use ProphecyTrait;
 
   /**
@@ -42,9 +44,9 @@ class VendorHardeningPluginTest extends TestCase {
   }
 
   /**
-   * @covers ::cleanPackage
+   * Tests clean package.
    */
-  public function testCleanPackage() {
+  public function testCleanPackage(): void {
 
     $config = $this->getMockBuilder(Config::class)
       ->disableOriginalConstructor()
@@ -78,9 +80,9 @@ class VendorHardeningPluginTest extends TestCase {
   }
 
   /**
-   * @covers ::cleanPathsForPackage
+   * Tests clean paths for package.
    */
-  public function testCleanPathsForPackage() {
+  public function testCleanPathsForPackage(): void {
     $plugin = $this->getMockBuilder(VendorHardeningPlugin::class)
       ->onlyMethods(['getInstallPathForPackage'])
       ->getMock();
@@ -106,9 +108,9 @@ class VendorHardeningPluginTest extends TestCase {
   }
 
   /**
-   * @covers ::cleanAllPackages
+   * Tests clean all packages.
    */
-  public function testCleanAllPackages() {
+  public function testCleanAllPackages(): void {
     $config = $this->getMockBuilder(Config::class)
       ->disableOriginalConstructor()
       ->getMock();
@@ -116,8 +118,7 @@ class VendorHardeningPluginTest extends TestCase {
       ->method('getAllCleanupPaths')
       ->willReturn(['drupal/package' => ['tests']]);
 
-    $package = $this->getMockBuilder(PackageInterface::class)
-      ->getMockForAbstractClass();
+    $package = $this->createMock(PackageInterface::class);
     $package->expects($this->any())
       ->method('getName')
       ->willReturn('drupal/package');
@@ -147,9 +148,9 @@ class VendorHardeningPluginTest extends TestCase {
   }
 
   /**
-   * @covers ::writeAccessRestrictionFiles
+   * Tests write access restriction files.
    */
-  public function testWriteAccessRestrictionFiles() {
+  public function testWriteAccessRestrictionFiles(): void {
     $dir = vfsStream::url('vendor');
 
     // Set up mocks so that writeAccessRestrictionFiles() can eventually use
@@ -167,15 +168,13 @@ class VendorHardeningPluginTest extends TestCase {
     $this->assertDirectoryExists($dir);
 
     $this->assertFileDoesNotExist($dir . '/.htaccess');
-    $this->assertFileDoesNotExist($dir . '/web.config');
 
     $plugin->writeAccessRestrictionFiles($dir);
 
     $this->assertFileExists($dir . '/.htaccess');
-    $this->assertFileExists($dir . '/web.config');
   }
 
-  public static function providerFindBinOverlap() {
+  public static function providerFindBinOverlap(): array {
     return [
       [
         [],
@@ -221,10 +220,10 @@ class VendorHardeningPluginTest extends TestCase {
   }
 
   /**
-   * @covers ::findBinOverlap
-   * @dataProvider providerFindBinOverlap
+   * Tests find bin overlap.
    */
-  public function testFindBinOverlap($expected, $binaries, $clean_paths) {
+  #[DataProvider('providerFindBinOverlap')]
+  public function testFindBinOverlap($expected, $binaries, $clean_paths): void {
     $plugin = $this->getMockBuilder(VendorHardeningPlugin::class)
       ->disableOriginalConstructor()
       ->getMock();

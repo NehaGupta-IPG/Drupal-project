@@ -4,11 +4,11 @@ namespace Drupal\migrate\Plugin\migrate\process;
 
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\Row;
 use GuzzleHttp\ClientInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Downloads a file from a HTTP(S) remote location into the local file system.
@@ -57,11 +57,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * destination URI is unique. If a file with the same name exists at the
  * destination, a numbered suffix like '_0' will be appended to make it unique.
  * The destination URI is saved in a file entity.
- *
- * @MigrateProcessPlugin(
- *   id = "download"
- * )
  */
+#[MigrateProcess('download')]
 class Download extends FileProcessBase implements ContainerFactoryPluginInterface {
 
   /**
@@ -99,19 +96,6 @@ class Download extends FileProcessBase implements ContainerFactoryPluginInterfac
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->fileSystem = $file_system;
     $this->httpClient = $http_client;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('file_system'),
-      $container->get('http_client')
-    );
   }
 
   /**

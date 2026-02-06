@@ -4,6 +4,7 @@ namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Validation\Attribute\Constraint;
+use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraints\Choice;
 
 /**
@@ -17,8 +18,15 @@ use Symfony\Component\Validator\Constraints\Choice;
 )]
 class AllowedValuesConstraint extends Choice {
 
-  public $strict = TRUE;
-  public $minMessage = 'You must select at least %limit choice.|You must select at least %limit choices.';
-  public $maxMessage = 'You must select at most %limit choice.|You must select at most %limit choices.';
+  /**
+   * {@inheritdoc}
+   */
+  #[HasNamedArguments]
+  public function __construct(...$args) {
+    $this->strict = TRUE;
+    $this->minMessage = 'You must select at least %limit choice.|You must select at least %limit choices.';
+    $this->maxMessage = 'You must select at most %limit choice.|You must select at most %limit choices.';
+    parent::__construct(...$args);
+  }
 
 }

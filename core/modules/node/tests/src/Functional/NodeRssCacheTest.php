@@ -6,15 +6,17 @@ namespace Drupal\Tests\node\Functional;
 
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\views\Tests\ViewTestData;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Ensures that RSS render cache doesn't interfere with other caches.
  *
  * Create a node, render that node as a teaser in the RSS feed, ensure that
  * the RSS teaser render doesn't contain tags from the default theme.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeRssCacheTest extends NodeTestBase {
 
   /**
@@ -54,7 +56,7 @@ class NodeRssCacheTest extends NodeTestBase {
   /**
    * Ensure the RSS teaser render does not interfere with default theme cache.
    */
-  public function testNodeRssCacheContent() {
+  public function testNodeRssCacheContent(): void {
     // Only the plain_text text format is available by default, which escapes
     // all HTML.
     FilterFormat::create([

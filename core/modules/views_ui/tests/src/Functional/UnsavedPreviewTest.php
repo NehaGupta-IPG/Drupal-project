@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views_ui\Functional;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 /**
  * Tests covering Preview of unsaved Views.
- *
- * @group views_ui
  */
+#[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class UnsavedPreviewTest extends UITestBase {
 
   /**
@@ -48,7 +51,7 @@ class UnsavedPreviewTest extends UITestBase {
   /**
    * Tests previews of unsaved new page displays.
    */
-  public function testUnsavedPageDisplayPreview() {
+  public function testUnsavedPageDisplayPreview(): void {
     $this->drupalCreateContentType(['type' => 'page']);
     for ($i = 0; $i < 5; $i++) {
       $this->drupalCreateNode();

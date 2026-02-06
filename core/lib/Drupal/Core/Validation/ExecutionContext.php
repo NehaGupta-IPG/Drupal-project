@@ -86,7 +86,7 @@ class ExecutionContext implements ExecutionContextInterface {
     protected ValidatorInterface $validator,
     protected mixed $root,
     protected TranslatorInterface $translator,
-    protected ?string $translationDomain = NULL
+    protected ?string $translationDomain = NULL,
   ) {
     $this->violations = new ConstraintViolationList();
   }
@@ -239,6 +239,27 @@ class ExecutionContext implements ExecutionContextInterface {
    */
   public function isObjectInitialized(string $cacheKey): bool {
     throw new \LogicException(ExecutionContextInterface::class . '::isObjectInitialized is unsupported.');
+  }
+
+  /**
+   * Clone this context.
+   */
+  public function __clone(): void {
+    $this->violations = clone $this->violations;
+  }
+
+  /**
+   * Gets the current constraint.
+   *
+   * @return \Symfony\Component\Validator\Constraint|null
+   *   The constraint.
+   *
+   * @internal
+   *   This method is not part of the public API. It is only used to make
+   *   recursive calls work.
+   */
+  public function getConstraint(): ?Constraint {
+    return $this->constraint ?? NULL;
   }
 
 }

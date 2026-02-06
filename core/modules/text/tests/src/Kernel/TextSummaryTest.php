@@ -1,25 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\text\Kernel;
 
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\filter\Entity\FilterFormat;
 use Drupal\filter\Render\FilteredMarkup;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests text_summary() with different strings and lengths.
- *
- * @group text
  */
+#[Group('text')]
+#[RunTestsInSeparateProcesses]
 class TextSummaryTest extends KernelTestBase {
 
   use UserCreationTrait;
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = [
     'system',
     'user',
@@ -41,7 +48,7 @@ class TextSummaryTest extends KernelTestBase {
   /**
    * Tests text summaries for a question followed by a sentence.
    */
-  public function testFirstSentenceQuestion() {
+  public function testFirstSentenceQuestion(): void {
     $text = 'A question? A sentence. Another sentence.';
     $expected = 'A question? A sentence.';
     $this->assertTextSummary($text, $expected, NULL, 30);
@@ -50,7 +57,7 @@ class TextSummaryTest extends KernelTestBase {
   /**
    * Tests summary with long example.
    */
-  public function testLongSentence() {
+  public function testLongSentence(): void {
     // 125.
     // cSpell:disable
     $text =
@@ -65,14 +72,15 @@ class TextSummaryTest extends KernelTestBase {
                 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ' .
                 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.';
     // cSpell:enable
-    // First three sentences add up to: 336, so add one for space and then 3 to get half-way into next word.
+    // First three sentences add up to: 336, so add one for space and then 3 to
+    // get half-way into next word.
     $this->assertTextSummary($text, $expected, NULL, 340);
   }
 
   /**
    * Tests various summary length edge cases.
    */
-  public function testLength() {
+  public function testLength(): void {
     FilterFormat::create([
       'format' => 'autop',
       'name' => 'Autop',
@@ -232,7 +240,7 @@ class TextSummaryTest extends KernelTestBase {
    *
    * @see text_summary()
    */
-  public function testInvalidFilterFormat() {
+  public function testInvalidFilterFormat(): void {
 
     $this->assertTextSummary($this->randomString(100), '', 'non_existent_format');
   }
@@ -242,7 +250,7 @@ class TextSummaryTest extends KernelTestBase {
    *
    * @internal
    */
-  public function assertTextSummary(string $text, string $expected, ?string $format = NULL, int $size = NULL): void {
+  public function assertTextSummary(string $text, string $expected, ?string $format = NULL, ?int $size = NULL): void {
     $summary = text_summary($text, $format, $size);
     $this->assertSame($expected, $summary, '<pre style="white-space: pre-wrap">' . $summary . '</pre> is identical to <pre style="white-space: pre-wrap">' . $expected . '</pre>');
   }
@@ -250,7 +258,8 @@ class TextSummaryTest extends KernelTestBase {
   /**
    * Tests required summary.
    */
-  public function testRequiredSummary() {
+  public function testRequiredSummary(): void {
+    $this->installEntitySchema('user');
     $this->installEntitySchema('entity_test');
     $this->setUpCurrentUser();
     $field_definition = FieldStorageConfig::create([
@@ -312,7 +321,7 @@ class TextSummaryTest extends KernelTestBase {
   /**
    * Test text normalization when filter_html or filter_htmlcorrector enabled.
    */
-  public function testNormalization() {
+  public function testNormalization(): void {
     FilterFormat::create([
       'format' => 'filter_html_enabled',
       'name' => 'Filter HTML enabled',

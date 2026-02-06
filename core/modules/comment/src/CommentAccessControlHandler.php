@@ -69,7 +69,7 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
   /**
    * {@inheritdoc}
    */
-  protected function checkFieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, FieldItemListInterface $items = NULL) {
+  protected function checkFieldAccess($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, ?FieldItemListInterface $items = NULL) {
     if ($operation == 'edit') {
       // Only users with the "administer comments" permission can edit
       // administrative fields.
@@ -135,9 +135,9 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
           return AccessResult::forbidden();
         }
         $is_name = $field_definition->getName() === 'name';
-        $anonymous_contact = $commented_entity->get($entity->getFieldName())->getFieldDefinition()->getSetting('anonymous');
+        $anonymous_contact = AnonymousContact::tryFrom($commented_entity->get($entity->getFieldName())->getFieldDefinition()->getSetting('anonymous'));
         $admin_access = AccessResult::allowedIfHasPermission($account, 'administer comments');
-        $anonymous_access = AccessResult::allowedIf($entity->isNew() && $account->isAnonymous() && ($anonymous_contact != CommentInterface::ANONYMOUS_MAYNOT_CONTACT || $is_name) && $account->hasPermission('post comments'))
+        $anonymous_access = AccessResult::allowedIf($entity->isNew() && $account->isAnonymous() && ($anonymous_contact != AnonymousContact::Forbidden || $is_name) && $account->hasPermission('post comments'))
           ->cachePerPermissions()
           ->addCacheableDependency($entity)
           ->addCacheableDependency($field_definition->getConfig($commented_entity->bundle()))

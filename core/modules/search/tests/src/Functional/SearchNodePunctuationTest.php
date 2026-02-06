@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\search\Functional;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests search functionality with punctuation and HTML entities.
- *
- * @group search
  */
+#[Group('search')]
+#[RunTestsInSeparateProcesses]
 class SearchNodePunctuationTest extends BrowserTestBase {
 
   /**
@@ -52,7 +54,7 @@ class SearchNodePunctuationTest extends BrowserTestBase {
   /**
    * Tests that search works with punctuation and HTML entities.
    */
-  public function testPhraseSearchPunctuation() {
+  public function testPhraseSearchPunctuation(): void {
     $node = $this->drupalCreateNode(['body' => [['value' => "The bunny's ears were fluffy."]]]);
     // cSpell:disable-next-line
     $this->drupalCreateNode(['body' => [['value' => 'Dignissim Aliquam &amp; Quieligo meus natu quae quia te. Damnum&copy; erat&mdash; neo pneum. Facilisi feugiat ibidem ratis.']]]);

@@ -25,9 +25,11 @@ class ViewsDisplayExtender extends Plugin {
    * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $short_title
    *   (optional) The short title used in the views UI.
    * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $help
-   *   A short help string; this is displayed in the views UI.
+   *   (optional) A short help string; this is displayed in the views UI.
    * @param bool $no_ui
-   *   Whether the plugin is selectable in the UI.
+   *   (optional) Whether the plugin should be not selectable in the UI.
+   *   If set to TRUE, you can still use it via the API in config files.
+   *   Defaults to FALSE.
    * @param class-string|null $deriver
    *   (optional) The deriver class.
    */
@@ -37,7 +39,7 @@ class ViewsDisplayExtender extends Plugin {
     public readonly ?TranslatableMarkup $short_title = NULL,
     public readonly ?TranslatableMarkup $help = NULL,
     public readonly bool $no_ui = FALSE,
-    public readonly ?string $deriver = NULL
+    public readonly ?string $deriver = NULL,
   ) {}
 
 }

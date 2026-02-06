@@ -4,14 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalJavascriptTests;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 /**
  * Tests Javascript deprecation notices.
- *
- * @group javascript
- * @group legacy
  */
+#[Group('javascript')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class JavascriptDeprecationTest extends WebDriverTestBase {
 
+  /**
+   * {@inheritdoc}
+   */
   protected static $modules = ['js_deprecation_test'];
 
   /**
@@ -22,7 +29,7 @@ class JavascriptDeprecationTest extends WebDriverTestBase {
   /**
    * Tests Javascript deprecation notices.
    */
-  public function testJavascriptDeprecation() {
+  public function testJavascriptDeprecation(): void {
     $this->expectDeprecation('Javascript Deprecation: This function is deprecated for testing purposes.');
     $this->expectDeprecation('Javascript Deprecation: This property is deprecated for testing purposes.');
     $this->drupalGet('js_deprecation_test');

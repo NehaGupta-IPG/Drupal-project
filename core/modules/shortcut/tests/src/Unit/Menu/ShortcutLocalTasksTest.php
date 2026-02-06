@@ -6,12 +6,13 @@ namespace Drupal\Tests\shortcut\Unit\Menu;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Tests\Core\Menu\LocalTaskIntegrationTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests existence of shortcut local tasks.
- *
- * @group shortcut
  */
+#[Group('shortcut')]
 class ShortcutLocalTasksTest extends LocalTaskIntegrationTestBase {
 
   /**
@@ -35,10 +36,9 @@ class ShortcutLocalTasksTest extends LocalTaskIntegrationTestBase {
 
   /**
    * Checks shortcut listing local tasks.
-   *
-   * @dataProvider getShortcutPageRoutes
    */
-  public function testShortcutPageLocalTasks($route) {
+  #[DataProvider('getShortcutPageRoutes')]
+  public function testShortcutPageLocalTasks($route): void {
     $tasks = [
       0 => ['shortcut.set_switch', 'entity.user.canonical', 'entity.user.edit_form'],
     ];

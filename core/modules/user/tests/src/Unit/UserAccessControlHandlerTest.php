@@ -9,15 +9,16 @@ use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\UserAccessControlHandler;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the user access controller.
- *
- * @group Drupal
- * @group User
- *
- * @coversDefaultClass \Drupal\user\UserAccessControlHandler
  */
+#[CoversClass(UserAccessControlHandler::class)]
+#[Group('Drupal')]
+#[Group('User')]
 class UserAccessControlHandlerTest extends UnitTestCase {
 
   /**
@@ -157,10 +158,9 @@ class UserAccessControlHandlerTest extends UnitTestCase {
 
   /**
    * Ensures user name access is working properly.
-   *
-   * @dataProvider userNameProvider
    */
-  public function testUserNameAccess($viewer, $target, $view, $edit) {
+  #[DataProvider('userNameProvider')]
+  public function testUserNameAccess($viewer, $target, $view, $edit): void {
     $this->assertFieldAccess('name', $viewer, $target, $view, $edit);
   }
 
@@ -208,10 +208,9 @@ class UserAccessControlHandlerTest extends UnitTestCase {
 
   /**
    * Tests that private user settings cannot be viewed by other users.
-   *
-   * @dataProvider hiddenUserSettingsProvider
    */
-  public function testHiddenUserSettings($field, $viewer, $target, $view, $edit) {
+  #[DataProvider('hiddenUserSettingsProvider')]
+  public function testHiddenUserSettings($field, $viewer, $target, $view, $edit): void {
     $this->assertFieldAccess($field, $viewer, $target, $view, $edit);
   }
 
@@ -275,10 +274,9 @@ class UserAccessControlHandlerTest extends UnitTestCase {
 
   /**
    * Tests that private user settings cannot be viewed by other users.
-   *
-   * @dataProvider adminFieldAccessProvider
    */
-  public function testAdminFieldAccess($field, $viewer, $target, $view, $edit) {
+  #[DataProvider('adminFieldAccessProvider')]
+  public function testAdminFieldAccess($field, $viewer, $target, $view, $edit): void {
     $this->assertFieldAccess($field, $viewer, $target, $view, $edit);
   }
 
@@ -325,10 +323,9 @@ class UserAccessControlHandlerTest extends UnitTestCase {
 
   /**
    * Tests that passwords cannot be viewed, just edited.
-   *
-   * @dataProvider passwordAccessProvider
    */
-  public function testPasswordAccess($viewer, $target, $view, $edit) {
+  #[DataProvider('passwordAccessProvider')]
+  public function testPasswordAccess($viewer, $target, $view, $edit): void {
     $this->assertFieldAccess('pass', $viewer, $target, $view, $edit);
   }
 
@@ -370,10 +367,9 @@ class UserAccessControlHandlerTest extends UnitTestCase {
 
   /**
    * Tests the user created field access.
-   *
-   * @dataProvider createdAccessProvider
    */
-  public function testCreatedAccess($viewer, $target, $view, $edit) {
+  #[DataProvider('createdAccessProvider')]
+  public function testCreatedAccess($viewer, $target, $view, $edit): void {
     $this->assertFieldAccess('created', $viewer, $target, $view, $edit);
   }
 
@@ -406,10 +402,9 @@ class UserAccessControlHandlerTest extends UnitTestCase {
 
   /**
    * Tests access to a non-existing base field.
-   *
-   * @dataProvider NonExistingFieldAccessProvider
    */
-  public function testNonExistingFieldAccess($viewer, $target, $view, $edit) {
+  #[DataProvider('NonExistingFieldAccessProvider')]
+  public function testNonExistingFieldAccess($viewer, $target, $view, $edit): void {
     // By default everyone has access to all fields that do not have explicit
     // access control.
     // @see EntityAccessControlHandler::checkFieldAccess()
