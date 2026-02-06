@@ -46,4 +46,17 @@ class PhpArrayContainerTest extends ContainerTest {
     return '%' . $name . '%';
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function getLiteralString($value): string {
+    // In the human-readable format, strings starting with @ are escaped
+    // by prepending another @.
+    if ($value !== '' && $value[0] === '@') {
+      return '@' . $value;
+    }
+
+    return $value;
+  }
+
 }

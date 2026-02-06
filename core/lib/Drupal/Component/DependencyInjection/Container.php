@@ -245,7 +245,7 @@ class Container implements ContainerInterface, ResetInterface {
     if (isset($definition['factory'])) {
       $factory = $definition['factory'];
       if (is_array($factory)) {
-        $factory = $this->resolveServicesAndParameters([$factory[0], $factory[1]]);
+        $factory[0] = $this->resolveServicesAndParameters([$factory[0]])[0];
       }
       elseif (!is_string($factory)) {
         throw new RuntimeException(sprintf('Cannot create service "%s" because of invalid factory', $id));
@@ -283,7 +283,7 @@ class Container implements ContainerInterface, ResetInterface {
     if (isset($definition['configurator'])) {
       $callable = $definition['configurator'];
       if (is_array($callable)) {
-        $callable = $this->resolveServicesAndParameters($callable);
+        $callable[0] = $this->resolveServicesAndParameters([$callable[0]])[0];
       }
 
       if (!is_callable($callable)) {
@@ -367,17 +367,25 @@ class Container implements ContainerInterface, ResetInterface {
   protected function resolveServicesAndParameters($arguments) {
     // Process the arguments.
     foreach ($arguments as $key => $argument) {
-      if (is_array($argument)) {
-        $arguments[$key] = $this->resolveServicesAndParameters($argument);
-        continue;
+      // In the machine-optimized format, bare strings are service references
+      // with EXCEPTION_ON_INVALID_REFERENCE behavior. This is the most common
+      // argument type, so check it first.
+      if (is_string($argument)) {
+        if (isset($this->aliases[$argument])) {
+          $argument = $this->aliases[$argument];
+        }
+
+        $arguments[$key] = $this->services[$argument] ?? $this->get($argument);
       }
-      // For this machine-optimized format, only \stdClass arguments are
-      // processed and resolved. All other values are kept as is.
-      if ($argument instanceof \stdClass) {
+      // stdClass objects encode parameters, literals, service references with
+      // non-default behavior, closures, private services, and iterators.
+      elseif ($argument instanceof \stdClass) {
         $type = $argument->type;
 
-        // Check for parameter.
-        if ($type == 'parameter') {
+        if ($type == 'raw') {
+          $arguments[$key] = $argument->value;
+        }
+        elseif ($type == 'parameter') {
           $name = $argument->name;
           if (!isset($this->parameters[$name])) {
             $arguments[$key] = $this->getParameter($name);
@@ -385,39 +393,11 @@ class Container implements ContainerInterface, ResetInterface {
             // because we already checked that the parameter is not set above.
           }
 
-          // Update argument.
-          $argument = $arguments[$key] = $this->parameters[$name];
-
-          // In case there is not a machine readable value (e.g. a service)
-          // behind this resolved parameter, continue.
-          if (!($argument instanceof \stdClass)) {
-            continue;
-          }
-
-          // Fall through.
-          $type = $argument->type;
+          $arguments[$key] = $this->parameters[$name];
         }
-
-        // Create a service.
-        if ($type == 'service') {
-          $id = $argument->id;
-
-          // Does the service already exist?
-          if (isset($this->aliases[$id])) {
-            $id = $this->aliases[$id];
-          }
-
-          if (isset($this->services[$id])) {
-            $arguments[$key] = $this->services[$id];
-            continue;
-          }
-
-          // Return the service.
-          $arguments[$key] = $this->get($id, $argument->invalidBehavior ?? ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
-
-          continue;
+        elseif ($type == 'service') {
+          $arguments[$key] = $this->get($argument->id, $argument->invalidBehavior);
         }
-        // Create private service.
         elseif ($type == 'private_service') {
           $id = $argument->id;
 
@@ -432,15 +412,11 @@ class Container implements ContainerInterface, ResetInterface {
           if ($argument->shared) {
             $this->privateServices[$id] = $arguments[$key];
           }
-
-          continue;
         }
         elseif ($type == 'service_closure') {
           $arguments[$key] = function () use ($argument) {
-            return $this->get($argument->id, $argument->invalidBehavior ?? ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
+            return $this->get($argument->id, $argument->invalidBehavior);
           };
-
-          continue;
         }
         elseif ($type == 'iterator') {
           $services = $argument->value;
@@ -449,13 +425,15 @@ class Container implements ContainerInterface, ResetInterface {
               yield $key => $this->resolveServicesAndParameters([$service])[0];
             }
           }, count($services));
-
-          continue;
         }
-        if ($type !== NULL) {
+        else {
           throw new InvalidArgumentException(sprintf('Undefined type "%s" while resolving parameters and services.', $type));
         }
       }
+      elseif (is_array($argument)) {
+        $arguments[$key] = $this->resolveServicesAndParameters($argument);
+      }
+      // int, bool, null, float — pass through.
     }
 
     return $arguments;

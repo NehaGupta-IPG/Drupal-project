@@ -207,7 +207,6 @@ class OptimizedPhpArrayDumper extends Dumper {
    */
   protected function getServiceDefinition(Definition $definition) {
     $service = [];
-
     if ($definition->getClass()) {
       $service['class'] = $definition->getClass();
     }
@@ -382,7 +381,7 @@ class OptimizedPhpArrayDumper extends Dumper {
       }
       else {
         // Unescape doubled percent signs back to single percents.
-        return str_replace('%%', '%', $value);
+        return $this->dumpLiteralString(str_replace('%%', '%', $value));
       }
     }
     elseif ($value instanceof Expression) {
@@ -403,6 +402,12 @@ class OptimizedPhpArrayDumper extends Dumper {
     }
     elseif (is_resource($value)) {
       throw new RuntimeException('Unable to dump a service container if a parameter is a resource.');
+    }
+
+    // Wrap literal strings so they are not confused with service references
+    // during resolution, where bare strings are treated as service IDs.
+    if (is_string($value)) {
+      return $this->dumpLiteralString($value);
     }
 
     return $value;
@@ -458,14 +463,15 @@ class OptimizedPhpArrayDumper extends Dumper {
    *   A suitable representation of the service reference.
    */
   protected function getServiceCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
-    $service_call = (object) [
-      'type' => 'service',
-      'id' => $id,
-    ];
     if ($invalid_behavior !== ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
-      $service_call->invalidBehavior = $invalid_behavior;
+      return (object) [
+        'type' => 'service',
+        'id' => $id,
+        'invalidBehavior' => $invalid_behavior,
+      ];
     }
-    return $service_call;
+
+    return $id;
   }
 
   /**
@@ -481,6 +487,25 @@ class OptimizedPhpArrayDumper extends Dumper {
     return (object) [
       'type' => 'parameter',
       'name' => $name,
+    ];
+  }
+
+  /**
+   * Wraps a literal string value for the dump format.
+   *
+   * In the machine-optimized format, bare strings are treated as service
+   * references, so literal strings must be wrapped in a stdClass object.
+   *
+   * @param string $value
+   *   The literal string value.
+   *
+   * @return object|string
+   *   The wrapped value.
+   */
+  protected function dumpLiteralString(string $value) {
+    return (object) [
+      'type' => 'raw',
+      'value' => $value,
     ];
   }
 
@@ -506,14 +531,11 @@ class OptimizedPhpArrayDumper extends Dumper {
    *   A suitable representation of the service closure reference.
    */
   protected function getServiceClosureCall(string $id, int $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
-    $service_closure = (object) [
+    return (object) [
       'type' => 'service_closure',
       'id' => $id,
+      'invalidBehavior' => $invalid_behavior,
     ];
-    if ($invalid_behavior !== ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
-      $service_closure->invalidBehavior = $invalid_behavior;
-    }
-    return $service_closure;
   }
 
   /**

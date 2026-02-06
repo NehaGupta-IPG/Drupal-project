@@ -588,16 +588,16 @@ class ContainerTest extends TestCase {
   }
 
   /**
-   * Tests that a parameter that points to a service works correctly.
+   * Tests that a service with a deep collection argument works correctly.
    *
    * @legacy-covers ::get
    * @legacy-covers ::createService
    * @legacy-covers ::resolveServicesAndParameters
    */
-  public function testResolveServicesAndParametersForServiceInstantiatedFromParameter(): void {
-    $service = $this->container->get('service.provider');
-    $test_service = $this->container->get('service_with_parameter_service');
-    $this->assertSame($service, $test_service->getSomeOtherService(), 'Service was passed via parameter.');
+  public function testResolveServicesAndParametersForDeepCollection(): void {
+    $other_service = $this->container->get('other.service');
+    $test_service = $this->container->get('service_with_deep_collection');
+    $this->assertSame($other_service, $test_service->getSomeOtherService(), 'Service was resolved in deep collection.');
   }
 
   /**
@@ -645,6 +645,17 @@ class ContainerTest extends TestCase {
   }
 
   /**
+   * Tests that escaped @-prefixed strings are not treated as service refs.
+   *
+   * @legacy-covers ::get
+   * @legacy-covers ::createService
+   * @legacy-covers ::resolveServicesAndParameters
+   */
+  public function testResolveServicesAndParametersForEscapedAtString(): void {
+    $this->assertEquals(['@admin', '@?optional'], $this->container->get('service_with_at_string')->getArguments());
+  }
+
+  /**
    * Tests that service iterators are lazily instantiated.
    */
   public function testIterator(): void {
@@ -688,9 +699,6 @@ class ContainerTest extends TestCase {
     $parameters['some_config'] = 'foo';
     $parameters['some_other_config'] = 'lama';
     $parameters['factory_service_class'] = get_class($fake_service);
-    // Also test alias resolving.
-    $parameters['service_from_parameter'] = $this->getServiceCall('service.provider_alias');
-
     $services = [];
     $services['other.service'] = [
       'class' => get_class($fake_service),
@@ -713,7 +721,7 @@ class ContainerTest extends TestCase {
         $this->getServiceCall('other.service'),
         $this->getParameterCall('some_config'),
       ],
-      'properties' => ['someProperty' => 'foo'],
+      'properties' => ['someProperty' => $this->getLiteralString('foo')],
       'calls' => [
         [
           'setContainer',
@@ -827,8 +835,8 @@ class ContainerTest extends TestCase {
       'class' => '\Drupal\service_container\ServiceContainer\ControllerInterface',
       'factory' => '\Drupal\Tests\Component\DependencyInjection\MockService::getFactoryMethod',
       'arguments' => [
-        '\Drupal\Tests\Component\DependencyInjection\MockService',
-        [NULL, 'bar'],
+        $this->getLiteralString('\Drupal\Tests\Component\DependencyInjection\MockService'),
+        [NULL, $this->getLiteralString('bar')],
       ],
       'calls' => [
         [
@@ -864,10 +872,9 @@ class ContainerTest extends TestCase {
     for ($i = 0; $i < 12; $i++) {
       $services['service_test_instantiation_' . $i] = [
         'class' => '\Drupal\Tests\Component\DependencyInjection\MockInstantiationService',
-        // Also test a collection that does not need resolving.
         'arguments' => $args,
       ];
-      $args[] = 'arg_' . $i;
+      $args[] = $this->getLiteralString('arg_' . $i);
     }
 
     $services['service_parameter_not_exists'] = [
@@ -885,10 +892,10 @@ class ContainerTest extends TestCase {
       ],
     ];
 
-    $services['service_with_parameter_service'] = [
+    $services['service_with_deep_collection'] = [
       'class' => '\Drupal\Tests\Component\DependencyInjection\MockService',
       'arguments' => [
-        $this->getParameterCall('service_from_parameter'),
+        $this->getServiceCall('other.service'),
         // Also test deep collections that don't need resolving.
         [
           1,
@@ -922,7 +929,16 @@ class ContainerTest extends TestCase {
     // Raw argument.
     $services['service_with_raw_argument'] = [
       'class' => '\Drupal\Tests\Component\DependencyInjection\MockInstantiationService',
-      'arguments' => ['ccc'],
+      'arguments' => [$this->getLiteralString('ccc')],
+    ];
+
+    // Literal @-prefixed string argument (not a service reference).
+    $services['service_with_at_string'] = [
+      'class' => '\Drupal\Tests\Component\DependencyInjection\MockInstantiationService',
+      'arguments' => [
+        $this->getLiteralString('@admin'),
+        $this->getLiteralString('@?optional'),
+      ],
     ];
 
     // Iterator argument.
@@ -952,11 +968,15 @@ class ContainerTest extends TestCase {
    * Helper function to return a service definition.
    */
   protected function getServiceCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
-    return (object) [
-      'type' => 'service',
-      'id' => $id,
-      'invalidBehavior' => $invalid_behavior,
-    ];
+    if ($invalid_behavior !== ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
+      return (object) [
+        'type' => 'service',
+        'id' => $id,
+        'invalidBehavior' => $invalid_behavior,
+      ];
+    }
+
+    return $id;
   }
 
   /**
@@ -987,6 +1007,19 @@ class ContainerTest extends TestCase {
     return (object) [
       'type' => 'parameter',
       'name' => $name,
+    ];
+  }
+
+  /**
+   * Helper function to return a literal string value.
+   *
+   * In the machine-optimized format, bare strings are service references,
+   * so literal strings must be wrapped in a stdClass object.
+   */
+  protected function getLiteralString($value): string|object {
+    return (object) [
+      'type' => 'raw',
+      'value' => $value,
     ];
   }
 
