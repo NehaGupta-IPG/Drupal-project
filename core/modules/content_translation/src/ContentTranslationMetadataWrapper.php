@@ -64,9 +64,6 @@ class ContentTranslationMetadataWrapper implements ContentTranslationMetadataWra
    */
   public function setOutdated($outdated) {
     $this->translation->set('content_translation_outdated', $outdated);
-    if (ContentTranslationManager::isPendingRevisionSupportEnabled($this->translation->getEntityTypeId(), $this->translation->bundle())) {
-      $this->handler->resetLastRevisionOutdatedStatus($this->translation);
-    }
     return $this;
   }
 

@@ -60,21 +60,6 @@ interface ContentTranslationHandlerInterface {
   public function retranslate(EntityInterface $entity, $langcode = NULL);
 
   /**
-   * Update the outdated status for the last affected revision translation.
-   *
-   * For moderated entities, the content_translation_outdated flag is
-   * determined by the latest revision where revision_translation_affected
-   * is TRUE. Therefore, to correctly keep the content_translation_outdated
-   * flag up to date, the old latest affected revision translation must be
-   * marked as up to date before the next affected revision translation is
-   * created.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity currently being edited.
-   */
-  public function resetLastRevisionOutdatedStatus(EntityInterface $entity): void;
-
-  /**
    * Performs the needed alterations to the entity form.
    *
    * @param array $form

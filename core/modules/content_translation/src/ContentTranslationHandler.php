@@ -268,57 +268,6 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
   }
 
   /**
-   * Update the outdated status for the last affected revision translation.
-   *
-   * For moderated entities, the content_translation_outdated flag is
-   * determined by the latest revision where revision_translation_affected
-   * is TRUE. Therefore, to correctly keep the content_translation_outdated
-   * revision history accurate, the old latest affected revision translation
-   * must be marked as up to date before the next affected revision translation
-   * is created.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity currently being edited.
-   */
-  public function resetLastRevisionOutdatedStatus(EntityInterface $entity): void {
-    // Only act for entities with pending revision support enabled.
-    if (!ContentTranslationManager::isPendingRevisionSupportEnabled($entity->getEntityTypeId(), $entity->bundle())) {
-      return;
-    }
-
-    /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
-    $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
-    $langcode = $entity->language()->getId();
-
-    // Identify the current latest translation-affected revision before a new
-    // one is recorded.
-    $latest_affected_revision_id = $storage->getLatestTranslationAffectedRevisionId($entity->id(), $langcode);
-    if (!$latest_affected_revision_id) {
-      return;
-    }
-
-    $metadata = $this->manager->getTranslationMetadata($entity);
-
-    // If the user is saving the translation with the outdated flag kept
-    // checked, then a new affected revision will be created upon save and
-    // should carry the outdated flag. To keep history accurate, the
-    // previous latest affected revision should be marked as not outdated.
-    if ($metadata->isOutdated()) {
-      /** @var \Drupal\Core\Entity\ContentEntityInterface $latest_revision */
-      $latest_revision = $storage->loadRevisionUnchanged($latest_affected_revision_id);
-      $latest_revision_translation = $latest_revision->getTranslation($langcode);
-      $metadata = $this->manager->getTranslationMetadata($latest_revision_translation);
-      if ($metadata->isOutdated()) {
-        $metadata->setOutdated(FALSE);
-        // Avoid creating another revision: we are just syncing metadata on the
-        // already-stored revision.
-        $latest_revision_translation->setSyncing(TRUE);
-        $storage->save($latest_revision_translation);
-      }
-    }
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function retranslate(EntityInterface $entity, $langcode = NULL) {

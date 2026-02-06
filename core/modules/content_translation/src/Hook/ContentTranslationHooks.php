@@ -6,8 +6,10 @@ namespace Drupal\content_translation\Hook;
 
 use Drupal\comment\CommentInterface;
 use Drupal\content_translation\ContentTranslationEnableTranslationPerBundle;
+use Drupal\content_translation\ContentTranslationManagerInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\EntityInterface;
@@ -27,6 +29,11 @@ use Drupal\workflows\Entity\Workflow;
 class ContentTranslationHooks {
 
   use StringTranslationTrait;
+
+  public function __construct(
+    private EntityTypeManagerInterface $entityTypeManager,
+    private ContentTranslationManagerInterface $contentTranslationManager,
+  ) {}
 
   /**
    * Implements hook_help().
@@ -468,6 +475,53 @@ class ContentTranslationHooks {
       $langcode = $entity->language()->getId();
       $source_langcode = !$entity->getOriginal()->hasTranslation($langcode) ? $manager->getTranslationMetadata($entity)->getSource() : NULL;
       \Drupal::service('content_translation.synchronizer')->synchronizeFields($entity, $langcode, $source_langcode);
+
+      $this->resetLastRevisionOutdatedStatus($entity);
+    }
+  }
+
+  /**
+   * Update the outdated status for the last affected revision translation.
+   *
+   * For moderated entities, the content_translation_outdated flag is
+   * determined by the latest revision where revision_translation_affected
+   * is TRUE. Therefore, to correctly keep the content_translation_outdated
+   * flag history in sync, the old latest affected revision translation must be
+   * reset before the next affected revision translation is created.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity currently being edited.
+   */
+  private function resetLastRevisionOutdatedStatus(ContentEntityInterface $entity): void {
+    $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
+    $langcode = $entity->language()->getId();
+
+    // Identify the current latest translation-affected revision before a new
+    // one is recorded.
+    $latest_affected_revision_id = $storage->getLatestTranslationAffectedRevisionId($entity->id(), $langcode);
+    if (!$latest_affected_revision_id) {
+      return;
+    }
+
+    $metadata = $this->contentTranslationManager->getTranslationMetadata($entity);
+
+    // If the user is saving the translation with the outdated flag kept
+    // checked, then a new affected revision will be created upon save and
+    // should carry the outdated flag. To keep history accurate, the
+    // previous latest affected revision should be marked as not outdated.
+    // If the user is saving the translation with the outdated flag
+    // unchecked, nothing needs to be done.
+    if ($metadata->isOutdated()) {
+      $latest_revision = $storage->loadRevisionUnchanged($latest_affected_revision_id);
+      $latest_revision_translation = $latest_revision->getTranslation($langcode);
+      $metadata = $this->contentTranslationManager->getTranslationMetadata($latest_revision_translation);
+      if ($metadata->isOutdated()) {
+        $metadata->setOutdated(FALSE);
+        // Avoid creating another revision: we are just syncing metadata on the
+        // already-stored revision.
+        $latest_revision_translation->setSyncing(TRUE);
+        $storage->save($latest_revision_translation);
+      }
     }
   }
 
