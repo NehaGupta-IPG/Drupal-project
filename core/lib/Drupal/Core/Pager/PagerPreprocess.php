@@ -51,6 +51,17 @@ class PagerPreprocess {
 
     $link_attributes = [];
 
+    // Allow pagers to opt out of generic modal AJAX handling (e.g., Views with
+    // AJAX enabled has its own pager AJAX handling that conflicts with this).
+    if (empty($variables['pager']['#skip_modal_ajax']) &&
+      $this->requestStack->getCurrentRequest()?->get(MainContentViewSubscriber::WRAPPER_FORMAT) === 'drupal_modal') {
+      $link_attributes = [
+        'class' => ['use-ajax'],
+        'data-dialog-type' => 'modal',
+        'data-accepts' => 'application/json',
+      ];
+    }
+
     $pager = $this->pagerManager->getPager($element);
 
     // Nothing to do if there is no pager.
