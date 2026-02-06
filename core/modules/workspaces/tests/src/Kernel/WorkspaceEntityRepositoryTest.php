@@ -208,6 +208,10 @@ class WorkspaceEntityRepositoryTest extends KernelTestBase {
     $active = $this->entityRepository->getActive($entity_type_id, $entity_3->id(), $en_contexts);
     $this->assertSame($non_default_live_revision->getLoadedRevisionId(), $active->getLoadedRevisionId());
     $this->assertSame($non_default_live_revision->language()->getId(), $active->language()->getId());
+    // Get the same active revision using ::getActiveMultiple().
+    $active = $this->entityRepository->getActiveMultiple($entity_type_id, [$entity_3->id()], $en_contexts)[0];
+    $this->assertSame($non_default_live_revision->getLoadedRevisionId(), $active->getLoadedRevisionId());
+    $this->assertSame($non_default_live_revision->language()->getId(), $active->language()->getId());
   }
 
 }
