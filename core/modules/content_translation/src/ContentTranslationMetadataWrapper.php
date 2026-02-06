@@ -64,9 +64,7 @@ class ContentTranslationMetadataWrapper implements ContentTranslationMetadataWra
    */
   public function setOutdated($outdated) {
     $this->translation->set('content_translation_outdated', $outdated);
-    // Keep the latest affected revision metadata in sync for moderated
-    // entities when a translation is marked as no longer outdated.
-    if (!$outdated && ContentTranslationManager::isPendingRevisionSupportEnabled($this->translation->getEntityTypeId(), $this->translation->bundle())) {
+    if (ContentTranslationManager::isPendingRevisionSupportEnabled($this->translation->getEntityTypeId(), $this->translation->bundle())) {
       $this->handler->resetLastRevisionOutdatedStatus($this->translation);
     }
     return $this;
