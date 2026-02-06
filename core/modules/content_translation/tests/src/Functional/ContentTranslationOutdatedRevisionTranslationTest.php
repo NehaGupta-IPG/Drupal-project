@@ -91,9 +91,48 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     ];
     $this->submitForm($edit, 'Save (this translation)');
 
-    // Create an English draft.
+    // Mark the other translations as outdated from the English node.
+    $en_edit_url = $this->getEditUrl($entity);
+    $this->drupalGet($en_edit_url);
     $edit = [
       'title[0][value]' => 'Test 1.4 EN',
+      'content_translation[retranslate]' => 1,
+    ];
+    $this->submitForm($edit, 'Save (this translation)');
+
+    $entity = $storage->loadUnchanged($entity->id());
+
+    // Check the Italian node is marked as outdated.
+    $it_edit_url = $this->getEditUrl($entity->getTranslation('it'));
+    $this->drupalGet($it_edit_url);
+    $this->assertSession()->pageTextContains('Test 1.2 IT');
+    $this->assertSession()->pageTextContains('This translation needs to be updated');
+
+    // Check the French node is marked as outdated.
+    $fr_edit_url = $this->getEditUrl($entity->getTranslation('fr'));
+    $this->drupalGet($fr_edit_url);
+    $this->assertSession()->pageTextContains('Test 1.3 FR');
+    $this->assertSession()->pageTextContains('This translation needs to be updated');
+
+    // Mark the Italian node not outdated.
+    $this->drupalGet($it_edit_url);
+    $edit = [
+      'title[0][value]' => 'Test 1.5 IT',
+      'content_translation[outdated]' => 0,
+    ];
+    $this->submitForm($edit, 'Save (this translation)');
+
+    // Mark the French node not outdated.
+    $this->drupalGet($fr_edit_url);
+    $edit = [
+      'title[0][value]' => 'Test 1.6 IT',
+      'content_translation[outdated]' => 0,
+    ];
+    $this->submitForm($edit, 'Save (this translation)');
+
+    // Mark the English node as a draft.
+    $edit = [
+      'title[0][value]' => 'Test 1.7 EN',
       'moderation_state[0][state]' => 'draft',
     ];
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
@@ -102,18 +141,18 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     $this->drupalGet($en_edit_url);
     $this->submitForm($edit, 'Save (this translation)');
 
-    // Create an Italian draft.
+    // Mark the italian node as a draft.
     $edit = [
-      'title[0][value]' => 'Test 1.5 IT',
+      'title[0][value]' => 'Test 1.8 IT',
       'moderation_state[0][state]' => 'draft',
     ];
     $it_edit_url = $this->getEditUrl($entity->getTranslation('it'));
     $this->drupalGet($it_edit_url);
     $this->submitForm($edit, $this->t('Save (this translation)'));
 
-    // Create a French draft.
+    // Mark the French node as a draft.
     $edit = [
-      'title[0][value]' => 'Test 1.6 FR',
+      'title[0][value]' => 'Test 1.9 FR',
       'moderation_state[0][state]' => 'draft',
     ];
     $fr_edit_url = $this->getEditUrl($entity->getTranslation('fr'));
@@ -124,9 +163,9 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     $latest_affected_revision_id_it = $storage->getLatestTranslationAffectedRevisionId($id, 'it');
     $latest_affected_revision_id_fr = $storage->getLatestTranslationAffectedRevisionId($id, 'fr');
 
-    // Create another English draft and mark the other translations as outdated.
+    // Mark the other translations as outdated from the English draft.
     $edit = [
-      'title[0][value]' => 'Test 1.7 EN',
+      'title[0][value]' => 'Test 1.10 EN',
       'moderation_state[0][state]' => 'draft',
       'content_translation[retranslate]' => 1,
     ];
@@ -144,17 +183,17 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     // Verify that the expected translation drafts are loaded in the related
     // entity forms and that the translations are marked as needing an update.
     $this->drupalGet($en_edit_url);
-    $this->assertSession()->pageTextContains('Test 1.7 EN');
+    $this->assertSession()->pageTextContains('Test 1.10 EN');
     $this->drupalGet($it_edit_url);
-    $this->assertSession()->pageTextContains('Test 1.5 IT');
+    $this->assertSession()->pageTextContains('Test 1.8 IT');
     $this->assertSession()->pageTextContains('This translation needs to be updated');
     $this->drupalGet($fr_edit_url);
-    $this->assertSession()->pageTextContains('Test 1.6 FR');
+    $this->assertSession()->pageTextContains('Test 1.9 FR');
     $this->assertSession()->pageTextContains('This translation needs to be updated');
 
     // Keep the Italian node as a draft but mark it as not outdated.
     $edit = [
-      'title[0][value]' => 'Test 1.8 IT',
+      'title[0][value]' => 'Test 1.11 IT',
       'moderation_state[0][state]' => 'draft',
       'content_translation[outdated]' => 0,
     ];
@@ -174,7 +213,7 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
 
     // Publish the French node and mark it as not outdated anymore.
     $edit = [
-      'title[0][value]' => 'Test 1.9 FR',
+      'title[0][value]' => 'Test 1.12 FR',
       'moderation_state[0][state]' => 'published',
       'content_translation[outdated]' => 0,
     ];
@@ -194,29 +233,26 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
 
     // Verify that the outdated flag is no longer checked on the translations.
     $this->drupalGet($it_edit_url);
-    $this->assertSession()->pageTextContains('Test 1.8 IT');
+    $this->assertSession()->pageTextContains('Test 1.11 IT');
     $this->assertSession()->pageTextContains('Flag other translations as outdated');
     $this->drupalGet($fr_edit_url);
-    $this->assertSession()->pageTextContains('Test 1.9 FR');
+    $this->assertSession()->pageTextContains('Test 1.12 FR');
     $this->assertSession()->pageTextContains('Flag other translations as outdated');
 
     // Re-mark the translations as outdated on the English node and publish
     // the changes.
     $edit = [
-      'title[0][value]' => 'Test 1.10 EN',
+      'title[0][value]' => 'Test 1.13 EN',
       'moderation_state[0][state]' => 'published',
       'content_translation[retranslate]' => 1,
     ];
     $this->drupalGet($en_edit_url);
     $this->submitForm($edit, $this->t('Save (this translation)'));
 
-    $this->drupalGet($en_edit_url);
-    $this->assertSession()->pageTextContains('Test 1.10 EN');
-
     // Verify that the outdated flag is read from the last affected
     // translation revision.
     $this->drupalGet($it_edit_url);
-    $this->assertSession()->pageTextContains('Test 1.8 IT');
+    $this->assertSession()->pageTextContains('Test 1.11 IT');
     $this->assertSession()->pageTextContains('This translation needs to be updated');
 
     // Assert that the stored Italian revision is marked outdated.
@@ -225,7 +261,7 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
 
     // Mark the Italian node as not outdated anymore.
     $edit = [
-      'title[0][value]' => 'Test 1.11 IT',
+      'title[0][value]' => 'Test 1.14 IT',
       'content_translation[outdated]' => 0,
     ];
     $this->drupalGet($it_edit_url);
@@ -245,14 +281,14 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
     // Verify that the outdated flag is read from the last affected
     // translation revision.
     $this->drupalGet($fr_edit_url);
-    $this->assertSession()->pageTextContains('Test 1.9 FR');
+    $this->assertSession()->pageTextContains('Test 1.12 FR');
     $this->assertSession()->pageTextContains('This translation needs to be updated');
 
     // Re-save the French node, keeping it outdated. We want to test that
     // re-saving it in the same state removes the outdated status from the
     // old affection revision.
     $edit = [
-      'title[0][value]' => 'Test 1.12 FR',
+      'title[0][value]' => 'Test 1.15 FR',
       'content_translation[outdated]' => 1,
     ];
     $this->drupalGet($fr_edit_url);
@@ -275,7 +311,7 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
 
     // Mark the French node as not outdated anymore.
     $edit = [
-      'title[0][value]' => 'Test 1.13 FR',
+      'title[0][value]' => 'Test 1.16 FR',
       'content_translation[outdated]' => 0,
     ];
     $this->drupalGet($fr_edit_url);
@@ -294,12 +330,13 @@ class ContentTranslationOutdatedRevisionTranslationTest extends ContentTranslati
 
     // Now re-verify that the outdated flags are as they should be.
     $this->drupalGet($en_edit_url);
-    $this->assertSession()->pageTextContains('Test 1.10 EN');
+    $this->assertSession()->pageTextContains('Test 1.13 EN');
+    $this->assertSession()->pageTextContains('Flag other translations as outdated');
     $this->drupalGet($it_edit_url);
-    $this->assertSession()->pageTextContains('Test 1.11 IT');
+    $this->assertSession()->pageTextContains('Test 1.14 IT');
     $this->assertSession()->pageTextContains('Flag other translations as outdated');
     $this->drupalGet($fr_edit_url);
-    $this->assertSession()->pageTextContains('Test 1.13 FR');
+    $this->assertSession()->pageTextContains('Test 1.16 FR');
     $this->assertSession()->pageTextContains('Flag other translations as outdated');
 
   }

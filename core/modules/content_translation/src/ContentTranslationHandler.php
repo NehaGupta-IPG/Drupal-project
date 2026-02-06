@@ -574,6 +574,7 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
     foreach (Element::children($form['actions']) as $action) {
       if (isset($form['actions'][$action]['#type']) && $form['actions'][$action]['#type'] == 'submit') {
         array_unshift($form['actions'][$action]['#submit'], [$this, 'entityFormSubmit']);
+        $form['actions'][$action]['#submit'][] = [$this, 'entityFormPostSave'];
       }
     }
   }
@@ -737,7 +738,25 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
     $metadata->setCreatedTime(!empty($values['created']) ? strtotime($values['created']) : $this->time->getRequestTime());
     $metadata->setOutdated(!empty($values['outdated']));
 
-    if (!empty($values['retranslate'])) {
+    if (!empty($values['retranslate']) && !ContentTranslationManager::isPendingRevisionSupportEnabled($entity->getEntityTypeId(), $entity->bundle())) {
+      $this->retranslate($entity, $form_langcode);
+    }
+  }
+
+  /**
+   * Form submission handler for ContentTranslationHandler::entityFormAlter().
+   *
+   * Performs required tasks after the entity has been saved.
+   */
+  public function entityFormPostSave($form, FormStateInterface $form_state) {
+    $values = $form_state->getValue('content_translation');
+    if (empty($values['retranslate'])) {
+      return;
+		}
+    $form_object = $form_state->getFormObject();
+    $form_langcode = $form_object->getFormLangcode($form_state);
+    $entity = $form_object->getEntity();
+    if (ContentTranslationManager::isPendingRevisionSupportEnabled($entity->getEntityTypeId(), $entity->bundle())) {
       $this->retranslate($entity, $form_langcode);
     }
   }
