@@ -6,6 +6,7 @@ namespace Drupal\content_translation\Hook;
 
 use Drupal\comment\CommentInterface;
 use Drupal\content_translation\ContentTranslationEnableTranslationPerBundle;
+use Drupal\content_translation\ContentTranslationManager;
 use Drupal\content_translation\ContentTranslationManagerInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\ContentEntityInterface;
@@ -476,7 +477,9 @@ class ContentTranslationHooks {
       $source_langcode = !$entity->getOriginal()->hasTranslation($langcode) ? $manager->getTranslationMetadata($entity)->getSource() : NULL;
       \Drupal::service('content_translation.synchronizer')->synchronizeFields($entity, $langcode, $source_langcode);
 
-      $this->resetLastRevisionOutdatedStatus($entity);
+      if ($entity->getEntityType()->isRevisionable() && ContentTranslationManager::isPendingRevisionSupportEnabled($entity->getEntityTypeId(), $entity->bundle())) {
+        $this->resetLastRevisionOutdatedStatus($entity);
+      }
     }
   }
 
@@ -486,7 +489,7 @@ class ContentTranslationHooks {
    * For moderated entities, the content_translation_outdated flag is
    * determined by the latest revision where revision_translation_affected
    * is TRUE. Therefore, to correctly keep the content_translation_outdated
-   * flag history in sync, the old latest affected revision translation must be
+   * history in sync, the old latest affected revision translation must be
    * reset before the next affected revision translation is created.
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
