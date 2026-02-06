@@ -8,6 +8,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\node\NodeInterface;
+use Drupal\user\Entity\User;
 
 /**
  * Returns a node ID listing.
@@ -17,16 +18,23 @@ class NodeAccessTestAutoBubblingController extends ControllerBase implements Con
   /**
    * Lists the three latest published node IDs.
    *
+   * @param string|int|null $uid
+   *   (optional) Check node access by the user with the given id, default is
+   *   the current user.
+   *
    * @return array
    *   A render array.
    */
-  public function latest() {
-    $nids = $this->entityTypeManager()->getStorage('node')->getQuery()
+  public function latest(string|int|null $uid = NULL) {
+    $query = $this->entityTypeManager()->getStorage('node')->getQuery()
       ->accessCheck(TRUE)
       ->condition('status', NodeInterface::PUBLISHED)
       ->sort('created', 'DESC')
-      ->range(0, 3)
-      ->execute();
+      ->range(0, 3);
+    if (!empty($uid)) {
+      $query->addMetaData('account', User::load($uid));
+    }
+    $nids = $query->execute();
     return ['#markup' => $this->t('The three latest nodes are: @nids.', ['@nids' => implode(', ', $nids)])];
   }
 

@@ -81,12 +81,16 @@ class NodeDatabaseHooks {
     }
     // Update the query for the given storage method.
     \Drupal::service('node.grant_storage')->alterQuery($query, $tables, $op, $account, $base_table);
-    // Bubble the 'user.node_grants:$op' cache context to the current render
-    // context.
-    $renderer = \Drupal::service('renderer');
-    if ($renderer->hasRenderContext()) {
-      $build = ['#cache' => ['contexts' => ['user.node_grants:' . $op]]];
-      $renderer->render($build);
+    if ($account->id() == \Drupal::currentUser()->id()) {
+      // Bubble the 'user.node_grants:$op' cache context to the current render
+      // context.
+      if (\Drupal::requestStack()->getCurrentRequest()?->isMethodCacheable()) {
+        $renderer = \Drupal::service('renderer');
+        if ($renderer->hasRenderContext()) {
+          $build = ['#cache' => ['contexts' => ['user.node_grants:' . $op]]];
+          $renderer->render($build);
+        }
+      }
     }
   }
 

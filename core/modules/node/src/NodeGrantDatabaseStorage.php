@@ -31,10 +31,15 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
     protected readonly LanguageManagerInterface $languageManager,
     #[Autowire(service: 'node.view_all_nodes_memory_cache')]
     protected MemoryCacheInterface $memoryCache,
+    protected AccountInterface $currentUser,
   ) {
     if (!$memoryCache) {
       @trigger_error('Calling NodeGrantDatabaseStorage::__construct() without the $memoryCache argument is deprecated in drupal:11.3.0 and the $memoryCache argument will be required in drupal:12.0.0. See https://www.drupal.org/node/3038909', E_USER_DEPRECATED);
       $this->memoryCache = \Drupal::service('node.view_all_nodes_memory_cache');
+    }
+    if (!$currentUser) {
+      @trigger_error('Calling NodeGrantDatabaseStorage::__construct() without the $currentUser argument is deprecated in drupal:11.3.0 and the $currentUser argument will be required in drupal:12.0.0. See https://www.drupal.org/node/3529545', E_USER_DEPRECATED);
+      $this->currentUser = \Drupal::currentUser();
     }
     $this->hasNodeGrantsImplementations = $this->moduleHandler->hasImplementations('node_grants');
   }
@@ -102,7 +107,9 @@ class NodeGrantDatabaseStorage implements NodeGrantDatabaseStorageInterface {
     else {
       $access_result = AccessResult::neutral();
     }
-    $access_result->addCacheContexts(['user.node_grants:' . $operation]);
+    if ($this->currentUser->id() == $account->id()) {
+      $access_result->addCacheContexts(['user.node_grants:' . $operation]);
+    }
 
     // Only the 'view' node grant can currently be cached; the others currently
     // don't have any cacheability metadata. Hopefully, we can add that in the
