@@ -15,8 +15,8 @@ class Standard extends Xss implements EditorXssFilterInterface {
   /**
    * {@inheritdoc}
    */
-  
-  public function filterXss(string $html, FilterFormatInterface $format, ?FilterFormatInterface $original_format = NULL): string {
+
+  public function filterXss($html, FilterFormatInterface $format, ?FilterFormatInterface $original_format = NULL) {
     // Apply XSS filtering, but disallow the <script>, <style>, <link>, <embed>
     // and <object> tags.
     //
@@ -87,7 +87,7 @@ class Standard extends Xss implements EditorXssFilterInterface {
    * @return string
    *   The filtered string.
    */
-  protected function filterXssDataAttributes(string $html): string {
+  protected function filterXssDataAttributes($html) {
     if (stristr($html, 'data-') !== FALSE) {
       $dom = Html::load($html);
       $xpath = new \DOMXPath($dom);
@@ -116,7 +116,7 @@ class Standard extends Xss implements EditorXssFilterInterface {
    *
    * @see \Drupal\filter\Plugin\Filter\FilterInterface::getHTMLRestrictions()
    */
-  protected function getAllowedTags($restrictions): array {
+  protected function getAllowedTags($restrictions) {
     if ($restrictions === FALSE || !isset($restrictions['allowed'])) {
       return [];
     }
