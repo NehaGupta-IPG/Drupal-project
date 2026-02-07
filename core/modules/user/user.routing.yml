@@ -148,6 +148,15 @@ user.pass.http:
     _access: 'TRUE'
     _format: 'json'
 
+user.pass_change.http:
+  path: '/user/password'
+  defaults:
+    _controller: \Drupal\user\Controller\UserAuthenticationController::changePassword
+  methods: [PATCH]
+  requirements:
+    _access: 'TRUE'
+    _format: 'json'
+
 user.page:
   path: '/user'
   defaults:

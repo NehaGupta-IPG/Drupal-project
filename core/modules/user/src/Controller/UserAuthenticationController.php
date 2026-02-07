@@ -13,6 +13,7 @@ use Drupal\user\UserInterface;
 use Drupal\user\UserStorageInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -262,6 +263,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
 
     // Load by name if provided.
     $identifier = '';
+    $users = NULL;
     if (isset($credentials['name'])) {
       $identifier = $credentials['name'];
       $users = $this->userStorage->loadByProperties(['name' => trim($identifier)]);
@@ -297,6 +299,86 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
 
     // Error if no users found with provided name or mail.
     $this->logger->error('Unable to send password reset email for unrecognized username or email address %identifier.', [
+      '%identifier' => $identifier,
+    ]);
+    return new Response();
+  }
+
+  /**
+   * Changes a user password.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request.
+   *
+   * @return \Symfony\Component\HttpFoundation\Response
+   *   The response object.
+   */
+  public function changePassword(Request $request) {
+    $format = $this->getRequestFormat($request);
+
+    $content = $request->getContent();
+    $credentials = $this->serializer->decode($content, $format);
+
+    // Check if a name or mail is provided.
+    if (!isset($credentials['name']) && !isset($credentials['mail'])) {
+      throw new BadRequestHttpException('Missing credentials.name or credentials.mail');
+    }
+
+    // Load by name if provided.
+    $identifier = '';
+    if (isset($credentials['name'])) {
+      $identifier = $credentials['name'];
+      $users = $this->userStorage->loadByProperties(['name' => trim($identifier)]);
+    }
+    elseif (isset($credentials['mail'])) {
+      $identifier = $credentials['mail'];
+      $users = $this->userStorage->loadByProperties(['mail' => trim($identifier)]);
+    }
+
+    /** @var \Drupal\Core\Session\AccountInterface $account */
+    $account = reset($users);
+    if ($account && $account->id()) {
+      if ($this->userIsBlocked($account->getAccountName())) {
+        $this->logger->error('Unable to change password for blocked or not yet activated user %identifier.', [
+          '%identifier' => $identifier,
+        ]);
+        return new Response();
+      }
+
+      // Set existing password.
+      $current_pass = trim($credentials['current_pass']);
+      $new_pass = trim($credentials['pass']);
+      /** @var \Drupal\user\UserInterface $account */
+      if (strlen($current_pass) > 0) {
+        $account->setExistingPassword($current_pass);
+      }
+      // Skip the protected user field constraint if the user came from the
+      // password recovery URL. This has to be called before setting the new
+      // password.
+      if ($credentials['pass-reset-token'] && $credentials['timestamp']) {
+        $account->_skipProtectedUserFieldConstraint = $this->validatePathParameters($account, $credentials['timestamp'], $credentials['pass-reset-token']);
+      }
+      $account->setPassword($new_pass);
+      $violations = $account->validate();
+      $errorMessages = [];
+      // Iterate over the list of violations.
+      foreach ($violations as $violation) {
+        // Get the error message for the violation.
+        $errorMessage = $violation->getMessage();
+        // Add the error message to the array.
+        $errorMessages[] = $errorMessage;
+      }
+      if ($errorMessages) {
+        return new JsonResponse(['errors' => $errorMessages], 400);
+      }
+      else {
+        $account->save();
+        return new Response();
+      }
+    }
+
+    // Error if no users found with provided name or mail.
+    $this->logger->error('Unable to change password for unrecognized username or email address %identifier.', [
       '%identifier' => $identifier,
     ]);
     return new Response();
@@ -440,6 +522,27 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
       return $identifier;
     }
     return '';
+  }
+
+  /**
+   * Validates hash and timestamp.
+   *
+   * @param \Drupal\user\UserInterface $user
+   *   User requesting reset.
+   * @param int $timestamp
+   *   The timestamp.
+   * @param string $hash
+   *   Login link hash.
+   * @param int $timeout
+   *   Link expiration timeout.
+   *
+   * @return bool
+   *   Whether the provided data are valid.
+   */
+  protected function validatePathParameters(UserInterface $user, int $timestamp, string $hash, int $timeout = 0): bool {
+    $current = \Drupal::time()->getRequestTime();
+    $timeout_valid = ((!empty($timeout) && $current - $timestamp < $timeout) || empty($timeout));
+    return ($timestamp >= $user->getLastLoginTime()) && $timestamp <= $current && $timeout_valid && hash_equals($hash, user_pass_rehash($user, $timestamp));
   }
 
 }
