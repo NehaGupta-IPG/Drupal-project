@@ -5,8 +5,6 @@
  * Documentation for Text Editor API.
  */
 
-use Drupal\filter\FilterFormatInterface;
-
 /**
  * @addtogroup hooks
  * @{

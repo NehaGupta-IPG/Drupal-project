@@ -7,8 +7,6 @@
 use Drupal\Core\Form\SubformState;
 use Drupal\editor\Entity\Editor;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\filter\FilterFormatInterface;
-use Drupal\filter\Plugin\FilterInterface;
 
 /**
  * Button submit handler for filter_format_form()'s 'editor_configure' button.
