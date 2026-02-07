@@ -10,6 +10,7 @@ use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldException;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Utility\Async;
 use Drupal\entity_test\Entity\EntityTestStringId;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
@@ -107,7 +108,7 @@ class EntityReferenceFieldTest extends EntityKernelTestBase {
 
     $entity = $storage->load($entity->id());
 
-    $fiber = new \Fiber(OpenTelemetry::bindContext(fn() => $entity->{$this->fieldName}->entity));
+    $fiber = Async::createFiber(fn() => $entity->{$this->fieldName}->entity);
     $fiber->start();
     $referenced_entity = $entity->{$this->fieldName}->entity;
     $this->assertIsObject($referenced_entity);
@@ -132,7 +133,7 @@ class EntityReferenceFieldTest extends EntityKernelTestBase {
     $entity = $storage->load($entity->id());
     $field_item = $entity->get($this->fieldName)->first();
 
-    $fiber = new \Fiber(OpenTelemetry::bindContext(fn() => $field_item->entity));
+    $fiber = Async::createFiber(fn() => $field_item->entity);
     $fiber->start();
     $referenced_entity = $field_item->entity;
     $this->assertIsObject($referenced_entity);
