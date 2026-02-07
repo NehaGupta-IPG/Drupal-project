@@ -6,7 +6,6 @@ namespace Drupal\Tests\big_pipe\Unit\Render;
 
 use Drupal\big_pipe\Render\BigPipe;
 use Drupal\big_pipe\Render\BigPipeResponse;
-use Drupal\Component\Utility\OpenTelemetry;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Render\ElementInfoManagerInterface;

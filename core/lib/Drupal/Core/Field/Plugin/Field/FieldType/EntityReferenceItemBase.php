@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Field\Plugin\Field\FieldType;
 
-use Drupal\Component\Utility\OpenTelemetry;
 use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Utility\Async;
 use Drupal\Core\Utility\FiberResumeType;

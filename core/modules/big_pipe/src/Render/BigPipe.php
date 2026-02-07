@@ -5,7 +5,6 @@ namespace Drupal\big_pipe\Render;
 use Drupal\Component\HttpFoundation\SecuredRedirectResponse;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Html;
-use Drupal\Component\Utility\OpenTelemetry;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\MessageCommand;
 use Drupal\Core\Ajax\RedirectCommand;
