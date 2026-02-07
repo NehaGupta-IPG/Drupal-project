@@ -15,13 +15,8 @@ class Async {
    * @param callable $callback
    *   Function to invoke when starting the fiber.
    *
-   * @return \Fiber<TStart,TResume,TReturn,TSuspend>
+   * @return \Fiber
    *   The fiber
-   *
-   * @template TStart
-   * @template TResume
-   * @template TReturn
-   * @template TSuspend
    */
   public static function createFiber(callable $callback): \Fiber {
     return new \Fiber(OpenTelemetry::bindContext($callback));
