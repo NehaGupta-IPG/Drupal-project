@@ -132,15 +132,15 @@ class DefaultTableMapping implements TableMappingInterface {
 
     // @todo Remove table names from the entity type definition in
     //   https://www.drupal.org/node/2232465.
-    $this->baseTable = $this->prefix . $entity_type->getBaseTable() ?: $entity_type->id();
+    $this->baseTable = $this->prefix . ($entity_type->getBaseTable() ?: $entity_type->id());
     if ($entity_type->isRevisionable()) {
-      $this->revisionTable = $this->prefix . $entity_type->getRevisionTable() ?: $entity_type->id() . '_revision';
+      $this->revisionTable = $this->prefix . ($entity_type->getRevisionTable() ?: $entity_type->id() . '_revision');
     }
     if ($entity_type->isTranslatable()) {
-      $this->dataTable = $this->prefix . $entity_type->getDataTable() ?: $entity_type->id() . '_field_data';
+      $this->dataTable = $this->prefix . ($entity_type->getDataTable() ?: $entity_type->id() . '_field_data');
     }
     if ($entity_type->isRevisionable() && $entity_type->isTranslatable()) {
-      $this->revisionDataTable = $this->prefix . $entity_type->getRevisionDataTable() ?: $entity_type->id() . '_field_revision';
+      $this->revisionDataTable = $this->prefix . ($entity_type->getRevisionDataTable() ?: $entity_type->id() . '_field_revision');
     }
   }
 
