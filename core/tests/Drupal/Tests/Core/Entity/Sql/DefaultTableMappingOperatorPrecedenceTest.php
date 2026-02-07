@@ -44,16 +44,11 @@ class DefaultTableMappingOperatorPrecedenceTest extends UnitTestCase {
     $entity_type->method('getBaseTable')->willReturn('test_entity');
     $entity_type->method('isRevisionable')->willReturn(TRUE);
     $entity_type->method('isTranslatable')->willReturn(FALSE);
-    // Simulate entity type that doesn't have revision table explicitly set.
     $entity_type->method('getRevisionTable')->willReturn(NULL);
-
-    $prefix = 'simpletest123';
-    $table_mapping = new DefaultTableMapping($entity_type, [], $prefix);
 
     $this->assertEquals(
       'simpletest123test_entity_revision',
-      $table_mapping->getRevisionTable(),
-      'Revision table should include entity ID when getRevisionTable() returns NULL'
+      (new DefaultTableMapping($entity_type, [], 'simpletest123'))->getRevisionTable()
     );
   }
 
@@ -66,16 +61,11 @@ class DefaultTableMappingOperatorPrecedenceTest extends UnitTestCase {
     $entity_type->method('getBaseTable')->willReturn('test_entity');
     $entity_type->method('isRevisionable')->willReturn(TRUE);
     $entity_type->method('isTranslatable')->willReturn(FALSE);
-    // Simulate entity type with empty revision table.
     $entity_type->method('getRevisionTable')->willReturn('');
-
-    $prefix = 'simpletest456';
-    $table_mapping = new DefaultTableMapping($entity_type, [], $prefix);
 
     $this->assertEquals(
       'simpletest456test_entity_revision',
-      $table_mapping->getRevisionTable(),
-      'Revision table should include entity ID when getRevisionTable() returns empty string'
+      (new DefaultTableMapping($entity_type, [], 'simpletest456'))->getRevisionTable()
     );
   }
 
@@ -90,13 +80,9 @@ class DefaultTableMappingOperatorPrecedenceTest extends UnitTestCase {
     $entity_type->method('isTranslatable')->willReturn(TRUE);
     $entity_type->method('getDataTable')->willReturn(NULL);
 
-    $prefix = 'simpletest789';
-    $table_mapping = new DefaultTableMapping($entity_type, [], $prefix);
-
     $this->assertEquals(
       'simpletest789test_entity_field_data',
-      $table_mapping->getDataTable(),
-      'Data table should include entity ID when getDataTable() returns NULL'
+      (new DefaultTableMapping($entity_type, [], 'simpletest789'))->getDataTable()
     );
   }
 
@@ -110,13 +96,9 @@ class DefaultTableMappingOperatorPrecedenceTest extends UnitTestCase {
     $entity_type->method('isRevisionable')->willReturn(FALSE);
     $entity_type->method('isTranslatable')->willReturn(FALSE);
 
-    $prefix = 'simpletest000';
-    $table_mapping = new DefaultTableMapping($entity_type, [], $prefix);
-
     $this->assertEquals(
       'simpletest000test_entity',
-      $table_mapping->getBaseTable(),
-      'Base table should include entity ID when getBaseTable() returns NULL'
+      (new DefaultTableMapping($entity_type, [], 'simpletest000'))->getBaseTable()
     );
   }
 
@@ -133,13 +115,9 @@ class DefaultTableMappingOperatorPrecedenceTest extends UnitTestCase {
     $entity_type->method('getDataTable')->willReturn('test_entity_field_data');
     $entity_type->method('getRevisionDataTable')->willReturn(NULL);
 
-    $prefix = 'simpletest111';
-    $table_mapping = new DefaultTableMapping($entity_type, [], $prefix);
-
     $this->assertEquals(
       'simpletest111test_entity_field_revision',
-      $table_mapping->getRevisionDataTable(),
-      'Revision data table should include entity ID when getRevisionDataTable() returns NULL'
+      (new DefaultTableMapping($entity_type, [], 'simpletest111'))->getRevisionDataTable()
     );
   }
 
