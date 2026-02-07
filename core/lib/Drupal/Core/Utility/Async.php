@@ -6,6 +6,11 @@ use Drupal\Component\Utility\OpenTelemetry;
 
 /**
  * Helper functions to create fibers in a consistent way.
+ *
+ * @template TStart
+ * @template TResume
+ * @template TReturn
+ * @template TSuspend
  */
 class Async {
 
@@ -15,7 +20,7 @@ class Async {
    * @param callable $callback
    *   Function to invoke when starting the fiber.
    *
-   * @return \Fiber
+   * @return \Fiber<TStart,TResume,TReturn,TSuspend>
    *   The fiber
    */
   public static function createFiber(callable $callback): \Fiber {
