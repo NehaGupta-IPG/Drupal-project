@@ -193,4 +193,42 @@ class CommentFieldsTest extends CommentTestBase {
     $this->assertSession()->statusMessageContains('Saved User comment configuration.', 'status');
   }
 
+  /**
+   * Tests the comment widget shows status in summary when closed.
+   */
+  public function testCommentWidgetDetailsSummary(): void {
+    $this->drupalCreateContentType(['type' => 'test_node_type']);
+    $this->addDefaultCommentField('node', 'test_node_type');
+
+    // Create a node.
+    $node = $this->drupalCreateNode([
+      'type' => 'test_node_type',
+      'comment' => CommentItemInterface::OPEN,
+    ]);
+
+    // Log in as admin and edit the node.
+    $this->drupalLogin($this->adminUser);
+    $this->drupalGet('node/' . $node->id() . '/edit');
+
+    // Check that the details summary shows current status.
+    $this->assertSession()->pageTextContains('Comment settings: Open');
+
+    // The details should be closed by default.
+    $details = $this->cssSelect('details.comment-node-test-node-type-settings-form');
+    $this->assertNotEmpty($details, 'Comment settings details element found.');
+    $this->assertFalse($details[0]->hasAttribute('open'), 'Comment settings details is closed by default.');
+
+    // Change to closed and verify summary updates.
+    $node->set('comment', CommentItemInterface::CLOSED);
+    $node->save();
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $this->assertSession()->pageTextContains('Comment settings: Closed');
+
+    // Change to hidden and verify summary updates.
+    $node->set('comment', CommentItemInterface::HIDDEN);
+    $node->save();
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $this->assertSession()->pageTextContains('Comment settings: Hidden');
+  }
+
 }
