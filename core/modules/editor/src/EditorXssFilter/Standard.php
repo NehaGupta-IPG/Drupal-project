@@ -15,7 +15,8 @@ class Standard extends Xss implements EditorXssFilterInterface {
   /**
    * {@inheritdoc}
    */
-  public static function filterXss($html, FilterFormatInterface $format, ?FilterFormatInterface $original_format = NULL) {
+  
+  public function filterXss(string $html, FilterFormatInterface $format, ?FilterFormatInterface $original_format = NULL): string {
     // Apply XSS filtering, but disallow the <script>, <style>, <link>, <embed>
     // and <object> tags.
     //
@@ -60,21 +61,21 @@ class Standard extends Xss implements EditorXssFilterInterface {
     // When switching from another format, we must use the intersection of
     // allowed tags: if either format is more restrictive, then the safety
     // expectations of *both* formats apply.
-    $allowed_tags = self::getAllowedTags($format_restrictions);
+    $allowed_tags = $this->getAllowedTags($format_restrictions);
     if ($original_format !== NULL) {
-      $allowed_tags = array_intersect($allowed_tags, self::getAllowedTags($original_format_restrictions));
+      $allowed_tags = array_intersect($allowed_tags, $this->getAllowedTags($original_format_restrictions));
     }
 
     // Don't remove dangerous tags that are explicitly allowed in both text
     // formats.
     $removed_tags = array_diff($dangerous_tags, $allowed_tags);
 
-    $output = static::filter($html, $removed_tags);
+    $output = Xss::filter($html, $removed_tags);
 
     // Since data-attributes can contain encoded HTML markup that could be
     // decoded and interpreted by editors, we need to apply XSS filtering to
     // their contents.
-    return static::filterXssDataAttributes($output);
+    return $this->filterXssDataAttributes($output);
   }
 
   /**
@@ -86,7 +87,7 @@ class Standard extends Xss implements EditorXssFilterInterface {
    * @return string
    *   The filtered string.
    */
-  protected static function filterXssDataAttributes($html) {
+  protected function filterXssDataAttributes(string $html): string {
     if (stristr($html, 'data-') !== FALSE) {
       $dom = Html::load($html);
       $xpath = new \DOMXPath($dom);
@@ -115,7 +116,7 @@ class Standard extends Xss implements EditorXssFilterInterface {
    *
    * @see \Drupal\filter\Plugin\Filter\FilterInterface::getHTMLRestrictions()
    */
-  protected static function getAllowedTags($restrictions) {
+  protected function getAllowedTags($restrictions): array {
     if ($restrictions === FALSE || !isset($restrictions['allowed'])) {
       return [];
     }

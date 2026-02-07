@@ -15,8 +15,7 @@ class Insecure implements EditorXssFilterInterface {
   /**
    * {@inheritdoc}
    */
-  public static function filterXss($html, FilterFormatInterface $format, ?FilterFormatInterface $original_format = NULL) {
-    // Don't apply any XSS filtering, just return the string we received.
+  public function filterXss(string $html, FilterFormatInterface $format, ?FilterFormatInterface $original_format = NULL): string {
     return $html;
   }
 

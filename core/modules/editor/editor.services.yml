@@ -9,6 +9,9 @@ services:
     parent: default_plugin_manager
     arguments:
       $entityTypeManager: '@entity_type.manager'
+  editor.xss_filter:
+    class: Drupal\editor\EditorXssFilter\Standard
+  Drupal\editor\EditorXssFilterInterface: '@editor.xss_filter'
   element.editor:
     class: Drupal\editor\Element
     arguments: ['@plugin.manager.editor']

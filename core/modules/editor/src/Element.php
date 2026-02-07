@@ -5,6 +5,7 @@ namespace Drupal\editor;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
+use Drupal\filter\FilterFormatInterface;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 
