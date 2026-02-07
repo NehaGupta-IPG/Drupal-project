@@ -32,15 +32,6 @@ class EditorController extends ControllerBase {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('element.editor')
-    );
-  }
-
-  /**
    * Apply the necessary XSS filtering for using a certain text format's editor.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
