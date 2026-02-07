@@ -4,6 +4,7 @@ namespace Drupal\editor;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\filter\FilterFormatInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -12,6 +13,32 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * Returns responses for Editor module routes.
  */
 class EditorController extends ControllerBase {
+
+  /**
+   * The editor element service.
+   *
+   * @var \Drupal\editor\Element
+   */
+  protected $editorElement;
+
+  /**
+   * Constructs an EditorController object.
+   *
+   * @param \Drupal\editor\Element $editor_element
+   *   The editor element service.
+   */
+  public function __construct(Element $editor_element) {
+    $this->editorElement = $editor_element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('element.editor')
+    );
+  }
 
   /**
    * Apply the necessary XSS filtering for using a certain text format's editor.
@@ -44,7 +71,7 @@ class EditorController extends ControllerBase {
         ->load($original_format_id);
     }
 
-    return new JsonResponse(editor_filter_xss($value, $filter_format, $original_format));
+    return new JsonResponse($this->editorElement->filterXss($value, $filter_format, $original_format));
   }
 
 }

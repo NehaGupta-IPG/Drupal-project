@@ -254,7 +254,8 @@ class FilterKernelTest extends KernelTestBase {
     // Editor XSS filter.
     $test_editor_xss_filter = function ($input) {
       $dummy_filter_format = FilterFormat::create();
-      return Standard::filterXss($input, $dummy_filter_format);
+      $filter = new Standard();
+      return $filter->filterXss($input, $dummy_filter_format);
     };
 
     // All the tricky cases encountered at https://www.drupal.org/node/2105841.
