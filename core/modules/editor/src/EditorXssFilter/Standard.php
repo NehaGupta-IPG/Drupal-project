@@ -15,7 +15,6 @@ class Standard extends Xss implements EditorXssFilterInterface {
   /**
    * {@inheritdoc}
    */
-
   public function filterXss($html, FilterFormatInterface $format, ?FilterFormatInterface $original_format = NULL) {
     // Apply XSS filtering, but disallow the <script>, <style>, <link>, <embed>
     // and <object> tags.
@@ -70,7 +69,7 @@ class Standard extends Xss implements EditorXssFilterInterface {
     // formats.
     $removed_tags = array_diff($dangerous_tags, $allowed_tags);
 
-    $output = Xss::filter($html, $removed_tags);
+    $output = static::filter($html, $removed_tags);
 
     // Since data-attributes can contain encoded HTML markup that could be
     // decoded and interpreted by editors, we need to apply XSS filtering to

@@ -40,7 +40,6 @@ function hook_editor_js_settings_alter(array &$settings) {
   }
 }
 
-
 /**
  * @} End of "addtogroup hooks".
  */

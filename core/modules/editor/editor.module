@@ -130,4 +130,3 @@ function editor_load($format_id) {
   // @see Drupal\Core\Config\Entity\ConfigEntityStorage::doLoadMultiple()
   return $format_id ? Editor::load($format_id) : NULL;
 }
-
