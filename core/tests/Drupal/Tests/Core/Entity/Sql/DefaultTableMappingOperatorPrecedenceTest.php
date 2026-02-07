@@ -7,13 +7,14 @@ namespace Drupal\Tests\Core\Entity\Sql;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\Sql\DefaultTableMapping;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests operator precedence in DefaultTableMapping table name construction.
- *
- * @coversDefaultClass \Drupal\Core\Entity\Sql\DefaultTableMapping
- * @group Entity
  */
+#[CoversClass(DefaultTableMapping::class)]
+#[Group('Entity')]
 class DefaultTableMappingOperatorPrecedenceTest extends UnitTestCase {
 
   /**
@@ -36,9 +37,6 @@ class DefaultTableMappingOperatorPrecedenceTest extends UnitTestCase {
    * - "test123" . NULL = "test123" (truthy)
    * - Fallback is NOT used
    * - Result: "test123" instead of "test123entity_id_revision"
-   *
-   * @covers ::__construct
-   * @covers ::getRevisionTable
    */
   public function testRevisionTableWithNullValue(): void {
     $entity_type = $this->createMock(ContentEntityTypeInterface::class);
@@ -61,9 +59,6 @@ class DefaultTableMappingOperatorPrecedenceTest extends UnitTestCase {
 
   /**
    * Tests that revision table name is correctly constructed with empty string.
-   *
-   * @covers ::__construct
-   * @covers ::getRevisionTable
    */
   public function testRevisionTableWithEmptyString(): void {
     $entity_type = $this->createMock(ContentEntityTypeInterface::class);
@@ -86,9 +81,6 @@ class DefaultTableMappingOperatorPrecedenceTest extends UnitTestCase {
 
   /**
    * Tests that data table name is correctly constructed when NULL.
-   *
-   * @covers ::__construct
-   * @covers ::getDataTable
    */
   public function testDataTableWithNullValue(): void {
     $entity_type = $this->createMock(ContentEntityTypeInterface::class);
@@ -110,9 +102,6 @@ class DefaultTableMappingOperatorPrecedenceTest extends UnitTestCase {
 
   /**
    * Tests that base table name is correctly constructed when NULL.
-   *
-   * @covers ::__construct
-   * @covers ::getBaseTable
    */
   public function testBaseTableWithNullValue(): void {
     $entity_type = $this->createMock(ContentEntityTypeInterface::class);
@@ -133,9 +122,6 @@ class DefaultTableMappingOperatorPrecedenceTest extends UnitTestCase {
 
   /**
    * Tests that revision data table is correctly constructed when NULL.
-   *
-   * @covers ::__construct
-   * @covers ::getRevisionDataTable
    */
   public function testRevisionDataTableWithNullValue(): void {
     $entity_type = $this->createMock(ContentEntityTypeInterface::class);
