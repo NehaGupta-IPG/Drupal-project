@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Drupal\Tests\language\Functional\Update;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the update path in a different language.
@@ -12,6 +15,9 @@ use Drupal\FunctionalTests\Update\UpdatePathTestBase;
  * @group Update
  * @group legacy
  */
+#[Group('Update')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class NonDefaultConfigSaveUpdateTest extends UpdatePathTestBase {
 
   /**

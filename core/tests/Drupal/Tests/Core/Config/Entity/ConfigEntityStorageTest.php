@@ -577,7 +577,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
   }
 
   /**
-   * @legaqcy-covers ::save
+   * @legacy-covers ::save
    */
   public function testSaveWithOverrides(): void {
     $entity = $this->getMockEntity(['id' => 'foo'], ['hasOverrides']);

@@ -6,14 +6,16 @@ namespace Drupal\Tests\config_translation\Functional;
 
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cSpell:ignore Angemeldeter Benutzer userroleauthenticated
 
 /**
  * Tests the config translation behaviors when editing roles and permissions.
- *
- * @group config_translation
  */
+#[Group('config_translation')]
+#[RunTestsInSeparateProcesses]
 class ConfigTranslationRoleUiTest extends BrowserTestBase {
 
   /**
