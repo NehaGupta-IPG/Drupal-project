@@ -17,7 +17,7 @@ use PHPUnit\Framework\Attributes\Group;
 class MigrateExceptionTest extends UnitTestCase {
 
   /**
-   * Ensures code and previous are passed to the parent constructor.
+   * Ensures $code and $previous are passed to the parent constructor.
    */
   public function testCodeAndPrevious(): void {
     $previous = new \Exception('A previous message');
