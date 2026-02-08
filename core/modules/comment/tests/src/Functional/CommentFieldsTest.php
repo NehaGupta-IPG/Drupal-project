@@ -199,6 +199,16 @@ class CommentFieldsTest extends CommentTestBase {
   public function testCommentWidgetDetailsSummary(): void {
     $this->drupalCreateContentType(['type' => 'test_node_type']);
     $this->addDefaultCommentField('node', 'test_node_type');
+
+    // Explicitly ensure the field is on the form display.
+    \Drupal::service('entity_display.repository')
+    ->getFormDisplay('node', 'test_node_type', 'default')
+    ->setComponent('comment', [
+      'type' => 'comment_default',
+      'weight' => 20,
+    ])
+    ->save();
+
     // Create a user that can edit article nodes.
     $admin = $this->drupalCreateUser([
       'administer nodes',
