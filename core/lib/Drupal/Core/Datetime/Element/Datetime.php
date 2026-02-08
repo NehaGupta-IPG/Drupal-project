@@ -368,6 +368,14 @@ class Datetime extends DateElementBase {
     $input_exists = FALSE;
     $input = NestedArray::getValue($form_state->getValues(), $element['#parents'], $input_exists);
     if ($input_exists) {
+      
+      // If the value has already been validated and replaced with a
+      // DrupalDateTime object (or NULL), skip re-validation to avoid
+      // "Cannot use object as array" fatal errors when the form is
+      // rebuilt and validated multiple times in the same request.
+      if ($input instanceof DrupalDateTime || ($input === NULL && !$element['#required'])) {
+        return;
+      }
 
       $title = static::getElementTitle($element, $complete_form);
 
