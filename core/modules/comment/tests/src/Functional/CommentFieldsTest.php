@@ -203,6 +203,11 @@ class CommentFieldsTest extends CommentTestBase {
     $admin = $this->drupalCreateUser([
       'bypass node access',
     ]);
+    // Create a node with the comment field.
+    $node = $this->drupalCreateNode([
+      'type' => 'test_node_type',
+    ]);
+    
     $this->drupalLogin($admin);
     $this->drupalGet('node/' . $this->node->id() . '/edit');
 
