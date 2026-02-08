@@ -207,9 +207,9 @@ class CommentFieldsTest extends CommentTestBase {
     $node = $this->drupalCreateNode([
       'type' => 'test_node_type',
     ]);
-    
+
     $this->drupalLogin($admin);
-    $this->drupalGet('node/' . $this->node->id() . '/edit');
+    $this->drupalGet('node/' . $node->id() . '/edit');
 
     // Check that the details summary shows current status.
     $this->assertSession()->statusCodeEquals(200);
@@ -221,15 +221,15 @@ class CommentFieldsTest extends CommentTestBase {
     // $this->assertFalse($details[0]->hasAttribute('open'), 'Comment settings details is closed by default.');
 
     // // Change to closed and verify summary updates.
-    // $this->node->set('comment', CommentItemInterface::CLOSED);
-    // $this->node->save();
-    // $this->drupalGet('node/' . $this->node->id() . '/edit');
+    // $node->set('comment', CommentItemInterface::CLOSED);
+    // $node->save();
+    // $this->drupalGet('node/' . $node->id() . '/edit');
     // $this->assertSession()->pageTextContains('Comment settings: Closed');
 
     // // Change to hidden and verify summary updates.
-    // $this->node->set('comment', CommentItemInterface::HIDDEN);
-    // $this->node->save();
-    // $this->drupalGet('node/' . $this->node->id() . '/edit');
+    // $node->set('comment', CommentItemInterface::HIDDEN);
+    // $node->save();
+    // $this->drupalGet('node/' . $node->id() . '/edit');
     // $this->assertSession()->pageTextContains('Comment settings: Hidden');
   }
 
