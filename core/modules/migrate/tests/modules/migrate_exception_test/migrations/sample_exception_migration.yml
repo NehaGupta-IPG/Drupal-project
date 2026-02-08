@@ -1,0 +1,23 @@
+id: sample_exception_migration
+label: Sample Exception Migration
+source:
+  plugin: embedded_data
+  data_rows:
+    - id: 1
+      part: 1
+      date: 'not-a-date-value'
+  ids:
+    id:
+      type: integer
+process:
+  entity_reference:
+    - plugin: get
+      source:
+        - 'part'
+        - 'date'
+    - plugin: flatten
+    - plugin: migration_lookup
+      migration: sample_exception_chaining_migration
+      stub_id: sample_exception_chaining_migration
+destination:
+  plugin: 'null'

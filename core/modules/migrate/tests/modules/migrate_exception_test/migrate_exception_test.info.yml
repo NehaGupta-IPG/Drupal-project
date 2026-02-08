@@ -1,0 +1,7 @@
+name: 'Migration Exception Test'
+type: module
+description: 'Provides test migrations to test migration exception chaining.'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:migrate

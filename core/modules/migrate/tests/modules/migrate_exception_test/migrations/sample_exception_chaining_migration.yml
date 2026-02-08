@@ -1,0 +1,18 @@
+id: sample_exception_chaining_migration
+label: Sample Exception Chaining Migration
+source:
+  plugin: embedded_data
+  data_rows: []
+  ids:
+    id:
+      type: integer
+    date:
+      type: string
+process:
+  date:
+    plugin: format_date
+    source: date
+    from_format: 'Y-m-d'
+    to_format: 'Y-m-d\TH:i:s'
+destination:
+  plugin: 'null'
