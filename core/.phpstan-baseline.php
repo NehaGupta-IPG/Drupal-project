@@ -23224,18 +23224,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/migrate/src/Form/MessageForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Constructor of class Drupal\\\\migrate\\\\MigrateException has an unused parameter \\$code\\.$#',
-	'identifier' => 'constructor.unusedParameter',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/src/MigrateException.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Constructor of class Drupal\\\\migrate\\\\MigrateException has an unused parameter \\$previous\\.$#',
-	'identifier' => 'constructor.unusedParameter',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/migrate/src/MigrateException.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\migrate\\\\MigrateExecutable\\:\\:handleException\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
