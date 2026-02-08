@@ -197,6 +197,8 @@ class CommentFieldsTest extends CommentTestBase {
    * Tests the comment widget shows status in summary when closed.
    */
   public function testCommentWidgetDetailsSummary(): void {
+    $this->drupalCreateContentType(['type' => 'test_node_type']);
+    $this->addDefaultCommentField('node', 'test_node_type');
     // Create a user that can edit article nodes.
     $admin = $this->drupalCreateUser([
       'bypass node access',
@@ -205,6 +207,7 @@ class CommentFieldsTest extends CommentTestBase {
     $this->drupalGet('node/' . $this->node->id() . '/edit');
 
     // Check that the details summary shows current status.
+    $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains('Comment');
 
     // The details should be closed by default.
