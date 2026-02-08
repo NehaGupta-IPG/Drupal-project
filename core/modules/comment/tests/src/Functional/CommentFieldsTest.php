@@ -205,19 +205,19 @@ class CommentFieldsTest extends CommentTestBase {
       'edit any test_node_type content',
       'access content',
     ]);
-  
+
     $node = $this->drupalCreateNode([
       'type' => 'test_node_type',
     ]);
-  
+
     $this->drupalLogin($admin);
     $this->drupalGet('node/' . $node->id() . '/edit');
-  
+
     $this->assertSession()->statusCodeEquals(200);
-    
+
     // Check we're actually on an edit form
     $this->assertSession()->buttonExists('Save');
-    
+
     // Debug - what's on the page?
     $this->assertSession()->pageTextContains('test_node_type');
 
