@@ -200,6 +200,12 @@ class CommentFieldsTest extends CommentTestBase {
     $this->drupalCreateContentType(['type' => 'test_node_type']);
     $this->addDefaultCommentField('node', 'test_node_type');
 
+    // Create a user that can edit nodes.
+    $admin = $this->drupalCreateUser([
+      'edit any test_node_type content',
+      'access content',
+    ]);
+
     // Create a node.
     $node = $this->drupalCreateNode([
       'type' => 'test_node_type',
@@ -207,7 +213,7 @@ class CommentFieldsTest extends CommentTestBase {
     ]);
 
     // Log in as admin and edit the node.
-    $this->drupalLogin($this->adminUser);
+    $this->drupalLogin($admin);
     $this->drupalGet('node/' . $node->id() . '/edit');
 
     // Check that the details summary shows current status.
