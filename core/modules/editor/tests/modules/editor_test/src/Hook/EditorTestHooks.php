@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\editor_test\Hook;
 
 use Drupal\file\FileInterface;
-use Drupal\filter\FilterFormatInterface;
 use Drupal\node\NodeInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -57,21 +56,6 @@ class EditorTestHooks {
     }
     if (isset($settings['editor']['formats']['full_html'])) {
       $settings['editor']['formats']['full_html']['editorSettings']['ponyModeEnabled'] = FALSE;
-    }
-  }
-
-  /**
-   * Implements hook_editor_xss_filter_alter().
-   */
-  #[Hook('editor_xss_filter_alter')]
-  public function editorXssFilterAlter(&$editor_xss_filter_class, FilterFormatInterface $format, ?FilterFormatInterface $original_format = NULL): void {
-    // Allow tests to enable or disable this alter hook.
-    if (!\Drupal::keyValue('editor_test')->get('editor_xss_filter_alter_enabled', FALSE)) {
-      return;
-    }
-    $filters = $format->filters()->getAll();
-    if (isset($filters['filter_html']) && $filters['filter_html']->status) {
-      $editor_xss_filter_class = '\Drupal\editor_test\EditorXssFilter\Insecure';
     }
   }
 
