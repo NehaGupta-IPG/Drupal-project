@@ -201,6 +201,7 @@ class CommentFieldsTest extends CommentTestBase {
     $admin = $this->drupalCreateUser([
       'edit any article content',
       'access content',
+      'administer nodes',
     ]);
 
     $this->drupalLogin($admin);
