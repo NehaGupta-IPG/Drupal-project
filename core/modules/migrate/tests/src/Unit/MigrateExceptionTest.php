@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\migrate\Unit;
 
 use Drupal\migrate\MigrateException;
-use Drupal\migrate\MigrateExecutable;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -13,7 +12,7 @@ use PHPUnit\Framework\Attributes\Group;
 /**
  * Tests the MigrateException class.
  */
-#[CoversClass(MigrateExecutable::class)]
+#[CoversClass(MigrateException::class)]
 #[Group('migrate')]
 class MigrateExceptionTest extends UnitTestCase {
 
