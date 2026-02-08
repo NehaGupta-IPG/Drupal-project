@@ -93,18 +93,20 @@ class MediaLibraryWithPagerTest extends WebDriverTestBase {
 
     // Create a sample media entity to be embedded.
     $this->createMediaType('image', ['id' => 'image', 'label' => 'Image']);
-    File::create([
+    $file1 = File::create([
       'uri' => $this->getTestFiles('image')[0]->uri,
-    ])->save();
-    File::create([
+    ]);
+    $file1->save();
+    $file2 = File::create([
       'uri' => $this->getTestFiles('image')[1]->uri,
-    ])->save();
+    ]);
+    $file2->save();
     Media::create([
       'bundle' => 'image',
       'name' => 'Fear is the mind-killer',
       'field_media_image' => [
         [
-          'target_id' => 1,
+          'target_id' => $file1->id(),
           'alt' => 'default alt',
           'title' => 'default title',
         ],
@@ -115,7 +117,7 @@ class MediaLibraryWithPagerTest extends WebDriverTestBase {
       'name' => 'Action cures fear',
       'field_media_image' => [
         [
-          'target_id' => 2,
+          'target_id' => $file2->id(),
           'alt' => 'default alt',
           'title' => 'default title',
         ],
@@ -150,9 +152,11 @@ class MediaLibraryWithPagerTest extends WebDriverTestBase {
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#drupal-modal #media-library-content'));
 
     $assert_session->elementTextContains('css', '.js-media-library-item', 'Fear is the mind-killer');
+    $assert_session->elementTextNotContains('css', '.js-media-library-item', 'Action cures fear');
 
     $page->clickLink('Next page');
     $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->elementTextNotContains('css', '.js-media-library-item', 'Fear is the mind-killer');
     $assert_session->elementTextContains('css', '.js-media-library-item', 'Action cures fear');
   }
 
