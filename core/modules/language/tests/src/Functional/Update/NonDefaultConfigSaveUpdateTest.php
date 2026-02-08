@@ -11,9 +11,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the update path in a different language.
- *
- * @group Update
- * @group legacy
  */
 #[Group('Update')]
 #[IgnoreDeprecations]

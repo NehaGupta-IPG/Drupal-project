@@ -13,7 +13,6 @@ use Drupal\Core\Entity\EntityStorageBase;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\Entity\Exception\ConfigEntityIdLengthException;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
