@@ -162,11 +162,6 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
     /** @var \Drupal\Core\Config\Config[] $configs */
     $configs = [];
     $records = [];
-
-    // Never load config with overrides when running updates.
-    if (defined('MAINTENANCE_MODE') && (MAINTENANCE_MODE == 'update' || InstallerKernel::installationAttempted())) {
-      $this->overrideFree = TRUE;
-    }
     foreach ($this->configFactory->loadMultiple($names) as $config) {
       $id = $config->get($this->idKey);
       if ($this->overrideFree) {

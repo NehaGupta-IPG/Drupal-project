@@ -235,11 +235,6 @@ function update_do_one($module, $number, $dependency_map, &$context): void {
 function update_invoke_post_update($function, &$context): void {
   $ret = [];
 
-  // Disable config entity overrides.
-  if (!defined('MAINTENANCE_MODE')) {
-    define('MAINTENANCE_MODE', 'update');
-  }
-
   // If this update was aborted in a previous step, or has a dependency that was
   // aborted in a previous step, go no further.
   if (!empty($context['results']['#abort'])) {

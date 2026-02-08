@@ -723,38 +723,6 @@ class ConfigEntityStorageTest extends UnitTestCase {
    * @legacy-covers ::mapFromStorageRecords
    * @legacy-covers ::doLoadMultiple
    */
-  #[PreserveGlobalState(FALSE)]
-  #[RunInSeparateProcess]
-  public function testLoadWithOverridesMaintenanceMode(): void {
-
-    define('MAINTENANCE_MODE', 'update');
-
-    $config_object = $this->prophesize(ImmutableConfig::class);
-    $config_object->getOriginal(NULL, FALSE)->willReturn(['id' => 'foo', 'value' => 'original_value']);
-    $config_object->get()->willReturn(['id' => 'foo', 'value' => 'some_value']);
-    $config_object->get('id')->willReturn('foo');
-    $config_object->hasOverrides()->willReturn(FALSE);
-    $config_object->getCacheContexts()->willReturn([]);
-    $config_object->getCacheTags()->willReturn(['config:foo']);
-    $config_object->getCacheMaxAge()->willReturn(Cache::PERMANENT);
-    $config_object->getName()->willReturn('foo');
-
-    $this->configFactory->loadMultiple(['the_provider.the_config_prefix.foo'])
-      ->willReturn([$config_object->reveal()]);
-
-    $entity = $this->entityStorage->load('foo');
-    $this->assertInstanceOf(EntityInterface::class, $entity);
-    $this->assertSame('foo', $entity->id());
-    $this->assertSame('original_value', $entity->get('value'));
-    $this->assertFalse($entity->hasOverrides());
-  }
-
-  /**
-   * @legacy-covers ::load
-   * @legacy-covers ::postLoad
-   * @legacy-covers ::mapFromStorageRecords
-   * @legacy-covers ::doLoadMultiple
-   */
   public function testLoadOverrideFree(): void {
     $config_object = $this->prophesize(ImmutableConfig::class);
     $config_object->getOriginal(NULL, FALSE)->willReturn(['id' => 'foo']);
