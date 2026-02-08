@@ -111,3 +111,13 @@ user:
     component:
       css/components/user.css:
         weight: -10
+# Example of a JS behavior.
+reading-time:
+  version: VERSION
+  js:
+    js/reading-time.js: {}
+  dependencies:
+    - core/drupal
+    - core/drupal.message
+    - core/drupalSettings
+    - core/once

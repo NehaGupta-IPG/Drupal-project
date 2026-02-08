@@ -6,6 +6,16 @@
  */
 
 /**
+ * Implements THEME_page_attachments_alter().
+ */
+function starterkit_theme_page_attachments_alter(&$page) {
+  // Pass a value to our JS behavior (e.g. Drupal.behaviors.readingTime).
+  $page['#attached']['drupalSettings']['starterkit_theme']['wordsPerMinute'] = 225;
+  // Attach our JS behavior to every page.
+  $page['#attached']['library'][] = 'starterkit_theme/reading-time';
+}
+
+/**
  * Implements hook_preprocess_image_widget().
  */
 function starterkit_theme_preprocess_image_widget(array &$variables): void {
