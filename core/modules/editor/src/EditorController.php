@@ -4,7 +4,6 @@ namespace Drupal\editor;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\filter\FilterFormatInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
