@@ -222,25 +222,25 @@ class CommentFieldsTest extends CommentTestBase {
     $this->assertSession()->pageTextContains('test_node_type');
 
     // Check that the details summary shows current status.
-    // $this->assertSession()->statusCodeEquals(200);
-    // $this->assertSession()->pageTextContains('Comment');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('Comment');
 
     // The details should be closed by default.
-    // $details = $this->cssSelect('details.comment-node-settings-form');
-    // $this->assertNotEmpty($details, 'Comment settings details element found.');
-    // $this->assertFalse($details[0]->hasAttribute('open'), 'Comment settings details is closed by default.');
+    $details = $this->cssSelect('details.comment-node-settings-form');
+    $this->assertNotEmpty($details, 'Comment settings details element found.');
+    $this->assertFalse($details[0]->hasAttribute('open'), 'Comment settings details is closed by default.');
 
-    // // Change to closed and verify summary updates.
-    // $node->set('comment', CommentItemInterface::CLOSED);
-    // $node->save();
-    // $this->drupalGet('node/' . $node->id() . '/edit');
-    // $this->assertSession()->pageTextContains('Comment settings: Closed');
+    // Change to closed and verify summary updates.
+    $node->set('comment', CommentItemInterface::CLOSED);
+    $node->save();
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $this->assertSession()->pageTextContains('Comment settings: Closed');
 
-    // // Change to hidden and verify summary updates.
-    // $node->set('comment', CommentItemInterface::HIDDEN);
-    // $node->save();
-    // $this->drupalGet('node/' . $node->id() . '/edit');
-    // $this->assertSession()->pageTextContains('Comment settings: Hidden');
+    // Change to hidden and verify summary updates.
+    $node->set('comment', CommentItemInterface::HIDDEN);
+    $node->save();
+    $this->drupalGet('node/' . $node->id() . '/edit');
+    $this->assertSession()->pageTextContains('Comment settings: Hidden');
   }
 
 }
