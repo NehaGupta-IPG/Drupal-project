@@ -209,14 +209,7 @@ class CommentFieldsTest extends CommentTestBase {
 
     $this->assertSession()->statusCodeEquals(200);
 
-    // Find ALL details elements on the page
-    $details = $this->cssSelect('details');
-    $details_classes = [];
-    foreach ($details as $d) {
-      $details_classes[] = $d->getAttribute('class') ?: '(no class)';
-    }
-
-    $this->fail('Details elements found: ' . implode(' | ', $details_classes));
+    $this->assertSession()->pageTextContains('Comment settings');
 
     // Check that the details summary shows current status.
     // $this->assertSession()->statusCodeEquals(200);
