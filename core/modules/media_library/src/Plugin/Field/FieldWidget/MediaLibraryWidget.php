@@ -625,9 +625,13 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    *   The message to display when there are no allowed media types.
    */
   protected function getNoMediaTypesAvailableMessage() {
-    $entity_type_id = $this->fieldDefinition->getTargetEntityTypeId();
-
     $default_message = $this->t('There are no allowed media types configured for this field. Contact the site administrator.');
+
+    // Ignore base fields.
+    if (!$this->fieldDefinition instanceof FieldConfigInterface) {
+      return $default_message;
+    }
+    $entity_type_id = $this->fieldDefinition->getTargetEntityTypeId();
 
     // Show the default message if the user does not have the permissions to
     // configure the fields for the entity type.
