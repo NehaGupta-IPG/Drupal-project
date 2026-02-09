@@ -22,15 +22,16 @@ class NumberTest extends TestCase {
   /**
    * Tests Number::validStep() without offset.
    *
-   * @dataProvider providerTestValidStep
-   * @covers ::validStep
-   *
    * @param int|float|string $value
    *   The value argument for Number::validStep().
    * @param int|float|string $step
    *   The step argument for Number::validStep().
    * @param bool $expected
    *   Expected return value from Number::validStep().
+   *
+   * @covers ::validStep
+   *
+   * @dataProvider providerTestValidStep
    */
   #[DataProvider('providerTestValidStep')]
   public function testValidStep(int|float|string $value, int|float|string $step, bool $expected): void {
@@ -41,9 +42,6 @@ class NumberTest extends TestCase {
   /**
    * Tests Number::validStep() with offset.
    *
-   * @dataProvider providerTestValidStepOffset
-   * @covers ::validStep
-   *
    * @param int|float|string $value
    *   The value argument for Number::validStep().
    * @param int|float|string $step
@@ -52,6 +50,10 @@ class NumberTest extends TestCase {
    *   The offset argument for Number::validStep().
    * @param bool $expected
    *   Expected return value from Number::validStep().
+   *
+   * @covers ::validStep
+   *
+   * @dataProvider providerTestValidStepOffset
    */
   #[DataProvider('providerTestValidStepOffset')]
   public function testValidStepOffset(int|float|string $value, int|float|string $step, float $offset, bool $expected): void {
