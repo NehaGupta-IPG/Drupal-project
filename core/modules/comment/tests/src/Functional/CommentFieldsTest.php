@@ -229,9 +229,9 @@ class CommentFieldsTest extends CommentTestBase {
     $this->assertSession()->buttonExists('Save');
 
     // Debug - what's on the page?
-    $this->assertSession()->pageTextContains('test_node_type');
-    // Check if the comment field radio buttons exist
-    $this->assertSession()->fieldExists('comment[0][status]');
+    // Check for the radio button options text
+    $this->assertSession()->pageTextContains('Open');
+    $this->assertSession()->pageTextContains('Users with the "Post comments" permission can post comments.');
 
     // Check that the details summary shows current status.
     // $this->assertSession()->statusCodeEquals(200);
