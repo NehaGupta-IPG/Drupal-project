@@ -197,33 +197,25 @@ class CommentFieldsTest extends CommentTestBase {
    * Tests the comment widget shows status in summary when closed.
    */
   public function testCommentWidgetDetailsSummary(): void {
-    $field = FieldConfig::loadByName('node', 'article', 'comment');
-    $this->assertNotNull($field, 'Comment field exists on article');
-
-    // Check form display
-    $form_display = \Drupal::service('entity_display.repository')
-      ->getFormDisplay('node', 'article', 'default');
-    $component = $form_display->getComponent('comment');
-    $this->assertNotNull($component, 'Comment field is on form display');
-
     $admin = $this->drupalCreateUser([
+      'administer nodes',
       'edit any article content',
       'access content',
     ]);
-
+  
     $this->drupalLogin($admin);
     $this->drupalGet('node/' . $this->node->id() . '/edit');
-
+  
     $this->assertSession()->statusCodeEquals(200);
-    // What fields ARE on the form?
-    $this->assertSession()->fieldExists('title[0][value]');
-    $this->assertSession()->fieldExists('body[0][value]');
-
-    // Look for the details element with our class
-    $this->assertSession()->elementExists('css', 'details.comment-node-settings-form');
-
-    // Check the summary text contains the status
-    $this->assertSession()->pageTextContains('Comment settings: Open');
+    
+    // Find ALL details elements on the page
+    $details = $this->cssSelect('details');
+    $details_classes = [];
+    foreach ($details as $d) {
+      $details_classes[] = $d->getAttribute('class') ?: '(no class)';
+    }
+    
+    $this->fail('Details elements found: ' . implode(' | ', $details_classes));
 
     // Check that the details summary shows current status.
     // $this->assertSession()->statusCodeEquals(200);
