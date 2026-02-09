@@ -22,8 +22,8 @@ use Drupal\views\Plugin\views\wizard\WizardPluginBase;
  */
 #[ViewsWizard(
   id: 'node',
-  base_table: 'node_field_data',
-  title: new TranslatableMarkup('Content')
+  title: new TranslatableMarkup('Content'),
+  base_table: 'node_field_data'
 )]
 class Node extends WizardPluginBase {
 
@@ -56,9 +56,6 @@ class Node extends WizardPluginBase {
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeBundleInfoInterface $bundle_info_service, protected EntityDisplayRepositoryInterface $entityDisplayRepository, protected EntityFieldManagerInterface $entityFieldManager, MenuParentFormSelectorInterface $parent_form_selector, protected EntityTypeManagerInterface $entityTypeManager,) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $bundle_info_service, $parent_form_selector);
-
-    $this->entityDisplayRepository = $entity_display_repository;
-    $this->entityFieldManager = $entity_field_manager;
   }
 
   /**
