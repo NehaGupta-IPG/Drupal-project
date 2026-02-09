@@ -206,7 +206,6 @@ class CommentFieldsTest extends CommentTestBase {
 
     $this->drupalLogin($admin);
     $this->drupalGet('node/' . $this->node->id() . '/edit');
-
     $this->assertSession()->statusCodeEquals(200);
 
     // Check that the details summary shows current status.
