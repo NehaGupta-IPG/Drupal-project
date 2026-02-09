@@ -32,7 +32,7 @@
  *
  * @see https://www.php.net/manual/en/ini.core.php#ini.zend.assertions
  */
-if (ini_get('zend.assertions') !== -1) {
+if (ini_get('zend.assertions') != -1) {
   ini_set('zend.assertions', 1);
 }
 
