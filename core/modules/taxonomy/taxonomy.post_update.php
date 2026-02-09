@@ -8,6 +8,8 @@
 use Drupal\Component\Uuid\Uuid;
 use Drupal\Core\Config\Entity\ConfigEntityUpdater;
 use Drupal\taxonomy\Entity\Term;
+use Drupal\views\ViewEntityInterface;
+use Drupal\views\ViewsConfigUpdater;
 
 /**
  * Implements hook_removed_post_updates().
@@ -34,48 +36,10 @@ function taxonomy_post_update_convert_term_views_filters_to_uuids(&$sandbox = NU
     return;
   }
 
-  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function ($view) {
-    /** @var \Drupal\views\ViewEntityInterface $view */
-    $displays = $view->get('display');
-
-    foreach ($displays as &$display) {
-      $filters = $display['display_options']['filters'] ?? [];
-      foreach ($filters as $id => $filter) {
-        if ($filter['plugin_id'] === 'taxonomy_index_tid' && isset($filter['value'])) {
-          $filters[$id]['value'] = taxonomy_convert_entity_ids_to_uuids($filter['value']);
-        }
-      }
-
-      $display['display_options']['filters'] = $filters;
-    }
-    $view->set('display', $displays);
-    return TRUE;
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::service(ViewsConfigUpdater::class);
+  $view_config_updater->setDeprecationsEnabled(FALSE);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
+    return $view_config_updater->needsTaxonomyTermViewsFilterUpdate($view);
   });
-}
-
-/**
- * Convert entity IDs to UUIDs.
- *
- * @param array $entity_ids
- *   Entity IDs to retrieve UUIDs for.
- *
- * @return array
- *   UUIDs for the given entity IDs.
- */
-function taxonomy_convert_entity_ids_to_uuids(array $entity_ids): array {
-  $uuids = [];
-
-  foreach ($entity_ids as $entity_id) {
-    if (Uuid::isValid($entity_id)) {
-      // This ID is already a UUID.
-      $uuids[] = $entity_id;
-      continue;
-    }
-    $term = Term::load($entity_id);
-    if ($term) {
-      $uuids[] = $term->uuid();
-    }
-  }
-
-  return $uuids;
 }

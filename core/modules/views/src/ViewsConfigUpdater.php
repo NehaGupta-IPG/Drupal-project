@@ -3,10 +3,12 @@
 namespace Drupal\views;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
+use Drupal\Component\Uuid\Uuid;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\taxonomy\Plugin\migrate\source\d7\Term;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -82,6 +84,9 @@ class ViewsConfigUpdater {
         $changed = TRUE;
       }
       if ($this->processRssViewModeUpdate($view)) {
+        $changed = TRUE;
+      }
+      if ($this->processTaxonomyTermViewsFilterUpdate($view)) {
         $changed = TRUE;
       }
       return $changed;
@@ -469,6 +474,57 @@ class ViewsConfigUpdater {
       $view->set('display', $displays);
     }
 
+    return $changed;
+  }
+
+  /**
+   * Update views filters to use UUIDs for term IDs instead of entity IDs.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view entity.
+   *
+   */
+  public function needsTaxonomyTermViewsFilterUpdate(ViewEntityInterface $view): bool {
+    return $this->processDisplayHandlers($view, TRUE, function (&$handler, $handler_type) use ($view) {
+      return $this->processTaxonomyTermViewsFilterUpdate($view);
+    });
+  }
+
+  /**
+   * Processes views and sets the default RSS view mode if necessary.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view entity.
+   *
+   * @return bool
+   *   TRUE if the view was updated with a default RSS view mode.
+   */
+  public function processTaxonomyTermViewsFilterUpdate(ViewEntityInterface $view) : bool {
+    $changed = FALSE;
+    $displays = $view->get('display');
+
+    foreach ($displays as &$display) {
+      $filters = $display['display_options']['filters'] ?? [];
+      foreach ($filters as $id => $filter) {
+        if ($filter['plugin_id'] === 'taxonomy_index_tid' && isset($filter['value'])) {
+          $changed = TRUE;
+          // Filter all the IDs and UUIDs.
+          // If someone has applied that patch, we can already have UUIDs.
+          $valid_uuids = array_filter($filter['value'], fn($id) => Uuid::isValid($id));
+
+          $ids_to_load = array_filter($filter['value'], fn($id) => !Uuid::isValid($id));
+          $terms = $this->entityTypeManager->getStorage('taxonomy_term')->loadMultiple($ids_to_load);
+          $loaded_uuids = array_map(fn($term) => $term->uuid(), $terms);
+
+          $filters[$id]['value'] = array_merge($valid_uuids, $loaded_uuids);
+        }
+      }
+
+      $display['display_options']['filters'] = $filters;
+    }
+    if ($changed) {
+      $view->set('display', $displays);
+    }
     return $changed;
   }
 
