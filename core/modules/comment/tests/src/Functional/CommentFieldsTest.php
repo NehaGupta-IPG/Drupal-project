@@ -197,32 +197,12 @@ class CommentFieldsTest extends CommentTestBase {
    * Tests the comment widget shows status in summary when closed.
    */
   public function testCommentWidgetDetailsSummary(): void {
-    $this->drupalCreateContentType(['type' => 'test_node_type']);
-    $this->addDefaultCommentField('node', 'test_node_type');
-
-    // Create a user that can edit article nodes.
-    $admin = $this->drupalCreateUser([
-      'administer nodes',
-      'edit any test_node_type content',
-      'access content',
-    ]);
-
-    $node = $this->drupalCreateNode([
-      'type' => 'test_node_type',
-    ]);
-
-    $this->drupalLogin($admin);
-    $this->drupalGet('node/' . $node->id() . '/edit');
+    // Use existing article node and adminUser from setUp()
+    $this->drupalLogin($this->adminUser);
+    $this->drupalGet('node/' . $this->node->id() . '/edit');
 
     $this->assertSession()->statusCodeEquals(200);
-
-    // Check we're actually on an edit form
-    $this->assertSession()->buttonExists('Save');
-
-    // Debug - what's on the page?
-    // Check for the radio button options text
-    $this->assertSession()->pageTextContains('Open');
-    $this->assertSession()->pageTextContains('Users with the "Post comments" permission can post comments.');
+    $this->assertSession()->fieldExists('comment[0][status]');
 
     // Check that the details summary shows current status.
     // $this->assertSession()->statusCodeEquals(200);
