@@ -6,10 +6,12 @@ use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Authentication\AuthenticationProviderInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\Routing\LocalAwareRedirectResponseTrait;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\UserSession;
 use Drupal\Core\Session\SessionConfigurationInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -23,6 +25,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class Cookie implements AuthenticationProviderInterface, EventSubscriberInterface {
 
+  use LocalAwareRedirectResponseTrait;
   use StringTranslationTrait;
 
   /**
@@ -127,6 +130,10 @@ class Cookie implements AuthenticationProviderInterface, EventSubscriberInterfac
       if ($event->getRequest()->getSession()->has('check_logged_in')) {
         $event->getRequest()->getSession()->remove('check_logged_in');
         $url = $response->getTargetUrl();
+        // The target URL should be left as-is for external URL.
+        if (!$this->isLocal($url) && !$this->isTrustedHost($url)) {
+          return;
+        }
         $options = UrlHelper::parse($url);
         $options['query']['check_logged_in'] = '1';
         $url = $options['path'] . '?' . UrlHelper::buildQuery($options['query']);
@@ -153,6 +160,31 @@ class Cookie implements AuthenticationProviderInterface, EventSubscriberInterfac
   public static function getSubscribedEvents(): array {
     $events[KernelEvents::RESPONSE][] = ['addCheckToUrl', -1000];
     return $events;
+  }
+
+  /**
+   * Check if a URL matches the trusted host pattern.
+   *
+   * @param string $url
+   *   The URL to check.
+   *
+   * @return bool
+   *   TRUE if the URL matches the trusted host patterns.
+   */
+  protected function isTrustedHost(string $url): bool {
+    $host_patterns = Settings::get('trusted_host_patterns', []);
+    if (empty($host_patterns)) {
+      return FALSE;
+    }
+
+    $host = parse_url($url, PHP_URL_HOST);
+    foreach ($host_patterns as $pattern) {
+      if (preg_match('{' . $pattern . '}i', $host)) {
+        return TRUE;
+      }
+    }
+
+    return FALSE;
   }
 
 }

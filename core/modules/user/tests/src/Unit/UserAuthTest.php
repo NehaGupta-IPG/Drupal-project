@@ -7,6 +7,7 @@ namespace Drupal\Tests\user\Unit;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\RequestContext;
 use Drupal\Core\Routing\TrustedRedirectResponse;
+use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\Authentication\Provider\Cookie;
 use Drupal\user\UserAuth;
@@ -228,6 +229,12 @@ class UserAuthTest extends UnitTestCase {
    * Tests the auth that ends in a redirect from subdomain to TLD.
    */
   public function testAddCheckToUrlForTrustedRedirectResponse(): void {
+    new Settings([
+      'trusted_host_patterns' => [
+        "^.+\.site\.com$",
+        "^.+\.api\.site\.com$",
+      ],
+    ]);
     $site_domain = 'site.com';
     $frontend_url = "https://$site_domain";
     $backend_url = "https://api.$site_domain";
@@ -275,9 +282,71 @@ class UserAuthTest extends UnitTestCase {
   }
 
   /**
+   * Tests the auth that ends in a redirect to external.
+   */
+  public function testAddCheckToUrlForTrustedRedirectResponseToExternalUrl(): void {
+    new Settings([
+      'trusted_host_patterns' => [
+        "^.+\.site\.com$",
+        "^.+\.api\.site\.com$",
+      ],
+    ]);
+    $site_domain = 'site.com';
+    $external_url = "https://site-external.com";
+    $backend_url = "https://api.$site_domain";
+    $request = Request::create($backend_url);
+    $response = new TrustedRedirectResponse($external_url);
+
+    $request_context = $this->createMock(RequestContext::class);
+    $request_context
+      ->method('getCompleteBaseUrl')
+      ->willReturn($backend_url);
+
+    $container = new ContainerBuilder();
+    $container->set('router.request_context', $request_context);
+    \Drupal::setContainer($container);
+
+    $session_mock = $this->createMock(SessionInterface::class);
+    $session_mock
+      ->expects($this->once())
+      ->method('has')
+      ->with('check_logged_in')
+      ->willReturn(TRUE);
+    $session_mock
+      ->expects($this->once())
+      ->method('remove')
+      ->with('check_logged_in');
+
+    $event = new ResponseEvent(
+      $this->createMock(HttpKernelInterface::class),
+      $request,
+      HttpKernelInterface::MAIN_REQUEST,
+      $response
+    );
+
+    $request
+      ->setSession($session_mock);
+
+    $this
+      ->getMockBuilder(Cookie::class)
+      ->disableOriginalConstructor()
+      ->onlyMethods([])
+      ->getMock()
+      ->addCheckToUrl($event);
+
+    $this->assertSame($external_url, $response->getTargetUrl());
+  }
+
+  /**
    * Tests the auth that ends in a redirect from subdomain with a fragment to TLD.
    */
   public function testAddCheckToUrlForTrustedRedirectResponseWithFragment(): void {
+    new Settings([
+      'trusted_host_patterns' => [
+        "^site\.com$",
+        "^.+\.site\.com$",
+      ],
+    ]);
     $site_domain = 'site.com';
     $frontend_url = "https://$site_domain";
     $backend_url = "https://api.$site_domain";
@@ -322,6 +391,62 @@ class UserAuthTest extends UnitTestCase {
       ->addCheckToUrl($event);
 
     $this->assertSame("$frontend_url?check_logged_in=1#a_fragment", $response->getTargetUrl());
+  }
+
+  /**
+   * Tests the auth that ends in a redirect with a fragment  to external.
+   */
+  public function testAddCheckToUrlForTrustedRedirectResponseWithFragmentToExternalUrl(): void {
+    new Settings([
+      'trusted_host_patterns' => [
+        "^site\.com$",
+        "^.+\.site\.com$",
+      ],
+    ]);
+    $site_domain = 'site.com';
+    $external_url = "https://site-external.com";
+    $backend_url = "https://api.$site_domain";
+    $request = Request::create($backend_url);
+    $response = new TrustedRedirectResponse($external_url . '#a_fragment');
+
+    $request_context = $this->createMock(RequestContext::class);
+    $request_context
+      ->method('getCompleteBaseUrl')
+      ->willReturn($backend_url);
+
+    $container = new ContainerBuilder();
+    $container->set('router.request_context', $request_context);
+    \Drupal::setContainer($container);
+
+    $session_mock = $this->createMock(SessionInterface::class);
+    $session_mock
+      ->expects($this->once())
+      ->method('has')
+      ->with('check_logged_in')
+      ->willReturn(TRUE);
+    $session_mock
+      ->expects($this->once())
+      ->method('remove')
+      ->with('check_logged_in');
+
+    $event = new ResponseEvent(
+      $this->createMock(HttpKernelInterface::class),
+      $request,
+      HttpKernelInterface::MAIN_REQUEST,
+      $response
+    );
+
+    $request
+      ->setSession($session_mock);
+
+    $this
+      ->getMockBuilder(Cookie::class)
+      ->disableOriginalConstructor()
+      ->onlyMethods([])
+      ->getMock()
+      ->addCheckToUrl($event);
+
+    $this->assertSame("$external_url#a_fragment", $response->getTargetUrl());
   }
 
 }
