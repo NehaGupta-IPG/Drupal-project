@@ -219,6 +219,12 @@ class CommentFieldsTest extends CommentTestBase {
     $this->assertSession()->fieldExists('title[0][value]');
     $this->assertSession()->fieldExists('body[0][value]');
 
+    // Look for the details element with our class
+    $this->assertSession()->elementExists('css', 'details.comment-node-settings-form');
+    
+    // Check the summary text contains the status
+    $this->assertSession()->pageTextContains('Comment settings: Open');
+
     // Check that the details summary shows current status.
     // $this->assertSession()->statusCodeEquals(200);
     // $this->assertSession()->pageTextContains('Comment');
