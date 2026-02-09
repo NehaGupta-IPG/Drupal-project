@@ -197,12 +197,14 @@ class CommentFieldsTest extends CommentTestBase {
    * Tests the comment widget shows status in summary when closed.
    */
   public function testCommentWidgetDetailsSummary(): void {
-    // Create user with permission to edit the article node
+    $field = \Drupal\field\Entity\FieldConfig::loadByName('node', 'article', 'comment');
+    $this->assertNotNull($field, 'Comment field exists on article');
+
     $admin = $this->drupalCreateUser([
       'edit any article content',
       'access content',
     ]);
-    // Use existing article node and adminUser from setUp()
+
     $this->drupalLogin($admin);
     $this->drupalGet('node/' . $this->node->id() . '/edit');
 
