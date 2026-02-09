@@ -56,10 +56,8 @@ class CurrentThemeConditionTest extends KernelTestBase {
     $this->assertFalse($condition->execute());
     $this->assertTrue($condition_negated->execute());
 
-    // Check whether the deprecated config functions as expected, but throws a
-    // deprecation notice:
+    // Check whether the deprecated config still functions as expected:
     $this->assertFalse($condition_deprecated_config->execute());
-    $this->expectUserDeprecationMessage('The "theme" configuration key is deprecated in drupal:11.3.0 and will be removed in drupal:13.0.0. Use "themes" instead. See https://www.drupal.org/node/3523553');
 
     // Set the expected theme to be used.
     $this->config('system.theme')->set('default', 'starterkit_theme')->save();
@@ -80,10 +78,8 @@ class CurrentThemeConditionTest extends KernelTestBase {
     $this->assertTrue($condition_multiple->execute());
     $this->assertFalse($condition_multiple_negated->execute());
 
-    // Check whether the deprecated config functions as expected, but throws a
-    // deprecation notice:
+    // Check whether the deprecated config still functions as expected:
     $this->assertTrue($condition_deprecated_config->execute());
-    $this->expectUserDeprecationMessage('The "theme" configuration key is deprecated in drupal:11.3.0 and will be removed in drupal:13.0.0. Use "themes" instead. See https://www.drupal.org/node/3523553');
 
     // Also when setting the other expected theme:
     $this->config('system.theme')->set('default', 'test_subtheme')->save();
