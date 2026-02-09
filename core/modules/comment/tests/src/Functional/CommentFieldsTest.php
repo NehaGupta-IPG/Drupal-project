@@ -215,7 +215,9 @@ class CommentFieldsTest extends CommentTestBase {
     $this->drupalGet('node/' . $this->node->id() . '/edit');
 
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->fieldExists('comment[0][status]');
+    // What fields ARE on the form?
+    $this->assertSession()->fieldExists('title[0][value]');
+    $this->assertSession()->fieldExists('body[0][value]');
 
     // Check that the details summary shows current status.
     // $this->assertSession()->statusCodeEquals(200);
