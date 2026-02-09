@@ -197,8 +197,13 @@ class CommentFieldsTest extends CommentTestBase {
    * Tests the comment widget shows status in summary when closed.
    */
   public function testCommentWidgetDetailsSummary(): void {
+    // Create user with permission to edit the article node
+    $admin = $this->drupalCreateUser([
+      'edit any article content',
+      'access content',
+    ]);
     // Use existing article node and adminUser from setUp()
-    $this->drupalLogin($this->adminUser);
+    $this->drupalLogin($admin);
     $this->drupalGet('node/' . $this->node->id() . '/edit');
 
     $this->assertSession()->statusCodeEquals(200);
