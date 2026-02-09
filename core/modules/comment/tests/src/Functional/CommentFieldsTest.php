@@ -200,6 +200,12 @@ class CommentFieldsTest extends CommentTestBase {
     $field = FieldConfig::loadByName('node', 'article', 'comment');
     $this->assertNotNull($field, 'Comment field exists on article');
 
+    // Check form display
+    $form_display = \Drupal::service('entity_display.repository')
+      ->getFormDisplay('node', 'article', 'default');
+    $component = $form_display->getComponent('comment');
+    $this->assertNotNull($component, 'Comment field is on form display');
+
     $admin = $this->drupalCreateUser([
       'edit any article content',
       'access content',
