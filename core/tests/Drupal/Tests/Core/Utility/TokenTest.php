@@ -20,6 +20,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 /**
  * Tests Drupal\Core\Utility\Token.
@@ -96,10 +97,10 @@ class TokenTest extends UnitTestCase {
     $this->token = new Token($this->moduleHandler, $this->cache, $this->languageManager, $this->cacheTagsInvalidator, $this->createStub(RendererInterface::class));
 
     $container = new ContainerBuilder();
-    $this->cacheContextManager = new CacheContextsManager($container, [
-      'current_user',
-      'custom_context',
-    ]);
+    $this->cacheContextManager = new CacheContextsManager(new ServiceLocator([
+      'current_user' => fn() => new \stdClass(),
+      'custom_context' => fn() => new \stdClass(),
+    ]));
     $container->set('cache_contexts_manager', $this->cacheContextManager);
     \Drupal::setContainer($container);
   }
