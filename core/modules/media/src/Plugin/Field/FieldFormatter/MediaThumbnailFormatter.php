@@ -10,7 +10,6 @@ use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\image\ImageStyleStorageInterface;
 use Drupal\image\Plugin\Field\FieldFormatter\ImageFormatter;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\Core\Render\RendererInterface;
