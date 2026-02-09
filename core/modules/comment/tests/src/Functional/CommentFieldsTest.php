@@ -199,6 +199,7 @@ class CommentFieldsTest extends CommentTestBase {
   public function testCommentWidgetDetailsSummary(): void {
     $admin = $this->drupalCreateUser([
       'administer nodes',
+      'administer comments',
       'edit any article content',
       'access content',
     ]);
