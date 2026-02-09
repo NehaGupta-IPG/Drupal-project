@@ -202,19 +202,19 @@ class CommentFieldsTest extends CommentTestBase {
       'edit any article content',
       'access content',
     ]);
-  
+
     $this->drupalLogin($admin);
     $this->drupalGet('node/' . $this->node->id() . '/edit');
-  
+
     $this->assertSession()->statusCodeEquals(200);
-    
+
     // Find ALL details elements on the page
     $details = $this->cssSelect('details');
     $details_classes = [];
     foreach ($details as $d) {
       $details_classes[] = $d->getAttribute('class') ?: '(no class)';
     }
-    
+
     $this->fail('Details elements found: ' . implode(' | ', $details_classes));
 
     // Check that the details summary shows current status.
