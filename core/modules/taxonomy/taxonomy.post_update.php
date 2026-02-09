@@ -5,9 +5,7 @@
  * Post update functions for Taxonomy.
  */
 
-use Drupal\Component\Uuid\Uuid;
 use Drupal\Core\Config\Entity\ConfigEntityUpdater;
-use Drupal\taxonomy\Entity\Term;
 use Drupal\views\ViewEntityInterface;
 use Drupal\views\ViewsConfigUpdater;
 

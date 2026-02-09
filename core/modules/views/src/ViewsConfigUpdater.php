@@ -8,7 +8,6 @@ use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\taxonomy\Plugin\migrate\source\d7\Term;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -482,7 +481,6 @@ class ViewsConfigUpdater {
    *
    * @param \Drupal\views\ViewEntityInterface $view
    *   The view entity.
-   *
    */
   public function needsTaxonomyTermViewsFilterUpdate(ViewEntityInterface $view): bool {
     return $this->processDisplayHandlers($view, TRUE, function (&$handler, $handler_type) use ($view) {

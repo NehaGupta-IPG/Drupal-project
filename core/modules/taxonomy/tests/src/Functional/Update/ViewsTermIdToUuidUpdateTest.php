@@ -6,16 +6,18 @@ namespace Drupal\Tests\taxonomy\Functional\Update;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use Drupal\views\Entity\View;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the upgrade path for converting Views term references to UUIDs.
  *
- * @group Update
- *
  * @see taxonomy_post_update_convert_term_views_filters_to_uuids()
  */
 #[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
+#[Group('Update')]
 class ViewsTermIdToUuidUpdateTest extends UpdatePathTestBase {
 
   /**
