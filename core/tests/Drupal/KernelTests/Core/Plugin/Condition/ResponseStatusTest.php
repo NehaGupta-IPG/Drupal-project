@@ -6,16 +6,21 @@ namespace Drupal\KernelTests\Core\Plugin\Condition;
 
 use Drupal\Core\Condition\ConditionManager;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Tests the Response Status Condition, provided by the system module.
- *
- * @group Plugin
  */
+#[Group('Plugin')]
+#[RunTestsInSeparateProcesses]
 class ResponseStatusTest extends KernelTestBase {
 
   /**
@@ -50,10 +55,9 @@ class ResponseStatusTest extends KernelTestBase {
 
   /**
    * Tests the request path condition.
-   *
-   * @dataProvider providerTestConditions
    */
-  public function testConditions(array $status_codes, bool $negate, int $response_code, bool $expected_execute) {
+  #[DataProvider('providerTestConditions')]
+  public function testConditions(array $status_codes, bool $negate, int $response_code, bool $expected_execute): void {
     if ($response_code === Response::HTTP_OK) {
       $request = Request::create('/my/valid/page');
     }
@@ -61,6 +65,7 @@ class ResponseStatusTest extends KernelTestBase {
       $request = new Request();
       $request->attributes->set('exception', new HttpException($response_code));
     }
+    $request->setSession(new Session(new MockArraySessionStorage()));
     $this->requestStack->push($request);
 
     /** @var \Drupal\system\Plugin\Condition\ResponseStatus $condition */
@@ -74,7 +79,7 @@ class ResponseStatusTest extends KernelTestBase {
   /**
    * Provides test data for testConditions.
    */
-  public function providerTestConditions() {
+  public static function providerTestConditions() {
     // Default values with 200 response code.
     yield [
       'status_codes' => [],

@@ -7,6 +7,7 @@ use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\RedundantEditableConfigNamesTrait;
 use Drupal\Core\StreamWrapper\AssetsStream;
 use Drupal\Core\StreamWrapper\PrivateStream;
 use Drupal\Core\StreamWrapper\PublicStream;
@@ -21,6 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @internal
  */
 class FileSystemForm extends ConfigFormBase {
+  use RedundantEditableConfigNamesTrait;
 
   /**
    * The date formatter service.
@@ -87,13 +89,6 @@ class FileSystemForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  protected function getEditableConfigNames() {
-    return ['system.file'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form['file_public_path'] = [
       '#type' => 'item',
@@ -119,7 +114,7 @@ class FileSystemForm extends ConfigFormBase {
     $form['file_private_path'] = [
       '#type' => 'item',
       '#title' => $this->t('Private file system path'),
-      '#markup' => (PrivateStream::basePath() ? PrivateStream::basePath() : $this->t('Not set')),
+      '#markup' => (PrivateStream::basePath() ?: $this->t('Not set')),
       '#description' => $this->t('An existing local file system path for storing private files. It should be writable by Drupal and not accessible over the web. This must be changed in settings.php'),
     ];
 

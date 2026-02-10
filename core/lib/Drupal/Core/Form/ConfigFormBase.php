@@ -2,11 +2,14 @@
 
 namespace Drupal\Core\Form;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Render\Element;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Component\Render\MarkupInterface;
+use Drupal\Core\Render\Markup;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -35,18 +38,14 @@ abstract class ConfigFormBase extends FormBase {
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface|null $typedConfigManager
+   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
    *   The typed config manager.
    */
   public function __construct(
     ConfigFactoryInterface $config_factory,
-    protected ?TypedConfigManagerInterface $typedConfigManager = NULL,
+    protected TypedConfigManagerInterface $typedConfigManager,
   ) {
     $this->setConfigFactory($config_factory);
-    if ($this->typedConfigManager === NULL) {
-      @trigger_error('Calling ConfigFormBase::__construct() without the $typedConfigManager argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3373502', E_USER_DEPRECATED);
-      $this->typedConfigManager = \Drupal::service('config.typed');
-    }
   }
 
   /**
@@ -57,6 +56,19 @@ abstract class ConfigFormBase extends FormBase {
       $container->get('config.factory'),
       $container->get('config.typed')
     );
+  }
+
+  /**
+   * Returns the typed config manager service.
+   *
+   * @return \Drupal\Core\Config\TypedConfigManagerInterface
+   *   The typed config manager service.
+   */
+  protected function typedConfigManager(): TypedConfigManagerInterface {
+    if ($this->typedConfigManager instanceof TypedConfigManagerInterface) {
+      return $this->typedConfigManager;
+    }
+    return \Drupal::service('config.typed');
   }
 
   /**
@@ -77,7 +89,7 @@ abstract class ConfigFormBase extends FormBase {
     // property.
     $form['#process'][] = '::loadDefaultValuesFromConfig';
     $form['#after_build'][] = '::storeConfigKeyToFormElementMap';
-
+    $form['#after_build'][] = '::checkConfigOverrides';
     return $form;
   }
 
@@ -97,11 +109,8 @@ abstract class ConfigFormBase extends FormBase {
         $target = ConfigTarget::fromString($target);
       }
 
-      $value = $this->config($target->configName)->get($target->propertyPath);
-      if ($target->fromConfig) {
-        $value = call_user_func($target->fromConfig, $value);
-      }
-      $element['#default_value'] = $value;
+      $config = $this->configFactory()->getEditable($target->configName);
+      $element['#default_value'] = $target->getValue($config);
     }
 
     foreach (Element::children($element) as $key) {
@@ -111,7 +120,9 @@ abstract class ConfigFormBase extends FormBase {
   }
 
   /**
-   * #after_build callback which stores a map of element names to config keys.
+   * Render API callback: Stores a map of element names to config keys.
+   *
+   * This function is assigned as a #after_build callback.
    *
    * This will store an array in the form state whose keys are strings in the
    * form of `CONFIG_NAME:PROPERTY_PATH`, and whose values are instances of
@@ -128,22 +139,60 @@ abstract class ConfigFormBase extends FormBase {
    *
    * @return array
    *   The processed element.
+   *
+   * @see \Drupal\Core\Form\ConfigFormBase::buildForm()
    */
   public function storeConfigKeyToFormElementMap(array $element, FormStateInterface $form_state): array {
+    // Empty the map to ensure the information is always correct after
+    // rebuilding the form.
+    $form_state->set(static::CONFIG_KEY_TO_FORM_ELEMENT_MAP, []);
+
+    return $this->doStoreConfigMap($element, $form_state);
+  }
+
+  /**
+   * Helper method for #after_build callback ::storeConfigKeyToFormElementMap().
+   *
+   * @param array $element
+   *   The element being processed.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current form state.
+   *
+   * @return array
+   *   The processed element.
+   *
+   * @see \Drupal\Core\Form\ConfigFormBase::storeConfigKeyToFormElementMap()
+   */
+  protected function doStoreConfigMap(array $element, FormStateInterface $form_state): array {
     if (array_key_exists('#config_target', $element)) {
       $map = $form_state->get(static::CONFIG_KEY_TO_FORM_ELEMENT_MAP) ?? [];
 
+      /** @var \Drupal\Core\Form\ConfigTarget|string $target */
       $target = $element['#config_target'];
       if (is_string($target)) {
         $target = ConfigTarget::fromString($target);
       }
-      $target->elementName = $element['#name'];
-      $target->elementParents = $element['#parents'];
-      $map[$target->configName . ':' . $target->propertyPath] = $target;
+      elseif ($target->toConfig instanceof \Closure || $target->fromConfig instanceof \Closure) {
+        // If the form is using closures as toConfig or fromConfig callables
+        // then form cannot be cached.
+        $form_state->disableCache();
+      }
+
+      foreach ($target->propertyPaths as $property_path) {
+        if (isset($map[$target->configName][$property_path])) {
+          throw new \LogicException(sprintf('Two #config_targets both target "%s" in the "%s" config: `%s` and `%s`.',
+            $property_path,
+            $target->configName,
+            '$form[\'' . implode("']['", $map[$target->configName][$property_path]) . '\']',
+            '$form[\'' . implode("']['", $element['#array_parents']) . '\']',
+          ));
+        }
+        $map[$target->configName][$property_path] = $element['#array_parents'];
+      }
       $form_state->set(static::CONFIG_KEY_TO_FORM_ELEMENT_MAP, $map);
     }
     foreach (Element::children($element) as $key) {
-      $element[$key] = $this->storeConfigKeyToFormElementMap($element[$key], $form_state);
+      $element[$key] = $this->doStoreConfigMap($element[$key], $form_state);
     }
     return $element;
   }
@@ -152,22 +201,11 @@ abstract class ConfigFormBase extends FormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    assert($this->typedConfigManager instanceof TypedConfigManagerInterface);
-
     $map = $form_state->get(static::CONFIG_KEY_TO_FORM_ELEMENT_MAP) ?? [];
-
-    foreach ($this->getEditableConfigNames() as $config_name) {
-      $config = $this->config($config_name);
-      try {
-        static::copyFormValuesToConfig($config, $form_state);
-      }
-      catch (\BadMethodCallException $e) {
-        // Nothing to do: this config form does not yet use validation
-        // constraints. Continue trying the other editable config, to allow
-        // partial adoption.
-        continue;
-      }
-      $typed_config = $this->typedConfigManager->createFromNameAndData($config_name, $config->getRawData());
+    foreach (array_keys($map) as $config_name) {
+      $config = $this->configFactory()->getEditable($config_name);
+      static::copyFormValuesToConfig($config, $form_state, $form);
+      $typed_config = $this->typedConfigManager()->createFromNameAndData($config_name, $config->getRawData());
 
       $violations = $typed_config->validate();
       // Rather than immediately applying all violation messages to the
@@ -183,16 +221,25 @@ abstract class ConfigFormBase extends FormBase {
         $property_path = $violation->getPropertyPath();
         // Default to index 0.
         $index = 0;
-        // Detect if this is a sequence property path, and if so, determine the
-        // actual sequence index.
-        $matches = [];
-        if (preg_match("/.*\.(\d+)$/", $property_path, $matches) === 1) {
+
+        // Detect if this is a sequence item property path, and if so, attempt
+        // to fall back to the containing sequence's property path.
+        if (!isset($map[$config_name][$property_path]) && preg_match("/.*\.(\d+)$/", $property_path, $matches) === 1) {
           $index = intval($matches[1]);
           // The property path as known in the config key-to-form element map
           // will not have the sequence index in it.
           $property_path = rtrim($property_path, '0123456789.');
         }
-        $form_element_name = $map["$config_name:$property_path"]->elementName;
+
+        if (isset($map[$config_name][$property_path])) {
+          $config_target = ConfigTarget::fromForm($map[$config_name][$property_path], $form);
+          $form_element_name = implode('][', $config_target->elementParents);
+        }
+        else {
+          // We cannot determine where to place the violation. The only option
+          // is the entire form.
+          $form_element_name = '';
+        }
         $violations_per_form_element[$form_element_name][$index] = $violation;
       }
 
@@ -232,9 +279,10 @@ abstract class ConfigFormBase extends FormBase {
    * @param \Symfony\Component\Validator\ConstraintViolationListInterface $violations
    *   The list of constraint violations that apply to this form element.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   * @return \Drupal\Component\Render\MarkupInterface|\Stringable
+   *   The rendered HTML.
    */
-  protected function formatMultipleViolationsMessage(string $form_element_name, array $violations): TranslatableMarkup {
+  protected function formatMultipleViolationsMessage(string $form_element_name, array $violations): MarkupInterface|\Stringable {
     $transformed_message_parts = [];
     foreach ($violations as $index => $violation) {
       // Note that `@validation_error_message` (should) already contain a
@@ -247,25 +295,20 @@ abstract class ConfigFormBase extends FormBase {
         '@validation_error_message' => $violation->getMessage(),
       ]);
     }
-    return $this->t(implode("\n", $transformed_message_parts));
+    // We use \Drupal\Core\Render\Markup::create() here as it is safe,
+    // rather than use t() because all input has been escaped by t().
+    return Markup::create(implode("\n", $transformed_message_parts));
   }
 
   /**
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    foreach ($this->getEditableConfigNames() as $config_name) {
-      $config = $this->config($config_name);
-      try {
-        static::copyFormValuesToConfig($config, $form_state);
-        $config->save();
-      }
-      catch (\BadMethodCallException $e) {
-        // Nothing to do: this config form does not yet use validation
-        // constraints. Continue trying the other editable config, to allow
-        // partial adoption.
-        continue;
-      }
+    $map = $form_state->get(static::CONFIG_KEY_TO_FORM_ELEMENT_MAP) ?? [];
+    foreach (array_keys($map) as $config_name) {
+      $config = $this->configFactory()->getEditable($config_name);
+      static::copyFormValuesToConfig($config, $form_state, $form);
+      $config->save();
     }
     $this->messenger()->addStatus($this->t('The configuration options have been saved.'));
   }
@@ -280,28 +323,76 @@ abstract class ConfigFormBase extends FormBase {
    *   The configuration being edited.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
+   * @param array $form
+   *   The form array.
    *
    * @see \Drupal\Core\Entity\EntityForm::copyFormValuesToEntity()
    */
-  private static function copyFormValuesToConfig(Config $config, FormStateInterface $form_state): void {
+  private static function copyFormValuesToConfig(Config $config, FormStateInterface $form_state, array $form): void {
     $map = $form_state->get(static::CONFIG_KEY_TO_FORM_ELEMENT_MAP);
-    // If there's no map of config keys to form elements, this form does not
-    // yet support config validation.
-    // @see ::validateForm()
-    if ($map === NULL) {
-      throw new \BadMethodCallException();
-    }
 
-    /** @var \Drupal\Core\Form\ConfigTarget $target */
-    foreach ($map as $target) {
-      if ($target->configName === $config->getName()) {
-        $value = $form_state->getValue($target->elementParents);
-        if ($target->toConfig) {
-          $value = call_user_func($target->toConfig, $value);
+    foreach ($map[$config->getName()] as $array_parents) {
+      $target = ConfigTarget::fromForm($array_parents, $form);
+      if ($target->configName !== $config->getName()) {
+        continue;
+      }
+      $value = $form_state->getValue($target->elementParents);
+      $target->setValue($config, $value, $form_state);
+    }
+  }
+
+  /**
+   * Form #after_build callback: Adds message if overrides exist.
+   */
+  public function checkConfigOverrides(array $form, FormStateInterface $form_state): array {
+    // Determine which of those editable config keys have overrides.
+    $override_links = [];
+    $map = $form_state->get(static::CONFIG_KEY_TO_FORM_ELEMENT_MAP) ?? [];
+    foreach ($map as $config_name => $config_keys) {
+      $stored_config = $this->configFactory->get($config_name);
+      if (!$stored_config->hasOverrides()) {
+        // The config has no overrides at all. Can be skipped.
+        continue;
+      }
+
+      foreach ($config_keys as $key => $array_parents) {
+        if ($stored_config->hasOverrides($key)) {
+          $element = NestedArray::getValue($form, $array_parents);
+          $override_links[] = [
+            'attributes' => ['title' => $this->t("'@title' form element", ['@title' => $element['#title']])],
+            'url' => Url::fromUri("internal:#{$element['#id']}"),
+            'title' => $element['#title'],
+          ];
         }
-        $config->set($target->propertyPath, $value);
       }
     }
+
+    if (!empty($override_links)) {
+      $override_output = [
+        '#theme' => 'links__config_overrides',
+        '#heading' => [
+          'text' => $this->t('These values are overridden. Changes on this form will be saved, but overrides will take precedence. See <a href="https://www.drupal.org/docs/drupal-apis/configuration-api/configuration-override-system">configuration overrides documentation</a> for more information.'),
+          'level' => 'div',
+        ],
+        '#links' => $override_links,
+      ];
+      $form['config_override_status_messages'] = [
+        'message' => [
+          '#theme' => 'status_messages',
+          '#message_list' => ['status' => [$override_output]],
+          '#status_headings' => [
+            'status' => $this->t('Status message'),
+          ],
+        ],
+        // Ensure that the status message is at the top of the form.
+        '#weight' => array_reduce(
+          Element::children($form),
+          fn (int $carry, string $key) => min(($form[$key]['#weight'] ?? 0), $carry),
+          0
+        ) - 1,
+      ];
+    }
+    return $form;
   }
 
 }

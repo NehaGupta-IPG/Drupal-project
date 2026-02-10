@@ -3,15 +3,18 @@
 namespace Drupal\Core\Mail\Plugin\Mail;
 
 use Drupal\Component\Render\MarkupInterface;
+use Drupal\Core\Mail\Attribute\Mail;
 use Drupal\Core\Mail\MailFormatHelper;
 use Drupal\Core\Mail\MailInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Utility\Error;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mime\Email;
 
 /**
@@ -35,20 +38,24 @@ use Symfony\Component\Mime\Email;
  *
  * @code
  *   $config['system.mail']['interface'] = [ 'default' => 'symfony_mailer' ];
- *   $config['system.mail']['mailer_dsn'] = 'smtp://user:pass@smtp.example.com:25';
+ *   $config['system.mail']['mailer_dsn'] = [
+ *     'scheme' => 'smtp',
+ *     'host' => 'smtp.example.com',
+ *     'port' => 25,
+ *     'user' => 'user',
+ *     'password' => 'pass',
+ *     'options' => [],
+ *   ];
  * @endcode
- *
- * Note that special characters in the mailer_dsn need to be URL encoded.
  *
  * @see https://symfony.com/doc/current/mailer.html#using-built-in-transports
  *
- * @Mail(
- *   id = "symfony_mailer",
- *   label = @Translation("Symfony mailer (Experimental)"),
- * )
- *
  * @internal
  */
+#[Mail(
+  id: 'symfony_mailer',
+  label: new TranslatableMarkup('Symfony mailer (Experimental)'),
+)]
 class SymfonyMailer implements MailInterface, ContainerFactoryPluginInterface {
 
   /**
@@ -69,6 +76,9 @@ class SymfonyMailer implements MailInterface, ContainerFactoryPluginInterface {
    */
   protected const SKIP_HEADERS = ['content-type', 'content-transfer-encoding'];
 
+  /**
+   * {@inheritdoc}
+   */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $container->get('logger.channel.mail')
@@ -86,15 +96,22 @@ class SymfonyMailer implements MailInterface, ContainerFactoryPluginInterface {
    */
   public function __construct(
     protected LoggerInterface $logger,
-    protected ?MailerInterface $mailer = NULL) {
+    protected ?MailerInterface $mailer = NULL,
+  ) {
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function format(array $message) {
-    // Convert any HTML to plain-text.
     foreach ($message['body'] as &$part) {
+      // If the message contains HTML, convert it to plain text (which also
+      // wraps the mail body).
       if ($part instanceof MarkupInterface) {
         $part = MailFormatHelper::htmlToText($part);
       }
+      // If the message does not contain HTML, it still needs to be wrapped
+      // properly.
       else {
         $part = MailFormatHelper::wrapMail($part);
       }
@@ -106,6 +123,9 @@ class SymfonyMailer implements MailInterface, ContainerFactoryPluginInterface {
     return $message;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function mail(array $message) {
     try {
       $email = new Email();
@@ -116,14 +136,17 @@ class SymfonyMailer implements MailInterface, ContainerFactoryPluginInterface {
           if (in_array(strtolower($name), self::MAILBOX_LIST_HEADERS, TRUE)) {
             // Split values by comma, but ignore commas encapsulated in double
             // quotes.
-            $value = str_getcsv($value, ',');
+            $value = str_getcsv($value, escape: '\\');
           }
           $headers->addHeader($name, $value);
         }
       }
 
+      // Parse the recipients into an array of addresses.
+      $recipients = array_map(trim(...), str_getcsv($message['to'], escape: "\\"));
+
       $email
-        ->to($message['to'])
+        ->to(...$recipients)
         ->subject($message['subject'])
         ->text($message['body']);
 
@@ -143,6 +166,7 @@ class SymfonyMailer implements MailInterface, ContainerFactoryPluginInterface {
   protected function getMailer(): MailerInterface {
     if (!isset($this->mailer)) {
       $dsn = \Drupal::config('system.mail')->get('mailer_dsn');
+      $dsnObject = new Dsn(...$dsn);
 
       // Symfony Mailer and Transport classes both optionally depend on the
       // event dispatcher. When provided, a MessageEvent is fired whenever an
@@ -154,7 +178,9 @@ class SymfonyMailer implements MailInterface, ContainerFactoryPluginInterface {
       // mails into the code path (i.e., event subscribers) of the new API.
       // Therefore, this plugin deliberately refrains from injecting the event
       // dispatcher.
-      $transport = Transport::fromDsn($dsn, logger: $this->logger);
+      $factories = Transport::getDefaultFactories();
+      $transportFactory = new Transport($factories);
+      $transport = $transportFactory->fromDsnObject($dsnObject);
       $this->mailer = new Mailer($transport);
     }
 

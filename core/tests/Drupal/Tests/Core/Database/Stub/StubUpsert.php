@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Database\Stub;
 
 use Drupal\Core\Database\Query\Upsert;
@@ -13,7 +15,7 @@ class StubUpsert extends Upsert {
    * {@inheritdoc}
    */
   public function __toString() {
-    return '';
+    throw new \BadMethodCallException('Upsert not implemented');
   }
 
 }

@@ -8,7 +8,6 @@ use Drupal\Core\Render\RendererInterface;
 use Drupal\search\Form\SearchPageForm;
 use Drupal\search\SearchPageInterface;
 use Drupal\search\SearchPageRepositoryInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -52,16 +51,6 @@ class SearchController extends ControllerBase {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('search.search_page_repository'),
-      $container->get('renderer')
-    );
-  }
-
-  /**
    * Creates a render array for the search page.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
@@ -95,7 +84,7 @@ class SearchController extends ControllerBase {
       if ($plugin->isSearchExecutable()) {
         // Log the search.
         if ($this->config('search.settings')->get('logging')) {
-          $this->logger->notice('Searched %type for %keys.', ['%keys' => $keys, '%type' => $entity->label()]);
+          $this->logger->info('Searched %type for %keys.', ['%keys' => $keys, '%type' => $entity->label()]);
         }
 
         // Collect the search results.

@@ -4,9 +4,11 @@ namespace Drupal\responsive_image\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\file\FileInterface;
 use Drupal\image\Plugin\Field\FieldFormatter\ImageFormatterBase;
@@ -17,15 +19,14 @@ use Drupal\Core\Utility\LinkGeneratorInterface;
 
 /**
  * Plugin for responsive image formatter.
- *
- * @FieldFormatter(
- *   id = "responsive_image",
- *   label = @Translation("Responsive image"),
- *   field_types = {
- *     "image",
- *   }
- * )
  */
+#[FieldFormatter(
+  id: 'responsive_image',
+  label: new TranslatableMarkup('Responsive image'),
+  field_types: [
+    'image',
+  ],
+)]
 class ResponsiveImageFormatter extends ImageFormatterBase {
 
   /**
@@ -58,7 +59,7 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
    * Constructs a ResponsiveImageFormatter object.
    *
    * @param string $plugin_id
-   *   The plugin_id for the formatter.
+   *   The plugin ID for the formatter.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
@@ -266,16 +267,16 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
       // Extract field item attributes for the theme function, and unset them
       // from the $item so that the field template does not re-render them.
       $item = $file->_referringItem;
-      $item_attributes = $item->_attributes;
+      $attributes = $item->_attributes;
       unset($item->_attributes);
 
       $image_loading_settings = $this->getSetting('image_loading');
-      $item_attributes['loading'] = $image_loading_settings['attribute'];
+      $attributes['loading'] = $image_loading_settings['attribute'];
 
       $elements[$delta] = [
         '#theme' => 'responsive_image_formatter',
         '#item' => $item,
-        '#item_attributes' => $item_attributes,
+        '#attributes' => $attributes,
         '#responsive_image_style_id' => $responsive_image_style ? $responsive_image_style->id() : '',
         '#url' => $url,
         '#cache' => [
