@@ -6,6 +6,7 @@ namespace Drupal\Tests\responsive_image\Kernel;
 
 use Drupal\image\Entity\ImageStyle;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\responsive_image\ResponsiveImageBuilder;
 use Drupal\responsive_image\ResponsiveImageStyleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -42,7 +43,7 @@ class ResponsiveImageBuilderTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->installConfig(['image']);
-    $this->responsiveImageBuilder = $this->container->get('responsive_image.builder');
+    $this->responsiveImageBuilder = $this->container->get(ResponsiveImageBuilder::class);
   }
 
   /**
