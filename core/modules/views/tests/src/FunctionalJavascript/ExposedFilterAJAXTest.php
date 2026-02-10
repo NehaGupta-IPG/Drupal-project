@@ -28,6 +28,7 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
     'node',
     'views',
     'views_test_modal',
+    'views_test_config',
     'user_test_views',
   ];
 
@@ -41,7 +42,7 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
    *
    * @var array
    */
-  public static $testViews = ['test_user_name'];
+  public static $testViews = ['list_view', 'test_user_name'];
 
   /**
    * {@inheritdoc}
@@ -56,6 +57,7 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
 
     // Import user_test_views and set it to use ajax.
     ViewTestData::createTestViews(get_class($this), ['user_test_views']);
+    ViewTestData::createTestViews(self::class, ['views_test_config']);
     \Drupal::configFactory()->getEditable('views.view.test_user_name')
       ->set('display.default.display_options.use_ajax', TRUE)
       ->save();
@@ -207,6 +209,17 @@ class ExposedFilterAJAXTest extends WebDriverTestBase {
     $html = $session->getPage()->getHtml();
     $this->assertStringContainsString('Page One', $html);
     $this->assertStringNotContainsString('Page Two', $html);
+  }
+
+  /**
+   * Tests if exposed filter progress type is visible as configured.
+   */
+  public function testExposedFiltersProgressType() {
+    $this->drupalGet('list_view');
+    $assert = $this->assertSession();
+    $this->submitForm(['title' => 'Basic'], 'Apply');
+    $assert->elementExists('css', '.ajax-progress-throbber');
+    $assert->assertWaitOnAjaxRequest();
   }
 
   /**

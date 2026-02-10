@@ -114,7 +114,11 @@
       setClick: true,
       event: 'click',
       selector,
-      progress: { type: 'fullscreen' },
+      progress: {
+        type:
+          this.$view.find('[data-progress-type]').attr('data-progress-type') ||
+          'fullscreen',
+      },
     };
 
     this.settings = settings;

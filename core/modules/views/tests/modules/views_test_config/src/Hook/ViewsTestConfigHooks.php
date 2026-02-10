@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\views_test_config\Hook;
 
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Plugin\views\cache\CachePluginBase;
 use Drupal\views\ViewExecutable;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -95,6 +96,16 @@ class ViewsTestConfigHooks {
   public function disableBrokenHandler(array &$definitions, string $handler_type): void {
     if (in_array($handler_type, \Drupal::state()->get('views_test_config_disable_broken_handler', []))) {
       unset($definitions['broken']);
+    }
+  }
+
+  /**
+   * Implements hook_form_BASE_FORM_ID_alter().
+   */
+  #[Hook('form_alter')]
+  public function formAlter(&$form, FormStateInterface $form_state, $form_id) {
+    if ($form['#id'] == 'views-exposed-form-list-view-page-1') {
+      $form['actions']['submit']['#attributes']['data-progress-type'][] = 'throbber';
     }
   }
 
