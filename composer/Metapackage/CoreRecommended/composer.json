@@ -7,7 +7,7 @@
         "webflo/drupal-core-strict": "*"
     },
     "require": {
-        "drupal/core": "11.x-dev",
+        "drupal/core": "12.x-dev",
         "asm89/stack-cors": "~v2.3.0",
         "composer/semver": "~3.4.4",
         "doctrine/lexer": "~3.0.1",
@@ -49,9 +49,7 @@
         "symfony/polyfill-intl-idn": "~v1.33.0",
         "symfony/polyfill-intl-normalizer": "~v1.33.0",
         "symfony/polyfill-mbstring": "~v1.33.0",
-        "symfony/polyfill-php84": "~v1.33.0",
-        "symfony/polyfill-php85": "~v1.33.0",
-        "symfony/process": "~v7.4.5",
+        "symfony/process": "~v7.4.0",
         "symfony/psr-http-message-bridge": "~v7.4.0",
         "symfony/routing": "~v7.4.0",
         "symfony/serializer": "~v7.4.0",
@@ -66,7 +64,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "11.x-dev"
+            "dev-main": "12.x-dev"
         }
     }
 }
