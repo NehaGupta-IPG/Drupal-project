@@ -114,13 +114,6 @@ default:
   rules:
     - if: $PERFORMANCE_TEST != "1"
 
-.composer-setup: &composer-setup
-  - echo -e "\e[0Ksection_start:`date +%s`:composer_setup[collapsed=true]\r\e[0K\e[0;30;103m*** Composer setup ***\e[0m"
-  - composer validate
-  - composer install --optimize-autoloader
-  - composer run-script drupal-phpunit-upgrade-check
-  - echo -e "\e[0Ksection_end:`date +%s`:composer_setup\r\e[0K"
-
 .download-cache: &download-cache
   - |
     if [[ "$CI_MERGE_REQUEST_LABELS" =~ "Test lint cache warming" ]]; then
@@ -132,6 +125,20 @@ default:
   # target branch. Allow the job to proceed and pass if the file doesn't exist.
   - echo Downloading $CACHE_URL
   - curl --fail --location --create-dirs --output $CACHE_FILE "$CACHE_URL" || true
+
+.composer-setup: &composer-setup
+  - echo -e "\e[0Ksection_start:`date +%s`:composer_setup[collapsed=true]\r\e[0K\e[0;30;103m*** Composer setup ***\e[0m"
+  - CACHE_FILE=vendor.tar.gz
+  - *download-cache
+  - '[ -f vendor.tar.gz ] && tar xzf vendor.tar.gz || true'
+  - composer validate
+  - composer install --optimize-autoloader
+  - composer run-script drupal-phpunit-upgrade-check
+  - if [ -n "$COMPOSER_UPDATE" ]; then
+      composer update --optimize-autoloader;
+      composer outdated;
+    fi
+  - echo -e "\e[0Ksection_end:`date +%s`:composer_setup\r\e[0K"
 
 .core-spellcheck: &core-spellcheck
   - cd core
@@ -208,9 +215,6 @@ default:
     CONCURRENCY: 24
     PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
   before_script:
-    - CACHE_FILE=vendor.tar.gz
-    - *download-cache
-    - '[ -f vendor.tar.gz ] && tar xzf vendor.tar.gz || true'
     - *composer-setup
     - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
     - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
@@ -250,9 +254,6 @@ default:
     _ARTIFACTS_DIR: "test-artifacts/phpunit"
     PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
   before_script:
-    - CACHE_FILE=vendor.tar.gz
-    - *download-cache
-    - '[ -f vendor.tar.gz ] && tar xzf vendor.tar.gz || true'
     - mkdir -p $_ARTIFACTS_DIR
     - *composer-setup
     - |
@@ -547,18 +548,11 @@ default:
     _ARTIFACTS_DIR: "test-artifacts/phpstan"
     _PHPSTAN_NEON: "core/phpstan.neon.dist"
     _PHPSTAN_BASELINE: "core/.phpstan-baseline.php"
+    CACHE_FILE: "core/phpstan-tmp/resultCache"
   before_script:
-    - CACHE_FILE=vendor.tar.gz
-    - *download-cache
-    - '[ -f vendor.tar.gz ] && tar xzf vendor.tar.gz || true'
-    - CACHE_FILE=core/phpstan-tmp/resultCache.php
     - *download-cache
     - mkdir -p $_ARTIFACTS_DIR
     - *composer-setup
-    - if [ -n "$COMPOSER_UPDATE" ]; then
-        composer update --optimize-autoloader;
-        composer outdated;
-      fi
   script:
     - vendor/bin/phpstan --version
     # Rely on PHPStan caching to execute analysis multiple times without performance drawback.
@@ -605,15 +599,9 @@ default:
     _ARTIFACTS_DIR: "test-artifacts/phpcs"
     CACHE_FILE: "core/.phpcscache"
   before_script:
+    - *download-cache
     - mkdir -p $_ARTIFACTS_DIR
     - *composer-setup
-    - if [ -n "$COMPOSER_UPDATE" ]; then
-        composer update --optimize-autoloader;
-        composer outdated;
-      fi
-    - mkdir -p $_ARTIFACTS_DIR
-    - *download-cache
-    - tar czf vendor.tar.gz vendor/
   script:
     - vendor/bin/phpcs --version
     - composer phpcs -- -s --report-full --report-summary --report-\\Micheh\\PhpCodeSniffer\\Report\\Gitlab=$_ARTIFACTS_DIR/phpcs-quality-report.json --cache=core/.phpcscache
