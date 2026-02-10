@@ -454,9 +454,9 @@ class EntityApiTest extends EntityKernelTestBase {
   }
 
   /**
-   * Tests that resaving an deleted entity throws an exception.
+   * Tests that resaving a deleted entity throws an exception.
    */
-  public function testSavingDeletedEntity() {
+  public function testSavingDeletedEntity(): void {
     $storage = \Drupal::entityTypeManager()->getStorage('entity_test_mulrev');
 
     // Create a new entity.
