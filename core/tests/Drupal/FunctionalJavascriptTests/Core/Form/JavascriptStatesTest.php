@@ -204,6 +204,8 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertSession()->pageTextContains('Enter password');
     // Check item_with_markup is visible.
     $this->assertSession()->pageTextContains('This is a test item with markup.');
+    // Check container_with_child_textfield is visible.
+    $this->assertSession()->pageTextContains('Textfield in container');
 
     // Change state: check the checkbox.
     $trigger->check();
@@ -250,6 +252,8 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertSession()->pageTextNotContains('Enter password');
     // Check item_with_markup is not visible.
     $this->assertSession()->pageTextNotContains('This is a test item with markup.');
+    // Check container_with_child_textfield is not visible.
+    $this->assertSession()->pageTextNotContains('Textfield in container');
 
     // Change state: uncheck the checkbox.
     $trigger->uncheck();
@@ -289,6 +293,8 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertSession()->pageTextContains('Enter password');
     // Check item_with_markup is visible.
     $this->assertSession()->pageTextContains('This is a test item with markup.');
+    // Check container_with_child_textfield is visible.
+    $this->assertSession()->pageTextContains('Textfield in container');
   }
 
   /**

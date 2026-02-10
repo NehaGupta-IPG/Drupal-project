@@ -753,6 +753,19 @@ class JavascriptStatesForm extends FormBase {
       ],
     ];
 
+    $form['container_with_child_textfield'] = [
+      '#type' => 'container',
+      '#states' => [
+        'visible' => [
+          ':input[name="checkbox_trigger"]' => ['checked' => FALSE],
+        ],
+      ],
+    ];
+    $form['container_with_child_textfield']['textfield_in_container'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Textfield in container'),
+    ];
+
     $form['test_select_visible_dependence']['select_visible_1'] = [
       '#type' => 'select',
       '#title' => 'Select visible 1',
