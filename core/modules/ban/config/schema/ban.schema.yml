@@ -1,0 +1,10 @@
+ban.allowed.*:
+  type: config_entity
+  label: 'Allowed IPs'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    allowedIp:
+      type: string
+      label: 'Allowed IP'

@@ -3,6 +3,7 @@
 namespace Drupal\ban;
 
 use Drupal\Core\Database\Connection;
+use Drupal\ban\Event\BanEvent;
 
 /**
  * Ban IP manager.
@@ -44,6 +45,18 @@ class BanIpManager implements BanIpManagerInterface {
    * {@inheritdoc}
    */
   public function banIp($ip) {
+    // Allow subscribers (e.g. allowed list) to veto banning this IP.
+    $event = new BanEvent($ip);
+    /** @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher */
+    $dispatcher = \Drupal::service('event_dispatcher');
+    $dispatcher->dispatch($event, BanEvent::EVENT_NAME);
+
+    // Exit early if a subscriber marked the IP as not to be banned.
+    if (!$event->isBanned) {
+      return;
+    }
+
+    // Persist the ban as in core.
     $this->connection->merge('ban_ip')
       ->key('ip', $ip)
       ->fields(['ip' => $ip])

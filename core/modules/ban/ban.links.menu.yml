@@ -4,3 +4,8 @@ ban.admin_page:
   route_name: ban.admin_page
   weight: 10
   parent: user.admin_index
+ban.allowed.collection:
+  title: 'Ban – allowed IPs'
+  parent: user.admin_index
+  description: 'Manage allowed IP addresses'
+  route_name: entity.ban_allowed_ip.collection
