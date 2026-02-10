@@ -4,6 +4,7 @@ namespace Drupal\datetime_range;
 
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 
 /**
  * Provides friendly methods for datetime range.
@@ -275,7 +276,7 @@ trait DateTimeRangeTrait {
    * @return array
    *   A renderable array for a single date time range.
    */
-  protected function renderStartEndWithIsoAttribute(DrupalDateTime $start_date, string $separator, DrupalDateTime $end_date): array {
+  protected function renderStartEndWithIsoAttribute(DrupalDateTime $start_date, string $separator, DrupalDateTime $end_date, $all_day): array {
     $element = [];
     if ($this->startDateIsDisplayed()) {
       $element[DateTimeRangeDisplayOptions::StartDate->value] = $this->buildDateWithIsoAttribute($start_date, $all_day);

@@ -80,6 +80,7 @@ class DateRangeItem extends DateTimeItem {
     ] + $schema['columns']['value'];
 
     $schema['indexes']['end_value'] = ['end_value'];
+
     $schema['columns']['all_day'] = [
       'description' => 'Flag indicating all day dates.',
       'type' => 'int',

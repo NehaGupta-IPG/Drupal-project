@@ -30,7 +30,7 @@ class DateRangeWidgetBase extends DateTimeWidgetBase {
       '#title' => $this->t('End date'),
     ] + $element['value'];
 
-     
+
     $element['all_day'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('All day'),
@@ -74,7 +74,6 @@ class DateRangeWidgetBase extends DateTimeWidgetBase {
     // The widget form element type has transformed the value to a
     // DrupalDateTime object at this point. We need to convert it back to the
     // storage timezone and format.
-
     $datetime_type = $this->getFieldSetting('datetime_type');
     if ($datetime_type === DateRangeItem::DATETIME_TYPE_DATE) {
       $storage_format = DateTimeItemInterface::DATE_STORAGE_FORMAT;
