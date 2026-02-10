@@ -662,6 +662,65 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   }
 
   /**
+   * Gets the value of a specific property of a field.
+   *
+   * By default the first delta can be accessed with this method.
+   *
+   * @param string $field_name
+   *   The name of the field.
+   * @param string $property
+   *   The field property, "value" for many field types.
+   * @param int $delta
+   *   Field value offset for multiple-value fields.
+   *
+   * @return mixed|null
+   *   The value of the specified field property, or NULL if not found.
+   */
+  public function getFieldValue(string $field_name, string $property, int $delta = 0): mixed {
+    // Attempt to get the value from the values directly if the field is not
+    // initialized yet.
+    if (!isset($this->fields[$field_name])) {
+      $field_values = NULL;
+      $field_values_found = FALSE;
+      if (\array_key_exists($this->activeLangcode, $this->values[$field_name])) {
+        $field_values = $this->values[$field_name][$this->activeLangcode];
+        $field_values_found = TRUE;
+      }
+      elseif (\array_key_exists(LanguageInterface::LANGCODE_DEFAULT, $this->values[$field_name])) {
+        $field_values = $this->values[$field_name][LanguageInterface::LANGCODE_DEFAULT];
+        $field_values_found = TRUE;
+      }
+
+      if ($field_values_found)  {
+        // If there are field values, try to get the property value.
+        // Configurable/Multi-value fields are stored differently, try accessing
+        // with delta and property first, then without delta and last, if the
+        // value are a scalar, just return that.
+        if (isset($field_values[$delta][$property])) {
+          return $field_values[$delta][$property];
+        }
+        elseif (isset($field_values[$property])) {
+          return $field_values[$property];
+        }
+        elseif (!is_array($field_values)) {
+          return $field_values;
+        }
+        else {
+          return NULL;
+        }
+      }
+    }
+
+    // Fall back to access the property through the field object.
+    $field_value = $this->get($field_name)->get($delta);
+    if ($field_value !== NULL) {
+      return $field_value->$property;
+    }
+    // $delta does not exist in value list.
+    return NULL;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function set($name, $value, $notify = TRUE) {
