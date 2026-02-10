@@ -28,6 +28,7 @@ class FilterThemeHooks {
           'children' => NULL,
           'description' => NULL,
           'attributes' => [],
+          'disabled' => FALSE,
         ],
         'initial preprocess' => static::class . ':preprocessTextFormatWrapper',
       ],
