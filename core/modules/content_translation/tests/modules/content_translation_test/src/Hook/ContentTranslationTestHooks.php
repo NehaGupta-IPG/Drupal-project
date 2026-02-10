@@ -85,4 +85,18 @@ class ContentTranslationTestHooks {
     \Drupal::state()->set('test_field_only_en_fr', $form_state->getValue('test_field_only_en_fr'));
   }
 
+  /**
+   * Implements hook_entity_translation_access().
+   */
+  #[Hook('entity_translation_access')]
+  function entityTranslationAccess(EntityInterface $entity, $operation, AccountInterface $account) {
+    $access = \Drupal::state()->get('content_translation_test.entity_translation_access.override.' . $entity->getEntityTypeId());
+    if (isset($access[$operation]) && $access[$operation] === TRUE) {
+      return AccessResult::allowed();
+    }
+    else {
+      return AccessResult::neutral();
+    }
+  }
+
 }
