@@ -113,7 +113,7 @@
       // Set focus to the first match:
 
       // 1. An element that was focused previously.
-      let hasFocus = this._focusedElement ? this._focusedElement.get(0) : null;
+      let hasFocus = this._focusedElement?.get(0) ?? null;
 
       // 2. First element inside the dialog matching [autofocus].
       if (!hasFocus) {
@@ -128,7 +128,7 @@
           const element = $elements[i].get(0);
           if (element) {
             const elementTabbable = tabbable(element);
-            hasFocus = elementTabbable.length ? elementTabbable[0] : null;
+            hasFocus = elementTabbable?.[0] ?? null;
           }
           if (hasFocus) {
             break;

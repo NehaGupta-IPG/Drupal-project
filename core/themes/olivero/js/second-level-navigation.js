@@ -23,10 +23,7 @@
     const buttonSelector =
       '[data-drupal-selector="primary-nav-submenu-toggle-button"]';
     const button = topLevelMenuItem.querySelector(buttonSelector);
-    const state =
-      toState !== undefined
-        ? toState
-        : button.getAttribute('aria-expanded') !== 'true';
+    const state = toState ?? button.getAttribute('aria-expanded') !== 'true';
 
     if (state) {
       // If desktop nav, ensure all menus close before expanding new one.

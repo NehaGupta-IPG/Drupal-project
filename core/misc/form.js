@@ -289,9 +289,7 @@
   const handleFragmentLinkClickOrHashChange = (e) => {
     let url;
     if (e.type === 'click') {
-      url = e.currentTarget.location
-        ? e.currentTarget.location
-        : e.currentTarget;
+      url = e.currentTarget?.location ?? e.currentTarget;
     } else {
       url = window.location;
     }

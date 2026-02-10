@@ -262,7 +262,7 @@
               activeTray: $(this.get('activeTab')).attr('data-toolbar-tray'),
               isOriented: this.get('isOriented'),
               isFixed: this.get('isFixed'),
-              userButtonMinWidth: userButton ? userButton.clientWidth : 0,
+              userButtonMinWidth: userButton?.clientWidth ?? 0,
             };
             // Store toolbar UI state in session storage, so it can be accessed
             // by JavaScript that executes before the first paint.

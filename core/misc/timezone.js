@@ -28,7 +28,7 @@
         // abbreviation, between 3 and 5 letters enclosed in parentheses,
         // which can be interpreted by PHP.
         const matches = dateString.match(/\(([A-Z]{3,5})\)/);
-        const abbreviation = matches ? matches[1] : 0;
+        const abbreviation = matches?.[1] ?? 0;
 
         // For all other client environments, the abbreviation is set to "0"
         // and the current offset from UTC and daylight saving time status are

@@ -54,8 +54,7 @@
        *   The new value of the tray attribute in the model.
        */
       onActiveTrayChange(model, tray) {
-        const relevantTray =
-          tray === null ? model.previous('activeTray') : tray;
+        const relevantTray = tray ?? model.previous('activeTray');
         // Current activeTray and previous activeTray are empty, no state change
         // to announce.
         if (!relevantTray) {
