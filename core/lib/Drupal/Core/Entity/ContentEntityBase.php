@@ -634,10 +634,12 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
 
       $default = $langcode == LanguageInterface::LANGCODE_DEFAULT;
       if (!$default && !$definition->isTranslatable()) {
-        if (!isset($this->fields[$name][LanguageInterface::LANGCODE_DEFAULT])) {
+        $return = $this->getTranslatedField($name, LanguageInterface::LANGCODE_DEFAULT);
+        if ($this->isNew()) {
           $this->fields[$name][LanguageInterface::LANGCODE_DEFAULT] = $this->getTranslatedField($name, LanguageInterface::LANGCODE_DEFAULT);
+          $this->fields[$name][$langcode] = &$this->fields[$name][LanguageInterface::LANGCODE_DEFAULT];
         }
-        $this->fields[$name][$langcode] = &$this->fields[$name][LanguageInterface::LANGCODE_DEFAULT];
+        return $return;
       }
       else {
         $value = NULL;
@@ -655,7 +657,10 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
           $field_langcode = $langcode;
         }
         $field->setLangcode($field_langcode);
-        $this->fields[$name][$langcode] = $field;
+        if ($this->isNew()) {
+          $this->fields[$name][$langcode] = $field;
+        }
+        return $field;
       }
     }
     return $this->fields[$name][$langcode];
