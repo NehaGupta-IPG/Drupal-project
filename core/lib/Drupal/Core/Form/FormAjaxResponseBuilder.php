@@ -41,7 +41,9 @@ class FormAjaxResponseBuilder implements FormAjaxResponseBuilderInterface {
     // needs to be rendered.
     $triggering_element = $form_state->getTriggeringElement();
     if (empty($triggering_element)) {
-      throw new HttpException(500, 'No triggering element found for the Ajax request.');
+      throw new HttpException(500, sprintf('No triggering element found for the "%s" form Ajax request.',
+        $form['#build_id'] ?? ''
+      ));
     }
 
     if (!empty($triggering_element['#array_parents'])) {
@@ -53,8 +55,8 @@ class FormAjaxResponseBuilder implements FormAjaxResponseBuilderInterface {
 
     // Sanity check the callback.
     if (empty($triggering_element['#ajax']['callback'])) {
-      throw new HttpException(500, sprintf('The specified #ajax callback in the form "%s" is empty for triggering form element "%s" with array parents "%s".',
-        $form_state->getFormObject()->getFormId(),
+      throw new HttpException(500, sprintf('The specified "%s" form #ajax callback is empty for triggering form element "%s" with array parents "%s".',
+        $form['#build_id'] ?? '',
         $triggering_element['#name'],
         $array_parents_string
       ));
