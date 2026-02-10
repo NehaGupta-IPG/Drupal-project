@@ -42,7 +42,7 @@ class ResponsiveImageBuilderTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->installConfig(['image']);
+    $this->installConfig(['system', 'image']);
     $this->responsiveImageBuilder = $this->container->get(ResponsiveImageBuilder::class);
   }
 
