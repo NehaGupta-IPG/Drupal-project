@@ -69,8 +69,8 @@ class EntityAdapter extends TypedData implements \IteratorAggregate, ComplexData
   public function setValue($entity, $notify = TRUE) {
     $this->entity = $entity;
     // Notify the parent of any changes.
-    if ($notify && isset($this->parent)) {
-      $this->parent->onChange($this->name);
+    if ($notify && isset($this->weakReferenceParent)) {
+      $this->weakReferenceParent->get()->onChange($this->name);
     }
   }
 
