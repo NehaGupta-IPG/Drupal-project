@@ -45,6 +45,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Route;
 use Drupal\user\Entity\User;
+use Symfony\Component\HttpFoundation\Session\SessionFactoryInterface;
 
 /**
  * Do not run the task during the current installation request.
@@ -150,7 +151,6 @@ function install_drupal($class_loader, $settings = [], ?callable $callback = NUL
   // installations can send output to the browser or redirect the user to the
   // next page.
   if ($state['interactive']) {
-    \Drupal::request()->getSession()->save();
     if ($state['parameters_changed']) {
       // Redirect to the correct page if the URL parameters have changed.
       install_goto(install_redirect_url($state));
@@ -1076,6 +1076,7 @@ function install_display_output($output, $install_state): void {
     'ETag' => '"' . $request_time . '"',
   ];
   $response->headers->add($default_headers);
+  \Drupal::request()->getSession()->save();
   $response->send();
   exit;
 }
@@ -1555,8 +1556,9 @@ function install_load_profile(&$install_state): void {
  */
 function install_bootstrap_full(): void {
   // Store the session on the request object and start it.
-  /** @var \Symfony\Component\HttpFoundation\Session\SessionInterface $session */
-  $session = \Drupal::service('session');
+  /** @var \Symfony\Component\HttpFoundation\Session\SessionFactoryInterface $sessionFactory */
+  $sessionFactory = \Drupal::service(SessionFactoryInterface::class);
+  $session = $sessionFactory->createSession();
   \Drupal::request()->setSession($session);
   $session->start();
 }

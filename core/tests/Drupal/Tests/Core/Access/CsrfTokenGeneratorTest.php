@@ -11,6 +11,10 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
  * Tests the CsrfTokenGenerator class.
@@ -41,6 +45,11 @@ class CsrfTokenGeneratorTest extends UnitTestCase {
   protected $sessionMetadata;
 
   /**
+   * The request stack.
+   */
+  protected RequestStack $requestStack;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -61,7 +70,13 @@ class CsrfTokenGeneratorTest extends UnitTestCase {
 
     new Settings($settings);
 
-    $this->generator = new CsrfTokenGenerator($this->privateKey, $this->sessionMetadata);
+    $session = new Session(new MockArraySessionStorage(metaBag: $this->sessionMetadata));
+    $request = new Request();
+    $request->setSession($session);
+    $this->requestStack = new RequestStack();
+    $this->requestStack->push($request);
+
+    $this->generator = new CsrfTokenGenerator($this->privateKey, $this->requestStack);
   }
 
   /**
@@ -200,7 +215,7 @@ class CsrfTokenGeneratorTest extends UnitTestCase {
   public function testGetWithNoHashSalt(): void {
     // Update settings with no hash salt.
     new Settings([]);
-    $generator = new CsrfTokenGenerator($this->privateKey, $this->sessionMetadata);
+    $generator = new CsrfTokenGenerator($this->privateKey, $this->requestStack);
     $this->expectException(\RuntimeException::class);
     $generator->get();
   }

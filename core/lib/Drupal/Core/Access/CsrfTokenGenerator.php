@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Core\PrivateKey;
 use Drupal\Core\Session\MetadataBag;
 use Drupal\Core\Site\Settings;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Generates and validates CSRF tokens.
@@ -15,30 +16,17 @@ use Drupal\Core\Site\Settings;
 class CsrfTokenGenerator {
 
   /**
-   * The private key service.
-   *
-   * @var \Drupal\Core\PrivateKey
-   */
-  protected $privateKey;
-
-  /**
-   * The session metadata bag.
-   *
-   * @var \Drupal\Core\Session\MetadataBag
-   */
-  protected $sessionMetadata;
-
-  /**
    * Constructs the token generator.
    *
-   * @param \Drupal\Core\PrivateKey $private_key
+   * @param \Drupal\Core\PrivateKey $privateKey
    *   The private key service.
-   * @param \Drupal\Core\Session\MetadataBag $session_metadata
-   *   The session metadata bag.
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   The request stack.
    */
-  public function __construct(PrivateKey $private_key, MetadataBag $session_metadata) {
-    $this->privateKey = $private_key;
-    $this->sessionMetadata = $session_metadata;
+  public function __construct(
+    protected readonly PrivateKey $privateKey,
+    protected readonly RequestStack $requestStack,
+  ) {
   }
 
   /**
@@ -61,10 +49,13 @@ class CsrfTokenGenerator {
    * @see \Symfony\Component\HttpFoundation\Session\SessionInterface::start()
    */
   public function get($value = '') {
-    $seed = $this->sessionMetadata->getCsrfTokenSeed();
+    $sessionMetadata = $this->requestStack->getSession()->getMetadataBag();
+    $seed = ($sessionMetadata instanceof MetadataBag) ? $sessionMetadata->getCsrfTokenSeed() : NULL;
     if (empty($seed)) {
       $seed = Crypt::randomBytesBase64();
-      $this->sessionMetadata->setCsrfTokenSeed($seed);
+      if ($sessionMetadata instanceof MetadataBag) {
+        $sessionMetadata->setCsrfTokenSeed($seed);
+      }
     }
 
     return $this->computeToken($seed, $value);
@@ -82,7 +73,8 @@ class CsrfTokenGenerator {
    *   TRUE for a valid token, FALSE for an invalid token.
    */
   public function validate($token, $value = '') {
-    $seed = $this->sessionMetadata->getCsrfTokenSeed();
+    $sessionMetadata = $this->requestStack->getSession()->getMetadataBag();
+    $seed = ($sessionMetadata instanceof MetadataBag) ? $sessionMetadata->getCsrfTokenSeed() : NULL;
     if (empty($seed)) {
       return FALSE;
     }

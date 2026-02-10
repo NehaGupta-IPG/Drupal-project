@@ -5,7 +5,7 @@ namespace Drupal\workspaces\Negotiator;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\workspaces\WorkspaceInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Defines the session workspace negotiator.
@@ -14,7 +14,7 @@ class SessionWorkspaceNegotiator implements WorkspaceNegotiatorInterface, Worksp
 
   public function __construct(
     protected readonly AccountInterface $currentUser,
-    protected readonly SessionInterface $session,
+    protected readonly RequestStack $requestStack,
   ) {}
 
   /**
@@ -29,21 +29,21 @@ class SessionWorkspaceNegotiator implements WorkspaceNegotiatorInterface, Worksp
    * {@inheritdoc}
    */
   public function getActiveWorkspaceId(Request $request): ?string {
-    return $this->session->get('active_workspace_id');
+    return $this->requestStack->getSession()->get('active_workspace_id');
   }
 
   /**
    * {@inheritdoc}
    */
   public function setActiveWorkspace(WorkspaceInterface $workspace) {
-    $this->session->set('active_workspace_id', $workspace->id());
+    $this->requestStack->getSession()->set('active_workspace_id', $workspace->id());
   }
 
   /**
    * {@inheritdoc}
    */
   public function unsetActiveWorkspace() {
-    $this->session->remove('active_workspace_id');
+    $this->requestStack->getSession()->remove('active_workspace_id');
   }
 
 }

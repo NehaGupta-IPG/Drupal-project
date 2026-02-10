@@ -502,7 +502,7 @@ services:
     arguments: [replica]
   database.replica_kill_switch:
     class: Drupal\Core\Database\ReplicaKillSwitch
-    arguments: ['@settings', '@datetime.time', '@session']
+    arguments: ['@settings', '@datetime.time', '@request_stack']
   Drupal\Core\Database\ReplicaKillSwitch: '@database.replica_kill_switch'
   Drupal\Core\Database\EventSubscriber\StatementExecutionSubscriber: ~
   datetime.time:
@@ -1369,7 +1369,7 @@ services:
   Drupal\Core\PrivateKey: '@private_key'
   csrf_token:
     class: Drupal\Core\Access\CsrfTokenGenerator
-    arguments: ['@private_key', '@session_manager.metadata_bag']
+    arguments: ['@private_key', '@request_stack']
   Drupal\Core\Access\CsrfTokenGenerator: '@csrf_token'
   access_arguments_resolver_factory:
     class: Drupal\Core\Access\AccessArgumentsResolverFactory
@@ -1599,7 +1599,7 @@ services:
   Drupal\Core\Utility\Token: '@token'
   batch.storage:
     class: Drupal\Core\Batch\BatchStorage
-    arguments: ['@database', '@session', '@csrf_token', '@datetime.time']
+    arguments: ['@database', '@request_stack', '@csrf_token', '@datetime.time']
     tags:
       - { name: backend_overridable }
     lazy: true
@@ -1695,9 +1695,8 @@ services:
   Drupal\Core\Session\SessionConfigurationInterface: '@session_configuration'
   session:
     class: Symfony\Component\HttpFoundation\Session\Session
-    arguments: ['@session_manager', '@session.attribute_bag', '@session.flash_bag']
-    tags:
-      - { name: service_collector, tag: session_bag, call: registerBag }
+    factory: ['@request_stack', 'getSession']
+    deprecated: 'The "%service_id%" service is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Get the session from the request (stack) instead. See https://www.drupal.org/node/XXXXXXX'
   Symfony\Component\HttpFoundation\Session\SessionInterface: '@session'
   # session.flash_bag has special treatment: it is passed to the session
   # service as an argument. Other services using FlashBag should be tagged
@@ -1705,10 +1704,14 @@ services:
   session.flash_bag:
     class: Symfony\Component\HttpFoundation\Session\Flash\FlashBag
     public: false
+    factory: ['@session', 'getFlashBag']
+    deprecated: 'The "%service_id%" service is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Get the flash bag via session from the request (stack) instead. See https://www.drupal.org/node/XXXXXXX'
   Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface: '@session.flash_bag'
   session.attribute_bag:
     class: Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag
+    factory: ['@session', 'getAttributeBag']
     public: false
+    deprecated: 'The "%service_id%" service is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Get the attribute bag via session from the request (request) instead. See https://www.drupal.org/node/XXXXXXX'
   Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface: '@session.attribute_bag'
   session_handler:
     alias: session_handler.storage
@@ -1724,16 +1727,36 @@ services:
   Drupal\Core\Session\WriteSafeSessionHandlerInterface: '@session_handler.write_safe'
   session_manager:
     class: Drupal\Core\Session\SessionManager
-    arguments: ['@request_stack', '@database', '@session_manager.metadata_bag', '@session_configuration', '@datetime.time', '@session_handler']
-    tags:
-      - { name: backend_overridable }
-    calls:
-      - [setWriteSafeHandler, ['@session_handler.write_safe']]
+    factory: ['@Symfony\Component\HttpFoundation\Session\Storage\SessionStorageFactoryInterface', 'createStorage']
+    arguments: [ null ]
+    deprecated: 'The "%service_id%" service is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Swap out or decorate the Symfony\Component\HttpFoundation\Session\Storage\SessionStorageFactoryInterface in order to customize session backend instead. See https://www.drupal.org/node/XXXXXXX'
   Drupal\Core\Session\SessionManagerInterface: '@session_manager'
   session_manager.metadata_bag:
     class: Drupal\Core\Session\MetadataBag
-    arguments: ['@settings']
+    factory: ['@session', 'getMetadataBag']
+    deprecated: 'The "%service_id%" service is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Get the metadata bag via session from the request (request) instead. See https://www.drupal.org/node/XXXXXXX'
   Drupal\Core\Session\MetadataBag: '@session_manager.metadata_bag'
+  Symfony\Component\HttpFoundation\Session\Storage\SessionStorageFactoryInterface:
+    class: Drupal\Core\Session\SessionManagerFactory
+    arguments:
+      - '@request_stack'
+      - '@database'
+      - '@session_configuration'
+      - '@datetime.time'
+      - '@session_handler.write_safe'
+      - '@session_handler'
+    tags:
+      - { name: backend_overridable }
+  Drupal\Core\Session\SessionFactoryCompat:
+    decorates: 'Symfony\Component\HttpFoundation\Session\SessionFactoryInterface'
+    arguments: ['@.inner']
+    tags:
+      - { name: service_collector, tag: session_bag, call: registerBag }
+  Symfony\Component\HttpFoundation\Session\SessionFactoryInterface:
+    class: Symfony\Component\HttpFoundation\Session\SessionFactory
+    arguments:
+      - '@Symfony\Component\HttpFoundation\RequestStack'
+      - '@Symfony\Component\HttpFoundation\Session\Storage\SessionStorageFactoryInterface'
   asset.css.collection_renderer:
     class: Drupal\Core\Asset\CssCollectionRenderer
     arguments: [ '@asset.query_string', '@file_url_generator' ]
@@ -1941,7 +1964,7 @@ services:
     class: Drupal\Core\EventSubscriber\RssResponseRelativeUrlFilter
   messenger:
     class: Drupal\Core\Messenger\Messenger
-    arguments: ['@session.flash_bag', '@page_cache_kill_switch']
+    arguments: ['@request_stack', '@page_cache_kill_switch']
   Drupal\Core\Messenger\MessengerInterface: '@messenger'
   tempstore.private:
     class: Drupal\Core\TempStore\PrivateTempStoreFactory

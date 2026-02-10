@@ -5,19 +5,13 @@ namespace Drupal\Core\Messenger;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\PageCache\ResponsePolicy\KillSwitch;
 use Drupal\Core\Render\Markup;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 
 /**
  * The messenger service.
  */
 class Messenger implements MessengerInterface {
-
-  /**
-   * The flash bag.
-   *
-   * @var \Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface
-   */
-  protected $flashBag;
 
   /**
    * The kill switch.
@@ -29,13 +23,12 @@ class Messenger implements MessengerInterface {
   /**
    * Messenger constructor.
    *
-   * @param \Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface $flash_bag
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The flash bag.
    * @param \Drupal\Core\PageCache\ResponsePolicy\KillSwitch $killSwitch
    *   The kill switch.
    */
-  public function __construct(FlashBagInterface $flash_bag, KillSwitch $killSwitch) {
-    $this->flashBag = $flash_bag;
+  public function __construct(protected readonly RequestStack $requestStack, KillSwitch $killSwitch) {
     $this->killSwitch = $killSwitch;
   }
 
@@ -54,10 +47,14 @@ class Messenger implements MessengerInterface {
       $message = Markup::create((string) $message);
     }
 
+    $session = $this->requestStack->getSession();
+    assert($session instanceof FlashBagAwareSessionInterface);
+    $flashBag = $session->getFlashBag();
+
     // Do not use strict type checking so that equivalent string and
     // MarkupInterface objects are detected.
-    if ($repeat || !in_array($message, $this->flashBag->peek($type))) {
-      $this->flashBag->add($type, $message);
+    if ($repeat || !in_array($message, $flashBag->peek($type))) {
+      $flashBag->add($type, $message);
     }
 
     // Mark this page as being uncacheable.
@@ -84,14 +81,18 @@ class Messenger implements MessengerInterface {
    * {@inheritdoc}
    */
   public function all() {
-    return $this->flashBag->peekAll();
+    $session = $this->requestStack->getSession();
+    assert($session instanceof FlashBagAwareSessionInterface);
+    return $session->getFlashBag()->peekAll();
   }
 
   /**
    * {@inheritdoc}
    */
   public function deleteAll() {
-    return $this->flashBag->clear();
+    $session = $this->requestStack->getSession();
+    assert($session instanceof FlashBagAwareSessionInterface);
+    return $session->getFlashBag()->clear();
   }
 
   /**
@@ -99,14 +100,18 @@ class Messenger implements MessengerInterface {
    */
   public function deleteByType($type) {
     // Flash bag gets and clears flash messages from the stack.
-    return $this->flashBag->get($type);
+    $session = $this->requestStack->getSession();
+    assert($session instanceof FlashBagAwareSessionInterface);
+    return $session->getFlashBag()->get($type);
   }
 
   /**
    * {@inheritdoc}
    */
   public function messagesByType($type) {
-    return $this->flashBag->peek($type);
+    $session = $this->requestStack->getSession();
+    assert($session instanceof FlashBagAwareSessionInterface);
+    return $session->getFlashBag()->peek($type);
   }
 
 }

@@ -41,11 +41,15 @@ class FiberPlaceholderTest extends UnitTestCase {
    * @legacy-covers \Drupal\big_pipe\Render\BigPipe::sendPlaceholders
    */
   public function testLongPlaceholderFiberSuspendingLoop(): void {
+    $session = $this->prophesize(SessionInterface::class);
+    $session->start()->willReturn(TRUE);
     $request_stack = $this->prophesize(RequestStack::class);
     $request_stack->getMainRequest()
       ->willReturn(new Request());
     $request_stack->getCurrentRequest()
       ->willReturn(new Request());
+    $request_stack->getSession()
+      ->willReturn($session->reveal());
 
     $callableResolver = $this->prophesize(CallableResolver::class);
     $callableResolver->getCallableFromDefinition(Argument::any())
@@ -65,12 +69,8 @@ class FiberPlaceholderTest extends UnitTestCase {
       ],
     );
 
-    $session = $this->prophesize(SessionInterface::class);
-    $session->start()->willReturn(TRUE);
-
     $bigpipe = new BigPipe(
       $renderer,
-      $session->reveal(),
       $request_stack->reveal(),
       $this->prophesize(HttpKernelInterface::class)->reveal(),
       $this->createMock(EventDispatcherInterface::class),

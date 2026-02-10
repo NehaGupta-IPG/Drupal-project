@@ -176,7 +176,7 @@ class AccessTest extends KernelTestBase {
     ]);
     $file->setPermanent();
     $file->save();
-    \Drupal::service('session')->set('anonymous_allowed_file_ids', [$file->id() => $file->id()]);
+    \Drupal::requestStack()->getSession()->set('anonymous_allowed_file_ids', [$file->id() => $file->id()]);
 
     $account = User::getAnonymousUser();
     $file->setOwnerId($account->id())->save();

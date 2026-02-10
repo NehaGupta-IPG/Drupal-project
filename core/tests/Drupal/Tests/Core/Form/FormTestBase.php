@@ -11,6 +11,7 @@ use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\FormValidator;
+use Drupal\Core\Session\MetadataBag;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\MockObject\Stub;
@@ -190,7 +191,7 @@ abstract class FormTestBase extends UnitTestCase {
     $this->account = $this->createMock('Drupal\Core\Session\AccountInterface');
     $this->themeManager = $this->createMock('Drupal\Core\Theme\ThemeManagerInterface');
     $this->request = Request::createFromGlobals();
-    $this->request->setSession(new Session(new MockArraySessionStorage()));
+    $this->request->setSession(new Session(new MockArraySessionStorage(metaBag: new MetadataBag())));
     $this->eventDispatcher = $this->createMock('Symfony\Contracts\EventDispatcher\EventDispatcherInterface');
     $this->requestStack = new RequestStack();
     $this->requestStack->push($this->request);

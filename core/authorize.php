@@ -28,6 +28,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Routing\RouteObjectInterface;
+use Symfony\Component\HttpFoundation\Session\SessionFactoryInterface;
 use Symfony\Component\Routing\Route;
 
 @trigger_error('authorize.php is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
@@ -76,7 +77,9 @@ try {
   $kernel->preHandle($request);
   // Ensure our request includes the session if appropriate.
   if (PHP_SAPI !== 'cli') {
-    $request->setSession($kernel->getContainer()->get('session'));
+    $session_factory = \Drupal::service(SessionFactoryInterface::class);
+    $session = $session_factory->createSession();
+    $request->setSession($session);
   }
 }
 catch (HttpExceptionInterface $e) {

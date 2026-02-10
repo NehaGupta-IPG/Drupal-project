@@ -24,6 +24,7 @@ use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Installer\InstallerRedirectTrait;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Security\RequestSanitizer;
+use Drupal\Core\Session\MetadataBag;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\DrupalInstalled;
@@ -33,6 +34,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionFactoryInterface;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -997,17 +999,21 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       // expected.
       $this->container->get(ReverseContainer::class)->recordContainer();
 
-      // If there is a session, close and save it.
-      if ($this->container->initialized('session')) {
-        $session = $this->container->get('session');
-        if ($session->isStarted()) {
-          $session_started = TRUE;
-          $session->save();
-        }
-        unset($session);
+      if ($this->container->initialized('messenger')) {
+        $all_messages = $this->container->get('messenger')->all();
       }
 
-      $all_messages = $this->container->get('messenger')->all();
+      // If there is a session, close and save it.
+      if (($request_stack = $this->container->get('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE))) {
+        if ($request = $request_stack->getMainRequest()) {
+          $session = $request->getSession();
+          if ($session->isStarted()) {
+            $session_started = TRUE;
+            $session->save();
+          }
+          unset($session);
+        }
+      }
     }
 
     // If the module list hasn't already been set in updateModules and we are
@@ -1046,16 +1052,18 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $this->attachSynthetic($container);
 
     $this->container = $container;
-    if ($session_started) {
-      $this->container->get('session')->start();
-    }
 
     // The request stack is preserved across container rebuilds. Re-inject the
     // new session into the main request if one was present before.
     if (($request_stack = $this->container->get('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE))) {
       if ($request = $request_stack->getMainRequest()) {
         $subrequest = TRUE;
-        $request->setSession($this->container->get('session'));
+        $session_factory = $this->container->get(SessionFactoryInterface::class);
+        $session = $session_factory->createSession();
+        $request->setSession($session);
+        if ($session_started) {
+          $session->start();
+        }
       }
     }
 
@@ -1276,6 +1284,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   public function resetContainer(): ContainerInterface {
     $session_started = FALSE;
+    $all_messages = [];
     $subrequest = FALSE;
     $reload_module_handler = FALSE;
 
@@ -1295,17 +1304,21 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // expected.
     $this->container->get(ReverseContainer::class)->recordContainer();
 
-    // If there is a session, close and save it.
-    if ($this->container->initialized('session')) {
-      $session = $this->container->get('session');
-      if ($session->isStarted()) {
-        $session_started = TRUE;
-        $session->save();
-      }
-      unset($session);
+    if ($this->container->initialized('messenger')) {
+      $all_messages = $this->container->get('messenger')->all();
     }
 
-    $all_messages = $this->container->get('messenger')->all();
+    // If there is a session, close and save it.
+    if (($request_stack = $this->container->get('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE))) {
+      if ($request = $request_stack->getMainRequest()) {
+        $session = $request->getSession();
+        if ($session->isStarted()) {
+          $session_started = TRUE;
+          $session->save();
+        }
+        unset($session);
+      }
+    }
 
     $persist = $this->getServicesToPersist($this->container);
     $this->container->reset();
@@ -1320,16 +1333,17 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $this->container->get('module_handler')->reload();
     }
 
-    if ($session_started) {
-      $this->container->get('session')->start();
-    }
-
     // The request stack is preserved across container rebuilds. Re-inject the
     // new session into the main request if one was present before.
     if (($request_stack = $this->container->get('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE))) {
       if ($request = $request_stack->getMainRequest()) {
         $subrequest = TRUE;
-        $request->setSession($this->container->get('session'));
+        $session_factory = $this->container->get(SessionFactoryInterface::class);
+        $session = $session_factory->createSession();
+        $request->setSession($session);
+        if ($session_started) {
+          $session->start();
+        }
       }
     }
 
@@ -1887,7 +1901,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @see \Drupal\Core\StackMiddleware\Session::handle()
    */
   protected function initializeEphemeralSession(Request $request): void {
-    $session = new Session(new MockArraySessionStorage());
+    $session = new Session(new MockArraySessionStorage(metaBag: new MetadataBag()));
     $session->start();
     $request->setSession($session);
   }

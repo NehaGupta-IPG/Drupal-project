@@ -13,6 +13,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Logger\RfcLogLevel;
+use Drupal\Core\Session\MetadataBag;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -454,7 +455,9 @@ class BigPipeTest extends BrowserTestBase {
     }
 
     // Store the CSRF token in the test runners session metadata bag.
-    $this->container->get('session_manager.metadata_bag')->setCsrfTokenSeed($csrf_token_seed);
+    $metadata_bag = $session->getMetadataBag();
+    assert($metadata_bag instanceof MetadataBag);
+    $metadata_bag->setCsrfTokenSeed($csrf_token_seed);
   }
 
   /**

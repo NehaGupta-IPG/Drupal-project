@@ -7,6 +7,7 @@
 
 use Drupal\Core\DrupalKernel;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionFactoryInterface;
 
 /**
  * Rebuilds all caches even when Drupal itself does not work.
@@ -35,7 +36,9 @@ function drupal_rebuild($class_loader, Request $request): void {
   $kernel->preHandle($request);
   // Ensure our request includes the session if appropriate.
   if (PHP_SAPI !== 'cli') {
-    $request->setSession($kernel->getContainer()->get('session'));
+    $session_factory = \Drupal::service(SessionFactoryInterface::class);
+    $session = $session_factory->createSession();
+    $request->setSession($session);
   }
 
   drupal_flush_all_caches($kernel);

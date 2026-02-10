@@ -10,6 +10,7 @@ use Drupal\Core\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
@@ -126,8 +127,8 @@ class UpdateKernel extends DrupalKernel {
    */
   protected function bootSession(Request $request) {
     $container = $this->getContainer();
-    /** @var \Symfony\Component\HttpFoundation\Session\SessionInterface $session */
-    $session = $container->get('session');
+    $session_factory = $container->get(SessionFactoryInterface::class);
+    $session = $session_factory->createSession();
     $session->start();
     $request->setSession($session);
   }
