@@ -114,22 +114,9 @@ default:
   rules:
     - if: $PERFORMANCE_TEST != "1"
 
-.download-cache: &download-cache
-  - |
-    if [[ "$CI_MERGE_REQUEST_LABELS" =~ "Test lint cache warming" ]]; then
-      CACHE_URL=https://git.drupalcode.org/api/v4/projects/${CI_PROJECT_ID}/jobs/artifacts/${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}/raw/${CACHE_FILE}?job=Write%20lint%20caches
-    else
-      CACHE_URL=https://git.drupalcode.org/api/v4/projects/project%2Fdrupal/jobs/artifacts/${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}${CI_COMMIT_BRANCH}/raw/${CACHE_FILE}?job=Write%20lint%20caches
-    fi
-  # Get the cache file from the artifacts of the latest successful job from the
-  # target branch. Allow the job to proceed and pass if the file doesn't exist.
-  - echo Downloading $CACHE_URL
-  - curl --fail --location --create-dirs --output $CACHE_FILE "$CACHE_URL" || true
-
 .composer-setup: &composer-setup
   - echo -e "\e[0Ksection_start:`date +%s`:composer_setup[collapsed=true]\r\e[0K\e[0;30;103m*** Composer setup ***\e[0m"
-  - CACHE_FILE=vendor.tar.gz
-  - *download-cache
+  - .gitlab-ci/scripts/download-cache.sh vendor.tar.gz
   - '[ -f vendor.tar.gz ] && tar xzf vendor.tar.gz || true'
   - composer validate
   - composer install --optimize-autoloader
@@ -511,18 +498,12 @@ default:
     - if: ($CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_LABELS =~ /Test lint cache warming/)
     - if: $PERFORMANCE_TEST == "1"
   script:
-    - CACHE_FILE=core/phpstan-tmp/resultCache.php
-    - *download-cache
-    - CACHE_FILE=core/.cspellcache
-    - *download-cache
-    - CACHE_FILE=core/.eslintcache
-    - *download-cache
-    - CACHE_FILE=core/.stylelintcache
-    - *download-cache
-    - CACHE_FILE=core/.phpcscache
-    - *download-cache
-    - CACHE_FILE=vendor.tar.gz
-    - *download-cache
+    - .gitlab-ci/scripts/download-cache.sh core/phpstan-tmp/resultCache.php
+    - .gitlab-ci/scripts/download-cache.sh core/.cspellcache
+    - .gitlab-ci/scripts/download-cache.sh core/.eslintcache
+    - .gitlab-ci/scripts/download-cache.sh core/.stylelintcache
+    - .gitlab-ci/scripts/download-cache.sh core/.phpcscache
+    - .gitlab-ci/scripts/download-cache.sh vendor.tar.gz
 
 '📔 Spell-checking':
   <<: [ *yarn-install-from-cache ]
@@ -530,9 +511,8 @@ default:
   stage: 🪄 Lint
   variables:
     KUBERNETES_CPU_REQUEST: "2"
-    CACHE_FILE: "core/.cspellcache"
   script:
-    - *download-cache
+    - .gitlab-ci/scripts/download-cache.sh core/.cspellcache
     - *core-spellcheck
   artifacts:
     expire_in: 1 week
@@ -548,9 +528,8 @@ default:
     _ARTIFACTS_DIR: "test-artifacts/phpstan"
     _PHPSTAN_NEON: "core/phpstan.neon.dist"
     _PHPSTAN_BASELINE: "core/.phpstan-baseline.php"
-    CACHE_FILE: "core/phpstan-tmp/resultCache"
   before_script:
-    - *download-cache
+    - .gitlab-ci/scripts/download-cache.sh core/phpstan-tmp/resultCache.php
     - mkdir -p $_ARTIFACTS_DIR
     - *composer-setup
   script:
@@ -597,11 +576,11 @@ default:
   variables:
     KUBERNETES_CPU_REQUEST: "4"
     _ARTIFACTS_DIR: "test-artifacts/phpcs"
-    CACHE_FILE: "core/.phpcscache"
   before_script:
-    - *download-cache
+    - .gitlab-ci/scripts/download-cache.sh core/.phpcscache
     - mkdir -p $_ARTIFACTS_DIR
     - *composer-setup
+    - tar czf vendor.tar.gz vendor/
   script:
     - vendor/bin/phpcs --version
     - composer phpcs -- -s --report-full --report-summary --report-\\Micheh\\PhpCodeSniffer\\Report\\Gitlab=$_ARTIFACTS_DIR/phpcs-quality-report.json --cache=core/.phpcscache
@@ -629,7 +608,6 @@ default:
   stage: 🪄 Lint
   variables:
     KUBERNETES_CPU_REQUEST: "2"
-    CACHE_FILE: "core/.eslintcache"
   # Run on push, or on MRs if CSS files have changed, or manually.
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
@@ -645,7 +623,7 @@ default:
     - when: manual
       allow_failure: true
   script:
-    - *download-cache
+    - .gitlab-ci/scripts/download-cache.sh core/.eslintcache
     - cd core
     - echo -e "Node version $(node --version)\nYarn version $(yarn --version)"
     - yarn run check:ckeditor5
@@ -661,7 +639,6 @@ default:
   stage: 🪄 Lint
   variables:
     KUBERNETES_CPU_REQUEST: "2"
-    CACHE_FILE: "core/.stylelintcache"
   # Run on push, or on MRs if CSS files have changed, or manually.
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
@@ -676,7 +653,7 @@ default:
     - when: manual
       allow_failure: true
   script:
-    - *download-cache
+    - .gitlab-ci/scripts/download-cache.sh core/.stylelintcache
     - cd core
     - echo -e "Node version $(node --version)\nYarn version $(yarn --version)"
     - yarn run build:css --check
