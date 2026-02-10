@@ -475,6 +475,11 @@ default:
 ################
 
 .lint-cache-artifacts: &lint-cache-artifacts
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $DAILY_TEST == "1"
+    - if: ($CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_LABELS =~ /Test lint cache warming/)
+    - if: $PERFORMANCE_TEST == "1"
   artifacts:
     paths:
       - core/phpstan-tmp/resultCache.php
@@ -492,11 +497,6 @@ default:
 'Lint cache download':
   <<: [ *lint-cache-artifacts ]
   stage: 🪄 Lint
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
-    - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $DAILY_TEST == "1"
-    - if: ($CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_LABELS =~ /Test lint cache warming/)
-    - if: $PERFORMANCE_TEST == "1"
   script:
     - .gitlab-ci/scripts/download-cache.sh core/phpstan-tmp/resultCache.php
     - .gitlab-ci/scripts/download-cache.sh core/.cspellcache
@@ -721,11 +721,6 @@ default:
 # This job should be real quick and run at the very end of the pipeline.
 'Write lint caches':
   <<: [ *lint-cache-artifacts ]
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
-    - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $DAILY_TEST == "1"
-    - if: ($CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_LABELS =~ /Test lint cache warming/)
-    - if: $PERFORMANCE_TEST == "1"
   stage: 🗜️ Test
   script:
     # Exit with an error if any of the lint cache files do not exist.
