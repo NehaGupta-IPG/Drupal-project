@@ -229,9 +229,18 @@ class IconPackManager extends DefaultPluginManager implements IconPackManagerInt
     $definition['relative_path'] = $relative_path;
     // To avoid the need for appRoot in extractors.
     $definition['absolute_path'] = sprintf('%s/%s', $this->appRoot, $relative_path);
+  }
 
-    // Load all discovered icon ids in the definition so they are cached.
-    $definition['icons'] = $this->getIconsFromDefinition($definition);
+  /**
+   * {@inheritdoc}
+   */
+  protected function findDefinitions() {
+    $definitions = parent::findDefinitions();
+    foreach ($definitions as &$definition) {
+      // Load all discovered icon ids in the definition so they are cached.
+      $definition['icons'] = $this->getIconsFromDefinition($definition);
+    }
+    return $definitions;
   }
 
   /**
