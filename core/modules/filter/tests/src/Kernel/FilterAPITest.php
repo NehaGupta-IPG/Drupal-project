@@ -6,7 +6,6 @@ namespace Drupal\Tests\filter\Kernel;
 
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Session\AnonymousUserSession;
-use Drupal\Core\Template\TwigThemeEngine;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\Core\TypedData\OptionsProviderInterface;
 use Drupal\filter\Entity\FilterFormat;
