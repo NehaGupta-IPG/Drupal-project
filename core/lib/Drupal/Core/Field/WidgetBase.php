@@ -164,6 +164,10 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
       'field_widget_complete_form',
       'field_widget_complete_' . $this->getPluginId() . '_form',
     ], $field_widget_complete_form, $form_state, $context);
+    \Drupal::theme()->alter([
+      'field_widget_complete_form',
+      'field_widget_complete_' . $this->getPluginId() . '_form'
+    ], $field_widget_complete_form, $form_state, $context);
 
     return $field_widget_complete_form;
   }
@@ -482,6 +486,10 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
       \Drupal::moduleHandler()->alter([
         'field_widget_single_element_form',
         'field_widget_single_element_' . $this->getPluginId() . '_form',
+      ], $element, $form_state, $context);
+      \Drupal::theme()->alter([
+        'field_widget_single_element_form',
+        'field_widget_single_element_' . $this->getPluginId() . '_form'
       ], $element, $form_state, $context);
     }
 
