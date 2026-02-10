@@ -101,4 +101,15 @@ class Callbacks {
     $form_state->setRebuild();
   }
 
+  /**
+   * After build callback to prove !empty check on #parents is necessary.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3027240
+   */
+  public static function testAfterBuild($element, FormStateInterface $form_state) {
+    // Add a new element to the form that doesn't have #parents set.
+    $element['after_build_item'] = ['#markup' => 'after_build_item'];
+    return $element;
+  }
+
 }
