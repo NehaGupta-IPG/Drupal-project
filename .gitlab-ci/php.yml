@@ -30,7 +30,7 @@ variables:
     - yarn install
     - echo -e "Node version $(node --version)\nYarn version $(yarn --version)"
     - yarn playwright install --with-deps chromium-headless-shell
-    - sudo -u www-data -E -H yarn run test:playwright
+    - yarn run test:playwright
   artifacts:
     when: always
     expire_in: 6 mos
