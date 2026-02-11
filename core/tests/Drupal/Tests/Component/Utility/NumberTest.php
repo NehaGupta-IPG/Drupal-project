@@ -140,6 +140,10 @@ class NumberTest extends TestCase {
       'Large within limits' => ['99999999.9999999', '0.0000001', TRUE],
       'PHP_INT_MAX overflow' => ['9000000000000000000.99', '0.01', TRUE],
 
+      // Large precision within MySQL DECIMAL(65,30) and PostgreSQL NUMERIC limits.
+      'Precision 32 scale 10' => ['1234567890123456789012.1234567890', '0.0000000001', TRUE],
+      'Precision 32 all nines' => ['9999999999999999999999.9999999999', '0.0000000001', TRUE],
+
       // Decimal field: 5 digits before, 4 after.
       '5 digits before decimal' => ['19999.0000', '0.0001', TRUE],
       '5 nines before decimal' => ['99999.0000', '0.0001', TRUE],
