@@ -93,8 +93,6 @@ class EntityUrlTest extends UnitTestCase {
 
   /**
    * Tests the toUrl() method without an entity ID.
-   *
-   * @legacy-covers ::toUrl
    */
   public function testToUrlNoId(): void {
     $entity = $this->getEntity(StubEntityBase::class, []);
@@ -109,8 +107,6 @@ class EntityUrlTest extends UnitTestCase {
    *
    * It should throw an exception when neither canonical and edit-form link
    * templates exist if no parameters are passed in.
-   *
-   * @legacy-covers ::toUrl
    */
   public function testToUrlDefaultException(): void {
     $values = ['id' => static::ENTITY_ID];
@@ -127,8 +123,6 @@ class EntityUrlTest extends UnitTestCase {
    *
    * It should return the edit-form or canonical link templates by default if
    * they are registered.
-   *
-   * @legacy-covers ::toUrl
    */
   public function testToUrlDefaultFallback(): void {
     $values = ['id' => static::ENTITY_ID, 'langcode' => $this->langcode];
@@ -184,7 +178,7 @@ class EntityUrlTest extends UnitTestCase {
    * @return array
    *   An array of test cases for testToUrlLinkTemplates().
    */
-  public static function providerTestToUrlLinkTemplates() {
+  public static function providerTestToUrlLinkTemplates(): array {
     $test_cases = [];
 
     $test_cases['canonical'] = ['canonical', 'entity.test_entity.canonical'];
@@ -241,11 +235,26 @@ class EntityUrlTest extends UnitTestCase {
     $test_cases = [];
 
     $route_parameters = ['test_entity' => static::ENTITY_ID];
-    $test_cases['default_revision'] = [static::DEFAULT_REVISION, 'canonical', 'entity.test_entity.canonical', $route_parameters];
+    $test_cases['default_revision'] = [
+      static::DEFAULT_REVISION,
+      'canonical',
+      'entity.test_entity.canonical',
+      $route_parameters,
+    ];
     // Add the revision ID to the expected route parameters.
     $route_parameters['test_entity_revision'] = static::REVISION_ID;
-    $test_cases['non_default_revision'] = [static::NON_DEFAULT_REVISION, 'revision', 'entity.test_entity.revision', $route_parameters];
-    $test_cases['revision-delete'] = [static::NON_DEFAULT_REVISION, 'revision-delete-form', 'entity.test_entity.revision_delete_form', $route_parameters];
+    $test_cases['non_default_revision'] = [
+      static::NON_DEFAULT_REVISION,
+      'revision',
+      'entity.test_entity.revision',
+      $route_parameters,
+    ];
+    $test_cases['revision-delete'] = [
+      static::NON_DEFAULT_REVISION,
+      'revision-delete-form',
+      'entity.test_entity.revision_delete_form',
+      $route_parameters,
+    ];
 
     return $test_cases;
   }
@@ -278,7 +287,7 @@ class EntityUrlTest extends UnitTestCase {
    * @return array
    *   An array of test cases for testToUrlLinkTemplateNoId().
    */
-  public static function providerTestToUrlLinkTemplateNoId() {
+  public static function providerTestToUrlLinkTemplateNoId(): array {
     $test_cases = [];
 
     $test_cases['collection'] = ['collection', 'entity.test_entity.collection'];
@@ -369,7 +378,7 @@ class EntityUrlTest extends UnitTestCase {
    * @return array
    *   An array of test cases for testToUrlUriCallbackUndefined().
    */
-  public static function providerTestToUrlUriCallbackUndefined() {
+  public static function providerTestToUrlUriCallbackUndefined(): array {
     $test_cases = [];
 
     $test_cases['no_callback'] = [[], NULL];
@@ -425,8 +434,6 @@ class EntityUrlTest extends UnitTestCase {
 
   /**
    * Tests the uriRelationships() method.
-   *
-   * @legacy-covers ::uriRelationships
    */
   public function testUriRelationships(): void {
     $entity = $this->getEntity(StubEntityBase::class, ['id' => static::ENTITY_ID]);

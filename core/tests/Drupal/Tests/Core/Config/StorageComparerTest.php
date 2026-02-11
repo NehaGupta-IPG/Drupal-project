@@ -62,7 +62,7 @@ class StorageComparerTest extends UnitTestCase {
     $this->storageComparer = new StorageComparer($this->sourceStorage, $this->targetStorage);
   }
 
-  protected function getConfigData() {
+  protected function getConfigData(): array {
     $uuid = new Php();
     // Mock data using minimal data to use ConfigDependencyManger.
     $this->configData = [
@@ -112,8 +112,6 @@ class StorageComparerTest extends UnitTestCase {
 
   /**
    * Tests create changelist no change.
-   *
-   * @legacy-covers ::createChangelist
    */
   public function testCreateChangelistNoChange(): void {
     $config_data = $this->getConfigData();
@@ -145,8 +143,6 @@ class StorageComparerTest extends UnitTestCase {
 
   /**
    * Tests create changelist create.
-   *
-   * @legacy-covers ::createChangelist
    */
   public function testCreateChangelistCreate(): void {
     $target_data = $source_data = $this->getConfigData();
@@ -186,8 +182,6 @@ class StorageComparerTest extends UnitTestCase {
 
   /**
    * Tests create changelist delete.
-   *
-   * @legacy-covers ::createChangelist
    */
   public function testCreateChangelistDelete(): void {
     $target_data = $source_data = $this->getConfigData();
@@ -227,8 +221,6 @@ class StorageComparerTest extends UnitTestCase {
 
   /**
    * Tests create changelist update.
-   *
-   * @legacy-covers ::createChangelist
    */
   public function testCreateChangelistUpdate(): void {
     $target_data = $source_data = $this->getConfigData();
