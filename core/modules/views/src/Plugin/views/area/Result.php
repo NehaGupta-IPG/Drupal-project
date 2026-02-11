@@ -80,7 +80,7 @@ class Result extends AreaPluginBase {
 
     // Send the output.
     if (!empty($this->getTotal()) || !empty($this->options['empty'])) {
-      $output .= str_replace(array_keys($replacements), array_values($replacements), $format);
+      $output .= str_replace(array_keys($replacements), $replacements, $format);
       // Return as render array.
       return [
         '#markup' => $output,
@@ -135,15 +135,15 @@ class Result extends AreaPluginBase {
     $current_record_count = ($end - $start) + $start_offset;
     // Get the search information.
     $replacements = [];
-    $replacements['@start'] = $start;
-    $replacements['@end'] = $end;
-    $replacements['@total'] = $total;
+    $replacements['@start'] = (string) $start;
+    $replacements['@end'] = (string) $end;
+    $replacements['@total'] = (string) $total;
     $replacements['@format_total'] = number_format($total, 0, '.', ',');
     $replacements['@label'] = $label;
-    $replacements['@per_page'] = $per_page;
-    $replacements['@current_page'] = $current_page;
-    $replacements['@current_record_count'] = $current_record_count;
-    $replacements['@page_count'] = $page_count;
+    $replacements['@per_page'] = (string) $per_page;
+    $replacements['@current_page'] = (string) $current_page;
+    $replacements['@current_record_count'] = (string) $current_record_count;
+    $replacements['@page_count'] = (string) $page_count;
 
     return $replacements;
   }

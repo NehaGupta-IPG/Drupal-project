@@ -92,7 +92,7 @@ class ResultPlural extends Result {
 
     // Send the output.
     if (!empty($this->getTotal()) || !empty($this->options['empty'])) {
-      $output .= str_replace(array_keys($replacements), array_values($replacements), $format);
+      $output .= str_replace(array_keys($replacements), $replacements, $format);
       // Return as render array.
       return [
         '#markup' => $output,
