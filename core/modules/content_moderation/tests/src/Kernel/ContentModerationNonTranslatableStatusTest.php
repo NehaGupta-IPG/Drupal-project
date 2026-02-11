@@ -18,7 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests the fix for the Content Moderation 'status' field validation conflict.
  *
  * Content Moderation requires the 'status' field to diverge across
- * translations, however, if the 'status' field is nontranslatable, Drupal
+ * translations, however, if the 'status' field is not translatable, Drupal
  * validation blocks this save.
  *
  * @see https://www.drupal.org/project/drupal/issues/3025039
