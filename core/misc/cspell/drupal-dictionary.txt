@@ -22,6 +22,8 @@ druplicon
 drush
 fapi
 fieldable
+franken
+frankenphp
 fulldate
 groupby
 groupwise
