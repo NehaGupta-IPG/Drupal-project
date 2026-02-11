@@ -4,6 +4,7 @@ bartik
 bubbleable
 buytaert
 buytaert's
+caddyfile
 daterange
 dbtng
 dependee
