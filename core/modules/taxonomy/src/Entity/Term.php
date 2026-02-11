@@ -214,7 +214,8 @@ class Term extends EditorialContentEntityBase implements TermInterface {
         'type' => 'select',
         'weight' => 0,
       ])
-      ->setDisplayConfigurable('form', TRUE);
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['parent'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Parent terms'))
@@ -225,6 +226,7 @@ class Term extends EditorialContentEntityBase implements TermInterface {
         'weight' => 0,
       ])
       ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE)
       ->setCardinality(BaseFieldDefinition::CARDINALITY_UNLIMITED);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
