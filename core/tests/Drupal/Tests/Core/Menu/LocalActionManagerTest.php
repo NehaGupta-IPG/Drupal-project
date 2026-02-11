@@ -140,8 +140,6 @@ class LocalActionManagerTest extends UnitTestCase {
 
   /**
    * Tests get title.
-   *
-   * @legacy-covers ::getTitle
    */
   public function testGetTitle(): void {
     $local_action = $this->createMock('Drupal\Core\Menu\LocalActionInterface');
@@ -159,8 +157,6 @@ class LocalActionManagerTest extends UnitTestCase {
 
   /**
    * Tests get actions for route.
-   *
-   * @legacy-covers ::getActionsForRoute
    */
   #[DataProvider('getActionsForRouteProvider')]
   public function testGetActionsForRoute($route_appears, array $plugin_definitions, array $expected_actions): void {
@@ -209,7 +205,7 @@ class LocalActionManagerTest extends UnitTestCase {
     $this->assertEquals($expected_actions, $this->localActionManager->getActionsForRoute($route_appears));
   }
 
-  public static function getActionsForRouteProvider() {
+  public static function getActionsForRouteProvider(): array {
     $originalContainer = \Drupal::hasContainer() ? \Drupal::getContainer() : NULL;
 
     $cache_contexts_manager = (new Prophet())->prophesize(CacheContextsManager::class);

@@ -465,7 +465,7 @@ class ComponentRenderTest extends ComponentKernelTestBase {
         'ctaTarget' => '',
       ],
       '#propsAlter' => [
-        fn ($props) => [...$props, 'heading' => 'I am another banner'],
+        fn ($props): array => [...$props, 'heading' => 'I am another banner'],
       ],
       '#slots' => [
         'banner_body' => [
@@ -475,7 +475,7 @@ class ComponentRenderTest extends ComponentKernelTestBase {
         ],
       ],
       '#slotsAlter' => [
-        static fn ($slots) => [...$slots, 'banner_body' => ['#markup' => '<h2>Just something else.</h2>']],
+        static fn ($slots): array => [...$slots, 'banner_body' => ['#markup' => '<h2>Just something else.</h2>']],
       ],
     ];
     $crawler = $this->renderComponentRenderArray($build);

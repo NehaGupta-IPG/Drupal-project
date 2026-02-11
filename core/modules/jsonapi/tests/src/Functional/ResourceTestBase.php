@@ -71,6 +71,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     'basic_auth',
     'rest_test',
     'jsonapi_test_field_access',
+    'jsonapi_response_validator',
     'text',
   ];
 
@@ -333,9 +334,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
    */
   protected function resaveEntity(EntityInterface $entity, AccountInterface $account): EntityInterface {
     // Reload entity so that it has the new field.
-    $reloaded_entity = $this->entityLoadUnchanged($entity->id());
+    $entity_id = $entity->id();
     // Some entity types are not stored, hence they cannot be reloaded.
-    if ($reloaded_entity !== NULL) {
+    if ($entity_id !== NULL) {
+      $reloaded_entity = $this->entityLoadUnchanged($entity_id);
       $entity = $reloaded_entity;
       // Set a default value on the fields.
       $entity->set('field_rest_test', ['value' => 'All the faith he had had had had no effect on the outcome of his life.']);
@@ -603,6 +605,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       'url.query_args',
       // Drupal defaults.
       'url.site',
+      'user.permissions',
     ];
     // If the entity type is revisionable, add a resource version cache context.
     $cache_contexts = Cache::mergeContexts($cache_contexts, $entity_type->isRevisionable() ? ['url.query_args:resourceVersion'] : []);
@@ -982,7 +985,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $expected_document,
       $response,
       ['4xx-response', 'http_response'],
-      ['url.query_args', 'url.site'],
+      ['url.query_args', 'url.site', 'user.permissions'],
       'UNCACHEABLE (request policy)',
       TRUE,
     );
@@ -1096,6 +1099,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       [
         'url.query_args',
         'url.site',
+        'user.permissions',
       ],
       'UNCACHEABLE (request policy)',
       'UNCACHEABLE (poor cacheability)',
@@ -1117,6 +1121,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       [
         'url.query_args',
         'url.site',
+        'user.permissions',
       ],
       'UNCACHEABLE (request policy)',
       'UNCACHEABLE (poor cacheability)',
@@ -3085,6 +3090,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       'url.path',
       'url.query_args',
       'url.site',
+      'user.permissions',
     ];
     $this->assertResourceErrorResponse(501, 'JSON:API does not support filtering on revisions other than the latest version because a secure Drupal core API does not yet exist to do so.', $rel_working_copy_collection_url_filtered, $actual_response, FALSE, ['http_response'], $filtered_collection_expected_cache_contexts);
     // Fetch the collection URL using an invalid version identifier.
@@ -3093,6 +3099,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       'url.path',
       'url.query_args',
       'url.site',
+      'user.permissions',
     ];
     $this->assertResourceErrorResponse(
       400,
@@ -3562,6 +3569,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
     /** @var \Drupal\Core\Field\TypedData\FieldItemDataDefinition $item_definition */
     $item_definition = $field_definition->getItemDefinition();
     $main_property = $item_definition->getMainPropertyName();
+    if ($main_property === NULL) {
+      return FALSE;
+    }
     $property_definition = $item_definition->getPropertyDefinition($main_property);
     return $property_definition instanceof DataReferenceTargetDefinition;
   }
@@ -3592,8 +3602,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @todo Remove this after https://www.drupal.org/project/drupal/issues/3038706 lands.
    */
   protected function entityLoadUnchanged($id) {
-    $this->entityStorage->resetCache();
-    return $this->entityStorage->loadUnchanged($id);
+    $entity_storage = \Drupal::service('entity_type.manager')->getStorage(static::$entityTypeId);
+    $entity_storage->resetCache();
+    return $entity_storage->loadUnchanged($id);
   }
 
   /**

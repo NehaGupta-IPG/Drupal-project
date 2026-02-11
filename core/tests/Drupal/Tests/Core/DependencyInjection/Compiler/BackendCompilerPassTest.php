@@ -39,8 +39,6 @@ class BackendCompilerPassTest extends UnitTestCase {
 
   /**
    * Tests the process method.
-   *
-   * @legacy-covers ::process
    */
   public function testProcess(): void {
     // Add a container with no set default_backend.
@@ -121,7 +119,7 @@ class BackendCompilerPassTest extends UnitTestCase {
    * @return \Symfony\Component\DependencyInjection\ContainerBuilder
    *   The container with a sqlite database service in it.
    */
-  protected function getSqliteContainer($service) {
+  protected function getSqliteContainer($service): ContainerBuilder {
     $container = new ContainerBuilder();
     $container->setDefinition('service', $service);
     $container->setDefinition('sqlite.service', new Definition(__NAMESPACE__ . '\\ServiceClassSqlite'));
@@ -142,7 +140,7 @@ class BackendCompilerPassTest extends UnitTestCase {
    * @return \Symfony\Component\DependencyInjection\ContainerBuilder
    *   The container with a mysql database service in it.
    */
-  protected function getMysqlContainer($service) {
+  protected function getMysqlContainer($service): ContainerBuilder {
     $container = new ContainerBuilder();
     $container->setDefinition('service', $service);
     $container->setDefinition('mysql.service', new Definition(__NAMESPACE__ . '\\ServiceClassMysql'));
@@ -161,7 +159,7 @@ class BackendCompilerPassTest extends UnitTestCase {
    * @return \Symfony\Component\DependencyInjection\ContainerBuilder
    *   The container with a DriverTestMysql database service in it.
    */
-  protected function getDriverTestMysqlContainer($service) {
+  protected function getDriverTestMysqlContainer($service): ContainerBuilder {
     $container = new ContainerBuilder();
     $container->setDefinition('service', $service);
     $mock = $this->getMockBuilder('Drupal\driver_test\Driver\Database\DriverTestMysql\Connection')->onlyMethods([])->disableOriginalConstructor()->getMock();

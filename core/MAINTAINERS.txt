@@ -79,7 +79,7 @@ Asset Library API
 - Florent Torregrosa 'grimreaper' https://www.drupal.org/u/grimreaper
 
 Authentication and Authorization
-- ?
+- Lucas Hedding 'heddn' https://www.drupal.org/u/heddn
 
 Automated Cron
 - ?
@@ -113,7 +113,6 @@ Bootstrap
 
 Breakpoint
 - Peter Droogmans 'attiks' https://www.drupal.org/u/attiks
-- Heather Brooke Drummond 'RainbowArray' https://www.drupal.org/u/rainbowarray
 
 Cache
 - Nathaniel Catchpole 'catch' https://www.drupal.org/u/catch
@@ -152,10 +151,11 @@ Contact
 - Andrey Postnikov 'andypost' https://www.drupal.org/u/andypost
 
 Content Moderation
-- ?
+- Andrei Mateescu 'amateescu' https://www.drupal.org/u/amateescu
+- Derek Wright 'dww' https://www.drupal.org/u/dww
 
 Content Translation
-- ?
+- Christian López Espínola 'penyaskito' https://www.drupal.org/u/penyaskito
 
 Contextual
 - Lee Rowlands 'larowlan' https://www.drupal.org/u/larowlan
@@ -230,15 +230,12 @@ Form API
 - Tim Plunkett 'tim.plunkett' https://www.drupal.org/u/tim.plunkett
 - Lee Rowlands 'larowlan' https://www.drupal.org/u/larowlan
 
-History
-- Andrey Postnikov 'andypost' https://www.drupal.org/u/andypost
-
 Help
 - Amber Matz 'Amber Himes Matz' https://www.drupal.org/u/amber-himes-matz
 - Andrey Postnikov 'andypost' https://www.drupal.org/u/andypost
 
 Image
-- ?
+- Lucas Hedding 'heddn' https://www.drupal.org/u/heddn
 
 Inline Form Errors
 - ?
@@ -259,7 +256,7 @@ JSON:API
 - Wim Leers 'Wim Leers' https://www.drupal.org/u/wim-leers
 
 Language
-- ?
+- Christian López Espínola 'penyaskito' https://www.drupal.org/u/penyaskito
 
 Layout Builder
 - Ted Bowman 'tedbow' https://www.drupal.org/u/tedbow
@@ -277,7 +274,7 @@ Mail
 - ?
 
 Markup
-- ?
+- Mark Conroy 'markconroy' https://www.drupal.org/u/markconroy
 
 Media
 - Sean Blommaert 'seanB' https://www.drupal.org/u/seanb
@@ -295,7 +292,7 @@ Menu Link Content
 - Peter Wolanin 'pwolanin' https://www.drupal.org/u/pwolanin
 
 Menu UI
-- ?
+- Stephen Mustgrave 'smustgrave' https://www.drupal.org/u/smustgrave
 
 Migrate
 - Benji Fisher 'benjifisher' https://www.drupal.org/u/benjifisher
@@ -363,7 +360,6 @@ REST
 
 Responsive Image
 - Peter Droogmans 'attiks' https://www.drupal.org/u/attiks
-- Heather Brooke Drummond 'RainbowArray' https://www.drupal.org/u/rainbowarray
 
 Routing
 - Tim Plunkett 'tim.plunkett' https://www.drupal.org/u/tim.plunkett
@@ -375,7 +371,7 @@ Serialization
 - Brad Jones 'bradjones1' https://www.drupal.org/u/bradjones1
 
 Settings Tray
-- ?
+- Mark Conroy 'markconroy' https://www.drupal.org/u/markconroy
 
 Shortcut
 - Jibran Ijaz 'jibran' https://www.drupal.org/u/jibran
@@ -390,7 +386,7 @@ Syslog
 - Mariano D'Agostino 'dagmar' https://www.drupal.org/u/dagmar
 
 System (module)
-- ?
+- Michael Strelan 'mstrelan' https://www.drupal.org/u/mstrelan
 
 Taxonomy
 - Jess Myrbo 'xjm' https://www.drupal.org/u/xjm
@@ -442,7 +438,7 @@ Views
 - Len Swaneveld 'Lendude' https://www.drupal.org/u/lendude
 
 Workflows
-- ?
+- Andrei Mateescu 'amateescu' https://www.drupal.org/u/amateescu
 
 Workspaces
 - Andrei Mateescu 'amateescu' https://www.drupal.org/u/amateescu

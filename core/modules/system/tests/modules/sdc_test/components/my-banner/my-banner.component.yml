@@ -45,3 +45,4 @@ slots:
       - <p>Foo is <strong>NOT</strong> bar.</p>
   nested_slot:
     title: Nested slot
+  minimal: { }
