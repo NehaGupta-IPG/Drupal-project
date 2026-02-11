@@ -40,7 +40,7 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
    *
    * @var WeakReference|null
    */
-  protected ?\WeakReference $realParent;
+  protected ?\WeakReference $realParent = NULL;
 
   /**
    * The parent typed data object.
