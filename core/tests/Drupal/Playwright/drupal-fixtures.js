@@ -35,8 +35,8 @@ exports.test = base.extend({
     const dbPrefix = installData.db_prefix;
     const sitePath = installData.site_path;
 
-    // Create a new browser context with the SIMPLETEST_USER_AGENT cookie.
-    const context = await browser.newContext();
+    // Create a new browser context with baseURL and SIMPLETEST_USER_AGENT cookie.
+    const context = await browser.newContext({ baseURL: baseUrl });
     await context.addCookies([
       {
         name: 'SIMPLETEST_USER_AGENT',
@@ -48,7 +48,7 @@ exports.test = base.extend({
     const page = await context.newPage();
 
     // Attach Drupal metadata to the page for use by helpers.
-    page._drupal = { dbPrefix, sitePath, baseUrl };
+    page._drupal = { dbPrefix, sitePath };
 
     // Provide the page to the test.
     await use(page);
@@ -68,24 +68,13 @@ exports.test = base.extend({
 exports.expect = expect;
 
 /**
- * Navigate to a Drupal relative URL.
- */
-exports.drupalRelativeURL = async (page, path) => {
-  const baseUrl = process.env.DRUPAL_TEST_BASE_URL;
-  await page.goto(`${baseUrl}${path}`);
-};
-
-/**
  * Log in as admin via one-time login link.
  */
 exports.drupalLoginAsAdmin = async (page) => {
-  const sitePath = page._drupal.sitePath;
-  const baseUrl = page._drupal.baseUrl;
   const userLink = commandAsWebserver(
-    `php scripts/test-site.php user-login 1 --site-path ${sitePath}`,
+    `php scripts/test-site.php user-login 1 --site-path ${page._drupal.sitePath}`,
   ).trim();
-
-  await page.goto(`${baseUrl}${userLink}`);
+  await page.goto(userLink);
 };
 
 /**
@@ -95,7 +84,7 @@ exports.drupalCreateUser = async (
   page,
   { name, password, permissions = [] },
 ) => {
-  const { drupalLoginAsAdmin, drupalRelativeURL, drupalLogout } = exports;
+  const { drupalLoginAsAdmin, drupalLogout } = exports;
   let machineName;
   if (permissions.length) {
     const roleLabel = Math.random()
@@ -104,7 +93,7 @@ exports.drupalCreateUser = async (
       .substring(2, 15);
     // Create role: login as admin, create role with permissions.
     await drupalLoginAsAdmin(page);
-    await drupalRelativeURL(page, '/admin/people/roles/add');
+    await page.goto('/admin/people/roles/add');
     await page.locator('input[name="label"]').fill(roleLabel);
     // Trigger JS machine name generation and wait for it to appear.
     await page.locator('input[name="label"]').dispatchEvent('formUpdated');
@@ -117,7 +106,7 @@ exports.drupalCreateUser = async (
     await page.locator('#user-role-form').locator('[type="submit"]').click();
 
     // Assign permissions.
-    await drupalRelativeURL(page, '/admin/people/permissions');
+    await page.goto('/admin/people/permissions');
     await page.locator('table.permissions').waitFor({ state: 'visible' });
     await Promise.all(
       permissions.map((perm) =>
@@ -133,7 +122,7 @@ exports.drupalCreateUser = async (
 
   // Create user: login as admin.
   await drupalLoginAsAdmin(page);
-  await drupalRelativeURL(page, '/admin/people/create');
+  await page.goto('/admin/people/create');
   await page.locator('input[name="name"]').fill(name);
   await page.locator('input[name="notify"]').uncheck();
   await page.locator('input[name="pass[pass1]"]').fill(password);
@@ -154,8 +143,7 @@ exports.drupalCreateUser = async (
  * Log in as a given user via the login form.
  */
 exports.drupalLogin = async (page, { name, password }) => {
-  const { drupalRelativeURL } = exports;
-  await drupalRelativeURL(page, '/user/login');
+  await page.goto('/user/login');
   await page.locator('input[name="name"]').fill(name);
   await page.locator('input[name="pass"]').fill(password);
   await page.locator('#user-login-form').locator('[type="submit"]').click();
@@ -169,8 +157,7 @@ exports.drupalLogin = async (page, { name, password }) => {
  * Log out of Drupal.
  */
 exports.drupalLogout = async (page) => {
-  const { drupalRelativeURL } = exports;
-  await drupalRelativeURL(page, '/user/logout/confirm');
+  await page.goto('/user/logout/confirm');
   await page.locator('#user-logout-confirm').locator('[type="submit"]').click();
 };
 
