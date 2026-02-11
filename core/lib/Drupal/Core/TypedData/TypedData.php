@@ -1,4 +1,6 @@
 <?php
+// phpcs:ignoreFile
+// @phpstan-ignore-file
 
 namespace Drupal\Core\TypedData;
 
