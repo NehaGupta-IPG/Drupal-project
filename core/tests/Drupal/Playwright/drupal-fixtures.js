@@ -194,6 +194,60 @@ exports.drupalLogout = async (page) => {
 };
 
 /**
+ * Install a module via the admin UI.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {string} module - The module machine name.
+ * @param {boolean} [force=false] - Click Continue if dependencies are required.
+ */
+exports.drupalInstallModule = async (page, module, force = false) => {
+  const { drupalLoginAsAdmin, drupalLogout } = exports;
+  await drupalLoginAsAdmin(page);
+  await page.goto('/admin/modules');
+  // Filter the module list to expand collapsed <details> elements.
+  await page
+    .locator('form.system-modules [data-drupal-selector="edit-text"]')
+    .fill(module);
+  const checkbox = page.locator(
+    `form.system-modules [name="modules[${module}][enable]"]`,
+  );
+  await checkbox.waitFor({ state: 'visible' });
+  await checkbox.check();
+  await page.locator('form.system-modules').locator('[type="submit"]').click();
+
+  if (force) {
+    // Click Continue if a dependency confirmation form appears.
+    const continueButton = page.locator('input[value="Continue"]');
+    try {
+      await continueButton.click({ timeout: 10000 });
+    } catch {
+      // No confirmation form — module installed directly.
+    }
+  }
+
+  // Wait for the checkbox to be disabled, indicating the module is enabled.
+  // Use 'attached' since the checkbox may be in a collapsed <details> element.
+  await page
+    .locator(`form.system-modules [name="modules[${module}][enable]"]:disabled`)
+    .waitFor({ state: 'attached', timeout: 10000 });
+  await drupalLogout(page);
+};
+
+/**
+ * Assert that a specific deprecation error exists in sessionStorage.
+ */
+exports.assertDeprecationErrorExists = async (page, expected) => {
+  const warnings = await page.evaluate(() =>
+    window.sessionStorage.getItem('js_testing_log_test.warnings'),
+  );
+  const entries = warnings ? JSON.parse(warnings) : [];
+  const deprecations = (entries || [])
+    .filter((m) => m.includes('[Deprecation]'))
+    .map((m) => m.replace('[Deprecation] ', ''));
+  expect(deprecations).toContainEqual(expect.stringContaining(expected));
+};
+
+/**
  * Assert no JS deprecation errors in sessionStorage.
  */
 exports.assertNoDeprecationErrors = async (page) => {
