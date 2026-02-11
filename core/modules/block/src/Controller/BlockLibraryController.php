@@ -10,7 +10,7 @@ use Drupal\Core\Menu\LocalActionManagerInterface;
 use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 
 /**
  * Provides a list of block plugins to be added to the layout.
@@ -67,18 +67,27 @@ class BlockLibraryController extends ControllerBase {
   /**
    * Shows a list of blocks that can be added to a theme's layout.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The current request.
    * @param string $theme
    *   Theme key of the block list.
+   * @param string|null $region
+   *   (optional) The region to which the block will be added.
+   * @param int|null $weight
+   *   (optional) The weight of the block to be added.
+   * @param string|null $wrapper_format
+   *   (optional) The request wrapper format.
    *
    * @return array
    *   A render array as expected by the renderer.
    */
-  public function listBlocks(Request $request, $theme) {
+  public function listBlocks(
+    string $theme,
+    #[MapQueryParameter] ?string $region = NULL,
+    #[MapQueryParameter] ?int $weight = NULL,
+    #[MapQueryParameter(MainContentViewSubscriber::WRAPPER_FORMAT)] ?string $wrapper_format = NULL,
+  ) {
     // Since modals do not render any other part of the page, we need to render
     // them manually as part of this listing.
-    if ($request->query->get(MainContentViewSubscriber::WRAPPER_FORMAT) === 'drupal_modal') {
+    if ($wrapper_format === 'drupal_modal') {
       $build['local_actions'] = $this->buildLocalActions();
     }
 
@@ -87,9 +96,6 @@ class BlockLibraryController extends ControllerBase {
       ['data' => $this->t('Category')],
       ['data' => $this->t('Operations')],
     ];
-
-    $region = $request->query->get('region');
-    $weight = $request->query->get('weight');
 
     // Only add blocks which work without any available context.
     $definitions = $this->blockManager->getFilteredDefinitions('block_ui', $this->contextRepository->getAvailableContexts(), [
