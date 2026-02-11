@@ -10,56 +10,90 @@ function testSiteCommand(command) {
 }
 
 /**
+ * Install a Drupal test site and return a Page with the session cookie set.
+ *
+ * @param {import('@playwright/test').Browser} browser
+ * @param {object} options
+ * @param {string} [options.installProfile='nightwatch_testing']
+ * @param {string} [options.setupFile='']
+ * @param {string} [options.langcode='']
+ * @return {{ page: import('@playwright/test').Page, dbPrefix: string }}
+ */
+async function drupalInstall(browser, options = {}) {
+  const {
+    installProfile = 'nightwatch_testing',
+    setupFile = '',
+    langcode = '',
+  } = options;
+  const dbOption = process.env.DRUPAL_TEST_DB_URL
+    ? `--db-url "${process.env.DRUPAL_TEST_DB_URL}"`
+    : '';
+  const baseUrl = process.env.DRUPAL_TEST_BASE_URL;
+  const setupFileOption = setupFile ? `--setup-file "${setupFile}"` : '';
+  const langcodeOption = langcode ? `--langcode "${langcode}"` : '';
+
+  const output = testSiteCommand(
+    `install --install-profile "${installProfile}" ${setupFileOption} ${langcodeOption} --base-url ${baseUrl} ${dbOption} --json`,
+  );
+
+  const installData = JSON.parse(output);
+  const dbPrefix = installData.db_prefix;
+  const sitePath = installData.site_path;
+
+  const context = await browser.newContext({ baseURL: baseUrl });
+  await context.addCookies([
+    {
+      name: 'SIMPLETEST_USER_AGENT',
+      value: encodeURIComponent(installData.user_agent),
+      url: baseUrl,
+    },
+  ]);
+
+  const page = await context.newPage();
+  page._drupal = { dbPrefix, sitePath };
+  return { page, dbPrefix };
+}
+
+/**
+ * Tear down a Drupal test site.
+ */
+function drupalTearDown(dbPrefix) {
+  const dbOption = process.env.DRUPAL_TEST_DB_URL
+    ? `--db-url "${process.env.DRUPAL_TEST_DB_URL}"`
+    : '';
+  try {
+    testSiteCommand(`tear-down ${dbPrefix} ${dbOption}`);
+  } catch (e) {
+    console.error('Failed to tear down test site:', e.message);
+  }
+}
+
+/**
  * Extend Playwright's base test with Drupal-specific fixtures.
  */
 exports.test = base.extend({
+  /**
+   * Install options for the drupalPage fixture. Override in test files via
+   * test.use({ drupalInstallOptions: { ... } }) to customize the install.
+   */
+  drupalInstallOptions: [{}, { option: true }],
+
   /**
    * drupalPage fixture: installs a Drupal test site before each test
    * and tears it down after.
    *
    * Usage: test('my test', async ({ drupalPage }) => { ... })
    */
-  drupalPage: async ({ browser }, use) => {
-    // Install the test site.
-    const dbOption = process.env.DRUPAL_TEST_DB_URL
-      ? `--db-url "${process.env.DRUPAL_TEST_DB_URL}"`
-      : '';
-    const installProfile = 'nightwatch_testing';
-    const baseUrl = process.env.DRUPAL_TEST_BASE_URL;
-
-    const output = testSiteCommand(
-      `install --install-profile "${installProfile}" --base-url ${baseUrl} ${dbOption} --json`,
+  drupalPage: async ({ browser, drupalInstallOptions }, use) => {
+    const { page, dbPrefix } = await drupalInstall(
+      browser,
+      drupalInstallOptions,
     );
 
-    const installData = JSON.parse(output);
-    const dbPrefix = installData.db_prefix;
-    const sitePath = installData.site_path;
-
-    // Create a new browser context with baseURL and SIMPLETEST_USER_AGENT cookie.
-    const context = await browser.newContext({ baseURL: baseUrl });
-    await context.addCookies([
-      {
-        name: 'SIMPLETEST_USER_AGENT',
-        value: encodeURIComponent(installData.user_agent),
-        url: baseUrl,
-      },
-    ]);
-
-    const page = await context.newPage();
-
-    // Attach Drupal metadata to the page for use by helpers.
-    page._drupal = { dbPrefix, sitePath };
-
-    // Provide the page to the test.
     await use(page);
 
-    // Teardown: close context and uninstall.
-    await context.close();
-    try {
-      testSiteCommand(`tear-down ${dbPrefix} ${dbOption}`);
-    } catch (e) {
-      console.error('Failed to tear down test site:', e.message);
-    }
+    await page.context().close();
+    drupalTearDown(dbPrefix);
   },
 });
 
