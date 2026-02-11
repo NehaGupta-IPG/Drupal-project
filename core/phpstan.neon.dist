@@ -23,7 +23,6 @@ parameters:
     - lib/Drupal/Core/Serialization/Yaml.php
 
   excludePaths:
-    - lib/Drupal/Core/TypedData/TypedData.php
     # Skip sites directory.
     - ../sites
     # Skip test fixtures.
