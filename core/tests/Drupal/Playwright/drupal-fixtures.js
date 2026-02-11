@@ -140,11 +140,11 @@ exports.drupalCreateUser = async (
     // Assign permissions.
     await page.goto('/admin/people/permissions');
     await page.locator('table.permissions').waitFor({ state: 'visible' });
-    await Promise.all(
-      permissions.map((perm) =>
-        page.locator(`input[name="${machineName}[${perm}]"]`).check(),
-      ),
-    );
+    // eslint-disable-next-line no-restricted-syntax
+    for (const perm of permissions) {
+      // eslint-disable-next-line no-await-in-loop
+      await page.locator(`input[name="${machineName}[${perm}]"]`).check();
+    }
     await page
       .locator('#user-admin-permissions')
       .locator('[type="submit"]')
