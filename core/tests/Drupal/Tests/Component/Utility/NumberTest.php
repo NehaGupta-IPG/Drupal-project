@@ -28,10 +28,6 @@ class NumberTest extends TestCase {
    *   The step argument for Number::validStep().
    * @param bool $expected
    *   Expected return value from Number::validStep().
-   *
-   * @covers ::validStep
-   *
-   * @dataProvider providerTestValidStep
    */
   #[DataProvider('providerTestValidStep')]
   public function testValidStep(int|float|string $value, int|float|string $step, bool $expected): void {
@@ -50,10 +46,6 @@ class NumberTest extends TestCase {
    *   The offset argument for Number::validStep().
    * @param bool $expected
    *   Expected return value from Number::validStep().
-   *
-   * @covers ::validStep
-   *
-   * @dataProvider providerTestValidStepOffset
    */
   #[DataProvider('providerTestValidStepOffset')]
   public function testValidStepOffset(int|float|string $value, int|float|string $step, float $offset, bool $expected): void {
@@ -129,10 +121,10 @@ class NumberTest extends TestCase {
       // minimum is normalized.
       [0.0000000000000900009, 0.0000000000000100001, TRUE],
 
-      // Binary incompatibility edge cases.
+      // Binary incompatibility (IEEE 754).
       '0.3 step 0.1' => ['0.3', '0.1', TRUE],
       '0.7 step 0.35' => ['0.7', '0.35', TRUE],
-      'Issue #2230909' => ['20.12345678', '0.00000001', TRUE],
+      '8 decimal places' => ['20.12345678', '0.00000001', TRUE],
 
       // Scientific notation.
       'Scientific step' => ['0.00001', '1.0E-5', TRUE],
@@ -148,31 +140,31 @@ class NumberTest extends TestCase {
       'Large within limits' => ['99999999.9999999', '0.0000001', TRUE],
       'PHP_INT_MAX overflow' => ['9000000000000000000.99', '0.01', TRUE],
 
-      // Original issue cases: precision=10, scale=4.
-      '19999.0000 scale 4' => ['19999.0000', '0.0001', TRUE],
-      '99999.0000 scale 4' => ['99999.0000', '0.0001', TRUE],
+      // Decimal field: 5 digits before, 4 after.
+      '5 digits before decimal' => ['19999.0000', '0.0001', TRUE],
+      '5 nines before decimal' => ['99999.0000', '0.0001', TRUE],
 
-      // High precision for cryptocurrency (scale=8).
-      'Bitcoin scale 8' => ['20.12345678', '0.00000001', TRUE],
-      'Bitcoin mismatch' => ['20.123456789', '0.00000001', FALSE],
+      // Cryptocurrency (8 decimals).
+      'Satoshi precision valid' => ['20.12345678', '0.00000001', TRUE],
+      'Satoshi precision invalid' => ['20.123456789', '0.00000001', FALSE],
 
       // Zero edge cases.
       'Zero value' => ['0', '0.1', TRUE],
       'Zero with decimals' => ['0.00', '0.01', TRUE],
 
-      // Very small numbers.
+      // Very small steps.
       'Small number valid' => ['0.0000001', '0.0000001', TRUE],
       'Small step large value' => ['1000', '0.000001', TRUE],
 
       // Step larger than value.
-      'Step > value valid' => ['5', '10', FALSE],
+      'Step > value invalid' => ['5', '10', FALSE],
       'Step > value at boundary' => ['10', '10', TRUE],
 
       // Repeating decimals.
       '1/7 multiples' => [3 / 7, 1 / 7, TRUE],
       '1/9 multiples' => [4 / 9, 1 / 9, TRUE],
 
-      // Mixed string/numeric inputs.
+      // Mixed input types.
       'String value float step' => ['1.5', 0.5, TRUE],
       'Float value string step' => [1.5, '0.5', TRUE],
     ];
@@ -200,26 +192,26 @@ class NumberTest extends TestCase {
       [-10, 4, 0, FALSE],
       [-10, 4, -4, FALSE],
 
-      // Negative value with negative offset.
+      // Negative offset.
       'Negative offset valid' => ['-1.0', '0.5', -2.0, TRUE],
       'Negative decimal offset' => ['-1.2', '0.2', -2.0, TRUE],
       'Negative mismatch' => ['-1.2', '0.5', 0.0, FALSE],
 
-      // Non-zero offset validation.
+      // Non-zero offset.
       'Offset valid' => ['3.1', '2.0', 1.1, TRUE],
       'Offset invalid' => ['3.2', '2.0', 1.1, FALSE],
 
-      // Zero offset edge cases.
+      // Zero offset.
       'Zero value zero offset' => ['0', '0.1', 0.0, TRUE],
       'Value equals offset' => ['5.5', '0.5', 5.5, TRUE],
 
-      // High precision offset.
+      // High precision.
       'High precision all' => ['0.123456789', '0.000000001', 0.123456789, TRUE],
 
-      // Negative step (should fail).
+      // Negative step.
       'Negative step' => ['10', -5, 0.0, FALSE],
 
-      // Mixed signs with offset.
+      // Mixed signs.
       'Pos value neg offset' => ['10', '5', -5.0, TRUE],
     ];
   }
