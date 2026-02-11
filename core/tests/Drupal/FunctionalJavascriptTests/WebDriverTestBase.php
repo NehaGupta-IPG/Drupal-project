@@ -34,6 +34,13 @@ abstract class WebDriverTestBase extends BrowserTestBase {
   protected $failOnJavascriptConsoleErrors = TRUE;
 
   /**
+   * Determines if a test should fail on JavaScript console errors.
+   *
+   * @var bool
+   */
+  protected $errorOnJavascriptDeprecationWarnings = TRUE;
+
+  /**
    * Disables CSS animations in tests for more reliable testing.
    *
    * CSS animations are disabled by installing the css_disable_transitions_test
@@ -109,12 +116,13 @@ abstract class WebDriverTestBase extends BrowserTestBase {
         // explaining what the problem is.
         throw new \RuntimeException('Unfinished AJAX requests while tearing down a test');
       }
-
-      $warnings = $this->getSession()->evaluateScript("JSON.parse(sessionStorage.getItem('js_testing_log_test.warnings') || JSON.stringify([]))");
-      foreach ($warnings as $warning) {
-        if (str_starts_with($warning, '[Deprecation]')) {
-          // phpcs:ignore Drupal.Semantics.FunctionTriggerError
-          @trigger_error('Javascript Deprecation:' . substr($warning, 13), E_USER_DEPRECATED);
+      if ($this->errorOnJavascriptDeprecationWarnings) {
+        $warnings = $this->getSession()->evaluateScript("JSON.parse(sessionStorage.getItem('js_testing_log_test.warnings') || JSON.stringify([]))");
+        foreach ($warnings as $warning) {
+          if (str_starts_with($warning, '[Deprecation]')) {
+            // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+            @trigger_error('Javascript Deprecation:' . substr($warning, 13), E_USER_DEPRECATED);
+          }
         }
       }
     }

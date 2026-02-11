@@ -252,3 +252,14 @@ user.well-known.change_password:
     _controller: '\Drupal\user\Controller\UserController::userEditPage'
   requirements:
     _user_is_logged_in: 'TRUE'
+
+user.verify_cookies:
+  path: '/user/verify-cookies'
+  defaults:
+    _controller: \Drupal\user\Controller\UserAuthenticationController::verifyCookiesEnabled
+    _title: Verify Cookies Enabled
+  requirements:
+    _user_is_logged_in: 'FALSE'
+  options:
+    _maintenance_access: TRUE
+    no_cache: TRUE

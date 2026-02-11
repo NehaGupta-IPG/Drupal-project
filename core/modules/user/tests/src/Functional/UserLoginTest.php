@@ -31,7 +31,7 @@ class UserLoginTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['dblog'];
+  protected static $modules = ['dblog', 'block'];
 
   /**
    * Tests login with destination.
@@ -247,34 +247,46 @@ class UserLoginTest extends BrowserTestBase {
   }
 
   /**
-   * Tests with a browser that denies cookies.
+   * Ensure disabled cookies message doesn't display when cookies are enabled.
    */
-  public function testCookiesNotAccepted(): void {
-    $this->drupalGet('user/login');
-    $form_build_id = $this->getSession()->getPage()->findField('form_build_id');
-
+  public function testCookiesMessage(): void {
     $account = $this->drupalCreateUser([]);
-    $post = [
-      'form_id' => 'user_login_form',
-      'form_build_id' => $form_build_id,
-      'name' => $account->getAccountName(),
-      'pass' => $account->passRaw,
-      'op' => 'Log in',
-    ];
-    $url = $this->buildUrl(Url::fromRoute('user.login'));
 
-    /** @var \Psr\Http\Message\ResponseInterface $response */
-    $response = $this->getHttpClient()->post($url, [
-      'form_params' => $post,
-      'http_errors' => FALSE,
-      'cookies' => FALSE,
-      'allow_redirects' => FALSE,
-    ]);
-
-    // Follow the location header.
-    $this->drupalGet($response->getHeader('location')[0]);
+    // Ensure error message is not displayed when clicking back button after
+    // logging out.
+    $this->placeBlock('system_menu_block:account');
+    $this->drupalGet('user/login');
+    $this->assertSession()->pageTextNotContains('To log in to this site, your browser must accept cookies from the domain');
+    $values = ['name' => $account->getAccountName(), 'pass' => $account->passRaw];
+    $this->submitForm($values, 'Log in');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->addressEquals('user/' . $account->id());
+    $this->clickLink('Log out');
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->addressEquals('/');
+    $this->getSession()->back();
     $this->assertSession()->statusCodeEquals(403);
-    $this->assertSession()->pageTextContains('To log in to this site, your browser must accept cookies from the domain');
+    $this->assertSession()->addressEquals('/user/' . $account->id());
+    $this->assertSession()->pageTextNotContains('To log in to this site, your browser must accept cookies from the domain');
+
+    // Ensure accessing url directly with the check_logged_in query parameter
+    // does not result in the error message being displayed.
+    $this->drupalGet('user/login', ['query' => ['check_logged_in' => 1]]);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->addressEquals('/user/login');
+    $this->assertSession()->pageTextNotContains('To log in to this site, your browser must accept cookies from the domain');
+
+    // Ensure presence of both check_logged_in and destination query parameters
+    // is handled correctly.
+    $this->drupalGet('user/login', [
+      'query' => [
+        'check_logged_in' => 1,
+        'destination' => '/',
+      ],
+    ]);
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->addressEquals('/user/login?destination=/');
+    $this->assertSession()->pageTextNotContains('To log in to this site, your browser must accept cookies from the domain');
   }
 
   /**

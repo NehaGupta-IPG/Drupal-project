@@ -5,6 +5,7 @@ namespace Drupal\user\Controller;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Routing\LocalRedirectResponse;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\user\UserAuthenticationInterface;
 use Drupal\user\UserAuthInterface;
@@ -440,6 +441,44 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
       return $identifier;
     }
     return '';
+  }
+
+  /**
+   * Verifies cookies are enabled.
+   *
+   * This page expects the `verify_cookies` cookie has been set by a previous
+   * request.
+   *
+   * Authentication providers that need cookies to be enabled can use this page
+   * to verify cookie functionality by doing the following:
+   *  - Add a kernel request event listener.
+   *  - In the listener add a redirect to this page and set the
+   *    `verify_cookies` cookie in the response.
+   *  - Also add the page the user should be redirected to if cookies are
+   *    enabled as a `destination` query parameter to the redirect.
+   *
+   * @return array|LocalRedirectResponse
+   *   If cookies are disabled, it returns an empty render array and displays an
+   *   error message. If cookies are enabled, it will redirect the user to
+   *   the destination or the root path if no destination query parameter is
+   *   declared on the request.
+   *
+   * @see \Drupal\user\Authentication\Provider\Cookie::onKernelRequestVerifyCookies()
+   *   Example of using this page to verify cookie functionality.
+   */
+  public function verifyCookiesEnabled(Request $request): array|LocalRedirectResponse {
+    if (!$request->cookies->has('verify_cookies')) {
+      $domain = ltrim(ini_get('session.cookie_domain'), '.') ?: $request->getHttpHost();
+      $this->messenger()->addError($this->t('To log in to this site, your browser must accept cookies from the domain %domain.', ['%domain' => $domain]));
+      return [];
+    }
+    $destination = $request->query->get('destination');
+    if (NULL === $destination) {
+      $destination = '/';
+    }
+    $response = new LocalRedirectResponse($destination);
+    $response->headers->clearCookie('verify_cookies');
+    return $response;
   }
 
 }
