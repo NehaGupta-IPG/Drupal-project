@@ -60,17 +60,25 @@ class Number {
    *   returns 20.
    */
   private static function countSignificantDecimals(int|float|string $number): int {
-    $number = is_numeric($number) ? static::normalize($number) : 0;
+    $number_str = (string) $number;
 
-    // If no decimal separator is encountered, there are 0 significant
-    // decimals.
-    if (!str_contains($number, '.')) {
-      return 0;
+    // Handle scientific notation (e.g., 1.0E-5).
+    if (stripos($number_str, 'e') !== FALSE) {
+      [$mantissa, $exponent] = preg_split('/e/i', $number_str);
+      $mantissa_decimals = 0;
+      if (strpos($mantissa, '.') !== FALSE) {
+        $mantissa_decimals = strlen(substr(strrchr($mantissa, '.'), 1));
+      }
+      $exp_val = (int) $exponent;
+      return $exp_val < 0 ? $mantissa_decimals + abs($exp_val) : max(0, $mantissa_decimals - $exp_val);
     }
 
-    // If a decimal separator is encountered, count the number of significant
-    // decimal digits.
-    return strlen($number) - strrpos($number, '.') - 1;
+    // Standard decimal handling.
+    if (strpos($number_str, '.') !== FALSE) {
+      return strlen(substr(strrchr($number_str, '.'), 1));
+    }
+
+    return 0;
   }
 
   /**
@@ -104,49 +112,62 @@ class Number {
    * @see http://opensource.apple.com/source/WebCore/WebCore-1298/html/NumberInputType.cpp
    */
   public static function validStep($value, $step, $offset = 0.0) {
-    // Confirm the step is positive.
     if ($step <= 0) {
       return FALSE;
     }
 
-    // Convert the value to a float so we can evaluate the precision later.
-    // Because subtracting the offset may change the value's precision, we only
-    // do so if it was set explicitly (is not null).
+    // Convert value to float and check precision.
     $float_value = (float) abs($value - $offset);
+    $expected_decimals = self::countSignificantDecimals($step) + 1;
+    $actual_decimals = self::countSignificantDecimals($float_value);
 
-    // The step dictates the expected number of significant decimals.
-    $expected_significant_decimals = static::countSignificantDecimals($step) + 1;
-
-    // If the actual value has more significant decimals than expected, then it
-    // has a higher precision than desired, so it isn't divisible by the step.
-    $actual_significant_decimals = static::countSignificantDecimals($float_value);
-    if ($actual_significant_decimals > $expected_significant_decimals) {
+    // Reject values with more precision than the step allows.
+    if ($actual_decimals > $expected_decimals) {
       return FALSE;
     }
 
-    $float_value = (float) round($float_value, $expected_significant_decimals);
+    // Convert to strings to preserve precision.
+    $value_str = (string) $value;
+    $step_str = (string) $step;
+    $offset_str = (string) $offset;
 
-    // The fractional part of a double has 53 bits. The greatest number that
-    // could be represented with that is 2^53. If the given value is even bigger
-    // than $step * 2^53, then dividing by $step will result in a very small
-    // remainder. Since that remainder can't even be represented with a single
-    // precision float the following computation of the remainder makes no sense
-    // and we can safely ignore it instead.
-    if ($float_value / (2 ** 53) > $step) {
+    // Calculate maximum decimals across all inputs to handle trailing zeros.
+    $decimals_value = self::countSignificantDecimals($value_str);
+    $decimals_step = self::countSignificantDecimals($step_str);
+    $decimals_offset = self::countSignificantDecimals($offset_str);
+    $max_decimals = max($decimals_value, $decimals_step, $decimals_offset);
+
+    // Scale to integers.
+    $multiplier = pow(10, $max_decimals);
+    $value_scaled = (float) $value_str * $multiplier;
+    $step_scaled = (float) $step_str * $multiplier;
+    $offset_scaled = (float) $offset_str * $multiplier;
+
+    // Overflow guard: fallback to float math if exceeding PHP_INT_MAX.
+    if (abs($value_scaled) >= PHP_INT_MAX || abs($step_scaled) >= PHP_INT_MAX || abs($offset_scaled) >= PHP_INT_MAX) {
+      $double_value = (float) $value;
+      $double_step = (float) $step;
+      $double_offset = (float) $offset;
+      $n = round(($double_value - $double_offset) / $double_step);
+      $calculated_value = $double_offset + ($n * $double_step);
+      return abs($double_value - $calculated_value) < 1E-10;
+    }
+
+    // Integer arithmetic with rounding to handle floating-point drift.
+    $value_int = (int) round($value_scaled);
+    $step_int = (int) round($step_scaled);
+    $offset_int = (int) round($offset_scaled);
+    $numerator = abs($value_int - $offset_int);
+    $remainder = $numerator % $step_int;
+
+    // Check for exact match.
+    if ($remainder === 0) {
       return TRUE;
     }
 
-    $expected_float_value = (float) round($step * round($float_value / $step), $expected_significant_decimals);
-    // Now compute that remainder of a division by $step.
-    $remainder = (float) abs($float_value - $expected_float_value);
-
-    // $remainder is a double precision floating point number. Remainders that
-    // can't be represented with single precision floats are acceptable. The
-    // fractional part of a float has 24 bits. That means remainders smaller
-    // than $step * 2^-24 are acceptable.
-    $computed_acceptable_error = (float) ($step / (2 ** 24));
-
-    return $computed_acceptable_error >= $remainder || $remainder >= ($step - $computed_acceptable_error);
+    // Allow small rounding errors from float scaling.
+    $acceptable_error = (float) $step_scaled / (2 ** 24);
+    return $remainder <= $acceptable_error || $remainder >= ($step_int - $acceptable_error);
   }
 
   /**
