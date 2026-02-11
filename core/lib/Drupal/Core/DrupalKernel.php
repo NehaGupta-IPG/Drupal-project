@@ -54,6 +54,9 @@ use Symfony\Component\HttpKernel\TerminableInterface;
 class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   use InstallerRedirectTrait;
 
+  // zzzzzzz
+  function a() {}
+
   /**
    * Holds the class used for dumping the container to a PHP array.
    *
