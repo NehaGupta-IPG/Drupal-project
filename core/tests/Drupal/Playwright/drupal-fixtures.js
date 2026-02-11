@@ -2,11 +2,11 @@ const { test: base, expect } = require('@playwright/test');
 const { execSync } = require('node:child_process');
 
 // Run a shell command, optionally as the webserver user.
-function commandAsWebserver(command) {
+function testSiteCommand(command) {
   const cmd = process.env.DRUPAL_TEST_WEBSERVER_USER
-    ? `sudo -u ${process.env.DRUPAL_TEST_WEBSERVER_USER} ${command}`
-    : command;
-  return execSync(cmd).toString();
+    ? `sudo -u ${process.env.DRUPAL_TEST_WEBSERVER_USER} php scripts/test-site.php ${command}`
+    : `php scripts/test-site.php ${command}`;
+  return execSync(cmd).toString().trim();
 }
 
 /**
@@ -27,8 +27,8 @@ exports.test = base.extend({
     const installProfile = 'nightwatch_testing';
     const baseUrl = process.env.DRUPAL_TEST_BASE_URL;
 
-    const output = commandAsWebserver(
-      `php scripts/test-site.php install --install-profile "${installProfile}" --base-url ${baseUrl} ${dbOption} --json`,
+    const output = testSiteCommand(
+      `install --install-profile "${installProfile}" --base-url ${baseUrl} ${dbOption} --json`,
     );
 
     const installData = JSON.parse(output);
@@ -56,9 +56,7 @@ exports.test = base.extend({
     // Teardown: close context and uninstall.
     await context.close();
     try {
-      commandAsWebserver(
-        `php scripts/test-site.php tear-down ${dbPrefix} ${dbOption}`,
-      );
+      testSiteCommand(`tear-down ${dbPrefix} ${dbOption}`);
     } catch (e) {
       console.error('Failed to tear down test site:', e.message);
     }
@@ -71,9 +69,9 @@ exports.expect = expect;
  * Log in as admin via one-time login link.
  */
 exports.drupalLoginAsAdmin = async (page) => {
-  const userLink = commandAsWebserver(
-    `php scripts/test-site.php user-login 1 --site-path ${page._drupal.sitePath}`,
-  ).trim();
+  const userLink = testSiteCommand(
+    `user-login 1 --site-path ${page._drupal.sitePath}`,
+  );
   await page.goto(userLink);
 };
 
