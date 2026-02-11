@@ -34,11 +34,30 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
   protected $name;
 
   /**
-   * The parent typed data object.
+   * A weak reference to the parent typed data object.
    *
-   * @var \Drupal\Core\TypedData\TraversableTypedDataInterface|null
+   * @var WeakReference|null
    */
-  protected $parent;
+  protected ?\WeakReference $realParent;
+
+  /**
+   * The parent typed data object.
+   */
+  protected $parent {
+    get {
+      if ($this->realParent instanceof \WeakReference) {
+        return $this->realParent->get();
+      }
+    }
+    set($value) {
+      if (is_null($value)) {
+        $this->realParent = NULL;
+      }
+      else {
+        $this->realParent = \WeakReference::create($value);
+      }
+    }
+  }
 
   /**
    * {@inheritdoc}
