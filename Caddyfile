@@ -1,10 +1,31 @@
+# Caddyfile for Drupal with FrankenPHP.
+# https://frankenphp.dev/
+#
+# This configuration works for both root and subdirectory installs.
+#
+# == Running from a subdirectory ==
+# If your hosting does not allow running from the document root, you can
+# serve Drupal from a subdirectory (e.g. https://example.com/drupal/).
+#
+# For a Composer-based project layout (vendor/, web/):
+#
+# 1. Set your document root to the parent directory:
+#        root * /var/www/html
+# 2. Place (or symlink) the project's web/ directory into a subdirectory:
+#        ln -s /path/to/project/web /var/www/html/drupal
+# 3. Access your site at https://example.com/drupal/
+#
+# No additional Caddyfile changes are needed — subdirectory routing is
+# handled automatically by the @subdir block below.
+
 {
 	frankenphp
 	order php_server before file_server
 	order php before file_server
 }
 
-localhost {
+:80 {
+	root * /var/www/html
 	encode zstd br gzip
 
 	@hiddenPhpFilesRegexp path_regexp \..*/.*\.php$
@@ -31,5 +52,20 @@ localhost {
 	}
 	header @static Cache-Control "max-age=31536000,public,immutable"
 
-	php_server
+	# Rewrite clean URLs to the nearest index.php.
+	# Supports both root installs and subdirectory installs
+	# (e.g. /subdirectory/) as used by DrupalCI.
+	@subdir path_regexp subdir ^(/[^/]+)
+	handle @subdir {
+		try_files {path} {path}/index.php {re.subdir.1}/index.php /index.php
+		@phpFiles path *.php
+		php @phpFiles
+		file_server
+	}
+	handle {
+		try_files {path} {path}/index.php /index.php
+		@phpFiles path *.php
+		php @phpFiles
+		file_server
+	}
 }
