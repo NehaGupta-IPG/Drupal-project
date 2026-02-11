@@ -112,6 +112,8 @@ default:
 
 .default-job-settings-lint: &default-job-settings-lint
   rules:
+    - if: $CI_MERGE_REQUEST_DRAFT == "true" && $PERFORMANCE_TEST != "1"
+      allow_failure: true
     - if: $PERFORMANCE_TEST != "1"
 
 .composer-setup: &composer-setup
@@ -532,6 +534,7 @@ default:
       - core/.cspellcache
 
 '🧹 PHP Static Analysis (phpstan)':
+  <<: [ *default-job-settings-lint ]
   stage: 🪄 Lint
   variables:
     KUBERNETES_CPU_REQUEST: "4"
@@ -607,6 +610,8 @@ default:
   artifacts:
     reports:
       codequality: $_ARTIFACTS_DIR/phpcs-quality-report.json
+    # Vendor is needed for downstream jobs, even if PHPCS fails.
+    when: always
     expire_in: 1 week
     expose_as: 'web-vendor'
     paths:
@@ -631,6 +636,15 @@ default:
   # Run on push, or on MRs if CSS files have changed, or manually.
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_DRAFT == "true"
+      changes:
+        - core/.eslint*
+        - core/.prettier*
+        - core/package.json
+        - core/yarn.lock
+        - "**/*.js"
+        - "**/*.yml"
+      allow_failure: true
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
         - core/.eslint*
@@ -663,6 +677,14 @@ default:
   # Run on push, or on MRs if CSS files have changed, or manually.
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_DRAFT == "true"
+      changes:
+        - core/.stylelintrc.json
+        - core/.prettier*
+        - core/package.json
+        - core/yarn.lock
+        - "**/*.css"
+      allow_failure: true
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes:
         - core/.stylelintrc.json
