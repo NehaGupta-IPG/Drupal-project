@@ -17,7 +17,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
  * @ingroup typed_data
  */
 abstract class TypedData implements TypedDataInterface, PluginInspectionInterface {
-  use DependencySerializationTrait;
+  use DependencySerializationTrait { __sleep as traitSleep; }
   use StringTranslationTrait;
   use TypedDataTrait;
 
@@ -215,6 +215,14 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
    */
   public function getParent() {
     return $this->parent;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __sleep() {
+    $this->realParent = NULL;
+    $this->traitSleep();
   }
 
 }
