@@ -34,9 +34,11 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
   protected $name;
 
   /**
-   * A wak reference to the parent typed data object.
+   * The parent typed data object.
+   *
+   * @var \Drupal\Core\TypedData\TraversableTypedDataInterface|null
    */
-  protected ?\WeakReference $weakReferenceParent = NULL;
+  protected $parent;
 
   /**
    * {@inheritdoc}
@@ -61,28 +63,8 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
    */
   public function __construct(DataDefinitionInterface $definition, $name = NULL, ?TypedDataInterface $parent = NULL) {
     $this->definition = $definition;
-    if (isset($parent)) {
-      $this->weakReferenceParent = \WeakReference::create($parent);
-    }
+    $this->parent = $parent;
     $this->name = $name;
-  }
-
-  public function __get(string $name) {
-    if ($name === 'parent') {
-      return $this->weakReferenceParent->get();
-    }
-  }
-
-  public function __set(string $name, $value) {
-    if ($name === 'parent') {
-      $this->weakReferenceParent = \WeakReference::create($value);
-    }
-  }
-
-  public function __isset(string $name) {
-    if ($name === 'parent') {
-      return isset($this->weakReferenceParent);
-    }
   }
 
   /**
@@ -119,8 +101,8 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
   public function setValue($value, $notify = TRUE) {
     $this->value = $value;
     // Notify the parent of any changes.
-    if ($notify && isset($this->weakReferenceParent)) {
-      $this->weakReferenceParent->get()->onChange($this->name);
+    if ($notify && isset($this->parent)) {
+      $this->parent->onChange($this->name);
     }
   }
 
@@ -163,9 +145,7 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
    * {@inheritdoc}
    */
   public function setContext($name = NULL, ?TraversableTypedDataInterface $parent = NULL) {
-    if (isset($parent)) {
-      $this->weakReferenceParent = \WeakReference::create($parent);
-    }
+    $this->parent = $parent;
     $this->name = $name;
   }
 
@@ -180,8 +160,8 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
    * {@inheritdoc}
    */
   public function getRoot() {
-    if (isset($this->weakReferenceParent)) {
-      return $this->weakReferenceParent->get()->getRoot();
+    if (isset($this->parent)) {
+      return $this->parent->getRoot();
     }
     // If no parent is set, this is the root of the data tree.
     return $this;
@@ -213,10 +193,7 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
    * {@inheritdoc}
    */
   public function getParent() {
-    if (isset($this->weakReferenceParent)) {
-      return $this->weakReferenceParent->get();
-    }
-    return NULL;
+    return $this->parent;
   }
 
 }

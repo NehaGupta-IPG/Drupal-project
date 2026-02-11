@@ -111,8 +111,8 @@ class EntityReference extends DataReferenceBase {
       $this->id = $value;
     }
     // Notify the parent of any changes.
-    if ($notify && isset($this->weakReferenceParent)) {
-      $this->weakReferenceParent->get()->onChange($this->name);
+    if ($notify && isset($this->parent)) {
+      $this->parent->onChange($this->name);
     }
   }
 
