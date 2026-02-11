@@ -164,7 +164,7 @@ exports.drupalCreateUser = async (
     await page.locator(`input[name="roles[${machineName}]"]`).check();
   }
 
-  await page.locator('#user-register-form').locator('[type="submit"]').click();
+  await page.getByRole('button', { name: 'Create new account' }).click();
   await expect(page.locator('[data-drupal-messages]')).toContainText(
     'Created a new user account',
   );
