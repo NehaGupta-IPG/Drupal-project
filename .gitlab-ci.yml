@@ -474,11 +474,15 @@ default:
 # Lint Jobs
 ################
 
-.lint-cache-artifacts: &lint-cache-artifacts
+# https://gitlab.com/gitlab-org/gitlab/-/issues/458828 means that artifacts are
+# lost if a conditional job fails. To work around this, we upload artifacts on
+# every push to the project repo. The download-cache.sh script downloads the
+# cached artifacts as needed in jobs that can be sped up by using cached files.
+.artifact-cache: &artifact-cache
   rules:
     - if: $CI_PIPELINE_SOURCE == "push" && $CI_PROJECT_ROOT_NAMESPACE == "project"
     - if: $CI_PIPELINE_SOURCE == "schedule" && $CI_PROJECT_ROOT_NAMESPACE == "project" && $DAILY_TEST == "1"
-    - if: ($CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_LABELS =~ /Test lint cache warming/)
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_LABELS =~ /Test artifact cache/
     - if: $PERFORMANCE_TEST == "1"
   artifacts:
     paths:
@@ -489,13 +493,11 @@ default:
       - core/.phpcscache
       - vendor.tar.gz
 
-# Download the cache artifacts from the previous pipeline run to work around
-# https://gitlab.com/gitlab-org/gitlab/-/issues/458828 due to performance
-# testing. Note that this job must come before the lint jobs that create the
-# updated cache files. This ensures that their updated artifacts are used in the
-# 'Write lint caches' job.
-'Lint cache download':
-  <<: [ *lint-cache-artifacts ]
+# Download cache artifacts from the previous pipeline run to ensure they all
+# exist. Subsequent jobs may overwrite them, then the 'Artifact cache upload'
+# job uploads updated versions.
+'Artifact cache download':
+  <<: [ *artifact-cache ]
   stage: 🪄 Lint
   script:
     - .gitlab-ci/scripts/download-cache.sh core/phpstan-tmp/resultCache.php
@@ -619,7 +621,7 @@ default:
         - core/yarn.lock
         - "**/*.js"
         - "**/*.yml"
-    - if: ($CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_LABELS =~ /Test lint cache warming/)
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_LABELS =~ /Test artifact cache/
     - when: manual
       allow_failure: true
   script:
@@ -719,8 +721,8 @@ default:
       '
 
 # This job should be real quick and run at the very end of the pipeline.
-'Write lint caches':
-  <<: [ *lint-cache-artifacts ]
+'Artifact cache upload':
+  <<: [ *artifact-cache ]
   stage: 🗜️ Test
   script:
     # Exit with an error if any of the lint cache files do not exist.
