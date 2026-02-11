@@ -5,20 +5,21 @@ declare(strict_types=1);
 namespace Drupal\Tests\content_translation\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
+use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
-use Drupal\Tests\content_moderation\Traits\ContentModerationTestTrait;
-use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the fix for the Content Moderation 'status' field validation conflict.
  *
- * Content Moderation requires the 'status' field to diverge across translations.
- * However, if the 'status' field is non-translatable, Drupal validation blocks this save.
+ * Content Moderation requires the 'status' field to diverge across
+ * translations, however, if the 'status' field is nontranslatable, Drupal
+ * validation blocks this save.
  *
  * @see https://www.drupal.org/project/drupal/issues/3025039
  */
@@ -58,7 +59,8 @@ class ContentModerationNonTranslatableStatusTest extends KernelTestBase {
     $this->installEntitySchema('user');
     ConfigurableLanguage::createFromLangcode('it')->save();
 
-    // Set up translatable content type with un-translatable status field, untranslatable fields should be hidden.
+    // Set up translatable content type with un-translatable status field,
+    // untranslatable fields should be hidden.
     $node_type = NodeType::create([
       'type' => 'page',
       'name' => 'Page',
@@ -104,7 +106,7 @@ class ContentModerationNonTranslatableStatusTest extends KernelTestBase {
   }
 
   /**
-   * Verifies that moderated bundles can have different status values per language.
+   * Tests that moderated bundles can have different status values per language.
    */
   public function testStatusExceptionTriggered(): void {
     $node = Node::create([
