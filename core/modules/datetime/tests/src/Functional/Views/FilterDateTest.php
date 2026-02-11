@@ -266,4 +266,42 @@ class FilterDateTest extends ViewTestBase {
 
   }
 
+  /**
+   * Tests exposed form date field group filter with multiple selects.
+   */
+  public function testExposedGroupedMultipleSelectFilters(): void {
+    $filter_identifier = $this->fieldName . '_value';
+    $this->drupalGet('admin/structure/views/nojs/handler/test_filter_datetime/default/filter/' . $filter_identifier);
+    $this->submitForm([], 'Expose filter');
+    $this->submitForm([], 'Grouped filters');
+
+    $edit = [];
+    $edit['options[group_info][multiple]'] = 1;
+    $edit['options[group_info][group_items][1][title]'] = 'empty';
+    $edit['options[group_info][group_items][1][operator]'] = 'empty';
+    $edit['options[group_info][group_items][2][title]'] = 'not empty';
+    $edit['options[group_info][group_items][2][operator]'] = 'not empty';
+    $edit['options[group_info][group_items][3][title]'] = 'less than';
+    $edit['options[group_info][group_items][3][operator]'] = '<';
+    $edit['options[group_info][group_items][3][value][value]'] = $this->dates[0];
+    $this->submitForm($edit, 'Apply');
+
+    // Test that the exposed filter works as expected.
+    $path = 'test_filter_datetime-path';
+    $this->drupalGet('admin/structure/views/view/test_filter_datetime/edit');
+    $this->submitForm([], 'Add Page');
+    $this->drupalGet('admin/structure/views/nojs/display/test_filter_datetime/page_1/path');
+    $this->submitForm(['path' => $path], 'Apply');
+    $this->submitForm([], 'Save');
+
+    $this->drupalGet($path);
+
+    $this->submitForm([
+      $filter_identifier . '[1]' => 1,
+    ], 'Apply');
+
+    $this->assertIds([4]);
+
+  }
+
 }
