@@ -221,8 +221,8 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
    * {@inheritdoc}
    */
   public function __sleep() {
-    $this->realParent = NULL;
-    $this->traitSleep();
+    $properties = $this->traitSleep();
+    return array_diff($properties, ['realParent', 'parent']);
   }
 
 }
