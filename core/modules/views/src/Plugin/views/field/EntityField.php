@@ -546,13 +546,13 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
       \Drupal::moduleHandler()->invokeAllWith(
         'field_formatter_third_party_settings_form',
         function (callable $hook, string $module) use (&$settings_form, &$formatter, &$field, &$form, &$form_state) {
-          $settings_form['third_party_settings'][$module] = $hook(
+          $settings_form['third_party_settings'][$module] = ($settings_form['third_party_settings'][$module] ?? []) + ($hook(
             $formatter,
             $field,
             'views',
             $form,
-            $form_state
-          );
+            $form_state,
+          )) ?? [];
         }
       );
       if (!empty($settings_form['third_party_settings'])) {
