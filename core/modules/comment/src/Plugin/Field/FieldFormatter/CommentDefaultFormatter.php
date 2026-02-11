@@ -15,7 +15,6 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a default comment formatter.
@@ -80,30 +79,10 @@ class CommentDefaultFormatter extends FormatterBase {
   protected $routeMatch;
 
   /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $plugin_id,
-      $plugin_definition,
-      $configuration['field_definition'],
-      $configuration['settings'],
-      $configuration['label'],
-      $configuration['view_mode'],
-      $configuration['third_party_settings'],
-      $container->get('current_user'),
-      $container->get('entity_type.manager'),
-      $container->get('entity.form_builder'),
-      $container->get('current_route_match'),
-      $container->get('entity_display.repository')
-    );
-  }
-
-  /**
    * Constructs a new CommentDefaultFormatter.
    *
    * @param string $plugin_id
-   *   The plugin_id for the formatter.
+   *   The plugin ID for the formatter.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
@@ -172,9 +151,9 @@ class CommentDefaultFormatter extends FormatterBase {
             $build = $this->viewBuilder->viewMultiple($comments, $this->getSetting('view_mode'));
             $build['pager']['#type'] = 'pager';
             // CommentController::commentPermalink() calculates the page number
-            // where a specific comment appears and does a subrequest pointing to
-            // that page, we need to pass that subrequest route to our pager to
-            // keep the pager working.
+            // where a specific comment appears and does a subrequest pointing
+            // to that page, we need to pass that subrequest route to our pager
+            // to keep the pager working.
             $build['pager']['#route_name'] = $this->routeMatch->getRouteName();
             $build['pager']['#route_parameters'] = $this->routeMatch->getRawParameters()->all();
             if ($this->getSetting('pager_id')) {

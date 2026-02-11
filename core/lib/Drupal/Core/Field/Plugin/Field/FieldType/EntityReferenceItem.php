@@ -35,7 +35,9 @@ use Drupal\Core\Validation\Plugin\Validation\Constraint\AllowedValuesConstraint;
 #[FieldType(
   id: "entity_reference",
   label: new TranslatableMarkup("Entity reference"),
-  description: new TranslatableMarkup("An entity field containing an entity reference."),
+  description: [
+    new TranslatableMarkup("Choose any content or configuration type to reference on the next screen"),
+  ],
   category: "reference",
   default_widget: "entity_reference_autocomplete",
   default_formatter: "entity_reference_label",
@@ -105,7 +107,7 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
       // We can add a constraint for the target entity type. The list of
       // referenceable bundles is a field setting, so the corresponding
       // constraint is added dynamically in ::getConstraints().
-      ->addConstraint('EntityType', $settings['target_type']);
+      ->addConstraint('EntityType', ['type' => $settings['target_type']]);
 
     return $properties;
   }
@@ -139,8 +141,7 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
 
     /** @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_bundle_information */
     $entity_bundle_information = \Drupal::service('entity_type.bundle.info');
-    $bundle_info = $entity_bundle_information->getBundleInfo($target_type);
-    $bundles = array_map(fn($bundle) => $bundle_info[$bundle]['label'], $handler_settings['target_bundles']);
+    $bundles = array_intersect_key($entity_bundle_information->getBundleLabels($target_type), $handler_settings['target_bundles']);
     $bundle_label = \Drupal::entityTypeManager()->getDefinition($target_type)->getBundleLabel();
 
     if (!empty($bundles)) {
@@ -764,6 +765,9 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
     foreach ($common_references as $entity_type) {
       $options[$entity_type->id()] = [
         'label' => $entity_type->getLabel(),
+        'description' => new TranslatableMarkup('A reference to a(n) @item', [
+          '@item' => $entity_type->getSingularLabel(),
+        ]),
         'field_storage_config' => [
           'settings' => [
             'target_type' => $entity_type->id(),

@@ -1,3 +1,12 @@
+parameters:
+  content_translation.moved_classes:
+    'Drupal\content_translation\Plugin\migrate\source\I18nQueryTrait':
+      class: 'Drupal\migrate_drupal\Plugin\migrate\source\I18nQueryTrait'
+      deprecation_version: drupal:11.2.0
+      removed_version: drupal:12.0.0
+      change_record: https://www.drupal.org/node/3439256
+  content_translation.skip_procedural_hook_scan: true
+
 services:
   _defaults:
     autoconfigure: true
@@ -33,3 +42,5 @@ services:
     arguments: ['@entity_type.manager', '@entity_type.bundle.info']
   Drupal\content_translation\ContentTranslationManagerInterface: '@content_translation.manager'
   Drupal\content_translation\BundleTranslationSettingsInterface: '@content_translation.manager'
+  Drupal\content_translation\FieldSyncWidget:
+    autowire: true
