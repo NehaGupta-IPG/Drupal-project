@@ -375,6 +375,7 @@ rtsp
 sameorigin
 sandboxed
 sandboxing
+satoshi
 savepoints
 sayre
 schemaapi
