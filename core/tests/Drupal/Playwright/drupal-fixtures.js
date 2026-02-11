@@ -248,6 +248,24 @@ exports.assertDeprecationErrorExists = async (page, expected) => {
 };
 
 /**
+ * Enable a theme as the default via the admin UI.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {string} themeName - The theme display name (e.g. 'Claro').
+ */
+exports.drupalEnableTheme = async (page, themeName) => {
+  const { drupalLoginAsAdmin, drupalLogout } = exports;
+  await drupalLoginAsAdmin(page);
+  await page.goto('/admin/appearance');
+  await page.locator(`[title="Install ${themeName} as default theme"]`).click();
+  await page
+    .locator('.system-themes-list')
+    .first()
+    .waitFor({ state: 'visible' });
+  await drupalLogout(page);
+};
+
+/**
  * Assert no JS deprecation errors in sessionStorage.
  */
 exports.assertNoDeprecationErrors = async (page) => {
