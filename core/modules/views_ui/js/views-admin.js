@@ -205,7 +205,7 @@
        *   The source form field value.
        */
       getTransliterated() {
-        let from = this.source?.[0].value ?? '';
+        let from = this.source?.[0]?.value ?? '';
         if (this.exclude) {
           from = from.toLowerCase().replace(this.exclude, this.replace);
         }

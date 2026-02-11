@@ -135,7 +135,7 @@
           const $box = $item.children('.toolbar-box');
           const $link = $box.find('a');
           options.text = Drupal.t('@label', {
-            '@label': $link?.[0].textContent ?? '',
+            '@label': $link?.[0]?.textContent ?? '',
           });
           $item
             .children('.toolbar-box')
