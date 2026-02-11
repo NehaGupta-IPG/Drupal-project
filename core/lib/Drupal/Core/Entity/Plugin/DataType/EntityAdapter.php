@@ -37,7 +37,32 @@ class EntityAdapter extends TypedData implements \IteratorAggregate, ComplexData
    *
    * @var \Drupal\Core\Entity\EntityInterface|null
    */
-  protected $entity;
+  protected $strongEntity;
+
+  protected $weakEntity;
+
+  protected $entityTypeId;
+
+  protected $entityId;
+
+  protected $entity {
+    get {
+      if (isset($this->strongEntity)) {
+        return $this->strongEntity;
+      }
+      if ($this->weakEntity instanceof \WeakReference) {
+        $weak_entity = $this->weakEntity->get();
+        if (!is_null($weak_entity)) {
+          return $weak_entity;
+        }
+        else {
+          if ($this->entityId && $this->entityTypeId) {
+            $weak_entity = \Drupal::entityTypeManager()->getStorage($this->entityTypeId)->load($this->entityId);
+          }
+        }
+      }
+    }
+  }
 
   /**
    * Creates an instance wrapping the given entity.
@@ -52,8 +77,36 @@ class EntityAdapter extends TypedData implements \IteratorAggregate, ComplexData
       ->setEntityTypeId($entity->getEntityTypeId())
       ->setBundles([$entity->bundle()]);
     $instance = new static($definition);
-    $instance->setValue($entity);
+    $instance->setStrongEntity($entity);
     return $instance;
+
+    if ($entity->id() === NULL) {
+      $instance->setStrongEntity($entity);
+    }
+    else {
+      $instance->setStrongEntity = $entity;
+      return $instance;
+      $instance->setEntityTypeId($entity->getEntityTypeId());
+      $instance->setEntityId($entity->id());
+      $instance->setWeakEntity($entity);
+    }
+    return $instance;
+  }
+
+  public function setEntityTypeId($id) {
+    $this->entityTypeId = $id;
+  }
+
+  public function setEntityId($id) {
+    $this->entityId = $id;
+  }
+
+  public function setWeakEntity($entity) {
+    $this->weakEntity = \WeakReference::create($entity);
+  }
+
+  public function setStrongEntity($entity) {
+    $this->strongEntity = $entity;
   }
 
   /**
@@ -67,7 +120,7 @@ class EntityAdapter extends TypedData implements \IteratorAggregate, ComplexData
    * {@inheritdoc}
    */
   public function setValue($entity, $notify = TRUE) {
-    $this->entity = $entity;
+    $this->strongEntity = $entity;
     // Notify the parent of any changes.
     if ($notify && isset($this->parent)) {
       $this->parent->onChange($this->name);
