@@ -647,7 +647,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
 
       $default = $langcode == LanguageInterface::LANGCODE_DEFAULT;
       if (!$default && !$definition->isTranslatable()) {
-        if (!isset($this->fieldWeakReferences[$name][LanguageInterface::LANGCODE_DEFAULT]) || $this->fieldWeakReferences[$name][LanguageInterface::LANGUAGE_DEFAULT]->get() === NULL) {
+        if (!isset($this->fieldWeakReferences[$name][LanguageInterface::LANGCODE_DEFAULT]) || $this->fieldWeakReferences[$name][LanguageInterface::LANGCODE_DEFAULT]->get() === NULL) {
           $item = $this->getTranslatedField($name, LanguageInterface::LANGCODE_DEFAULT);
           $this->fieldWeakReferences[$name][LanguageInterface::LANGCODE_DEFAULT] = \WeakReference::create($item);
         }
@@ -662,14 +662,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
         if (isset($this->values[$name][$langcode])) {
           $value = $this->values[$name][$langcode];
         }
-        if ($name === 'id') {
-          dump('ID FIELD ITEM LIST WTF');
-          dump($value);
-        }
         $field = \Drupal::service('plugin.manager.field.field_type')->createFieldItemList($this->getTranslation($langcode), $name, $value);
-        if ($name === 'id') {
-          dump($field->getValue());
-        }
         if ($default) {
           // $this->defaultLangcode might not be set if we are initializing the
           // default language code cache, in which case there is no valid
@@ -680,7 +673,17 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
           $field_langcode = $langcode;
         }
         $field->setLangcode($field_langcode);
-        $this->fieldWeakReferences[$name][$langcode] = \WeakReference::create($field);
+        // Always write keys back to the field list because this is relied
+        // upon when saving entities.
+        $entity_keys = $this->getEntityType()->getKeys();
+        $key = array_search($name, $entity_keys);
+        if ($key !== FALSE) {
+          $this->fields[$name][$langcode] = $field;
+        }
+        else {
+          $this->fieldWeakReferences[$name][$langcode] = \WeakReference::create($field);
+        }
+
         return $field;
       }
     }
