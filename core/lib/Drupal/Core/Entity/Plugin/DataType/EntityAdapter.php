@@ -39,14 +39,27 @@ class EntityAdapter extends TypedData implements \IteratorAggregate, ComplexData
    */
   protected $weakEntity;
 
+  protected $strongEntity;
+
   protected $entity {
     get {
+      if (isset($this->strongEntity)) {
+        return $this->strongEntity;
+      }
       if ($this->weakEntity instanceof \WeakReference) {
         return $this->weakEntity->get();
       }
     }
     set($value) {
-      $this->weakEntity = \WeakReference::create($value);
+      if (!$value instanceOf FieldableEntityInterface) {
+        $this->strongEntity = $value;
+      }
+      if (isset($value)) {
+         $this->weakEntity = \WeakReference::create($value);
+      }
+      else {
+        $this->weakEntity = NULL;
+      }
     }
   }
 
