@@ -140,7 +140,7 @@ class ViewAjaxControllerTest extends UnitTestCase {
     $this->viewAjaxController = new ViewAjaxController($this->viewStorage, $this->executableFactory, $this->renderer, $this->currentPath, $this->redirectDestination, $this->pathValidator);
 
     $cacheContextsManager = $this->createMock(CacheContextsManager::class);
-    $cacheContextsManager->expects($this->any())
+    $cacheContextsManager->expects($this->atMost(1))
       ->method('assertValidTokens')
       ->with(['url.query_args'])
       ->willReturn(TRUE);
@@ -543,7 +543,7 @@ class ViewAjaxControllerTest extends UnitTestCase {
           ],
         ],
       ]);
-    $executable->expects($this->any())
+    $executable->expects($this->atMost(1))
       ->method('getCacheTags')
       ->willReturn(['custom_cache_tag']);
 
