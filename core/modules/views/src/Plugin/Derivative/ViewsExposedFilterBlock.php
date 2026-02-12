@@ -5,6 +5,7 @@ namespace Drupal\views\Plugin\Derivative;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -88,12 +89,27 @@ class ViewsExposedFilterBlock implements ContainerDeriverInterface {
           // Add a block definition for the block.
           if ($display->usesExposedFormInBlock()) {
             $delta = $view->id() . '-' . $display->display['id'];
-            $desc = $this->t('Exposed form: @view-@display_id', [
-              '@view' => $view->id(),
-              '@display_id' => $display->display['id'],
-            ]);
+
+            // Allow translators to control the punctuation. Plugin
+            // definitions get cached, so use TranslatableMarkup() instead of
+            // $this->t() to avoid double escaping when $admin_label is rendered
+            // during requests that use the cached definition.
+            $block_description = $display->getOption('block_description');
+            if ($block_description) {
+              $admin_label = new TranslatableMarkup('Exposed form: @view: @block_description', [
+                '@view' => $view->label(),
+                '@block_description' => $block_description,
+              ]);
+            }
+            else {
+              $admin_label = new TranslatableMarkup('Exposed form: @view: @display', [
+                '@view' => $view->label(),
+                '@display' => $display->display['display_title'],
+              ]);
+            }
+
             $this->derivatives[$delta] = [
-              'admin_label' => $desc,
+              'admin_label' => $admin_label,
               'config_dependencies' => [
                 'config' => [
                   $view->getConfigDependencyName(),
