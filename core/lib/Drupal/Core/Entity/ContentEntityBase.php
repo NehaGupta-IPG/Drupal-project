@@ -1325,8 +1325,12 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
         $fields_by_langcode = array_intersect_key($fields_by_langcode, [LanguageInterface::LANGCODE_DEFAULT => TRUE]);
       }
       foreach ($fields_by_langcode as $langcode => $items) {
-        $this->fields[$name][$langcode] = \WeakReference::create(clone $items->get());
-        $this->fields[$name][$langcode]->get()->setContext($name, $this->getTranslation($langcode)->getTypedData());
+        $value = $items->get();
+        if ($value !== NULL) {
+          $value = clone ($value);
+          $value->setContext($name, $this->getTranslation($langcode)->getTypedData());
+          $this->fields[$name][$langcode] = \WeakReference::create($value);
+        }
       }
     }
   }
