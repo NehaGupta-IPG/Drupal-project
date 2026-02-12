@@ -16,8 +16,5 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
     headless: true,
-    launchOptions: {
-      args: ['--disable-dev-shm-usage', '--disable-gpu', '--no-sandbox'],
-    },
   },
 });
