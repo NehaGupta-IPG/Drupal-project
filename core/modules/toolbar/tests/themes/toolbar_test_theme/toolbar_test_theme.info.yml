@@ -1,0 +1,9 @@
+name: 'Toolbar height test theme'
+type: theme
+version: VERSION
+base theme: stark
+hidden: true
+
+libraries-extend:
+  system/base:
+    - toolbar_test_theme/hidden.module.important

@@ -85,6 +85,12 @@
 .toolbar .toolbar-tray-horizontal .toolbar-tray {
   background-color: #f5f5f5;
 }
+.toolbar .toolbar-tray-vertical {
+  top: var(--drupal-displace-offset-top, 39px);
+}
+.toolbar-tray .toolbar-tray-horizontal {
+  z-index: 503;
+}
 .toolbar-tray a,
 .toolbar-tray a:visited {
   padding: 1em 1.3333em;

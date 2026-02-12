@@ -1,0 +1,4 @@
+hidden.module.important:
+  css:
+    component:
+      css/hidden.module.important.css: {}

@@ -29,6 +29,7 @@ toolbar:
     - core/drupal.displace
     - toolbar/toolbar.menu
     - toolbar/toolbar.anti-flicker
+    - core/drupal.debounce
 
 toolbar.menu:
   version: VERSION

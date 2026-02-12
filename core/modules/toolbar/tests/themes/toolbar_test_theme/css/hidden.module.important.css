@@ -1,0 +1,8 @@
+/**
+ * @file
+ * Extension of hidden module.
+ */
+
+.hidden {
+  display: none !important;
+}

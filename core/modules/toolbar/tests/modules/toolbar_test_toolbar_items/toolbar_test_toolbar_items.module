@@ -1,0 +1,65 @@
+<?php
+
+/**
+ * @file
+ * A dummy module that provides extra toolbar items for toolbar testing.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_page_top().
+ */
+function toolbar_test_toolbar_items_page_top(array &$page_top): void {
+  $page_top['home_link'] = [
+    '#type' => 'link',
+    '#title' => t('Home'),
+    '#url' => Url::fromRoute('<front>'),
+    '#attributes' => ['class' => ['js-toolbar-test-home-link']],
+  ];
+}
+
+/**
+ * Implements hook_toolbar().
+ */
+function toolbar_test_toolbar_items_toolbar(): array {
+  $items['toolbar_test_toolbar_items_hidden'] = [
+    '#type' => 'toolbar_item',
+    'tab' => [
+      '#type' => 'link',
+      '#title' => t('The hidden, first toolbar tab'),
+      '#url' => Url::fromRoute('<front>'),
+      '#attributes' => ['class' => ['hidden']],
+    ],
+    '#weight' => -1000,
+  ];
+
+  $test_toolbar_items = \Drupal::state()->get('toolbar_test_toolbar_items', []);
+  $weight_if_unset = 101;
+
+  foreach ($test_toolbar_items as $key => $toolbar_item_data) {
+    if (!is_array($toolbar_item_data)) {
+      $toolbar_item_data = [];
+    }
+
+    $toolbar_item_data += [
+      'title' => t('A toolbar menu item with a long title that links to the user page'),
+      'url' => Url::fromRoute('user.page'),
+      'weight' => $weight_if_unset++,
+    ];
+
+    $items['toolbar_test_toolbar_item_' . $key] = [
+      '#type' => 'toolbar_item',
+      'tab' => [
+        '#type' => 'link',
+        '#title' => $toolbar_item_data['title'],
+        '#url' => $toolbar_item_data['url'],
+      ],
+      '#weight' => $toolbar_item_data['weight'],
+    ];
+  }
+
+  return $items;
+}

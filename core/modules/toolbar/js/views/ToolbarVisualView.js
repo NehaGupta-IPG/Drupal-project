@@ -3,7 +3,7 @@
  * A Backbone view for the toolbar element. Listens to mouse & touch.
  */
 
-(function ($, Drupal, drupalSettings, Backbone) {
+(function ($, Drupal, drupalSettings, Backbone, debounce) {
   Drupal.toolbar.ToolbarVisualView = Backbone.View.extend(
     /** @lends Drupal.toolbar.ToolbarVisualView# */ {
       /**
@@ -14,7 +14,7 @@
        */
       events() {
         // Prevents delay and simulated mouse events.
-        const touchEndToClick = function (event) {
+        const touchEndToClick = (event) => {
           event.preventDefault();
           event.target.click();
         };
@@ -65,6 +65,11 @@
         // Trigger an activeTab change so that listening scripts can respond on
         // page load. This will call render.
         this.model.trigger('change:activeTab');
+
+        const observer = new ResizeObserver(
+          debounce(() => this.updateToolbarHeight(), 100),
+        );
+        observer.observe($('#toolbar-bar').get(0));
       },
 
       /**
@@ -75,17 +80,53 @@
        * @augments Backbone.View
        */
       updateToolbarHeight() {
-        const toolbarTabOuterHeight =
-          $('#toolbar-bar').find('.toolbar-tab').outerHeight() || 0;
+        const isOriented = this.model.get('isOriented');
+        const toolbarBarOffsetTop = $('#toolbar-bar').offset()
+          ? $('#toolbar-bar').offset().top
+          : 0;
+        const toolbarBarOuterHeight = $('#toolbar-bar').outerHeight() || 0;
+        const toolbarTrayHorizontalOffsetTop = $(
+          '.is-active.toolbar-tray-horizontal',
+        ).offset()
+          ? $('.is-active.toolbar-tray-horizontal').offset().top
+          : 0;
+
         const toolbarTrayHorizontalOuterHeight =
           $('.is-active.toolbar-tray-horizontal').outerHeight() || 0;
-        this.model.set(
-          'height',
-          toolbarTabOuterHeight + toolbarTrayHorizontalOuterHeight,
+        // The vertical size of the required area for displaying the toolbar
+        // bar.
+        const toolbarBarOffsetPlusHeight =
+          toolbarBarOffsetTop + toolbarBarOuterHeight;
+        // The vertical size of the required area for displaying the toolbar
+        // tray.
+        const toolbarTrayOffsetPlusHeight =
+          toolbarTrayHorizontalOffsetTop + toolbarTrayHorizontalOuterHeight;
+        // The vertical size of the tray including the offset diff from the
+        // toolbar bar.
+        const toolbarHeightWithTray =
+          toolbarTrayHorizontalOffsetTop -
+          toolbarBarOffsetTop +
+          toolbarTrayHorizontalOuterHeight;
+        // The complete height of the toolbar that will be set for the model.
+        const toolbarHeight = Math.max(
+          toolbarBarOuterHeight,
+          toolbarHeightWithTray,
         );
 
-        $('body')[0].style.paddingTop = `${this.model.get('height')}px`;
-        $('html')[0].style.scrollPaddingTop = `${this.model.get('height')}px`;
+        // The needed height for the toolbar that will be set as padding-top of
+        // the document body. This will prevent toolbar from overlapping
+        // elements.
+        // If the toolbar is not oriented (so its position is not absolute or
+        // fixed,) we don't have to reserve space for the toolbar.
+        const toolbarPlaceholderSize = isOriented
+          ? Math.max(toolbarBarOffsetPlusHeight, toolbarTrayOffsetPlusHeight)
+          : 0;
+        this.model.set('height', toolbarHeight);
+
+        const scrollOffset = $(window).scrollTop();
+
+        $('body')[0].style.paddingTop = `${toolbarPlaceholderSize - scrollOffset}px`;
+        $('html')[0].style.scrollPaddingTop = `${toolbarPlaceholderSize - scrollOffset}px`;
 
         this.triggerDisplace();
       },
@@ -393,4 +434,4 @@
       },
     },
   );
-})(jQuery, Drupal, drupalSettings, Backbone);
+})(jQuery, Drupal, drupalSettings, Backbone, Drupal.debounce);

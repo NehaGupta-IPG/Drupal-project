@@ -1,0 +1,7 @@
+name: 'Toolbar items for toolbar testing'
+type: module
+description: 'Support module for testing toolbar items'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:user
