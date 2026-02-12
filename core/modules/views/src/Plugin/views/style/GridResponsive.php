@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Plugin\views\style;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsStyle;
@@ -34,6 +35,8 @@ class GridResponsive extends StylePluginBase {
     $options['cell_min_width'] = ['default' => '100'];
     $options['grid_gutter'] = ['default' => '10'];
     $options['alignment'] = ['default' => 'horizontal'];
+    $options['col_class_custom'] = ['default' => ''];
+    $options['row_class_custom'] = ['default' => ''];
     return $options;
   }
 
@@ -78,6 +81,48 @@ class GridResponsive extends StylePluginBase {
       '#default_value' => $this->options['alignment'],
       '#description' => $this->t('Horizontal alignment will place items starting in the upper left and moving right. Vertical alignment will place items starting in the upper left and moving down.'),
     ];
+    $form['col_class_custom'] = [
+      '#title' => $this->t('Custom column class'),
+      '#description' => $this->t('Additional classes to provide on each column. Separated by a space.'),
+      '#type' => 'textfield',
+      '#default_value' => $this->options['col_class_custom'],
+    ];
+    if ($this->usesFields()) {
+      $form['col_class_custom']['#description'] .= ' ' . $this->t('You may use field tokens as per the "Replacement patterns" used in "Rewrite the output of this field" for all fields.');
+    }
+    $form['row_class_custom'] = [
+      '#title' => $this->t('Custom row class'),
+      '#description' => $this->t('Additional classes to provide on each row. Separated by a space.'),
+      '#type' => 'textfield',
+      '#default_value' => $this->options['row_class_custom'],
+    ];
+    if ($this->usesFields()) {
+      $form['row_class_custom']['#description'] .= ' ' . $this->t('You may use field tokens as per the "Replacement patterns" used in "Rewrite the output of this field" for all fields.');
+    }
+  }
+
+  /**
+   * Return the token-replaced row or column classes for the specified result.
+   *
+   * @param int $result_index
+   *   The delta of the result item to get custom classes for.
+   * @param string $type
+   *   The type of custom grid class to return, either "row" or "col".
+   *
+   * @return string
+   *   A space-delimited string of classes.
+   */
+  public function getCustomClass($result_index, $type) {
+    $class = $this->options[$type . '_class_custom'];
+    if ($this->usesFields() && $this->view->field) {
+      $class = strip_tags($this->tokenizeValue($class, $result_index));
+    }
+
+    $classes = explode(' ', $class);
+    foreach ($classes as &$class) {
+      $class = Html::cleanCssIdentifier($class);
+    }
+    return implode(' ', $classes);
   }
 
 }

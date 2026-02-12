@@ -1033,6 +1033,8 @@ class ViewsThemeHooks {
   public function preprocessViewsViewGridResponsive(array &$variables): void {
     $variables['options'] = $variables['view']->style_plugin->options;
     $view = $variables['view'];
+    $variables['options']['row_class_custom'] = $view->style_plugin->getCustomClass(0, 'row');
+    $variables['options']['col_class_custom'] = $view->style_plugin->getCustomClass(0, 'col');
 
     $items = [];
 
