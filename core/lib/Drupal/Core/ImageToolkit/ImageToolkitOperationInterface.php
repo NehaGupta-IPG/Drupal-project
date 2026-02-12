@@ -3,6 +3,7 @@
 namespace Drupal\Core\ImageToolkit;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
+use Drupal\Core\Image\ImageInterface;
 
 /**
  * Defines an interface for image toolkit operations.
@@ -23,6 +24,8 @@ interface ImageToolkitOperationInterface extends PluginInspectionInterface {
    *
    * @param \Drupal\Core\ImageToolkit\ImageToolkitInterface $toolkit
    *   The image toolkit in use.
+   *
+   * @deprecated
    */
   public function setToolkit(ImageToolkitInterface $toolkit): void;
 
@@ -38,6 +41,6 @@ interface ImageToolkitOperationInterface extends PluginInspectionInterface {
    * @throws \InvalidArgumentException
    *   If one or more of the arguments are not valid.
    */
-  public function apply(array $arguments);
+  public function apply(/* ImageInterface $image, array */ $arguments);
 
 }

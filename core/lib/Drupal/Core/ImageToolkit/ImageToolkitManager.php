@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\ImageToolkit;
 
+use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -18,12 +19,7 @@ use Drupal\Core\Plugin\DefaultPluginManager;
  */
 class ImageToolkitManager extends DefaultPluginManager {
 
-  /**
-   * The config factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
+  protected array $activeToolkits = [];
 
   /**
    * Constructs the ImageToolkitManager object.
@@ -42,7 +38,7 @@ class ImageToolkitManager extends DefaultPluginManager {
     \Traversable $namespaces,
     CacheBackendInterface $cache_backend,
     ModuleHandlerInterface $module_handler,
-    ConfigFactoryInterface $config_factory,
+    protected readonly ConfigFactoryInterface $configFactory,
   ) {
     parent::__construct(
       'Plugin/ImageToolkit',
@@ -52,9 +48,21 @@ class ImageToolkitManager extends DefaultPluginManager {
       ImageToolkit::class,
       'Drupal\Core\ImageToolkit\Annotation\ImageToolkit',
     );
-
     $this->setCacheBackend($cache_backend, 'image_toolkit_plugins');
-    $this->configFactory = $config_factory;
+  }
+
+  public function getToolkit(string $id): ImageToolkitInterface {
+    $this->activeToolkits[$id] ??= $this->createInstance($id);
+    return $this->activeToolkits[$id];
+  }
+
+  public function getInstance(array $options) {
+    $toolkit_definition = $this->getDefinition($options['id']);
+    if (isset($toolkit_definition['imageClass'])) {
+      $this->activeToolkits[$options['id']] ??= $this->createInstance($options['id']);
+      return $this->activeToolkits[$options['id']];
+    }
+    return $this->createInstance($options['id']);
   }
 
   /**
@@ -84,7 +92,7 @@ class ImageToolkitManager extends DefaultPluginManager {
    */
   public function getDefaultToolkit() {
     if ($toolkit_id = $this->getDefaultToolkitId()) {
-      return $this->createInstance($toolkit_id);
+      return $this->getInstance(['id' => $toolkit_id]);
     }
     return FALSE;
   }
@@ -98,7 +106,6 @@ class ImageToolkitManager extends DefaultPluginManager {
   public function getAvailableToolkits() {
     // Use plugin system to get list of available toolkits.
     $toolkits = $this->getDefinitions();
-
     $output = [];
     foreach ($toolkits as $id => $definition) {
       // Only allow modules that aren't marked as unavailable.

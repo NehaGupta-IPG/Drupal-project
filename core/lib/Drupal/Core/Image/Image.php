@@ -15,25 +15,31 @@ use Drupal\Core\ImageToolkit\ImageToolkitInterface;
 class Image implements ImageInterface {
 
   /**
-   * Path of the image file.
-   *
-   * @var string
+   * The image factory.
    */
-  protected $source = '';
+  protected readonly ImageFactory $imageFactory;
+
+  /**
+   * The image toolkit id.
+   */
+  protected readonly string $toolkitId;
+
+  /**
+   * Path of the image file.
+   */
+  protected string $source = '';
 
   /**
    * An image toolkit object.
    *
-   * @var \Drupal\Core\ImageToolkit\ImageToolkitInterface
+   * @deprecated
    */
-  protected $toolkit;
+  protected ImageToolkitInterface $toolkit;
 
   /**
    * File size in bytes.
-   *
-   * @var int
    */
-  protected $fileSize;
+  protected int $fileSize;
 
   /**
    * Constructs a new Image object.
@@ -44,13 +50,23 @@ class Image implements ImageInterface {
    *   (optional) The path to an image file, or NULL to construct the object
    *   with no image source.
    */
-  public function __construct(ImageToolkitInterface $toolkit, $source = NULL) {
+  public function __construct(
+    ImageToolkitInterface $toolkit,
+    $source = NULL,
+    ?ImageFactory $imageFactory = NULL,
+  ) {
+    if (!$imageFactory) {
+      @trigger_error(__METHOD__ . ' not receiving the ImageFactory is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+      $imageFactory = \Drupal::service('image.factory');
+    }
+    $this->imageFactory = $imageFactory;
     $this->toolkit = $toolkit;
+    $this->toolkitId = $toolkit->getPluginId();
     if ($source) {
       $this->source = $source;
       $this->getToolkit()->setSource($this->source);
       // Defer image file validity check to the toolkit.
-      if ($this->getToolkit()->parseFile()) {
+      if ($this->getToolkit()->parseFile($this)) {
         $this->fileSize = filesize($this->source);
       }
     }
@@ -60,21 +76,21 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function isValid() {
-    return $this->getToolkit()->isValid();
+    return $this->getToolkit()->isValid($this);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getHeight() {
-    return $this->getToolkit()->getHeight();
+    return $this->getToolkit()->getHeight($this);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getWidth() {
-    return $this->getToolkit()->getWidth();
+    return $this->getToolkit()->getWidth($this);
   }
 
   /**
@@ -88,7 +104,7 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function getMimeType() {
-    return $this->getToolkit()->getMimeType();
+    return $this->getToolkit()->getMimeType($this);
   }
 
   /**
@@ -102,13 +118,22 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function getToolkitId() {
-    return $this->getToolkit()->getPluginId();
+    return $this->toolkitId;
+  }
+
+  public function toolkit(): ImageToolkitInterface {
+    return $this->imageFactory->getToolkit($this->toolkitId);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getToolkit() {
+    @trigger_error(__METHOD__ . ' is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+    if (!isset($this->toolkit)) {
+      $this->toolkit = clone $this->toolkit();
+      $this->toolkit->backfillImage = $this;
+    }
     return $this->toolkit;
   }
 
@@ -122,7 +147,7 @@ class Image implements ImageInterface {
     }
 
     $destination = $destination ?: $this->getSource();
-    if ($return = $this->getToolkit()->save($destination)) {
+    if ($return = $this->getToolkit()->save($this, $destination)) {
       // Clear the cached file size and refresh the image information.
       clearstatcache(TRUE, $destination);
       $this->fileSize = filesize($destination);
@@ -139,7 +164,7 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function apply($operation, array $arguments = []) {
-    return $this->getToolkit()->apply($operation, $arguments);
+    return $this->getToolkit()->apply($this, $operation, $arguments);
   }
 
   /**

@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Image;
 
+use Drupal\Core\ImageToolkit\ImageToolkitInterface;
 use Drupal\Core\ImageToolkit\ImageToolkitManager;
 
 /**
@@ -10,27 +11,19 @@ use Drupal\Core\ImageToolkit\ImageToolkitManager;
 class ImageFactory {
 
   /**
-   * The image toolkit plugin manager.
-   *
-   * @var \Drupal\Core\ImageToolkit\ImageToolkitManager
-   */
-  protected $toolkitManager;
-
-  /**
    * The image toolkit ID to use for this factory.
    *
    * @var string
    */
   protected $toolkitId;
 
-  /**
-   * Constructs a new ImageFactory object.
-   *
-   * @param \Drupal\Core\ImageToolkit\ImageToolkitManager $toolkit_manager
-   *   The image toolkit plugin manager.
-   */
-  public function __construct(ImageToolkitManager $toolkit_manager) {
-    $this->toolkitManager = $toolkit_manager;
+  public function __construct(
+    protected readonly ImageToolkitManager $toolkitManager,
+  ) {
+  }
+
+  public function getToolkit(string $id): ImageToolkitInterface {
+    return $this->toolkitManager->getToolkit($id);
   }
 
   /**
@@ -84,7 +77,12 @@ class ImageFactory {
    */
   public function get($source = NULL, $toolkit_id = NULL) {
     $toolkit_id = $toolkit_id ?: $this->getToolkitId();
-    return new Image($this->toolkitManager->createInstance($toolkit_id), $source);
+    $toolkit_definition = $this->toolkitManager->getDefinition($toolkit_id);
+    if (isset($toolkit_definition['imageClass'])) {
+      $image_class = isset($toolkit_definition['imageClass']) ? $toolkit_definition['imageClass'] : Image::class;
+      return new $image_class($this, $toolkit_id, $source);
+    }
+    return new Image($this->toolkitManager->getInstance(['id' => $toolkit_id]), $source, $this);
   }
 
   /**

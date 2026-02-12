@@ -3,6 +3,7 @@
 namespace Drupal\Core\ImageToolkit;
 
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
+use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Psr\Log\LoggerInterface;
@@ -178,17 +179,25 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    *   If the plugin does not define a default for an optional argument.
    */
-  protected function validateArguments(array $arguments) {
+  protected function validateArguments(array $arguments /* , ImageInterface $image */) {
     return $arguments;
   }
 
   /**
    * {@inheritdoc}
    */
-  final public function apply(array $arguments) {
+  final public function apply(/* ImageInterface $image, array */ $arguments, $extra = NULL) {
+    if ($arguments instanceof ImageInterface) {
+      $image = $arguments;
+      $arguments = $extra;
+      assert(is_array($arguments));
+    }
+    else {
+      // @todo fix.
+    }
     $arguments = $this->prepareArguments($arguments);
-    $arguments = $this->validateArguments($arguments);
-    return $this->execute($arguments);
+    $arguments = $this->validateArguments($arguments, $image);
+    return $this->execute($arguments, $image);
   }
 
   /**
@@ -208,6 +217,6 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    * @throws \RuntimeException
    *   If the operation can not be performed.
    */
-  abstract protected function execute(array $arguments);
+  abstract protected function execute(array $arguments /* , ImageInterface $image */);
 
 }

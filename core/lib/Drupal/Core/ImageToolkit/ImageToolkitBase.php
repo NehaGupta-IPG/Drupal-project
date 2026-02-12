@@ -5,6 +5,7 @@ namespace Drupal\Core\ImageToolkit;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Psr\Log\LoggerInterface;
@@ -23,6 +24,8 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    * Path of the image file.
    *
    * @var string
+   *
+   * @deprecated
    */
   protected $source = '';
 
@@ -62,6 +65,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    * {@inheritdoc}
    */
   public function setSource($source) {
+    @trigger_error(__METHOD__ . ' is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     // If a previous image has been loaded, there is no way to know if the
     // toolkit implementation needs to perform any additional actions like
     // freeing memory. Therefore, the source image cannot be changed once set.
@@ -76,6 +80,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    * {@inheritdoc}
    */
   public function getSource() {
+    @trigger_error(__METHOD__ . ' is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     return $this->source;
   }
 
@@ -102,10 +107,20 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
   /**
    * {@inheritdoc}
    */
-  public function apply($operation, array $arguments = []) {
+  public function apply($operation, $arguments = [], $extra = NULL) {
+    if ($operation instanceof ImageInterface) {
+      $image = $operation;
+      $operation = $arguments;
+      assert(is_string($operation));
+      $arguments = $extra;
+      assert(is_array($arguments));
+    }
+    else {
+      // @todo fix.
+    }
     try {
       // Get the plugin to use for the operation and apply the operation.
-      return $this->getToolkitOperation($operation)->apply($arguments);
+      return $this->getToolkitOperation($operation)->apply($image, $arguments);
     }
     catch (PluginNotFoundException) {
       $this->logger->error("The selected image handling toolkit '@toolkit' can not process operation '@operation'.", [
@@ -118,7 +133,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
       $this->logger->warning("The image toolkit '@toolkit' failed processing '@operation' for image '@image'. Reported error: @class - @message", [
         '@toolkit' => $this->getPluginId(),
         '@operation' => $operation,
-        '@image' => $this->getSource(),
+        '@image' => $this->getSource(), # @todo fix.
         '@class' => get_class($t),
         '@message' => $t->getMessage(),
       ]);

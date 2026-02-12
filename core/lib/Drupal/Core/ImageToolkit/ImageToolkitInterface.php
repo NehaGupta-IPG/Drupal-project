@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\ImageToolkit;
 
+use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
@@ -57,6 +58,8 @@ interface ImageToolkitInterface extends ContainerFactoryPluginInterface, PluginI
    *
    * @throws \BadMethodCallException
    *   After being set initially, the source image cannot be changed.
+   *
+   * @deprecated
    */
   public function setSource($source);
 
@@ -66,6 +69,8 @@ interface ImageToolkitInterface extends ContainerFactoryPluginInterface, PluginI
    * @return string
    *   The source path of the image file, or an empty string if the source is
    *   not set.
+   *
+   * @deprecated
    */
   public function getSource();
 
@@ -76,7 +81,7 @@ interface ImageToolkitInterface extends ContainerFactoryPluginInterface, PluginI
    *   TRUE if the image toolkit is currently handling a valid image, FALSE
    *   otherwise.
    */
-  public function isValid();
+  public function isValid(/* ImageInterface $image */);
 
   /**
    * Writes an image resource to a destination file.
@@ -87,7 +92,7 @@ interface ImageToolkitInterface extends ContainerFactoryPluginInterface, PluginI
    * @return bool
    *   TRUE on success, FALSE on failure.
    */
-  public function save($destination);
+  public function save(/* ImageInterface $image, string */ $destination);
 
   /**
    * Determines if a file contains a valid image.
@@ -99,7 +104,7 @@ interface ImageToolkitInterface extends ContainerFactoryPluginInterface, PluginI
    * @return bool
    *   TRUE if the file could be found and is an image, FALSE otherwise.
    */
-  public function parseFile();
+  public function parseFile(/* ImageInterface $image */);
 
   /**
    * Returns the height of the image.
@@ -107,7 +112,7 @@ interface ImageToolkitInterface extends ContainerFactoryPluginInterface, PluginI
    * @return int|null
    *   The height of the image, or NULL if the image is invalid.
    */
-  public function getHeight();
+  public function getHeight(/* ImageInterface $image */);
 
   /**
    * Returns the width of the image.
@@ -115,7 +120,7 @@ interface ImageToolkitInterface extends ContainerFactoryPluginInterface, PluginI
    * @return int|null
    *   The width of the image, or NULL if the image is invalid.
    */
-  public function getWidth();
+  public function getWidth(/* ImageInterface $image */);
 
   /**
    * Returns the MIME type of the image file.
@@ -124,7 +129,7 @@ interface ImageToolkitInterface extends ContainerFactoryPluginInterface, PluginI
    *   The MIME type of the image file, or an empty string if the image is
    *   invalid.
    */
-  public function getMimeType();
+  public function getMimeType(/* ImageInterface $image */);
 
   /**
    * Gets toolkit requirements in a format suitable for hook_requirements().
@@ -168,6 +173,6 @@ interface ImageToolkitInterface extends ContainerFactoryPluginInterface, PluginI
    * @return bool
    *   TRUE if the operation was performed successfully, FALSE otherwise.
    */
-  public function apply($operation, array $arguments = []);
+  public function apply(/* ImageInterface $image, string */ $operation, array $arguments = []);
 
 }

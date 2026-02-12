@@ -62,6 +62,8 @@ interface ImageInterface {
    *
    * @return \Drupal\Core\ImageToolkit\ImageToolkitInterface
    *   The image toolkit.
+   *
+   * @deprecated
    */
   public function getToolkit();
 
