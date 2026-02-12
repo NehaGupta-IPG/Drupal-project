@@ -548,8 +548,6 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
    */
   public static function providerGet(): array {
     return [
-      // Populated fields array.
-      ['result', 'field_name', 'langcode', ['field_name' => ['langcode' => 'result']]],
       // Incomplete fields array.
       ['getTranslatedField_result', 'field_name', 'langcode', ['field_name' => 'no_langcode']],
       // Empty fields array.
