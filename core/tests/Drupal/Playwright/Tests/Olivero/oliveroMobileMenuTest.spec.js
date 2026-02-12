@@ -1,9 +1,9 @@
-const {
+import {
   test,
   expect,
   drupalInstallModule,
   drupalLoginAsAdmin,
-} = require('../../drupal-fixtures');
+} from '../../drupal-fixtures.js';
 
 const mobileNavButtonSelector = 'button.mobile-nav-button';
 const headerNavSelector = '#header-nav';
@@ -19,9 +19,7 @@ async function focusTrapCheck(page, parentSelector, tabCount, tabBackwards) {
     await page.keyboard.down('Shift');
   }
   for (let i = 0; i < tabCount; i++) {
-    // eslint-disable-next-line no-await-in-loop
     await page.keyboard.press('Tab');
-    // eslint-disable-next-line no-await-in-loop
     await page.waitForTimeout(50);
   }
   const isFocused = await page.evaluate(

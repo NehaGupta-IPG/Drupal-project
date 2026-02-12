@@ -1,9 +1,9 @@
-const {
+import {
   test,
   expect,
   drupalCreateUser,
   drupalLogin,
-} = require('../../drupal-fixtures');
+} from '../../drupal-fixtures.js';
 
 const primaryTabsWrapper = '[data-drupal-nav-primary-tabs]';
 const activeTab = '.tabs__tab.is-active';

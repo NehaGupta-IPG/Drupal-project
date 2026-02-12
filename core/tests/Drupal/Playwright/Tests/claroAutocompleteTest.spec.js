@@ -1,13 +1,13 @@
 // cspell:ignore is-autocompleting
 
-const {
+import {
   test,
   expect,
   drupalInstallModule,
   drupalEnableTheme,
   drupalCreateUser,
   drupalLogin,
-} = require('../drupal-fixtures');
+} from '../drupal-fixtures.js';
 
 test.describe('Claro autocomplete', { tag: ['@core'] }, () => {
   test('Test Claro autocomplete', async ({ drupalPage: page }) => {

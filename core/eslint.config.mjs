@@ -98,6 +98,20 @@ export default defineConfig(
       'yml/indent': ['error', 2],
       ...noJQuery.configs.all.rules,
     },
+    overrides: [
+      {
+        files: ["tests/Drupal/Playwright/**/*.js"],
+        rules: {
+          'import/no-extraneous-dependencies': ['error', {
+            devDependencies: true,
+            packageDir: "./"
+          }],
+          'import/extensions': ['error', 'ignorePackages'],
+          'no-restricted-syntax': 'off',
+          'no-await-in-loop': 'off'
+        }
+      }
+    ],
     settings: {
       jsdoc: {
         tagNamePreference: {

@@ -1,9 +1,9 @@
-const {
+import {
   test,
   expect,
   drupalInstallModule,
   drupalLoginAsAdmin,
-} = require('../../drupal-fixtures');
+} from '../../drupal-fixtures.js';
 
 const selectors = {
   expandButton: {

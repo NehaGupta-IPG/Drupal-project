@@ -1,9 +1,9 @@
-const {
+import {
   test,
   expect,
   drupalInstallModule,
   assertDeprecationErrorExists,
-} = require('../drupal-fixtures');
+} from '../drupal-fixtures.js';
 
 test.describe('JavaScript deprecations', { tag: '@core' }, () => {
   test('Test JavaScript deprecations', async ({ drupalPage: page }) => {

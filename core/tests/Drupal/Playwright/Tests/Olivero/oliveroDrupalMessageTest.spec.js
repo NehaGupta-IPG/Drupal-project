@@ -1,4 +1,4 @@
-const { test, expect } = require('../../drupal-fixtures');
+import { test, expect } from '../../drupal-fixtures.js';
 
 const mainContent = '#block-olivero-content';
 const mainMessagesContainer = '[data-drupal-messages] > .messages__wrapper';

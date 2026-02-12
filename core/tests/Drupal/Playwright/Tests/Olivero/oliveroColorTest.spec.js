@@ -1,9 +1,9 @@
-const {
+import {
   test,
   expect,
   drupalCreateUser,
   drupalLogin,
-} = require('../../drupal-fixtures');
+} from '../../drupal-fixtures.js';
 
 const selectors = {
   schemePicker: '[data-drupal-selector="edit-color-scheme"]',
@@ -47,19 +47,15 @@ test.describe('Olivero color settings', { tag: ['@core', '@olivero'] }, () => {
     await page.goto('/admin/appearance/settings/olivero');
     await page.locator(selectors.schemePicker).waitFor({ state: 'visible' });
 
-    // eslint-disable-next-line no-restricted-syntax
     for (const [scheme, colors] of Object.entries(colorSchemes)) {
       if (scheme === 'default') {
         // eslint-disable-next-line no-continue
         continue;
       }
-      // eslint-disable-next-line no-await-in-loop
       await page.locator(selectors.schemePicker).selectOption(scheme);
-      // eslint-disable-next-line no-await-in-loop
       await expect(page.locator(selectors.primaryColor.text)).toHaveValue(
         colors.base_primary_color,
       );
-      // eslint-disable-next-line no-await-in-loop
       await expect(page.locator(selectors.primaryColor.color)).toHaveValue(
         colors.base_primary_color,
       );
@@ -82,11 +78,8 @@ test.describe('Olivero color settings', { tag: ['@core', '@olivero'] }, () => {
       .waitFor({ state: 'visible' });
 
     const testColors = ['#ff0000', '#00ff00', '#0000ff'];
-    // eslint-disable-next-line no-restricted-syntax
     for (const color of testColors) {
-      // eslint-disable-next-line no-await-in-loop
       await page.locator(selectors.primaryColor.text).fill(color);
-      // eslint-disable-next-line no-await-in-loop
       await expect(page.locator(selectors.primaryColor.color)).toHaveValue(
         color,
       );

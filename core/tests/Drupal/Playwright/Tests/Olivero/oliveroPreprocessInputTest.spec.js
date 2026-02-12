@@ -1,4 +1,4 @@
-const { test, expect } = require('../../drupal-fixtures');
+import { test, expect } from '../../drupal-fixtures.js';
 
 const checkboxSelector = '#edit-form-checkboxes-title-attribute';
 
@@ -60,29 +60,22 @@ test.describe(
     test('Check form element classes by type', async ({ drupalPage: page }) => {
       await page.goto('/form_test/form-labels');
 
-      // eslint-disable-next-line no-restricted-syntax
       for (const inputType of inputTypes) {
-        // eslint-disable-next-line no-await-in-loop
         await expect(page.locator(inputType.selector)).toHaveClass(
           /form-element/,
         );
-        // eslint-disable-next-line no-await-in-loop
         await expect(page.locator(inputType.selector)).toHaveClass(
           new RegExp(`form-element--type-${inputType.type}`),
         );
-        // eslint-disable-next-line no-await-in-loop
         await expect(page.locator(inputType.selector)).toHaveClass(
           new RegExp(`form-element--api-${inputType.api}`),
         );
       }
 
-      // eslint-disable-next-line no-restricted-syntax
       for (const boolType of booleanInputTypes) {
-        // eslint-disable-next-line no-await-in-loop
         await expect(page.locator(boolType.selector)).toHaveClass(
           /form-boolean/,
         );
-        // eslint-disable-next-line no-await-in-loop
         await expect(page.locator(boolType.selector)).toHaveClass(
           new RegExp(`form-boolean--type-${boolType.type}`),
         );

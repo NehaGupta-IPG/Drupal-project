@@ -1,8 +1,8 @@
-const { defineConfig } = require('@playwright/test');
+import { defineConfig } from '@playwright/test';
 
 const outputFolder = process.env.DRUPAL_PLAYWRIGHT_OUTPUT || 'reports';
 
-module.exports = defineConfig({
+export default defineConfig({
   testDir: './Tests',
   timeout: 60000,
   workers: 1,

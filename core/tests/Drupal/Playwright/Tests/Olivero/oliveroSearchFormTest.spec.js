@@ -1,9 +1,9 @@
-const {
+import {
   test,
   expect,
   drupalCreateUser,
   drupalLogin,
-} = require('../../drupal-fixtures');
+} from '../../drupal-fixtures.js';
 
 const mobileNavButtonSelector = 'button.mobile-nav-button';
 const headerNavSelector = '#header-nav';

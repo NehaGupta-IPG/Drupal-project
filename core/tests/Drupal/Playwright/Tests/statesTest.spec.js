@@ -1,9 +1,9 @@
-const {
+import {
   test,
   expect,
   drupalInstallModule,
   assertNoDeprecationErrors,
-} = require('../drupal-fixtures');
+} from '../drupal-fixtures.js';
 
 test.describe('States API', { tag: '@core' }, () => {
   test('Test form with state API', async ({ drupalPage: page }) => {

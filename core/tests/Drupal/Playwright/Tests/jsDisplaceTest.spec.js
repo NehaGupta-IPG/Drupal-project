@@ -1,4 +1,4 @@
-const { test, expect, drupalInstallModule } = require('../drupal-fixtures');
+import { test, expect, drupalInstallModule } from '../drupal-fixtures.js';
 
 const testValues = {
   top: 200,

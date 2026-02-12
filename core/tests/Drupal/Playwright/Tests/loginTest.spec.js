@@ -1,10 +1,10 @@
-const {
+import {
   test,
   expect,
   drupalCreateUser,
   drupalLogin,
   assertNoDeprecationErrors,
-} = require('../drupal-fixtures');
+} from '../drupal-fixtures.js';
 
 test.describe('Login', { tag: '@core' }, () => {
   test('Test login', async ({ drupalPage: page }) => {

@@ -1,4 +1,4 @@
-const { test, expect } = require('../../drupal-fixtures');
+import { test, expect } from '../../drupal-fixtures.js';
 
 const buttonSelector = 'button.sticky-header-toggle';
 const mainMenuSelector = '#block-olivero-main-menu';

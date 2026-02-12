@@ -1,9 +1,9 @@
-const {
+import {
   test,
   expect,
   drupalCreateUser,
   drupalLogin,
-} = require('../../drupal-fixtures');
+} from '../../drupal-fixtures.js';
 
 const tableSelector = '#edit-field-multiple-value-form-field-wrapper table';
 const tableHeaderSelector = '#edit-field-multiple-value-form-field-wrapper th';

@@ -1,4 +1,4 @@
-const { test, expect, drupalInstallModule } = require('../drupal-fixtures');
+import { test, expect, drupalInstallModule } from '../drupal-fixtures.js';
 
 // cSpell:disable
 const machineNameTestArray = [
@@ -227,9 +227,7 @@ test.describe('Machine name transliteration', { tag: ['@core'] }, () => {
     await drupalInstallModule(page, 'form_test', true);
     await page.goto('/form-test/machine-name');
 
-    // eslint-disable-next-line no-restricted-syntax
     for (const iteration of machineNameTestArray) {
-      // eslint-disable-next-line no-await-in-loop
       const result = await page.evaluate((obj) => {
         return Drupal.behaviors.machineName.transliterate(obj.machineName, {
           replace_pattern: obj.replacePattern,

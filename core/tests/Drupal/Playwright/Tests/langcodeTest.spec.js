@@ -1,4 +1,4 @@
-const { test, expect } = require('../drupal-fixtures');
+import { test, expect } from '../drupal-fixtures.js';
 
 test.use({
   drupalInstallOptions: {

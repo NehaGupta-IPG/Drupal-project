@@ -1,4 +1,4 @@
-const { test, expect, drupalInstallModule } = require('../drupal-fixtures');
+import { test, expect, drupalInstallModule } from '../drupal-fixtures.js';
 
 test.describe('Tabbing manager', { tag: ['@core'] }, () => {
   test('test tabbingmanager', async ({ drupalPage: page }) => {

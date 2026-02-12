@@ -1,4 +1,4 @@
-const { test, expect } = require('../../drupal-fixtures');
+import { test, expect } from '../../drupal-fixtures.js';
 
 const preloadFontPaths = [
   'core/themes/olivero/fonts/metropolis/Metropolis-Regular.woff2',

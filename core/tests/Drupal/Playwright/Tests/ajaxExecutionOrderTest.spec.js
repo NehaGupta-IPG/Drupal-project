@@ -1,4 +1,4 @@
-const { test, expect, drupalInstallModule } = require('../drupal-fixtures');
+import { test, expect, drupalInstallModule } from '../drupal-fixtures.js';
 
 test.describe('AJAX execution order', { tag: ['@core', '@ajax'] }, () => {
   test('Test Execution Order', async ({ drupalPage: page }) => {

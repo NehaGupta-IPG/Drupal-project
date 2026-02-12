@@ -1,5 +1,5 @@
-const { test: base, expect } = require('@playwright/test');
-const { execSync } = require('node:child_process');
+import { test as base, expect } from '@playwright/test';
+import { execSync } from 'node:child_process';
 
 // Run a shell command, optionally as the webserver user.
 function testSiteCommand(command) {
@@ -71,7 +71,7 @@ function drupalTearDown(dbPrefix) {
 /**
  * Extend Playwright's base test with Drupal-specific fixtures.
  */
-exports.test = base.extend({
+export const test = base.extend({
   /**
    * Install options for the drupalPage fixture. Override in test files via
    * test.use({ drupalInstallOptions: { ... } }) to customize the install.
@@ -97,26 +97,33 @@ exports.test = base.extend({
   },
 });
 
-exports.expect = expect;
+export { expect };
 
 /**
  * Log in as admin via one-time login link.
  */
-exports.drupalLoginAsAdmin = async (page) => {
+export async function drupalLoginAsAdmin(page) {
   const userLink = testSiteCommand(
     `user-login 1 --site-path ${page._drupal.sitePath}`,
   );
   await page.goto(userLink);
-};
+}
+
+/**
+ * Log out of Drupal.
+ */
+export async function drupalLogout(page) {
+  await page.goto('/user/logout/confirm');
+  await page.locator('#user-logout-confirm').locator('[type="submit"]').click();
+}
 
 /**
  * Create a Drupal user with given permissions via the admin UI.
  */
-exports.drupalCreateUser = async (
+export async function drupalCreateUser(
   page,
   { name, password, permissions = [] },
-) => {
-  const { drupalLoginAsAdmin, drupalLogout } = exports;
+) {
   let machineName;
   if (permissions.length) {
     const roleLabel = Math.random()
@@ -140,9 +147,7 @@ exports.drupalCreateUser = async (
     // Assign permissions.
     await page.goto('/admin/people/permissions');
     await page.locator('table.permissions').waitFor({ state: 'visible' });
-    // eslint-disable-next-line no-restricted-syntax
     for (const perm of permissions) {
-      // eslint-disable-next-line no-await-in-loop
       await page.locator(`input[name="${machineName}[${perm}]"]`).check();
     }
     await page
@@ -169,12 +174,12 @@ exports.drupalCreateUser = async (
     'Created a new user account',
   );
   await drupalLogout(page);
-};
+}
 
 /**
  * Log in as a given user via the login form.
  */
-exports.drupalLogin = async (page, { name, password }) => {
+export async function drupalLogin(page, { name, password }) {
   await page.goto('/user/login');
   await page.locator('input[name="name"]').fill(name);
   await page.locator('input[name="pass"]').fill(password);
@@ -183,15 +188,7 @@ exports.drupalLogin = async (page, { name, password }) => {
   const cookies = await page.context().cookies();
   const hasSession = cookies.some((c) => /^S?SESS/.test(c.name));
   expect(hasSession).toBe(true);
-};
-
-/**
- * Log out of Drupal.
- */
-exports.drupalLogout = async (page) => {
-  await page.goto('/user/logout/confirm');
-  await page.locator('#user-logout-confirm').locator('[type="submit"]').click();
-};
+}
 
 /**
  * Install a module via the admin UI.
@@ -200,8 +197,7 @@ exports.drupalLogout = async (page) => {
  * @param {string} module - The module machine name.
  * @param {boolean} [force=false] - Click Continue if dependencies are required.
  */
-exports.drupalInstallModule = async (page, module, force = false) => {
-  const { drupalLoginAsAdmin, drupalLogout } = exports;
+export async function drupalInstallModule(page, module, force = false) {
   await drupalLoginAsAdmin(page);
   await page.goto('/admin/modules');
   // Filter the module list to expand collapsed <details> elements.
@@ -231,12 +227,12 @@ exports.drupalInstallModule = async (page, module, force = false) => {
     .locator(`form.system-modules [name="modules[${module}][enable]"]:disabled`)
     .waitFor({ state: 'attached', timeout: 10000 });
   await drupalLogout(page);
-};
+}
 
 /**
  * Assert that a specific deprecation error exists in sessionStorage.
  */
-exports.assertDeprecationErrorExists = async (page, expected) => {
+export async function assertDeprecationErrorExists(page, expected) {
   const warnings = await page.evaluate(() =>
     window.sessionStorage.getItem('js_testing_log_test.warnings'),
   );
@@ -245,7 +241,7 @@ exports.assertDeprecationErrorExists = async (page, expected) => {
     .filter((m) => m.includes('[Deprecation]'))
     .map((m) => m.replace('[Deprecation] ', ''));
   expect(deprecations).toContainEqual(expect.stringContaining(expected));
-};
+}
 
 /**
  * Enable a theme as the default via the admin UI.
@@ -253,8 +249,7 @@ exports.assertDeprecationErrorExists = async (page, expected) => {
  * @param {import('@playwright/test').Page} page
  * @param {string} themeName - The theme display name (e.g. 'Claro').
  */
-exports.drupalEnableTheme = async (page, themeName) => {
-  const { drupalLoginAsAdmin, drupalLogout } = exports;
+export async function drupalEnableTheme(page, themeName) {
   await drupalLoginAsAdmin(page);
   await page.goto('/admin/appearance');
   await page.locator(`[title="Install ${themeName} as default theme"]`).click();
@@ -263,12 +258,12 @@ exports.drupalEnableTheme = async (page, themeName) => {
     .first()
     .waitFor({ state: 'visible' });
   await drupalLogout(page);
-};
+}
 
 /**
  * Assert no JS deprecation errors in sessionStorage.
  */
-exports.assertNoDeprecationErrors = async (page) => {
+export async function assertNoDeprecationErrors(page) {
   const warnings = await page.evaluate(() =>
     window.sessionStorage.getItem('js_testing_log_test.warnings'),
   );
@@ -279,4 +274,4 @@ exports.assertNoDeprecationErrors = async (page) => {
     );
     expect(deprecations).toEqual([]);
   }
-};
+}

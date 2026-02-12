@@ -1,9 +1,9 @@
-const {
+import {
   test,
   expect,
   drupalInstallModule,
   drupalEnableTheme,
-} = require('../../drupal-fixtures');
+} from '../../drupal-fixtures.js';
 
 const mainContent = '.region-content';
 const mainMessagesContainer =

@@ -1,9 +1,9 @@
-const {
+import {
   test,
   expect,
   drupalInstallModule,
   drupalLoginAsAdmin,
-} = require('../../drupal-fixtures');
+} from '../../drupal-fixtures.js';
 
 test.describe('Navigation displace', { tag: ['@core', '@navigation'] }, () => {
   test('Verify displace attribute', async ({ drupalPage: page }) => {

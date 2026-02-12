@@ -1,4 +1,4 @@
-const { test, expect, drupalInstallModule } = require('../drupal-fixtures');
+import { test, expect, drupalInstallModule } from '../drupal-fixtures.js';
 
 /* cSpell:disable */
 const testScenarios = {
@@ -837,7 +837,6 @@ test.describe('jQuery UI Position Shim', { tag: ['@core'] }, () => {
           options.of = attachScenarios[attachToType];
           options.collision = 'none';
           const idKey = `${attachToType}${key}`;
-          // eslint-disable-next-line no-await-in-loop
           const tip = await new Promise((resolve) => {
             const addedTip = $(
               `<div class="test-tip" style="position:${attachToType === 'window' ? 'fixed' : 'absolute'}" id="${idKey}">${idKey}</div>`,
@@ -845,7 +844,6 @@ test.describe('jQuery UI Position Shim', { tag: ['@core'] }, () => {
             addedTip.position(options);
             setTimeout(() => resolve(addedTip));
           });
-          // eslint-disable-next-line no-await-in-loop
           await checkPosition(tip, options, attachToType, idKey);
           tip.remove();
         }

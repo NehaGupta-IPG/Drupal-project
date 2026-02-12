@@ -1,9 +1,9 @@
-const {
+import {
   test,
   expect,
   drupalLoginAsAdmin,
   drupalLogout,
-} = require('../../drupal-fixtures');
+} from '../../drupal-fixtures.js';
 
 const headerNavSelector = '#header-nav';
 const linkSubMenuId = 'primary-menu-item-1';
