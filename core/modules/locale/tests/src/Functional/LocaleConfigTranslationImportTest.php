@@ -56,6 +56,7 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
 
     // Add translation permissions now that the locale module has been enabled.
     $edit = [
+      'authenticated[administer locale]' => 'administer locale',
       'authenticated[translate interface]' => 'translate interface',
     ];
     $this->drupalGet('admin/people/permissions');

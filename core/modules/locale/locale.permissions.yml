@@ -1,3 +1,7 @@
+administer locale:
+  title: 'Administer interface translation settings'
+  description: 'Configure locale settings for this site.'
+  restrict access: true
 translate interface:
   title: 'Translate interface text'
   description: 'Translate any interface text including configuration shipped with modules and themes.'

@@ -4,14 +4,14 @@ locale.settings:
     _form: '\Drupal\locale\Form\LocaleSettingsForm'
     _title: 'Interface translation settings'
   requirements:
-    _permission: 'translate interface'
+    _permission: 'administer locale'
 
 locale.check_translation:
   path: '/admin/reports/translations/check'
   defaults:
     _controller: '\Drupal\locale\Controller\LocaleController::checkTranslation'
   requirements:
-    _permission: 'translate interface'
+    _permission: 'administer locale'
 
 locale.translate_page:
   path: '/admin/config/regional/translate'
@@ -19,7 +19,7 @@ locale.translate_page:
     _controller: '\Drupal\locale\Controller\LocaleController::translatePage'
     _title: 'User interface translation'
   requirements:
-    _permission: 'translate interface'
+    _permission: 'administer locale+translate interface'
 
 locale.translate_import:
   path: '/admin/config/regional/translate/import'
@@ -27,7 +27,7 @@ locale.translate_import:
     _form: '\Drupal\locale\Form\ImportForm'
     _title: 'Interface translation import'
   requirements:
-    _permission: 'translate interface'
+    _permission: 'administer locale+translate interface'
 
 locale.translate_export:
   path: '/admin/config/regional/translate/export'
@@ -35,7 +35,7 @@ locale.translate_export:
     _form: '\Drupal\locale\Form\ExportForm'
     _title: 'Interface translation export'
   requirements:
-    _permission: 'translate interface'
+    _permission: 'administer locale+translate interface'
 
 locale.translate_status:
   path: '/admin/reports/translations'
@@ -43,4 +43,4 @@ locale.translate_status:
     _form: '\Drupal\locale\Form\TranslationStatusForm'
     _title: 'Available translation updates'
   requirements:
-    _permission: 'translate interface'
+    _permission: 'administer locale'
