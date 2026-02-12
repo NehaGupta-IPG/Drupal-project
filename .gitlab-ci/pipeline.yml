@@ -226,6 +226,7 @@ variables:
     KUBERNETES_CPU_REQUEST: "16"
     YARN_ENABLE_GLOBAL_CACHE: false
     YARN_ENABLE_MIRROR: false
+    DEBUG: pw:browser*
   services:
     - <<: *with-database
   script:
@@ -239,7 +240,7 @@ variables:
     - echo -e "Node version $(node --version)\nYarn version $(yarn --version)"
     - yarn playwright install --with-deps chromium-headless-shell
     - yarn run test:playwright --workers 3 --max-failures 3
-    - cd ..
+  after_script:
     - find . -name playwright_output
   artifacts:
     when: always

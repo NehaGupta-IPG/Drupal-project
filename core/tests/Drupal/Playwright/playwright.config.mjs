@@ -17,7 +17,7 @@ export default defineConfig({
     trace: 'retain-on-failure',
     headless: true,
     launchOptions: {
-      args: ['--disable-dev-shm-usage'],
+      args: ['--disable-dev-shm-usage', '--disable-gpu', '--no-sandbox'],
     },
   },
 });
