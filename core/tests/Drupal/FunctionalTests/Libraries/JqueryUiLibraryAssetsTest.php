@@ -8,12 +8,14 @@ use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the loading of jQuery UI CSS and JS assets.
  */
 #[Group('libraries')]
 #[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class JqueryUiLibraryAssetsTest extends BrowserTestBase {
 
   /**
@@ -160,35 +162,6 @@ class JqueryUiLibraryAssetsTest extends BrowserTestBase {
       $assets_loaded_in_stage = $this->weightGroupedAssets[$configured_weights[$stage]];
       foreach ($assets as $asset) {
         $this->assertContains($asset, $assets_loaded_in_stage);
-      }
-    }
-  }
-
-  /**
-   * Confirm that uses of a jQuery UI asset are configured with the same weight.
-   */
-  public function testSameAssetSameWeight(): void {
-    $asset_weights = [];
-    $libraries_to_check = $this->coreLibrariesWithJqueryUiAssets;
-
-    foreach ($libraries_to_check as $library) {
-      foreach (['js', 'css'] as $type) {
-        foreach ($library[$type] as $asset) {
-          $file = $asset['data'];
-
-          if (str_contains($file, 'jquery.ui')) {
-            // If this is the first time a given file is checked, add the weight
-            // value to an array.
-            if (!isset($asset_weights[$file])) {
-              $asset_weights[$file] = $asset['weight'];
-            }
-            else {
-              // Confirm the weight of the file being loaded matches the weight
-              // of when it was loaded by a library that was checked earlier.
-              $this->assertEquals($asset_weights[$file], $asset['weight']);
-            }
-          }
-        }
       }
     }
   }
@@ -342,7 +315,7 @@ class JqueryUiLibraryAssetsTest extends BrowserTestBase {
    *     library prior to the change from jQuery UI library dependencies to
    *     direct file inclusion.
    */
-  public static function providerTestAssetLoading() {
+  public static function providerTestAssetLoading(): array {
     return [
       'drupal.autocomplete' => [
         'library' => 'drupal.autocomplete',

@@ -5,20 +5,17 @@
  */
 
 use Drupal\Core\Batch\BatchBuilder;
-use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
 use Drupal\Core\Utility\ProjectInfo;
+use Drupal\locale\LocaleDefaultOptions;
+use Drupal\locale\LocaleSource;
 
 /**
  * Load common APIs.
  */
-// @todo Combine functions differently in files to avoid unnecessary includes.
-// Follow-up issue: https://www.drupal.org/node/1834298.
-require_once __DIR__ . '/locale.translation.inc';
 
 /**
  * Clear the project data table.
  */
-#[ProceduralHookScanStop]
 function locale_translation_flush_projects(): void {
   \Drupal::service('locale.project')->deleteAll();
 }
@@ -81,9 +78,6 @@ function locale_translation_build_projects() {
 
     // Create or update the project record.
     \Drupal::service('locale.project')->set($project->name, $data);
-
-    // Invalidate the cache of translatable projects.
-    locale_translation_clear_cache_projects();
   }
   return $projects;
 }
@@ -173,8 +167,6 @@ function locale_translation_default_translation_server() {
  *   Array of project names to check. Defaults to all translatable projects.
  * @param array $langcodes
  *   Array of language codes. Defaults to all translatable languages.
- *
- * @todo Return batch or NULL.
  */
 function locale_translation_check_projects($projects = [], $langcodes = []): void {
   if (locale_translation_use_remote_source()) {
@@ -227,9 +219,9 @@ function locale_translation_check_projects_batch($projects = [], $langcodes = []
  *   Batch definition array.
  */
 function locale_translation_batch_status_build($projects = [], $langcodes = []) {
-  $projects = $projects ?: array_keys(locale_translation_get_projects());
+  $projects = $projects ?: array_keys(\Drupal::service('locale.project')->getProjects());
   $langcodes = $langcodes ?: array_keys(locale_translatable_language_list());
-  $options = _locale_translation_default_update_options();
+  $options = LocaleDefaultOptions::updateOptions();
 
   $operations = _locale_translation_batch_status_operations($projects, $langcodes, $options);
 
@@ -293,7 +285,7 @@ function _locale_translation_batch_status_operations($projects, $langcodes, $opt
  *   Array of language codes. Defaults to all translatable languages.
  */
 function locale_translation_check_projects_local($projects = [], $langcodes = []): void {
-  $projects = locale_translation_get_projects($projects);
+  $projects = \Drupal::service('locale.project')->getProjects($projects);
   $langcodes = $langcodes ?: array_keys(locale_translatable_language_list());
 
   // For each project and each language we check if a local po file is
@@ -301,8 +293,8 @@ function locale_translation_check_projects_local($projects = [], $langcodes = []
   // type and timestamp of the po file.
   foreach ($projects as $name => $project) {
     foreach ($langcodes as $langcode) {
-      $source = locale_translation_source_build($project, $langcode);
-      $file = locale_translation_source_check_file($source);
+      $source = \Drupal::service(LocaleSource::class)->sourceBuild($project, $langcode);
+      $file = \Drupal::service(LocaleSource::class)->sourceCheckFile($source);
       locale_translation_status_save($name, $langcode, LOCALE_TRANSLATION_LOCAL, $file);
     }
   }

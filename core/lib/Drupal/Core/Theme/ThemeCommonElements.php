@@ -7,6 +7,7 @@ namespace Drupal\Core\Theme;
 use Drupal\Core\Breadcrumb\BreadcrumbPreprocess;
 use Drupal\Core\Datetime\DatePreprocess;
 use Drupal\Core\Field\FieldPreprocess;
+use Drupal\Core\Form\FormPreprocess;
 use Drupal\Core\Menu\MenuPreprocess;
 use Drupal\Core\Pager\PagerPreprocess;
 
@@ -186,7 +187,6 @@ class ThemeCommonElements {
           'messages' => [],
           'attributes' => [],
         ],
-        'includes' => ['core/includes/theme.maintenance.inc'],
         'template' => 'authorize-report',
         'deprecated' => 'The "authorize-report" template is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3522119',
       ],
@@ -215,39 +215,50 @@ class ThemeCommonElements {
           'secondary' => [],
         ],
       ],
-      // From form.inc.
+      // From form system.
       'input' => [
         'render element' => 'element',
+        'initial preprocess' => FormPreprocess::class . ':preprocessInput',
       ],
       'select' => [
         'render element' => 'element',
+        'initial preprocess' => FormPreprocess::class . ':preprocessSelect',
       ],
       'fieldset' => [
         'render element' => 'element',
+        'initial preprocess' => FormPreprocess::class . ':preprocessFieldset',
       ],
       'details' => [
         'render element' => 'element',
+        'initial preprocess' => FormPreprocess::class . ':preprocessDetails',
       ],
       'radios' => [
         'render element' => 'element',
+        'initial preprocess' => FormPreprocess::class . ':preprocessRadios',
       ],
       'checkboxes' => [
         'render element' => 'element',
+        'initial preprocess' => FormPreprocess::class . ':preprocessCheckboxes',
       ],
       'form' => [
         'render element' => 'element',
+        'initial preprocess' => FormPreprocess::class . ':preprocessForm',
       ],
       'textarea' => [
         'render element' => 'element',
+        'initial preprocess' => FormPreprocess::class . ':preprocessTextArea',
       ],
       'form_element' => [
         'render element' => 'element',
+        'initial preprocess' => FormPreprocess::class . ':preprocessFormElement',
       ],
       'form_element_label' => [
         'render element' => 'element',
+        'initial preprocess' => FormPreprocess::class . ':preprocessFormElementLabel',
       ],
       'vertical_tabs' => [
         'render element' => 'element',
+        'initial preprocess' => FormPreprocess::class . ':preprocessVerticalTabs',
       ],
       'container' => [
         'render element' => 'element',
