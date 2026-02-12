@@ -1,4 +1,4 @@
-import { test, expect } from '../../drupal-fixtures.js';
+import { test, expect } from '../../drupal-fixtures';
 
 const checkboxSelector = '#edit-form-checkboxes-title-attribute';
 

@@ -7,7 +7,7 @@ import {
   drupalEnableTheme,
   drupalCreateUser,
   drupalLogin,
-} from '../drupal-fixtures.js';
+} from '../drupal-fixtures';
 
 test.describe('Claro autocomplete', { tag: ['@core'] }, () => {
   test('Test Claro autocomplete', async ({ drupalPage: page }) => {

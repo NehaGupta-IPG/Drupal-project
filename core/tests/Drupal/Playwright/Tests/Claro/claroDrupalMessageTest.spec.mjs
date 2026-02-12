@@ -1,7 +1,13 @@
-import { test, expect } from '../../drupal-fixtures.js';
+import {
+  test,
+  expect,
+  drupalInstallModule,
+  drupalEnableTheme,
+} from '../../drupal-fixtures';
 
-const mainContent = '#block-olivero-content';
-const mainMessagesContainer = '[data-drupal-messages] > .messages__wrapper';
+const mainContent = '.region-content';
+const mainMessagesContainer =
+  '[data-drupal-messages] > .messages-list__wrapper';
 const secondaryMessagesContainer = '[data-drupal-messages-other]';
 
 const mainButtons = {
@@ -16,18 +22,13 @@ const secondaryButtons = {
   addWarning: '[id="add-[data-drupal-messages-other]-warning"]',
 };
 
-test.use({
-  drupalInstallOptions: {
-    setupFile:
-      'core/tests/Drupal/TestSite/TestSiteOliveroInstallTestScript.php',
-    installProfile: 'minimal',
-  },
-});
-
-test.describe('Olivero Drupal messages', { tag: ['@core', '@olivero'] }, () => {
+test.describe('Claro Drupal messages', { tag: ['@core', '@claro'] }, () => {
   test('Verify default placement of javascript-created messages', async ({
     drupalPage: page,
   }) => {
+    await drupalInstallModule(page, 'js_message_test');
+    await drupalEnableTheme(page, 'Claro');
+
     await page.goto('/js_message_test_link_with_system_messages');
     await page.locator(mainContent).waitFor({ state: 'visible' });
     await expect(page.locator(mainMessagesContainer)).toBeAttached();
@@ -69,6 +70,9 @@ test.describe('Olivero Drupal messages', { tag: ['@core', '@olivero'] }, () => {
   test('Verify customized placement of javascript-created messages', async ({
     drupalPage: page,
   }) => {
+    await drupalInstallModule(page, 'js_message_test');
+    await drupalEnableTheme(page, 'Claro');
+
     await page.goto('/js_message_test_link_with_system_messages');
     await page.locator(mainContent).waitFor({ state: 'visible' });
     await expect(page.locator(secondaryMessagesContainer)).toBeAttached();

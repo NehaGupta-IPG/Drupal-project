@@ -1,4 +1,4 @@
-import { test, expect } from '../../drupal-fixtures.js';
+import { test, expect } from '../../drupal-fixtures';
 
 const buttonSelector = 'button.sticky-header-toggle';
 const mainMenuSelector = '#block-olivero-main-menu';

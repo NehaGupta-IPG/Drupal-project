@@ -3,7 +3,7 @@ import {
   expect,
   drupalCreateUser,
   drupalLogin,
-} from '../../drupal-fixtures.js';
+} from '../../drupal-fixtures';
 
 const commentCountSelector = 'h2.comments__title .comments__count';
 

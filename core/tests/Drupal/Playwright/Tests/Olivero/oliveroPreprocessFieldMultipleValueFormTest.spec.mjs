@@ -3,7 +3,7 @@ import {
   expect,
   drupalCreateUser,
   drupalLogin,
-} from '../../drupal-fixtures.js';
+} from '../../drupal-fixtures';
 
 const tableSelector = '#edit-field-multiple-value-form-field-wrapper table';
 const tableHeaderSelector = '#edit-field-multiple-value-form-field-wrapper th';

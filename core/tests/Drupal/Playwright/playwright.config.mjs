@@ -4,8 +4,8 @@ const outputFolder = process.env.DRUPAL_PLAYWRIGHT_OUTPUT || 'reports';
 
 export default defineConfig({
   testDir: './Tests',
+  testMatch: '**/*.spec.mjs',
   timeout: 60000,
-  workers: 1,
   reporter: [
     ['list'],
     ['junit', { outputFile: `${outputFolder}/results.xml` }],

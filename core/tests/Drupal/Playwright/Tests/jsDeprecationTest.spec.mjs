@@ -3,7 +3,7 @@ import {
   expect,
   drupalInstallModule,
   assertDeprecationErrorExists,
-} from '../drupal-fixtures.js';
+} from '../drupal-fixtures';
 
 test.describe('JavaScript deprecations', { tag: '@core' }, () => {
   test('Test JavaScript deprecations', async ({ drupalPage: page }) => {

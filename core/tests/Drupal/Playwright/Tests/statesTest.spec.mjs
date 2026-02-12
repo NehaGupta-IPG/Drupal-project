@@ -3,7 +3,7 @@ import {
   expect,
   drupalInstallModule,
   assertNoDeprecationErrors,
-} from '../drupal-fixtures.js';
+} from '../drupal-fixtures';
 
 test.describe('States API', { tag: '@core' }, () => {
   test('Test form with state API', async ({ drupalPage: page }) => {

@@ -1,4 +1,4 @@
-import { test, expect, drupalInstallModule } from '../drupal-fixtures.js';
+import { test, expect, drupalInstallModule } from '../drupal-fixtures';
 
 test.describe('Once API', { tag: ['@core'] }, () => {
   test('Test simple once call', async ({ drupalPage: page }) => {

@@ -100,15 +100,10 @@ export default defineConfig(
     },
     overrides: [
       {
-        files: ["tests/Drupal/Playwright/**/*.js"],
+        files: ["tests/Drupal/Playwright/**/*.mjs"],
         rules: {
-          'import/no-extraneous-dependencies': ['error', {
-            devDependencies: true,
-            packageDir: "./"
-          }],
-          'import/extensions': ['error', 'ignorePackages'],
-          'no-restricted-syntax': 'off',
-          'no-await-in-loop': 'off'
+          "no-restricted-syntax": "off",
+          "no-await-in-loop": "off"
         }
       }
     ],

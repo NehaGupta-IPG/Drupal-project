@@ -3,7 +3,7 @@ import {
   expect,
   drupalCreateUser,
   drupalLogin,
-} from '../../drupal-fixtures.js';
+} from '../../drupal-fixtures';
 
 const selectors = {
   schemePicker: '[data-drupal-selector="edit-color-scheme"]',

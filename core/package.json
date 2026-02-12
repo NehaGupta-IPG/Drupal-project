@@ -18,7 +18,7 @@
     "lint:css": "stylelint \"**/*.css\"",
     "lint:css-checkstyle": "stylelint \"**/*.css\" --custom-formatter=@gitlab-formatters/stylelint-formatter-gitlab --output-file=gl-codequality.json",
     "test:nightwatch": "node -r dotenv-safe/config ./node_modules/.bin/nightwatch --config ./tests/Drupal/Nightwatch/nightwatch.conf.js",
-    "test:playwright": "playwright test --config ./tests/Drupal/Playwright/playwright.config.js",
+    "test:playwright": "playwright test --config ./tests/Drupal/Playwright/playwright.config.mjs",
     "prettier": "prettier --write \"./**/*.css\" \"./**/*.js\"",
     "spellcheck": "cspell -c .cspell.json --cache",
     "spellcheck:make-dict": "rm -f misc/cspell/dictionary.txt && touch misc/cspell/dictionary.txt && yarn spellcheck:core --unique --words-only | perl -Mopen=locale -pe '$_=lc$_' | LC_ALL=en_US.UTF-8 tr -d \\\\\\\\ | LC_ALL=C sort -u -o misc/cspell/dictionary.txt",

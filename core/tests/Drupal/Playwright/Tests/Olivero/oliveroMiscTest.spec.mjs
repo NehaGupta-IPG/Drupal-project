@@ -1,4 +1,4 @@
-import { test, expect } from '../../drupal-fixtures.js';
+import { test, expect } from '../../drupal-fixtures';
 
 const preloadFontPaths = [
   'core/themes/olivero/fonts/metropolis/Metropolis-Regular.woff2',

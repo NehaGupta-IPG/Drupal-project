@@ -1,4 +1,4 @@
-import { test, expect } from '../../drupal-fixtures.js';
+import { test, expect } from '../../drupal-fixtures';
 
 const scriptSelector = 'script[src*="test_htmx/js/behavior.js"]';
 const cssSelector = 'link[rel="stylesheet"][href*="test_htmx/css/style.css"]';

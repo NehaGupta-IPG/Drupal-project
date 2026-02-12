@@ -3,7 +3,7 @@ import {
   expect,
   drupalLoginAsAdmin,
   drupalLogout,
-} from '../../drupal-fixtures.js';
+} from '../../drupal-fixtures';
 
 test.use({
   drupalInstallOptions: {

@@ -3,7 +3,7 @@ import {
   expect,
   drupalCreateUser,
   drupalLogin,
-} from '../../drupal-fixtures.js';
+} from '../../drupal-fixtures';
 
 const mobileNavButtonSelector = 'button.mobile-nav-button';
 const headerNavSelector = '#header-nav';

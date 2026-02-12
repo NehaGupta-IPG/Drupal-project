@@ -3,7 +3,7 @@ import {
   expect,
   drupalInstallModule,
   drupalLoginAsAdmin,
-} from '../../drupal-fixtures.js';
+} from '../../drupal-fixtures';
 
 test.describe('Navigation displace', { tag: ['@core', '@navigation'] }, () => {
   test('Verify displace attribute', async ({ drupalPage: page }) => {

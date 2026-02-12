@@ -4,7 +4,7 @@ import {
   drupalCreateUser,
   drupalLogin,
   assertNoDeprecationErrors,
-} from '../drupal-fixtures.js';
+} from '../drupal-fixtures';
 
 test.describe('Login', { tag: '@core' }, () => {
   test('Test login', async ({ drupalPage: page }) => {

@@ -1,4 +1,4 @@
-import { test, expect, drupalInstallModule } from '../drupal-fixtures.js';
+import { test, expect, drupalInstallModule } from '../drupal-fixtures';
 
 /* cSpell:disable */
 const testScenarios = {
