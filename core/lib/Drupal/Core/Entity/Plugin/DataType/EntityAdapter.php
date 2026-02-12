@@ -42,10 +42,7 @@ class EntityAdapter extends TypedData implements \IteratorAggregate, ComplexData
   protected $entity {
     get {
       if ($this->weakEntity instanceof \WeakReference) {
-        $weak_entity = $this->weakEntity->get();
-        if (!is_null($weak_entity)) {
-          return $weak_entity;
-        }
+        return $this->weakEntity->get();
       }
     }
     set($value) {
@@ -196,6 +193,10 @@ class EntityAdapter extends TypedData implements \IteratorAggregate, ComplexData
    */
   public function getEntity() {
     return $this->entity;
+  }
+
+  public function __serialize() {
+    unset($this->weakEntity);
   }
 
 }
