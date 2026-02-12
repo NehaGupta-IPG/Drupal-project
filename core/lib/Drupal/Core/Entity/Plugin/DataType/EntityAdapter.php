@@ -38,7 +38,7 @@ class EntityAdapter extends TypedData implements \IteratorAggregate, ComplexData
    *
    * @var WeakReference|null
    */
-  protected \WeakReference ?$weakEntity = NULL;
+  protected ?\WeakReference $weakEntity = NULL;
 
   /**
    * The wrapped entity object.
