@@ -552,7 +552,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     // Get the values of instantiated field objects, only serialize the values.
     foreach ($this->fields as $name => $fields) {
       foreach ($fields as $langcode => $field) {
-        $this->values[$name][$langcode] = $field->getValue();
+        $this->values[$name][$langcode] = $field->get()->getValue();
       }
     }
     $this->fields = [];
@@ -606,10 +606,10 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    * {@inheritdoc}
    */
   public function get($field_name) {
-    if (!isset($this->fields[$field_name][$this->activeLangcode])) {
+    if (!isset($this->fields[$field_name][$this->activeLangcode]) || $this->fields[$field_name][$this->activeLangcode]->get() === NULL) {
       return $this->getTranslatedField($field_name, $this->activeLangcode);
     }
-    return $this->fields[$field_name][$this->activeLangcode];
+    return $this->fields[$field_name][$this->activeLangcode]->get();
   }
 
   /**
@@ -624,7 +624,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     }
     // Populate $this->fields to speed-up further look-ups and to keep track of
     // fields objects, possibly holding changes to field values.
-    if (!isset($this->fields[$name][$langcode])) {
+    if (!isset($this->fields[$name][$langcode]) || $this->fields[$name][$langcode]->get() === NULL) {
       $definition = $this->getFieldDefinition($name);
       if (!$definition) {
         throw new \InvalidArgumentException("Field $name is unknown.");
@@ -635,9 +635,9 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
       $default = $langcode == LanguageInterface::LANGCODE_DEFAULT;
       if (!$default && !$definition->isTranslatable()) {
         if (!isset($this->fields[$name][LanguageInterface::LANGCODE_DEFAULT])) {
-          $this->fields[$name][LanguageInterface::LANGCODE_DEFAULT] = $this->getTranslatedField($name, LanguageInterface::LANGCODE_DEFAULT);
+          $this->fields[$name][LanguageInterface::LANGCODE_DEFAULT] = \WeakReference::create($this->getTranslatedField($name, LanguageInterface::LANGCODE_DEFAULT));
         }
-        $this->fields[$name][$langcode] = &$this->fields[$name][LanguageInterface::LANGCODE_DEFAULT];
+        $this->fields[$name][$langcode] = \WeakReference::create($this->fields[$name][LanguageInterface::LANGCODE_DEFAULT]);
       }
       else {
         $value = NULL;
@@ -655,10 +655,10 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
           $field_langcode = $langcode;
         }
         $field->setLangcode($field_langcode);
-        $this->fields[$name][$langcode] = $field;
+        $this->fields[$name][$langcode] = \WeakReference::create($field);
       }
     }
-    return $this->fields[$name][$langcode];
+    return $this->fields[$name][$langcode]->get();
   }
 
   /**
@@ -806,7 +806,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     // This needs to be initialized manually as it is skipped when instantiating
     // the language field object to avoid infinite recursion.
     if (!empty($this->fields[$this->langcodeKey])) {
-      $this->fields[$this->langcodeKey][LanguageInterface::LANGCODE_DEFAULT]->setLangcode($this->defaultLangcode);
+      $this->fields[$this->langcodeKey][LanguageInterface::LANGCODE_DEFAULT]->get()->setLangcode($this->defaultLangcode);
     }
   }
 
@@ -815,8 +815,8 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    */
   protected function updateFieldLangcodes($langcode) {
     foreach ($this->fields as $items) {
-      if (!empty($items[LanguageInterface::LANGCODE_DEFAULT])) {
-        $items[LanguageInterface::LANGCODE_DEFAULT]->setLangcode($langcode);
+      if (!empty($items[LanguageInterface::LANGCODE_DEFAULT]) && $items[LanguageInterface::LANGCODE_DEFAULT]->get() !== NULL) {
+        $items[LanguageInterface::LANGCODE_DEFAULT]->get()->setLangcode($langcode);
       }
     }
   }
@@ -1077,7 +1077,8 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     }
     foreach ($this->getFieldDefinitions() as $name => $definition) {
       if (!$definition->isComputed() && !empty($this->fields[$name])) {
-        foreach ($this->fields[$name] as $langcode => $item) {
+        foreach ($this->fields[$name] as $langcode => $weak_reference) {
+          $item = $weak_reference->get();
           $item->filterEmptyItems();
           $this->values[$name][$langcode] = $item->getValue();
         }
@@ -1094,8 +1095,9 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   public function &__get($name) {
     // If this is an entity field, handle it accordingly. We first check whether
     // a field object has been already created. If not, we create one.
-    if (isset($this->fields[$name][$this->activeLangcode])) {
-      return $this->fields[$name][$this->activeLangcode];
+    if (isset($this->fields[$name][$this->activeLangcode]) && $this->fields[$name][$this->activeLangcode]->get() !== NULL) {
+      $return = $this->fields[$name][$this->activeLangcode]->get();
+      return $return;
     }
     // Inline getFieldDefinition() to speed things up.
     if (!isset($this->fieldDefinitions)) {
@@ -1135,8 +1137,8 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
         $value = $value->getValue();
       }
       // If a FieldItemList object already exists, set its value.
-      if (isset($this->fields[$name][$this->activeLangcode])) {
-        $this->fields[$name][$this->activeLangcode]->setValue($value);
+      if (isset($this->fields[$name][$this->activeLangcode]) && $this->fields[$name][$this->activeLangcode]->get() !== NULL) {
+        $this->fields[$name][$this->activeLangcode]->get()->setValue($value);
       }
       // If not, create one.
       else {
@@ -1321,8 +1323,8 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
         $fields_by_langcode = array_intersect_key($fields_by_langcode, [LanguageInterface::LANGCODE_DEFAULT => TRUE]);
       }
       foreach ($fields_by_langcode as $langcode => $items) {
-        $this->fields[$name][$langcode] = clone $items;
-        $this->fields[$name][$langcode]->setContext($name, $this->getTranslation($langcode)->getTypedData());
+        $this->fields[$name][$langcode] = \WeakReference::create(clone $items->get());
+        $this->fields[$name][$langcode]->get()->setContext($name, $this->getTranslation($langcode)->getTypedData());
       }
     }
   }
