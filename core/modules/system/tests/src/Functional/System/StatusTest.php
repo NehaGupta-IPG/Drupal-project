@@ -211,6 +211,52 @@ class StatusTest extends BrowserTestBase {
   }
 
   /**
+   * Tests warnings for invalid configured system page paths.
+   */
+  public function testConfiguredSystemPagesWarning(): void {
+    $this->config('system.site')
+      ->set('page.front', '/this-path-does-not-exist')
+      ->set('page.403', '/this-403-path-does-not-exist')
+      ->set('page.404', '/this-404-path-does-not-exist')
+      ->save();
+
+    $this->drupalGet('admin/reports/status');
+    $this->assertSession()->pageTextContains('Configured system pages');
+    $this->assertSession()->pageTextContains('system.site:page.front');
+    $this->assertSession()->pageTextContains('system.site:page.403');
+    $this->assertSession()->pageTextContains('system.site:page.404');
+    $this->assertSession()->pageTextContains('/this-path-does-not-exist');
+    $this->assertSession()->pageTextContains('/this-403-path-does-not-exist');
+    $this->assertSession()->pageTextContains('/this-404-path-does-not-exist');
+
+    // Front page cannot be empty, but 403/404 can be.
+    $this->config('system.site')
+      ->set('page.front', '')
+      ->set('page.403', '')
+      ->set('page.404', '')
+      ->save();
+
+    $this->drupalGet('admin/reports/status');
+    $this->assertSession()->pageTextContains('Configured system pages');
+    $this->assertSession()->pageTextContains('system.site:page.front');
+    $this->assertSession()->pageTextContains('[empty]');
+    $this->assertSession()->pageTextNotContains('system.site:page.403');
+    $this->assertSession()->pageTextNotContains('system.site:page.404');
+
+    $this->config('system.site')
+      ->set('page.front', '/user/login')
+      ->set('page.403', '')
+      ->set('page.404', '')
+      ->save();
+
+    $this->drupalGet('admin/reports/status');
+    $this->assertSession()->pageTextNotContains('Configured system pages');
+    $this->assertSession()->pageTextNotContains('system.site:page.front');
+    $this->assertSession()->pageTextNotContains('system.site:page.403');
+    $this->assertSession()->pageTextNotContains('system.site:page.404');
+  }
+
+  /**
    * Tests that the Error counter matches the displayed number of errors.
    */
   public function testErrorElementCount(): void {
