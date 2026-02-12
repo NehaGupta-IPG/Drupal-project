@@ -226,14 +226,13 @@ variables:
     KUBERNETES_CPU_REQUEST: "16"
     YARN_ENABLE_GLOBAL_CACHE: false
     YARN_ENABLE_MIRROR: false
+    DRUPAL_TEST_DB_URL: $SIMPLETEST_DB
+    DRUPAL_TEST_BASE_URL: $SIMPLETEST_BASE_URL
+    DRUPAL_PLAYWRIGHT_OUTPUT: $CI_PROJECT_DIR/playwright_output
     DEBUG: pw:browser*
   services:
     - <<: *with-database
   script:
-    - export DRUPAL_TEST_DB_URL=$SIMPLETEST_DB
-    - export DRUPAL_TEST_BASE_URL=$SIMPLETEST_BASE_URL
-    - export DRUPAL_PLAYWRIGHT_OUTPUT=../playwright_output
-    - chown -R www-data:www-data ./sites /var/www
     - cd core
     - corepack enable
     - yarn install
