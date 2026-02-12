@@ -440,4 +440,5 @@ class FormPreprocess {
     $element = $variables['element'];
     $variables['children'] = (!empty($element['#children'])) ? $element['#children'] : '';
   }
+
 }

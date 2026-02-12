@@ -291,7 +291,6 @@ function template_preprocess_vertical_tabs(&$variables): void {
  *   - element: An associative array containing the properties of the element.
  *     Properties used: #attributes.
  *
- *
  * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial
  *   template_preprocess functions are registered directly in hook_theme().
  *
