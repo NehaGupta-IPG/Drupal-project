@@ -64,7 +64,7 @@ class Sections extends PermissionsParserPluginBase implements ContainerFactoryPl
     $permissions['sections'][self::PROCESSED_KEY] = TRUE;
     $count = 0;
 
-    foreach ($permissions['sections'] as $k => $section) {
+    foreach ($permissions['sections'] as $section) {
       if (empty($section['title'])) {
         continue;
       }

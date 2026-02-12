@@ -1,15 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\user\Functional;
 
 use Drupal\Component\Utility\DiffArray;
-use Drupal\Core\Config\FileStorage;
-use Drupal\Core\Discovery\YamlDiscovery;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\PermissionHandlerInterface;
 use Drupal\user\Service\PermissionsRepositoryFactoryInterface;
-use Drupal\user\Service\PermissionsRepositoryReturnStyle;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore testprovider
@@ -17,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 /**
  * Tests extended permissions.
  */
+#[Group('user')]
 #[RunTestsInSeparateProcesses]
 class UserPermissionsRepositoryTest extends BrowserTestBase {
 
@@ -66,6 +66,9 @@ class UserPermissionsRepositoryTest extends BrowserTestBase {
    */
   protected $permissionsRepositoryFactory;
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     parent::setUp();
 
@@ -89,7 +92,7 @@ class UserPermissionsRepositoryTest extends BrowserTestBase {
   /**
    * Do the legacy and current handlers provide the same permissions?
    */
-  public function testSamePermissionsFromLegacyHandlerAsFromCurrentHandler() {
+  public function testSamePermissionsFromLegacyHandlerAsFromCurrentHandler(): void {
     $legacyPermissions = $this->legacyPermissionHandler->getPermissions();
     $newPermissions = $this->newPermissionHandler->getPermissions();
 
@@ -107,7 +110,7 @@ class UserPermissionsRepositoryTest extends BrowserTestBase {
   /**
    * Do we see the section added by user_permissions_repository_test.permissions.yml?
    */
-  public function testSectionFromYMLFile() {
+  public function testSectionFromYMLFile(): void {
     $newPermissions = $this->newPermissionHandler->getPermissions();
 
     $sectionTitle = $newPermissions['access_something']['section']['title'] ?? NULL;
@@ -119,7 +122,7 @@ class UserPermissionsRepositoryTest extends BrowserTestBase {
   /**
    * Do we see the permissions added by the system module?
    */
-  public function testParsingPermissionFiles() {
+  public function testParsingPermissionFiles(): void {
     $repo = $this->permissionsRepositoryFactory->createPermissionsRepositoryFromPermissionFiles();
 
     $providersList = $repo->getProviders();
@@ -141,7 +144,7 @@ class UserPermissionsRepositoryTest extends BrowserTestBase {
    *
    * @see \Drupal\user_permissions_repository_test\TestProvider
    */
-  public function testSectionFromTestProvider() {
+  public function testSectionFromTestProvider(): void {
     $newPermissions = $this->newPermissionHandler->getPermissions();
 
     $sectionTitle = $this->getNestedArrayValue($newPermissions, [
@@ -160,7 +163,12 @@ class UserPermissionsRepositoryTest extends BrowserTestBase {
     $this->assertStringContainsString('This is just for testing', $sectionHelp, 'TestProvider section help is empty or wrong: ' . $sectionHelp);
   }
 
-  protected function normalizePermissions(array $perms) {
+  /**
+   * Normalize an array of permissions.
+   *
+   * This means removing any extension keys and converting to strings.
+   */
+  protected function normalizePermissions(array $perms): array {
     ksort($perms);
 
     foreach ($perms as $k => $data) {
@@ -181,6 +189,11 @@ class UserPermissionsRepositoryTest extends BrowserTestBase {
     return $perms;
   }
 
+  /**
+   * Get a nested array value or throw an error if any keys are missing.
+   *
+   * @see \PHPUnit\Framework\TestCase\assertArrayHasKey
+   */
   protected function getNestedArrayValue(mixed $input, array $keys, string $message): mixed {
     $value = $input;
     foreach ($keys as $key) {

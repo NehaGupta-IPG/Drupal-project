@@ -81,7 +81,7 @@ interface PermissionsRepositoryInterface {
   public function getAllPermissions(PermissionsRepositoryReturnStyle $style = PermissionsRepositoryReturnStyle::SectionArray): array;
 
   /**
-   * Returns an array of permissions data in the repository for the given provider.
+   * Returns an array of permissions data in the repository for a provider.
    *
    * @param string $provider
    *   The provider (e.g., machine name of a module).

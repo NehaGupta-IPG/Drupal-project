@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\user\Service;
 
-use Drupal\Core\Extension\ModuleExtensionList;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\StringTranslation\TranslationInterface;
-use Drupal\Core\Utility\CallableResolver;
 use Drupal\user\PermissionHandlerInterface;
 use Drupal\user\Permissions\PermissionsRepositoryReturnStyle;
 
@@ -28,7 +24,8 @@ class PermissionsRepositoryHandler implements PermissionHandlerInterface {
    *   The permissions repository factory.
    */
   public function __construct(
-    protected readonly PermissionsRepositoryFactoryInterface $permissionsRepositoryFactory) {
+    protected readonly PermissionsRepositoryFactoryInterface $permissionsRepositoryFactory,
+    ) {
   }
 
   /**
