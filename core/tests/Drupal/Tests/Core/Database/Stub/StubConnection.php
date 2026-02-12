@@ -48,8 +48,8 @@ class StubConnection extends Connection {
   /**
    * {@inheritdoc}
    */
-  public static function open(array &$connection_options = []): \stdClass {
-    return new \stdClass();
+  public static function open(array &$connection_options = []): \PDO {
+    return new StubPDO();
   }
 
   /**
