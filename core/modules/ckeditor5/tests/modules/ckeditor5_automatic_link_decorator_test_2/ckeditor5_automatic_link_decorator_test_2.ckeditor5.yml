@@ -7,7 +7,7 @@ ckeditor5_automatic_link_decorator_test_2_addTargetToExternalLinks:
   drupal:
     label: Open external links in a new tab
     elements:
-      - <a target="_blank" rel="noopener noreferrer">
+      - <a rel="noopener noreferrer">
     conditions:
       plugins:
         - ckeditor5_link

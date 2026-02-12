@@ -176,7 +176,7 @@ class MediaHooks {
     $allowed_bundles = !empty($settings['target_bundles']) ? $settings['target_bundles'] : [];
     $add_url = _media_get_add_url($allowed_bundles);
     if ($add_url) {
-      $elements['#media_help']['#media_add_help'] = $this->t('Create your media on the <a href=":add_page" target="_blank">media add page</a> (opens a new window), then add it by name to the field below.', [':add_page' => $add_url]);
+      $elements['#media_help']['#media_add_help'] = $this->t('Create your media on the <a href=":add_page">media add page</a> (opens a new window), then add it by name to the field below.', [':add_page' => $add_url]);
     }
     $elements['#theme'] = 'media_reference_help';
     // @todo \Drupal\Core\Field\FieldPreprocess::preprocessFieldMultipleValueForm()
@@ -209,7 +209,7 @@ class MediaHooks {
       $elements['#media_help']['#media_list_help'] = $this->t('Type part of the media name.');
       $overview_url = Url::fromRoute('entity.media.collection');
       if ($overview_url->access()) {
-        $elements['#media_help']['#media_list_link'] = $this->t('See the <a href=":list_url" target="_blank">media list</a> (opens a new window) to help locate media.', [':list_url' => $overview_url->toString()]);
+        $elements['#media_help']['#media_list_link'] = $this->t('See the <a href=":list_url">media list</a> (opens a new window) to help locate media.', [':list_url' => $overview_url->toString()]);
       }
       $bundle_labels = array_intersect_key(\Drupal::service('entity_type.bundle.info')->getBundleLabels('media'), $allowed_bundles);
       $elements['#media_help']['#allowed_types_help'] = $this->t('Allowed media types: %types', ['%types' => implode(", ", $bundle_labels)]);

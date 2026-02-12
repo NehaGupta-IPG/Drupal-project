@@ -19,7 +19,7 @@ ckeditor5_manual_decorator_test_openInNewTab:
   drupal:
     label: Open in new tab
     elements:
-      - <a target="_blank" rel="noopener noreferrer" class>
+      - <a rel="noopener noreferrer" class>
     conditions:
       plugins:
         - ckeditor5_link

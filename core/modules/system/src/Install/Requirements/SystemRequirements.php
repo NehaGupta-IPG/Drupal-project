@@ -415,7 +415,7 @@ class SystemRequirements implements InstallRequirementsInterface {
         $requirements['php_opcache'] = [
           'value' => t('Not enabled'),
           'severity' => RequirementSeverity::Warning,
-          'description' => t('PHP OPcode caching can improve your site\'s performance considerably. It is <strong>highly recommended</strong> to have <a href="http://php.net/manual/opcache.installation.php" target="_blank">OPcache</a> installed on your server.'),
+          'description' => t('PHP OPcode caching can improve your site\'s performance considerably. It is <strong>highly recommended</strong> to have <a href="http://php.net/manual/opcache.installation.php">OPcache</a> installed on your server.'),
         ];
       }
       else {
@@ -470,7 +470,7 @@ class SystemRequirements implements InstallRequirementsInterface {
         $requirements['php_apcu_enabled'] += [
           'value' => t('Not enabled'),
           'severity' => RequirementSeverity::Info,
-          'description' => t('PHP APCu caching can improve your site\'s performance considerably. It is <strong>highly recommended</strong> to have <a href="https://www.php.net/manual/apcu.installation.php" target="_blank">APCu</a> installed on your server.'),
+          'description' => t('PHP APCu caching can improve your site\'s performance considerably. It is <strong>highly recommended</strong> to have <a href="https://www.php.net/manual/apcu.installation.php">APCu</a> installed on your server.'),
         ];
       }
     }
@@ -1365,7 +1365,7 @@ class SystemRequirements implements InstallRequirementsInterface {
         'title' => t('SameSite cookie attribute'),
         'value' => $samesite,
         'severity' => $valid ? RequirementSeverity::OK : RequirementSeverity::Warning,
-        'description' => t('This attribute should be explicitly set to Lax, Strict or None. If set to None then the request must be made via HTTPS. See <a href=":url" target="_blank">PHP documentation</a>', [
+        'description' => t('This attribute should be explicitly set to Lax, Strict or None. If set to None then the request must be made via HTTPS. See <a href=":url">PHP documentation</a>', [
           ':url' => 'https://www.php.net/manual/en/session.configuration.php#ini.session.cookie-samesite',
         ]),
       ];
