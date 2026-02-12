@@ -14,6 +14,7 @@ use Drupal\system\Plugin\ImageToolkit\GDToolkit;
 use Drupal\system\Plugin\ImageToolkit\Operation\gd\GDImageToolkitOperationBase;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Runtime\PropertyHook;
@@ -364,6 +365,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::scaleAndCrop().
    */
+  #[IgnoreDeprecations]
   public function testScaleAndCropWidth(): void {
     $this->getTestImageForOperation('ScaleAndCrop');
     $this->toolkitOperation->expects($this->once())
@@ -377,6 +379,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::scaleAndCrop().
    */
+  #[IgnoreDeprecations]
   public function testScaleAndCropHeight(): void {
     $this->getTestImageForOperation('ScaleAndCrop');
     $this->toolkitOperation->expects($this->once())
@@ -390,6 +393,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::scaleAndCrop().
    */
+  #[IgnoreDeprecations]
   public function testScaleAndCropFails(): void {
     $this->getTestImageForOperation('ScaleAndCrop');
     $this->toolkitOperation->expects($this->once())
@@ -406,6 +410,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::crop().
    */
+  #[IgnoreDeprecations]
   public function testCropWidth(): void {
     $this->getTestImageForOperation('Crop');
     $this->toolkitOperation->expects($this->once())
@@ -420,6 +425,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::crop().
    */
+  #[IgnoreDeprecations]
   public function testCropHeight(): void {
     $this->getTestImageForOperation('Crop');
     $this->toolkitOperation->expects($this->once())
@@ -434,6 +440,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::crop().
    */
+  #[IgnoreDeprecations]
   public function testCrop(): void {
     $this->getTestImageForOperation('Crop');
     $this->toolkitOperation->expects($this->once())
@@ -447,6 +454,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::convert().
    */
+  #[IgnoreDeprecations]
   public function testConvert(): void {
     $this->getTestImageForOperation('Convert');
     $this->toolkitOperation->expects($this->once())
@@ -461,10 +469,10 @@ class ImageTest extends UnitTestCase {
    * Tests \Drupal\Core\Image\Image::resize().
    */
   public function testResize(): void {
-    $this->getTestImageForOperation('Resize');
+    $this->getTestImageForOperation('Resize', FALSE);
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
-      ->willReturnArgument(0);
+      ->willReturnArgument(1);
 
     // Resize with integer for width and height.
     $ret = $this->image->resize(30, 40);
@@ -476,10 +484,10 @@ class ImageTest extends UnitTestCase {
    * Tests \Drupal\Core\Image\Image::resize().
    */
   public function testFloatResize(): void {
-    $this->getTestImageForOperation('Resize');
+    $this->getTestImageForOperation('Resize', FALSE);
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
-      ->willReturnArgument(0);
+      ->willReturnArgument(1);
 
     // Pass a float for width.
     $ret = $this->image->resize(30.4, 40);
@@ -490,6 +498,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::desaturate().
    */
+  #[IgnoreDeprecations]
   public function testDesaturate(): void {
     $this->getTestImageForOperation('Desaturate');
     $this->toolkitOperation->expects($this->once())
@@ -502,6 +511,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::rotate().
    */
+  #[IgnoreDeprecations]
   public function testRotate(): void {
     $this->getTestImageForOperation('Rotate');
     $this->toolkitOperation->expects($this->once())

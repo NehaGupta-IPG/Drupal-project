@@ -124,11 +124,54 @@ class GdImageWrapper extends ImageBase {
 
   /**
    * {@inheritdoc}
-   *
-   * @todo move back to base.
    */
   public function isValid() {
     return $this->toolkit()->isValid($this);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getHeight() {
+    return $this->toolkit()->getHeight($this);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getWidth() {
+    return $this->toolkit()->getWidth($this);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getMimeType() {
+    return $this->toolkit()->getMimeType($this);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function save($destination = NULL) {
+    // Return immediately if the image is not valid.
+    if (!$this->isValid()) {
+      return FALSE;
+    }
+
+    $destination = $destination ?: $this->getSource();
+    // @phpstan-ignore method.deprecated
+    if ($return = $this->toolkit()->save($this, $destination)) {
+      // Clear the cached file size and refresh the image information.
+      clearstatcache(TRUE, $destination);
+      $this->fileSize = filesize($destination);
+      $this->source = $destination;
+
+      if (\Drupal::service('file_system')->chmod($destination)) {
+        return $return;
+      }
+    }
+    return FALSE;
   }
 
   /**
