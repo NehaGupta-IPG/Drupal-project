@@ -34,14 +34,22 @@ use Drupal\Core\TypedData\TypedData;
 class EntityAdapter extends TypedData implements \IteratorAggregate, ComplexDataInterface {
 
   /**
+   * A weak reference to the wrapped entity object
+   *
+   * @var WeakReference|null
+   */
+  protected \WeakReference ?$weakEntity = NULL;
+
+  /**
    * The wrapped entity object.
    *
    * @var \Drupal\Core\Entity\EntityInterface|null
    */
-  protected $weakEntity;
-
   protected $strongEntity;
 
+  /**
+   * The wrapped entity object.
+   */
   protected $entity {
     get {
       if (isset($this->strongEntity)) {
