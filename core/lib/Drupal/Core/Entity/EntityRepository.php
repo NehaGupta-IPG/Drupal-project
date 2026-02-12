@@ -103,13 +103,29 @@ class EntityRepository implements EntityRepositoryInterface {
       // Retrieve language fallback candidates to perform the entity language
       // negotiation, unless the current translation is already the desired one.
       if ($entity->language()->getId() != $langcode) {
+        $strict_fallback = $context['strict_fallback'] ?? FALSE;
+        unset($context['strict_fallback']);
         $context['data'] = $entity;
         $context += ['operation' => 'entity_view', 'langcode' => $langcode];
         $candidates = $this->languageManager->getFallbackCandidates($context);
 
         // Ensure the default language has the proper language code.
         $default_language = $entity->getUntranslated()->language();
-        $candidates[$default_language->getId()] = LanguageInterface::LANGCODE_DEFAULT;
+
+        // We should check if the default language is allowed in fallback
+        // candidates only if we have a strict fallback mode enabled.
+        if (
+          !$strict_fallback
+          || isset($candidates[$default_language->getId()])
+        ) {
+          $candidates[$default_language->getId()] = LanguageInterface::LANGCODE_DEFAULT;
+        }
+
+        // If we have a strict fallback mode, the function can return NULL if
+        // no allowed translation is available.
+        if ($strict_fallback) {
+          $translation = NULL;
+        }
 
         // Return the most fitting entity translation.
         foreach ($candidates as $candidate) {
