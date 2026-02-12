@@ -38,7 +38,7 @@ class GDToolkit extends ImageToolkitBase {
    * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
    *    whack-a-mole instead.
    *
-   * @see https://www.drupal.org/node/7654123'
+   * @see https://www.drupal.org/node/7654123
    */
   public ?GdImageWrapper $backfillImage;
 
@@ -107,7 +107,7 @@ class GDToolkit extends ImageToolkitBase {
    * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
    *    whack-a-mole instead.
    *
-   * @see https://www.drupal.org/node/7654123'
+   * @see https://www.drupal.org/node/7654123
    */
   public function setImage(?\GdImage $image): static {
     @trigger_error(__METHOD__ . ' is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
@@ -124,7 +124,7 @@ class GDToolkit extends ImageToolkitBase {
    * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
    *    whack-a-mole instead.
    *
-   * @see https://www.drupal.org/node/7654123'
+   * @see https://www.drupal.org/node/7654123
    */
   public function getImage(): ?\GdImage {
     @trigger_error(__METHOD__ . ' is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
@@ -376,7 +376,9 @@ class GDToolkit extends ImageToolkitBase {
    * {@inheritdoc}
    */
   public function getWidth($image = NULL) {
-    assert($image instanceof GdImageWrapper);
+    if (!$image instanceof GdImageWrapper) {
+      $image = $this->backfillImage;
+    }
 
     if ($image->hasPreLoadInfo()) {
       return $image->getPreLoadInfo()[0];
@@ -393,7 +395,9 @@ class GDToolkit extends ImageToolkitBase {
    * {@inheritdoc}
    */
   public function getHeight($image = NULL) {
-    assert($image instanceof GdImageWrapper);
+    if (!$image instanceof GdImageWrapper) {
+      $image = $this->backfillImage;
+    }
 
     if ($image->hasPreLoadInfo()) {
       return $image->getPreLoadInfo()[1];
@@ -416,7 +420,7 @@ class GDToolkit extends ImageToolkitBase {
    * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
    *    whack-a-mole instead.
    *
-   * @see https://www.drupal.org/node/7654123'
+   * @see https://www.drupal.org/node/7654123
    */
   public function getType() {
     @trigger_error(__METHOD__ . ' is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
@@ -435,7 +439,7 @@ class GDToolkit extends ImageToolkitBase {
    * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
    *    whack-a-mole instead.
    *
-   * @see https://www.drupal.org/node/7654123'
+   * @see https://www.drupal.org/node/7654123
    */
   public function setType($type) {
     @trigger_error(__METHOD__ . ' is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);

@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Plugin\ImageToolkit\Operation\gd;
 
+use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\ImageToolkit\Attribute\ImageToolkitOperation;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
@@ -20,6 +21,13 @@ class Resize extends GDImageToolkitOperationBase {
   /**
    * {@inheritdoc}
    */
+  public bool $needsToolkitInjection {
+    get => FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function arguments() {
     return [
       'width' => [
@@ -34,7 +42,16 @@ class Resize extends GDImageToolkitOperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function validateArguments(array $arguments) {
+  protected function validateArguments(ImageInterface|array $arguments, $extra = NULL) {
+    if ($arguments instanceof ImageInterface) {
+      $image = $arguments;
+      $arguments = $extra;
+      assert(is_array($arguments));
+    }
+    else {
+      // @todo fix.
+    }
+
     // Assure integers for all arguments.
     $arguments['width'] = (int) round($arguments['width']);
     $arguments['height'] = (int) round($arguments['height']);
@@ -53,14 +70,23 @@ class Resize extends GDImageToolkitOperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function execute(array $arguments = []) {
+  protected function execute(ImageInterface|array $arguments, $extra = NULL) {
+    if ($arguments instanceof ImageInterface) {
+      $image = $arguments;
+      $arguments = $extra;
+      assert(is_array($arguments));
+    }
+    else {
+      // @todo fix.
+    }
+
     // Create a new image of the required dimensions, and copy and resize
     // the original image on it with resampling.
     $original_image = $this->getToolkit()->getImage();
     $data = [
       'width' => $arguments['width'],
       'height' => $arguments['height'],
-      'extension' => image_type_to_extension($this->getToolkit()->getType(), FALSE),
+      'extension' => image_type_to_extension($image->getType(), FALSE),
       'transparent_color' => $this->getToolkit()->getTransparentColor(),
       'is_temp' => TRUE,
     ];

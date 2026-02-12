@@ -109,6 +109,14 @@ class Image implements ImageInterface {
   }
 
   /**
+   * @todo add to interface.
+   */
+  public function setSource(string $source): static {
+    $this->source = $source;
+    return $this;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function getSource() {
@@ -136,6 +144,13 @@ class Image implements ImageInterface {
       $this->toolkit->backfillImage = $this;
     }
     return $this->toolkit;
+  }
+
+  public function setToolkit(ImageToolkitInterface $toolkit): static {
+    @trigger_error(__METHOD__ . ' is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+    $this->toolkit = $toolkit;
+    $this->toolkit->backfillImage = $this;
+    return $this;
   }
 
   /**

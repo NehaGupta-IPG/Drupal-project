@@ -25,7 +25,10 @@ interface ImageToolkitOperationInterface extends PluginInspectionInterface {
    * @param \Drupal\Core\ImageToolkit\ImageToolkitInterface $toolkit
    *   The image toolkit in use.
    *
-   * @deprecated
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   public function setToolkit(ImageToolkitInterface $toolkit): void;
 

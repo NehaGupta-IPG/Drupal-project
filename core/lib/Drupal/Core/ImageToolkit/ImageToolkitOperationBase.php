@@ -20,7 +20,25 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 abstract class ImageToolkitOperationBase extends PluginBase implements ImageToolkitOperationInterface, ContainerFactoryPluginInterface {
 
   /**
+   * BC layer.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
+   */
+  public bool $needsToolkitInjection {
+    get => TRUE;
+    set => throw new \LogicException('Cannot set $needsToolkitInjection');
+  }
+
+  /**
    * The image toolkit.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   protected ImageToolkitInterface $toolkit;
 
@@ -67,6 +85,7 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    * {@inheritdoc}
    */
   public function setToolkit(ImageToolkitInterface $toolkit): void {
+    @trigger_error(__METHOD__ . ' is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     $this->toolkit = $toolkit;
   }
 
@@ -80,8 +99,14 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    *
    * @return \Drupal\Core\ImageToolkit\ImageToolkitInterface
    *   The image toolkit in use.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   protected function getToolkit() {
+    @trigger_error(__METHOD__ . ' is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     return $this->toolkit;
   }
 
@@ -179,7 +204,7 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    *   If the plugin does not define a default for an optional argument.
    */
-  protected function validateArguments(array $arguments /* , ImageInterface $image */) {
+  protected function validateArguments(array $arguments) {
     return $arguments;
   }
 
@@ -196,8 +221,12 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
       // @todo fix.
     }
     $arguments = $this->prepareArguments($arguments);
-    $arguments = $this->validateArguments($arguments, $image);
-    return $this->execute($arguments, $image);
+    if ($this->needsToolkitInjection) {
+      $arguments = $this->validateArguments($arguments);
+      return $this->execute($arguments);
+    }
+    $arguments = $this->validateArguments($image, $arguments);
+    return $this->execute($image, $arguments);
   }
 
   /**
@@ -217,6 +246,6 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    * @throws \RuntimeException
    *   If the operation can not be performed.
    */
-  abstract protected function execute(array $arguments /* , ImageInterface $image */);
+  abstract protected function execute(array $arguments);
 
 }
