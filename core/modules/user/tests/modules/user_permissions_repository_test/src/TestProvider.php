@@ -7,6 +7,8 @@ namespace Drupal\user_permissions_repository_test;
 use Drupal\user\Permissions\ProvidesPermissionsInterface;
 use Drupal\user\Permissions\ProvidesSectionsInterface;
 
+// cspell:ignore testprovider
+
 /**
  * Returns responses to test the permissions repository.
  */

@@ -12,6 +12,8 @@ use Drupal\user\Service\PermissionsRepositoryFactoryInterface;
 use Drupal\user\Service\PermissionsRepositoryReturnStyle;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
+// cspell:ignore testprovider
+
 /**
  * Tests extended permissions.
  */
