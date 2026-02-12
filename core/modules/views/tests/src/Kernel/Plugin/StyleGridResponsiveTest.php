@@ -51,6 +51,21 @@ class StyleGridResponsiveTest extends PluginKernelTestBase {
     $result = $this->xpath('//div[contains(@class, "views-view-responsive-grid") and contains(@class, :alignment)]', [':alignment' => 'views-view-responsive-grid--' . $expected['alignment']]);
     $this->assertGreaterThan(0, count($result), "Alignment CSS variable value is detected and correct.");
 
+    // Confirm that custom classes have been added.
+    if (!empty($expected['row_class_custom'])) {
+      foreach (explode(' ', $expected['row_class_custom']) as $class) {
+        $result = $this->xpath('//div[contains(@class, "views-view-responsive-grid") and contains(@class, :class)]', [':class' => $class]);
+        $this->assertGreaterThan(0, count($result), "Custom row class '$class' is present on the grid container.");
+      }
+    }
+
+    if (!empty($expected['col_class_custom'])) {
+      foreach (explode(' ', $expected['col_class_custom']) as $class) {
+        $result = $this->xpath('//div[contains(@class, "views-view-responsive-grid__item") and contains(@class, :class)]', [':class' => $class]);
+        $this->assertGreaterThan(0, count($result), "Custom column class '$class' is present on the grid items.");
+      }
+    }
+
     // Check for CSS variables in style attribute.
     $result = $this->xpath('//div[contains(@class, "views-view-responsive-grid") and contains(@style, :columns)]', [':columns' => '--views-responsive-grid--column-count:' . $expected['columns']]);
     $this->assertGreaterThan(0, count($result), "Max-columns CSS variable value is detected and correct.");
@@ -80,12 +95,16 @@ class StyleGridResponsiveTest extends PluginKernelTestBase {
           'cell_min_width' => 123,
           'grid_gutter' => 13,
           'alignment' => 'horizontal',
+          'row_class_custom' => 'pb-2 mb-4',
+          'col_class_custom' => 'bg-primary',
         ],
         'expected' => [
           'columns' => 7,
           'cell_min_width' => 123,
           'grid_gutter' => 13,
           'alignment' => 'horizontal',
+          'row_class_custom' => 'pb-2 mb-4',
+          'col_class_custom' => 'bg-primary',
         ],
       ],
       'vertical' => [
@@ -94,12 +113,16 @@ class StyleGridResponsiveTest extends PluginKernelTestBase {
           'cell_min_width' => 50,
           'grid_gutter' => 44,
           'alignment' => 'vertical',
+          'row_class_custom' => 'pb-2 mb-4',
+          'col_class_custom' => 'pb-2 mb-4',
         ],
         'expected' => [
           'columns' => 8,
           'cell_min_width' => 50,
           'grid_gutter' => 44,
           'alignment' => 'vertical',
+          'row_class_custom' => 'pb-2 mb-4',
+          'col_class_custom' => 'pb-2 mb-4',
         ],
       ],
       'default options' => [
@@ -109,6 +132,8 @@ class StyleGridResponsiveTest extends PluginKernelTestBase {
           'cell_min_width' => 100,
           'grid_gutter' => 10,
           'alignment' => 'horizontal',
+          'row_class_custom' => '',
+          'col_class_custom' => '',
         ],
       ],
     ];
