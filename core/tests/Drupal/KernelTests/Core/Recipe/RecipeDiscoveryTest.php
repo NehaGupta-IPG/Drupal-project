@@ -64,7 +64,7 @@ class RecipeDiscoveryTest extends KernelTestBase {
       $this->assertNotEmpty($core_recipes);
     }
     else {
-      $this->assertEmpty($include_core_recipes);
+      $this->assertEmpty($core_recipes);
     }
   }
 
