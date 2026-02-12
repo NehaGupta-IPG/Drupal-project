@@ -285,7 +285,7 @@ class TaxonomyHooks {
   * @param string $form_id
   *   String representation of form name.
   */
-  #[Hook('form_taxonomy_term_alter')]
+  #[Hook('form_taxonomy_term_form_alter')]
   public function taxonomyTermFormAlter(&$form, FormStateInterface $form_state, $form_id): void {
     /** @var \Drupal\taxonomy\TermStorageInterface $taxonomy_storage */
     $taxonomy_storage = $this->entityTypeManager->getStorage('taxonomy_term');
