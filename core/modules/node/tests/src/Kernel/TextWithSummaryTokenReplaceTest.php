@@ -9,6 +9,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
+use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\system\Kernel\Token\TokenReplaceKernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class TextWithSummaryTokenReplaceTest extends TokenReplaceKernelTestBase {
 
+  use NodeCreationTrait;
   use ContentTypeCreationTrait;
 
   /**
@@ -33,17 +35,22 @@ class TextWithSummaryTokenReplaceTest extends TokenReplaceKernelTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->installConfig(['filter', 'node']);
+  }
 
+  /**
+   * Creates a node, then tests the tokens generated from it.
+   */
+  public function testNodeTokenReplacement(): void {
     // We don't create a default body field as we need a text_with_summary.
     $this->createContentType(['type' => 'article', 'name' => 'Article'], FALSE);
-    FieldStorageConfig::create([
+    $fieldStorage = FieldStorageConfig::create([
       'field_name' => 'body',
       'type' => 'text_with_summary',
       'entity_type' => 'node',
       'cardinality' => 1,
       'persist_with_no_fields' => TRUE,
-    ])->save();
-    $fieldStorage = FieldStorageConfig::loadByName('node', 'body');
+    ]);
+    $fieldStorage->save();
     FieldConfig::create([
       'field_storage' => $fieldStorage,
       'bundle' => 'article',
@@ -53,16 +60,10 @@ class TextWithSummaryTokenReplaceTest extends TokenReplaceKernelTestBase {
         'allowed_formats' => [],
       ],
     ])->save();
-  }
 
-  /**
-   * Creates a node, then tests the tokens generated from it.
-   */
-  public function testNodeTokenReplacement(): void {
     // Create a user and a node.
     $account = $this->createUser();
-    /** @var \Drupal\node\NodeInterface $node */
-    $node = Node::create([
+    $node = $this->createNode([
       'type' => 'article',
       'uid' => $account->id(),
       'title' => '<blink>Blinking Text</blink>',
@@ -74,7 +75,6 @@ class TextWithSummaryTokenReplaceTest extends TokenReplaceKernelTestBase {
         ],
       ],
     ]);
-    $node->save();
 
     // Generate and test tokens.
     $tests = [];
@@ -136,6 +136,36 @@ class TextWithSummaryTokenReplaceTest extends TokenReplaceKernelTestBase {
     foreach ($tests as $input => $expected) {
       $output = $this->tokenService->replace($input, ['node' => $node], ['language' => $this->interfaceLanguage]);
       $this->assertSame((string) $expected, $output, "Failed test case: {$input}");
+    }
+  }
+
+  /**
+   * Tests node:summary and node:body tokens for a text_long body field.
+   */
+  public function testNodeTokenReplacementNoSummary(): void {
+    $this->createContentType(['type' => 'article', 'name' => 'Article']);
+
+    $node = $this->createNode([
+      'type' => 'article',
+      'body' => [
+        [
+          'value' => 'Regular NODE body for the test.',
+          'format' => 'plain_text',
+        ],
+      ],
+    ]);
+
+    // Generate and test tokens.
+    $tests = [
+      '[node:body]' => $node->body->processed,
+      '[node:summary]' => '',
+    ];
+    $base_bubbleable_metadata = BubbleableMetadata::createFromObject($node);
+    foreach ($tests as $input => $expected) {
+      $bubbleable_metadata = new BubbleableMetadata();
+      $output = $this->tokenService->replace($input, ['node' => $node], ['langcode' => $this->interfaceLanguage->getId()], $bubbleable_metadata);
+      $this->assertSame((string) $expected, (string) $output, "Failed test case: {$input}");
+      $this->assertEquals($base_bubbleable_metadata, $bubbleable_metadata);
     }
   }
 
