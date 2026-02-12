@@ -48,6 +48,8 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    */
   protected $fields = [];
 
+  protected $fieldWeakReferences = [];
+
   /**
    * Local cache for field definitions.
    *
@@ -556,6 +558,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
       }
     }
     $this->fields = [];
+    $this->fieldWeakReferences = [];
     $this->fieldDefinitions = NULL;
     $this->languages = NULL;
     $this->clearTranslationCache();
@@ -622,6 +625,16 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     if ($this->translations[$this->activeLangcode]['status'] == static::TRANSLATION_REMOVED) {
       throw new \InvalidArgumentException("The entity object refers to a removed translation ({$this->activeLangcode}) and cannot be manipulated.");
     }
+
+    if (isset($this->fields[$name][$langcode])) {
+      return $this->fields[$name][$langcode];
+    }
+    if (isset($this->fieldWeakReferences[$name][$langcode])) {
+      $item = $this->fieldWeakReferences[$name][$langcode]->get();
+      if ($item !== NULL) {
+        return $item;
+      }
+    }
     // Populate $this->fields to speed-up further look-ups and to keep track of
     // fields objects, possibly holding changes to field values.
     if (!isset($this->fields[$name][$langcode])) {
@@ -634,17 +647,29 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
 
       $default = $langcode == LanguageInterface::LANGCODE_DEFAULT;
       if (!$default && !$definition->isTranslatable()) {
-        if (!isset($this->fields[$name][LanguageInterface::LANGCODE_DEFAULT])) {
-          $this->fields[$name][LanguageInterface::LANGCODE_DEFAULT] = $this->getTranslatedField($name, LanguageInterface::LANGCODE_DEFAULT);
+        if (!isset($this->fieldWeakReferences[$name][LanguageInterface::LANGCODE_DEFAULT]) || $this->fieldWeakReferences[$name][LanguageInterface::LANGUAGE_DEFAULT]->get() === NULL) {
+          $item = $this->getTranslatedField($name, LanguageInterface::LANGCODE_DEFAULT);
+          $this->fieldWeakReferences[$name][LanguageInterface::LANGCODE_DEFAULT] = \WeakReference::create($item);
         }
-        $this->fields[$name][$langcode] = &$this->fields[$name][LanguageInterface::LANGCODE_DEFAULT];
+        else {
+          $item = $this->fieldWeakRefences[$name][LanguageInterface::LANGCODE_DEFAULT]->get();
+        }
+        $this->fieldWeakReferences[$name][$langcode] = $item;
+        return $item;
       }
       else {
         $value = NULL;
         if (isset($this->values[$name][$langcode])) {
           $value = $this->values[$name][$langcode];
         }
+        if ($name === 'id') {
+          dump('ID FIELD ITEM LIST WTF');
+          dump($value);
+        }
         $field = \Drupal::service('plugin.manager.field.field_type')->createFieldItemList($this->getTranslation($langcode), $name, $value);
+        if ($name === 'id') {
+          dump($field->getValue());
+        }
         if ($default) {
           // $this->defaultLangcode might not be set if we are initializing the
           // default language code cache, in which case there is no valid
@@ -655,10 +680,13 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
           $field_langcode = $langcode;
         }
         $field->setLangcode($field_langcode);
-        $this->fields[$name][$langcode] = $field;
+        $this->fieldWeakReferences[$name][$langcode] = \WeakReference::create($field);
+        return $field;
       }
     }
-    return $this->fields[$name][$langcode];
+    if ($this->fieldWeakReferences[$name][$langcode]->get() !== NULL) {
+      return $this->fieldWeakReferences[$name][$langcode]->get();
+    }
   }
 
   /**
