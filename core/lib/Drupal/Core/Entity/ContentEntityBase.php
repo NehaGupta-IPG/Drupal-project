@@ -1079,8 +1079,10 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
       if (!$definition->isComputed() && !empty($this->fields[$name])) {
         foreach ($this->fields[$name] as $langcode => $weak_reference) {
           $item = $weak_reference->get();
-          $item->filterEmptyItems();
-          $this->values[$name][$langcode] = $item->getValue();
+          if ($item !== NULL) {
+            $item->filterEmptyItems();
+            $this->values[$name][$langcode] = $item->getValue();
+          }
         }
       }
     }
