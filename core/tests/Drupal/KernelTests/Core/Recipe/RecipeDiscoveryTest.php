@@ -23,6 +23,8 @@ class RecipeDiscoveryTest extends KernelTestBase {
   protected static $modules = ['user', 'system'];
 
   /**
+   * Tests finding recipes.
+   *
    * @testWith [true, true]
    *   [true, false]
    *   [false, true]
@@ -68,6 +70,9 @@ class RecipeDiscoveryTest extends KernelTestBase {
     }
   }
 
+  /**
+   * Tests following symlinks in recipe discovery.
+   */
   public function testDiscoveryFollowsSymlinks(): void {
     $cookbook_dir = FileSystem::getOsTemporaryDirectory();
     $link_name = uniqid($cookbook_dir . '/recipe_link');
