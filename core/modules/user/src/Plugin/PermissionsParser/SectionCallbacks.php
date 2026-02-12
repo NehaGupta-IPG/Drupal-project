@@ -76,7 +76,7 @@ class SectionCallbacks extends PermissionsParserPluginBase implements ContainerF
         continue;
       }
 
-      foreach ($sections as $section) {
+      foreach ($sections as $key => $section) {
         if (!is_array($section)) {
           $section = [
             'title' => $section,
@@ -87,7 +87,7 @@ class SectionCallbacks extends PermissionsParserPluginBase implements ContainerF
           continue;
         }
 
-        $section['key'] = $section['title'];
+        $section['key'] = $key;
         $section['title'] = $this->tWrapper($section['title'], [], ['context' => 'permissions: section title']);
         $section['extended_help'] = !empty($section['extended_help']) ? $this->tWrapper($section['extended_help'], [], ['context' => 'permissions: extended help']) : '';
 

@@ -57,10 +57,6 @@ class Permissions extends PermissionsParserPluginBase implements ContainerFactor
    * {@inheritdoc}
    */
   public function parse(array &$permissions, string $provider, PermissionsRepositoryInterface $permissionObj): int {
-    if (!is_iterable($permissions)) {
-      return 0;
-    }
-
     $count = 0;
 
     foreach ($permissions as $key => $permission) {

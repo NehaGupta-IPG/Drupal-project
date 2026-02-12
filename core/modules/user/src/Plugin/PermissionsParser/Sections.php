@@ -64,12 +64,12 @@ class Sections extends PermissionsParserPluginBase implements ContainerFactoryPl
     $permissions['sections'][self::PROCESSED_KEY] = TRUE;
     $count = 0;
 
-    foreach ($permissions['sections'] as $section) {
+    foreach ($permissions['sections'] as $k => $section) {
       if (empty($section['title'])) {
         continue;
       }
 
-      $section['key'] = $section['title'];
+      $section['key'] = $section['key'] ?? $section['title'];
       $section['title'] = $this->tWrapper($section['title'], [], ['context' => 'permissions: section title']);
       $section['extended_help'] = !empty($section['extended_help']) ? $this->tWrapper($section['extended_help'], [], ['context' => 'permissions: extended help']) : '';
 
