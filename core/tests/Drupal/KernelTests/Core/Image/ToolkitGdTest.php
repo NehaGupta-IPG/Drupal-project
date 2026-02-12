@@ -80,6 +80,7 @@ class ToolkitGdTest extends KernelTestBase {
     ];
     $image = $this->imageFactory->get();
     foreach ($expected_image_types as $extension => $expected_image_type) {
+    // @phpstan-ignore method.deprecated
       $this->assertSame($expected_image_type, $image->getToolkit()->extensionToImageType($extension));
     }
   }
@@ -128,10 +129,13 @@ class ToolkitGdTest extends KernelTestBase {
     $this->assertSame(50, $image_reloaded->getWidth());
     $this->assertSame(20, $image_reloaded->getHeight());
     $this->assertSame(image_type_to_mime_type($type), $image_reloaded->getMimeType());
+    // @phpstan-ignore method.deprecated
     if ($image_reloaded->getToolkit()->getType() == IMAGETYPE_GIF) {
+    // @phpstan-ignore method.deprecated
       $this->assertSame('#ffff00', $image_reloaded->getToolkit()->getTransparentColor(), "Image '$file' after reload should have color channel set to #ffff00, but it has not.");
     }
     else {
+    // @phpstan-ignore method.deprecated
       $this->assertNull($image_reloaded->getToolkit()->getTransparentColor(), "Image '$file' after reload should have no color channel set, but it has.");
     }
   }
@@ -176,6 +180,7 @@ class ToolkitGdTest extends KernelTestBase {
           implode(', ', ['GIF', 'JPEG', 'PNG', 'WEBP', 'AVIF']),
         ),
       ],
+    // @phpstan-ignore method.deprecated
     ], $this->imageFactory->get()->getToolkit()->getRequirements());
   }
 

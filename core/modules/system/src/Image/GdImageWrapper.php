@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\system\Image;
 
 use Drupal\Core\Image\Image as ImageBase;
@@ -7,7 +9,7 @@ use Drupal\Core\Image\ImageFactory;
 use Drupal\system\Plugin\ImageToolkit\GDToolkit;
 
 /**
- * Defines the ImageInterface object for use with the GD toolit.
+ * Defines the ImageInterface object for use with the GD toolkit.
  */
 class GdImageWrapper extends ImageBase {
 
@@ -35,10 +37,11 @@ class GdImageWrapper extends ImageBase {
   protected ?array $preLoadInfo = NULL;
 
   public function __construct(
-    protected readonly ImageFactory $imageFactory,
+    ImageFactory $imageFactory,
     protected readonly string $toolkitId,
     ?string $source = NULL,
   ) {
+    $this->imageFactory = $imageFactory;
     if ($source) {
       $this->source = $source;
       if ($this->toolkit()->parseFile($this)) {

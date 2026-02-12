@@ -16,8 +16,10 @@ class Image implements ImageInterface {
 
   /**
    * The image factory.
+   *
+   * @todo make the prop non-nullable.
    */
-  protected readonly ImageFactory $imageFactory;
+  protected readonly ?ImageFactory $imageFactory;
 
   /**
    * The image toolkit id.
@@ -57,7 +59,6 @@ class Image implements ImageInterface {
   ) {
     if (!$imageFactory) {
       @trigger_error(__METHOD__ . ' not receiving the ImageFactory is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
-      $imageFactory = \Drupal::service('image.factory');
     }
     $this->imageFactory = $imageFactory;
     $this->toolkit = $toolkit;
@@ -147,6 +148,7 @@ class Image implements ImageInterface {
     }
 
     $destination = $destination ?: $this->getSource();
+    // @phpstan-ignore method.deprecated
     if ($return = $this->getToolkit()->save($this, $destination)) {
       // Clear the cached file size and refresh the image information.
       clearstatcache(TRUE, $destination);
@@ -164,6 +166,7 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function apply($operation, array $arguments = []) {
+    // @phpstan-ignore method.deprecated
     return $this->getToolkit()->apply($this, $operation, $arguments);
   }
 

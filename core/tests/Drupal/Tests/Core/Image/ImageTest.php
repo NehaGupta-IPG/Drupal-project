@@ -190,6 +190,7 @@ class ImageTest extends UnitTestCase {
    */
   public function testGetType(): void {
     $this->getTestImage(FALSE);
+    // @phpstan-ignore method.deprecated
     $this->assertEquals(IMAGETYPE_PNG, $this->image->getToolkit()->getType());
   }
 

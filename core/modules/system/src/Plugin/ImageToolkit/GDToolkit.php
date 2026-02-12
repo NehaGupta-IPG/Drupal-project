@@ -9,7 +9,6 @@ use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\ImageToolkit\Attribute\ImageToolkit;
 use Drupal\Core\ImageToolkit\ImageToolkitBase;
 use Drupal\Core\ImageToolkit\ImageToolkitOperationManagerInterface;
@@ -33,6 +32,14 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 )]
 class GDToolkit extends ImageToolkitBase {
 
+  /**
+   * An ImageInterface object to be used for BC.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123'
+   */
   public ?GdImageWrapper $backfillImage;
 
   /**
@@ -97,7 +104,10 @@ class GDToolkit extends ImageToolkitBase {
    * @return $this
    *   An instance of the current toolkit object.
    *
-   * @deprecated
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123'
    */
   public function setImage(?\GdImage $image): static {
     @trigger_error(__METHOD__ . ' is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
@@ -111,7 +121,10 @@ class GDToolkit extends ImageToolkitBase {
    * @return \GdImage|null
    *   The GD image object, or NULL if not available.
    *
-   * @deprecated
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123'
    */
   public function getImage(): ?\GdImage {
     @trigger_error(__METHOD__ . ' is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
@@ -327,6 +340,15 @@ class GDToolkit extends ImageToolkitBase {
     return $this->doGetTransparentColor($image->getGdImageObject());
   }
 
+  /**
+   * Gets the color set for alpha channel from a \GdImage object.
+   *
+   * @var \GdImage $gdImage
+   *   A GdImage object.
+   *
+   * @return string|null
+   *   A color string like '#rrggbb', or NULL if not set or not relevant.
+   */
   protected function doGetTransparentColor(\GdImage $gdImage): ?string {
     // Find out if a transparent color is set, will return -1 if no
     // transparent color has been defined in the image.
@@ -391,7 +413,10 @@ class GDToolkit extends ImageToolkitBase {
    *   The image type represented by a PHP IMAGETYPE_* constant (e.g.
    *   IMAGETYPE_JPEG).
    *
-   * @deprecated
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123'
    */
   public function getType() {
     @trigger_error(__METHOD__ . ' is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
@@ -407,7 +432,10 @@ class GDToolkit extends ImageToolkitBase {
    *
    * @return $this
    *
-   * @deprecated
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123'
    */
   public function setType($type) {
     @trigger_error(__METHOD__ . ' is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
