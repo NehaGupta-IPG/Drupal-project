@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  theme:
+    - unmet
+id: test_translate_unmet
+theme: unmet
+region: content
+weight: -40
+provider: null
+plugin: local_tasks_block
+settings:
+  id: local_tasks_block
+  label: 'Title (en) unmet'
+  label_display: '0'
+  provider: core
+  primary: true
+  secondary: true
+visibility: {  }

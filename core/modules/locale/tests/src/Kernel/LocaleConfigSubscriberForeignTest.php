@@ -139,7 +139,7 @@ class LocaleConfigSubscriberForeignTest extends LocaleConfigSubscriberTest {
     $this->assertTranslation($config_name, 'Updated English', 'en');
 
     $this->deleteLocaleTranslationData($config_name, 'test', 'English test', 'en');
-    $this->assertNoConfigOverride($config_name, 'en');
+    $this->assertNoTranslation($config_name, 'en');
   }
 
   /**

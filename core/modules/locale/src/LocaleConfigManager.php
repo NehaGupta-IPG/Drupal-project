@@ -632,20 +632,20 @@ class LocaleConfigManager {
   protected function filterOverride(array $override_data, array $translatable) {
     $filtered_data = [];
     foreach ($override_data as $key => $value) {
-      if (isset($translatable[$key])) {
+      if (isset($translatable[$key]) && is_array($value)) {
         // If the translatable default configuration has this key, look further
-        // for subkeys or ignore this element for scalar values.
-        if (is_array($value)) {
-          $value = $this->filterOverride($value, $translatable[$key]);
-          if (!empty($value)) {
-            $filtered_data[$key] = $value;
-          }
+        // for subkeys.
+        $value = $this->filterOverride($value, $translatable[$key]);
+        if (!empty($value)) {
+          $filtered_data[$key] = $value;
         }
       }
       else {
         // If this key was not in the translatable default configuration,
-        // keep it.
-        $filtered_data[$key] = $value;
+        // or the element has scalar values, then keep it.
+        if (!empty($value)) {
+          $filtered_data[$key] = $value;
+        }
       }
     }
     return $filtered_data;

@@ -1,0 +1,17 @@
+config_install_optional_test.settings:
+  type: config_object
+  label: 'Config install/optional test settings'
+  mapping:
+    data:
+      type: mapping
+      label: 'Data'
+      mapping:
+        item:
+          type: label
+          label: Item
+    label:
+      type: label
+      label: 'Label'
+    text:
+      type: text
+      label: 'Text'

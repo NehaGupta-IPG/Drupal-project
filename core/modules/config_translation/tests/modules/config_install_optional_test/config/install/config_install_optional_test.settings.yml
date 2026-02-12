@@ -1,0 +1,5 @@
+langcode: en
+data:
+  item: 'Item (en)'
+label: 'Label (en)'
+text: 'Text (en)'

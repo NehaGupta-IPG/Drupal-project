@@ -184,12 +184,15 @@ class ConfigInstaller implements ConfigInstallerInterface {
       // optional configuration should be installed as usual.
       // @see install_install_profile()
       $profile_installed = in_array($this->drupalGetProfile(), $this->getEnabledExtensions(), TRUE);
+      $collection_info = $this->configManager->getConfigCollectionInfo();
       if (!$this->isSyncing() && (!InstallerKernel::installationAttempted() || $profile_installed)) {
         $optional_install_path = $extension_path . '/' . InstallStorage::CONFIG_OPTIONAL_DIRECTORY;
         if (is_dir($optional_install_path)) {
           // Install any optional config the module provides.
           $storage = new FileStorage($optional_install_path, StorageInterface::DEFAULT_COLLECTION);
-          $this->installOptionalConfig($storage, '');
+          foreach ($collection_info->getCollectionNames() as $collection) {
+            $this->installOptionalConfig($storage, '', $collection);
+          }
         }
       }
     }
@@ -216,22 +219,28 @@ class ConfigInstaller implements ConfigInstallerInterface {
   /**
    * {@inheritdoc}
    */
-  public function installOptionalConfig(?StorageInterface $storage = NULL, $dependency = []) {
+  public function installOptionalConfig(?StorageInterface $storage = NULL, $dependency = [], $collection = StorageInterface::DEFAULT_COLLECTION) {
     $profile = $this->drupalGetProfile();
     $enabled_extensions = $this->getEnabledExtensions();
     $existing_config = $this->getActiveStorages()->listAll();
 
+    // Get proper storage for non-default collection.
+    if ($storage !== NULL && $storage->getCollectionName() !== $collection) {
+      $default_storage = $storage;
+      $storage = $storage->createCollection($collection);
+    }
+
     // Create the storages to read configuration from.
     if (!$storage) {
       // Search the install profile's optional configuration too.
-      $storage = new ExtensionInstallStorage($this->getActiveStorages(StorageInterface::DEFAULT_COLLECTION), InstallStorage::CONFIG_OPTIONAL_DIRECTORY, StorageInterface::DEFAULT_COLLECTION, TRUE, $this->installProfile);
+      $storage = new ExtensionInstallStorage($this->getActiveStorages($collection), InstallStorage::CONFIG_OPTIONAL_DIRECTORY, $collection, TRUE, $this->installProfile);
       // The extension install storage ensures that overrides are used.
       $profile_storage = NULL;
     }
     elseif (!empty($profile)) {
       // Creates a profile storage to search for overrides.
       $profile_install_path = $this->extensionPathResolver->getPath('module', $profile) . '/' . InstallStorage::CONFIG_OPTIONAL_DIRECTORY;
-      $profile_storage = new FileStorage($profile_install_path, StorageInterface::DEFAULT_COLLECTION);
+      $profile_storage = new FileStorage($profile_install_path, $collection);
     }
     else {
       // Profile has not been set yet. For example during the first steps of the
@@ -250,7 +259,11 @@ class ConfigInstaller implements ConfigInstallerInterface {
 
     // Filter the list of configuration to only include configuration that
     // should be created.
-    $list = array_filter($list, function ($config_name) use ($existing_config) {
+    $list = array_filter($list, function ($config_name) use ($existing_config, $collection) {
+      // Allow non-default collection's config to be processed further.
+      if ($collection != StorageInterface::DEFAULT_COLLECTION) {
+        return TRUE;
+      }
       // Only list configuration that:
       // - does not already exist
       // - is a configuration entity (this also excludes config that has an
@@ -277,6 +290,11 @@ class ConfigInstaller implements ConfigInstallerInterface {
     }
 
     foreach ($config_to_create as $config_name => $data) {
+      // For non-default collection's config load data from default one
+      // to get proper dependencies.
+      if (!empty($default_storage) && $collection != StorageInterface::DEFAULT_COLLECTION) {
+        $data = $default_storage->read($config_name);
+      }
       // Remove configuration where its dependencies cannot be met.
       $remove = !$this->validateDependencies($config_name, $data, $enabled_extensions, $all_config);
       // Remove configuration that is not dependent on $dependency, if it is
@@ -296,7 +314,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
 
     // Create the optional configuration if there is any left after filtering.
     if (!empty($config_to_create)) {
-      $this->createConfiguration(StorageInterface::DEFAULT_COLLECTION, $config_to_create);
+      $this->createConfiguration($collection, $config_to_create);
     }
   }
 

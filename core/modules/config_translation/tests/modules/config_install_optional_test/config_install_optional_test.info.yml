@@ -1,0 +1,6 @@
+name: 'Config install/optional test'
+type: module
+description: 'Support module for configuration install/optional testing.'
+package: Testing
+version: '1.2'
+hidden: true

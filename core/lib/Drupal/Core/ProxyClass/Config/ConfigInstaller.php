@@ -79,9 +79,9 @@ namespace Drupal\Core\ProxyClass\Config {
          * {@inheritdoc}
          */
         public function installOptionalConfig(?\Drupal\Core\Config\StorageInterface $storage = NULL, $dependency = array (
-        ))
+        ), $collection = '')
         {
-            return $this->lazyLoadItself()->installOptionalConfig($storage, $dependency);
+            return $this->lazyLoadItself()->installOptionalConfig($storage, $dependency, $collection);
         }
 
         /**

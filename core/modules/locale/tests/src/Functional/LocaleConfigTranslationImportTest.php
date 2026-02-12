@@ -188,7 +188,7 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
   }
 
   /**
-   * Tests removing a string from Locale deletes configuration translations.
+   * Tests removing a string from Locale shouldn't delete config translations.
    */
   public function testLocaleRemovalAndConfigOverrideDelete(): void {
     // Enable the locale module.
@@ -217,7 +217,10 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
     $this->submitForm(['predefined_langcode' => 'af'], 'Add language');
 
     $override = \Drupal::languageManager()->getLanguageConfigOverride('af', 'locale_test_translate.settings');
-    $this->assertEquals(['translatable_default_with_translation' => 'Locale can translate Afrikaans'], $override->get());
+    $expected = [
+      'translatable_default_with_translation' => 'Locale can translate Afrikaans',
+    ];
+    $this->assertEquals($expected, $override->get());
 
     // Remove the string from translation to simulate a Locale removal. Note
     // that is no current way of doing this in the UI.
@@ -228,13 +231,15 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
     $count = \Drupal::service('locale.config_manager')->updateConfigTranslations(['locale_test_translate.settings'], ['af']);
     $this->assertEquals(1, $count, 'Correct count of updated translations');
 
+    // Deleting the locale translation should not delete configuration
+    // translations.
     $override = \Drupal::languageManager()->getLanguageConfigOverride('af', 'locale_test_translate.settings');
-    $this->assertEquals([], $override->get());
-    $this->assertTrue($override->isNew(), 'The configuration override was deleted when the Locale string was deleted.');
+    $this->assertEquals($expected, $override->get());
+    $this->assertFalse($override->isNew(), 'The configuration override was not deleted when the Locale string was deleted.');
   }
 
   /**
-   * Tests removing a string from Locale changes configuration translations.
+   * Tests removing a string from Locale shouldn't change config translations.
    */
   public function testLocaleRemovalAndConfigOverridePreserve(): void {
     // Enable the locale module.
@@ -291,11 +296,9 @@ class LocaleConfigTranslationImportTest extends BrowserTestBase {
     $this->drupalGet('admin/config/regional/translate');
     $this->submitForm($edit, 'Save translations');
 
+    // Deleting the locale translation should not change configuration
+    // translations.
     $override = \Drupal::languageManager()->getLanguageConfigOverride('af', 'locale_test_translate.settings');
-    $expected = [
-      'translatable_no_default' => 'This translation is preserved',
-      'translatable_default_with_no_translation' => 'This translation is preserved',
-    ];
     $this->assertEquals($expected, $override->get());
   }
 
