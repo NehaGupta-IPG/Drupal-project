@@ -9,12 +9,18 @@ use Drupal\Component\FileSystem\FileSystem;
 use Drupal\Core\Recipe\Recipe;
 use Drupal\Core\Recipe\RecipeDiscovery;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 
 /**
- * @coversDefaultClass \Drupal\Core\Recipe\RecipeDiscovery
- * @group Recipe
+ * Tests recipe discovery.
  */
+#[CoversClass(RecipeDiscovery::class)]
+#[Group('Recipe')]
+#[RunTestsInSeparateProcesses]
 class RecipeDiscoveryTest extends KernelTestBase {
 
   /**
@@ -25,10 +31,14 @@ class RecipeDiscoveryTest extends KernelTestBase {
   /**
    * Tests finding recipes.
    *
-   * @testWith [true, true]
-   *   [true, false]
-   *   [false, true]
+   * @param bool $include_test_recipes
+   *   Whether to include test recipes.
+   * @param bool $include_core_recipes
+   *   Whether to include core recipes.
    */
+  #[TestWith([TRUE, TRUE])]
+  #[TestWith([TRUE, FALSE])]
+  #[TestWith([FALSE, TRUE])]
   public function testFindRecipes(bool $include_test_recipes, bool $include_core_recipes): void {
     $this->installConfig(['system', 'user']);
     $drupal_root = $this->getDrupalRoot();
