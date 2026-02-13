@@ -61,13 +61,13 @@ class EntityRepository implements EntityRepositoryInterface {
       throw new EntityStorageException("Entity type $entity_type_id does not support UUIDs.");
     }
 
-    return $this->loadOneByProperties($entity_type_id, [$uuid_key => $uuid]);
+    return $this->loadUniqueByProperties($entity_type_id, [$uuid_key => $uuid]);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function loadOneByProperties(string $entity_type_id, array $values = []): ?EntityInterface {
+  public function loadUniqueByProperties(string $entity_type_id, array $values = []): ?EntityInterface {
     $entities = $this->entityTypeManager->getStorage($entity_type_id)->loadByProperties($values);
     if (count($entities) > 1) {
       throw new EntityStorageException('Trying to load a single entity but found multiple candidates.');
