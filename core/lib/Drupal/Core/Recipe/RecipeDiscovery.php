@@ -7,7 +7,9 @@ namespace Drupal\Core\Recipe;
 use Composer\InstalledVersions;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use RuntimeException;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Validator\Exception\ValidationFailedException;
 
 /**
  * Discovers recipes at specific locations in the file system.
@@ -105,7 +107,12 @@ final class RecipeDiscovery implements \IteratorAggregate, LoggerAwareInterface 
       try {
         yield Recipe::createFromDirectory($file->getPath());
       }
-      catch (RecipeFileException $e) {
+      catch (RecipeFileException |
+        RecipeMissingExtensionsException |
+        RecipePreExistingConfigException |
+        RuntimeException |
+        UnknownRecipeException |
+        ValidationFailedException $e) {
         // If we're ignoring invalid recipes, log the exception message (if a
         // logger has been set).
         if ($this->skipInvalid) {
