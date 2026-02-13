@@ -49,7 +49,7 @@ class RecipeDiscoveryTest extends KernelTestBase {
 
     // Certain test recipes have validation errors on purpose, but we want to
     // skip those.
-    $discovery = new RecipeDiscovery($dir, $include_core_recipes, TRUE);
+    $discovery = new RecipeDiscovery($dir, $include_core_recipes, TRUE, ['default_content_base/']);
     $logger = new TestLogger();
     $discovery->setLogger($logger);
 
@@ -66,6 +66,10 @@ class RecipeDiscoveryTest extends KernelTestBase {
       $invalid_recipes = preg_grep('/\/invalid_recipe$/', $paths);
       $this->assertEmpty($invalid_recipes);
       $this->assertTrue($logger->hasWarningThatContains("Validation errors were found in $drupal_root/core/tests/fixtures/recipes/invalid_recipe/recipe.yml:"));
+
+      // A specified path should have been excluded.
+      $excluded_paths = preg_grep('/\/default_content_base$/', $paths);
+      $this->assertEmpty($excluded_paths);
     }
     else {
       $this->assertEmpty($test_recipes);

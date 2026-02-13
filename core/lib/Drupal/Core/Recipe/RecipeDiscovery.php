@@ -54,11 +54,15 @@ final class RecipeDiscovery implements \IteratorAggregate, LoggerAwareInterface 
    *   (optional) Whether to include recipes provided by core.
    * @param bool $skipInvalid
    *   (optional) Whether recipes that have validation errors should be ignored.
+   * @param array|null $pathsToExclude
+   *   (optional) Paths to exclude from searching for recipes. Can be used to
+   *   exclude recipes such as the example recipe included in Drupal core.
    */
   public function __construct(
     ?string $path = NULL,
     bool $includeCoreRecipes = TRUE,
     public bool $skipInvalid = FALSE,
+    private readonly ?array $pathsToExclude = NULL,
   ) {
     if ($includeCoreRecipes) {
       $this->directoriesToSearch[] = \Drupal::root() . '/core/recipes';
@@ -100,7 +104,9 @@ final class RecipeDiscovery implements \IteratorAggregate, LoggerAwareInterface 
       ->depth(1)
       ->followLinks()
       ->in($this->directoriesToSearch);
-
+    if ($this->pathsToExclude) {
+      $finder->notPath($this->pathsToExclude);
+    }
     /** @var \Symfony\Component\Finder\SplFileInfo $file */
     foreach ($finder as $file) {
       try {
