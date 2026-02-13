@@ -27,7 +27,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class SystemRequirements implements InstallRequirementsInterface {
 
-  // cspell:ignore quickedit
+  // cspell:ignore quickedit unroutable
 
   /**
    * An array of machine names of modules that were removed from Drupal core.
