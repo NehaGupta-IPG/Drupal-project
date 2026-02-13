@@ -89,14 +89,7 @@ class PagerManager implements PagerManagerInterface {
   public function getUpdatedParameters(array $query, $element, $index) {
     // For a single link within a pager, update its link whilst
     // remembering the current index of other pagers.
-    $page_query = $this->requestStack->getCurrentRequest()->query->get('page');
-    // Do not interpret an existing first pager index of 0 to be empty.
-    if ($page_query || $page_query === '0') {
-      $pagers_indexes = explode(',', $page_query);
-    }
-    else {
-      $pagers_indexes = [];
-    }
+    $pagers_indexes = $this->pagerParams->getPagerQuery();
 
     // Fill missing array elements to preserve gaps in element IDs.
     $max = max(array_merge(array_keys($pagers_indexes), [$element]));

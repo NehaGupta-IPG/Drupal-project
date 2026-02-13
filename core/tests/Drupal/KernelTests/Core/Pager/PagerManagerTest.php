@@ -58,7 +58,7 @@ class PagerManagerTest extends KernelTestBase {
   public static function providerTestGetUpdatedParameters() {
     return [
       'no_existing_page_parameter' => [2, 5, '', ',,5'],
-      'existing_first_page_parameter' => [2, 5, '0', '0,,5'],
+      'existing_first_page_parameter' => [2, 5, '0', ',,5'],
       'existing_non_first_page_parameter' => [2, 5, ',1', ',1,5'],
       'page_parameter_with_id_less_than_max_pager_id' => [2, 5, ',7', ',7,5'],
       'page_parameter_with_id_greater_than_max_pager_id' => [2, 5, ',,,9', ',,5,9'],
