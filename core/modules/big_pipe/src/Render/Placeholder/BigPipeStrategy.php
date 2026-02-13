@@ -5,8 +5,11 @@ namespace Drupal\big_pipe\Render\Placeholder;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Render\Placeholder\PlaceholderStrategyInterface;
+use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Session\SessionConfigurationInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -65,41 +68,19 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
    */
   const NOJS_COOKIE = 'big_pipe_nojs';
 
-  /**
-   * The session configuration.
-   *
-   * @var \Drupal\Core\Session\SessionConfigurationInterface
-   */
-  protected $sessionConfiguration;
-
-  /**
-   * The request stack.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
-   */
-  protected $requestStack;
-
-  /**
-   * The current route match.
-   *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
-   */
-  protected $routeMatch;
-
-  /**
-   * Constructs a new BigPipeStrategy class.
-   *
-   * @param \Drupal\Core\Session\SessionConfigurationInterface $session_configuration
-   *   The session configuration.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
-   *   The request stack.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
-   *   The current route match.
-   */
-  public function __construct(SessionConfigurationInterface $session_configuration, RequestStack $request_stack, RouteMatchInterface $route_match) {
-    $this->sessionConfiguration = $session_configuration;
-    $this->requestStack = $request_stack;
-    $this->routeMatch = $route_match;
+  public function __construct(protected SessionConfigurationInterface $sessionConfiguration, protected RequestStack $requestStack, protected RouteMatchInterface $routeMatch, protected ?ModuleHandlerInterface $moduleHandler = NULL, protected ?RedirectDestinationInterface $redirectDestination = NULL, protected ?UrlGeneratorInterface $urlGenerator = NULL) {
+    if (!isset($moduleHandler)) {
+      trigger_error('Calling ' . __METHOD__ . ' without the module handler service is deprecated in drupal:11.4.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3508508.');
+      $this->moduleHandler = \Drupal::service('module_handler');
+    }
+    if (!isset($redirectDestination)) {
+      trigger_error('Calling ' . __METHOD__ . ' without the redirect destination service is deprecated in drupal:11.4.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3508508.');
+      $this->moduleHandler = \Drupal::service('redirect.destination');
+    }
+    if (!isset($urlGenerator)) {
+      trigger_error('Calling ' . __METHOD__ . ' without the URL generator service is deprecated in drupal:11.4.0 and the argument will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3508508.');
+      $this->urlGenerator = \Drupal::service('url_generator');
+    }
   }
 
   /**
@@ -122,7 +103,13 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
       return [];
     }
 
-    if (!$this->sessionConfiguration->hasSession($request)) {
+    // If dynamic_page_cache is installed, allow session-less requests to be
+    // served with big pipe responses. This is because dynamic_page_cache hits
+    // will usually not have any big pipe placeholders to replace and therefore
+    // can be cached in internal/external page caches.
+    if (!$this->sessionConfiguration->hasSession($request)
+      && !$this->moduleHandler->moduleExists('dynamic_page_cache')
+    ) {
       return [];
     }
 
@@ -160,13 +147,41 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
       else {
         // If the current request/session doesn't have JavaScript, fall back to
         // no-JS BigPipe.
-        if ($this->requestStack->getCurrentRequest()->cookies->has(static::NOJS_COOKIE)) {
+        $has_big_pipe_nojs_cookie = $this->requestStack->getCurrentRequest()->cookies->has(static::NOJS_COOKIE);
+        if ($has_big_pipe_nojs_cookie) {
           $overridden_placeholders[$placeholder] = static::createBigPipeNoJsPlaceholder($placeholder, $placeholder_elements, FALSE);
         }
         else {
           $overridden_placeholders[$placeholder] = static::createBigPipeJsPlaceholder($placeholder, $placeholder_elements);
         }
         $overridden_placeholders[$placeholder]['#cache']['contexts'][] = 'cookies:' . static::NOJS_COOKIE;
+        if (!$has_big_pipe_nojs_cookie) {
+          // Let server set the BigPipe no-JS cookie.
+          // Redirect through a 'Refresh' meta tag if JavaScript is disabled.
+          $overridden_placeholders[$placeholder]['#attached']['html_head'][] = [
+            [
+              '#tag' => 'meta',
+              '#noscript' => TRUE,
+              '#attributes' => [
+                'http-equiv' => 'Refresh',
+                'content' => '0; URL=' . $this->urlGenerator->generateFromRoute('big_pipe.nojs', [], [
+                  'query' => $this->redirectDestination->getAsArray(),
+                ]),
+              ],
+            ],
+            'big_pipe_detect_nojs',
+          ];
+        }
+        else {
+          // Let client delete the BigPipe no-JS cookie.
+          $overridden_placeholders[$placeholder]['#attached']['html_head'][] = [
+            [
+              '#tag' => 'script',
+              '#value' => 'document.cookie = "' . BigPipeStrategy::NOJS_COOKIE . '=1; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"',
+            ],
+            'big_pipe_detect_js',
+          ];
+        }
       }
     }
 
@@ -221,9 +236,6 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
       '#suffix' => '</span>',
       '#cache' => [
         'max-age' => 0,
-        'contexts' => [
-          'session.exists',
-        ],
       ],
       '#attached' => [
         'library' => [

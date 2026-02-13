@@ -29,9 +29,9 @@ class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
     }, 'umamiFrontAndRecipePages');
 
     $expected = [
-      'ScriptCount' => 1,
-      'ScriptBytes' => 11700,
-      'StylesheetCount' => 6,
+      'ScriptCount' => 3,
+      'ScriptBytes' => 72500,
+      'StylesheetCount' => 10,
       'StylesheetBytes' => 117400,
     ];
     $this->assertMetrics($expected, $performance_data);

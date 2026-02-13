@@ -6,7 +6,10 @@ namespace Drupal\Tests\big_pipe\Unit\Render\Placeholder;
 
 use Drupal\big_pipe\Render\Placeholder\BigPipeStrategy;
 use Drupal\big_pipe_test\BigPipePlaceholderTestCases;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Routing\RedirectDestinationInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Session\SessionConfigurationInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -28,7 +31,7 @@ class BigPipeStrategyTest extends UnitTestCase {
    * Tests process placeholders.
    */
   #[DataProvider('placeholdersProvider')]
-  public function testProcessPlaceholders(array $placeholders, $method, $route_match_has_no_big_pipe_option, $request_has_session, $request_has_big_pipe_nojs_cookie, array $expected_big_pipe_placeholders): void {
+  public function testProcessPlaceholders(array $placeholders, $method, $route_match_has_no_big_pipe_option, $request_has_session, $request_has_big_pipe_nojs_cookie, bool $dynamic_page_cache_installed, array $expected_big_pipe_placeholders): void {
     $request = new Request();
     $request->setMethod($method);
     if ($request_has_big_pipe_nojs_cookie) {
@@ -49,13 +52,31 @@ class BigPipeStrategyTest extends UnitTestCase {
     $route_match->getRouteObject()
       ->willReturn($route);
 
-    $big_pipe_strategy = new BigPipeStrategy($session_configuration->reveal(), $request_stack->reveal(), $route_match->reveal());
+    $module_handler = $this->prophesize(ModuleHandlerInterface::class);
+    $module_handler->moduleExists('dynamic_page_cache')->willReturn($dynamic_page_cache_installed);
+    $redirect_destination = $this->prophesize(RedirectDestinationInterface::class);
+    $redirect_destination->get()
+      ->willReturn('/');
+    $redirect_destination->getAsArray()
+      ->willReturn(['destination' => '/']);
+    $url_generator = $this->prophesize(UrlGeneratorInterface::class);
+    $url_generator->generateFromRoute(
+     "big_pipe.nojs",
+        [],
+        ["query" => ["destination" => "/"]]
+    )->willReturn('/');
+    $big_pipe_strategy = new BigPipeStrategy($session_configuration->reveal(), $request_stack->reveal(), $route_match->reveal(), $module_handler->reveal(), $redirect_destination->reveal(), $url_generator->reveal());
     $processed_placeholders = $big_pipe_strategy->processPlaceholders($placeholders);
 
-    if ($request->isMethodCacheable() && !$route_match_has_no_big_pipe_option && $request_has_session) {
+    if ($request->isMethodCacheable() && !$route_match_has_no_big_pipe_option) {
       $this->assertSameSize($expected_big_pipe_placeholders, $processed_placeholders, 'BigPipe is able to deliver all placeholders.');
       foreach (array_keys($placeholders) as $placeholder) {
-        $this->assertSame($expected_big_pipe_placeholders[$placeholder], $processed_placeholders[$placeholder], "Verifying how BigPipeStrategy handles the placeholder '$placeholder'");
+        // If the request has a session, every placeholder will be processed by
+        // Big Pipe. Otherwise ensure only the explicitly expected placeholders
+        // are checked.
+        if ($request_has_session || isset($expected_big_pipe_placeholders[$placeholder])) {
+          $this->assertSame($expected_big_pipe_placeholders[$placeholder], $processed_placeholders[$placeholder], "Verifying how BigPipeStrategy handles the placeholder '$placeholder'");
+        }
       }
     }
     else {
@@ -90,6 +111,7 @@ class BigPipeStrategyTest extends UnitTestCase {
         FALSE,
         FALSE,
         FALSE,
+        FALSE,
         [],
       ],
       '_no_big_pipe absent, no session, no-JS cookie present' => [
@@ -98,12 +120,48 @@ class BigPipeStrategyTest extends UnitTestCase {
         FALSE,
         FALSE,
         TRUE,
+        FALSE,
         [],
+      ],
+      '_no_big_pipe absent, no session, no-JS cookie absent, dynamic page cache installed' => [
+        $placeholders,
+        'GET',
+        FALSE,
+        FALSE,
+        FALSE,
+        TRUE,
+        [
+          $cases['html']->placeholder => $cases['html']->bigPipePlaceholderRenderArray,
+          $cases['html_attribute_value']->placeholder => $cases['html_attribute_value']->bigPipeNoJsPlaceholderRenderArray,
+          $cases['html_attribute_value_subset']->placeholder => $cases['html_attribute_value_subset']->bigPipeNoJsPlaceholderRenderArray,
+          $cases['edge_case__invalid_html']->placeholder => $cases['edge_case__invalid_html']->bigPipeNoJsPlaceholderRenderArray,
+          $cases['edge_case__html_non_lazy_builder']->placeholder => $cases['edge_case__html_non_lazy_builder']->bigPipePlaceholderRenderArray,
+          $cases['exception__lazy_builder']->placeholder => $cases['exception__lazy_builder']->bigPipePlaceholderRenderArray,
+          $cases['exception__embedded_response']->placeholder => $cases['exception__embedded_response']->bigPipePlaceholderRenderArray,
+        ],
+      ],
+      '_no_big_pipe absent, no session, no-JS cookie present, dynamic page cache' => [
+        $placeholders,
+        'GET',
+        FALSE,
+        FALSE,
+        TRUE,
+        TRUE,
+        [
+          $cases['html']->placeholder => $cases['html']->bigPipeNoJsPlaceholderRenderArray,
+          $cases['html_attribute_value']->placeholder => $cases['html_attribute_value']->bigPipeNoJsPlaceholderRenderArray,
+          $cases['html_attribute_value_subset']->placeholder => $cases['html_attribute_value_subset']->bigPipeNoJsPlaceholderRenderArray,
+          $cases['edge_case__invalid_html']->placeholder => $cases['edge_case__invalid_html']->bigPipeNoJsPlaceholderRenderArray,
+          $cases['edge_case__html_non_lazy_builder']->placeholder => $cases['edge_case__html_non_lazy_builder']->bigPipeNoJsPlaceholderRenderArray,
+          $cases['exception__lazy_builder']->placeholder => $cases['exception__lazy_builder']->bigPipeNoJsPlaceholderRenderArray,
+          $cases['exception__embedded_response']->placeholder => $cases['exception__embedded_response']->bigPipeNoJsPlaceholderRenderArray,
+        ],
       ],
       '_no_big_pipe present, no session, no-JS cookie absent' => [
         $placeholders,
         'GET',
         TRUE,
+        FALSE,
         FALSE,
         FALSE,
         [],
@@ -114,6 +172,7 @@ class BigPipeStrategyTest extends UnitTestCase {
         TRUE,
         FALSE,
         TRUE,
+        FALSE,
         [],
       ],
       '_no_big_pipe present, session, no-JS cookie absent' => [
@@ -121,6 +180,7 @@ class BigPipeStrategyTest extends UnitTestCase {
         'GET',
         TRUE,
         TRUE,
+        FALSE,
         FALSE,
         [],
       ],
@@ -130,6 +190,7 @@ class BigPipeStrategyTest extends UnitTestCase {
         TRUE,
         TRUE,
         TRUE,
+        FALSE,
         [],
       ],
       '_no_big_pipe absent, session, no-JS cookie absent: (JS-powered) BigPipe placeholder used for HTML placeholders' => [
@@ -137,6 +198,7 @@ class BigPipeStrategyTest extends UnitTestCase {
         'GET',
         FALSE,
         TRUE,
+        FALSE,
         FALSE,
         [
           $cases['html']->placeholder => $cases['html']->bigPipePlaceholderRenderArray,
@@ -154,6 +216,7 @@ class BigPipeStrategyTest extends UnitTestCase {
         FALSE,
         TRUE,
         FALSE,
+        FALSE,
         [],
       ],
       '_no_big_pipe absent, session, no-JS cookie present: no-JS BigPipe placeholder used for HTML placeholders' => [
@@ -162,6 +225,7 @@ class BigPipeStrategyTest extends UnitTestCase {
         FALSE,
         TRUE,
         TRUE,
+        FALSE,
         [
           $cases['html']->placeholder => $cases['html']->bigPipeNoJsPlaceholderRenderArray,
           $cases['html_attribute_value']->placeholder => $cases['html_attribute_value']->bigPipeNoJsPlaceholderRenderArray,
@@ -178,6 +242,7 @@ class BigPipeStrategyTest extends UnitTestCase {
         FALSE,
         TRUE,
         TRUE,
+        FALSE,
         [],
       ],
     ];

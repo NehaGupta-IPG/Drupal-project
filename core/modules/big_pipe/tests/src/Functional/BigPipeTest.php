@@ -81,14 +81,28 @@ class BigPipeTest extends BrowserTestBase {
   public function testNoJsDetection(): void {
     $no_js_to_js_markup = '<script>document.cookie = "' . BigPipeStrategy::NOJS_COOKIE . '=1; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"</script>';
 
-    // 1. No session (anonymous).
+    // 1. No session (anonymous). Dynamic page cache.
+    $this->drupalGet(Url::fromRoute('big_pipe_test'));
+    $this->assertSessionCookieExists('0');
+    $this->assertBigPipeNoJsCookieExists('0');
+    $this->assertSession()->responseContains('<noscript><meta http-equiv="Refresh" content="0; URL=' . base_path() . 'big_pipe/no-js?destination=' . base_path() . 'big_pipe_test" />' . "\n" . '</noscript>');
+    $this->assertSession()->responseNotContains($no_js_to_js_markup);
+    $this->assertBigPipeNoJsMetaRefreshRedirect();
+    $this->assertBigPipeNoJsCookieExists('1');
+    $this->assertSession()->responseNotContains('<noscript><meta http-equiv="Refresh" content="0; URL=');
+    $this->assertSession()->responseContains($no_js_to_js_markup);
+    $this->getSession()->reset();
+
+    \Drupal::service('module_installer')->uninstall(['dynamic_page_cache']);
+    // 2. No session (anonymous). No dynamic page cache.
     $this->drupalGet(Url::fromRoute('<front>'));
     $this->assertSessionCookieExists('0');
     $this->assertBigPipeNoJsCookieExists('0');
     $this->assertSession()->responseNotContains('<noscript><meta http-equiv="Refresh" content="0; URL=');
     $this->assertSession()->responseNotContains($no_js_to_js_markup);
+    \Drupal::service('module_installer')->uninstall(['dynamic_page_cache']);
 
-    // 2. Session (authenticated).
+    // 3. Session (authenticated).
     $this->drupalLogin($this->rootUser);
     $this->drupalGet(Url::fromRoute('big_pipe_test'));
     $this->assertSessionCookieExists('1');
@@ -104,7 +118,7 @@ class BigPipeTest extends BrowserTestBase {
     // Close the prior connection and remove the collected state.
     $this->getSession()->reset();
 
-    // 3. Session (anonymous).
+    // 4. Session (anonymous). No dynamic_page_cache.
     $this->drupalGet(Url::fromRoute('user.login', [], ['query' => ['trigger_session' => 1]]));
     $this->drupalGet(Url::fromRoute('big_pipe_test'));
     $this->assertSessionCookieExists('1');

@@ -41,9 +41,37 @@ class BigPipePlaceholderTestCases {
       'max-age' => 0,
       'contexts' => ['session.exists'],
     ];
+    $cacheability_depends_on_nojs_cookie_only = [
+      'max-age' => 0,
+      'contexts' => ['cookies:big_pipe_nojs'],
+    ];
     $cacheability_depends_on_session_and_nojs_cookie = [
       'max-age' => 0,
       'contexts' => ['session.exists', 'cookies:big_pipe_nojs'],
+    ];
+
+    $html_head_js = [
+      [
+        [
+          '#tag' => 'meta',
+          '#noscript' => TRUE,
+          '#attributes' => [
+            'http-equiv' => 'Refresh',
+            'content' => '0; URL=/',
+          ],
+        ],
+        'big_pipe_detect_nojs',
+      ],
+    ];
+
+    $html_head_no_js = [
+      [
+        [
+          '#tag' => 'script',
+          '#value' => 'document.cookie = "big_pipe_nojs=1; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"',
+        ],
+        'big_pipe_detect_js',
+      ],
     ];
 
     // 1. Real-world example of HTML placeholder.
@@ -69,7 +97,7 @@ class BigPipePlaceholderTestCases {
         '#arguments' => [NULL],
       ],
       '#suffix' => '</span>',
-      '#cache' => $cacheability_depends_on_session_and_nojs_cookie,
+      '#cache' => $cacheability_depends_on_nojs_cookie_only,
       '#attached' => [
         'library' => ['big_pipe/big_pipe'],
         'drupalSettings' => [
@@ -82,6 +110,7 @@ class BigPipePlaceholderTestCases {
           // cspell:disable-next-line
           'callback=Drupal%5CCore%5CRender%5CElement%5CStatusMessages%3A%3ArenderMessages&amp;args%5B0%5D&amp;token=_HAdUpwWmet0TOTe2PSiJuMntExoshbm1kh2wQzzzAA' => $status_messages->placeholderRenderArray,
         ],
+        'html_head' => $html_head_js,
       ],
     ];
     // cspell:disable-next-line
@@ -95,6 +124,7 @@ class BigPipePlaceholderTestCases {
           // cspell:disable-next-line
           '<span data-big-pipe-nojs-placeholder-id="callback=Drupal%5CCore%5CRender%5CElement%5CStatusMessages%3A%3ArenderMessages&amp;args%5B0%5D&amp;token=_HAdUpwWmet0TOTe2PSiJuMntExoshbm1kh2wQzzzAA"></span>' => $status_messages->placeholderRenderArray,
         ],
+        'html_head' => $html_head_no_js,
       ],
     ];
     if ($container && $user) {
@@ -230,6 +260,7 @@ class BigPipePlaceholderTestCases {
         'big_pipe_placeholders' => [
           'divpiggydiv' => $piggy->placeholderRenderArray,
         ],
+        'html_head' => $html_head_js,
       ],
     ];
     $piggy->embeddedAjaxResponseCommands = [
@@ -249,6 +280,7 @@ class BigPipePlaceholderTestCases {
         'big_pipe_nojs_placeholders' => [
           '<span data-big-pipe-nojs-placeholder-id="divpiggydiv"></span>' => $piggy->placeholderRenderArray,
         ],
+        'html_head' => $html_head_no_js,
       ],
     ];
     $piggy->embeddedHtmlResponse = '<span>This 🐷 little 🐽 piggy 🐖 stayed 🐽 at 🐷 home.</span>';
@@ -280,7 +312,7 @@ class BigPipePlaceholderTestCases {
       '#prefix' => '<span data-big-pipe-placeholder-id="timecurrent-timetime">',
       'interface_preview' => [],
       '#suffix' => '</span>',
-      '#cache' => $cacheability_depends_on_session_and_nojs_cookie,
+      '#cache' => $cacheability_depends_on_nojs_cookie_only,
       '#attached' => [
         'library' => ['big_pipe/big_pipe'],
         'drupalSettings' => [
@@ -291,6 +323,7 @@ class BigPipePlaceholderTestCases {
         'big_pipe_placeholders' => [
           'timecurrent-timetime' => $current_time->placeholderRenderArray,
         ],
+        'html_head' => $html_head_js,
       ],
     ];
     $current_time->embeddedAjaxResponseCommands = [
@@ -310,6 +343,7 @@ class BigPipePlaceholderTestCases {
         'big_pipe_nojs_placeholders' => [
           '<span data-big-pipe-nojs-placeholder-id="timecurrent-timetime"></span>' => $current_time->placeholderRenderArray,
         ],
+        'html_head' => $html_head_no_js,
       ],
     ];
     $current_time->embeddedHtmlResponse = '<time datetime="1991-03-14"></time>';
@@ -337,7 +371,7 @@ class BigPipePlaceholderTestCases {
         '#arguments' => ['llamas', 'suck'],
       ],
       '#suffix' => '</span>',
-      '#cache' => $cacheability_depends_on_session_and_nojs_cookie,
+      '#cache' => $cacheability_depends_on_nojs_cookie_only,
       '#attached' => [
         'library' => ['big_pipe/big_pipe'],
         'drupalSettings' => [
@@ -350,6 +384,7 @@ class BigPipePlaceholderTestCases {
           // cspell:disable-next-line
           'callback=%5CDrupal%5Cbig_pipe_test%5CBigPipeTestController%3A%3Aexception&amp;args%5B0%5D=llamas&amp;args%5B1%5D=suck&amp;token=uhKFNfT4eF449_W-kDQX8E5z4yHyt0-nSHUlwaGAQeU' => $exception->placeholderRenderArray,
         ],
+        'html_head' => $html_head_js,
       ],
     ];
     $exception->embeddedAjaxResponseCommands = NULL;
@@ -362,6 +397,7 @@ class BigPipePlaceholderTestCases {
         'big_pipe_nojs_placeholders' => [
           $exception->bigPipeNoJsPlaceholder => $exception->placeholderRenderArray,
         ],
+        'html_head' => $html_head_no_js,
       ],
     ];
     $exception->embeddedHtmlResponse = NULL;
@@ -389,7 +425,7 @@ class BigPipePlaceholderTestCases {
         '#arguments' => [],
       ],
       '#suffix' => '</span>',
-      '#cache' => $cacheability_depends_on_session_and_nojs_cookie,
+      '#cache' => $cacheability_depends_on_nojs_cookie_only,
       '#attached' => [
         'library' => ['big_pipe/big_pipe'],
         'drupalSettings' => [
@@ -400,6 +436,7 @@ class BigPipePlaceholderTestCases {
         'big_pipe_placeholders' => [
           'callback=%5CDrupal%5Cbig_pipe_test%5CBigPipeTestController%3A%3AresponseException&amp;&amp;token=' . $token => $embedded_response_exception->placeholderRenderArray,
         ],
+        'html_head' => $html_head_js,
       ],
     ];
     $embedded_response_exception->embeddedAjaxResponseCommands = NULL;
@@ -411,6 +448,7 @@ class BigPipePlaceholderTestCases {
         'big_pipe_nojs_placeholders' => [
           $embedded_response_exception->bigPipeNoJsPlaceholder => $embedded_response_exception->placeholderRenderArray,
         ],
+        'html_head' => $html_head_no_js,
       ],
     ];
     $exception->embeddedHtmlResponse = NULL;

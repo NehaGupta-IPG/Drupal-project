@@ -68,9 +68,10 @@ class StandardPerformanceTest extends PerformanceTestBase {
    * Tests performance for anonymous users.
    */
   protected function testAnonymous(): void {
-    // Request the front page, then immediately clear all object caches, so that
-    // aggregates and image styles are created on disk but otherwise caches are
-    // empty.
+    // Request the front page and node pages, then immediately clear all object
+    // caches, so that aggregates and image styles are created on disk but
+    // otherwise caches are empty.
+    $this->drupalGet('user/login');
     $this->drupalGet('');
     // Give time for big pipe placeholders, asset aggregate requests, and post
     // response tasks to finish processing and write to any caches before
@@ -88,7 +89,6 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $performance_data = $this->collectPerformanceData(function () {
       $this->drupalGet('');
     }, 'standardFrontPage');
-    $this->assertNoJavaScript($performance_data);
 
     $expected_queries = [
       'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."alias" LIKE "/node" ESCAPE ' . "'\\\\'" . ') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
@@ -148,10 +148,10 @@ class StandardPerformanceTest extends PerformanceTestBase {
         'entity' => 2,
         'menu' => 3,
       ],
-      'CacheSetCount' => 45,
+      'CacheSetCount' => 44,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 10,
+      'CacheTagLookupQueryCount' => 9,
       'CacheTagGroupedLookups' => [
         [
           'route_match',
@@ -179,7 +179,6 @@ class StandardPerformanceTest extends PerformanceTestBase {
         ],
         ['config:system.menu.account'],
         ['config:system.menu.main'],
-        ['config:user.role.anonymous'],
       ],
       'StylesheetCount' => 1,
       'StylesheetBytes' => 1450,
@@ -198,7 +197,6 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $performance_data = $this->collectPerformanceData(function () {
       $this->drupalGet('node/1');
     }, 'standardNodePage');
-    $this->assertNoJavaScript($performance_data);
 
     $expected_queries = [
       'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."alias" LIKE "/node/1" ESCAPE ' . "'\\\\'" . ') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
@@ -217,10 +215,10 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $expected = [
       'QueryCount' => 10,
       'CacheGetCount' => 71,
-      'CacheSetCount' => 16,
+      'CacheSetCount' => 15,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 8,
+      'CacheTagLookupQueryCount' => 7,
       'CacheTagGroupedLookups' => [
         [
           'route_match',
@@ -246,7 +244,6 @@ class StandardPerformanceTest extends PerformanceTestBase {
         ],
         ['config:system.menu.main'],
         ['config:system.menu.account'],
-        ['config:user.role.anonymous'],
       ],
       'StylesheetCount' => 1,
       'StylesheetBytes' => 1500,
@@ -258,7 +255,6 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $performance_data = $this->collectPerformanceData(function () {
       $this->drupalGet('user/' . $this->user->id());
     }, 'standardUserPage');
-    $this->assertNoJavaScript($performance_data);
 
     $expected_queries = [
       'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."alias" LIKE "/user/2" ESCAPE ' . "'\\\\'" . ') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
@@ -279,7 +275,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $expected = [
       'QueryCount' => 12,
       'CacheGetCount' => 57,
-      'CacheSetCount' => 16,
+      'CacheSetCount' => 15,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 7,

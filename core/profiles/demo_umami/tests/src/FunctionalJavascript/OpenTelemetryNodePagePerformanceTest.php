@@ -55,15 +55,15 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
     $this->assertSession()->pageTextContains('quiche');
 
     $expected = [
-      'QueryCount' => 225,
-      'CacheGetCount' => 241,
-      'CacheSetCount' => 238,
+      'QueryCount' => 226,
+      'CacheGetCount' => 244,
+      'CacheSetCount' => 240,
       'CacheDeleteCount' => 0,
-      'CacheTagLookupQueryCount' => 24,
+      'CacheTagLookupQueryCount' => 23,
       'CacheTagInvalidationCount' => 0,
-      'ScriptCount' => 1,
-      'ScriptBytes' => 12000,
-      'StylesheetCount' => 2,
+      'ScriptCount' => 3,
+      'ScriptBytes' => 72550,
+      'StylesheetCount' => 5,
       'StylesheetBytes' => 40800,
     ];
     $this->assertMetrics($expected, $performance_data);
@@ -107,10 +107,12 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
    * specific to the route or path is cold.
    */
   protected function testNodePageCoolCache(): void {
-    // First of all visit the node page to ensure the image style exists.
+    // Follow the same steps to warm the caches as the requests that will be
+    // tested after the cache clear.
+    $this->clearCaches();
+    $this->drupalGet('user/login');
     $this->drupalGet('node/1');
     $this->clearCaches();
-    // Now visit a non-node page to warm non-route-specific caches.
     $this->drupalGet('user/login');
     $performance_data = $this->collectPerformanceData(function () {
       $this->drupalGet('node/1');
@@ -120,12 +122,12 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
     $expected = [
       'QueryCount' => 77,
       'CacheGetCount' => 171,
-      'CacheSetCount' => 59,
+      'CacheSetCount' => 58,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 20,
-      'ScriptCount' => 1,
-      'ScriptBytes' => 12000,
+      'CacheTagLookupQueryCount' => 19,
+      'ScriptCount' => 3,
+      'ScriptBytes' => 72552,
       'StylesheetCount' => 2,
       'StylesheetBytes' => 40800,
     ];
@@ -139,7 +141,10 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
    * warm but caches specific to this particular node/path are not.
    */
   protected function testNodePageWarmCache(): void {
-    // First of all visit the node page to ensure the image style exists.
+    // Follow the same steps to warm the caches as the requests that will be
+    // tested after the cache clear.
+    $this->clearCaches();
+    $this->drupalGet('node/2');
     $this->drupalGet('node/1');
     // Allow time for the image style and asset aggregate requests to finish.
     sleep(1);
@@ -200,8 +205,6 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       'SELECT "base"."fid" AS "fid", "base"."uuid" AS "uuid", "base"."langcode" AS "langcode", "base"."uid" AS "uid", "base"."filename" AS "filename", "base"."uri" AS "uri", "base"."filemime" AS "filemime", "base"."filesize" AS "filesize", "base"."status" AS "status", "base"."created" AS "created", "base"."changed" AS "changed" FROM "file_managed" "base" WHERE "base"."fid" IN (5)',
       'SELECT "name", "value" FROM "key_value" WHERE "name" IN ( "theme:umami" ) AND "collection" = "config.entity.key_store.block"',
       'SELECT "base_table"."path" AS "path", "base_table"."alias" AS "alias" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/node/1" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("es", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
-      'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."alias" LIKE "/recipes" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
-      'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."alias" LIKE "/node" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
       'SELECT "base_table"."vid" AS "vid", "base_table"."nid" AS "nid" FROM "node_revision" "base_table" INNER JOIN "node_field_data" "node_field_data" ON "node_field_data"."nid" = "base_table"."nid" INNER JOIN "node_field_revision" "node_field_revision" ON "node_field_revision"."vid" = "base_table"."vid" AND "node_field_revision"."langcode" = "en" WHERE ("node_field_data"."nid" = "1") AND ("node_field_revision"."revision_translation_affected" = 1) ORDER BY "base_table"."vid" DESC LIMIT 1 OFFSET 0',
       'SELECT "revision"."vid" AS "vid", "revision"."langcode" AS "langcode", "revision"."revision_uid" AS "revision_uid", "revision"."revision_timestamp" AS "revision_timestamp", "revision"."revision_log" AS "revision_log", "revision"."revision_default" AS "revision_default", "base"."nid" AS "nid", "base"."type" AS "type", "base"."uuid" AS "uuid", CASE "base"."vid" WHEN "revision"."vid" THEN 1 ELSE 0 END AS "isDefaultRevision" FROM "node" "base" INNER JOIN "node_revision" "revision" ON "revision"."nid" = "base"."nid" AND "revision"."vid" IN (75)',
       'SELECT "revision".* FROM "node_field_revision" "revision" WHERE ("revision"."vid" IN (75)) AND ("revision"."vid" IN ("75")) ORDER BY "revision"."vid" ASC',
@@ -211,6 +214,8 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
       'SELECT "base_table"."revision_id" AS "revision_id", "base_table"."id" AS "id" FROM "content_moderation_state_revision" "base_table" INNER JOIN "content_moderation_state_field_revision" "content_moderation_state_field_revision" ON "content_moderation_state_field_revision"."revision_id" = "base_table"."revision_id" WHERE ("content_moderation_state_field_revision"."content_entity_type_id" LIKE "node" ESCAPE \'\\\\\') AND ("content_moderation_state_field_revision"."content_entity_id" = "1") AND ("content_moderation_state_field_revision"."content_entity_revision_id" = "76") AND ("content_moderation_state_field_revision"."workflow" = "editorial") AND ("content_moderation_state_field_revision"."langcode" = "en") ORDER BY "base_table"."revision_id" DESC',
       'SELECT "revision"."revision_id" AS "revision_id", "revision"."langcode" AS "langcode", "revision"."revision_default" AS "revision_default", "base"."id" AS "id", "base"."uuid" AS "uuid", CASE "base"."revision_id" WHEN "revision"."revision_id" THEN 1 ELSE 0 END AS "isDefaultRevision" FROM "content_moderation_state" "base" INNER JOIN "content_moderation_state_revision" "revision" ON "revision"."id" = "base"."id" AND "revision"."revision_id" IN (76)',
       'SELECT "revision".* FROM "content_moderation_state_field_revision" "revision" WHERE ("revision"."revision_id" IN (76)) AND ("revision"."revision_id" IN ("76")) ORDER BY "revision"."revision_id" ASC',
+      'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."alias" LIKE "/recipes" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
+      'SELECT "base_table"."id" AS "id", "base_table"."path" AS "path", "base_table"."alias" AS "alias", "base_table"."langcode" AS "langcode" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."alias" LIKE "/node" ESCAPE \'\\\\\') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
       'INSERT INTO "semaphore" ("name", "value", "expire") VALUES ("theme_registry:runtime:umami:Drupal\Core\Utility\ThemeRegistry", "LOCK_ID", "EXPIRE")',
       'DELETE FROM "semaphore"  WHERE ("name" = "theme_registry:runtime:umami:Drupal\Core\Utility\ThemeRegistry") AND ("value" = "LOCK_ID")',
     ];
@@ -231,10 +236,10 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
         'render' => 21,
         'default' => 3,
       ],
-      'CacheSetCount' => 41,
+      'CacheSetCount' => 40,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 20,
+      'CacheTagLookupQueryCount' => 19,
       'CacheTagGroupedLookups' => [
         [
           'entity_types',
@@ -318,10 +323,9 @@ class OpenTelemetryNodePagePerformanceTest extends PerformanceTestBase {
         ['node:1:revisions'],
         ['content_moderation_state:1:revisions'],
         ['config:workflows.workflow.editorial'],
-        ['config:user.role.anonymous'],
       ],
-      'ScriptCount' => 1,
-      'ScriptBytes' => 12000,
+      'ScriptCount' => 3,
+      'ScriptBytes' => 72550,
       'StylesheetCount' => 2,
       'StylesheetBytes' => 40500,
     ];
