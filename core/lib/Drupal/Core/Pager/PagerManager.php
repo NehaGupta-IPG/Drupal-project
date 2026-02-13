@@ -3,7 +3,6 @@
 namespace Drupal\Core\Pager;
 
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Provides a manager for pagers.
@@ -44,8 +43,6 @@ class PagerManager implements PagerManagerInterface {
    *
    * @param \Drupal\Core\Pager\PagerParametersInterface $pager_params
    *   The pager parameters.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request
-   *   The request_stack service.
    */
   public function __construct(PagerParametersInterface $pager_params) {
     $this->pagerParams = $pager_params;
