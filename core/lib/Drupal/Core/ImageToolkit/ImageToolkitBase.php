@@ -117,20 +117,10 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
   /**
    * {@inheritdoc}
    */
-  public function apply($operation, $arguments = [], $extra = NULL) {
-    if ($operation instanceof ImageInterface) {
-      $image = $operation;
-      $operation = $arguments;
-      assert(is_string($operation));
-      $arguments = $extra;
-      assert(is_array($arguments));
-    }
-    else {
-      $image = $this->backfillImage;
-    }
+  public function apply($operation, array $arguments = []) {
     try {
       // Get the plugin to use for the operation and apply the operation.
-      return $this->getToolkitOperation($operation)->apply($image, $arguments);
+      return $this->getToolkitOperation($operation)->apply($arguments);
     }
     catch (PluginNotFoundException) {
       $this->logger->error("The selected image handling toolkit '@toolkit' can not process operation '@operation'.", [

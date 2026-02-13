@@ -66,7 +66,7 @@ class Image implements ImageInterface {
     $this->toolkitId = $toolkit->getPluginId();
     if ($source) {
       $this->source = $source;
-    // @phpstan-ignore method.deprecated
+    // @phpstan-ignore-next-line
       $this->getToolkit()->setSource($this->source);
       // Defer image file validity check to the toolkit.
     // @phpstan-ignore method.deprecated
@@ -146,6 +146,7 @@ class Image implements ImageInterface {
    */
   public function getToolkit() {
     @trigger_error(__METHOD__ . ' is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+    // @phpstan-ignore isset.initializedProperty
     if (!isset($this->toolkit)) {
       $this->toolkit = clone $this->toolkit();
       $this->toolkit->backfillImage = $this;

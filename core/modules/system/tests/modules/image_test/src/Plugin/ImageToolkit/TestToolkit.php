@@ -258,7 +258,6 @@ class TestToolkit extends ImageToolkitBase {
   /**
    * {@inheritdoc}
    */
-  // @phpstan-ignore-next-line
   public function apply($operation, array $arguments = []) {
     $this->logCall('apply', func_get_args());
     return parent::apply($operation, $arguments);

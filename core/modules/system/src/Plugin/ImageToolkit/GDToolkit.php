@@ -369,7 +369,7 @@ class GDToolkit extends ImageToolkitBase {
    */
   public function getWidth($image = NULL) {
     if (!$image instanceof GdImageWrapper) {
-      // @phpstan-ignore method.deprecated
+      // @phpstan-ignore property.deprecated
       $image = $this->backfillImage;
     }
 
@@ -389,7 +389,7 @@ class GDToolkit extends ImageToolkitBase {
    */
   public function getHeight($image = NULL) {
     if (!$image instanceof GdImageWrapper) {
-      // @phpstan-ignore method.deprecated
+      // @phpstan-ignore property.deprecated
       $image = $this->backfillImage;
     }
 
@@ -620,6 +620,46 @@ class GDToolkit extends ImageToolkitBase {
       $types[] = IMAGETYPE_AVIF;
     }
     return $types;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function apply($operation, $arguments = [], $extra = NULL) {
+    if ($operation instanceof ImageInterface) {
+      $image = $operation;
+      $operation = $arguments;
+      assert(is_string($operation));
+      $arguments = $extra;
+      assert(is_array($arguments));
+    }
+    else {
+      // @phpstan-ignore property.deprecated
+      $image = $this->backfillImage;
+    }
+    try {
+      // Get the plugin to use for the operation and apply the operation.
+      return $this->getToolkitOperation($operation)->apply($image, $arguments);
+    }
+    catch (PluginNotFoundException) {
+      $this->logger->error("The selected image handling toolkit '@toolkit' can not process operation '@operation'.", [
+        '@toolkit' => $this->getPluginId(),
+        '@operation' => $operation,
+      ]);
+      return FALSE;
+    }
+    catch (\Throwable $t) {
+      $this->logger->warning("The image toolkit '@toolkit' failed processing '@operation' for image '@image'. Reported error: @class - @message", [
+        '@toolkit' => $this->getPluginId(),
+        '@operation' => $operation,
+        // @todo fix.
+        // @phpstan-ignore method.deprecated
+        '@image' => $this->getSource(),
+        '@class' => get_class($t),
+        '@message' => $t->getMessage(),
+      ]);
+      return FALSE;
+    }
   }
 
 }

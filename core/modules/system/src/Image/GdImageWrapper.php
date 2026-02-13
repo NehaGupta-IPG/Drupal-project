@@ -160,7 +160,6 @@ class GdImageWrapper extends ImageBase {
     }
 
     $destination = $destination ?: $this->getSource();
-    // @phpstan-ignore method.deprecated
     if ($return = $this->toolkit()->save($this, $destination)) {
       // Clear the cached file size and refresh the image information.
       clearstatcache(TRUE, $destination);
