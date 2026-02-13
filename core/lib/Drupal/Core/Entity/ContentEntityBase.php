@@ -48,7 +48,12 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    */
   protected $fields = [];
 
-  protected $fieldWeakReferences = [];
+  /**
+   * An array of weak references to FieldItemListInterface.
+   *
+   * @var array
+   */
+  protected array $fieldWeakReferences = [];
 
   /**
    * Local cache for field definitions.
@@ -637,59 +642,52 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     }
     // Populate $this->fields to speed-up further look-ups and to keep track of
     // fields objects, possibly holding changes to field values.
-    if (!isset($this->fields[$name][$langcode])) {
-      $definition = $this->getFieldDefinition($name);
-      if (!$definition) {
-        throw new \InvalidArgumentException("Field $name is unknown.");
-      }
-      // Non-translatable fields are always stored with
-      // LanguageInterface::LANGCODE_DEFAULT as key.
+    $definition = $this->getFieldDefinition($name);
+    if (!$definition) {
+      throw new \InvalidArgumentException("Field $name is unknown.");
+    }
+    // Non-translatable fields are always stored with
+    // LanguageInterface::LANGCODE_DEFAULT as key.
 
-      $default = $langcode == LanguageInterface::LANGCODE_DEFAULT;
-      if (!$default && !$definition->isTranslatable()) {
-        if (!isset($this->fieldWeakReferences[$name][LanguageInterface::LANGCODE_DEFAULT]) || $this->fieldWeakReferences[$name][LanguageInterface::LANGCODE_DEFAULT]->get() === NULL) {
-          $item = $this->getTranslatedField($name, LanguageInterface::LANGCODE_DEFAULT);
-          $this->fieldWeakReferences[$name][LanguageInterface::LANGCODE_DEFAULT] = \WeakReference::create($item);
-        }
-        else {
-          $item = $this->fieldWeakRefences[$name][LanguageInterface::LANGCODE_DEFAULT]->get();
-        }
-        $this->fieldWeakReferences[$name][$langcode] = $item;
-        return $item;
+    $default = $langcode == LanguageInterface::LANGCODE_DEFAULT;
+    if (!$default && !$definition->isTranslatable()) {
+      if (!isset($this->fieldWeakReferences[$name][LanguageInterface::LANGCODE_DEFAULT]) || $this->fieldWeakReferences[$name][LanguageInterface::LANGCODE_DEFAULT]->get() === NULL) {
+        $field = $this->getTranslatedField($name, LanguageInterface::LANGCODE_DEFAULT);
+        $this->fieldWeakReferences[$name][LanguageInterface::LANGCODE_DEFAULT] = \WeakReference::create($field);
       }
       else {
-        $value = NULL;
-        if (isset($this->values[$name][$langcode])) {
-          $value = $this->values[$name][$langcode];
-        }
-        $field = \Drupal::service('plugin.manager.field.field_type')->createFieldItemList($this->getTranslation($langcode), $name, $value);
-        if ($default) {
-          // $this->defaultLangcode might not be set if we are initializing the
-          // default language code cache, in which case there is no valid
-          // langcode to assign.
-          $field_langcode = $this->defaultLangcode ?? LanguageInterface::LANGCODE_NOT_SPECIFIED;
-        }
-        else {
-          $field_langcode = $langcode;
-        }
-        $field->setLangcode($field_langcode);
-        // Always write keys back to the field list because this is relied
-        // upon when saving entities.
-        $entity_keys = $this->getEntityType()->getKeys();
-        $key = array_search($name, $entity_keys);
-        if ($key !== FALSE) {
-          $this->fields[$name][$langcode] = $field;
-        }
-        else {
-          $this->fieldWeakReferences[$name][$langcode] = \WeakReference::create($field);
-        }
-
-        return $field;
+        $field = $this->fieldWeakReferences[$name][LanguageInterface::LANGCODE_DEFAULT]->get();
+      }
+      $this->fieldWeakReferences[$name][$langcode] = $field;
+    }
+    else {
+      $value = NULL;
+      if (isset($this->values[$name][$langcode])) {
+        $value = $this->values[$name][$langcode];
+      }
+      $field = \Drupal::service('plugin.manager.field.field_type')->createFieldItemList($this->getTranslation($langcode), $name, $value);
+      if ($default) {
+        // $this->defaultLangcode might not be set if we are initializing the
+        // default language code cache, in which case there is no valid
+        // langcode to assign.
+        $field_langcode = $this->defaultLangcode ?? LanguageInterface::LANGCODE_NOT_SPECIFIED;
+      }
+      else {
+        $field_langcode = $langcode;
+      }
+      $field->setLangcode($field_langcode);
+      // Always write keys back to the field list because this is relied
+      // upon when saving entities.
+      $entity_keys = $this->getEntityType()->getKeys();
+      $key = array_search($name, $entity_keys);
+      if ($key !== FALSE) {
+        $this->fields[$name][$langcode] = $field;
+      }
+      else {
+        $this->fieldWeakReferences[$name][$langcode] = \WeakReference::create($field);
       }
     }
-    if ($this->fieldWeakReferences[$name][$langcode]->get() !== NULL) {
-      return $this->fieldWeakReferences[$name][$langcode]->get();
-    }
+    return $field;
   }
 
   /**
