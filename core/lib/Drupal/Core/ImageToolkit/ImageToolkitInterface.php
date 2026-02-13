@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\ImageToolkit;
 
-use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
@@ -59,7 +58,10 @@ interface ImageToolkitInterface extends ContainerFactoryPluginInterface, PluginI
    * @throws \BadMethodCallException
    *   After being set initially, the source image cannot be changed.
    *
-   * @deprecated
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   public function setSource($source);
 
@@ -69,8 +71,11 @@ interface ImageToolkitInterface extends ContainerFactoryPluginInterface, PluginI
    * @return string
    *   The source path of the image file, or an empty string if the source is
    *   not set.
+   *   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
    *
-   * @deprecated
+   * @see https://www.drupal.org/node/7654123
    */
   public function getSource();
 

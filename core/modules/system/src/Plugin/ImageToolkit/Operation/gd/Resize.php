@@ -18,12 +18,14 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 )]
 class Resize extends GDImageToolkitOperationBase {
 
+  // phpcs:disable
   /**
    * {@inheritdoc}
    */
   public bool $needsToolkitInjection {
     get => FALSE;
   }
+  // phpcs:enable
 
   /**
    * {@inheritdoc}
@@ -44,12 +46,8 @@ class Resize extends GDImageToolkitOperationBase {
    */
   protected function validateArguments(ImageInterface|array $arguments, $extra = NULL) {
     if ($arguments instanceof ImageInterface) {
-      $image = $arguments;
       $arguments = $extra;
       assert(is_array($arguments));
-    }
-    else {
-      // @todo fix.
     }
 
     // Assure integers for all arguments.

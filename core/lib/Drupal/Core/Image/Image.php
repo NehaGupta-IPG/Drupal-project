@@ -34,7 +34,10 @@ class Image implements ImageInterface {
   /**
    * An image toolkit object.
    *
-   * @deprecated
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   protected ImageToolkitInterface $toolkit;
 
@@ -51,6 +54,8 @@ class Image implements ImageInterface {
    * @param string|null $source
    *   (optional) The path to an image file, or NULL to construct the object
    *   with no image source.
+   * @param \Drupal\Core\Image\ImageFactory|null $imageFactory
+   *   The image factory.
    */
   public function __construct(
     ImageToolkitInterface $toolkit,
@@ -66,10 +71,10 @@ class Image implements ImageInterface {
     $this->toolkitId = $toolkit->getPluginId();
     if ($source) {
       $this->source = $source;
-    // @phpstan-ignore-next-line
+      // @phpstan-ignore-next-line
       $this->getToolkit()->setSource($this->source);
       // Defer image file validity check to the toolkit.
-    // @phpstan-ignore method.deprecated
+      // @phpstan-ignore method.deprecated
       if ($this->getToolkit()->parseFile($this)) {
         $this->fileSize = filesize($this->source);
       }
@@ -137,6 +142,14 @@ class Image implements ImageInterface {
     return $this->toolkitId;
   }
 
+  /**
+   * Returns the image toolkit singleton to be used for manipulation.
+   *
+   * @return \Drupal\Core\ImageToolkit\ImageToolkitInterface
+   *   The image toolkit.
+   *
+   * @todo add to the interface.
+   */
   public function toolkit(): ImageToolkitInterface {
     return $this->imageFactory->getToolkit($this->toolkitId);
   }
@@ -154,6 +167,20 @@ class Image implements ImageInterface {
     return $this->toolkit;
   }
 
+  /**
+   * Sets the image toolkit used for this image file.
+   *
+   * @param \Drupal\Core\ImageToolkit\ImageToolkitInterface $toolkit
+   *   The image toolkit.
+   *
+   * @return static
+   *   The image.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
+   */
   public function setToolkit(ImageToolkitInterface $toolkit): static {
     @trigger_error(__METHOD__ . ' is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     // @phpstan-ignore property.deprecated

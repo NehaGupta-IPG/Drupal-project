@@ -3,7 +3,6 @@
 namespace Drupal\Core\ImageToolkit;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;
-use Drupal\Core\Image\ImageInterface;
 
 /**
  * Defines an interface for image toolkit operations.

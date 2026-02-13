@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\ImageToolkit;
 
-use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -19,21 +18,13 @@ use Drupal\Core\Plugin\DefaultPluginManager;
  */
 class ImageToolkitManager extends DefaultPluginManager {
 
+  /**
+   * The map of active toolkit instances.
+   *
+   * @var array<string, ImageToolkitInterface>
+   */
   protected array $activeToolkits = [];
 
-  /**
-   * Constructs the ImageToolkitManager object.
-   *
-   * @param \Traversable $namespaces
-   *   An object that implements \Traversable which contains the root paths
-   *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
-   *   Cache backend instance to use.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   */
   public function __construct(
     \Traversable $namespaces,
     CacheBackendInterface $cache_backend,
@@ -51,11 +42,23 @@ class ImageToolkitManager extends DefaultPluginManager {
     $this->setCacheBackend($cache_backend, 'image_toolkit_plugins');
   }
 
+  /**
+   * Returns an image toolkit active instance.
+   *
+   * @param string $id
+   *   The ID of the image toolkit.
+   *
+   * @return \Drupal\Core\ImageToolkit\ImageToolkitInterface
+   *   The toolkit.
+   */
   public function getToolkit(string $id): ImageToolkitInterface {
     $this->activeToolkits[$id] ??= $this->createInstance($id);
     return $this->activeToolkits[$id];
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getInstance(array $options) {
     $toolkit_definition = $this->getDefinition($options['id']);
     if (isset($toolkit_definition['imageClass'])) {

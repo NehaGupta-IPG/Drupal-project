@@ -22,12 +22,21 @@ class ImageFactory {
   ) {
   }
 
+  /**
+   * Gets an active image toolkit from the manager.
+   *
+   * @param string $id
+   *   The ID of the image toolkit.
+   *
+   * @return \Drupal\Core\ImageToolkit\ImageToolkitInterface
+   *   The toolkit.
+   */
   public function getToolkit(string $id): ImageToolkitInterface {
     return $this->toolkitManager->getToolkit($id);
   }
 
   /**
-   * Sets the ID of the image toolkit.
+   * Sets the ID of the default image toolkit to use.
    *
    * @param string $toolkit_id
    *   The ID of the image toolkit to use for this image factory.
@@ -79,7 +88,7 @@ class ImageFactory {
     $toolkit_id = $toolkit_id ?: $this->getToolkitId();
     $toolkit_definition = $this->toolkitManager->getDefinition($toolkit_id);
     if (isset($toolkit_definition['imageClass'])) {
-      $image_class = isset($toolkit_definition['imageClass']) ? $toolkit_definition['imageClass'] : Image::class;
+      $image_class = $toolkit_definition['imageClass'];
       return new $image_class($this, $toolkit_id, $source);
     }
     return new Image($this->toolkitManager->getInstance(['id' => $toolkit_id]), $source, $this);

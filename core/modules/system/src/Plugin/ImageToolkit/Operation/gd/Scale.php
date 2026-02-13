@@ -18,12 +18,14 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 )]
 class Scale extends Resize {
 
+  // phpcs:disable
   /**
    * {@inheritdoc}
    */
   public bool $needsToolkitInjection {
     get => FALSE;
   }
+  // phpcs:enable
 
   /**
    * {@inheritdoc}
@@ -99,6 +101,7 @@ class Scale extends Resize {
    */
   protected function execute(ImageInterface|array $arguments, $extra = NULL) {
     if ($arguments instanceof ImageInterface) {
+      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
       $image = $arguments;
       $arguments = $extra;
       assert(is_array($arguments));

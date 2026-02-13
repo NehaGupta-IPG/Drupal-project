@@ -102,6 +102,9 @@ class ImageTest extends UnitTestCase {
    *   The short name of the GD toolkit operation class to be mocked.
    * @param \Drupal\system\Plugin\ImageToolkit\GDToolkit $toolkit
    *   The image toolkit object.
+   * @param bool $needsToolkitInjection
+   *   BC layer - Whether a copy of the toolkit should be injected to the
+   *   operation.
    *
    * @return \Drupal\system\Plugin\ImageToolkit\Operation\gd\GDImageToolkitOperationBase&\PHPUnit\Framework\MockObject\MockObject
    *   Mocked GDToolkit operation instance.
@@ -160,6 +163,9 @@ class ImageTest extends UnitTestCase {
    *
    * @param string $class_name
    *   The name of the GD toolkit operation class to be mocked.
+   * @param bool $needsToolkitInjection
+   *   BC layer - Whether a copy of the toolkit should be injected to the
+   *   operation.
    *
    * @return \Drupal\system\Image\GdImageWrapper
    *   An image object.

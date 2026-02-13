@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Plugin\ImageToolkit;
 
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Utility\Color;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
@@ -9,6 +10,7 @@ use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\ImageToolkit\Attribute\ImageToolkit;
 use Drupal\Core\ImageToolkit\ImageToolkitBase;
 use Drupal\Core\ImageToolkit\ImageToolkitOperationManagerInterface;

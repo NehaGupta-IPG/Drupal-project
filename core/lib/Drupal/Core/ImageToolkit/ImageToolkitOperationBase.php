@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  */
 abstract class ImageToolkitOperationBase extends PluginBase implements ImageToolkitOperationInterface, ContainerFactoryPluginInterface {
 
+  // phpcs:disable
   /**
    * BC layer.
    *
@@ -31,6 +32,7 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
     get => TRUE;
     set => throw new \LogicException('Cannot set $needsToolkitInjection');
   }
+  // phpcs:enable
 
   /**
    * The image toolkit.
