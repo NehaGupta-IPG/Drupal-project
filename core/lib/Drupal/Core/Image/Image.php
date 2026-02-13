@@ -61,12 +61,15 @@ class Image implements ImageInterface {
       @trigger_error(__METHOD__ . ' not receiving the ImageFactory is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     }
     $this->imageFactory = $imageFactory;
+    // @phpstan-ignore property.deprecated
     $this->toolkit = $toolkit;
     $this->toolkitId = $toolkit->getPluginId();
     if ($source) {
       $this->source = $source;
+    // @phpstan-ignore method.deprecated
       $this->getToolkit()->setSource($this->source);
       // Defer image file validity check to the toolkit.
+    // @phpstan-ignore method.deprecated
       if ($this->getToolkit()->parseFile($this)) {
         $this->fileSize = filesize($this->source);
       }
@@ -77,6 +80,7 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function isValid() {
+    // @phpstan-ignore method.deprecated
     return $this->getToolkit()->isValid($this);
   }
 
@@ -84,6 +88,7 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function getHeight() {
+    // @phpstan-ignore method.deprecated
     return $this->getToolkit()->getHeight($this);
   }
 
@@ -91,6 +96,7 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function getWidth() {
+    // @phpstan-ignore method.deprecated
     return $this->getToolkit()->getWidth($this);
   }
 
@@ -105,6 +111,7 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function getMimeType() {
+    // @phpstan-ignore method.deprecated
     return $this->getToolkit()->getMimeType($this);
   }
 
@@ -148,7 +155,9 @@ class Image implements ImageInterface {
 
   public function setToolkit(ImageToolkitInterface $toolkit): static {
     @trigger_error(__METHOD__ . ' is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+    // @phpstan-ignore property.deprecated
     $this->toolkit = $toolkit;
+    // @phpstan-ignore property.deprecated
     $this->toolkit->backfillImage = $this;
     return $this;
   }

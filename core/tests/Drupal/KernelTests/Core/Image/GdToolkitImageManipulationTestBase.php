@@ -92,6 +92,7 @@ abstract class GdToolkitImageManipulationTestBase extends KernelTestBase {
    * Function for finding a pixel's RGBa values.
    */
   public function getPixelColor(ImageInterface $image, int $x, int $y): array {
+    // @phpstan-ignore method.deprecated
     $toolkit = $image->getToolkit();
     $color_index = imagecolorat($toolkit->getImage(), $x, $y);
 
@@ -288,8 +289,10 @@ abstract class GdToolkitImageManipulationTestBase extends KernelTestBase {
   public function testManipulations(string $test_case, string $operation, array $arguments, array $expected): void {
     // Load up a fresh image.
     $image = $this->imageFactory->get('core/tests/fixtures/files/' . $this->sourceTestImage);
+    // @phpstan-ignore method.deprecated
     $toolkit = $image->getToolkit();
     $this->assertTrue($image->isValid());
+    // @phpstan-ignore method.deprecated
     $image_original_type = $image->getToolkit()->getType();
 
     $this->assertTrue(imageistruecolor($toolkit->getImage()), "Image '$this->sourceTestImage' after load should be a truecolor image, but it is not.");
@@ -298,6 +301,7 @@ abstract class GdToolkitImageManipulationTestBase extends KernelTestBase {
     $image->apply($operation, $arguments);
 
     // Flush Image object to disk storage.
+    // @phpstan-ignore method.deprecated
     $file_path = $this->directory . '/' . $test_case . image_type_to_extension($image->getToolkit()->getType());
     $image->save($file_path);
 
@@ -338,6 +342,7 @@ abstract class GdToolkitImageManipulationTestBase extends KernelTestBase {
 
     // Check that saved image reloads without raising PHP errors.
     $image_reloaded = $this->imageFactory->get($file_path);
+    // @phpstan-ignore method.deprecated
     $this->assertInstanceOf(\GdImage::class, $image_reloaded->getToolkit()->getImage());
   }
 

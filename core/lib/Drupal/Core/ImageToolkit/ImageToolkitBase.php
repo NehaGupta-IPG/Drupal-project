@@ -21,6 +21,16 @@ use Psr\Log\LoggerInterface;
 abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterface, ContainerFactoryPluginInterface {
 
   /**
+   * An ImageInterface object to be used for BC.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
+   */
+  public ?ImageInterface $backfillImage;
+
+  /**
    * Path of the image file.
    *
    * @var string
@@ -116,7 +126,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
       assert(is_array($arguments));
     }
     else {
-      // @todo fix.
+      $image = $this->backfillImage;
     }
     try {
       // Get the plugin to use for the operation and apply the operation.
@@ -133,7 +143,9 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
       $this->logger->warning("The image toolkit '@toolkit' failed processing '@operation' for image '@image'. Reported error: @class - @message", [
         '@toolkit' => $this->getPluginId(),
         '@operation' => $operation,
-        '@image' => $this->getSource(), # @todo fix.
+        // @todo fix.
+        // @phpstan-ignore method.deprecated
+        '@image' => $this->getSource(),
         '@class' => get_class($t),
         '@message' => $t->getMessage(),
       ]);

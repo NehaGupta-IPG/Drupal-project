@@ -33,16 +33,6 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 class GDToolkit extends ImageToolkitBase {
 
   /**
-   * An ImageInterface object to be used for BC.
-   *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
-   *    whack-a-mole instead.
-   *
-   * @see https://www.drupal.org/node/7654123
-   */
-  public ?GdImageWrapper $backfillImage;
-
-  /**
    * Constructs a GDToolkit object.
    *
    * @param array $configuration
@@ -328,8 +318,10 @@ class GDToolkit extends ImageToolkitBase {
    *   A color string like '#rrggbb', or NULL if not set or not relevant.
    */
   public function getTransparentColor($image = NULL) {
+    // @phpstan-ignore property.deprecated
     if (!$image && $this->backfillImage) {
       @trigger_error(__METHOD__ . ' not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+      // @phpstan-ignore property.deprecated
       $image = $this->backfillImage;
     }
     assert($image instanceof GdImageWrapper);
@@ -377,6 +369,7 @@ class GDToolkit extends ImageToolkitBase {
    */
   public function getWidth($image = NULL) {
     if (!$image instanceof GdImageWrapper) {
+      // @phpstan-ignore method.deprecated
       $image = $this->backfillImage;
     }
 
@@ -396,6 +389,7 @@ class GDToolkit extends ImageToolkitBase {
    */
   public function getHeight($image = NULL) {
     if (!$image instanceof GdImageWrapper) {
+      // @phpstan-ignore method.deprecated
       $image = $this->backfillImage;
     }
 
