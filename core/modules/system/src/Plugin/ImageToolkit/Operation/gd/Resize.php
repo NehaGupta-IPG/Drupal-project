@@ -80,20 +80,20 @@ class Resize extends GDImageToolkitOperationBase {
 
     // Create a new image of the required dimensions, and copy and resize
     // the original image on it with resampling.
-    $original_image = $this->getToolkit()->getImage();
+    $original_gd_image = $image->getGdImageObject();
     $data = [
       'width' => $arguments['width'],
       'height' => $arguments['height'],
       'extension' => image_type_to_extension($image->getType(), FALSE),
-      'transparent_color' => $this->getToolkit()->getTransparentColor(),
+      'transparent_color' => $image->toolkit()->getTransparentColor($image),
       'is_temp' => TRUE,
     ];
-    if ($this->getToolkit()->apply('create_new', $data)) {
-      if (imagecopyresampled($this->getToolkit()->getImage(), $original_image, 0, 0, 0, 0, $arguments['width'], $arguments['height'], imagesx($original_image), imagesy($original_image))) {
+    if ($image->apply('create_new', $data)) {
+      if (imagecopyresampled($image->getGdImageObject(), $original_gd_image, 0, 0, 0, 0, $arguments['width'], $arguments['height'], imagesx($original_gd_image), imagesy($original_gd_image))) {
         return TRUE;
       }
       // In case of failure, restore the original image.
-      $this->getToolkit()->setImage($original_image);
+      $image->setGdImageObject($original_gd_image);
     }
     return FALSE;
   }
