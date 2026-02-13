@@ -658,7 +658,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
       else {
         $field = $this->fieldWeakReferences[$name][LanguageInterface::LANGCODE_DEFAULT]->get();
       }
-      $this->fieldWeakReferences[$name][$langcode] = $field;
+      $this->fieldWeakReferences[$name][$langcode] = \WeakReference::create($field);
     }
     else {
       $value = NULL;
