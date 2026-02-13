@@ -7,8 +7,7 @@ namespace Drupal\Tests\user\Functional;
 use Drupal\Component\Utility\DiffArray;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\user\PermissionHandlerInterface;
-use Drupal\user\Service\PermissionsRepositoryFactoryInterface;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore testprovider

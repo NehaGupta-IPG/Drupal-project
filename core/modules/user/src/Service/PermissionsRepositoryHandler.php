@@ -24,8 +24,8 @@ class PermissionsRepositoryHandler implements PermissionHandlerInterface {
    *   The permissions repository factory.
    */
   public function __construct(
-    protected readonly PermissionsRepositoryFactoryInterface $permissionsRepositoryFactory,
-    ) {
+  protected readonly PermissionsRepositoryFactoryInterface $permissionsRepositoryFactory,
+  ) {
   }
 
   /**
