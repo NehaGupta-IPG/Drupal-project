@@ -715,12 +715,16 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    * {@inheritdoc}
    */
   public function set($name, $value, $notify = TRUE) {
+    // Ensure any value set explicitly on the entity is written to the fields
+    // array, however allow later ::get() calls to use weak references.
+    $original = $this->createWeakReferences;
     $this->createWeakReferences = FALSE;
 
     // Assign the value on the child and overrule notify such that we get
     // notified to handle changes afterwards. We can ignore notify as there is
     // no parent to notify anyway.
     $this->get($name)->setValue($value, TRUE);
+    $this->createWeakReferences = $original;
     return $this;
   }
 
