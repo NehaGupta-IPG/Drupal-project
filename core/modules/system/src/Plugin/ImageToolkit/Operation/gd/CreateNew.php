@@ -19,6 +19,15 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 )]
 class CreateNew extends GDImageToolkitOperationBase {
 
+  // phpcs:disable
+  /**
+   * {@inheritdoc}
+   */
+  public bool $needsToolkitInjection {
+    get => FALSE;
+  }
+  // phpcs:enable
+
   /**
    * {@inheritdoc}
    */
@@ -51,9 +60,18 @@ class CreateNew extends GDImageToolkitOperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function validateArguments(array $arguments, ?ImageInterface $image = NULL) {
+  protected function validateArguments(ImageInterface|array $arguments, $extra = NULL) {
+    if ($arguments instanceof ImageInterface) {
+      $image = $arguments;
+      $arguments = $extra;
+      assert(is_array($arguments));
+    }
+    else {
+      // @todo fix.
+    }
+
     // Assure extension is supported.
-    if (!in_array($arguments['extension'], $this->getToolkit()->getSupportedExtensions())) {
+    if (!in_array($arguments['extension'], $image->toolkit()->getSupportedExtensions())) {
       throw new \InvalidArgumentException("Invalid extension ('{$arguments['extension']}') specified for the image 'create_new' operation");
     }
 
@@ -80,7 +98,16 @@ class CreateNew extends GDImageToolkitOperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function execute(array $arguments, ?ImageInterface $image = NULL) {
+  protected function execute(ImageInterface|array $arguments, $extra = NULL) {
+    if ($arguments instanceof ImageInterface) {
+      $image = $arguments;
+      $arguments = $extra;
+      assert(is_array($arguments));
+    }
+    else {
+      // @todo fix.
+    }
+
     // Get the image type.
     $type = $image->toolkit()->extensionToImageType($arguments['extension']);
 

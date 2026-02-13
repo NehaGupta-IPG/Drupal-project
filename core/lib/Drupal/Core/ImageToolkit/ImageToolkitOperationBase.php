@@ -87,6 +87,9 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    */
   public function setToolkit(ImageToolkitInterface $toolkit): void {
     @trigger_error(__METHOD__ . ' is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+    if (!$this->needsToolkitInjection) {
+      throw new \RuntimeException("No toolkit can be injected in image toolkit operation '{$this->getPluginId()}'");
+    }
     $this->toolkit = $toolkit;
   }
 
@@ -108,6 +111,9 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    */
   protected function getToolkit() {
     @trigger_error(__METHOD__ . ' is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+    if (!$this->needsToolkitInjection) {
+      throw new \RuntimeException("No toolkit injected in image toolkit operation '{$this->getPluginId()}'");
+    }
     return $this->toolkit;
   }
 

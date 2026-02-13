@@ -20,6 +20,20 @@ use Psr\Log\LoggerInterface;
  */
 abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterface, ContainerFactoryPluginInterface {
 
+  // phpcs:ignoreFile
+  /**
+   * BC layer.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
+   */
+  public bool $isStateful {
+    get => TRUE;
+    set => throw new \LogicException('Cannot set $isStateful');
+  }
+
   /**
    * An ImageInterface object to be used for BC.
    *

@@ -34,6 +34,15 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 )]
 class GDToolkit extends ImageToolkitBase {
 
+  // phpcs:disable
+  /**
+   * {@inheritdoc}
+   */
+  public bool $isStateful {
+    get => FALSE;
+  }
+  // phpcs:enable
+
   /**
    * Constructs a GDToolkit object.
    *
@@ -636,6 +645,7 @@ class GDToolkit extends ImageToolkitBase {
       assert(is_array($arguments));
     }
     else {
+      // @todo what if backfill missing?
       // @phpstan-ignore property.deprecated
       $image = $this->backfillImage;
     }
@@ -654,9 +664,7 @@ class GDToolkit extends ImageToolkitBase {
       $this->logger->warning("The image toolkit '@toolkit' failed processing '@operation' for image '@image'. Reported error: @class - @message", [
         '@toolkit' => $this->getPluginId(),
         '@operation' => $operation,
-        // @todo fix.
-        // @phpstan-ignore method.deprecated
-        '@image' => $this->getSource(),
+        '@image' => $image->getSource(),
         '@class' => get_class($t),
         '@message' => $t->getMessage(),
       ]);

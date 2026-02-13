@@ -25,13 +25,15 @@ class ImageFactory {
   /**
    * Gets an active image toolkit from the manager.
    *
-   * @param string $id
-   *   The ID of the image toolkit.
+   * @param string|null $id
+   *   The ID of the image toolkit. The default toolkit will be returned if
+   *   NULL.
    *
    * @return \Drupal\Core\ImageToolkit\ImageToolkitInterface
    *   The toolkit.
    */
-  public function getToolkit(string $id): ImageToolkitInterface {
+  public function getToolkit(?string $id = NULL): ImageToolkitInterface {
+    $id ??= $this->getToolkitId();
     return $this->toolkitManager->getToolkit($id);
   }
 
