@@ -50,17 +50,17 @@ final class RecipeDiscovery implements \IteratorAggregate, LoggerAwareInterface 
    * @param string|null $path
    *   (optional) A path containing directories that contain a recipe.yml file.
    *   There will be no further traversal into the directory tree.
-   * @param bool $include_core_recipes
-   *   (optional) Whether or not to include recipes provided by core.
+   * @param bool $includeCoreRecipes
+   *   (optional) Whether to include recipes provided by core.
    * @param bool $skipInvalid
    *   (optional) Whether recipes that have validation errors should be ignored.
    */
   public function __construct(
     ?string $path = NULL,
-    bool $include_core_recipes = TRUE,
+    bool $includeCoreRecipes = TRUE,
     public bool $skipInvalid = FALSE,
   ) {
-    if ($include_core_recipes) {
+    if ($includeCoreRecipes) {
       $this->directoriesToSearch[] = \Drupal::root() . '/core/recipes';
     }
 
