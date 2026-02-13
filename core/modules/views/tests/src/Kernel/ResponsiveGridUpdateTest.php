@@ -12,6 +12,7 @@ use PHPUnit\Framework\Attributes\Group;
  * Tests the upgrade path for adding custom classes to responsive grid.
  */
 #[Group('views')]
+#[RunTestsInSeparateProcesses]
 class ResponsiveGridUpdateTest extends ViewsKernelTestBase {
 
   /**
