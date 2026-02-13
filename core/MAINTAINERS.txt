@@ -274,7 +274,7 @@ Mail
 - ?
 
 Markup
-- ?
+- Mark Conroy 'markconroy' https://www.drupal.org/u/markconroy
 
 Media
 - Sean Blommaert 'seanB' https://www.drupal.org/u/seanb
@@ -371,7 +371,7 @@ Serialization
 - Brad Jones 'bradjones1' https://www.drupal.org/u/bradjones1
 
 Settings Tray
-- ?
+- Mark Conroy 'markconroy' https://www.drupal.org/u/markconroy
 
 Shortcut
 - Jibran Ijaz 'jibran' https://www.drupal.org/u/jibran
