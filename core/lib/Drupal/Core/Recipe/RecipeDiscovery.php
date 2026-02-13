@@ -7,7 +7,6 @@ namespace Drupal\Core\Recipe;
 use Composer\InstalledVersions;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use RuntimeException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 
@@ -110,7 +109,7 @@ final class RecipeDiscovery implements \IteratorAggregate, LoggerAwareInterface 
       catch (RecipeFileException |
         RecipeMissingExtensionsException |
         RecipePreExistingConfigException |
-        RuntimeException |
+        \RuntimeException |
         UnknownRecipeException |
         ValidationFailedException $e) {
         // If we're ignoring invalid recipes, log the exception message (if a
