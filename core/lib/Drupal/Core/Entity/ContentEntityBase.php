@@ -56,6 +56,11 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   protected array $fieldWeakReferences = [];
 
   /**
+   * Whether to create weak references or not.
+   */
+  protected bool $createWeakReferences = TRUE;
+
+  /**
    * Local cache for field definitions.
    *
    * @var array
@@ -310,6 +315,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    * {@inheritdoc}
    */
   public function setNewRevision($value = TRUE) {
+    $this->createWeakReferences = FALSE;
     if (!$this->getEntityType()->hasKey('revision')) {
       throw new \LogicException("Entity type {$this->getEntityTypeId()} does not support revisions.");
     }
@@ -497,6 +503,21 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   /**
    * {@inheritdoc}
    */
+  public function save() {
+    // SqlContentStorage::mapToStorageRecord() relies on creating field item
+    // lists for entity keys just as ID, bundle etc. which are otherwise rarely
+    // or never accessed in this way. These have to persist after the save call
+    // so that calling code is able to retrieve the ID, since they are not also
+    // written to $entity->values.
+    $this->createWeakReferences = FALSE;
+    $storage = $this->entityTypeManager()->getStorage($this->entityTypeId);
+    $return = $storage->save($this);
+    return $return;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
 
@@ -637,6 +658,9 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     if (isset($this->fieldWeakReferences[$name][$langcode])) {
       $item = $this->fieldWeakReferences[$name][$langcode]->get();
       if ($item !== NULL) {
+        if (!$this->createWeakReferences) {
+          $this->fields[$name][$langcode] = $item;
+        }
         return $item;
       }
     }
@@ -651,14 +675,15 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
 
     $default = $langcode == LanguageInterface::LANGCODE_DEFAULT;
     if (!$default && !$definition->isTranslatable()) {
-      if (!isset($this->fieldWeakReferences[$name][LanguageInterface::LANGCODE_DEFAULT]) || $this->fieldWeakReferences[$name][LanguageInterface::LANGCODE_DEFAULT]->get() === NULL) {
-        $field = $this->getTranslatedField($name, LanguageInterface::LANGCODE_DEFAULT);
+      $field = $this->getTranslatedField($name, LanguageInterface::LANGCODE_DEFAULT);
+      // Only assign objects as weak references, in rare cases, mostly tests,
+      // strings are set instead of field item list objects.
+      if ($this->createWeakReferences) {
         $this->fieldWeakReferences[$name][LanguageInterface::LANGCODE_DEFAULT] = \WeakReference::create($field);
       }
       else {
-        $field = $this->fieldWeakReferences[$name][LanguageInterface::LANGCODE_DEFAULT]->get();
+        $this->fields[$name][LanguageInterface::LANGCODE_DEFAULT] = $field;
       }
-      $this->fieldWeakReferences[$name][$langcode] = \WeakReference::create($field);
     }
     else {
       $value = NULL;
@@ -676,11 +701,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
         $field_langcode = $langcode;
       }
       $field->setLangcode($field_langcode);
-      // Always write keys back to the field list because this is relied
-      // upon when saving entities.
-      $entity_keys = $this->getEntityType()->getKeys();
-      $key = array_search($name, $entity_keys);
-      if ($key !== FALSE) {
+      if (!$this->createWeakReferences) {
         $this->fields[$name][$langcode] = $field;
       }
       else {
@@ -694,6 +715,8 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    * {@inheritdoc}
    */
   public function set($name, $value, $notify = TRUE) {
+    $this->createWeakReferences = FALSE;
+
     // Assign the value on the child and overrule notify such that we get
     // notified to handle changes afterwards. We can ignore notify as there is
     // no parent to notify anyway.
@@ -1308,8 +1331,22 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     $original_revision_id = $this->loadedRevisionId;
     $this->loadedRevisionId = &$original_revision_id;
 
+    foreach ($this->fieldWeakReferences as $name => $fields_by_langcode) {
+      if (!$definitions[$name]->isTranslatable() && count($fields_by_langcode) > 1) {
+        $fields_by_langcode = array_intersect_key($fields_by_langcode, [LanguageInterface::LANGCODE_DEFAULT => TRUE]);
+      }
+      foreach ($fields_by_langcode as $langcode => $items) {
+        if (!isset($this->fields[$name][$langcode])) {
+          if ($items->get() !== NULL) {
+            $this->fields[$name][$langcode] = clone $items->get();
+          }
+        }
+      }
+    }
+
     $fields = $this->fields;
     $this->fields = &$fields;
+
 
     $entity_keys = $this->entityKeys;
     $this->entityKeys = &$entity_keys;
@@ -1329,6 +1366,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     $is_syncing = $this->isSyncing;
     $this->isSyncing = &$is_syncing;
 
+
     foreach ($this->fields as $name => $fields_by_langcode) {
       $this->fields[$name] = [];
       // Untranslatable fields may have multiple references for the same field
@@ -1343,6 +1381,8 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
         $this->fields[$name][$langcode]->setContext($name, $this->getTranslation($langcode)->getTypedData());
       }
     }
+    $this->fieldWeakReferences = [];
+    $this->createWeakReferences = FALSE;
   }
 
   /**
