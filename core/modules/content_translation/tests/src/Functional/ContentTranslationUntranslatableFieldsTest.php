@@ -8,6 +8,7 @@ use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\Tests\content_translation\Traits\ContentTranslationTestTrait;
 use Drupal\Tests\language\Traits\LanguageTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class ContentTranslationUntranslatableFieldsTest extends ContentTranslationPendingRevisionTestBase {
 
+  use ContentTranslationTestTrait;
   use LanguageTestTrait;
 
   /**
@@ -187,6 +189,65 @@ class ContentTranslationUntranslatableFieldsTest extends ContentTranslationPendi
     $this->assertSession()->pageTextContains('Fields that apply to all languages are hidden to avoid conflicting changes.');
     $this->submitForm([], 'Save (this translation)');
     $this->assertSession()->pageTextNotContains('Fields that apply to all languages are hidden to avoid conflicting changes.');
+  }
+
+  /**
+   * Tests that new untranslatable boolean fields do not trigger the constraint.
+   *
+   * @see https://www.drupal.org/project/drupal/issues/3025039
+   */
+  public function testNewUntranslatableField(): void {
+    /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */
+    $entity_type_manager = $this->container->get('entity_type.manager');
+
+    // Enable untranslatable fields hiding.
+    $settings_key = 'settings[' . $this->entityTypeId . '][' . $this->bundle . '][settings][content_translation][untranslatable_fields_hide]';
+    $this->drupalGet('admin/config/regional/content-language');
+    $this->submitForm([$settings_key => 1], 'Save configuration');
+
+    // Create a source entity.
+    $id = $this->createEntity(['title' => 'EN title'], 'en');
+    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    $entity = $entity_type_manager
+      ->getStorage($this->entityTypeId)
+      ->load($id);
+
+    // Add an untranslatable boolean field and expose it on the form display.
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => 'field_bool_untranslatable',
+      'type' => 'boolean',
+      'entity_type' => $this->entityTypeId,
+      'cardinality' => 1,
+    ]);
+    $field_storage->save();
+    FieldConfig::create([
+      'field_storage' => $field_storage,
+      'bundle' => $this->bundle,
+      'label' => 'Untranslatable boolean',
+      'translatable' => FALSE,
+    ])->save();
+    \Drupal::service('entity_display.repository')
+      ->getFormDisplay($this->entityTypeId, $this->bundle, 'default')
+      ->setComponent('field_bool_untranslatable', ['type' => 'boolean_checkbox'])
+      ->save();
+
+    // Add an Italian translation to the entity now that the new field was added.
+    // The field widget should be hidden and must not trigger the untranslatable
+    // fields constraint on save.
+    $add_url = Url::fromRoute("entity.{$this->entityTypeId}.content_translation_add", [
+      $entity->getEntityTypeId() => $entity->id(),
+      'source' => 'en',
+      'target' => 'it',
+    ]);
+    $this->drupalGet($add_url);
+
+    // Verify the boolean field widget is hidden on the translation form.
+    $this->assertSession()->fieldNotExists('field_bool_untranslatable[value]');
+
+    $this->submitForm(['title[0][value]' => 'IT title'], 'Save');
+
+    // The save should succeed without the constraint violation.
+    $this->assertSession()->statusMessageNotContains('Non-translatable fields can only be changed when updating the original language.');
   }
 
 }

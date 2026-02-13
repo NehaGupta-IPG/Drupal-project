@@ -6,6 +6,7 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityChangesDetectionTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -69,17 +70,24 @@ class EntityUntranslatableFieldsConstraintValidator extends ConstraintValidator 
     // translations, so that is forbidden too. For the same reason, when changes
     // to untranslatable fields affect all translations, we can only allow them
     // in default revisions.
-    if ($this->hasUntranslatableFieldsChanges($entity)) {
+    $items = $this->hasUntranslatableFieldsChanges($entity);
+    if ($items instanceof FieldItemListInterface) {
       if ($entity->isDefaultTranslationAffectedOnly()) {
         foreach ($entity->getTranslationLanguages(FALSE) as $langcode => $language) {
           if ($entity->getTranslation($langcode)->hasTranslationChanges()) {
-            $this->context->addViolation($constraint->defaultTranslationMessage);
+            $this->context
+              ->buildViolation($constraint->defaultTranslationMessage)
+              ->atPath($items->getPropertyPath())
+              ->addViolation();
             break;
           }
         }
       }
       else {
-        $this->context->addViolation($constraint->defaultRevisionMessage);
+        $this->context
+          ->buildViolation($constraint->defaultRevisionMessage)
+          ->atPath($items->getPropertyPath())
+          ->addViolation();
       }
     }
   }
@@ -90,10 +98,10 @@ class EntityUntranslatableFieldsConstraintValidator extends ConstraintValidator 
    * @param \Drupal\Core\Entity\ContentEntityInterface $entity
    *   A content entity object.
    *
-   * @return bool
-   *   TRUE if untranslatable fields have changes, FALSE otherwise.
+   * @return false|\Drupal\Core\Field\FieldItemListInterface<mixed>
+   *   A field item list if untranslatable fields have changes, FALSE otherwise.
    */
-  protected function hasUntranslatableFieldsChanges(ContentEntityInterface $entity) {
+  protected function hasUntranslatableFieldsChanges(ContentEntityInterface $entity): false|FieldItemListInterface {
     $skip_fields = $this->getFieldsToSkipFromTranslationChangesCheck($entity);
     /** @var \Drupal\Core\Entity\ContentEntityInterface $original */
     $original = $entity->getOriginal();
@@ -112,7 +120,7 @@ class EntityUntranslatableFieldsConstraintValidator extends ConstraintValidator 
       $items = $entity->get($field_name)->filterEmptyItems();
       $original_items = $original->get($field_name)->filterEmptyItems();
       if ($items->hasAffectingChanges($original_items, $entity->getUntranslated()->language()->getId())) {
-        return TRUE;
+        return $items;
       }
     }
 
