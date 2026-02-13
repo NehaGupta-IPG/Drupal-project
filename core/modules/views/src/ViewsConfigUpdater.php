@@ -84,6 +84,9 @@ class ViewsConfigUpdater {
       if ($this->processRssViewModeUpdate($view)) {
         $changed = TRUE;
       }
+      if ($this->processResponsiveGridClassUpdate($view)) {
+        $changed = TRUE;
+      }
       return $changed;
     });
   }
@@ -460,6 +463,56 @@ class ViewsConfigUpdater {
         }
         else {
           $display['display_options']['row']['options']['view_mode'] = $previous_view_mode;
+          $changed = TRUE;
+        }
+      }
+    }
+
+    if ($changed) {
+      $view->set('display', $displays);
+    }
+
+    return $changed;
+  }
+
+  /**
+   * Checks for responsive grid style views needing custom class options.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view entity.
+   *
+   * @return bool
+   *   TRUE if responsive grid style needs to have custom class options added.
+   */
+  public function needsResponsiveGridClassUpdate(ViewEntityInterface $view): bool {
+    return $this->processResponsiveGridClassUpdate($view);
+  }
+
+  /**
+   * Processes views and adds default responsive grid custom classes.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view entity.
+   *
+   * @return bool
+   *   TRUE if the view was updated with custom class defaults.
+   */
+  public function processResponsiveGridClassUpdate(ViewEntityInterface $view): bool {
+    $changed = FALSE;
+    $displays = $view->get('display');
+
+    foreach ($displays as &$display) {
+      if (isset($display['display_options']['style'])
+        && $display['display_options']['style']['type'] === 'grid_responsive'
+        && isset($display['display_options']['style']['options'])
+      ) {
+        $options = &$display['display_options']['style']['options'];
+        if (!isset($options['row_class_custom'])) {
+          $options['row_class_custom'] = '';
+          $changed = TRUE;
+        }
+        if (!isset($options['col_class_custom'])) {
+          $options['col_class_custom'] = '';
           $changed = TRUE;
         }
       }

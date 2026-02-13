@@ -129,3 +129,16 @@ function views_post_update_block_items_per_page(?array &$sandbox = NULL): void {
 function views_post_update_add_date_default_arguments(): void {
   // Empty update to cause a cache rebuild so that schema additions are read.
 }
+
+/**
+ * Add custom row and column classes to the responsive grid style plugin.
+ */
+function views_post_update_responsive_grid_custom_classes(?array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::service(ViewsConfigUpdater::class);
+  $view_config_updater->setDeprecationsEnabled(FALSE);
+
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
+    return $view_config_updater->needsResponsiveGridClassUpdate($view);
+  });
+}
