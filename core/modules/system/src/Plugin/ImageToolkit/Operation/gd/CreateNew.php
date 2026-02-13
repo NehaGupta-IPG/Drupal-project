@@ -62,6 +62,7 @@ class CreateNew extends GDImageToolkitOperationBase {
    */
   protected function validateArguments(ImageInterface|array $arguments, $extra = NULL) {
     if ($arguments instanceof ImageInterface) {
+      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
       $image = $arguments;
       $arguments = $extra;
       assert(is_array($arguments));
