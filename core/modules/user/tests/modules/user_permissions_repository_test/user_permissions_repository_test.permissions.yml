@@ -2,7 +2,7 @@ main:
   extended_help: 'These permissions deal with this module. You can probably use the default settings, however, if you want to do [ABC], you might want to [XYZ]. Another possible use case is [ABC2]. In that case  [XYZ2].'
 
 section_callbacks:
-  - \Drupal\user_permissions_repository_test\TestProvider
+  - \Drupal\user_permissions_repository_test\TestProvider::getSections
 
 sections:
   - title: users
@@ -20,4 +20,4 @@ sections:
   extended_help: 'Users with this permission can view the page [ABC]. They will be able to see [XYZ], [ABC2], and [XYZ2]. So, you should only give this permission to users who need to see [ABC].'
 
 permission_callbacks:
-  - \Drupal\user_permissions_repository_test\TestProvider
+  - \Drupal\user_permissions_repository_test\TestProvider::getPerms
