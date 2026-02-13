@@ -22,13 +22,6 @@ class PagerManager implements PagerManagerInterface {
   protected $pagerParams;
 
   /**
-   * The request stack.
-   *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
-   */
-  protected RequestStack $requestStack;
-
-  /**
    * An associative array of pagers.
    *
    * Implemented as an array consisting of:
@@ -54,9 +47,8 @@ class PagerManager implements PagerManagerInterface {
    * @param \Symfony\Component\HttpFoundation\RequestStack $request
    *   The request_stack service.
    */
-  public function __construct(PagerParametersInterface $pager_params, RequestStack $request) {
+  public function __construct(PagerParametersInterface $pager_params) {
     $this->pagerParams = $pager_params;
-    $this->requestStack = $request;
   }
 
   /**

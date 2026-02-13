@@ -1949,7 +1949,7 @@ services:
   Drupal\Core\TempStore\SharedTempStoreFactory: '@tempstore.shared'
   pager.manager:
     class: Drupal\Core\Pager\PagerManager
-    arguments: ['@pager.parameters', '@request_stack']
+    arguments: ['@pager.parameters']
   Drupal\Core\Pager\PagerManagerInterface: '@pager.manager'
   pager.parameters:
     class: Drupal\Core\Pager\PagerParameters
