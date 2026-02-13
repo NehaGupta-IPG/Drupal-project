@@ -10,6 +10,9 @@ default:
   revision_uid:
     -
       target_id: 1
+  revision_uuid:
+    -
+      value: 04e9f54b-47f5-4972-8207-9c1e29acf759
   status:
     -
       value: true

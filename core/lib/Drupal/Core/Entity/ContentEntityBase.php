@@ -613,6 +613,16 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function getRevisionUuid(): ?string {
+    if (!$this->getEntityType()->hasRevisionMetadataKey('revision_uuid')) {
+      return NULL;
+    }
+    return $this->get($this->getEntityType()->getRevisionMetadataKey('revision_uuid'))->value;
+  }
+
+  /**
    * Gets a translated field.
    *
    * @return \Drupal\Core\Field\FieldItemListInterface<\Drupal\Core\Field\FieldItemInterface>
@@ -1231,6 +1241,10 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     if ($entity_type->isRevisionable()) {
       $duplicate->{$entity_type->getKey('revision')}->value = NULL;
       $duplicate->loadedRevisionId = NULL;
+      // Allow the storage to set a new revision UUID.
+      if ($entity_type->hasRevisionMetadataKey('revision_uuid')) {
+        $duplicate->set($entity_type->getRevisionMetadataKey('revision_uuid'), NULL);
+      }
     }
 
     // Modules might need to add or change the data initially held by the new
@@ -1418,6 +1432,13 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
         ->setLabel(new TranslatableMarkup('Revision ID'))
         ->setReadOnly(TRUE)
         ->setSetting('unsigned', TRUE);
+
+      if ($entity_type->hasRevisionMetadataKey('revision_uuid')) {
+        $fields[$entity_type->getRevisionMetadataKey('revision_uuid')] = BaseFieldDefinition::create('uuid')
+          ->setLabel(t('Revision UUID'))
+          ->setRevisionable(TRUE)
+          ->setReadOnly(TRUE);
+      }
     }
     if ($entity_type->hasKey('langcode')) {
       $fields[$entity_type->getKey('langcode')] = BaseFieldDefinition::create('language')

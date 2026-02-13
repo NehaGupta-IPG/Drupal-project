@@ -73,4 +73,11 @@ class StubRevisionableEntity extends StubEntityBase implements RevisionableInter
   public function preSaveRevision(EntityStorageInterface $storage, \stdClass $record): void {
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getRevisionUuid(): ?string {
+    return NULL;
+  }
+
 }

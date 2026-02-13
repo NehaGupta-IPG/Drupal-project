@@ -972,11 +972,13 @@ class SystemRequirements implements InstallRequirementsInterface {
         'title' => t('Entity/field definitions'),
         'value' => t('Up to date'),
       ];
+
+      $entity_type_manager = \Drupal::entityTypeManager();
       // Verify that no entity updates are pending.
       if ($change_list = \Drupal::entityDefinitionUpdateManager()->getChangeSummary()) {
         $build = [];
         foreach ($change_list as $entity_type_id => $changes) {
-          $entity_type = \Drupal::entityTypeManager()->getDefinition($entity_type_id);
+          $entity_type = $entity_type_manager->getDefinition($entity_type_id);
           $build[] = [
             '#theme' => 'item_list',
             '#title' => $entity_type->getLabel(),
@@ -988,6 +990,53 @@ class SystemRequirements implements InstallRequirementsInterface {
         $requirements['entity_update']['severity'] = RequirementSeverity::Error;
         $requirements['entity_update']['value'] = t('Mismatched entity and/or field definitions');
         $requirements['entity_update']['description'] = t('The following changes were detected in the entity type and field definitions. @updates', ['@updates' => $entity_update_issues]);
+      }
+
+      $requirements['entity_revision_missing_uuid'] = [
+        'title' => t('Revisions UUID'),
+      ];
+      $queue_worker_manager = \Drupal::service('plugin.manager.queue_worker');
+      $unprocessed_entity_types = [];
+      foreach ($queue_worker_manager->getDefinitions() as $pluginId => $definition) {
+        if (str_starts_with($pluginId, 'revision_uuid_update:')) {
+          $worker = $queue_worker_manager->createInstance($pluginId);
+          $queue = \Drupal::queue($pluginId);
+          $queue->createQueue();
+          if ($queue->numberOfItems()) {
+            $unprocessed_entity_types[$worker->getDerivativeId()] = $queue->numberOfItems();
+          }
+        }
+      }
+
+      if ($unprocessed_entity_types) {
+        $items = [];
+        foreach ($unprocessed_entity_types as $entity_type_id => $count) {
+          $items[] = new PluralTranslatableMarkup($count, '@type: @count revision', '@type: @count revisions', [
+            '@type' => $entity_type_manager->getDefinition($entity_type_id)->getLabel(),
+          ]);
+        }
+        $requirements['entity_revision_missing_uuid']['severity'] = RequirementSeverity::Warning;
+        $requirements['entity_revision_missing_uuid']['value'] = t('Some revision UUIDs are not yet updated');
+        $requirements['entity_revision_missing_uuid']['description'] = [
+          [
+            '#markup' => t('The following entity types have revisions with empty UUIDs:'),
+            '#prefix' => '<p>',
+            '#suffix' => '</p>',
+          ],
+          [
+            '#theme' => 'item_list',
+            '#items' => $items,
+          ],
+          [
+            '#markup' => t('The update process is queued and runs on cron. Is the cron processing enabled? To speed up the process, you can use a command-line tool, such as Drush, and run the queue for each unprocessed entity type. E.g., for the Node entity type run the <code>revision_uuid_update:node</code> queue.'),
+            '#prefix' => '<p>',
+            '#suffix' => '</p>',
+          ],
+        ];
+      }
+      else {
+        $requirements['entity_revision_missing_uuid']['severity'] = RequirementSeverity::OK;
+        $requirements['entity_revision_missing_uuid']['value'] = t('All revisions have assigned UUID values');
       }
     }
 

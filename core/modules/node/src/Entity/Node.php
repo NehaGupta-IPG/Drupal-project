@@ -93,6 +93,7 @@ use Drupal\user\EntityOwnerTrait;
     'revision_user' => 'revision_uid',
     'revision_created' => 'revision_timestamp',
     'revision_log_message' => 'revision_log',
+    'revision_uuid' => 'revision_uuid',
   ],
 )]
 class Node extends EditorialContentEntityBase implements NodeInterface {

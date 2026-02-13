@@ -1625,6 +1625,9 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
             if (!empty($schema[$table_name]['unique keys'])) {
               foreach ($schema[$table_name]['unique keys'] as $name => $specifier) {
                 $schema_handler->addUniqueKey($table_name, $name, $specifier);
+                // Check if the unique key exists because it might already have
+                // been created as part of the earlier entity type update event.
+                $this->addUniqueKey($table_name, $name, $specifier);
               }
             }
           }

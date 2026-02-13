@@ -149,6 +149,11 @@ abstract class BlockContentResourceTestBase extends EntityResourceTestBase {
         ],
       ],
       'revision_user' => [],
+      'revision_uuid' => [
+        [
+          'value' => $this->entity->getRevisionUuid(),
+        ],
+      ],
       'revision_translation_affected' => [
         [
           'value' => TRUE,

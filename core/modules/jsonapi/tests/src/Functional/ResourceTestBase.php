@@ -222,6 +222,11 @@ abstract class ResourceTestBase extends BrowserTestBase {
   protected $serializer;
 
   /**
+   * The revision UUID field if any.
+   */
+  protected ?string $revisionUuidFieldName = NULL;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -242,8 +247,12 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // Create an entity.
     $entity_type_manager = $this->container->get('entity_type.manager');
     $this->entityStorage = $entity_type_manager->getStorage(static::$entityTypeId);
-    $this->uuidKey = $entity_type_manager->getDefinition(static::$entityTypeId)
-      ->getKey('uuid');
+    $entity_type = $entity_type_manager->getDefinition(static::$entityTypeId);
+    $this->uuidKey = $entity_type->getKey('uuid');
+    if ($entity_type->isRevisionable()) {
+      $this->revisionUuidFieldName = $entity_type->getRevisionMetadataKey('revision_uuid') ?: NULL;
+    }
+
     $this->entity = $this->setUpFields($this->createEntity(), $this->account);
 
     $this->resourceType = $this->container->get('jsonapi.resource_type.repository')->getByTypeName(static::$resourceTypeName);
@@ -1005,6 +1014,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $rel_working_copy_url = Url::fromRoute(sprintf('jsonapi.%s.individual', static::$resourceTypeName), ['entity' => $this->entity->uuid()]);
       $rel_working_copy_url->setOption('query', ['resourceVersion' => 'rel:working-copy']);
       $expected_document['data']['links']['working-copy']['href'] = $rel_working_copy_url->setAbsolute()->toString();
+      if ($this->revisionUuidFieldName) {
+        $expected_document['data']['attributes'][$this->revisionUuidFieldName] = $this->entity->getRevisionUuid();
+      }
     }
     $this->assertResourceResponse(200, $expected_document, $response, $this->getExpectedCacheTags(), $this->getExpectedCacheContexts(), 'UNCACHEABLE (request policy)', $this->generateDynamicPageCacheExpectedHeaderValue($this->getExpectedCacheContexts()) === 'MISS' ? 'HIT' : 'UNCACHEABLE (poor cacheability)');
     // Assert that Dynamic Page Cache did not store a ResourceResponse object,
@@ -2774,6 +2786,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
 
       if ($this->entity->getEntityType()->isRevisionable()) {
         $expected_document['data']['links']['working-copy']['href'] = $rel_working_copy_url->setAbsolute()->toString();
+        if ($type === 'all' && $this->revisionUuidFieldName) {
+          $expected_document['data']['attributes'][$this->revisionUuidFieldName] = $this->entity->getRevisionUuid();
+        }
       }
 
       $response = $this->request('GET', $url, $request_options);
@@ -2836,6 +2851,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
         $rel_working_copy_url = clone $url;
         $rel_working_copy_url->setOption('query', ['resourceVersion' => 'rel:working-copy']);
         $expected_document['data']['links']['working-copy']['href'] = $rel_working_copy_url->setAbsolute()->toString();
+        if ($this->revisionUuidFieldName) {
+          $expected_document['data']['attributes'][$this->revisionUuidFieldName] = $this->entity->getRevisionUuid();
+        }
       }
       // Dynamic Page Cache miss because cache should vary based on the
       // 'include' query param.
@@ -2977,6 +2995,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // Resource objects always link to their specific revision by revision ID.
     $expected_document['data']['attributes'][$revision_id_key] = $latest_revision_id;
     $expected_document['data']['attributes']['field_revisionable_number'] = 99;
+    if ($this->revisionUuidFieldName) {
+      $expected_document['data']['attributes'][$this->revisionUuidFieldName] = $this->entityStorage->loadRevision($latest_revision_id)->getRevisionUuid();
+    }
     $expected_cache_tags = $this->getExpectedCacheTags();
     $expected_cache_contexts = $this->getExpectedCacheContexts();
     $this->assertResourceResponse(200, $expected_document, $actual_response, $expected_cache_tags, $expected_cache_contexts, NULL, TRUE);
@@ -3018,6 +3039,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // object.
     $expected_document['data']['links']['latest-version']['href'] = $rel_latest_version_url->setAbsolute()->toString();
     $expected_document['data']['links']['working-copy']['href'] = $rel_working_copy_url->setAbsolute()->toString();
+    if ($this->revisionUuidFieldName) {
+      $expected_document['data']['attributes'][$this->revisionUuidFieldName] = $this->entity->getRevisionUuid();
+    }
     $this->assertResourceResponse(200, $expected_document, $actual_response, Cache::mergeTags($expected_cache_tags, $this->getExtraRevisionCacheTags()), $expected_cache_contexts, NULL, TRUE);
 
     // Install content_moderation module.
@@ -3064,6 +3088,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // not be a link to the latest version.
     unset($expected_document['data']['links']['latest-version']);
     $expected_document = $this->alterExpectedDocumentForRevision($expected_document);
+    if ($this->revisionUuidFieldName) {
+      $expected_document['data']['attributes'][$this->revisionUuidFieldName] = $this->entityStorage->loadRevision($latest_revision_id)->getRevisionUuid();
+    }
     $expected_cache_tags = array_unique([...$expected_cache_tags, ...$workflow->getCacheTags()]);
     $this->assertResourceResponse(200, $expected_document, $actual_response, $expected_cache_tags, $expected_cache_contexts, NULL, TRUE);
     // Fetch the collection URL using the `latest-version` version argument.
@@ -3195,6 +3222,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // link is required to indicate that the requested version is not the
     // default revision.
     $expected_document['data']['links']['latest-version']['href'] = $rel_latest_version_url->setAbsolute()->toString();
+    if ($this->revisionUuidFieldName) {
+      $expected_document['data']['attributes'][$this->revisionUuidFieldName] = $this->entityStorage->loadRevision($latest_revision_id)->getRevisionUuid();
+    }
     $expected_cache_tags = $this->getExpectedCacheTags();
     $expected_cache_contexts = $this->getExpectedCacheContexts();
     $expected_cache_tags = array_unique([...$expected_cache_tags, ...$workflow->getCacheTags()]);

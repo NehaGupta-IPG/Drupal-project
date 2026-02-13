@@ -34,6 +34,7 @@ class EntitySchemaTestHooks {
         // Update the keys with a revision ID.
         $keys = $entity_type->getKeys();
         $keys['revision'] = 'revision_id';
+        $keys['revision_uuid'] = 'revision_uuid';
         $entity_type->set('entity_keys', $keys);
         $entity_type->setRevisionMetadataKey('revision_log_message', 'revision_log');
       }

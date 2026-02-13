@@ -112,6 +112,11 @@ class EntityUUIDTest extends EntityKernelTestBase {
           $this->assertNotEquals($entity->{$property}->getValue(), $entity_duplicate->{$property}->getValue());
           break;
 
+        case 'revision_uuid':
+          $this->assertNotNull($entity->getRevisionUuid());
+          $this->assertNotEquals($entity->getRevisionUuid(), $entity_duplicate->getRevisionUuid());
+          break;
+
         case 'name':
           // Assert alter hooks in \Drupal\entity_test\Hook\EntityTestHooks.
           if ($entity_type === 'entity_test') {

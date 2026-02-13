@@ -1,0 +1,101 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\Tests\system\Functional\Update;
+
+use Drupal\Component\Uuid\Uuid;
+use Drupal\Core\Entity\ContentEntityTypeInterface;
+use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
+/**
+ * Tests that revision_uuid base field install.
+ */
+#[CoversFunction('system_update_11301')]
+#[Group('Update')]
+#[RunTestsInSeparateProcesses]
+class InstallRevisionUuidFieldUpdateTest extends UpdatePathTestBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setDatabaseDumpFiles(): void {
+    $this->databaseDumpFiles = [
+      __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz',
+    ];
+  }
+
+  /**
+   * Tests system_update_11301().
+   */
+  public function testRevisionUuidUpdate(): void {
+    $assert = $this->assertSession();
+    $this->drupalLogin($this->createUser(admin: TRUE));
+
+    $this->runUpdates();
+
+    // Check update return message.
+    $assert->pageTextContains('Update #11301');
+    $assert->pageTextMatches('~The following entity types are converted to support revision UUID: block_content, node. Existing entity revisions are queued to update their UUID, and the process is handled gradually on cron. You can check the status of update at https?://[^/].*/update.php/admin/reports/status~');
+
+    // Check the warning message on Status Report page.
+    $this->drupalGet('/admin/reports/status');
+    $assert->pageTextContains('Revisions UUID');
+    $assert->pageTextContains('Some revision UUIDs are not yet updated');
+    $assert->pageTextContains('The following entity types have revisions with empty UUIDs:');
+    $assert->pageTextContains('Content block: 1 revision');
+    $assert->pageTextContains('Content: 1 revision');
+    $assert->pageTextContains('The update process is queued and runs on cron. Is the cron processing enabled? To speed up the process, you can use a command-line tool, such as Drush, and run the queue for each unprocessed entity type. E.g., for the Node entity type run the revision_uuid_update:node queue.');
+
+    $this->runQueues();
+
+    // Check again the Status Report page.
+    $this->drupalGet('/admin/reports/status');
+    $assert->pageTextContains('Revisions UUID');
+    $assert->pageTextContains('All revisions have assigned UUID values');
+
+    $manager = \Drupal::entityTypeManager();
+    \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
+
+    foreach ($manager->getDefinitions() as $entityTypeId => $entityType) {
+      if (!$entityType instanceof ContentEntityTypeInterface || !$entityType->hasRevisionMetadataKey('revision_uuid')) {
+        continue;
+      }
+
+      $storage = $manager->getStorage($entityTypeId);
+      $fieldName = $entityType->getRevisionMetadataKey('revision_uuid');
+      foreach ($storage->loadMultiple() as $entity) {
+        $this->assertTrue(Uuid::isValid($entity->get($fieldName)->value));
+      }
+    }
+  }
+
+  /**
+   * Runs all revision_uuid_update:* queues until it consumes them.
+   *
+   * For practical reasons we don't test by running cron because it's expensive,
+   * and might need several runs. Also, we're only interested in running the
+   * revision_uuid_update:* queues.
+   */
+  protected function runQueues(): void {
+    $workerManager = \Drupal::service('plugin.manager.queue_worker');
+    foreach ($workerManager->getDefinitions() as $pluginId => $definition) {
+      $worker = $workerManager->createInstance($pluginId);
+
+      if ($worker->getBaseId() === 'revision_uuid_update') {
+        $queue = \Drupal::queue($worker->getPluginId());
+        $queue->createQueue();
+
+        while ($queue->numberOfItems()) {
+          $item = $queue->claimItem();
+          $worker->processItem($item->data);
+          $queue->deleteItem($item);
+        }
+      }
+    }
+  }
+
+}

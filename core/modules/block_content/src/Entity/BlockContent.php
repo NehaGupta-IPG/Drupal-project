@@ -100,6 +100,7 @@ use Drupal\block_content\BlockContentInterface;
     'revision_user' => 'revision_user',
     'revision_created' => 'revision_created',
     'revision_log_message' => 'revision_log',
+    'revision_uuid' => 'revision_uuid',
   ],
 )]
 class BlockContent extends EditorialContentEntityBase implements BlockContentInterface {

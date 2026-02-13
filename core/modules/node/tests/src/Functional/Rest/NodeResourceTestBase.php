@@ -198,6 +198,9 @@ abstract class NodeResourceTestBase extends EntityResourceTestBase {
           'url' => base_path() . 'user/' . $author->id(),
         ],
       ],
+      'revision_uuid' => [
+        ['value' => $this->entity->getRevisionUuid()],
+      ],
       'path' => [
         [
           'alias' => '/llama',

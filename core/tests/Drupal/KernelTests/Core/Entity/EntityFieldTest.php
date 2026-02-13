@@ -645,6 +645,7 @@ class EntityFieldTest extends EntityKernelTestBase {
       NULL,
     ];
 
+    // Adding empty string for revision message.
     if ($entity instanceof RevisionLogInterface) {
       // Adding empty string for revision message.
       $target_strings[] = '';
