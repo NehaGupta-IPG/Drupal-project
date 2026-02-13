@@ -11,7 +11,7 @@ config:
       setFilterConfig:
         instance_id: media_embed
         configuration: []
-    config.does.not.exist:
+    system.image:
       # This will cause a validation error, which will trigger a rollback.
       # The rollback should fail, since the Media module can't be uninstalled
       # now that the plain_text format is using one of its filters.
