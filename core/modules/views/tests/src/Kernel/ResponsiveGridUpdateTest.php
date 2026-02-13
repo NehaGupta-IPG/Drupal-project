@@ -7,6 +7,7 @@ namespace Drupal\Tests\views\Kernel;
 use Drupal\views\Entity\View;
 use Drupal\views\ViewsConfigUpdater;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the upgrade path for adding custom classes to responsive grid.
