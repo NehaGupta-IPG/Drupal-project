@@ -71,7 +71,7 @@ interface ImageToolkitInterface extends ContainerFactoryPluginInterface, PluginI
    * @return string
    *   The source path of the image file, or an empty string if the source is
    *   not set.
-   *   *
+   *
    * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
    *    whack-a-mole instead.
    *

@@ -183,9 +183,7 @@ class Image implements ImageInterface {
    */
   public function setToolkit(ImageToolkitInterface $toolkit): static {
     @trigger_error(__METHOD__ . ' is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
-    // @phpstan-ignore property.deprecated
     $this->toolkit = $toolkit;
-    // @phpstan-ignore property.deprecated
     $this->toolkit->backfillImage = $this;
     return $this;
   }

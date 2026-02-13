@@ -184,6 +184,7 @@ class ImageTest extends UnitTestCase {
 
     $this->image = new GdImageWrapper($this->getImageFactoryMock($this->toolkit), 'gd', $this->source);
     if ($needsToolkitInjection) {
+      // @phpstan-ignore method.deprecated
       $this->image->setToolkit($this->toolkit);
     }
 
