@@ -63,9 +63,9 @@ class RecipeDiscoveryTest extends KernelTestBase {
       $this->assertNotEmpty($test_recipes);
 
       // An invalid recipe should have been skipped.
-      $invalid_recipes = preg_grep('/\/config_rollback_exception$/', $paths);
+      $invalid_recipes = preg_grep('/\/invalid_recipe$/', $paths);
       $this->assertEmpty($invalid_recipes);
-      $this->assertTrue($logger->hasWarningThatContains("Validation errors were found in $drupal_root/core/tests/fixtures/recipes/config_rollback_exception/recipe.yml:"));
+      $this->assertTrue($logger->hasWarningThatContains("Validation errors were found in $drupal_root/core/tests/fixtures/recipes/invalid_recipe/recipe.yml:"));
     }
     else {
       $this->assertEmpty($test_recipes);
