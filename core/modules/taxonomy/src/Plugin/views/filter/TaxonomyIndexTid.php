@@ -419,7 +419,6 @@ class TaxonomyIndexTid extends ManyToOne {
    */
   public function adminSummary() {
     // Set up $this->valueOptions for the parent summary
-    $this->valueOptions = [];
 
     if ($this->value) {
       $this->value = array_filter($this->value);
