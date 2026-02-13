@@ -1347,7 +1347,6 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     $fields = $this->fields;
     $this->fields = &$fields;
 
-
     $entity_keys = $this->entityKeys;
     $this->entityKeys = &$entity_keys;
 
@@ -1365,7 +1364,6 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
 
     $is_syncing = $this->isSyncing;
     $this->isSyncing = &$is_syncing;
-
 
     foreach ($this->fields as $name => $fields_by_langcode) {
       $this->fields[$name] = [];
