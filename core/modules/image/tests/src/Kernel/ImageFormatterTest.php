@@ -177,6 +177,58 @@ class ImageFormatterTest extends FieldKernelTestBase {
   }
 
   /**
+   * Tests ImageUrlFormatter's handling of SVG images.
+   */
+  #[RequiresPhpExtension('gd')]
+  public function testImageUrlFormatterSvg(): void {
+    // Install the default image styles.
+    $this->installConfig(['image']);
+
+    $png = File::create([
+      'uri' => 'public://test-image.png',
+    ]);
+    $png->save();
+
+    // We need to create an actual empty PNG, or the GD toolkit will not
+    // consider the image valid.
+    $png_resource = imagecreate(300, 300);
+    imagefill($png_resource, 0, 0, imagecolorallocate($png_resource, 0, 0, 0));
+    imagepng($png_resource, $png->getFileUri());
+
+    $svg = File::create([
+      'uri' => 'public://test-image.svg',
+    ]);
+    $svg->save();
+    // We don't have to put any real SVG data in here, because the GD toolkit
+    // won't be able to load it anyway.
+    touch($svg->getFileUri());
+
+    $entity = EntityTest::create([
+      'name' => $this->randomMachineName(),
+      $this->fieldName => [$png, $svg],
+    ]);
+    $entity->save();
+
+    // Switch to the image_url formatter with the medium image style.
+    $this->display->setComponent($this->fieldName, [
+      'type' => 'image_url',
+      'settings' => ['image_style' => 'medium'],
+    ])->save();
+
+    $build = $this->display->build($entity);
+
+    // The first image is a PNG, so its URL should contain the image style
+    // derivative path.
+    $this->assertStringContainsString('styles/medium', $build[$this->fieldName][0]['#markup']);
+    $this->assertStringContainsString('test-image.png', $build[$this->fieldName][0]['#markup']);
+
+    // The second image is an SVG, which is not supported by the GD toolkit.
+    // The URL should fall back to the original file path, not a derivative.
+    $this->assertStringNotContainsString('styles/medium', $build[$this->fieldName][1]['#markup']);
+    $this->assertStringContainsString('test-image.svg', $build[$this->fieldName][1]['#markup']);
+  }
+
+  /**
    * Tests Image Formatter URL options handling.
    */
   public function testImageFormatterUrlOptions(): void {
