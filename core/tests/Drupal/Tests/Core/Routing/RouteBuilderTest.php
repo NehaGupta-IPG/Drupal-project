@@ -322,6 +322,53 @@ class RouteBuilderTest extends UnitTestCase {
     $this->assertTrue($this->routeBuilder->rebuild());
   }
 
+  /**
+   * Tests that boolean requirement values are converted to strings.
+   *
+   * @see \Drupal\Core\Access\DefaultAccessCheck::access()
+   */
+  public function testRebuildConvertsBooleanRequirements(): void {
+    $this->lock->expects($this->once())
+      ->method('acquire')
+      ->with('router_rebuild')
+      ->willReturn(TRUE);
+    $this->yamlDiscovery->expects($this->once())
+      ->method('findAll')
+      ->willReturn([
+        'test_module' => [
+          'test_route.bool_true' => [
+            'path' => '/test-bool-true',
+            'requirements' => [
+              '_access' => TRUE,
+            ],
+          ],
+          'test_route.bool_false' => [
+            'path' => '/test-bool-false',
+            'requirements' => [
+              '_access' => FALSE,
+            ],
+          ],
+          'test_route.string_true' => [
+            'path' => '/test-string-true',
+            'requirements' => [
+              '_access' => 'TRUE',
+            ],
+          ],
+        ],
+      ]);
+
+    $this->dumper->expects($this->once())
+      ->method('addRoutes')
+      ->with($this->callback(function (RouteCollection $collection) {
+        $this->assertSame('TRUE', $collection->get('test_route.bool_true')->getRequirement('_access'));
+        $this->assertSame('FALSE', $collection->get('test_route.bool_false')->getRequirement('_access'));
+        $this->assertSame('TRUE', $collection->get('test_route.string_true')->getRequirement('_access'));
+        return TRUE;
+      }));
+
+    $this->assertTrue($this->routeBuilder->rebuild());
+  }
+
 }
 
 /**

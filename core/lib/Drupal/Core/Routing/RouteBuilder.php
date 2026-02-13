@@ -186,6 +186,16 @@ class RouteBuilder implements RouteBuilderInterface, DestructableInterface {
           'compiler_class' => RouteCompiler::class,
         ];
 
+        // Convert boolean requirement values to their string equivalents, so
+        // that _access: TRUE in YAML (parsed as a PHP boolean) works the same
+        // as _access: 'TRUE' (parsed as a string). Symfony's Route class
+        // expects all requirement values to be strings.
+        foreach ($route_info['requirements'] as $key => $value) {
+          if (is_bool($value)) {
+            $route_info['requirements'][$key] = $value ? 'TRUE' : 'FALSE';
+          }
+        }
+
         $route = new Route($route_info['path'], $route_info['defaults'], $route_info['requirements'], $route_info['options'], $route_info['host'], $route_info['schemes'], $route_info['methods'], $route_info['condition']);
         $collection->add($name, $route);
       }
