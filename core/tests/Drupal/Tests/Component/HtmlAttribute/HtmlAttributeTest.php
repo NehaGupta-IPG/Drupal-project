@@ -372,7 +372,7 @@ class HtmlAttributeTest extends TestCase {
    *
    * @internal
    */
-  protected function assertID(string $id, string $html): void {
+  protected function assertId(string $id, string $html): void {
     $xpath = "//*[@id='$id']";
     self::assertTrue((bool) $this->getXpathResultCount($xpath, $html));
   }
@@ -387,7 +387,7 @@ class HtmlAttributeTest extends TestCase {
    *
    * @internal
    */
-  protected function assertNoID(string $id, string $html): void {
+  protected function assertNoId(string $id, string $html): void {
     $xpath = "//*[@id='$id']";
     self::assertFalse((bool) $this->getXpathResultCount($xpath, $html));
   }
@@ -455,9 +455,21 @@ class HtmlAttributeTest extends TestCase {
    */
   public function providerTestMerge() {
     return [
-      [new HtmlAttributeCollection([]), new HtmlAttributeCollection(['class' => ['class1']]), new HtmlAttributeCollection(['class' => ['class1']])],
-      [new HtmlAttributeCollection(['class' => ['example-class']]), new HtmlAttributeCollection(['class' => ['class1']]), new HtmlAttributeCollection(['class' => ['example-class', 'class1']])],
-      [new HtmlAttributeCollection(['class' => ['example-class']]), new HtmlAttributeCollection(['id' => 'foo', 'href' => 'bar']), new HtmlAttributeCollection(['class' => ['example-class'], 'id' => 'foo', 'href' => 'bar'])],
+      [
+        new HtmlAttributeCollection([]),
+        new HtmlAttributeCollection(['class' => ['class1']]),
+        new HtmlAttributeCollection(['class' => ['class1']]),
+      ],
+      [
+        new HtmlAttributeCollection(['class' => ['example-class']]),
+        new HtmlAttributeCollection(['class' => ['class1']]),
+        new HtmlAttributeCollection(['class' => ['example-class', 'class1']]),
+      ],
+      [
+        new HtmlAttributeCollection(['class' => ['example-class']]),
+        new HtmlAttributeCollection(['id' => 'foo', 'href' => 'bar']),
+        new HtmlAttributeCollection(['class' => ['example-class'], 'id' => 'foo', 'href' => 'bar']),
+      ],
     ];
   }
 

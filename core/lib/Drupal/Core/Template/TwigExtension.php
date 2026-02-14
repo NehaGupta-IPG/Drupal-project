@@ -635,7 +635,7 @@ class TwigExtension extends AbstractExtension {
   /**
    * Creates an HtmlAttributeCollection object.
    *
-   * @param HtmlAttributeCollection|array $attributes
+   * @param \Drupal\Component\HtmlAttribute\HtmlAttributeCollection|array $attributes
    *   (optional) An existing attribute object or an associative array of
    *   key-value pairs to be converted to HTML attributes.
    *

@@ -81,7 +81,7 @@ class HtmlAttributeCollection implements \ArrayAccess, \IteratorAggregate, \Stri
   protected array $storage = [];
 
   /**
-   * Constructs a \Drupal\Component\HtmlAttribute\HtmlAttributeCollection object.
+   * Constructs a HtmlAttributeCollection object.
    *
    * @param HtmlAttributeCollection|array<scalar> $attributes
    *   An associative array of key-value pairs to be converted to attributes.
@@ -99,6 +99,7 @@ class HtmlAttributeCollection implements \ArrayAccess, \IteratorAggregate, \Stri
    *   The offset to retrieve.
    *
    * @return \Drupal\Component\HtmlAttribute\HtmlAttributeValueBase|null
+   *   The value at the specified index.
    */
   public function offsetGet(mixed $key): ?HtmlAttributeValueBase {
     return $this->storage[$key] ?? NULL;
@@ -376,6 +377,7 @@ class HtmlAttributeCollection implements \ArrayAccess, \IteratorAggregate, \Stri
    * Retrieves an external iterator.
    *
    * @return \ArrayIterator<string, HtmlAttributeValueBase>
+   *   An external iterator.
    */
   public function getIterator(): \Traversable {
     return new \ArrayIterator($this->storage);
@@ -385,6 +387,7 @@ class HtmlAttributeCollection implements \ArrayAccess, \IteratorAggregate, \Stri
    * Returns the whole array.
    *
    * @return array<string, HtmlAttributeValueBase>
+   *   The whole array.
    */
   public function storage(): array {
     return $this->storage;

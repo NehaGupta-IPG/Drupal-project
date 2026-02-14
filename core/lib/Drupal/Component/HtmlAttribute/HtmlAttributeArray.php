@@ -69,6 +69,7 @@ class HtmlAttributeArray extends HtmlAttributeValueBase implements \ArrayAccess,
    *   The offset to retrieve.
    *
    * @return scalar
+   *   The value at the specified index.
    */
   public function offsetGet(mixed $key): bool|float|int|string {
     return $this->arrayValue[$key];
@@ -124,6 +125,7 @@ class HtmlAttributeArray extends HtmlAttributeValueBase implements \ArrayAccess,
    * Retrieves an external iterator.
    *
    * @return \ArrayIterator<string|int, scalar>
+   *   An external iterator.
    */
   public function getIterator(): \Traversable {
     return new \ArrayIterator($this->arrayValue);
@@ -132,13 +134,13 @@ class HtmlAttributeArray extends HtmlAttributeValueBase implements \ArrayAccess,
   /**
    * Exchange the array for another one.
    *
-   * @see ArrayObject::exchangeArray
-   *
    * @param array<scalar> $input
    *   The array input to replace the internal value.
    *
    * @return array<scalar>
    *   The old array value.
+   *
+   * @see ArrayObject::exchangeArray
    */
   public function exchangeArray(array $input): array {
     $old = $this->arrayValue;

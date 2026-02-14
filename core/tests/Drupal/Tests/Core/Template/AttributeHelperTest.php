@@ -54,12 +54,34 @@ class AttributeHelperTest extends UnitTestCase {
    */
   public static function providerTestMergeCollections(): array {
     return [
-      [[], ['class' => ['class1']], ['class' => ['class1']]],
-      [[], new HtmlAttributeCollection(['class' => ['class1']]), ['class' => ['class1']]],
-      [['class' => ['example-class']], ['class' => ['class1']], ['class' => ['example-class', 'class1']]],
-      [['class' => ['example-class']], new HtmlAttributeCollection(['class' => ['class1']]), ['class' => ['example-class', 'class1']]],
-      [['class' => ['example-class']], ['id' => 'foo', 'href' => 'bar'], ['class' => ['example-class'], 'id' => 'foo', 'href' => 'bar']],
-      [['class' => ['example-class']], new HtmlAttributeCollection(['id' => 'foo', 'href' => 'bar']), ['class' => ['example-class'], 'id' => 'foo', 'href' => 'bar']],
+      [
+        [],
+        ['class' => ['class1']], ['class' => ['class1']],
+      ],
+      [
+        [],
+        new HtmlAttributeCollection(['class' => ['class1']]), ['class' => ['class1']],
+      ],
+      [
+        ['class' => ['example-class']],
+        ['class' => ['class1']],
+        ['class' => ['example-class', 'class1']],
+      ],
+      [
+        ['class' => ['example-class']],
+        new HtmlAttributeCollection(['class' => ['class1']]),
+        ['class' => ['example-class', 'class1']],
+      ],
+      [
+        ['class' => ['example-class']],
+        ['id' => 'foo', 'href' => 'bar'],
+        ['class' => ['example-class'], 'id' => 'foo', 'href' => 'bar'],
+      ],
+      [
+        ['class' => ['example-class']],
+        new HtmlAttributeCollection(['id' => 'foo', 'href' => 'bar']),
+        ['class' => ['example-class'], 'id' => 'foo', 'href' => 'bar'],
+      ],
     ];
   }
 
