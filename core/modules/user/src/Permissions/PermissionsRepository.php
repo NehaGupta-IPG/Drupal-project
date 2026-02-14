@@ -50,14 +50,22 @@ class PermissionsRepository implements PermissionsRepositoryInterface {
       throw new \InvalidArgumentException('Invalid section format: ' . json_encode($section));
     }
 
+    if (!empty($section['key'])) {
+      $key = (string) $section['key'];
+    }
+    else {
+      $key = (string) $section['title'];
+    }
+
     $section += [
+      'key' => $key,
       'description' => NULL,
       'provider' => $provider,
       'weight' => 0,
       'extended_help' => '',
     ];
 
-    $this->data[$provider]['sections'][(string) $section['title']] = $section;
+    $this->data[$provider]['sections'][(string) $section['key']] = $section;
   }
 
   /**

@@ -158,8 +158,8 @@ class UserPermissionsRepositoryTest extends BrowserTestBase {
       'extended_help',
     ], 'TestProvider section extended_help is missing');
 
-    $this->assertEquals('Section from TestProvider', $sectionTitle, 'TestProvider section title is empty or wrong: ' . $sectionTitle);
-    $this->assertStringContainsString('This is just for testing', $sectionHelp, 'TestProvider section help is empty or wrong: ' . $sectionHelp);
+    $this->assertEquals('Section from TestProvider', (string) $sectionTitle, 'TestProvider section title is empty or wrong: ' . $sectionTitle);
+    $this->assertStringContainsString('This is just for testing', (string) $sectionHelp, 'TestProvider section help is empty or wrong: ' . $sectionHelp);
   }
 
   /**

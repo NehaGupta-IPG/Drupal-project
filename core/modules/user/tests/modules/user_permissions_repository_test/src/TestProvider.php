@@ -11,6 +11,9 @@ use Drupal\user\Permissions\ProvidesSectionsInterface;
 
 /**
  * Returns responses to test the permissions repository.
+ *
+ * Note that implementing ProvidesPermissionsInterface and
+ * ProvidesSectionsInterface aren't currently required.
  */
 class TestProvider implements ProvidesPermissionsInterface, ProvidesSectionsInterface {
 
