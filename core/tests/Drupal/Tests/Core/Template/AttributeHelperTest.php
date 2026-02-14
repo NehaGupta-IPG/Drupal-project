@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[CoversClass(AttributeHelper::class)]
 #[Group('Template')]
+#[Group('legacy')]
 class AttributeHelperTest extends UnitTestCase {
 
   /**
@@ -97,7 +98,7 @@ class AttributeHelperTest extends UnitTestCase {
   /**
    * Tests merge collections argument exception.
    */
-  public function testMergeCollectionsArgumentException() {
+  public function testMergeCollectionsArgumentException(): void {
     $attributes = new HtmlAttributeCollection(['class' => ['example-class']]);
     $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage('Invalid collection argument');

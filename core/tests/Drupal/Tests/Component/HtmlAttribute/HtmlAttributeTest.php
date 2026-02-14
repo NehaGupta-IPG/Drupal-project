@@ -7,17 +7,22 @@ namespace Drupal\Tests\Component\HtmlAttribute;
 use Drupal\Component\HtmlAttribute\HtmlAttributeCollection;
 use Drupal\Component\HtmlAttribute\HtmlAttributeArray;
 use Drupal\Component\HtmlAttribute\HtmlAttributeScalar;
+use Drupal\Component\PhpStorage\FileReadOnlyStorage;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Render\MarkupTrait;
 use Drupal\Component\Utility\Html;
 use Drupal\Tests\PhpUnitCompatibilityTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 
 /**
- * @coversDefaultClass \Drupal\Component\HtmlAttribute\HtmlAttributeCollection
- * @group HtmlAttribute
+ * Tests Drupal\Component\HtmlAttribute\HtmlAttributeCollection.
  */
+#[CoversClass(HtmlAttributeCollection::class)]
+#[Group('Drupal')]
+#[Group('HtmlAttribute')]
 class HtmlAttributeTest extends TestCase {
 
   use PhpUnitCompatibilityTrait;
@@ -26,7 +31,7 @@ class HtmlAttributeTest extends TestCase {
   /**
    * Tests the constructor of the attribute class.
    */
-  public function testConstructor() {
+  public function testConstructor(): void {
     $attributes = new HtmlAttributeCollection(['class' => ['example-class']]);
     $this->assertTrue(isset($attributes['class']));
     $this->assertEquals(new HtmlAttributeArray('class', ['example-class']), $attributes['class']);
@@ -52,7 +57,7 @@ class HtmlAttributeTest extends TestCase {
   /**
    * Tests set of values.
    */
-  public function testSet() {
+  public function testSet(): void {
     $attributes = new HtmlAttributeCollection();
     $attributes['class'] = ['example-class'];
 
@@ -63,7 +68,7 @@ class HtmlAttributeTest extends TestCase {
   /**
    * Tests adding new values to an existing part of the attribute.
    */
-  public function testAdd() {
+  public function testAdd(): void {
     $attributes = new HtmlAttributeCollection(['class' => ['example-class']]);
 
     $attributes['class'][] = 'other-class';
@@ -73,7 +78,7 @@ class HtmlAttributeTest extends TestCase {
   /**
    * Tests removing of values.
    */
-  public function testRemove() {
+  public function testRemove(): void {
     $attributes = new HtmlAttributeCollection(['class' => ['example-class']]);
     unset($attributes['class']);
     $this->assertFalse(isset($attributes['class']));
@@ -84,7 +89,7 @@ class HtmlAttributeTest extends TestCase {
    *
    * @covers ::setAttribute
    */
-  public function testSetAttribute() {
+  public function testSetAttribute(): void {
     $attributes = new HtmlAttributeCollection();
 
     // Test adding various attributes.
@@ -113,7 +118,7 @@ class HtmlAttributeTest extends TestCase {
    *
    * @covers ::removeAttribute
    */
-  public function testRemoveAttribute() {
+  public function testRemoveAttribute(): void {
     $values = [
       'alt' => 'Alternative text',
       'id' => 'bunny',
@@ -153,7 +158,7 @@ class HtmlAttributeTest extends TestCase {
    *
    * @covers ::addClass
    */
-  public function testAddClasses() {
+  public function testAddClasses(): void {
     // Add empty Attribute object with no classes.
     $attributes = new HtmlAttributeCollection();
 
@@ -206,7 +211,7 @@ class HtmlAttributeTest extends TestCase {
    *
    * @covers ::removeClass
    */
-  public function testRemoveClasses() {
+  public function testRemoveClasses(): void {
     // Add duplicate class to ensure that both duplicates are removed.
     $classes = ['example-class', 'aa', 'xx', 'yy', 'red', 'green', 'blue', 'red'];
     $attributes = new HtmlAttributeCollection(['class' => $classes]);
@@ -238,7 +243,7 @@ class HtmlAttributeTest extends TestCase {
    *
    * @covers ::hasClass
    */
-  public function testHasClass() {
+  public function testHasClass(): void {
     // Test an attribute without any classes.
     $attributes = new HtmlAttributeCollection();
     $this->assertFalse($attributes->hasClass('a-class-nowhere-to-be-found'));
@@ -255,7 +260,7 @@ class HtmlAttributeTest extends TestCase {
    * @covers ::removeClass
    * @covers ::addClass
    */
-  public function testChainAddRemoveClasses() {
+  public function testChainAddRemoveClasses(): void {
     $attributes = new HtmlAttributeCollection(
       ['class' => ['example-class', 'red', 'green', 'blue']]
     );
@@ -271,7 +276,7 @@ class HtmlAttributeTest extends TestCase {
   /**
    * Tests iterating on the values of the attribute.
    */
-  public function testIterate() {
+  public function testIterate(): void {
     $attributes = new HtmlAttributeCollection(['class' => ['example-class'], 'id' => 'example-id']);
 
     $counter = 0;
@@ -291,7 +296,7 @@ class HtmlAttributeTest extends TestCase {
   /**
    * Tests printing of an attribute.
    */
-  public function testPrint() {
+  public function testPrint(): void {
     $attributes = new HtmlAttributeCollection(['class' => ['example-class'], 'id' => 'example-id', 'enabled' => TRUE]);
 
     $html = '<div' . (string) $attributes . '>test content</div>';
@@ -311,7 +316,7 @@ class HtmlAttributeTest extends TestCase {
    *
    * @dataProvider providerTestAttributeValues
    */
-  public function testAttributeValues(array $attributes, $expected) {
+  public function testAttributeValues(array $attributes, $expected): void {
     $this->assertEquals($expected, (new HtmlAttributeCollection($attributes))->__toString());
   }
 
@@ -321,7 +326,7 @@ class HtmlAttributeTest extends TestCase {
    * @return array
    *   An array of test data.
    */
-  public function providerTestAttributeValues() {
+  public function providerTestAttributeValues(): array {
     $data = [];
 
     $string = '"> <script>alert(123)</script>"';
@@ -405,7 +410,7 @@ class HtmlAttributeTest extends TestCase {
    * @return int
    *   The number of results that are found.
    */
-  protected function getXpathResultCount($query, $html) {
+  protected function getXpathResultCount($query, $html): int {
     $document = new \DOMDocument();
     $document->loadHTML($html);
     $xpath = new \DOMXPath($document);
@@ -416,7 +421,7 @@ class HtmlAttributeTest extends TestCase {
   /**
    * Tests the storage method.
    */
-  public function testStorage() {
+  public function testStorage(): void {
     $attributes = new HtmlAttributeCollection(['class' => ['example-class']]);
 
     $this->assertEquals(['class' => new HtmlAttributeArray('class', ['example-class'])], $attributes->storage());
@@ -429,7 +434,7 @@ class HtmlAttributeTest extends TestCase {
    *   An array of test data each containing an array of attributes, the name
    *   of the attribute to check existence of, and the expected result.
    */
-  public function providerTestHasAttribute() {
+  public function providerTestHasAttribute(): array {
     return [
       [['class' => ['example-class']], 'class', TRUE],
       [[], 'class', FALSE],
@@ -443,7 +448,7 @@ class HtmlAttributeTest extends TestCase {
    * @covers ::hasAttribute
    * @dataProvider providerTestHasAttribute
    */
-  public function testHasAttribute(array $test_data, $test_attribute, $expected) {
+  public function testHasAttribute(array $test_data, $test_attribute, $expected): void {
     $attributes = new HtmlAttributeCollection($test_data);
     $this->assertSame($expected, $attributes->hasAttribute($test_attribute));
   }
@@ -455,7 +460,7 @@ class HtmlAttributeTest extends TestCase {
    *   An array of test data each containing an initial Attribute object, an
    *   Attribute object or array to be merged, and the expected result.
    */
-  public function providerTestMerge() {
+  public function providerTestMerge(): array {
     return [
       [
         new HtmlAttributeCollection([]),
@@ -479,14 +484,14 @@ class HtmlAttributeTest extends TestCase {
    * @covers ::merge
    * @dataProvider providerTestMerge
    */
-  public function testMerge($original, $merge, $expected) {
+  public function testMerge($original, $merge, $expected): void {
     $this->assertEquals($expected, $original->merge($merge));
   }
 
   /**
    * @covers ::merge
    */
-  public function testMergeArgumentException() {
+  public function testMergeArgumentException(): void {
     $attributes = new HtmlAttributeCollection(['class' => ['example-class']]);
     $this->expectException(\TypeError::class);
     $attributes->merge('not an array');

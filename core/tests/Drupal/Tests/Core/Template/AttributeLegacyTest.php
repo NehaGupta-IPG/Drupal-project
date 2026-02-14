@@ -13,13 +13,13 @@ use Drupal\Core\Template\AttributeBoolean as CoreAttributeBoolean;
 use Drupal\Core\Template\AttributeString as CoreAttributeString;
 use Drupal\Core\Template\AttributeValueBase as CoreAttributeValueBase;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Deprecation tests for the core Attribute* classes.
- *
- * @group Template
- * @group legacy
  */
+#[Group('Template')]
+#[Group('legacy')]
 class AttributeLegacyTest extends UnitTestCase {
 
   /**
@@ -54,7 +54,6 @@ class AttributeLegacyTest extends UnitTestCase {
         string $name,
         private array $value,
       ) {
-        // @phpstan-ignore-next-line
         parent::__construct($name);
       }
 

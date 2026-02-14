@@ -567,7 +567,7 @@ class TwigExtensionTest extends UnitTestCase {
    *
    * @dataProvider providerTestAttributeClassHelpers
    */
-  public function testTwigAddRemoveClasses($template, $expected, $seed_attributes = []) {
+  public function testTwigAddRemoveClasses($template, $expected, $seed_attributes = []): void {
     $loader = new StringLoader();
     $twig = new Environment($loader);
     $data = ['attributes' => new HtmlAttributeCollection($seed_attributes)];
@@ -582,7 +582,7 @@ class TwigExtensionTest extends UnitTestCase {
    *   An array of test data each containing of a twig template string,
    *   a resulting string of classes and an optional array of attributes.
    */
-  public function providerTestAttributeClassHelpers() {
+  public static function providerTestAttributeClassHelpers(): array {
     return [
       ["{{ attributes.class }}", ''],
       ["{{ attributes.addClass('everest').class }}", 'everest'],
