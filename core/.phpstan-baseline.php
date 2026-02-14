@@ -26834,6 +26834,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/path_alias/src/AliasPrefixList.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\path_alias\\\\AliasPrefixList\\:\\:has\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/path_alias/src/AliasPrefixList.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\path_alias\\\\AliasPrefixList\\:\\:lazyLoadCache\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -26841,6 +26847,12 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\path_alias\\\\AliasPrefixList\\:\\:loadMenuPathRoots\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/path_alias/src/AliasPrefixList.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\path_alias\\\\AliasPrefixList\\:\\:set\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/path_alias/src/AliasPrefixList.php',
@@ -29589,12 +29601,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\system\\\\Form\\\\SiteInformationForm\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Form/SiteInformationForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\system\\\\Form\\\\SiteInformationForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/src/Form/SiteInformationForm.php',
@@ -32485,12 +32491,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\theme_test\\\\ThemeTestController\\:\\:suggestionProvided\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/theme_test/src/ThemeTestController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\theme_test\\\\ThemeTestController\\:\\:testThemeClass\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/tests/modules/theme_test/src/ThemeTestController.php',
