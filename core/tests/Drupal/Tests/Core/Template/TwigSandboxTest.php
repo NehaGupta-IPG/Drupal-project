@@ -167,6 +167,7 @@ class TwigSandboxTest extends UnitTestCase {
     $this->expectDeprecation('\Drupal\Core\Template\Attribute as an allowed class in $settings[\'twig_sandbox_allowed_classes\'] is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Component\HtmlAttribute\HtmlAttributeCollection instead. See https://www.drupal.org/node/3070485');
 
     // Might be a hack?  This is hard to mock now...
+    // @phpstan-ignore-next-line
     new Settings(['twig_sandbox_allowed_classes' => CoreAttribute::class]);
     $policy = new TwigSandboxPolicy();
 

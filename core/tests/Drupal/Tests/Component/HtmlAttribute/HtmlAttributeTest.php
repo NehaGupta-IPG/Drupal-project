@@ -12,6 +12,7 @@ use Drupal\Component\Render\MarkupTrait;
 use Drupal\Component\Utility\Html;
 use Drupal\Tests\PhpUnitCompatibilityTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -297,9 +298,8 @@ class HtmlAttributeTest extends TestCase {
 
   /**
    * Tests attribute values.
-   *
-   * @dataProvider providerTestAttributeValues
    */
+  #[DataProvider('providerTestAttributeValues')]
   public function testAttributeValues(array $attributes, $expected): void {
     $this->assertEquals($expected, (new HtmlAttributeCollection($attributes))->__toString());
   }
@@ -310,7 +310,7 @@ class HtmlAttributeTest extends TestCase {
    * @return array
    *   An array of test data.
    */
-  public function providerTestAttributeValues(): array {
+  public static function providerTestAttributeValues(): array {
     $data = [];
 
     $string = '"> <script>alert(123)</script>"';
@@ -418,7 +418,7 @@ class HtmlAttributeTest extends TestCase {
    *   An array of test data each containing an array of attributes, the name
    *   of the attribute to check existence of, and the expected result.
    */
-  public function providerTestHasAttribute(): array {
+  public static function providerTestHasAttribute(): array {
     return [
       [['class' => ['example-class']], 'class', TRUE],
       [[], 'class', FALSE],
@@ -429,8 +429,9 @@ class HtmlAttributeTest extends TestCase {
   }
 
   /**
-   * @dataProvider providerTestHasAttribute
+   * Tests the hasAttribute method.
    */
+  #[DataProvider('providerTestHasAttribute')]
   public function testHasAttribute(array $test_data, $test_attribute, $expected): void {
     $attributes = new HtmlAttributeCollection($test_data);
     $this->assertSame($expected, $attributes->hasAttribute($test_attribute));
@@ -443,7 +444,7 @@ class HtmlAttributeTest extends TestCase {
    *   An array of test data each containing an initial Attribute object, an
    *   Attribute object or array to be merged, and the expected result.
    */
-  public function providerTestMerge(): array {
+  public static function providerTestMerge(): array {
     return [
       [
         new HtmlAttributeCollection([]),
@@ -464,18 +465,15 @@ class HtmlAttributeTest extends TestCase {
   }
 
   /**
-   * Tests the merge  method.
-   *
-   * @dataProvider providerTestMerge
+   * Tests the merge method.
    */
+  #[DataProvider('providerTestMerge')]
   public function testMerge($original, $merge, $expected): void {
     $this->assertEquals($expected, $original->merge($merge));
   }
 
   /**
    * Tests the storage method exception throwing.
-   *
-   * @covers ::merge
    */
   public function testMergeArgumentException(): void {
     $attributes = new HtmlAttributeCollection(['class' => ['example-class']]);
