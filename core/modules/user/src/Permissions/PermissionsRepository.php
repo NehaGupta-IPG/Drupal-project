@@ -39,7 +39,7 @@ class PermissionsRepository implements PermissionsRepositoryInterface {
       'extended_help' => '',
     ];
 
-    $this->data[$provider]['permissions']['' . $permission['key']] = $permission;
+    $this->data[$provider]['permissions'][(string) $permission['key']] = $permission;
   }
 
   /**
@@ -57,7 +57,7 @@ class PermissionsRepository implements PermissionsRepositoryInterface {
       'extended_help' => '',
     ];
 
-    $this->data[$provider]['sections']['' . $section['title']] = $section;
+    $this->data[$provider]['sections'][(string) $section['title']] = $section;
   }
 
   /**

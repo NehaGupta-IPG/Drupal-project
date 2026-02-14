@@ -87,7 +87,7 @@ abstract class PermissionsParserPluginBase extends PluginBase implements Contain
     }
 
     if (!is_string($string)) {
-      $string = '' . $string;
+      $string = (string) $string;
     }
 
     // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString

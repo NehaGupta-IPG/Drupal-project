@@ -114,8 +114,8 @@ class UserPermissionsRepositoryTest extends BrowserTestBase {
 
     $sectionTitle = $newPermissions['access_something']['section']['title'] ?? NULL;
     $sectionHelp = $newPermissions['access_something']['section']['extended_help'] ?? NULL;
-    $this->assertEquals('users', $sectionTitle, 'section title is empty or wrong: ' . $sectionTitle);
-    $this->assertStringContainsString('another thing', $sectionHelp, 'section help is empty or wrong: ' . $sectionHelp);
+    $this->assertEquals('users', (string) $sectionTitle, 'section title is empty or wrong: ' . $sectionTitle);
+    $this->assertStringContainsString('another thing', (string) $sectionHelp, 'section help is empty or wrong: ' . $sectionHelp);
   }
 
   /**
@@ -179,7 +179,7 @@ class UserPermissionsRepositoryTest extends BrowserTestBase {
       unset($data['overall_weight']);
       foreach ($data as $k2 => $data2) {
         if ($data2 instanceof TranslatableMarkup) {
-          $data[$k2] = '' . $data2;
+          $data[$k2] = (string) $data2;
         }
       }
       $perms[$k] = $data;
@@ -196,7 +196,14 @@ class UserPermissionsRepositoryTest extends BrowserTestBase {
   protected function getNestedArrayValue(mixed $input, array $keys, string $message): mixed {
     $value = $input;
     foreach ($keys as $key) {
-      $this->assertArrayHasKey($key, $value, $message . ': ' . $key . ', input=' . json_encode($input));
+      $this->assertTrue(is_array($value) && is_string($key),
+        'bad data in getNestedArrayValue, $key=' . json_encode($key)
+        . ', $keys=' . json_encode($keys)
+        . ', $input=' . json_encode($input));
+
+      $this->assertArrayHasKey($key, $value, $message . ': ' . $key
+        . ', input=' . json_encode($input));
+
       $value = $value[$key];
     }
 
