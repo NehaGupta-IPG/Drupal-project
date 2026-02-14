@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Component\HtmlAttribute;
 
 use Drupal\Component\Utility\Html;
+use ReturnTypeWillChange;
 
 /**
  * A class defining a type of HtmlAttribute that can be added to as an array.
@@ -35,100 +36,55 @@ class HtmlAttributeArray extends HtmlAttributeValueBase implements \ArrayAccess,
    * @see \Drupal\Component\HtmlAttribute\HtmlAttributeArray::__toString()
    * @see \Drupal\Component\HtmlAttribute\HtmlAttributeValueBase::render()
    */
-  const RENDER_EMPTY_ATTRIBUTE = FALSE;
+  const bool RENDER_EMPTY_ATTRIBUTE = FALSE;
 
   /**
-   * Constructs an HtmlAttributeArray object.
-   *
-   * @param string $name
-   *   The name of the value.
-   * @param array<scalar> $arrayValue
-   *   The value itself.
+   * {@inheritdoc}
    */
-  public function __construct(
-    string $name,
-    private array $arrayValue,
-  ) {
-    parent::__construct($name);
+  public function offsetGet(mixed $offset): mixed {
+    return $this->value[$offset];
   }
 
   /**
-   * Returns the raw value.
-   *
-   * @return array<scalar>
-   *   The raw value.
+   * {@inheritdoc}
    */
-  protected function doGetValue(): array {
-    return $this->arrayValue;
-  }
-
-  /**
-   * Returns the value at the specified index.
-   *
-   * @param string|int $key
-   *   The offset to retrieve.
-   *
-   * @return scalar
-   *   The value at the specified index.
-   */
-  public function offsetGet(mixed $key): bool|float|int|string {
-    return $this->arrayValue[$key];
-  }
-
-  /**
-   * Sets the value at the specified index.
-   *
-   * @param string|int|null $key
-   *   The offset to assign the value to.
-   * @param scalar $value
-   *   The value to set.
-   */
-  public function offsetSet(mixed $key, mixed $value): void {
-    if (isset($key)) {
-      $this->arrayValue[$key] = $value;
+  public function offsetSet(mixed $offset, mixed $value): void {
+    if (isset($offset)) {
+      $this->value[$offset] = $value;
     }
     else {
-      $this->arrayValue[] = $value;
+      $this->value[] = $value;
     }
   }
 
   /**
-   * Unsets the value at the specified index.
-   *
-   * @param string|int $key
-   *   The offset to unset.
+   * {@inheritdoc}
    */
-  public function offsetUnset(mixed $key): void {
-    unset($this->arrayValue[$key]);
+  public function offsetUnset(mixed $offset): void {
+    unset($this->value[$offset]);
   }
 
   /**
-   * Returns whether the requested index exists.
-   *
-   * @param string|int $key
-   *   An offset to check for.
+   * {@inheritdoc}
    */
-  public function offsetExists(mixed $key): bool {
-    return isset($this->arrayValue[$key]);
+  public function offsetExists(mixed $offset): bool {
+    return isset($this->value[$offset]);
   }
 
   /**
-   * Implements the magic __toString() method.
+   * {@inheritdoc}
    */
   public function __toString(): string {
     // Filter out any empty values before printing.
-    $this->arrayValue = array_unique(array_filter($this->arrayValue));
-    return Html::escape(implode(' ', $this->arrayValue));
+    $this->value = array_unique(array_filter($this->value));
+    return Html::escape(implode(' ', $this->value));
   }
 
   /**
-   * Retrieves an external iterator.
-   *
-   * @return \ArrayIterator<string|int, scalar>
-   *   An external iterator.
+   * {@inheritdoc}
    */
-  public function getIterator(): \Traversable {
-    return new \ArrayIterator($this->arrayValue);
+  public function getIterator(): \ArrayIterator {
+    return new \ArrayIterator($this->value);
   }
 
   /**
@@ -142,9 +98,9 @@ class HtmlAttributeArray extends HtmlAttributeValueBase implements \ArrayAccess,
    *
    * @see ArrayObject::exchangeArray
    */
-  public function exchangeArray(array $input): array {
-    $old = $this->arrayValue;
-    $this->arrayValue = $input;
+  public function exchangeArray(/*array */$input) {
+    $old = $this->value;
+    $this->value = $input;
     return $old;
   }
 

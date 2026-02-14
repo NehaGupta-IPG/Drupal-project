@@ -7,6 +7,7 @@ namespace Drupal\Component\HtmlAttribute;
 use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Serialization\Attribute\JsonSchema;
 
 /**
  * Collects, sanitizes, and renders HTML attributes.
@@ -93,28 +94,17 @@ class HtmlAttributeCollection implements \ArrayAccess, \IteratorAggregate, \Stri
   }
 
   /**
-   * Returns the value at the specified index.
-   *
-   * @param string $key
-   *   The offset to retrieve.
-   *
-   * @return \Drupal\Component\HtmlAttribute\HtmlAttributeValueBase|null
-   *   The value at the specified index.
+   * {@inheritdoc}
    */
-  public function offsetGet(mixed $key): ?HtmlAttributeValueBase {
-    return $this->storage[$key] ?? NULL;
+  public function offsetGet(mixed $offset): ?HtmlAttributeValueBase {
+    return $this->storage[$offset] ?? NULL;
   }
 
   /**
-   * Sets the value at the specified index.
-   *
-   * @param string $key
-   *   The offset to assign the value to.
-   * @param \Drupal\Component\Render\MarkupInterface|\Drupal\Component\HtmlAttribute\HtmlAttributeValueBase|scalar|array<scalar>|null $value
-   *   The value to set.
+   * {@inheritdoc}
    */
-  public function offsetSet(mixed $key, mixed $value): void {
-    $this->storage[$key] = $this->createAttributeValue($key, $value);
+  public function offsetSet(mixed $offset, mixed $value): void {
+    $this->storage[$offset] = $this->createAttributeValue($offset, $value);
   }
 
   /**
@@ -128,7 +118,7 @@ class HtmlAttributeCollection implements \ArrayAccess, \IteratorAggregate, \Stri
    * @return \Drupal\Component\HtmlAttribute\HtmlAttributeValueBase
    *   An HtmlAttributeValueBase representation of the attribute's value.
    */
-  protected function createAttributeValue(string $name, MarkupInterface|HtmlAttributeValueBase|string|int|bool|float|array|NULL $value): HtmlAttributeValueBase {
+  protected function createAttributeValue(/* string */$name, /* MarkupInterface|HtmlAttributeValueBase|string|int|bool|float|array|NULL */$value): HtmlAttributeValueBase {
     // If the value is already an HtmlAttributeValueBase object,
     // return a new instance of the same class, but with the new name.
     if ($value instanceof HtmlAttributeValueBase) {
@@ -170,21 +160,21 @@ class HtmlAttributeCollection implements \ArrayAccess, \IteratorAggregate, \Stri
   /**
    * Unsets the value at the specified index.
    *
-   * @param string $key
+   * @param string $offset
    *   The offset to unset.
    */
-  public function offsetUnset(mixed $key): void {
-    unset($this->storage[$key]);
+  public function offsetUnset(mixed $offset): void {
+    unset($this->storage[$offset]);
   }
 
   /**
    * Returns whether the requested index exists.
    *
-   * @param string $key
+   * @param string $offset
    *   An offset to check for.
    */
-  public function offsetExists(mixed $key): bool {
-    return isset($this->storage[$key]);
+  public function offsetExists(mixed $offset): bool {
+    return isset($this->storage[$offset]);
   }
 
   /**
@@ -195,7 +185,7 @@ class HtmlAttributeCollection implements \ArrayAccess, \IteratorAggregate, \Stri
    *
    * @return $this
    */
-  public function addClass(string|array|NULL ...$args): HtmlAttributeCollection {
+  public function addClass(/*string|array|NULL */...$args): HtmlAttributeCollection {
     if ($args) {
       $classes = [];
       foreach ($args as $arg) {
@@ -231,7 +221,7 @@ class HtmlAttributeCollection implements \ArrayAccess, \IteratorAggregate, \Stri
    *
    * @return $this
    */
-  public function setAttribute(string $attribute, MarkupInterface|HtmlAttributeValueBase|string|int|bool|float|array|NULL $value): HtmlAttributeCollection {
+  public function setAttribute(/*string */$attribute, /*MarkupInterface|HtmlAttributeValueBase|string|int|bool|float|array|NULL */$value): HtmlAttributeCollection {
     $this->offsetSet($attribute, $value);
     return $this;
   }
@@ -257,7 +247,7 @@ class HtmlAttributeCollection implements \ArrayAccess, \IteratorAggregate, \Stri
    *
    * @return $this
    */
-  public function removeAttribute(string|array ...$args): HtmlAttributeCollection {
+  public function removeAttribute(/*string|array */...$args): HtmlAttributeCollection {
     foreach ($args as $arg) {
       // Support arrays or multiple arguments.
       if (is_array($arg)) {
@@ -280,7 +270,7 @@ class HtmlAttributeCollection implements \ArrayAccess, \IteratorAggregate, \Stri
    *
    * @return $this
    */
-  public function removeClass(string|array ...$args): HtmlAttributeCollection {
+  public function removeClass(/*string|array */...$args): HtmlAttributeCollection {
     // With no class attribute, there is no need to remove.
     if (isset($this->storage['class']) && $this->storage['class'] instanceof HtmlAttributeArray) {
       $classes = [];
@@ -325,7 +315,7 @@ class HtmlAttributeCollection implements \ArrayAccess, \IteratorAggregate, \Stri
    * @return bool
    *   Returns TRUE if the class exists, or FALSE otherwise.
    */
-  public function hasClass(string $class): bool {
+  public function hasClass(/*string */$class): bool {
     if (isset($this->storage['class']) && $this->storage['class'] instanceof HtmlAttributeArray) {
       $storedValue = $this->storage['class']->value();
       assert(is_array($storedValue));
@@ -339,6 +329,7 @@ class HtmlAttributeCollection implements \ArrayAccess, \IteratorAggregate, \Stri
   /**
    * Implements the magic __toString() method.
    */
+  #[JsonSchema(['type' => 'string', 'description' => 'Rendered HTML element attributes'])]
   public function __toString(): string {
     $return = '';
     foreach ($this->storage as $value) {
@@ -374,10 +365,7 @@ class HtmlAttributeCollection implements \ArrayAccess, \IteratorAggregate, \Stri
   }
 
   /**
-   * Retrieves an external iterator.
-   *
-   * @return \ArrayIterator<string, HtmlAttributeValueBase>
-   *   An external iterator.
+   * {@inheritdoc}
    */
   public function getIterator(): \Traversable {
     return new \ArrayIterator($this->storage);
@@ -394,10 +382,7 @@ class HtmlAttributeCollection implements \ArrayAccess, \IteratorAggregate, \Stri
   }
 
   /**
-   * Returns a representation of the object for use in JSON serialization.
-   *
-   * @return string
-   *   The safe string content.
+   * {@inheritdoc}
    */
   public function jsonSerialize(): string {
     return (string) $this;

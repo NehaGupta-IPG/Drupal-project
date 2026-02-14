@@ -28,6 +28,7 @@ abstract class HtmlAttributeValueBase implements \Stringable {
    */
   public function __construct(
     protected string $name,
+    protected mixed $value,
   ) {
   }
 
@@ -42,7 +43,7 @@ abstract class HtmlAttributeValueBase implements \Stringable {
    */
   public function render(): string {
     $value = (string) $this;
-    if (!is_null($this->doGetValue()) && static::RENDER_EMPTY_ATTRIBUTE || !empty($value)) {
+    if (!is_null($this->value) && static::RENDER_EMPTY_ATTRIBUTE || !empty($value)) {
       return Html::escape($this->name) . '="' . $value . '"';
     }
     return '';
@@ -54,17 +55,9 @@ abstract class HtmlAttributeValueBase implements \Stringable {
    * @return scalar|array<scalar>|null
    *   The raw value.
    */
-  public function value(): string|int|bool|float|array|NULL {
-    return $this->doGetValue();
+  public function value(): mixed {
+    return $this->value;
   }
-
-  /**
-   * Returns the raw value, from the concrete class.
-   *
-   * @return scalar|array<scalar>|null
-   *   The raw value.
-   */
-  abstract protected function doGetValue(): string|int|bool|float|array|NULL;
 
   /**
    * Implements the magic __toString() method.

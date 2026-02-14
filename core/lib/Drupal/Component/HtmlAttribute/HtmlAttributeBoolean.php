@@ -30,31 +30,6 @@ use Drupal\Component\Utility\Html;
 class HtmlAttributeBoolean extends HtmlAttributeValueBase {
 
   /**
-   * Constructs an HtmlAttributeBoolean object.
-   *
-   * @param string $name
-   *   The name of the value.
-   * @param bool $boolValue
-   *   The value itself.
-   */
-  public function __construct(
-    string $name,
-    private bool $boolValue,
-  ) {
-    parent::__construct($name);
-  }
-
-  /**
-   * Returns the raw value.
-   *
-   * @return bool
-   *   The raw value.
-   */
-  protected function doGetValue(): bool {
-    return $this->boolValue;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function render(): string {
@@ -62,10 +37,10 @@ class HtmlAttributeBoolean extends HtmlAttributeValueBase {
   }
 
   /**
-   * Implements the magic __toString() method.
+   * {@inheritdoc}
    */
   public function __toString(): string {
-    return $this->boolValue === FALSE ? '' : Html::escape($this->name);
+    return $this->value === FALSE ? '' : Html::escape($this->name);
   }
 
 }

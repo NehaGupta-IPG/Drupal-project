@@ -18,6 +18,31 @@ parameters:
       deprecation_version: drupal:11.3.0
       removed_version: drupal:12.0.0
       change_record: https://www.drupal.org/node/3551049
+    'Drupal\Core\Template\Attribute':
+      class: 'Drupal\Component\HtmlAttribute\HtmlAttributeCollection'
+      deprecation_version: drupal:11.4.0
+      removed_version: drupal:13.0.0
+      change_record: https://www.drupal.org/node/3070485
+    'Drupal\Core\Template\AttributeArray':
+      class: 'Drupal\Component\HtmlAttribute\HtmlAttributeArray'
+      deprecation_version: drupal:11.4.0
+      removed_version: drupal:13.0.0
+      change_record: https://www.drupal.org/node/3070485
+    'Drupal\Core\Template\AttributeBoolean':
+      class: 'Drupal\Component\HtmlAttribute\HtmlAttributeBoolean'
+      deprecation_version: drupal:11.4.0
+      removed_version: drupal:13.0.0
+      change_record: https://www.drupal.org/node/3070485
+    'Drupal\Core\Template\AttributeString':
+      class: 'Drupal\Component\HtmlAttribute\HtmlAttributeScalar'
+      deprecation_version: drupal:11.4.0
+      removed_version: drupal:13.0.0
+      change_record: https://www.drupal.org/node/3070485
+    'Drupal\Core\Template\AttributeValueBase':
+      class: 'Drupal\Component\HtmlAttribute\HtmlAttributeValueBase'
+      deprecation_version: drupal:11.4.0
+      removed_version: drupal:13.0.0
+      change_record: https://www.drupal.org/node/3070485
   session.storage.options:
     gc_probability: 1
     gc_divisor: 100
