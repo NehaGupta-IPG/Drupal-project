@@ -41,7 +41,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    */
   public bool $isStateful {
     get => TRUE;
-    set => throw new \LogicException('Cannot set $isStateful');
+    set => throw new ImageToolkitException('Cannot set $isStateful');
   }
 
   /**
@@ -56,16 +56,16 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
     get => $this->backfillImage;
     set(?ImageInterface $image) {
       if ($this->isStateful) {
-        throw new \LogicException('Cannot set $backfillImage in a stateful toolkit');
+        throw new ImageToolkitException('Cannot set $backfillImage in a stateful toolkit');
       }
       if (!$this->isClone) {
-        throw new \LogicException('Cannot set $backfillImage in the toolkit singleton');
+        throw new ImageToolkitException('Cannot set $backfillImage in the toolkit singleton');
       }
       if (isset($this->backfillImage)) {
-        throw new \LogicException('$backfillImage is set already');
+        throw new ImageToolkitException('$backfillImage is set already');
       }
       if ($image === NULL) {
-        throw new \LogicException('$backfillImage cannot be set to NULL');
+        throw new ImageToolkitException('$backfillImage cannot be set to NULL');
       }
       $this->backfillImage = $image;
     }
@@ -184,6 +184,14 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
         '@operation' => $operation,
       ]);
       return FALSE;
+    }
+    catch (ImageToolkitException $e) {
+      $this->logger->error("Error handling image with toolkit '@toolkit' for operation '@operation': @message", [
+        '@toolkit' => $this->getPluginId(),
+        '@operation' => $operation,
+        '@message' => $e->getMessage(),
+      ]);
+      throw $e;
     }
     catch (\Throwable $t) {
       $this->logger->warning("The image toolkit '@toolkit' failed processing '@operation' for image '@image'. Reported error: @class - @message", [

@@ -47,6 +47,20 @@ class Image implements ImageInterface {
   protected int $fileSize;
 
   /**
+   * BC layer.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
+   */
+  public function __sleep(): array {
+    $ret = get_object_vars($this);
+    unset($ret['imageFactory'], $ret['toolkit']);
+    return array_keys($ret);
+  }
+
+  /**
    * Constructs a new Image object.
    *
    * @param \Drupal\Core\ImageToolkit\ImageToolkitInterface $toolkit
@@ -217,7 +231,7 @@ class Image implements ImageInterface {
    */
   public function apply($operation, array $arguments = []) {
     // @phpstan-ignore method.deprecated
-    return $this->getToolkit()->apply($this, $operation, $arguments);
+    return $this->getToolkit()->apply($operation, $arguments);
   }
 
   /**

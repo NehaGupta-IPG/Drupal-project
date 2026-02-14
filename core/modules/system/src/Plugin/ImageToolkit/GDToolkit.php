@@ -13,6 +13,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\ImageToolkit\Attribute\ImageToolkit;
 use Drupal\Core\ImageToolkit\ImageToolkitBase;
+use Drupal\Core\ImageToolkit\ImageToolkitException;
 use Drupal\Core\ImageToolkit\ImageToolkitOperationManagerInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
@@ -659,6 +660,14 @@ class GDToolkit extends ImageToolkitBase {
         '@operation' => $operation,
       ]);
       return FALSE;
+    }
+    catch (ImageToolkitException $e) {
+      $this->logger->error("Error handling image with toolkit '@toolkit' for operation '@operation': @message", [
+        '@toolkit' => $this->getPluginId(),
+        '@operation' => $operation,
+        '@message' => $e->getMessage(),
+      ]);
+      throw $e;
     }
     catch (\Throwable $t) {
       $this->logger->warning("The image toolkit '@toolkit' failed processing '@operation' for image '@image'. Reported error: @class - @message", [

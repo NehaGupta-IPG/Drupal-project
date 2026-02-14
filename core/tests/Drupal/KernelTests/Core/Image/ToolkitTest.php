@@ -10,12 +10,14 @@ use Drupal\image\ImageEffectManager;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\Traits\Core\Image\ToolkitTestTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the image toolkit.
  */
 #[Group('Image')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class ToolkitTest extends KernelTestBase {
 

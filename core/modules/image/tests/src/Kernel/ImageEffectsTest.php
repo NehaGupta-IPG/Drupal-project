@@ -10,12 +10,14 @@ use Drupal\image\Form\ImageEffectEditForm;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\Traits\Core\Image\ToolkitTestTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests image effects.
  */
 #[Group('image')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class ImageEffectsTest extends KernelTestBase {
 
