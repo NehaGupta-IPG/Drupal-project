@@ -53,6 +53,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    * @see https://www.drupal.org/node/7654123
    */
   public ?ImageInterface $backfillImage {
+    get => $this->backfillImage;
     set(?ImageInterface $image) {
       if ($this->isStateful) {
         throw new \LogicException('Cannot set $backfillImage in a stateful toolkit');

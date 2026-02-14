@@ -13,6 +13,7 @@ use Drupal\system\Image\GdImageWrapper;
 use Drupal\system\Plugin\ImageToolkit\GDToolkit;
 use Drupal\system\Plugin\ImageToolkit\Operation\gd\GDImageToolkitOperationBase;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
@@ -21,8 +22,9 @@ use PHPUnit\Framework\MockObject\Runtime\PropertyHook;
 use Psr\Log\LoggerInterface;
 
 /**
- * Tests the image class.
+ * Tests the GdImageWrapper class.
  */
+#[CoversClass(GdImageWrapper::class)]
 #[Group('Image')]
 #[RequiresPhpExtension('gd')]
 class ImageTest extends UnitTestCase {
@@ -69,7 +71,7 @@ class ImageTest extends UnitTestCase {
   protected function getToolkitMock(array $stubs = []): GDToolkit&MockObject {
     $mock_builder = $this->getMockBuilder(GDToolkit::class);
     $stubs = array_merge(['getPluginId', 'save'], $stubs);
-    return $mock_builder
+    $toolkit = $mock_builder
       ->setConstructorArgs([
         [],
         '',
@@ -82,6 +84,7 @@ class ImageTest extends UnitTestCase {
       ])
       ->onlyMethods($stubs)
       ->getMock();
+    return $toolkit;
   }
 
   /**
@@ -155,6 +158,9 @@ class ImageTest extends UnitTestCase {
 
     $this->image = new GdImageWrapper($this->getImageFactoryMock($this->toolkit), 'gd', $this->source);
 
+    $this->toolkit->expects($this->never())
+      ->method(PropertyHook::get('backfillImage'));
+
     return $this->image;
   }
 
@@ -166,11 +172,13 @@ class ImageTest extends UnitTestCase {
    * @param bool $needsToolkitInjection
    *   BC layer - Whether a copy of the toolkit should be injected to the
    *   operation.
+   * @param bool $expectsBackfillImageAccess
+   *   BC layer - Whether access to the BC layer image backfill is expected.
    *
    * @return \Drupal\system\Image\GdImageWrapper
    *   An image object.
    */
-  protected function getTestImageForOperation(string $class_name, bool $needsToolkitInjection = TRUE): GdImageWrapper {
+  protected function getTestImageForOperation(string $class_name, bool $needsToolkitInjection = TRUE, bool $expectsBackfillImageAccess = TRUE): GdImageWrapper {
     $this->toolkit = $this->getToolkitMock(['getToolkitOperation']);
     $this->toolkitOperation = $this->getToolkitOperationMock($class_name, $this->toolkit, $needsToolkitInjection);
 
@@ -183,7 +191,12 @@ class ImageTest extends UnitTestCase {
       ->willReturn($this->toolkitOperation);
 
     $this->image = new GdImageWrapper($this->getImageFactoryMock($this->toolkit), 'gd', $this->source);
+
     if ($needsToolkitInjection) {
+      $this->toolkit->expects($expectsBackfillImageAccess ? $this->atLeastOnce() : $this->never())
+        ->method(PropertyHook::get('backfillImage'))
+        ->willReturn($this->image);
+
       // @phpstan-ignore method.deprecated
       $this->image->setToolkit($this->toolkit);
     }
@@ -463,7 +476,7 @@ class ImageTest extends UnitTestCase {
    */
   #[IgnoreDeprecations]
   public function testConvert(): void {
-    $this->getTestImageForOperation('Convert');
+    $this->getTestImageForOperation('Convert', TRUE, FALSE);
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
       ->willReturnArgument(0);
@@ -507,7 +520,7 @@ class ImageTest extends UnitTestCase {
    */
   #[IgnoreDeprecations]
   public function testDesaturate(): void {
-    $this->getTestImageForOperation('Desaturate');
+    $this->getTestImageForOperation('Desaturate', TRUE, FALSE);
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
       ->willReturnArgument(0);
