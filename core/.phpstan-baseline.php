@@ -10292,12 +10292,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/TempStore/SharedTempStore.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Constructor of class Drupal\\\\Core\\\\Template\\\\TwigEnvironment has an unused parameter \\$root\\.$#',
-	'identifier' => 'constructor.unusedParameter',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Template/TwigEnvironment.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Template\\\\TwigEnvironment\\:\\:invalidate\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
