@@ -660,16 +660,16 @@ class GDToolkit extends ImageToolkitBase {
       ]);
       return FALSE;
     }
-#    catch (\Throwable $t) {
-#      $this->logger->warning("The image toolkit '@toolkit' failed processing '@operation' for image '@image'. Reported error: @class - @message", [
-#        '@toolkit' => $this->getPluginId(),
-#        '@operation' => $operation,
-#        '@image' => $image->getSource(),
-#        '@class' => get_class($t),
-#        '@message' => $t->getMessage(),
-#      ]);
-#      return FALSE;
-#    }
+    catch (\Throwable $t) {
+      $this->logger->warning("The image toolkit '@toolkit' failed processing '@operation' for image '@image'. Reported error: @class - @message", [
+        '@toolkit' => $this->getPluginId(),
+        '@operation' => $operation,
+        '@image' => $image->getSource(),
+        '@class' => get_class($t),
+        '@message' => $t->getMessage(),
+      ]);
+      return FALSE;
+    }
   }
 
 }
