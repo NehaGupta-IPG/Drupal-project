@@ -146,4 +146,9 @@ class ConfigEntityAdapter extends EntityAdapter {
     return $this->getTypedConfigManager()->createFromNameAndData($this->entity->getConfigDependencyName(), $this->entity->toArray());
   }
 
+  public function __destruct() {
+    unset($this->entity);
+    parent::__destruct();
+  }
+
 }

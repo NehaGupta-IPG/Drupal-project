@@ -315,4 +315,9 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
     return $this->get($this->count() - 1);
   }
 
+  public function __destruct() {
+    unset($this->list);
+    parent::__destruct();
+  }
+
 }

@@ -60,4 +60,9 @@ abstract class DataReferenceBase extends TypedData implements DataReferenceInter
     return (string) $this->getType() . ':' . $this->getTargetIdentifier();
   }
 
+  public function __destruct() {
+    unset($this->target);
+    parent::__destruct();
+  }
+
 }

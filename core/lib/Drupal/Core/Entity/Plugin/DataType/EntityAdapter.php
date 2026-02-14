@@ -184,4 +184,9 @@ class EntityAdapter extends TypedData implements \IteratorAggregate, ComplexData
     return $this->entity;
   }
 
+  public function __destruct() {
+    unset($this->entity);
+    parent::__destruct();
+  }
+
 }

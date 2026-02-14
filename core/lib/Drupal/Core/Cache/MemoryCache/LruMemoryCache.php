@@ -83,6 +83,7 @@ class LruMemoryCache extends MemoryCache {
       // the array, and avoid using array_splice() or array_shift() because they
       // re-index numeric keys.
       unset($this->cache[array_key_first($this->cache)]);
+      gc_collect_cycles();
     }
 
     parent::set($cid, $data, $expire, $tags);
