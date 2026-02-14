@@ -5,6 +5,6 @@ dependencies:
     - block_content
 id: block_content.full
 label: Full
-description: ''
+description: null
 targetEntityType: block_content
 cache: true
