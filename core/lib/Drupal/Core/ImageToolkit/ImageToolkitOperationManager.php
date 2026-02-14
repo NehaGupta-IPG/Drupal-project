@@ -137,10 +137,11 @@ class ImageToolkitOperationManager extends DefaultPluginManager implements Image
   /**
    * {@inheritdoc}
    */
-  public function createInstance($plugin_id, array $configuration = [], ImageToolkitInterface|ImageInterface|null $toolkit = NULL) {
+  public function createInstance($plugin_id, array $configuration = [], ?ImageToolkitInterface $toolkit = NULL) {
     $instance = parent::createInstance($plugin_id, $configuration);
     if ($instance->needsToolkitInjection) {
-      $toolkit instanceof ImageInterface ? $instance->setImage($toolkit) : $instance->setToolkit($toolkit);
+      $toolkitClone = clone $toolkit;
+      $instance->setToolkit($toolkitClone);
     }
     return $instance;
   }
@@ -148,7 +149,7 @@ class ImageToolkitOperationManager extends DefaultPluginManager implements Image
   /**
    * {@inheritdoc}
    */
-  public function getToolkitOperation(ImageToolkitInterface|ImageInterface $toolkit, $operation) {
+  public function getToolkitOperation(ImageToolkitInterface $toolkit, $operation) {
     $plugin_id = $this->getToolkitOperationPluginId($toolkit, $operation);
     return $this->createInstance($plugin_id, [], $toolkit);
   }

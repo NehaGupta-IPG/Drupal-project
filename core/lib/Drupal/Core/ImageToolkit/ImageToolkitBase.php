@@ -29,6 +29,16 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    *
    * @see https://www.drupal.org/node/7654123
    */
+  protected bool $isClone = FALSE;
+
+  /**
+   * BC layer.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
+   */
   public bool $isStateful {
     get => TRUE;
     set => throw new \LogicException('Cannot set $isStateful');
@@ -42,7 +52,23 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    *
    * @see https://www.drupal.org/node/7654123
    */
-  public ?ImageInterface $backfillImage;
+  public ?ImageInterface $backfillImage {
+    set(?ImageInterface $image) {
+      if ($this->isStateful) {
+        throw new \LogicException('Cannot set $backfillImage in a stateful toolkit');
+      }
+      if (!$this->isClone) {
+        throw new \LogicException('Cannot set $backfillImage in the toolkit singleton');
+      }
+      if (isset($this->backfillImage)) {
+        throw new \LogicException('$backfillImage is set already');
+      }
+      if ($image === NULL) {
+        throw new \LogicException('$backfillImage cannot be set to NULL');
+      }
+      $this->backfillImage = $image;
+    }
+  }
 
   /**
    * Path of the image file.
@@ -55,6 +81,18 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    * @see https://www.drupal.org/node/7654123
    */
   protected $source = '';
+
+  /**
+   * BC layer.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
+   */
+  public function __clone(): void {
+    $this->isClone = TRUE;
+  }
 
   /**
    * Constructs an ImageToolkitBase object.

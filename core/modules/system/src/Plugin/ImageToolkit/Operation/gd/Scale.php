@@ -114,7 +114,7 @@ class Scale extends Resize {
     if ($arguments['width'] !== $image->getWidth() || $arguments['height'] !== $image->getHeight()) {
       // Don't upscale if the option isn't enabled.
       if ($arguments['upscale'] || ($arguments['width'] <= $image->getWidth() && $arguments['height'] <= $image->getHeight())) {
-        return parent::execute($arguments);
+        return parent::execute($image, $arguments);
       }
     }
     return TRUE;
