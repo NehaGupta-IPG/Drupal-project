@@ -7,12 +7,12 @@ namespace Drupal\Tests\Component\HtmlAttribute;
 use Drupal\Component\HtmlAttribute\HtmlAttributeCollection;
 use Drupal\Component\HtmlAttribute\HtmlAttributeArray;
 use Drupal\Component\HtmlAttribute\HtmlAttributeScalar;
-use Drupal\Component\PhpStorage\FileReadOnlyStorage;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Render\MarkupTrait;
 use Drupal\Component\Utility\Html;
 use Drupal\Tests\PhpUnitCompatibilityTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -86,8 +86,6 @@ class HtmlAttributeTest extends TestCase {
 
   /**
    * Tests setting attributes.
-   *
-   * @covers ::setAttribute
    */
   public function testSetAttribute(): void {
     $attributes = new HtmlAttributeCollection();
@@ -115,8 +113,6 @@ class HtmlAttributeTest extends TestCase {
 
   /**
    * Tests removing attributes.
-   *
-   * @covers ::removeAttribute
    */
   public function testRemoveAttribute(): void {
     $values = [
@@ -155,8 +151,6 @@ class HtmlAttributeTest extends TestCase {
 
   /**
    * Tests adding class attributes with the AttributeArray helper method.
-   *
-   * @covers ::addClass
    */
   public function testAddClasses(): void {
     // Add empty Attribute object with no classes.
@@ -208,8 +202,6 @@ class HtmlAttributeTest extends TestCase {
 
   /**
    * Tests removing class attributes with the AttributeArray helper method.
-   *
-   * @covers ::removeClass
    */
   public function testRemoveClasses(): void {
     // Add duplicate class to ensure that both duplicates are removed.
@@ -240,8 +232,6 @@ class HtmlAttributeTest extends TestCase {
 
   /**
    * Tests checking for class names with the Attribute method.
-   *
-   * @covers ::hasClass
    */
   public function testHasClass(): void {
     // Test an attribute without any classes.
@@ -256,9 +246,6 @@ class HtmlAttributeTest extends TestCase {
 
   /**
    * Tests removing class attributes with the Attribute helper methods.
-   *
-   * @covers ::removeClass
-   * @covers ::addClass
    */
   public function testChainAddRemoveClasses(): void {
     $attributes = new HtmlAttributeCollection(
@@ -311,8 +298,6 @@ class HtmlAttributeTest extends TestCase {
 
   /**
    * Tests attribute values.
-   *
-   * @covers ::createAttributeValue
    *
    * @dataProvider providerTestAttributeValues
    */
@@ -445,7 +430,6 @@ class HtmlAttributeTest extends TestCase {
   }
 
   /**
-   * @covers ::hasAttribute
    * @dataProvider providerTestHasAttribute
    */
   public function testHasAttribute(array $test_data, $test_attribute, $expected): void {
@@ -481,7 +465,8 @@ class HtmlAttributeTest extends TestCase {
   }
 
   /**
-   * @covers ::merge
+   * Tests the merge  method.
+   *
    * @dataProvider providerTestMerge
    */
   public function testMerge($original, $merge, $expected): void {
@@ -489,6 +474,8 @@ class HtmlAttributeTest extends TestCase {
   }
 
   /**
+   * Tests the storage method exception throwing.
+   *
    * @covers ::merge
    */
   public function testMergeArgumentException(): void {

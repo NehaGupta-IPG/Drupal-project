@@ -9,8 +9,6 @@ use Drupal\Component\HtmlAttribute\HtmlAttributeValueBase as ComponentAttributeV
 /**
  * Defines the base class for an attribute type.
  *
- * @see \Drupal\Core\Template\Attribute
- *
  * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
  *   \Drupal\Component\HtmlAttribute\HtmlAttributeScalar instead.
  *

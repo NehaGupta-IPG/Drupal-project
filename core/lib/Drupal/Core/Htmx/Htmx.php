@@ -1336,7 +1336,7 @@ class Htmx {
         $preparedHeaders[$value[0]] = $value[1];
       }
     }
-    $attributes = new Attribute($incomingAttributes);
+    $attributes = new HtmlAttributeCollection($incomingAttributes);
     $headers = new HeaderBag($preparedHeaders);
     $cacheableMetadata = CacheableMetadata::createFromRenderArray($element);
     return new static($attributes, $headers, $cacheableMetadata);

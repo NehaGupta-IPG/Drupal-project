@@ -564,9 +564,8 @@ class TwigExtensionTest extends UnitTestCase {
 
   /**
    * Tests Twig calls to Attribute objects.
-   *
-   * @dataProvider providerTestAttributeClassHelpers
    */
+  #[DataProvider('providerTestAttributeClassHelpers')]
   public function testTwigAddRemoveClasses($template, $expected, $seed_attributes = []): void {
     $loader = new StringLoader();
     $twig = new Environment($loader);

@@ -9,18 +9,6 @@ use Drupal\Component\HtmlAttribute\HtmlAttributeScalar as ComponentAttributeStri
 /**
  * A class that represents most standard HTML attributes.
  *
- * To use with the Attribute class, set the key to be the attribute name
- * and the value the attribute value.
- * @code
- *  $attributes = new Attribute([]);
- *  $attributes['id'] = 'socks';
- *  $attributes['style'] = 'background-color:white';
- *  echo '<cat ' . $attributes . '>';
- *  // Produces: <cat id="socks" style="background-color:white">.
- * @endcode
- *
- * @see \Drupal\Core\Template\Attribute
- *
  * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
  *   \Drupal\Component\HtmlAttribute\HtmlAttributeScalar instead.
  *
