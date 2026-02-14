@@ -1,13 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\jsonapi\Functional;
 
+use Drupal\jsonapi\Form\JsonApiSettingsForm;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @covers \Drupal\jsonapi\Form\JsonApiSettingsForm
- * @group jsonapi
+ * Tests Settings Form.
  */
+#[Group('jsonapi')]
+#[CoversClass(JsonApiSettingsForm::class)]
+#[RunTestsInSeparateProcesses]
 class SettingsFormTest extends BrowserTestBase {
 
   /**
@@ -29,15 +37,15 @@ class SettingsFormTest extends BrowserTestBase {
     $this->drupalGet('/admin/config/services/jsonapi');
 
     $page = $this->getSession()->getPage();
-    $page->selectFieldOption('read_only', 0);
+    $page->selectFieldOption('read_only', 'rw');
     $page->pressButton('Save configuration');
     $assert_session = $this->assertSession();
     $assert_session->pageTextContains('The configuration options have been saved.');
-    $assert_session->fieldValueEquals('read_only', 0);
+    $assert_session->fieldValueEquals('read_only', 'rw');
 
-    $page->selectFieldOption('read_only', 1);
+    $page->selectFieldOption('read_only', 'r');
     $page->pressButton('Save configuration');
-    $assert_session->fieldValueEquals('read_only', '1');
+    $assert_session->fieldValueEquals('read_only', 'r');
     $assert_session->pageTextContains('The configuration options have been saved.');
   }
 

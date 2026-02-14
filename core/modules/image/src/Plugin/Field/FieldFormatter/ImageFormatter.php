@@ -3,11 +3,13 @@
 namespace Drupal\image\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\image\Entity\ImageStyle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -16,15 +18,14 @@ use Drupal\Core\Cache\Cache;
 
 /**
  * Plugin implementation of the 'image' formatter.
- *
- * @FieldFormatter(
- *   id = "image",
- *   label = @Translation("Image"),
- *   field_types = {
- *     "image"
- *   }
- * )
  */
+#[FieldFormatter(
+  id: 'image',
+  label: new TranslatableMarkup('Image'),
+  field_types: [
+    'image',
+  ],
+)]
 class ImageFormatter extends ImageFormatterBase {
 
   /**
@@ -52,7 +53,7 @@ class ImageFormatter extends ImageFormatterBase {
    * Constructs an ImageFormatter object.
    *
    * @param string $plugin_id
-   *   The plugin_id for the formatter.
+   *   The plugin ID for the formatter.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
@@ -250,16 +251,16 @@ class ImageFormatter extends ImageFormatterBase {
       // Extract field item attributes for the theme function, and unset them
       // from the $item so that the field template does not re-render them.
       $item = $file->_referringItem;
-      $item_attributes = $item->_attributes;
+      $attributes = $item->_attributes;
       unset($item->_attributes);
 
       $image_loading_settings = $this->getSetting('image_loading');
-      $item_attributes['loading'] = $image_loading_settings['attribute'];
+      $attributes['loading'] = $image_loading_settings['attribute'];
 
       $elements[$delta] = [
         '#theme' => 'image_formatter',
         '#item' => $item,
-        '#item_attributes' => $item_attributes,
+        '#attributes' => $attributes,
         '#image_style' => $image_style_setting,
         '#url' => $url,
         '#cache' => [

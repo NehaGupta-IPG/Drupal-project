@@ -13,7 +13,7 @@ use Drupal\Component\HtmlAttribute\HtmlAttributeArray as ComponentAttributeArray
  * Correct:
  * @code
  *  $attributes = new Attribute();
- *  $attributes['class'] = array();
+ *  $attributes['class'] = [];
  *  $attributes['class'][] = 'cat';
  * @endcode
  * Incorrect:
@@ -22,9 +22,12 @@ use Drupal\Component\HtmlAttribute\HtmlAttributeArray as ComponentAttributeArray
  *  $attributes['class'][] = 'cat';
  * @endcode
  *
+ * @implements \ArrayAccess<int|string, mixed>
+ * @implements \IteratorAggregate<int|string, mixed>
+ *
  * @see \Drupal\Core\Template\Attribute
  *
- * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
  *   \Drupal\Component\HtmlAttribute\HtmlAttributeArray instead.
  *
  * @see https://www.drupal.org/node/3070485

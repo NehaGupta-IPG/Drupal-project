@@ -12,7 +12,7 @@ use Drupal\Component\HtmlAttribute\HtmlAttributeScalar as ComponentAttributeStri
  * To use with the Attribute class, set the key to be the attribute name
  * and the value the attribute value.
  * @code
- *  $attributes = new Attribute(array());
+ *  $attributes = new Attribute([]);
  *  $attributes['id'] = 'socks';
  *  $attributes['style'] = 'background-color:white';
  *  echo '<cat ' . $attributes . '>';

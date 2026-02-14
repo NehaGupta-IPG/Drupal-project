@@ -2,31 +2,33 @@
 
 namespace Drupal\comment\Plugin\Field\FieldType;
 
-use Drupal\comment\CommentInterface;
+use Drupal\comment\AnonymousContact;
+use Drupal\comment\CommentFieldItemList;
 use Drupal\comment\CommentManagerInterface;
+use Drupal\comment\CommentPreviewMode;
 use Drupal\comment\Entity\CommentType;
+use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\TypedData\DataDefinition;
-use Drupal\Core\Field\FieldItemBase;
 use Drupal\Core\Session\AnonymousUserSession;
-use Drupal\Core\Url;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\TypedData\DataDefinition;
+use Drupal\Core\Url;
 
 /**
  * Plugin implementation of the 'comment' field type.
- *
- * @FieldType(
- *   id = "comment",
- *   label = @Translation("Comments"),
- *   description = @Translation("This field manages configuration and presentation of comments on an entity."),
- *   list_class = "\Drupal\comment\CommentFieldItemList",
- *   default_widget = "comment_default",
- *   default_formatter = "comment_default",
- *   cardinality = 1,
- * )
  */
+#[FieldType(
+  id: "comment",
+  label: new TranslatableMarkup("Comments"),
+  description: new TranslatableMarkup("Enable and configure how comments look and behave"),
+  default_widget: "comment_default",
+  default_formatter: "comment_default",
+  list_class: CommentFieldItemList::class,
+  cardinality: 1,
+)]
 class CommentItem extends FieldItemBase implements CommentItemInterface {
 
   /**
@@ -46,8 +48,8 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
       'default_mode' => CommentManagerInterface::COMMENT_MODE_THREADED,
       'per_page' => 50,
       'form_location' => CommentItemInterface::FORM_BELOW,
-      'anonymous' => CommentInterface::ANONYMOUS_MAYNOT_CONTACT,
-      'preview' => DRUPAL_OPTIONAL,
+      'anonymous' => AnonymousContact::Forbidden->value,
+      'preview' => CommentPreviewMode::Optional->value,
     ] + parent::defaultFieldSettings();
   }
 
@@ -126,11 +128,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
       '#type' => 'select',
       '#title' => $this->t('Anonymous commenting'),
       '#default_value' => $settings['anonymous'],
-      '#options' => [
-        CommentInterface::ANONYMOUS_MAYNOT_CONTACT => $this->t('Anonymous posters may not enter their contact information'),
-        CommentInterface::ANONYMOUS_MAY_CONTACT => $this->t('Anonymous posters may leave their contact information'),
-        CommentInterface::ANONYMOUS_MUST_CONTACT => $this->t('Anonymous posters must leave their contact information'),
-      ],
+      '#options' => AnonymousContact::asOptions(),
       '#access' => $anonymous_user->hasPermission('post comments'),
     ];
     $element['form_location'] = [
@@ -142,11 +140,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
       '#type' => 'radios',
       '#title' => $this->t('Preview comment'),
       '#default_value' => $settings['preview'],
-      '#options' => [
-        DRUPAL_DISABLED => $this->t('Disabled'),
-        DRUPAL_OPTIONAL => $this->t('Optional'),
-        DRUPAL_REQUIRED => $this->t('Required'),
-      ],
+      '#options' => CommentPreviewMode::asOptions(),
     ];
 
     return $element;

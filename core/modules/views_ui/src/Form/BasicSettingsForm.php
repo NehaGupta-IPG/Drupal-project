@@ -2,12 +2,9 @@
 
 namespace Drupal\views_ui\Form;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Config\TypedConfigManagerInterface;
-use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Form\RedundantEditableConfigNamesTrait;
 
 /**
  * Form builder for the admin display defaults page.
@@ -15,40 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @internal
  */
 class BasicSettingsForm extends ConfigFormBase {
-
-  /**
-   * The theme handler.
-   *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
-   */
-  protected $themeHandler;
-
-  /**
-   * Constructs a \Drupal\views_ui\Form\BasicSettingsForm object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
-   *   The typed config manager.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler.
-   */
-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, ThemeHandlerInterface $theme_handler) {
-    parent::__construct($config_factory, $typedConfigManager);
-
-    $this->themeHandler = $theme_handler;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('config.factory'),
-      $container->get('config.typed'),
-      $container->get('theme_handler')
-    );
-  }
+  use RedundantEditableConfigNamesTrait;
 
   /**
    * {@inheritdoc}
@@ -60,22 +24,8 @@ class BasicSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  protected function getEditableConfigNames() {
-    return ['views.settings'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
-
-    $options = [];
-    foreach ($this->themeHandler->listInfo() as $name => $theme) {
-      if ($theme->status) {
-        $options[$name] = $theme->info['name'];
-      }
-    }
 
     // This is not currently a fieldset but we may want it to be later,
     // so this will make it easier to change if we do.
@@ -85,12 +35,6 @@ class BasicSettingsForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Always show the default display'),
       '#config_target' => 'views.settings:ui.show.default_display',
-    ];
-
-    $form['basic']['ui_show_advanced_column'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Always show advanced display settings'),
-      '#config_target' => 'views.settings:ui.show.advanced_column',
     ];
 
     $form['basic']['ui_show_display_embed'] = [

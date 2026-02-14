@@ -4,7 +4,7 @@ namespace Drupal\Core\Template;
 
 use Drupal\Component\HtmlAttribute\HtmlAttributeCollection;
 
-@trigger_error('\Drupal\Core\Template\Attribute is deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use \Drupal\Component\HtmlAttribute\HtmlAttributeCollection instead. See https://www.drupal.org/node/3070485', E_USER_DEPRECATED);
+@trigger_error('\Drupal\Core\Template\Attribute is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Component\HtmlAttribute\HtmlAttributeCollection instead. See https://www.drupal.org/node/3070485', E_USER_DEPRECATED);
 
 /**
  * Collects, sanitizes, and renders HTML attributes.
@@ -12,8 +12,8 @@ use Drupal\Component\HtmlAttribute\HtmlAttributeCollection;
  * To use, optionally pass in an associative array of defined attributes, or
  * add attributes using array syntax. For example:
  * @code
- *  $attributes = new Attribute(array('id' => 'socks'));
- *  $attributes['class'] = array('black-cat', 'white-cat');
+ *  $attributes = new Attribute(['id' => 'socks']);
+ *  $attributes['class'] = ['black-cat', 'white-cat'];
  *  $attributes['class'][] = 'black-white-cat';
  *  echo '<cat' . $attributes . '>';
  *  // Produces <cat id="socks" class="black-cat white-cat black-white-cat">
@@ -21,11 +21,11 @@ use Drupal\Component\HtmlAttribute\HtmlAttributeCollection;
  *
  * $attributes always prints out all the attributes. For example:
  * @code
- *  $attributes = new Attribute(array('id' => 'socks'));
- *  $attributes['class'] = array('black-cat', 'white-cat');
+ *  $attributes = new Attribute(['id' => 'socks']);
+ *  $attributes['class'] = ['black-cat', 'white-cat'];
  *  $attributes['class'][] = 'black-white-cat';
  *  echo '<cat class="cat ' . $attributes['class'] . '"' . $attributes . '>';
- *  // Produces <cat class="cat black-cat white-cat black-white-cat" id="socks" class="cat black-cat white-cat black-white-cat">
+ *  // Produces <cat class="cat black-cat white-cat black-white-cat" id="socks" class="black-cat white-cat black-white-cat">
  * @endcode
  *
  * When printing out individual attributes to customize them within a Twig
@@ -36,7 +36,7 @@ use Drupal\Component\HtmlAttribute\HtmlAttributeCollection;
  * @endcode
  * Produces:
  * @code
- * <cat class="cat black-cat white-cat black-white-cat my-custom-class" id="socks">
+ * <cat class="black-cat white-cat black-white-cat my-custom-class" id="socks">
  * @endcode
  *
  * The attribute keys and values are automatically escaped for output with
@@ -47,7 +47,7 @@ use Drupal\Component\HtmlAttribute\HtmlAttributeCollection;
  * @code
  *  $path = 'javascript:alert("xss");';
  *  $path = UrlHelper::stripDangerousProtocols($path);
- *  $attributes = new Attribute(array('href' => $path));
+ *  $attributes = new Attribute(['href' => $path]);
  *  echo '<a' . $attributes . '>';
  *  // Produces <a href="alert(&quot;xss&quot;);">
  * @endcode
@@ -62,11 +62,14 @@ use Drupal\Component\HtmlAttribute\HtmlAttributeCollection;
  *   // Produces <input value="Highlight the &lt;em&gt; tag">
  * @endcode
  *
+ * @implements \ArrayAccess<string, \Drupal\Core\Template\AttributeValueBase>
+ * @implements \IteratorAggregate<string, \Drupal\Core\Template\AttributeValueBase>
+ *
  * @see \Drupal\Component\Utility\Html::escape()
  * @see \Drupal\Component\Render\PlainTextOutput::renderFromHtml()
  * @see \Drupal\Component\Utility\UrlHelper::stripDangerousProtocols()
  *
- * @deprecated in drupal:10.2.0 and is removed from drupal:11.0.0. Use
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
  *   \Drupal\Component\HtmlAttribute\HtmlAttributeCollection instead.
  *
  * @see https://www.drupal.org/node/3070485

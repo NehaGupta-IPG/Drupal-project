@@ -6,14 +6,15 @@ namespace Drupal\FunctionalTests\Asset;
 
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore abcdefghijklmnop
-
 /**
  * Tests asset aggregation.
- *
- * @group asset
  */
+#[Group('asset')]
+#[RunTestsInSeparateProcesses]
 class AssetOptimizationTest extends BrowserTestBase {
 
   /**
@@ -23,13 +24,10 @@ class AssetOptimizationTest extends BrowserTestBase {
 
   /**
    * The file assets path settings value.
+   *
+   * @var string
    */
   protected $fileAssetsPath;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
 
   /**
    * Tests that asset aggregates are rendered and created on disk.
@@ -118,6 +116,42 @@ class AssetOptimizationTest extends BrowserTestBase {
       $this->assertAggregate($url, FALSE);
       $this->assertInvalidAggregates($url);
     }
+
+    // The aggregates have just been created, so ::deleteAll() should avoid
+    // removing them.
+    \Drupal::service('asset.css.collection_optimizer')->deleteAll();
+    \Drupal::service('asset.js.collection_optimizer')->deleteAll();
+
+    foreach ($style_urls as $url) {
+      $this->assertAggregate($url, FALSE, 'text/css');
+    }
+
+    foreach ($script_urls as $url) {
+      $this->assertAggregate($url, FALSE);
+    }
+
+    // Now set the mtime of all the files in the directory to a year in the
+    // past, this is older than the threshold so they should be deleted.
+    foreach (['js', 'css'] as $type) {
+      $iterator = new \DirectoryIterator('assets://' . $type);
+      foreach ($iterator as $file) {
+        if ($file->isFile()) {
+          $mtime = $file->getMtime();
+          $return = touch($file->getPathName(), $mtime - (86400 * 365));
+          $this->assertTrue($return);
+        }
+      }
+    }
+
+    \Drupal::service('asset.css.collection_optimizer')->deleteAll();
+    \Drupal::service('asset.js.collection_optimizer')->deleteAll();
+    foreach ($style_urls as $url) {
+      $this->assertAggregate($url, TRUE, 'text/css');
+    }
+
+    foreach ($script_urls as $url) {
+      $this->assertAggregate($url, TRUE);
+    }
   }
 
   /**
@@ -130,7 +164,7 @@ class AssetOptimizationTest extends BrowserTestBase {
    * @param string|null $content_type
    *   The expected content type, or NULL to skip checking.
    */
-  protected function assertAggregate(string $url, bool $from_php = TRUE, string $content_type = NULL): void {
+  protected function assertAggregate(string $url, bool $from_php = TRUE, ?string $content_type = NULL): void {
     $url = $this->getAbsoluteUrl($url);
     if (!stripos($url, $this->fileAssetsPath) !== FALSE) {
       return;
@@ -143,8 +177,8 @@ class AssetOptimizationTest extends BrowserTestBase {
       $this->assertStringContainsString($content_type, $headers['Content-Type'][0]);
     }
     if ($from_php) {
-      $this->assertStringContainsString('no-store', $headers['Cache-Control'][0]);
       $this->assertArrayHasKey('X-Generator', $headers);
+      $this->assertStringContainsString('no-store', $headers['Cache-Control'][0]);
     }
     else {
       $this->assertArrayNotHasKey('X-Generator', $headers);
@@ -187,16 +221,12 @@ class AssetOptimizationTest extends BrowserTestBase {
     $session->visit($this->setInvalidLibrary($url));
     $this->assertSession()->statusCodeEquals(200);
 
+    // When an invalid asset hash name is given.
     $session->visit($this->replaceGroupHash($url));
     $this->assertSession()->statusCodeEquals(200);
-    $headers = $session->getResponseHeaders();
-    $this->assertEquals(['no-store, private'], $headers['Cache-Control']);
-
-    // And again to confirm it's not cached on disk.
-    $session->visit($this->replaceGroupHash($url));
-    $this->assertSession()->statusCodeEquals(200);
-    $headers = $session->getResponseHeaders();
-    $this->assertEquals(['no-store, private'], $headers['Cache-Control']);
+    $current_url = $session->getCurrentUrl();
+    // Redirect to the correct one.
+    $this->assertEquals($url, $current_url);
   }
 
   /**
