@@ -1684,7 +1684,6 @@ services:
     class: Drupal\Core\Session\PermissionsHashGenerator
     arguments: ['@private_key', '@cache.memory', '@access_policy_processor']
   Drupal\Core\Session\PermissionsHashGeneratorInterface: '@user_permissions_hash_generator'
-  Drupal\user\Service\PermissionsRepositoryFactoryInterface: '@user_permissions_parser.repository_factory'
   current_user:
     class: Drupal\Core\Session\AccountProxy
     arguments: ['@event_dispatcher']
