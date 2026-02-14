@@ -2,12 +2,12 @@
 
 namespace Drupal\Core\Menu;
 
+use Drupal\Component\HtmlAttribute\HtmlAttributeCollection;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Routing\PreloadableRouteProviderInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
-use Drupal\Core\Template\Attribute;
 use Drupal\Core\Utility\CallableResolver;
 
 /**
@@ -232,7 +232,7 @@ class MenuLinkTree implements MenuLinkTreeInterface {
 
       // Note: links are rendered in the menu.html.twig template; and they
       // automatically bubble their associated cacheability metadata.
-      $element['attributes'] = new Attribute();
+      $element['attributes'] = new HtmlAttributeCollection();
       $element['title'] = $link->getTitle();
       $element['url'] = $link->getUrlObject();
       $element['url']->setOption('set_active_class', TRUE);

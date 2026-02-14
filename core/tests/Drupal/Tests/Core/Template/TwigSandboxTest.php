@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Template;
 
-use Drupal\Core\Template\Attribute;
+use Drupal\Component\HtmlAttribute\HtmlAttributeCollection;
+use Drupal\Core\Site\Settings;
+use Drupal\Core\Template\Attribute as CoreAttribute;
+use Drupal\Core\Template\TwigSandboxPolicy;
 use Drupal\Core\Template\Attribute\TwigAllowed;
 use Drupal\Core\Template\Loader\StringLoader;
-use Drupal\Core\Template\TwigSandboxPolicy;
 use Drupal\Tests\Core\Entity\ContentEntityBaseMockableClass;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -72,7 +74,7 @@ class TwigSandboxTest extends UnitTestCase {
    * Tests that white listed classes can be extended.
    */
   public function testExtendedClass(): void {
-    $this->assertEquals(' class=&quot;kitten&quot;', $this->twig->render('{{ attribute.addClass("kitten") }}', ['attribute' => new TestAttribute()]));
+    $this->assertEquals(' class=&quot;kitten&quot;', $this->twig->render('{{ attribute.addClass("kitten") }}', ['attribute' => new TestAttributeCollection()]));
   }
 
   /**
@@ -158,6 +160,22 @@ class TwigSandboxTest extends UnitTestCase {
   }
 
   /**
+   * Tests deprecation of Drupal\Core\Template\Attribute as an allowed class.
+   */
+  #[Group('legacy')]
+  public function testDeprecatedAllowedClass(): void {
+    $this->expectDeprecation('\Drupal\Core\Template\Attribute as an allowed class in $settings[\'twig_sandbox_allowed_classes\'] is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Component\HtmlAttribute\HtmlAttributeCollection instead. See https://www.drupal.org/node/3070485');
+
+    // Might be a hack?  This is hard to mock now...
+    // @phpstan-ignore-next-line
+    new Settings(['twig_sandbox_allowed_classes' => CoreAttribute::class]);
+    $policy = new TwigSandboxPolicy();
+
+    $this->expectException(SecurityError::class);
+    $policy->checkMethodAllowed($this, 'add');
+  }
+
+  /**
    * Tests that method with TwigAllowed attribute is allowed.
    */
   public function testTwigMethodAttributeAllowed(): void {
@@ -180,7 +198,7 @@ class TwigSandboxTest extends UnitTestCase {
 /**
  * Test class for HTML attributes collector, sanitizer, and renderer.
  */
-class TestAttribute extends Attribute {}
+class TestAttributeCollection extends HtmlAttributeCollection {}
 
 /**
  * Test class for TwigAllowed attribute.

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Htmx;
 
+use Drupal\Component\HtmlAttribute\HtmlAttributeBoolean;
+use Drupal\Component\HtmlAttribute\HtmlAttributeCollection;
+use Drupal\Component\HtmlAttribute\HtmlAttributeScalar;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\Template\Attribute;
-use Drupal\Core\Template\AttributeBoolean;
 use Drupal\Core\Template\AttributeHelper;
-use Drupal\Core\Template\AttributeString;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use function Symfony\Component\String\u;
@@ -99,7 +99,7 @@ class Htmx {
    * Allows for passing a populated HeaderBag to support merging.
    */
   public function __construct(
-    protected Attribute $attributes = new Attribute(),
+    protected HtmlAttributeCollection $attributes = new HtmlAttributeCollection(),
     protected HeaderBag $headers = new HeaderBag(),
     protected CacheableMetadata $cacheableMetadata = new CacheableMetadata(),
   ) {
@@ -155,7 +155,7 @@ class Htmx {
    */
   protected function createStringAttribute(string $id, string $value): void {
     $key = self::ATTRIBUTE_PREFIX . $id;
-    $this->attributes[$key] = new AttributeString($key, $value);
+    $this->attributes[$key] = new HtmlAttributeScalar($key, $value);
   }
 
   /**
@@ -168,7 +168,7 @@ class Htmx {
    */
   protected function createBooleanAttribute(string $id, bool $value): void {
     $key = self::ATTRIBUTE_PREFIX . $id;
-    $this->attributes[$key] = new AttributeBoolean($key, $value);
+    $this->attributes[$key] = new HtmlAttributeBoolean($key, $value);
 
   }
 
@@ -186,7 +186,7 @@ class Htmx {
     // Ensure the object format HTMX shows in documentation.
     // Ensure numeric strings are encoded as numbers.
     $json = json_encode($value, JSON_FORCE_OBJECT | JSON_NUMERIC_CHECK);
-    $this->attributes[$key] = new AttributeString($key, $json);
+    $this->attributes[$key] = new HtmlAttributeScalar($key, $json);
   }
 
   /**
@@ -304,10 +304,10 @@ class Htmx {
   /**
    * Get the attribute storage.
    *
-   * @return \Drupal\Core\Template\Attribute
+   * @return \Drupal\Component\HtmlAttribute\HtmlAttributeCollection
    *   The attribute storage.
    */
-  public function getAttributes(): Attribute {
+  public function getAttributes(): HtmlAttributeCollection {
     return $this->attributes;
   }
 
@@ -1336,7 +1336,7 @@ class Htmx {
         $preparedHeaders[$value[0]] = $value[1];
       }
     }
-    $attributes = new Attribute($incomingAttributes);
+    $attributes = new HtmlAttributeCollection($incomingAttributes);
     $headers = new HeaderBag($preparedHeaders);
     $cacheableMetadata = CacheableMetadata::createFromRenderArray($element);
     return new static($attributes, $headers, $cacheableMetadata);
