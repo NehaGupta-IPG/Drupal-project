@@ -116,25 +116,6 @@ class GDToolkit extends ImageToolkitBase {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  public function setSource($source) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
-    $this->backfillImage->setSource($source);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * @todo move back to base.
-   */
-  public function getSource() {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
-    return isset($this->backfillImage) ? $this->backfillImage->getSource() : '';
-  }
-
-  /**
    * Sets an image or resets existing one.
    *
    * @param \GdImage|null $image

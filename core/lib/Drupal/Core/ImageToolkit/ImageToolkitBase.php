@@ -55,10 +55,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
   public ?ImageInterface $backfillImage {
     get => $this->backfillImage;
     set(?ImageInterface $image) {
-      if ($this->isStateful) {
-        throw new ImageToolkitException('Cannot set $backfillImage in a stateful toolkit');
-      }
-      if (!$this->isClone) {
+      if (!$this->isStateful && !$this->isClone) {
         throw new ImageToolkitException('Cannot set $backfillImage in the toolkit singleton');
       }
       if (isset($this->backfillImage)) {
@@ -81,7 +78,16 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    *
    * @see https://www.drupal.org/node/7654123
    */
-  protected $source = '';
+  protected $source {
+    get {
+      @trigger_error('Getting ' . __CLASS__ . '::$source is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+      return isset($this->backfillImage) ? $this->backfillImage->getSource() : '';
+    }
+    set($source) {
+      @trigger_error('Setting ' . __CLASS__ . '::$source is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+      $this->backfillImage->setSource($source);
+    }
+  }
 
   /**
    * Constructs an ImageToolkitBase object.
@@ -132,12 +138,6 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    */
   public function setSource($source) {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
-    // If a previous image has been loaded, there is no way to know if the
-    // toolkit implementation needs to perform any additional actions like
-    // freeing memory. Therefore, the source image cannot be changed once set.
-    if ($this->source) {
-      throw new \BadMethodCallException(__METHOD__ . '() may only be called once');
-    }
     $this->source = $source;
     return $this;
   }

@@ -83,6 +83,9 @@ class Image implements ImageInterface {
     // @phpstan-ignore property.deprecated
     $this->toolkit = $toolkit;
     $this->toolkitId = $toolkit->getPluginId();
+    if ($this->toolkit->isStateful) {
+      $this->toolkit->backfillImage = $this;
+    }
     if ($source) {
       $this->source = $source;
       // @phpstan-ignore-next-line
