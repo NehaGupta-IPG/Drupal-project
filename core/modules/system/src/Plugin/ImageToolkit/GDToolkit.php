@@ -32,15 +32,6 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 )]
 class GDToolkit extends ImageToolkitBase {
 
-  // phpcs:disable
-  /**
-   * {@inheritdoc}
-   */
-  public bool $isStateful {
-    get => FALSE;
-  }
-  // phpcs:enable
-
   /**
    * A GD image.
    *
@@ -80,6 +71,15 @@ class GDToolkit extends ImageToolkitBase {
       $this->backfillImage->setType($type);
     }
   }
+
+  // phpcs:disable
+  /**
+   * {@inheritdoc}
+   */
+  public bool $isStateful {
+    get => FALSE;
+  }
+  // phpcs:enable
 
   /**
    * Constructs a GDToolkit object.
