@@ -23,7 +23,7 @@ class MenuListBuilder extends ConfigEntityListBuilder {
   protected const SORT_KEY = 'label';
 
   /**
-   * The request staack.
+   * The request stack.
    */
   private RequestStack $requestStack;
 
