@@ -60,6 +60,7 @@ services:
   user_permissions_parser.repository_factory:
     class: Drupal\user\Service\PermissionsRepositoryFactory
     arguments: ['@module_handler', '@plugin.manager.permissions_parser']
+  Drupal\user\Service\PermissionsRepositoryFactoryInterface: '@user_permissions_parser.repository_factory'
 
   # The new way to retrieve permissions.
   user.permissions:
