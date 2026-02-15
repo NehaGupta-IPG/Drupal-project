@@ -32,6 +32,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 )]
 class GDToolkit extends ImageToolkitBase {
 
+  // phpcs:ignoreFile
+
   /**
    * A GD image.
    *
