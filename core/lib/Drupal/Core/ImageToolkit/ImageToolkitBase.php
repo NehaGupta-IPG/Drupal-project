@@ -58,9 +58,6 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
       if (!$this->isStateful && !$this->isClone) {
         throw new ImageToolkitException('Cannot set $backfillImage in the toolkit singleton');
       }
-      if (isset($this->backfillImage)) {
-        throw new ImageToolkitException('$backfillImage is set already');
-      }
       if ($image === NULL) {
         throw new ImageToolkitException('$backfillImage cannot be set to NULL');
       }
