@@ -179,7 +179,7 @@ class GdImageWrapper extends ImageBase {
    * @todo move back to base.
    */
   public function apply($operation, array $arguments = []) {
-    return $this->toolkit()->apply($this, $operation, $arguments);
+    return $this->toolkit()->apply($operation, $arguments, $this);
   }
 
 }

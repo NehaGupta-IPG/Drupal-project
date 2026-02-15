@@ -218,7 +218,7 @@ class GDToolkit extends ImageToolkitBase {
         'transparent_color' => $this->doGetTransparentColor($gdImage),
         'is_temp' => TRUE,
       ];
-      if ($this->apply($image, 'create_new', $data)) {
+      if ($this->apply('create_new', $data, $image)) {
         imagecopy($image->getGdImageObject(), $gdImage, 0, 0, 0, 0, imagesx($gdImage), imagesy($gdImage));
       }
     }
@@ -632,53 +632,6 @@ class GDToolkit extends ImageToolkitBase {
       $types[] = IMAGETYPE_AVIF;
     }
     return $types;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function apply($operation, $arguments = [], $extra = NULL) {
-    if ($operation instanceof ImageInterface) {
-      $image = $operation;
-      $operation = $arguments;
-      assert(is_string($operation));
-      $arguments = $extra;
-      assert(is_array($arguments));
-    }
-    else {
-      // @todo what if backfill missing?
-      // @phpstan-ignore property.deprecated
-      $image = $this->backfillImage;
-    }
-    try {
-      // Get the plugin to use for the operation and apply the operation.
-      return $this->getToolkitOperation($operation)->apply($image, $arguments);
-    }
-    catch (PluginNotFoundException) {
-      $this->logger->error("The selected image handling toolkit '@toolkit' can not process operation '@operation'.", [
-        '@toolkit' => $this->getPluginId(),
-        '@operation' => $operation,
-      ]);
-      return FALSE;
-    }
-    catch (ImageToolkitException $e) {
-      $this->logger->error("Error handling image with toolkit '@toolkit' for operation '@operation': @message", [
-        '@toolkit' => $this->getPluginId(),
-        '@operation' => $operation,
-        '@message' => $e->getMessage(),
-      ]);
-      throw $e;
-    }
-    catch (\Throwable $t) {
-      $this->logger->warning("The image toolkit '@toolkit' failed processing '@operation' for image '@image'. Reported error: @class - @message", [
-        '@toolkit' => $this->getPluginId(),
-        '@operation' => $operation,
-        '@image' => $image->getSource(),
-        '@class' => get_class($t),
-        '@message' => $t->getMessage(),
-      ]);
-      return FALSE;
-    }
   }
 
 }
