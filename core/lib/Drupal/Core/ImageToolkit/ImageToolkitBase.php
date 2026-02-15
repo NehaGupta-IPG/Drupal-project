@@ -84,18 +84,6 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
   protected $source = '';
 
   /**
-   * BC layer.
-   *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
-   *    whack-a-mole instead.
-   *
-   * @see https://www.drupal.org/node/7654123
-   */
-  public function __clone(): void {
-    $this->isClone = TRUE;
-  }
-
-  /**
    * Constructs an ImageToolkitBase object.
    *
    * @param array $configuration
@@ -123,6 +111,18 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
   }
 
   /**
+   * BC layer.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
+   */
+  public function __clone(): void {
+    $this->isClone = TRUE;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {}
@@ -131,7 +131,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    * {@inheritdoc}
    */
   public function setSource($source) {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     // If a previous image has been loaded, there is no way to know if the
     // toolkit implementation needs to perform any additional actions like
     // freeing memory. Therefore, the source image cannot be changed once set.
@@ -146,7 +146,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    * {@inheritdoc}
    */
   public function getSource() {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     return $this->source;
   }
 
