@@ -4,7 +4,10 @@ namespace Drupal\menu_ui;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Url;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Defines a class to build a listing of menu entities.
@@ -18,6 +21,48 @@ class MenuListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   protected const SORT_KEY = 'label';
+
+  /**
+   * The request staack.
+   */
+  private RequestStack $requestStack;
+
+  /**
+   * Administrative menus that should appear on the admin menu tab.
+   */
+  private const array ADMINISTRATIVE_MENUS = [
+    'account',
+    'admin',
+    'content',
+    'navigation-user-links',
+    'tools',
+    'top-tasks',
+  ];
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type): self {
+    $handler = parent::createInstance($container, $entity_type);
+    $handler->requestStack = $container->get(RequestStack::class);
+    return $handler;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function load(): array {
+    $menus = parent::load();
+
+    $admin_menus = array_flip(self::ADMINISTRATIVE_MENUS);
+    if ($this->requestStack->getCurrentRequest()->attributes->getBoolean('administrative')) {
+      $menus = array_intersect_key($menus, $admin_menus);
+    }
+    else {
+      $menus = array_diff_key($menus, $admin_menus);
+    }
+    return $menus;
+  }
 
   /**
    * {@inheritdoc}

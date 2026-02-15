@@ -7,3 +7,13 @@ entity.menu.collection:
   title: 'List'
   route_name: entity.menu.collection
   base_route: entity.menu.collection
+
+menu_ui.main:
+  title: 'Main'
+  route_name: entity.menu.collection
+  parent_id: entity.menu.collection
+
+menu_ui.admin_menus:
+  title: 'Admin menus'
+  route_name: menu_ui.menu_administrative
+  parent_id: entity.menu.collection

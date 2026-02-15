@@ -370,7 +370,7 @@ class MenuUiTest extends BrowserTestBase {
     $this->assertSession()->addressEquals('admin/structure/menu/manage/tools');
 
     // Test adding a menu link direct from the menus listing page.
-    $this->drupalGet('admin/structure/menu');
+    $this->drupalGet('admin/structure/menu/administrative');
     // Click the "Add link" operation in the Tools row.
     $links = $this->xpath(
       '//*/td[contains(text(),:menu_label)]/following::a[normalize-space()=:link_label]',
@@ -1252,6 +1252,37 @@ class MenuUiTest extends BrowserTestBase {
     $this->drupalGet('admin/structure/menu/manage/' . $menu_2->id());
     $this->submitForm([], 'Save');
     $this->assertSession()->elementNotExists('xpath', '//div[contains(@class, "messages--error")]');
+  }
+
+  /**
+   * Tests that administrative menus appear on the administrative route.
+   */
+  public function testAdministrativeMenusRoute(): void {
+    $this->drupalLogin($this->adminUser);
+
+    $administrative_menus = [
+      'Account menu',
+      'Administration',
+      'Tools',
+    ];
+
+    $this->drupalGet('admin/structure/menu/administrative');
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Verify that administrative menus are displayed.
+    foreach ($administrative_menus as $menu_label) {
+      $this->assertSession()->pageTextContains($menu_label);
+    }
+
+    // The main and footer menus should appear on the main route.
+    $this->drupalGet('admin/structure/menu');
+    $this->assertSession()->pageTextContains('Main navigation');
+    $this->assertSession()->pageTextContains('Footer');
+
+    // Also, verify administrative menus are not displayed
+    foreach ($administrative_menus as $menu_label) {
+      $this->assertSession()->pageTextNotContains($menu_label);
+    }
   }
 
   /**
