@@ -97,7 +97,7 @@ interface ImageToolkitInterface extends ContainerFactoryPluginInterface, PluginI
    * @return bool
    *   TRUE on success, FALSE on failure.
    */
-  public function save(/* ImageInterface $image, string */ $destination);
+  public function save(/* string */ $destination /* , ImageInterface $image */);
 
   /**
    * Determines if a file contains a valid image.

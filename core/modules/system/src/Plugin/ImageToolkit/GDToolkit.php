@@ -257,7 +257,7 @@ class GDToolkit extends ImageToolkitBase {
   /**
    * {@inheritdoc}
    */
-  public function save($image, $destination = NULL) {
+  public function save($destination = NULL, $image = NULL) {
     assert($image instanceof GdImageWrapper);
     assert(is_string($destination));
 

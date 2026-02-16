@@ -122,27 +122,4 @@ class GdImageWrapper extends ImageBase {
     return $this;
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function save($destination = NULL) {
-    // Return immediately if the image is not valid.
-    if (!$this->isValid()) {
-      return FALSE;
-    }
-
-    $destination = $destination ?: $this->getSource();
-    if ($return = $this->getToolkit()->save($this, $destination)) {
-      // Clear the cached file size and refresh the image information.
-      clearstatcache(TRUE, $destination);
-      $this->fileSize = filesize($destination);
-      $this->source = $destination;
-
-      if (\Drupal::service('file_system')->chmod($destination)) {
-        return $return;
-      }
-    }
-    return FALSE;
-  }
-
 }

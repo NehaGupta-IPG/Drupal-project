@@ -36,8 +36,10 @@ class Image implements ImageInterface {
 
   /**
    * File size in bytes.
+   *
+   * @var int
    */
-  protected int $fileSize;
+  protected $fileSize;
 
   /**
    * The image factory.
@@ -169,7 +171,7 @@ class Image implements ImageInterface {
     }
 
     $destination = $destination ?: $this->getSource();
-    if ($return = $this->getToolkit()->save($this, $destination)) {
+    if ($return = $this->getToolkit()->save($destination, $this)) {
       // Clear the cached file size and refresh the image information.
       clearstatcache(TRUE, $destination);
       $this->fileSize = filesize($destination);
