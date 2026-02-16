@@ -239,6 +239,27 @@ class UpdateRegistry implements EventSubscriberInterface {
     }
     // Ensure that the update order is deterministic.
     sort($updates);
+    return $this->alterAvailableUpdateFunctions($updates);
+  }
+
+  /**
+   * Invokes hook_post_updates_alter() in all installed modules.
+   *
+   * @return callable[]
+   *   A list of update functions.
+   *
+   * @see \Drupal\Core\Extension\ModuleHandlerInterface::invokeAll()
+   * @see hook_post_updates_alter()
+   */
+  protected function alterAvailableUpdateFunctions($updates) {
+    // Get a list of installed modules.
+    foreach ($this->enabledExtensions as $module) {
+      $function = $module . '_post_updates_alter';
+      if (function_exists($function)) {
+        $function($updates);
+      }
+    }
+
     return $updates;
   }
 

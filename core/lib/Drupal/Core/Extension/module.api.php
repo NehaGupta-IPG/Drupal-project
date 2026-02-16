@@ -137,6 +137,29 @@ function hook_module_implements_alter(&$implementations, $hook) {
 }
 
 /**
+ * Alter the list of available post update methods.
+ *
+ * This hook is invoked in \Drupal\Core\Update\UpdateRegistry::getAvailableUpdateFunctions().
+ * A module may implement this hook in order to reorder the list of
+ * available post update methods, which are otherwise ordered alphabetically.
+ *
+ * @param $updates
+ *   An array of available post update methods, ordered in the order
+ *   that are going to be run during the post update process.
+ */
+function hook_post_updates_alter(&$updates) {
+  foreach ($updates as $key => $update) {
+    // Execute my_module_post_update_task() last when running the post
+    // update process.
+    if ($update == 'my_module_post_update_task') {
+      unset($updates[$key]);
+      $updates[] = 'my_module_post_update_task';
+      break;
+    }
+  }
+}
+
+/**
  * Alter the information parsed from module and theme .info.yml files.
  *
  * This hook is invoked in \Drupal\Core\Extension\ExtensionList::doList(). A
