@@ -197,6 +197,7 @@ class ImageTest extends UnitTestCase {
         ->method(PropertyHook::get('backfillImage'))
         ->willReturn($this->image);
 
+      // @phpstan-ignore method.deprecated
       $this->image->ensureToolkit();
     }
 
