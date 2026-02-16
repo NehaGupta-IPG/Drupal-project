@@ -18,8 +18,11 @@ use Drupal\Core\Render\Attribute\RenderElement;
  *   in. To use multiple selectors, separate them with commas, like
  *   '.selector-a, .selector-b'.
  * - #list_item: (optional) The CSS selector, relative to the container, for the
- *   items to search for. By default, it points to the list items (such as
- *   table rows).
+ *   individual items that will be hidden or shown during filtering.
+ *   This selector identifies the DOM elements to toggle visibility on.
+ *   Defaults to 'tbody tr' (table rows within a tbody). Examples: '.item' for
+ *   list items, '.js-layout-builder-block-link' for block links, or
+ *   '.package-listing table tbody tr' for nested table rows.
  * - #list_text: (optional) The CSS selector, relative to a list item, of
  *   elements containing text to search for. This may produce multiple elements.
  *   Defaults to an empty string, which indicates that the whole of the list

@@ -59,7 +59,6 @@ class ConfigTranslationEntityListBuilder extends ConfigEntityListBuilder impleme
     $build['table']['#attributes']['class'][] = 'config-translation-entity-list';
     $build['table']['#attributes']['data-drupal-selector'] = 'config-translation-entity-list';
     $build['table']['#weight'] = 0;
-    $build['#attached']['library'][] = 'system/drupal.system.modules';
 
     return $build;
   }

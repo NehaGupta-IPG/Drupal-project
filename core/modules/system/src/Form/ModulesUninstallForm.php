@@ -216,7 +216,6 @@ class ModulesUninstallForm extends FormBase {
       }
     }
 
-    $form['#attached']['library'][] = 'system/drupal.system.modules';
     $form['actions'] = ['#type' => 'actions'];
     $form['actions']['submit'] = [
       '#type' => 'submit',

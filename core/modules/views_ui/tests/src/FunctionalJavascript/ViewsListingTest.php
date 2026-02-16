@@ -68,6 +68,7 @@ class ViewsListingTest extends WebDriverTestBase {
     $search_input = $page->find('css', '[data-list-filter]');
     $search_input->setValue('people');
 
+    // Wait for debounce (100ms) + filter execution time to complete.
     sleep(1);
 
     $enabled_rows = $page->findAll('css', 'tr.views-ui-list-enabled');
@@ -81,6 +82,7 @@ class ViewsListingTest extends WebDriverTestBase {
     // Filter on a string that also appears in the description.
     $search_input->setValue('content');
 
+    // Wait for debounce (100ms) + filter execution time.
     sleep(1);
 
     $enabled_rows = $page->findAll('css', 'tr.views-ui-list-enabled');
@@ -96,6 +98,7 @@ class ViewsListingTest extends WebDriverTestBase {
     // Add a backspace to trigger the keyUp event.
     $search_input->keyUp(8);
 
+    // Wait for debounce (100ms) + filter reset time.
     sleep(1);
 
     $enabled_rows = $page->findAll('css', 'tr.views-ui-list-enabled');
@@ -118,6 +121,7 @@ class ViewsListingTest extends WebDriverTestBase {
 
     $session->assertWaitOnAjaxRequest();
 
+    // Wait for DOM to update after AJAX response and filter to re-apply.
     sleep(1);
 
     $enabled_rows = $page->findAll('css', 'tr.views-ui-list-enabled');
