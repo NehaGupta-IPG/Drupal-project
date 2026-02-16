@@ -88,7 +88,6 @@ class Image implements ImageInterface {
       // @phpstan-ignore-next-line
       $this->getToolkit()->setSource($this->source);
       // Defer image file validity check to the toolkit.
-      // @phpstan-ignore method.deprecated
       if ($this->getToolkit()->parseFile($this)) {
         $this->fileSize = filesize($this->source);
       }
@@ -99,7 +98,6 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function isValid() {
-    // @phpstan-ignore method.deprecated
     return $this->getToolkit()->isValid($this);
   }
 
@@ -107,7 +105,6 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function getHeight() {
-    // @phpstan-ignore method.deprecated
     return $this->getToolkit()->getHeight($this);
   }
 
@@ -129,7 +126,6 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function getMimeType() {
-    // @phpstan-ignore method.deprecated
     return $this->getToolkit()->getMimeType($this);
   }
 
@@ -159,6 +155,7 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function getToolkit() {
+    // @phpstan-ignore property.deprecated
     return $this->toolkit ?? $this->imageFactory->getToolkit($this->getToolkitId());
   }
 
@@ -172,7 +169,6 @@ class Image implements ImageInterface {
     }
 
     $destination = $destination ?: $this->getSource();
-    // @phpstan-ignore method.deprecated
     if ($return = $this->getToolkit()->save($this, $destination)) {
       // Clear the cached file size and refresh the image information.
       clearstatcache(TRUE, $destination);
@@ -200,13 +196,13 @@ class Image implements ImageInterface {
     if (isset($this->toolkit)) {
       return;
     }
-    if ($toolkit->isStateful) {
-      throw new ImageToolkitException('$toolkit must be set in the constructor for stateful toolkits');
-    }
     if (!isset($this->imageFactory)) {
       throw new ImageToolkitException('ImageFactory service is missing from ' . get_class($this));
     }
     $toolkit = $this->imageFactory->getToolkit($this->getToolkitId());
+    if ($toolkit->isStateful) {
+      throw new ImageToolkitException('$toolkit must be set in the constructor for stateful toolkits');
+    }
     if ($storeClone) {
       $this->toolkit = clone $toolkit;
       $this->toolkit->backfillImage = $this;
