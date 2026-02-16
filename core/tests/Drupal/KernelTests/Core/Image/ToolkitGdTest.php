@@ -58,9 +58,6 @@ class ToolkitGdTest extends KernelTestBase {
 
   /**
    * Tests supported extensions.
-   *
-   * @legacy-covers ::getSupportedExtensions
-   * @legacy-covers ::extensionToImageType
    */
   public function testSupportedExtensions(): void {
     // Test the list of supported extensions.
@@ -78,9 +75,8 @@ class ToolkitGdTest extends KernelTestBase {
       'webp' => IMAGETYPE_WEBP,
       'avif' => IMAGETYPE_AVIF,
     ];
-    $image = $this->imageFactory->get();
     foreach ($expected_image_types as $extension => $expected_image_type) {
-      $this->assertSame($expected_image_type, $image->toolkit()->extensionToImageType($extension));
+      $this->assertSame($expected_image_type, $this->imageFactory->getToolkit()->extensionToImageType($extension));
     }
   }
 

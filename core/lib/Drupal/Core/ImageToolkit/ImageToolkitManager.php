@@ -19,7 +19,7 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 class ImageToolkitManager extends DefaultPluginManager {
 
   /**
-   * The map of active toolkit instances.
+   * The map of active toolkit singleton instances.
    *
    * @var array<string, ImageToolkitInterface>
    */
@@ -52,20 +52,14 @@ class ImageToolkitManager extends DefaultPluginManager {
    *   The toolkit.
    */
   public function getToolkit(string $id): ImageToolkitInterface {
-    $this->activeToolkits[$id] ??= $this->createInstance($id);
-    return $this->activeToolkits[$id];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getInstance(array $options) {
-    $toolkit_definition = $this->getDefinition($options['id']);
-    if (isset($toolkit_definition['imageClass'])) {
-      $this->activeToolkits[$options['id']] ??= $this->createInstance($options['id']);
-      return $this->activeToolkits[$options['id']];
+    if (isset($this->activeToolkits[$id])) {
+      return $this->activeToolkits[$id];
     }
-    return $this->createInstance($options['id']);
+    $toolkit = $this->createInstance($id);
+    if (!$toolkit->isStateful) {
+      $this->activeToolkits[$id] = $toolkit;
+    }
+    return $toolkit;
   }
 
   /**
@@ -95,7 +89,7 @@ class ImageToolkitManager extends DefaultPluginManager {
    */
   public function getDefaultToolkit() {
     if ($toolkit_id = $this->getDefaultToolkitId()) {
-      return $this->getInstance(['id' => $toolkit_id]);
+      return $this->getToolkit($toolkit_id);
     }
     return FALSE;
   }

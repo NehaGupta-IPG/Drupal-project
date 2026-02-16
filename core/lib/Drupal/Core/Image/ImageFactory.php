@@ -17,24 +17,16 @@ class ImageFactory {
    */
   protected $toolkitId;
 
+
+  /**
+   * Constructs a new ImageFactory object.
+   *
+   * @param \Drupal\Core\ImageToolkit\ImageToolkitManager $toolkitManager
+   *   The image toolkit plugin manager.
+   */
   public function __construct(
     protected readonly ImageToolkitManager $toolkitManager,
   ) {
-  }
-
-  /**
-   * Gets an active image toolkit from the manager.
-   *
-   * @param string|null $id
-   *   The ID of the image toolkit. The default toolkit will be returned if
-   *   NULL.
-   *
-   * @return \Drupal\Core\ImageToolkit\ImageToolkitInterface
-   *   The toolkit.
-   */
-  public function getToolkit(?string $id = NULL): ImageToolkitInterface {
-    $id ??= $this->getToolkitId();
-    return $this->toolkitManager->getToolkit($id);
   }
 
   /**
@@ -93,7 +85,7 @@ class ImageFactory {
       $image_class = $toolkit_definition['imageClass'];
       return new $image_class($this, $toolkit_id, $source);
     }
-    return new Image($this->toolkitManager->getInstance(['id' => $toolkit_id]), $source, $this);
+    return new Image($this->getToolkit($toolkit_id), $source, $this);
   }
 
   /**
@@ -109,9 +101,25 @@ class ImageFactory {
    * @see \Drupal\Core\ImageToolkit\ImageToolkitInterface::getSupportedExtensions()
    */
   public function getSupportedExtensions($toolkit_id = NULL) {
-    $toolkit_id = $toolkit_id ?: $this->getToolkitId();
-    $definition = $this->toolkitManager->getDefinition($toolkit_id);
-    return call_user_func($definition['class'] . '::getSupportedExtensions');
+    return $this->getToolkit($toolkit_id)->getSupportedExtensions();
+  }
+
+  /**
+   * Gets an image toolkit from the manager.
+   *
+   * It would be the singleton of stateless toolkit, or a new instance od the
+   * toolkit for stateful ones. In drupal:43.0.0 only stateless toolkits will
+   * be accepted.
+   *
+   * @param string|null $id
+   *   The ID of the image toolkit. The default toolkit will be returned if
+   *   NULL.
+   *
+   * @return \Drupal\Core\ImageToolkit\ImageToolkitInterface
+   *   The toolkit.
+   */
+  public function getToolkit(?string $toolkit_id = NULL): ImageToolkitInterface {
+    return $this->toolkitManager->getToolkit($toolkit_id ?? $this->getToolkitId());
   }
 
 }
