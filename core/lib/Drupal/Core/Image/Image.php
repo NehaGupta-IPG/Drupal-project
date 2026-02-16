@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Image;
 
+use Drupal\Core\ImageToolkit\ImageToolkitException;
 use Drupal\Core\ImageToolkit\ImageToolkitInterface;
 
 /**
@@ -15,6 +16,30 @@ use Drupal\Core\ImageToolkit\ImageToolkitInterface;
 class Image implements ImageInterface {
 
   /**
+   * Path of the image file.
+   *
+   * @var string
+   */
+  protected $source = '';
+
+  /**
+   * An image toolkit object.
+   *
+   * @var \Drupal\Core\ImageToolkit\ImageToolkitInterface
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
+   */
+  protected $toolkit;
+
+  /**
+   * File size in bytes.
+   */
+  protected int $fileSize;
+
+  /**
    * The image factory.
    *
    * @todo make the prop non-nullable.
@@ -25,26 +50,6 @@ class Image implements ImageInterface {
    * The image toolkit id.
    */
   protected readonly string $toolkitId;
-
-  /**
-   * Path of the image file.
-   */
-  protected string $source = '';
-
-  /**
-   * An image toolkit object.
-   *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
-   *    whack-a-mole instead.
-   *
-   * @see https://www.drupal.org/node/7654123
-   */
-  protected ImageToolkitInterface $toolkit;
-
-  /**
-   * File size in bytes.
-   */
-  protected int $fileSize;
 
   /**
    * BC layer.
@@ -71,23 +76,13 @@ class Image implements ImageInterface {
    * @param \Drupal\Core\Image\ImageFactory|null $imageFactory
    *   The image factory.
    */
-  public function __construct(
-    ImageToolkitInterface $toolkit,
-    $source = NULL,
-    ?ImageFactory $imageFactory = NULL,
-  ) {
-    if (!$imageFactory) {
-      @trigger_error(__METHOD__ . ' not receiving the ImageFactory is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
-    }
-    $this->imageFactory = $imageFactory;
+  public function __construct(ImageToolkitInterface $toolkit, $source = NULL, ?ImageFactory $imageFactory = NULL) {
     // @phpstan-ignore property.deprecated
     $this->toolkit = $toolkit;
-    $this->toolkitId = $toolkit->getPluginId();
     // @phpstan-ignore-next-line
-    if ($this->toolkit->isStateful) {
-      // @phpstan-ignore-next-line
-      $this->toolkit->backfillImage = $this;
-    }
+    $this->toolkit->backfillImage = $this;
+    $this->toolkitId = $toolkit->getPluginId();
+    $this->imageFactory = $imageFactory;
     if ($source) {
       $this->source = $source;
       // @phpstan-ignore-next-line
@@ -120,7 +115,6 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function getWidth() {
-    // @phpstan-ignore method.deprecated
     return $this->getToolkit()->getWidth($this);
   }
 
@@ -162,49 +156,10 @@ class Image implements ImageInterface {
   }
 
   /**
-   * Returns the image toolkit singleton to be used for manipulation.
-   *
-   * @return \Drupal\Core\ImageToolkit\ImageToolkitInterface
-   *   The image toolkit.
-   *
-   * @todo add to the interface.
-   */
-  public function toolkit(): ImageToolkitInterface {
-    return $this->imageFactory->getToolkit($this->toolkitId);
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function getToolkit() {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
-    // @phpstan-ignore isset.initializedProperty
-    if (!isset($this->toolkit)) {
-      $this->toolkit = clone $this->toolkit();
-      $this->toolkit->backfillImage = $this;
-    }
-    return $this->toolkit;
-  }
-
-  /**
-   * Sets the image toolkit used for this image file.
-   *
-   * @param \Drupal\Core\ImageToolkit\ImageToolkitInterface $toolkit
-   *   The image toolkit.
-   *
-   * @return static
-   *   The image.
-   *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
-   *    whack-a-mole instead.
-   *
-   * @see https://www.drupal.org/node/7654123
-   */
-  public function setToolkit(ImageToolkitInterface $toolkit): static {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
-    $this->toolkit = $toolkit;
-    $this->toolkit->backfillImage = $this;
-    return $this;
+    return $this->toolkit ?? $this->imageFactory->getToolkit($this->getToolkitId());
   }
 
   /**
@@ -232,11 +187,37 @@ class Image implements ImageInterface {
   }
 
   /**
+   * BC layer - ensure a toolkit clone is present when needed.
+   *
+   * @var \Drupal\Core\ImageToolkit\ImageToolkitInterface
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
+   */
+  public function ensureToolkit(bool $storeClone = FALSE): void {
+    if (isset($this->toolkit)) {
+      return;
+    }
+    if ($toolkit->isStateful) {
+      throw new ImageToolkitException('$toolkit must be set in the constructor for stateful toolkits');
+    }
+    if (!isset($this->imageFactory)) {
+      throw new ImageToolkitException('ImageFactory service is missing from ' . get_class($this));
+    }
+    $toolkit = $this->imageFactory->getToolkit($this->getToolkitId());
+    if ($storeClone) {
+      $this->toolkit = clone $toolkit;
+      $this->toolkit->backfillImage = $this;
+    }
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function apply($operation, array $arguments = []) {
-    // @phpstan-ignore method.deprecated
-    return $this->getToolkit()->apply($operation, $arguments);
+    return $this->getToolkit()->apply($operation, $arguments, $this);
   }
 
   /**

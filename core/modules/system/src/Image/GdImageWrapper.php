@@ -44,7 +44,7 @@ class GdImageWrapper extends ImageBase {
     $this->imageFactory = $imageFactory;
     if ($source) {
       $this->source = $source;
-      if ($this->toolkit()->parseFile($this)) {
+      if ($this->getToolkit()->parseFile($this)) {
         $this->fileSize = filesize($this->source);
       }
     }
@@ -90,7 +90,7 @@ class GdImageWrapper extends ImageBase {
    */
   public function getGdImageObject(): ?\GdImage {
     if (!$this->gdImage) {
-      $this->toolkit()->load($this);
+      $this->getToolkit()->load($this);
     }
     return $this->gdImage;
   }
@@ -125,34 +125,6 @@ class GdImageWrapper extends ImageBase {
   /**
    * {@inheritdoc}
    */
-  public function isValid() {
-    return $this->toolkit()->isValid($this);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getHeight() {
-    return $this->toolkit()->getHeight($this);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getWidth() {
-    return $this->toolkit()->getWidth($this);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getMimeType() {
-    return $this->toolkit()->getMimeType($this);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function save($destination = NULL) {
     // Return immediately if the image is not valid.
     if (!$this->isValid()) {
@@ -160,7 +132,7 @@ class GdImageWrapper extends ImageBase {
     }
 
     $destination = $destination ?: $this->getSource();
-    if ($return = $this->toolkit()->save($this, $destination)) {
+    if ($return = $this->getToolkit()->save($this, $destination)) {
       // Clear the cached file size and refresh the image information.
       clearstatcache(TRUE, $destination);
       $this->fileSize = filesize($destination);
@@ -171,15 +143,6 @@ class GdImageWrapper extends ImageBase {
       }
     }
     return FALSE;
-  }
-
-  /**
-   * {@inheritdoc}
-   *
-   * @todo move back to base.
-   */
-  public function apply($operation, array $arguments = []) {
-    return $this->toolkit()->apply($operation, $arguments, $this);
   }
 
 }

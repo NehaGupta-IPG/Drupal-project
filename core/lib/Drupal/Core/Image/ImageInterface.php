@@ -62,11 +62,6 @@ interface ImageInterface {
    *
    * @return \Drupal\Core\ImageToolkit\ImageToolkitInterface
    *   The image toolkit.
-   *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
-   *    whack-a-mole instead.
-   *
-   * @see https://www.drupal.org/node/7654123
    */
   public function getToolkit();
 

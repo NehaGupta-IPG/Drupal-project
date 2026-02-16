@@ -225,11 +225,13 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
       assert(is_array($arguments));
     }
     else {
-      // @todo fix.
+      $image = NULL;
     }
     $arguments = $this->prepareArguments($arguments);
     if ($this->needsToolkitInjection) {
-      $this->toolkit->backfillImage = $image;
+      if ($image) {
+        $this->toolkit->backfillImage = $image;
+      }
       $arguments = $this->validateArguments($arguments);
       return $this->execute($arguments);
     }

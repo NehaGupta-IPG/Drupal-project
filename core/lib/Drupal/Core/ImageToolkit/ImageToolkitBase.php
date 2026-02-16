@@ -174,10 +174,6 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
     // @todo BC layer - remove in drupal:43.0.0.
     $args = func_get_args();
     $image = $args[2] ?? NULL;
-    if (!$this->isStateful && !$image instanceof ImageInterface) {
-      // @phpstan-ignore property.deprecated
-      $image = $this->backfillImage;
-    }
 
     try {
       // Get the plugin to use for the operation and apply the operation.

@@ -72,7 +72,7 @@ class CreateNew extends GDImageToolkitOperationBase {
     }
 
     // Assure extension is supported.
-    if (!in_array($arguments['extension'], $image->toolkit()->getSupportedExtensions())) {
+    if (!in_array($arguments['extension'], $image->getToolkit()->getSupportedExtensions())) {
       throw new \InvalidArgumentException("Invalid extension ('{$arguments['extension']}') specified for the image 'create_new' operation");
     }
 
@@ -110,7 +110,7 @@ class CreateNew extends GDImageToolkitOperationBase {
     }
 
     // Get the image type.
-    $type = $image->toolkit()->extensionToImageType($arguments['extension']);
+    $type = $image->getToolkit()->extensionToImageType($arguments['extension']);
 
     // Create the image.
     if (!$gdImage = imagecreatetruecolor($arguments['width'], $arguments['height'])) {
