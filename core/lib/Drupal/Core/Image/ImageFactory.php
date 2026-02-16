@@ -76,13 +76,12 @@ class ImageFactory {
    * @see ImageFactory::setToolkitId()
    */
   public function get($source = NULL, $toolkit_id = NULL) {
-    $toolkit_id = $toolkit_id ?: $this->getToolkitId();
-    $toolkit_definition = $this->toolkitManager->getDefinition($toolkit_id);
-    if (isset($toolkit_definition['imageClass'])) {
-      $image_class = $toolkit_definition['imageClass'];
-      return new $image_class($this, $toolkit_id, $source);
+    $toolkit = $this->getToolkit($toolkit_id);
+    // @todo in drupal:43.0.0, only allow toolkits defining their image class.
+    if ($image_class = $toolkit->getPluginDefinition()['imageClass'] ?? NULL) {
+      return new $image_class($this, $toolkit->getPluginId(), $source);
     }
-    return new Image($this->getToolkit($toolkit_id), $source, $this);
+    return new Image($toolkit, $source, $this);
   }
 
   /**
@@ -104,7 +103,7 @@ class ImageFactory {
   /**
    * Gets an image toolkit from the manager.
    *
-   * It would be the singleton of stateless toolkit, or a new instance od the
+   * It would be the singleton of stateless toolkit, or a new instance of the
    * toolkit for stateful ones. In drupal:43.0.0 only stateless toolkits will
    * be accepted.
    *

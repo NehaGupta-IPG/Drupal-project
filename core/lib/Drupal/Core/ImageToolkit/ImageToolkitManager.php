@@ -19,12 +19,25 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 class ImageToolkitManager extends DefaultPluginManager {
 
   /**
-   * The map of active toolkit singleton instances.
+   * The map of active toolkit singleton instances, keyed by plugin ID.
    *
    * @var array<string, ImageToolkitInterface>
    */
   protected array $activeToolkits = [];
 
+  /**
+   * Constructs the ImageToolkitManager object.
+   *
+   * @param \Traversable $namespaces
+   *   An object that implements \Traversable which contains the root paths
+   *   keyed by the corresponding namespace to look for plugin implementations.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   *   Cache backend instance to use.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   *   The config factory.
+   */
   public function __construct(
     \Traversable $namespaces,
     CacheBackendInterface $cache_backend,
@@ -39,11 +52,16 @@ class ImageToolkitManager extends DefaultPluginManager {
       ImageToolkit::class,
       'Drupal\Core\ImageToolkit\Annotation\ImageToolkit',
     );
+
     $this->setCacheBackend($cache_backend, 'image_toolkit_plugins');
   }
 
   /**
    * Returns an image toolkit active instance.
+   *
+   * It would be the singleton of stateless toolkit, or a new instance of the
+   * toolkit for stateful ones. In drupal:43.0.0 only stateless toolkits will
+   * be accepted.
    *
    * @param string $id
    *   The ID of the image toolkit.
@@ -103,6 +121,7 @@ class ImageToolkitManager extends DefaultPluginManager {
   public function getAvailableToolkits() {
     // Use plugin system to get list of available toolkits.
     $toolkits = $this->getDefinitions();
+
     $output = [];
     foreach ($toolkits as $id => $definition) {
       // Only allow modules that aren't marked as unavailable.
