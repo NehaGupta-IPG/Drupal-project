@@ -77,7 +77,9 @@ class ContentTranslationTestHooks {
   }
 
   /**
-   * Form submission handler for custom field added based on a request parameter.
+   * A Form submission handler.
+   *
+   * For a custom field added based on a request parameter.
    *
    * @see content_translation_test_form_node_article_form_alter()
    */
@@ -87,9 +89,12 @@ class ContentTranslationTestHooks {
 
   /**
    * Implements hook_entity_translation_access().
+   *
+   * @return \Drupal\Core\Access\AccessResultInterface
+   *   The access result.
    */
   #[Hook('entity_translation_access')]
-  function entityTranslationAccess(EntityInterface $entity, $operation, AccountInterface $account) {
+  public function entityTranslationAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     $access = \Drupal::state()->get('content_translation_test.entity_translation_access.override.' . $entity->getEntityTypeId());
     if (isset($access[$operation]) && $access[$operation] === TRUE) {
       return AccessResult::allowed();

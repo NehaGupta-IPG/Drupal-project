@@ -174,7 +174,7 @@ class ContentTranslationOperationsTest extends NodeTestBase {
   /**
    * Test the access of "hook_entity_translation_access()" hook.
    */
-  public function testContentTranslationAccessHookTest() {
+  public function testContentTranslationAccessHookTest(): void {
     $node = $this->drupalCreateNode(['type' => 'article', 'langcode' => 'en']);
     // baseUser1 doesn't have any specific permission and we override all the
     // permissions via entity_translation_access hook to ensure that they
