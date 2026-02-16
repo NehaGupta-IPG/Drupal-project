@@ -55,7 +55,7 @@ abstract class WebDriverTestBase extends BrowserTestBase {
     if (!is_a($this->minkDefaultDriverClass, DrupalSelenium2Driver::class, TRUE)) {
       throw new \UnexpectedValueException(sprintf("%s has to be an instance of %s", $this->minkDefaultDriverClass, DrupalSelenium2Driver::class));
     }
-    $this->minkDefaultDriverArgs = ['chrome', ['goog:chromeOptions' => ['w3c' => FALSE]], 'http://localhost:4444'];
+    $this->minkDefaultDriverArgs = ['chrome', ['goog:chromeOptions' => ['w3c' => TRUE]], 'http://localhost:4444'];
 
     try {
       return parent::initMink();
@@ -141,17 +141,7 @@ abstract class WebDriverTestBase extends BrowserTestBase {
    */
   protected function getMinkDriverArgs() {
     if ($this->minkDefaultDriverClass === DrupalSelenium2Driver::class) {
-      $json = getenv('MINK_DRIVER_ARGS_WEBDRIVER') ?: parent::getMinkDriverArgs();
-      if (!($json === FALSE || $json === '')) {
-        $args = json_decode($json, TRUE);
-        if (isset($args[0]) && $args[0] === 'chrome' && !isset($args[1]['goog:chromeOptions']['w3c'])) {
-          // @todo https://www.drupal.org/project/drupal/issues/3421202
-          //   Deprecate defaulting behavior and require w3c to be set.
-          $args[1]['goog:chromeOptions']['w3c'] = FALSE;
-        }
-        $json = json_encode($args);
-      }
-      return $json;
+      return getenv('MINK_DRIVER_ARGS_WEBDRIVER') ?: parent::getMinkDriverArgs();
     }
     return parent::getMinkDriverArgs();
   }
