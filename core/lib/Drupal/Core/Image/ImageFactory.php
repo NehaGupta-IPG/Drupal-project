@@ -46,7 +46,7 @@ class ImageFactory {
    *   The toolkit ID.
    */
   public function getToolkitId() {
-    if ($this->toolkitId === NULL) {
+    if (!isset($this->toolkitId)) {
       $this->setToolkitId($this->toolkitManager->getDefaultToolkitId());
     }
     return $this->toolkitId;
