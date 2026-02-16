@@ -53,7 +53,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    * @see https://www.drupal.org/node/7654123
    */
   public ?ImageInterface $backfillImage {
-    get => $this->backfillImage;
+    get => $this->backfillImage ?? NULL;
     set(?ImageInterface $image) {
       if (!$this->isStateful && !$this->isClone) {
         throw new ImageToolkitException('Cannot set $backfillImage in the toolkit singleton');
@@ -204,9 +204,9 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
       $this->logger->warning("The image toolkit '@toolkit' failed processing '@operation' for image '@image'. Reported error: @class - @message", [
         '@toolkit' => $this->getPluginId(),
         '@operation' => $operation,
-        // @todo fix.
+        // @todo remove call to $this->getSource() in drupal:43.0.0.
         // @phpstan-ignore method.deprecated
-        '@image' => $this->getSource(),
+        '@image' => $image ? $image->getSource() : $this->getSource(),
         '@class' => get_class($t),
         '@message' => $t->getMessage(),
       ]);
