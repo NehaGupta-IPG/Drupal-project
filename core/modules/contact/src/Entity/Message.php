@@ -90,7 +90,13 @@ class Message extends ContentEntityBase implements MessageInterface {
    * {@inheritdoc}
    */
   public function getSubject() {
-    return $this->get('subject')->value;
+    $subject = $this->get('subject')->value;
+
+    if (empty($subject)) {
+      return '';
+    }
+
+    return $subject;
   }
 
   /**
@@ -163,6 +169,7 @@ class Message extends ContentEntityBase implements MessageInterface {
     $fields['subject'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Subject'))
       ->setRequired(TRUE)
+      ->setDefaultValue('')
       ->setSetting('max_length', 100)
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
