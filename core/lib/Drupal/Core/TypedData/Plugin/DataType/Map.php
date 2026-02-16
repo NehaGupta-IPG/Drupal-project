@@ -53,11 +53,6 @@ class Map extends TypedData implements \IteratorAggregate, ComplexDataInterface 
   protected $properties = [];
 
   /**
-   * The array of property weak references.
-   */
-  protected $propertyWeakReferences = [];
-
-  /**
    * {@inheritdoc}
    */
   public function getValue() {
@@ -121,20 +116,15 @@ class Map extends TypedData implements \IteratorAggregate, ComplexDataInterface 
    * {@inheritdoc}
    */
   public function get($property_name) {
-    if (isset($this->properties[$property_name])) {
-      return $this->properties[$property_name];
+    if (!isset($this->properties[$property_name])) {
+      $value = NULL;
+      if (isset($this->values[$property_name])) {
+        $value = $this->values[$property_name];
+      }
+      // If the property is unknown, this will throw an exception.
+      $this->properties[$property_name] = $this->getTypedDataManager()->getPropertyInstance($this, $property_name, $value);
     }
-    $value = NULL;
-    if (isset($this->propertyWeakReferences[$property_name]) && $this->propertyWeakReferences[$property_name]->get() !== NULL) {
-      return $this->propertyWeakReferences[$property_name]->get();
-    }
-    if (isset($this->values[$property_name])) {
-      $value = $this->values[$property_name];
-    }
-    // If the property is unknown, this will throw an exception.
-    $return = $this->getTypedDataManager()->getPropertyInstance($this, $property_name, $value);
-    $this->propertyWeakReferences[$property_name] = \WeakReference::create($return);
-    return $return;
+    return $this->properties[$property_name];
   }
 
   /**
@@ -167,7 +157,6 @@ class Map extends TypedData implements \IteratorAggregate, ComplexDataInterface 
       // Just set the plain value, which allows adding a new entry to the map.
       $this->values[$property_name] = $value;
     }
-    unset($this->propertyWeakReferences[$property_name]);
   }
 
   /**
@@ -208,7 +197,7 @@ class Map extends TypedData implements \IteratorAggregate, ComplexDataInterface 
    * {@inheritdoc}
    */
   public function isEmpty() {
-    foreach ($this->getProperties() as $property) {
+    foreach ($this->properties as $property) {
       $definition = $property->getDataDefinition();
       if (!$definition->isComputed() && $property->getValue() !== NULL) {
         return FALSE;
@@ -228,7 +217,6 @@ class Map extends TypedData implements \IteratorAggregate, ComplexDataInterface 
    * Magic method: Implements a deep clone.
    */
   public function __clone() {
-    $this->propertyWeakReferences = [];
     foreach ($this->properties as $name => $property) {
       $this->properties[$name] = clone $property;
       $this->properties[$name]->setContext($name, $this);
