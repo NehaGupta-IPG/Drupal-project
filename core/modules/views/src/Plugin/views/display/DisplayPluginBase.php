@@ -2671,7 +2671,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   public function viewExposedFormBlocks() {
     // Avoid interfering with the admin forms.
     $route_name = \Drupal::routeMatch()->getRouteName();
-    if (str_starts_with($route_name, 'views_ui.')) {
+    if ($route_name !== NULL && str_starts_with($route_name, 'views_ui.')) {
       return;
     }
     $this->view->initHandlers();
