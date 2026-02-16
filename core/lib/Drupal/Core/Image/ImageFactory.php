@@ -11,12 +11,9 @@ use Drupal\Core\ImageToolkit\ImageToolkitManager;
 class ImageFactory {
 
   /**
-   * The image toolkit ID to use for this factory.
-   *
-   * @var string
+   * The default image toolkit ID.
    */
-  protected $toolkitId;
-
+  protected string $toolkitId;
 
   /**
    * Constructs a new ImageFactory object.
@@ -30,10 +27,10 @@ class ImageFactory {
   }
 
   /**
-   * Sets the ID of the default image toolkit to use.
+   * Sets the ID of the default image toolkit.
    *
    * @param string $toolkit_id
-   *   The ID of the image toolkit to use for this image factory.
+   *   The toolkit ID.
    *
    * @return $this
    */
@@ -43,14 +40,14 @@ class ImageFactory {
   }
 
   /**
-   * Gets the ID of the image toolkit currently in use.
+   * Gets the default image toolkit ID.
    *
    * @return string
-   *   The ID of the image toolkit in use by the image factory.
+   *   The toolkit ID.
    */
   public function getToolkitId() {
     if ($this->toolkitId === NULL) {
-      $this->toolkitId = $this->toolkitManager->getDefaultToolkitId();
+      $this->setToolkitId($this->toolkitManager->getDefaultToolkitId());
     }
     return $this->toolkitId;
   }
@@ -111,7 +108,7 @@ class ImageFactory {
    * toolkit for stateful ones. In drupal:43.0.0 only stateless toolkits will
    * be accepted.
    *
-   * @param string|null $id
+   * @param string|null $toolkit_id
    *   The ID of the image toolkit. The default toolkit will be returned if
    *   NULL.
    *
