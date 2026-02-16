@@ -9,9 +9,12 @@ services:
     parent: default_plugin_manager
     arguments:
       $entityTypeManager: '@entity_type.manager'
+  editor.xss_filter:
+    class: Drupal\editor\EditorXssFilter\Standard
+  Drupal\editor\EditorXssFilterInterface: '@editor.xss_filter'
   element.editor:
     class: Drupal\editor\Element
-    arguments: ['@plugin.manager.editor']
+    arguments: ['@plugin.manager.editor', '@editor.xss_filter']
   Drupal\editor\Element: '@element.editor'
   editor.config_translation_mapper_subscriber:
     class: Drupal\editor\EventSubscriber\EditorConfigTranslationSubscriber

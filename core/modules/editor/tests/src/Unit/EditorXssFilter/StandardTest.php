@@ -729,7 +729,8 @@ xss:ex/*XSS*//*/*/pression(alert("XSS"))\'>',
    */
   #[DataProvider('providerTestFilterXss')]
   public function testFilterXss($input, $expected_output): void {
-    $output = Standard::filterXss($input, $this->format);
+    $filter = new Standard();
+    $output = $filter->filterXss($input, $this->format);
     $this->assertSame($expected_output, $output);
   }
 

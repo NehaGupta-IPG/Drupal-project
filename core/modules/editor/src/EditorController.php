@@ -14,6 +14,23 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class EditorController extends ControllerBase {
 
   /**
+   * The editor element service.
+   *
+   * @var \Drupal\editor\Element
+   */
+  protected $editorElement;
+
+  /**
+   * Constructs an EditorController object.
+   *
+   * @param \Drupal\editor\Element $editor_element
+   *   The editor element service.
+   */
+  public function __construct(Element $editor_element) {
+    $this->editorElement = $editor_element;
+  }
+
+  /**
    * Apply the necessary XSS filtering for using a certain text format's editor.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
@@ -44,7 +61,7 @@ class EditorController extends ControllerBase {
         ->load($original_format_id);
     }
 
-    return new JsonResponse(editor_filter_xss($value, $filter_format, $original_format));
+    return new JsonResponse($this->editorElement->filterXss($value, $filter_format, $original_format));
   }
 
 }
