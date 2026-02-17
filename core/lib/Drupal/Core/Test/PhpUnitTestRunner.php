@@ -241,7 +241,7 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     global $base_url;
 
     $process_environment_variables = [
-      'DRUPAL_TEST_RUN_ID' => $test_run_id,
+      'DRUPAL_TEST_RUN_ID' => $test_run->id(),
     ];
 
     // Setup an environment variable containing the database connection if
