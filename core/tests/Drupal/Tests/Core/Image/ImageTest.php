@@ -198,7 +198,7 @@ class ImageTest extends UnitTestCase {
         ->willReturn($this->image);
 
       // @phpstan-ignore method.deprecated
-      $this->image->ensureToolkit();
+      $this->image->ensureToolkitClone();
     }
 
     return $this->image;

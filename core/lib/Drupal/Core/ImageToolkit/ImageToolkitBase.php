@@ -176,13 +176,14 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
     $image = $args[2] ?? NULL;
 
     try {
+      $operation = $this->getToolkitOperation($operation);
       // Get the plugin to use for the operation and apply the operation.
-      // @todo remove the isStateful case in drupal:43.0.0.
-      if ($this->isStateful) {
-        return $this->getToolkitOperation($operation)->apply($arguments);
+      // @todo remove the needsToolkitInjection case in drupal:43.0.0.
+      if ($operation->needsToolkitInjection) {
+        return $operation->apply($arguments);
       }
       else {
-        return $this->getToolkitOperation($operation)->apply($image, $arguments);
+        return $operation->apply($image, $arguments);
       }
     }
     catch (PluginNotFoundException) {

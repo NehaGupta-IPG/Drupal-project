@@ -194,7 +194,7 @@ class Image implements ImageInterface {
    *
    * @see https://www.drupal.org/node/7654123
    */
-  public function ensureToolkit(bool $storeClone = FALSE): void {
+  public function ensureToolkitClone(): void {
     if (isset($this->toolkit)) {
       return;
     }
@@ -205,10 +205,8 @@ class Image implements ImageInterface {
     if ($toolkit->isStateful) {
       throw new ImageToolkitException('$toolkit must be set in the constructor for stateful toolkits');
     }
-    if ($storeClone) {
-      $this->toolkit = clone $toolkit;
-      $this->toolkit->backfillImage = $this;
-    }
+    $this->toolkit = clone $toolkit;
+    $this->toolkit->backfillImage = $this;
   }
 
   /**

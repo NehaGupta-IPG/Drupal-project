@@ -74,6 +74,26 @@ class GDToolkit extends ImageToolkitBase {
     }
   }
 
+  /**
+   * Image information from a file, available prior to loading the GD object.
+   *
+   * This contains a copy of the array returned by executing getimagesize()
+   * on the image file when the image object is instantiated. It gets reset
+   * to NULL as soon as the GD object is loaded.
+   *
+   * @var array|null
+   *
+   * @see \Drupal\system\Plugin\ImageToolkit\GDToolkit::parseFile()
+   * @see \Drupal\system\Plugin\ImageToolkit\GDToolkit::setImage()
+   * @see http://php.net/manual/function.getimagesize.php
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
+   */
+  protected $preLoadInfo = NULL;
+
   // phpcs:disable
   /**
    * {@inheritdoc}
