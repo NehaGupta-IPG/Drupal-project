@@ -8,12 +8,14 @@ use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\TypedData\ComplexDataDefinitionInterface;
 use Drupal\link\Plugin\Field\FieldType\LinkItem;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestWith;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests LinkItem::getCacheTags().
@@ -32,7 +34,7 @@ class LinkItemGetCacheTagsTest extends UnitTestCase {
   #[TestWith(['https://example.com'])]
   #[TestWith(['this is a malformed uri'])]
   public function testNonEntityUris(string $uri): void {
-    $link_item = $this->createPartialMock(LinkItem::class, []);
+    $link_item = new LinkItem($this->getMockDefinition());
     $link_item->uri = $uri;
     $this->assertSame([], $link_item->getCacheTags());
   }
@@ -51,7 +53,7 @@ class LinkItemGetCacheTagsTest extends UnitTestCase {
     $container->set('entity_type.manager', $manager);
     \Drupal::setContainer($container);
 
-    $link_item = $this->createPartialMock(LinkItem::class, []);
+    $link_item = new LinkItem($this->getMockDefinition());
     $link_item->uri = "entity:$entity_type_name/1";
     $this->assertSame([], $link_item->getCacheTags());
   }
@@ -79,9 +81,23 @@ class LinkItemGetCacheTagsTest extends UnitTestCase {
     $container->set('entity_type.manager', $manager);
     \Drupal::setContainer($container);
 
-    $link_item = $this->createPartialMock(LinkItem::class, []);
+    $link_item = new LinkItem($this->getMockDefinition());
     $link_item->uri = 'entity:node/1';
     $this->assertSame($tags, $link_item->getCacheTags());
+  }
+
+  /**
+   * Builds a mock data definition object.
+   *
+   * @return \Drupal\Core\TypedData\ComplexDataDefinitionInterface&\PHPUnit\Framework\MockObject\MockObject
+   *   The data definition.
+   */
+  protected function getMockDefinition(): ComplexDataDefinitionInterface&MockObject {
+    $definition = $this->createMock(ComplexDataDefinitionInterface::class);
+    $definition->expects($this->once())
+      ->method('getPropertyDefinitions')
+      ->willReturn([]);
+    return $definition;
   }
 
 }
