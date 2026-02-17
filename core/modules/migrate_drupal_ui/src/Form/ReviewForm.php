@@ -4,6 +4,7 @@ namespace Drupal\migrate_drupal_ui\Form;
 
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Batch\BatchBuilder;
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\ModuleExtensionList;
@@ -72,6 +73,10 @@ class ReviewForm extends MigrateUpgradeFormBase {
    *   The module extension list.
    * @param \Drupal\Component\Datetime\TimeInterface $time
    *   The time service.
+   * @param \Drupal\Core\Batch\BatchProcessorInterface|null $batchProcessor
+   *   Batch processor.
+   *
+   * @see https://www.drupal.org/node/3229844
    */
   public function __construct(
     StateInterface $state,
@@ -81,9 +86,14 @@ class ReviewForm extends MigrateUpgradeFormBase {
     ConfigFactoryInterface $config_factory,
     protected ModuleExtensionList $moduleExtensionList,
     protected TimeInterface $time,
+    protected /*readonly*/ ?BatchProcessorInterface $batchProcessor = NULL,
   ) {
     parent::__construct($config_factory, $migration_plugin_manager, $state, $tempstore_private);
     $this->migrationState = $migrationState;
+    if ($this->batchProcessor === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $batchProcessor argument is deprecated in drupal:11.4.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+      $this->batchProcessor = \Drupal::service(BatchProcessorInterface::class);
+    }
   }
 
   /**
@@ -98,6 +108,7 @@ class ReviewForm extends MigrateUpgradeFormBase {
       $container->get('config.factory'),
       $container->get('extension.list.module'),
       $container->get('datetime.time'),
+      $container->get(BatchProcessorInterface::class),
     );
   }
 
@@ -250,7 +261,7 @@ class ReviewForm extends MigrateUpgradeFormBase {
         'run',
       ], [array_keys($this->migrations), $config])
       ->setFinishCallback([MigrateUpgradeImportBatch::class, 'finished']);
-    batch_set($batch_builder->toArray());
+    $this->batchProcessor->queue($batch_builder->toArray());
     $form_state->setRedirect('<front>');
     $this->store->set('step', 'overview');
     $this->state->set('migrate_drupal_ui.performed', $this->time->getRequestTime());

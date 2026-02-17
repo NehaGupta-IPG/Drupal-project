@@ -6,12 +6,20 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * Defines the storage handler class for batches.
  */
 class BatchStorage implements BatchStorageInterface {
+
+  /**
+   * The session.
+   *
+   * Is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0.
+   */
+  protected SessionInterface $session;
 
   /**
    * The table name.
@@ -23,7 +31,7 @@ class BatchStorage implements BatchStorageInterface {
    *
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection.
-   * @param \Symfony\Component\HttpFoundation\Session\SessionInterface $session
+   * @param \Symfony\Component\HttpFoundation\RequestStack|\Symfony\Component\HttpFoundation\Session\SessionInterface $requestStack
    *   The session.
    * @param \Drupal\Core\Access\CsrfTokenGenerator $csrfToken
    *   The CSRF token generator.
@@ -32,10 +40,34 @@ class BatchStorage implements BatchStorageInterface {
    */
   public function __construct(
     protected Connection $connection,
-    protected SessionInterface $session,
+    protected RequestStack|SessionInterface $requestStack,
     protected CsrfTokenGenerator $csrfToken,
     protected TimeInterface $time,
   ) {
+    if ($this->requestStack instanceof RequestStack) {
+      $this->session = $this->requestStack->getSession();
+    }
+    else {
+      $this->session = $this->requestStack;
+      $this->requestStack = \Drupal::requestStack();
+      @trigger_error('Calling ' . __METHOD__ . '() without the $requestStack argument is deprecated in drupal:11.4.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() with the $session argument is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use $requestStack instead. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+    }
+  }
+
+  /**
+   * Starts the session if it is not already started.
+   */
+  protected function startSession(): void {
+    if ($this->requestStack instanceof RequestStack) {
+      $session = $this->requestStack->getSession();
+      if ($session->isStarted() === FALSE) {
+        $session->start();
+      }
+    }
+    else {
+      $this->session->start();
+    }
   }
 
   /**
@@ -43,7 +75,7 @@ class BatchStorage implements BatchStorageInterface {
    */
   public function load($id) {
     // Ensure that a session is started before using the CSRF token generator.
-    $this->session->start();
+    $this->startSession();
     try {
       $batch = $this->connection->select('batch', 'b')
         ->fields('b', ['batch'])
@@ -112,7 +144,7 @@ class BatchStorage implements BatchStorageInterface {
   public function create(array $batch) {
     // Ensure that a session is started before using the CSRF token generator,
     // and update the database record.
-    $this->session->start();
+    $this->startSession();
     $this->connection->update('batch')
       ->fields([
         'token' => $this->csrfToken->get($batch['id']),

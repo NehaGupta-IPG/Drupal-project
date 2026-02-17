@@ -13,11 +13,11 @@
 /**
  * Perform a single batch operation.
  *
- * Callback for batch_set().
+ * Callback for \Drupal\Core\Batch\BatchProcessorInterface::queue().
  *
  * @param array $multiple_params
  *   Additional parameters specific to the batch. These are specified in the
- *   array passed to batch_set().
+ *   array passed to \Drupal\Core\Batch\BatchProcessorInterface::queue().
  * @param array|\ArrayAccess $context
  *   The batch context array, passed by reference. This contains the following
  *   properties:
@@ -97,7 +97,7 @@ function callback_batch_operation($multiple_params, &$context) {
 /**
  * Complete a batch process.
  *
- * Callback for batch_set().
+ * Callback for \Drupal\Core\Batch\BatchProcessorInterface::queue().
  *
  * This callback may be specified in a batch to perform clean-up operations, or
  * to analyze the results of the batch operations.
@@ -324,15 +324,16 @@ function hook_form_BASE_FORM_ID_alter(&$form, \Drupal\Core\Form\FormStateInterfa
 /**
  * Alter batch information before a batch is processed.
  *
- * Called by batch_process() to allow modules to alter a batch before it is
- * processed.
+ * Called by \Drupal\Core\Batch\BatchProcessorInterface::process() to allow
+ * modules to alter a batch before it is processed.
  *
  * @param array $batch
- *   The associative array of batch information. See batch_set() for details on
+ *   The associative array of batch information. See
+ *   \Drupal\Core\Batch\BatchProcessorInterface::queue() for details on
  *   what this could contain.
  *
- * @see batch_set()
- * @see batch_process()
+ * @see \Drupal\Core\Batch\BatchProcessorInterface::queue()
+ * @see \Drupal\Core\Batch\BatchProcessorInterface::process()
  *
  * @ingroup batch
  */

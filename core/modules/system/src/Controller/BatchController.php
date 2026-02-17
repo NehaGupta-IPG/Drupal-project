@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Controller;
 
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Batch\BatchStorageInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -19,12 +20,26 @@ class BatchController implements ContainerInjectionInterface {
 
   /**
    * Constructs a new BatchController.
+   *
+   * @param string $root
+   *   The app root.
+   * @param \Drupal\Core\Batch\BatchStorageInterface $batchStorage
+   *   Batch storage.
+   * @param \Drupal\Core\Batch\BatchProcessorInterface|null $batchProcessor
+   *   Batch processor.
+   *
+   * @see https://www.drupal.org/node/3229844
    */
   public function __construct(
     protected string $root,
     protected BatchStorageInterface $batchStorage,
+    protected /*readonly*/ ?BatchProcessorInterface $batchProcessor = NULL,
   ) {
     require_once $this->root . '/core/includes/batch.inc';
+    if ($this->batchProcessor === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $batchProcessor argument is deprecated in drupal:11.4.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+      $this->batchProcessor = \Drupal::service(BatchProcessorInterface::class);
+    }
   }
 
   /**
@@ -34,6 +49,7 @@ class BatchController implements ContainerInjectionInterface {
     return new static(
       $container->getParameter('app.root'),
       $container->get('batch.storage'),
+      $container->get(BatchProcessorInterface::class),
     );
   }
 
@@ -85,7 +101,7 @@ class BatchController implements ContainerInjectionInterface {
    *   The page title.
    */
   public function batchPageTitle(Request $request) {
-    $batch = &batch_get();
+    $batch = &$this->batchProcessor->getCurrentBatch();
 
     if (!($request_id = $request->query->get('id'))) {
       return '';
@@ -100,7 +116,7 @@ class BatchController implements ContainerInjectionInterface {
       return '';
     }
 
-    $current_set = _batch_current_set();
+    $current_set = $this->batchProcessor->getCurrentSet();
     return !empty($current_set['title']) ? $current_set['title'] : '';
   }
 

@@ -526,7 +526,7 @@ services:
   Drupal\Core\Form\FormValidatorInterface: '@form_validator'
   form_submitter:
     class: Drupal\Core\Form\FormSubmitter
-    arguments: ['@request_stack', '@url_generator', '@redirect_response_subscriber', '@callable_resolver']
+    arguments: ['@request_stack', '@url_generator', '@redirect_response_subscriber', '@callable_resolver', '@batch.processor']
   Drupal\Core\Form\FormSubmitterInterface: '@form_submitter'
   form_error_handler:
     class: Drupal\Core\Form\FormErrorHandler
@@ -1594,9 +1594,24 @@ services:
     class: Drupal\Core\Utility\Token
     arguments: ['@module_handler', '@cache.default', '@language_manager', '@cache_tags.invalidator', '@renderer']
   Drupal\Core\Utility\Token: '@token'
+  batch.processor:
+    class: Drupal\Core\Batch\BatchProcessor
+    arguments:
+      - '%app.root%'
+      - '@date.formatter'
+      - '@request_stack'
+      - '@module_handler'
+      - '@theme.manager'
+      - '@current_route_match'
+      - '@>database'
+      - '@>batch.storage'
+      - '@>path.validator'
+      - '@>form_submitter'
+      - '@>callable_resolver'
+  Drupal\Core\Batch\BatchProcessorInterface: '@batch.processor'
   batch.storage:
     class: Drupal\Core\Batch\BatchStorage
-    arguments: ['@database', '@session', '@csrf_token', '@datetime.time']
+    arguments: ['@database', '@request_stack', '@csrf_token', '@datetime.time']
     tags:
       - { name: backend_overridable }
     lazy: true

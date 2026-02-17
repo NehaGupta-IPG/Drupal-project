@@ -5,6 +5,7 @@ namespace Drupal\system\Form;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Batch\BatchBuilder;
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -40,9 +41,20 @@ class PrepareModulesEntityUninstallForm extends ConfirmFormBase {
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
+   * @param \Drupal\Core\Batch\BatchProcessorInterface|null $batchProcessor
+   *   Batch processor.
+   *
+   * @see https://www.drupal.org/node/3229844
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(
+    EntityTypeManagerInterface $entity_type_manager,
+    protected /*readonly*/ ?BatchProcessorInterface $batchProcessor = NULL,
+  ) {
     $this->entityTypeManager = $entity_type_manager;
+    if ($this->batchProcessor === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $batchProcessor argument is deprecated in drupal:11.4.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+      $this->batchProcessor = \Drupal::service(BatchProcessorInterface::class);
+    }
   }
 
   /**
@@ -50,7 +62,8 @@ class PrepareModulesEntityUninstallForm extends ConfirmFormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get(BatchProcessorInterface::class),
     );
   }
 
@@ -221,7 +234,7 @@ class PrepareModulesEntityUninstallForm extends ConfirmFormBase {
       ->setProgressMessage('')
       ->setFinishCallback([__CLASS__, 'moduleBatchFinished'])
       ->addOperation([__CLASS__, 'deleteContentEntities'], [$entity_type_id]);
-    batch_set($batch_builder->toArray());
+    $this->batchProcessor->queue($batch_builder->toArray());
   }
 
   /**

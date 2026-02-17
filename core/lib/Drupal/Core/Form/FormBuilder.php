@@ -245,6 +245,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
 
   /**
    * {@inheritdoc}
+   *
+   * @see \Drupal\Core\Batch\BatchProcessorInterface::finishedProcessing()
    */
   public function buildForm($form_arg, FormStateInterface &$form_state) {
     // Ensure the form ID is prepared.
@@ -272,7 +274,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
 
     if ($request->getSession()->has('batch_form_state')) {
       // We've been redirected here after a batch processing. The form has
-      // already been processed, but needs to be rebuilt. See _batch_finished().
+      // already been processed, but needs to be rebuilt.
+      // See \Drupal\Core\Batch\BatchProcessorInterface::finishedProcessing().
       $session = $request->getSession();
       $form_state = $session->get('batch_form_state');
       $session->remove('batch_form_state');

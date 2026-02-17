@@ -3,6 +3,7 @@
 namespace Drupal\config\Form;
 
 use Drupal\Core\Batch\BatchBuilder;
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\Config\ConfigImporterException;
 use Drupal\Core\Config\ConfigImporterFactory;
 use Drupal\Core\Config\Importer\ConfigImporterBatch;
@@ -37,6 +38,8 @@ class ConfigSync extends FormBase {
    *   The import transformer service.
    * @param \Drupal\Core\Config\ConfigImporterFactory $configImporterFactory
    *   The config importer factory.
+   * @param \Drupal\Core\Batch\BatchProcessorInterface|null $batchProcessor
+   *   Batch processor.
    */
   public function __construct(
     protected StorageInterface $syncStorage,
@@ -45,7 +48,12 @@ class ConfigSync extends FormBase {
     protected RendererInterface $renderer,
     protected ImportStorageTransformer $importTransformer,
     protected ConfigImporterFactory $configImporterFactory,
+    protected /*readonly*/ ?BatchProcessorInterface $batchProcessor = NULL,
   ) {
+    if ($this->batchProcessor === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $batchProcessor argument is deprecated in drupal:11.4.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/3229844', E_USER_DEPRECATED);
+      $this->batchProcessor = \Drupal::service(BatchProcessorInterface::class);
+    }
   }
 
   /**
@@ -59,6 +67,7 @@ class ConfigSync extends FormBase {
       $container->get('renderer'),
       $container->get('config.import_transformer'),
       $container->get(ConfigImporterFactory::class),
+      $container->get(BatchProcessorInterface::class),
     );
   }
 
@@ -241,7 +250,7 @@ class ConfigSync extends FormBase {
           $batch_builder->addOperation([ConfigImporterBatch::class, 'process'], [$config_importer, $sync_step]);
         }
 
-        batch_set($batch_builder->toArray());
+        $this->batchProcessor->queue($batch_builder->toArray());
       }
       catch (ConfigImporterException) {
         // There are validation errors.

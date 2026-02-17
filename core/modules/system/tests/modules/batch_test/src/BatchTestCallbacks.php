@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\batch_test;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -135,13 +136,15 @@ class BatchTestCallbacks {
   public function nestedBatchCallback(array $batches = []): void {
     $batch_test_definitions = new BatchTestDefinitions();
     $batch_test_helper = new BatchTestHelper();
+    /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+    $batch_processor = \Drupal::service(BatchProcessorInterface::class);
     foreach ($batches as $batch) {
       $batch_test_helper->stack("setting up batch $batch");
       $function = 'batch' . $batch;
-      batch_set($batch_test_definitions->$function());
+      $batch_processor->queue($batch_test_definitions->$function());
     }
     \Drupal::state()
-      ->set('batch_test_nested_order_multiple_batches', batch_get());
+      ->set('batch_test_nested_order_multiple_batches', $batch_processor->getCurrentBatch());
   }
 
   /**

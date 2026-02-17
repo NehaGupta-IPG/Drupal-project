@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Form;
 
+use Drupal\Core\Batch\BatchProcessorInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\EventSubscriber\RedirectResponseSubscriber;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\FormSubmitter;
+use Drupal\Core\Form\FormSubmitterInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\CallableResolver;
@@ -57,6 +59,13 @@ class FormSubmitterTest extends UnitTestCase {
   protected CallableResolver | Stub $callableResolver;
 
   /**
+   * The mocked batch processor.
+   *
+   * @var \Drupal\Core\Batch\BatchProcessorInterface|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected BatchProcessorInterface|MockObject $batchProcessor;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -65,6 +74,7 @@ class FormSubmitterTest extends UnitTestCase {
     $this->unroutedUrlAssembler = $this->createMock(UnroutedUrlAssemblerInterface::class);
     $this->redirectResponseSubscriber = $this->createMock(RedirectResponseSubscriber::class);
     $this->callableResolver = $this->createStub(CallableResolver::class);
+    $this->batchProcessor = $this->createMock(BatchProcessorInterface::class);
   }
 
   /**
@@ -161,7 +171,7 @@ class FormSubmitterTest extends UnitTestCase {
    * @legacy-covers ::redirectForm
    */
   #[DataProvider('providerTestRedirectWithUrl')]
-  public function testRedirectWithUrl(Url $redirect_value, $result, $status = 303): void {
+  public function testRedirectWithUrl(Url $redirect_value, string $result, int $status = 303): void {
     $container = new ContainerBuilder();
     $container->set('url_generator', $this->urlGenerator);
     \Drupal::setContainer($container);
@@ -186,6 +196,7 @@ class FormSubmitterTest extends UnitTestCase {
       ->method('getRedirect')
       ->willReturn($redirect_value);
     $redirect = $form_submitter->redirectForm($form_state);
+    $this->assertNotNull($redirect, 'The redirect object should not be NULL.');
     $this->assertSame($result, $redirect->getTargetUrl());
     $this->assertSame($status, $redirect->getStatusCode());
   }
@@ -286,21 +297,21 @@ class FormSubmitterTest extends UnitTestCase {
   }
 
   /**
+   * Returns a mocked FormSubmitter.
+   *
    * @return \Drupal\Core\Form\FormSubmitterInterface
    *   A mocked instance of FormSubmitter.
    */
-  protected function getFormSubmitter(): FormSubmitter&MockObject {
+  protected function getFormSubmitter(): FormSubmitterInterface {
     $request_stack = new RequestStack();
     $request_stack->push(Request::create('/test-path'));
-    return $this->getMockBuilder(FormSubmitter::class)
-      ->setConstructorArgs([
-        $request_stack,
-        $this->urlGenerator,
-        $this->redirectResponseSubscriber,
-        $this->callableResolver,
-      ])
-      ->onlyMethods(['batchGet'])
-      ->getMock();
+    return new FormSubmitter(
+      $request_stack,
+      $this->urlGenerator,
+      $this->redirectResponseSubscriber,
+      $this->callableResolver,
+      $this->batchProcessor,
+    );
   }
 
 }

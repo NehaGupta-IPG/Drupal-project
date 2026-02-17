@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Kernel;
 
+use Drupal\Core\Batch\BatchProcessorInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -164,14 +165,16 @@ class NodeAccessTest extends NodeAccessTestBase {
    * Tests that multiple calls to node_access_rebuild only result in one batch.
    */
   public function testDuplicateBatchRebuild(): void {
+    /** @var \Drupal\Core\Batch\BatchProcessorInterface $batch_processor */
+    $batch_processor = \Drupal::service(BatchProcessorInterface::class);
     $this->enableModules(['node_access_test']);
-    $batch = batch_get();
+    $batch = $batch_processor->getCurrentBatch();
     $this->assertEmpty($batch);
     node_access_rebuild(TRUE);
-    $batch = batch_get();
+    $batch = $batch_processor->getCurrentBatch();
     $this->assertCount(1, $batch['sets']);
     node_access_rebuild(TRUE);
-    $batch = batch_get();
+    $batch = $batch_processor->getCurrentBatch();
     $this->assertCount(1, $batch['sets']);
   }
 
