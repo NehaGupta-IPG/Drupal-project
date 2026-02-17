@@ -424,6 +424,28 @@ class SystemRequirements implements InstallRequirementsInterface {
       $requirements['php_opcache']['title'] = t('PHP OPcode caching');
     }
 
+    // Warn when PHP runtime assertions are enabled.
+    if ($phase === 'runtime' && PHP_SAPI !== 'cli') {
+      $zend_assertions = ini_get('zend.assertions');
+
+      // ini_get() may return FALSE or an empty string if unset.
+      if ($zend_assertions !== FALSE && $zend_assertions !== '') {
+        $zend_assertions = (int) $zend_assertions;
+
+        // 1 = generate and execute assertion code (dev mode, slow for prod).
+        if ($zend_assertions === 1) {
+          $requirements['php_assertions'] = [
+            'title' => t('PHP runtime assertions'),
+            'value' => t('Enabled (zend.assertions = 1)'),
+            'severity' => RequirementSeverity::Warning,
+            'description' => t('Runtime assertions can negatively impact performance and are not recommended on production sites. Disable them in your PHP configuration to improve performance. Refer to the <a href=":runtime_assertions">runtime assertions documentation</a> for more information.', [
+              ':runtime_assertions' => 'https://api.drupal.org/api/drupal/core%21core.api.php/group/php_assert/11.x',
+            ]),
+          ];
+        }
+      }
+    }
+
     // Check to see if APCu is installed and configured correctly.
     if ($phase == 'runtime' && PHP_SAPI != 'cli') {
       $requirements['php_apcu_enabled']['title'] = t('PHP APCu caching');

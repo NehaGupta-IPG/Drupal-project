@@ -208,6 +208,27 @@ class StatusTest extends BrowserTestBase {
         $this->assertFalse($elements[0]->find('xpath', '../../summary')->hasClass('system-status-report__status-icon--warning'));
       }
     }
+
+    // Confirm PHP runtime assertion warnings behave correctly.
+    $zend_assertions_default = ini_get('zend.assertions');
+
+    try {
+      // Assertions disabled: warning should NOT appear.
+      ini_set('zend.assertions', '0');
+      $this->drupalGet('admin/reports/status');
+      $this->assertSession()->pageTextNotContains('PHP runtime assertions');
+
+      // Assertions enabled: warning SHOULD appear.
+      ini_set('zend.assertions', '1');
+      $this->drupalGet('admin/reports/status');
+      $this->assertSession()->pageTextContains('PHP runtime assertions');
+    }
+    catch (\Exception $e) {
+      // Always restore original value.
+      ini_set('zend.assertions', $zend_assertions_default);
+
+      throw $e;
+    }
   }
 
   /**
