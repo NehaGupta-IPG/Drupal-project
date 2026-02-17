@@ -17,7 +17,7 @@ use Drupal\media\OEmbed\Provider;
  */
 
 /**
- * Alters the information provided in \Drupal\media\Annotation\MediaSource.
+ * Alters the information provided in \Drupal\media\Attribute\MediaSource.
  *
  * @param array $sources
  *   The array of media source plugin definitions, keyed by plugin ID.

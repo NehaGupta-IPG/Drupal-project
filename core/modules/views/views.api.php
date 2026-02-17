@@ -35,10 +35,11 @@ use Drupal\views\ViewExecutable;
  *   by implementing hook_views_data_alter(). To provide views data for an
  *   entity, create a class implementing
  *   \Drupal\views\EntityViewsDataInterface and reference this in the
- *   "views_data" annotation in the entity class. You can autogenerate big parts
- *   of the integration if you extend the \Drupal\views\EntityViewsData base
- *   class. See the @link entity_api Entity API topic @endlink for more
- *   information about entities.
+ *   "views_data" attribute argument in the entity class. You can autogenerate
+ *   big parts of the integration if you extend the
+ *   \Drupal\views\EntityViewsData base class. See the
+ *   @link entity_api Entity API topic @endlink for more information about
+ *   entities.
  * - Implement hooks: A few operations in Views can be influenced by hooks.
  *   See the @link views_hooks Views hooks topic @endlink for a list.
  * - Theming: See the @link views_templates Views templates topic @endlink
@@ -71,7 +72,6 @@ use Drupal\views\ViewExecutable;
  * @see \Drupal\views\Plugin\views\PluginBase
  * @see \Drupal\views\Plugin\views\HandlerBase
  * @see plugin_api
- * @see annotation
  * @}
  */
 
@@ -108,10 +108,10 @@ function hook_views_analyze(ViewExecutable $view): array {
  *
  * To provide views data for an entity, instead of implementing this hook,
  * create a class implementing \Drupal\views\EntityViewsDataInterface and
- * reference this in the "handlers.views_data" annotation in the entity class.
- * The return value of the getViewsData() method on the interface is the same as
- * this hook, and base class in \Drupal\views\EntityViewsData will take care of
- * adding the basic Views tables and fields for your entity. See the
+ * reference this in the "handlers.views_data" attribute argument in the entity
+ * class. The return value of the getViewsData() method on the interface is the
+ * same as this hook, and base class in \Drupal\views\EntityViewsData will take
+ * care of adding the basic Views tables and fields for your entity. See the
  * @link entity_api Entity API topic @endlink for more information about
  * entities.
  *

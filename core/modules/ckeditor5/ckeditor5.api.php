@@ -54,7 +54,7 @@ use Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition;
  *
  * The minimally required metadata: the CKEditor 5 plugins to load, the label
  * and the HTML elements it can generate — here's an example for a module
- * providing a Marquee plugin, both in yml or Annotation form:
+ * providing a Marquee plugin, both in yml or Attribute form:
  *
  * Declared in the yml file:
  * @code

@@ -11,7 +11,7 @@
  */
 
 /**
- * Alter the information provided in \Drupal\image\Annotation\ImageEffect.
+ * Alter the information provided in \Drupal\image\Attribute\ImageEffect.
  *
  * @param array $effects
  *   The array of image effects, keyed on the machine-readable effect name.

@@ -45,16 +45,16 @@ use Drupal\Core\Language\LanguageInterface;
  *   types label, text, and date_format are translatable; string is
  *   non-translatable text. See the @link config_api Config API topic @endlink
  *   for more information.
- * - For annotation, make sure that any text that is displayable in the UI
- *   is wrapped in \@Translation(). See the
+ * - For an attribute argument, make sure that any text that is displayable in
+ *   the UI is defined with "new TranslatableMarkup('my text')", See the
  *   @link plugin_translatable Plugin translatables topic @endlink for more
  *   information.
  * - Content entities are translatable if they have
  *   @code
- *   translatable = TRUE,
+ *   translatable: TRUE,
  *   @endcode
- *   in their annotation. The use of entities to store user-editable content to
- *   be displayed in the site is highly recommended over creating your own
+ *   in the class attributes. The use of entities to store user-editable content
+ *   to be displayed in the site is highly recommended over creating your own
  *   method for storing, retrieving, displaying, and internationalizing content.
  * - For Twig templates, use 't' or 'trans' filters to indicate translatable
  *   text. See https://www.drupal.org/node/2133321 for more information.
