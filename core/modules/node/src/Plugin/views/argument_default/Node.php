@@ -66,7 +66,7 @@ class Node extends ArgumentDefaultPluginBase implements CacheableDependencyInter
    * {@inheritdoc}
    */
   public function getCacheContexts() {
-    return ['url'];
+    return ['route'];
   }
 
 }
