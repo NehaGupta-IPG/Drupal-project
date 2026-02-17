@@ -506,6 +506,7 @@ class HookCollectorPass extends HookCollectorBase implements CompilerPassInterfa
     if (in_array($hook, ['requirements', 'requirements_alter'])) {
       $message = "$function without a #[LegacyRequirementsHook] attribute is deprecated in drupal:11.3.0 and removed in drupal:13.0.0. See https://www.drupal.org/node/3549685";
       @trigger_error($message, E_USER_DEPRECATED);
+      return;
     }
     $this->proceduralImplementations[$hook][] = $module;
   }
