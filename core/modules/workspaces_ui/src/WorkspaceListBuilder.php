@@ -90,6 +90,9 @@ class WorkspaceListBuilder extends EntityListBuilder {
     $workspace_tree = $this->workspaceRepository->loadTree();
     $loaded = $this->storage->loadMultiple($this->getEntityIds());
 
+    // Filter out workspaces that the current user does not have access to view.
+    $loaded = array_filter($loaded, fn($entity) => $entity->access('view'));
+
     // Filter the tree to only include loaded entities, then replaces those tree
     // items with the actual loaded entity objects.
     $entities = array_replace(array_intersect_key($workspace_tree, $loaded), $loaded);
