@@ -45,7 +45,7 @@ class Tar implements ArchiverInterface {
   /**
    * {@inheritdoc}
    */
-  public function add($file_path) {
+  public function add($file_path, $entry_name = NULL) {
     $this->tar->add($file_path);
 
     return $this;
