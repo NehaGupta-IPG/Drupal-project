@@ -29,7 +29,7 @@ class ModerationStateFieldItemList extends FieldItemList {
     // the computed field.
     if ($moderation_state) {
       // An entity can only have a single moderation state.
-      $this->list[0] = $this->createItem(0, $moderation_state);
+      $this->list[0] = $this->createItem(0, $moderation_state)->getValue();
     }
   }
 
