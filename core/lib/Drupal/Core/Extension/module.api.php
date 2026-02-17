@@ -61,38 +61,6 @@ use Drupal\Core\Utility\UpdateException;
  */
 
 /**
- * Defines one or more hooks that are exposed by a module.
- *
- * Only procedural implementations are supported for this hook.
- *
- * Support for this hook will be removed in Drupal 12.0.0.
- * This hook has intentionally not been deprecated since removing
- * implementations will break modules with code in $module.$group.inc files.
- *
- * $module.$group.inc themselves have been deprecated, so modules supporting
- * drupal 12.0.0 will have removed all code from $module.$group.inc files.
- *
- * Once a module requires 12.0.0 as a minimum version of Drupal the module can
- * safely remove hook_hook_info() implementations.
- *
- * @return array<string, array{group: string}>
- *   An associative array whose keys are hook names and whose values are an
- *   associative array containing:
- *   - group: A string defining the group to which the hook belongs. The module
- *     system will determine whether a file with the name $module.$group.inc
- *     exists, and automatically load it when required.
- */
-function hook_hook_info(): array {
-  $hooks['token_info'] = [
-    'group' => 'tokens',
-  ];
-  $hooks['tokens'] = [
-    'group' => 'tokens',
-  ];
-  return $hooks;
-}
-
-/**
  * Alter the registry of modules implementing a hook.
  *
  * This hook will be removed in 12.0.0. It is not deprecated in order to
@@ -853,7 +821,8 @@ function hook_update_N(&$sandbox) {
  * a THEME.post_update.php file.
  *
  * These updates are executed after all hook_update_N() implementations. At this
- * stage Drupal is already fully repaired so you can use any API as you wish.
+ * stage Drupal is already fully bootstrapped so you can use any API as you
+ * wish.
  *
  * NAME can be arbitrary machine names. In contrast to hook_update_N() the
  * alphanumeric naming of functions in the file is the only thing which ensures
@@ -942,8 +911,9 @@ function hook_post_update_NAME(&$sandbox) {
 function hook_removed_post_updates(): array {
   return [
     'my_module_post_update_foo' => '8.x-2.0',
-    'my_module_post_update_bar' => '8.x-3.0',
-    'my_module_post_update_baz' => '8.x-3.0',
+    'my_module_post_update_bar' => '3.0.0',
+    'my_module_post_update_baz' => '4.0.0',
+    'my_module_post_update_qux' => '4.0.0',
   ];
 }
 
