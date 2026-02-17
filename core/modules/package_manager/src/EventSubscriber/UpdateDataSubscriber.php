@@ -29,8 +29,12 @@ final class UpdateDataSubscriber implements EventSubscriberInterface {
    * have been added, removed, or updated.
    */
   public function clearData(): void {
-    $this->updateManager->refreshUpdateData();
+    // Clear anything we have now.
     update_storage_clear();
+    // Create new fetch tasks.
+    $this->updateManager->refreshUpdateData();
+    // Actually fetch the new data.
+    update_fetch_data();
   }
 
   /**

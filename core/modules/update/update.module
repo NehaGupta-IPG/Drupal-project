@@ -245,7 +245,7 @@ function _update_project_status_sort($a, $b) {
  */
 function update_storage_clear(): void {
   \Drupal::keyValueExpirable('update')->deleteAll();
-  \Drupal::keyValueExpirable('update_available_release')->deleteAll();
+  \Drupal::keyValueExpirable('update_available_releases')->deleteAll();
 }
 
 /**
