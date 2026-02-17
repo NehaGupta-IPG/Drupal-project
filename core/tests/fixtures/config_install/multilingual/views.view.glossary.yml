@@ -263,6 +263,7 @@ display:
           path_case: lower
           transform_dash: false
           break_phrase: false
+          not: true
       filters:
         status:
           id: status
@@ -433,6 +434,7 @@ display:
           path_case: lower
           transform_dash: false
           break_phrase: false
+          not: true
       query:
         type: views_query
         options: {  }
