@@ -8,6 +8,7 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Hook\Attribute\LegacyHook;
+use Drupal\Core\Hook\Attribute\LegacyRequirementsHook;
 use Drupal\Core\Hook\ImplementationList;
 use Drupal\Core\Hook\OrderOperation\OrderOperation;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
@@ -282,9 +283,24 @@ class ModuleHandler implements ModuleHandlerInterface {
    * {@inheritdoc}
    */
   public function invokeAllWith(string $hook, callable $callback): void {
-    $list = $this->getHookImplementationList($hook);
-    foreach ($list->iterateByModule() as $module => $listener) {
-      $callback($listener, $module);
+    if ($hook == 'requirements') {
+      // hook_requirements() is special, they typically reside in .install files
+      // and they are not collected in \Drupal\Core\Hook\HookCollectorPass to
+      // avoid edge cases when those files have not yet been loaded. Fall
+      // back to an implementation similar to legacyInvoke(). Callers are
+      // responsible to load the .install files first.
+      foreach ($this->moduleList as $module => $filename) {
+        $function = $module . '_' . $hook;
+        if (function_exists($function) && !(new \ReflectionFunction($function))->getAttributes(LegacyRequirementsHook::class)) {
+          $callback($function, $module);
+        }
+      }
+    }
+    else {
+      $list = $this->getHookImplementationList($hook);
+      foreach ($list->iterateByModule() as $module => $listener) {
+        $callback($listener, $module);
+      }
     }
   }
 
