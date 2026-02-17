@@ -46,6 +46,14 @@ drupal.system:
 
 drupal.system.modules:
   version: VERSION
+  js:
+    js/system.modules.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal
+    - core/drupal.debounce
+    - core/once
+    - core/drupal.announce
   deprecated: The %library_id% asset library is deprecated in Drupal 11.4.0 and will be removed in Drupal 12.0.0. There is no replacement. See https://www.drupal.org/node/3573847
 
 diff:

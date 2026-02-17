@@ -24,9 +24,9 @@ use Drupal\Core\Render\Attribute\RenderElement;
  *   list items, '.js-layout-builder-block-link' for block links, or
  *   '.package-listing table tbody tr' for nested table rows.
  * - #list_text: (optional) The CSS selector, relative to a list item, of
- *   elements containing text to search for. This may produce multiple elements.
- *   Defaults to an empty string, which indicates that the whole of the list
- *   item should be considered searchable text.
+ *   elements containing text to search for. This may produce multiple elements
+ *   for each list item. Defaults to an empty string, which indicates that the
+ *   whole of the list item should be considered searchable text.
  * - #minimum_filter_length: (optional) The minimum length of the typed string
  *   before a filter is triggered. By default, is triggered after 2 chars.
  * - #search_start_of_words: (optional) Whether the entered filter text will
