@@ -1038,4 +1038,55 @@ class MediaTest extends MediaTestBase {
     ];
   }
 
+  /**
+   * Tests early exit when modelElement does not exist during upcast.
+   *
+   * Tests that when a drupal-media element is upcasted but the modelElement
+   * does not exist in the model range, the upcast converter exits early
+   * without attempting to call getMetadata or set attributes.
+   */
+  public function testModelElementEarlyExit(): void {
+    $page = $this->getSession()->getPage();
+    $assert_session = $this->assertSession();
+
+    $original_value = $this->host->body->value;
+
+    // Case 1: Malformed drupal-media element.
+    $this->host->body->value = '<p>Test content</p><drupal-media></drupal-media>';
+    $this->host->save();
+
+    $this->drupalGet($this->host->toUrl('edit-form'));
+    $this->waitForEditor();
+
+    $editable = $page->find('css', '.ck-editor__editable');
+
+    $this->assertNotNull($editable, 'Editor editable area exists.');
+
+    $this->assertSame('true', $editable->getAttribute('contenteditable'));
+
+    // Case 2: Invalid media UUID.
+    $this->host->body->value = '<drupal-media data-entity-type="media" data-entity-uuid="00000000-0000-0000-0000-000000000000"></drupal-media>';
+    $this->host->save();
+
+    $this->getSession()->reload();
+    $this->waitForEditor();
+
+    $editable = $page->find('css', '.ck-editor__editable');
+
+    $this->assertNotNull($editable);
+    $this->assertSame('true', $editable->getAttribute('contenteditable'));
+
+    // Restore original value.
+    $this->host->body->value = $original_value;
+    $this->host->save();
+
+    // Reload the page to get the Original configuration.
+    $this->getSession()->reload();
+    $this->waitForEditor();
+    // Wait for the media preview to load.
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', '.ck-widget.drupal-media img'));
+    $this->click('.ck-widget.drupal-media');
+    $this->assertVisibleBalloon('[aria-label="Drupal Media toolbar"]');
+  }
+
 }
