@@ -45,6 +45,14 @@ class FormTestHooks {
   }
 
   /**
+   * Implements hook_form_FORM_ID_alter() via FormAlter attribute with FQCN.
+   */
+  #[FormAlter(FormTestAlterForm::class)]
+  public function formTestAlterFormFqcnAlter(&$form, FormStateInterface $form_state): void {
+    \Drupal::messenger()->addStatus('form_test FormAlter(FormTestAlterForm::class) executed.');
+  }
+
+  /**
    * Implements hook_form_FORM_ID_alter().
    */
   #[Hook('form_form_test_alter_form_alter', module: 'system')]
@@ -76,14 +84,6 @@ class FormTestHooks {
     $form['tabs3']['#access'] = TRUE;
     $form['fieldset1']['#access'] = FALSE;
     $form['container']['#access'] = FALSE;
-  }
-
-  /**
-   * Implements hook_form_FORM_ID_alter() via FormAlter attribute with FQCN.
-   */
-  #[FormAlter(FormTestAlterForm::class)]
-  public function formTestAlterFormFqcnAlter(&$form, FormStateInterface $form_state): void {
-    \Drupal::messenger()->addStatus('form_test FormAlter(FormTestAlterForm::class) executed.');
   }
 
 }
