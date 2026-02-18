@@ -12,8 +12,8 @@ use Drupal\filter\FilterFormatInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Controller which renders a preview of the provided text.
@@ -84,24 +84,23 @@ class MediaFilterController implements ContainerInjectionInterface {
    *   The request object.
    * @param \Drupal\filter\FilterFormatInterface $filter_format
    *   The text format.
+   * @param string $text
+   *   The text to filter.
+   * @param string $uuid
+   *   The media UUID.
    *
    * @return \Symfony\Component\HttpFoundation\Response
    *   The filtered text.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-   *   Throws an exception if 'text' parameter is not found in the query
-   *   string.
-   *
    * @see \Drupal\editor\EditorController::getUntransformedText
    */
-  public function preview(Request $request, FilterFormatInterface $filter_format) {
+  public function preview(
+    Request $request,
+    FilterFormatInterface $filter_format,
+    #[MapQueryParameter] string $text,
+    #[MapQueryParameter] string $uuid,
+  ) {
     self::checkCsrf($request, \Drupal::currentUser());
-
-    $text = $request->query->get('text');
-    $uuid = $request->query->get('uuid');
-    if ($text == '' || $uuid == '') {
-      throw new NotFoundHttpException();
-    }
 
     $build = [
       '#type' => 'processed_text',
