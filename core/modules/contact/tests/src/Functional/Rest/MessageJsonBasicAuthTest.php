@@ -6,11 +6,15 @@ namespace Drupal\Tests\contact\Functional\Rest;
 
 use Drupal\Tests\rest\Functional\BasicAuthResourceTestTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Message Json Basic Auth.
  */
 #[Group('rest')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class MessageJsonBasicAuthTest extends MessageResourceTestBase {
 
   use BasicAuthResourceTestTrait;

@@ -62,7 +62,14 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
     'type' => ['column' => 'n.type'],
     'language' => ['column' => 'i.langcode'],
     'author' => ['column' => 'n.uid'],
-    'term' => ['column' => 'ti.tid', 'join' => ['table' => 'taxonomy_index', 'alias' => 'ti', 'condition' => 'n.nid = ti.nid']],
+    'term' => [
+      'column' => 'ti.tid',
+      'join' => [
+        'table' => 'taxonomy_index',
+        'alias' => 'ti',
+        'condition' => 'n.nid = ti.nid',
+      ],
+    ],
   ];
 
   /**
@@ -720,7 +727,8 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
    */
   protected function getRankings() {
     if (!$this->rankings) {
-      $this->rankings = $this->moduleHandler->invokeAll('ranking');
+      $this->rankings = $this->moduleHandler->invokeAll('node_search_ranking');
+      $this->rankings += $this->moduleHandler->invokeAllDeprecated('Use hook_node_search_ranking() instead. See https://www.drupal.org/node/2690393.', 'ranking');
     }
     return $this->rankings;
   }

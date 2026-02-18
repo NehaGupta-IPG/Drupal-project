@@ -146,14 +146,28 @@ class ElementTest extends UnitTestCase {
    * @return array
    *   An array of test cases.
    */
-  public static function providerVisibleChildren() {
+  public static function providerVisibleChildren(): array {
     return [
       [['#property1' => '', '#property2' => []], []],
       [['#property1' => '', 'child1' => []], ['child1']],
       [['#property1' => '', 'child1' => [], 'child2' => ['#access' => TRUE]], ['child1', 'child2']],
       [['#property1' => '', 'child1' => [], 'child2' => ['#access' => FALSE]], ['child1']],
-      'access_result_object_allowed' => [['#property1' => '', 'child1' => [], 'child2' => ['#access' => AccessResult::allowed()]], ['child1', 'child2']],
-      'access_result_object_forbidden' => [['#property1' => '', 'child1' => [], 'child2' => ['#access' => AccessResult::forbidden()]], ['child1']],
+      'access_result_object_allowed' => [
+        [
+          '#property1' => '',
+          'child1' => [],
+          'child2' => ['#access' => AccessResult::allowed()],
+        ],
+        ['child1', 'child2'],
+      ],
+      'access_result_object_forbidden' => [
+        [
+          '#property1' => '',
+          'child1' => [],
+          'child2' => ['#access' => AccessResult::forbidden()],
+        ],
+        ['child1'],
+      ],
       [['#property1' => '', 'child1' => [], 'child2' => ['#type' => 'textfield']], ['child1', 'child2']],
       [['#property1' => '', 'child1' => [], 'child2' => ['#type' => 'value']], ['child1']],
       [['#property1' => '', 'child1' => [], 'child2' => ['#type' => 'hidden']], ['child1']],
@@ -172,26 +186,32 @@ class ElementTest extends UnitTestCase {
   /**
    * Data provider for testSetAttributes().
    */
-  public static function providerTestSetAttributes() {
+  public static function providerTestSetAttributes(): array {
     $base = ['#id' => 'id', '#class' => []];
     return [
       [$base, [], $base],
-      [$base, ['id', 'class'], $base + ['#attributes' => ['id' => 'id', 'class' => []]]],
-      [$base + ['#attributes' => ['id' => 'id-not-overwritten']], ['id', 'class'], $base + ['#attributes' => ['id' => 'id-not-overwritten', 'class' => []]]],
+      [
+        $base,
+        ['id', 'class'],
+        $base + ['#attributes' => ['id' => 'id', 'class' => []]],
+      ],
+      [
+        $base + ['#attributes' => ['id' => 'id-not-overwritten']],
+        ['id', 'class'],
+        $base + ['#attributes' => ['id' => 'id-not-overwritten', 'class' => []]],
+      ],
     ];
   }
 
   /**
    * Tests is empty.
-   *
-   * @legacy-covers ::isEmpty
    */
   #[DataProvider('providerTestIsEmpty')]
   public function testIsEmpty(array $element, $expected): void {
     $this->assertSame(Element::isEmpty($element), $expected);
   }
 
-  public static function providerTestIsEmpty() {
+  public static function providerTestIsEmpty(): array {
     return [
       [[], TRUE],
       [['#attached' => []], FALSE],
@@ -231,8 +251,6 @@ class ElementTest extends UnitTestCase {
 
   /**
    * Tests is render array.
-   *
-   * @legacy-covers ::isRenderArray
    */
   #[DataProvider('dataProviderIsRenderArray')]
   public function testIsRenderArray($build, $expected): void {
@@ -242,7 +260,7 @@ class ElementTest extends UnitTestCase {
     );
   }
 
-  public static function dataProviderIsRenderArray() {
+  public static function dataProviderIsRenderArray(): array {
     return [
       'valid markup render array' => [['#markup' => 'hello world'], TRUE],
       'invalid "foo" string' => [['foo', '#markup' => 'hello world'], FALSE],

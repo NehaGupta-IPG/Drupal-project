@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Kernel;
 
-use Drupal\comment\CommentInterface;
+use Drupal\comment\AnonymousContact;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Entity\CommentType;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
@@ -17,13 +17,15 @@ use Drupal\Tests\comment\Traits\CommentCreationTrait;
 use Drupal\Tests\Traits\Core\GeneratePermutationsTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests comment field level access.
- *
- * @group comment
- * @group Access
  */
+#[Group('comment')]
+#[Group('Access')]
+#[RunTestsInSeparateProcesses]
 class CommentFieldAccessTest extends EntityKernelTestBase {
 
   use CommentCreationTrait;
@@ -151,7 +153,7 @@ class CommentFieldAccessTest extends EntityKernelTestBase {
     // Change the second field's anonymous contact setting.
     $instance = FieldConfig::loadByName('entity_test', 'entity_test', 'comment_other');
     // Default is 'May not contact', for this field - they may contact.
-    $instance->setSetting('anonymous', CommentInterface::ANONYMOUS_MAY_CONTACT);
+    $instance->setSetting('anonymous', AnonymousContact::Allowed->value);
     $instance->save();
 
     // Create three "Comments". One is owned by our edit-enabled user.

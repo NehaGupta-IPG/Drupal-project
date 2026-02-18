@@ -13,6 +13,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Prophecy\Argument;
 
 /**
@@ -20,6 +21,7 @@ use Prophecy\Argument;
  */
 #[CoversClass(BlockSettings::class)]
 #[Group('block')]
+#[IgnoreDeprecations]
 class BlockSettingsTest extends UnitTestCase {
 
   /**
@@ -29,8 +31,6 @@ class BlockSettingsTest extends UnitTestCase {
    *   The source value for the plugin.
    * @param array $expected
    *   The expected result.
-   *
-   * @legacy-covers ::transform
    */
   #[DataProvider('providerTestTransform')]
   public function testTransform($value, $expected): void {

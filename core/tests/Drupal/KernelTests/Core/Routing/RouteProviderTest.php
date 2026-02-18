@@ -20,6 +20,7 @@ use Drupal\Tests\Core\Routing\RoutingFixtures;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -31,6 +32,7 @@ use Symfony\Component\Routing\RouteCollection;
  * Confirm that the default route provider is working correctly.
  */
 #[Group('Routing')]
+#[RunTestsInSeparateProcesses]
 class RouteProviderTest extends KernelTestBase {
 
   use PathAliasTestTrait;
@@ -40,7 +42,6 @@ class RouteProviderTest extends KernelTestBase {
    */
   protected static $modules = [
     'url_alter_test',
-    'system',
     'language',
     'path_alias',
   ];
@@ -209,7 +210,7 @@ class RouteProviderTest extends KernelTestBase {
   /**
    * Data provider for testMixedCasePaths()
    */
-  public static function providerMixedCaseRoutePaths() {
+  public static function providerMixedCaseRoutePaths(): array {
     // cSpell:disable
     return [
       ['/path/one', 'route_a'],
@@ -258,7 +259,7 @@ class RouteProviderTest extends KernelTestBase {
   /**
    * Data provider for testMixedCasePaths()
    */
-  public static function providerDuplicateRoutePaths() {
+  public static function providerDuplicateRoutePaths(): array {
     // When matching routes with the same fit the route with the lowest-sorting
     // name should end up first in the resulting route collection.
     return [

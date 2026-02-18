@@ -14,6 +14,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -23,6 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 #[CoversClass(DrupalKernel::class)]
 #[Group('DrupalKernel')]
+#[RunTestsInSeparateProcesses]
 class DrupalKernelTest extends KernelTestBase {
 
   /**
@@ -145,7 +147,14 @@ class DrupalKernelTest extends KernelTestBase {
     // Check that the location of the new module is registered.
     $modules = $container->getParameter('container.modules');
     $module_extension_list = $container->get('extension.list.module');
-    $this->assertEquals(['type' => 'module', 'pathname' => $module_extension_list->getPathname('service_provider_test'), 'filename' => NULL], $modules['service_provider_test']);
+    $this->assertEquals(
+      [
+        'type' => 'module',
+        'pathname' => $module_extension_list->getPathname('service_provider_test'),
+        'filename' => NULL,
+      ],
+      $modules['service_provider_test']
+    );
 
     // Check that the container itself is not among the persist IDs because it
     // does not make sense to persist the container itself.
@@ -209,7 +218,7 @@ class DrupalKernelTest extends KernelTestBase {
    *   An array of test cases. Each test case is an array containing a single boolean value
    *   that represents the class_loader_auto_detect setting to be tested.
    */
-  public static function providerClassLoaderAutoDetect() {
+  public static function providerClassLoaderAutoDetect(): array {
     return [
       'TRUE' => [TRUE],
       'FALSE' => [FALSE],
@@ -267,8 +276,6 @@ class DrupalKernelTest extends KernelTestBase {
 
   /**
    * Tests reset container.
-   *
-   * @legacy-covers ::resetContainer
    */
   public function testResetContainer(): void {
     $modules_enabled = [

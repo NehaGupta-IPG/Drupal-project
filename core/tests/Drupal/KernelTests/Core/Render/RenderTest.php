@@ -7,11 +7,13 @@ namespace Drupal\KernelTests\Core\Render;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Performs functional tests on \Drupal::service('renderer')->render().
  */
 #[Group('Common')]
+#[RunTestsInSeparateProcesses]
 class RenderTest extends KernelTestBase {
 
   /**
@@ -62,7 +64,7 @@ class RenderTest extends KernelTestBase {
   }
 
   /**
-   * Tests that we get an exception when we try to attach an illegal type.
+   * Tests that we get an exception when we try to attach an invalid type.
    */
   public function testProcessAttached(): void {
     // Specify invalid attachments in a render array.

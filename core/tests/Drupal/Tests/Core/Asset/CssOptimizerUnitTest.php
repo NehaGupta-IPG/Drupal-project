@@ -38,7 +38,7 @@ class CssOptimizerUnitTest extends UnitTestCase {
     $this->fileUrlGenerator = $this->createMock(FileUrlGeneratorInterface::class);
     $this->fileUrlGenerator->expects($this->any())
       ->method('generateString')
-      ->with($this->isType('string'))
+      ->with($this->isString())
       ->willReturnCallback(function ($uri) {
         return 'generated-relative-url:' . $uri;
       });
@@ -48,7 +48,7 @@ class CssOptimizerUnitTest extends UnitTestCase {
   /**
    * Provides data for the CSS asset optimizing test.
    */
-  public static function providerTestOptimize() {
+  public static function providerTestOptimize(): array {
     $path = 'core/tests/Drupal/Tests/Core/Asset/css_test_files/';
     $absolute_path = dirname(__FILE__) . '/css_test_files/';
     return [

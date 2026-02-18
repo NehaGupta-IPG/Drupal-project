@@ -6,11 +6,13 @@ namespace Drupal\Tests\update\Functional\Update;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests update_post_update_fix_update_emails.
  */
 #[Group('Update')]
+#[RunTestsInSeparateProcesses]
 class UpdateEmptyEmailsUpdatePathTest extends UpdatePathTestBase {
 
   /**
@@ -19,6 +21,7 @@ class UpdateEmptyEmailsUpdatePathTest extends UpdatePathTestBase {
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-history.php',
     ];
   }
 

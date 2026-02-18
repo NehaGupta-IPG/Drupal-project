@@ -7,6 +7,7 @@ namespace Drupal\Tests\views\Functional\Update;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use Drupal\views\Entity\View;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the upgrade path for converting numeric arguments to entity_target_id.
@@ -14,6 +15,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @see views_post_update_views_data_argument_plugin_id()
  */
 #[Group('Update')]
+#[RunTestsInSeparateProcesses]
 class EntityArgumentUpdateTest extends UpdatePathTestBase {
 
   /**
@@ -22,6 +24,7 @@ class EntityArgumentUpdateTest extends UpdatePathTestBase {
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-history.php',
       __DIR__ . '/../../../fixtures/update/entity-id-argument.php',
     ];
   }

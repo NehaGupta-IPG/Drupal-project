@@ -6,11 +6,13 @@ namespace Drupal\Tests\user\Functional;
 
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that users can be assigned and unassigned roles.
  */
 #[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserRolesAssignmentTest extends BrowserTestBase {
 
   /**
@@ -64,6 +66,7 @@ class UserRolesAssignmentTest extends BrowserTestBase {
       'pass[pass1]' => $pass = $this->randomString(),
       'pass[pass2]' => $pass,
       "roles[$rid]" => $rid,
+      'notify' => FALSE,
     ];
     $this->drupalGet('admin/people/create');
     $this->submitForm($edit, 'Create new account');

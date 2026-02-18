@@ -64,7 +64,7 @@ class GroupwiseMax extends RelationshipPluginBase {
   /**
    * The namespace of the subquery.
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public string $subquery_namespace;
 
   /**
@@ -383,7 +383,7 @@ class GroupwiseMax extends RelationshipPluginBase {
     else {
       $id = 'subquery';
     }
-    $join = Views::pluginManager('join')->createInstance($id, $def);
+    $join = \Drupal::service('plugin.manager.views.join')->createInstance($id, $def);
 
     // Use a short alias for this:
     $alias = $def['table'] . '_' . $this->table;

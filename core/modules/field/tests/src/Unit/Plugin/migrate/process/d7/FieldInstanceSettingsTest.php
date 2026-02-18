@@ -10,18 +10,18 @@ use Drupal\migrate\Row;
 use Drupal\Tests\migrate\Unit\MigrateTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests Drupal\field\Plugin\migrate\process\d7\FieldInstanceSettings.
  */
 #[CoversClass(FieldInstanceSettings::class)]
 #[Group('field')]
+#[IgnoreDeprecations]
 class FieldInstanceSettingsTest extends MigrateTestCase {
 
   /**
    * Tests transformation of image field settings.
-   *
-   * @legacy-covers ::transform
    */
   public function testTransformImageSettings(): void {
     $plugin = new FieldInstanceSettings([], 'd7_field_instance_settings', []);

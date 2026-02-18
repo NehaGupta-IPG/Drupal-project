@@ -8,6 +8,7 @@ use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use Drupal\views\Entity\View;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the addition of the default table style `class` setting.
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
  */
 #[Group('Update')]
 #[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class ViewsAddDefaultTableCssClassUpdateTest extends UpdatePathTestBase {
 
   /**
@@ -29,6 +31,7 @@ class ViewsAddDefaultTableCssClassUpdateTest extends UpdatePathTestBase {
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-history.php',
       __DIR__ . '/../../../fixtures/update/test_table_css_class.php',
     ];
   }

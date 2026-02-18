@@ -9,12 +9,14 @@ use Drupal\big_pipe_regression_test\BigPipeRegressionTestController;
 use Drupal\Core\Url;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * BigPipe regression tests.
  */
 #[Group('big_pipe')]
 #[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class BigPipeRegressionTest extends WebDriverTestBase {
 
   /**
@@ -205,6 +207,19 @@ JS;
     $assert_session->elementExists('css', 'div.container-before');
     $assert_session->elementExists('css', 'body.inline-script-fires');
     $assert_session->elementExists('css', 'div.container-after');
+  }
+
+  /**
+   * Tests that all occurrences of the same placeholder are replaced.
+   */
+  public function testMultipleOccurrences(): void {
+    \Drupal::service('module_installer')->install(['big_pipe_test']);
+    $user = $this->drupalCreateUser();
+    $this->drupalLogin($user);
+    $assert_session = $this->assertSession();
+    $this->drupalGet(Url::fromRoute('big_pipe_test_multi_occurrence'));
+    $this->assertNotNull($assert_session->waitForElement('css', 'script[data-big-pipe-event="stop"]'));
+    $assert_session->elementsCount('css', 'p.multiple-occurrence-instance', 3);
   }
 
 }
