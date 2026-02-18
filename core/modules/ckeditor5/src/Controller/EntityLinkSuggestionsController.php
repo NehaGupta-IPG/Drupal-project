@@ -71,8 +71,6 @@ class EntityLinkSuggestionsController extends ControllerBase {
    * Like other autocomplete functions, this function inspects the 'q' query
    * parameter for the string to use to search for suggestions.
    *
-   * @param \Drupal\editor\EditorInterface $editor
-   *   The text editor whose drupalEntityLinkSuggestions configuration to use.
    * @param string $input
    *   The search input.
    * @param string|null $hostEntityTypeId
@@ -84,7 +82,6 @@ class EntityLinkSuggestionsController extends ControllerBase {
    *   A JSON response containing the autocomplete suggestions.
    */
   public function suggestions(
-    EditorInterface $editor,
     #[MapQueryParameter('q')] string $input = '',
     #[MapQueryParameter] ?string $hostEntityTypeId = NULL,
     #[MapQueryParameter] ?string $hostEntityLangcode = NULL,

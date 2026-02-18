@@ -365,14 +365,11 @@ class EntityLinkSuggestionTest extends KernelTestBase {
    */
   #[DataProvider('providerEntityLinkSuggestions')]
   public function testEntityLinkSuggestions(string $search, string $host_entity_type_id, string $host_entity_langcode, array $expected): void {
-    // Set the given configuration for the entity link suggestions plugin.
-    $editor = Editor::load('test_format');
-
     // Whatever configuration it is, it must be valid.
     $this->assertExpectedCkeditor5Violations();
 
     $controller = EntityLinkSuggestionsController::create($this->container);
-    $response = $controller->suggestions($editor, $search, $host_entity_type_id, $host_entity_langcode);
+    $response = $controller->suggestions($search, $host_entity_type_id, $host_entity_langcode);
     $data = json_decode($response->getContent(), TRUE);
 
     // Perform assertions on the response data.
