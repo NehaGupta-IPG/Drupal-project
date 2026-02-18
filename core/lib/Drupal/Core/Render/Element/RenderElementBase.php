@@ -36,6 +36,10 @@ use Drupal\Core\Url;
  * of type string, they would generally end up being
  * \Drupal\Core\StringTranslation\TranslatableMarkup objects instead.
  *
+ * For properties containing callables it is not recommended to use a closure
+ * or anonymous function because it will trigger an error if the element is
+ * serialized.
+ *
  * Here is the list of the properties used during the rendering of all render
  * elements:
  * - #access: (bool or AccessResultInterface)
