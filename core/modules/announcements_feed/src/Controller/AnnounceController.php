@@ -7,6 +7,7 @@ namespace Drupal\announcements_feed\Controller;
 use Drupal\announcements_feed\AnnounceRenderer;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 
 /**
@@ -36,7 +37,9 @@ class AnnounceController extends ControllerBase implements ContainerInjectionInt
    * @return array
    *   A build array with announcements.
    */
-  public function getAnnouncements(#[MapQueryParameter('_wrapper_format')] ?string $wrapper_format = NULL): array {
+  public function getAnnouncements(
+    #[MapQueryParameter(MainContentViewSubscriber::WRAPPER_FORMAT)] ?string $wrapper_format = NULL,
+  ): array {
     $build = $this->announceRenderer->render();
     if ($wrapper_format != 'drupal_dialog.off_canvas') {
       $build['#theme'] = 'announcements_feed_admin';
