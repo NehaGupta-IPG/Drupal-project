@@ -195,6 +195,15 @@ function drupal_install_system($install_state): void {
   // to full database-backed services. We write to $GLOBALS directly rather
   // than using 'global $install_state' to avoid redeclaring the parameter.
   $GLOBALS['install_state']['base_system_verified'] = TRUE;
+  // The old installer reboot path called $kernel->shutdown(), which reset the
+  // bootstrap config storage used during service provider discovery.
+  // Without resetting, later rebuildContainer() calls in this request can read
+  // a stale pre-install core.extension and omit newly installed module
+  // services.
+  $kernel = \Drupal::service('kernel');
+  if ($kernel instanceof InstallerKernel) {
+    $kernel->resetConfigStorage();
+  }
 
   // Install base system configuration.
   // Writes go through InstallerFallbackConfigStorage → DatabaseStorage.
