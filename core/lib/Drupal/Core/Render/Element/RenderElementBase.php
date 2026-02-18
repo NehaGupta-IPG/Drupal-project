@@ -94,8 +94,8 @@ use Drupal\Core\Url;
  *   called after the element is rendered. Arguments: rendered element string,
  *   children.
  * - #pre_render: (array) Array of callables or function names, which are
- *   called just before the element is rendered. Closures are not supported.
- *   Argument: $element. Return value: an altered $element.
+ *   called just before the element is rendered. Argument: $element.
+ *   Return value: an altered $element.
  * - #prefix: (string) Text to render before the entire element output. See
  *   also #suffix. If it is not already wrapped in a safe markup object, will
  *   be filtered for XSS safety.
