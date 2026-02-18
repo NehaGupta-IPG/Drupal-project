@@ -3776,18 +3776,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Database/Schema.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Cannot unset property Drupal\\\\Core\\\\Database\\\\Statement\\\\StatementBase\\:\\:\\$clientStatement because it might have hooks in a subclass\\.$#',
-	'identifier' => 'unset.possiblyHookedProperty',
-	'count' => 2,
-	'path' => __DIR__ . '/lib/Drupal/Core/Database/StatementPrefetchIterator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\StatementPrefetchIterator\\:\\:fetchColumn\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Database/StatementPrefetchIterator.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\Transaction\\:\\:name\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -29384,19 +29372,7 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/src/Form/ThemeSettingsForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$directories might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Install/Requirements/SystemRequirements.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Variable \\$pdo_message might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Install/Requirements/SystemRequirements.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$site_path might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/src/Install/Requirements/SystemRequirements.php',
@@ -44010,54 +43986,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/workspaces/src/Plugin/Validation/Constraint/EntityWorkspaceConflictConstraintValidator.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\WorkspaceAssociation\\:\\:deleteAssociations\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceAssociation.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\WorkspaceAssociation\\:\\:initializeWorkspace\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceAssociation.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\WorkspaceAssociation\\:\\:trackEntity\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceAssociation.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\WorkspaceAssociation\\:\\:workspaceInsert\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceAssociation.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\WorkspaceAssociationInterface\\:\\:deleteAssociations\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceAssociationInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\WorkspaceAssociationInterface\\:\\:initializeWorkspace\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceAssociationInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\WorkspaceAssociationInterface\\:\\:trackEntity\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceAssociationInterface.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\WorkspaceAssociationInterface\\:\\:workspaceInsert\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceAssociationInterface.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workspaces\\\\WorkspaceInterface\\:\\:publish\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -44068,18 +43996,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceManager.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\WorkspaceManager\\:\\:purgeDeletedWorkspacesBatch\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceManager.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\WorkspaceManagerInterface\\:\\:purgeDeletedWorkspacesBatch\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/WorkspaceManagerInterface.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workspaces\\\\WorkspaceMerger\\:\\:checkConflictsOnTarget\\(\\) should return array but return statement is missing\\.$#',
