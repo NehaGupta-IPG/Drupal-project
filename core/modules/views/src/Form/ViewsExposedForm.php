@@ -151,7 +151,7 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
     else {
       $form['#attributes']['data-drupal-target-view'] = $view_id_display_id;
     }
-    $form['#id'] = Html::cleanCssIdentifier('views_exposed_form-' . $view_id_display_id);
+    $form['#id'] = Html::getUniqueId(Html::cleanCssIdentifier('views_exposed_form-' . $view_id_display_id));
 
     // Labels are built too late for inline form errors to work, resulting
     // in duplicated messages.
