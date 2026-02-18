@@ -5,7 +5,7 @@ namespace Drupal\shortcut\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\shortcut\ShortcutSetInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
@@ -35,17 +35,21 @@ class ShortcutSetController extends ControllerBase {
    *
    * @param \Drupal\shortcut\ShortcutSetInterface $shortcut_set
    *   The shortcut set to add a link to.
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The request object.
+   * @param string $link
+   *   The link path.
+   * @param string $name
+   *   The link name.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    *   A redirect response to the front page, or the previous location.
    *
    * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
    */
-  public function addShortcutLinkInline(ShortcutSetInterface $shortcut_set, Request $request) {
-    $link = $request->query->get('link');
-    $name = $request->query->get('name');
+  public function addShortcutLinkInline(
+    ShortcutSetInterface $shortcut_set,
+    #[MapQueryParameter] string $link,
+    #[MapQueryParameter] string $name,
+  ) {
     if (parse_url($link, PHP_URL_SCHEME) === NULL && $this->pathValidator->isValid($link)) {
       $shortcut = $this->entityTypeManager()->getStorage('shortcut')->create([
         'title' => $name,
