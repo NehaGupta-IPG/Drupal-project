@@ -738,7 +738,7 @@
         const $multipleLabel = $(e.target)
           .closest('table')
           .find('.form-item__label--multiple-value-form');
-        if ($multipleLabel) {
+        if ($multipleLabel.length) {
           $label = $multipleLabel;
         }
       }
