@@ -20,6 +20,7 @@ use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 
 /**
  * Controller routines for system_test routes.
@@ -286,15 +287,19 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
 
   /**
    * Sets a header.
+   *
+   * @param string $name
+   *   The header name query parameter.
+   * @param string $value
+   *   The header value query parameter.
    */
-  public function setHeader(Request $request) {
-    $query = $request->query->all();
+  public function setHeader(#[MapQueryParameter] string $name, #[MapQueryParameter] string $value) {
     $response = new CacheableResponse();
-    $response->headers->set($query['name'], $query['value']);
+    $response->headers->set($name, $value);
     $response->getCacheableMetadata()->addCacheContexts(['url.query_args:name', 'url.query_args:value']);
     $response->setContent((string) $this->t('The following header was set: %name: %value', [
-      '%name' => $query['name'],
-      '%value' => $query['value'],
+      '%name' => $name,
+      '%value' => $value,
     ]));
 
     return $response;

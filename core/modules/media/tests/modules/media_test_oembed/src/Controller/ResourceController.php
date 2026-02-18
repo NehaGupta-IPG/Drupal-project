@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Drupal\media_test_oembed\Controller;
 
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 
 /**
  * Test controller returning oEmbed resources from Media's test fixtures.
@@ -16,16 +16,14 @@ class ResourceController {
   /**
    * Creates an oEmbed resource response.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The request.
+   * @param string $url
+   *   The asset URL from the query string.
    *
    * @return \Symfony\Component\HttpFoundation\Response
    *   The oEmbed resource response.
    */
-  public function get(Request $request) {
-    $asset_url = $request->query->get('url');
-
-    $resource = \Drupal::keyValue('media_test_oembed')->get($asset_url);
+  public function get(#[MapQueryParameter] string $url) {
+    $resource = \Drupal::keyValue('media_test_oembed')->get($url);
 
     if ($resource === 404) {
       $response = new Response('Not Found', 404);
