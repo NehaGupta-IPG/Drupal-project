@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Config;
 
 use Drupal\Core\Config\ConfigCollectionEvents;
+use Drupal\Core\Config\ConfigInstaller;
 use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Config\PreExistingConfigException;
 use Drupal\Core\Config\UnmetDependenciesException;
+use Drupal\Core\Installer\InstallerFallbackConfigStorage;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -268,6 +270,34 @@ class ConfigInstallTest extends KernelTestBase {
     // Ensure that dependencies can be added during module installation by
     // hooks.
     $this->assertSame('config_install_dependency_test', $entity->getDependencies()['module'][0]);
+  }
+
+  /**
+   * Tests installer fallback storage semantics for pre-existing checks.
+   */
+  public function testInstallerFallbackStoragePreExistingChecks(): void {
+    $fallback_storage = new InstallerFallbackConfigStorage();
+    $data = $fallback_storage->read('config_test.system');
+    $this->assertSame('bar', $data['foo']);
+
+    // Active storage semantics are required for pre-existing config checks.
+    $this->assertFalse($fallback_storage->exists('config_test.system'));
+    $this->assertNotContains('config_test.system', $fallback_storage->listAll('config_test.'));
+
+    $config_installer = new ConfigInstaller(
+      \Drupal::service('config.factory'),
+      $fallback_storage,
+      \Drupal::service('config.typed'),
+      \Drupal::service('config.manager'),
+      \Drupal::service('event_dispatcher'),
+      $this->container->getParameter('install_profile'),
+      \Drupal::service('extension.path.resolver'),
+    );
+
+    // This must not throw PreExistingConfigException when active storage is
+    // still empty for config_test.* objects.
+    $config_installer->checkConfigurationToInstall('module', 'config_test');
+    $this->addToAssertionCount(1);
   }
 
   /**

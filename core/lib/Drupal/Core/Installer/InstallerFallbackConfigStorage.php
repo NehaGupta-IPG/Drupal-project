@@ -77,10 +77,7 @@ class InstallerFallbackConfigStorage implements StorageInterface {
    */
   public function exists($name) {
     $db = $this->getDatabaseStorage();
-    if ($db && $db->exists($name)) {
-      return TRUE;
-    }
-    return $this->installStorage->exists($name);
+    return $db ? $db->exists($name) : FALSE;
   }
 
   /**
@@ -180,10 +177,7 @@ class InstallerFallbackConfigStorage implements StorageInterface {
    */
   public function listAll($prefix = '') {
     $db = $this->getDatabaseStorage();
-    $dbNames = $db ? $db->listAll($prefix) : [];
-    $fileNames = $this->installStorage->listAll($prefix);
-    // Merge and deduplicate.
-    return array_values(array_unique(array_merge($dbNames, $fileNames)));
+    return $db ? $db->listAll($prefix) : [];
   }
 
   /**
@@ -209,11 +203,7 @@ class InstallerFallbackConfigStorage implements StorageInterface {
    */
   public function getAllCollectionNames() {
     $db = $this->getDatabaseStorage();
-    $dbCollections = $db ? $db->getAllCollectionNames() : [];
-    $fileCollections = $this->installStorage->getAllCollectionNames();
-    $collections = array_unique(array_merge($dbCollections, $fileCollections));
-    sort($collections);
-    return array_values($collections);
+    return $db ? $db->getAllCollectionNames() : [];
   }
 
   /**
