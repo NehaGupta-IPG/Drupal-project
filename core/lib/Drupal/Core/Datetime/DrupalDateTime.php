@@ -60,42 +60,6 @@ class DrupalDateTime extends DateTimePlus {
   protected $formatTranslationCache = [];
 
   /**
-   * Constructs a date object.
-   *
-   * @param string $time
-   *   A date/input_time_adjusted string. Defaults to 'now'.
-   * @param mixed $timezone
-   *   PHP DateTimeZone object, string or NULL allowed.
-   *   Defaults to NULL. Note that the $timezone parameter and the current
-   *   timezone are ignored when the $time parameter either is a UNIX timestamp
-   *   (e.g. @946684800) or specifies a timezone
-   *   (e.g. 2010-01-28T15:00:00+02:00).
-   *   phpcs:ignore Drupal.Commenting.FunctionComment.ParamCommentFullStop
-   *   @see http://php.net/manual/datetime.construct.php
-   * @param array $settings
-   *   - validate_format: (optional) Boolean choice to validate the
-   *     created date using the input format. The format used in
-   *     createFromFormat() allows slightly different values than format().
-   *     Using an input format that works in both functions makes it
-   *     possible to a validation step to confirm that the date created
-   *     from a format string exactly matches the input. This option
-   *     indicates the format can be used for validation. Defaults to TRUE.
-   *   - langcode: (optional) Used to control the result of the format() method.
-   *     Defaults to NULL.
-   *   - debug: (optional) Boolean choice to leave debug values in the
-   *     date object for debugging purposes. Defaults to FALSE.
-   */
-  public function __construct($time = 'now', $timezone = NULL, $settings = []) {
-    if (!isset($settings['langcode'])) {
-      $settings['langcode'] = \Drupal::languageManager()->getCurrentLanguage()->getId();
-    }
-
-    // Instantiate the parent class.
-    parent::__construct($time, $timezone, $settings);
-
-  }
-
-  /**
    * Overrides prepareTimezone().
    *
    * Override basic component timezone handling to use Drupal's
