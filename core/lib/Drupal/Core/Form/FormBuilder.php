@@ -898,7 +898,9 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
       $hooks[] = 'form_' . $build_info['base_form_id'];
     }
     $hooks[] = 'form_' . $form_id;
-    $hooks[] = 'form_' . get_class($form_state->getFormObject());
+    if (is_object($form_state->getFormObject())) {
+      $hooks[] = 'form_' . get_class($form_state->getFormObject());
+    }
     $this->moduleHandler->alter($hooks, $form, $form_state, $form_id);
     $this->themeManager->alter($hooks, $form, $form_state, $form_id);
   }
