@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\layout_discovery\Kernel;
 
+use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\layout_discovery\Hook\LayoutDiscoveryThemeHooks;
@@ -63,6 +64,7 @@ class LayoutTest extends KernelTestBase {
     // Assume each layout is contained by a form, in order to ensure the
     // building of the layout does not interfere with form processing.
     $form_state = new FormState();
+    $form_state->setFormObject($this->createStub(FormInterface::class));
     $form_builder = $this->container->get('form_builder');
     $form_builder->prepareForm('the_form_id', $built, $form_state);
     $form_builder->processForm('the_form_id', $built, $form_state);
