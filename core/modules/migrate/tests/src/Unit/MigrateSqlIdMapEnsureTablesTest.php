@@ -81,6 +81,7 @@ class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
       'primary key' => ['source_ids_hash'],
       'indexes' => [
         'source' => ['sourceid1', 'sourceid2'],
+        'destid1' => ['destid1'],
       ],
     ];
 
@@ -134,6 +135,8 @@ class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
     $schema->fieldExists('migrate_map_sql_idmap_test', 'rollback_action')->willReturn(FALSE);
     $schema->fieldExists('migrate_map_sql_idmap_test', 'hash')->willReturn(FALSE);
     $schema->fieldExists('migrate_map_sql_idmap_test', 'source_ids_hash')->willReturn(FALSE);
+    $schema->fieldExists('migrate_map_sql_idmap_test', 'destid1')->willReturn(TRUE);
+    $schema->indexExists('migrate_map_sql_idmap_test', 'destid1')->willReturn(FALSE);
     $schema->addField('migrate_map_sql_idmap_test', 'rollback_action', [
       'type' => 'int',
       'size' => 'tiny',
@@ -153,6 +156,15 @@ class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
       'length' => '64',
       'not null' => TRUE,
       'description' => 'Hash of source ids. Used as primary key',
+    ])->shouldBeCalled();
+    $schema->addIndex('migrate_map_sql_idmap_test', 'destid1', ['destid1'], [
+      'fields' => [
+        'destid1' => [
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => FALSE,
+        ],
+      ],
     ])->shouldBeCalled();
 
     $this->runEnsureTablesTest($schema->reveal());

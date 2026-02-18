@@ -408,6 +408,10 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
             $indexes[$index_name] = $index_columns;
           }
         }
+        // Rollback operations often resolve map rows by destination ID.
+        if (isset($fields['destid1'])) {
+          $indexes['destid1'] = ['destid1'];
+        }
         $schema = [
           'description' => 'Mappings from source identifier value(s) to destination identifier value(s).',
           'fields' => $fields,
@@ -493,6 +497,19 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
           'not null' => TRUE,
           'description' => 'Hash of source ids. Used as primary key',
         ]);
+      }
+      if ($this->getDatabase()->schema()->fieldExists($this->mapTableName, 'destid1')
+        && !$this->getDatabase()->schema()->indexExists($this->mapTableName, 'destid1')) {
+        // Add the destination index for pre-existing map tables.
+        $destination_id_definitions = $this->migration->getDestinationPlugin()->getIds();
+        $destination_id_definition = reset($destination_id_definitions);
+        if (!empty($destination_id_definition)) {
+          $this->getDatabase()->schema()->addIndex($this->mapTableName, 'destid1', ['destid1'], [
+            'fields' => [
+              'destid1' => $this->getFieldSchema($destination_id_definition),
+            ],
+          ]);
+        }
       }
     }
   }
