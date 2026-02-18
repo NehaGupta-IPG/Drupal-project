@@ -18,7 +18,7 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\editor\EditorInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 
 /**
  * Returns responses for entity link suggestions autocomplete route.
@@ -71,18 +71,25 @@ class EntityLinkSuggestionsController extends ControllerBase {
    * Like other autocomplete functions, this function inspects the 'q' query
    * parameter for the string to use to search for suggestions.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The request.
    * @param \Drupal\editor\EditorInterface $editor
    *   The text editor whose drupalEntityLinkSuggestions configuration to use.
+   * @param string $input
+   *   The search input.
+   * @param string|null $hostEntityTypeId
+   *   The host entity type ID.
+   * @param string|null $hostEntityLangcode
+   *   The host entity language code.
    *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   A JSON response containing the autocomplete suggestions.
    */
-  public function suggestions(Request $request, EditorInterface $editor): JsonResponse {
-    $input = mb_strtolower($request->query->get('q'));
-    $host_entity_type_id = $request->query->get('hostEntityTypeId');
-    $host_entity_langcode = $request->query->get('hostEntityLangcode');
+  public function suggestions(
+    EditorInterface $editor,
+    #[MapQueryParameter('q')] string $input = '',
+    #[MapQueryParameter] ?string $hostEntityTypeId = NULL,
+    #[MapQueryParameter] ?string $hostEntityLangcode = NULL,
+  ): JsonResponse {
+    $input = mb_strtolower($input);
     $suggestions = [];
 
     if ($input) {
@@ -95,12 +102,12 @@ class EntityLinkSuggestionsController extends ControllerBase {
           }
         }
       }
-      if (in_array($host_entity_type_id, array_keys($allowed_bundles), TRUE)) {
+      if (in_array($hostEntityTypeId, array_keys($allowed_bundles), TRUE)) {
         $suggestions = $this->getSuggestions(
-          $host_entity_type_id,
-          $allowed_bundles[$host_entity_type_id],
+          $hostEntityTypeId,
+          $allowed_bundles[$hostEntityTypeId],
           $input,
-          $host_entity_langcode
+          $hostEntityLangcode
         );
       }
 
@@ -108,7 +115,7 @@ class EntityLinkSuggestionsController extends ControllerBase {
       // order.
       $allowed_entity_type_ids = array_keys($allowed_bundles);
       foreach ($allowed_bundles as $entity_type_id => $bundles) {
-        if ($host_entity_type_id === $entity_type_id) {
+        if ($hostEntityTypeId === $entity_type_id) {
           continue;
         }
         if (in_array($entity_type_id, $allowed_entity_type_ids, TRUE)) {
@@ -116,7 +123,7 @@ class EntityLinkSuggestionsController extends ControllerBase {
             $entity_type_id,
             $bundles,
             $input,
-            $host_entity_langcode
+            $hostEntityLangcode
           ));
         }
       }
