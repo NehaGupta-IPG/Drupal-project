@@ -90,7 +90,12 @@ class CustomPageExceptionHtmlSubscriberTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->configFactory = $this->getConfigFactoryStub(['system.site' => ['page.403' => '/access-denied-page', 'page.404' => '/not-found-page']]);
+    $this->configFactory = $this->getConfigFactoryStub([
+      'system.site' => [
+        'page.403' => '/access-denied-page',
+        'page.404' => '/not-found-page',
+      ],
+    ]);
 
     $this->kernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
     $this->logger = $this->createMock('Psr\Log\LoggerInterface');
@@ -129,6 +134,7 @@ class CustomPageExceptionHtmlSubscriberTest extends UnitTestCase {
    */
   protected function tearDown(): void {
     ini_set('error_log', $this->errorLog);
+    parent::tearDown();
   }
 
   /**

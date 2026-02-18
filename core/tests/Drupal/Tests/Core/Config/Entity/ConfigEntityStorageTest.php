@@ -253,7 +253,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
    * @legacy-covers ::doSave
    */
   #[\PHPUnit\Framework\Attributes\Depends('testCreate')]
-  public function testSaveInsert(EntityInterface $entity) {
+  public function testSaveInsert(EntityInterface $entity): EntityInterface {
     $immutable_config_object = $this->prophesize(ImmutableConfig::class);
     $immutable_config_object->isNew()->willReturn(TRUE);
 
@@ -314,7 +314,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
    * @legacy-covers ::doSave
    */
   #[\PHPUnit\Framework\Attributes\Depends('testSaveInsert')]
-  public function testSaveUpdate(EntityInterface $entity) {
+  public function testSaveUpdate(EntityInterface $entity): EntityInterface {
     $immutable_config_object = $this->prophesize(ImmutableConfig::class);
     $immutable_config_object->isNew()->willReturn(FALSE);
 
@@ -427,8 +427,6 @@ class ConfigEntityStorageTest extends UnitTestCase {
 
   /**
    * Tests save invalid.
-   *
-   * @legacy-covers ::save
    */
   public function testSaveInvalid(): void {
     $this->cacheTagsInvalidator->invalidateTags(Argument::cetera())
