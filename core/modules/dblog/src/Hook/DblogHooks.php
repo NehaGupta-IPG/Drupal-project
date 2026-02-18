@@ -2,7 +2,9 @@
 
 namespace Drupal\dblog\Hook;
 
+use Drupal\Core\Hook\Attribute\FormAlter;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\system\Form\LoggingForm;
 use Drupal\views\ViewExecutable;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -83,9 +85,9 @@ class DblogHooks {
   }
 
   /**
-   * Implements hook_form_FORM_ID_alter() for system_logging_settings().
+   * Implements hook_form_FORM_ID_alter().
    */
-  #[Hook('form_system_logging_settings_alter')]
+  #[FormAlter(LoggingForm::class)]
   public function formSystemLoggingSettingsAlter(&$form, FormStateInterface $form_state) : void {
     $row_limits = [100, 1000, 10000, 100000, 1000000];
     $form['dblog_row_limit'] = [
