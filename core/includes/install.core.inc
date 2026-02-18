@@ -398,9 +398,9 @@ function install_begin_request($class_loader, &$install_state): void {
   $install_state['settings_verified'] = $install_state['config_verified'] && $install_state['database_verified'] && (bool) Settings::get('hash_salt', FALSE);
 
   // Query the database directly for the install_task state entry. This tells us
-  // whether a previous install request made progress, so we know whether to use
-  // the full service container (NormalInstallerServiceProvider) or the minimal
-  // one (InstallerServiceProvider).
+  // whether a previous install request made progress, so we know whether
+  // InstallerServiceProvider should register its early-phase services or the
+  // full database-backed ones.
   if ($install_state['settings_verified']) {
     try {
       $result = Database::getConnection()
@@ -416,26 +416,22 @@ function install_begin_request($class_loader, &$install_state): void {
     }
     catch (\Exception) {
       // Database not set up yet, or key_value table doesn't exist.
-      // $install_state['base_system_verified'] defaults to FALSE, so the code
-      // following below will use the minimal installer service container.
+      // $install_state['base_system_verified'] defaults to FALSE, so
+      // InstallerServiceProvider will use early-phase services.
     }
   }
 
-  // Replace services with in-memory and null implementations. This kernel is
-  // replaced with a regular one in drupal_install_system().
-  if (!$install_state['base_system_verified']) {
-    $environment = 'install';
-    $GLOBALS['conf']['container_service_providers']['InstallerServiceProvider'] = 'Drupal\Core\Installer\InstallerServiceProvider';
-  }
-  else {
-    $environment = 'prod';
-    $GLOBALS['conf']['container_service_providers']['InstallerServiceProvider'] = 'Drupal\Core\Installer\NormalInstallerServiceProvider';
-  }
+  // InstallerServiceProvider handles both early and post-install phases
+  // based on $install_state['base_system_verified'].
+  $GLOBALS['conf']['container_service_providers']['InstallerServiceProvider'] = 'Drupal\Core\Installer\InstallerServiceProvider';
   $GLOBALS['conf']['container_service_providers']['InstallerConfigOverride'] = 'Drupal\Core\Installer\ConfigOverride';
 
+  // Always use 'install' environment — InstallerKernel never caches containers
+  // ($environment is only used for cache key + kernel.environment parameter,
+  // neither of which matters when allowDumping=FALSE).
   // Note, InstallerKernel::createFromRequest() is not used because Settings is
   // already initialized.
-  $kernel = new InstallerKernel($environment, $class_loader, FALSE);
+  $kernel = new InstallerKernel('install', $class_loader, FALSE);
   $kernel::bootEnvironment();
 
   // Add list of all available profiles to the installation state.

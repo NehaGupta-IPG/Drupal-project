@@ -26,6 +26,10 @@ use Symfony\Component\DependencyInjection\Reference;
  * Note that the early installer environment requires the further customizations
  * in InstallerServiceProvider.
  *
+ * @deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\Core\Installer\InstallerServiceProvider instead.
+ *
+ * @see https://www.drupal.org/node/3574200
  * @see install_begin_request()
  * @see \Drupal\Core\Installer\InstallerServiceProvider
  */
@@ -35,6 +39,7 @@ class NormalInstallerServiceProvider implements ServiceProviderInterface {
    * {@inheritdoc}
    */
   public function register(ContainerBuilder $container) {
+    @trigger_error(__CLASS__ . ' is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use \Drupal\Core\Installer\InstallerServiceProvider instead. See https://www.drupal.org/node/3574200', E_USER_DEPRECATED);
     global $install_state;
 
     // During the installer user 1 is a superuser.

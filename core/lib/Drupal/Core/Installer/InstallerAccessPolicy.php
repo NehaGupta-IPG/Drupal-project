@@ -34,7 +34,7 @@ final class InstallerAccessPolicy extends AccessPolicyBase {
    */
   public function getPersistentCacheContexts(): array {
     // Note that cache contexts in the installer are ignored because
-    // \Drupal\Core\Installer\NormalInstallerServiceProvider::register() changes
+    // \Drupal\Core\Installer\InstallerServiceProvider::register() changes
     // everything to use a memory cache. If this was not the case, then this
     // should also return a cache context related to the return value of
     // \Drupal\Core\Installer\InstallerKernel::installationAttempted().
