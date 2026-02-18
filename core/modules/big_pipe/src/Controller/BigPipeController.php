@@ -7,8 +7,8 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Routing\LocalRedirectResponse;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Returns responses for BigPipe module routes.
@@ -20,6 +20,8 @@ class BigPipeController {
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The current request.
+   * @param string $destination
+   *   The destination query parameter for redirecting.
    *
    * @return \Drupal\Core\Routing\LocalRedirectResponse
    *   A response that sets the no-JS cookie and redirects back to the original
@@ -33,7 +35,7 @@ class BigPipeController {
    *
    * @see \Drupal\big_pipe\Render\Placeholder\BigPipeStrategy
    */
-  public function setNoJsCookie(Request $request) {
+  public function setNoJsCookie(Request $request, #[MapQueryParameter] string $destination) {
     // This controller may only be accessed when the browser does not support
     // JavaScript. It is accessed automatically when that's the case thanks to
     // big_pipe_page_attachments(). When this controller is executed, deny
@@ -46,11 +48,7 @@ class BigPipeController {
       throw new AccessDeniedHttpException();
     }
 
-    if (!$request->query->has('destination')) {
-      throw new HttpException(400, 'The original location is missing.');
-    }
-
-    $response = new LocalRedirectResponse($request->query->get('destination'));
+    $response = new LocalRedirectResponse($destination);
     // Set cookie without httpOnly, so that JavaScript can delete it.
     $response->headers->setCookie(new Cookie(BigPipeStrategy::NOJS_COOKIE, TRUE, 0, '/', NULL, FALSE, FALSE, FALSE, NULL));
     $response->addCacheableDependency((new CacheableMetadata())->addCacheContexts([
