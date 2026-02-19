@@ -71,6 +71,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     'basic_auth',
     'rest_test',
     'jsonapi_test_field_access',
+    'jsonapi_response_validator',
     'text',
   ];
 
@@ -432,11 +433,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $id_key = $duplicate->getEntityType()->getKey('id');
     $needs_manual_id = $duplicate instanceof ConfigEntityInterface && $id_key;
 
-    if ($duplicate instanceof FieldableEntityInterface && $id_key) {
-      $id_field = $duplicate->getFieldDefinition($id_key);
-      if ($id_field->getType() !== 'integer') {
-        $needs_manual_id = TRUE;
-      }
+    if (!$duplicate->getEntityType()->hasIntegerId()) {
+      $needs_manual_id = TRUE;
     }
 
     if ($needs_manual_id) {
@@ -826,7 +824,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   The error response to assert.
    * @param string|false $pointer
    *   The expected JSON Pointer to the associated entity in the request
-   *   document. See http://jsonapi.org/format/#error-objects.
+   *   document. See https://jsonapi.org/format/#error-objects.
    * @param string[]|false $expected_cache_tags
    *   (optional) The expected cache tags in the X-Drupal-Cache-Tags response
    *   header, or FALSE if that header should be absent. Defaults to FALSE.
@@ -973,7 +971,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
           'status' => '400',
           'detail' => "The following query parameters violate the JSON:API spec: 'foo'.",
           'links' => [
-            'info' => ['href' => 'http://jsonapi.org/format/#query-parameters'],
+            'info' => ['href' => 'https://jsonapi.org/format/#query-parameters'],
             'via' => ['href' => $url_reserved_custom_query_parameter->toString()],
           ],
         ],
