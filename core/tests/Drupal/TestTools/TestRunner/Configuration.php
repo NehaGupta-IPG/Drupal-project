@@ -296,7 +296,7 @@ final class Configuration {
     $inputDefinition->addArgument(new InputArgument(
       'tests',
       InputArgument::OPTIONAL,
-      "One or more tests to be run.\nBy default, these are interpreted as the names of test groups which are derived from test class @group annotations.\nThese group names typically correspond to module names like \"User\" or \"Profile\" or \"System\", but there is also a group \"Database\".\nFor Contrib projects the @group can be anything but usually it will start with the project machine name.\nIf --class is specified then these are interpreted as the names of specific test classes whose test methods will be run.\nTests must be separated by commas.\nIgnored if --all is specified.",
+      "One or more tests to be run.\nBy default, these are interpreted as the names of test groups which are derived from test class #[Group()] attributes.\nThese group names typically correspond to module names like \"User\" or \"Profile\" or \"System\", but there is also a group \"Database\".\nFor Contrib projects the #[Group()] attribute can be anything but usually it will start with the project machine name.\nIf --class is specified then these are interpreted as the fully qualified class names of specific test classes whose test methods will be run. Note that in this case the backslashes in the command line need to be escaped, see example below.\nTests must be separated by commas.\nIgnored if --all is specified.",
     ));
 
     return $inputDefinition;
