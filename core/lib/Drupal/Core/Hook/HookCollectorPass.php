@@ -33,9 +33,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * contains:
  *  - hook_list a mapping from [hook,class,method] to the module name.
  *  - preprocess_for_suggestions preprocess hooks with double underscores.
- *  - includes files that contain hooks that are not defined by hook_hook_info
- *    or in .module files
- *  - group_includes files identified by hook_hook_info
  *  - packed_order_operations ordering rules for runtime evaluation
  *
  * The parameter hook_data is processed in HookCollectorKeyValueWritePass and
@@ -81,15 +78,6 @@ class HookCollectorPass implements CompilerPassInterface {
   protected array $removeHookIdentifiers = [];
 
   /**
-   * A map of include files by function name.
-   *
-   * (This is required only for BC.)
-   *
-   * @var array<callable-string, string>
-   */
-  protected array $includes = [];
-
-  /**
    * A list of functions implementing hook_module_implements_alter().
    *
    * (This is required only for BC.)
@@ -97,15 +85,6 @@ class HookCollectorPass implements CompilerPassInterface {
    * @var list<callable-string>
    */
   protected array $moduleImplementsAlters = [];
-
-  /**
-   * A list of functions implementing hook_hook_info().
-   *
-   * (This is required only for BC.)
-   *
-   * @var list<callable-string>
-   */
-  private array $hookInfo = [];
 
   /**
    * Preprocess suggestions discovered in modules.
@@ -116,13 +95,6 @@ class HookCollectorPass implements CompilerPassInterface {
    * @var array<string, true>
    */
   protected array $preprocessForSuggestions;
-
-  /**
-   * Include files, keyed by the $group part of "/$module.$group.inc".
-   *
-   * @var array<string, list<string>>
-   */
-  private array $groupIncludes = [];
 
   /**
    * Constructor.
@@ -139,13 +111,7 @@ class HookCollectorPass implements CompilerPassInterface {
    * {@inheritdoc}
    */
   public function process(ContainerBuilder $container): void {
-    $module_list = $container->getParameter('container.modules');
-    $parameters = $container->getParameterBag()->all();
-    $skip_procedural_modules = array_filter(
-      array_keys($module_list),
-      static fn (string $module) => !empty($parameters["$module.skip_procedural_hook_scan"]),
-    );
-    $collector = static::collectAllHookImplementations($module_list, $skip_procedural_modules);
+    $collector = static::collectAllHookImplementations($container);
 
     $collector->writeToContainer($container);
   }
@@ -157,23 +123,8 @@ class HookCollectorPass implements CompilerPassInterface {
    *   Container builder.
    */
   protected function writeToContainer(ContainerBuilder $container): void {
-    // Gather includes for each hook_hook_info group. Store this in
-    // $groupIncludes so the module handler includes the files at runtime when
-    // the hooks are invoked.
-    $groupIncludes = [];
-    foreach ($this->hookInfo as $function) {
-      foreach ($function() as $hook => $info) {
-        if (isset($this->groupIncludes[$info['group']])) {
-          $groupIncludes[$hook] = $this->groupIncludes[$info['group']];
-        }
-      }
-    }
-
     $implementationsByHook = $this->calculateImplementations();
-
     static::registerHookServices($container, $implementationsByHook);
-
-    $includes = $this->collectIncludesPerHook($implementationsByHook, $groupIncludes);
 
     $packed_order_operations = [];
     $order_operations = $this->getOrderOperations();
@@ -191,50 +142,8 @@ class HookCollectorPass implements CompilerPassInterface {
     $container->setParameter('.hook_data', [
       'hook_list' => $implementationsByHook,
       'preprocess_for_suggestions' => $this->preprocessForSuggestions ?? [],
-      'includes' => $includes,
-      'group_includes' => $groupIncludes,
       'packed_order_operations' => $packed_order_operations,
     ]);
-
-    // Remove converted flags, they are only needed while building the
-    // container.
-    $parameters = $container->getParameterBag();
-    foreach ($parameters->all() as $name => $value) {
-      if (str_ends_with($name, '.skip_procedural_hook_scan')) {
-        $parameters->remove($name);
-      }
-    }
-  }
-
-  /**
-   * Collects include files by hook name.
-   *
-   * @param array<string, array<string, string>> $implementationsByHook
-   *   Implementations by hook.
-   * @param array<string, list<string>> $groupIncludes
-   *   Explicitly defined group includes to filter out.
-   *
-   * @return array<string, list<string>>
-   *   Lists of include files by hook name.
-   */
-  protected function collectIncludesPerHook(array $implementationsByHook, array $groupIncludes): array {
-    $includesMap = [];
-    foreach ($implementationsByHook as $hook => $hookImplementations) {
-      foreach ($hookImplementations as $identifier => $module) {
-        if (str_contains($identifier, '::')) {
-          continue;
-        }
-        $include = $this->includes[$identifier] ?? NULL;
-        if ($include !== NULL) {
-          // Do not add includes that are already in group includes.
-          if (isset($groupIncludes[$hook]) && in_array($include, $groupIncludes[$hook])) {
-            continue;
-          }
-          $includesMap[$hook][$include] = TRUE;
-        }
-      }
-    }
-    return array_map(array_keys(...), $includesMap);
   }
 
   /**
@@ -296,7 +205,7 @@ class HookCollectorPass implements CompilerPassInterface {
       }
       foreach ($moduleImplements as $module => $v) {
         if (is_string($hook) && str_starts_with($hook, 'preprocess_') && str_contains($hook, '__')) {
-          $this->preprocessForSuggestions[$module . '_' . $hook] = TRUE;
+          $this->preprocessForSuggestions[$module . '_' . $hook] = 'module';
         }
         foreach (array_keys($implementationsByHookOrig[$hook], $module, TRUE) as $identifier) {
           $implementationsByHook[$hook][$identifier] = $module;
@@ -329,7 +238,6 @@ class HookCollectorPass implements CompilerPassInterface {
         }
       }
       $operations_by_hook[$hook] = array_values($order_operations);
-
     }
     return $operations_by_hook;
   }
@@ -394,28 +302,26 @@ class HookCollectorPass implements CompilerPassInterface {
   /**
    * Collects all hook implementations.
    *
-   * @param array<string, array{pathname: string}> $module_list
-   *   An associative array. Keys are the module names, values are relevant
-   *   info yml file path.
-   * @param list<string> $skipProceduralModules
-   *   Module names that are known to not have procedural hook implementations.
+   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   *   The ContainerBuilder to get module parameters from.
    *
    * @return static
    *   A HookCollectorPass instance holding all hook implementations and
    *   include file information.
-   *
-   * @internal
-   *   This method is only used by ModuleHandler.
-   *
-   * @todo Pass only $container and make protected when ModuleHandler::add() is
-   *   removed in Drupal 12.0.0.
    */
-  public static function collectAllHookImplementations(array $module_list, array $skipProceduralModules = []): static {
+  protected static function collectAllHookImplementations(ContainerBuilder $container): static {
+    $module_list = $container->getParameter('container.modules');
+    $parameters = $container->getParameterBag()->all();
+    $skip_procedural_modules = array_filter(
+      array_keys($module_list),
+      static fn (string $module) => !empty($parameters["$module.skip_procedural_hook_scan"]),
+    );
+
     $modules = array_keys($module_list);
     $all_modules_preg = static::getModuleListPattern($modules);
     $collector = new static($modules);
     foreach ($module_list as $module => $info) {
-      $skip_procedural = in_array($module, $skipProceduralModules);
+      $skip_procedural = in_array($module, $skip_procedural_modules);
       $current_module_preg = static::getModuleListPattern([$module]);
       $collector->collectModuleHookImplementations(dirname($info['pathname']), $module, $current_module_preg, $all_modules_preg, $skip_procedural);
     }
@@ -460,7 +366,11 @@ class HookCollectorPass implements CompilerPassInterface {
    */
   protected function collectModuleHookImplementations($dir, $module, $current_module_preg, $all_modules_preg, bool $skip_procedural): void {
     $hook_file_cache = FileCacheFactory::get('hook_implementations');
-    $procedural_hook_file_cache = FileCacheFactory::get('procedural_hook_implementations:' . $all_modules_preg);
+    // List of modules must be included in the cache key to ensure rediscovery
+    // takes place when a new module is installed. Some modules define hooks
+    // on behalf of other modules and those hooks need to be found.
+    // Hash to prevent massive key sizes.
+    $procedural_hook_file_cache = FileCacheFactory::get('procedural_hook_implementations:' . hash('xxh3', $all_modules_preg));
 
     $iterator = new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::UNIX_PATHS | \FilesystemIterator::FOLLOW_SYMLINKS);
     $iterator = new \RecursiveCallbackFilterIterator($iterator, static::filterIterator(...));
@@ -560,12 +470,6 @@ class HookCollectorPass implements CompilerPassInterface {
           $this->addProceduralImplementation($fileinfo, $implementation['hook'], $implementation['module']);
         }
       }
-      if ($extension === 'inc') {
-        $parts = explode('.', $fileinfo->getFilename());
-        if (count($parts) === 3 && $parts[0] === $module) {
-          $this->groupIncludes[$parts[1]][] = $filename;
-        }
-      }
     }
   }
 
@@ -624,11 +528,7 @@ class HookCollectorPass implements CompilerPassInterface {
    */
   protected function addProceduralImplementation(\SplFileInfo $fileinfo, string $hook, string $module): void {
     $function = $module . '_' . $hook;
-    if ($hook === 'hook_info') {
-      $this->hookInfo[] = $function;
-      include_once $fileinfo->getPathname();
-    }
-    elseif ($hook === 'module_implements_alter') {
+    if ($hook === 'module_implements_alter') {
       $message = "$function without a #[LegacyModuleImplementsAlter] attribute is deprecated in drupal:11.2.0 and removed in drupal:12.0.0. See https://www.drupal.org/node/3496788";
       @trigger_error($message, E_USER_DEPRECATED);
       $this->moduleImplementsAlters[] = $function;
@@ -639,22 +539,6 @@ class HookCollectorPass implements CompilerPassInterface {
       @trigger_error($message, E_USER_DEPRECATED);
     }
     $this->proceduralImplementations[$hook][] = $module;
-    if ($fileinfo->getExtension() !== 'module') {
-      $this->includes[$function] = $fileinfo->getPathname();
-    }
-  }
-
-  /**
-   * This method is only to be used by ModuleHandler.
-   *
-   * @todo Remove when ModuleHandler::add() is removed in Drupal 12.0.0.
-   *
-   * @internal
-   */
-  public function loadAllIncludes(): void {
-    foreach ($this->includes as $include) {
-      include_once $include;
-    }
   }
 
   /**
@@ -667,7 +551,6 @@ class HookCollectorPass implements CompilerPassInterface {
    */
   public static function checkForProceduralOnlyHooks(Hook $hookAttribute, string $class): void {
     $staticDenyHooks = [
-      'hook_info',
       'install',
       'install_tasks',
       'install_tasks_alter',

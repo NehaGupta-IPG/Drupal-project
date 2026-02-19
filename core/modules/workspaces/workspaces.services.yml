@@ -7,8 +7,6 @@ services:
   workspaces.manager:
     class: Drupal\workspaces\WorkspaceManager
     autowire: true
-    tags:
-      - { name: service_collector, call: addNegotiator, tag: workspace_negotiator }
   Drupal\workspaces\WorkspaceManagerInterface: '@workspaces.manager'
   workspaces.information:
     class: Drupal\workspaces\WorkspaceInformation
@@ -18,11 +16,6 @@ services:
     class: Drupal\workspaces\WorkspaceOperationFactory
     autowire: true
   Drupal\workspaces\WorkspaceOperationFactory: '@workspaces.operation_factory'
-  workspaces.association:
-    class: Drupal\workspaces\WorkspaceAssociation
-    arguments: ['@workspaces.tracker']
-    deprecated: The "%service_id%" service is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use the 'workspaces.tracker' service instead. See https://www.drupal.org/node/3551450
-  Drupal\workspaces\WorkspaceAssociationInterface: '@workspaces.association'
   workspaces.tracker:
     class: Drupal\workspaces\WorkspaceTracker
     autowire: true
@@ -73,11 +66,6 @@ services:
   logger.channel.workspaces:
     parent: logger.channel_base
     arguments: ['workspaces']
-
-  workspaces.lazy_builders:
-    class: Drupal\workspaces\WorkspacesLazyBuilders
-    arguments: [ '@workspaces.manager', '@plugin.manager.element_info' ]
-  Drupal\workspaces\WorkspacesLazyBuilders: '@workspaces.lazy_builders'
 
   workspaces.entity.repository:
     decorates: entity.repository

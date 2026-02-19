@@ -752,12 +752,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $response = $this->handleException($e, $request, $type);
     }
 
-    // Backward compatibility for Symfony 7.4, which sets the charset to utf-8.
-    // @todo Remove this in https://www.drupal.org/project/drupal/issues/3555537
-    if (!$response->getCharset()) {
-      $response->setCharset('UTF-8');
-    }
-
     // Adapt response headers to the current request.
     $response->prepare($request);
 
@@ -1123,10 +1117,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       // in the query string.
       ini_set('session.use_cookies', '1');
       ini_set('session.use_strict_mode', '1');
-      if (\PHP_VERSION_ID < 80400) {
-        ini_set('session.use_only_cookies', '1');
-        ini_set('session.use_trans_sid', '0');
-      }
       // Don't send HTTP headers using PHP's session handler.
       // Send an empty string to disable the cache limiter.
       ini_set('session.cache_limiter', '');
