@@ -17,7 +17,7 @@ use Drupal\Core\TypedData\DataReferenceDefinitionInterface;
 class Tables implements TablesInterface {
 
   /**
-   * @var \Drupal\Core\Database\Query\SelectInterface
+   * @var SelectInterface
    */
   protected $sqlQuery;
 
@@ -65,7 +65,7 @@ class Tables implements TablesInterface {
   protected $caseSensitiveFields = [];
 
   /**
-   * @param \Drupal\Core\Database\Query\SelectInterface $sql_query
+   * @param SelectInterface $sql_query
    *   The SQL query.
    */
   public function __construct(SelectInterface $sql_query) {
@@ -355,7 +355,7 @@ class Tables implements TablesInterface {
    * @return string
    *   The alias of the joined table.
    *
-   * @throws \Drupal\Core\Entity\Query\QueryException
+   * @throws QueryException
    *   When an invalid property has been passed.
    */
   protected function ensureEntityTable($index_prefix, $property, $type, $langcode, $base_table, $id_field, $entity_tables) {
@@ -383,7 +383,7 @@ class Tables implements TablesInterface {
    *   The table array index prefix. For a base table this will be empty,
    *   for a target entity reference like 'field_tags.entity:taxonomy_term.name'
    *   this will be 'entity:taxonomy_term.target_id.'.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface &$field
+   * @param FieldStorageDefinitionInterface &$field
    *   The field storage definition for the field being joined.
    * @param string $type
    *   The join type.
@@ -483,19 +483,19 @@ class Tables implements TablesInterface {
   /**
    * Add the next entity base table.
    *
-   * For example, when building the SQL query for
+   * For example, when building the SQL query for.
    * @code
    * condition('uid.entity.name', 'foo', 'CONTAINS')
    * @endcode
    * this adds the users table.
    *
-   * @param \Drupal\Core\Entity\EntityType $entity_type
+   * @param EntityType $entity_type
    *   The entity type being joined, in the above example, User.
    * @param string $table
    *   This is the table being joined, in the above example, {users}.
    * @param string $sql_column
    *   This is the SQL column in the existing table being joined to.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $field_storage
+   * @param FieldStorageDefinitionInterface $field_storage
    *   The field storage definition for the field referencing this column.
    *
    * @return string

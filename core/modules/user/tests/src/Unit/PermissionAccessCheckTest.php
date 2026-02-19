@@ -26,14 +26,14 @@ class PermissionAccessCheckTest extends UnitTestCase {
   /**
    * The tested access checker.
    *
-   * @var \Drupal\user\Access\PermissionAccessCheck
+   * @var PermissionAccessCheck
    */
   public $accessCheck;
 
   /**
    * The dependency injection container.
    *
-   * @var \Symfony\Component\DependencyInjection\ContainerBuilder
+   * @var ContainerBuilder
    */
   protected $container;
 

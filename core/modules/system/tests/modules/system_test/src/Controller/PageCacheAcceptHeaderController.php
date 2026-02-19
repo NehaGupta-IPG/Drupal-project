@@ -18,7 +18,7 @@ class PageCacheAcceptHeaderController {
   /**
    * Processes a request that will vary with Accept header.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request object.
    *
    * @return mixed

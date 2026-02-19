@@ -19,7 +19,7 @@ interface FileUsageInterface {
    * - The User module associates an image with a user, so $type would be 'user'
    *   and the $id would be the user's uid.
    *
-   * @param \Drupal\file\FileInterface $file
+   * @param FileInterface $file
    *   A file entity.
    * @param string $module
    *   The name of the module using the file.
@@ -35,7 +35,7 @@ interface FileUsageInterface {
   /**
    * Removes a record to indicate that a module is no longer using a file.
    *
-   * @param \Drupal\file\FileInterface $file
+   * @param FileInterface $file
    *   A file entity.
    * @param string $module
    *   The name of the module using the file.
@@ -57,7 +57,7 @@ interface FileUsageInterface {
   /**
    * Determines where a file is used.
    *
-   * @param \Drupal\file\FileInterface $file
+   * @param FileInterface $file
    *   A file entity.
    *
    * @return array

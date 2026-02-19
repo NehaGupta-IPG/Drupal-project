@@ -15,10 +15,10 @@ interface ProviderRepositoryInterface {
   /**
    * Returns information on all available oEmbed providers.
    *
-   * @return \Drupal\media\OEmbed\Provider[]
+   * @return Provider[]
    *   Returns an array of provider value objects, keyed by provider name.
    *
-   * @throws \Drupal\media\OEmbed\ProviderException
+   * @throws ProviderException
    *   If the oEmbed provider information cannot be retrieved.
    */
   public function getAll();
@@ -29,7 +29,7 @@ interface ProviderRepositoryInterface {
    * @param string $provider_name
    *   The name of the provider.
    *
-   * @return \Drupal\media\OEmbed\Provider
+   * @return Provider
    *   A value object containing information about the provider.
    *
    * @throws \InvalidArgumentException

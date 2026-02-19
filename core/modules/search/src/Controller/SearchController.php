@@ -18,7 +18,7 @@ class SearchController extends ControllerBase {
   /**
    * The search page repository.
    *
-   * @var \Drupal\search\SearchPageRepositoryInterface
+   * @var SearchPageRepositoryInterface
    */
   protected $searchPageRepository;
 
@@ -32,16 +32,16 @@ class SearchController extends ControllerBase {
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * Constructs a new search controller.
    *
-   * @param \Drupal\search\SearchPageRepositoryInterface $search_page_repository
+   * @param SearchPageRepositoryInterface $search_page_repository
    *   The search page repository.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
    */
   public function __construct(SearchPageRepositoryInterface $search_page_repository, RendererInterface $renderer) {
@@ -53,9 +53,9 @@ class SearchController extends ControllerBase {
   /**
    * Creates a render array for the search page.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
-   * @param \Drupal\search\SearchPageInterface $entity
+   * @param SearchPageInterface $entity
    *   The search page entity.
    *
    * @return array
@@ -140,7 +140,7 @@ class SearchController extends ControllerBase {
   /**
    * Creates a render array for the search help page.
    *
-   * @param \Drupal\search\SearchPageInterface $entity
+   * @param SearchPageInterface $entity
    *   The search page entity.
    *
    * @return array
@@ -159,7 +159,7 @@ class SearchController extends ControllerBase {
    *
    * This is used to redirect from /search to the default search page.
    *
-   * @param \Drupal\search\SearchPageInterface $entity
+   * @param SearchPageInterface $entity
    *   The search page entity.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
@@ -172,7 +172,7 @@ class SearchController extends ControllerBase {
   /**
    * Route title callback.
    *
-   * @param \Drupal\search\SearchPageInterface $search_page
+   * @param SearchPageInterface $search_page
    *   The search page entity.
    *
    * @return string
@@ -185,7 +185,7 @@ class SearchController extends ControllerBase {
   /**
    * Performs an operation on the search page entity.
    *
-   * @param \Drupal\search\SearchPageInterface $search_page
+   * @param SearchPageInterface $search_page
    *   The search page entity.
    * @param string $op
    *   The operation to perform, usually 'enable' or 'disable'.
@@ -210,7 +210,7 @@ class SearchController extends ControllerBase {
   /**
    * Sets the search page as the default.
    *
-   * @param \Drupal\search\SearchPageInterface $search_page
+   * @param SearchPageInterface $search_page
    *   The search page entity.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse

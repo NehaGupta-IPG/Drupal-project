@@ -42,7 +42,7 @@ class Permission extends AccessPluginBase implements CacheableDependencyInterfac
   /**
    * The permission handler.
    *
-   * @var \Drupal\user\PermissionHandlerInterface
+   * @var PermissionHandlerInterface
    */
   protected $permissionHandler;
 
@@ -60,9 +60,9 @@ class Permission extends AccessPluginBase implements CacheableDependencyInterfac
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\user\PermissionHandlerInterface $permission_handler
+   * @param PermissionHandlerInterface $permission_handler
    *   The permission handler.
-   * @param \Drupal\Core\Extension\ModuleExtensionList|\Drupal\Core\Extension\ModuleHandlerInterface $module_extension_list
+   * @param ModuleExtensionList|ModuleHandlerInterface $module_extension_list
    *   The module extension list.
    */
   public function __construct(

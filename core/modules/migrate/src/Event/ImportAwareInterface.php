@@ -10,7 +10,7 @@ interface ImportAwareInterface {
   /**
    * Performs pre-import tasks.
    *
-   * @param \Drupal\migrate\Event\MigrateImportEvent $event
+   * @param MigrateImportEvent $event
    *   The pre-import event object.
    */
   public function preImport(MigrateImportEvent $event);
@@ -18,7 +18,7 @@ interface ImportAwareInterface {
   /**
    * Performs post-import tasks.
    *
-   * @param \Drupal\migrate\Event\MigrateImportEvent $event
+   * @param MigrateImportEvent $event
    *   The post-import event object.
    */
   public function postImport(MigrateImportEvent $event);

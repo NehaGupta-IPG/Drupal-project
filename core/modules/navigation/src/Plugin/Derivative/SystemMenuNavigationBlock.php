@@ -20,7 +20,7 @@ final class SystemMenuNavigationBlock extends DeriverBase implements ContainerDe
   /**
    * Constructs new SystemMenuNavigationBlock.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $menuStorage
+   * @param EntityStorageInterface $menuStorage
    *   The menu storage.
    */
   public function __construct(protected EntityStorageInterface $menuStorage) {}

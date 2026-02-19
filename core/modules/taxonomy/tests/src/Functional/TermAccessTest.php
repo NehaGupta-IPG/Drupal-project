@@ -112,7 +112,7 @@ class TermAccessTest extends TaxonomyTestBase {
   /**
    * Checks access on taxonomy term.
    *
-   * @param \Drupal\taxonomy\TermInterface $term
+   * @param TermInterface $term
    *   A taxonomy term entity.
    * @param string $access_operation
    *   The entity operation, e.g. 'view', 'edit', 'delete', etc.

@@ -24,7 +24,7 @@ interface ExtendableInterface {
    *   driver-specific subclasses as well, using the same logic as the query
    *   objects themselves.
    *
-   * @return \Drupal\Core\Database\Query\ExtendableInterface
+   * @return ExtendableInterface
    *   The extender object, which now contains a reference to this object.
    */
   public function extend($extender_name);

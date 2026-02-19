@@ -23,7 +23,7 @@ class FieldConfigEditFormTest extends UnitTestCase {
   /**
    * The field config edit form.
    *
-   * @var \Drupal\field_ui\Form\FieldConfigEditForm|\PHPUnit\Framework\MockObject\MockObject
+   * @var FieldConfigEditForm|MockObject
    */
   protected $fieldConfigEditForm;
 

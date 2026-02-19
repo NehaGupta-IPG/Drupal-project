@@ -32,54 +32,54 @@ class NegotiationConfigureForm extends ConfigFormBase {
   /**
    * The language manager.
    *
-   * @var \Drupal\language\ConfigurableLanguageManagerInterface
+   * @var \Drupal\Core\Config\ConfigurableLanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The language negotiator.
    *
-   * @var \Drupal\language\LanguageNegotiatorInterface
+   * @var LanguageNegotiatorInterface
    */
   protected $negotiator;
 
   /**
    * The block manager.
    *
-   * @var \Drupal\Core\Block\BlockManagerInterface
+   * @var BlockManagerInterface
    */
   protected $blockManager;
 
   /**
    * The block storage.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface|null
+   * @var EntityStorageInterface|null
    */
   protected $blockStorage;
 
   /**
    * The theme handler.
    *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
+   * @var ThemeHandlerInterface
    */
   protected $themeHandler;
 
   /**
    * Constructs a NegotiationConfigureForm object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
+   * @param TypedConfigManagerInterface $typedConfigManager
    *   The typed config manager.
-   * @param \Drupal\language\ConfigurableLanguageManagerInterface $language_manager
+   * @param ConfigurableLanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\language\LanguageNegotiatorInterface $negotiator
+   * @param LanguageNegotiatorInterface $negotiator
    *   The language negotiation methods manager.
-   * @param \Drupal\Core\Block\BlockManagerInterface $block_manager
+   * @param BlockManagerInterface $block_manager
    *   The block manager.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param ThemeHandlerInterface $theme_handler
    *   The theme handler.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $block_storage
+   * @param EntityStorageInterface $block_storage
    *   The block storage, or NULL if not available.
    */
   public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, ConfigurableLanguageManagerInterface $language_manager, LanguageNegotiatorInterface $negotiator, BlockManagerInterface $block_manager, ThemeHandlerInterface $theme_handler, ?EntityStorageInterface $block_storage = NULL) {

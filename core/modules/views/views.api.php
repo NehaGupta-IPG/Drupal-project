@@ -5,13 +5,13 @@
  * Describes hooks and plugins provided by the Views module.
  */
 
-use Drupal\views\Analyzer;
-use Drupal\field\FieldStorageConfigInterface;
-use Drupal\views\Plugin\views\pager\Full;
-use Drupal\views\Plugin\views\cache\Time;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\field\FieldStorageConfigInterface;
+use Drupal\views\Analyzer;
 use Drupal\views\Plugin\views\cache\CachePluginBase;
+use Drupal\views\Plugin\views\cache\Time;
+use Drupal\views\Plugin\views\pager\Full;
 use Drupal\views\Plugin\views\PluginBase;
 use Drupal\views\Plugin\views\query\QueryPluginBase;
 use Drupal\views\ViewExecutable;
@@ -48,7 +48,6 @@ use Drupal\views\ViewExecutable;
  * @see \Drupal\views\Views
  * @}
  */
-
 /**
  * @defgroup views_plugins Views plugins
  * @{
@@ -74,7 +73,6 @@ use Drupal\views\ViewExecutable;
  * @see annotation
  * @}
  */
-
 /**
  * @addtogroup hooks
  * @{
@@ -83,7 +81,7 @@ use Drupal\views\ViewExecutable;
 /**
  * Analyze a view to provide warnings about its configuration.
  *
- * @param \Drupal\views\ViewExecutable $view
+ * @param ViewExecutable $view
  *   The view being executed.
  *
  * @return array
@@ -540,7 +538,7 @@ function hook_views_data_alter(array &$data) {
  * If no hook implementation exists, hook_views_data() falls back to
  * FieldViewsDataProvider::defaultFieldImplementation().
  *
- * @param \Drupal\field\FieldStorageConfigInterface $field_storage
+ * @param FieldStorageConfigInterface $field_storage
  *   The field storage config entity.
  *
  * @return array
@@ -577,7 +575,7 @@ function hook_field_views_data(FieldStorageConfigInterface $field_storage): arra
  * @param array $data
  *   The views data for the field storage. This has the same format as the
  *   return value of hook_views_data().
- * @param \Drupal\field\FieldStorageConfigInterface $field_storage
+ * @param FieldStorageConfigInterface $field_storage
  *   The field storage config entity.
  *
  * @see views_views_data()
@@ -633,7 +631,7 @@ function hook_field_views_data_alter(array &$data, FieldStorageConfigInterface $
  *
  * @param array $data
  *   The views data.
- * @param \Drupal\field\FieldStorageConfigInterface $field
+ * @param FieldStorageConfigInterface $field
  *   The field storage config entity.
  *
  * @see hook_field_views_data()
@@ -678,7 +676,7 @@ function hook_field_views_data_views_data_alter(array &$data, FieldStorageConfig
  * built, and substituted at run-time, allowing the query to be cached and
  * still work correctly when executed.
  *
- * @param \Drupal\views\ViewExecutable $view
+ * @param ViewExecutable $view
  *   The View being executed.
  *
  * @return array
@@ -717,7 +715,7 @@ function hook_views_form_substitutions() {
  * Output can be added to the view by setting $view->attachment_before
  * and $view->attachment_after.
  *
- * @param \Drupal\views\ViewExecutable $view
+ * @param ViewExecutable $view
  *   The view object about to be processed.
  * @param string $display_id
  *   The machine name of the active display.
@@ -743,7 +741,7 @@ function hook_views_pre_view(ViewExecutable $view, $display_id, array &$args) {
  * Output can be added to the view by setting $view->attachment_before
  * and $view->attachment_after.
  *
- * @param \Drupal\views\ViewExecutable $view
+ * @param ViewExecutable $view
  *   The view object about to be processed.
  *
  * @see \Drupal\views\ViewExecutable
@@ -764,7 +762,7 @@ function hook_views_pre_build(ViewExecutable $view) {
  * Output can be added to the view by setting $view->attachment_before
  * and $view->attachment_after.
  *
- * @param \Drupal\views\ViewExecutable $view
+ * @param ViewExecutable $view
  *   The view object about to be processed.
  *
  * @see \Drupal\views\ViewExecutable
@@ -789,7 +787,7 @@ function hook_views_post_build(ViewExecutable $view) {
  * Output can be added to the view by setting $view->attachment_before
  * and $view->attachment_after.
  *
- * @param \Drupal\views\ViewExecutable $view
+ * @param ViewExecutable $view
  *   The view object about to be processed.
  *
  * @see \Drupal\views\ViewExecutable
@@ -815,7 +813,7 @@ function hook_views_pre_execute(ViewExecutable $view) {
  * Output can be added to the view by setting $view->attachment_before
  * and $view->attachment_after.
  *
- * @param \Drupal\views\ViewExecutable $view
+ * @param ViewExecutable $view
  *   The view object about to be processed.
  *
  * @see \Drupal\views\ViewExecutable
@@ -840,7 +838,7 @@ function hook_views_post_execute(ViewExecutable $view) {
  * Output can be added to the view by setting $view->attachment_before
  * and $view->attachment_after.
  *
- * @param \Drupal\views\ViewExecutable $view
+ * @param ViewExecutable $view
  *   The view object about to be processed.
  *
  * @see \Drupal\views\ViewExecutable
@@ -872,13 +870,13 @@ function hook_views_pre_render(ViewExecutable $view): void {
  * Alternatively, it could also implement hook_preprocess_HOOK() for
  * the particular view template, if there is one.
  *
- * @param \Drupal\views\ViewExecutable $view
+ * @param ViewExecutable $view
  *   The view object being processed.
  * @param array $output
  *   A structured content array representing the view output. The given array
  *   depends on the style plugin and can be either a render array or an array of
  *   render arrays.
- * @param \Drupal\views\Plugin\views\cache\CachePluginBase $cache
+ * @param CachePluginBase $cache
  *   The cache settings.
  *
  * @see \Drupal\views\ViewExecutable
@@ -895,9 +893,9 @@ function hook_views_post_render(ViewExecutable $view, array &$output, CachePlugi
 /**
  * Alter the query before it is executed.
  *
- * @param \Drupal\views\ViewExecutable $view
+ * @param ViewExecutable $view
  *   The view object about to be processed.
- * @param \Drupal\views\Plugin\views\query\QueryPluginBase $query
+ * @param QueryPluginBase $query
  *   The query plugin object for the query.
  *
  * @see hook_views_query_substitutions()
@@ -938,7 +936,7 @@ function hook_views_query_alter(ViewExecutable $view, QueryPluginBase $query) {
  *     information about the query and the display title and path.
  *   - statistics: An array of rows suitable for '#type' => 'table',
  *     containing performance statistics.
- * @param \Drupal\views\ViewExecutable $view
+ * @param ViewExecutable $view
  *   The view object.
  *
  * @see \Drupal\views_ui\ViewUI

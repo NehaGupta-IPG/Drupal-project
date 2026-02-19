@@ -28,7 +28,7 @@ abstract class EntityTestBundleResourceTestBase extends ConfigEntityResourceTest
   protected static $patchProtectedFieldNames = [];
 
   /**
-   * @var \Drupal\entity_test\Entity\EntityTestBundle
+   * @var EntityTestBundle
    */
   protected $entity;
 

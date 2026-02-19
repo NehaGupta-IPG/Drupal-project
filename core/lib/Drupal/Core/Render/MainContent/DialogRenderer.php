@@ -6,8 +6,8 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\OpenDialogCommand;
 use Drupal\Core\Controller\TitleResolverInterface;
-use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -18,23 +18,23 @@ class DialogRenderer implements MainContentRendererInterface {
   /**
    * The title resolver.
    *
-   * @var \Drupal\Core\Controller\TitleResolverInterface
+   * @var TitleResolverInterface
    */
   protected $titleResolver;
 
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * Constructs a new DialogRenderer.
    *
-   * @param \Drupal\Core\Controller\TitleResolverInterface $title_resolver
+   * @param TitleResolverInterface $title_resolver
    *   The title resolver.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
    */
   public function __construct(TitleResolverInterface $title_resolver, RendererInterface $renderer) {
@@ -72,7 +72,7 @@ class DialogRenderer implements MainContentRendererInterface {
    *
    * @param array &$options
    *   The 'target' option, if set, is used, and then removed from $options.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   When no 'target' option is set in $options, $route_match is used instead
    *   to determine the target.
    *
@@ -102,7 +102,7 @@ class DialogRenderer implements MainContentRendererInterface {
   /**
    * Returns the dialog options from request.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The HTTP request.
    *
    * @return array
@@ -123,9 +123,9 @@ class DialogRenderer implements MainContentRendererInterface {
    *
    * @param array $main_content
    *   The main content array.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
    *
    * @return \Stringable|string|null

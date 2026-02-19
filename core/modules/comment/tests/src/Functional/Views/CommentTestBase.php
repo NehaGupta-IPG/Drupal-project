@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Functional\Views;
 
+use Drupal\comment\Entity\Comment;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
-use Drupal\comment\Entity\Comment;
 
 /**
  * Provides setup and helper methods for comment views tests.
@@ -51,7 +51,7 @@ abstract class CommentTestBase extends ViewTestBase {
   /**
    * Stores a comment used by the tests.
    *
-   * @var \Drupal\comment\Entity\Comment
+   * @var Comment
    */
   protected $comment;
 

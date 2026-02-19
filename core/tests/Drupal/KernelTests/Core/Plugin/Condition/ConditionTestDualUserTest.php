@@ -20,14 +20,14 @@ class ConditionTestDualUserTest extends KernelTestBase {
   /**
    * An anonymous user for testing purposes.
    *
-   * @var \Drupal\user\Entity\User
+   * @var User
    */
   protected $anonymous;
 
   /**
    * An authenticated user for testing purposes.
    *
-   * @var \Drupal\user\Entity\User
+   * @var User
    */
   protected $authenticated;
 

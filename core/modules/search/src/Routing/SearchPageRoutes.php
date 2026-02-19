@@ -15,14 +15,14 @@ class SearchPageRoutes implements ContainerInjectionInterface {
   /**
    * The search page repository.
    *
-   * @var \Drupal\search\SearchPageRepositoryInterface
+   * @var SearchPageRepositoryInterface
    */
   protected $searchPageRepository;
 
   /**
    * Constructs a new search route subscriber.
    *
-   * @param \Drupal\search\SearchPageRepositoryInterface $search_page_repository
+   * @param SearchPageRepositoryInterface $search_page_repository
    *   The search page repository.
    */
   public function __construct(SearchPageRepositoryInterface $search_page_repository) {
@@ -41,7 +41,7 @@ class SearchPageRoutes implements ContainerInjectionInterface {
   /**
    * Returns an array of route objects.
    *
-   * @return \Symfony\Component\Routing\Route[]
+   * @return Route[]
    *   An array of route objects.
    */
   public function routes() {

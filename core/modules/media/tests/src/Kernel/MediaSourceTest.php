@@ -464,9 +464,9 @@ class MediaSourceTest extends MediaKernelTestBase {
       'source' => 'test',
     ]);
 
-    /** @var \Drupal\field\Entity\FieldConfig $field */
+    /** @var FieldConfig $field */
     $field = $type->getSource()->createSourceField($type);
-    /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
+    /** @var FieldStorageConfig $field_storage */
     $field_storage = $field->getFieldStorageDefinition();
 
     // Test field storage.
@@ -527,9 +527,9 @@ class MediaSourceTest extends MediaKernelTestBase {
     ]);
     $type->save();
 
-    /** @var \Drupal\field\Entity\FieldConfig $field */
+    /** @var FieldConfig $field */
     $field = $type->getSource()->createSourceField($type);
-    /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
+    /** @var FieldStorageConfig $field_storage */
     $field_storage = $field->getFieldStorageDefinition();
     $field_storage->save();
     // Field configuration depends on the field storage, which must be saved first.
@@ -545,9 +545,9 @@ class MediaSourceTest extends MediaKernelTestBase {
     ]);
     $type->save();
 
-    /** @var \Drupal\field\Entity\FieldConfig $field */
+    /** @var FieldConfig $field */
     $field = $type->getSource()->createSourceField($type);
-    /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
+    /** @var FieldStorageConfig $field_storage */
     $field_storage = $field->getFieldStorageDefinition();
     $field_storage->save();
     // Field configuration depends on the field storage, which must be saved first.

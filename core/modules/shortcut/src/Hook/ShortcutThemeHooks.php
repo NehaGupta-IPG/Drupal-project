@@ -5,9 +5,9 @@ namespace Drupal\shortcut\Hook;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Extension\ThemeSettingsProvider;
-use Drupal\Core\Url;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
 
 /**
  * Hook implementations for shortcut.

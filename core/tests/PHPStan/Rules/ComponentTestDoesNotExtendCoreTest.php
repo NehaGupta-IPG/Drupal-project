@@ -19,7 +19,7 @@ use PHPStan\Rules\RuleErrorBuilder;
 /**
  * Ensures that no component tests are extending a core test base class.
  *
- * @implements Rule<\PHPStan\Node\InClassNode>
+ * @implements Rule<InClassNode>
  *
  * @internal
  */

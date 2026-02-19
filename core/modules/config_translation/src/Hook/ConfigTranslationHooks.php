@@ -2,13 +2,13 @@
 
 namespace Drupal\config_translation\Hook;
 
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\field\FieldConfigInterface;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
-use Drupal\Core\Url;
-use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
+use Drupal\field\FieldConfigInterface;
 
 /**
  * Hook implementations for config_translation.

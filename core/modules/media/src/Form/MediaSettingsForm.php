@@ -5,9 +5,9 @@ namespace Drupal\media\Form;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\ConfigTarget;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Form\ConfigFormBase;
 use Drupal\media\IFrameUrlHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -21,27 +21,27 @@ class MediaSettingsForm extends ConfigFormBase {
   /**
    * The iFrame URL helper service.
    *
-   * @var \Drupal\media\IFrameUrlHelper
+   * @var IFrameUrlHelper
    */
   protected $iFrameUrlHelper;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * MediaSettingsForm constructor.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory service.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
+   * @param TypedConfigManagerInterface $typedConfigManager
    *   The typed config manager.
-   * @param \Drupal\media\IFrameUrlHelper $iframe_url_helper
+   * @param IFrameUrlHelper $iframe_url_helper
    *   The iFrame URL helper service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, IFrameUrlHelper $iframe_url_helper, EntityTypeManagerInterface $entity_type_manager) {

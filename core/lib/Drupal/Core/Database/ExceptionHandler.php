@@ -23,7 +23,7 @@ class ExceptionHandler {
    *   An associative array of options to control how the database operation is
    *   run.
    *
-   * @throws \Drupal\Core\Database\DatabaseExceptionWrapper
+   * @throws DatabaseExceptionWrapper
    */
   public function handleStatementException(\Exception $exception, string $sql, array $options = []): void {
     if ($exception instanceof \PDOException) {
@@ -42,7 +42,7 @@ class ExceptionHandler {
    *
    * @param \Exception $exception
    *   The exception to be handled.
-   * @param \Drupal\Core\Database\StatementInterface $statement
+   * @param StatementInterface $statement
    *   The statement object requested to be executed.
    * @param array $arguments
    *   An array of arguments for the prepared statement.
@@ -50,8 +50,8 @@ class ExceptionHandler {
    *   An associative array of options to control how the database operation is
    *   run.
    *
-   * @throws \Drupal\Core\Database\DatabaseExceptionWrapper
-   * @throws \Drupal\Core\Database\IntegrityConstraintViolationException
+   * @throws DatabaseExceptionWrapper
+   * @throws IntegrityConstraintViolationException
    */
   public function handleExecutionException(\Exception $exception, StatementInterface $statement, array $arguments = [], array $options = []): void {
     if ($exception instanceof \PDOException) {

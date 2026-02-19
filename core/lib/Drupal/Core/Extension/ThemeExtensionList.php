@@ -58,14 +58,14 @@ class ThemeExtensionList extends ExtensionList {
   /**
    * The config factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * The theme engine list needed by this theme list.
    *
-   * @var \Drupal\Core\Extension\ThemeEngineExtensionList
+   * @var ThemeEngineExtensionList
    */
   protected $engineList;
 
@@ -83,17 +83,17 @@ class ThemeExtensionList extends ExtensionList {
    *   The app root.
    * @param string $type
    *   The extension type.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The cache.
-   * @param \Drupal\Core\Extension\InfoParserInterface $info_parser
+   * @param InfoParserInterface $info_parser
    *   The info parser.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state service.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\Core\Extension\ThemeEngineExtensionList $engine_list
+   * @param ThemeEngineExtensionList $engine_list
    *   The theme engine extension listing.
    * @param string $install_profile
    *   The install profile used by the site.
@@ -202,7 +202,7 @@ class ThemeExtensionList extends ExtensionList {
    * Themes can inherit templates and function implementations from earlier
    * themes.
    *
-   * @param \Drupal\Core\Extension\Extension[] $themes
+   * @param Extension[] $themes
    *   An array of available themes.
    * @param string $theme
    *   The name of the theme whose base we are looking for.

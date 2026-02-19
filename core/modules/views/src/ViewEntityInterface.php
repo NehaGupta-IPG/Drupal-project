@@ -12,7 +12,7 @@ interface ViewEntityInterface extends ConfigEntityInterface {
   /**
    * Gets an executable instance for this view.
    *
-   * @return \Drupal\views\ViewExecutable
+   * @return ViewExecutable
    *   A view executable instance.
    */
   public function getExecutable();

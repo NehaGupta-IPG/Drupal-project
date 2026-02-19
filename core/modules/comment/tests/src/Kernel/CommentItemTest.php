@@ -57,7 +57,7 @@ class CommentItemTest extends FieldKernelTestBase {
     $this->assertInstanceOf(CommentItemInterface::class, $entity->comment[0]);
 
     // Test sample item generation.
-    /** @var \Drupal\entity_test\Entity\EntityTest $entity */
+    /** @var EntityTest $entity */
     $entity = EntityTest::create();
     $entity->comment->generateSampleItems();
     $this->entityValidateAndSave($entity);

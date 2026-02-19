@@ -36,14 +36,14 @@ class ViewsEntityRow implements ContainerDeriverInterface {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The views data service.
    *
-   * @var \Drupal\views\ViewsData
+   * @var ViewsData
    */
   protected $viewsData;
 
@@ -52,9 +52,9 @@ class ViewsEntityRow implements ContainerDeriverInterface {
    *
    * @param string $base_plugin_id
    *   The base plugin ID.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\views\ViewsData $views_data
+   * @param ViewsData $views_data
    *   The views data service.
    */
   public function __construct($base_plugin_id, EntityTypeManagerInterface $entity_type_manager, ViewsData $views_data) {

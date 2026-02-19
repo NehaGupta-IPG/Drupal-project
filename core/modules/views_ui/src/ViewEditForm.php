@@ -2,12 +2,13 @@
 
 namespace Drupal\views_ui;
 
-use Drupal\Component\Utility\Html;
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\HtmlCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Datetime\DateFormatterInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Render\ElementInfoManagerInterface;
@@ -19,7 +20,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
  * Form controller for the Views edit form.
@@ -38,52 +38,52 @@ class ViewEditForm extends ViewFormBase {
   /**
    * The request object.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * The date formatter service.
    *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
+   * @var DateFormatterInterface
    */
   protected $dateFormatter;
 
   /**
    * The element info manager.
    *
-   * @var \Drupal\Core\Render\ElementInfoManagerInterface
+   * @var ElementInfoManagerInterface
    */
   protected $elementInfo;
 
   /**
    * The theme manager.
    *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   * @var ThemeManagerInterface
    */
   protected $themeManager;
 
   /**
    * The module handler service.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * Constructs a new ViewEditForm object.
    *
-   * @param \Drupal\Core\TempStore\SharedTempStoreFactory $temp_store_factory
+   * @param SharedTempStoreFactory $temp_store_factory
    *   The factory for the temp store object.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   * @param RequestStack $requestStack
    *   The request stack object.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   * @param DateFormatterInterface $date_formatter
    *   The date Formatter service.
-   * @param \Drupal\Core\Render\ElementInfoManagerInterface $element_info
+   * @param ElementInfoManagerInterface $element_info
    *   The element info manager.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
+   * @param ThemeManagerInterface $theme_manager
    *   The theme manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler service.
    */
   public function __construct(SharedTempStoreFactory $temp_store_factory, RequestStack $requestStack, DateFormatterInterface $date_formatter, ElementInfoManagerInterface $element_info, ThemeManagerInterface $theme_manager, ModuleHandlerInterface $module_handler) {
@@ -113,7 +113,7 @@ class ViewEditForm extends ViewFormBase {
    * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state) {
-    /** @var \Drupal\views_ui\ViewUI $view */
+    /** @var ViewUI $view */
     $view = $this->entity;
     $display_id = $this->displayID;
     // Do not allow the form to be cached, because $form_state->get('view') can
@@ -372,7 +372,7 @@ class ViewEditForm extends ViewFormBase {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function cancel(array $form, FormStateInterface $form_state) {
@@ -416,7 +416,7 @@ class ViewEditForm extends ViewFormBase {
   /**
    * Helper function to get the display details section of the edit UI.
    *
-   * @param \Drupal\views_ui\ViewUI $view
+   * @param ViewUI $view
    *   The ViewUI entity.
    * @param array $display
    *   The display.
@@ -716,9 +716,9 @@ class ViewEditForm extends ViewFormBase {
   /**
    * Regenerate the current tab for AJAX updates.
    *
-   * @param \Drupal\views_ui\ViewUI $view
+   * @param ViewUI $view
    *   The view to regenerate its tab.
-   * @param \Drupal\Core\Ajax\AjaxResponse $response
+   * @param AjaxResponse $response
    *   The response object to add new commands to.
    * @param string $display_id
    *   The display ID of the tab to regenerate.

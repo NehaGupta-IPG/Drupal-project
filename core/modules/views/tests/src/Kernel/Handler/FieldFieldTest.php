@@ -56,14 +56,14 @@ class FieldFieldTest extends ViewsKernelTestBase {
   /**
    * The stored test entities.
    *
-   * @var \Drupal\entity_test\Entity\EntityTest[]
+   * @var EntityTest[]
    */
   protected $entities;
 
   /**
    * The stored revisionable test entities.
    *
-   * @var \Drupal\entity_test\Entity\EntityTestRev[]
+   * @var EntityTestRev[]
    */
   protected $entityRevision;
 

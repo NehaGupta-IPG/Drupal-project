@@ -8,8 +8,8 @@ use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 use Drupal\TestTools\Extension\Dump\DebugDump;
 use PHPUnit\Framework\Attributes\BeforeClass;
@@ -89,7 +89,7 @@ abstract class UnitTestCase extends TestCase {
    *   configuration object names and whose values are key => value arrays for
    *   the configuration object in question. Defaults to an empty array.
    *
-   * @return \PHPUnit\Framework\MockObject\MockObject|\Drupal\Core\Config\ConfigFactoryInterface
+   * @return MockObject|ConfigFactoryInterface
    *   A mock configuration factory object.
    */
   public function getConfigFactoryStub(array $configs = []) {
@@ -146,7 +146,7 @@ abstract class UnitTestCase extends TestCase {
   /**
    * Returns a stub translation manager that just returns the passed string.
    *
-   * @return \PHPUnit\Framework\MockObject\MockObject|\Drupal\Core\StringTranslation\TranslationInterface
+   * @return MockObject|TranslationInterface
    *   A mock translation object.
    */
   public function getStringTranslationStub() {
@@ -174,10 +174,10 @@ abstract class UnitTestCase extends TestCase {
   /**
    * Sets up a container with a cache tags invalidator.
    *
-   * @param \Drupal\Core\Cache\CacheTagsInvalidatorInterface $cache_tags_validator
+   * @param CacheTagsInvalidatorInterface $cache_tags_validator
    *   The cache tags invalidator.
    *
-   * @return \Symfony\Component\DependencyInjection\ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @return \Symfony\Component\DependencyInjection\ContainerInterface|MockObject
    *   The container with the cache tags invalidator service.
    */
   protected function getContainerWithCacheTagsInvalidator(CacheTagsInvalidatorInterface $cache_tags_validator) {
@@ -194,7 +194,7 @@ abstract class UnitTestCase extends TestCase {
   /**
    * Returns a stub class resolver.
    *
-   * @return \Drupal\Core\DependencyInjection\ClassResolverInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @return \Drupal\Core\DependencyInjection\ClassResolverInterface|MockObject
    *   The class resolver stub.
    */
   protected function getClassResolverStub() {
@@ -219,15 +219,15 @@ abstract class UnitTestCase extends TestCase {
    * \Iterator which requires setting up five methods. Instead, this helper
    * can be used.
    *
-   * @param \PHPUnit\Framework\MockObject\MockObject&\Iterator $mock
+   * @param MockObject&\Iterator $mock
    *   A mock object mocking a traversable class.
    * @param array $items
    *   The items to return when this mock is iterated.
    *
-   * @return \PHPUnit\Framework\MockObject\MockObject&\Iterator
+   * @return MockObject&\Iterator
    *   The same mock object ready to be iterated.
    *
-   * @template T of \PHPUnit\Framework\MockObject\MockObject&\Iterator
+   * @template T of MockObject&\Iterator
    * @phpstan-param T $mock
    * @phpstan-return T
    * @see https://github.com/sebastianbergmann/phpunit-mock-objects/issues/103

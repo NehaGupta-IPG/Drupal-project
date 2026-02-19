@@ -20,9 +20,9 @@ interface MainContentRendererInterface {
    *
    * @param array $main_content
    *   The render array representing the main content.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object, for context.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match, for context.
    *
    * @return \Symfony\Component\HttpFoundation\Response

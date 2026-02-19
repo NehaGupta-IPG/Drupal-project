@@ -27,7 +27,7 @@ abstract class PageCacheTagsTestBase extends BrowserTestBase {
   /**
    * Verify that when loading a given page, it's a page cache hit or miss.
    *
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   The page for this URL will be loaded.
    * @param string $hit_or_miss
    *   'HIT' if a page cache hit is expected, 'MISS' otherwise.
@@ -54,7 +54,7 @@ abstract class PageCacheTagsTestBase extends BrowserTestBase {
   /**
    * Verify that when loading a given page, it's a page cache hit or miss.
    *
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   The page for this URL will be loaded.
    * @param string $hit_or_miss
    *   'HIT' if a page cache hit is expected, 'MISS' otherwise.

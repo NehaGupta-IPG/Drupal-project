@@ -8,10 +8,10 @@ use Drupal\Component\Datetime\DateTimePlus;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItem;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Tests\ViewTestData;
-use Drupal\field\Entity\FieldStorageConfig;
 
 /**
  * Base class for testing datetime handlers.

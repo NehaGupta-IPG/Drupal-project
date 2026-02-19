@@ -41,7 +41,7 @@ class WorkflowAccessControlHandlerTest extends KernelTestBase {
   /**
    * The workflow access control handler.
    *
-   * @var \Drupal\workflows\WorkflowAccessControlHandler
+   * @var WorkflowAccessControlHandler
    */
   protected $accessControlHandler;
 

@@ -19,9 +19,9 @@ interface DynamicallyFieldableEntityStorageSchemaInterface extends EntityStorage
   /**
    * Checks if the changes to the storage definition requires schema changes.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The updated field storage definition.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $original
+   * @param FieldStorageDefinitionInterface $original
    *   The original field storage definition.
    *
    * @return bool
@@ -56,9 +56,9 @@ interface DynamicallyFieldableEntityStorageSchemaInterface extends EntityStorage
    * perform an automated update, and will instead need to perform a site
    * migration or invoke some custom update process.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The updated field storage definition.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $original
+   * @param FieldStorageDefinitionInterface $original
    *   The original field storage definition.
    *
    * @return bool
@@ -71,7 +71,7 @@ interface DynamicallyFieldableEntityStorageSchemaInterface extends EntityStorage
   /**
    * Performs final cleanup after all data of a field has been purged.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field being purged.
    */
   public function finalizePurge(FieldStorageDefinitionInterface $storage_definition);

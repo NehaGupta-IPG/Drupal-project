@@ -16,14 +16,14 @@ class RoleSettingsForm extends FormBase {
   /**
    * The role storage used when changing the admin role.
    *
-   * @var \Drupal\user\RoleStorageInterface
+   * @var RoleStorageInterface
    */
   protected $roleStorage;
 
   /**
    * Constructs a \Drupal\user\Form\RoleSettingsForm object.
    *
-   * @param \Drupal\user\RoleStorageInterface $role_storage
+   * @param RoleStorageInterface $role_storage
    *   The role storage.
    */
   public function __construct(RoleStorageInterface $role_storage) {

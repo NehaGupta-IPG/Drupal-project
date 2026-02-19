@@ -116,7 +116,7 @@ class FrontMatter {
    *   - data: The front matter data extracted and decoded.
    *   - line: The line number where the real content starts.
    *
-   * @throws \Drupal\Component\FrontMatter\Exception\FrontMatterParseException
+   * @throws FrontMatterParseException
    */
   protected function parse(): array {
     if (!$this->parsed) {
@@ -167,7 +167,7 @@ class FrontMatter {
    * @return string
    *   The extracted source content.
    *
-   * @throws \Drupal\Component\FrontMatter\Exception\FrontMatterParseException
+   * @throws FrontMatterParseException
    */
   public function getContent(): string {
     return $this->parse()['content'];
@@ -179,7 +179,7 @@ class FrontMatter {
    * @return array
    *   The extracted front matter data.
    *
-   * @throws \Drupal\Component\FrontMatter\Exception\FrontMatterParseException
+   * @throws FrontMatterParseException
    */
   public function getData(): array {
     return $this->parse()['data'];
@@ -191,7 +191,7 @@ class FrontMatter {
    * @return int
    *   The source content line.
    *
-   * @throws \Drupal\Component\FrontMatter\Exception\FrontMatterParseException
+   * @throws FrontMatterParseException
    */
   public function getLine(): int {
     return $this->parse()['line'];

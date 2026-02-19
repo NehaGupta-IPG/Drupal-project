@@ -19,7 +19,7 @@ class AnnounceController extends ControllerBase implements ContainerInjectionInt
   /**
    * Constructs an AnnounceController object.
    *
-   * @param \Drupal\announcements_feed\AnnounceRenderer $announceRenderer
+   * @param AnnounceRenderer $announceRenderer
    *   The AnnounceRenderer service.
    */
   public function __construct(
@@ -30,7 +30,7 @@ class AnnounceController extends ControllerBase implements ContainerInjectionInt
   /**
    * Returns the list of Announcements.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
    * @return array

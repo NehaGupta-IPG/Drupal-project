@@ -25,28 +25,28 @@ class EntityOperationsUnitTest extends UnitTestCase {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityTypeManagerInterface|MockObject
    */
   protected $entityTypeManager;
 
   /**
    * The entity repository.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityRepositoryInterface|MockObject
    */
   protected $entityRepository;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Language\LanguageManagerInterface|MockObject
    */
   protected $languageManager;
 
   /**
    * The plugin under test.
    *
-   * @var \Drupal\views\Plugin\views\field\EntityOperations
+   * @var EntityOperations
    */
   protected $plugin;
 

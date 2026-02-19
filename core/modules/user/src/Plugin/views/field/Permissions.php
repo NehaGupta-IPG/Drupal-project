@@ -6,8 +6,8 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\views\Attribute\ViewsField;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
-use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\field\PrerenderList;
+use Drupal\views\ViewExecutable;
 
 /**
  * Field handler to provide a list of permissions.
@@ -27,7 +27,7 @@ class Permissions extends PrerenderList {
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
@@ -40,9 +40,9 @@ class Permissions extends PrerenderList {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, ModuleHandlerInterface $module_handler, EntityTypeManagerInterface $entity_type_manager) {

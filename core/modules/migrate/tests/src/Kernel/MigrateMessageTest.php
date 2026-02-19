@@ -29,7 +29,7 @@ class MigrateMessageTest extends KernelTestBase implements MigrateMessageInterfa
   /**
    * Migration to run.
    *
-   * @var \Drupal\migrate\Plugin\MigrationInterface
+   * @var MigrationInterface
    */
   protected $migration;
 
@@ -129,7 +129,7 @@ class MigrateMessageTest extends KernelTestBase implements MigrateMessageInterfa
   /**
    * Reacts to map message event.
    *
-   * @param \Drupal\migrate\Event\MigrateIdMapMessageEvent $event
+   * @param MigrateIdMapMessageEvent $event
    *   The migration event.
    * @param string $name
    *   The event name.

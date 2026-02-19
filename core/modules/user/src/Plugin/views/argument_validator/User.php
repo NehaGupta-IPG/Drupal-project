@@ -6,10 +6,10 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use Drupal\views\Plugin\views\argument\ArgumentPluginBase;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Plugin\views\argument_validator\Entity;
 
 /**

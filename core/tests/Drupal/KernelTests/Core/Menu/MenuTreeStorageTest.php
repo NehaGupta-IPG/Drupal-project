@@ -25,7 +25,7 @@ class MenuTreeStorageTest extends KernelTestBase {
   /**
    * The tested tree storage.
    *
-   * @var \Drupal\Core\Menu\MenuTreeStorage
+   * @var MenuTreeStorage
    */
   protected $treeStorage;
 

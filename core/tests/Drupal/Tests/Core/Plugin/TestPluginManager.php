@@ -22,7 +22,7 @@ class TestPluginManager extends DefaultPluginManager {
    *   keyed by the corresponding namespace to look for plugin implementations.
    * @param array $definitions
    *   An array of static definitions.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   (optional) The module handler to invoke the alter hook with.
    * @param string $alter_hook
    *   (optional) Name of the alter hook.

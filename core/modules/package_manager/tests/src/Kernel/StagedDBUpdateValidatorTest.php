@@ -143,7 +143,7 @@ class StagedDBUpdateValidatorTest extends PackageManagerKernelTestBase {
    * @param string $file_extension
    *   The extension of the update file, without the leading period. Must be
    *   either `install` or `post_update.php`.
-   * @param \Drupal\package_manager\ValidationResult[] $expected_results
+   * @param ValidationResult[] $expected_results
    *   The expected validation results.
    */
   #[DataProvider('providerStagedDatabaseUpdate')]

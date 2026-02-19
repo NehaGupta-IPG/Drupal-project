@@ -115,7 +115,7 @@ class TermParentsTest extends BrowserTestBase {
    * @param string $name
    *   The name of the term to create.
    *
-   * @return \Drupal\taxonomy\TermInterface
+   * @return TermInterface
    *   The newly created taxonomy term.
    */
   protected function submitAddTermForm($name) {
@@ -128,7 +128,7 @@ class TermParentsTest extends BrowserTestBase {
       ->accessCheck(FALSE)
       ->condition('name', $name)
       ->execute();
-    /** @var \Drupal\taxonomy\TermInterface $term_1 */
+    /** @var TermInterface $term_1 */
     $term_1 = $this->termStorage->load(reset($result));
     $this->assertInstanceOf(TermInterface::class, $term_1);
     return $term_1;
@@ -194,7 +194,7 @@ class TermParentsTest extends BrowserTestBase {
   /**
    * Performs tests that edit terms with a single parent.
    *
-   * @return \Drupal\taxonomy\TermInterface[]
+   * @return TermInterface[]
    *   A list of terms created for testing.
    */
   protected function doTestEditingSingleParent(): array {
@@ -321,11 +321,11 @@ class TermParentsTest extends BrowserTestBase {
    * @param int[] $parent_ids
    *   (optional) A list of parent term IDs.
    *
-   * @return \Drupal\taxonomy\TermInterface
+   * @return TermInterface
    *   The created term.
    */
   protected function createTerm($name, array $parent_ids = []) {
-    /** @var \Drupal\taxonomy\TermInterface $term */
+    /** @var TermInterface $term */
     $term = $this->termStorage->create([
       'name' => $name,
       'vid' => $this->vocabularyId,
@@ -363,7 +363,7 @@ class TermParentsTest extends BrowserTestBase {
   /**
    * Asserts that the parents of the term have not changed after saving.
    *
-   * @param \Drupal\taxonomy\TermInterface $term
+   * @param TermInterface $term
    *   The term to check.
    *
    * @internal

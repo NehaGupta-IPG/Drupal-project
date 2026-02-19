@@ -27,7 +27,7 @@ abstract class ModerationStateTestBase extends BrowserTestBase {
   /**
    * Admin user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $adminUser;
 
@@ -154,7 +154,7 @@ abstract class ModerationStateTestBase extends BrowserTestBase {
   /**
    * Grants given user permission to create content of given type.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   User to grant permission to.
    * @param string $content_type_id
    *   Content type ID.

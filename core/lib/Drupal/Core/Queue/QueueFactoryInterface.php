@@ -13,7 +13,7 @@ interface QueueFactoryInterface {
    * @param string $name
    *   The name of the queue.
    *
-   * @return \Drupal\Core\Queue\QueueInterface
+   * @return QueueInterface
    *   The queue object.
    */
   public function get($name);

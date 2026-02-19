@@ -27,14 +27,14 @@ class UnpackRecipeTest extends BuildTestBase {
   /**
    * The Symfony FileSystem component.
    *
-   * @var \Composer\Util\Filesystem
+   * @var Filesystem
    */
   protected Filesystem $fileSystem;
 
   /**
    * The Fixtures object.
    *
-   * @var \Drupal\Tests\Composer\Plugin\Unpack\Fixtures
+   * @var Fixtures
    */
   protected Fixtures $fixtures;
 

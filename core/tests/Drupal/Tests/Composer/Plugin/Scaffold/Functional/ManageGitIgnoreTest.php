@@ -50,7 +50,7 @@ class ManageGitIgnoreTest extends TestCase {
   /**
    * The Fixtures object.
    *
-   * @var \Drupal\Tests\Composer\Plugin\Scaffold\Fixtures
+   * @var Fixtures
    */
   protected $fixtures;
 

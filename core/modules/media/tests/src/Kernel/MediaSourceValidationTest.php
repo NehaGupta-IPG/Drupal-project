@@ -77,10 +77,10 @@ final class MediaSourceValidationTest extends KernelTestBase {
    *
    * @param array $requestHistory
    *   History container.
-   * @param \GuzzleHttp\Psr7\Response|\Exception ...$responses
+   * @param Response|\Exception ...$responses
    *   Responses.
    *
-   * @return \GuzzleHttp\ClientInterface
+   * @return ClientInterface
    *   Mock client
    */
   protected function mockClient(array &$requestHistory, Response|\Exception ...$responses): ClientInterface {

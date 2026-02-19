@@ -86,7 +86,7 @@ class MediaAccessTest extends MediaFunctionalTestBase {
     $assert_session->statusCodeEquals(200);
 
     $this->drupalLogin($this->nonAdminUser);
-    /** @var \Drupal\user\RoleInterface $role */
+    /** @var RoleInterface $role */
     $role = Role::load(RoleInterface::AUTHENTICATED_ID);
 
     user_role_revoke_permissions($role->id(), ['view media']);
@@ -265,7 +265,7 @@ class MediaAccessTest extends MediaFunctionalTestBase {
     $user_media->save();
 
     $this->drupalLogin($this->nonAdminUser);
-    /** @var \Drupal\user\RoleInterface $role */
+    /** @var RoleInterface $role */
     $role = Role::load(RoleInterface::AUTHENTICATED_ID);
 
     user_role_revoke_permissions($role->id(), ['view media']);

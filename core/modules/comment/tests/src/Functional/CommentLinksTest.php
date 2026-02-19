@@ -23,7 +23,7 @@ class CommentLinksTest extends CommentTestBase {
   /**
    * Comment being tested.
    *
-   * @var \Drupal\comment\CommentInterface
+   * @var CommentInterface
    */
   protected $comment;
 

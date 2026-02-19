@@ -2,6 +2,7 @@
 
 namespace Drupal\Composer\Generator;
 
+use Symfony\Component\Finder\SplFileInfo;
 use Composer\IO\IOInterface;
 use Composer\Semver\VersionParser;
 use Composer\Script\Event;
@@ -33,14 +34,14 @@ class ComponentGenerator {
   /**
    * Data from drupal/drupal's composer.json file.
    *
-   * @var \Drupal\Composer\Generator\Util\DrupalCoreComposer
+   * @var DrupalCoreComposer
    */
   protected $drupalProjectInfo;
 
   /**
    * Data from drupal/core's composer.json file.
    *
-   * @var \Drupal\Composer\Generator\Util\DrupalCoreComposer
+   * @var DrupalCoreComposer
    */
   protected $drupalCoreInfo;
 
@@ -54,7 +55,7 @@ class ComponentGenerator {
   /**
    * Find all the composer.json files for components.
    *
-   * @return \Symfony\Component\Finder\Finder
+   * @return Finder
    *   A Finder object with all the composer.json files for components.
    */
   public function getComponentPathsFinder(): Finder {
@@ -82,7 +83,7 @@ class ComponentGenerator {
     $this->drupalCoreInfo = DrupalCoreComposer::createFromPath($base_dir . '/core');
 
     $changed = FALSE;
-    /** @var \Symfony\Component\Finder\SplFileInfo $component_composer_json */
+    /** @var SplFileInfo $component_composer_json */
     foreach ($this->getComponentPathsFinder()->getIterator() as $component_composer_json) {
       $changed |= $this->generateComponentPackage($event, $component_composer_json->getRelativePathname());
     }

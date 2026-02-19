@@ -31,7 +31,7 @@ class ViewsBlock implements ContainerDeriverInterface {
   /**
    * The view storage.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var EntityStorageInterface
    */
   protected $viewStorage;
 
@@ -50,7 +50,7 @@ class ViewsBlock implements ContainerDeriverInterface {
    *
    * @param string $base_plugin_id
    *   The base plugin ID.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $view_storage
+   * @param EntityStorageInterface $view_storage
    *   The entity storage to load views.
    */
   public function __construct($base_plugin_id, EntityStorageInterface $view_storage) {

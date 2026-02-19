@@ -37,32 +37,32 @@ class ContentTranslationSynchronizedFieldsConstraintValidator extends Constraint
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The content translation manager.
    *
-   * @var \Drupal\content_translation\ContentTranslationManagerInterface
+   * @var ContentTranslationManagerInterface
    */
   protected $contentTranslationManager;
 
   /**
    * The field translation synchronizer.
    *
-   * @var \Drupal\content_translation\FieldTranslationSynchronizerInterface
+   * @var FieldTranslationSynchronizerInterface
    */
   protected $synchronizer;
 
   /**
    * ContentTranslationSynchronizedFieldsConstraintValidator constructor.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\content_translation\ContentTranslationManagerInterface $content_translation_manager
+   * @param ContentTranslationManagerInterface $content_translation_manager
    *   The content translation manager.
-   * @param \Drupal\content_translation\FieldTranslationSynchronizerInterface $synchronizer
+   * @param FieldTranslationSynchronizerInterface $synchronizer
    *   The field translation synchronizer.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, ContentTranslationManagerInterface $content_translation_manager, FieldTranslationSynchronizerInterface $synchronizer) {
@@ -87,7 +87,7 @@ class ContentTranslationSynchronizedFieldsConstraintValidator extends Constraint
    */
   public function validate($value, Constraint $constraint): void {
     /** @var \Drupal\content_translation\Plugin\Validation\Constraint\ContentTranslationSynchronizedFieldsConstraint $constraint */
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     $entity = $value;
     if ($entity->isNew() || !$entity->getEntityType()->isRevisionable()) {
       return;
@@ -106,7 +106,7 @@ class ContentTranslationSynchronizedFieldsConstraintValidator extends Constraint
       return;
     }
 
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $original */
+    /** @var ContentEntityInterface $original */
     $original = $this->getOriginalEntity($entity);
     $original_translation = $this->getOriginalTranslation($entity, $original);
     if ($this->hasSynchronizedPropertyChanges($entity, $original_translation, $synchronized_properties)) {
@@ -127,9 +127,9 @@ class ContentTranslationSynchronizedFieldsConstraintValidator extends Constraint
   /**
    * Checks whether any synchronized property has changes.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity being validated.
-   * @param \Drupal\Core\Entity\ContentEntityInterface $original
+   * @param ContentEntityInterface $original
    *   The original unchanged entity.
    * @param string[][] $synchronized_properties
    *   An associative array of arrays of synchronized field properties keyed by
@@ -162,10 +162,10 @@ class ContentTranslationSynchronizedFieldsConstraintValidator extends Constraint
   /**
    * Returns the original unchanged entity to be used to detect changes.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity being changed.
    *
-   * @return \Drupal\Core\Entity\ContentEntityInterface
+   * @return ContentEntityInterface
    *   The unchanged entity.
    */
   protected function getOriginalEntity(ContentEntityInterface $entity) {
@@ -183,12 +183,12 @@ class ContentTranslationSynchronizedFieldsConstraintValidator extends Constraint
   /**
    * Returns the original translation.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity being validated.
-   * @param \Drupal\Core\Entity\ContentEntityInterface $original
+   * @param ContentEntityInterface $original
    *   The original entity.
    *
-   * @return \Drupal\Core\Entity\ContentEntityInterface
+   * @return ContentEntityInterface
    *   The original entity translation object.
    */
   protected function getOriginalTranslation(ContentEntityInterface $entity, ContentEntityInterface $original) {
@@ -212,7 +212,7 @@ class ContentTranslationSynchronizedFieldsConstraintValidator extends Constraint
   /**
    * Returns the synchronized properties for every specified field.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface[] $field_definitions
+   * @param FieldDefinitionInterface[] $field_definitions
    *   An array of field definitions.
    *
    * @return string[][]

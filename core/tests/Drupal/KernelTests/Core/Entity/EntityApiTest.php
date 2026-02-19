@@ -48,7 +48,7 @@ class EntityApiTest extends EntityKernelTestBase {
    *
    * @param string $entity_type
    *   The entity type to run the tests with.
-   * @param \Drupal\user\UserInterface $user1
+   * @param UserInterface $user1
    *   The user to run the tests with.
    *
    * @internal

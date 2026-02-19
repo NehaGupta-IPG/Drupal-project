@@ -107,7 +107,7 @@ final class ProjectRelease {
    * @param array $release_data
    *   The project release data as returned by update_get_available().
    *
-   * @return \Drupal\update\ProjectRelease
+   * @return ProjectRelease
    *   The ProjectRelease instance.
    *
    * @throws \UnexpectedValueException

@@ -22,10 +22,10 @@ trait AccessibleTestingTrait {
   /**
    * Creates AccessibleInterface object from access result object for testing.
    *
-   * @param \Drupal\Core\Access\AccessResultInterface $accessResult
+   * @param AccessResultInterface $accessResult
    *   The accessible result to return.
    *
-   * @return \Drupal\Core\Access\AccessibleInterface
+   * @return AccessibleInterface
    *   The AccessibleInterface object.
    */
   private function createAccessibleDouble(AccessResultInterface $accessResult) {

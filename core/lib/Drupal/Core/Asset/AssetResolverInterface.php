@@ -28,7 +28,7 @@ interface AssetResolverInterface {
    * - CSS_LAYOUT
    * - CSS_COMPONENT
    * - CSS_STATE
-   * - CSS_THEME
+   * - CSS_THEME.
    *
    * This ensures proper cascading of styles so themes can easily override
    * module styles through CSS selectors.
@@ -40,12 +40,12 @@ interface AssetResolverInterface {
    *
    * Also invokes hook_css_alter(), to allow CSS assets to be altered.
    *
-   * @param \Drupal\Core\Asset\AttachedAssetsInterface $assets
+   * @param AttachedAssetsInterface $assets
    *   The assets attached to the current response.
    * @param bool $optimize
    *   Whether to apply the CSS asset collection optimizer, to return an
    *   optimized CSS asset collection rather than an unoptimized one.
-   * @param \Drupal\Core\Language\LanguageInterface $language
+   * @param LanguageInterface $language
    *   (optional) The interface language the assets will be rendered with.
    *
    * @return array
@@ -68,14 +68,14 @@ interface AssetResolverInterface {
    * way to add JavaScript during hook_js_alter() is to add another element to
    * the $javascript array. See locale_js_alter() for an example of this.
    *
-   * @param \Drupal\Core\Asset\AttachedAssetsInterface $assets
+   * @param AttachedAssetsInterface $assets
    *   The assets attached to the current response.
    *   Note that this object is modified to reflect the final JavaScript
    *   settings assets.
    * @param bool $optimize
    *   Whether to apply the JavaScript asset collection optimizer, to return
    *   optimized JavaScript asset collections rather than an unoptimized ones.
-   * @param \Drupal\Core\Language\LanguageInterface $language
+   * @param LanguageInterface $language
    *   (optional) The interface language for the assets will be rendered with.
    *
    * @return array

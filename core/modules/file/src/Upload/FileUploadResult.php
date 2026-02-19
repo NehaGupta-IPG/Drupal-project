@@ -36,14 +36,14 @@ class FileUploadResult {
   /**
    * The File entity.
    *
-   * @var \Drupal\file\FileInterface
+   * @var FileInterface
    */
   protected $file;
 
   /**
    * The constraint violations.
    *
-   * @var \Symfony\Component\Validator\ConstraintViolationListInterface
+   * @var ConstraintViolationListInterface
    */
   protected ConstraintViolationListInterface $violations;
 
@@ -103,7 +103,7 @@ class FileUploadResult {
   /**
    * Sets the File entity.
    *
-   * @param \Drupal\file\FileInterface $file
+   * @param FileInterface $file
    *   A file entity.
    *
    * @return $this
@@ -146,7 +146,7 @@ class FileUploadResult {
   /**
    * Gets the File entity.
    *
-   * @return \Drupal\file\FileInterface
+   * @return FileInterface
    *   The file entity.
    */
   public function getFile(): FileInterface {
@@ -156,7 +156,7 @@ class FileUploadResult {
   /**
    * Adds a constraint violation.
    *
-   * @param \Symfony\Component\Validator\ConstraintViolationInterface $violation
+   * @param ConstraintViolationInterface $violation
    *   The constraint violation.
    */
   public function addViolation(ConstraintViolationInterface $violation): void {
@@ -166,7 +166,7 @@ class FileUploadResult {
   /**
    * Adds constraint violations.
    *
-   * @param \Symfony\Component\Validator\ConstraintViolationListInterface $violations
+   * @param ConstraintViolationListInterface $violations
    *   The constraint violations.
    */
   public function addViolations(ConstraintViolationListInterface $violations): void {
@@ -176,7 +176,7 @@ class FileUploadResult {
   /**
    * Gets the constraint violations.
    *
-   * @return \Symfony\Component\Validator\ConstraintViolationListInterface
+   * @return ConstraintViolationListInterface
    *   The constraint violations.
    */
   public function getViolations(): ConstraintViolationListInterface {

@@ -2,8 +2,8 @@
 
 namespace Drupal\user;
 
-use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
@@ -218,7 +218,7 @@ interface UserInterface extends ContentEntityInterface, EntityChangedInterface, 
   /**
    * Checks the existing password if set.
    *
-   * @param \Drupal\user\UserInterface $account_unchanged
+   * @param UserInterface $account_unchanged
    *   The unchanged user entity to compare against.
    *
    * @return bool

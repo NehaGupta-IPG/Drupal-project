@@ -31,7 +31,7 @@ class ExceptionJsonSubscriber extends HttpExceptionSubscriberBase {
   /**
    * Handles all 4xx errors for JSON.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   * @param ExceptionEvent $event
    *   The event to process.
    */
   public function on4xx(ExceptionEvent $event) {

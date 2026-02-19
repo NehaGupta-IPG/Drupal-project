@@ -23,7 +23,7 @@ class EnforcedResponse extends Response {
   /**
    * The wrapped response object.
    *
-   * @var \Symfony\Component\HttpFoundation\Response
+   * @var Response
    */
   protected $response;
 
@@ -56,7 +56,7 @@ class EnforcedResponse extends Response {
    *
    * Use EnforcedResponse::createFromException() instead.
    *
-   * @param \Symfony\Component\HttpFoundation\Response $response
+   * @param Response $response
    *   The response to wrap.
    */
   public function __construct(Response $response) {
@@ -67,7 +67,7 @@ class EnforcedResponse extends Response {
   /**
    * Returns the wrapped response.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   The wrapped response.
    */
   public function getResponse() {

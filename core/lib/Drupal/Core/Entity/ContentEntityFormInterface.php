@@ -13,10 +13,10 @@ interface ContentEntityFormInterface extends EntityFormInterface {
   /**
    * Gets the form display.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
-   * @return \Drupal\Core\Entity\Display\EntityFormDisplayInterface
+   * @return EntityFormDisplayInterface
    *   The current form display.
    */
   public function getFormDisplay(FormStateInterface $form_state);
@@ -27,9 +27,9 @@ interface ContentEntityFormInterface extends EntityFormInterface {
    * Sets the form display which will be used for populating form element
    * defaults.
    *
-   * @param \Drupal\Core\Entity\Display\EntityFormDisplayInterface $form_display
+   * @param EntityFormDisplayInterface $form_display
    *   The form display that the current form operates with.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return $this
@@ -39,7 +39,7 @@ interface ContentEntityFormInterface extends EntityFormInterface {
   /**
    * Gets the code identifying the active form language.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return string
@@ -50,7 +50,7 @@ interface ContentEntityFormInterface extends EntityFormInterface {
   /**
    * Checks whether the current form language matches the entity one.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return bool
@@ -70,7 +70,7 @@ interface ContentEntityFormInterface extends EntityFormInterface {
    * For more information about entity validation, see
    * https://www.drupal.org/node/2015613.
    *
-   * @return \Drupal\Core\Entity\ContentEntityInterface
+   * @return ContentEntityInterface
    *   The built entity.
    */
   public function validateForm(array &$form, FormStateInterface $form_state);

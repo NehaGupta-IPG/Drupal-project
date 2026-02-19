@@ -38,28 +38,28 @@ class LayoutPluginManagerTest extends UnitTestCase {
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The theme handler.
    *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
+   * @var ThemeHandlerInterface
    */
   protected $themeHandler;
 
   /**
    * The theme manager.
    *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   * @var ThemeManagerInterface
    */
   protected $themeManager;
 
   /**
    * Cache backend instance.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $cacheBackend;
 

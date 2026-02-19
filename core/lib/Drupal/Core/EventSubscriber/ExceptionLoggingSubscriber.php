@@ -17,14 +17,14 @@ class ExceptionLoggingSubscriber implements EventSubscriberInterface {
   /**
    * The logger channel factory.
    *
-   * @var \Drupal\Core\Logger\LoggerChannelFactoryInterface
+   * @var LoggerChannelFactoryInterface
    */
   protected $logger;
 
   /**
    * Constructs a new ExceptionLoggingSubscriber.
    *
-   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger
+   * @param LoggerChannelFactoryInterface $logger
    *   The logger channel factory.
    */
   public function __construct(LoggerChannelFactoryInterface $logger) {
@@ -34,7 +34,7 @@ class ExceptionLoggingSubscriber implements EventSubscriberInterface {
   /**
    * Log 403 errors.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   * @param ExceptionEvent $event
    *   The event to process.
    */
   public function on403(ExceptionEvent $event) {
@@ -50,7 +50,7 @@ class ExceptionLoggingSubscriber implements EventSubscriberInterface {
   /**
    * Log 404 errors.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   * @param ExceptionEvent $event
    *   The event to process.
    */
   public function on404(ExceptionEvent $event) {
@@ -61,7 +61,7 @@ class ExceptionLoggingSubscriber implements EventSubscriberInterface {
   /**
    * Log not-otherwise-specified errors, including HTTP 500.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   * @param ExceptionEvent $event
    *   The event to process.
    */
   public function onError(ExceptionEvent $event) {
@@ -78,7 +78,7 @@ class ExceptionLoggingSubscriber implements EventSubscriberInterface {
   /**
    * Log 4xx errors that are not 403 or 404.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   * @param ExceptionEvent $event
    *   The event to process.
    */
   public function onClientError(ExceptionEvent $event) {
@@ -95,7 +95,7 @@ class ExceptionLoggingSubscriber implements EventSubscriberInterface {
   /**
    * Log all exceptions.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   * @param ExceptionEvent $event
    *   The event to process.
    */
   public function onException(ExceptionEvent $event) {

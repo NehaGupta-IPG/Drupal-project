@@ -70,14 +70,14 @@ class MediaEntityMetadataApiTest extends BrowserTestBase {
   /**
    * The editor instance to use for testing.
    *
-   * @var \Drupal\editor\Entity\Editor
+   * @var Editor
    */
   protected $editor;
 
   /**
    * The admin user.
    *
-   * @var \Drupal\user\Entity\User
+   * @var User
    */
   protected User $adminUser;
 

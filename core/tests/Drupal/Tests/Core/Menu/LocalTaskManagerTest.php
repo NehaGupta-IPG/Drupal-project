@@ -39,7 +39,7 @@ class LocalTaskManagerTest extends UnitTestCase {
   /**
    * The tested manager.
    *
-   * @var \Drupal\Core\Menu\LocalTaskManager
+   * @var LocalTaskManager
    */
   protected $manager;
 
@@ -51,7 +51,7 @@ class LocalTaskManagerTest extends UnitTestCase {
   /**
    * The test request.
    *
-   * @var \Symfony\Component\HttpFoundation\Request
+   * @var Request
    */
   protected $request;
 
@@ -73,7 +73,7 @@ class LocalTaskManagerTest extends UnitTestCase {
   /**
    * The cache backend used in the test.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var \Drupal\Core\Cache\CacheBackendInterface|ObjectProphecy
    */
   protected $cacheBackend;
 
@@ -318,7 +318,7 @@ class LocalTaskManagerTest extends UnitTestCase {
   /**
    * Setups the plugin factory with some local task plugins.
    *
-   * @param \PHPUnit\Framework\MockObject\MockObject $mock_plugin
+   * @param MockObject $mock_plugin
    *   The mock plugin.
    */
   protected function setupFactory($mock_plugin): void {
@@ -334,7 +334,7 @@ class LocalTaskManagerTest extends UnitTestCase {
   /**
    * Returns an expected result for getLocalTasksForRoute.
    *
-   * @param \PHPUnit\Framework\MockObject\MockObject $mock_plugin
+   * @param MockObject $mock_plugin
    *   The mock plugin.
    *
    * @return array

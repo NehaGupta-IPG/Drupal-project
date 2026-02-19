@@ -18,23 +18,23 @@ class UnroutedUrlAssembler implements UnroutedUrlAssemblerInterface {
   /**
    * A request stack object.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * The outbound path processor.
    *
-   * @var \Drupal\Core\PathProcessor\OutboundPathProcessorInterface
+   * @var OutboundPathProcessorInterface
    */
   protected $pathProcessor;
 
   /**
    * Constructs a new unroutedUrlAssembler object.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   A request stack object.
-   * @param \Drupal\Core\PathProcessor\OutboundPathProcessorInterface $path_processor
+   * @param OutboundPathProcessorInterface $path_processor
    *   The output path processor.
    * @param string[] $filter_protocols
    *   (optional) An array of protocols allowed for URL generation.

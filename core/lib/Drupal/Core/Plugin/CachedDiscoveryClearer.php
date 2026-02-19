@@ -13,7 +13,7 @@ class CachedDiscoveryClearer implements CachedDiscoveryClearerInterface {
   /**
    * The legacy stored discoveries.
    *
-   * @var \Drupal\Component\Plugin\Discovery\CachedDiscoveryInterface[]
+   * @var CachedDiscoveryInterface[]
    *
    * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Pass
    *    the full set of services to the constructor instead.
@@ -24,7 +24,7 @@ class CachedDiscoveryClearer implements CachedDiscoveryClearerInterface {
   /**
    * Adds a plugin manager to the active list.
    *
-   * @param \Drupal\Component\Plugin\Discovery\CachedDiscoveryInterface $cached_discovery
+   * @param CachedDiscoveryInterface $cached_discovery
    *   An object that implements the cached discovery interface, typically a
    *   plugin manager.
    *

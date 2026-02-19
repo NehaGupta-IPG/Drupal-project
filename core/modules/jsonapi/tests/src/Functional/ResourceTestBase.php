@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
-use Drupal\jsonapi\JsonApiSpec;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Random;
@@ -39,6 +38,7 @@ use Drupal\jsonapi\JsonApiResource\LinkCollection;
 use Drupal\jsonapi\JsonApiResource\NullIncludedData;
 use Drupal\jsonapi\JsonApiResource\ResourceObject;
 use Drupal\jsonapi\JsonApiResource\ResourceObjectData;
+use Drupal\jsonapi\JsonApiSpec;
 use Drupal\jsonapi\Normalizer\HttpExceptionNormalizer;
 use Drupal\jsonapi\ResourceResponse;
 use Drupal\path\Plugin\Field\FieldType\PathItem;
@@ -182,21 +182,21 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * The entity being tested.
    *
-   * @var \Drupal\Core\Entity\EntityInterface
+   * @var EntityInterface
    */
   protected $entity;
 
   /**
    * Another entity of the same type used for testing.
    *
-   * @var \Drupal\Core\Entity\EntityInterface
+   * @var EntityInterface
    */
   protected $anotherEntity;
 
   /**
    * The account to use for authentication.
    *
-   * @var null|\Drupal\Core\Session\AccountInterface
+   * @var null|AccountInterface
    */
   protected $account;
 
@@ -252,15 +252,15 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Sets up additional fields for testing.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The primary test entity.
-   * @param \Drupal\user\UserInterface $account
+   * @param UserInterface $account
    *   The primary test user account.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The reloaded entity with the new fields attached.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    */
   protected function setUpFields(EntityInterface $entity, UserInterface $account): EntityInterface {
     if (!$entity instanceof FieldableEntityInterface) {
@@ -352,10 +352,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Sets up a collection of entities of the same type for testing.
    *
-   * @return \Drupal\Core\Entity\EntityInterface[]
+   * @return EntityInterface[]
    *   The collection of entities to test.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    */
   protected function getData() {
     if ($this->entityStorage->getQuery()->accessCheck(FALSE)->count()->execute() < 2) {
@@ -371,9 +371,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Generates a JSON:API normalization for the given entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to generate a JSON:API normalization for.
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   The URL to use as the "self" link.
    *
    * @return array
@@ -395,7 +395,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Creates the entity to be tested.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The entity to be tested.
    */
   abstract protected function createEntity();
@@ -406,10 +406,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @param mixed $key
    *   A unique key to be used for the ID and/or label of the duplicated entity.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   Another entity based on $this->entity.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    */
   protected function createAnotherEntity($key) {
     $duplicate = $this->getEntityDuplicate($this->entity, $key);
@@ -481,7 +481,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Returns the expected cacheability for an unauthorized response.
    *
-   * @return \Drupal\Core\Cache\CacheableMetadata
+   * @return CacheableMetadata
    *   The expected cacheability.
    */
   protected function getExpectedUnauthorizedAccessCacheability() {
@@ -550,10 +550,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Computes the cacheability for a given entity collection.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   An account for which cacheability should be computed (cacheability is
    *   dependent on access).
-   * @param \Drupal\Core\Entity\EntityInterface[] $collection
+   * @param EntityInterface[] $collection
    *   The entities for which cacheability should be computed.
    * @param array $sparse_fieldset
    *   (optional) If a sparse fieldset is being requested, limit the expected
@@ -562,7 +562,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @param bool $filtered
    *   Whether the collection is filtered or not.
    *
-   * @return \Drupal\Core\Cache\CacheableMetadata
+   * @return CacheableMetadata
    *   The expected cacheability for the given entity collection.
    */
   protected static function getExpectedCollectionCacheability(AccountInterface $account, array $collection, ?array $sparse_fieldset = NULL, $filtered = FALSE) {
@@ -689,7 +689,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @param array|null|false $expected_document
    *   The expected document or NULL if there should not be a response body.
    *   FALSE in case this should not be asserted.
-   * @param \Psr\Http\Message\ResponseInterface $response
+   * @param ResponseInterface $response
    *   The response to assert.
    * @param string[]|false $expected_cache_tags
    *   (optional) The expected cache tags in the X-Drupal-Cache-Tags response
@@ -817,10 +817,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   The expected response status.
    * @param string $expected_message
    *   The expected error message.
-   * @param \Drupal\Core\Url|null $via_link
+   * @param Url|null $via_link
    *   The source URL for the errors of the response. NULL if the error occurs
    *   for example during entity creation.
-   * @param \Psr\Http\Message\ResponseInterface $response
+   * @param ResponseInterface $response
    *   The error response to assert.
    * @param string|false $pointer
    *   The expected JSON Pointer to the associated entity in the request
@@ -1281,7 +1281,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Returns a JSON:API collection document for the expected entities.
    *
-   * @param \Drupal\Core\Entity\EntityInterface[] $collection
+   * @param EntityInterface[] $collection
    *   The entities for the collection.
    * @param string $self_link
    *   The self link for the collection response document.
@@ -1293,7 +1293,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @param bool $filtered
    *   Whether the collection is filtered or not.
    *
-   * @return \Drupal\jsonapi\ResourceResponse
+   * @return ResourceResponse
    *   A ResourceResponse for the expected entity collection.
    *
    * @see \GuzzleHttp\ClientInterface::request()
@@ -1416,9 +1416,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
     // Fetches actual responses as an array keyed by relationship field name.
     $related_responses = $this->getRelatedResponses($relationship_field_names, $request_options);
     foreach ($relationship_field_names as $relationship_field_name) {
-      /** @var \Drupal\jsonapi\ResourceResponse $expected_resource_response */
+      /** @var ResourceResponse $expected_resource_response */
       $expected_resource_response = $expected_relationship_responses[$relationship_field_name];
-      /** @var \Psr\Http\Message\ResponseInterface $actual_response */
+      /** @var ResponseInterface $actual_response */
       $actual_response = $related_responses[$relationship_field_name];
       // Dynamic Page Cache miss because cache should vary based on the
       // 'include' query param.
@@ -1484,7 +1484,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @see ::testRelationships
    */
   protected function doTestRelationshipMutation(array $request_options) {
-    /** @var \Drupal\Core\Entity\FieldableEntityInterface $resource */
+    /** @var FieldableEntityInterface $resource */
     $resource = $this->createAnotherEntity('dupe');
     $resource->set('field_jsonapi_test_entity_ref', NULL);
     $violations = $resource->validate();
@@ -1497,7 +1497,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $target_identifier = static::toResourceIdentifier($target_resource);
     $resource_identifier = static::toResourceIdentifier($resource);
     $relationship_field_name = 'field_jsonapi_test_entity_ref';
-    /** @var \Drupal\Core\Access\AccessResultReasonInterface $update_access */
+    /** @var AccessResultReasonInterface $update_access */
     $update_access = static::entityAccess($resource, 'update', $this->account)
       ->andIf(static::entityFieldAccess($resource, $relationship_field_name, 'edit', $this->account));
     $url = Url::fromRoute(sprintf("jsonapi.{$resource_identifier['type']}.{$relationship_field_name}.relationship.patch"), [
@@ -1729,10 +1729,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * @param string $relationship_field_name
    *   The relationship for which to get an expected response.
-   * @param \Drupal\Core\Entity\EntityInterface|null $entity
+   * @param EntityInterface|null $entity
    *   (optional) The entity for which to get expected relationship response.
    *
-   * @return \Drupal\jsonapi\CacheableResourceResponse
+   * @return CacheableResourceResponse
    *   The expected ResourceResponse.
    */
   protected function getExpectedGetRelationshipResponse($relationship_field_name, ?EntityInterface $entity = NULL) {
@@ -1766,7 +1766,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * @param string $relationship_field_name
    *   The relationship for which to get an expected response.
-   * @param \Drupal\Core\Entity\EntityInterface|null $entity
+   * @param EntityInterface|null $entity
    *   (optional) The entity for which to get expected relationship document.
    *
    * @return array
@@ -1800,7 +1800,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * @param string $relationship_field_name
    *   The relationship for which to get an expected response.
-   * @param \Drupal\Core\Entity\EntityInterface|null $entity
+   * @param EntityInterface|null $entity
    *   (optional) The entity for which to get expected relationship data.
    *
    * @return mixed
@@ -1874,7 +1874,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Adds drupal_internal__target_id to the meta of a resource identifier.
    *
-   * @param \Drupal\Core\Field\FieldItemInterface|\Drupal\Core\Field\FieldItemListInterface $field
+   * @param FieldItemInterface|FieldItemListInterface $field
    *   The field containing the entity that is described by the
    *   resource_identifier.
    * @param array $resource_identifier
@@ -1911,10 +1911,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   ResourceResponses.
    * @param array $request_options
    *   Request options to apply.
-   * @param \Drupal\Core\Entity\EntityInterface|null $entity
+   * @param EntityInterface|null $entity
    *   (optional) The entity for which to get expected related resources.
    *
-   * @return \Drupal\jsonapi\ResourceResponse[]
+   * @return ResourceResponse[]
    *   An array of expected ResourceResponses, keyed by their relationship field
    *   name.
    *
@@ -1935,10 +1935,10 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   ResourceResponse.
    * @param array $request_options
    *   Request options to apply.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity for which to get expected related resources.
    *
-   * @return \Drupal\jsonapi\ResourceResponse
+   * @return ResourceResponse
    *   An expected ResourceResponse.
    *
    * @see \GuzzleHttp\ClientInterface::request()
@@ -2646,7 +2646,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Clones the given entity and modifies all PATCH-protected fields.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity being tested and to modify.
    *
    * @return array
@@ -2714,7 +2714,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Tests sparse field sets.
    *
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   The base URL with which to test includes.
    * @param array $request_options
    *   Request options to apply.
@@ -2793,7 +2793,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Tests included resources.
    *
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   The base URL with which to test includes.
    * @param array $request_options
    *   Request options to apply.
@@ -2874,7 +2874,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $entity = $this->entityLoadUnchanged($this->entity->id());
 
     // Set up test data.
-    /** @var \Drupal\Core\Entity\FieldableEntityInterface $entity */
+    /** @var FieldableEntityInterface $entity */
     $entity->set('field_revisionable_number', 42);
     $entity->save();
     $original_revision_id = (int) $entity->getRevisionId();
@@ -3032,7 +3032,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->grantPermissionsToTestedRole(['use editorial transition publish']);
 
     // Ensure the test entity has content_moderation fields attached to it.
-    /** @var \Drupal\Core\Entity\FieldableEntityInterface|\Drupal\Core\Entity\TranslatableRevisionableInterface $entity */
+    /** @var FieldableEntityInterface|TranslatableRevisionableInterface $entity */
     $entity = $this->entityStorage->load($entity->id());
 
     // Set the published moderation state on the test entity.
@@ -3356,12 +3356,12 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * the expected cacheability for those includes. It does so based of responses
    * from the related routes for individual relationships.
    *
-   * @param \Drupal\jsonapi\CacheableResourceResponse $expected_response
+   * @param CacheableResourceResponse $expected_response
    *   The expected ResourceResponse.
-   * @param \Drupal\jsonapi\ResourceResponse[] $related_responses
+   * @param ResourceResponse[] $related_responses
    *   The related ResourceResponses, keyed by relationship field names.
    *
-   * @return \Drupal\jsonapi\CacheableResourceResponse
+   * @return CacheableResourceResponse
    *   The decorated ResourceResponse.
    */
   protected static function decorateExpectedResponseForIncludedFields(CacheableResourceResponse $expected_response, array $related_responses) {
@@ -3397,7 +3397,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Gets the expected individual ResourceResponse for GET.
    *
-   * @return \Drupal\jsonapi\CacheableResourceResponse
+   * @return CacheableResourceResponse
    *   The expected individual ResourceResponse.
    */
   protected function getExpectedGetIndividualResourceResponse($status_code = 200) {
@@ -3432,7 +3432,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Gets a list of public relationship names for the resource type under test.
    *
-   * @param \Drupal\Core\Entity\EntityInterface|null $entity
+   * @param EntityInterface|null $entity
    *   (optional) The entity for which to get relationship field names.
    *
    * @return array
@@ -3478,11 +3478,11 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Checks access for the given operation on the given entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity for which to check field access.
    * @param string $operation
    *   The operation for which to check access.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The account for which to check access.
    *
    * @return \Drupal\Core\Access\AccessResultInterface
@@ -3500,13 +3500,13 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Checks access for the given field operation on the given entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity for which to check field access.
    * @param string $field_name
    *   The field for which to check access.
    * @param string $operation
    *   The operation for which to check access.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The account for which to check access.
    *
    * @return \Drupal\Core\Access\AccessResultInterface
@@ -3555,7 +3555,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * Determines if a given field definition is a reference field.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition to inspect.
    *
    * @return bool
@@ -3593,7 +3593,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @param int $id
    *   The entity ID.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|null
+   * @return EntityInterface|null
    *   The loaded entity.
    *
    * @todo Remove this after https://www.drupal.org/project/drupal/issues/3038706 lands.

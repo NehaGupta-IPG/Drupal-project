@@ -16,7 +16,7 @@ interface AuthenticationProviderChallengeInterface {
   /**
    * Constructs an exception which is used to generate the challenge.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    * @param \Exception $previous
    *   The previous exception.

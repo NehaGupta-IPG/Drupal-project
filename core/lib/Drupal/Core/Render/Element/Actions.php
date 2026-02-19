@@ -48,7 +48,7 @@ class Actions extends Container {
    * @param array $element
    *   An associative array containing the properties and children of the
    *   form actions container.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array $complete_form
    *   The complete form structure.
@@ -78,7 +78,7 @@ class Actions extends Container {
    *
    * @param array $element
    *   The #type 'actions' element to process.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array $complete_form
    *   The complete form structure.

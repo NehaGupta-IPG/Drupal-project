@@ -34,18 +34,18 @@ class EntityDisplayRebuilder implements ContainerInjectionInterface {
   /**
    * The entity type bundle info.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @var EntityTypeBundleInfoInterface
    */
   protected $entityTypeBundleInfo;
 
   /**
    * Constructs a new EntityDisplayRebuilder.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity manager.
-   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
+   * @param EntityDisplayRepositoryInterface $entity_display_repository
    *   The entity display repository.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle info.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityDisplayRepositoryInterface $entity_display_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info) {

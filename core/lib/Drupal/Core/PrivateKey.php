@@ -2,8 +2,8 @@
 
 namespace Drupal\Core;
 
-use Drupal\Core\State\StateInterface;
 use Drupal\Component\Utility\Crypt;
+use Drupal\Core\State\StateInterface;
 
 /**
  * Manages the Drupal private key.
@@ -13,14 +13,14 @@ class PrivateKey {
   /**
    * The state service.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
   /**
    * Constructs the private key object.
    *
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state service.
    */
   public function __construct(StateInterface $state) {

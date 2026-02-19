@@ -2,8 +2,8 @@
 
 namespace Drupal\Core\Entity;
 
-use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
+use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Utility\FiberResumeType;
 
 /**
@@ -21,8 +21,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
   /**
    * Information about the entity type.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface
-   *
+   * @var EntityTypeInterface *
    * The following code returns the same object:
    * @code
    * \Drupal::entityTypeManager()->getDefinition($this->entityTypeId)
@@ -79,7 +78,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
   /**
    * The memory cache.
    *
-   * @var \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface
+   * @var MemoryCacheInterface
    */
   protected $memoryCache;
 
@@ -98,9 +97,9 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
   /**
    * Constructs an EntityStorageBase instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache
+   * @param MemoryCacheInterface $memory_cache
    *   The memory cache.
    */
   public function __construct(EntityTypeInterface $entity_type, MemoryCacheInterface $memory_cache) {
@@ -177,7 +176,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
    * @param array $ids
    *   If not empty, return entities that match these IDs.
    *
-   * @return \Drupal\Core\Entity\EntityInterface[]
+   * @return EntityInterface[]
    *   Array of entities from the entity cache, keyed by entity ID.
    */
   protected function getFromStaticCache(array $ids) {
@@ -194,7 +193,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
   /**
    * Stores entities in the static entity cache.
    *
-   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   * @param EntityInterface[] $entities
    *   Entities to store in the cache.
    */
   protected function setStaticCache(array $entities) {
@@ -211,7 +210,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
    * @param string $hook
    *   One of 'create', 'presave', 'insert', 'update', 'predelete', 'delete', or
    *   'revision_delete'.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity object.
    */
   protected function invokeHook($hook, EntityInterface $entity) {
@@ -251,7 +250,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
    * @param array $values
    *   An array of values to set, keyed by property name.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The created entity.
    */
   protected function doCreate(array $values) {
@@ -379,7 +378,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
    * @param array|null $ids
    *   (optional) An array of entity IDs, or NULL to load all entities.
    *
-   * @return \Drupal\Core\Entity\EntityInterface[]
+   * @return EntityInterface[]
    *   Associative array of entities, keyed on the entity ID.
    */
   abstract protected function doLoadMultiple(?array $ids = NULL);
@@ -391,7 +390,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
    *   If not empty, return entities that match these IDs. IDs that were found
    *   will be removed from the list.
    *
-   * @return \Drupal\Core\Entity\EntityInterface[]
+   * @return EntityInterface[]
    *   Associative array of entities, keyed by the entity ID.
    */
   protected function preLoad(?array &$ids = NULL) {
@@ -442,14 +441,14 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
    * @param array $records
    *   Associative array of query results, keyed on the entity ID.
    *
-   * @return \Drupal\Core\Entity\EntityInterface[]
+   * @return EntityInterface[]
    *   An array of entity objects implementing the EntityInterface.
    */
   protected function mapFromStorageRecords(array $records) {
     $entities = [];
     foreach ($records as $record) {
       $entity_class = $this->getEntityClass();
-      /** @var \Drupal\Core\Entity\EntityInterface $entity */
+      /** @var EntityInterface $entity */
       $entity = new $entity_class($record, $this->entityTypeId);
       $entity_id = $entity->id();
       if ($entity_id === NULL) {
@@ -465,7 +464,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
    *
    * @param int|string $id
    *   The original entity ID.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity being saved.
    *
    * @return bool
@@ -506,7 +505,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
   /**
    * Performs storage-specific entity deletion.
    *
-   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   * @param EntityInterface[] $entities
    *   An array of entity objects to delete.
    */
   abstract protected function doDelete($entities);
@@ -533,13 +532,13 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
   /**
    * Performs presave entity processing.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The saved entity.
    *
    * @return int|string|null
    *   The processed entity identifier, or null for new entities.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   If the entity identifier is invalid.
    */
   protected function doPreSave(EntityInterface $entity) {
@@ -575,7 +574,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
    *
    * @param int|string $id
    *   The original entity ID.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to save.
    *
    * @return bool|int
@@ -587,7 +586,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
   /**
    * Performs post save entity processing.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The saved entity.
    * @param bool $update
    *   Specifies whether the entity is being updated or created.
@@ -621,7 +620,7 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
   /**
    * Builds an entity query.
    *
-   * @param \Drupal\Core\Entity\Query\QueryInterface $entity_query
+   * @param QueryInterface $entity_query
    *   EntityQuery instance.
    * @param array $values
    *   An associative array where the keys are the property names and the
@@ -682,10 +681,10 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
   /**
    * Indexes the given array of entities by their class name and ID.
    *
-   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   * @param EntityInterface[] $entities
    *   The array of entities to index.
    *
-   * @return \Drupal\Core\Entity\EntityInterface[][]
+   * @return EntityInterface[][]
    *   An array of the passed-in entities, indexed by their class name and ID.
    */
   protected function getEntitiesByClass(array $entities): array {

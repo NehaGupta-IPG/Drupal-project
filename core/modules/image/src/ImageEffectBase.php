@@ -2,8 +2,8 @@
 
 namespace Drupal\image;
 
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\ConfigurablePluginBase;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\RemovableDependentPluginReturn;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -37,7 +37,7 @@ abstract class ImageEffectBase extends ConfigurablePluginBase implements ImageEf
   /**
    * A logger instance.
    *
-   * @var \Psr\Log\LoggerInterface
+   * @var LoggerInterface
    */
   protected $logger;
 

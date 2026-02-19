@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Drupal\contact_storage_test\Hook;
 
 use Drupal\contact\ContactFormInterface;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 
 /**
@@ -32,7 +32,7 @@ class ContactStorageTestHooks {
    */
   #[Hook('entity_type_alter')]
   public function entityTypeAlter(array &$entity_types) : void {
-    /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
+    /** @var EntityTypeInterface[] $entity_types */
     // Set the controller class for nodes to an alternate implementation of the
     // Drupal\Core\Entity\EntityStorageInterface interface.
     $entity_types['contact_message']->setStorageClass('\Drupal\Core\Entity\Sql\SqlContentEntityStorage');
@@ -47,7 +47,7 @@ class ContactStorageTestHooks {
    */
   #[Hook('form_contact_form_form_alter')]
   public function formContactFormFormAlter(&$form, FormStateInterface $form_state) : void {
-    /** @var \Drupal\contact\ContactFormInterface $contact_form */
+    /** @var ContactFormInterface $contact_form */
     $contact_form = $form_state->getFormObject()->getEntity();
     $form['send_a_pony'] = [
       '#type' => 'checkbox',

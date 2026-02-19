@@ -2,9 +2,9 @@
 
 namespace Drupal\views\Plugin\views\display;
 
-use Drupal\views\ViewExecutable;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\views\ViewExecutable;
 
 /**
  * @defgroup views_display_plugins Views display plugins
@@ -35,7 +35,7 @@ interface DisplayPluginInterface {
   /**
    * Initializes the display plugin.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The views executable.
    * @param array $display
    *   The display that will be populated and attached to the view.
@@ -168,7 +168,7 @@ interface DisplayPluginInterface {
   /**
    * Allows displays to attach to other views.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The views executable.
    * @param string $display_id
    *   The display to attach to.
@@ -241,7 +241,7 @@ interface DisplayPluginInterface {
    * block display links to a page display, the page display will be returned
    * in both cases.
    *
-   * @return \Drupal\views\Plugin\views\display\DisplayRouterInterface|null
+   * @return DisplayRouterInterface|null
    *   The linked display or NULL if none exists.
    */
   public function getRoutedDisplay();

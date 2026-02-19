@@ -260,10 +260,10 @@ class ContentTranslationSyncImageTest extends ContentTranslationTestBase {
   /**
    * Saves the passed entity and reloads it, enabling compatibility mode.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to be saved.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The saved entity.
    */
   protected function saveEntity(EntityInterface $entity): EntityInterface {

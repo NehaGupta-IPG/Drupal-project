@@ -4,7 +4,7 @@
  * @file
  * Hooks related to the Token system.
  */
-
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\user\Entity\User;
 
 /**
@@ -40,7 +40,7 @@ use Drupal\user\Entity\User;
  * @param array $options
  *   An associative array of options for token replacement; see
  *   \Drupal\Core\Utility\Token::replace() for possible values.
- * @param \Drupal\Core\Render\BubbleableMetadata $bubbleable_metadata
+ * @param BubbleableMetadata $bubbleable_metadata
  *   The bubbleable metadata. Prior to invoking this hook,
  *   \Drupal\Core\Utility\Token::generate() collects metadata for all of the
  *   data objects in $data. For any data sources not in $data, but that are
@@ -71,7 +71,7 @@ use Drupal\user\Entity\User;
  * @see hook_token_info()
  * @see hook_tokens_alter()
  */
-function hook_tokens($type, $tokens, array $data, array $options, \Drupal\Core\Render\BubbleableMetadata $bubbleable_metadata): array {
+function hook_tokens($type, $tokens, array $data, array $options, BubbleableMetadata $bubbleable_metadata): array {
   $token_service = \Drupal::token();
 
   $url_options = ['absolute' => TRUE];
@@ -141,14 +141,14 @@ function hook_tokens($type, $tokens, array $data, array $options, \Drupal\Core\R
  *   - 'tokens'.
  *   - 'data'.
  *   - 'options'.
- * @param \Drupal\Core\Render\BubbleableMetadata $bubbleable_metadata
+ * @param BubbleableMetadata $bubbleable_metadata
  *   The bubbleable metadata. In case you alter an existing token based upon
  *   a data source that isn't in $context['data'], you must add that
  *   dependency to $bubbleable_metadata.
  *
  * @see hook_tokens()
  */
-function hook_tokens_alter(array &$replacements, array $context, \Drupal\Core\Render\BubbleableMetadata $bubbleable_metadata) {
+function hook_tokens_alter(array &$replacements, array $context, BubbleableMetadata $bubbleable_metadata) {
   if ($context['type'] == 'node' && !empty($context['data']['node'])) {
     $node = $context['data']['node'];
 

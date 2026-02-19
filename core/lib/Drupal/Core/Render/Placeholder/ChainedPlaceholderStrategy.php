@@ -17,14 +17,14 @@ class ChainedPlaceholderStrategy implements PlaceholderStrategyInterface {
    *
    * Ordered according to service priority.
    *
-   * @var \Drupal\Core\Render\Placeholder\PlaceholderStrategyInterface[]
+   * @var PlaceholderStrategyInterface[]
    */
   protected $placeholderStrategies = [];
 
   /**
    * Adds a placeholder strategy to use.
    *
-   * @param \Drupal\Core\Render\Placeholder\PlaceholderStrategyInterface $strategy
+   * @param PlaceholderStrategyInterface $strategy
    *   The strategy to add to the placeholder strategies.
    */
   public function addPlaceholderStrategy(PlaceholderStrategyInterface $strategy) {

@@ -12,7 +12,7 @@ interface MessageInterface extends ContentEntityInterface {
   /**
    * Returns the form this contact message belongs to.
    *
-   * @return \Drupal\contact\ContactFormInterface
+   * @return ContactFormInterface
    *   The contact form entity.
    */
   public function getContactForm();

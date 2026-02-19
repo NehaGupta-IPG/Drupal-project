@@ -14,10 +14,10 @@ trait EntityResourceAccessTrait {
   /**
    * Performs edit access checks for fields.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity whose fields edit access should be checked for.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   * @throws AccessDeniedHttpException
    *   Throws access denied when the user does not have permissions to edit a
    *   field.
    */

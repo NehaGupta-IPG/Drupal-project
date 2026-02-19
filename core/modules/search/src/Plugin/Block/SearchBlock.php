@@ -26,14 +26,14 @@ class SearchBlock extends BlockBase implements ContainerFactoryPluginInterface {
   /**
    * The form builder.
    *
-   * @var \Drupal\Core\Form\FormBuilderInterface
+   * @var FormBuilderInterface
    */
   protected $formBuilder;
 
   /**
    * The search page repository.
    *
-   * @var \Drupal\search\SearchPageRepositoryInterface
+   * @var SearchPageRepositoryInterface
    */
   protected $searchPageRepository;
 
@@ -46,9 +46,9 @@ class SearchBlock extends BlockBase implements ContainerFactoryPluginInterface {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
+   * @param FormBuilderInterface $form_builder
    *   The form builder.
-   * @param \Drupal\search\SearchPageRepositoryInterface $search_page_repository
+   * @param SearchPageRepositoryInterface $search_page_repository
    *   The search page repository.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, FormBuilderInterface $form_builder, SearchPageRepositoryInterface $search_page_repository) {

@@ -20,14 +20,14 @@ class EntityUntranslatableFieldsConstraintValidator extends ConstraintValidator 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * Constructs an EntityUntranslatableFieldsConstraintValidator object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
@@ -48,8 +48,7 @@ class EntityUntranslatableFieldsConstraintValidator extends ConstraintValidator 
    */
   public function validate($entity, Constraint $constraint): void {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-    /** @var \Drupal\Core\Entity\Plugin\Validation\Constraint\EntityUntranslatableFieldsConstraint $constraint */
-
+    /** @var EntityUntranslatableFieldsConstraint $constraint */
     // Untranslatable field restrictions apply only to revisions of multilingual
     // entities.
     if ($entity->isNew() || !$entity->isTranslatable() || !$entity->getEntityType()->isRevisionable()) {
@@ -87,7 +86,7 @@ class EntityUntranslatableFieldsConstraintValidator extends ConstraintValidator 
   /**
    * Checks whether an entity has untranslatable field changes.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   A content entity object.
    *
    * @return bool
@@ -95,7 +94,7 @@ class EntityUntranslatableFieldsConstraintValidator extends ConstraintValidator 
    */
   protected function hasUntranslatableFieldsChanges(ContentEntityInterface $entity) {
     $skip_fields = $this->getFieldsToSkipFromTranslationChangesCheck($entity);
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $original */
+    /** @var ContentEntityInterface $original */
     $original = $entity->getOriginal();
     if (!$original) {
       /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */

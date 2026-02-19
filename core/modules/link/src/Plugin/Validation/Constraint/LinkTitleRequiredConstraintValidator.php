@@ -23,7 +23,7 @@ class LinkTitleRequiredConstraintValidator extends ConstraintValidator {
       throw new UnexpectedValueException($value, LinkItemInterface::class);
     }
 
-    /** @var \Drupal\link\LinkItemInterface $link_item */
+    /** @var LinkItemInterface $link_item */
     $link_item = $value;
     $title_setting = $link_item->getFieldDefinition()->getSetting('title');
     $title_visibility = LinkTitleVisibility::tryFrom((int) $title_setting);

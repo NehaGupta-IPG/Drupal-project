@@ -32,7 +32,7 @@ final class VendorHardeningExcluder implements EventSubscriberInterface {
   /**
    * Excludes vendor hardening files from stage operations.
    *
-   * @param \Drupal\package_manager\Event\CollectPathsToExcludeEvent $event
+   * @param CollectPathsToExcludeEvent $event
    *   The event object.
    */
   public function excludeVendorHardeningFiles(CollectPathsToExcludeEvent $event): void {

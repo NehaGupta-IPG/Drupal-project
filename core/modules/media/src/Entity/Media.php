@@ -4,17 +4,17 @@ namespace Drupal\media\Entity;
 
 use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\Entity\ContentEntityDeleteForm;
-use Drupal\Core\Entity\EntityViewBuilder;
-use Drupal\Core\Entity\Form\DeleteMultipleForm;
-use Drupal\Core\Entity\Routing\RevisionHtmlRouteProvider;
-use Drupal\Core\Entity\Form\RevisionRevertForm;
-use Drupal\Core\Entity\Form\RevisionDeleteForm;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\EditorialContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityViewBuilder;
+use Drupal\Core\Entity\Form\DeleteMultipleForm;
+use Drupal\Core\Entity\Form\RevisionDeleteForm;
+use Drupal\Core\Entity\Form\RevisionRevertForm;
+use Drupal\Core\Entity\Routing\RevisionHtmlRouteProvider;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\media\MediaAccessControlHandler;
 use Drupal\media\MediaForm;
 use Drupal\media\MediaInterface;
@@ -166,7 +166,7 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
    * @param bool $from_queue
    *   Specifies whether the thumbnail update is triggered from the queue.
    *
-   * @return \Drupal\media\MediaInterface
+   * @return MediaInterface
    *   The updated media item.
    *
    * @internal
@@ -241,7 +241,7 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
   /**
    * Updates the queued thumbnail for the media item.
    *
-   * @return \Drupal\media\MediaInterface
+   * @return MediaInterface
    *   The updated media item.
    *
    * @internal

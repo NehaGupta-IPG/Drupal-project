@@ -21,34 +21,34 @@ class ThemeController extends ControllerBase {
   /**
    * The theme handler service.
    *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
+   * @var ThemeHandlerInterface
    */
   protected $themeHandler;
 
   /**
    * An extension discovery instance.
    *
-   * @var \Drupal\Core\Extension\ThemeExtensionList
+   * @var ThemeExtensionList
    */
   protected $themeList;
 
   /**
    * The theme installer service.
    *
-   * @var \Drupal\Core\Extension\ThemeInstallerInterface
+   * @var ThemeInstallerInterface
    */
   protected $themeInstaller;
 
   /**
    * Constructs a new ThemeController.
    *
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param ThemeHandlerInterface $theme_handler
    *   The theme handler.
-   * @param \Drupal\Core\Extension\ThemeExtensionList $theme_list
+   * @param ThemeExtensionList $theme_list
    *   The theme extension list.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer
+   * @param ThemeInstallerInterface $theme_installer
    *   The theme installer.
    */
   public function __construct(ThemeHandlerInterface $theme_handler, ThemeExtensionList $theme_list, ConfigFactoryInterface $config_factory, ThemeInstallerInterface $theme_installer) {

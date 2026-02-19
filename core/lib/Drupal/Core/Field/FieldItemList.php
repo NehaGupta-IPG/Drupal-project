@@ -19,15 +19,15 @@ use Drupal\Core\TypedData\Plugin\DataType\ItemList;
  * field delegates __get() and __set() calls directly to the first item.
  *
  * @template T of \Drupal\Core\Field\FieldItemInterface
- * @extends \Drupal\Core\TypedData\Plugin\DataType\ItemList<T>
- * @implements \Drupal\Core\Field\FieldItemListInterface<T>
+ * @extends ItemList<T>
+ * @implements FieldItemListInterface<T>
  */
 class FieldItemList extends ItemList implements FieldItemListInterface {
 
   /**
    * Numerically indexed array of field items.
    *
-   * @var \Drupal\Core\Field\FieldItemInterface[]
+   * @var FieldItemInterface[]
    */
   protected $list = [];
 
@@ -343,10 +343,10 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
   /**
    * Returns the widget object used in default value form.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state of the (entire) configuration form.
    *
-   * @return \Drupal\Core\Field\WidgetInterface|null
+   * @return WidgetInterface|null
    *   A Widget object or NULL if no widget is available.
    */
   protected function defaultValueWidget(FormStateInterface $form_state) {
@@ -361,7 +361,7 @@ class FieldItemList extends ItemList implements FieldItemListInterface {
       /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity_form_display */
       $entity_form_display = \Drupal::service('entity_display.repository')
         ->getFormDisplay($entity->getEntityTypeId(), $entity->bundle());
-      /** @var \Drupal\Core\Field\WidgetPluginManager $field_widget_plugin_manager */
+      /** @var WidgetPluginManager $field_widget_plugin_manager */
       $field_widget_plugin_manager = \Drupal::service('plugin.manager.field.widget');
 
       // Use the widget currently configured for the 'default' form mode, or

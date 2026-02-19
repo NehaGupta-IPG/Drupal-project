@@ -36,14 +36,14 @@ class BreakpointTest extends UnitTestCase {
   /**
    * The breakpoint under test.
    *
-   * @var \Drupal\breakpoint\Breakpoint
+   * @var Breakpoint
    */
   protected $breakpoint;
 
   /**
    * The mocked translator.
    *
-   * @var \Drupal\Core\StringTranslation\TranslationInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\StringTranslation\TranslationInterface|MockObject
    */
   protected $stringTranslation;
 

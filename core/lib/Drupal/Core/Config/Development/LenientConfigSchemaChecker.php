@@ -16,11 +16,11 @@ class LenientConfigSchemaChecker extends ConfigSchemaChecker {
   /**
    * Constructs the ConfigSchemaChecker object.
    *
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_manager
+   * @param TypedConfigManagerInterface $typed_manager
    *   The typed config manager.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger service to display the warning.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   The logger to save the warning.
    * @param string[] $exclude
    *   An array of config object names that are excluded from schema checking.
@@ -32,7 +32,7 @@ class LenientConfigSchemaChecker extends ConfigSchemaChecker {
   /**
    * Checks that configuration complies with its schema on config save.
    *
-   * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   * @param ConfigCrudEvent $event
    *   The configuration event.
    */
   public function onConfigSave(ConfigCrudEvent $event): void {

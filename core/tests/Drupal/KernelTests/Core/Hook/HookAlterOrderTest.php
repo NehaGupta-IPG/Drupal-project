@@ -22,7 +22,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests Hook Alter Order.
  *
  *  Tests using the 'procedural_alter' and 'procedural_subtype_alter' which
- *  are procedural only
+ *  are procedural only.
  */
 #[Group('Hook')]
 #[IgnoreDeprecations]

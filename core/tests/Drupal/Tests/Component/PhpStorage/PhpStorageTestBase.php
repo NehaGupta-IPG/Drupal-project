@@ -71,7 +71,7 @@ abstract class PhpStorageTestBase extends TestCase {
   /**
    * Additional asserts to be run.
    *
-   * @param \Drupal\Component\PhpStorage\PhpStorageInterface $php
+   * @param PhpStorageInterface $php
    *   The PHP storage object.
    * @param string $name
    *   The name of an object. It should exist in the storage.

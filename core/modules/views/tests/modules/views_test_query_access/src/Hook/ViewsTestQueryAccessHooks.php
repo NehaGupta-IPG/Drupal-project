@@ -34,7 +34,7 @@ class ViewsTestQueryAccessHooks {
   /**
    * Excludes entities with the 'hidden-ENTITY_TYPE_ID' UUID from a query.
    *
-   * @param \Drupal\Core\Database\Query\AlterableInterface $query
+   * @param AlterableInterface $query
    *   The Views select query to alter.
    */
   public function restrictByUuid(AlterableInterface $query): void {

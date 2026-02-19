@@ -22,9 +22,9 @@ class FileImageDimensionsConstraintValidator extends BaseFileConstraintValidator
   /**
    * Creates a new FileImageDimensionsConstraintValidator.
    *
-   * @param \Drupal\Core\Image\ImageFactory $imageFactory
+   * @param ImageFactory $imageFactory
    *   The image factory.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger.
    */
   public function __construct(

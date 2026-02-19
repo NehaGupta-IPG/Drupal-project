@@ -21,7 +21,7 @@ class ImageToolkitManager extends DefaultPluginManager {
   /**
    * The config factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
@@ -31,11 +31,11 @@ class ImageToolkitManager extends DefaultPluginManager {
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param CacheBackendInterface $cache_backend
    *   Cache backend instance to use.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
    */
   public function __construct(
@@ -79,7 +79,7 @@ class ImageToolkitManager extends DefaultPluginManager {
   /**
    * Gets the default image toolkit.
    *
-   * @return \Drupal\Core\ImageToolkit\ImageToolkitInterface
+   * @return ImageToolkitInterface
    *   Object of the default toolkit, or FALSE on error.
    */
   public function getDefaultToolkit() {

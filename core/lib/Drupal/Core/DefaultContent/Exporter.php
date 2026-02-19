@@ -42,10 +42,10 @@ final class Exporter implements LoggerAwareInterface {
   /**
    * Exports a single content entity as an array.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity to export.
    *
-   * @return \Drupal\Core\DefaultContent\ExportResult
+   * @return ExportResult
    *   A read-only value object with the exported entity data, and any metadata
    *   that was collected while exporting the entity, including dependencies and
    *   attachments.
@@ -112,13 +112,13 @@ final class Exporter implements LoggerAwareInterface {
    * Any attachments to the entity (e.g., physical files) will be copied into
    * the destination directory, alongside the exported entity.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity to export.
    * @param string $destination
    *   A destination path or URI; will be created if it does not exist. A
    *   subdirectory will be created for the entity type that is being exported.
    *
-   * @return \Drupal\Core\DefaultContent\ExportResult
+   * @return ExportResult
    *   The exported entity data and its metadata.
    */
   public function exportToFile(ContentEntityInterface $entity, string $destination): ExportResult {
@@ -148,7 +148,7 @@ final class Exporter implements LoggerAwareInterface {
   /**
    * Exports an entity and all of its dependencies to a directory.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity to export.
    * @param string $destination
    *   A destination path or URI; will be created if it does not exist.
@@ -188,9 +188,9 @@ final class Exporter implements LoggerAwareInterface {
    * Any fields that are explicitly marked non-exportable (including computed
    * properties by default) will not be exported.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $translation
+   * @param ContentEntityInterface $translation
    *   The translation to export.
-   * @param \Drupal\Core\DefaultContent\ExportMetadata $metadata
+   * @param ExportMetadata $metadata
    *   Any metadata about the entity being exported (e.g., dependencies).
    * @param callable[] $callbacks
    *   Custom export functions for specific field types, keyed by field type.
@@ -219,7 +219,7 @@ final class Exporter implements LoggerAwareInterface {
         ->getDataType();
       $callback = $callbacks[$name] ?? $callbacks[$data_type] ?? $this->exportFieldItem(...);
 
-      /** @var \Drupal\Core\Field\FieldItemInterface $item */
+      /** @var FieldItemInterface $item */
       foreach ($items as $item) {
         $values = $callback($item, $metadata);
         // If the callback returns NULL, this item should not be exported.
@@ -241,7 +241,7 @@ final class Exporter implements LoggerAwareInterface {
    * function to the exporter by subscribing to
    * \Drupal\Core\DefaultContent\PreExportEvent.
    *
-   * @param \Drupal\Core\Field\FieldItemInterface $item
+   * @param FieldItemInterface $item
    *   The field item to export.
    *
    * @return array
@@ -267,9 +267,9 @@ final class Exporter implements LoggerAwareInterface {
   /**
    * Exports an entity reference field item.
    *
-   * @param \Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItemInterface&\Drupal\Core\Field\FieldItemInterface $item
+   * @param EntityReferenceItemInterface&FieldItemInterface $item
    *   The field item to export.
-   * @param \Drupal\Core\DefaultContent\ExportMetadata $metadata
+   * @param ExportMetadata $metadata
    *   Any metadata about the entity being exported (e.g., dependencies).
    *
    * @return array|null

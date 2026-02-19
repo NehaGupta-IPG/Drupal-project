@@ -1,5 +1,8 @@
 <?php
 
+use Drupal\Core\Ajax\PrependCommand;
+use Drupal\Core\Form\FormStateInterface;
+
 /**
  * @file
  * Callbacks and hooks related to form system.
@@ -141,7 +144,6 @@ function callback_batch_finished($success, $results, $operations, $elapsed) {
 /**
  * @} End of "addtogroup callbacks".
  */
-
 /**
  * @addtogroup hooks
  * @{
@@ -150,13 +152,13 @@ function callback_batch_finished($success, $results, $operations, $elapsed) {
 /**
  * Alter the Ajax command data that is sent to the client.
  *
- * @param \Drupal\Core\Ajax\CommandInterface[] $data
+ * @param CommandInterface[] $data
  *   An array of all the rendered commands that will be sent to the client.
  */
 function hook_ajax_render_alter(array &$data) {
   // Inject any new status messages into the content area.
   $status_messages = ['#type' => 'status_messages'];
-  $command = new \Drupal\Core\Ajax\PrependCommand('#block-system-main .content', \Drupal::service('renderer')->renderRoot($status_messages));
+  $command = new PrependCommand('#block-system-main .content', \Drupal::service('renderer')->renderRoot($status_messages));
   $data[] = $command->render();
 }
 
@@ -188,7 +190,7 @@ function hook_ajax_render_alter(array &$data) {
  *
  * @param array $form
  *   Nested array of form elements that comprise the form.
- * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param FormStateInterface $form_state
  *   The current state of the form. The arguments that
  *   \Drupal::formBuilder()->getForm() was originally called with are available
  *   in the array $form_state->getBuildInfo()['args'].
@@ -201,7 +203,7 @@ function hook_ajax_render_alter(array &$data) {
  *
  * @ingroup form_api
  */
-function hook_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id): void {
+function hook_form_alter(&$form, FormStateInterface $form_state, $form_id): void {
   if (isset($form['type']) && $form['type']['#value'] . '_node_settings' == $form_id) {
     $upload_enabled_types = \Drupal::config('my_module.settings')->get('upload_enabled_types');
     $form['workflow']['upload_' . $form['type']['#value']] = [
@@ -238,7 +240,7 @@ function hook_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_stat
  *
  * @param array $form
  *   Nested array of form elements that comprise the form.
- * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param FormStateInterface $form_state
  *   The current state of the form. The arguments that
  *   \Drupal::formBuilder()->getForm() was originally called with are available
  *   in the array $form_state->getBuildInfo()['args'].
@@ -252,7 +254,7 @@ function hook_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_stat
  *
  * @ingroup form_api
  */
-function hook_form_FORM_ID_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id): void {
+function hook_form_FORM_ID_alter(&$form, FormStateInterface $form_state, $form_id): void {
   // Modification for the form with the given form ID goes here. For example, if
   // FORM_ID is "user_register_form" this code would run only on the user
   // registration form.
@@ -296,7 +298,7 @@ function hook_form_FORM_ID_alter(&$form, \Drupal\Core\Form\FormStateInterface $f
  *
  * @param array $form
  *   Nested array of form elements that comprise the form.
- * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param FormStateInterface $form_state
  *   The current state of the form.
  * @param string $form_id
  *   String representing the name of the form itself. Typically this is the
@@ -308,7 +310,7 @@ function hook_form_FORM_ID_alter(&$form, \Drupal\Core\Form\FormStateInterface $f
  *
  * @ingroup form_api
  */
-function hook_form_BASE_FORM_ID_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id): void {
+function hook_form_BASE_FORM_ID_alter(&$form, FormStateInterface $form_state, $form_id): void {
   // Modification for the form with the given BASE_FORM_ID goes here. For
   // example, if BASE_FORM_ID is "node_form", this code would run on every
   // node form, regardless of node type.

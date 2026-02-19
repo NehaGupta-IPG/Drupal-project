@@ -140,7 +140,7 @@ class SessionHttpsTest extends BrowserTestBase {
     // controller in order to retrieve the target page. Because the URL in the
     // location header needs to be modified, it is necessary to disable the
     // automatic redirects normally performed by the Guzzle CurlHandler.
-    /** @var \Psr\Http\Message\ResponseInterface $response */
+    /** @var ResponseInterface $response */
     $response = $this->getHttpClient()->post($url, [
       'form_params' => $post,
       'http_errors' => FALSE,
@@ -191,7 +191,7 @@ class SessionHttpsTest extends BrowserTestBase {
     // controller in order to retrieve the target page. Because the URL in the
     // location header needs to be modified, it is necessary to disable the
     // automatic redirects normally performed by the Guzzle CurlHandler.
-    /** @var \Psr\Http\Message\ResponseInterface $response */
+    /** @var ResponseInterface $response */
     $response = $this->getHttpClient()->post($url, [
       'form_params' => $post,
       'http_errors' => FALSE,
@@ -224,7 +224,7 @@ class SessionHttpsTest extends BrowserTestBase {
   /**
    * Extracts internal path from the location header on the response.
    *
-   * @param \Psr\Http\Message\ResponseInterface $response
+   * @param ResponseInterface $response
    *   The response from logging in.
    * @param bool $https
    *   Whether the log in was via HTTPS. Defaults to FALSE.
@@ -296,7 +296,7 @@ class SessionHttpsTest extends BrowserTestBase {
   /**
    * Creates a new Guzzle CookieJar with a Xdebug cookie if necessary.
    *
-   * @return \GuzzleHttp\Cookie\CookieJar
+   * @return CookieJar
    *   The Guzzle CookieJar.
    */
   protected function getGuzzleCookieJar() {

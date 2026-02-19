@@ -75,7 +75,7 @@ class PathValidatorTest extends KernelTestBase {
         $requestContext->setMethod($method);
       }
 
-      /** @var \Drupal\Core\Url $url */
+      /** @var Url $url */
       $url = $pathValidator->getUrlIfValidWithoutAccessCheck($entity->toUrl()->toString(TRUE)->getGeneratedUrl());
       $this->assertEquals($method, $requestContext->getMethod());
       $this->assertInstanceOf(Url::class, $url);

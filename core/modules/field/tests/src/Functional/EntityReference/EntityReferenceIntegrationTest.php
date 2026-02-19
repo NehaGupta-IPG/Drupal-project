@@ -198,7 +198,7 @@ class EntityReferenceIntegrationTest extends BrowserTestBase {
    *
    * @param string $entity_name
    *   The name of the test entity.
-   * @param \Drupal\Core\Entity\EntityInterface[] $referenced_entities
+   * @param EntityInterface[] $referenced_entities
    *   An array of referenced entities.
    * @param bool $assert_order
    *   Whether the correct order of the references should be assert or just

@@ -6,8 +6,8 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
-use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Security\TrustedCallbackInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -18,23 +18,23 @@ class EntityViewController implements ContainerInjectionInterface, TrustedCallba
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The renderer service.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * Creates an EntityViewController object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer service.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, RendererInterface $renderer) {
@@ -116,7 +116,7 @@ class EntityViewController implements ContainerInjectionInterface, TrustedCallba
   /**
    * Provides a page to render a single entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $_entity
+   * @param EntityInterface $_entity
    *   The Entity to be rendered. Note this variable is named $_entity rather
    *   than $entity to prevent collisions with other named placeholders in the
    *   route.

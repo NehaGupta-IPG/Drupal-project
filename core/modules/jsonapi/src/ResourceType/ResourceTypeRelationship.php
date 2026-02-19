@@ -18,7 +18,7 @@ class ResourceTypeRelationship extends ResourceTypeField {
   /**
    * The resource type to which this relationships can relate.
    *
-   * @var \Drupal\jsonapi\ResourceType\ResourceType[]
+   * @var ResourceType[]
    */
   protected $relatableResourceTypes;
 
@@ -40,7 +40,7 @@ class ResourceTypeRelationship extends ResourceTypeField {
   /**
    * Gets the relatable resource types.
    *
-   * @return \Drupal\jsonapi\ResourceType\ResourceType[]
+   * @return ResourceType[]
    *   The resource type to which this relationships can relate.
    */
   public function getRelatableResourceTypes() {

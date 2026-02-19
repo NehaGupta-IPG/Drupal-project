@@ -93,7 +93,7 @@ class HtmxRendererTest extends KernelTestBase {
   /**
    * Verify expected response from HtmxRenderer.
    *
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   The url to use for the request.
    */
   protected function assertHtmxResponseContent(Url $url): void {

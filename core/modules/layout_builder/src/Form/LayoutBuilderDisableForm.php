@@ -24,23 +24,23 @@ class LayoutBuilderDisableForm extends ConfirmFormBase implements WorkspaceDynam
   /**
    * The layout tempstore repository.
    *
-   * @var \Drupal\layout_builder\LayoutTempstoreRepositoryInterface
+   * @var LayoutTempstoreRepositoryInterface
    */
   protected $layoutTempstoreRepository;
 
   /**
    * The section storage.
    *
-   * @var \Drupal\layout_builder\DefaultsSectionStorageInterface
+   * @var DefaultsSectionStorageInterface
    */
   protected $sectionStorage;
 
   /**
    * Constructs a new RevertOverridesForm.
    *
-   * @param \Drupal\layout_builder\LayoutTempstoreRepositoryInterface $layout_tempstore_repository
+   * @param LayoutTempstoreRepositoryInterface $layout_tempstore_repository
    *   The layout tempstore repository.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger service.
    */
   public function __construct(LayoutTempstoreRepositoryInterface $layout_tempstore_repository, MessengerInterface $messenger) {

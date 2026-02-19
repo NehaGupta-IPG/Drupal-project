@@ -31,7 +31,7 @@ class SandboxDirectoryValidatorTest extends UnitTestCase {
   /**
    * Tests check not in active.
    *
-   * @param \Drupal\package_manager\ValidationResult[] $expected
+   * @param ValidationResult[] $expected
    *   The expected result.
    * @param string $project_root
    *   The project root.

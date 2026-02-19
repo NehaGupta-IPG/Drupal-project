@@ -2,12 +2,12 @@
 
 namespace Drupal\mysql\Driver\Database\mysql;
 
-use Drupal\Core\Database\Exception\SchemaPrimaryKeyMustBeDroppedException;
-use Drupal\Core\Database\SchemaException;
-use Drupal\Core\Database\SchemaObjectExistsException;
-use Drupal\Core\Database\SchemaObjectDoesNotExistException;
-use Drupal\Core\Database\Schema as DatabaseSchema;
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Database\Exception\SchemaPrimaryKeyMustBeDroppedException;
+use Drupal\Core\Database\Schema as DatabaseSchema;
+use Drupal\Core\Database\SchemaException;
+use Drupal\Core\Database\SchemaObjectDoesNotExistException;
+use Drupal\Core\Database\SchemaObjectExistsException;
 
 // cspell:ignore gipk
 
@@ -307,7 +307,7 @@ class Schema extends DatabaseSchema {
    * @return array
    *   List of shortened indexes.
    *
-   * @throws \Drupal\Core\Database\SchemaException
+   * @throws SchemaException
    *   Thrown if field specification is missing.
    */
   protected function getNormalizedIndexes(array $spec) {

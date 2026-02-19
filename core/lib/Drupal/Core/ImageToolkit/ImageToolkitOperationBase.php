@@ -37,9 +37,9 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    *   The plugin ID for the plugin instance.
    * @param array $plugin_definition
    *   The plugin implementation definition.
-   * @param \Psr\Log\LoggerInterface|\Drupal\Core\ImageToolkit\ImageToolkitInterface $toolkit
+   * @param LoggerInterface|ImageToolkitInterface $toolkit
    *   (deprecated) The image toolkit.
-   * @param \Psr\Log\LoggerInterface|null $logger
+   * @param LoggerInterface|null $logger
    *   A logger instance.
    */
   public function __construct(
@@ -77,7 +77,7 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    * getter. This provides better DX (code checking and code completion) for
    * image toolkit operation developers.
    *
-   * @return \Drupal\Core\ImageToolkit\ImageToolkitInterface
+   * @return ImageToolkitInterface
    *   The image toolkit in use.
    */
   protected function getToolkit() {
@@ -118,7 +118,7 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    *   The prepared arguments array.
    *
    * @throws \InvalidArgumentException
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws InvalidPluginDefinitionException
    */
   protected function prepareArguments(array $arguments) {
     foreach ($this->arguments() as $id => $argument) {
@@ -175,7 +175,7 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    *
    * @throws \InvalidArgumentException
    *   If one or more of the arguments are not valid.
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws InvalidPluginDefinitionException
    *   If the plugin does not define a default for an optional argument.
    */
   protected function validateArguments(array $arguments) {

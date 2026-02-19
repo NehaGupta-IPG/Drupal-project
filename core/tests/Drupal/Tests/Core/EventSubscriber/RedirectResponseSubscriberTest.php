@@ -30,14 +30,14 @@ class RedirectResponseSubscriberTest extends UnitTestCase {
   /**
    * The mocked request context.
    *
-   * @var \Drupal\Core\Routing\RequestContext|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Routing\RequestContext|MockObject
    */
   protected $requestContext;
 
   /**
    * The mocked request context.
    *
-   * @var \Drupal\Core\Utility\UnroutedUrlAssemblerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var UnroutedUrlAssemblerInterface|MockObject
    */
   protected $urlAssembler;
 
@@ -102,7 +102,7 @@ class RedirectResponseSubscriberTest extends UnitTestCase {
   /**
    * Tests destination detection and redirection.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object with destination query set.
    * @param string|false $expected
    *   The expected target URL or FALSE.

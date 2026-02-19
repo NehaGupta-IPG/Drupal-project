@@ -39,7 +39,7 @@ abstract class ExtensionList {
   /**
    * The cache.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $cache;
 
@@ -53,21 +53,21 @@ abstract class ExtensionList {
   /**
    * The info parser.
    *
-   * @var \Drupal\Core\Extension\InfoParserInterface
+   * @var InfoParserInterface
    */
   protected $infoParser;
 
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The cached extensions.
    *
-   * @var \Drupal\Core\Extension\Extension[]|null
+   * @var Extension[]|null
    */
   protected $extensions;
 
@@ -105,7 +105,7 @@ abstract class ExtensionList {
   /**
    * The state store.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
@@ -123,13 +123,13 @@ abstract class ExtensionList {
    *   The app root.
    * @param string $type
    *   The extension type.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The cache.
-   * @param \Drupal\Core\Extension\InfoParserInterface $info_parser
+   * @param InfoParserInterface $info_parser
    *   The info parser.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state.
    * @param string $install_profile
    *   The install profile used by the site.
@@ -147,7 +147,7 @@ abstract class ExtensionList {
   /**
    * Returns the extension discovery.
    *
-   * @return \Drupal\Core\Extension\ExtensionDiscovery
+   * @return ExtensionDiscovery
    *   The extension discovery.
    */
   protected function getExtensionDiscovery() {
@@ -238,7 +238,7 @@ abstract class ExtensionList {
    * @return string
    *   The human-readable name of the extension.
    *
-   * @throws \Drupal\Core\Extension\Exception\UnknownExtensionException
+   * @throws UnknownExtensionException
    *   If there is no extension with the supplied machine name.
    */
   public function getName($extension_name) {
@@ -251,11 +251,11 @@ abstract class ExtensionList {
    * @param string $extension_name
    *   The machine name of the extension.
    *
-   * @return \Drupal\Core\Extension\Extension
+   * @return Extension
    *   A processed extension object for the extension with the specified machine
    *   name.
    *
-   * @throws \Drupal\Core\Extension\Exception\UnknownExtensionException
+   * @throws UnknownExtensionException
    *   If there is no extension with the supplied name.
    */
   public function get($extension_name) {
@@ -270,7 +270,7 @@ abstract class ExtensionList {
   /**
    * Returns all available extensions.
    *
-   * @return \Drupal\Core\Extension\Extension[]
+   * @return Extension[]
    *   Processed extension objects, keyed by machine name.
    */
   public function getList() {
@@ -293,7 +293,7 @@ abstract class ExtensionList {
    * Overriding this method gives other code the chance to add additional
    * extensions to this raw listing.
    *
-   * @return \Drupal\Core\Extension\Extension[]
+   * @return Extension[]
    *   Unprocessed extension objects, keyed by machine name.
    */
   protected function doScanExtensions() {
@@ -303,10 +303,10 @@ abstract class ExtensionList {
   /**
    * Builds the list of extensions.
    *
-   * @return \Drupal\Core\Extension\Extension[]
+   * @return Extension[]
    *   Processed extension objects, keyed by machine name.
    *
-   * @throws \Drupal\Core\Extension\InfoParserException
+   * @throws InfoParserException
    *   If one of the .info.yml files is incomplete, or causes a parsing error.
    */
   protected function doList() {
@@ -337,7 +337,7 @@ abstract class ExtensionList {
    * @return mixed[]
    *   An associative array of extension information.
    *
-   * @throws \Drupal\Core\Extension\Exception\UnknownExtensionException
+   * @throws UnknownExtensionException
    *   If there is no extension with the supplied name.
    */
   public function getExtensionInfo($extension_name) {
@@ -506,7 +506,7 @@ abstract class ExtensionList {
    *   The drupal-root relative filename and path of the requested extension's
    *   .info.yml file.
    *
-   * @throws \Drupal\Core\Extension\Exception\UnknownExtensionException
+   * @throws UnknownExtensionException
    *   If there is no extension with the supplied machine name.
    */
   public function getPathname($extension_name) {
@@ -534,7 +534,7 @@ abstract class ExtensionList {
    * @return string
    *   The Drupal-root-relative path to the specified extension.
    *
-   * @throws \Drupal\Core\Extension\Exception\UnknownExtensionException
+   * @throws UnknownExtensionException
    *   If there is no extension with the supplied name.
    */
   public function getPath($extension_name) {
@@ -544,7 +544,7 @@ abstract class ExtensionList {
   /**
    * Creates the info value for an extension object.
    *
-   * @param \Drupal\Core\Extension\Extension $extension
+   * @param Extension $extension
    *   The extension whose info is to be altered.
    *
    * @return array
@@ -577,7 +577,7 @@ abstract class ExtensionList {
    * @return bool
    *   TRUE if the extension is incompatible and FALSE if not.
    *
-   * @throws \Drupal\Core\Extension\Exception\UnknownExtensionException
+   * @throws UnknownExtensionException
    *   If there is no extension with the supplied name.
    */
   public function checkIncompatibility($name) {
@@ -588,9 +588,9 @@ abstract class ExtensionList {
   /**
    * Array sorting callback; sorts extensions by their name.
    *
-   * @param \Drupal\Core\Extension\Extension $a
+   * @param Extension $a
    *   The first extension to compare.
-   * @param \Drupal\Core\Extension\Extension $b
+   * @param Extension $b
    *   The second extension to compare.
    *
    * @return int

@@ -39,7 +39,7 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
   /**
    * The write safe session handler.
    *
-   * @var \Drupal\Core\Session\WriteSafeSessionHandlerInterface
+   * @var WriteSafeSessionHandlerInterface
    *
    * @todo This reference should be removed once all database queries
    *   are removed from the session manager class.
@@ -49,17 +49,17 @@ class SessionManager extends NativeSessionStorage implements SessionManagerInter
   /**
    * Constructs a new session manager instance.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   * @param RequestStack $requestStack
    *   The request stack.
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection.
-   * @param \Drupal\Core\Session\MetadataBag $metadata_bag
+   * @param MetadataBag $metadata_bag
    *   The session metadata bag.
-   * @param \Drupal\Core\Session\SessionConfigurationInterface $sessionConfiguration
+   * @param SessionConfigurationInterface $sessionConfiguration
    *   The session configuration interface.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
-   * @param \Symfony\Component\HttpFoundation\Session\Storage\Proxy\AbstractProxy|\SessionHandlerInterface|null $handler
+   * @param AbstractProxy|\SessionHandlerInterface|null $handler
    *   The object to register as a PHP session handler.
    *
    * @see \Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage::setSaveHandler()

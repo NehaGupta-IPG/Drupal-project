@@ -453,7 +453,7 @@ class FilterAPITest extends EntityKernelTestBase {
   /**
    * Checks if an expected violation exists in the given violations.
    *
-   * @param \Symfony\Component\Validator\ConstraintViolationListInterface $violations
+   * @param ConstraintViolationListInterface $violations
    *   The violations to assert.
    * @param string $invalid_value
    *   The expected invalid value.

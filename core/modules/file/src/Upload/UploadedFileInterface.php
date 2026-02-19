@@ -64,12 +64,12 @@ interface UploadedFileInterface {
   /**
    * Validates the uploaded file information.
    *
-   * @param \Symfony\Component\Validator\Validator\ValidatorInterface $validator
+   * @param ValidatorInterface $validator
    *   A validator object.
    * @param array $options
    *   Options to pass to a constraint.
    *
-   * @return \Symfony\Component\Validator\ConstraintViolationListInterface
+   * @return ConstraintViolationListInterface
    *   The list of violations.
    */
   public function validate(ValidatorInterface $validator, array $options = []): ConstraintViolationListInterface;

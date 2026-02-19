@@ -20,7 +20,7 @@ class TaxonomyRelationshipTest extends TaxonomyTestBase {
   /**
    * Stores the terms used in the tests.
    *
-   * @var \Drupal\taxonomy\TermInterface[]
+   * @var TermInterface[]
    */
   protected $terms = [];
 

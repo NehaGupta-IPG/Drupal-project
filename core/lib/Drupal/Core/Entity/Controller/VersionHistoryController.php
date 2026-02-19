@@ -9,12 +9,12 @@ use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Entity\RevisionableStorageInterface;
+use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Entity\RevisionLogInterface;
 
 /**
  * Provides a controller showing revision history for an entity.
@@ -41,13 +41,13 @@ class VersionHistoryController extends ControllerBase {
   /**
    * Constructs a new VersionHistoryController.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   * @param LanguageManagerInterface $languageManager
    *   The language manager.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
+   * @param DateFormatterInterface $dateFormatter
    *   The date formatter service.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
    */
   public function __construct(
@@ -63,7 +63,7 @@ class VersionHistoryController extends ControllerBase {
   /**
    * Generates an overview table of revisions for an entity.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
+   * @param RouteMatchInterface $routeMatch
    *   The route match.
    *
    * @return array
@@ -78,7 +78,7 @@ class VersionHistoryController extends ControllerBase {
   /**
    * Builds a link to revert an entity revision.
    *
-   * @param \Drupal\Core\Entity\RevisionableInterface $revision
+   * @param RevisionableInterface $revision
    *   The entity to build a revert revision link for.
    *
    * @return array|null
@@ -107,7 +107,7 @@ class VersionHistoryController extends ControllerBase {
   /**
    * Builds a link to delete an entity revision.
    *
-   * @param \Drupal\Core\Entity\RevisionableInterface $revision
+   * @param RevisionableInterface $revision
    *   The entity to build a delete revision link for.
    *
    * @return array|null
@@ -136,7 +136,7 @@ class VersionHistoryController extends ControllerBase {
   /**
    * Get a description of the revision.
    *
-   * @param \Drupal\Core\Entity\RevisionableInterface $revision
+   * @param RevisionableInterface $revision
    *   The entity revision.
    *
    * @return array
@@ -181,7 +181,7 @@ class VersionHistoryController extends ControllerBase {
   /**
    * Date format to use for revision description dates.
    *
-   * @param \Drupal\Core\Entity\RevisionableInterface $revision
+   * @param RevisionableInterface $revision
    *   The revision in context.
    *
    * @return array
@@ -198,10 +198,10 @@ class VersionHistoryController extends ControllerBase {
   /**
    * Generates revisions of an entity relevant to the current language.
    *
-   * @param \Drupal\Core\Entity\RevisionableInterface $entity
+   * @param RevisionableInterface $entity
    *   The entity.
    *
-   * @return \Generator|\Drupal\Core\Entity\RevisionableInterface
+   * @return \Generator|RevisionableInterface
    *   Generates revisions.
    */
   protected function loadRevisions(RevisionableInterface $entity) {
@@ -237,7 +237,7 @@ class VersionHistoryController extends ControllerBase {
   /**
    * Generates an overview table of revisions of an entity.
    *
-   * @param \Drupal\Core\Entity\RevisionableInterface $entity
+   * @param RevisionableInterface $entity
    *   A revisionable entity.
    *
    * @return array
@@ -270,7 +270,7 @@ class VersionHistoryController extends ControllerBase {
   /**
    * Builds a table row for a revision.
    *
-   * @param \Drupal\Core\Entity\RevisionableInterface $revision
+   * @param RevisionableInterface $revision
    *   An entity revision.
    *
    * @return array
@@ -304,7 +304,7 @@ class VersionHistoryController extends ControllerBase {
   /**
    * Get operations for an entity revision.
    *
-   * @param \Drupal\Core\Entity\RevisionableInterface $revision
+   * @param RevisionableInterface $revision
    *   The entity to build revision links for.
    *
    * @return array

@@ -84,7 +84,7 @@ class StorageCopyTraitTest extends UnitTestCase {
   /**
    * Get the protected config data out of a MemoryStorage.
    *
-   * @param \Drupal\Core\Config\MemoryStorage $storage
+   * @param MemoryStorage $storage
    *   The config storage to extract the data from.
    *
    * @return array
@@ -100,7 +100,7 @@ class StorageCopyTraitTest extends UnitTestCase {
   /**
    * Generate random data in a config storage.
    *
-   * @param \Drupal\Core\Config\StorageInterface $storage
+   * @param StorageInterface $storage
    *   The storage to populate with random data.
    * @param bool $collections
    *   Add random collections or not.

@@ -48,7 +48,7 @@ interface ParamConverterInterface {
    *   The parameter definition provided in the route options.
    * @param string $name
    *   The name of the parameter.
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route to consider attaching to.
    *
    * @return bool

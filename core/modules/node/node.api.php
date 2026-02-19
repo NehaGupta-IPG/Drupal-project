@@ -5,10 +5,10 @@
  * Hooks specific to the Node module.
  */
 
-use Drupal\Core\Session\AccountInterface;
-use Drupal\node\NodeInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\node\NodeInterface;
 
 /**
  * @addtogroup hooks
@@ -61,7 +61,7 @@ use Drupal\Component\Utility\Xss;
  * sure to restore your {node_access} record after node_access_rebuild() is
  * called.
  *
- * @param \Drupal\Core\Session\AccountInterface $account
+ * @param AccountInterface $account
  *   The account object whose grants are requested.
  * @param string $operation
  *   The node operation to be performed, such as 'view', 'update', or 'delete'.
@@ -141,7 +141,7 @@ function hook_node_grants(AccountInterface $account, $operation): array {
  * Also note that a deny all is not written to the database; denies are
  * implicit.
  *
- * @param \Drupal\node\NodeInterface $node
+ * @param NodeInterface $node
  *   The node that has just been saved.
  *
  * @return array
@@ -209,7 +209,7 @@ function hook_node_access_records(NodeInterface $node): array {
  *
  * @param array $grants
  *   The $grants array returned by hook_node_access_records().
- * @param \Drupal\node\NodeInterface $node
+ * @param NodeInterface $node
  *   The node for which the grants were acquired.
  *
  * @see hook_node_access_records()
@@ -252,7 +252,7 @@ function hook_node_access_records_alter(&$grants, NodeInterface $node) {
  *
  * @param array $grants
  *   The $grants array returned by hook_node_grants().
- * @param \Drupal\Core\Session\AccountInterface $account
+ * @param AccountInterface $account
  *   The account requesting access to content.
  * @param string $operation
  *   The operation being performed, 'view', 'update' or 'delete'.
@@ -287,7 +287,7 @@ function hook_node_grants_alter(&$grants, AccountInterface $account, $operation)
  * This hook is invoked from the node search plugin during search execution,
  * after loading and rendering the node.
  *
- * @param \Drupal\node\NodeInterface $node
+ * @param NodeInterface $node
  *   The node being displayed in a search result.
  *
  * @return array
@@ -312,7 +312,7 @@ function hook_node_search_result(NodeInterface $node): array {
  * This hook is invoked during search indexing, after loading, and after the
  * result of rendering is added as $node->rendered to the node object.
  *
- * @param \Drupal\node\NodeInterface $node
+ * @param NodeInterface $node
  *   The node being indexed.
  *
  * @return string|\Stringable
@@ -476,7 +476,7 @@ function hook_node_search_ranking(): array {
  *
  * @param array &$links
  *   A renderable array representing the node links.
- * @param \Drupal\node\NodeInterface $entity
+ * @param NodeInterface $entity
  *   The node being rendered.
  * @param array &$context
  *   Various aspects of the context in which the node links are going to be

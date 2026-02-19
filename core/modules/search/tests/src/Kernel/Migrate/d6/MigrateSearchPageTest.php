@@ -35,7 +35,7 @@ class MigrateSearchPageTest extends MigrateDrupal6TestBase {
    */
   public function testSearchPage(): void {
     $id = 'node_search';
-    /** @var \Drupal\search\Entity\SearchPage $search_page */
+    /** @var SearchPage $search_page */
     $search_page = SearchPage::load($id);
     $this->assertSame($id, $search_page->id());
     $configuration = $search_page->getPlugin()->getConfiguration();

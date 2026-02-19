@@ -16,23 +16,23 @@ class UpdateController extends ControllerBase {
   /**
    * Update manager service.
    *
-   * @var \Drupal\update\UpdateManagerInterface
+   * @var UpdateManagerInterface
    */
   protected $updateManager;
 
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * Constructs update status data.
    *
-   * @param \Drupal\update\UpdateManagerInterface $update_manager
+   * @param UpdateManagerInterface $update_manager
    *   Update Manager Service.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
    */
   public function __construct(UpdateManagerInterface $update_manager, RendererInterface $renderer) {

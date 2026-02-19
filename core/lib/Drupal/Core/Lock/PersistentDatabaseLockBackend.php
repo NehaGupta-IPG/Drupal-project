@@ -16,7 +16,7 @@ class PersistentDatabaseLockBackend extends DatabaseLockBackend {
   /**
    * Constructs a new PersistentDatabaseLockBackend.
    *
-   * @param \Drupal\Core\Database\Connection $database
+   * @param Connection $database
    *   The database connection.
    */
   public function __construct(Connection $database) {

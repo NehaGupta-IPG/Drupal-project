@@ -187,7 +187,7 @@ class ContentModerationSyncingTest extends KernelTestBase {
   /**
    * Get all the revision names in order of the revision ID.
    *
-   * @param \Drupal\entity_test\Entity\EntityTestMulRevPub $entity
+   * @param EntityTestMulRevPub $entity
    *   The entity.
    *
    * @return array

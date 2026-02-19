@@ -29,7 +29,7 @@ abstract class EntityTestLabelResourceTestBase extends ConfigEntityResourceTestB
   protected static $patchProtectedFieldNames = [];
 
   /**
-   * @var \Drupal\entity_test\Entity\EntityTestLabel
+   * @var EntityTestLabel
    */
   protected $entity;
 

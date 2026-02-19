@@ -16,7 +16,7 @@ class BinaryFileResponseTestController {
   /**
    * Download the file set in the relative_file_url query parameter.
    *
-   * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+   * @return BinaryFileResponse
    *   The response wrapping the file content.
    */
   public function download(Request $request) {

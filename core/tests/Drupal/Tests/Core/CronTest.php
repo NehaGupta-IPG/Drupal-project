@@ -44,7 +44,7 @@ class CronTest extends UnitTestCase {
   /**
    * An instance of the Cron class for testing.
    *
-   * @var \Drupal\Core\Cron
+   * @var Cron
    */
   protected $cron;
 
@@ -58,7 +58,7 @@ class CronTest extends UnitTestCase {
   /**
    * The current state of the test in memory.
    *
-   * @var \Drupal\Core\State\State
+   * @var State
    */
   protected $state;
 

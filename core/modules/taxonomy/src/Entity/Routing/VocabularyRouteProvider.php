@@ -32,10 +32,10 @@ class VocabularyRouteProvider extends AdminHtmlRouteProvider {
   /**
    * Gets the reset page route.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type.
    *
-   * @return \Symfony\Component\Routing\Route|null
+   * @return Route|null
    *   The generated route, if available.
    */
   protected function getResetPageRoute(EntityTypeInterface $entity_type) {
@@ -56,10 +56,10 @@ class VocabularyRouteProvider extends AdminHtmlRouteProvider {
   /**
    * Gets the overview page route.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type.
    *
-   * @return \Symfony\Component\Routing\Route|null
+   * @return Route|null
    *   The generated route, if available.
    */
   protected function getOverviewPageRoute(EntityTypeInterface $entity_type) {

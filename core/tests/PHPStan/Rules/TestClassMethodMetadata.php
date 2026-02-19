@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Validates method-level PHPUnit test metadata in test classes.
  *
- * @implements Rule<\PHPStan\Node\InClassMethodNode>
+ * @implements Rule<InClassMethodNode>
  *
  * @internal
  */

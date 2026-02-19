@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Rest;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
 use Drupal\system\Entity\Action;
+use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
 use Drupal\user\RoleInterface;
 
 /**

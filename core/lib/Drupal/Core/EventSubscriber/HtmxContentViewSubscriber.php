@@ -32,7 +32,7 @@ class HtmxContentViewSubscriber implements EventSubscriberInterface {
   /**
    * Sets a minimal response render array on an `_htmx_route` route.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ViewEvent $event
+   * @param ViewEvent $event
    *   The event to process.
    */
   public function renderHtmxResponse(ViewEvent $event): void {

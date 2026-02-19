@@ -19,14 +19,14 @@ class FieldUninstallValidatorTest extends UnitTestCase {
   /**
    * The mock field uninstall validator.
    *
-   * @var \Drupal\field\FieldUninstallValidator|\PHPUnit\Framework\MockObject\MockObject
+   * @var FieldUninstallValidator|MockObject
    */
   protected $fieldUninstallValidator;
 
   /**
    * The mock field type plugin manager.
    *
-   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface|MockObject
    */
   protected $fieldTypePluginManager;
 

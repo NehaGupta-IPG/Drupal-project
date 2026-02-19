@@ -21,14 +21,14 @@ class DatabaseTestController extends ControllerBase {
   /**
    * The database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
   /**
    * Constructs a DatabaseTestController object.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   A database connection.
    */
   public function __construct(Connection $connection) {
@@ -41,7 +41,7 @@ class DatabaseTestController extends ControllerBase {
    * This function does care about the page GET parameter, as set by the
    * test HTTP call.
    *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   * @return JsonResponse
    *   A JSON response containing the names of the test entries.
    */
   public function pagerQueryEven($limit) {
@@ -68,7 +68,7 @@ class DatabaseTestController extends ControllerBase {
    * This function does care about the page GET parameter, as set by the
    * test HTTP call.
    *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   * @return JsonResponse
    *   A JSON response containing the names of the test entries.
    */
   public function pagerQueryOdd($limit) {
@@ -95,7 +95,7 @@ class DatabaseTestController extends ControllerBase {
    * This function does care about the page GET parameter, as set by the
    * test HTTP call.
    *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   * @return JsonResponse
    *   A JSON response containing the test tasks.
    */
   public function testTablesort() {
@@ -128,7 +128,7 @@ class DatabaseTestController extends ControllerBase {
    * This function does care about the page GET parameter, as set by the
    * test HTTP call.
    *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   * @return JsonResponse
    *   A JSON response containing the test tasks.
    */
   public function testTablesortFirst() {

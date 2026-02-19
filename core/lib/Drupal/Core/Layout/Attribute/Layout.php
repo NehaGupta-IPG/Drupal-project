@@ -3,9 +3,9 @@
 namespace Drupal\Core\Layout\Attribute;
 
 use Drupal\Component\Plugin\Attribute\Plugin;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Layout\LayoutDefault;
 use Drupal\Core\Layout\LayoutDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Defines a Layout attribute object.
@@ -37,13 +37,13 @@ class Layout extends Plugin {
    *
    * @param string $id
    *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $label
+   * @param TranslatableMarkup|null $label
    *   (optional) The human-readable name. @todo Deprecate optional label in
    *   https://www.drupal.org/project/drupal/issues/3392572.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $category
+   * @param TranslatableMarkup|null $category
    *   (optional) The human-readable category. @todo Deprecate optional category
    *   in https://www.drupal.org/project/drupal/issues/3392572.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $description
+   * @param TranslatableMarkup|null $description
    *   (optional) The description for advanced layouts.
    * @param string|null $template
    *   (optional) The template file to render the layout.
@@ -64,7 +64,7 @@ class Layout extends Plugin {
    *   (optional) The default region.
    * @param class-string $class
    *   (optional) The layout plugin class.
-   * @param \Drupal\Core\Plugin\Context\ContextDefinitionInterface[] $context_definitions
+   * @param ContextDefinitionInterface[] $context_definitions
    *   (optional) The context definition.
    * @param array $config_dependencies
    *   (optional) The config dependencies.

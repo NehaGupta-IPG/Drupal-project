@@ -45,56 +45,56 @@ class HelpSearch extends SearchPluginBase implements AccessibleInterface, Search
   /**
    * The current database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $database;
 
   /**
    * A config object for 'search.settings'.
    *
-   * @var \Drupal\Core\Config\Config
+   * @var Config
    */
   protected $searchSettings;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The Drupal account to use for checking for access to search.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $account;
 
   /**
    * The messenger.
    *
-   * @var \Drupal\Core\Messenger\MessengerInterface
+   * @var MessengerInterface
    */
   protected $messenger;
 
   /**
    * The state object.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
   /**
    * The help section plugin manager.
    *
-   * @var \Drupal\help\HelpSectionManager
+   * @var HelpSectionManager
    */
   protected $helpSectionManager;
 
   /**
    * The search index.
    *
-   * @var \Drupal\search\SearchIndexInterface
+   * @var SearchIndexInterface
    */
   protected $searchIndex;
 
@@ -126,21 +126,21 @@ class HelpSearch extends SearchPluginBase implements AccessibleInterface, Search
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Database\Connection $database
+   * @param Connection $database
    *   The current database connection.
-   * @param \Drupal\Core\Config\Config $search_settings
+   * @param Config $search_settings
    *   A config object for 'search.settings'.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The $account object to use for checking for access to view help.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state object.
-   * @param \Drupal\help\HelpSectionManager $help_section_manager
+   * @param HelpSectionManager $help_section_manager
    *   The help section manager.
-   * @param \Drupal\search\SearchIndexInterface $search_index
+   * @param SearchIndexInterface $search_index
    *   The search index.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, Connection $database, Config $search_settings, LanguageManagerInterface $language_manager, MessengerInterface $messenger, AccountInterface $account, StateInterface $state, HelpSectionManager $help_section_manager, SearchIndexInterface $search_index) {
@@ -188,7 +188,7 @@ class HelpSearch extends SearchPluginBase implements AccessibleInterface, Search
   /**
    * Finds the search results.
    *
-   * @return \Drupal\Core\Database\StatementInterface|null
+   * @return StatementInterface|null
    *   Results from search query execute() method, or NULL if the search
    *   failed.
    */
@@ -265,7 +265,7 @@ class HelpSearch extends SearchPluginBase implements AccessibleInterface, Search
   /**
    * Prepares search results for display.
    *
-   * @param \Drupal\Core\Database\StatementInterface $found
+   * @param StatementInterface $found
    *   Results found from a successful search query execute() method.
    *
    * @return array
@@ -513,7 +513,7 @@ class HelpSearch extends SearchPluginBase implements AccessibleInterface, Search
    * @param string $section_plugin_id
    *   Type of plugin to instantiate.
    *
-   * @return \Drupal\help\SearchableHelpInterface|false
+   * @return SearchableHelpInterface|false
    *   Plugin object, or FALSE if it is not searchable.
    */
   protected function getSectionPlugin($section_plugin_id) {

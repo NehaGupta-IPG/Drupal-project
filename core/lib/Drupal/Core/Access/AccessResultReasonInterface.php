@@ -29,7 +29,7 @@ interface AccessResultReasonInterface extends AccessResultInterface {
    * @param string|null $reason
    *   The reason of this access result or NULL if no reason is provided.
    *
-   * @return \Drupal\Core\Access\AccessResultInterface
+   * @return AccessResultInterface
    *   The access result instance.
    */
   public function setReason($reason);

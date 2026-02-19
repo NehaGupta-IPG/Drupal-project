@@ -16,7 +16,7 @@ class DefinedTestAccessCheck implements AccessInterface {
   /**
    * Checks access.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route to check against.
    *
    * @return \Drupal\Core\Access\AccessResultInterface

@@ -54,7 +54,7 @@ final class ExportMetadata {
   /**
    * Adds a dependency on another content entity.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity we depend upon.
    */
   public function addDependency(ContentEntityInterface $entity): void {

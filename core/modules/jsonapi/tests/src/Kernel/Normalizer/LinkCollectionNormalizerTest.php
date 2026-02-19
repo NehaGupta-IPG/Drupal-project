@@ -42,7 +42,7 @@ class LinkCollectionNormalizerTest extends KernelTestBase {
   /**
    * The subject under test.
    *
-   * @var \Drupal\jsonapi\Normalizer\LinkCollectionNormalizer
+   * @var LinkCollectionNormalizer
    */
   protected $normalizer;
 

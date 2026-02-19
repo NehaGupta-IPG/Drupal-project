@@ -2,9 +2,9 @@
 
 namespace Drupal\Core\Routing;
 
-use Symfony\Component\Routing\RouteCompilerInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCompiler as SymfonyRouteCompiler;
+use Symfony\Component\Routing\RouteCompilerInterface;
 
 /**
  * Compiler to generate derived information from a Route necessary for matching.
@@ -19,10 +19,10 @@ class RouteCompiler extends SymfonyRouteCompiler implements RouteCompilerInterfa
    * new compiled object.  If upstream gets refactored so we can subclass more
    * easily then this may not be necessary.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   A Route instance.
    *
-   * @return \Drupal\Core\Routing\CompiledRoute
+   * @return CompiledRoute
    *   A CompiledRoute instance.
    */
   public static function compile(Route $route): CompiledRoute {
@@ -115,7 +115,7 @@ class RouteCompiler extends SymfonyRouteCompiler implements RouteCompilerInterfa
    * with default values don't make sense anyway, so that should not be a
    * problem.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route to have the placeholders removed from.
    *
    * @return string

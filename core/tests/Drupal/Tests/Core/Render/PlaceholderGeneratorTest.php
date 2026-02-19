@@ -21,7 +21,7 @@ class PlaceholderGeneratorTest extends RendererTestBase {
   /**
    * The tested placeholder generator.
    *
-   * @var \Drupal\Core\Render\PlaceholderGenerator
+   * @var PlaceholderGenerator
    */
   protected $placeholderGenerator;
 

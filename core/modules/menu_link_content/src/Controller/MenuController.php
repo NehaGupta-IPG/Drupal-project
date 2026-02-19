@@ -13,7 +13,7 @@ class MenuController extends ControllerBase {
   /**
    * Provides the menu link creation form.
    *
-   * @param \Drupal\system\MenuInterface $menu
+   * @param MenuInterface $menu
    *   An entity representing a custom menu.
    *
    * @return array

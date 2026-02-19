@@ -159,7 +159,7 @@ class MigrationTest extends UnitTestCase {
    * @param array $expected_value
    *   The migration dependencies configuration array expected.
    *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws InvalidPluginDefinitionException
    *
    * @legacy-covers ::getMigrationDependencies
    */
@@ -260,7 +260,7 @@ class MigrationTest extends UnitTestCase {
    * @param string[] $expected
    *   The migration dependencies configuration array expected.
    *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws InvalidPluginDefinitionException
    */
   #[DataProvider('providerTestAddRequiredDependencies')]
   public function testAddRequiredDependencies(?array $initial_dependency, array $addition, array $expected): void {
@@ -423,7 +423,7 @@ class MigrationTest extends UnitTestCase {
   /**
    * Returns a mock MigrationPluginManager.
    *
-   * @return \Drupal\migrate\Plugin\MigrationPluginManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @return MigrationPluginManagerInterface|MockObject
    *   A configured MigrationPluginManager test mock.
    */
   public function getMockPluginManager() {
@@ -479,7 +479,7 @@ class TestMigration extends Migration {
   /**
    * Sets the source Plugin.
    *
-   * @param \Drupal\migrate\Plugin\MigrateSourceInterface $source_plugin
+   * @param MigrateSourceInterface $source_plugin
    *   The source Plugin.
    */
   public function setSourcePlugin(MigrateSourceInterface $source_plugin): void {
@@ -489,7 +489,7 @@ class TestMigration extends Migration {
   /**
    * Sets the destination Plugin.
    *
-   * @param \Drupal\migrate\Plugin\MigrateDestinationInterface $destination_plugin
+   * @param MigrateDestinationInterface $destination_plugin
    *   The destination Plugin.
    */
   public function setDestinationPlugin(MigrateDestinationInterface $destination_plugin): void {
@@ -499,7 +499,7 @@ class TestMigration extends Migration {
   /**
    * Sets the plugin manager service.
    *
-   * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $plugin_manager
+   * @param MigrationPluginManagerInterface $plugin_manager
    *   The plugin manager service.
    */
   public function setMigrationPluginManager(MigrationPluginManagerInterface $plugin_manager): void {

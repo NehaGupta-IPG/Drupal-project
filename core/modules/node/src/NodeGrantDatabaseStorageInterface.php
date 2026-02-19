@@ -14,7 +14,7 @@ interface NodeGrantDatabaseStorageInterface {
   /**
    * Checks all grants for a given account.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   A user object representing the user for whom the operation is to be
    *   performed.
    *
@@ -36,7 +36,7 @@ interface NodeGrantDatabaseStorageInterface {
    *   - "update".
    *   - "delete".
    *   - "create".
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   A user object representing the user for whom the operation is to be
    *   performed.
    * @param string $base_table
@@ -58,7 +58,7 @@ interface NodeGrantDatabaseStorageInterface {
    * Note: Don't call this method directly from a contributed module. Call
    * \Drupal\node\NodeAccessControlHandlerInterface::acquireGrants() instead.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   The node whose grants are being written.
    * @param array $grants
    *   A list of grants to write. Each grant is an array that must contain the
@@ -95,12 +95,12 @@ interface NodeGrantDatabaseStorageInterface {
   /**
    * Determines access to nodes based on node grants.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   The entity for which to check 'create' access.
    * @param string $operation
    *   The entity operation. Usually one of 'view', 'edit', 'create' or
    *   'delete'.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user for which to check access.
    *
    * @return \Drupal\Core\Access\AccessResultInterface

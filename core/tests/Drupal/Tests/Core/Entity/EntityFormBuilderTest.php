@@ -19,14 +19,14 @@ class EntityFormBuilderTest extends UnitTestCase {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|MockObject
    */
   protected $entityTypeManager;
 
   /**
    * The form builder.
    *
-   * @var \Drupal\Core\Form\FormBuilderInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Form\FormBuilderInterface|MockObject
    */
   protected $formBuilder;
 

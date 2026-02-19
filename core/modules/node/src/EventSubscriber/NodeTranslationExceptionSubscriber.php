@@ -33,41 +33,41 @@ class NodeTranslationExceptionSubscriber implements EventSubscriberInterface {
   /**
    * The key value factory.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueFactoryInterface
+   * @var KeyValueFactoryInterface
    */
   protected $keyValue;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The URL generator.
    *
-   * @var \Drupal\Core\Routing\UrlGeneratorInterface
+   * @var UrlGeneratorInterface
    */
   protected $urlGenerator;
 
   /**
    * The state service.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
   /**
    * Constructs the NodeTranslationExceptionSubscriber.
    *
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value
+   * @param KeyValueFactoryInterface $key_value
    *   The key value factory.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
+   * @param UrlGeneratorInterface $url_generator
    *   The URL generator.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state service.
    */
   public function __construct(KeyValueFactoryInterface $key_value, LanguageManagerInterface $language_manager, UrlGeneratorInterface $url_generator, StateInterface $state) {
@@ -80,7 +80,7 @@ class NodeTranslationExceptionSubscriber implements EventSubscriberInterface {
   /**
    * Redirects not found node translations using the key value collection.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   * @param ExceptionEvent $event
    *   The exception event.
    */
   public function onException(ExceptionEvent $event) {

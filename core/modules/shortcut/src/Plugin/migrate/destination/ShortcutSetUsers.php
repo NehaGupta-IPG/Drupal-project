@@ -2,14 +2,14 @@
 
 namespace Drupal\shortcut\Plugin\migrate\destination;
 
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Attribute\MigrateDestination;
-use Drupal\shortcut\ShortcutSetStorageInterface;
-use Drupal\user\Entity\User;
+use Drupal\migrate\Plugin\migrate\destination\DestinationBase;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
-use Drupal\migrate\Plugin\migrate\destination\DestinationBase;
+use Drupal\shortcut\ShortcutSetStorageInterface;
+use Drupal\user\Entity\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 
 /**
  * Migration destination for shortcut_set_users.
@@ -20,7 +20,7 @@ class ShortcutSetUsers extends DestinationBase implements ContainerFactoryPlugin
   /**
    * The shortcut set storage handler.
    *
-   * @var \Drupal\shortcut\ShortcutSetStorageInterface
+   * @var ShortcutSetStorageInterface
    */
   protected $shortcutSetStorage;
 
@@ -33,9 +33,9 @@ class ShortcutSetUsers extends DestinationBase implements ContainerFactoryPlugin
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration.
-   * @param \Drupal\shortcut\ShortcutSetStorageInterface $shortcut_set_storage
+   * @param ShortcutSetStorageInterface $shortcut_set_storage
    *   The shortcut_set entity storage handler.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, ShortcutSetStorageInterface $shortcut_set_storage) {

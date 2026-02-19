@@ -2,8 +2,8 @@
 
 namespace Drupal\Core\Config;
 
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Render\MarkupInterface;
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
@@ -87,7 +87,7 @@ abstract class ConfigBase implements RefinableCacheableDependencyInterface {
    * @param string $name
    *   The name of the configuration object.
    *
-   * @throws \Drupal\Core\Config\ConfigNameException
+   * @throws ConfigNameException
    *
    * @see Config::MAX_NAME_LENGTH
    */
@@ -153,7 +153,7 @@ abstract class ConfigBase implements RefinableCacheableDependencyInterface {
    * @return $this
    *   The configuration object.
    *
-   * @throws \Drupal\Core\Config\ConfigValueException
+   * @throws ConfigValueException
    *   If any key in $data in any depth contains a dot.
    */
   public function setData(array $data) {
@@ -174,7 +174,7 @@ abstract class ConfigBase implements RefinableCacheableDependencyInterface {
    * @return $this
    *   The configuration object.
    *
-   * @throws \Drupal\Core\Config\ConfigValueException
+   * @throws ConfigValueException
    *   If $value is an array and any of its keys in any depth contains a dot.
    */
   public function set($key, $value) {
@@ -200,7 +200,7 @@ abstract class ConfigBase implements RefinableCacheableDependencyInterface {
    * @param array $data
    *   Configuration array structure.
    *
-   * @throws \Drupal\Core\Config\ConfigValueException
+   * @throws ConfigValueException
    *   If any key in $data in any depth contains a dot.
    */
   protected function validateKeys(array $data) {

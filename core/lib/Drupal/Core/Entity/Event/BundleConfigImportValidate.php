@@ -16,23 +16,23 @@ class BundleConfigImportValidate extends ConfigImportValidateEventSubscriberBase
   /**
    * The config manager.
    *
-   * @var \Drupal\Core\Config\ConfigManagerInterface
+   * @var ConfigManagerInterface
    */
   protected $configManager;
 
   /**
    * The entity type manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * Constructs the event subscriber.
    *
-   * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
+   * @param ConfigManagerInterface $config_manager
    *   The config manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
    */
   public function __construct(ConfigManagerInterface $config_manager, EntityTypeManagerInterface $entity_type_manager) {
@@ -43,7 +43,7 @@ class BundleConfigImportValidate extends ConfigImportValidateEventSubscriberBase
   /**
    * Ensures bundles that will be deleted are not in use.
    *
-   * @param \Drupal\Core\Config\ConfigImporterEvent $event
+   * @param ConfigImporterEvent $event
    *   The config import event.
    */
   public function onConfigImporterValidate(ConfigImporterEvent $event) {

@@ -13,7 +13,7 @@ abstract class RouteSubscriberBase implements EventSubscriberInterface {
   /**
    * Alters existing routes for a specific collection.
    *
-   * @param \Symfony\Component\Routing\RouteCollection $collection
+   * @param RouteCollection $collection
    *   The route collection for adding routes.
    */
   abstract protected function alterRoutes(RouteCollection $collection);
@@ -29,7 +29,7 @@ abstract class RouteSubscriberBase implements EventSubscriberInterface {
   /**
    * Delegates the route altering to self::alterRoutes().
    *
-   * @param \Drupal\Core\Routing\RouteBuildEvent $event
+   * @param RouteBuildEvent $event
    *   The route build event.
    */
   public function onAlterRoutes(RouteBuildEvent $event) {

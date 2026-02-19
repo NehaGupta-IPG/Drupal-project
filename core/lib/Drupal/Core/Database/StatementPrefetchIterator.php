@@ -23,7 +23,7 @@ class StatementPrefetchIterator extends StatementBase {
    *
    * @param object $clientConnection
    *   Client database connection object, for example \PDO.
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection.
    * @param string $queryString
    *   The query string.

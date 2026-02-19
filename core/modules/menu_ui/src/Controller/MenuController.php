@@ -17,14 +17,14 @@ class MenuController extends ControllerBase {
   /**
    * The menu parent form service.
    *
-   * @var \Drupal\Core\Menu\MenuParentFormSelectorInterface
+   * @var MenuParentFormSelectorInterface
    */
   protected $menuParentSelector;
 
   /**
    * Creates a new MenuController object.
    *
-   * @param \Drupal\Core\Menu\MenuParentFormSelectorInterface $menu_parent_form
+   * @param MenuParentFormSelectorInterface $menu_parent_form
    *   The menu parent form service.
    */
   public function __construct(MenuParentFormSelectorInterface $menu_parent_form) {
@@ -34,10 +34,10 @@ class MenuController extends ControllerBase {
   /**
    * Gets all the available menus and menu items as a JavaScript array.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request of the page.
    *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   * @return JsonResponse
    *   The available menu and menu items.
    */
   public function getParentOptions(Request $request) {
@@ -57,7 +57,7 @@ class MenuController extends ControllerBase {
   /**
    * Route title callback.
    *
-   * @param \Drupal\system\MenuInterface $menu
+   * @param MenuInterface $menu
    *   The menu entity.
    *
    * @return array

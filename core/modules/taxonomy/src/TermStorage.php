@@ -41,7 +41,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
   /**
    * Term ancestry keyed by ancestor term ID, keyed by term ID.
    *
-   * @var \Drupal\taxonomy\TermInterface[][]
+   * @var TermInterface[][]
    */
   protected $ancestors;
 
@@ -108,7 +108,7 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
   /**
    * Returns a list of parents of this term.
    *
-   * @return \Drupal\taxonomy\TermInterface[]
+   * @return TermInterface[]
    *   The parent taxonomy term entities keyed by term ID. If this term has a
    *   <root> parent, that item is keyed with 0 and will have NULL as value.
    *
@@ -148,14 +148,14 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
    * {@inheritdoc}
    */
   public function loadAllParents($tid) {
-    /** @var \Drupal\taxonomy\TermInterface $term */
+    /** @var TermInterface $term */
     return (!empty($tid) && $term = $this->load($tid)) ? $this->getAncestors($term) : [];
   }
 
   /**
    * Returns all ancestors of this term.
    *
-   * @return \Drupal\taxonomy\TermInterface[]
+   * @return TermInterface[]
    *   A list of ancestor taxonomy term entities keyed by term ID.
    *
    * @internal
@@ -182,14 +182,14 @@ class TermStorage extends SqlContentEntityStorage implements TermStorageInterfac
    * {@inheritdoc}
    */
   public function loadChildren($tid, $vid = NULL) {
-    /** @var \Drupal\taxonomy\TermInterface $term */
+    /** @var TermInterface $term */
     return (!empty($tid) && $term = $this->load($tid)) ? $this->getChildren($term) : [];
   }
 
   /**
    * Returns all children terms of this term.
    *
-   * @return \Drupal\taxonomy\TermInterface[]
+   * @return TermInterface[]
    *   A list of children taxonomy term entities keyed by term ID.
    *
    * @internal

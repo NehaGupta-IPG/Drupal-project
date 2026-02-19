@@ -26,7 +26,7 @@ class DateTimeViewsHelper {
    * views plugins. Modules defining new datetime-based fields may use this
    * function to simplify Views integration.
    *
-   * @param \Drupal\field\FieldStorageConfigInterface $field_storage
+   * @param FieldStorageConfigInterface $field_storage
    *   The field storage config entity.
    * @param array $data
    *   Field view data or views_field_default_views_data($field_storage) if

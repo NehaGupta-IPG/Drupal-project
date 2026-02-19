@@ -39,11 +39,11 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\navigation\EntityRouteHelper $entityRouteHelper
+   * @param EntityRouteHelper $entityRouteHelper
    *   The entity route helper service.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
+   * @param EntityRepositoryInterface $entityRepository
    *   The entity repository.
-   * @param \Drupal\content_moderation\ModerationInformationInterface|null $moderationInformation
+   * @param ModerationInformationInterface|null $moderationInformation
    *   The moderation information service.
    */
   public function __construct(
@@ -123,7 +123,7 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
   /**
    * Retrieves the label of the given entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity from which the label will be retrieved.
    *
    * @return string|null
@@ -143,7 +143,7 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
   /**
    * Retrieves the badge label for the given entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity for which the label is being retrieved.
    *
    * @return string|null
@@ -183,7 +183,7 @@ class PageContext extends TopBarItemBase implements ContainerFactoryPluginInterf
   /**
    * Retrieves the badge status for the given entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity for which the status is being retrieved.
    *
    * @return string|null

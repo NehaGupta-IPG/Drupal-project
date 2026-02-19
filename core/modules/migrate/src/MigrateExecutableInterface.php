@@ -29,7 +29,7 @@ interface MigrateExecutableInterface {
   /**
    * Processes a row.
    *
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The $row to be processed.
    * @param array $process
    *   (optional) A process pipeline configuration. If not set, the top level
@@ -42,7 +42,7 @@ interface MigrateExecutableInterface {
    *   \Drupal\migrate\Plugin\migrate\process\SubProcess::transformKey for an
    *   example.
    *
-   * @throws \Drupal\migrate\MigrateException
+   * @throws MigrateException
    */
   public function processRow(Row $row, ?array $process = NULL, $value = NULL);
 

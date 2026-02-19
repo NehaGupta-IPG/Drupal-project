@@ -3,10 +3,10 @@
 namespace Drupal\system\Hook;
 
 use Drupal\Core\Datetime\Entity\DateFormat;
+use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
-use Drupal\Core\Render\BubbleableMetadata;
-use Drupal\Core\Hook\Attribute\Hook;
 
 /**
  * Hook implementations for system.

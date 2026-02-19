@@ -17,14 +17,14 @@ class Query extends QueryBase implements QueryInterface {
   /**
    * The build sql select query.
    *
-   * @var \Drupal\Core\Database\Query\SelectInterface
+   * @var SelectInterface
    */
   protected $sqlQuery;
 
   /**
    * The Tables object for this query.
    *
-   * @var \Drupal\Core\Entity\Query\Sql\TablesInterface
+   * @var TablesInterface
    */
   protected $tables;
 
@@ -50,19 +50,19 @@ class Query extends QueryBase implements QueryInterface {
   protected $sqlGroupBy = [];
 
   /**
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
   /**
    * Constructs a query object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
    * @param string $conjunction
    *   - AND: all of the conditions on the query need to match.
    *   - OR: at least one of the conditions on the query need to match.
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection to run the query against.
    * @param array $namespaces
    *   List of potential namespaces of the classes belonging to this query.
@@ -91,7 +91,7 @@ class Query extends QueryBase implements QueryInterface {
    * @return $this
    *   Returns the called object.
    *
-   * @throws \Drupal\Core\Entity\Query\QueryException
+   * @throws QueryException
    *   Thrown if the base table does not exist.
    */
   protected function prepare() {
@@ -339,10 +339,10 @@ class Query extends QueryBase implements QueryInterface {
   /**
    * Gets the Tables object for this query.
    *
-   * @param \Drupal\Core\Database\Query\SelectInterface $sql_query
+   * @param SelectInterface $sql_query
    *   The SQL query object being built.
    *
-   * @return \Drupal\Core\Entity\Query\Sql\TablesInterface
+   * @return TablesInterface
    *   The object that adds tables and fields to the SQL query object.
    */
   public function getTables(SelectInterface $sql_query) {

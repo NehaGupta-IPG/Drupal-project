@@ -7,9 +7,9 @@ namespace Drupal\Tests\jsonapi_response_validator\Unit\EventSubscriber;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Routing\RouteObjectInterface;
-use Drupal\jsonapi_response_validator\EventSubscriber\ResourceResponseValidator;
 use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\jsonapi\Routing\Routes;
+use Drupal\jsonapi_response_validator\EventSubscriber\ResourceResponseValidator;
 use Drupal\node\Entity\Node;
 use Drupal\rest\ResourceResponse;
 use Drupal\Tests\UnitTestCase;
@@ -31,7 +31,7 @@ class ResourceResponseValidatorTest extends UnitTestCase {
   /**
    * The subscriber under test.
    *
-   * @var \Drupal\jsonapi_response_validator\EventSubscriber\ResourceResponseValidator
+   * @var ResourceResponseValidator
    */
   protected ResourceResponseValidator $subscriber;
 
@@ -169,10 +169,10 @@ EOD
    *
    * @param string $route_name
    *   The route name with which to construct a request.
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The resource type for the requested route.
    *
-   * @return \Symfony\Component\HttpFoundation\Request
+   * @return Request
    *   The mock request object.
    */
   protected static function createRequest(string $route_name, ResourceType $resource_type): Request {
@@ -188,7 +188,7 @@ EOD
    * @param string|null $json
    *   The JSON with which to create a mock response.
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return ResourceResponse
    *   The mock response object.
    */
   protected static function createResponse(?string $json = NULL): ResourceResponse {

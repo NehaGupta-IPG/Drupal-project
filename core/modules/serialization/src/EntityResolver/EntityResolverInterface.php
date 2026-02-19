@@ -26,7 +26,7 @@ interface EntityResolverInterface {
    * entity, and it is up to the implementor of this interface to resolve that
    * appropriately for the specification being used.
    *
-   * @param \Symfony\Component\Serializer\Normalizer\NormalizerInterface $normalizer
+   * @param NormalizerInterface $normalizer
    *   The Normalizer which is handling the data.
    * @param array $data
    *   The data passed into the calling Normalizer.

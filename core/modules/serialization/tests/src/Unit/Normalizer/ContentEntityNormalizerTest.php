@@ -30,14 +30,14 @@ class ContentEntityNormalizerTest extends UnitTestCase {
   /**
    * The mock serializer.
    *
-   * @var \Symfony\Component\Serializer\Serializer|\Prophecy\Prophecy\ObjectProphecy
+   * @var Serializer|ObjectProphecy
    */
   protected $serializer;
 
   /**
    * The normalizer under test.
    *
-   * @var \Drupal\serialization\Normalizer\ContentEntityNormalizer
+   * @var ContentEntityNormalizer
    */
   protected $contentEntityNormalizer;
 
@@ -125,7 +125,7 @@ class ContentEntityNormalizerTest extends UnitTestCase {
    * @param array $definitions
    *   The properties the will be returned.
    *
-   * @return \PHPUnit\Framework\MockObject\MockObject
+   * @return MockObject
    *   The mock content entity.
    */
   public function createMockForContentEntity($definitions) {
@@ -151,10 +151,10 @@ class ContentEntityNormalizerTest extends UnitTestCase {
    *   The value that access() will return.
    * @param bool $internal
    *   The value that isInternal() will return.
-   * @param \Drupal\Core\Session\AccountInterface|null $user_context
+   * @param AccountInterface|null $user_context
    *   The user context used for the access check.
    *
-   * @return \Drupal\Core\Field\FieldItemListInterface<\Drupal\Core\Field\FieldItemInterface>&\PHPUnit\Framework\MockObject\MockObject
+   * @return FieldItemListInterface<FieldItemInterface>&MockObject
    *   The mock field list item.
    */
   protected function createMockFieldListItem(bool $access, bool $internal, ?AccountInterface $user_context = NULL): FieldItemListInterface&MockObject {

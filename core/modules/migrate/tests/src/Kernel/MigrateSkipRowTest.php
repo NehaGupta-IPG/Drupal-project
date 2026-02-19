@@ -55,7 +55,7 @@ class MigrateSkipRowTest extends KernelTestBase {
     $result = $executable->import();
     $this->assertEquals(MigrationInterface::RESULT_COMPLETED, $result);
 
-    /** @var \Drupal\migrate\Plugin\MigrateIdMapInterface $id_map_plugin */
+    /** @var MigrateIdMapInterface $id_map_plugin */
     $id_map_plugin = $migration->getIdMap();
     // The first row is recorded in the map as ignored.
     $map_row = $id_map_plugin->getRowBySource(['id' => 1]);

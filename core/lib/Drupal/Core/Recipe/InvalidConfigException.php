@@ -18,9 +18,9 @@ final class InvalidConfigException extends \RuntimeException {
   /**
    * Constructs an InvalidConfigException object.
    *
-   * @param \Symfony\Component\Validator\ConstraintViolationList $violations
+   * @param ConstraintViolationList $violations
    *   The validation constraint violations.
-   * @param \Drupal\Core\Config\Schema\Mapping $data
+   * @param Mapping $data
    *   A typed data wrapper around the invalid config data.
    * @param string $message
    *   (optional) The exception message. Defaults to the string representation

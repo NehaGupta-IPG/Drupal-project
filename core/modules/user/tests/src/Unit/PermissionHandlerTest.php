@@ -29,28 +29,28 @@ class PermissionHandlerTest extends UnitTestCase {
   /**
    * The tested permission handler.
    *
-   * @var \Drupal\user\PermissionHandler
+   * @var PermissionHandler
    */
   protected $permissionHandler;
 
   /**
    * The mocked module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface|MockObject
    */
   protected $moduleHandler;
 
   /**
    * The mocked string translation.
    *
-   * @var \Drupal\Tests\user\Unit\TestTranslationManager
+   * @var TestTranslationManager
    */
   protected $stringTranslation;
 
   /**
    * The mocked callable resolver.
    *
-   * @var \Drupal\Core\Utility\CallableResolver|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Utility\CallableResolver|MockObject
    */
   protected $callableResolver;
 
@@ -72,7 +72,7 @@ class PermissionHandlerTest extends UnitTestCase {
    * @param string $name
    *   The module human name.
    *
-   * @return \Drupal\Core\Extension\Extension
+   * @return Extension
    *   The extension object.
    */
   protected function mockModuleExtension($module, $name) {

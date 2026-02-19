@@ -90,9 +90,9 @@ abstract class FileManagedTestBase extends BrowserTestBase {
   /**
    * Asserts that two files have the same values (except timestamp).
    *
-   * @param \Drupal\file\FileInterface $before
+   * @param FileInterface $before
    *   File object to compare.
-   * @param \Drupal\file\FileInterface $after
+   * @param FileInterface $after
    *   File object to compare.
    */
   public function assertFileUnchanged(FileInterface $before, FileInterface $after) {
@@ -108,9 +108,9 @@ abstract class FileManagedTestBase extends BrowserTestBase {
   /**
    * Asserts that two files are not the same by comparing the fid and filepath.
    *
-   * @param \Drupal\file\FileInterface $file1
+   * @param FileInterface $file1
    *   File object to compare.
-   * @param \Drupal\file\FileInterface $file2
+   * @param FileInterface $file2
    *   File object to compare.
    */
   public function assertDifferentFile(FileInterface $file1, FileInterface $file2) {
@@ -121,9 +121,9 @@ abstract class FileManagedTestBase extends BrowserTestBase {
   /**
    * Asserts that two files are the same by comparing the fid and filepath.
    *
-   * @param \Drupal\file\FileInterface $file1
+   * @param FileInterface $file1
    *   File object to compare.
-   * @param \Drupal\file\FileInterface $file2
+   * @param FileInterface $file2
    *   File object to compare.
    */
   public function assertSameFile(FileInterface $file1, FileInterface $file2) {
@@ -144,7 +144,7 @@ abstract class FileManagedTestBase extends BrowserTestBase {
    *   Optional string indicating the stream scheme to use. Drupal core includes
    *   public, private, and temporary. The public wrapper is the default.
    *
-   * @return \Drupal\file\FileInterface
+   * @return FileInterface
    *   File entity.
    */
   public function createFile($filepath = NULL, $contents = NULL, $scheme = NULL) {

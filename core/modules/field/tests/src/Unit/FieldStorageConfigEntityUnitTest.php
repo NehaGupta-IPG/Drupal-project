@@ -25,7 +25,7 @@ class FieldStorageConfigEntityUnitTest extends UnitTestCase {
   /**
    * The entity type manager used for testing.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityTypeManagerInterface|MockObject
    */
   protected $entityTypeManager;
 
@@ -39,14 +39,14 @@ class FieldStorageConfigEntityUnitTest extends UnitTestCase {
   /**
    * The UUID generator used for testing.
    *
-   * @var \Drupal\Component\Uuid\UuidInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Component\Uuid\UuidInterface|MockObject
    */
   protected $uuid;
 
   /**
    * The field type manager.
    *
-   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var FieldTypePluginManagerInterface|MockObject
    */
   protected $fieldTypeManager;
 

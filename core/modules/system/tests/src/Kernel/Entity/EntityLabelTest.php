@@ -33,7 +33,6 @@ class EntityLabelTest extends KernelTestBase {
 
     foreach ($definitions as $definition) {
       /** @var \Drupal\Core\Entity\EntityType $definition */
-
       /** @var \Drupal\Core\StringTranslation\TranslatableMarkup $label */
       $label = $definition->getLabel();
       $collection_label = $definition->getCollectionLabel();

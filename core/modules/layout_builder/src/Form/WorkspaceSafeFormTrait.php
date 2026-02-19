@@ -20,7 +20,7 @@ trait WorkspaceSafeFormTrait {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return bool
@@ -44,10 +44,10 @@ trait WorkspaceSafeFormTrait {
   /**
    * Retrieves the section storage from a form state object, if it exists.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state object.
    *
-   * @return \Drupal\layout_builder\SectionStorageInterface|null
+   * @return SectionStorageInterface|null
    *   The section storage or NULL if it doesn't exist.
    */
   protected function getSectionStorageFromFormState(FormStateInterface $form_state): ?SectionStorageInterface {

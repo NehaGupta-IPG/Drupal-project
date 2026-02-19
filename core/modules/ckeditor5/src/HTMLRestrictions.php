@@ -392,7 +392,7 @@ final class HTMLRestrictions {
   /**
    * Creates the empty set of HTML restrictions: nothing is allowed.
    *
-   * @return \Drupal\ckeditor5\HTMLRestrictions
+   * @return HTMLRestrictions
    *   The empty set of HTML restrictions.
    */
   public static function emptySet(): HTMLRestrictions {
@@ -427,10 +427,10 @@ final class HTMLRestrictions {
   /**
    * Constructs a set of HTML restrictions matching the given text format.
    *
-   * @param \Drupal\filter\Plugin\FilterInterface $filter
+   * @param FilterInterface $filter
    *   A filter plugin instance to construct a HTML restrictions object for.
    *
-   * @return \Drupal\ckeditor5\HTMLRestrictions
+   * @return HTMLRestrictions
    *   The HTML restrictions object.
    */
   public static function fromFilterPluginInstance(FilterInterface $filter): HTMLRestrictions {
@@ -440,10 +440,10 @@ final class HTMLRestrictions {
   /**
    * Constructs a set of HTML restrictions matching the given text format.
    *
-   * @param \Drupal\filter\FilterFormatInterface $text_format
+   * @param FilterFormatInterface $text_format
    *   A text format to construct a HTML restrictions object for.
    *
-   * @return \Drupal\ckeditor5\HTMLRestrictions
+   * @return HTMLRestrictions
    *   The HTML restrictions object.
    */
   public static function fromTextFormat(FilterFormatInterface $text_format): HTMLRestrictions {
@@ -453,7 +453,7 @@ final class HTMLRestrictions {
   /**
    * Constructs an unrestricted set of HTML restrictions.
    *
-   * @return \Drupal\ckeditor5\HTMLRestrictions
+   * @return HTMLRestrictions
    *   The HTML restrictions object.
    */
   private static function unrestricted(): self {
@@ -471,11 +471,11 @@ final class HTMLRestrictions {
    * exists: to simplify the two public static methods that each accept one of
    * those two interfaces.
    *
-   * @param \Drupal\filter\Plugin\FilterInterface|\Drupal\filter\FilterFormatInterface $object
+   * @param FilterInterface|FilterFormatInterface $object
    *   A text format or filter plugin instance to construct a HTML restrictions
    *   object for.
    *
-   * @return \Drupal\ckeditor5\HTMLRestrictions
+   * @return HTMLRestrictions
    *   The HTML restrictions object.
    *
    * @see ::fromFilterPluginInstance()
@@ -536,7 +536,7 @@ final class HTMLRestrictions {
    * @param string $elements_string
    *   A string representing a list of allowed HTML elements.
    *
-   * @return \Drupal\ckeditor5\HTMLRestrictions
+   * @return HTMLRestrictions
    *   The HTML restrictions object.
    *
    * @see ::toFilterHtmlAllowedTagsString()
@@ -593,10 +593,10 @@ final class HTMLRestrictions {
   /**
    * Computes difference of two HTML restrictions, with wildcard support.
    *
-   * @param \Drupal\ckeditor5\HTMLRestrictions $other
+   * @param HTMLRestrictions $other
    *   The HTML restrictions to compare to.
    *
-   * @return \Drupal\ckeditor5\HTMLRestrictions
+   * @return HTMLRestrictions
    *   Returns a new HTML restrictions value object with all the elements that
    *   are not allowed in $other.
    */
@@ -607,10 +607,10 @@ final class HTMLRestrictions {
   /**
    * Computes difference of two HTML restrictions, without wildcard support.
    *
-   * @param \Drupal\ckeditor5\HTMLRestrictions $other
+   * @param HTMLRestrictions $other
    *   The HTML restrictions to compare to.
    *
-   * @return \Drupal\ckeditor5\HTMLRestrictions
+   * @return HTMLRestrictions
    *   Returns a new HTML restrictions value object with all the elements that
    *   are not allowed in $other.
    */
@@ -728,10 +728,10 @@ final class HTMLRestrictions {
   /**
    * Computes intersection of two HTML restrictions, with wildcard support.
    *
-   * @param \Drupal\ckeditor5\HTMLRestrictions $other
+   * @param HTMLRestrictions $other
    *   The HTML restrictions to compare to.
    *
-   * @return \Drupal\ckeditor5\HTMLRestrictions
+   * @return HTMLRestrictions
    *   Returns a new HTML restrictions value object with all the elements that
    *   are also allowed in $other.
    */
@@ -742,10 +742,10 @@ final class HTMLRestrictions {
   /**
    * Computes intersection of two HTML restrictions, without wildcard support.
    *
-   * @param \Drupal\ckeditor5\HTMLRestrictions $other
+   * @param HTMLRestrictions $other
    *   The HTML restrictions to compare to.
    *
-   * @return \Drupal\ckeditor5\HTMLRestrictions
+   * @return HTMLRestrictions
    *   Returns a new HTML restrictions value object with all the elements that
    *   are also allowed in $other.
    */
@@ -948,10 +948,10 @@ final class HTMLRestrictions {
   /**
    * Computes set union of two HTML restrictions, with wildcard support.
    *
-   * @param \Drupal\ckeditor5\HTMLRestrictions $other
+   * @param HTMLRestrictions $other
    *   The HTML restrictions to compare to.
    *
-   * @return \Drupal\ckeditor5\HTMLRestrictions
+   * @return HTMLRestrictions
    *   Returns a new HTML restrictions value object with all the elements that
    *   are either allowed in $this or in $other.
    */
@@ -996,14 +996,14 @@ final class HTMLRestrictions {
   /**
    * Applies an operation (difference/intersection/union) with wildcard support.
    *
-   * @param \Drupal\ckeditor5\HTMLRestrictions $a
+   * @param HTMLRestrictions $a
    *   The first operand.
-   * @param \Drupal\ckeditor5\HTMLRestrictions $b
+   * @param HTMLRestrictions $b
    *   The second operand.
    * @param string $operation_method_name
    *   The name of the private method on this class to use as the operation.
    *
-   * @return \Drupal\ckeditor5\HTMLRestrictions
+   * @return HTMLRestrictions
    *   The result of the operation.
    */
   private static function applyOperation(HTMLRestrictions $a, HTMLRestrictions $b, string $operation_method_name): HTMLRestrictions {
@@ -1068,7 +1068,7 @@ final class HTMLRestrictions {
   /**
    * Gets the subset of allowed elements whose tags are wildcards.
    *
-   * @return \Drupal\ckeditor5\HTMLRestrictions
+   * @return HTMLRestrictions
    *   The subset of the given set of HTML restrictions.
    */
   public function getWildcardSubset(): HTMLRestrictions {
@@ -1078,7 +1078,7 @@ final class HTMLRestrictions {
   /**
    * Gets the subset of allowed elements whose tags are concrete.
    *
-   * @return \Drupal\ckeditor5\HTMLRestrictions
+   * @return HTMLRestrictions
    *   The subset of the given set of HTML restrictions.
    */
   public function getConcreteSubset(): HTMLRestrictions {
@@ -1090,7 +1090,7 @@ final class HTMLRestrictions {
   /**
    * Gets the subset of plain tags (no attributes) from allowed elements.
    *
-   * @return \Drupal\ckeditor5\HTMLRestrictions
+   * @return HTMLRestrictions
    *   The subset of the given set of HTML restrictions.
    */
   public function getPlainTagsSubset(): HTMLRestrictions {
@@ -1104,7 +1104,7 @@ final class HTMLRestrictions {
   /**
    * Extracts plain tags (attributes omitted) from allowed elements.
    *
-   * @return \Drupal\ckeditor5\HTMLRestrictions
+   * @return HTMLRestrictions
    *   The extracted subset of the given set of HTML restrictions.
    */
   public function extractPlainTagsSubset(): HTMLRestrictions {
@@ -1130,10 +1130,10 @@ final class HTMLRestrictions {
   /**
    * Resolves the wildcard tags (this consumes the wildcard tags).
    *
-   * @param \Drupal\ckeditor5\HTMLRestrictions $r
+   * @param HTMLRestrictions $r
    *   A set of HTML restrictions.
    *
-   * @return \Drupal\ckeditor5\HTMLRestrictions
+   * @return HTMLRestrictions
    *   The concrete interpretation of the given set of HTML restrictions. All
    *   wildcard tag restrictions are resolved into restrictions on concrete
    *   elements, if concrete elements are allowed that correspond to the

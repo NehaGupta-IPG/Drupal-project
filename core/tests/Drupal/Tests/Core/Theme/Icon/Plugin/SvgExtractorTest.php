@@ -33,14 +33,14 @@ class SvgExtractorTest extends UnitTestCase {
   /**
    * The SvgExtractor instance.
    *
-   * @var \Drupal\Core\Theme\Plugin\IconExtractor\SvgExtractor
+   * @var SvgExtractor
    */
   private SvgExtractor $svgExtractorPlugin;
 
   /**
    * The IconFinder instance.
    *
-   * @var \Drupal\Core\Theme\Icon\IconFinder|\PHPUnit\Framework\MockObject\MockObject
+   * @var IconFinder|MockObject
    */
   private IconFinder $iconFinder;
 

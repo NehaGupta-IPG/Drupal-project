@@ -13,14 +13,14 @@ use Drupal\Core\Path\PathMatcherInterface;
 class IsFrontPathCacheContext implements CacheContextInterface {
 
   /**
-   * @var \Drupal\Core\Path\PathMatcherInterface
+   * @var PathMatcherInterface
    */
   protected $pathMatcher;
 
   /**
    * Constructs an IsFrontPathCacheContext object.
    *
-   * @param \Drupal\Core\Path\PathMatcherInterface $path_matcher
+   * @param PathMatcherInterface $path_matcher
    *   The path matcher.
    */
   public function __construct(PathMatcherInterface $path_matcher) {

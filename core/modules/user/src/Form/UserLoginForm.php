@@ -5,14 +5,14 @@ namespace Drupal\user\Form;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
-use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Render\BareHtmlPageRendererInterface;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
 use Drupal\user\UserAuthenticationInterface;
 use Drupal\user\UserAuthInterface;
+use Drupal\user\UserFloodControlInterface;
 use Drupal\user\UserInterface;
 use Drupal\user\UserStorageInterface;
-use Drupal\user\UserFloodControlInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -32,43 +32,43 @@ class UserLoginForm extends FormBase implements WorkspaceSafeFormInterface {
   /**
    * The user storage.
    *
-   * @var \Drupal\user\UserStorageInterface
+   * @var UserStorageInterface
    */
   protected $userStorage;
 
   /**
    * The user authentication object.
    *
-   * @var \Drupal\user\UserAuthInterface|\Drupal\user\UserAuthenticationInterface
+   * @var UserAuthInterface|UserAuthenticationInterface
    */
   protected $userAuth;
 
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * The bare HTML renderer.
    *
-   * @var \Drupal\Core\Render\BareHtmlPageRendererInterface
+   * @var BareHtmlPageRendererInterface
    */
   protected $bareHtmlPageRenderer;
 
   /**
    * Constructs a new UserLoginForm.
    *
-   * @param \Drupal\user\UserFloodControlInterface $user_flood_control
+   * @param UserFloodControlInterface $user_flood_control
    *   The user flood control service.
-   * @param \Drupal\user\UserStorageInterface $user_storage
+   * @param UserStorageInterface $user_storage
    *   The user storage.
-   * @param \Drupal\user\UserAuthInterface|\Drupal\user\UserAuthenticationInterface $user_auth
+   * @param UserAuthInterface|UserAuthenticationInterface $user_auth
    *   The user authentication object.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\Core\Render\BareHtmlPageRendererInterface $bare_html_renderer
+   * @param BareHtmlPageRendererInterface $bare_html_renderer
    *   The renderer.
    */
   public function __construct(UserFloodControlInterface $user_flood_control, UserStorageInterface $user_storage, UserAuthInterface|UserAuthenticationInterface $user_auth, RendererInterface $renderer, BareHtmlPageRendererInterface $bare_html_renderer) {

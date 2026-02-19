@@ -86,7 +86,7 @@ class FieldItemTest extends EntityKernelTestBase {
   /**
    * Checks that the saved field item value matches the expected one.
    *
-   * @param \Drupal\entity_test\Entity\EntityTest $entity
+   * @param EntityTest $entity
    *   The test entity.
    * @param string $expected_value
    *   The expected field item value.

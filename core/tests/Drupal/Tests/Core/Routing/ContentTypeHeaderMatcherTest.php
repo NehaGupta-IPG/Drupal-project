@@ -30,7 +30,7 @@ class ContentTypeHeaderMatcherTest extends UnitTestCase {
   /**
    * The matcher object that is going to be tested.
    *
-   * @var \Drupal\Core\Routing\ContentTypeHeaderMatcher
+   * @var ContentTypeHeaderMatcher
    */
   protected $matcher;
 

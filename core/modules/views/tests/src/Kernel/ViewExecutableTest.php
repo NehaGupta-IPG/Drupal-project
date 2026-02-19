@@ -378,7 +378,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
   /**
    * Asserts that expected view properties have been unset by destroy().
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view executable.
    *
    * @internal
@@ -515,7 +515,7 @@ class ViewExecutableTest extends ViewsKernelTestBase {
     // string.
     $this->assertStringNotContainsString('"Drupal\views\Entity\View"', $serialized, 'The Drupal\views\Entity\View class was not found in the serialized string.');
 
-    /** @var \Drupal\views\ViewExecutable $unserialized */
+    /** @var ViewExecutable $unserialized */
     $unserialized = unserialize($serialized);
 
     $this->assertInstanceOf(ViewExecutable::class, $unserialized);

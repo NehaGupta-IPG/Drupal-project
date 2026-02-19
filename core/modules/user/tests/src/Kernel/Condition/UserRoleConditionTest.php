@@ -43,7 +43,7 @@ class UserRoleConditionTest extends KernelTestBase {
   /**
    * A custom role for testing purposes.
    *
-   * @var \Drupal\user\RoleInterface
+   * @var RoleInterface
    */
   protected $role;
 

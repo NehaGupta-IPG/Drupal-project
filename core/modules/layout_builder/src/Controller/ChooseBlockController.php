@@ -30,32 +30,32 @@ class ChooseBlockController implements ContainerInjectionInterface {
   /**
    * The block manager.
    *
-   * @var \Drupal\Core\Block\BlockManagerInterface
+   * @var BlockManagerInterface
    */
   protected $blockManager;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
   /**
    * ChooseBlockController constructor.
    *
-   * @param \Drupal\Core\Block\BlockManagerInterface $block_manager
+   * @param BlockManagerInterface $block_manager
    *   The block manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
    */
   public function __construct(BlockManagerInterface $block_manager, EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user) {
@@ -78,7 +78,7 @@ class ChooseBlockController implements ContainerInjectionInterface {
   /**
    * Provides the UI for choosing a new block.
    *
-   * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
+   * @param SectionStorageInterface $section_storage
    *   The section storage.
    * @param int $delta
    *   The delta of the section to splice.
@@ -162,7 +162,7 @@ class ChooseBlockController implements ContainerInjectionInterface {
   /**
    * Provides the UI for choosing a new inline block.
    *
-   * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
+   * @param SectionStorageInterface $section_storage
    *   The section storage.
    * @param int $delta
    *   The delta of the section to splice.
@@ -209,7 +209,7 @@ class ChooseBlockController implements ContainerInjectionInterface {
   /**
    * Gets a render array of block links.
    *
-   * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
+   * @param SectionStorageInterface $section_storage
    *   The section storage.
    * @param int $delta
    *   The delta of the section to splice.

@@ -30,7 +30,7 @@ final class EventLogSubscriber implements EventSubscriberInterface {
   /**
    * Excludes the log file from Package Manager operations.
    *
-   * @param \Drupal\package_manager\Event\CollectPathsToExcludeEvent $event
+   * @param CollectPathsToExcludeEvent $event
    *   The event being handled.
    */
   public function excludeLogFile(CollectPathsToExcludeEvent $event): void {
@@ -40,7 +40,7 @@ final class EventLogSubscriber implements EventSubscriberInterface {
   /**
    * Logs all events in the stage life cycle.
    *
-   * @param \Drupal\package_manager\Event\SandboxEvent $event
+   * @param SandboxEvent $event
    *   The event object.
    */
   public function logEventInfo(SandboxEvent $event): void {

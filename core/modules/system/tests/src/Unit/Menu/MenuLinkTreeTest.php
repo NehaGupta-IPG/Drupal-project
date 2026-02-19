@@ -28,7 +28,7 @@ class MenuLinkTreeTest extends UnitTestCase {
   /**
    * The tested menu link tree service.
    *
-   * @var \Drupal\Core\Menu\MenuLinkTree
+   * @var MenuLinkTree
    */
   protected $menuLinkTree;
 

@@ -236,7 +236,7 @@ final class NavigationRenderer {
    * @param array $build
    *   A renderable array representing the local_tasks_block plugin block to be
    *   rendered.
-   * @param \Drupal\Core\Block\BlockPluginInterface $block
+   * @param BlockPluginInterface $block
    *   Block plugin object representing a local_tasks_block.
    *
    * @see navigation_block_build_local_tasks_block_alter()

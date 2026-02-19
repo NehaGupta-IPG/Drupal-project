@@ -4,12 +4,12 @@ namespace Drupal\config_translation\Form;
 
 use Drupal\config_translation\ConfigMapperManagerInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
-use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\Form\BaseFormIdInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -22,14 +22,14 @@ abstract class ConfigTranslationFormBase extends FormBase implements BaseFormIdI
   /**
    * The typed configuration manager.
    *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface
+   * @var TypedConfigManagerInterface
    */
   protected $typedConfigManager;
 
   /**
    * The configuration mapper manager.
    *
-   * @var \Drupal\config_translation\ConfigMapperManagerInterface
+   * @var ConfigMapperManagerInterface
    */
   protected $configMapperManager;
 
@@ -43,7 +43,7 @@ abstract class ConfigTranslationFormBase extends FormBase implements BaseFormIdI
   /**
    * The language manager.
    *
-   * @var \Drupal\language\ConfigurableLanguageManagerInterface
+   * @var ConfigurableLanguageManagerInterface
    */
   protected $languageManager;
 
@@ -71,11 +71,11 @@ abstract class ConfigTranslationFormBase extends FormBase implements BaseFormIdI
   /**
    * Constructs a ConfigTranslationFormBase.
    *
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config_manager
+   * @param TypedConfigManagerInterface $typed_config_manager
    *   The typed configuration manager.
-   * @param \Drupal\config_translation\ConfigMapperManagerInterface $config_mapper_manager
+   * @param ConfigMapperManagerInterface $config_mapper_manager
    *   The configuration mapper manager.
-   * @param \Drupal\language\ConfigurableLanguageManagerInterface $language_manager
+   * @param ConfigurableLanguageManagerInterface $language_manager
    *   The configurable language manager.
    */
   public function __construct(TypedConfigManagerInterface $typed_config_manager, ConfigMapperManagerInterface $config_mapper_manager, ConfigurableLanguageManagerInterface $language_manager) {
@@ -110,9 +110,9 @@ abstract class ConfigTranslationFormBase extends FormBase implements BaseFormIdI
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   (optional) The route match.
    * @param string $plugin_id
    *   (optional) The plugin ID of the mapper.
@@ -123,7 +123,7 @@ abstract class ConfigTranslationFormBase extends FormBase implements BaseFormIdI
    * @return array
    *   The form structure.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   * @throws NotFoundHttpException
    *   Throws an exception if the language code provided as a query parameter in
    *   the request does not match an active language.
    */
@@ -229,7 +229,7 @@ abstract class ConfigTranslationFormBase extends FormBase implements BaseFormIdI
   /**
    * Creates a form element builder.
    *
-   * @param \Drupal\Core\TypedData\TypedDataInterface $schema
+   * @param TypedDataInterface $schema
    *   Schema definition of configuration.
    *
    * @return \Drupal\config_translation\FormElement\ElementInterface|null

@@ -34,7 +34,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
   /**
    * Responsive image style entity instance we test with.
    *
-   * @var \Drupal\responsive_image\Entity\ResponsiveImageStyle
+   * @var ResponsiveImageStyle
    */
   protected $responsiveImgStyle;
 

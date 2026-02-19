@@ -22,54 +22,54 @@ class MessageForm extends ContentEntityForm {
   /**
    * The message being used by this form.
    *
-   * @var \Drupal\contact\MessageInterface
+   * @var MessageInterface
    */
   protected $entity;
 
   /**
    * The flood control mechanism.
    *
-   * @var \Drupal\Core\Flood\FloodInterface
+   * @var FloodInterface
    */
   protected $flood;
 
   /**
    * The language manager service.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The contact mail handler service.
    *
-   * @var \Drupal\contact\MailHandlerInterface
+   * @var MailHandlerInterface
    */
   protected $mailHandler;
 
   /**
    * The date formatter service.
    *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
+   * @var DateFormatterInterface
    */
   protected $dateFormatter;
 
   /**
    * Constructs a MessageForm object.
    *
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository.
-   * @param \Drupal\Core\Flood\FloodInterface $flood
+   * @param FloodInterface $flood
    *   The flood control mechanism.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager service.
-   * @param \Drupal\contact\MailHandlerInterface $mail_handler
+   * @param MailHandlerInterface $mail_handler
    *   The contact mail handler service.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   * @param DateFormatterInterface $date_formatter
    *   The date service.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct(EntityRepositoryInterface $entity_repository, FloodInterface $flood, LanguageManagerInterface $language_manager, MailHandlerInterface $mail_handler, DateFormatterInterface $date_formatter, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL) {

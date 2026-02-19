@@ -14,7 +14,7 @@ class LoggerChannelFactory implements LoggerChannelFactoryInterface {
   /**
    * Array of all instantiated logger channels keyed by channel name.
    *
-   * @var \Drupal\Core\Logger\LoggerChannelInterface[]
+   * @var LoggerChannelInterface[]
    */
   protected $channels = [];
 
@@ -28,9 +28,9 @@ class LoggerChannelFactory implements LoggerChannelFactoryInterface {
   /**
    * Constructs a LoggerChannelFactory.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   * @param RequestStack $requestStack
    *   (optional) The request stack.
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
+   * @param AccountInterface $currentUser
    *   (optional) The current user.
    */
   public function __construct(

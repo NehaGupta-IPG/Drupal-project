@@ -16,7 +16,7 @@ class PhpTransliteration extends BaseTransliteration {
   /**
    * The module handler to execute the transliteration_overrides alter hook.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
@@ -26,7 +26,7 @@ class PhpTransliteration extends BaseTransliteration {
    * @param string|null $data_directory
    *   The directory where data files reside. If NULL, defaults to subdirectory
    *   'data' underneath the directory where the class's PHP file resides.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler to execute the transliteration_overrides alter hook.
    */
   public function __construct($data_directory, ModuleHandlerInterface $module_handler) {

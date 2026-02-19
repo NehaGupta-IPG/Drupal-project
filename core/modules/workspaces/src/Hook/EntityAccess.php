@@ -68,10 +68,10 @@ class EntityAccess {
   /**
    * Checks the 'bypass' permissions.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user account making the to check access for.
    *
-   * @return \Drupal\Core\Access\AccessResultInterface
+   * @return AccessResultInterface
    *   The result of the access check.
    */
   protected function bypassAccessResult(AccountInterface $account): AccessResultInterface {

@@ -48,7 +48,7 @@ interface ViewsPluginInterface extends PluginInspectionInterface, DerivativeInsp
    * @param array $form
    *   An alterable, associative array containing the structure of the form,
    *   passed by reference.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function validateOptionsForm(&$form, FormStateInterface $form_state);
@@ -78,9 +78,9 @@ interface ViewsPluginInterface extends PluginInspectionInterface, DerivativeInsp
   /**
    * Initialize the plugin.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view object.
-   * @param \Drupal\views\Plugin\views\display\DisplayPluginBase $display
+   * @param DisplayPluginBase $display
    *   The display handler.
    * @param array $options
    *   The options configured for this plugin.
@@ -93,7 +93,7 @@ interface ViewsPluginInterface extends PluginInspectionInterface, DerivativeInsp
    * @param array $form
    *   An alterable, associative array containing the structure of the form,
    *   passed by reference.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function submitOptionsForm(&$form, FormStateInterface $form_state);
@@ -103,7 +103,7 @@ interface ViewsPluginInterface extends PluginInspectionInterface, DerivativeInsp
    *
    * @param array $form
    *   The form array to alter, passed by reference.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function globalTokenForm(&$form, FormStateInterface $form_state);

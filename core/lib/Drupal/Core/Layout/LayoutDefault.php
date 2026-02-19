@@ -3,9 +3,9 @@
 namespace Drupal\Core\Layout;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Plugin\ConfigurablePluginBase;
 use Drupal\Core\Plugin\ContextAwarePluginAssignmentTrait;
 use Drupal\Core\Plugin\ContextAwarePluginTrait;
-use Drupal\Core\Plugin\ConfigurablePluginBase;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Plugin\PreviewAwarePluginInterface;
 
@@ -27,7 +27,7 @@ class LayoutDefault extends ConfigurablePluginBase implements LayoutInterface, P
   /**
    * The layout definition.
    *
-   * @var \Drupal\Core\Layout\LayoutDefinition
+   * @var LayoutDefinition
    */
   protected $pluginDefinition;
 
@@ -71,7 +71,7 @@ class LayoutDefault extends ConfigurablePluginBase implements LayoutInterface, P
   /**
    * {@inheritdoc}
    *
-   * @return \Drupal\Core\Layout\LayoutDefinition
+   * @return LayoutDefinition
    *   The layout plugin definition for this plugin.
    */
   public function getPluginDefinition() {

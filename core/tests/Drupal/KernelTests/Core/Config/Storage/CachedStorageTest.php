@@ -27,7 +27,7 @@ class CachedStorageTest extends ConfigStorageTestBase {
   /**
    * The file storage the cached storage is using.
    *
-   * @var \Drupal\Core\Config\FileStorage
+   * @var FileStorage
    */
   protected $fileStorage;
 

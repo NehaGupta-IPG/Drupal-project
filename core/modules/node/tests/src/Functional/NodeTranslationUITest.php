@@ -424,7 +424,7 @@ class NodeTranslationUITest extends ContentTranslationUITestBase {
   /**
    * Tests that the given path provides the correct alternate hreflang links.
    *
-   * @param \Drupal\node\Entity\Node $node
+   * @param Node $node
    *   The node to be tested.
    */
   protected function doTestAlternateHreflangLinks(Node $node): void {

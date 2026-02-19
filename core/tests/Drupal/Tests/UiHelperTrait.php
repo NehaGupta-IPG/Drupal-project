@@ -155,7 +155,7 @@ trait UiHelperTrait {
    *   $account->passRaw = $pass_raw;
    * @endcode
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   User object representing the user to log in.
    *
    * @see drupalCreateUser()
@@ -226,7 +226,7 @@ trait UiHelperTrait {
    * @param string $name
    *   (optional) Name of the session. Defaults to the active session.
    *
-   * @return \Drupal\Tests\WebAssert
+   * @return WebAssert
    *   A new web-assert option for asserting the presence of elements with.
    */
   public function assertSession($name = NULL) {
@@ -237,7 +237,7 @@ trait UiHelperTrait {
   /**
    * Retrieves a Drupal path or an absolute path.
    *
-   * @param string|\Drupal\Core\Url $path
+   * @param string|Url $path
    *   Drupal path or URL to load into Mink controlled browser.
    * @param array $options
    *   (optional) Options to be forwarded to the URL generator.
@@ -303,7 +303,7 @@ trait UiHelperTrait {
   /**
    * Builds an absolute URL from a system path or a URL object.
    *
-   * @param string|\Drupal\Core\Url $path
+   * @param string|Url $path
    *   A system path or a URL object.
    * @param array $options
    *   Options to be passed to Url::fromUri().
@@ -399,7 +399,7 @@ trait UiHelperTrait {
   /**
    * Returns whether a given user account is logged in.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user account object to check.
    *
    * @return bool
@@ -446,7 +446,7 @@ trait UiHelperTrait {
    *
    * If the link is discovered and clicked, the test passes. Fail otherwise.
    *
-   * @param string|\Drupal\Component\Render\MarkupInterface $label
+   * @param string|MarkupInterface $label
    *   Text between the anchor tags.
    * @param int $index
    *   (optional) The index number for cases where multiple links have the same

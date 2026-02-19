@@ -17,7 +17,7 @@ abstract class PluginFormBase implements PluginFormInterface, PluginAwareInterfa
   /**
    * The plugin this form is for.
    *
-   * @var \Drupal\Component\Plugin\PluginInspectionInterface
+   * @var PluginInspectionInterface
    */
   protected $plugin;
 

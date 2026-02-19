@@ -14,14 +14,14 @@ class Service {
   /**
    * The decorated service.
    *
-   * @var \Drupal\new_dependency_test\Service
+   * @var Service
    */
   protected $inner;
 
   /**
    * Service constructor.
    *
-   * @param \Drupal\new_dependency_test\Service|null $inner
+   * @param Service|null $inner
    *   The service to decorate.
    */
   public function __construct(?Service $inner = NULL) {

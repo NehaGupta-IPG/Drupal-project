@@ -4,10 +4,10 @@ namespace Drupal\Core\Theme;
 
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Routing\StackedRouteMatchInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Routing\StackedRouteMatchInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\AttributeHelper;
 use Drupal\Core\Utility\CallableResolver;
@@ -23,14 +23,14 @@ class ThemeManager implements ThemeManagerInterface {
   /**
    * The theme registry used to render an output.
    *
-   * @var \Drupal\Core\Theme\Registry
+   * @var Registry
    */
   protected $themeRegistry;
 
   /**
    * Contains the current active theme.
    *
-   * @var \Drupal\Core\Theme\ActiveTheme
+   * @var ActiveTheme
    */
   protected $activeTheme;
 
@@ -81,7 +81,7 @@ class ThemeManager implements ThemeManagerInterface {
   /**
    * Sets the theme registry.
    *
-   * @param \Drupal\Core\Theme\Registry $theme_registry
+   * @param Registry $theme_registry
    *   The theme registry.
    *
    * @return $this
@@ -479,7 +479,7 @@ class ThemeManager implements ThemeManagerInterface {
   /**
    * Initializes the active theme for a given route match.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The current route match.
    */
   protected function initTheme(?RouteMatchInterface $route_match = NULL) {
@@ -600,7 +600,7 @@ class ThemeManager implements ThemeManagerInterface {
   /**
    * Gets theme and base themes in reverse order.
    *
-   * @param \Drupal\Core\Theme\ActiveTheme $active_theme
+   * @param ActiveTheme $active_theme
    *   A manually specified theme.
    *
    * @return list<string>

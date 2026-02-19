@@ -46,13 +46,13 @@ class UserRegistrationResource extends ResourceBase {
    *   The plugin implementation definition.
    * @param array $serializer_formats
    *   The available serialization formats.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   A logger instance.
-   * @param \Drupal\Core\Config\ImmutableConfig $userSettings
+   * @param ImmutableConfig $userSettings
    *   A user settings config instance.
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
+   * @param AccountInterface $currentUser
    *   The current user.
-   * @param \Drupal\Core\Password\PasswordGeneratorInterface $passwordGenerator
+   * @param PasswordGeneratorInterface $passwordGenerator
    *   The password generator.
    */
   public function __construct(
@@ -87,14 +87,14 @@ class UserRegistrationResource extends ResourceBase {
   /**
    * Responds to user registration POST request.
    *
-   * @param \Drupal\user\UserInterface $account
+   * @param UserInterface $account
    *   The user account entity.
    *
-   * @return \Drupal\rest\ModifiedResourceResponse
+   * @return ModifiedResourceResponse
    *   The HTTP response object.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
-   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   * @throws BadRequestHttpException
+   * @throws AccessDeniedHttpException
    */
   public function post(?UserInterface $account = NULL) {
     $this->ensureAccountCanRegister($account);
@@ -128,7 +128,7 @@ class UserRegistrationResource extends ResourceBase {
   /**
    * Ensure the account can be registered in this request.
    *
-   * @param \Drupal\user\UserInterface $account
+   * @param UserInterface $account
    *   The user account to register.
    */
   protected function ensureAccountCanRegister(?UserInterface $account = NULL) {
@@ -172,7 +172,7 @@ class UserRegistrationResource extends ResourceBase {
   /**
    * Sends email notifications if necessary for user that was registered.
    *
-   * @param \Drupal\user\UserInterface $account
+   * @param UserInterface $account
    *   The user account.
    */
   protected function sendEmailNotifications(UserInterface $account) {

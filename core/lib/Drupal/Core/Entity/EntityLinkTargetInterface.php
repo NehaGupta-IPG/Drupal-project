@@ -14,10 +14,10 @@ interface EntityLinkTargetInterface {
   /**
    * Gets the generated URL object for a linked entity's link target.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   A linked entity.
    *
-   * @return \Drupal\Core\GeneratedUrl
+   * @return GeneratedUrl
    *   The generated URL plus cacheability metadata.
    */
   public function getLinkTarget(EntityInterface $entity): GeneratedUrl;

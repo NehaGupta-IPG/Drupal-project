@@ -19,32 +19,32 @@ class ContentTranslationPermissions implements ContainerInjectionInterface {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity bundle info.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @var EntityTypeBundleInfoInterface
    */
   protected $entityTypeBundleInfo;
 
   /**
    * The content translation manager.
    *
-   * @var \Drupal\content_translation\ContentTranslationManagerInterface
+   * @var ContentTranslationManagerInterface
    */
   protected $contentTranslationManager;
 
   /**
    * Constructs a ContentTranslationPermissions instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\content_translation\ContentTranslationManagerInterface $content_translation_manager
+   * @param ContentTranslationManagerInterface $content_translation_manager
    *   The content translation manager.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle info.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, ContentTranslationManagerInterface $content_translation_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info) {
@@ -103,7 +103,7 @@ class ContentTranslationPermissions implements ContainerInjectionInterface {
   /**
    * Builds a content translation permission array for a bundle.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type.
    * @param string $bundle
    *   The bundle to build the translation permission for.

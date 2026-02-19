@@ -29,42 +29,42 @@ class UserAccessControlHandlerTest extends UnitTestCase {
   /**
    * The user access controller to test.
    *
-   * @var \Drupal\user\UserAccessControlHandler
+   * @var UserAccessControlHandler
    */
   protected $accessControlHandler;
 
   /**
    * The mock user account with view access.
    *
-   * @var \Drupal\user\UserInterface
+   * @var UserInterface
    */
   protected $viewer;
 
   /**
    * The mock user account with 'view user email addresses' permission.
    *
-   * @var \Drupal\user\UserInterface
+   * @var UserInterface
    */
   protected $emailViewer;
 
   /**
    * The mock user account that is able to change their own account name.
    *
-   * @var \Drupal\user\UserInterface
+   * @var UserInterface
    */
   protected $owner;
 
   /**
    * The mock administrative test user.
    *
-   * @var \Drupal\user\UserInterface
+   * @var UserInterface
    */
   protected $admin;
 
   /**
    * The mocked test field items.
    *
-   * @var \Drupal\Core\Field\FieldItemList
+   * @var FieldItemList
    */
   protected $items;
 

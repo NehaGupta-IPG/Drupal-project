@@ -95,7 +95,7 @@ interface TableMappingInterface {
   /**
    * Generates a column name for a field property.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field storage definition.
    * @param string $property_name
    *   The name of the property.
@@ -115,7 +115,7 @@ interface TableMappingInterface {
    * @return string
    *   Table name for the given field.
    *
-   * @throws \Drupal\Core\Entity\Sql\SqlContentEntityStorageException
+   * @throws SqlContentEntityStorageException
    */
   public function getFieldTableName($field_name);
 
@@ -129,7 +129,7 @@ interface TableMappingInterface {
    * - base table
    * - data table
    * - revision table
-   * - revision data table
+   * - revision data table.
    *
    * @param string $field_name
    *   The name of the entity field to return the tables names for.
@@ -137,7 +137,7 @@ interface TableMappingInterface {
    * @return string[]
    *   An array of table names in which the given field is stored.
    *
-   * @throws \Drupal\Core\Entity\Sql\SqlContentEntityStorageException
+   * @throws SqlContentEntityStorageException
    */
   public function getAllFieldTableNames($field_name);
 

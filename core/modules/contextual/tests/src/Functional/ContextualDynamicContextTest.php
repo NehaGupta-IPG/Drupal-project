@@ -267,7 +267,7 @@ class ContextualDynamicContextTest extends BrowserTestBase {
    * @param string $current_path
    *   The Drupal path for the page for which the contextual links are rendered.
    *
-   * @return \Psr\Http\Message\ResponseInterface
+   * @return ResponseInterface
    *   The response object.
    */
   protected function renderContextualLinks($ids, $current_path): ResponseInterface {

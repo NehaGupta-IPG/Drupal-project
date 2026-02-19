@@ -25,7 +25,7 @@ class UserControllerTest extends KernelTestBase {
   /**
    * The user controller.
    *
-   * @var \Drupal\user\Controller\UserController
+   * @var UserController
    */
   protected $userController;
 

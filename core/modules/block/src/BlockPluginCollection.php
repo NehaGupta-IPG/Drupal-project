@@ -21,7 +21,7 @@ class BlockPluginCollection extends DefaultSingleLazyPluginCollection {
   /**
    * Constructs a new BlockPluginCollection.
    *
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $manager
+   * @param PluginManagerInterface $manager
    *   The manager to be used for instantiating plugins.
    * @param string $instance_id
    *   The ID of the plugin instance.

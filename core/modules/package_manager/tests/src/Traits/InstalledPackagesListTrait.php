@@ -20,9 +20,9 @@ trait InstalledPackagesListTrait {
   /**
    * Asserts that 2 installed package lists are equal.
    *
-   * @param \Drupal\package_manager\InstalledPackagesList $expected_list
+   * @param InstalledPackagesList $expected_list
    *   The expected list.
-   * @param \Drupal\package_manager\InstalledPackagesList $actual_list
+   * @param InstalledPackagesList $actual_list
    *   The actual list.
    */
   private function assertPackageListsEqual(InstalledPackagesList $expected_list, InstalledPackagesList $actual_list): void {

@@ -18,7 +18,7 @@ class FinalMissingContentSubscriber implements EventSubscriberInterface {
   /**
    * Handles the missing content event.
    *
-   * @param \Drupal\Core\Config\Importer\MissingContentEvent $event
+   * @param MissingContentEvent $event
    *   The missing content event.
    */
   public function onMissingContent(MissingContentEvent $event) {

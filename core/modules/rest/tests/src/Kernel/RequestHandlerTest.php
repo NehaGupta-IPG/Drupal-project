@@ -29,7 +29,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 class RequestHandlerTest extends KernelTestBase {
 
   /**
-   * @var \Drupal\rest\RequestHandler
+   * @var RequestHandler
    */
   protected $requestHandler;
 

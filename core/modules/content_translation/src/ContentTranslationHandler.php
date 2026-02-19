@@ -57,25 +57,25 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
   /**
    * Initializes an instance of the content translation controller.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entityType
+   * @param EntityTypeInterface $entityType
    *   The info array of the given entity type.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   * @param LanguageManagerInterface $languageManager
    *   The language manager.
-   * @param \Drupal\content_translation\ContentTranslationManagerInterface $manager
+   * @param ContentTranslationManagerInterface $manager
    *   The content translation manager service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
+   * @param AccountInterface $currentUser
    *   The current user.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger service.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
+   * @param DateFormatterInterface $dateFormatter
    *   The date formatter service.
-   * @param \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository
+   * @param EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository
    *   The installed entity definition repository service.
-   * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirectDestination
+   * @param RedirectDestinationInterface $redirectDestination
    *   The request stack.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct(
@@ -280,7 +280,6 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
    */
   public function entityFormAlter(array &$form, FormStateInterface $form_state, EntityInterface $entity) {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-
     $metadata = $this->manager->getTranslationMetadata($entity);
     $form_object = $form_state->getFormObject();
     $form_langcode = $form_object->getFormLangcode($form_state);
@@ -644,11 +643,11 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
    *
    * @param string $entity_type
    *   The type of the entity.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity whose form is being built.
    * @param array $form
    *   A nested array form elements comprising the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @see \Drupal\content_translation\ContentTranslationHandler::entityFormAlter()
@@ -768,7 +767,7 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
   /**
    * Returns the title to be used for the entity form page.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity whose form is being altered.
    *
    * @return string|null

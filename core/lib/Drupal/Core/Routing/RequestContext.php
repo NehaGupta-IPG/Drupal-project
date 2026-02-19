@@ -21,7 +21,7 @@ class RequestContext extends SymfonyRequestContext {
   /**
    * Populates the context from the current request from the request stack.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   The current request stack.
    */
   public function fromRequestStack(RequestStack $request_stack) {

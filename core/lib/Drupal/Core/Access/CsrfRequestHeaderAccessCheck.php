@@ -4,8 +4,8 @@ namespace Drupal\Core\Access;
 
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\SessionConfigurationInterface;
-use Symfony\Component\Routing\Route;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Route;
 
 /**
  * Access protection against CSRF attacks.
@@ -20,23 +20,23 @@ class CsrfRequestHeaderAccessCheck implements AccessCheckInterface {
   /**
    * The session configuration.
    *
-   * @var \Drupal\Core\Session\SessionConfigurationInterface
+   * @var SessionConfigurationInterface
    */
   protected $sessionConfiguration;
 
   /**
    * The token generator.
    *
-   * @var \Drupal\Core\Access\CsrfTokenGenerator
+   * @var CsrfTokenGenerator
    */
   protected $csrfToken;
 
   /**
    * Constructs a new rest CSRF access check.
    *
-   * @param \Drupal\Core\Session\SessionConfigurationInterface $session_configuration
+   * @param SessionConfigurationInterface $session_configuration
    *   The session configuration.
-   * @param \Drupal\Core\Access\CsrfTokenGenerator $csrf_token
+   * @param CsrfTokenGenerator $csrf_token
    *   The token generator.
    */
   public function __construct(SessionConfigurationInterface $session_configuration, CsrfTokenGenerator $csrf_token) {
@@ -69,12 +69,12 @@ class CsrfRequestHeaderAccessCheck implements AccessCheckInterface {
   /**
    * Checks access.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The currently logged in account.
    *
-   * @return \Drupal\Core\Access\AccessResultInterface
+   * @return AccessResultInterface
    *   The access result.
    */
   public function access(Request $request, AccountInterface $account) {

@@ -48,7 +48,7 @@ class DbImportCommand extends DbCommandBase {
   /**
    * Run the database script.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   Connection used by the script when included.
    * @param string $script
    *   Path to dump script.

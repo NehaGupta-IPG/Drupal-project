@@ -4,7 +4,7 @@
  * @file
  * Hooks related to the Database system and the Schema API.
  */
-
+use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Database\Query\SelectInterface;
 
 /**
@@ -293,7 +293,6 @@ use Drupal\Core\Database\Query\SelectInterface;
  *
  * @}
  */
-
 /**
  * @defgroup schemaapi Schema API
  * @{
@@ -460,7 +459,6 @@ use Drupal\Core\Database\Query\SelectInterface;
  *
  * @}
  */
-
 /**
  * @addtogroup hooks
  * @{
@@ -472,7 +470,7 @@ use Drupal\Core\Database\Query\SelectInterface;
  * Structured (aka dynamic) queries that have tags associated may be altered by
  * any module before the query is executed.
  *
- * @param \Drupal\Core\Database\Query\AlterableInterface $query
+ * @param AlterableInterface $query
  *   A Query object describing the composite parts of a SQL query.
  *
  * @see hook_query_TAG_alter()
@@ -482,7 +480,7 @@ use Drupal\Core\Database\Query\SelectInterface;
  *
  * @ingroup database
  */
-function hook_query_alter(Drupal\Core\Database\Query\AlterableInterface $query) {
+function hook_query_alter(AlterableInterface $query) {
   if ($query->hasTag('micro_limit')) {
     $query->range(0, 2);
   }
@@ -497,7 +495,7 @@ function hook_query_alter(Drupal\Core\Database\Query\AlterableInterface $query) 
  * - ENTITY_TYPE . '_access': For queries of entities that will be displayed in
  *   a listing (e.g., from Views) and therefore require access control.
  *
- * @param \Drupal\Core\Database\Query\AlterableInterface $query
+ * @param AlterableInterface $query
  *   A Query object describing the composite parts of a SQL query.
  *
  * @see hook_query_alter()
@@ -507,7 +505,7 @@ function hook_query_alter(Drupal\Core\Database\Query\AlterableInterface $query) 
  *
  * @ingroup database
  */
-function hook_query_TAG_alter(Drupal\Core\Database\Query\AlterableInterface $query) {
+function hook_query_TAG_alter(AlterableInterface $query) {
   // This is an example of a possible hook_query_media_access_alter()
   // implementation. In other words, alter queries of media entities that
   // require access control (have the 'media_access' query tag).

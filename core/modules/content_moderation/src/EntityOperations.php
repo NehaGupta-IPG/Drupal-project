@@ -4,6 +4,7 @@ namespace Drupal\content_moderation;
 
 use Drupal\content_moderation\Entity\ContentModerationState as ContentModerationStateEntity;
 use Drupal\content_moderation\Entity\ContentModerationStateInterface;
+use Drupal\content_moderation\Form\EntityModerationForm;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
@@ -12,7 +13,6 @@ use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBuilderInterface;
-use Drupal\content_moderation\Form\EntityModerationForm;
 use Drupal\Core\Routing\RouteBuilderInterface;
 use Drupal\workflows\Entity\Workflow;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -27,50 +27,50 @@ class EntityOperations implements ContainerInjectionInterface {
   /**
    * The Moderation Information service.
    *
-   * @var \Drupal\content_moderation\ModerationInformationInterface
+   * @var ModerationInformationInterface
    */
   protected $moderationInfo;
 
   /**
    * The Entity Type Manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The Form Builder service.
    *
-   * @var \Drupal\Core\Form\FormBuilderInterface
+   * @var FormBuilderInterface
    */
   protected $formBuilder;
 
   /**
    * The entity bundle information service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @var EntityTypeBundleInfoInterface
    */
   protected $bundleInfo;
 
   /**
    * The router builder service.
    *
-   * @var \Drupal\Core\Routing\RouteBuilderInterface
+   * @var RouteBuilderInterface
    */
   protected $routerBuilder;
 
   /**
    * Constructs a new EntityOperations object.
    *
-   * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_info
+   * @param ModerationInformationInterface $moderation_info
    *   Moderation information service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   Entity type manager service.
-   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
+   * @param FormBuilderInterface $form_builder
    *   The form builder.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info
+   * @param EntityTypeBundleInfoInterface $bundle_info
    *   The entity bundle information service.
-   * @param \Drupal\Core\Routing\RouteBuilderInterface $router_builder
+   * @param RouteBuilderInterface $router_builder
    *   The router builder service.
    */
   public function __construct(ModerationInformationInterface $moderation_info, EntityTypeManagerInterface $entity_type_manager, FormBuilderInterface $form_builder, EntityTypeBundleInfoInterface $bundle_info, RouteBuilderInterface $router_builder) {
@@ -97,7 +97,7 @@ class EntityOperations implements ContainerInjectionInterface {
   /**
    * Acts on an entity and set published status based on the moderation state.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity being saved.
    *
    * @see hook_entity_presave()
@@ -127,7 +127,7 @@ class EntityOperations implements ContainerInjectionInterface {
   }
 
   /**
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity that was just saved.
    *
    * @see hook_entity_insert()
@@ -139,7 +139,7 @@ class EntityOperations implements ContainerInjectionInterface {
   }
 
   /**
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity that was just saved.
    *
    * @see hook_entity_update()
@@ -159,11 +159,11 @@ class EntityOperations implements ContainerInjectionInterface {
   /**
    * Creates or updates the moderation state of an entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to update or create a moderation state for.
    */
   protected function updateOrCreateFromEntity(EntityInterface $entity) {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     $entity_revision_id = $entity->getRevisionId();
     $workflow = $this->moderationInfo->getWorkflowForEntity($entity);
     $content_moderation_state = ContentModerationStateEntity::loadFromModeratedEntity($entity);
@@ -205,7 +205,7 @@ class EntityOperations implements ContainerInjectionInterface {
 
     // Create the ContentModerationState entity for the inserted entity.
     $moderation_state = $entity->moderation_state->value;
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     if (!$moderation_state) {
       $moderation_state = $workflow->getTypePlugin()->getInitialState($entity)->id();
     }
@@ -216,7 +216,7 @@ class EntityOperations implements ContainerInjectionInterface {
   }
 
   /**
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity being deleted.
    *
    * @see hook_entity_delete()
@@ -229,7 +229,7 @@ class EntityOperations implements ContainerInjectionInterface {
   }
 
   /**
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity revision being deleted.
    *
    * @see hook_entity_revision_delete()
@@ -248,13 +248,13 @@ class EntityOperations implements ContainerInjectionInterface {
   }
 
   /**
-   * @param \Drupal\Core\Entity\EntityInterface $translation
+   * @param EntityInterface $translation
    *   The entity translation being deleted.
    *
    * @see hook_entity_translation_delete()
    */
   public function entityTranslationDelete(EntityInterface $translation) {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $translation */
+    /** @var ContentEntityInterface $translation */
     if (!$translation->isDefaultTranslation()) {
       $langcode = $translation->language()->getId();
       $content_moderation_state = ContentModerationStateEntity::loadFromModeratedEntity($translation);
@@ -272,7 +272,7 @@ class EntityOperations implements ContainerInjectionInterface {
    * @see EntityFieldManagerInterface::getExtraFields()
    */
   public function entityView(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode) {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     if (!$this->moderationInfo->isModeratedEntity($entity)) {
       return;
     }
@@ -302,7 +302,7 @@ class EntityOperations implements ContainerInjectionInterface {
    * This method is optimized to not have to unnecessarily load the moderation
    * state and workflow if it is not required.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity to check.
    *
    * @return bool

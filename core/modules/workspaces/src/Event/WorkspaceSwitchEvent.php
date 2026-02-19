@@ -2,8 +2,8 @@
 
 namespace Drupal\workspaces\Event;
 
-use Drupal\workspaces\WorkspaceInterface;
 use Drupal\Component\EventDispatcher\Event;
+use Drupal\workspaces\WorkspaceInterface;
 
 /**
  * Defines the workspace switch event.
@@ -18,7 +18,7 @@ class WorkspaceSwitchEvent extends Event {
   /**
    * Gets the new activate workspace.
    *
-   * @return \Drupal\workspaces\WorkspaceInterface|null
+   * @return WorkspaceInterface|null
    *   A workspace entity, or NULL if we switched into Live.
    */
   public function getWorkspace(): ?WorkspaceInterface {
@@ -28,7 +28,7 @@ class WorkspaceSwitchEvent extends Event {
   /**
    * Gets the previous active workspace.
    *
-   * @return \Drupal\workspaces\WorkspaceInterface|null
+   * @return WorkspaceInterface|null
    *   A workspace entity, or NULL if we switched from Live.
    */
   public function getPreviousWorkspace(): ?WorkspaceInterface {

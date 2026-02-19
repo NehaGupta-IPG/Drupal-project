@@ -128,7 +128,7 @@ abstract class WorkflowTypeBase extends ConfigurablePluginBase implements Workfl
     if ($state_ids === NULL) {
       $state_ids = array_keys($this->configuration['states']);
     }
-    /** @var \Drupal\workflows\StateInterface[] $states */
+    /** @var StateInterface[] $states */
     $states = array_combine($state_ids, array_map([$this, 'getState'], $state_ids));
     return static::labelWeightMultisort($states);
   }
@@ -248,7 +248,7 @@ abstract class WorkflowTypeBase extends ConfigurablePluginBase implements Workfl
     if ($transition_ids === NULL) {
       $transition_ids = array_keys($this->configuration['transitions']);
     }
-    /** @var \Drupal\workflows\TransitionInterface[] $transitions */
+    /** @var TransitionInterface[] $transitions */
     $transitions = array_combine($transition_ids, array_map([$this, 'getTransition'], $transition_ids));
     return static::labelWeightMultisort($transitions);
   }
@@ -256,11 +256,11 @@ abstract class WorkflowTypeBase extends ConfigurablePluginBase implements Workfl
   /**
    * Sort states or transitions by weight, label, and key.
    *
-   * @param \Drupal\workflows\StateInterface[]|\Drupal\workflows\TransitionInterface[] $objects
+   * @param StateInterface[]|TransitionInterface[] $objects
    *   An array of state or transition objects to multi-sort, keyed by the
    *   state or transition ID.
    *
-   * @return \Drupal\workflows\StateInterface[]|\Drupal\workflows\TransitionInterface[]
+   * @return StateInterface[]|TransitionInterface[]
    *   An array of sorted transitions or states, keyed by the state or
    *   transition ID.
    */

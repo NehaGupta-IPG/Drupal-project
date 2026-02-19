@@ -2,9 +2,9 @@
 
 namespace Drupal\views\Plugin\Menu\Form;
 
-use Drupal\Core\Url;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Menu\Form\MenuLinkDefaultForm;
+use Drupal\Core\Url;
 
 /**
  * Provides a form to edit Views menu links.

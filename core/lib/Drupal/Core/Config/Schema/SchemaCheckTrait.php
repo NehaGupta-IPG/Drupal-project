@@ -9,9 +9,9 @@ use Drupal\Core\Entity\Plugin\DataType\ConfigEntityAdapter;
 use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\Core\TypedData\TraversableTypedDataInterface;
 use Drupal\Core\TypedData\Type\BooleanInterface;
-use Drupal\Core\TypedData\Type\StringInterface;
 use Drupal\Core\TypedData\Type\FloatInterface;
 use Drupal\Core\TypedData\Type\IntegerInterface;
+use Drupal\Core\TypedData\Type\StringInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
@@ -78,7 +78,7 @@ trait SchemaCheckTrait {
   /**
    * Checks the TypedConfigManager has a valid schema for the configuration.
    *
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
+   * @param TypedConfigManagerInterface $typed_config
    *   The TypedConfigManager.
    * @param string $config_name
    *   The configuration name.
@@ -128,7 +128,7 @@ trait SchemaCheckTrait {
   /**
    * Determines whether this violation is for an ignored Config property path.
    *
-   * @param \Symfony\Component\Validator\ConstraintViolationInterface $v
+   * @param ConstraintViolationInterface $v
    *   A validation constraint violation for a Config object.
    *
    * @return bool

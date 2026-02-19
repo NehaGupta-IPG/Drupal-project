@@ -46,7 +46,7 @@ class TestableSqlContentEntityStorage extends SqlContentEntityStorage {
   /**
    * Sets the table mapping.
    *
-   * @param \Drupal\Core\Entity\Sql\TableMappingInterface $table_mapping
+   * @param TableMappingInterface $table_mapping
    *   The dummy table mapping.
    */
   public function setTableMapping(TableMappingInterface $table_mapping): void {

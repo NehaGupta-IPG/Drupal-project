@@ -16,7 +16,7 @@ class SchemaListenerController extends ControllerBase {
   /**
    * Constructs the SchemaListenerController object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
    */
   public function __construct(ConfigFactoryInterface $config_factory) {

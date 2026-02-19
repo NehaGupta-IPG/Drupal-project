@@ -14,7 +14,7 @@ interface DateTimeInterface {
   /**
    * Returns the date time object.
    *
-   * @return \Drupal\Core\Datetime\DrupalDateTime|null
+   * @return DrupalDateTime|null
    *   A date object or NULL if there is no date.
    */
   public function getDateTime();
@@ -22,7 +22,7 @@ interface DateTimeInterface {
   /**
    * Sets the date time object.
    *
-   * @param \Drupal\Core\Datetime\DrupalDateTime $dateTime
+   * @param DrupalDateTime $dateTime
    *   An instance of a date time object.
    */
   public function setDateTime(DrupalDateTime $dateTime);

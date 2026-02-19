@@ -21,7 +21,7 @@ trait AssertViewsCacheTagsTrait {
    *
    * This methods uses a full view object in order to render the view.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view to test, must have caching enabled.
    * @param null|string[] $expected_results_cache
    *   NULL when expecting no results cache item, a set of cache tags expected
@@ -107,7 +107,7 @@ trait AssertViewsCacheTagsTrait {
    *
    * This method starts with a pre bubbling basic render array.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view.
    * @param string[] $expected_render_array_cache_tags
    *   The expected render cache tags.

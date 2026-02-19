@@ -200,7 +200,7 @@ class DuplicateInfoFileValidatorTest extends PackageManagerKernelTestBase {
    *   An array of info.yml files in active directory.
    * @param string[] $stage_info_files
    *   An array of info.yml files in stage directory.
-   * @param \Drupal\package_manager\ValidationResult[] $expected_results
+   * @param ValidationResult[] $expected_results
    *   An array of expected results.
    */
   #[DataProvider('providerDuplicateInfoFilesInStage')]

@@ -2,14 +2,14 @@
 
 namespace Drupal\views\Plugin\views\field;
 
-use Drupal\Core\Datetime\TimeZoneFormHelper;
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Datetime\DateFormatterInterface;
+use Drupal\Core\Datetime\TimeZoneFormHelper;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Attribute\ViewsField;
 use Drupal\views\ResultRow;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Datetime\DateFormatterInterface;
 
 /**
  * A handler to provide proper displays for dates.
@@ -22,14 +22,14 @@ class Date extends FieldPluginBase {
   /**
    * The date formatter service.
    *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
+   * @var DateFormatterInterface
    */
   protected $dateFormatter;
 
   /**
    * The date format storage.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var EntityStorageInterface
    */
   protected $dateFormatStorage;
 
@@ -42,11 +42,11 @@ class Date extends FieldPluginBase {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   * @param DateFormatterInterface $date_formatter
    *   The date formatter service.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $date_format_storage
+   * @param EntityStorageInterface $date_format_storage
    *   The date format storage.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct(

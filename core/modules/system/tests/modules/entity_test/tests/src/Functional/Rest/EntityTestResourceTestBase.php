@@ -35,7 +35,7 @@ abstract class EntityTestResourceTestBase extends ConfigEntityResourceTestBase {
   /**
    * The state object.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected StateInterface $state;
 
@@ -47,7 +47,7 @@ abstract class EntityTestResourceTestBase extends ConfigEntityResourceTestBase {
   /**
    * The entity definition update manager.
    *
-   * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
+   * @var EntityDefinitionUpdateManagerInterface
    */
   protected EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager;
 

@@ -20,19 +20,19 @@ use PHPUnit\Framework\Attributes\Group;
 class StorageComparerTest extends UnitTestCase {
 
   /**
-   * @var \Drupal\Core\Config\StorageInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var StorageInterface|MockObject
    */
   protected $sourceStorage;
 
   /**
-   * @var \Drupal\Core\Config\StorageInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var StorageInterface|MockObject
    */
   protected $targetStorage;
 
   /**
    * The storage comparer to test.
    *
-   * @var \Drupal\Core\Config\StorageComparer
+   * @var StorageComparer
    */
   protected $storageComparer;
 
@@ -294,7 +294,7 @@ class StorageComparerTest extends UnitTestCase {
   /**
    * Generate random data in a config storage.
    *
-   * @param \Drupal\Core\Config\StorageInterface $storage
+   * @param StorageInterface $storage
    *   The storage to populate with random data.
    * @param string $prefix
    *   The prefix for random names to make sure they are unique.

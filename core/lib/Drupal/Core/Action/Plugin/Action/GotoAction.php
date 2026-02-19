@@ -4,16 +4,16 @@ namespace Drupal\Core\Action\Plugin\Action;
 
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Action\ConfigurableActionBase;
 use Drupal\Core\Action\Attribute\Action;
+use Drupal\Core\Action\ConfigurableActionBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Utility\UnroutedUrlAssemblerInterface;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Redirects to a different URL.
@@ -28,14 +28,14 @@ class GotoAction extends ConfigurableActionBase implements ContainerFactoryPlugi
   /**
    * The event dispatcher service.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+   * @var EventDispatcherInterface
    */
   protected $dispatcher;
 
   /**
    * The unrouted URL assembler service.
    *
-   * @var \Drupal\Core\Utility\UnroutedUrlAssemblerInterface
+   * @var UnroutedUrlAssemblerInterface
    */
   protected $unroutedUrlAssembler;
 
@@ -48,9 +48,9 @@ class GotoAction extends ConfigurableActionBase implements ContainerFactoryPlugi
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher
+   * @param EventDispatcherInterface $dispatcher
    *   The tempstore factory.
-   * @param \Drupal\Core\Utility\UnroutedUrlAssemblerInterface $url_assembler
+   * @param UnroutedUrlAssemblerInterface $url_assembler
    *   The unrouted URL assembler service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $dispatcher, UnroutedUrlAssemblerInterface $url_assembler) {

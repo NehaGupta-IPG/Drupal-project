@@ -48,7 +48,7 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    * @param array $options
    *   (optional) An associative array of additional options. See t() for
    *   allowed keys.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param TranslationInterface $string_translation
    *   (optional) The string translation service.
    *
    * @see \Drupal\Component\Render\FormattableMarkup::placeholderFormat()

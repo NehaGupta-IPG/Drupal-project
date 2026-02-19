@@ -22,7 +22,7 @@ class ImmutablePropertiesConstraintValidator extends ConstraintValidator impleme
   /**
    * Constructs an ImmutablePropertiesConstraintValidator object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager service.
    */
   public function __construct(protected EntityTypeManagerInterface $entityTypeManager) {

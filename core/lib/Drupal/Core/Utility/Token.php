@@ -70,14 +70,14 @@ class Token {
   /**
    * The token cache.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $cache;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
@@ -96,36 +96,36 @@ class Token {
   /**
    * The module handler service.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The cache tags invalidator.
    *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface
+   * @var CacheTagsInvalidatorInterface
    */
   protected $cacheTagsInvalidator;
 
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * Constructs a new class instance.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The token cache.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Cache\CacheTagsInvalidatorInterface $cache_tags_invalidator
+   * @param CacheTagsInvalidatorInterface $cache_tags_invalidator
    *   The cache tags invalidator.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
    */
   public function __construct(ModuleHandlerInterface $module_handler, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, CacheTagsInvalidatorInterface $cache_tags_invalidator, RendererInterface $renderer) {
@@ -160,7 +160,7 @@ class Token {
    *     reference, the data, and the options as parameters.
    *   - clear: A boolean flag indicating that tokens should be removed from the
    *     final text if no replacement value can be generated.
-   * @param \Drupal\Core\Render\BubbleableMetadata|null $bubbleable_metadata
+   * @param BubbleableMetadata|null $bubbleable_metadata
    *   (optional) An object to which static::generate() and the hooks and
    *   functions that it invokes will add their required bubbleable metadata.
    *
@@ -204,7 +204,7 @@ class Token {
    *   (optional) An array of keyed objects. See replace().
    * @param array $options
    *   (optional) A keyed array of options. See replace().
-   * @param \Drupal\Core\Render\BubbleableMetadata|null $bubbleable_metadata
+   * @param BubbleableMetadata|null $bubbleable_metadata
    *   (optional) Target for adding metadata. See replace().
    *
    * @return string
@@ -225,7 +225,7 @@ class Token {
    *   An array of keyed objects. See replace().
    * @param array $options
    *   A keyed array of options. See replace().
-   * @param \Drupal\Core\Render\BubbleableMetadata|null $bubbleable_metadata
+   * @param BubbleableMetadata|null $bubbleable_metadata
    *   (optional) Target for adding metadata. See replace().
    *
    * @return string
@@ -342,7 +342,7 @@ class Token {
    *     array of token replacements after they are generated. Can be used when
    *     modules require special formatting of token text, for example URL
    *     encoding or truncation to a specific length.
-   * @param \Drupal\Core\Render\BubbleableMetadata $bubbleable_metadata
+   * @param BubbleableMetadata $bubbleable_metadata
    *   The bubbleable metadata. This is passed to the token replacement
    *   implementations so that they can attach their metadata.
    *

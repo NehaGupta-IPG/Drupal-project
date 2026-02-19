@@ -24,7 +24,7 @@ trait StringTranslationTrait {
   /**
    * The string translation service.
    *
-   * @var \Drupal\Core\StringTranslation\TranslationInterface
+   * @var TranslationInterface
    */
   protected $stringTranslation;
 
@@ -77,7 +77,7 @@ trait StringTranslationTrait {
    *
    * @see \Drupal\Core\StringTranslation\TranslationInterface::formatPlural()
    *
-   * @return \Drupal\Core\StringTranslation\PluralTranslatableMarkup
+   * @return PluralTranslatableMarkup
    *   An object that, when cast to a string, returns the translated string.
    */
   protected function formatPlural($count, $singular, $plural, array $args = [], array $options = []) {
@@ -103,7 +103,7 @@ trait StringTranslationTrait {
   /**
    * Gets the string translation service.
    *
-   * @return \Drupal\Core\StringTranslation\TranslationInterface
+   * @return TranslationInterface
    *   The string translation service.
    */
   protected function getStringTranslation() {
@@ -117,7 +117,7 @@ trait StringTranslationTrait {
   /**
    * Sets the string translation service to use.
    *
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
+   * @param TranslationInterface $translation
    *   The string translation service.
    *
    * @return $this

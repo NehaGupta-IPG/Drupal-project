@@ -22,9 +22,9 @@ interface ResponsePolicyInterface {
   /**
    * Determines whether it is save to store a page in the cache.
    *
-   * @param \Symfony\Component\HttpFoundation\Response $response
+   * @param Response $response
    *   The response which is about to be sent to the client.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    *
    * @return string|null

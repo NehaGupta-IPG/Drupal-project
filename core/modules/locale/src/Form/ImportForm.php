@@ -3,8 +3,8 @@
 namespace Drupal\locale\Form;
 
 use Drupal\Component\Utility\Environment;
-use Drupal\Core\Form\FormBase;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
@@ -28,14 +28,14 @@ class ImportForm extends FormBase {
   /**
    * The module handler service.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The configurable language manager.
    *
-   * @var \Drupal\language\ConfigurableLanguageManagerInterface
+   * @var ConfigurableLanguageManagerInterface
    */
   protected $languageManager;
 
@@ -52,9 +52,9 @@ class ImportForm extends FormBase {
   /**
    * Constructs a form for language import.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler service.
-   * @param \Drupal\language\ConfigurableLanguageManagerInterface $language_manager
+   * @param ConfigurableLanguageManagerInterface $language_manager
    *   The configurable language manager.
    */
   public function __construct(ModuleHandlerInterface $module_handler, ConfigurableLanguageManagerInterface $language_manager) {

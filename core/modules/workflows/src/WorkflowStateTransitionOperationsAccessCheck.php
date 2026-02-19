@@ -39,9 +39,9 @@ class WorkflowStateTransitionOperationsAccessCheck implements AccessInterface {
    *   _workflow_access: 'delete-state'
    * @endcode
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The parametrized route.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The currently logged in account.
    *
    * @return \Drupal\Core\Access\AccessResultInterface
@@ -71,7 +71,7 @@ class WorkflowStateTransitionOperationsAccessCheck implements AccessInterface {
   /**
    * Get the operation that will be used for the access check.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The parametrized route.
    *
    * @return string

@@ -29,14 +29,14 @@ class ControllerResolverTest extends UnitTestCase {
   /**
    * The tested controller resolver.
    *
-   * @var \Drupal\Core\Controller\ControllerResolver
+   * @var ControllerResolver
    */
   public $controllerResolver;
 
   /**
    * The container.
    *
-   * @var \Symfony\Component\DependencyInjection\ContainerBuilder
+   * @var ContainerBuilder
    */
   protected $container;
 

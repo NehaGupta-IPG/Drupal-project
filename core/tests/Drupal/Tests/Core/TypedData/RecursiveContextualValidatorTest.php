@@ -31,14 +31,14 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
   /**
    * The type data manager.
    *
-   * @var \Drupal\Core\TypedData\TypedDataManager
+   * @var TypedDataManager
    */
   protected $typedDataManager;
 
   /**
    * The recursive validator.
    *
-   * @var \Drupal\Core\TypedData\Validation\RecursiveValidator
+   * @var RecursiveValidator
    */
   protected $recursiveValidator;
 
@@ -52,7 +52,7 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
   /**
    * The execution context factory.
    *
-   * @var \Drupal\Core\Validation\ExecutionContextFactory
+   * @var ExecutionContextFactory
    */
   protected $contextFactory;
 
@@ -198,7 +198,7 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
    * @param string $name
    *   The name to use for the object.
    *
-   * @return \Drupal\Core\TypedData\TypedDataInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @return \Drupal\Core\TypedData\TypedDataInterface|MockObject
    *   The typed data object.
    */
   protected function setupTypedData(array $tree, $name = '') {
@@ -323,7 +323,7 @@ class RecursiveContextualValidatorTest extends UnitTestCase {
   /**
    * Builds some example type data object.
    *
-   * @return \Drupal\Core\TypedData\TypedDataInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @return \Drupal\Core\TypedData\TypedDataInterface|MockObject
    *   A typed data object with nested properties for testing purposes.
    */
   protected function buildExampleTypedDataWithProperties($subkey_value = NULL) {

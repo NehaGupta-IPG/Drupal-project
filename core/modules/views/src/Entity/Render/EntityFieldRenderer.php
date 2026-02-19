@@ -34,14 +34,14 @@ class EntityFieldRenderer extends RendererBase {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity repository service.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   * @var EntityRepositoryInterface
    */
   protected $entityRepository;
 
@@ -55,17 +55,17 @@ class EntityFieldRenderer extends RendererBase {
   /**
    * Constructs an EntityFieldRenderer object.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view whose fields are being rendered.
    * @param string $relationship
    *   The relationship to be handled.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository.
    */
   public function __construct(ViewExecutable $view, $relationship, LanguageManagerInterface $language_manager, EntityTypeInterface $entity_type, EntityTypeManagerInterface $entity_type_manager, EntityRepositoryInterface $entity_repository) {
@@ -127,9 +127,9 @@ class EntityFieldRenderer extends RendererBase {
   /**
    * Renders entity field data.
    *
-   * @param \Drupal\views\ResultRow $row
+   * @param ResultRow $row
    *   A single row of the query result.
-   * @param \Drupal\views\Plugin\views\field\EntityField $field
+   * @param EntityField $field
    *   (optional) A field to be rendered.
    *
    * @return array
@@ -196,7 +196,7 @@ class EntityFieldRenderer extends RendererBase {
    * - For each set of fields, entities are processed by bundle, so that
    *   formatters can operate on the proper field definition for the bundle.
    *
-   * @param \Drupal\views\ResultRow[] $values
+   * @param ResultRow[] $values
    *   An array of all ResultRow objects returned from the query.
    *
    * @return array

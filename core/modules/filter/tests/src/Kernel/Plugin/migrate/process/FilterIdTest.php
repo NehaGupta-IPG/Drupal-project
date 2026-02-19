@@ -30,7 +30,7 @@ class FilterIdTest extends KernelTestBase {
   /**
    * The mocked MigrateExecutable.
    *
-   * @var \Drupal\migrate\MigrateExecutableInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var MigrateExecutableInterface|MockObject
    */
   protected $executable;
 

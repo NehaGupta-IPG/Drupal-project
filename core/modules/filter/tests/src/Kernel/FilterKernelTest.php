@@ -31,7 +31,7 @@ class FilterKernelTest extends KernelTestBase {
   protected static $modules = ['system', 'filter'];
 
   /**
-   * @var \Drupal\filter\Plugin\FilterInterface[]
+   * @var FilterInterface[]
    */
   protected $filters;
 
@@ -972,7 +972,7 @@ class FilterKernelTest extends KernelTestBase {
   /**
    * Asserts multiple filter output expectations for multiple input strings.
    *
-   * @param \Drupal\filter\Plugin\FilterInterface $filter
+   * @param FilterInterface $filter
    *   An input filter object.
    * @param array $tests
    *   An associative array, whereas each key is an arbitrary input string and

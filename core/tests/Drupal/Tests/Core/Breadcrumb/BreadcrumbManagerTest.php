@@ -30,21 +30,21 @@ class BreadcrumbManagerTest extends UnitTestCase {
   /**
    * The breadcrumb object.
    *
-   * @var \Drupal\Core\Breadcrumb\Breadcrumb
+   * @var Breadcrumb
    */
   protected $breadcrumb;
 
   /**
    * The tested breadcrumb manager.
    *
-   * @var \Drupal\Core\Breadcrumb\BreadcrumbManager
+   * @var BreadcrumbManager
    */
   protected $breadcrumbManager;
 
   /**
    * The mocked module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface|MockObject
    */
   protected $moduleHandler;
 

@@ -39,7 +39,7 @@ interface SectionStorageInterface extends SectionListInterface, PluginInspection
    * \Drupal\layout_builder\Routing\LayoutBuilderRoutesTrait is provided for the
    * typical use case of building a standard Layout Builder UI.
    *
-   * @param \Symfony\Component\Routing\RouteCollection $collection
+   * @param RouteCollection $collection
    *   The route collection.
    *
    * @see \Drupal\Core\Routing\RoutingEvents::ALTER
@@ -119,7 +119,7 @@ interface SectionStorageInterface extends SectionListInterface, PluginInspection
   /**
    * Determines if this section storage is applicable for the current contexts.
    *
-   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $cacheability
+   * @param RefinableCacheableDependencyInterface $cacheability
    *   Refinable cacheability object, typically provided by the section storage
    *   manager. When implementing this method, populate $cacheability with any
    *   information that affects whether this storage is applicable.

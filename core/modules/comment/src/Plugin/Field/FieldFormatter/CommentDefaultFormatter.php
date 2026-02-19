@@ -8,12 +8,12 @@ use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityFormBuilderInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\Attribute\FieldFormatter;
-use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FormatterBase;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
@@ -48,7 +48,7 @@ class CommentDefaultFormatter extends FormatterBase {
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
@@ -62,19 +62,19 @@ class CommentDefaultFormatter extends FormatterBase {
   /**
    * The entity display repository.
    *
-   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
+   * @var EntityDisplayRepositoryInterface
    */
   protected $entityDisplayRepository;
 
   /**
    * The entity form builder.
    *
-   * @var \Drupal\Core\Entity\EntityFormBuilderInterface
+   * @var EntityFormBuilderInterface
    */
   protected $entityFormBuilder;
 
   /**
-   * @var \Drupal\Core\Routing\RouteMatchInterface
+   * @var RouteMatchInterface
    */
   protected $routeMatch;
 
@@ -85,7 +85,7 @@ class CommentDefaultFormatter extends FormatterBase {
    *   The plugin ID for the formatter.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The definition of the field to which the formatter is associated.
    * @param array $settings
    *   The formatter settings.
@@ -95,15 +95,15 @@ class CommentDefaultFormatter extends FormatterBase {
    *   The view mode.
    * @param array $third_party_settings
    *   Third party settings.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityFormBuilderInterface $entity_form_builder
+   * @param EntityFormBuilderInterface $entity_form_builder
    *   The entity form builder.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match object.
-   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
+   * @param EntityDisplayRepositoryInterface $entity_display_repository
    *   The entity display repository.
    */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, AccountInterface $current_user, EntityTypeManagerInterface $entity_type_manager, EntityFormBuilderInterface $entity_form_builder, RouteMatchInterface $route_match, EntityDisplayRepositoryInterface $entity_display_repository) {

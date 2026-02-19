@@ -35,19 +35,19 @@ class FormSubmitterTest extends UnitTestCase {
   /**
    * The mocked URL generator.
    *
-   * @var \PHPUnit\Framework\MockObject\MockObject|\Drupal\Core\Routing\UrlGeneratorInterface
+   * @var MockObject|UrlGeneratorInterface
    */
   protected $urlGenerator;
 
   /**
    * The mocked unrouted URL assembler.
    *
-   * @var \PHPUnit\Framework\MockObject\MockObject|\Drupal\Core\Utility\UnroutedUrlAssemblerInterface
+   * @var MockObject|UnroutedUrlAssemblerInterface
    */
   protected $unroutedUrlAssembler;
 
   /**
-   * @var \PHPUnit\Framework\MockObject\MockObject|\Drupal\Core\EventSubscriber\RedirectResponseSubscriber
+   * @var MockObject|RedirectResponseSubscriber
    */
   protected $redirectResponseSubscriber;
 

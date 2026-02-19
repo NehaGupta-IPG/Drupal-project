@@ -18,9 +18,9 @@ class FileSizeLimitConstraintValidator extends BaseFileConstraintValidator imple
   /**
    * Creates a new FileSizeConstraintValidator.
    *
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
+   * @param AccountInterface $currentUser
    *   The current user.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
   public function __construct(

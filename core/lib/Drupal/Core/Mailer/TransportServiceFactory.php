@@ -21,7 +21,7 @@ class TransportServiceFactory implements TransportServiceFactoryInterface {
    *
    * @param Iterable<TransportFactoryInterface> $factories
    *   A list of transport factories.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   * @param ConfigFactoryInterface $configFactory
    *   The config factory service.
    */
   public function __construct(

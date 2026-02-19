@@ -2,17 +2,17 @@
 
 namespace Drupal\field;
 
+use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Config\Config;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\DeletedFieldsRepositoryInterface;
 use Drupal\Core\Field\FieldConfigStorageBase;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Component\Uuid\UuidInterface;
 
 /**
  * Storage handler for field config.
@@ -22,42 +22,42 @@ class FieldConfigStorage extends FieldConfigStorageBase {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The field type plugin manager.
    *
-   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface
+   * @var FieldTypePluginManagerInterface
    */
   protected $fieldTypeManager;
 
   /**
    * The deleted fields repository.
    *
-   * @var \Drupal\Core\Field\DeletedFieldsRepositoryInterface
+   * @var DeletedFieldsRepositoryInterface
    */
   protected $deletedFieldsRepository;
 
   /**
    * Constructs a FieldConfigStorage object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory service.
-   * @param \Drupal\Component\Uuid\UuidInterface $uuid_service
+   * @param UuidInterface $uuid_service
    *   The UUID service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager
+   * @param FieldTypePluginManagerInterface $field_type_manager
    *   The field type plugin manager.
-   * @param \Drupal\Core\Field\DeletedFieldsRepositoryInterface $deleted_fields_repository
+   * @param DeletedFieldsRepositoryInterface $deleted_fields_repository
    *   The deleted fields repository.
-   * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache
+   * @param MemoryCacheInterface $memory_cache
    *   The memory cache.
    */
   public function __construct(EntityTypeInterface $entity_type, ConfigFactoryInterface $config_factory, UuidInterface $uuid_service, LanguageManagerInterface $language_manager, EntityTypeManagerInterface $entity_type_manager, FieldTypePluginManagerInterface $field_type_manager, DeletedFieldsRepositoryInterface $deleted_fields_repository, MemoryCacheInterface $memory_cache) {

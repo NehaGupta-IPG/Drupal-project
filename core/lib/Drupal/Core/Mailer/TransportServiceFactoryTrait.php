@@ -23,11 +23,11 @@ trait TransportServiceFactoryTrait {
   /**
    * Constructs a transport instance given a DSN object.
    *
-   * @param \Symfony\Component\Mailer\Transport\Dsn $dsn
+   * @param Dsn $dsn
    *   The mailer DSN object.
    *
-   * @throws \Symfony\Component\Mailer\Exception\IncompleteDsnException
-   * @throws \Symfony\Component\Mailer\Exception\UnsupportedSchemeException
+   * @throws IncompleteDsnException
+   * @throws UnsupportedSchemeException
    */
   protected function fromDsnObject(Dsn $dsn): TransportInterface {
     foreach ($this->factories as $factory) {

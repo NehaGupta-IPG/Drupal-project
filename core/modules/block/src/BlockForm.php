@@ -3,7 +3,6 @@
 namespace Drupal\block;
 
 use Drupal\Component\Utility\Html;
-use Drupal\Core\Plugin\PluginFormFactoryInterface;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -12,8 +11,9 @@ use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\SubformState;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
+use Drupal\Core\Plugin\ContextAwarePluginInterface;
+use Drupal\Core\Plugin\PluginFormFactoryInterface;
 use Drupal\Core\Plugin\PluginWithFormsInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -27,7 +27,7 @@ class BlockForm extends EntityForm {
   /**
    * The block entity.
    *
-   * @var \Drupal\block\BlockInterface
+   * @var BlockInterface
    */
   protected $entity;
 
@@ -48,7 +48,7 @@ class BlockForm extends EntityForm {
   /**
    * The language manager service.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $language;
 
@@ -62,33 +62,33 @@ class BlockForm extends EntityForm {
   /**
    * The context repository service.
    *
-   * @var \Drupal\Core\Plugin\Context\ContextRepositoryInterface
+   * @var ContextRepositoryInterface
    */
   protected $contextRepository;
 
   /**
    * The plugin form manager.
    *
-   * @var \Drupal\Core\Plugin\PluginFormFactoryInterface
+   * @var PluginFormFactoryInterface
    */
   protected $pluginFormFactory;
 
   /**
    * Constructs a BlockForm object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Executable\ExecutableManagerInterface $manager
+   * @param ExecutableManagerInterface $manager
    *   The ConditionManager for building the visibility UI.
-   * @param \Drupal\Core\Plugin\Context\ContextRepositoryInterface $context_repository
+   * @param ContextRepositoryInterface $context_repository
    *   The lazy context repository service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language
+   * @param LanguageManagerInterface $language
    *   The language manager.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param ThemeHandlerInterface $theme_handler
    *   The theme handler.
-   * @param \Drupal\Core\Plugin\PluginFormFactoryInterface $plugin_form_manager
+   * @param PluginFormFactoryInterface $plugin_form_manager
    *   The plugin form manager.
-   * @param \Drupal\block\BlockRepositoryInterface $blockRepository
+   * @param BlockRepositoryInterface $blockRepository
    *   The block repository service.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, ExecutableManagerInterface $manager, ContextRepositoryInterface $context_repository, LanguageManagerInterface $language, ThemeHandlerInterface $theme_handler, PluginFormFactoryInterface $plugin_form_manager, protected BlockRepositoryInterface $blockRepository) {
@@ -210,7 +210,7 @@ class BlockForm extends EntityForm {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return array
@@ -310,7 +310,7 @@ class BlockForm extends EntityForm {
    *
    * @param array $form
    *   A nested array form elements comprising the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   protected function validateVisibility(array $form, FormStateInterface $form_state) {
@@ -367,7 +367,7 @@ class BlockForm extends EntityForm {
    *
    * @param array $form
    *   A nested array form elements comprising the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   protected function submitVisibility(array $form, FormStateInterface $form_state) {
@@ -385,7 +385,7 @@ class BlockForm extends EntityForm {
   /**
    * Generates a unique machine name for a block based on a suggested string.
    *
-   * @param \Drupal\block\BlockInterface $block
+   * @param BlockInterface $block
    *   The block entity.
    *
    * @return string
@@ -399,7 +399,7 @@ class BlockForm extends EntityForm {
   /**
    * Retrieves the plugin form for a given block and operation.
    *
-   * @param \Drupal\Core\Block\BlockPluginInterface $block
+   * @param BlockPluginInterface $block
    *   The block plugin.
    *
    * @return \Drupal\Core\Plugin\PluginFormInterface

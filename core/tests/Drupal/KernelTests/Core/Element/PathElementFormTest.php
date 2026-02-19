@@ -132,7 +132,7 @@ class PathElementFormTest extends KernelTestBase implements FormInterface {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {}
@@ -159,7 +159,7 @@ class PathElementFormTest extends KernelTestBase implements FormInterface {
       ['route_name' => 'entity.user.canonical', 'route_parameters' => ['user' => $this->testUser->id()]],
       $form_state->getValue('required_validate_route'),
     );
-    /** @var \Drupal\Core\Url $url */
+    /** @var Url $url */
     $url = $form_state->getValue('required_validate_url');
     $this->assertInstanceOf(Url::class, $url);
     $this->assertEquals('entity.user.canonical', $url->getRouteName());

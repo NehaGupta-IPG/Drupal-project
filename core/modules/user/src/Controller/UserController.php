@@ -27,52 +27,52 @@ class UserController extends ControllerBase {
   /**
    * The date formatter service.
    *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
+   * @var DateFormatterInterface
    */
   protected $dateFormatter;
 
   /**
    * The user storage.
    *
-   * @var \Drupal\user\UserStorageInterface
+   * @var UserStorageInterface
    */
   protected $userStorage;
 
   /**
    * The user data service.
    *
-   * @var \Drupal\user\UserDataInterface
+   * @var UserDataInterface
    */
   protected $userData;
 
   /**
    * A logger instance.
    *
-   * @var \Psr\Log\LoggerInterface
+   * @var LoggerInterface
    */
   protected $logger;
 
   /**
    * The flood service.
    *
-   * @var \Drupal\Core\Flood\FloodInterface
+   * @var FloodInterface
    */
   protected $flood;
 
   /**
    * Constructs a UserController object.
    *
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   * @param DateFormatterInterface $date_formatter
    *   The date formatter service.
-   * @param \Drupal\user\UserStorageInterface $user_storage
+   * @param UserStorageInterface $user_storage
    *   The user storage.
-   * @param \Drupal\user\UserDataInterface $user_data
+   * @param UserDataInterface $user_data
    *   The user data service.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   A logger instance.
-   * @param \Drupal\Core\Flood\FloodInterface $flood
+   * @param FloodInterface $flood
    *   The flood service.
-   * @param \Drupal\Component\Datetime\TimeInterface|null $time
+   * @param TimeInterface|null $time
    *   The time service.
    */
   public function __construct(
@@ -110,7 +110,7 @@ class UserController extends ControllerBase {
    * In order to never disclose a reset link via a referrer header this
    * controller must always return a redirect response.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    * @param int $uid
    *   User ID of the user requesting reset.
@@ -119,7 +119,7 @@ class UserController extends ControllerBase {
    * @param string $hash
    *   Login link hash.
    *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   * @return RedirectResponse
    *   The redirect response.
    */
   public function resetPass(Request $request, $uid, $timestamp, $hash) {
@@ -143,7 +143,7 @@ class UserController extends ControllerBase {
       }
       // A different user is already logged in on the computer.
       else {
-        /** @var \Drupal\user\UserInterface $reset_link_user */
+        /** @var UserInterface $reset_link_user */
         $reset_link_user = $this->userStorage->load($uid);
         if ($reset_link_user && $this->validatePathParameters($reset_link_user, $timestamp, $hash)) {
           $this->messenger()
@@ -162,7 +162,7 @@ class UserController extends ControllerBase {
       }
     }
 
-    /** @var \Drupal\user\UserInterface $reset_link_user */
+    /** @var UserInterface $reset_link_user */
     $reset_link_user = $this->userStorage->load($uid);
     if ($redirect = $this->determineErrorRedirect($reset_link_user, $timestamp, $hash)) {
       return $redirect;
@@ -180,15 +180,15 @@ class UserController extends ControllerBase {
   /**
    * Returns the user password reset form.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    * @param int $uid
    *   User ID of the user requesting reset.
    *
-   * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
+   * @return array|RedirectResponse
    *   The form structure or a redirect response.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   * @throws AccessDeniedHttpException
    *   If the pass_reset_timeout or pass_reset_hash are not available in the
    *   session. Or if $uid is for a blocked user or invalid user ID.
    */
@@ -205,7 +205,7 @@ class UserController extends ControllerBase {
       throw new AccessDeniedHttpException();
     }
 
-    /** @var \Drupal\user\UserInterface $user */
+    /** @var UserInterface $user */
     $user = $this->userStorage->load($uid);
     if ($user === NULL || !$user->isActive()) {
       // Blocked or invalid user ID, so deny access. The parameters will be in
@@ -229,19 +229,19 @@ class UserController extends ControllerBase {
    *   The current timestamp.
    * @param string $hash
    *   Login link hash.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   * @return RedirectResponse
    *   Returns a redirect to the user edit form if the information is correct.
    *   If the information is incorrect redirects to 'user.pass' route with a
    *   message for the user.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   * @throws AccessDeniedHttpException
    *   If $uid is for a blocked user or invalid user ID.
    */
   public function resetPassLogin($uid, $timestamp, $hash, Request $request) {
-    /** @var \Drupal\user\UserInterface $user */
+    /** @var UserInterface $user */
     $user = $this->userStorage->load($uid);
     if ($redirect = $this->determineErrorRedirect($user, $timestamp, $hash)) {
       return $redirect;
@@ -287,18 +287,18 @@ class UserController extends ControllerBase {
    * the same logic to check the user, timestamp and hash and redirect to the
    * same location with the same messages.
    *
-   * @param \Drupal\user\UserInterface|null $user
+   * @param UserInterface|null $user
    *   User requesting reset. NULL if the user does not exist.
    * @param int $timestamp
    *   The current timestamp.
    * @param string $hash
    *   Login link hash.
    *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse|null
+   * @return RedirectResponse|null
    *   Returns a redirect if the information is incorrect. It redirects to
    *   'user.pass' route with a message for the user.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   * @throws AccessDeniedHttpException
    *   If $uid is for a blocked user or invalid user ID.
    */
   protected function determineErrorRedirect(?UserInterface $user, int $timestamp, string $hash): ?RedirectResponse {
@@ -330,7 +330,7 @@ class UserController extends ControllerBase {
   /**
    * Validates hash and timestamp.
    *
-   * @param \Drupal\user\UserInterface $user
+   * @param UserInterface $user
    *   User requesting reset.
    * @param int $timestamp
    *   The timestamp.
@@ -355,7 +355,7 @@ class UserController extends ControllerBase {
    * This is enforced for the 'user.page' route with the '_user_is_logged_in'
    * requirement.
    *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   * @return RedirectResponse
    *   Returns a redirect to the profile of the currently logged in user.
    */
   public function userPage() {
@@ -368,7 +368,7 @@ class UserController extends ControllerBase {
    * This controller assumes that it is only invoked for authenticated users.
    * This is typically enforced with the '_user_is_logged_in' requirement.
    *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   * @return RedirectResponse
    *   Returns a redirect to the profile edit form of the currently logged in
    *   user.
    */
@@ -379,7 +379,7 @@ class UserController extends ControllerBase {
   /**
    * Route title callback.
    *
-   * @param \Drupal\user\UserInterface $user
+   * @param UserInterface $user
    *   The user account.
    *
    * @return string|array
@@ -393,7 +393,7 @@ class UserController extends ControllerBase {
   /**
    * Logs the current user out.
    *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   * @return RedirectResponse
    *   A redirection to home page.
    */
   public function logout() {
@@ -406,14 +406,14 @@ class UserController extends ControllerBase {
   /**
    * Confirms cancelling a user account via an email link.
    *
-   * @param \Drupal\user\UserInterface $user
+   * @param UserInterface $user
    *   The user account.
    * @param int $timestamp
    *   The timestamp.
    * @param string $hashed_pass
    *   The hashed password.
    *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   * @return RedirectResponse
    *   A redirect response.
    */
   public function confirmCancel(UserInterface $user, $timestamp = 0, $hashed_pass = '') {

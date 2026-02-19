@@ -2,13 +2,13 @@
 
 namespace Drupal\shortcut\Entity;
 
-use Drupal\Core\Entity\Attribute\ContentEntityType;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\link\LinkItemInterface;
 use Drupal\link\LinkTitleVisibility;
 use Drupal\shortcut\Form\ShortcutDeleteForm;
@@ -19,7 +19,7 @@ use Drupal\shortcut\ShortcutInterface;
 /**
  * Defines the shortcut entity class.
  *
- * @property \Drupal\link\LinkItemInterface $link
+ * @property LinkItemInterface $link
  */
 #[ContentEntityType(
   id: 'shortcut',
@@ -120,7 +120,7 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    /** @var \Drupal\Core\Field\BaseFieldDefinition[] $fields */
+    /** @var BaseFieldDefinition[] $fields */
     $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['id']->setDescription(t('The ID of the shortcut.'));
@@ -179,9 +179,9 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
    *
    * Callback for uasort().
    *
-   * @param \Drupal\shortcut\ShortcutInterface $a
+   * @param ShortcutInterface $a
    *   First item for comparison.
-   * @param \Drupal\shortcut\ShortcutInterface $b
+   * @param ShortcutInterface $b
    *   Second item for comparison.
    *
    * @return int

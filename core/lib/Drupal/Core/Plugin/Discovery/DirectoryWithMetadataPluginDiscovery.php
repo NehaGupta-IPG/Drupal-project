@@ -19,7 +19,7 @@ class DirectoryWithMetadataPluginDiscovery extends YamlDiscovery {
    * @param string $file_cache_key_suffix
    *   The file cache key suffix. This should be unique for each type of
    *   discovery.
-   * @param \Drupal\Core\File\FileSystemInterface|null $file_system
+   * @param FileSystemInterface|null $file_system
    *   The file system service.
    */
   public function __construct(array $directories, $file_cache_key_suffix, ?FileSystemInterface $file_system = NULL) {

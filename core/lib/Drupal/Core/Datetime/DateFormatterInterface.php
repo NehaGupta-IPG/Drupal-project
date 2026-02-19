@@ -105,7 +105,7 @@ interface DateFormatterInterface {
    *   - return_as_object: A Boolean value whether to return a FormattedDateDiff
    *     object.
    *
-   * @return string|\Drupal\Core\Datetime\FormattedDateDiff
+   * @return string|FormattedDateDiff
    *   A translated string representation of the difference between the given
    *   timestamp and the current request time. This interval is always positive.
    *
@@ -135,7 +135,7 @@ interface DateFormatterInterface {
    *   - return_as_object: A Boolean value whether to return a FormattedDateDiff
    *     object.
    *
-   * @return string|\Drupal\Core\Datetime\FormattedDateDiff
+   * @return string|FormattedDateDiff
    *   A translated string representation of the difference between the given
    *   timestamp and the current request time. This interval is always positive.
    *
@@ -166,7 +166,7 @@ interface DateFormatterInterface {
    *   - return_as_object: A Boolean value whether to return a FormattedDateDiff
    *     object.
    *
-   * @return string|\Drupal\Core\Datetime\FormattedDateDiff
+   * @return string|FormattedDateDiff
    *   A translated string representation of the interval. This interval is
    *   always positive.
    *

@@ -3,10 +3,10 @@
 namespace Drupal\migrate\Plugin\migrate\process;
 
 use Drupal\migrate\Attribute\MigrateProcess;
-use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\MigrateExecutableInterface;
-use Drupal\migrate\Row;
 use Drupal\migrate\MigrateSkipRowException;
+use Drupal\migrate\ProcessPluginBase;
+use Drupal\migrate\Row;
 
 /**
  * Skips processing the current row when the input value is empty.
@@ -83,9 +83,9 @@ class SkipOnEmpty extends ProcessPluginBase {
    *
    * @param mixed $value
    *   The input value.
-   * @param \Drupal\migrate\MigrateExecutableInterface $migrate_executable
+   * @param MigrateExecutableInterface $migrate_executable
    *   The migration in which this process is being executed.
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The row from the source to process.
    * @param string $destination_property
    *   The destination property currently worked on. This is only used together
@@ -94,7 +94,7 @@ class SkipOnEmpty extends ProcessPluginBase {
    * @return mixed
    *   The input value, $value, if it is not empty.
    *
-   * @throws \Drupal\migrate\MigrateSkipRowException
+   * @throws MigrateSkipRowException
    *   Thrown if the source property is not set and the row should be skipped,
    *   records with STATUS_IGNORED status in the map.
    */
@@ -111,9 +111,9 @@ class SkipOnEmpty extends ProcessPluginBase {
    *
    * @param mixed $value
    *   The input value.
-   * @param \Drupal\migrate\MigrateExecutableInterface $migrate_executable
+   * @param MigrateExecutableInterface $migrate_executable
    *   The migration in which this process is being executed.
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The row from the source to process.
    * @param string $destination_property
    *   The destination property currently worked on. This is only used together

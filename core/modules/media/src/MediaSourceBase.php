@@ -3,6 +3,7 @@
 namespace Drupal\media;
 
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
@@ -10,9 +11,8 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Plugin\PluginBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\PluginBase;
 
 /**
  * Base implementation of media source plugin.
@@ -29,28 +29,28 @@ abstract class MediaSourceBase extends PluginBase implements MediaSourceInterfac
   /**
    * The entity type manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity field manager service.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 
   /**
    * The field type plugin manager service.
    *
-   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface
+   * @var FieldTypePluginManagerInterface
    */
   protected $fieldTypeManager;
 
   /**
    * The config factory service.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
@@ -63,13 +63,13 @@ abstract class MediaSourceBase extends PluginBase implements MediaSourceInterfac
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   Entity type manager service.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @param EntityFieldManagerInterface $entity_field_manager
    *   Entity field manager service.
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager
+   * @param FieldTypePluginManagerInterface $field_type_manager
    *   The field type plugin manager service.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, FieldTypePluginManagerInterface $field_type_manager, ConfigFactoryInterface $config_factory) {

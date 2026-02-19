@@ -25,56 +25,56 @@ class MailManagerTest extends UnitTestCase {
   /**
    * The cache backend to use.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Cache\CacheBackendInterface|MockObject
    */
   protected $cache;
 
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface|MockObject
    */
   protected $moduleHandler;
 
   /**
    * The configuration factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Config\ConfigFactoryInterface|MockObject
    */
   protected $configFactory;
 
   /**
    * The plugin discovery.
    *
-   * @var \Drupal\Component\Plugin\Discovery\DiscoveryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var DiscoveryInterface|MockObject
    */
   protected $discovery;
 
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var RendererInterface|MockObject
    */
   protected $renderer;
 
   /**
    * The mail manager under test.
    *
-   * @var \Drupal\Tests\Core\Mail\TestMailManager
+   * @var TestMailManager
    */
   protected $mailManager;
 
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack|\Prophecy\Prophecy\ProphecyInterface
+   * @var RequestStack|ProphecyInterface
    */
   protected $requestStack;
 
   /**
    * The current request.
    *
-   * @var \Symfony\Component\HttpFoundation\Request
+   * @var Request
    */
   protected $request;
 
@@ -202,7 +202,7 @@ class TestMailManager extends MailManager {
   /**
    * Sets the discovery for the manager.
    *
-   * @param \Drupal\Component\Plugin\Discovery\DiscoveryInterface $discovery
+   * @param DiscoveryInterface $discovery
    *   The discovery object.
    */
   public function setDiscovery(DiscoveryInterface $discovery): void {

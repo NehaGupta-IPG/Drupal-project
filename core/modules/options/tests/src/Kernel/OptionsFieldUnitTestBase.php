@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\options\Kernel;
 
 use Drupal\field\Entity\FieldConfig;
-use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 
 /**
  * Base class for Options module integration tests.
@@ -35,14 +35,14 @@ abstract class OptionsFieldUnitTestBase extends FieldKernelTestBase {
   /**
    * The list field storage used in the test.
    *
-   * @var \Drupal\field\Entity\FieldStorageConfig
+   * @var FieldStorageConfig
    */
   protected $fieldStorage;
 
   /**
    * The list field used in the test.
    *
-   * @var \Drupal\field\Entity\FieldConfig
+   * @var FieldConfig
    */
   protected $field;
 

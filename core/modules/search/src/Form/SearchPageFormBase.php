@@ -30,14 +30,14 @@ abstract class SearchPageFormBase extends EntityForm {
   /**
    * The search page repository.
    *
-   * @var \Drupal\search\SearchPageRepositoryInterface
+   * @var SearchPageRepositoryInterface
    */
   protected $searchPageRepository;
 
   /**
    * Constructs a new search form.
    *
-   * @param \Drupal\search\SearchPageRepositoryInterface $search_page_repository
+   * @param SearchPageRepositoryInterface $search_page_repository
    *   The search page repository.
    */
   public function __construct(SearchPageRepositoryInterface $search_page_repository) {

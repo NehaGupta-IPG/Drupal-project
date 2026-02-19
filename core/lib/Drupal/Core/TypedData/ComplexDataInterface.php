@@ -23,7 +23,7 @@ interface ComplexDataInterface extends TraversableTypedDataInterface {
   /**
    * Gets the data definition.
    *
-   * @return \Drupal\Core\TypedData\ComplexDataDefinitionInterface
+   * @return ComplexDataDefinitionInterface
    *   The data definition object describing the complex data.
    */
   public function getDataDefinition();
@@ -34,12 +34,12 @@ interface ComplexDataInterface extends TraversableTypedDataInterface {
    * @param string $property_name
    *   The name of the property to get; e.g., 'title' or 'name'.
    *
-   * @return \Drupal\Core\TypedData\TypedDataInterface
+   * @return TypedDataInterface
    *   The property object.
    *
    * @throws \InvalidArgumentException
    *   If an invalid property name is given.
-   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+   * @throws MissingDataException
    *   If the complex data structure is unset and no property can be created.
    */
   public function get($property_name);
@@ -60,7 +60,7 @@ interface ComplexDataInterface extends TraversableTypedDataInterface {
    *
    * @throws \InvalidArgumentException
    *   If the specified property does not exist.
-   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+   * @throws MissingDataException
    *   If the complex data structure is unset and no property can be set.
    */
   public function set($property_name, $value, $notify = TRUE);
@@ -71,11 +71,11 @@ interface ComplexDataInterface extends TraversableTypedDataInterface {
    * @param bool $include_computed
    *   If set to TRUE, computed properties are included. Defaults to FALSE.
    *
-   * @return \Drupal\Core\TypedData\TypedDataInterface[]
+   * @return TypedDataInterface[]
    *   An array of property objects implementing the TypedDataInterface, keyed
    *   by property name.
    *
-   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+   * @throws MissingDataException
    *   If the complex data structure is unset and no property can be created.
    */
   public function getProperties($include_computed = FALSE);
@@ -89,7 +89,7 @@ interface ComplexDataInterface extends TraversableTypedDataInterface {
    * @return array
    *   An array of property values, keyed by property name.
    *
-   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+   * @throws MissingDataException
    *   If the complex data structure is unset and no property can be created.
    */
   public function toArray();

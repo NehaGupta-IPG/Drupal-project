@@ -44,7 +44,7 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
   /**
    * A secondary server instance, to serve XML metadata about available updates.
    *
-   * @var \Symfony\Component\Process\Process
+   * @var Process
    */
   private Process $metadataServer;
 

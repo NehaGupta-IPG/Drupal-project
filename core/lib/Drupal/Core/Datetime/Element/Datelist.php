@@ -174,7 +174,7 @@ class Datelist extends DateElementBase {
    *
    * @param array $element
    *   The form element whose value is being processed.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array $complete_form
    *   The complete form structure.
@@ -287,7 +287,7 @@ class Datelist extends DateElementBase {
    *
    * @param array $element
    *   The element being processed.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array $complete_form
    *   The complete form structure.
@@ -362,7 +362,7 @@ class Datelist extends DateElementBase {
    * @param int $increment
    *   The value to round to.
    *
-   * @return \Drupal\Core\Datetime\DrupalDateTime
+   * @return DrupalDateTime
    *   The Drupal date time object with the minutes and seconds rounded when the
    *   input date is a DrupalDateTime instance. Otherwise the date is returned
    *   unchanged.

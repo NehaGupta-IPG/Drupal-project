@@ -12,14 +12,14 @@ class SelectExtender implements SelectInterface {
   /**
    * The Select query object we are extending/decorating.
    *
-   * @var \Drupal\Core\Database\Query\SelectInterface
+   * @var SelectInterface
    */
   protected $query;
 
   /**
    * The connection object on which to run this query.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 

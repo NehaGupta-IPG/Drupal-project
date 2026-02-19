@@ -20,15 +20,15 @@ class MenuRouterRebuildSubscriber implements EventSubscriberInterface {
   /**
    * Constructs the MenuRouterRebuildSubscriber object.
    *
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
+   * @param LockBackendInterface $lock
    *   The lock backend.
-   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menuLinkManager
+   * @param MenuLinkManagerInterface $menuLinkManager
    *   The menu link plugin manager.
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection.
-   * @param \Drupal\Core\Database\ReplicaKillSwitch $replicaKillSwitch
+   * @param ReplicaKillSwitch $replicaKillSwitch
    *   The replica kill switch.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   The logger.
    */
   public function __construct(
@@ -43,7 +43,7 @@ class MenuRouterRebuildSubscriber implements EventSubscriberInterface {
   /**
    * Rebuilds the menu links and deletes the local_task cache tag.
    *
-   * @param \Drupal\Component\EventDispatcher\Event $event
+   * @param Event $event
    *   The event object.
    */
   public function onRouterRebuild($event) {

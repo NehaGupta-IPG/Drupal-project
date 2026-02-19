@@ -32,14 +32,14 @@ class TimestampAgoFormatter extends FormatterBase {
   /**
    * The date formatter service.
    *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
+   * @var DateFormatterInterface
    */
   protected $dateFormatter;
 
   /**
    * The current Request object.
    *
-   * @var \Symfony\Component\HttpFoundation\Request
+   * @var Request
    */
   protected $request;
 
@@ -50,7 +50,7 @@ class TimestampAgoFormatter extends FormatterBase {
    *   The plugin ID for the formatter.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The definition of the field to which the formatter is associated.
    * @param array $settings
    *   The formatter settings.
@@ -60,9 +60,9 @@ class TimestampAgoFormatter extends FormatterBase {
    *   The view mode.
    * @param array $third_party_settings
    *   Any third party settings.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   * @param DateFormatterInterface $date_formatter
    *   The date formatter service.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, DateFormatterInterface $date_formatter, Request $request) {

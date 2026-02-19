@@ -14,11 +14,11 @@ interface JoinPluginInterface {
    *
    * When possible, try to use table alias instead of table names.
    *
-   * @param \Drupal\Core\Database\Query\Select $select_query
+   * @param Select $select_query
    *   A select query object.
    * @param string $table
    *   The base table to join.
-   * @param \Drupal\views\Plugin\views\query\QueryPluginBase $view_query
+   * @param QueryPluginBase $view_query
    *   The source views query.
    */
   public function buildJoin($select_query, $table, $view_query);

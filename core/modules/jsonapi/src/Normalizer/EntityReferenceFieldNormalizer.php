@@ -60,9 +60,9 @@ class EntityReferenceFieldNormalizer extends FieldNormalizer {
   /**
    * Gets the links for the relationship.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceObject $relationship_context
+   * @param ResourceObject $relationship_context
    *   The JSON:API resource object context of the relationship.
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeRelationship $resource_relationship
+   * @param ResourceTypeRelationship $resource_relationship
    *   The resource type relationship field.
    *
    * @return array
@@ -95,7 +95,7 @@ class EntityReferenceFieldNormalizer extends FieldNormalizer {
   /**
    * Determines if a given list of resource types contains a non-internal type.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType[] $resource_types
+   * @param ResourceType[] $resource_types
    *   The JSON:API resource types to evaluate.
    *
    * @return bool

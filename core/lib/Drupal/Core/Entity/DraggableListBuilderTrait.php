@@ -22,7 +22,7 @@ trait DraggableListBuilderTrait {
   /**
    * The entities being listed.
    *
-   * @var \Drupal\Core\Entity\EntityInterface[]
+   * @var EntityInterface[]
    */
   protected $entities = [];
 
@@ -43,7 +43,7 @@ trait DraggableListBuilderTrait {
   /**
    * Gets the weight of the given entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to get the weight for.
    *
    * @return int|float
@@ -54,7 +54,7 @@ trait DraggableListBuilderTrait {
   /**
    * Sets the weight of an entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity whose weight will be set.
    * @param int|float $weight
    *   The weight to set on the entity.
@@ -82,7 +82,7 @@ trait DraggableListBuilderTrait {
   /**
    * Builds a row for an entity in the entity listing.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity for this row of the list.
    *
    * @return array
@@ -128,7 +128,7 @@ trait DraggableListBuilderTrait {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return array
@@ -185,7 +185,7 @@ trait DraggableListBuilderTrait {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @see \Drupal\Core\Form\FormInterface::validateForm())
@@ -199,12 +199,12 @@ trait DraggableListBuilderTrait {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @see \Drupal\Core\Form\FormInterface::submitForm()
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   If there is a failure when saving the entity.
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {

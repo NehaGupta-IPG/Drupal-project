@@ -17,7 +17,7 @@ class FormTestEventSubscriber implements EventSubscriberInterface {
   /**
    * Adds custom attributes to the request object.
    *
-   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
+   * @param RequestEvent $event
    *   The kernel request event.
    */
   public function onKernelRequest(RequestEvent $event) {
@@ -29,7 +29,7 @@ class FormTestEventSubscriber implements EventSubscriberInterface {
   /**
    * Adds custom headers to the response.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
+   * @param ResponseEvent $event
    *   The kernel response event.
    */
   public function onKernelResponse(ResponseEvent $event) {

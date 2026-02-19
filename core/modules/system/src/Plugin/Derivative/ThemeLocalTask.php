@@ -15,14 +15,14 @@ class ThemeLocalTask extends DeriverBase implements ContainerDeriverInterface {
   /**
    * The theme handler.
    *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
+   * @var ThemeHandlerInterface
    */
   protected $themeHandler;
 
   /**
    * Constructs a new ThemeLocalTask instance.
    *
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param ThemeHandlerInterface $theme_handler
    *   The theme handler.
    */
   public function __construct(ThemeHandlerInterface $theme_handler) {

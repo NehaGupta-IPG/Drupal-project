@@ -28,9 +28,9 @@ class FilesystemLoader extends TwigFilesystemLoader {
    *
    * @param string|array $paths
    *   A path or an array of paths to check for templates.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler service.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param ThemeHandlerInterface $theme_handler
    *   The theme handler service.
    * @param mixed[] $twig_config
    *   Twig configuration from the service container.

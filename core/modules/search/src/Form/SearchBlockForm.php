@@ -21,32 +21,32 @@ class SearchBlockForm extends FormBase implements WorkspaceSafeFormInterface {
   /**
    * The search page repository.
    *
-   * @var \Drupal\search\SearchPageRepositoryInterface
+   * @var SearchPageRepositoryInterface
    */
   protected $searchPageRepository;
 
   /**
    * The config factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * Constructs a new SearchBlockForm.
    *
-   * @param \Drupal\search\SearchPageRepositoryInterface $search_page_repository
+   * @param SearchPageRepositoryInterface $search_page_repository
    *   The search page repository.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
    */
   public function __construct(SearchPageRepositoryInterface $search_page_repository, ConfigFactoryInterface $config_factory, RendererInterface $renderer) {

@@ -33,7 +33,7 @@ abstract class ArgumentDefaultPluginBase extends PluginBase {
   /**
    * The argument handler instance associated with this plugin.
    *
-   * @var \Drupal\views\Plugin\views\argument\ArgumentPluginBase
+   * @var ArgumentPluginBase
    */
   protected $argument;
 
@@ -54,7 +54,7 @@ abstract class ArgumentDefaultPluginBase extends PluginBase {
   /**
    * Sets the parent argument this plugin is associated with.
    *
-   * @param \Drupal\views\Plugin\views\argument\ArgumentPluginBase $argument
+   * @param ArgumentPluginBase $argument
    *   The parent argument to set.
    */
   public function setArgument(ArgumentPluginBase $argument) {

@@ -115,7 +115,7 @@ class FileUploadResource extends ResourceBase {
   /**
    * Creates a file from an endpoint.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    * @param string $entity_type_id
    *   The entity type ID.
@@ -125,10 +125,10 @@ class FileUploadResource extends ResourceBase {
    * @param string $field_name
    *   The field name.
    *
-   * @return \Drupal\rest\ModifiedResourceResponse
+   * @return ModifiedResourceResponse
    *   A 201 response, on success.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+   * @throws HttpException
    *   Thrown when temporary files cannot be written, a lock cannot be acquired,
    *   or when temporary files cannot be moved to their new location.
    */
@@ -209,9 +209,9 @@ class FileUploadResource extends ResourceBase {
    * @return \Drupal\Core\Field\FieldDefinitionInterface
    *   The field definition.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws BadRequestHttpException
    *   Thrown when the field does not exist.
-   * @throws \Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException
+   * @throws AccessDeniedException
    *   Thrown when the target type of the field is not a file, or the current
    *   user does not have 'edit' access for the field.
    */

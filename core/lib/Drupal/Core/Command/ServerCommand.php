@@ -83,7 +83,7 @@ class ServerCommand extends Command {
   /**
    * Boots up a Drupal environment.
    *
-   * @return \Drupal\Core\DrupalKernelInterface
+   * @return DrupalKernelInterface
    *   The Drupal kernel.
    *
    * @throws \Exception
@@ -135,7 +135,7 @@ class ServerCommand extends Command {
    *
    * @param string $url
    *   The URL to browser to.
-   * @param \Symfony\Component\Console\Style\SymfonyStyle $io
+   * @param SymfonyStyle $io
    *   The IO.
    */
   protected function openBrowser($url, SymfonyStyle $io) {
@@ -197,11 +197,11 @@ class ServerCommand extends Command {
    *   The hostname of the webserver.
    * @param int $port
    *   The port to start the webserver on.
-   * @param \Drupal\Core\DrupalKernelInterface $kernel
+   * @param DrupalKernelInterface $kernel
    *   The Drupal kernel.
-   * @param \Symfony\Component\Console\Input\InputInterface $input
+   * @param InputInterface $input
    *   The input.
-   * @param \Symfony\Component\Console\Style\SymfonyStyle $io
+   * @param SymfonyStyle $io
    *   The IO.
    *
    * @return int

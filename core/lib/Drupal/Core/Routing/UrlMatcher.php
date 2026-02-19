@@ -4,9 +4,9 @@ namespace Drupal\Core\Routing;
 
 use Drupal\Core\Path\CurrentPathStack;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Matcher\UrlMatcher as BaseUrlMatcher;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\Matcher\UrlMatcher as BaseUrlMatcher;
 
 /**
  * Drupal-specific URL Matcher; handles the Drupal "system path" mapping.
@@ -16,7 +16,7 @@ class UrlMatcher extends BaseUrlMatcher {
   /**
    * The current path.
    *
-   * @var \Drupal\Core\Path\CurrentPathStack
+   * @var CurrentPathStack
    */
   protected $currentPath;
 
@@ -26,7 +26,7 @@ class UrlMatcher extends BaseUrlMatcher {
    * The parent class has a constructor we need to skip, so just override it
    * with a no-op.
    *
-   * @param \Drupal\Core\Path\CurrentPathStack $current_path
+   * @param CurrentPathStack $current_path
    *   The current path.
    */
   public function __construct(CurrentPathStack $current_path) {

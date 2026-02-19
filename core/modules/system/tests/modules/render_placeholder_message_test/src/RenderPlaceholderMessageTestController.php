@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Drupal\render_placeholder_message_test;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
-use Drupal\Core\Render\RenderContext;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -18,7 +18,7 @@ class RenderPlaceholderMessageTestController implements TrustedCallbackInterface
   /**
    * Constructs a new RenderPlaceholderMessageTestController object.
    *
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer service.
    */
   public function __construct(protected RendererInterface $renderer) {

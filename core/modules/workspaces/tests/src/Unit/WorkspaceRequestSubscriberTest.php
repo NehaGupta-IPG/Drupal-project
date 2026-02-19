@@ -24,7 +24,7 @@ class WorkspaceRequestSubscriberTest extends UnitTestCase {
   /**
    * The workspace manager.
    *
-   * @var \Drupal\workspaces\WorkspaceManagerInterface
+   * @var WorkspaceManagerInterface
    */
   protected $workspaceManager;
 

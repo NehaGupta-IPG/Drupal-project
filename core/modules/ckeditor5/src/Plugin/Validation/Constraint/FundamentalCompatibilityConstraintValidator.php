@@ -49,7 +49,7 @@ class FundamentalCompatibilityConstraintValidator extends ConstraintValidator im
   /**
    * {@inheritdoc}
    *
-   * @throws \Symfony\Component\Validator\Exception\UnexpectedTypeException
+   * @throws UnexpectedTypeException
    *   Thrown when the given constraint is not supported by this validator.
    */
   public function validate($toolbar_item, Constraint $constraint): void {
@@ -84,14 +84,14 @@ class FundamentalCompatibilityConstraintValidator extends ConstraintValidator im
    *
    * Two TYPE_MARKUP_LANGUAGE filters are exempted:
    * - filter_autop: pointless but harmless to have enabled
-   * - filter_url: not recommended but also harmless to have enabled
+   * - filter_url: not recommended but also harmless to have enabled.
    *
    * These two commonly enabled filters with a long history in Drupal are
    * considered to be acceptable to have enabled.
    *
-   * @param \Drupal\filter\FilterFormatInterface $text_format
+   * @param FilterFormatInterface $text_format
    *   The text format to validate.
-   * @param \Drupal\ckeditor5\Plugin\Validation\Constraint\FundamentalCompatibilityConstraint $constraint
+   * @param FundamentalCompatibilityConstraint $constraint
    *   The constraint to validate.
    */
   private function checkNoMarkupFilters(FilterFormatInterface $text_format, FundamentalCompatibilityConstraint $constraint): void {
@@ -113,9 +113,9 @@ class FundamentalCompatibilityConstraintValidator extends ConstraintValidator im
   /**
    * Checks that fundamental CKEditor 5 plugins' HTML tags are allowed.
    *
-   * @param \Drupal\filter\FilterFormatInterface $text_format
+   * @param FilterFormatInterface $text_format
    *   The text format to validate.
-   * @param \Drupal\ckeditor5\Plugin\Validation\Constraint\FundamentalCompatibilityConstraint $constraint
+   * @param FundamentalCompatibilityConstraint $constraint
    *   The constraint to validate.
    */
   private function checkHtmlRestrictionsAreCompatible(FilterFormatInterface $text_format, FundamentalCompatibilityConstraint $constraint): void {
@@ -137,9 +137,9 @@ class FundamentalCompatibilityConstraintValidator extends ConstraintValidator im
   /**
    * Checks the HTML restrictions match the enabled CKEditor 5 plugins' output.
    *
-   * @param \Drupal\editor\EditorInterface $text_editor
+   * @param EditorInterface $text_editor
    *   The text editor to validate.
-   * @param \Drupal\ckeditor5\Plugin\Validation\Constraint\FundamentalCompatibilityConstraint $constraint
+   * @param FundamentalCompatibilityConstraint $constraint
    *   The constraint to validate.
    */
   private function checkHtmlRestrictionsMatch(EditorInterface $text_editor, FundamentalCompatibilityConstraint $constraint): void {
@@ -178,9 +178,9 @@ class FundamentalCompatibilityConstraintValidator extends ConstraintValidator im
   /**
    * Checks all HTML tags supported by enabled CKEditor 5 plugins are creatable.
    *
-   * @param \Drupal\editor\EditorInterface $text_editor
+   * @param EditorInterface $text_editor
    *   The text editor to validate.
-   * @param \Drupal\ckeditor5\Plugin\Validation\Constraint\FundamentalCompatibilityConstraint $constraint
+   * @param FundamentalCompatibilityConstraint $constraint
    *   The constraint to validate.
    */
   private function checkAllHtmlTagsAreCreatable(EditorInterface $text_editor, FundamentalCompatibilityConstraint $constraint): void {
@@ -247,7 +247,7 @@ class FundamentalCompatibilityConstraintValidator extends ConstraintValidator im
   /**
    * Gets the filters of the given type in this text format.
    *
-   * @param \Drupal\filter\FilterFormatInterface $text_format
+   * @param FilterFormatInterface $text_format
    *   A text format whose filters to get.
    * @param int $filter_type
    *   One of FilterInterface::TYPE_*.
@@ -256,7 +256,7 @@ class FundamentalCompatibilityConstraintValidator extends ConstraintValidator im
    *   conditions to be met. Must return TRUE when it meets the conditions,
    *   FALSE otherwise.
    *
-   * @return iterable|\Drupal\filter\Plugin\FilterInterface[]
+   * @return iterable|FilterInterface[]
    *   An iterable of matched filter plugins.
    */
   private static function getFiltersInFormatOfType(FilterFormatInterface $text_format, int $filter_type, ?callable $extra_requirements = NULL): iterable {
@@ -276,12 +276,12 @@ class FundamentalCompatibilityConstraintValidator extends ConstraintValidator im
   /**
    * Analyzes a text format to find the filter not allowing required tags.
    *
-   * @param \Drupal\filter\FilterFormatInterface $text_format
+   * @param FilterFormatInterface $text_format
    *   A text format whose filters to check for compatibility.
-   * @param \Drupal\ckeditor5\HTMLRestrictions $required
+   * @param HTMLRestrictions $required
    *   A set of HTML restrictions, listing required HTML tags.
    *
-   * @return \Drupal\filter\Plugin\FilterInterface
+   * @return FilterInterface
    *   The filter plugin instance not allowing the required tags.
    *
    * @throws \InvalidArgumentException

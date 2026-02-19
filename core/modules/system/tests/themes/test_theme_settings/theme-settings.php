@@ -15,7 +15,7 @@ use Drupal\file\Entity\File;
  * Implements hook_form_system_theme_settings_alter().
  */
 function test_theme_settings_form_system_theme_settings_alter(&$form, FormStateInterface $form_state): void {
-  /** @var \Drupal\Core\Extension\ThemeSettingsProvider $theme_settings_provider */
+  /** @var ThemeSettingsProvider $theme_settings_provider */
   $theme_settings_provider = \Drupal::service(ThemeSettingsProvider::class);
   $form['custom_logo'] = [
     '#type' => 'managed_file',

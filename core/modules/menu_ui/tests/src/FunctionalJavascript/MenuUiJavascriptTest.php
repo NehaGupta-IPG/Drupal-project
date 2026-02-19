@@ -73,7 +73,7 @@ class MenuUiJavascriptTest extends WebDriverTestBase {
   /**
    * Creates a custom menu.
    *
-   * @return \Drupal\system\Entity\Menu
+   * @return Menu
    *   The custom menu that has been created.
    */
   protected function addCustomMenu() {

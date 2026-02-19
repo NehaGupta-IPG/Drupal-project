@@ -4,9 +4,9 @@ namespace Drupal\Core\EventSubscriber;
 
 use Drupal\Core\Render\HtmlResponse;
 use Drupal\Core\Render\Placeholder\PlaceholderStrategyInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * HTML response subscriber to allow for different placeholder strategies.
@@ -22,14 +22,14 @@ class HtmlResponsePlaceholderStrategySubscriber implements EventSubscriberInterf
   /**
    * The placeholder strategy to use.
    *
-   * @var \Drupal\Core\Render\Placeholder\PlaceholderStrategyInterface
+   * @var PlaceholderStrategyInterface
    */
   protected $placeholderStrategy;
 
   /**
    * Constructs a HtmlResponsePlaceholderStrategySubscriber object.
    *
-   * @param \Drupal\Core\Render\Placeholder\PlaceholderStrategyInterface $placeholder_strategy
+   * @param PlaceholderStrategyInterface $placeholder_strategy
    *   The placeholder strategy to use.
    */
   public function __construct(PlaceholderStrategyInterface $placeholder_strategy) {
@@ -39,7 +39,7 @@ class HtmlResponsePlaceholderStrategySubscriber implements EventSubscriberInterf
   /**
    * Processes placeholders for HTML responses.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
+   * @param ResponseEvent $event
    *   The event to process.
    */
   public function onRespond(ResponseEvent $event) {

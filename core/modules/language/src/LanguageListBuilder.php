@@ -27,21 +27,21 @@ class LanguageListBuilder extends DraggableListBuilder {
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The configuration factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * The messenger.
    *
-   * @var \Drupal\Core\Messenger\MessengerInterface
+   * @var MessengerInterface
    */
   protected $messenger;
 
@@ -61,15 +61,15 @@ class LanguageListBuilder extends DraggableListBuilder {
   /**
    * Constructs a new LanguageListBuilder object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The entity storage handler class.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger.
    */
   public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, LanguageManagerInterface $language_manager, ConfigFactoryInterface $config_factory, MessengerInterface $messenger) {

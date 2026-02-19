@@ -22,11 +22,11 @@ class ContentTranslationController extends ControllerBase {
   /**
    * Initializes a content translation controller.
    *
-   * @param \Drupal\content_translation\ContentTranslationManagerInterface $manager
+   * @param ContentTranslationManagerInterface $manager
    *   A content translation manager instance.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
+   * @param EntityFieldManagerInterface $entityFieldManager
    *   The entity field manager service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct(
@@ -39,11 +39,11 @@ class ContentTranslationController extends ControllerBase {
   /**
    * Populates target values with the source values.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity being translated.
-   * @param \Drupal\Core\Language\LanguageInterface $source
+   * @param LanguageInterface $source
    *   The language to be used as source.
-   * @param \Drupal\Core\Language\LanguageInterface $target
+   * @param LanguageInterface $target
    *   The language to be used as target.
    */
   public function prepareTranslation(ContentEntityInterface $entity, LanguageInterface $source, LanguageInterface $target) {
@@ -55,7 +55,7 @@ class ContentTranslationController extends ControllerBase {
     // additional draft translations that don't exist in the default revision.
     // Add those translations too so that they aren't deleted when the new
     // translation is saved.
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $default_revision */
+    /** @var ContentEntityInterface $default_revision */
     $default_revision = $storage->load($entity->id());
     // Check the entity isn't missing any translations.
     $languages = $this->languageManager()->getLanguages();
@@ -75,7 +75,7 @@ class ContentTranslationController extends ControllerBase {
         }
       }
     }
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $source_translation */
+    /** @var ContentEntityInterface $source_translation */
     $source_translation = $entity->getTranslation($source_langcode);
     $target_translation = $entity->addTranslation($target->getId(), $source_translation->toArray());
 
@@ -98,7 +98,7 @@ class ContentTranslationController extends ControllerBase {
   /**
    * Builds the translations overview page.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
    * @param string $entity_type_id
    *   (optional) The entity type ID.
@@ -107,7 +107,7 @@ class ContentTranslationController extends ControllerBase {
    *   Array of page elements to render.
    */
   public function overview(RouteMatchInterface $route_match, $entity_type_id = NULL) {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     $entity = $route_match->getParameter($entity_type_id);
     $account = $this->currentUser();
     $handler = $this->entityTypeManager()->getHandler($entity_type_id, 'translation');
@@ -159,7 +159,7 @@ class ContentTranslationController extends ControllerBase {
           $entity = $default_revision;
           $latest_revision_id = $storage->getLatestTranslationAffectedRevisionId($entity->id(), $langcode);
           if ($latest_revision_id) {
-            /** @var \Drupal\Core\Entity\ContentEntityInterface $latest_revision */
+            /** @var ContentEntityInterface $latest_revision */
             $latest_revision = $storage->loadRevision($latest_revision_id);
             // Make sure we do not list removed translations, i.e. translations
             // that have been part of a default revision but no longer are.
@@ -351,13 +351,13 @@ class ContentTranslationController extends ControllerBase {
   /**
    * Builds an add translation page.
    *
-   * @param \Drupal\Core\Language\LanguageInterface $source
+   * @param LanguageInterface $source
    *   The language of the values being translated. Defaults to the entity
    *   language.
-   * @param \Drupal\Core\Language\LanguageInterface $target
+   * @param LanguageInterface $target
    *   The language of the translated values. Defaults to the current content
    *   language.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match object from which to extract the entity type.
    * @param string $entity_type_id
    *   (optional) The entity type ID.
@@ -366,7 +366,7 @@ class ContentTranslationController extends ControllerBase {
    *   A processed form array ready to be rendered.
    */
   public function add(LanguageInterface $source, LanguageInterface $target, RouteMatchInterface $route_match, $entity_type_id = NULL) {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     $entity = $route_match->getParameter($entity_type_id);
 
     // In case of a pending revision, make sure we load the latest
@@ -406,10 +406,10 @@ class ContentTranslationController extends ControllerBase {
   /**
    * Builds the edit translation page.
    *
-   * @param \Drupal\Core\Language\LanguageInterface $language
+   * @param LanguageInterface $language
    *   The language of the translated values. Defaults to the current content
    *   language.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match object from which to extract the entity type.
    * @param string $entity_type_id
    *   (optional) The entity type ID.

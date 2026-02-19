@@ -18,7 +18,7 @@ class MenuLinkListBuilder extends EntityListBuilder {
   /**
    * The redirect destination.
    *
-   * @var \Drupal\Core\Routing\RedirectDestinationInterface
+   * @var RedirectDestinationInterface
    */
   protected $redirectDestination;
 
@@ -36,11 +36,11 @@ class MenuLinkListBuilder extends EntityListBuilder {
   /**
    * Constructs a new instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The entity storage class.
-   * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirect_destination
+   * @param RedirectDestinationInterface $redirect_destination
    *   The redirect destination.
    */
   public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, RedirectDestinationInterface $redirect_destination) {

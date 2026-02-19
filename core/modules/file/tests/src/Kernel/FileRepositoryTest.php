@@ -27,7 +27,7 @@ class FileRepositoryTest extends FileManagedUnitTestBase {
   /**
    * The file repository service under test.
    *
-   * @var \Drupal\file\FileRepository
+   * @var FileRepository
    */
   protected $fileRepository;
 
@@ -184,7 +184,7 @@ class FileRepositoryTest extends FileManagedUnitTestBase {
    * @legacy-covers ::writeData
    */
   public function testEntityStorageException(): void {
-    /** @var \Drupal\Core\Entity\EntityTypeManager $entityTypeManager */
+    /** @var EntityTypeManager $entityTypeManager */
     $entityTypeManager = $this->prophesize(EntityTypeManager::class);
     $entityTypeManager->getStorage('file')
       ->willThrow(EntityStorageException::class);

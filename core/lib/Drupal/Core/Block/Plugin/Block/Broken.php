@@ -7,8 +7,8 @@ use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Block\BlockPluginTrait;
 use Drupal\Core\Cache\CacheableDependencyTrait;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Plugin\PluginBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Plugin\PluginBase;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
@@ -28,7 +28,7 @@ class Broken extends PluginBase implements BlockPluginInterface, ContainerFactor
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
@@ -41,7 +41,7 @@ class Broken extends PluginBase implements BlockPluginInterface, ContainerFactor
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
    */
   public function __construct(

@@ -17,7 +17,7 @@ class DrupalAspectsOfCKEditor5Plugin extends Plugin {
   /**
    * Constructs a DrupalAspectsOfCKEditor5Plugin attribute.
    *
-   * @param string|\Drupal\Core\StringTranslation\TranslatableMarkup|null $label
+   * @param string|TranslatableMarkup|null $label
    *   (optional) The human-readable name of the CKEditor plugin. Required
    *   unless set by deriver.
    * @param class-string $class

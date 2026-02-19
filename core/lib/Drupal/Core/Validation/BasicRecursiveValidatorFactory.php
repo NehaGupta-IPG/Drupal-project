@@ -16,7 +16,7 @@ class BasicRecursiveValidatorFactory {
   /**
    * Constructs a new RecursiveValidatorFactory.
    *
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $classResolver
+   * @param ClassResolverInterface $classResolver
    *   The class resolver.
    */
   public function __construct(
@@ -26,7 +26,7 @@ class BasicRecursiveValidatorFactory {
   /**
    * Creates a new RecursiveValidator.
    *
-   * @return \Symfony\Component\Validator\Validator\RecursiveValidator
+   * @return RecursiveValidator
    *   The validator.
    */
   public function createValidator(): RecursiveValidator {

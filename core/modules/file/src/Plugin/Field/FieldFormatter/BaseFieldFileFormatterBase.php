@@ -17,7 +17,7 @@ abstract class BaseFieldFileFormatterBase extends FormatterBase {
   /**
    * The file URL generator.
    *
-   * @var \Drupal\Core\File\FileUrlGeneratorInterface
+   * @var FileUrlGeneratorInterface
    */
   protected $fileUrlGenerator;
 
@@ -28,7 +28,7 @@ abstract class BaseFieldFileFormatterBase extends FormatterBase {
    *   The plugin ID for the formatter.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The definition of the field to which the formatter is associated.
    * @param array $settings
    *   The formatter settings.
@@ -38,7 +38,7 @@ abstract class BaseFieldFileFormatterBase extends FormatterBase {
    *   The view mode.
    * @param array $third_party_settings
    *   Any third party settings.
-   * @param \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator
+   * @param FileUrlGeneratorInterface $file_url_generator
    *   The file URL generator.
    */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, FileUrlGeneratorInterface $file_url_generator) {
@@ -103,7 +103,7 @@ abstract class BaseFieldFileFormatterBase extends FormatterBase {
   /**
    * Generate the output appropriate for one field item.
    *
-   * @param \Drupal\Core\Field\FieldItemInterface $item
+   * @param FieldItemInterface $item
    *   One field item.
    *
    * @return mixed

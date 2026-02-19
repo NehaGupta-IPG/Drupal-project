@@ -2,10 +2,10 @@
 
 namespace Drupal\Core\Session;
 
-use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\PrivateKey;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\PrivateKey;
 use Drupal\Core\Site\Settings;
 
 /**
@@ -16,11 +16,11 @@ class PermissionsHashGenerator implements PermissionsHashGeneratorInterface {
   /**
    * Constructs a PermissionsHashGenerator object.
    *
-   * @param \Drupal\Core\PrivateKey $privateKey
+   * @param PrivateKey $privateKey
    *   The private key service.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $static
+   * @param CacheBackendInterface $static
    *   The cache backend interface to use for the static cache.
-   * @param \Drupal\Core\Session\AccessPolicyProcessorInterface $processor
+   * @param AccessPolicyProcessorInterface $processor
    *   The access policy processor.
    */
   public function __construct(

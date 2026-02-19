@@ -12,14 +12,14 @@ class QueueDatabaseFactory implements QueueFactoryInterface {
   /**
    * The database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
   /**
    * Constructs this factory object.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The Connection object containing the queue table.
    */
   public function __construct(Connection $connection) {

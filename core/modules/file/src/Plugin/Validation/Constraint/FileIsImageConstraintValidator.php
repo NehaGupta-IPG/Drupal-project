@@ -18,7 +18,7 @@ class FileIsImageConstraintValidator extends BaseFileConstraintValidator impleme
   /**
    * Creates a new FileIsImageConstraintValidator.
    *
-   * @param \Drupal\Core\Image\ImageFactory $imageFactory
+   * @param ImageFactory $imageFactory
    *   The image factory.
    */
   public function __construct(

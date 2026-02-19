@@ -16,7 +16,7 @@ class EmailValidator extends EmailValidatorUtility implements EmailValidatorInte
    *
    * @param string $email
    *   A string containing an email address.
-   * @param \Egulias\EmailValidator\Validation\EmailValidation|null $email_validation
+   * @param EmailValidation|null $email_validation
    *   This argument is ignored. If it is supplied an error will be triggered.
    *   See https://www.drupal.org/node/2997196.
    *

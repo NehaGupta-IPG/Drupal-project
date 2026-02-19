@@ -24,14 +24,14 @@ class EntityModerationRouteProvider implements EntityRouteProviderInterface, Ent
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 
   /**
    * Constructs a new DefaultHtmlRouteProvider.
    *
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @param EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
    */
   public function __construct(EntityFieldManagerInterface $entity_field_manager) {
@@ -64,10 +64,10 @@ class EntityModerationRouteProvider implements EntityRouteProviderInterface, Ent
   /**
    * Gets the moderation-form route.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type.
    *
-   * @return \Symfony\Component\Routing\Route|null
+   * @return Route|null
    *   The generated route, if available.
    */
   protected function getLatestVersionRoute(EntityTypeInterface $entity_type) {

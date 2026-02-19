@@ -18,7 +18,7 @@ interface CheckProviderInterface {
   /**
    * For each route, saves a list of applicable access checks to the route.
    *
-   * @param \Symfony\Component\Routing\RouteCollection $routes
+   * @param RouteCollection $routes
    *   A collection of routes to apply checks to.
    */
   public function setChecks(RouteCollection $routes);
@@ -49,7 +49,7 @@ interface CheckProviderInterface {
    *
    * @throws \InvalidArgumentException
    *   Thrown when the service hasn't been registered in addCheckService().
-   * @throws \Drupal\Core\Access\AccessException
+   * @throws AccessException
    *   Thrown when the service doesn't implement the required interface.
    */
   public function loadCheck($service_id);

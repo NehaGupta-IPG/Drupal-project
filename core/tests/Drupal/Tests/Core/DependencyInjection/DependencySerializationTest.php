@@ -36,7 +36,7 @@ class DependencySerializationTest extends UnitTestCase {
     $dependencySerialization->setContainer($container);
 
     $string = serialize($dependencySerialization);
-    /** @var \Drupal\Tests\Core\DependencyInjection\DependencySerializationTestDummy $dependencySerialization */
+    /** @var DependencySerializationTestDummy $dependencySerialization */
     $dependencySerialization = unserialize($string);
 
     $this->assertTrue($container->has(ReverseContainer::class));
@@ -64,7 +64,7 @@ class DependencySerializationTestDummy {
   /**
    * The container.
    *
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface
+   * @var ContainerInterface
    */
   public $container;
 

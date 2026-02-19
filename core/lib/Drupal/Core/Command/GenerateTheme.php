@@ -12,14 +12,14 @@ use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\InfoParser;
 use Drupal\Core\Theme\StarterKitInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\Glob;
 use Symfony\Component\Process\Process;
 use function Symfony\Component\String\u;
@@ -223,7 +223,7 @@ class GenerateTheme extends Command {
    * @param string $theme_name
    *   The machine name of the theme.
    *
-   * @return \Drupal\Core\Extension\Extension|null
+   * @return Extension|null
    *   The extension info array. NULL if the theme_name is not discovered.
    */
   private function getThemeInfo(string $theme_name): ? Extension {

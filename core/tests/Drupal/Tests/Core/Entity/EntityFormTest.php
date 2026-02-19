@@ -28,7 +28,7 @@ class EntityFormTest extends UnitTestCase {
   /**
    * The mocked entity form.
    *
-   * @var \Drupal\Core\Entity\EntityFormInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityFormInterface|MockObject
    */
   protected $entityForm;
 
@@ -240,7 +240,7 @@ class EntityFormTest extends UnitTestCase {
   /**
    * Sets up the storage accessed via the entity type manager in the form.
    *
-   * @return \Prophecy\Prophecy\ObjectProphecy<\Drupal\Core\Entity\EntityStorageInterface>
+   * @return ObjectProphecy<EntityStorageInterface>
    *   The storage prophecy.
    */
   protected function setUpStorage(): ObjectProphecy {

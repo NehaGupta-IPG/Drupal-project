@@ -59,7 +59,7 @@ class RegisterSerializationClassesCompilerPass extends DrupalRegisterSerializati
    * ID: 'serializer' -> 'jsonapi.serializer'
    * Tag: 'normalizer' -> 'jsonapi_normalizer'
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   * @param ContainerBuilder $container
    *   The container to process.
    */
   public function process(ContainerBuilder $container): void {

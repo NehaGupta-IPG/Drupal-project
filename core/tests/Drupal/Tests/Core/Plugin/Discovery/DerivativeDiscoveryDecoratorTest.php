@@ -22,7 +22,7 @@ class DerivativeDiscoveryDecoratorTest extends UnitTestCase {
   /**
    * The mock main discovery object.
    *
-   * @var \Drupal\Component\Plugin\Discovery\DiscoveryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Component\Plugin\Discovery\DiscoveryInterface|MockObject
    */
   protected $discoveryMain;
 

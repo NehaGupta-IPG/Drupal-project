@@ -76,7 +76,7 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
    * @param string $bin
    *   Bin name to use for this backend instance.
    *
-   * @return \Drupal\Core\Cache\CacheBackendInterface
+   * @return CacheBackendInterface
    *   Cache backend to test.
    */
   abstract protected function createCacheBackend($bin);
@@ -99,7 +99,7 @@ abstract class GenericCacheBackendUnitTestBase extends KernelTestBase {
   /**
    * Gets a backend to test; this will get a shared instance set in the object.
    *
-   * @return \Drupal\Core\Cache\CacheBackendInterface
+   * @return CacheBackendInterface
    *   Cache backend to test.
    */
   protected function getCacheBackend($bin = NULL) {

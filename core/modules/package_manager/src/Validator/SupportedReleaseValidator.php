@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\package_manager\Validator;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\package_manager\ComposerInspector;
+use Drupal\package_manager\Event\PreApplyEvent;
+use Drupal\package_manager\LegacyVersionUtility;
 use Drupal\package_manager\PathLocator;
 use Drupal\package_manager\ProjectInfo;
-use Drupal\package_manager\LegacyVersionUtility;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\package_manager\Event\PreApplyEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -71,7 +71,7 @@ final class SupportedReleaseValidator implements EventSubscriberInterface {
   /**
    * Checks that the packages are secure and supported.
    *
-   * @param \Drupal\package_manager\Event\PreApplyEvent $event
+   * @param PreApplyEvent $event
    *   The event object.
    */
   public function validate(PreApplyEvent $event): void {

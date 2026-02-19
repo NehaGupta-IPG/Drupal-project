@@ -19,7 +19,7 @@ abstract class ConditionFundamentals {
    *
    * The value is one of the following:
    * - AND (default)
-   * - OR
+   * - OR.
    *
    * @var string
    */
@@ -28,7 +28,7 @@ abstract class ConditionFundamentals {
   /**
    * The query this condition belongs to.
    *
-   * @var \Drupal\Core\Entity\Query\QueryInterface
+   * @var QueryInterface
    */
   protected $query;
 

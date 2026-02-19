@@ -23,7 +23,7 @@ class NodeRevisionsAllTest extends NodeTestBase {
   /**
    * A list of nodes created to be used as starting point of different tests.
    *
-   * @var \Drupal\node\NodeInterface[]
+   * @var NodeInterface[]
    */
   protected $nodes;
 
@@ -88,10 +88,10 @@ class NodeRevisionsAllTest extends NodeTestBase {
   /**
    * Creates a new revision for a given node.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   A node object.
    *
-   * @return \Drupal\node\NodeInterface
+   * @return NodeInterface
    *   A node object with up to date revision information.
    */
   protected function createNodeRevision(NodeInterface $node) {

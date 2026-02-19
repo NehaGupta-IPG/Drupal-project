@@ -32,7 +32,7 @@ abstract class IconExtractorWithFinder extends IconExtractorBase implements Icon
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Theme\Icon\IconFinder $iconFinder
+   * @param IconFinder $iconFinder
    *   The icons finder service.
    */
   public function __construct(
@@ -75,7 +75,7 @@ abstract class IconExtractorWithFinder extends IconExtractorBase implements Icon
   /**
    * Check the required `config > sources` value from definition.
    *
-   * @throws \Drupal\Core\Theme\Icon\Exception\IconPackConfigErrorException
+   * @throws IconPackConfigErrorException
    *   If the config:sources value in definition is not set or not valid.
    */
   protected function checkRequiredConfigSources(): void {

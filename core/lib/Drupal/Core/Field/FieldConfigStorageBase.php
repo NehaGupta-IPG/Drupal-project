@@ -14,7 +14,7 @@ abstract class FieldConfigStorageBase extends ConfigEntityStorage {
   /**
    * The field type plugin manager.
    *
-   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface
+   * @var FieldTypePluginManagerInterface
    */
   protected $fieldTypeManager;
 

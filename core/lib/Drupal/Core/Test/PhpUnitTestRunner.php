@@ -71,7 +71,7 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
    *
    * This method executes the tests for a single test class.
    *
-   * @param \Drupal\Core\Test\TestRun $test_run
+   * @param TestRun $test_run
    *   The test run object.
    * @param class-string $test_class
    *   A fully qualified test class name.
@@ -80,7 +80,7 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
    * @param bool $suppressDeprecations
    *   If TRUE, disables the deprecation reporting.
    *
-   * @return \Symfony\Component\Process\Process
+   * @return Process
    *   The spawned process object.
    */
   public function startPhpUnitOnSingleTestClass(
@@ -100,9 +100,9 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
   /**
    * Processes PHPUnit test execution output.
    *
-   * @param \Symfony\Component\Process\Process $process
+   * @param Process $process
    *   The PHPUnit CLI process - terminated.
-   * @param \Drupal\Core\Test\TestRun $test_run
+   * @param TestRun $test_run
    *   The test run object.
    * @param class-string $test_class
    *   A fully qualified test class name.
@@ -220,7 +220,7 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
    * the tests for a single test class, as well as the necessary context of
    * working directory and environment variables.
    *
-   * @param \Drupal\Core\Test\TestRun $test_run
+   * @param TestRun $test_run
    *   The test run object.
    * @param class-string $test_class_name
    *   A fully qualified test class name.
@@ -307,7 +307,7 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
   /**
    * Logs the parsed PHPUnit results into the test run.
    *
-   * @param \Drupal\Core\Test\TestRun $test_run
+   * @param TestRun $test_run
    *   The test run object.
    * @param array[] $phpunit_results
    *   An array of test results, as returned from

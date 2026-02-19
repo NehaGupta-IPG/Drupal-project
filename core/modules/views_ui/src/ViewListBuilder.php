@@ -4,8 +4,8 @@ namespace Drupal\views_ui;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Link;
@@ -24,7 +24,7 @@ class ViewListBuilder extends ConfigEntityListBuilder {
   /**
    * The views display plugin manager to use.
    *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   * @var PluginManagerInterface
    */
   protected $displayManager;
 
@@ -42,11 +42,11 @@ class ViewListBuilder extends ConfigEntityListBuilder {
   /**
    * Constructs a new ViewListBuilder object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The entity storage class.
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $display_manager
+   * @param PluginManagerInterface $display_manager
    *   The views display plugin manager to use.
    */
   public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, PluginManagerInterface $display_manager) {
@@ -246,7 +246,7 @@ class ViewListBuilder extends ConfigEntityListBuilder {
   /**
    * Gets a list of displays included in the view.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $view
+   * @param EntityInterface $view
    *   The view entity instance to get a list of displays for.
    *
    * @return array

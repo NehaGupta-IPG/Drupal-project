@@ -26,21 +26,21 @@ class FormValidatorTest extends UnitTestCase {
   /**
    * A logger instance.
    *
-   * @var \Psr\Log\LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Psr\Log\LoggerInterface|MockObject
    */
   protected $logger;
 
   /**
    * The CSRF token generator to validate the form token.
    *
-   * @var \Drupal\Core\Access\CsrfTokenGenerator|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Access\CsrfTokenGenerator|MockObject
    */
   protected $csrfToken;
 
   /**
    * The form error handler.
    *
-   * @var \Drupal\Core\Form\FormErrorHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Form\FormErrorHandlerInterface|MockObject
    */
   protected $formErrorHandler;
 

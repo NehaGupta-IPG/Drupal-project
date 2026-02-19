@@ -9,9 +9,9 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
+use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Core\Plugin\Discovery\InfoHookDecorator;
 use Drupal\Core\Plugin\Discovery\YamlDiscovery;
-use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Core\Plugin\Factory\ContainerFactory;
 use Drupal\Core\TypedData\TraversableTypedDataInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
@@ -25,21 +25,21 @@ class ConfigMapperManager extends DefaultPluginManager implements ConfigMapperMa
   /**
    * The typed config manager.
    *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface
+   * @var TypedConfigManagerInterface
    */
   protected $typedConfigManager;
 
   /**
    * The theme handler.
    *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
+   * @var ThemeHandlerInterface
    */
   protected $themeHandler;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected LanguageManagerInterface $languageManager;
 
@@ -56,15 +56,15 @@ class ConfigMapperManager extends DefaultPluginManager implements ConfigMapperMa
   /**
    * Constructs a ConfigMapperManager.
    *
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param CacheBackendInterface $cache_backend
    *   The cache backend.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config_manager
+   * @param TypedConfigManagerInterface $typed_config_manager
    *   The typed config manager.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param ThemeHandlerInterface $theme_handler
    *   The theme handler.
    */
   public function __construct(CacheBackendInterface $cache_backend, LanguageManagerInterface $language_manager, ModuleHandlerInterface $module_handler, TypedConfigManagerInterface $typed_config_manager, ThemeHandlerInterface $theme_handler) {
@@ -180,7 +180,7 @@ class ConfigMapperManager extends DefaultPluginManager implements ConfigMapperMa
   /**
    * Returns TRUE if at least one translatable element is found.
    *
-   * @param \Drupal\Core\TypedData\TypedDataInterface $element
+   * @param TypedDataInterface $element
    *   Configuration schema element.
    *
    * @return bool

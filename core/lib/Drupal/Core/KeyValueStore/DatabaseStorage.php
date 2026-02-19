@@ -3,9 +3,9 @@
 namespace Drupal\Core\KeyValueStore;
 
 use Drupal\Component\Serialization\SerializationInterface;
-use Drupal\Core\Database\Query\Merge;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
+use Drupal\Core\Database\Query\Merge;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 
 /**
@@ -21,14 +21,14 @@ class DatabaseStorage extends StorageBase {
   /**
    * The serialization class to use.
    *
-   * @var \Drupal\Component\Serialization\SerializationInterface
+   * @var SerializationInterface
    */
   protected $serializer;
 
   /**
    * The database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
@@ -44,9 +44,9 @@ class DatabaseStorage extends StorageBase {
    *
    * @param string $collection
    *   The name of the collection holding key and value pairs.
-   * @param \Drupal\Component\Serialization\SerializationInterface $serializer
+   * @param SerializationInterface $serializer
    *   The serialization class to use.
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection to use.
    * @param string $table
    *   The name of the SQL table to use, defaults to key_value.

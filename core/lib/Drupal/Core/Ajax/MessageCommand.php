@@ -72,7 +72,7 @@ class MessageCommand implements CommandInterface, CommandWithAttachedAssetsInter
   /**
    * The message text.
    *
-   * @var string|\Drupal\Component\Render\MarkupInterface
+   * @var string|MarkupInterface
    */
   protected $message;
 
@@ -100,7 +100,7 @@ class MessageCommand implements CommandInterface, CommandWithAttachedAssetsInter
   /**
    * Constructs a MessageCommand object.
    *
-   * @param string|\Drupal\Component\Render\MarkupInterface $message
+   * @param string|MarkupInterface $message
    *   The text of the message.
    * @param string|null $wrapper_query_selector
    *   The query selector of the element to display messages in when they

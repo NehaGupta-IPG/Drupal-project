@@ -41,7 +41,7 @@ class SectionComponentTest extends UnitTestCase {
       ->dispatch(Argument::type(SectionComponentBuildRenderArrayEvent::class), LayoutBuilderEvents::SECTION_COMPONENT_BUILD_RENDER_ARRAY)
       ->shouldBeCalled()
       ->will(function ($args) {
-        /** @var \Drupal\layout_builder\Event\SectionComponentBuildRenderArrayEvent $event */
+        /** @var SectionComponentBuildRenderArrayEvent $event */
         $event = $args[0];
         $event->setBuild(['#markup' => $event->getPlugin()->getPluginId()]);
         return $event;

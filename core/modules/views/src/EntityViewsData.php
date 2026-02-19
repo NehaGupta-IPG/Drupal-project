@@ -6,8 +6,8 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\ContentEntityType;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityHandlerInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
 use Drupal\Core\Entity\Sql\TableMappingInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -27,28 +27,28 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
   /**
    * Entity type for this views data handler instance.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface
+   * @var EntityTypeInterface
    */
   protected $entityType;
 
   /**
    * The storage used for this entity type.
    *
-   * @var \Drupal\Core\Entity\Sql\SqlEntityStorageInterface
+   * @var SqlEntityStorageInterface
    */
   protected $storage;
 
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The translation manager.
    *
-   * @var \Drupal\Core\StringTranslation\TranslationInterface
+   * @var TranslationInterface
    */
   protected $translationManager;
 
@@ -67,31 +67,31 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 
   /**
    * Constructs an EntityViewsData object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type to provide views integration for.
-   * @param \Drupal\Core\Entity\Sql\SqlEntityStorageInterface $storage_controller
+   * @param SqlEntityStorageInterface $storage_controller
    *   The storage handler used for this entity type.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation_manager
+   * @param TranslationInterface $translation_manager
    *   The translation manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @param EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
    */
   public function __construct(EntityTypeInterface $entity_type, SqlEntityStorageInterface $storage_controller, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, TranslationInterface $translation_manager, EntityFieldManagerInterface $entity_field_manager) {
@@ -442,9 +442,9 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
    *   The table of the field to handle.
    * @param string $field_name
    *   The name of the field to handle.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition.
-   * @param \Drupal\Core\Entity\Sql\TableMappingInterface $table_mapping
+   * @param TableMappingInterface $table_mapping
    *   The table mapping information.
    * @param array $table_data
    *   A reference to a specific entity table (for example data_table) inside
@@ -487,7 +487,7 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
    *   Within the field, the column type being handled.
    * @param bool $first
    *   TRUE if this is the first column within the field.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition.
    *
    * @return array
@@ -615,7 +615,7 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
    *
    * @param string $table
    *   The table the language field is added to.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition.
    * @param array $views_field
    *   The views field data.
@@ -639,7 +639,7 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
    *
    * @param string $table
    *   The table the language field is added to.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition.
    * @param array $views_field
    *   The views field data.
@@ -690,7 +690,7 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
    *
    * @param string $table
    *   The table the field is added to.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition.
    * @param array $views_field
    *   The views field data.
@@ -710,7 +710,7 @@ class EntityViewsData implements EntityHandlerInterface, EntityViewsDataInterfac
    *
    * @param string $table
    *   The table the field is added to.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition.
    * @param array $views_field
    *   The views field data.

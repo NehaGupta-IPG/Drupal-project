@@ -38,15 +38,15 @@ class EntityUserRole extends EntityConfigBase {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The storage for this entity type.
    * @param array $bundles
    *   The list of bundles this entity type has.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The configuration factory.
    * @param array $destination_permissions
    *   All available permissions.

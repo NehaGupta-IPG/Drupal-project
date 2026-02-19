@@ -10,8 +10,8 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\package_manager\Event\PostApplyEvent;
 use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\Event\PreCreateEvent;
-use Drupal\package_manager\Event\SandboxValidationEvent;
 use Drupal\package_manager\Event\PreRequireEvent;
+use Drupal\package_manager\Event\SandboxValidationEvent;
 use Drupal\package_manager\Event\StatusCheckEvent;
 use Drupal\package_manager\PathLocator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -38,7 +38,7 @@ final class LockFileValidator implements EventSubscriberInterface {
   /**
    * The key-value store.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface
+   * @var KeyValueStoreInterface
    */
   private readonly KeyValueStoreInterface $keyValue;
 
@@ -84,7 +84,7 @@ final class LockFileValidator implements EventSubscriberInterface {
    * is to verify that the actual installed packages have not changed
    * unexpectedly; we don't care about the contents of composer.json.
    *
-   * @param \Drupal\package_manager\Event\PreCreateEvent $event
+   * @param PreCreateEvent $event
    *   The event being handled.
    */
   public function storeHash(PreCreateEvent $event): void {
@@ -105,7 +105,7 @@ final class LockFileValidator implements EventSubscriberInterface {
   /**
    * Checks that the active lock file is unchanged during stage operations.
    *
-   * @param \Drupal\package_manager\Event\SandboxValidationEvent $event
+   * @param SandboxValidationEvent $event
    *   The event being handled.
    */
   public function validate(SandboxValidationEvent $event): void {

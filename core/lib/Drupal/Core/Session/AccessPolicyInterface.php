@@ -37,12 +37,12 @@ interface AccessPolicyInterface {
   /**
    * Calculates the permissions for an account within a given scope.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user account for which to calculate the permissions.
    * @param string $scope
    *   The scope to calculate the permissions for.
    *
-   * @return \Drupal\Core\Session\RefinableCalculatedPermissionsInterface
+   * @return RefinableCalculatedPermissionsInterface
    *   An object representing the permissions within the given scope.
    */
   public function calculatePermissions(AccountInterface $account, string $scope): RefinableCalculatedPermissionsInterface;
@@ -63,11 +63,11 @@ interface AccessPolicyInterface {
    * list of permissions outside of office hours. This would make it so no-one
    * can perform any destructive actions while the help desk is offline.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user account for which to alter the permissions.
    * @param string $scope
    *   The scope to alter the permissions for.
-   * @param \Drupal\Core\Session\RefinableCalculatedPermissionsInterface $calculated_permissions
+   * @param RefinableCalculatedPermissionsInterface $calculated_permissions
    *   The completely built calculated permissions.
    */
   public function alterPermissions(AccountInterface $account, string $scope, RefinableCalculatedPermissionsInterface $calculated_permissions): void;

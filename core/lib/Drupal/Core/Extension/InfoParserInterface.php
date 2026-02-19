@@ -62,7 +62,7 @@ interface InfoParserInterface {
    * @return array
    *   The info array.
    *
-   * @throws \Drupal\Core\Extension\InfoParserException
+   * @throws InfoParserException
    *   Exception thrown if there is a parsing error or the .info.yml file does
    *   not contain a required key.
    *

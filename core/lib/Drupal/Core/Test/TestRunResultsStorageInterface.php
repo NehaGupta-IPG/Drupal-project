@@ -20,7 +20,7 @@ interface TestRunResultsStorageInterface {
   /**
    * Sets the test database prefix of a test run in storage.
    *
-   * @param \Drupal\Core\Test\TestRun $test_run
+   * @param TestRun $test_run
    *   The test run object.
    * @param string $database_prefix
    *   The database prefix.
@@ -33,7 +33,7 @@ interface TestRunResultsStorageInterface {
   /**
    * Adds a test log entry for a test run to the storage.
    *
-   * @param \Drupal\Core\Test\TestRun $test_run
+   * @param TestRun $test_run
    *   The test run object.
    * @param array $entry
    *   The array of the log entry elements.
@@ -46,7 +46,7 @@ interface TestRunResultsStorageInterface {
   /**
    * Removes the results of a test run from the storage.
    *
-   * @param \Drupal\Core\Test\TestRun $test_run
+   * @param TestRun $test_run
    *   The test run object.
    *
    * @return int
@@ -57,7 +57,7 @@ interface TestRunResultsStorageInterface {
   /**
    * Get test results for a test run, ordered by test class.
    *
-   * @param \Drupal\Core\Test\TestRun $test_run
+   * @param TestRun $test_run
    *   The test run object.
    *
    * @return array
@@ -68,7 +68,7 @@ interface TestRunResultsStorageInterface {
   /**
    * Get state information about a test run, from storage.
    *
-   * @param \Drupal\Core\Test\TestRun $test_run
+   * @param TestRun $test_run
    *   The test run object.
    *
    * @return array

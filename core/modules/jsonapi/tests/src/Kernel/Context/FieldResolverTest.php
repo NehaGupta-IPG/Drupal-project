@@ -42,7 +42,7 @@ class FieldResolverTest extends JsonapiKernelTestBase {
   /**
    * The subject under test.
    *
-   * @var \Drupal\jsonapi\Context\FieldResolver
+   * @var FieldResolver
    */
   protected $sut;
 

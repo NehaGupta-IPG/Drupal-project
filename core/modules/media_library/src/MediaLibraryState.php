@@ -85,13 +85,13 @@ class MediaLibraryState extends ParameterBag implements CacheableDependencyInter
   /**
    * Get the media library state from a request.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
    * @return static
    *   A state object.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws BadRequestHttpException
    *   Thrown when the hash query parameter is invalid.
    */
   public static function fromRequest(Request $request) {

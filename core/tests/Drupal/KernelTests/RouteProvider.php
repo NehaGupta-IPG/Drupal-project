@@ -24,7 +24,7 @@ class RouteProvider implements PreloadableRouteProviderInterface {
   /**
    * Loads the real route provider from the container and rebuilds the router.
    *
-   * @return \Drupal\Core\Routing\PreloadableRouteProviderInterface|\Symfony\Component\EventDispatcher\EventSubscriberInterface
+   * @return PreloadableRouteProviderInterface|EventSubscriberInterface
    *   The route provider.
    */
   protected function lazyLoadItself(): RouteProviderBase {

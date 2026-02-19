@@ -2,8 +2,8 @@
 
 namespace Drupal\block;
 
-use Drupal\Component\Utility\Html;
 use Drupal\Component\Serialization\Json;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
@@ -35,43 +35,43 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
   /**
    * The current request.
    *
-   * @var \Symfony\Component\HttpFoundation\Request
+   * @var Request
    */
   protected $request;
 
   /**
    * The theme manager.
    *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   * @var ThemeManagerInterface
    */
   protected $themeManager;
 
   /**
    * The form builder.
    *
-   * @var \Drupal\Core\Form\FormBuilderInterface
+   * @var FormBuilderInterface
    */
   protected $formBuilder;
 
   /**
    * The messenger.
    *
-   * @var \Drupal\Core\Messenger\MessengerInterface
+   * @var MessengerInterface
    */
   protected $messenger;
 
   /**
    * Constructs a new BlockListBuilder object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The entity storage class.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
+   * @param ThemeManagerInterface $theme_manager
    *   The theme manager.
-   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
+   * @param FormBuilderInterface $form_builder
    *   The form builder.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger service.
    */
   public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, ThemeManagerInterface $theme_manager, FormBuilderInterface $form_builder, MessengerInterface $messenger) {
@@ -102,7 +102,7 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
    * @param string|null $theme
    *   (optional) The theme to display the blocks for. If NULL, the current
    *   theme will be used.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    *
    * @return array
@@ -157,7 +157,7 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
     // Build blocks first for each region.
     $blocks = [];
     $entities = $this->load();
-    /** @var \Drupal\block\BlockInterface[] $entities */
+    /** @var BlockInterface[] $entities */
     foreach ($entities as $entity_id => $entity) {
       $definition = $entity->getPlugin()->getPluginDefinition();
       $blocks[$entity->getRegion()][$entity_id] = [
@@ -388,7 +388,7 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $blocks = $form_state->getValue('blocks');
     $entities = $this->storage->loadMultipleOverrideFree(array_keys($blocks));
-    /** @var \Drupal\block\BlockInterface[] $entities */
+    /** @var BlockInterface[] $entities */
     foreach ($entities as $entity_id => $entity) {
       $entity_values = $form_state->getValue(['blocks', $entity_id]);
       $entity->setWeight($entity_values['weight']);

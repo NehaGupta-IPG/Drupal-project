@@ -13,7 +13,7 @@ class MigrateController extends ControllerBase {
   /**
    * Sets a log filter and redirects to the log.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse

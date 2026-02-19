@@ -2,10 +2,10 @@
 
 namespace Drupal\migrate\Plugin\migrate\process;
 
-use Drupal\migrate\ProcessPluginBase;
-use Drupal\migrate\MigrateExecutableInterface;
-use Drupal\migrate\Row;
 use Drupal\migrate\MigrateException;
+use Drupal\migrate\MigrateExecutableInterface;
+use Drupal\migrate\ProcessPluginBase;
+use Drupal\migrate\Row;
 
 /**
  * This plugin ensures the source value is unique.
@@ -30,9 +30,9 @@ abstract class MakeUniqueBase extends ProcessPluginBase {
    *
    * @param string $value
    *   The input string.
-   * @param \Drupal\migrate\MigrateExecutableInterface $migrate_executable
+   * @param MigrateExecutableInterface $migrate_executable
    *   The migration in which this process is being executed.
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The row from the source to process.
    * @param string $destination_property
    *   The destination property currently worked on. This is only used together
@@ -41,7 +41,7 @@ abstract class MakeUniqueBase extends ProcessPluginBase {
    * @return string
    *   The unique version of the input value.
    *
-   * @throws \Drupal\migrate\MigrateException
+   * @throws MigrateException
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
     $i = 1;

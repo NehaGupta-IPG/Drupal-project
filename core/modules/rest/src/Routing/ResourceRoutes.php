@@ -19,7 +19,7 @@ class ResourceRoutes implements EventSubscriberInterface {
   /**
    * The plugin manager for REST plugins.
    *
-   * @var \Drupal\rest\Plugin\Type\ResourcePluginManager
+   * @var ResourcePluginManager
    */
   protected $manager;
 
@@ -33,18 +33,18 @@ class ResourceRoutes implements EventSubscriberInterface {
   /**
    * A logger instance.
    *
-   * @var \Psr\Log\LoggerInterface
+   * @var LoggerInterface
    */
   protected $logger;
 
   /**
    * Constructs a RouteSubscriber object.
    *
-   * @param \Drupal\rest\Plugin\Type\ResourcePluginManager $manager
+   * @param ResourcePluginManager $manager
    *   The resource plugin manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   A logger instance.
    */
   public function __construct(ResourcePluginManager $manager, EntityTypeManagerInterface $entity_type_manager, LoggerInterface $logger) {
@@ -56,12 +56,12 @@ class ResourceRoutes implements EventSubscriberInterface {
   /**
    * Alters existing routes for a specific collection.
    *
-   * @param \Drupal\Core\Routing\RouteBuildEvent $event
+   * @param RouteBuildEvent $event
    *   The route build event.
    */
   public function onDynamicRouteEvent(RouteBuildEvent $event) {
     // Iterate over all enabled REST resource config entities.
-    /** @var \Drupal\rest\RestResourceConfigInterface[] $resource_configs */
+    /** @var RestResourceConfigInterface[] $resource_configs */
     $resource_configs = $this->resourceConfigStorage->loadMultiple();
     foreach ($resource_configs as $resource_config) {
       if ($resource_config->status()) {
@@ -77,7 +77,7 @@ class ResourceRoutes implements EventSubscriberInterface {
    * This method determines where a resource is reachable, what path
    * replacements are used, the required HTTP method for the operation etc.
    *
-   * @param \Drupal\rest\RestResourceConfigInterface $rest_resource_config
+   * @param RestResourceConfigInterface $rest_resource_config
    *   The rest resource config.
    *
    * @return \Symfony\Component\Routing\RouteCollection

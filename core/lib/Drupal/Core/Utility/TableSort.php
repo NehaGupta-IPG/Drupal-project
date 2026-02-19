@@ -21,7 +21,7 @@ class TableSort {
    *
    * @param array $headers
    *   An array of column headers in the format described in '#type' => 'table'.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   A current request.
    *
    * @return array
@@ -100,7 +100,7 @@ class TableSort {
    *
    * @param array $headers
    *   An array of column headers in the format described in '#type' => 'table'.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   A current request.
    *
    * @return array
@@ -139,7 +139,7 @@ class TableSort {
    *
    * @param array $headers
    *   An array of column headers in the format described in '#type' => 'table'.
-   * @param \Symfony\Component\HttpFoundation\Request|null $request
+   * @param Request|null $request
    *   A current request.
    *
    * @return string
@@ -170,7 +170,7 @@ class TableSort {
   /**
    * Composes a URL query parameter array for table sorting links.
    *
-   * @param \Symfony\Component\HttpFoundation\Request|null $request
+   * @param Request|null $request
    *   A current request.
    *
    * @return array

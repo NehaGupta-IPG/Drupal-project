@@ -15,14 +15,14 @@ class AliasPrefixList extends CacheCollector implements AliasPrefixListInterface
   /**
    * The Key/Value Store to use for state.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
   /**
    * The path alias repository.
    *
-   * @var \Drupal\path_alias\AliasRepositoryInterface
+   * @var AliasRepositoryInterface
    */
   protected $pathAliasRepository;
 
@@ -31,13 +31,13 @@ class AliasPrefixList extends CacheCollector implements AliasPrefixListInterface
    *
    * @param string $cid
    *   The cache id to use.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The cache backend.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
+   * @param LockBackendInterface $lock
    *   The lock backend.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state keyvalue store.
-   * @param \Drupal\path_alias\AliasRepositoryInterface $alias_repository
+   * @param AliasRepositoryInterface $alias_repository
    *   The path alias repository.
    */
   public function __construct($cid, CacheBackendInterface $cache, LockBackendInterface $lock, StateInterface $state, AliasRepositoryInterface $alias_repository) {

@@ -39,7 +39,7 @@ class CKEditor5ToolbarTest extends WebDriverTestBase {
   /**
    * The admin user.
    *
-   * @var \Drupal\user\Entity\User
+   * @var User
    */
   protected User $user;
 

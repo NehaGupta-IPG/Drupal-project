@@ -16,14 +16,14 @@ class WorkspaceRepository implements WorkspaceRepositoryInterface {
   /**
    * The entity type manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The cache backend used to store the workspace tree.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $cache;
 
@@ -37,9 +37,9 @@ class WorkspaceRepository implements WorkspaceRepositoryInterface {
   /**
    * Constructs a new WorkspaceRepository instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param CacheBackendInterface $cache_backend
    *   The cache backend.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, CacheBackendInterface $cache_backend) {
@@ -58,7 +58,7 @@ class WorkspaceRepository implements WorkspaceRepositoryInterface {
         return $this->tree;
       }
 
-      /** @var \Drupal\workspaces\WorkspaceInterface[] $workspaces */
+      /** @var WorkspaceInterface[] $workspaces */
       $workspaces = $this->entityTypeManager->getStorage('workspace')->loadMultiple();
 
       // First, sort everything alphabetically.

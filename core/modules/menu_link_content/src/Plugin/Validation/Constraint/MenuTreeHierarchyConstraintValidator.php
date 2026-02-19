@@ -16,14 +16,14 @@ class MenuTreeHierarchyConstraintValidator extends ConstraintValidator implement
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   private $entityTypeManager;
 
   /**
    * Creates a new MenuTreeHierarchyConstraintValidator instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {

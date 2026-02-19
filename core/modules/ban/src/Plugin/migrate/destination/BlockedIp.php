@@ -5,8 +5,8 @@ namespace Drupal\ban\Plugin\migrate\destination;
 use Drupal\ban\BanIpManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Attribute\MigrateDestination;
-use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\migrate\destination\DestinationBase;
+use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -19,7 +19,7 @@ class BlockedIp extends DestinationBase implements ContainerFactoryPluginInterfa
   /**
    * The IP ban manager.
    *
-   * @var \Drupal\ban\BanIpManagerInterface
+   * @var BanIpManagerInterface
    */
   protected $banManager;
 
@@ -32,9 +32,9 @@ class BlockedIp extends DestinationBase implements ContainerFactoryPluginInterfa
    *   The plugin ID.
    * @param mixed $plugin_definition
    *   The plugin definition.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The current migration.
-   * @param \Drupal\ban\BanIpManagerInterface $ban_manager
+   * @param BanIpManagerInterface $ban_manager
    *   The IP manager service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, BanIpManagerInterface $ban_manager) {

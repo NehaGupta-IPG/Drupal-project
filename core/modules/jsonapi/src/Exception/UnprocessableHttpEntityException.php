@@ -2,8 +2,8 @@
 
 namespace Drupal\jsonapi\Exception;
 
-use Drupal\Core\Entity\EntityConstraintViolationListInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Drupal\Core\Entity\EntityConstraintViolationListInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
@@ -28,7 +28,7 @@ class UnprocessableHttpEntityException extends HttpException {
   /**
    * The constraint violations associated with this exception.
    *
-   * @var \Drupal\Core\Entity\EntityConstraintViolationListInterface
+   * @var EntityConstraintViolationListInterface
    */
   protected $violations;
 
@@ -49,7 +49,7 @@ class UnprocessableHttpEntityException extends HttpException {
   /**
    * Gets the constraint violations associated with this exception.
    *
-   * @return \Drupal\Core\Entity\EntityConstraintViolationListInterface
+   * @return EntityConstraintViolationListInterface
    *   The constraint violations.
    */
   public function getViolations() {
@@ -59,7 +59,7 @@ class UnprocessableHttpEntityException extends HttpException {
   /**
    * Sets the constraint violations associated with this exception.
    *
-   * @param \Drupal\Core\Entity\EntityConstraintViolationListInterface $violations
+   * @param EntityConstraintViolationListInterface $violations
    *   The constraint violations.
    */
   public function setViolations(EntityConstraintViolationListInterface $violations) {

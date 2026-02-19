@@ -23,7 +23,7 @@ class FieldSyncWidget {
   /**
    * Returns a form element to configure field synchronization.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field
+   * @param FieldDefinitionInterface $field
    *   A field definition object.
    * @param string $element_name
    *   (optional) The element name, which is added to drupalSettings so that

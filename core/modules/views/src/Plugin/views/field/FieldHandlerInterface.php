@@ -2,8 +2,8 @@
 
 namespace Drupal\views\Plugin\views\field;
 
-use Drupal\views\ResultRow;
 use Drupal\views\Plugin\views\ViewsHandlerInterface;
+use Drupal\views\ResultRow;
 
 /**
  * Base field handler that has no options and renders an unformatted field.
@@ -123,7 +123,7 @@ interface FieldHandlerInterface extends ViewsHandlerInterface {
   /**
    * Gets the entity matching the current row and relationship.
    *
-   * @param \Drupal\views\ResultRow $values
+   * @param ResultRow $values
    *   An object containing all retrieved values.
    *
    * @return \Drupal\Core\Entity\EntityInterface|null
@@ -138,7 +138,7 @@ interface FieldHandlerInterface extends ViewsHandlerInterface {
    * This api exists so that other modules can easy set the values of the field
    * without having the need to change the render method as well.
    *
-   * @param \Drupal\views\ResultRow $values
+   * @param ResultRow $values
    *   An object containing all retrieved values.
    * @param string|null $field
    *   (optional) Index of the row element. If NULL the last row is used.
@@ -163,7 +163,7 @@ interface FieldHandlerInterface extends ViewsHandlerInterface {
    * This gives the handlers some time to set up before any handler has been
    * rendered.
    *
-   * @param \Drupal\views\ResultRow[] $values
+   * @param ResultRow[] $values
    *   An array of all ResultRow objects returned from the query.
    */
   public function preRender(&$values);
@@ -171,10 +171,10 @@ interface FieldHandlerInterface extends ViewsHandlerInterface {
   /**
    * Renders the field.
    *
-   * @param \Drupal\views\ResultRow $values
+   * @param ResultRow $values
    *   The values retrieved from a single row of a view's query result.
    *
-   * @return string|\Drupal\Component\Render\MarkupInterface
+   * @return string|MarkupInterface
    *   The rendered output. If the output is safe it will be wrapped in an
    *   object that implements MarkupInterface. If it is empty or unsafe it
    *   will be a string.
@@ -189,7 +189,7 @@ interface FieldHandlerInterface extends ViewsHandlerInterface {
    * typical example is the row counter. For completely uncacheable field output
    * placeholders should be used.
    *
-   * @param \Drupal\views\ResultRow $row
+   * @param ResultRow $row
    *   An array of all ResultRow objects returned from the query.
    * @param string $output
    *   The field rendered output.
@@ -207,7 +207,7 @@ interface FieldHandlerInterface extends ViewsHandlerInterface {
    * This renders a field normally, then decides if render-as-link and
    * text-replacement rendering is necessary.
    *
-   * @param \Drupal\views\ResultRow $values
+   * @param ResultRow $values
    *   The values retrieved from a single row of a view's query result.
    *
    * @return \Drupal\Component\Render\MarkupInterface|string
@@ -270,7 +270,7 @@ interface FieldHandlerInterface extends ViewsHandlerInterface {
   /**
    * Renders row values using $this->themeFunctions() as #theme.
    *
-   * @param \Drupal\views\ResultRow $values
+   * @param ResultRow $values
    *   Holds single row of a view's result set.
    *
    * @return \Drupal\Component\Render\MarkupInterface|string

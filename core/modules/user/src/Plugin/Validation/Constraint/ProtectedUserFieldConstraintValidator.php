@@ -17,23 +17,23 @@ class ProtectedUserFieldConstraintValidator extends ConstraintValidator implemen
   /**
    * User storage handler.
    *
-   * @var \Drupal\user\UserStorageInterface
+   * @var UserStorageInterface
    */
   protected $userStorage;
 
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountProxyInterface
+   * @var AccountProxyInterface
    */
   protected $currentUser;
 
   /**
    * Constructs the object.
    *
-   * @param \Drupal\user\UserStorageInterface $user_storage
+   * @param UserStorageInterface $user_storage
    *   The user storage handler.
-   * @param \Drupal\Core\Session\AccountProxyInterface $current_user
+   * @param AccountProxyInterface $current_user
    *   The current user.
    */
   public function __construct(UserStorageInterface $user_storage, AccountProxyInterface $current_user) {

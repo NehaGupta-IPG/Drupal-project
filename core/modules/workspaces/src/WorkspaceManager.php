@@ -47,7 +47,7 @@ class WorkspaceManager implements WorkspaceManagerInterface {
       foreach ($this->negotiators as $negotiator) {
         if ($negotiator->applies($request)) {
           if ($workspace_id = $negotiator->getActiveWorkspaceId($request)) {
-            /** @var \Drupal\workspaces\WorkspaceInterface $negotiated_workspace */
+            /** @var WorkspaceInterface $negotiated_workspace */
             $negotiated_workspace = ($this->entityTypeManager)()
               ->getStorage('workspace')
               ->load($workspace_id);
@@ -111,11 +111,11 @@ class WorkspaceManager implements WorkspaceManagerInterface {
   /**
    * Switches the current workspace.
    *
-   * @param \Drupal\workspaces\WorkspaceInterface|null $workspace
+   * @param WorkspaceInterface|null $workspace
    *   The workspace to set as active or NULL to switch out of the currently
    *   active workspace.
    *
-   * @throws \Drupal\workspaces\WorkspaceAccessException
+   * @throws WorkspaceAccessException
    *   Thrown when the current user doesn't have access to view the workspace.
    */
   protected function doSwitchWorkspace($workspace) {
@@ -136,7 +136,7 @@ class WorkspaceManager implements WorkspaceManagerInterface {
    * {@inheritdoc}
    */
   public function executeInWorkspace($workspace_id, callable $function) {
-    /** @var \Drupal\workspaces\WorkspaceInterface $workspace */
+    /** @var WorkspaceInterface $workspace */
     $workspace = ($this->entityTypeManager)()->getStorage('workspace')->load($workspace_id);
 
     if (!$workspace) {

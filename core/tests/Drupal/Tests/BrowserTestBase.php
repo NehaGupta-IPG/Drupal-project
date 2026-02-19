@@ -157,7 +157,7 @@ abstract class BrowserTestBase extends TestCase {
    *
    * This will not be initialized if there was an error during the test setup.
    *
-   * @var \Behat\Mink\Mink|null
+   * @var Mink|null
    */
   protected $mink;
 
@@ -467,7 +467,7 @@ abstract class BrowserTestBase extends TestCase {
    * @param string $name
    *   (optional) Name of the session. Defaults to the active session.
    *
-   * @return \Behat\Mink\Session
+   * @return Session
    *   The active Mink session object.
    */
   public function getSession($name = NULL) {
@@ -477,7 +477,7 @@ abstract class BrowserTestBase extends TestCase {
   /**
    * Get session cookies from current session.
    *
-   * @return \GuzzleHttp\Cookie\CookieJar
+   * @return CookieJar
    *   A cookie jar with the current session.
    */
   protected function getSessionCookies() {
@@ -518,9 +518,9 @@ abstract class BrowserTestBase extends TestCase {
   /**
    * Helper function to get the options of select field.
    *
-   * @param \Behat\Mink\Element\NodeElement|string $select
+   * @param NodeElement|string $select
    *   Name, ID, or Label of select field to assert.
-   * @param \Behat\Mink\Element\Element $container
+   * @param Element $container
    *   (optional) Container element to check against. Defaults to current page.
    *
    * @return array

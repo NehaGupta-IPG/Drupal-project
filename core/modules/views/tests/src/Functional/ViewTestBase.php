@@ -107,7 +107,7 @@ abstract class ViewTestBase extends BrowserTestBase {
    *   (optional) A custom message to display with the assertion. If no custom
    *   message is provided, the message will indicate the button label.
    *
-   * @throws \Behat\Mink\Exception\ElementNotFoundException
+   * @throws ElementNotFoundException
    */
   protected function helperButtonHasLabel($id, $expected_label, $message = 'Label has the expected value: %label.') {
     $xpath = $this->assertSession()->buildXPathQuery('//button[@id=:value]|//input[@id=:value]', [':value' => $id]);
@@ -123,7 +123,7 @@ abstract class ViewTestBase extends BrowserTestBase {
   /**
    * Executes a view.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view object.
    * @param array $args
    *   (optional) An array of the view arguments to use for the view.

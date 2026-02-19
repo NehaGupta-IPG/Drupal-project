@@ -197,7 +197,7 @@ class RssFields extends RowPluginBase {
    * @param string $field_id
    *   The ID assigned to the required field in the display.
    *
-   * @return string|null|\Drupal\Component\Render\MarkupInterface
+   * @return string|null|MarkupInterface
    *   An empty string if there is no style plugin, or the field ID is empty.
    *   NULL if the field value is empty. If neither of these conditions apply,
    *   a MarkupInterface object containing the rendered field value.

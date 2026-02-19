@@ -24,14 +24,14 @@ class AliasPathProcessorTest extends UnitTestCase {
   /**
    * The mocked alias manager.
    *
-   * @var \Drupal\path_alias\AliasManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\path_alias\AliasManagerInterface|MockObject
    */
   protected $aliasManager;
 
   /**
    * The tested path processor.
    *
-   * @var \Drupal\path_alias\PathProcessor\AliasPathProcessor
+   * @var AliasPathProcessor
    */
   protected $pathProcessor;
 

@@ -155,14 +155,14 @@ class ImageUploadTest extends BrowserTestBase {
   /**
    * Make upload request to a controller.
    *
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   The URL for the request.
    * @param string $file_contents
    *   File contents.
    * @param string $file_name
    *   Name of the file.
    *
-   * @return \Psr\Http\Message\ResponseInterface
+   * @return ResponseInterface
    *   The response.
    */
   protected function uploadRequest(Url $url, string $file_contents, string $file_name): ResponseInterface {
@@ -183,7 +183,7 @@ class ImageUploadTest extends BrowserTestBase {
   /**
    * Provides the image upload URL.
    *
-   * @return \Drupal\Core\Url
+   * @return Url
    *   The upload image URL for the basic_html format.
    */
   protected function getUploadUrl() {
@@ -194,7 +194,7 @@ class ImageUploadTest extends BrowserTestBase {
   /**
    * Create a basic_html text format for the editor to reference.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    */
   protected function createBasicFormat(): void {
     $basic_html_format = FilterFormat::create([
@@ -215,10 +215,10 @@ class ImageUploadTest extends BrowserTestBase {
    * @param array $upload_config
    *   The editor image_upload config.
    *
-   * @return \Drupal\Core\Entity\EntityBase|\Drupal\Core\Entity\EntityInterface
+   * @return \Drupal\Core\Entity\EntityBase|EntityInterface
    *   The text editor entity.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    */
   protected function createEditorWithUpload(array $upload_config) {
     $editor = Editor::create([

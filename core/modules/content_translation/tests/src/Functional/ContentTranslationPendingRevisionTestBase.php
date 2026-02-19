@@ -131,12 +131,12 @@ abstract class ContentTranslationPendingRevisionTestBase extends ContentTranslat
   /**
    * Loads the active revision translation for the specified entity.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity being edited.
    * @param string $langcode
    *   The translation language code.
    *
-   * @return \Drupal\Core\Entity\ContentEntityInterface|null
+   * @return ContentEntityInterface|null
    *   The active revision translation or NULL if none could be identified.
    */
   protected function loadRevisionTranslation(ContentEntityInterface $entity, $langcode) {
@@ -144,7 +144,7 @@ abstract class ContentTranslationPendingRevisionTestBase extends ContentTranslat
     // statically cached.
     $this->storage->resetCache([$entity->id()]);
     $revision_id = $this->storage->getLatestTranslationAffectedRevisionId($entity->id(), $langcode);
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $revision */
+    /** @var ContentEntityInterface $revision */
     $revision = $revision_id ? $this->storage->loadRevision($revision_id) : NULL;
     return $revision && $revision->hasTranslation($langcode) ? $revision->getTranslation($langcode) : NULL;
   }
@@ -152,7 +152,7 @@ abstract class ContentTranslationPendingRevisionTestBase extends ContentTranslat
   /**
    * Returns the edit URL for the specified entity.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity being edited.
    *
    * @return \Drupal\Core\Url
@@ -172,7 +172,7 @@ abstract class ContentTranslationPendingRevisionTestBase extends ContentTranslat
   /**
    * Returns the delete translation URL for the specified entity.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity being edited.
    *
    * @return \Drupal\Core\Url

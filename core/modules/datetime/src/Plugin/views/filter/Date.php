@@ -30,7 +30,7 @@ class Date extends NumericDate implements ContainerFactoryPluginInterface {
   /**
    * The date formatter service.
    *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
+   * @var DateFormatterInterface
    */
   protected $dateFormatter;
 
@@ -53,7 +53,7 @@ class Date extends NumericDate implements ContainerFactoryPluginInterface {
   /**
    * The request stack used to determine current time.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
@@ -66,9 +66,9 @@ class Date extends NumericDate implements ContainerFactoryPluginInterface {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   * @param DateFormatterInterface $date_formatter
    *   The date formatter service.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   The request stack used to determine the current time.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, DateFormatterInterface $date_formatter, RequestStack $request_stack) {

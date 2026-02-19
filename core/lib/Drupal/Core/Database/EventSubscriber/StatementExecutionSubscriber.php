@@ -25,7 +25,7 @@ class StatementExecutionSubscriber implements EventSubscriberInterface {
    *
    * Logs the statement query if logging is active.
    *
-   * @param \Drupal\Core\Database\Event\StatementExecutionEndEvent $event
+   * @param StatementExecutionEndEvent $event
    *   The database event.
    */
   public function onStatementExecutionEnd(StatementExecutionEndEvent $event): void {

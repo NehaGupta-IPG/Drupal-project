@@ -131,7 +131,7 @@ class EntityViewControllerTest extends BrowserTestBase {
    * @param string|null $name
    *   The entity name, or NULL to generate random name.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The created entity.
    */
   protected function createTestEntity($entity_type, $name = NULL): EntityInterface {

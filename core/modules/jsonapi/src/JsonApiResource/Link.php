@@ -27,7 +27,7 @@ final class Link implements CacheableDependencyInterface {
   /**
    * The link URI.
    *
-   * @var \Drupal\Core\Url
+   * @var Url
    */
   protected $uri;
 
@@ -57,13 +57,13 @@ final class Link implements CacheableDependencyInterface {
   /**
    * JSON:API Link constructor.
    *
-   * @param \Drupal\Core\Cache\CacheableMetadata $cacheability
+   * @param CacheableMetadata $cacheability
    *   Any cacheability metadata associated with the link. For example, a
    *   'call-to-action' link might reference a registration resource if an event
    *   has vacancies or a wait-list resource otherwise. Therefore, the link's
    *   cacheability might be depend on a certain entity's values other than the
    *   entity on which the link will appear.
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   The Url object for the link.
    * @param string $link_relation_type
    *   An array of registered or extension RFC8288 link relation types.
@@ -88,7 +88,7 @@ final class Link implements CacheableDependencyInterface {
   /**
    * Gets the link's URI.
    *
-   * @return \Drupal\Core\Url
+   * @return Url
    *   The link's URI as a Url object.
    */
   public function getUri() {
@@ -128,9 +128,9 @@ final class Link implements CacheableDependencyInterface {
   /**
    * Compares two links.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\Link $a
+   * @param Link $a
    *   The first link.
-   * @param \Drupal\jsonapi\JsonApiResource\Link $b
+   * @param Link $b
    *   The second link.
    *
    * @return int
@@ -156,9 +156,9 @@ final class Link implements CacheableDependencyInterface {
    *
    * The links must share the same URI, link relation type and attributes.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\Link $a
+   * @param Link $a
    *   The first link.
-   * @param \Drupal\jsonapi\JsonApiResource\Link $b
+   * @param Link $b
    *   The second link.
    *
    * @return static

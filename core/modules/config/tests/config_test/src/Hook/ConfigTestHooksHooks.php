@@ -81,7 +81,7 @@ class ConfigTestHooksHooks {
    *
    * @param string $hook
    *   The fired hook.
-   * @param \Drupal\config_test\Entity\ConfigTest $config_test
+   * @param ConfigTest $config_test
    *   The ConfigTest entity.
    */
   protected function updateIsSyncingStore($hook, ConfigTest $config_test) {

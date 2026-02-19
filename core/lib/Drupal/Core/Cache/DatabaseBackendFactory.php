@@ -15,29 +15,29 @@ class DatabaseBackendFactory implements CacheFactoryInterface {
   /**
    * The database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
   /**
    * The cache tags checksum provider.
    *
-   * @var \Drupal\Core\Cache\CacheTagsChecksumInterface
+   * @var CacheTagsChecksumInterface
    */
   protected $checksumProvider;
 
   /**
    * Constructs the DatabaseBackendFactory object.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   Database connection.
-   * @param \Drupal\Core\Cache\CacheTagsChecksumInterface $checksum_provider
+   * @param CacheTagsChecksumInterface $checksum_provider
    *   The cache tags checksum provider.
-   * @param \Drupal\Core\Site\Settings $settings
+   * @param Settings $settings
    *   (optional) The site settings.
-   * @param \Drupal\Component\Serialization\ObjectAwareSerializationInterface|null $serializer
+   * @param ObjectAwareSerializationInterface|null $serializer
    *   (optional) The serializer to use.
-   * @param \Drupal\Component\Datetime\TimeInterface|null $time
+   * @param TimeInterface|null $time
    *   The time service.
    *
    * @throws \BadMethodCallException
@@ -59,7 +59,7 @@ class DatabaseBackendFactory implements CacheFactoryInterface {
    * @param string $bin
    *   The cache bin for which the object is created.
    *
-   * @return \Drupal\Core\Cache\DatabaseBackend
+   * @return DatabaseBackend
    *   The cache backend object for the specified cache bin.
    */
   public function get($bin) {

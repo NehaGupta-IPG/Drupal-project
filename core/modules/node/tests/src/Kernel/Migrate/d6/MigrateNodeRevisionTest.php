@@ -54,7 +54,7 @@ class MigrateNodeRevisionTest extends MigrateNodeTestBase {
    * @internal
    */
   protected function assertRevision(int $id, string $langcode, string $title, ?string $log, int $timestamp): void {
-    /** @var  \Drupal\node\NodeInterface $revision */
+    /** @var NodeInterface $revision */
     $revision = $this->nodeStorage->loadRevision($id)
       ->getTranslation($langcode);
     $this->assertInstanceOf(NodeInterface::class, $revision);
@@ -68,7 +68,7 @@ class MigrateNodeRevisionTest extends MigrateNodeTestBase {
    */
   public function testNodeRevision(): void {
     $node = \Drupal::entityTypeManager()->getStorage('node')->loadRevision(2001);
-    /** @var \Drupal\node\NodeInterface $node */
+    /** @var NodeInterface $node */
     $this->assertSame('1', $node->id());
     $this->assertSame('2001', $node->getRevisionId());
     $this->assertSame('und', $node->langcode->value);

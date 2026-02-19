@@ -30,9 +30,9 @@ interface FormBuilderInterface {
   /**
    * Determines the ID of a form.
    *
-   * @param \Drupal\Core\Form\FormInterface|string $form_arg
+   * @param FormInterface|string $form_arg
    *   The value is identical to that of self::getForm()'s $form_arg argument.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return string
@@ -47,7 +47,7 @@ interface FormBuilderInterface {
    * is not needed (i.e., when initially rendering the form) and is often
    * used as a menu callback.
    *
-   * @param \Drupal\Core\Form\FormInterface|string $form_arg
+   * @param FormInterface|string $form_arg
    *   The value must be one of the following:
    *   - The name of a class that implements \Drupal\Core\Form\FormInterface.
    *   - An instance of a class that implements \Drupal\Core\Form\FormInterface.
@@ -73,21 +73,21 @@ interface FormBuilderInterface {
    * previous page load. The form is then passed on for processing, validation,
    * and submission if there is proper input.
    *
-   * @param \Drupal\Core\Form\FormInterface|string $form_arg
+   * @param FormInterface|string $form_arg
    *   The value must be one of the following:
    *   - The name of a class that implements \Drupal\Core\Form\FormInterface.
    *   - An instance of a class that implements \Drupal\Core\Form\FormInterface.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return array
    *   The rendered form. This function may also perform a redirect and hence
    *   may not return at all depending upon the $form_state flags that were set.
    *
-   * @throws \Drupal\Core\Form\FormAjaxException
+   * @throws FormAjaxException
    *   Thrown when a form is triggered via an AJAX submission. It will be
    *   handled by \Drupal\Core\Form\EventSubscriber\FormAjaxSubscriber.
-   * @throws \Drupal\Core\Form\EnforcedResponseException
+   * @throws EnforcedResponseException
    *   Thrown when a form builder returns a response directly, usually a
    *   \Symfony\Component\HttpFoundation\RedirectResponse. It will be handled by
    *   \Drupal\Core\EventSubscriber\EnforcedFormResponseSubscriber.
@@ -113,7 +113,7 @@ interface FormBuilderInterface {
    * @param string $form_id
    *   The unique string identifying the desired form. If a function with that
    *   name exists, it is called to build the form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array|null $old_form
    *   (optional) A previously built $form. Used to retain the #build_id and
@@ -151,11 +151,11 @@ interface FormBuilderInterface {
    * \Drupal::formBuilder()->submitForm(RoleSettingsForm::class, $form_state);
    * @endcode
    *
-   * @param \Drupal\Core\Form\FormInterface|string $form_arg
+   * @param FormInterface|string $form_arg
    *   The value must be one of the following:
    *   - The name of a class that implements \Drupal\Core\Form\FormInterface.
    *   - An instance of a class that implements \Drupal\Core\Form\FormInterface.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form. Most important is the
    *   $form_state->getValues() collection, a tree of data used to simulate the
    *   incoming \Drupal::request()->request information from a user's form
@@ -185,12 +185,12 @@ interface FormBuilderInterface {
    * @param string $form_id
    *   The unique string identifying the desired form. If a function
    *   with that name exists, it is called to build the form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form, including the additional arguments to
    *   self::getForm() or self::submitForm() in the 'args' component of the
    *   array.
    *
-   * @return mixed|\Symfony\Component\HttpFoundation\Response
+   * @return mixed|Response
    *   The form array or a response object.
    */
   public function retrieveForm($form_id, FormStateInterface &$form_state);
@@ -205,7 +205,7 @@ interface FormBuilderInterface {
    *   The unique string identifying the current form.
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form. This includes the current persistent
    *   storage data for the form, and any data passed along by earlier steps
    *   when displaying a multi-step form. Additional information, like the
@@ -227,7 +227,7 @@ interface FormBuilderInterface {
    *   theming, and hook_form_alter functions.
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form. Passed in here so that hook_form_alter()
    *   calls can use it, as well.
    */
@@ -320,7 +320,7 @@ interface FormBuilderInterface {
    *   theming, and hook_form_alter functions.
    * @param array $element
    *   An associative array containing the structure of the current element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form. In this context, it is used to accumulate
    *   information about which button was clicked when the form was submitted,
    *   as well as the sanitized \Drupal::request()->request data.

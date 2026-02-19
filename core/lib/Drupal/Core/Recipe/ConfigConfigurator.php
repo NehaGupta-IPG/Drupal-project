@@ -30,7 +30,7 @@ final class ConfigConfigurator {
    *   Config options for a recipe.
    * @param string $recipe_directory
    *   The path to the recipe.
-   * @param \Drupal\Core\Config\StorageInterface $active_configuration
+   * @param StorageInterface $active_configuration
    *   The active configuration storage.
    */
   public function __construct(public readonly array $config, string $recipe_directory, StorageInterface $active_configuration) {
@@ -75,7 +75,7 @@ final class ConfigConfigurator {
   /**
    * Gets a config storage object for reading config from the recipe.
    *
-   * @return \Drupal\Core\Config\StorageInterface
+   * @return StorageInterface
    *   The  config storage object for reading config from the recipe.
    */
   public function getConfigStorage(): StorageInterface {

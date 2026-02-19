@@ -27,7 +27,7 @@ class ConfigTranslationTestSubscriber implements EventSubscriberInterface {
   /**
    * Reacts to the populating of a configuration mapper.
    *
-   * @param \Drupal\config_translation\Event\ConfigMapperPopulateEvent $event
+   * @param ConfigMapperPopulateEvent $event
    *   The configuration mapper event.
    */
   public function addConfigNames(ConfigMapperPopulateEvent $event) {

@@ -12,8 +12,8 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\entity_test\EntityTestHelper;
-use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\system\Functional\Cache\PageCacheTagsTestBase;
 use Drupal\Tests\system\Traits\CacheTestTrait;
 use Drupal\user\Entity\Role;
@@ -33,21 +33,21 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
   /**
    * The main entity used for testing.
    *
-   * @var \Drupal\Core\Entity\EntityInterface
+   * @var EntityInterface
    */
   protected $entity;
 
   /**
    * The entity instance referencing the main entity.
    *
-   * @var \Drupal\Core\Entity\EntityInterface
+   * @var EntityInterface
    */
   protected $referencingEntity;
 
   /**
    * The entity instance not referencing the main entity.
    *
-   * @var \Drupal\Core\Entity\EntityInterface
+   * @var EntityInterface
    */
   protected $nonReferencingEntity;
 
@@ -104,7 +104,7 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
   /**
    * Creates the entity to be tested.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The entity to be tested.
    */
   abstract protected function createEntity();
@@ -114,7 +114,7 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
    *
    * Only list cache contexts that aren't part of the required cache contexts.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to be tested, as created by createEntity().
    *
    * @return string[]
@@ -131,7 +131,7 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
    *
    * Only list cache contexts that aren't part of the required cache contexts.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to be tested, as created by createEntity().
    *
    * @return string[]
@@ -146,7 +146,7 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
   /**
    * Returns the additional (non-standard) cache tags for the tested entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to be tested, as created by createEntity().
    *
    * @return array
@@ -210,10 +210,10 @@ abstract class EntityCacheTagsTestBase extends PageCacheTagsTestBase {
   /**
    * Creates a referencing and a non-referencing entity for testing purposes.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $referenced_entity
+   * @param EntityInterface $referenced_entity
    *   The entity that the referencing entity should reference.
    *
-   * @return \Drupal\Core\Entity\EntityInterface[]
+   * @return EntityInterface[]
    *   An array containing a referencing entity and a non-referencing entity.
    */
   protected function createReferenceTestEntities($referenced_entity) {

@@ -27,7 +27,7 @@ class FieldViewsDataProvider {
   /**
    * Default views data implementation for a field.
    *
-   * @param \Drupal\field\FieldStorageConfigInterface $field_storage
+   * @param FieldStorageConfigInterface $field_storage
    *   The field definition.
    *
    * @return array
@@ -506,10 +506,10 @@ class FieldViewsDataProvider {
   /**
    * Determines whether the entity type the field appears in is SQL based.
    *
-   * @param \Drupal\field\FieldStorageConfigInterface $field_storage
+   * @param FieldStorageConfigInterface $field_storage
    *   The field storage definition.
    *
-   * @return \Drupal\Core\Entity\Sql\SqlContentEntityStorage|false
+   * @return SqlContentEntityStorage|false
    *   Returns the entity type storage if supported and FALSE otherwise.
    */
   public function getSqlStorageForField(FieldStorageConfigInterface $field_storage): SqlContentEntityStorage|bool {

@@ -166,14 +166,14 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
   /**
    * The field storage object.
    *
-   * @var \Drupal\Core\Field\FieldStorageDefinitionInterface
+   * @var FieldStorageDefinitionInterface
    */
   protected $fieldStorage;
 
   /**
    * The data definition of a field item.
    *
-   * @var \Drupal\Core\Field\TypedData\FieldItemDataDefinition
+   * @var FieldItemDataDefinition
    */
   protected $itemDefinition;
 
@@ -237,7 +237,7 @@ abstract class FieldConfigBase extends ConfigEntityBase implements FieldConfigIn
     // Add dependencies from the field type plugin. We can not use
     // self::calculatePluginDependencies() because instantiation of a field item
     // plugin requires a parent entity.
-    /** @var \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager */
+    /** @var FieldTypePluginManagerInterface $field_type_manager */
     $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
     $definition = $field_type_manager->getDefinition($this->getType());
     $this->addDependency('module', $definition['provider']);

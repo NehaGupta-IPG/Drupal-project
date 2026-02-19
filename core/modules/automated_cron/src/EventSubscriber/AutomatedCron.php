@@ -26,7 +26,7 @@ class AutomatedCron implements EventSubscriberInterface {
   /**
    * Run the automated cron if enabled.
    *
-   * @param \Symfony\Component\HttpKernel\Event\TerminateEvent $event
+   * @param TerminateEvent $event
    *   The Event to process.
    */
   public function onTerminate(TerminateEvent $event): void {

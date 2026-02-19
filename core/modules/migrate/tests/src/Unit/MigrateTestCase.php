@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Unit;
 
-use Drupal\sqlite\Driver\Database\sqlite\Connection;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
+use Drupal\sqlite\Driver\Database\sqlite\Connection;
 use Drupal\Tests\UnitTestCase;
 
 /**
@@ -25,7 +25,7 @@ abstract class MigrateTestCase extends UnitTestCase {
   /**
    * The migration ID map.
    *
-   * @var \Drupal\migrate\Plugin\MigrateIdMapInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var MigrateIdMapInterface|MockObject
    */
   protected $idMap;
 
@@ -39,11 +39,11 @@ abstract class MigrateTestCase extends UnitTestCase {
   /**
    * Retrieves a mocked migration.
    *
-   * @param \Drupal\migrate\Plugin\MigrateIdMapInterface|\PHPUnit\Framework\MockObject\MockObject|null $id_map
+   * @param MigrateIdMapInterface|MockObject|null $id_map
    *   An ID map plugin to use, or NULL for using a mocked one. Optional,
    *   defaults to NULL.
    *
-   * @return \Drupal\migrate\Plugin\MigrationInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @return MigrationInterface|MockObject
    *   The mocked migration.
    */
   protected function getMigration($id_map = NULL) {
@@ -108,7 +108,7 @@ abstract class MigrateTestCase extends UnitTestCase {
    *   (optional) Options for the database connection. Defaults to an empty
    *   array.
    *
-   * @return \Drupal\sqlite\Driver\Database\sqlite\Connection
+   * @return Connection
    *   The database connection.
    */
   protected function getDatabase(array $database_contents, $connection_options = []) {

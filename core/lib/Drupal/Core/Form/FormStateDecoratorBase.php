@@ -13,7 +13,7 @@ abstract class FormStateDecoratorBase implements FormStateInterface {
   /**
    * The decorated form state.
    *
-   * @var \Drupal\Core\Form\FormStateInterface
+   * @var FormStateInterface
    */
   protected $decoratedFormState;
 

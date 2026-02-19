@@ -17,7 +17,7 @@ class BubbleableMetadata extends CacheableMetadata implements AttachmentsInterfa
   /**
    * Creates a new bubbleable metadata object by merging this one with another.
    *
-   * @param \Drupal\Core\Cache\CacheableMetadata $other
+   * @param CacheableMetadata $other
    *   The other bubbleable metadata object.
    *
    * @return static
@@ -71,7 +71,7 @@ class BubbleableMetadata extends CacheableMetadata implements AttachmentsInterfa
   /**
    * Creates a bubbleable metadata object from a depended object.
    *
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface|mixed $object
+   * @param CacheableDependencyInterface|mixed $object
    *   The object whose cacheability metadata to retrieve. If it implements
    *   CacheableDependencyInterface, its cacheability metadata will be used,
    *   otherwise, the passed in object must be assumed to be uncacheable, so

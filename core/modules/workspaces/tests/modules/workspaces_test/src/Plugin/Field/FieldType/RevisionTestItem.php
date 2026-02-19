@@ -27,7 +27,7 @@ class RevisionTestItem extends FieldTestItem {
   public function preSave(): void {
     parent::preSave();
 
-    /** @var \Drupal\Core\Entity\RevisionableInterface|\Drupal\Core\Entity\EntityPublishedInterface $entity */
+    /** @var \Drupal\Core\Entity\RevisionableInterface|EntityPublishedInterface $entity */
     $entity = $this->getEntity();
 
     // Track the revision sequence of field pre-save for this entity.

@@ -24,7 +24,7 @@ interface ShortcutSetInterface extends ConfigEntityInterface {
   /**
    * Returns all the shortcuts from a shortcut set sorted correctly.
    *
-   * @return \Drupal\shortcut\ShortcutInterface[]
+   * @return ShortcutInterface[]
    *   An array of shortcut entities.
    */
   public function getShortcuts();

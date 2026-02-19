@@ -18,7 +18,7 @@ interface ContextAwareVariantInterface extends VariantInterface {
   /**
    * Sets the context values for this display variant.
    *
-   * @param \Drupal\Component\Plugin\Context\ContextInterface[] $contexts
+   * @param ContextInterface[] $contexts
    *   An array of contexts, keyed by context name.
    *
    * @return $this

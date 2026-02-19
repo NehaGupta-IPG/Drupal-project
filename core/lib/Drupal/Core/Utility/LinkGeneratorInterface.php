@@ -30,13 +30,13 @@ interface LinkGeneratorInterface {
    * This keeps the context of the link title ('settings' in the example) for
    * translators.
    *
-   * @param string|array|\Drupal\Component\Render\MarkupInterface $text
+   * @param string|array|MarkupInterface $text
    *   The link text for the anchor tag as a translated string or render array.
    *   Strings will be sanitized automatically. If you need to output HTML in
    *   the link text, use a render array or an already sanitized string such as
    *   the output of \Drupal\Component\Utility\Xss::filter() or
    *   \Drupal\Component\Render\FormattableMarkup.
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   The URL object used for the link. Amongst its options, the following may
    *   be set to affect the generated link:
    *   - attributes: An associative array of HTML attributes to apply to the
@@ -59,11 +59,11 @@ interface LinkGeneratorInterface {
    *   A GeneratedLink object containing a link to the given route and
    *   parameters and bubbleable metadata.
    *
-   * @throws \Symfony\Component\Routing\Exception\RouteNotFoundException
+   * @throws RouteNotFoundException
    *   Thrown when the named route doesn't exist.
-   * @throws \Symfony\Component\Routing\Exception\MissingMandatoryParametersException
+   * @throws MissingMandatoryParametersException
    *   Thrown when some parameters are missing that are mandatory for the route.
-   * @throws \Symfony\Component\Routing\Exception\InvalidParameterException
+   * @throws InvalidParameterException
    *   Thrown when a parameter value for a placeholder is not correct because it
    *   does not match the requirement.
    *

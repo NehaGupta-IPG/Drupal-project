@@ -35,7 +35,7 @@ final class NavigationShortcutsBlock extends BlockBase implements ContainerFacto
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   * @param ModuleHandlerInterface $moduleHandler
    *   The module handler service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, protected ModuleHandlerInterface $moduleHandler) {

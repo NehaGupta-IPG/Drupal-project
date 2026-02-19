@@ -57,7 +57,7 @@ interface StateInterface {
    * @param string $to_state_id
    *   The state to transition to.
    *
-   * @return \Drupal\workflows\TransitionInterface
+   * @return TransitionInterface
    *   The Transition object for the provided state ID.
    *
    * @throws \InvalidArgumentException
@@ -68,7 +68,7 @@ interface StateInterface {
   /**
    * Gets all the possible transition objects for the state.
    *
-   * @return \Drupal\workflows\TransitionInterface[]
+   * @return TransitionInterface[]
    *   All the possible transition objects for the state.
    */
   public function getTransitions();

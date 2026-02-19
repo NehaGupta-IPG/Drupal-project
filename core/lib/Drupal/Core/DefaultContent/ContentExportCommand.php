@@ -135,7 +135,7 @@ final class ContentExportCommand extends Command {
   /**
    * Find entities to export and yield them one by one.
    *
-   * @param \Drupal\Core\Entity\ContentEntityStorageInterface $storage
+   * @param ContentEntityStorageInterface $storage
    *   The entity storage handler.
    * @param string|int|null $entity_id
    *   The ID of the specific entity to load, or NULL to load all entities
@@ -143,7 +143,7 @@ final class ContentExportCommand extends Command {
    * @param string[] $bundles
    *   (optional) The bundles to filter by.
    *
-   * @return iterable<\Drupal\Core\Entity\ContentEntityInterface>
+   * @return iterable<ContentEntityInterface>
    *   A generator that yields content entities.
    */
   private function loadEntities(ContentEntityStorageInterface $storage, string|int|null $entity_id, array $bundles = []): iterable {

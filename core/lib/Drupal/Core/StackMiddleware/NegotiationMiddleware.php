@@ -14,7 +14,7 @@ class NegotiationMiddleware implements HttpKernelInterface {
   /**
    * The wrapped HTTP kernel.
    *
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface
+   * @var HttpKernelInterface
    */
   protected $httpKernel;
 
@@ -28,7 +28,7 @@ class NegotiationMiddleware implements HttpKernelInterface {
   /**
    * Constructs a new NegotiationMiddleware.
    *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel
+   * @param HttpKernelInterface $http_kernel
    *   The wrapper HTTP kernel.
    */
   public function __construct(HttpKernelInterface $http_kernel) {
@@ -72,7 +72,7 @@ class NegotiationMiddleware implements HttpKernelInterface {
    * The normalized type is a short, lowercase version of the format, such as
    * 'html', 'json' or 'atom'.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object from which to extract the content type.
    *
    * @return string

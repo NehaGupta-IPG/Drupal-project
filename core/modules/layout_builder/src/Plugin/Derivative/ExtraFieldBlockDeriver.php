@@ -7,13 +7,13 @@ use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\EntityTypeRepositoryInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\Context\EntityContextDefinition;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Entity\EntityTypeRepositoryInterface;
 
 /**
  * Provides entity field block definitions for every field.
@@ -28,43 +28,43 @@ class ExtraFieldBlockDeriver extends DeriverBase implements ContainerDeriverInte
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity type bundle info.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @var EntityTypeBundleInfoInterface
    */
   protected $entityTypeBundleInfo;
 
   /**
    * The entity type repository.
    *
-   * @var \Drupal\Core\Entity\EntityTypeRepositoryInterface
+   * @var EntityTypeRepositoryInterface
    */
   protected $entityTypeRepository;
 
   /**
    * Constructs new FieldBlockDeriver.
    *
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @param EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle info.
-   * @param \Drupal\Core\Entity\EntityTypeRepositoryInterface $entity_type_repository
+   * @param EntityTypeRepositoryInterface $entity_type_repository
    *   The entity type repository.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   * @param ModuleHandlerInterface $moduleHandler
    *   The module handler.
    */
   public function __construct(

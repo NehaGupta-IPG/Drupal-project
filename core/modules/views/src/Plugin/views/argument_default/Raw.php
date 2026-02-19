@@ -25,14 +25,14 @@ class Raw extends ArgumentDefaultPluginBase implements CacheableDependencyInterf
   /**
    * The alias manager.
    *
-   * @var \Drupal\path_alias\AliasManagerInterface
+   * @var AliasManagerInterface
    */
   protected $aliasManager;
 
   /**
    * The current path.
    *
-   * @var \Drupal\Core\Path\CurrentPathStack
+   * @var CurrentPathStack
    */
   protected $currentPath;
 
@@ -45,9 +45,9 @@ class Raw extends ArgumentDefaultPluginBase implements CacheableDependencyInterf
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\path_alias\AliasManagerInterface $alias_manager
+   * @param AliasManagerInterface $alias_manager
    *   The alias manager.
-   * @param \Drupal\Core\Path\CurrentPathStack $current_path
+   * @param CurrentPathStack $current_path
    *   The current path.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, AliasManagerInterface $alias_manager, CurrentPathStack $current_path) {

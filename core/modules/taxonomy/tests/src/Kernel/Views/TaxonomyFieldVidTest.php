@@ -65,12 +65,12 @@ class TaxonomyFieldVidTest extends ViewsKernelTestBase {
     $this->installEntitySchema('user');
     $this->installConfig(['filter']);
 
-    /** @var \Drupal\taxonomy\Entity\Vocabulary $vocabulary */
+    /** @var Vocabulary $vocabulary */
     $vocabulary = $this->createVocabulary(['vid' => 'aaa']);
     $term = $this->createTerm($vocabulary);
     $this->terms[$term->id()] = $term;
 
-    /** @var \Drupal\taxonomy\Entity\Vocabulary $vocabulary2 */
+    /** @var Vocabulary $vocabulary2 */
     $vocabulary2 = $this->createVocabulary(['vid' => 'bbb']);
     $term = $this->createTerm($vocabulary2);
     $this->terms[$term->id()] = $term;

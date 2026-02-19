@@ -26,7 +26,7 @@ class CKEditor5CodeSyntaxTest extends CKEditor5TestBase {
    */
   public function testCKEditor5CodeSyntax(): void {
     $this->addNewTextFormat();
-    /** @var \Drupal\editor\Entity\Editor $editor */
+    /** @var Editor $editor */
     $editor = Editor::load('ckeditor5');
     $editor->setSettings([
       'toolbar' => [

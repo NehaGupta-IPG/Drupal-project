@@ -22,27 +22,27 @@ class UserListBuilder extends EntityListBuilder {
   /**
    * The date formatter service.
    *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
+   * @var DateFormatterInterface
    */
   protected $dateFormatter;
 
   /**
    * The redirect destination service.
    *
-   * @var \Drupal\Core\Routing\RedirectDestinationInterface
+   * @var RedirectDestinationInterface
    */
   protected $redirectDestination;
 
   /**
    * Constructs a new UserListBuilder object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The entity storage class.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   * @param DateFormatterInterface $date_formatter
    *   The date formatter service.
-   * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirect_destination
+   * @param RedirectDestinationInterface $redirect_destination
    *   The redirect destination service.
    */
   public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, DateFormatterInterface $date_formatter, RedirectDestinationInterface $redirect_destination) {

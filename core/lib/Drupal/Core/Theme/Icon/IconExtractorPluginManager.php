@@ -45,7 +45,7 @@ class IconExtractorPluginManager extends DefaultPluginManager {
    * @param array $icon_pack_configurations
    *   All the icon pack configurations containing the extractor.
    *
-   * @return \Drupal\Core\Plugin\PluginFormInterface[]
+   * @return PluginFormInterface[]
    *   The extractor form indexed by extractor id.
    */
   public function getExtractorForms(array $icon_pack_configurations): array {
@@ -68,14 +68,14 @@ class IconExtractorPluginManager extends DefaultPluginManager {
    * @param array $icon_pack_configuration
    *   The extractor configuration.
    *
-   * @return \Drupal\Core\Plugin\PluginFormInterface|null
+   * @return PluginFormInterface|null
    *   The extractor form or null.
    */
   public function getExtractorForm(array $icon_pack_configuration): ?PluginFormInterface {
     if (!isset($icon_pack_configuration['settings'])) {
       return NULL;
     }
-    /** @var \Drupal\Core\Theme\Icon\IconExtractorInterface $plugin */
+    /** @var IconExtractorInterface $plugin */
     $plugin = $this->createInstance($icon_pack_configuration['extractor'], $icon_pack_configuration);
     return $this->getPluginForm($plugin);
   }
@@ -83,10 +83,10 @@ class IconExtractorPluginManager extends DefaultPluginManager {
   /**
    * Retrieves the plugin form for a given icon extractor.
    *
-   * @param \Drupal\Core\Theme\Icon\IconExtractorInterface $icon_extractor
+   * @param IconExtractorInterface $icon_extractor
    *   The ui icons extractor plugin.
    *
-   * @return \Drupal\Core\Plugin\PluginFormInterface
+   * @return PluginFormInterface
    *   The plugin form for this plugin.
    */
   protected function getPluginForm(IconExtractorInterface $icon_extractor): PluginFormInterface {

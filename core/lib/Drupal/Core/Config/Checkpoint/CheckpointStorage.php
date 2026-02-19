@@ -56,25 +56,25 @@ final class CheckpointStorage implements CheckpointStorageInterface, EventSubscr
   /**
    * The key value stores that store configuration changed for each checkpoint.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface[]
+   * @var KeyValueStoreInterface[]
    */
   private array $keyValueStores;
 
   /**
    * The checkpoint to read from.
    *
-   * @var \Drupal\Core\Config\Checkpoint\Checkpoint|null
+   * @var Checkpoint|null
    */
   private ?Checkpoint $readFromCheckpoint = NULL;
 
   /**
    * Constructs a CheckpointStorage object.
    *
-   * @param \Drupal\Core\Config\StorageInterface $activeStorage
+   * @param StorageInterface $activeStorage
    *   The active configuration storage.
-   * @param \Drupal\Core\Config\Checkpoint\CheckpointListInterface $checkpoints
+   * @param CheckpointListInterface $checkpoints
    *   The list of checkpoints.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $keyValueFactory
+   * @param KeyValueFactoryInterface $keyValueFactory
    *   The key value factory.
    * @param string $collection
    *   (optional) The configuration collection.
@@ -306,7 +306,7 @@ final class CheckpointStorage implements CheckpointStorageInterface, EventSubscr
    * @param string $collection
    *   The config collection to get the key value storage for.
    *
-   * @return \Drupal\Core\KeyValueStore\KeyValueStoreInterface
+   * @return KeyValueStoreInterface
    *   The key value storage for the provided checkpoint.
    */
   private function getKeyValue(string $checkpoint, string $collection): KeyValueStoreInterface {
@@ -320,13 +320,13 @@ final class CheckpointStorage implements CheckpointStorageInterface, EventSubscr
   /**
    * Gets the checkpoints to read from.
    *
-   * @return \Traversable<string, \Drupal\Core\Config\Checkpoint\Checkpoint>
+   * @return \Traversable<string, Checkpoint>
    *   The checkpoints, keyed by ID.
    */
   private function getCheckpointsToReadFrom(): \Traversable {
     $checkpoint = $this->checkpoints->getActiveCheckpoint();
 
-    /** @var \Drupal\Core\Config\Checkpoint\Checkpoint[] $checkpoints_to_read_from */
+    /** @var Checkpoint[] $checkpoints_to_read_from */
     $checkpoints_to_read_from = [$checkpoint];
     if ($checkpoint->id !== $this->readFromCheckpoint?->id) {
       // Follow ancestors to find the checkpoint to start reading from.
@@ -347,7 +347,7 @@ final class CheckpointStorage implements CheckpointStorageInterface, EventSubscr
   /**
    * Updates checkpoint when configuration is saved.
    *
-   * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   * @param ConfigCrudEvent $event
    *   The configuration event.
    */
   public function onConfigSaveAndDelete(ConfigCrudEvent $event): void {
@@ -382,7 +382,7 @@ final class CheckpointStorage implements CheckpointStorageInterface, EventSubscr
   /**
    * Updates checkpoint when configuration is saved.
    *
-   * @param \Drupal\Core\Config\ConfigRenameEvent $event
+   * @param ConfigRenameEvent $event
    *   The configuration event.
    */
   public function onConfigRename(ConfigRenameEvent $event): void {
@@ -415,7 +415,7 @@ final class CheckpointStorage implements CheckpointStorageInterface, EventSubscr
   /**
    * Gets the original data from the configuration.
    *
-   * @param \Drupal\Core\Config\StorableConfigBase $config
+   * @param StorableConfigBase $config
    *   The config to get the original data from.
    *
    * @return mixed

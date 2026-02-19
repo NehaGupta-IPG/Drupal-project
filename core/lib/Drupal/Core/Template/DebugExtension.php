@@ -48,7 +48,7 @@ final class DebugExtension extends AbstractExtension {
   /**
    * Dumps information about variables using Symfony VarDumper.
    *
-   * @param \Twig\Environment $env
+   * @param Environment $env
    *   The Twig environment.
    * @param array $context
    *   Variables from the Twig template.

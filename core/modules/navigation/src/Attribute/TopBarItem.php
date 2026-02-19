@@ -19,9 +19,9 @@ final class TopBarItem extends Plugin {
    *
    * @param string $id
    *   The top bar item ID.
-   * @param \Drupal\navigation\TopBarRegion $region
+   * @param TopBarRegion $region
    *   The region where the top bar item belongs to.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $label
+   * @param TranslatableMarkup|null $label
    *   (optional) The human-readable name of the top bar item.
    * @param class-string|null $deriver
    *   (optional) The deriver class.

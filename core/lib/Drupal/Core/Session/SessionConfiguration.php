@@ -63,7 +63,7 @@ class SessionConfiguration implements SessionConfigurationInterface {
   /**
    * Returns the session cookie name.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
    * @return string
@@ -83,7 +83,7 @@ class SessionConfiguration implements SessionConfigurationInterface {
   /**
    * Returns the session cookie name without the secure/insecure prefix.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
    * @return string
@@ -115,7 +115,7 @@ class SessionConfiguration implements SessionConfigurationInterface {
    * The Set-Cookie response header and its domain attribute are defined in RFC
    * 2109, RFC 2965 and RFC 6265 each one superseding the previous version.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
    * @return string|null

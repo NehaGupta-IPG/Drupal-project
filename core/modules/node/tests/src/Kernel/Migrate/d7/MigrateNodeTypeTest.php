@@ -57,7 +57,7 @@ class MigrateNodeTypeTest extends MigrateDrupal7TestBase {
    * @internal
    */
   protected function assertEntity(string $id, string $label, string $description, string $help, bool $display_submitted, bool $new_revision, ?array $expected_available_menus, ?string $expected_parent, ?string $body_label = NULL): void {
-    /** @var \Drupal\node\NodeTypeInterface $entity */
+    /** @var NodeTypeInterface $entity */
     $entity = NodeType::load($id);
     $this->assertInstanceOf(NodeTypeInterface::class, $entity);
     $this->assertSame($label, $entity->label());
@@ -69,7 +69,7 @@ class MigrateNodeTypeTest extends MigrateDrupal7TestBase {
     $this->assertSame($new_revision, $entity->shouldCreateNewRevision(), 'Is a new revision');
 
     if ($body_label) {
-      /** @var \Drupal\field\FieldConfigInterface $body */
+      /** @var FieldConfigInterface $body */
       $body = FieldConfig::load('node.' . $id . '.body');
       $this->assertInstanceOf(FieldConfigInterface::class, $body);
       $this->assertSame($body_label, $body->label());

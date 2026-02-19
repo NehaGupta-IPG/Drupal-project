@@ -25,9 +25,9 @@ abstract class NodeDateArgumentDefaultPluginBase extends ArgumentDefaultPluginBa
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
+   * @param RouteMatchInterface $routeMatch
    *   The route match.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
+   * @param DateFormatterInterface $dateFormatter
    *   The date formatter service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, protected RouteMatchInterface $routeMatch, protected DateFormatterInterface $dateFormatter) {
@@ -80,7 +80,7 @@ abstract class NodeDateArgumentDefaultPluginBase extends ArgumentDefaultPluginBa
   /**
    * Gets a timestamp value from the passed node.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   The node to get the timestamp value from.
    *
    * @return int

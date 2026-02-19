@@ -221,7 +221,7 @@ class MigrateEntityContentBaseTest extends KernelTestBase {
     $result = $executable->import();
     $this->assertEquals(MigrationInterface::RESULT_COMPLETED, $result);
 
-    /** @var \Drupal\migrate\Plugin\MigrateIdMapInterface $id_map_plugin */
+    /** @var MigrateIdMapInterface $id_map_plugin */
     $id_map_plugin = $migration->getIdMap();
 
     // Check that the destination has been stored.
@@ -268,7 +268,7 @@ class MigrateEntityContentBaseTest extends KernelTestBase {
     $executable = new MigrateExecutable($migration);
     $executable->import();
 
-    /** @var \Drupal\migrate_entity_test\Entity\StringIdEntityTest $entity */
+    /** @var StringIdEntityTest $entity */
     $entity = StringIdEntityTest::load('123');
     $this->assertSame('foo', $entity->version->value);
     $entity = StringIdEntityTest::load('123456789012');
@@ -285,7 +285,7 @@ class MigrateEntityContentBaseTest extends KernelTestBase {
     $executable = new MigrateExecutable($migration);
     $executable->import();
 
-    /** @var \Drupal\migrate_entity_test\Entity\StringIdEntityTest $entity */
+    /** @var StringIdEntityTest $entity */
     $entity = StringIdEntityTest::load('123');
     $this->assertNull($entity->version->value);
     $entity = StringIdEntityTest::load('123456789012');

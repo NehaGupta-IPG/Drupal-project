@@ -30,28 +30,28 @@ class NodeAccessGrantsCacheContextTest extends NodeTestBase {
   /**
    * User with permission to view content.
    *
-   * @var \Drupal\user\Entity\User|false
+   * @var User|false
    */
   protected $accessUser;
 
   /**
    * User without permission to view content.
    *
-   * @var \Drupal\user\Entity\User|false
+   * @var User|false
    */
   protected $noAccessUser;
 
   /**
    * User without permission to view content.
    *
-   * @var \Drupal\user\Entity\User
+   * @var User
    */
   protected User $noAccessUser2;
 
   /**
    * User with permission to bypass node access.
    *
-   * @var \Drupal\user\Entity\User|false
+   * @var User|false
    *
    * @see \Drupal\Tests\user\Traits\UserCreationTrait::createUser
    */

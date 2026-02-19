@@ -26,12 +26,12 @@ class BigPipePlaceholderTestCases {
   /**
    * Gets all BigPipe placeholder test cases.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface|null $container
+   * @param ContainerInterface|null $container
    *   Optional. Necessary to get the embedded AJAX/HTML responses.
-   * @param \Drupal\Core\Session\AccountInterface|null $user
+   * @param AccountInterface|null $user
    *   Optional. Necessary to get the embedded AJAX/HTML responses.
    *
-   * @return \Drupal\big_pipe_test\BigPipePlaceholderTestCase[]
+   * @return BigPipePlaceholderTestCase[]
    *   An array of placeholder test cases.
    */
   public static function cases(?ContainerInterface $container = NULL, ?AccountInterface $user = NULL) {

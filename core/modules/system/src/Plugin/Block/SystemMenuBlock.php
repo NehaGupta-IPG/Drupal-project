@@ -31,14 +31,14 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
   /**
    * The menu link tree service.
    *
-   * @var \Drupal\Core\Menu\MenuLinkTreeInterface
+   * @var MenuLinkTreeInterface
    */
   protected $menuTree;
 
   /**
    * The active menu trail service.
    *
-   * @var \Drupal\Core\Menu\MenuActiveTrailInterface
+   * @var MenuActiveTrailInterface
    */
   protected $menuActiveTrail;
 
@@ -51,9 +51,9 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
    *   The plugin ID for the plugin instance.
    * @param array $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menu_tree
+   * @param MenuLinkTreeInterface $menu_tree
    *   The menu tree service.
-   * @param \Drupal\Core\Menu\MenuActiveTrailInterface $menu_active_trail
+   * @param MenuActiveTrailInterface $menu_active_trail
    *   The active menu trail service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MenuLinkTreeInterface $menu_tree, MenuActiveTrailInterface $menu_active_trail) {
@@ -302,7 +302,7 @@ class SystemMenuBlock extends BlockBase implements ContainerFactoryPluginInterfa
    * set of links, so setting 'ignore_active_trail' to TRUE only works with
    * certain configurations:
    * - The initial level is 1 and all items are expanded
-   * - The initial level is 1 and only 1 level of links are displayed
+   * - The initial level is 1 and only 1 level of links are displayed.
    *
    * While the form UI and validation should prevent 'ignore_active_trail' from
    * being set to TRUE otherwise, the other settings are checked as well, in

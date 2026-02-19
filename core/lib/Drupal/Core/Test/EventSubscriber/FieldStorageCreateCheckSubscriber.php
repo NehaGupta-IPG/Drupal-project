@@ -30,9 +30,9 @@ final class FieldStorageCreateCheckSubscriber implements EventSubscriberInterfac
   /**
    * Constructs the FieldStorageCreateCheckSubscriber object.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager service.
    * @param bool $throwLogicExceptionOrDeprecationWarning
    *   When the value is TRUE a LogicException will be thrown, when the value is
@@ -63,7 +63,7 @@ final class FieldStorageCreateCheckSubscriber implements EventSubscriberInterfac
   /**
    * Listener method for any field storage definition create event.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionEvent $event
+   * @param FieldStorageDefinitionEvent $event
    *   The field storage definition event object.
    * @param string $event_name
    *   The event name.

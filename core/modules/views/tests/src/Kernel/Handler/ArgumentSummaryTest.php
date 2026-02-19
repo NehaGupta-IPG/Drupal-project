@@ -46,14 +46,14 @@ class ArgumentSummaryTest extends ViewsKernelTestBase {
   /**
    * Node type with an autocomplete tagging field.
    *
-   * @var \Drupal\node\NodeTypeInterface
+   * @var NodeTypeInterface
    */
   protected NodeTypeInterface $nodeType;
 
   /**
    * The vocabulary used for the test tag field.
    *
-   * @var \Drupal\taxonomy\VocabularyInterface
+   * @var VocabularyInterface
    */
   protected VocabularyInterface $tagVocabulary;
 
@@ -103,7 +103,7 @@ class ArgumentSummaryTest extends ViewsKernelTestBase {
   /**
    * Creates a term in the tag vocabulary.
    *
-   * @return \Drupal\taxonomy\TermInterface
+   * @return TermInterface
    *   The created term.
    */
   protected function createTag(): TermInterface {

@@ -25,7 +25,7 @@ interface SearchableHelpInterface {
    *
    * @param string $topic_id
    *   The ID of the topic to be indexed.
-   * @param \Drupal\Core\Language\LanguageInterface $language
+   * @param LanguageInterface $language
    *   The language to render the topic in.
    *
    * @return array

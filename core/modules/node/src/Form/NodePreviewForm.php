@@ -3,8 +3,8 @@
 namespace Drupal\node\Form;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
@@ -20,14 +20,14 @@ class NodePreviewForm extends FormBase {
   /**
    * The entity display repository.
    *
-   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
+   * @var EntityDisplayRepositoryInterface
    */
   protected $entityDisplayRepository;
 
   /**
    * The config factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
@@ -44,9 +44,9 @@ class NodePreviewForm extends FormBase {
   /**
    * Constructs a new NodePreviewForm.
    *
-   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
+   * @param EntityDisplayRepositoryInterface $entity_display_repository
    *   The entity display repository.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The configuration factory.
    */
   public function __construct(EntityDisplayRepositoryInterface $entity_display_repository, ConfigFactoryInterface $config_factory) {
@@ -66,9 +66,9 @@ class NodePreviewForm extends FormBase {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
-   * @param \Drupal\Core\Entity\EntityInterface $node
+   * @param EntityInterface $node
    *   The node being previews.
    *
    * @return array

@@ -4,20 +4,20 @@ namespace Drupal\block\Entity;
 
 use Drupal\block\BlockAccessControlHandler;
 use Drupal\block\BlockForm;
+use Drupal\block\BlockInterface;
 use Drupal\block\BlockListBuilder;
+use Drupal\block\BlockPluginCollection;
 use Drupal\block\BlockViewBuilder;
 use Drupal\block\Form\BlockDeleteForm;
-use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\Condition\ConditionPluginCollection;
 use Drupal\Core\Config\Action\Attribute\ActionMethod;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
-use Drupal\block\BlockPluginCollection;
-use Drupal\block\BlockInterface;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
-use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
+use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Defines a Block configuration entity class.
@@ -113,7 +113,7 @@ class Block extends ConfigEntityBase implements BlockInterface, EntityWithPlugin
   /**
    * The plugin collection that holds the block plugin for this entity.
    *
-   * @var \Drupal\block\BlockPluginCollection
+   * @var BlockPluginCollection
    */
   protected $pluginCollection;
 
@@ -127,7 +127,7 @@ class Block extends ConfigEntityBase implements BlockInterface, EntityWithPlugin
   /**
    * The visibility collection.
    *
-   * @var \Drupal\Core\Condition\ConditionPluginCollection
+   * @var ConditionPluginCollection
    */
   protected $visibilityCollection;
 
@@ -367,7 +367,7 @@ class Block extends ConfigEntityBase implements BlockInterface, EntityWithPlugin
    *
    * @param null|string $region
    *   The region to validate.
-   * @param \Symfony\Component\Validator\Context\ExecutionContextInterface $context
+   * @param ExecutionContextInterface $context
    *   The validation context.
    */
   public static function validateRegion(?string $region, ExecutionContextInterface $context): void {

@@ -28,14 +28,14 @@ class EntityCreateAccessCustomCidTest extends UnitTestCase {
   /**
    * A mock entity type.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface
+   * @var EntityTypeInterface
    */
   protected EntityTypeInterface $entityType;
 
   /**
    * A mock account.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected AccountInterface $account;
 
@@ -49,7 +49,7 @@ class EntityCreateAccessCustomCidTest extends UnitTestCase {
   /**
    * A mock module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected ModuleHandlerInterface $moduleHandler;
 
@@ -84,7 +84,7 @@ class EntityCreateAccessCustomCidTest extends UnitTestCase {
   /**
    * Setup the access cache on the entity handler for testing.
    *
-   * @param \Drupal\Core\Entity\EntityAccessControlHandler $handler
+   * @param EntityAccessControlHandler $handler
    *   The access control handler.
    * @param bool $in_cache
    *   Whether to prefill the handler's access cache.

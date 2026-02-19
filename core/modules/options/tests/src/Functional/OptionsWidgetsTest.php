@@ -38,21 +38,21 @@ class OptionsWidgetsTest extends FieldTestBase {
   /**
    * A field storage with cardinality 1 to use in this test class.
    *
-   * @var \Drupal\field\Entity\FieldStorageConfig
+   * @var FieldStorageConfig
    */
   protected $card1;
 
   /**
    * A field storage with cardinality 2 to use in this test class.
    *
-   * @var \Drupal\field\Entity\FieldStorageConfig
+   * @var FieldStorageConfig
    */
   protected $card2;
 
   /**
    * A field storage with float values to use in this test class.
    *
-   * @var \Drupal\field\Entity\FieldStorageConfig
+   * @var FieldStorageConfig
    */
   protected $float;
 

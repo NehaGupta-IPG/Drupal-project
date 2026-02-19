@@ -17,7 +17,7 @@ trait CacheTestTrait {
    *
    * This is how Drupal\Core\Render\RenderCache uses the render cache backend.
    *
-   * @return \Drupal\Core\Cache\VariationCacheInterface
+   * @return VariationCacheInterface
    *   The render cache backend as a variation cache.
    */
   protected function getRenderVariationCache(): VariationCacheInterface {
@@ -29,7 +29,7 @@ trait CacheTestTrait {
   /**
    * Retrieves the default cache backend as a variation cache.
    *
-   * @return \Drupal\Core\Cache\VariationCacheInterface
+   * @return VariationCacheInterface
    *   The default cache backend as a variation cache.
    */
   protected function getDefaultVariationCache(): VariationCacheInterface {
@@ -45,7 +45,7 @@ trait CacheTestTrait {
    *   The render cache item keys.
    * @param array $tags
    *   An array of expected cache tags.
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $cacheability
+   * @param CacheableDependencyInterface $cacheability
    *   The initial cacheability the item was rendered with.
    */
   protected function verifyRenderCache(array $keys, array $tags, CacheableDependencyInterface $cacheability): void {
@@ -59,7 +59,7 @@ trait CacheTestTrait {
    *   The cache item keys.
    * @param array $tags
    *   An array of expected cache tags.
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $cacheability
+   * @param CacheableDependencyInterface $cacheability
    *   The initial cacheability for the item.
    */
   protected function verifyDefaultCache(array $keys, array $tags, CacheableDependencyInterface $cacheability): void {
@@ -69,13 +69,13 @@ trait CacheTestTrait {
   /**
    * Verify that a given cache entry exists, with the correct cache tags.
    *
-   * @param \Drupal\Core\Cache\VariationCacheInterface $cache_bin
+   * @param VariationCacheInterface $cache_bin
    *   The cache bin to check.
    * @param string[] $keys
    *   The cache item keys.
    * @param array $tags
    *   An array of expected cache tags.
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $cacheability
+   * @param CacheableDependencyInterface $cacheability
    *   The initial cacheability for the item.
    */
   private function verifyCache(VariationCacheInterface $cache_bin, array $keys, array $tags, CacheableDependencyInterface $cacheability): void {

@@ -35,7 +35,7 @@ class EntityReverse extends RelationshipPluginBase {
    *   The plugin ID for the plugin instance.
    * @param array $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\views\Plugin\ViewsHandlerManager $join_manager
+   * @param ViewsHandlerManager $join_manager
    *   The views plugin join manager.
    */
   public function __construct(

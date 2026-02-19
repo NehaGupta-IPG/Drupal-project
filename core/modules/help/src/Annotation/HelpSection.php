@@ -7,7 +7,7 @@ use Drupal\Component\Annotation\Plugin;
 /**
  * Defines a Plugin annotation object for help page section plugins.
  *
- * Plugin Namespace: Plugin\HelpSection
+ * Plugin Namespace: Plugin\HelpSection.
  *
  * For a working example, see \Drupal\help\Plugin\HelpSection\HookHelpSection.
  *

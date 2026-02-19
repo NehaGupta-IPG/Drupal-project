@@ -1,11 +1,11 @@
 <?php
 
+use Drupal\Core\StreamWrapper\StreamWrapperManager;
+
 /**
  * @file
  * Hooks related to the File management system.
  */
-
-use Drupal\Core\StreamWrapper\StreamWrapperManager;
 
 /**
  * @addtogroup hooks

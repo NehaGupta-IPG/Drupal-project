@@ -15,7 +15,7 @@ trait RedirectDestinationTrait {
   /**
    * The redirect destination service.
    *
-   * @var \Drupal\Core\Routing\RedirectDestinationInterface
+   * @var RedirectDestinationInterface
    */
   protected $redirectDestination;
 
@@ -39,7 +39,7 @@ trait RedirectDestinationTrait {
   /**
    * Returns the redirect destination service.
    *
-   * @return \Drupal\Core\Routing\RedirectDestinationInterface
+   * @return RedirectDestinationInterface
    *   The redirect destination helper.
    */
   protected function getRedirectDestination() {
@@ -53,7 +53,7 @@ trait RedirectDestinationTrait {
   /**
    * Sets the redirect destination service.
    *
-   * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirect_destination
+   * @param RedirectDestinationInterface $redirect_destination
    *   The redirect destination service.
    *
    * @return $this

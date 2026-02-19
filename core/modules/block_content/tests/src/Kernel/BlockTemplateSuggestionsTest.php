@@ -31,7 +31,7 @@ class BlockTemplateSuggestionsTest extends KernelTestBase {
   /**
    * The BlockContent entity used for testing.
    *
-   * @var \Drupal\block_content\Entity\BlockContent
+   * @var BlockContent
    */
   protected $blockContent;
 

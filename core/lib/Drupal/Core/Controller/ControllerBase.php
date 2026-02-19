@@ -5,10 +5,10 @@ namespace Drupal\Core\Controller;
 use Drupal\Core\DependencyInjection\AutowireTrait;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Logger\LoggerChannelTrait;
+use Drupal\Core\Messenger\MessengerTrait;
 use Drupal\Core\Routing\RedirectDestinationTrait;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
-use Drupal\Core\Messenger\MessengerTrait;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
@@ -266,7 +266,7 @@ abstract class ControllerBase implements ContainerInjectionInterface {
    *   (optional) The HTTP redirect status code for the redirect. The default is
    *   302 Found.
    *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   * @return RedirectResponse
    *   A redirect response object that may be returned by the controller.
    */
   protected function redirect($route_name, array $route_parameters = [], array $options = [], $status = 302) {

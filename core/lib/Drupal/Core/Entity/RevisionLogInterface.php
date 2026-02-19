@@ -32,7 +32,7 @@ interface RevisionLogInterface extends RevisionableInterface {
   /**
    * Gets the entity revision author.
    *
-   * @return \Drupal\user\UserInterface|null
+   * @return UserInterface|null
    *   The user entity for the revision author, or NULL if not set or user was
    *   deleted.
    */
@@ -41,7 +41,7 @@ interface RevisionLogInterface extends RevisionableInterface {
   /**
    * Sets the entity revision author.
    *
-   * @param \Drupal\user\UserInterface $account
+   * @param UserInterface $account
    *   The user account of the revision author.
    *
    * @return $this

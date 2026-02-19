@@ -10,7 +10,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 /**
  * Defines a filter attribute for plugin discovery.
  *
- * Plugin Namespace: Plugin\Filter
+ * Plugin Namespace: Plugin\Filter.
  *
  * For a working example, see \Drupal\filter\Plugin\Filter\FilterHtml
  *
@@ -27,13 +27,13 @@ class Filter extends Plugin {
    *
    * @param string $id
    *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $title
+   * @param TranslatableMarkup $title
    *   The human-readable name of the filter. This is used as an administrative
    *   summary of what the filter does.
    * @param int $type
    *   The filter type. Values are defined in
    *   \Drupal\filter\Plugin\FilterInterface.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $description
+   * @param TranslatableMarkup|null $description
    *   (optional) Additional administrative information about the filter's
    *   behavior.
    * @param int $weight

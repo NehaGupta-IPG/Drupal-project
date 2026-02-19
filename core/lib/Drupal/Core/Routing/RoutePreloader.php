@@ -27,9 +27,9 @@ class RoutePreloader implements EventSubscriberInterface {
   /**
    * Constructs a new RoutePreloader.
    *
-   * @param \Drupal\Core\Routing\RouteProviderInterface $routeProvider
+   * @param RouteProviderInterface $routeProvider
    *   The route provider.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state key value store.
    */
   public function __construct(
@@ -41,7 +41,7 @@ class RoutePreloader implements EventSubscriberInterface {
   /**
    * Loads all non-admin routes right before the actual page is rendered.
    *
-   * @param \Symfony\Component\HttpKernel\Event\KernelEvent $event
+   * @param KernelEvent $event
    *   The event to process.
    */
   public function onRequest(KernelEvent $event) {
@@ -59,7 +59,7 @@ class RoutePreloader implements EventSubscriberInterface {
   /**
    * Alters existing routes for a specific collection.
    *
-   * @param \Drupal\Core\Routing\RouteBuildEvent $event
+   * @param RouteBuildEvent $event
    *   The route build event.
    */
   public function onAlterRoutes(RouteBuildEvent $event) {
@@ -96,7 +96,7 @@ class RoutePreloader implements EventSubscriberInterface {
   /**
    * Determines whether the given route is a GET and HTML route.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route to analyze.
    *
    * @return bool

@@ -19,14 +19,14 @@ class CssOptimizerUnitTest extends UnitTestCase {
   /**
    * A CSS asset optimizer.
    *
-   * @var \Drupal\Core\Asset\CssOptimizer
+   * @var CssOptimizer
    */
   protected $optimizer;
 
   /**
    * The file URL generator mock.
    *
-   * @var \Drupal\Core\File\FileUrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var FileUrlGeneratorInterface|MockObject
    */
   protected $fileUrlGenerator;
 

@@ -16,7 +16,7 @@ interface AccountSwitcherInterface {
    * matched by a corresponding invocation of
    * AccountSwitcherInterface::switchBack() in the same function.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The account to switch to.
    *
    * @return $this

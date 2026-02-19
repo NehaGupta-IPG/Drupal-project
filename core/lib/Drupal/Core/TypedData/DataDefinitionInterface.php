@@ -57,7 +57,7 @@ interface DataDefinitionInterface {
   /**
    * Returns a human readable label.
    *
-   * @return string|\Drupal\Core\StringTranslation\TranslatableMarkup|null
+   * @return string|TranslatableMarkup|null
    *   The label. A string or an instance of TranslatableMarkup will be returned
    *   based on the way the label translation is handled. NULL if no label is
    *   available.
@@ -70,7 +70,7 @@ interface DataDefinitionInterface {
    * Descriptions are usually used on user interfaces where the data is edited
    * or displayed.
    *
-   * @return string|\Drupal\Core\StringTranslation\TranslatableMarkup|null
+   * @return string|TranslatableMarkup|null
    *   The description. A string or an instance of TranslatableMarkup will be
    *   returned based on the way the description translation is handled. NULL if
    *   no description is available.

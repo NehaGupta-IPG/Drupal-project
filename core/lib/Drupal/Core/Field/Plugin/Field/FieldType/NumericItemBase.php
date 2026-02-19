@@ -133,7 +133,7 @@ abstract class NumericItemBase extends FieldItemBase {
    *
    * @param array[] $element
    *   The numeric element to be validated.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array[] $complete_form
    *   The complete form structure.

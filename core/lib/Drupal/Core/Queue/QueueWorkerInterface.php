@@ -23,14 +23,14 @@ interface QueueWorkerInterface extends PluginInspectionInterface {
    *   The data that was passed to
    *   \Drupal\Core\Queue\QueueInterface::createItem() when the item was queued.
    *
-   * @throws \Drupal\Core\Queue\RequeueException
+   * @throws RequeueException
    *   Processing is not yet finished. This will allow another process to claim
    *   the item immediately.
    * @throws \Exception
    *   A QueueWorker plugin may throw an exception to indicate there was a
    *   problem. The cron process will log the exception, and leave the item in
    *   the queue to be processed again later.
-   * @throws \Drupal\Core\Queue\SuspendQueueException
+   * @throws SuspendQueueException
    *   More specifically, a SuspendQueueException should be thrown when a
    *   QueueWorker plugin is aware that the problem will affect all subsequent
    *   workers of its queue. For example, a callback that makes HTTP requests
@@ -38,7 +38,7 @@ interface QueueWorkerInterface extends PluginInspectionInterface {
    *   behave as with a normal Exception, and in addition will not attempt to
    *   process further items from the current item's queue during the current
    *   cron run.
-   * @throws \Drupal\Core\Queue\DelayedRequeueException
+   * @throws DelayedRequeueException
    *   To leave an item in the queue until its lock expires.
    *
    * @see \Drupal\Core\Cron::processQueues()

@@ -28,7 +28,7 @@ class TypedDataDefinitionEntityBundleTest extends KernelTestBase {
   /**
    * The storage for the 'entity_test_bundle' entity type.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var EntityStorageInterface
    */
   protected EntityStorageInterface $entityTestBundleStorage;
 
@@ -53,7 +53,7 @@ class TypedDataDefinitionEntityBundleTest extends KernelTestBase {
   /**
    * Tests that entity bundle definitions are derived correctly.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    */
   public function testEntityBundleDefinitions(): void {
     // Start without any bundles and no bundle-specific data type.

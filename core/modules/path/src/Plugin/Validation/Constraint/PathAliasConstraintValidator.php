@@ -16,14 +16,14 @@ class PathAliasConstraintValidator extends ConstraintValidator implements Contai
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   private $entityTypeManager;
 
   /**
    * Creates a new PathAliasConstraintValidator instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {

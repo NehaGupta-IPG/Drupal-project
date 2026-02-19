@@ -77,9 +77,9 @@ class OverviewTerms extends EntityForm {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
-   * @param \Drupal\taxonomy\VocabularyInterface $taxonomy_vocabulary
+   * @param VocabularyInterface $taxonomy_vocabulary
    *   The vocabulary to display the overview form for.
    *
    * @return array
@@ -460,7 +460,7 @@ class OverviewTerms extends EntityForm {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
@@ -558,7 +558,7 @@ class OverviewTerms extends EntityForm {
    * Redirects to confirmation form for the reset action.
    */
   public function submitReset(array &$form, FormStateInterface $form_state) {
-    /** @var \Drupal\taxonomy\VocabularyInterface $vocabulary */
+    /** @var VocabularyInterface $vocabulary */
     $vocabulary = $form_state->get(['taxonomy', 'vocabulary']);
     $form_state->setRedirectUrl($vocabulary->toUrl('reset-form'));
   }

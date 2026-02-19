@@ -24,14 +24,14 @@ class ConfigMapperManagerTest extends UnitTestCase {
   /**
    * The configuration mapper manager to test.
    *
-   * @var \Drupal\config_translation\ConfigMapperManager
+   * @var ConfigMapperManager
    */
   protected $configMapperManager;
 
   /**
    * The typed configuration manager used for testing.
    *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Config\TypedConfigManagerInterface|MockObject
    */
   protected $typedConfigManager;
 
@@ -66,7 +66,7 @@ class ConfigMapperManagerTest extends UnitTestCase {
   /**
    * Tests ConfigMapperManager::hasTranslatable().
    *
-   * @param \Drupal\Core\TypedData\TypedDataInterface $element
+   * @param TypedDataInterface $element
    *   The schema element to test.
    * @param bool $expected
    *   The expected return value of ConfigMapperManager::hasTranslatable().
@@ -168,7 +168,7 @@ class ConfigMapperManagerTest extends UnitTestCase {
    * @param array $elements
    *   An array of simple schema elements.
    *
-   * @return \Drupal\Core\Config\Schema\Mapping
+   * @return Mapping
    *   A nested schema element, containing the passed-in elements.
    */
   protected static function getNestedElement(array $elements) {

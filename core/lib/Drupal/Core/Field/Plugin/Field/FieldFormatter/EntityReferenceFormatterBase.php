@@ -6,8 +6,8 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\Core\Field\FormatterBase;
+use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\Core\TypedData\TranslatableInterface;
 
 /**
@@ -29,12 +29,12 @@ abstract class EntityReferenceFormatterBase extends FormatterBase {
    * is available in $entity->_referringItem. This is useful for field types
    * that store additional values next to the reference itself.
    *
-   * @param \Drupal\Core\Field\EntityReferenceFieldItemListInterface $items
+   * @param EntityReferenceFieldItemListInterface $items
    *   The item list.
    * @param string $langcode
    *   The language code of the referenced entities to display.
    *
-   * @return \Drupal\Core\Entity\EntityInterface[]
+   * @return EntityInterface[]
    *   The array of referenced entities to display, keyed by delta.
    *
    * @see ::prepareView()
@@ -164,7 +164,7 @@ abstract class EntityReferenceFormatterBase extends FormatterBase {
   /**
    * Returns whether the entity referenced by an item needs to be loaded.
    *
-   * @param \Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem $item
+   * @param EntityReferenceItem $item
    *   The item to check.
    *
    * @return bool
@@ -181,7 +181,7 @@ abstract class EntityReferenceFormatterBase extends FormatterBase {
    * to exclude certain items from entity access checking by immediately
    * granting access.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to check.
    *
    * @return \Drupal\Core\Access\AccessResult

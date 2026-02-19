@@ -42,21 +42,21 @@ class OEmbedFormatter extends FormatterBase {
   /**
    * The messenger service.
    *
-   * @var \Drupal\Core\Messenger\MessengerInterface
+   * @var MessengerInterface
    */
   protected $messenger;
 
   /**
    * The oEmbed resource fetcher.
    *
-   * @var \Drupal\media\OEmbed\ResourceFetcherInterface
+   * @var ResourceFetcherInterface
    */
   protected $resourceFetcher;
 
   /**
    * The oEmbed URL resolver service.
    *
-   * @var \Drupal\media\OEmbed\UrlResolverInterface
+   * @var UrlResolverInterface
    */
   protected $urlResolver;
 
@@ -77,7 +77,7 @@ class OEmbedFormatter extends FormatterBase {
   /**
    * The iFrame URL helper service.
    *
-   * @var \Drupal\media\IFrameUrlHelper
+   * @var IFrameUrlHelper
    */
   protected $iFrameUrlHelper;
 
@@ -88,7 +88,7 @@ class OEmbedFormatter extends FormatterBase {
    *   The plugin ID for the formatter.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The definition of the field to which the formatter is associated.
    * @param array $settings
    *   The formatter settings.
@@ -98,17 +98,17 @@ class OEmbedFormatter extends FormatterBase {
    *   The view mode.
    * @param array $third_party_settings
    *   Any third party settings.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger service.
-   * @param \Drupal\media\OEmbed\ResourceFetcherInterface $resource_fetcher
+   * @param ResourceFetcherInterface $resource_fetcher
    *   The oEmbed resource fetcher service.
-   * @param \Drupal\media\OEmbed\UrlResolverInterface $url_resolver
+   * @param UrlResolverInterface $url_resolver
    *   The oEmbed URL resolver service.
-   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
+   * @param LoggerChannelFactoryInterface $logger_factory
    *   The logger factory service.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory service.
-   * @param \Drupal\media\IFrameUrlHelper $iframe_url_helper
+   * @param IFrameUrlHelper $iframe_url_helper
    *   The iFrame URL helper service.
    */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, MessengerInterface $messenger, ResourceFetcherInterface $resource_fetcher, UrlResolverInterface $url_resolver, LoggerChannelFactoryInterface $logger_factory, ConfigFactoryInterface $config_factory, IFrameUrlHelper $iframe_url_helper) {

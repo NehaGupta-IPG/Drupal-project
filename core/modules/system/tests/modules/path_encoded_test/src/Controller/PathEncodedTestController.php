@@ -14,7 +14,7 @@ class PathEncodedTestController {
   /**
    * Returns an HTML simple response.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   A simple HTML response.
    */
   public function simple() {

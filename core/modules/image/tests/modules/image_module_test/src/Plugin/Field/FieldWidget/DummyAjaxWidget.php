@@ -45,10 +45,10 @@ class DummyAjaxWidget extends WidgetBase {
    *
    * @param array $form
    *   The build form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   Ajax response.
    */
   public static function dummyAjaxCallback(array &$form, FormStateInterface $form_state) {

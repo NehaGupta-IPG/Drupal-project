@@ -27,7 +27,7 @@ class LocalActionManagerTest extends KernelTestBase {
    * Tests the cacheability of local actions.
    */
   public function testCacheability(): void {
-    /** @var \Drupal\Core\Menu\LocalActionManager $local_action_manager */
+    /** @var LocalActionManager $local_action_manager */
     $local_action_manager = \Drupal::service('plugin.manager.menu.local_action');
     $build = [
       '#cache' => [

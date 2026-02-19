@@ -15,7 +15,7 @@ class TestController extends ControllerBase {
   /**
    * Constructs a TestController.
    *
-   * @param \Drupal\Core\DrupalKernelInterface $kernel
+   * @param DrupalKernelInterface $kernel
    *   The Drupal kernel.
    */
   public function __construct(protected DrupalKernelInterface $kernel) {

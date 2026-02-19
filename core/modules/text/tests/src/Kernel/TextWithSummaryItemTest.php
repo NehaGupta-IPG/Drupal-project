@@ -28,14 +28,14 @@ class TextWithSummaryItemTest extends FieldKernelTestBase {
   /**
    * Field storage entity.
    *
-   * @var \Drupal\field\Entity\FieldStorageConfig
+   * @var FieldStorageConfig
    */
   protected $fieldStorage;
 
   /**
    * Field entity.
    *
-   * @var \Drupal\field\Entity\FieldConfig
+   * @var FieldConfig
    */
   protected $field;
 

@@ -24,38 +24,38 @@ class NodeForm extends ContentEntityForm {
   /**
    * The tempstore factory.
    *
-   * @var \Drupal\Core\TempStore\PrivateTempStoreFactory
+   * @var PrivateTempStoreFactory
    */
   protected $tempStoreFactory;
 
   /**
    * The Current User object.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
   /**
    * The date formatter service.
    *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
+   * @var DateFormatterInterface
    */
   protected $dateFormatter;
 
   /**
    * Constructs a NodeForm object.
    *
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository.
-   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $temp_store_factory
+   * @param PrivateTempStoreFactory $temp_store_factory
    *   The factory for the temp store object.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   * @param DateFormatterInterface $date_formatter
    *   The date formatter service.
    */
   public function __construct(
@@ -102,8 +102,7 @@ class NodeForm extends ContentEntityForm {
     // rebuilding the form.
     $request_uuid = \Drupal::request()->query->get('uuid');
     if (!$form_state->isRebuilding() && $request_uuid && $preview = $store->get($request_uuid)) {
-      /** @var \Drupal\Core\Form\FormStateInterface $preview */
-
+      /** @var FormStateInterface $preview */
       $form_state->setStorage($preview->getStorage());
       $form_state->setUserInput($preview->getUserInput());
 
@@ -254,7 +253,7 @@ class NodeForm extends ContentEntityForm {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function preview(array $form, FormStateInterface $form_state) {

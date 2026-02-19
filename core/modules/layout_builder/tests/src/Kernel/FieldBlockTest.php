@@ -41,14 +41,14 @@ class FieldBlockTest extends EntityKernelTestBase {
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 
   /**
    * The logger.
    *
-   * @var \Psr\Log\LoggerInterface
+   * @var LoggerInterface
    */
   protected $logger;
 
@@ -199,14 +199,14 @@ class FieldBlockTest extends EntityKernelTestBase {
   /**
    * Instantiates a block for testing.
    *
-   * @param \Prophecy\Prophecy\ProphecyInterface $entity_prophecy
+   * @param ProphecyInterface $entity_prophecy
    *   An entity prophecy for use as an entity context value.
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param array $plugin_definition
    *   The plugin implementation definition.
    *
-   * @return \Drupal\layout_builder\Plugin\Block\FieldBlock
+   * @return FieldBlock
    *   The block to test.
    */
   protected function getTestBlock(ProphecyInterface $entity_prophecy, array $configuration = [], array $plugin_definition = []) {

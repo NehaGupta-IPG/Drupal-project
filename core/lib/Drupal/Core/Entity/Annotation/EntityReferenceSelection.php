@@ -7,7 +7,7 @@ use Drupal\Component\Annotation\Plugin;
 /**
  * Defines an EntityReferenceSelection plugin annotation object.
  *
- * Plugin Namespace: Plugin\EntityReferenceSelection
+ * Plugin Namespace: Plugin\EntityReferenceSelection.
  *
  * For a working example, see
  * \Drupal\comment\Plugin\EntityReferenceSelection\CommentSelection

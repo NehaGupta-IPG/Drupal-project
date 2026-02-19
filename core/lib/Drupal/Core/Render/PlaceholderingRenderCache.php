@@ -68,13 +68,13 @@ class PlaceholderingRenderCache extends RenderCache {
   /**
    * Constructs a new PlaceholderingRenderCache object.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   * @param RequestStack $requestStack
    *   The request stack.
-   * @param \Drupal\Core\Cache\VariationCacheFactoryInterface $cacheFactory
+   * @param VariationCacheFactoryInterface $cacheFactory
    *   The variation cache factory.
-   * @param \Drupal\Core\Cache\Context\CacheContextsManager $cacheContextsManager
+   * @param CacheContextsManager $cacheContextsManager
    *   The cache contexts manager.
-   * @param \Drupal\Core\Render\PlaceholderGeneratorInterface $placeholderGenerator
+   * @param PlaceholderGeneratorInterface $placeholderGenerator
    *   The placeholder generator.
    */
   public function __construct(

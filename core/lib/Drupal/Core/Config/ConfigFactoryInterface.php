@@ -15,7 +15,7 @@ interface ConfigFactoryInterface {
    * @param string $name
    *   The name of the configuration object to construct.
    *
-   * @return \Drupal\Core\Config\ImmutableConfig
+   * @return ImmutableConfig
    *   A configuration object.
    */
   public function get($name);
@@ -29,7 +29,7 @@ interface ConfigFactoryInterface {
    * @param string $name
    *   The name of the configuration object to construct.
    *
-   * @return \Drupal\Core\Config\Config
+   * @return Config
    *   A configuration object.
    */
   public function getEditable($name);
@@ -45,7 +45,7 @@ interface ConfigFactoryInterface {
    * @param array $names
    *   List of names of configuration objects.
    *
-   * @return \Drupal\Core\Config\ImmutableConfig[]
+   * @return ImmutableConfig[]
    *   List of successfully loaded configuration objects, keyed by name.
    */
   public function loadMultiple(array $names);
@@ -111,7 +111,7 @@ interface ConfigFactoryInterface {
   /**
    * Adds config factory override services.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryOverrideInterface $config_factory_override
+   * @param ConfigFactoryOverrideInterface $config_factory_override
    *   The config factory override service to add. It is added at the end of the
    *   priority list (lower priority relative to existing ones).
    */

@@ -19,7 +19,7 @@ class OmittedData extends ResourceObjectData {
   /**
    * OmittedData constructor.
    *
-   * @param \Drupal\jsonapi\Exception\EntityAccessDeniedHttpException[] $data
+   * @param EntityAccessDeniedHttpException[] $data
    *   Resource objects that are the primary data for the response.
    *
    * @see \Drupal\jsonapi\JsonApiResource\Data::__construct

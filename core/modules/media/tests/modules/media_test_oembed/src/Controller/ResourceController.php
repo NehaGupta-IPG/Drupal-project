@@ -16,10 +16,10 @@ class ResourceController {
   /**
    * Creates an oEmbed resource response.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   The oEmbed resource response.
    */
   public function get(Request $request) {
@@ -42,7 +42,7 @@ class ResourceController {
   /**
    * Returns an example thumbnail file without an extension.
    *
-   * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+   * @return BinaryFileResponse
    *   The response.
    */
   public function getThumbnailWithNoExtension() {

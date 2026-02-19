@@ -16,16 +16,16 @@ final class PreCreateEvent extends SandboxValidationEvent {
   /**
    * The list of paths to exclude from the stage directory.
    *
-   * @var \Drupal\package_manager\ImmutablePathList
+   * @var ImmutablePathList
    */
   public readonly ImmutablePathList $excludedPaths;
 
   /**
    * Constructs a PreCreateEvent object.
    *
-   * @param \Drupal\package_manager\SandboxManagerBase $sandboxManager
+   * @param SandboxManagerBase $sandboxManager
    *   The stage which fired this event.
-   * @param \PhpTuf\ComposerStager\API\Path\Value\PathListInterface $excluded_paths
+   * @param PathListInterface $excluded_paths
    *   The list of paths to exclude. These will not be copied into the stage
    *   directory when it is created.
    */

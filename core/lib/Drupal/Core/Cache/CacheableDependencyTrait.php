@@ -31,7 +31,7 @@ trait CacheableDependencyTrait {
   /**
    * Sets cacheability; useful for value object constructors.
    *
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $cacheability
+   * @param CacheableDependencyInterface $cacheability
    *   The cacheability to set.
    *
    * @return $this

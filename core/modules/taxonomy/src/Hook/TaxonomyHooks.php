@@ -2,14 +2,14 @@
 
 namespace Drupal\taxonomy\Hook;
 
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\taxonomy\Entity\Term;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
-use Drupal\Core\Url;
-use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
+use Drupal\taxonomy\Entity\Term;
 
 /**
  * Hook implementations for taxonomy.
@@ -186,7 +186,7 @@ class TaxonomyHooks {
    * The index lists all terms that are related to a given node entity, and is
    * therefore maintained at the entity level.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   The node entity.
    */
   protected function buildNodeIndex(NodeInterface $node): void {
@@ -233,7 +233,7 @@ class TaxonomyHooks {
   /**
    * Deletes taxonomy index entries for a given node.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $node
+   * @param EntityInterface $node
    *   The node entity.
    */
   protected function deleteNodeIndex(EntityInterface $node): void {

@@ -32,42 +32,42 @@ class LocaleLookup extends CacheCollector {
   /**
    * The locale storage.
    *
-   * @var \Drupal\locale\StringStorageInterface
+   * @var StringStorageInterface
    */
   protected $stringStorage;
 
   /**
    * The cache backend that should be used.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $cache;
 
   /**
    * The lock backend that should be used.
    *
-   * @var \Drupal\Core\Lock\LockBackendInterface
+   * @var LockBackendInterface
    */
   protected $lock;
 
   /**
    * The configuration factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
@@ -78,17 +78,17 @@ class LocaleLookup extends CacheCollector {
    *   The language code.
    * @param string $context
    *   The string context.
-   * @param \Drupal\locale\StringStorageInterface $string_storage
+   * @param StringStorageInterface $string_storage
    *   The string storage.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The cache backend.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
+   * @param LockBackendInterface $lock
    *   The lock backend.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   The request stack.
    */
   public function __construct($langcode, $context, StringStorageInterface $string_storage, CacheBackendInterface $cache, LockBackendInterface $lock, ConfigFactoryInterface $config_factory, LanguageManagerInterface $language_manager, RequestStack $request_stack) {

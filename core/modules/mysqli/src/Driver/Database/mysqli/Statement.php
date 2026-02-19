@@ -27,7 +27,7 @@ class Statement extends StatementBase {
   /**
    * Constructs a Statement object.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   Drupal database connection object.
    * @param \mysqli $clientConnection
    *   Client database connection object.

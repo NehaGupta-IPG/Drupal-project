@@ -24,14 +24,14 @@ class AddSectionController implements ContainerInjectionInterface {
   /**
    * The layout tempstore repository.
    *
-   * @var \Drupal\layout_builder\LayoutTempstoreRepositoryInterface
+   * @var LayoutTempstoreRepositoryInterface
    */
   protected $layoutTempstoreRepository;
 
   /**
    * AddSectionController constructor.
    *
-   * @param \Drupal\layout_builder\LayoutTempstoreRepositoryInterface $layout_tempstore_repository
+   * @param LayoutTempstoreRepositoryInterface $layout_tempstore_repository
    *   The layout tempstore repository.
    */
   public function __construct(LayoutTempstoreRepositoryInterface $layout_tempstore_repository) {
@@ -50,7 +50,7 @@ class AddSectionController implements ContainerInjectionInterface {
   /**
    * Adds the new section.
    *
-   * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
+   * @param SectionStorageInterface $section_storage
    *   The section storage.
    * @param int $delta
    *   The delta of the section to splice.

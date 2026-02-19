@@ -30,7 +30,7 @@ class MoveBlockForm extends FormBase implements WorkspaceDynamicSafeFormInterfac
   /**
    * The section storage.
    *
-   * @var \Drupal\layout_builder\SectionStorageInterface
+   * @var SectionStorageInterface
    */
   protected $sectionStorage;
 
@@ -58,14 +58,14 @@ class MoveBlockForm extends FormBase implements WorkspaceDynamicSafeFormInterfac
   /**
    * The Layout Tempstore.
    *
-   * @var \Drupal\layout_builder\LayoutTempstoreRepositoryInterface
+   * @var LayoutTempstoreRepositoryInterface
    */
   protected $layoutTempstore;
 
   /**
    * Constructs a new MoveBlockForm.
    *
-   * @param \Drupal\layout_builder\LayoutTempstoreRepositoryInterface $layout_tempstore_repository
+   * @param LayoutTempstoreRepositoryInterface $layout_tempstore_repository
    *   The layout tempstore.
    */
   public function __construct(LayoutTempstoreRepositoryInterface $layout_tempstore_repository) {
@@ -93,9 +93,9 @@ class MoveBlockForm extends FormBase implements WorkspaceDynamicSafeFormInterfac
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
-   * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
+   * @param SectionStorageInterface $section_storage
    *   The section storage being configured.
    * @param int $delta
    *   The original delta of the section.
@@ -273,7 +273,7 @@ class MoveBlockForm extends FormBase implements WorkspaceDynamicSafeFormInterfac
    *
    * @param array $form
    *   The form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    *
    * @return array
@@ -293,7 +293,7 @@ class MoveBlockForm extends FormBase implements WorkspaceDynamicSafeFormInterfac
   /**
    * Gets the selected region.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    *
    * @return string
@@ -309,7 +309,7 @@ class MoveBlockForm extends FormBase implements WorkspaceDynamicSafeFormInterfac
   /**
    * Gets the selected delta.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    *
    * @return int
@@ -325,7 +325,7 @@ class MoveBlockForm extends FormBase implements WorkspaceDynamicSafeFormInterfac
   /**
    * Provides a title callback.
    *
-   * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
+   * @param SectionStorageInterface $section_storage
    *   The section storage.
    * @param int $delta
    *   The original delta of the section.

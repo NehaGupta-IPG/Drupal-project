@@ -20,9 +20,9 @@ final class ComponentsTwigExtension extends AbstractExtension {
   /**
    * Creates TwigExtension.
    *
-   * @param \Drupal\Core\Theme\ComponentPluginManager $pluginManager
+   * @param ComponentPluginManager $pluginManager
    *   The component plugin manager.
-   * @param \Drupal\Core\Theme\Component\ComponentValidator $componentValidator
+   * @param ComponentValidator $componentValidator
    *   The component validator.
    */
   public function __construct(
@@ -55,7 +55,7 @@ final class ComponentsTwigExtension extends AbstractExtension {
    * @param string $component_id
    *   The component ID.
    *
-   * @throws \Drupal\Core\Render\Component\Exception\ComponentNotFoundException
+   * @throws ComponentNotFoundException
    */
   public function addAdditionalContext(array &$context, string $component_id): void {
     $context = $this->mergeAdditionalRenderContext(
@@ -67,7 +67,7 @@ final class ComponentsTwigExtension extends AbstractExtension {
   /**
    * Calculates additional context for this template.
    *
-   * @param \Drupal\Core\Plugin\Component $component
+   * @param Component $component
    *   The component.
    * @param array $context
    *   The context to update.
@@ -100,7 +100,7 @@ final class ComponentsTwigExtension extends AbstractExtension {
    * @param string $component_id
    *   The component ID.
    *
-   * @throws \Drupal\Core\Render\Component\Exception\InvalidComponentException
+   * @throws InvalidComponentException
    */
   public function validateProps(array &$context, string $component_id): void {
     assert($this->doValidateProps($context, $component_id));
@@ -117,7 +117,7 @@ final class ComponentsTwigExtension extends AbstractExtension {
    * @return bool
    *   TRUE if it's valid.
    *
-   * @throws \Drupal\Core\Render\Component\Exception\InvalidComponentException
+   * @throws InvalidComponentException
    */
   protected function doValidateProps(array $context, string $component_id): bool {
     try {

@@ -39,7 +39,7 @@ class TranslatableMarkup extends FormattableMarkup {
   /**
    * The string translation service.
    *
-   * @var \Drupal\Core\StringTranslation\TranslationInterface
+   * @var TranslationInterface
    */
   protected $stringTranslation;
 
@@ -115,7 +115,7 @@ class TranslatableMarkup extends FormattableMarkup {
    *     translate to a language other than what is used to display the page.
    *   - 'context' (defaults to the empty context): The context the source
    *     string belongs to.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param TranslationInterface $string_translation
    *   (optional) The string translation service.
    *
    * @throws \InvalidArgumentException
@@ -207,7 +207,7 @@ class TranslatableMarkup extends FormattableMarkup {
   /**
    * Gets the string translation service.
    *
-   * @return \Drupal\Core\StringTranslation\TranslationInterface
+   * @return TranslationInterface
    *   The string translation service.
    */
   protected function getStringTranslation() {

@@ -29,35 +29,35 @@ class FieldDefinitionListenerTest extends UnitTestCase {
   /**
    * The key-value factory.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueFactoryInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var KeyValueFactoryInterface|ProphecyInterface
    */
   protected $keyValueFactory;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var EntityTypeManagerInterface|ProphecyInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var EntityFieldManagerInterface|ProphecyInterface
    */
   protected $entityFieldManager;
 
   /**
    * The cache backend.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var CacheBackendInterface|ProphecyInterface
    */
   protected $cacheBackend;
 
   /**
    * The field definition listener under test.
    *
-   * @var \Drupal\Core\Field\FieldDefinitionListener
+   * @var FieldDefinitionListener
    */
   protected $fieldDefinitionListener;
 
@@ -78,7 +78,7 @@ class FieldDefinitionListenerTest extends UnitTestCase {
   /**
    * Sets up the entity type manager to be tested.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface[]|\Prophecy\Prophecy\ProphecyInterface[] $definitions
+   * @param EntityTypeInterface[]|ProphecyInterface[] $definitions
    *   (optional) An array of entity type definitions.
    */
   protected function setUpEntityTypeManager($definitions = []): void {

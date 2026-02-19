@@ -50,7 +50,7 @@ interface TranslationInterface {
   /**
    * Translates a TranslatableMarkup object to a string.
    *
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $translated_string
+   * @param TranslatableMarkup $translated_string
    *   A TranslatableMarkup object.
    *
    * @return string
@@ -99,7 +99,7 @@ interface TranslationInterface {
    * @param array $options
    *   An associative array of additional options. See t() for allowed keys.
    *
-   * @return \Drupal\Core\StringTranslation\PluralTranslatableMarkup
+   * @return PluralTranslatableMarkup
    *   A translated string.
    *
    * @see \Drupal\Core\StringTranslation\TranslationInterface::translate()

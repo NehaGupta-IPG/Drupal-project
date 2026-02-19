@@ -23,7 +23,7 @@ class SectionData extends TypedData {
   /**
    * The section object.
    *
-   * @var \Drupal\layout_builder\Section
+   * @var Section
    */
   protected $value;
 

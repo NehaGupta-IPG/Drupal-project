@@ -21,7 +21,7 @@ class NodeViewBuilder extends EntityViewBuilder implements TrustedCallbackInterf
    * {@inheritdoc}
    */
   public function buildComponents(array &$build, array $entities, array $displays, $view_mode) {
-    /** @var \Drupal\node\NodeInterface[] $entities */
+    /** @var NodeInterface[] $entities */
     if (empty($entities)) {
       return;
     }
@@ -102,7 +102,7 @@ class NodeViewBuilder extends EntityViewBuilder implements TrustedCallbackInterf
 
     if (!$is_in_preview) {
       $storage = \Drupal::entityTypeManager()->getStorage('node');
-      /** @var \Drupal\node\NodeInterface $revision */
+      /** @var NodeInterface $revision */
       $revision = !isset($revision_id) ? $storage->load($node_entity_id) : $storage->loadRevision($revision_id);
       $entity = $revision->getTranslation($langcode);
       $links['node'] = static::buildLinks($entity, $view_mode);
@@ -120,7 +120,7 @@ class NodeViewBuilder extends EntityViewBuilder implements TrustedCallbackInterf
   /**
    * Build the default links (Read more) for a node.
    *
-   * @param \Drupal\node\NodeInterface $entity
+   * @param NodeInterface $entity
    *   The node object.
    * @param string $view_mode
    *   A view mode identifier.

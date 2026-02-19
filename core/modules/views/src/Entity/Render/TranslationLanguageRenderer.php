@@ -40,7 +40,7 @@ class TranslationLanguageRenderer extends EntityTranslationRendererBase {
   /**
    * Returns the name of the table holding the "langcode" field.
    *
-   * @param \Drupal\views\Plugin\views\query\QueryPluginBase $query
+   * @param QueryPluginBase $query
    *   The query being executed.
    * @param string|null $relationship
    *   The relationship used by the entity type. NULL if there is no
@@ -84,7 +84,7 @@ class TranslationLanguageRenderer extends EntityTranslationRendererBase {
   public function preRenderByRelationship(array $result, string $relationship): void {
     $view_builder = \Drupal::entityTypeManager()->getViewBuilder($this->entityType->id());
 
-    /** @var \Drupal\views\ResultRow $row */
+    /** @var ResultRow $row */
     foreach ($result as $row) {
       if ($entity = $this->getEntity($row, $relationship)) {
         $entity->view = $this->view;

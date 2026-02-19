@@ -21,7 +21,7 @@ class TranslationManagerTest extends UnitTestCase {
   /**
    * The tested translation manager.
    *
-   * @var \Drupal\Core\StringTranslation\TranslationManager
+   * @var TranslationManager
    */
   protected $translationManager;
 

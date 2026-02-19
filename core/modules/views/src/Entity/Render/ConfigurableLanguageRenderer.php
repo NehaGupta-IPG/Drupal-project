@@ -22,11 +22,11 @@ class ConfigurableLanguageRenderer extends EntityTranslationRendererBase {
   /**
    * Constructs a renderer object.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The entity row being rendered.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type.
    * @param string|null $langcode
    *   A specific language code to set, if available.

@@ -40,11 +40,11 @@ interface ConditionInterface {
    * be case sensitive and when a case insensitive collation is used, the =
    * operator will also be case insensitive.
    *
-   * @param string|\Drupal\Core\Database\Query\ConditionInterface $field
+   * @param string|ConditionInterface $field
    *   The name of the field to check. This can also be ConditionInterface
    *   in itself. Use where(), if you would like to add a more complex condition
    *   involving operators or functions, or an already compiled condition.
-   * @param string|int|array|\Drupal\Core\Database\Query\SelectInterface|null $value
+   * @param string|int|array|SelectInterface|null $value
    *   The value to test the field against. In most cases, and depending on the
    *   operator, this will be a scalar or an array. As SQL accepts select
    *   queries on any place where a scalar value or set is expected, $value may
@@ -61,7 +61,7 @@ interface ConditionInterface {
    * @return $this
    *   The called object.
    *
-   * @throws \Drupal\Core\Database\InvalidQueryException
+   * @throws InvalidQueryException
    *   If passed invalid arguments, such as an empty array as $value.
    *
    * @see \Drupal\Core\Database\Query\ConditionInterface::isNull()
@@ -91,7 +91,7 @@ interface ConditionInterface {
   /**
    * Sets a condition that the specified field be NULL.
    *
-   * @param string|\Drupal\Core\Database\Query\SelectInterface $field
+   * @param string|SelectInterface $field
    *   The name of the field or a subquery to check.
    *
    * @return $this
@@ -102,7 +102,7 @@ interface ConditionInterface {
   /**
    * Sets a condition that the specified field be NOT NULL.
    *
-   * @param string|\Drupal\Core\Database\Query\SelectInterface $field
+   * @param string|SelectInterface $field
    *   The name of the field or a subquery to check.
    *
    * @return $this
@@ -113,7 +113,7 @@ interface ConditionInterface {
   /**
    * Sets a condition that the specified subquery returns values.
    *
-   * @param \Drupal\Core\Database\Query\SelectInterface $select
+   * @param SelectInterface $select
    *   The subquery that must contain results.
    *
    * @return $this
@@ -124,7 +124,7 @@ interface ConditionInterface {
   /**
    * Sets a condition that the specified subquery returns no values.
    *
-   * @param \Drupal\Core\Database\Query\SelectInterface $select
+   * @param SelectInterface $select
    *   The subquery that must not contain results.
    *
    * @return $this
@@ -181,9 +181,9 @@ interface ConditionInterface {
    * This method does not return anything, but simply prepares data to be
    * retrieved via __toString() and arguments().
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection for which to compile the conditionals.
-   * @param \Drupal\Core\Database\Query\PlaceholderInterface $queryPlaceholder
+   * @param PlaceholderInterface $queryPlaceholder
    *   The query this condition belongs to. If not given, the current query is
    *   used.
    */
@@ -206,7 +206,7 @@ interface ConditionInterface {
    *   - AND (default): this is the equivalent of andConditionGroup().
    *   - OR: this is the equivalent of orConditionGroup().
    *
-   * @return \Drupal\Core\Database\Query\ConditionInterface
+   * @return ConditionInterface
    *   An object holding a group of conditions.
    */
   public function conditionGroupFactory($conjunction = 'AND');
@@ -214,7 +214,7 @@ interface ConditionInterface {
   /**
    * Creates a new group of conditions ANDed together.
    *
-   * @return \Drupal\Core\Database\Query\ConditionInterface
+   * @return ConditionInterface
    *   An object holding a group of conditions.
    */
   public function andConditionGroup();
@@ -222,7 +222,7 @@ interface ConditionInterface {
   /**
    * Creates a new group of conditions ORed together.
    *
-   * @return \Drupal\Core\Database\Query\ConditionInterface
+   * @return ConditionInterface
    *   An object holding a group of conditions.
    */
   public function orConditionGroup();

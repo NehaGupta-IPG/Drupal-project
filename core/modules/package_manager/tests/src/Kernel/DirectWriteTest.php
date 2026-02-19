@@ -87,7 +87,7 @@ class DirectWriteTest extends PackageManagerKernelTestBase implements EventSubsc
   /**
    * Event listener that asserts the sandbox manager isn't in direct-write mode.
    *
-   * @param \Drupal\package_manager\Event\SandboxEvent $event
+   * @param SandboxEvent $event
    *   The event being handled.
    */
   public function assertNotDirectWrite(SandboxEvent $event): void {

@@ -25,32 +25,32 @@ class MediaTypeForm extends EntityForm {
   /**
    * Media source plugin manager.
    *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   * @var PluginManagerInterface
    */
   protected $sourceManager;
 
   /**
    * Entity field manager service.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 
   /**
    * Entity display repository service.
    *
-   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
+   * @var EntityDisplayRepositoryInterface
    */
   protected $entityDisplayRepository;
 
   /**
    * Constructs a new class instance.
    *
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $source_manager
+   * @param PluginManagerInterface $source_manager
    *   Media source plugin manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @param EntityFieldManagerInterface $entity_field_manager
    *   Entity field manager service.
-   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entityDisplayRepository
+   * @param EntityDisplayRepositoryInterface $entityDisplayRepository
    *   Entity display repository service.
    */
   public function __construct(PluginManagerInterface $source_manager, EntityFieldManagerInterface $entity_field_manager, EntityDisplayRepositoryInterface $entityDisplayRepository) {
@@ -86,7 +86,7 @@ class MediaTypeForm extends EntityForm {
     $form = parent::form($form, $form_state);
 
     // Source is not set when the entity is initially created.
-    /** @var \Drupal\media\MediaSourceInterface $source */
+    /** @var MediaSourceInterface $source */
     $source = $this->entity->get('source') ? $this->entity->getSource() : NULL;
 
     if ($this->operation === 'add') {
@@ -272,7 +272,7 @@ class MediaTypeForm extends EntityForm {
    *
    * @param array $form
    *   Full form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   Parent form state.
    *
    * @return \Drupal\Core\Form\SubformStateInterface
@@ -346,7 +346,7 @@ class MediaTypeForm extends EntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $status = parent::save($form, $form_state);
-    /** @var \Drupal\media\MediaTypeInterface $media_type */
+    /** @var MediaTypeInterface $media_type */
     $media_type = $this->entity;
 
     // If the media source is using a source field, ensure it's
@@ -392,7 +392,7 @@ class MediaTypeForm extends EntityForm {
 
     // Override the "status" base field default value, for this media type.
     $fields = $this->entityFieldManager->getFieldDefinitions('media', $media_type->id());
-    /** @var \Drupal\media\MediaInterface $media */
+    /** @var MediaInterface $media */
     $media = $this->entityTypeManager->getStorage('media')->create(['bundle' => $media_type->id()]);
     $value = (bool) $form_state->getValue(['options', 'status']);
     if ($media->status->value != $value) {

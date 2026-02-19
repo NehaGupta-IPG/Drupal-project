@@ -8,7 +8,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 /**
  * Defines an EntityReferenceSelection attribute for plugin discovery.
  *
- * Plugin Namespace: Plugin\EntityReferenceSelection
+ * Plugin Namespace: Plugin\EntityReferenceSelection.
  *
  * For a working example, see
  * \Drupal\comment\Plugin\EntityReferenceSelection\CommentSelection
@@ -28,7 +28,7 @@ class EntityReferenceSelection extends Plugin {
    *   available only if the ID follows a specific pattern. It must be either
    *   identical to group or prefixed with the group. E.g. if the group is "foo"
    *   the ID must be either "foo" or "foo:bar".
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $label
+   * @param TranslatableMarkup $label
    *   The human-readable name of the selection plugin.
    * @param string $group
    *   The selection plugin group. This property is used to allow selection

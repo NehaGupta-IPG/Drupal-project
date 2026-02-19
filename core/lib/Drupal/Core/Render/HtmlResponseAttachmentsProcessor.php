@@ -2,15 +2,14 @@
 
 namespace Drupal\Core\Render;
 
-// cspell:ignore turbolinks
-
 use Drupal\Core\Asset\AssetCollectionRendererInterface;
 use Drupal\Core\Asset\AssetResolverInterface;
 use Drupal\Core\Asset\AttachedAssets;
 use Drupal\Core\Asset\AttachedAssetsInterface;
+// cspell:ignore turbolinks
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Form\EnforcedResponseException;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Form\EnforcedResponseException;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -43,21 +42,21 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
   /**
    * Constructs a HtmlResponseAttachmentsProcessor object.
    *
-   * @param \Drupal\Core\Asset\AssetResolverInterface $assetResolver
+   * @param AssetResolverInterface $assetResolver
    *   An asset resolver.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   A config factory for retrieving required config objects.
-   * @param \Drupal\Core\Asset\AssetCollectionRendererInterface $cssCollectionRenderer
+   * @param AssetCollectionRendererInterface $cssCollectionRenderer
    *   The CSS asset collection renderer.
-   * @param \Drupal\Core\Asset\AssetCollectionRendererInterface $jsCollectionRenderer
+   * @param AssetCollectionRendererInterface $jsCollectionRenderer
    *   The JS asset collection renderer.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   * @param RequestStack $requestStack
    *   The request stack.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   * @param ModuleHandlerInterface $moduleHandler
    *   The module handler service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   * @param LanguageManagerInterface $languageManager
    *   The language manager.
    */
   public function __construct(
@@ -234,10 +233,10 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
    * that indicates what that markup depends on. That metadata is also added to
    * the HTML response object.
    *
-   * @param \Drupal\Core\Render\HtmlResponse $response
+   * @param HtmlResponse $response
    *   The HTML response whose placeholders are being replaced.
    *
-   * @return \Drupal\Core\Render\HtmlResponse
+   * @return HtmlResponse
    *   The updated HTML response, with replaced placeholders.
    *
    * @see \Drupal\Core\Render\Renderer::replacePlaceholders()
@@ -267,7 +266,7 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
   /**
    * Processes asset libraries into render arrays.
    *
-   * @param \Drupal\Core\Asset\AttachedAssetsInterface $assets
+   * @param AttachedAssetsInterface $assets
    *   The attached assets collection for the current response.
    * @param array $placeholders
    *   The placeholders that exist in the response.
@@ -308,7 +307,7 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
    * This is the last step where all of the attachments are placed into the
    * response object's contents.
    *
-   * @param \Drupal\Core\Render\HtmlResponse $response
+   * @param HtmlResponse $response
    *   The HTML response to update.
    * @param array $placeholders
    *   An array of placeholders, keyed by type with the placeholders
@@ -330,7 +329,7 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
   /**
    * Sets headers on a response object.
    *
-   * @param \Drupal\Core\Render\HtmlResponse $response
+   * @param HtmlResponse $response
    *   The HTML response to update.
    * @param array $headers
    *   The headers to set, as an array. The items in this array should be as

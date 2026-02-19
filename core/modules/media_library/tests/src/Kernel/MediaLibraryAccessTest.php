@@ -457,7 +457,7 @@ class MediaLibraryAccessTest extends KernelTestBase {
   /**
    * Asserts various aspects of an access result.
    *
-   * @param \Drupal\Core\Access\AccessResult $access_result
+   * @param AccessResult $access_result
    *   The access result.
    * @param bool $is_allowed
    *   The expected access status.

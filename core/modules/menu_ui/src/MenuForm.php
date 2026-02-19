@@ -31,28 +31,28 @@ class MenuForm extends EntityForm {
   /**
    * The menu link manager.
    *
-   * @var \Drupal\Core\Menu\MenuLinkManagerInterface
+   * @var MenuLinkManagerInterface
    */
   protected $menuLinkManager;
 
   /**
    * The menu tree service.
    *
-   * @var \Drupal\Core\Menu\MenuLinkTreeInterface
+   * @var MenuLinkTreeInterface
    */
   protected $menuTree;
 
   /**
    * The link generator.
    *
-   * @var \Drupal\Core\Utility\LinkGeneratorInterface
+   * @var LinkGeneratorInterface
    */
   protected $linkGenerator;
 
   /**
    * The menu_link_content storage handler.
    *
-   * @var \Drupal\menu_link_content\MenuLinkContentStorageInterface
+   * @var MenuLinkContentStorageInterface
    */
   protected $menuLinkContentStorage;
 
@@ -66,13 +66,13 @@ class MenuForm extends EntityForm {
   /**
    * Constructs a MenuForm object.
    *
-   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager
+   * @param MenuLinkManagerInterface $menu_link_manager
    *   The menu link manager.
-   * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menu_tree
+   * @param MenuLinkTreeInterface $menu_tree
    *   The menu tree service.
-   * @param \Drupal\Core\Utility\LinkGeneratorInterface $link_generator
+   * @param LinkGeneratorInterface $link_generator
    *   The link generator.
-   * @param \Drupal\menu_link_content\MenuLinkContentStorageInterface $menu_link_content_storage
+   * @param MenuLinkContentStorageInterface $menu_link_content_storage
    *   The menu link content storage handler.
    */
   public function __construct(MenuLinkManagerInterface $menu_link_manager, MenuLinkTreeInterface $menu_tree, LinkGeneratorInterface $link_generator, MenuLinkContentStorageInterface $menu_link_content_storage) {
@@ -383,7 +383,7 @@ class MenuForm extends EntityForm {
   /**
    * Recursive helper function for buildOverviewForm().
    *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
+   * @param MenuLinkTreeElement[] $tree
    *   The tree retrieved by \Drupal\Core\Menu\MenuLinkTreeInterface::load().
    * @param int $delta
    *   The default number of menu items used in the menu weight selector is 50.

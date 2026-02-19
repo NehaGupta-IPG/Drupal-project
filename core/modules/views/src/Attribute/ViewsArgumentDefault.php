@@ -22,9 +22,9 @@ class ViewsArgumentDefault extends Plugin {
    *
    * @param string $id
    *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $title
+   * @param TranslatableMarkup|null $title
    *   The plugin title used in the views UI.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $short_title
+   * @param TranslatableMarkup|null $short_title
    *   (optional) The short title used in the views UI.
    * @param bool $no_ui
    *   (optional) Whether the plugin should be not selectable in the UI. If it's

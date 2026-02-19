@@ -1177,7 +1177,7 @@ HTML;
   /**
    * Sets up the theme manager for the <details>-tag.
    *
-   * @return \Drupal\Core\Theme\ThemeManagerInterface|\PHPUnit\Framework\MockObject\Builder\InvocationMocker
+   * @return \Drupal\Core\Theme\ThemeManagerInterface|InvocationMocker
    *   The mocked theme manager.
    */
   protected function setupThemeManagerForDetails(): InvocationMocker {

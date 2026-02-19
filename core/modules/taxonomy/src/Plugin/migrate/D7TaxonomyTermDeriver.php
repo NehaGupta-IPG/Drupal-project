@@ -28,7 +28,7 @@ class D7TaxonomyTermDeriver extends DeriverBase implements ContainerDeriverInter
   /**
    * The migration field discovery service.
    *
-   * @var \Drupal\migrate_drupal\FieldDiscoveryInterface
+   * @var FieldDiscoveryInterface
    */
   protected $fieldDiscovery;
 
@@ -37,7 +37,7 @@ class D7TaxonomyTermDeriver extends DeriverBase implements ContainerDeriverInter
    *
    * @param string $base_plugin_id
    *   The base plugin ID for the plugin ID.
-   * @param \Drupal\migrate_drupal\FieldDiscoveryInterface $field_discovery
+   * @param FieldDiscoveryInterface $field_discovery
    *   The migration field discovery service.
    */
   public function __construct($base_plugin_id, FieldDiscoveryInterface $field_discovery) {

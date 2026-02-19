@@ -216,10 +216,10 @@ class AjaxTestController {
   /**
    * Returns an AjaxResponse with alert command.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request object.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   The JSON response object.
    */
   public function renderError(Request $request) {
@@ -341,7 +341,7 @@ class AjaxTestController {
   /**
    * Returns an AjaxResponse with command to close dialog.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   The JSON response object.
    */
   public function dialogClose() {
@@ -412,7 +412,7 @@ class AjaxTestController {
   /**
    * Returns an AjaxResponse with command to clear the 'test_global_events_log'.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   The JSON response object.
    */
   public function globalEventsClearLog() {

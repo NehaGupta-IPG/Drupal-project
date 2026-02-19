@@ -35,7 +35,7 @@ class RecipeConfiguratorTest extends KernelTestBase {
     $reflection = new \ReflectionMethod('\Drupal\Core\Recipe\RecipeConfigurator', 'listAllRecipes');
 
     // Test methods.
-    /** @var \Drupal\Core\Recipe\Recipe[] $recipes */
+    /** @var Recipe[] $recipes */
     $recipes = (array) $reflection->invoke($recipe_configurator);
     $recipes_names = array_map(fn(Recipe $recipe): string => $recipe->name, $recipes);
     $recipe_extensions = $recipe_configurator->listAllExtensions();

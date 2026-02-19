@@ -2,8 +2,8 @@
 
 namespace Drupal\search\Plugin;
 
-use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
 use Drupal\Component\Plugin\PluginManagerInterface;
+use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
 
 /**
  * Provides a container for lazily loading search plugins.
@@ -20,7 +20,7 @@ class SearchPluginCollection extends DefaultSingleLazyPluginCollection {
   /**
    * Constructs a new SearchPluginCollection.
    *
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $manager
+   * @param PluginManagerInterface $manager
    *   The manager to be used for instantiating plugins.
    * @param string $instance_id
    *   The ID of the plugin instance.
@@ -38,7 +38,7 @@ class SearchPluginCollection extends DefaultSingleLazyPluginCollection {
   /**
    * {@inheritdoc}
    *
-   * @return \Drupal\search\Plugin\SearchInterface
+   * @return SearchInterface
    *   The search plugin instance associated with the given instance ID.
    */
   public function &get($instance_id) {

@@ -43,14 +43,14 @@ class ResourceObjectNormalizationCacher implements EventSubscriberInterface {
   /**
    * The variation cache.
    *
-   * @var \Drupal\Core\Cache\VariationCacheInterface
+   * @var VariationCacheInterface
    */
   protected $variationCache;
 
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
@@ -64,7 +64,7 @@ class ResourceObjectNormalizationCacher implements EventSubscriberInterface {
   /**
    * Sets the variation cache.
    *
-   * @param \Drupal\Core\Cache\VariationCacheInterface $variation_cache
+   * @param VariationCacheInterface $variation_cache
    *   The variation cache.
    */
   public function setVariationCache(VariationCacheInterface $variation_cache) {
@@ -74,7 +74,7 @@ class ResourceObjectNormalizationCacher implements EventSubscriberInterface {
   /**
    * Sets the request stack.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   The request stack.
    */
   public function setRequestStack(RequestStack $request_stack) {
@@ -87,7 +87,7 @@ class ResourceObjectNormalizationCacher implements EventSubscriberInterface {
    * The returned normalization may only be a partial normalization because it
    * was previously normalized with a sparse fieldset.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceObject $object
+   * @param ResourceObject $object
    *   The resource object for which to generate a cache item.
    *
    * @return array|false
@@ -141,7 +141,7 @@ class ResourceObjectNormalizationCacher implements EventSubscriberInterface {
   /**
    * Adds a normalization to be cached after the response has been sent.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceObject $object
+   * @param ResourceObject $object
    *   The resource object for which to generate a cache item.
    * @param array $normalization_parts
    *   The normalization parts to cache.
@@ -161,7 +161,7 @@ class ResourceObjectNormalizationCacher implements EventSubscriberInterface {
   /**
    * Writes normalizations of entities to cache, if any were created.
    *
-   * @param \Symfony\Component\HttpKernel\Event\TerminateEvent $event
+   * @param TerminateEvent $event
    *   The Event to process.
    */
   public function onTerminate(TerminateEvent $event) {
@@ -174,7 +174,7 @@ class ResourceObjectNormalizationCacher implements EventSubscriberInterface {
   /**
    * Writes a normalization to cache.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceObject $object
+   * @param ResourceObject $object
    *   The resource object for which to generate a cache item.
    * @param array $normalization_parts
    *   The normalization parts to cache.
@@ -198,7 +198,7 @@ class ResourceObjectNormalizationCacher implements EventSubscriberInterface {
   /**
    * Generates the cache keys for a normalization.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceObject $object
+   * @param ResourceObject $object
    *   The resource object for which to generate the cache keys.
    *
    * @return string[]
@@ -221,10 +221,10 @@ class ResourceObjectNormalizationCacher implements EventSubscriberInterface {
   /**
    * Determines the joint cacheability of all provided dependencies.
    *
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface|object[] $dependencies
+   * @param CacheableDependencyInterface|object[] $dependencies
    *   The dependencies.
    *
-   * @return \Drupal\Core\Cache\CacheableMetadata
+   * @return CacheableMetadata
    *   The cacheability of all dependencies.
    *
    * @see \Drupal\Core\Cache\RefinableCacheableDependencyInterface::addCacheableDependency()

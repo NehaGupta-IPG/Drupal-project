@@ -20,7 +20,7 @@ class JsonApiDocumentTopLevel {
   /**
    * The data to normalize.
    *
-   * @var \Drupal\jsonapi\JsonApiResource\ResourceIdentifierInterface|\Drupal\jsonapi\JsonApiResource\Data|\Drupal\jsonapi\JsonApiResource\ErrorCollection|\Drupal\Core\Field\EntityReferenceFieldItemListInterface
+   * @var ResourceIdentifierInterface|Data|ErrorCollection|EntityReferenceFieldItemListInterface
    */
   protected $data;
 
@@ -34,34 +34,34 @@ class JsonApiDocumentTopLevel {
   /**
    * The links.
    *
-   * @var \Drupal\jsonapi\JsonApiResource\LinkCollection
+   * @var LinkCollection
    */
   protected $links;
 
   /**
    * The includes to normalize.
    *
-   * @var \Drupal\jsonapi\JsonApiResource\IncludedData
+   * @var IncludedData
    */
   protected $includes;
 
   /**
    * Resource objects that will be omitted from the response for access reasons.
    *
-   * @var \Drupal\jsonapi\JsonApiResource\OmittedData
+   * @var OmittedData
    */
   protected $omissions;
 
   /**
    * Instantiates a JsonApiDocumentTopLevel object.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\TopLevelDataInterface|\Drupal\jsonapi\JsonApiResource\ErrorCollection $data
+   * @param TopLevelDataInterface|ErrorCollection $data
    *   The data to normalize. It can be either a ResourceObject, or a stand-in
    *   for one, or a collection of the same.
-   * @param \Drupal\jsonapi\JsonApiResource\IncludedData $includes
+   * @param IncludedData $includes
    *   A JSON:API Data object containing resources to be included in the
    *   response document or NULL if there should not be includes.
-   * @param \Drupal\jsonapi\JsonApiResource\LinkCollection $links
+   * @param LinkCollection $links
    *   A collection of links to resources related to the top-level document.
    * @param array $meta
    *   (optional) The metadata to normalize.
@@ -81,7 +81,7 @@ class JsonApiDocumentTopLevel {
   /**
    * Gets the data.
    *
-   * @return \Drupal\jsonapi\JsonApiResource\Data|\Drupal\jsonapi\JsonApiResource\ErrorCollection
+   * @return Data|ErrorCollection
    *   The data.
    */
   public function getData() {
@@ -91,7 +91,7 @@ class JsonApiDocumentTopLevel {
   /**
    * Gets the links.
    *
-   * @return \Drupal\jsonapi\JsonApiResource\LinkCollection
+   * @return LinkCollection
    *   The top-level links.
    */
   public function getLinks() {
@@ -111,7 +111,7 @@ class JsonApiDocumentTopLevel {
   /**
    * Gets a JSON:API Data object of resources to be included in the response.
    *
-   * @return \Drupal\jsonapi\JsonApiResource\IncludedData
+   * @return IncludedData
    *   The includes.
    */
   public function getIncludes() {
@@ -121,7 +121,7 @@ class JsonApiDocumentTopLevel {
   /**
    * Gets an OmittedData instance containing resources to be omitted.
    *
-   * @return \Drupal\jsonapi\JsonApiResource\OmittedData
+   * @return OmittedData
    *   The omissions.
    */
   public function getOmissions() {

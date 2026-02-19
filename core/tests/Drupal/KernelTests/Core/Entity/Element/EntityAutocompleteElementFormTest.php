@@ -41,7 +41,7 @@ class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements 
   /**
    * An array of entities to be referenced in this test.
    *
-   * @var \Drupal\Core\Entity\EntityInterface[]
+   * @var EntityInterface[]
    */
   protected $referencedEntities;
 
@@ -397,7 +397,7 @@ class EntityAutocompleteElementFormTest extends EntityKernelTestBase implements 
   /**
    * Returns an entity label in format needed by the EntityAutocomplete element.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   A Drupal entity.
    *
    * @return string

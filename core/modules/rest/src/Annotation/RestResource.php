@@ -7,7 +7,7 @@ use Drupal\Component\Annotation\Plugin;
 /**
  * Defines a REST resource annotation object.
  *
- * Plugin Namespace: Plugin\rest\resource
+ * Plugin Namespace: Plugin\rest\resource.
  *
  * For a working example, see \Drupal\dblog\Plugin\rest\resource\DbLogResource
  *

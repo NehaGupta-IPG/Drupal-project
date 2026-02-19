@@ -33,63 +33,63 @@ class PathBasedBreadcrumbBuilderTest extends UnitTestCase {
   /**
    * The path based breadcrumb builder object to test.
    *
-   * @var \Drupal\system\PathBasedBreadcrumbBuilder
+   * @var PathBasedBreadcrumbBuilder
    */
   protected $builder;
 
   /**
    * The mocked title resolver.
    *
-   * @var \Drupal\Core\Controller\TitleResolverInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Controller\TitleResolverInterface|MockObject
    */
   protected $titleResolver;
 
   /**
    * The mocked access manager.
    *
-   * @var \Drupal\Core\Access\AccessManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Access\AccessManagerInterface|MockObject
    */
   protected $accessManager;
 
   /**
    * The request matching mock object.
    *
-   * @var \Symfony\Component\Routing\Matcher\RequestMatcherInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Symfony\Component\Routing\Matcher\RequestMatcherInterface|MockObject
    */
   protected $requestMatcher;
 
   /**
    * The mocked route request context.
    *
-   * @var \Drupal\Core\Routing\RequestContext|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Routing\RequestContext|MockObject
    */
   protected $context;
 
   /**
    * The mocked current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Session\AccountInterface|MockObject
    */
   protected $currentUser;
 
   /**
    * The mocked path processor.
    *
-   * @var \Drupal\Core\PathProcessor\InboundPathProcessorInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\PathProcessor\InboundPathProcessorInterface|MockObject
    */
   protected $pathProcessor;
 
   /**
    * The mocked current path.
    *
-   * @var \Drupal\Core\Path\CurrentPathStack|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Path\CurrentPathStack|MockObject
    */
   protected $currentPath;
 
   /**
    * The mocked path matcher service.
    *
-   * @var \Drupal\Core\Path\PathMatcherInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var PathMatcherInterface|MockObject
    */
   protected $pathMatcher;
 

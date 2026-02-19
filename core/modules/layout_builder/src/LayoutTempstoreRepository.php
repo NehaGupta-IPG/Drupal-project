@@ -19,14 +19,14 @@ class LayoutTempstoreRepository implements LayoutTempstoreRepositoryInterface {
   /**
    * The static cache of loaded values.
    *
-   * @var \Drupal\layout_builder\SectionStorageInterface[]
+   * @var SectionStorageInterface[]
    */
   protected array $cache = [];
 
   /**
    * LayoutTempstoreRepository constructor.
    *
-   * @param \Drupal\Core\TempStore\SharedTempStoreFactory $temp_store_factory
+   * @param SharedTempStoreFactory $temp_store_factory
    *   The shared tempstore factory.
    */
   public function __construct(SharedTempStoreFactory $temp_store_factory) {
@@ -97,7 +97,7 @@ class LayoutTempstoreRepository implements LayoutTempstoreRepositoryInterface {
   /**
    * Gets the shared tempstore.
    *
-   * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
+   * @param SectionStorageInterface $section_storage
    *   The section storage.
    *
    * @return \Drupal\Core\TempStore\SharedTempStore
@@ -111,7 +111,7 @@ class LayoutTempstoreRepository implements LayoutTempstoreRepositoryInterface {
   /**
    * Gets the string to use as the tempstore key.
    *
-   * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
+   * @param SectionStorageInterface $section_storage
    *   The section storage.
    *
    * @return string

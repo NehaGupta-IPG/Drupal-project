@@ -49,7 +49,7 @@ class RouteProviderTest extends KernelTestBase {
   /**
    * A collection of shared fixture data for tests.
    *
-   * @var \Drupal\Tests\Core\Routing\RoutingFixtures
+   * @var RoutingFixtures
    */
   protected $fixtures;
 
@@ -63,14 +63,14 @@ class RouteProviderTest extends KernelTestBase {
   /**
    * The current path.
    *
-   * @var \Drupal\Core\Path\CurrentPathStack
+   * @var CurrentPathStack
    */
   protected $currentPath;
 
   /**
    * The cache backend.
    *
-   * @var \Drupal\Core\Cache\MemoryBackend
+   * @var MemoryBackend
    */
   protected $cache;
 
@@ -91,7 +91,7 @@ class RouteProviderTest extends KernelTestBase {
   /**
    * The test logger.
    *
-   * @var \ColinODell\PsrTestLogger\TestLogger
+   * @var TestLogger
    */
   protected TestLogger $logger;
 

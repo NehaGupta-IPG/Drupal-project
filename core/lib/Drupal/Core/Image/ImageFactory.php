@@ -12,7 +12,7 @@ class ImageFactory {
   /**
    * The image toolkit plugin manager.
    *
-   * @var \Drupal\Core\ImageToolkit\ImageToolkitManager
+   * @var ImageToolkitManager
    */
   protected $toolkitManager;
 
@@ -26,7 +26,7 @@ class ImageFactory {
   /**
    * Constructs a new ImageFactory object.
    *
-   * @param \Drupal\Core\ImageToolkit\ImageToolkitManager $toolkit_manager
+   * @param ImageToolkitManager $toolkit_manager
    *   The image toolkit plugin manager.
    */
   public function __construct(ImageToolkitManager $toolkit_manager) {
@@ -77,7 +77,7 @@ class ImageFactory {
    *   (optional) The ID of the image toolkit to use for this image, or NULL
    *   to use the current toolkit.
    *
-   * @return \Drupal\Core\Image\ImageInterface
+   * @return ImageInterface
    *   An Image object.
    *
    * @see ImageFactory::setToolkitId()

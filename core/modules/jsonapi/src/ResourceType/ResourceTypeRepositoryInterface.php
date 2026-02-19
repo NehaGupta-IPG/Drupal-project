@@ -16,7 +16,7 @@ interface ResourceTypeRepositoryInterface {
   /**
    * Gets all JSON:API resource types.
    *
-   * @return \Drupal\jsonapi\ResourceType\ResourceType[]
+   * @return ResourceType[]
    *   The set of all JSON:API resource types in this Drupal instance.
    */
   public function all();
@@ -30,7 +30,7 @@ interface ResourceTypeRepositoryInterface {
    *   The ID for the bundle to find. If the entity type does not have a bundle,
    *   then the entity type ID again.
    *
-   * @return \Drupal\jsonapi\ResourceType\ResourceType|null
+   * @return ResourceType|null
    *   The requested JSON:API resource type, if it exists. NULL otherwise.
    *
    * @see \Drupal\Core\Entity\EntityInterface::bundle()
@@ -43,7 +43,7 @@ interface ResourceTypeRepositoryInterface {
    * @param string $type_name
    *   The public typename of a JSON:API resource.
    *
-   * @return \Drupal\jsonapi\ResourceType\ResourceType|null
+   * @return ResourceType|null
    *   The resource type, or NULL if none found.
    */
   public function getByTypeName($type_name);

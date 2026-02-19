@@ -183,7 +183,7 @@ class DateTimePlusTest extends TestCase {
   /**
    * Asserts a DateTimePlus value.
    *
-   * @param \Drupal\Component\Datetime\DateTimePlus $date
+   * @param DateTimePlus $date
    *   DateTimePlus to test.
    * @param string|int $input
    *   The original input passed to the test method.

@@ -32,11 +32,11 @@ class TranslationStatusForm extends FormBase {
   /**
    * Constructs a TranslationStatusForm object.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   * @param ModuleHandlerInterface $moduleHandler
    *   A module handler.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct(

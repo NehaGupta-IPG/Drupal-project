@@ -2,10 +2,10 @@
 
 namespace Drupal\user\Form;
 
+use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Form\FormBase;
 use Drupal\Core\Url;
 
 /**
@@ -29,9 +29,9 @@ class UserPasswordResetForm extends FormBase implements WorkspaceSafeFormInterfa
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
-   * @param \Drupal\Core\Session\AccountInterface $user
+   * @param AccountInterface $user
    *   User requesting reset.
    * @param string $expiration_date
    *   Formatted expiration date for the login link, or NULL if the link does

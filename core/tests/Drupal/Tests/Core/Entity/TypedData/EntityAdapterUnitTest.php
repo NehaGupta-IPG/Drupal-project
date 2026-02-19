@@ -42,27 +42,27 @@ class EntityAdapterUnitTest extends UnitTestCase {
   /**
    * The content entity adapter under test.
    *
-   * @var \Drupal\Core\Entity\Plugin\DataType\EntityAdapter
+   * @var EntityAdapter
    */
   protected $entityAdapter;
 
   /**
    * The entity type used for testing.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityTypeInterface|MockObject
    */
   protected $entityType;
 
   /**
    * The entity type manager used for testing.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityTypeManagerInterface|MockObject
    */
   protected $entityTypeManager;
 
   /**
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityFieldManagerInterface|MockObject
    */
   protected $entityFieldManager;
 
@@ -76,35 +76,35 @@ class EntityAdapterUnitTest extends UnitTestCase {
   /**
    * The typed data manager used for testing.
    *
-   * @var \Drupal\Core\TypedData\TypedDataManager|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\TypedData\TypedDataManager|MockObject
    */
   protected $typedDataManager;
 
   /**
    * The field item list returned by the typed data manager.
    *
-   * @var \Drupal\Core\Field\FieldItemListInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Field\FieldItemListInterface|MockObject
    */
   protected $fieldItemList;
 
   /**
    * The field type manager used for testing.
    *
-   * @var \Drupal\Core\Field\FieldTypePluginManager|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Field\FieldTypePluginManager|MockObject
    */
   protected $fieldTypePluginManager;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Language\LanguageManagerInterface|MockObject
    */
   protected $languageManager;
 
   /**
    * The UUID generator used for testing.
    *
-   * @var \Drupal\Component\Uuid\UuidInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Component\Uuid\UuidInterface|MockObject
    */
   protected $uuid;
 
@@ -118,7 +118,7 @@ class EntityAdapterUnitTest extends UnitTestCase {
   /**
    * Field definitions.
    *
-   * @var \Drupal\Core\Field\BaseFieldDefinition[]
+   * @var BaseFieldDefinition[]
    */
   protected $fieldDefinitions;
 

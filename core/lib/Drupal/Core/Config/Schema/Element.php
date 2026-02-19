@@ -24,7 +24,7 @@ abstract class Element extends TypedData {
    * Overrides \Drupal\Core\TypedData\TypedDataTrait::getTypedDataManager() to
    * ensure the typed configuration manager is returned.
    *
-   * @return \Drupal\Core\Config\TypedConfigManagerInterface
+   * @return TypedConfigManagerInterface
    *   The typed configuration manager.
    */
   public function getTypedDataManager() {
@@ -41,7 +41,7 @@ abstract class Element extends TypedData {
    * Overrides \Drupal\Core\TypedData\TypedDataTrait::setTypedDataManager() to
    * ensure that only typed configuration manager can be used.
    *
-   * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typed_data_manager
+   * @param TypedDataManagerInterface $typed_data_manager
    *   The typed config manager. This must be an instance of
    *   \Drupal\Core\Config\TypedConfigManagerInterface. If it is not, then this
    *   method will error when assertions are enabled. We can not narrow the

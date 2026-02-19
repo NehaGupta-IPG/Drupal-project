@@ -17,14 +17,14 @@ class EntityCreateAnyAccessCheck implements AccessInterface {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity type bundle info.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @var EntityTypeBundleInfoInterface
    */
   protected $entityTypeBundleInfo;
 
@@ -38,9 +38,9 @@ class EntityCreateAnyAccessCheck implements AccessInterface {
   /**
    * Constructs an EntityCreateAnyAccessCheck object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle info.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info) {
@@ -51,11 +51,11 @@ class EntityCreateAnyAccessCheck implements AccessInterface {
   /**
    * Checks access to create an entity of any bundle for the given route.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route to check against.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The parameterized route.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The currently logged in account.
    *
    * @return \Drupal\Core\Access\AccessResultInterface

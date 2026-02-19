@@ -2,8 +2,8 @@
 
 namespace Drupal\Core\Entity\Plugin\DataType;
 
-use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\Plugin\DataType\Deriver\EntityDeriver;
 use Drupal\Core\Entity\TypedData\EntityDataDefinition;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -21,7 +21,7 @@ use Drupal\Core\TypedData\TypedData;
  * In addition to the "entity" data type, this exposes derived
  * "entity:$entity_type" and "entity:$entity_type:$bundle" data types.
  *
- * @implements \IteratorAggregate<string, \Drupal\Core\TypedData\TypedDataInterface>
+ * @implements \IteratorAggregate<string, TypedDataInterface>
  */
 #[DataType(
   id: "entity",
@@ -35,14 +35,14 @@ class EntityAdapter extends TypedData implements \IteratorAggregate, ComplexData
   /**
    * The wrapped entity object.
    *
-   * @var \Drupal\Core\Entity\EntityInterface|null
+   * @var EntityInterface|null
    */
   protected $entity;
 
   /**
    * Creates an instance wrapping the given entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface|null $entity
+   * @param EntityInterface|null $entity
    *   The entity object to wrap.
    *
    * @return static
@@ -164,7 +164,7 @@ class EntityAdapter extends TypedData implements \IteratorAggregate, ComplexData
   /**
    * Retrieves the iterator for the object.
    *
-   * @return \ArrayIterator<string, \Drupal\Core\TypedData\TypedDataInterface>
+   * @return \ArrayIterator<string, TypedDataInterface>
    *   The iterator.
    */
   public function getIterator(): \ArrayIterator {
@@ -174,7 +174,7 @@ class EntityAdapter extends TypedData implements \IteratorAggregate, ComplexData
   /**
    * Returns the wrapped entity object.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The wrapped entity object. If the entity is translatable and a specific
    *   translation is required, always request it by calling ::getTranslation()
    *   or ::getUntranslated() as the language of the returned object is not

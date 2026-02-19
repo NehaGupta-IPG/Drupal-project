@@ -23,42 +23,42 @@ class ViewsDataTest extends UnitTestCase {
   /**
    * The mocked cache backend.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Cache\CacheBackendInterface|MockObject
    */
   protected $cacheBackend;
 
   /**
    * The mocked cache tags invalidator.
    *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface|MockObject
    */
   protected $cacheTagsInvalidator;
 
   /**
    * The mocked module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface|MockObject
    */
   protected $moduleHandler;
 
   /**
    * The mocked config factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Config\ConfigFactoryInterface|MockObject
    */
   protected $configFactory;
 
   /**
    * The mocked language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Language\LanguageManagerInterface|MockObject
    */
   protected $languageManager;
 
   /**
    * The tested views data class.
    *
-   * @var \Drupal\views\ViewsData
+   * @var ViewsData
    */
   protected $viewsData;
 
@@ -862,7 +862,7 @@ class ViewsDataTest extends UnitTestCase {
    * 2. getData() invokes module hooks which may suspend the fiber
    * 3. Fiber B calls get($table) or getAll(), sees fullyLoaded is FALSE
    * 4. Fiber B correctly calls getData() again (not skipping it)
-   * 5. Both fibers get correct data, no empty cache entries written
+   * 5. Both fibers get correct data, no empty cache entries written.
    *
    * The fix ensures fullyLoaded is set to TRUE only AFTER data is obtained,
    * not at the start of getData().

@@ -47,7 +47,7 @@ trait FilteredPluginManagerTrait {
   /**
    * Wraps the module handler.
    *
-   * @return \Drupal\Core\Extension\ModuleHandlerInterface
+   * @return ModuleHandlerInterface
    *   The module handler.
    */
   protected function moduleHandler() {
@@ -61,7 +61,7 @@ trait FilteredPluginManagerTrait {
   /**
    * Wraps the theme manager.
    *
-   * @return \Drupal\Core\Theme\ThemeManagerInterface
+   * @return ThemeManagerInterface
    *   The theme manager.
    */
   protected function themeManager() {

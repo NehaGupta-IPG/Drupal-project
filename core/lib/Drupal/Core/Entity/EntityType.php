@@ -193,7 +193,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
   /**
    * The human-readable name of the type.
    *
-   * @var string|\Drupal\Core\StringTranslation\TranslatableMarkup
+   * @var string|TranslatableMarkup
    *
    * @see \Drupal\Core\Entity\EntityTypeInterface::getLabel()
    */
@@ -202,7 +202,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
   /**
    * The human-readable label for a collection of entities of the type.
    *
-   * @var string|\Drupal\Core\StringTranslation\TranslatableMarkup
+   * @var string|TranslatableMarkup
    *
    * @see \Drupal\Core\Entity\EntityTypeInterface::getCollectionLabel()
    */
@@ -212,7 +212,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
   /**
    * The indefinite singular name of the type.
    *
-   * @var string|\Drupal\Core\StringTranslation\TranslatableMarkup
+   * @var string|TranslatableMarkup
    *
    * @see \Drupal\Core\Entity\EntityTypeInterface::getSingularLabel()
    */
@@ -222,7 +222,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
   /**
    * The indefinite plural name of the type.
    *
-   * @var string|\Drupal\Core\StringTranslation\TranslatableMarkup
+   * @var string|TranslatableMarkup
    *
    * @see \Drupal\Core\Entity\EntityTypeInterface::getPluralLabel()
    */
@@ -268,7 +268,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
   /**
    * The human-readable name of the entity type group.
    *
-   * @var string|\Drupal\Core\StringTranslation\TranslatableMarkup
+   * @var string|TranslatableMarkup
    *
    * @see \Drupal\Core\Entity\EntityTypeInterface::getGroupLabel()
    */
@@ -330,7 +330,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
    * @param array $definition
    *   An array of values from the annotation.
    *
-   * @throws \Drupal\Core\Entity\Exception\EntityTypeIdLengthException
+   * @throws EntityTypeIdLengthException
    *   Thrown when attempting to instantiate an entity type with too long ID.
    */
   public function __construct($definition) {

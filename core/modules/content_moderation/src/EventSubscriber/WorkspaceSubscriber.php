@@ -17,9 +17,9 @@ class WorkspaceSubscriber implements EventSubscriberInterface {
   /**
    * Constructs a new WorkspaceSubscriber instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager service.
-   * @param \Drupal\workspaces\WorkspaceTrackerInterface|null $workspaceTracker
+   * @param WorkspaceTrackerInterface|null $workspaceTracker
    *   The workspace tracker service.
    */
   public function __construct(
@@ -30,7 +30,7 @@ class WorkspaceSubscriber implements EventSubscriberInterface {
   /**
    * Prevents a workspace from being published based on certain conditions.
    *
-   * @param \Drupal\workspaces\Event\WorkspacePublishEvent $event
+   * @param WorkspacePublishEvent $event
    *   The workspace publish event.
    */
   public function onWorkspacePrePublish(WorkspacePublishEvent $event): void {

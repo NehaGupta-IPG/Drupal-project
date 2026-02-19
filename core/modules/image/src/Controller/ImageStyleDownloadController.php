@@ -15,8 +15,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 /**
@@ -27,14 +27,14 @@ class ImageStyleDownloadController extends FileDownloadController {
   /**
    * The lock backend.
    *
-   * @var \Drupal\Core\Lock\LockBackendInterface
+   * @var LockBackendInterface
    */
   protected $lock;
 
   /**
    * The image factory.
    *
-   * @var \Drupal\Core\Image\ImageFactory
+   * @var ImageFactory
    */
   protected $imageFactory;
 
@@ -48,20 +48,20 @@ class ImageStyleDownloadController extends FileDownloadController {
   /**
    * File system service.
    *
-   * @var \Drupal\Core\File\FileSystemInterface
+   * @var FileSystemInterface
    */
   protected $fileSystem;
 
   /**
    * Constructs an ImageStyleDownloadController object.
    *
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
+   * @param LockBackendInterface $lock
    *   The lock backend.
-   * @param \Drupal\Core\Image\ImageFactory $image_factory
+   * @param ImageFactory $image_factory
    *   The image factory.
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager
+   * @param StreamWrapperManagerInterface $stream_wrapper_manager
    *   The stream wrapper manager.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
+   * @param FileSystemInterface $file_system
    *   The system service.
    */
   public function __construct(
@@ -83,23 +83,23 @@ class ImageStyleDownloadController extends FileDownloadController {
    *
    * After generating an image, transfer it to the requesting agent.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    * @param string $scheme
    *   The file scheme, defaults to 'private'.
-   * @param \Drupal\image\ImageStyleInterface $image_style
+   * @param ImageStyleInterface $image_style
    *   The image style to deliver.
    * @param string $required_derivative_scheme
    *   The required scheme for the derivative image.
    *
-   * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|\Symfony\Component\HttpFoundation\Response
+   * @return BinaryFileResponse|Response
    *   The transferred file as response or some error response.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   * @throws NotFoundHttpException
    *   Thrown when the file request is invalid.
-   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   * @throws AccessDeniedHttpException
    *   Thrown when the user does not have access to the file.
-   * @throws \Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException
+   * @throws ServiceUnavailableHttpException
    *   Thrown when the file is still being generated.
    */
   public function deliver(Request $request, $scheme, ImageStyleInterface $image_style, string $required_derivative_scheme) {

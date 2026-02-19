@@ -31,27 +31,27 @@ class OverridesEntityForm extends ContentEntityForm implements WorkspaceDynamicS
   /**
    * Layout tempstore repository.
    *
-   * @var \Drupal\layout_builder\LayoutTempstoreRepositoryInterface
+   * @var LayoutTempstoreRepositoryInterface
    */
   protected $layoutTempstoreRepository;
 
   /**
    * The section storage.
    *
-   * @var \Drupal\layout_builder\SectionStorageInterface
+   * @var SectionStorageInterface
    */
   protected $sectionStorage;
 
   /**
    * Constructs a new OverridesEntityForm.
    *
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository service.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
-   * @param \Drupal\layout_builder\LayoutTempstoreRepositoryInterface $layout_tempstore_repository
+   * @param LayoutTempstoreRepositoryInterface $layout_tempstore_repository
    *   The layout tempstore repository.
    */
   public function __construct(EntityRepositoryInterface $entity_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info, TimeInterface $time, LayoutTempstoreRepositoryInterface $layout_tempstore_repository) {
@@ -115,9 +115,9 @@ class OverridesEntityForm extends ContentEntityForm implements WorkspaceDynamicS
   /**
    * Renders a message to display at the top of the layout builder.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity whose layout is being edited.
-   * @param \Drupal\layout_builder\OverridesSectionStorageInterface $section_storage
+   * @param OverridesSectionStorageInterface $section_storage
    *   The current section storage.
    *
    * @return array

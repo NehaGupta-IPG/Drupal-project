@@ -26,10 +26,10 @@ final class PreImportEvent extends Event {
   /**
    * Constructs a PreImportEvent object.
    *
-   * @param \Drupal\Core\DefaultContent\Finder $finder
+   * @param Finder $finder
    *   The content finder, which has information on the entities to create
    *   in the necessary dependency order.
-   * @param \Drupal\Core\DefaultContent\Existing $existing
+   * @param Existing $existing
    *   What the importer will do when importing an entity that already exists.
    */
   public function __construct(

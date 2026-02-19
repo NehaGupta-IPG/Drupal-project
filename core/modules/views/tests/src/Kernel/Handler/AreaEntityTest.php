@@ -119,7 +119,7 @@ class AreaEntityTest extends ViewsKernelTestBase {
   /**
    * Tests rendering the entity area handler.
    *
-   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   * @param EntityInterface[] $entities
    *   The entities.
    */
   public function doTestRender($entities): void {

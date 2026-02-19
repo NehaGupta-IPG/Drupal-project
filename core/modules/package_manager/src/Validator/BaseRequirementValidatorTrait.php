@@ -6,8 +6,8 @@ namespace Drupal\package_manager\Validator;
 
 use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\Event\PreCreateEvent;
-use Drupal\package_manager\Event\SandboxValidationEvent;
 use Drupal\package_manager\Event\PreRequireEvent;
+use Drupal\package_manager\Event\SandboxValidationEvent;
 use Drupal\package_manager\Event\StatusCheckEvent;
 
 /**
@@ -26,7 +26,7 @@ trait BaseRequirementValidatorTrait {
   /**
    * Validates base requirements.
    *
-   * @param \Drupal\package_manager\Event\SandboxValidationEvent $event
+   * @param SandboxValidationEvent $event
    *   The event being handled.
    */
   abstract public function validate(SandboxValidationEvent $event): void;

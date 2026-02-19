@@ -28,28 +28,28 @@ class FieldStorageConfigAccessControlHandlerTest extends UnitTestCase {
   /**
    * The field storage config access controller to test.
    *
-   * @var \Drupal\field\FieldStorageConfigAccessControlHandler
+   * @var FieldStorageConfigAccessControlHandler
    */
   protected $accessControlHandler;
 
   /**
    * The mock module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The mock account without field storage config access.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $anon;
 
   /**
    * The mock account with field storage config access.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $member;
 
@@ -160,7 +160,7 @@ class FieldStorageConfigAccessControlHandlerTest extends UnitTestCase {
    *
    * @param array $allow_operations
    *   A list of allowed operations.
-   * @param \Drupal\Core\Session\AccountInterface $user
+   * @param AccountInterface $user
    *   The account to use for get access.
    *
    * @internal

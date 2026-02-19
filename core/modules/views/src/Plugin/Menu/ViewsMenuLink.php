@@ -2,8 +2,8 @@
 
 namespace Drupal\views\Plugin\Menu;
 
-use Drupal\Core\Menu\MenuLinkBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Menu\MenuLinkBase;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\views\ViewExecutableFactory;
 
@@ -30,7 +30,7 @@ class ViewsMenuLink extends MenuLinkBase implements ContainerFactoryPluginInterf
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
@@ -57,9 +57,9 @@ class ViewsMenuLink extends MenuLinkBase implements ContainerFactoryPluginInterf
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\views\ViewExecutableFactory $view_executable_factory
+   * @param ViewExecutableFactory $view_executable_factory
    *   The view executable factory.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, ViewExecutableFactory $view_executable_factory) {

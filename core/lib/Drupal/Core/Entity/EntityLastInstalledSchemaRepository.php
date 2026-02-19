@@ -15,14 +15,14 @@ class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRe
   /**
    * The key-value factory.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueFactoryInterface
+   * @var KeyValueFactoryInterface
    */
   protected $keyValueFactory;
 
   /**
    * The cache backend.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $cacheBackend;
 
@@ -43,9 +43,9 @@ class EntityLastInstalledSchemaRepository implements EntityLastInstalledSchemaRe
   /**
    * Constructs a new EntityLastInstalledSchemaRepository.
    *
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_factory
+   * @param KeyValueFactoryInterface $key_value_factory
    *   The key-value factory.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The cache backend.
    */
   public function __construct(KeyValueFactoryInterface $key_value_factory, CacheBackendInterface $cache) {

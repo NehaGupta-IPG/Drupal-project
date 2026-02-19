@@ -70,7 +70,7 @@ class ContentTranslationLinkTagTest extends BrowserTestBase {
   /**
    * Create a test entity with translations.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   An entity with translations.
    */
   protected function createTranslatableEntity(): EntityInterface {
@@ -106,7 +106,7 @@ class ContentTranslationLinkTagTest extends BrowserTestBase {
       ->getDefaultLanguage()
       ->getId();
 
-    /** @var \Drupal\Core\Url[] $urls */
+    /** @var Url[] $urls */
     $urls = array_map(
       function ($langcode) use ($url_base, $languageManager) {
         $url = clone $url_base;

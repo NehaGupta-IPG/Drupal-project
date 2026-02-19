@@ -18,7 +18,7 @@ trait NodeAccessTrait {
   /**
    * Adds the private field to a node type.
    *
-   * @param \Drupal\node\NodeTypeInterface $type
+   * @param NodeTypeInterface $type
    *   A node type entity.
    *
    * @see \Drupal\node_access_test\Hook\NodeAccessTestHooks::nodeGrants()

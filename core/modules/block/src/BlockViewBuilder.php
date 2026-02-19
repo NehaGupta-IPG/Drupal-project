@@ -2,18 +2,18 @@
 
 namespace Drupal\block;
 
+use Drupal\big_pipe\Render\Placeholder\BigPipeStrategy;
+use Drupal\block\Entity\Block;
 use Drupal\Core\Block\MainContentBlockPluginInterface;
 use Drupal\Core\Block\TitleBlockPluginInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheOptionalInterface;
-use Drupal\Core\Entity\EntityViewBuilder;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityViewBuilder;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\Core\Render\Element;
-use Drupal\block\Entity\Block;
-use Drupal\big_pipe\Render\Placeholder\BigPipeStrategy;
 use Drupal\Core\Security\TrustedCallbackInterface;
 
 /**
@@ -39,7 +39,7 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
    * {@inheritdoc}
    */
   public function viewMultiple(array $entities = [], $view_mode = 'full', $langcode = NULL) {
-    /** @var \Drupal\block\BlockInterface[] $entities */
+    /** @var BlockInterface[] $entities */
     $build = [];
     foreach ($entities as $entity) {
       $entity_id = $entity->id();
@@ -121,9 +121,9 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
   /**
    * Builds a #pre_render-able block render array.
    *
-   * @param \Drupal\block\BlockInterface $entity
+   * @param BlockInterface $entity
    *   A block config entity.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler service.
    *
    * @return array

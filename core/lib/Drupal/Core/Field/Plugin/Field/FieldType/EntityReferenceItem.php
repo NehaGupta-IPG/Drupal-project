@@ -384,7 +384,7 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
   /**
    * Gets a bundle for a given entity type and selection options.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type.
    * @param array $selection_settings
    *   An array of selection settings.
@@ -506,7 +506,7 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
    *
    * @param array $form
    *   The form where the settings form is being included in.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state of the (entire) configuration form.
    */
   public static function fieldSettingsFormValidate(array $form, FormStateInterface $form_state) {
@@ -755,7 +755,7 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
       return $entity_type->isCommonReferenceTarget();
     });
 
-    /** @var \Drupal\Core\Entity\EntityTypeInterface $entity_type */
+    /** @var EntityTypeInterface $entity_type */
     foreach ($common_references as $entity_type) {
       $options[$entity_type->id()] = [
         'label' => $entity_type->getLabel(),

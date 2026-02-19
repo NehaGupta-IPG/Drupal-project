@@ -28,7 +28,7 @@ class RoutesTest extends UnitTestCase {
   /**
    * List of routes objects for the different scenarios.
    *
-   * @var \Drupal\jsonapi\Routing\Routes[]
+   * @var \Symfony\Component\Routing\Routes[]
    */
   protected $routes;
 

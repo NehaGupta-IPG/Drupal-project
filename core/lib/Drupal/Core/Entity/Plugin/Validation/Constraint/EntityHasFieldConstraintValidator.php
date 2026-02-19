@@ -19,7 +19,7 @@ class EntityHasFieldConstraintValidator extends ConstraintValidator {
       return;
     }
 
-    /** @var \Drupal\Core\Entity\Plugin\Validation\Constraint\EntityHasFieldConstraint $constraint */
+    /** @var EntityHasFieldConstraint $constraint */
     if (!($entity instanceof FieldableEntityInterface)) {
       $this->context->addViolation($constraint->notFieldableMessage);
       return;

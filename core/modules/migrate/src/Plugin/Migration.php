@@ -3,12 +3,12 @@
 namespace Drupal\migrate\Plugin;
 
 use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\Exception\RequirementsException;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateSkipRowException;
-use Drupal\Component\Utility\NestedArray;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 // cspell:ignore idmap
@@ -124,7 +124,7 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
   /**
    * The source plugin.
    *
-   * @var \Drupal\migrate\Plugin\MigrateSourceInterface
+   * @var MigrateSourceInterface
    */
   protected $sourcePlugin;
 
@@ -157,7 +157,7 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
   /**
    * The destination plugin.
    *
-   * @var \Drupal\migrate\Plugin\MigrateDestinationInterface
+   * @var MigrateDestinationInterface
    */
   protected $destinationPlugin;
 
@@ -173,7 +173,7 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
   /**
    * The identifier map.
    *
-   * @var \Drupal\migrate\Plugin\MigrateIdMapInterface
+   * @var MigrateIdMapInterface
    */
   protected $idMapPlugin;
 
@@ -247,35 +247,35 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
   /**
    * The migration plugin manager for loading other migration plugins.
    *
-   * @var \Drupal\migrate\Plugin\MigrationPluginManagerInterface
+   * @var MigrationPluginManagerInterface
    */
   protected $migrationPluginManager;
 
   /**
    * The source plugin manager.
    *
-   * @var \Drupal\migrate\Plugin\MigratePluginManager
+   * @var MigratePluginManager
    */
   protected $sourcePluginManager;
 
   /**
    * The process plugin manager.
    *
-   * @var \Drupal\migrate\Plugin\MigratePluginManager
+   * @var MigratePluginManager
    */
   protected $processPluginManager;
 
   /**
    * The destination plugin manager.
    *
-   * @var \Drupal\migrate\Plugin\MigrateDestinationPluginManager
+   * @var MigrateDestinationPluginManager
    */
   protected $destinationPluginManager;
 
   /**
    * The ID map plugin manager.
    *
-   * @var \Drupal\migrate\Plugin\MigratePluginManager
+   * @var MigratePluginManager
    */
   protected $idMapPluginManager;
 
@@ -301,15 +301,15 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
    *   The plugin ID.
    * @param mixed $plugin_definition
    *   The plugin definition.
-   * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
+   * @param MigrationPluginManagerInterface $migration_plugin_manager
    *   The migration plugin manager.
-   * @param \Drupal\migrate\Plugin\MigratePluginManagerInterface $source_plugin_manager
+   * @param MigratePluginManagerInterface $source_plugin_manager
    *   The source migration plugin manager.
-   * @param \Drupal\migrate\Plugin\MigratePluginManagerInterface $process_plugin_manager
+   * @param MigratePluginManagerInterface $process_plugin_manager
    *   The process migration plugin manager.
-   * @param \Drupal\migrate\Plugin\MigrateDestinationPluginManager $destination_plugin_manager
+   * @param MigrateDestinationPluginManager $destination_plugin_manager
    *   The destination migration plugin manager.
-   * @param \Drupal\migrate\Plugin\MigratePluginManagerInterface $id_map_plugin_manager
+   * @param MigratePluginManagerInterface $id_map_plugin_manager
    *   The ID map migration plugin manager.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationPluginManagerInterface $migration_plugin_manager, MigratePluginManagerInterface $source_plugin_manager, MigratePluginManagerInterface $process_plugin_manager, MigrateDestinationPluginManager $destination_plugin_manager, MigratePluginManagerInterface $id_map_plugin_manager) {
@@ -363,7 +363,7 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
   /**
    * Retrieves the ID map plugin.
    *
-   * @return \Drupal\migrate\Plugin\MigrateIdMapInterface
+   * @return MigrateIdMapInterface
    *   The ID map plugin.
    */
   public function getIdMapPlugin() {
@@ -487,7 +487,7 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
       // There are no requirements to check.
       return;
     }
-    /** @var \Drupal\migrate\Plugin\MigrationInterface[] $required_migrations */
+    /** @var MigrationInterface[] $required_migrations */
     $required_migrations = $this->getMigrationPluginManager()->createInstances($this->requirements);
 
     $missing_migrations = array_diff($this->requirements, array_keys($required_migrations));
@@ -505,7 +505,7 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
   /**
    * Gets the migration plugin manager.
    *
-   * @return \Drupal\migrate\Plugin\MigrationPluginManagerInterface
+   * @return MigrationPluginManagerInterface
    *   The migration plugin manager.
    */
   protected function getMigrationPluginManager() {

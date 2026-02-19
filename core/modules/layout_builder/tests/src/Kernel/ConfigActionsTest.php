@@ -39,10 +39,10 @@ class ConfigActionsTest extends KernelTestBase {
     $this->installEntitySchema('entity_test_with_bundle');
     EntityTestBundle::create(['id' => 'test'])->save();
 
-    /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
+    /** @var EntityDisplayRepositoryInterface $display_repository */
     $display_repository = $this->container->get(EntityDisplayRepositoryInterface::class);
 
-    /** @var \Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay $display */
+    /** @var LayoutBuilderEntityViewDisplay $display */
     $display = $display_repository->getViewDisplay('entity_test_with_bundle', 'test');
     $this->assertInstanceOf(LayoutBuilderEntityViewDisplay::class, $display);
     $display->save();

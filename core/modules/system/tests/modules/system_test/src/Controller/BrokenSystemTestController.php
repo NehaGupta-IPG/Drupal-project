@@ -15,7 +15,7 @@ class BrokenSystemTestController extends ControllerBase {
   /**
    * Constructs the BrokenSystemTestController.
    *
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
+   * @param LockBackendInterface $lock
    *   The lock service.
    */
   public function __construct(

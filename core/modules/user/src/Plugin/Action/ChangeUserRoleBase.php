@@ -22,7 +22,7 @@ abstract class ChangeUserRoleBase extends ConfigurableActionBase implements Cont
   /**
    * The user role entity type.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface
+   * @var EntityTypeInterface
    */
   protected $entityType;
 

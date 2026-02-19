@@ -8,7 +8,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 /**
  * Defines an archiver attribute object.
  *
- * Plugin Namespace: Plugin\Archiver
+ * Plugin Namespace: Plugin\Archiver.
  *
  * For a working example, see \Drupal\system\Plugin\Archiver\Zip
  *
@@ -29,9 +29,9 @@ class Archiver extends Plugin {
    *
    * @param string $id
    *   The archiver plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $title
+   * @param TranslatableMarkup|null $title
    *   The human-readable name of the archiver plugin.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $description
+   * @param TranslatableMarkup|null $description
    *   The description of the archiver plugin.
    * @param array $extensions
    *   An array of valid extensions for this archiver.

@@ -200,7 +200,7 @@ class UserValidationTest extends KernelTestBase {
   /**
    * Verifies that a length violation exists for the given field.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity object to validate.
    * @param string $field_name
    *   The field that violates the maximum length.
@@ -224,7 +224,7 @@ class UserValidationTest extends KernelTestBase {
   /**
    * Verifies that an AllowedValues violation exists for the given field.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity object to validate.
    * @param string $field_name
    *   The name of the field to verify.

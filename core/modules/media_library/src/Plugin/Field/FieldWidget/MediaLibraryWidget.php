@@ -47,21 +47,21 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
   /**
    * Entity type manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The current active user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
@@ -72,17 +72,17 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The definition of the field to which the widget is associated.
    * @param array $settings
    *   The widget settings.
    * @param array $third_party_settings
    *   Any third party settings.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   Entity type manager service.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current active user.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
    */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user, ModuleHandlerInterface $module_handler) {
@@ -230,7 +230,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    * @param mixed $input
    *   The incoming input to populate the form element. If this is FALSE,
    *   the element's default value should be returned.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return mixed
@@ -680,10 +680,10 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    *
    * @param array $form
    *   The form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   An AJAX response to update the selection.
    */
   public static function updateWidget(array $form, FormStateInterface $form_state) {
@@ -763,7 +763,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    *
    * @param array $form
    *   The form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    */
   public static function removeItem(array $form, FormStateInterface $form_state) {
@@ -809,10 +809,10 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    *
    * @param array $form
    *   The form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   An AJAX response to open the media library.
    */
   public static function openMediaLibrary(array $form, FormStateInterface $form_state) {
@@ -831,7 +831,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    *
    * @param array $form
    *   The form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    */
   public static function validateItems(array $form, FormStateInterface $form_state) {
@@ -868,7 +868,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    *
    * @param array $form
    *   The form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    */
   public static function addItems(array $form, FormStateInterface $form_state) {
@@ -912,7 +912,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    *
    * @param array $element
    *   The wrapping element for this widget.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return \Drupal\media\MediaInterface[]
@@ -942,7 +942,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    *
    * @param array $element
    *   The wrapping element for this widget.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return array[]
@@ -970,7 +970,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    *
    * @param array $element
    *   The wrapping element for this widget.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array[] $field_state
    *   An array of arrays with the following key/value pairs:
@@ -987,7 +987,7 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
    *
    * @param array $element
    *   The form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    * @param array $form
    *   The form array.

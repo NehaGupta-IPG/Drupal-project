@@ -18,14 +18,14 @@ class FileDownloadController extends ControllerBase {
   /**
    * The stream wrapper manager.
    *
-   * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface
+   * @var StreamWrapperManagerInterface
    */
   protected $streamWrapperManager;
 
   /**
    * FileDownloadController constructor.
    *
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $streamWrapperManager
+   * @param StreamWrapperManagerInterface $streamWrapperManager
    *   The stream wrapper manager.
    */
   public function __construct(StreamWrapperManagerInterface $streamWrapperManager) {
@@ -42,17 +42,17 @@ class FileDownloadController extends ControllerBase {
    * file exists but no modules responded an AccessDeniedHttpException will be
    * thrown. If the file does not exist a NotFoundHttpException will be thrown.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    * @param string $scheme
    *   The file scheme, defaults to 'private'.
    *
-   * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+   * @return BinaryFileResponse
    *   The transferred file as response.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   * @throws NotFoundHttpException
    *   Thrown when the requested file does not exist.
-   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   * @throws AccessDeniedHttpException
    *   Thrown when the user does not have access to the file.
    *
    * @see hook_file_download()

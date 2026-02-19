@@ -52,9 +52,9 @@ class ImageToolkitOperation extends Plugin {
    * @param string $operation
    *   The machine name of the image toolkit operation implemented
    *   (e.g. "crop").
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $label
+   * @param TranslatableMarkup $label
    *   The human-readable name of the image toolkit operation.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $description
+   * @param TranslatableMarkup|null $description
    *   (optional) The description of the image toolkit operation.
    * @param class-string|null $deriver
    *   (optional) The deriver class for the image toolkit operation.

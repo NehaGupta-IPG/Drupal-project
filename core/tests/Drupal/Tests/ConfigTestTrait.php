@@ -38,9 +38,9 @@ trait ConfigTestTrait {
   /**
    * Copies configuration objects from source storage to target storage.
    *
-   * @param \Drupal\Core\Config\StorageInterface $source_storage
+   * @param StorageInterface $source_storage
    *   The source config storage service.
-   * @param \Drupal\Core\Config\StorageInterface $target_storage
+   * @param StorageInterface $target_storage
    *   The target config storage service.
    */
   protected function copyConfig(StorageInterface $source_storage, StorageInterface $target_storage) {

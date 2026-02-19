@@ -28,14 +28,14 @@ class ResultTest extends UnitTestCase {
   /**
    * The view executable object.
    *
-   * @var \Drupal\views\ViewExecutable
+   * @var ViewExecutable
    */
   protected $view;
 
   /**
    * The Result handler.
    *
-   * @var \Drupal\views\Plugin\views\area\Result
+   * @var Result
    */
   protected $resultHandler;
 

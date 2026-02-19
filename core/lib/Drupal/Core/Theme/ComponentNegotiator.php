@@ -27,7 +27,7 @@ class ComponentNegotiator {
   /**
    * Constructs ComponentNegotiator objects.
    *
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $themeManager
+   * @param ThemeManagerInterface $themeManager
    *   The theme manager.
    */
   public function __construct(

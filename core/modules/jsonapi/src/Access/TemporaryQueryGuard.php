@@ -41,14 +41,14 @@ class TemporaryQueryGuard {
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected static $fieldManager;
 
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected static $moduleHandler;
 
@@ -57,7 +57,7 @@ class TemporaryQueryGuard {
    *
    * This must be called before calling ::applyAccessControls().
    *
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager
+   * @param EntityFieldManagerInterface $field_manager
    *   The entity field manager.
    */
   public static function setFieldManager(EntityFieldManagerInterface $field_manager) {
@@ -69,7 +69,7 @@ class TemporaryQueryGuard {
    *
    * This must be called before calling ::applyAccessControls().
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
    */
   public static function setModuleHandler(ModuleHandlerInterface $module_handler) {
@@ -79,11 +79,11 @@ class TemporaryQueryGuard {
   /**
    * Applies access controls to an entity query.
    *
-   * @param \Drupal\jsonapi\Query\Filter $filter
+   * @param Filter $filter
    *   The filters applicable to the query.
-   * @param \Drupal\Core\Entity\Query\QueryInterface $query
+   * @param QueryInterface $query
    *   The query to which access controls should be applied.
-   * @param \Drupal\Core\Cache\CacheableMetadata $cacheability
+   * @param CacheableMetadata $cacheability
    *   Collects cacheability for the query.
    */
   public static function applyAccessControls(Filter $filter, QueryInterface $query, CacheableMetadata $cacheability) {
@@ -99,7 +99,7 @@ class TemporaryQueryGuard {
   /**
    * Applies tags, metadata and conditions to secure an entity query.
    *
-   * @param \Drupal\Core\Entity\Query\QueryInterface $query
+   * @param QueryInterface $query
    *   The query to be secured.
    * @param string $entity_type_id
    *   An entity type ID.
@@ -108,12 +108,12 @@ class TemporaryQueryGuard {
    *   multi-dimensional array where the keys are field specifiers and the
    *   values are multi-dimensional array of the same form, containing only
    *   subsequent specifiers. @see ::buildTree().
-   * @param \Drupal\Core\Cache\CacheableMetadata $cacheability
+   * @param CacheableMetadata $cacheability
    *   Collects cacheability for the query.
    * @param string|null $field_prefix
    *   Internal use only. Contains a string representation of the previously
    *   visited field specifiers.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $field_storage_definition
+   * @param FieldStorageDefinitionInterface $field_storage_definition
    *   Internal use only. The current field storage definition, if known.
    *
    * @see \Drupal\Core\Database\Query\AlterableInterface::addTag()
@@ -185,14 +185,14 @@ class TemporaryQueryGuard {
    * the field prefix should be applied to ensure that the conditions are
    * applied to the right subset of entities in the query.
    *
-   * @param \Drupal\Core\Entity\Query\QueryInterface $query
+   * @param QueryInterface $query
    *   The query to which access conditions should be applied.
    * @param string $entity_type_id
    *   The entity type for which to access conditions should be applied.
    * @param string|null $field_prefix
    *   A prefix to add before any query condition fields. NULL if no prefix
    *   should be added.
-   * @param \Drupal\Core\Cache\CacheableMetadata $cacheability
+   * @param CacheableMetadata $cacheability
    *   Collects cacheability for the query.
    */
   protected static function applyAccessConditions(QueryInterface $query, $entity_type_id, $field_prefix, CacheableMetadata $cacheability) {
@@ -228,10 +228,10 @@ class TemporaryQueryGuard {
    *
    * @param string $entity_type_id
    *   The entity type ID for which to get an EntityConditionGroup.
-   * @param \Drupal\Core\Cache\CacheableMetadata $cacheability
+   * @param CacheableMetadata $cacheability
    *   Collects cacheability for the query.
    *
-   * @return \Drupal\jsonapi\Query\EntityConditionGroup|null
+   * @return EntityConditionGroup|null
    *   An EntityConditionGroup or NULL if no conditions need to be applied to
    *   secure an entity query.
    */
@@ -333,14 +333,14 @@ class TemporaryQueryGuard {
    * of allowed subsets. If no subsets are allowed, then static::alwaysFalse()
    * is returned.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type for which to check filter access.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The account for which to check access.
-   * @param \Drupal\Core\Cache\CacheableMetadata $cacheability
+   * @param CacheableMetadata $cacheability
    *   Collects cacheability for the query.
    *
-   * @return \Drupal\jsonapi\Query\EntityConditionGroup|null
+   * @return EntityConditionGroup|null
    *   An EntityConditionGroup or NULL if no conditions need to be applied to
    *   secure an entity query.
    */
@@ -422,9 +422,9 @@ class TemporaryQueryGuard {
    * hook_jsonapi_ENTITY_TYPE_filter_access() and combines the results from all
    * of the modules into a single set of results.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type for which to check filter access.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The account for which to check access.
    *
    * @return \Drupal\Core\Access\AccessResultInterface[]
@@ -469,18 +469,18 @@ class TemporaryQueryGuard {
    * bundle. This makes the query access conditions sufficiently complex to
    * merit a dedicated method.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $comment_entity_type
+   * @param EntityTypeInterface $comment_entity_type
    *   The comment entity type object.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
-   * @param \Drupal\Core\Cache\CacheableMetadata $cacheability
+   * @param CacheableMetadata $cacheability
    *   Collects cacheability for the query.
    * @param int $depth
    *   Internal use only. The recursion depth. It is possible to have comments
    *   on comments, but since comment access is dependent on access to the
    *   entity on which they live, this method can recurse endlessly.
    *
-   * @return \Drupal\jsonapi\Query\EntityConditionGroup|null
+   * @return EntityConditionGroup|null
    *   An EntityConditionGroup or NULL if no conditions need to be applied to
    *   secure an entity query.
    */
@@ -543,10 +543,10 @@ class TemporaryQueryGuard {
   /**
    * Gets an always FALSE entity condition group for the given entity type.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type for which to construct an impossible condition.
    *
-   * @return \Drupal\jsonapi\Query\EntityConditionGroup
+   * @return EntityConditionGroup
    *   An EntityConditionGroup which cannot evaluate to TRUE.
    */
   protected static function alwaysFalse(EntityTypeInterface $entity_type) {
@@ -562,7 +562,7 @@ class TemporaryQueryGuard {
    * Entity conditions can be nested within AND and OR groups. This recursively
    * finds all unique fields in an entity query condition.
    *
-   * @param \Drupal\jsonapi\Query\EntityConditionGroup $group
+   * @param EntityConditionGroup $group
    *   The root entity condition group.
    * @param array $fields
    *   Internal use only.

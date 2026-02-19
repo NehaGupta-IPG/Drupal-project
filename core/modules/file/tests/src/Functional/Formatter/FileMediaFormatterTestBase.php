@@ -43,7 +43,7 @@ abstract class FileMediaFormatterTestBase extends BrowserTestBase {
    * @param array $formatter_settings
    *   Settings for the formatter.
    *
-   * @return \Drupal\field\Entity\FieldConfig
+   * @return FieldConfig
    *   Newly created file field.
    */
   protected function createMediaField($formatter, $file_extensions, array $formatter_settings = []) {

@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Drupal\ajax_test\Form;
 
 use Drupal\ajax_test\Controller\AjaxTestController;
-use Drupal\Core\Form\FormBase;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\OpenDialogCommand;
 use Drupal\Core\Ajax\OpenModalDialogCommand;
 use Drupal\Core\Ajax\OpenModalDialogWithUrl;
+use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 
@@ -102,7 +102,7 @@ class AjaxTestDialogForm extends FormBase {
    * @param bool $is_url
    *   (optional) True if modal is from a URL, Defaults to FALSE.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   An ajax response object.
    */
   protected function dialog(bool $is_modal = FALSE, bool $is_url = FALSE) {

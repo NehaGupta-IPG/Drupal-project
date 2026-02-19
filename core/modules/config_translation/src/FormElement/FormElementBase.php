@@ -19,7 +19,7 @@ abstract class FormElementBase implements ElementInterface {
   /**
    * The schema element this form is for.
    *
-   * @var \Drupal\Core\TypedData\TypedDataInterface
+   * @var TypedDataInterface
    */
   protected $element;
 
@@ -33,7 +33,7 @@ abstract class FormElementBase implements ElementInterface {
   /**
    * Constructs a FormElementBase.
    *
-   * @param \Drupal\Core\TypedData\TypedDataInterface $element
+   * @param TypedDataInterface $element
    *   The schema element this form element is for.
    */
   public function __construct(TypedDataInterface $element) {
@@ -78,7 +78,7 @@ abstract class FormElementBase implements ElementInterface {
    * what is considered to provide a more intuitive user interface for the
    * translator.
    *
-   * @param \Drupal\Core\Language\LanguageInterface $source_language
+   * @param LanguageInterface $source_language
    *   Thee source language of the configuration object.
    * @param mixed $source_config
    *   The configuration value of the element in the source language.
@@ -144,7 +144,7 @@ abstract class FormElementBase implements ElementInterface {
    * element is not available for translation of complex data, similar access
    * logic must be implemented manually.
    *
-   * @param \Drupal\Core\Language\LanguageInterface $translation_language
+   * @param LanguageInterface $translation_language
    *   The language to display the translation form for.
    * @param mixed $source_config
    *   The configuration value of the element in the source language.

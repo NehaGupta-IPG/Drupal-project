@@ -40,14 +40,14 @@ class EntityReferenceSettingsTest extends KernelTestBase {
   /**
    * Testing node type.
    *
-   * @var \Drupal\node\Entity\NodeType
+   * @var NodeType
    */
   protected $nodeType;
 
   /**
    * Testing vocabulary.
    *
-   * @var \Drupal\taxonomy\Entity\Vocabulary
+   * @var Vocabulary
    */
   protected $vocabulary;
 
@@ -94,7 +94,7 @@ class EntityReferenceSettingsTest extends KernelTestBase {
    */
   public function testConfigTargetBundleDeletion(): void {
     // Create two vocabularies.
-    /** @var \Drupal\taxonomy\Entity\Vocabulary[] $vocabularies */
+    /** @var Vocabulary[] $vocabularies */
     $vocabularies = [];
     for ($i = 0; $i < 2; $i++) {
       $vid = $this->randomMachineName();

@@ -168,7 +168,7 @@ abstract class SettingsTrayTestBase extends OffCanvasTestBase {
   /**
    * Gets the block CSS selector.
    *
-   * @param \Drupal\block\Entity\Block $block
+   * @param Block $block
    *   The block.
    *
    * @return string

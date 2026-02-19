@@ -29,64 +29,64 @@ abstract class RendererTestBase extends UnitTestCase {
   /**
    * System time service.
    *
-   * @var \Drupal\Component\Datetime\TimeInterface
+   * @var TimeInterface
    */
   protected TimeInterface $datetimeTime;
 
   /**
    * The tested renderer.
    *
-   * @var \Drupal\Core\Render\Renderer
+   * @var Renderer
    */
   protected $renderer;
 
   /**
    * The tested render cache.
    *
-   * @var \Drupal\Core\Render\PlaceholderingRenderCache
+   * @var PlaceholderingRenderCache
    */
   protected $renderCache;
 
   /**
    * The tested placeholder generator.
    *
-   * @var \Drupal\Core\Render\PlaceholderGenerator
+   * @var PlaceholderGenerator
    */
   protected $placeholderGenerator;
 
   /**
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
-   * @var \Drupal\Core\Cache\VariationCacheFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Cache\VariationCacheFactoryInterface|MockObject
    */
   protected $cacheFactory;
 
   /**
-   * @var \Drupal\Core\Cache\Context\CacheContextsManager|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Cache\Context\CacheContextsManager|MockObject
    */
   protected $cacheContextsManager;
 
   /**
    * The mocked controller resolver.
    *
-   * @var \Drupal\Core\Utility\CallableResolver|\PHPUnit\Framework\MockObject\MockObject
+   * @var CallableResolver|MockObject
    */
   protected $callableResolver;
 
   /**
    * The mocked theme manager.
    *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Theme\ThemeManagerInterface|MockObject
    */
   protected $themeManager;
 
   /**
    * The mocked element info.
    *
-   * @var \Drupal\Core\Render\ElementInfoManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Render\ElementInfoManagerInterface|MockObject
    */
   protected $elementInfo;
 

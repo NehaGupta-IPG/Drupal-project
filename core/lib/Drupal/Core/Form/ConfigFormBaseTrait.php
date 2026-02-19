@@ -31,7 +31,7 @@ trait ConfigFormBaseTrait {
    *   object returned will contain the contents of node.admin configuration
    *   file.
    *
-   * @return \Drupal\Core\Config\Config|\Drupal\Core\Config\ImmutableConfig
+   * @return \Drupal\Core\Config\Config|ImmutableConfig
    *   An editable configuration object if the given name is listed in the
    *   getEditableConfigNames() method or an immutable configuration object if
    *   not.

@@ -28,38 +28,38 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class FormAjaxSubscriberTest extends UnitTestCase {
 
   /**
-   * @var \Drupal\Core\Form\EventSubscriber\FormAjaxSubscriber
+   * @var FormAjaxSubscriber
    */
   protected $subscriber;
 
   /**
-   * @var \Drupal\Core\Form\FormAjaxResponseBuilderInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Form\FormAjaxResponseBuilderInterface|MockObject
    */
   protected $formAjaxResponseBuilder;
 
   /**
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var HttpKernelInterface|MockObject
    */
   protected $httpKernel;
 
   /**
    * The mocked string translation.
    *
-   * @var \Drupal\Core\StringTranslation\TranslationInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\StringTranslation\TranslationInterface|MockObject
    */
   protected $stringTranslation;
 
   /**
    * The mocked messenger.
    *
-   * @var \Drupal\Core\Messenger\MessengerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var MessengerInterface|MockObject
    */
   protected $messenger;
 
   /**
    * The event used to derive the response.
    *
-   * @var \Symfony\Component\HttpKernel\Event\ExceptionEvent
+   * @var ExceptionEvent
    */
   protected $event = NULL;
 
@@ -254,11 +254,11 @@ class FormAjaxSubscriberTest extends UnitTestCase {
   /**
    * Asserts that the expected response is derived from the given exception.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    * @param \Exception $exception
    *   The exception to pass to the event.
-   * @param \Symfony\Component\HttpFoundation\Response|null $expected_response
+   * @param Response|null $expected_response
    *   The response expected to be set on the event.
    *
    * @internal

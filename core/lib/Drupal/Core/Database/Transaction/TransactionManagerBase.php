@@ -114,7 +114,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
   /**
    * Constructor.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection.
    */
   public function __construct(
@@ -180,7 +180,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    *
    * @param string $id
    *   The id of the transaction.
-   * @param \Drupal\Core\Database\Transaction\StackItem $item
+   * @param StackItem $item
    *   The stack item.
    */
   protected function addStackItem(string $id, StackItem $item): void {
@@ -366,9 +366,9 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * @param string $id
    *   The id of the transaction.
    *
-   * @throws \Drupal\Core\Database\TransactionOutOfOrderException
+   * @throws TransactionOutOfOrderException
    *   If a Drupal Transaction with the specified name does not exist.
-   * @throws \Drupal\Core\Database\TransactionCommitFailedException
+   * @throws TransactionCommitFailedException
    *   If the commit of the root transaction failed.
    */
   protected function commit(string $name, string $id): void {
@@ -482,7 +482,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * Drivers should not override this method unless they also override the
    * $connectionTransactionState property.
    *
-   * @param \Drupal\Core\Database\Transaction\ClientConnectionTransactionState $state
+   * @param ClientConnectionTransactionState $state
    *   The state of the client connection.
    */
   protected function setConnectionTransactionState(ClientConnectionTransactionState $state): void {
@@ -499,7 +499,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * Drivers should not override this method unless they also override the
    * $connectionTransactionState property.
    *
-   * @return \Drupal\Core\Database\Transaction\ClientConnectionTransactionState
+   * @return ClientConnectionTransactionState
    *   The state of the client connection.
    */
   protected function getConnectionTransactionState(): ClientConnectionTransactionState {
@@ -516,7 +516,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
   /**
    * Processes the root transaction commit.
    *
-   * @throws \Drupal\Core\Database\TransactionCommitFailedException
+   * @throws TransactionCommitFailedException
    *   If the commit of the root transaction failed.
    */
   protected function processRootCommit(): void {

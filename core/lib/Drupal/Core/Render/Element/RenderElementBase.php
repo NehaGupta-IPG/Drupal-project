@@ -13,7 +13,7 @@ use Drupal\Core\Url;
  * Provides a base class for render element plugins.
  *
  * Render elements are referenced in render arrays; see the
- * @link theme_render Render API topic @endlink for an overview of render
+ * @link @endlink for an overview of render
  * arrays and render elements.
  *
  * The elements of render arrays are divided up into properties (whose keys
@@ -220,7 +220,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
    *
    * @param array $element
    *   An associative array containing the properties of the element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array $complete_form
    *   The complete form structure.
@@ -450,7 +450,7 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
    *   An associative array containing the properties and children of the
    *   element. Note that $element must be taken by reference here, so processed
    *   child elements are taken over into $form_state.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array $complete_form
    *   The complete form structure.

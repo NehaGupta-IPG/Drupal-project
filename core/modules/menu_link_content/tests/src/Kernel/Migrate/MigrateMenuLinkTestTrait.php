@@ -36,11 +36,11 @@ trait MigrateMenuLinkTestTrait {
    * @param int $weight
    *   The expected weight of the link.
    *
-   * @return \Drupal\menu_link_content\MenuLinkContentInterface
+   * @return MenuLinkContentInterface
    *   The menu link content.
    */
   protected function assertEntity($id, $langcode, $title, $menu, $description, $enabled, $expanded, array $attributes, $uri, $weight) {
-    /** @var \Drupal\menu_link_content\MenuLinkContentInterface $menu_link */
+    /** @var MenuLinkContentInterface $menu_link */
     $menu_link = MenuLinkContent::load($id);
     $menu_link = $menu_link->getTranslation($langcode);
     $this->assertInstanceOf(MenuLinkContentInterface::class, $menu_link);

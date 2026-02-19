@@ -48,7 +48,7 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
   /**
    * Returns the site maintenance page if the site is offline.
    *
-   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
+   * @param RequestEvent $event
    *   The event to process.
    */
   public function onKernelRequestMaintenance(RequestEvent $event) {
@@ -89,7 +89,7 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
   /**
    * Returns response when site is in maintenance mode and user is not exempt.
    *
-   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
+   * @param RequestEvent $event
    *   The event to process.
    */
   public function onMaintenanceModeRequest(RequestEvent $event) {
@@ -110,7 +110,7 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
   /**
    * Logs changes to maintenance mode.
    *
-   * @param \Symfony\Component\HttpKernel\Event\TerminateEvent $event
+   * @param TerminateEvent $event
    *   The event object.
    */
   public function onTerminate(TerminateEvent $event): void {
@@ -128,7 +128,7 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
   /**
    * Gets the logging service.
    *
-   * @return \Psr\Log\LoggerInterface
+   * @return LoggerInterface
    *   The logging service.
    */
   protected function getLogger(): LoggerInterface {

@@ -33,7 +33,7 @@ interface EntityLastInstalledSchemaRepositoryInterface {
    * @param string $entity_type_id
    *   The entity type ID.
    *
-   * @return \Drupal\Core\Entity\EntityTypeInterface|null
+   * @return EntityTypeInterface|null
    *   The installed entity type definition, or NULL if the entity type has
    *   not yet been installed via onEntityTypeCreate().
    *
@@ -63,7 +63,7 @@ interface EntityLastInstalledSchemaRepositoryInterface {
    *   codebase.
    * - Perform some other action.
    *
-   * @return \Drupal\Core\Entity\EntityTypeInterface[]
+   * @return EntityTypeInterface[]
    *   An array containing the installed definition for all entity types, keyed
    *   by the entity type ID.
    */
@@ -72,7 +72,7 @@ interface EntityLastInstalledSchemaRepositoryInterface {
   /**
    * Stores the entity type definition in the application state.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
    *
    * @return $this
@@ -116,7 +116,7 @@ interface EntityLastInstalledSchemaRepositoryInterface {
    * @param string $entity_type_id
    *   The entity type ID.
    *
-   * @return \Drupal\Core\Field\FieldStorageDefinitionInterface[]
+   * @return FieldStorageDefinitionInterface[]
    *   The array of installed field storage definitions for the entity type,
    *   keyed by field name.
    *
@@ -129,7 +129,7 @@ interface EntityLastInstalledSchemaRepositoryInterface {
    *
    * @param string $entity_type_id
    *   The entity type identifier.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface[] $storage_definitions
+   * @param FieldStorageDefinitionInterface[] $storage_definitions
    *   An array of field storage definitions.
    */
   public function setLastInstalledFieldStorageDefinitions($entity_type_id, array $storage_definitions);
@@ -137,7 +137,7 @@ interface EntityLastInstalledSchemaRepositoryInterface {
   /**
    * Stores the field storage definition in the application state.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field storage definition.
    */
   public function setLastInstalledFieldStorageDefinition(FieldStorageDefinitionInterface $storage_definition);
@@ -145,7 +145,7 @@ interface EntityLastInstalledSchemaRepositoryInterface {
   /**
    * Deletes the field storage definition from the application state.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field storage definition.
    */
   public function deleteLastInstalledFieldStorageDefinition(FieldStorageDefinitionInterface $storage_definition);

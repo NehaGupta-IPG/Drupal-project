@@ -61,7 +61,7 @@ class MigrateFieldInstanceTest extends MigrateDrupal7TestBase {
   protected function assertEntity(string $id, string $expected_label, string $expected_field_type, bool $is_required, bool $expected_translatable): void {
     [$expected_entity_type, $expected_bundle, $expected_name] = explode('.', $id);
 
-    /** @var \Drupal\field\FieldConfigInterface $field */
+    /** @var FieldConfigInterface $field */
     $field = FieldConfig::load($id);
     $this->assertInstanceOf(FieldConfigInterface::class, $field);
     $this->assertEquals($expected_label, $field->label());
@@ -79,7 +79,7 @@ class MigrateFieldInstanceTest extends MigrateDrupal7TestBase {
    *
    * @param string $id
    *   The entity ID in the form ENTITY_TYPE.BUNDLE.FIELD_NAME.
-   * @param \Drupal\link\LinkTitleVisibility $title_setting
+   * @param LinkTitleVisibility $title_setting
    *   The expected title setting.
    *
    * @internal

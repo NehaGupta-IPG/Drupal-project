@@ -104,7 +104,7 @@ interface PagerManagerInterface {
    * @param int $element
    *   (optional) An integer to distinguish between multiple pagers on one page.
    *
-   * @return \Drupal\Core\Pager\Pager
+   * @return Pager
    *   The pager.
    */
   public function createPager($total, $limit, $element = 0);
@@ -115,7 +115,7 @@ interface PagerManagerInterface {
    * @param int $element
    *   The pager element index.
    *
-   * @return \Drupal\Core\Pager\Pager|null
+   * @return Pager|null
    *   The pager, or null if not found.
    */
   public function getPager($element = 0);

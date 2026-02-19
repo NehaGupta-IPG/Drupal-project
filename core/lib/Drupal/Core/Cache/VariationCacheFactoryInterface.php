@@ -13,7 +13,7 @@ interface VariationCacheFactoryInterface {
    * @param string $bin
    *   The cache bin for which a variation cache should be returned.
    *
-   * @return \Drupal\Core\Cache\VariationCacheInterface
+   * @return VariationCacheInterface
    *   The variation cache associated with the specified bin.
    */
   public function get($bin);

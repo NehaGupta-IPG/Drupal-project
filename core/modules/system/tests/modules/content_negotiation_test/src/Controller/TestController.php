@@ -16,7 +16,7 @@ class TestController {
   /**
    * Returns a json response.
    *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   * @return JsonResponse
    *   The Json response value.
    */
   public function simple() {
@@ -38,10 +38,10 @@ class TestController {
   /**
    * Returns different responses depending on the request format.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   The response.
    */
   public function format(Request $request) {

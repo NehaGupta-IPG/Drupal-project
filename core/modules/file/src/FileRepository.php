@@ -52,10 +52,10 @@ class FileRepository implements FileRepositoryInterface {
    * @param bool $rename
    *   Whether to rename the file.
    *
-   * @return \Drupal\file\Entity\File|\Drupal\file\FileInterface
+   * @return File|FileInterface
    *   The file entity.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   Thrown when there is an error saving the file.
    */
   protected function createOrUpdate(string $uri, string $destination, bool $rename): FileInterface {
@@ -161,7 +161,7 @@ class FileRepository implements FileRepositoryInterface {
    */
   public function loadByUri(string $uri): ?FileInterface {
     $fileStorage = $this->entityTypeManager->getStorage('file');
-    /** @var \Drupal\file\FileInterface[] $files */
+    /** @var FileInterface[] $files */
     $files = $fileStorage->loadByProperties(['uri' => $uri]);
     if (count($files)) {
       foreach ($files as $item) {

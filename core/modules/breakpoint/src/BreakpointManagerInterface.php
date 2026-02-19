@@ -13,7 +13,7 @@ interface BreakpointManagerInterface {
    * @param string $group
    *   The breakpoint group to retrieve.
    *
-   * @return \Drupal\breakpoint\BreakpointInterface[]
+   * @return BreakpointInterface[]
    *   Array of breakpoint plugins keyed by machine name.
    */
   public function getBreakpointsByGroup($group);

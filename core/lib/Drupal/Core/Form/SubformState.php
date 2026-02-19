@@ -32,9 +32,9 @@ class SubformState extends FormStateDecoratorBase implements SubformStateInterfa
    *   The subform for which to create a form state.
    * @param mixed[] $parent_form
    *   The subform's parent form.
-   * @param \Drupal\Core\Form\FormStateInterface $parent_form_state
+   * @param FormStateInterface $parent_form_state
    *   The parent form state.
-   * @param \Drupal\Core\Form\FormInterface|null $subformFormObject
+   * @param FormInterface|null $subformFormObject
    *   The subform form object when it's not the same as the parent form.
    */
   protected function __construct(array &$subform, array &$parent_form, FormStateInterface $parent_form_state, protected readonly ?FormInterface $subformFormObject = NULL) {
@@ -50,9 +50,9 @@ class SubformState extends FormStateDecoratorBase implements SubformStateInterfa
    *   The subform for which to create a form state.
    * @param mixed[] $parent_form
    *   The subform's parent form.
-   * @param \Drupal\Core\Form\FormStateInterface $parent_form_state
+   * @param FormStateInterface $parent_form_state
    *   The parent form state.
-   * @param \Drupal\Core\Form\FormInterface|null $subform_form_object
+   * @param FormInterface|null $subform_form_object
    *   The subform form object when it's not the same as the parent form.
    *
    * @return static

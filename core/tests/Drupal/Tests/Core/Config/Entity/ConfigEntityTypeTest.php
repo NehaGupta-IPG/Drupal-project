@@ -23,7 +23,7 @@ class ConfigEntityTypeTest extends UnitTestCase {
   /**
    * The mocked typed config manager.
    *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var TypedConfigManagerInterface|MockObject
    */
   protected $typedConfigManager;
 

@@ -22,7 +22,7 @@ class ProxyServicesPassTest extends UnitTestCase {
   /**
    * The tested proxy services pass.
    *
-   * @var \Drupal\Core\DependencyInjection\Compiler\ProxyServicesPass
+   * @var ProxyServicesPass
    */
   protected $proxyServicesPass;
 

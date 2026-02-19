@@ -40,12 +40,12 @@ class CommentCacheTagsTest extends EntityWithUriCacheTagsTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * @var \Drupal\entity_test\Entity\EntityTest
+   * @var EntityTest
    */
   protected $entityTestCamelid;
 
   /**
-   * @var \Drupal\entity_test\Entity\EntityTest
+   * @var EntityTest
    */
   protected $entityTestHippopotamidae;
 
@@ -157,7 +157,7 @@ class CommentCacheTagsTest extends EntityWithUriCacheTagsTestBase {
    * Each comment must have a comment body, which always has a text format.
    */
   protected function getAdditionalCacheTagsForEntity(EntityInterface $entity): array {
-    /** @var \Drupal\comment\CommentInterface $entity */
+    /** @var CommentInterface $entity */
     return [
       'config:filter.format.plain_text',
       'user:' . $entity->getOwnerId(),

@@ -11,11 +11,11 @@ use Drupal\Core\Diff\DiffFormatter;
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Serialization\Yaml;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\system\FileDownloadController;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Returns responses for config module routes.
@@ -27,56 +27,56 @@ class ConfigController implements ContainerInjectionInterface {
   /**
    * The target storage.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   protected $targetStorage;
 
   /**
    * The sync storage.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   protected $syncStorage;
 
   /**
    * The import transformer service.
    *
-   * @var \Drupal\Core\Config\ImportStorageTransformer
+   * @var ImportStorageTransformer
    */
   protected $importTransformer;
 
   /**
    * The configuration manager.
    *
-   * @var \Drupal\Core\Config\ConfigManagerInterface
+   * @var ConfigManagerInterface
    */
   protected $configManager;
 
   /**
    * The export storage.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   protected $exportStorage;
 
   /**
    * The file download controller.
    *
-   * @var \Drupal\system\FileDownloadController
+   * @var FileDownloadController
    */
   protected $fileDownloadController;
 
   /**
    * The diff formatter.
    *
-   * @var \Drupal\Core\Diff\DiffFormatter
+   * @var DiffFormatter
    */
   protected $diffFormatter;
 
   /**
    * The file system.
    *
-   * @var \Drupal\Core\File\FileSystemInterface
+   * @var FileSystemInterface
    */
   protected $fileSystem;
 
@@ -99,21 +99,21 @@ class ConfigController implements ContainerInjectionInterface {
   /**
    * Constructs a ConfigController object.
    *
-   * @param \Drupal\Core\Config\StorageInterface $target_storage
+   * @param StorageInterface $target_storage
    *   The target storage.
-   * @param \Drupal\Core\Config\StorageInterface $sync_storage
+   * @param StorageInterface $sync_storage
    *   The sync storage.
-   * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
+   * @param ConfigManagerInterface $config_manager
    *   The config manager.
-   * @param \Drupal\system\FileDownloadController $file_download_controller
+   * @param FileDownloadController $file_download_controller
    *   The file download controller.
-   * @param \Drupal\Core\Diff\DiffFormatter $diff_formatter
+   * @param DiffFormatter $diff_formatter
    *   The diff formatter.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
+   * @param FileSystemInterface $file_system
    *   The file system.
-   * @param \Drupal\Core\Config\StorageInterface $export_storage
+   * @param StorageInterface $export_storage
    *   The export storage.
-   * @param \Drupal\Core\Config\ImportStorageTransformer $import_transformer
+   * @param ImportStorageTransformer $import_transformer
    *   The import transformer service.
    */
   public function __construct(StorageInterface $target_storage, StorageInterface $sync_storage, ConfigManagerInterface $config_manager, FileDownloadController $file_download_controller, DiffFormatter $diff_formatter, FileSystemInterface $file_system, StorageInterface $export_storage, ImportStorageTransformer $import_transformer) {

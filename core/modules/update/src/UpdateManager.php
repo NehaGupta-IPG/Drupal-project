@@ -9,8 +9,8 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
-use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Utility\ProjectInfo;
 
 /**
@@ -30,14 +30,14 @@ class UpdateManager implements UpdateManagerInterface {
   /**
    * Module Handler Service.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * Update Processor Service.
    *
-   * @var \Drupal\update\UpdateProcessorInterface
+   * @var UpdateProcessorInterface
    */
   protected $updateProcessor;
 
@@ -65,42 +65,42 @@ class UpdateManager implements UpdateManagerInterface {
   /**
    * The theme handler.
    *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
+   * @var ThemeHandlerInterface
    */
   protected $themeHandler;
 
   /**
    * The module extension list.
    *
-   * @var \Drupal\Core\Extension\ModuleExtensionList
+   * @var ModuleExtensionList
    */
   protected $moduleExtensionList;
 
   /**
    * The theme extension list.
    *
-   * @var \Drupal\Core\Extension\ThemeExtensionList
+   * @var ThemeExtensionList
    */
   protected ThemeExtensionList $themeExtensionList;
 
   /**
    * Constructs an UpdateManager.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The Module Handler service.
-   * @param \Drupal\update\UpdateProcessorInterface $update_processor
+   * @param UpdateProcessorInterface $update_processor
    *   The Update Processor service.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
+   * @param TranslationInterface $translation
    *   The translation service.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_expirable_factory
+   * @param KeyValueFactoryInterface $key_value_expirable_factory
    *   The expirable key/value factory.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param ThemeHandlerInterface $theme_handler
    *   The theme handler.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $extension_list_module
+   * @param ModuleExtensionList $extension_list_module
    *   The module extension list.
-   * @param \Drupal\Core\Extension\ThemeExtensionList $extension_list_theme
+   * @param ThemeExtensionList $extension_list_theme
    *   The theme extension list.
    */
   public function __construct(ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, UpdateProcessorInterface $update_processor, TranslationInterface $translation, KeyValueFactoryInterface $key_value_expirable_factory, ThemeHandlerInterface $theme_handler, ModuleExtensionList $extension_list_module, ThemeExtensionList $extension_list_theme) {

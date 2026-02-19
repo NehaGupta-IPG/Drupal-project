@@ -19,7 +19,7 @@ final class RecipeFileException extends \RuntimeException {
    *   The path of the offending recipe file.
    * @param string $message
    *   (optional) The exception message.
-   * @param \Symfony\Component\Validator\ConstraintViolationList|null $violations
+   * @param ConstraintViolationList|null $violations
    *   (optional) A list of validation constraint violations in the recipe file,
    *   if any.
    * @param int $code
@@ -42,7 +42,7 @@ final class RecipeFileException extends \RuntimeException {
    *
    * @param string $path
    *   The path of the offending recipe file.
-   * @param \Symfony\Component\Validator\ConstraintViolationList $violations
+   * @param ConstraintViolationList $violations
    *   The list of validation constraint violations.
    *
    * @return static

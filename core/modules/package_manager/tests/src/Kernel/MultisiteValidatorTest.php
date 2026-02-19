@@ -77,7 +77,7 @@ PHP,
    * @param string|null $sites_php
    *   The sites.php contents to write, if any. If NULL, no sites.php will be
    *   created.
-   * @param \Drupal\package_manager\ValidationResult[] $expected_results
+   * @param ValidationResult[] $expected_results
    *   The expected validation results.
    */
   #[DataProvider('providerMultisite')]
@@ -96,7 +96,7 @@ PHP,
    * @param string|null $sites_php
    *   The sites.php contents to write, if any. If NULL, no sites.php will be
    *   created.
-   * @param \Drupal\package_manager\ValidationResult[] $expected_results
+   * @param ValidationResult[] $expected_results
    *   The expected validation results.
    */
   #[DataProvider('providerMultisite')]

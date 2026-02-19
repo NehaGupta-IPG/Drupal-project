@@ -18,7 +18,7 @@ class FileWidgetAjaxController {
    * @param string $key
    *   The unique key for this upload process.
    *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   * @return JsonResponse
    *   A JsonResponse object.
    */
   public function progress($key) {

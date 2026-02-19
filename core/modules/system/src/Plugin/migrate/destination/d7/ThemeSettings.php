@@ -2,12 +2,12 @@
 
 namespace Drupal\system\Plugin\migrate\destination\d7;
 
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Attribute\MigrateDestination;
+use Drupal\migrate\Plugin\migrate\destination\DestinationBase;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
-use Drupal\migrate\Plugin\migrate\destination\DestinationBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -24,7 +24,7 @@ class ThemeSettings extends DestinationBase implements ContainerFactoryPluginInt
   /**
    * The configuration factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
@@ -37,9 +37,9 @@ class ThemeSettings extends DestinationBase implements ContainerFactoryPluginInt
    *   The plugin ID.
    * @param mixed $plugin_definition
    *   The plugin definition.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The current migration.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The configuration factory.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, ConfigFactoryInterface $config_factory) {

@@ -16,9 +16,9 @@ class UserHooksTest {
   /**
    * Alters the username.
    *
-   * @param string|\Drupal\Component\Render\MarkupInterface $name
+   * @param string|MarkupInterface $name
    *   The username that is displayed for a user.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The object on which the operation is being performed.
    */
   #[Hook('user_format_name_alter')]

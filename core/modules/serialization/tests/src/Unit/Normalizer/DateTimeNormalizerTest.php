@@ -32,14 +32,14 @@ class DateTimeNormalizerTest extends UnitTestCase {
   /**
    * The tested data type's normalizer.
    *
-   * @var \Drupal\serialization\Normalizer\DateTimeNormalizer
+   * @var DateTimeNormalizer
    */
   protected $normalizer;
 
   /**
    * The tested data type.
    *
-   * @var \Drupal\Core\TypedData\Type\DateTimeInterface
+   * @var DateTimeInterface
    */
   protected $data;
 

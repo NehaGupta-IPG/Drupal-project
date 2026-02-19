@@ -31,7 +31,7 @@ class ComponentValidatorTest extends UnitTestCase {
   /**
    * Tests that valid component definitions don't cause errors.
    *
-   * @throws \Drupal\Core\Render\Component\Exception\InvalidComponentException
+   * @throws InvalidComponentException
    */
   #[DataProvider('dataProviderValidateDefinitionValid')]
   public function testValidateDefinitionValid(array $definition): void {
@@ -188,7 +188,7 @@ class ComponentValidatorTest extends UnitTestCase {
   /**
    * Tests that valid props are handled properly.
    *
-   * @throws \Drupal\Core\Render\Component\Exception\InvalidComponentException
+   * @throws InvalidComponentException
    */
   #[DataProvider('dataProviderValidatePropsValid')]
   public function testValidatePropsValid(array $context, string $component_id, array $definition): void {
@@ -272,7 +272,7 @@ class ComponentValidatorTest extends UnitTestCase {
   /**
    * Tests that invalid props are handled properly.
    *
-   * @throws \Drupal\Core\Render\Component\Exception\InvalidComponentException
+   * @throws InvalidComponentException
    */
   #[DataProvider('dataProviderValidatePropsInvalid')]
   public function testValidatePropsInvalid(array $context, string $component_id, array $definition, string $expected_exception_message): void {

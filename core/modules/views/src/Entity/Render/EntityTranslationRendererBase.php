@@ -14,7 +14,7 @@ abstract class EntityTranslationRendererBase extends RendererBase {
   /**
    * Returns the language code associated with the given row.
    *
-   * @param \Drupal\views\ResultRow $row
+   * @param ResultRow $row
    *   The result row.
    *
    * @return string
@@ -25,7 +25,7 @@ abstract class EntityTranslationRendererBase extends RendererBase {
   /**
    * Returns the language code associated with the given row.
    *
-   * @param \Drupal\views\ResultRow $row
+   * @param ResultRow $row
    *   The result row.
    * @param string $relationship
    *   The relationship to be used.
@@ -55,7 +55,7 @@ abstract class EntityTranslationRendererBase extends RendererBase {
   /**
    * Runs before each entity is rendered if a relationship is needed.
    *
-   * @param \Drupal\views\ResultRow[] $result
+   * @param ResultRow[] $result
    *   The full array of results from the query.
    * @param string $relationship
    *   The relationship to be used.
@@ -81,7 +81,7 @@ abstract class EntityTranslationRendererBase extends RendererBase {
   /**
    * Renders entity data.
    *
-   * @param \Drupal\views\ResultRow $row
+   * @param ResultRow $row
    *   A single row of the query result.
    * @param string $relationship
    *   The relationship to be used.
@@ -100,12 +100,12 @@ abstract class EntityTranslationRendererBase extends RendererBase {
   /**
    * Gets the entity associated with a row.
    *
-   * @param \Drupal\views\ResultRow $row
+   * @param ResultRow $row
    *   The result row.
    * @param string $relationship
    *   (optional) The relationship.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|null
+   * @return EntityInterface|null
    *   The entity might be optional, because the relationship entity might not
    *   always exist.
    */

@@ -2,9 +2,9 @@
 
 namespace Drupal\Core\EventSubscriber;
 
-use Drupal\Core\State\StateInterface;
 use Drupal\Core\Routing\RouteBuildEvent;
 use Drupal\Core\Routing\RoutingEvents;
+use Drupal\Core\State\StateInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -25,14 +25,14 @@ class PathRootsSubscriber implements EventSubscriberInterface {
   /**
    * The state key value store.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
   /**
    * Constructs a new PathRootsSubscriber instance.
    *
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state key value store.
    */
   public function __construct(StateInterface $state) {
@@ -42,7 +42,7 @@ class PathRootsSubscriber implements EventSubscriberInterface {
   /**
    * Collects all path roots.
    *
-   * @param \Drupal\Core\Routing\RouteBuildEvent $event
+   * @param RouteBuildEvent $event
    *   The route build event.
    */
   public function onRouteAlter(RouteBuildEvent $event) {

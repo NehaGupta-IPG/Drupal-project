@@ -17,7 +17,7 @@ use Drupal\layout_builder\Section;
  * @internal
  *   Plugin classes are internal.
  *
- * @property \Drupal\layout_builder\Section $section
+ * @property Section $section
  */
 #[FieldType(
   id: "layout_section",

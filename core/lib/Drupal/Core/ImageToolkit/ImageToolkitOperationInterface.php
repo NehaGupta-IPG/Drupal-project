@@ -21,7 +21,7 @@ interface ImageToolkitOperationInterface extends PluginInspectionInterface {
   /**
    * Set the image toolkit instance for this operation.
    *
-   * @param \Drupal\Core\ImageToolkit\ImageToolkitInterface $toolkit
+   * @param ImageToolkitInterface $toolkit
    *   The image toolkit in use.
    */
   public function setToolkit(ImageToolkitInterface $toolkit): void;

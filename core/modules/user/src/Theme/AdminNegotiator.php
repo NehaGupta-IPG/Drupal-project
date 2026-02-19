@@ -24,32 +24,32 @@ class AdminNegotiator implements ThemeNegotiatorInterface {
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $user;
 
   /**
    * The config factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * The route admin context to determine whether a route is an admin one.
    *
-   * @var \Drupal\Core\Routing\AdminContext
+   * @var AdminContext
    */
   protected $adminContext;
 
   /**
    * Creates a new AdminNegotiator instance.
    *
-   * @param \Drupal\Core\Session\AccountInterface $user
+   * @param AccountInterface $user
    *   The current user.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\Core\Routing\AdminContext|EntityTypeManagerInterface $admin_context
+   * @param AdminContext|EntityTypeManagerInterface $admin_context
    *   The route admin context to determine whether the route is an admin one.
    */
   public function __construct(AccountInterface $user, ConfigFactoryInterface $config_factory, AdminContext|EntityTypeManagerInterface $admin_context) {

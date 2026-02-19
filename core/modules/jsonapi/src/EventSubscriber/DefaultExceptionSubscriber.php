@@ -57,7 +57,7 @@ class DefaultExceptionSubscriber extends SerializationDefaultExceptionSubscriber
    * {@inheritdoc}
    */
   protected function setEventResponse(ExceptionEvent $event, $status) {
-    /** @var \Symfony\Component\HttpKernel\Exception\HttpException $exception */
+    /** @var HttpException $exception */
     $exception = $event->getThrowable();
     $document = new JsonApiDocumentTopLevel(new ErrorCollection([$exception]), new NullIncludedData(), new LinkCollection([]));
     if ($event->getRequest()->isMethodCacheable()) {
@@ -76,7 +76,7 @@ class DefaultExceptionSubscriber extends SerializationDefaultExceptionSubscriber
    * The JSON:API format is supported if the format is explicitly set or the
    * request is for a known JSON:API route.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $exception_event
+   * @param ExceptionEvent $exception_event
    *   The exception event.
    *
    * @return bool

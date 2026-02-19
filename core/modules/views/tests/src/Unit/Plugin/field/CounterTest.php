@@ -31,7 +31,7 @@ class CounterTest extends UnitTestCase {
   /**
    * The view executable.
    *
-   * @var \Drupal\views\ViewExecutable
+   * @var ViewExecutable
    */
   protected $view;
 
@@ -221,9 +221,9 @@ class CounterTest extends UnitTestCase {
   /**
    * Renders the counter field handler.
    *
-   * @param \Drupal\views\Plugin\views\field\Counter $handler
+   * @param Counter $handler
    *   The counter handler.
-   * @param \Drupal\views\ResultRow $row
+   * @param ResultRow $row
    *   A result row.
    *
    * @return string

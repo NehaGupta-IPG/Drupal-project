@@ -13,10 +13,10 @@ interface ConfigMapperManagerInterface extends PluginManagerInterface {
   /**
    * Returns an array of all mappers.
    *
-   * @param \Symfony\Component\Routing\RouteCollection $collection
+   * @param RouteCollection $collection
    *   The route collection used to initialize the mappers.
    *
-   * @return \Drupal\config_translation\ConfigMapperInterface[]
+   * @return ConfigMapperInterface[]
    *   An array of all mappers.
    */
   public function getMappers(?RouteCollection $collection = NULL);

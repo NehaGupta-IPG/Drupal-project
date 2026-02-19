@@ -19,7 +19,7 @@ trait WorkspaceSafeFormTrait {
   /**
    * Determines whether an entity used in a form is workspace-safe.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   An entity object.
    *
    * @return bool
@@ -39,7 +39,7 @@ trait WorkspaceSafeFormTrait {
   /**
    * Determines whether an entity type used in a form is workspace-safe.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   An entity type object.
    *
    * @return bool
@@ -59,7 +59,7 @@ trait WorkspaceSafeFormTrait {
   /**
    * Retrieves the workspace information service.
    *
-   * @return \Drupal\workspaces\WorkspaceInformationInterface
+   * @return WorkspaceInformationInterface
    *   The workspace information service.
    */
   protected function getWorkspaceInfo(): WorkspaceInformationInterface {

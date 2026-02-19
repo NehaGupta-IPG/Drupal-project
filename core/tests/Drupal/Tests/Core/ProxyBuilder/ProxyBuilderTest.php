@@ -19,7 +19,7 @@ class ProxyBuilderTest extends UnitTestCase {
   /**
    * The tested proxy builder.
    *
-   * @var \Drupal\Core\ProxyBuilder\ProxyBuilder
+   * @var ProxyBuilder
    */
   protected $proxyBuilder;
 

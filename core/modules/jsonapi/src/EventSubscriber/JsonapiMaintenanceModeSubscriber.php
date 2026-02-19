@@ -32,16 +32,16 @@ class JsonapiMaintenanceModeSubscriber implements EventSubscriberInterface {
   /**
    * The configuration factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $config;
 
   /**
    * Constructs a new JsonapiMaintenanceModeSubscriber.
    *
-   * @param \Drupal\Core\Site\MaintenanceModeInterface $maintenance_mode
+   * @param MaintenanceModeInterface $maintenance_mode
    *   The maintenance mode.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
    */
   public function __construct(MaintenanceModeInterface $maintenance_mode, ConfigFactoryInterface $config_factory) {
@@ -64,7 +64,7 @@ class JsonapiMaintenanceModeSubscriber implements EventSubscriberInterface {
   /**
    * Returns response when site is in maintenance mode and user is not exempt.
    *
-   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
+   * @param RequestEvent $event
    *   The event to process.
    */
   public function onMaintenanceModeRequest(RequestEvent $event) {

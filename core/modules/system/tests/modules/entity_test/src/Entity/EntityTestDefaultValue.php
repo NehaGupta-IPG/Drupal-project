@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Drupal\entity_test\Entity;
 
 use Drupal\Core\Entity\Attribute\ContentEntityType;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Field\BaseFieldDefinition;
 
 /**
  * Defines a test entity class for testing default values.
@@ -44,9 +44,9 @@ class EntityTestDefaultValue extends EntityTest {
   /**
    * Field default value callback.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The entity being created.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $definition
+   * @param FieldDefinitionInterface $definition
    *   The field definition.
    *
    * @return array

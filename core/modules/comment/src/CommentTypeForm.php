@@ -20,21 +20,21 @@ class CommentTypeForm extends EntityForm {
   /**
    * Entity type manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * A logger instance.
    *
-   * @var \Psr\Log\LoggerInterface
+   * @var LoggerInterface
    */
   protected $logger;
 
   /**
    * The comment manager.
    *
-   * @var \Drupal\comment\CommentManagerInterface
+   * @var CommentManagerInterface
    */
   protected $commentManager;
 
@@ -52,11 +52,11 @@ class CommentTypeForm extends EntityForm {
   /**
    * Constructs a CommentTypeFormController.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   A logger instance.
-   * @param \Drupal\comment\CommentManagerInterface $comment_manager
+   * @param CommentManagerInterface $comment_manager
    *   The comment manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, LoggerInterface $logger, CommentManagerInterface $comment_manager) {
@@ -165,7 +165,7 @@ class CommentTypeForm extends EntityForm {
   /**
    * Wraps _comment_entity_uses_integer_id().
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   Entity type being tested.
    *
    * @return bool

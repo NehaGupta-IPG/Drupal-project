@@ -18,12 +18,12 @@ interface ResourceFetcherInterface {
    * @param string $url
    *   Endpoint-specific URL of the oEmbed resource.
    *
-   * @return \Drupal\media\OEmbed\Resource
+   * @return Resource
    *   A resource object built from the oEmbed resource data.
    *
    * @see https://oembed.com/#section2
    *
-   * @throws \Drupal\media\OEmbed\ResourceException
+   * @throws ResourceException
    *   If the oEmbed endpoint is not reachable or the response returns an
    *   unexpected Content-Type header.
    */

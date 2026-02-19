@@ -21,23 +21,23 @@ class FileTestSaveUploadFromForm extends FormBase {
   /**
    * Stores the state storage service.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
   /**
    * The messenger.
    *
-   * @var \Drupal\Core\Messenger\MessengerInterface
+   * @var MessengerInterface
    */
   protected $messenger;
 
   /**
    * Constructs a FileTestSaveUploadFromForm object.
    *
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state key value store.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger.
    */
   public function __construct(StateInterface $state, MessengerInterface $messenger) {

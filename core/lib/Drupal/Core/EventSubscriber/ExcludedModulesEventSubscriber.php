@@ -21,28 +21,28 @@ final class ExcludedModulesEventSubscriber implements EventSubscriberInterface {
   const EXCLUDED_MODULES_KEY = "config_exclude_modules";
 
   /**
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   private $activeStorage;
 
   /**
-   * @var \Drupal\Core\Site\Settings
+   * @var Settings
    */
   private $settings;
 
   /**
-   * @var \Drupal\Core\Config\ConfigManagerInterface
+   * @var ConfigManagerInterface
    */
   private $manager;
 
   /**
    * EnvironmentModulesEventSubscriber constructor.
    *
-   * @param \Drupal\Core\Config\StorageInterface $active_storage
+   * @param StorageInterface $active_storage
    *   The active config storage.
-   * @param \Drupal\Core\Site\Settings $settings
+   * @param Settings $settings
    *   The Drupal settings.
-   * @param \Drupal\Core\Config\ConfigManagerInterface $manager
+   * @param ConfigManagerInterface $manager
    *   The config manager.
    */
   public function __construct(StorageInterface $active_storage, Settings $settings, ConfigManagerInterface $manager) {
@@ -68,7 +68,7 @@ final class ExcludedModulesEventSubscriber implements EventSubscriberInterface {
    * Make sure excluded modules are not uninstalled by adding them and their
    * config to the storage when importing configuration.
    *
-   * @param \Drupal\Core\Config\StorageTransformEvent $event
+   * @param StorageTransformEvent $event
    *   The transformation event.
    */
   public function onConfigTransformImport(StorageTransformEvent $event) {
@@ -113,7 +113,7 @@ final class ExcludedModulesEventSubscriber implements EventSubscriberInterface {
    * Make sure excluded modules are not exported by removing all the config
    * which depends on them from the storage that is exported.
    *
-   * @param \Drupal\Core\Config\StorageTransformEvent $event
+   * @param StorageTransformEvent $event
    *   The transformation event.
    */
   public function onConfigTransformExport(StorageTransformEvent $event) {

@@ -60,7 +60,7 @@ class ExternalNormalizersTest extends BrowserTestBase {
   /**
    * The test entity.
    *
-   * @var \Drupal\entity_test\Entity\EntityTest
+   * @var EntityTest
    */
   protected $entity;
 

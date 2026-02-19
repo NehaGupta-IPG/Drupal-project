@@ -19,7 +19,7 @@ final class ByteSizeMarkup {
   /**
    * Gets the TranslatableMarkup object for the provided size.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   * @return TranslatableMarkup
    *   The translatable markup.
    *
    * @throws \LogicException

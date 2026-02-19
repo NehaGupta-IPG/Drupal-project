@@ -3,10 +3,10 @@
 namespace Drupal\Component\Plugin\Discovery;
 
 use Drupal\Component\Discovery\MissingClassDetectionClassLoader;
-use Drupal\Component\Plugin\Attribute\AttributeInterface;
-use Drupal\Component\Plugin\Attribute\Plugin;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\FileCache\FileCacheInterface;
+use Drupal\Component\Plugin\Attribute\AttributeInterface;
+use Drupal\Component\Plugin\Attribute\Plugin;
 
 /**
  * Defines a discovery mechanism to find plugins with attributes.
@@ -233,7 +233,7 @@ class AttributeClassDiscovery implements DiscoveryInterface {
 
     $id = $content = NULL;
     if ($attributes = $reflection_class->getAttributes($this->pluginDefinitionAttributeName, \ReflectionAttribute::IS_INSTANCEOF)) {
-      /** @var \Drupal\Component\Plugin\Attribute\AttributeInterface $attribute */
+      /** @var AttributeInterface $attribute */
       $attribute = $attributes[0]->newInstance();
       $this->prepareAttributeDefinition($attribute, $class);
       if (($dependencies = $this->getClassDependencies($reflection_class))) {
@@ -250,7 +250,7 @@ class AttributeClassDiscovery implements DiscoveryInterface {
   /**
    * Prepares the attribute definition.
    *
-   * @param \Drupal\Component\Plugin\Attribute\AttributeInterface $attribute
+   * @param AttributeInterface $attribute
    *   The attribute derived from the plugin.
    * @param string $class
    *   The class used for the plugin.

@@ -25,21 +25,21 @@ class HelpBlock extends BlockBase implements ContainerFactoryPluginInterface {
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The current request.
    *
-   * @var \Symfony\Component\HttpFoundation\Request
+   * @var Request
    */
   protected $request;
 
   /**
    * The current route match.
    *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
+   * @var RouteMatchInterface
    */
   protected $routeMatch;
 
@@ -52,11 +52,11 @@ class HelpBlock extends BlockBase implements ContainerFactoryPluginInterface {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The current route match.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, Request $request, ModuleHandlerInterface $module_handler, RouteMatchInterface $route_match) {

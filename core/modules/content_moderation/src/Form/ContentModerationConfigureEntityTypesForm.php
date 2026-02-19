@@ -27,28 +27,28 @@ class ContentModerationConfigureEntityTypesForm extends FormBase {
   /**
    * The entity type manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity type bundle information service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @var EntityTypeBundleInfoInterface
    */
   protected $bundleInfo;
 
   /**
    * The moderation information service.
    *
-   * @var \Drupal\content_moderation\ModerationInformationInterface
+   * @var ModerationInformationInterface
    */
   protected $moderationInformation;
 
   /**
    * The workflow entity object.
    *
-   * @var \Drupal\workflows\WorkflowInterface
+   * @var WorkflowInterface
    */
   protected $workflow;
 
@@ -62,7 +62,7 @@ class ContentModerationConfigureEntityTypesForm extends FormBase {
   /**
    * The Messenger service.
    *
-   * @var \Drupal\Core\Messenger\MessengerInterface
+   * @var MessengerInterface
    */
   protected $messenger;
 
@@ -193,7 +193,7 @@ class ContentModerationConfigureEntityTypesForm extends FormBase {
   /**
    * Ajax callback to close the modal and update the selected text.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   An ajax response object.
    */
   public function ajaxCallback() {

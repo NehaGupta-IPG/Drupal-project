@@ -10,8 +10,6 @@ use Drupal\Core\DependencyInjection\Compiler\BackwardsCompatibilityClassLoaderPa
 use Drupal\Core\DependencyInjection\Compiler\CorsCompilerPass;
 use Drupal\Core\DependencyInjection\Compiler\DeprecatedServicePass;
 use Drupal\Core\DependencyInjection\Compiler\DevelopmentSettingsPass;
-use Drupal\Core\Hook\HookCollectorPass;
-use Drupal\Core\Hook\HookCollectorKeyValueWritePass;
 use Drupal\Core\DependencyInjection\Compiler\LoggerAwarePass;
 use Drupal\Core\DependencyInjection\Compiler\ModifyServiceDefinitionsPass;
 use Drupal\Core\DependencyInjection\Compiler\ProxyServicesPass;
@@ -28,6 +26,8 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\Extension\ModuleUninstallValidatorInterface;
+use Drupal\Core\Hook\HookCollectorKeyValueWritePass;
+use Drupal\Core\Hook\HookCollectorPass;
 use Drupal\Core\Hook\ThemeHookCollectorPass;
 use Drupal\Core\Plugin\PluginManagerPass;
 use Drupal\Core\PreWarm\PreWarmableInterface;
@@ -135,7 +135,7 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
   /**
    * Alters the UUID service to use the most efficient method available.
    *
-   * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
+   * @param ContainerBuilder $container
    *   The container builder.
    */
   public function alter(ContainerBuilder $container) {

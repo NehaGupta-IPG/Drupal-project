@@ -14,10 +14,10 @@ use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\migrate\Audit\HighestIdInterface;
 use Drupal\migrate\Exception\EntityValidationException;
-use Drupal\migrate\Plugin\MigrateValidatableEntityInterface;
-use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
+use Drupal\migrate\Plugin\MigrateValidatableEntityInterface;
+use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
 use Drupal\user\EntityOwnerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -103,21 +103,21 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
   /**
    * Field type plugin manager.
    *
-   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface
+   * @var FieldTypePluginManagerInterface
    */
   protected $fieldTypeManager;
 
   /**
    * The account switcher service.
    *
-   * @var \Drupal\Core\Session\AccountSwitcherInterface
+   * @var AccountSwitcherInterface
    */
   protected $accountSwitcher;
 
   /**
    * Entity type bundle info.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @var EntityTypeBundleInfoInterface
    */
   protected EntityTypeBundleInfoInterface $entityTypeBundleInfo;
 
@@ -130,19 +130,19 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration entity.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The storage for this entity type.
    * @param array $bundles
    *   The list of bundles this entity type has.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @param EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager
+   * @param FieldTypePluginManagerInterface $field_type_manager
    *   The field type plugin manager service.
-   * @param \Drupal\Core\Session\AccountSwitcherInterface $account_switcher
+   * @param AccountSwitcherInterface $account_switcher
    *   The account switcher service.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface|null $entity_type_bundle_info
+   * @param EntityTypeBundleInfoInterface|null $entity_type_bundle_info
    *   The entity type bundle info service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityStorageInterface $storage, array $bundles, EntityFieldManagerInterface $entity_field_manager, FieldTypePluginManagerInterface $field_type_manager, ?AccountSwitcherInterface $account_switcher = NULL, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL) {
@@ -179,9 +179,9 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
   /**
    * {@inheritdoc}
    *
-   * @throws \Drupal\migrate\MigrateException
+   * @throws MigrateException
    *   When an entity cannot be looked up.
-   * @throws \Drupal\migrate\Exception\EntityValidationException
+   * @throws EntityValidationException
    *   When an entity validation hasn't been passed.
    */
   public function import(Row $row, array $old_destination_id_values = []) {
@@ -246,7 +246,7 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
   /**
    * Saves the entity.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The content entity.
    * @param array $old_destination_id_values
    *   (optional) An array of destination ID values. Defaults to an empty array.

@@ -129,7 +129,7 @@ class WritableFileSystemValidatorTest extends PackageManagerKernelTestBase {
    * @param string $webroot_relative_directory
    *   The web root path, relative to the project root, or an empty string if
    *   the web root and project root are the same.
-   * @param \Drupal\package_manager\ValidationResult[] $expected_results
+   * @param ValidationResult[] $expected_results
    *   The expected validation results.
    */
   #[DataProvider('providerWritable')]
@@ -152,7 +152,7 @@ class WritableFileSystemValidatorTest extends PackageManagerKernelTestBase {
    * @param string $webroot_relative_directory
    *   The web root path, relative to the project root, or an empty string if
    *   the web root and project root are the same.
-   * @param \Drupal\package_manager\ValidationResult[] $expected_results
+   * @param ValidationResult[] $expected_results
    *   The expected validation results.
    */
   #[DataProvider('providerWritable')]

@@ -3,11 +3,11 @@
 namespace Drupal\node\Hook;
 
 use Drupal\Core\Datetime\Entity\DateFormat;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\user\Entity\User;
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Render\BubbleableMetadata;
-use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\user\Entity\User;
 
 /**
  * Token hook implementations for node.

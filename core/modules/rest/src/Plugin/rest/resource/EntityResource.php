@@ -6,22 +6,22 @@ use Drupal\Component\Plugin\DependentPluginInterface;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Access\AccessResultReasonInterface;
 use Drupal\Core\Cache\CacheableResponseInterface;
-use Drupal\Core\Config\Entity\ConfigEntityType;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\Entity\ConfigEntityType;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageException;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Routing\AccessAwareRouterInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\rest\Attribute\RestResource;
+use Drupal\rest\ModifiedResourceResponse;
 use Drupal\rest\Plugin\Deriver\EntityDeriver;
 use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\rest\ModifiedResourceResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -58,14 +58,14 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
   /**
    * The config factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * The link relation type manager used to create HTTP header links.
    *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   * @var PluginManagerInterface
    */
   protected $linkRelationTypeManager;
 
@@ -78,15 +78,15 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param array $serializer_formats
    *   The available serialization formats.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   A logger instance.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $link_relation_type_manager
+   * @param PluginManagerInterface $link_relation_type_manager
    *   The link relation type manager.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, $serializer_formats, LoggerInterface $logger, ConfigFactoryInterface $config_factory, PluginManagerInterface $link_relation_type_manager) {
@@ -115,15 +115,15 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
   /**
    * Responds to entity GET requests.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity object.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The incoming request.
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return ResourceResponse
    *   The response containing the entity with its accessible fields.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+   * @throws HttpException
    */
   public function get(EntityInterface $entity, Request $request) {
     $response = new ResourceResponse($entity, 200);
@@ -133,7 +133,7 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
 
     if ($entity instanceof FieldableEntityInterface) {
       foreach ($entity as $field_name => $field) {
-        /** @var \Drupal\Core\Field\FieldItemListInterface $field */
+        /** @var FieldItemListInterface $field */
         $field_access = $field->access('view', NULL, TRUE);
         $response->addCacheableDependency($field_access);
 
@@ -151,13 +151,13 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
   /**
    * Responds to entity POST requests and saves the new entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity.
    *
-   * @return \Drupal\rest\ModifiedResourceResponse
+   * @return ModifiedResourceResponse
    *   The HTTP response object.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+   * @throws HttpException
    */
   public function post(?EntityInterface $entity = NULL) {
     if ($entity == NULL) {
@@ -209,15 +209,15 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
   /**
    * Responds to entity PATCH requests.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $original_entity
+   * @param EntityInterface $original_entity
    *   The original entity object.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity.
    *
-   * @return \Drupal\rest\ModifiedResourceResponse
+   * @return ModifiedResourceResponse
    *   The HTTP response object.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+   * @throws HttpException
    */
   public function patch(EntityInterface $original_entity, ?EntityInterface $entity = NULL) {
     if ($entity == NULL) {
@@ -270,15 +270,15 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
   /**
    * Checks whether the given field should be PATCHed.
    *
-   * @param \Drupal\Core\Field\FieldItemListInterface $original_field
+   * @param FieldItemListInterface $original_field
    *   The original (stored) value for the field.
-   * @param \Drupal\Core\Field\FieldItemListInterface $received_field
+   * @param FieldItemListInterface $received_field
    *   The received value for the field.
    *
    * @return bool
    *   Whether the field should be PATCHed or not.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   * @throws AccessDeniedHttpException
    *   Thrown when the user sending the request is not allowed to update the
    *   field. Only thrown when the user could not abuse this information to
    *   determine the stored value.
@@ -321,13 +321,13 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
   /**
    * Responds to entity DELETE requests.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity object.
    *
-   * @return \Drupal\rest\ModifiedResourceResponse
+   * @return ModifiedResourceResponse
    *   The HTTP response object.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+   * @throws HttpException
    */
   public function delete(EntityInterface $entity) {
     try {
@@ -348,7 +348,7 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
   /**
    * Generates a fallback access denied message, when no specific reason is set.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity object.
    * @param string $operation
    *   The disallowed entity operation.
@@ -442,9 +442,9 @@ class EntityResource extends ResourceBase implements DependentPluginInterface {
   /**
    * Adds link headers to a response.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity.
-   * @param \Symfony\Component\HttpFoundation\Response $response
+   * @param Response $response
    *   The response.
    *
    * @see https://tools.ietf.org/html/rfc5988#section-5

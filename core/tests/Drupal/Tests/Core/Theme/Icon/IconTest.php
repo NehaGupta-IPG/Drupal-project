@@ -26,7 +26,7 @@ class IconTest extends UnitTestCase {
   /**
    * The container.
    *
-   * @var \Drupal\Core\DependencyInjection\ContainerBuilder
+   * @var ContainerBuilder
    */
   private ContainerBuilder $container;
 

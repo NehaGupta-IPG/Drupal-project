@@ -4,14 +4,14 @@ namespace Drupal\contact\Entity;
 
 use Drupal\contact\ContactMessageAccessControlHandler;
 use Drupal\contact\MessageForm;
+use Drupal\contact\MessageInterface;
 use Drupal\contact\MessageViewBuilder;
 use Drupal\Core\Entity\Attribute\ContentEntityType;
-use Drupal\Core\Entity\ContentEntityNullStorage;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\ContentEntityBase;
-use Drupal\contact\MessageInterface;
+use Drupal\Core\Entity\ContentEntityNullStorage;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Defines the contact message entity.
@@ -141,7 +141,7 @@ class Message extends ContentEntityBase implements MessageInterface {
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    /** @var \Drupal\Core\Field\BaseFieldDefinition[] $fields */
+    /** @var BaseFieldDefinition[] $fields */
     $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['contact_form']->setLabel(t('Form ID'))

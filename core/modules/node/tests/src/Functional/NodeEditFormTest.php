@@ -289,7 +289,7 @@ class NodeEditFormTest extends NodeTestBase {
   /**
    * Checks that the "authored by" works correctly with various values.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   A node object.
    * @param string $form_element_name
    *   The name of the form element to populate.

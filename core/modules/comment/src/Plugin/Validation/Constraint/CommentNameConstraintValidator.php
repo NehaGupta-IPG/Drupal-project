@@ -3,10 +3,10 @@
 namespace Drupal\comment\Plugin\Validation\Constraint;
 
 use Drupal\comment\AnonymousContact;
+use Drupal\comment\CommentInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\user\UserStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\comment\CommentInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -18,14 +18,14 @@ class CommentNameConstraintValidator extends ConstraintValidator implements Cont
   /**
    * User storage handler.
    *
-   * @var \Drupal\user\UserStorageInterface
+   * @var UserStorageInterface
    */
   protected $userStorage;
 
   /**
    * Constructs a new CommentNameConstraintValidator.
    *
-   * @param \Drupal\user\UserStorageInterface $user_storage
+   * @param UserStorageInterface $user_storage
    *   The user storage handler.
    */
   public function __construct(UserStorageInterface $user_storage) {
@@ -80,10 +80,10 @@ class CommentNameConstraintValidator extends ConstraintValidator implements Cont
   /**
    * Gets the anonymous contact details setting from the comment.
    *
-   * @param \Drupal\comment\CommentInterface $comment
+   * @param CommentInterface $comment
    *   The entity.
    *
-   * @return \Drupal\comment\AnonymousContact
+   * @return AnonymousContact
    *   The anonymous contact setting.
    */
   protected function getAnonymousContactDetailsSetting(CommentInterface $comment): AnonymousContact {

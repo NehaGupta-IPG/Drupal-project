@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\entity_schema_test\Hook;
 
-use Drupal\Core\Field\FieldDefinition;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\entity_test\FieldStorageDefinition;
-use Drupal\entity_test\Entity\EntityTestMulRev;
-use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Field\FieldDefinition;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\entity_test\Entity\EntityTestMulRev;
+use Drupal\entity_test\FieldStorageDefinition;
 
 /**
  * Hook implementations for entity_schema_test.

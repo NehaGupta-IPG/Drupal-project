@@ -21,7 +21,7 @@ class LocalActionDefaultTest extends UnitTestCase {
   /**
    * The tested local action default plugin.
    *
-   * @var \Drupal\Core\Menu\LocalActionDefault
+   * @var LocalActionDefault
    */
   protected $localActionDefault;
 
@@ -51,14 +51,14 @@ class LocalActionDefaultTest extends UnitTestCase {
   /**
    * The mocked translator.
    *
-   * @var \Drupal\Core\StringTranslation\TranslationInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\StringTranslation\TranslationInterface|MockObject
    */
   protected $stringTranslation;
 
   /**
    * The mocked route provider.
    *
-   * @var \Drupal\Core\Routing\RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Routing\RouteProviderInterface|MockObject
    */
   protected $routeProvider;
 

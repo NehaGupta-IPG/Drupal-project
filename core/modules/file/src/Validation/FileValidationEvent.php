@@ -14,9 +14,9 @@ class FileValidationEvent extends Event {
   /**
    * Creates a new FileValidationEvent.
    *
-   * @param \Drupal\file\FileInterface $file
+   * @param FileInterface $file
    *   The file.
-   * @param \Symfony\Component\Validator\ConstraintViolationListInterface $violations
+   * @param ConstraintViolationListInterface $violations
    *   The violations.
    */
   public function __construct(

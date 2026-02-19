@@ -29,7 +29,7 @@ trait InstallerRedirectTrait {
    *
    * @param \Throwable $exception
    *   The exception to check.
-   * @param \Drupal\Core\Database\Connection|null $connection
+   * @param Connection|null $connection
    *   (optional) The default database connection. If not provided, a less
    *   comprehensive check will be performed. This can be the case if the
    *   exception occurs early enough that a database connection object isn't

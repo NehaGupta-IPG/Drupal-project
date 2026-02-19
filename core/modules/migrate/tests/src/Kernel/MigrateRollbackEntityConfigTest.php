@@ -76,7 +76,7 @@ class MigrateRollbackEntityConfigTest extends MigrateTestBase {
     $vocabulary_executable = new MigrateExecutable($vocabulary_migration, $this);
     $vocabulary_executable->import();
     foreach ($vocabulary_data_rows as $row) {
-      /** @var \Drupal\taxonomy\Entity\Vocabulary $vocabulary */
+      /** @var Vocabulary $vocabulary */
       $vocabulary = Vocabulary::load($row['id']);
       $this->assertNotEmpty($vocabulary);
       $map_row = $vocabulary_id_map->getRowBySource(['id' => $row['id']]);
@@ -164,7 +164,7 @@ class MigrateRollbackEntityConfigTest extends MigrateTestBase {
 
     // Confirm the original vocabulary still exists.
     foreach ($vocabulary_data_rows as $row) {
-      /** @var \Drupal\taxonomy\Entity\Vocabulary $vocabulary */
+      /** @var Vocabulary $vocabulary */
       $vocabulary = Vocabulary::load($row['id']);
       $this->assertNotEmpty($vocabulary);
       $map_row = $vocabulary_id_map->getRowBySource(['id' => $row['id']]);

@@ -118,7 +118,7 @@ class Bytes {
    *
    * @param string|int|float|null $value
    *   The string, integer or float to validate.
-   * @param \Symfony\Component\Validator\Context\ExecutionContextInterface $context
+   * @param ExecutionContextInterface $context
    *   The validation execution context.
    *
    * @see \Symfony\Component\Validator\Constraints\CallbackValidator

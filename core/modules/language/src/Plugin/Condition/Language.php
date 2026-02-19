@@ -30,14 +30,14 @@ class Language extends ConditionPluginBase implements ContainerFactoryPluginInte
   /**
    * The Language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * Creates a new Language instance.
    *
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
    * @param array $configuration
    *   The plugin configuration, i.e. an array with configuration values keyed

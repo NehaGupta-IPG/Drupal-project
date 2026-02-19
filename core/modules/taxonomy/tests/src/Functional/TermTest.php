@@ -610,12 +610,12 @@ class TermTest extends TaxonomyTestBase {
    * @param string $name
    *   The name of the term.
    *
-   * @return \Drupal\taxonomy\TermInterface
+   * @return TermInterface
    *   The reloaded term.
    */
   private function reloadTermByName(string $name): TermInterface {
     \Drupal::entityTypeManager()->getStorage('taxonomy_term')->resetCache();
-    /** @var \Drupal\taxonomy\TermInterface[] $terms */
+    /** @var TermInterface[] $terms */
     $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties(['name' => $name]);
     return reset($terms);
   }
@@ -623,7 +623,7 @@ class TermTest extends TaxonomyTestBase {
   /**
    * Get the parent tids for a term including root.
    *
-   * @param \Drupal\taxonomy\TermInterface $term
+   * @param TermInterface $term
    *   The term.
    *
    * @return array

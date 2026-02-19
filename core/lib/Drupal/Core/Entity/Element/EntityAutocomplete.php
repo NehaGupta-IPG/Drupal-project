@@ -142,7 +142,7 @@ class EntityAutocomplete extends Textfield {
    *     handler.
    *   - #selection_settings: An array of settings that will be passed to the
    *     selection handler.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array $complete_form
    *   The complete form structure.
@@ -208,7 +208,7 @@ class EntityAutocomplete extends Textfield {
         'target_type' => $element['#target_type'],
         'handler' => $element['#selection_handler'],
       ];
-      /** @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface $handler */
+      /** @var SelectionInterface $handler */
       $handler = \Drupal::service('plugin.manager.entity_reference_selection')->getInstance($options);
       $autocreate = (bool) $element['#autocreate'] && $handler instanceof SelectionWithAutocreateInterface;
 
@@ -234,7 +234,7 @@ class EntityAutocomplete extends Textfield {
             ];
           }
           elseif ($autocreate) {
-            /** @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface $handler */
+            /** @var SelectionWithAutocreateInterface $handler */
             // Auto-create item. See an example of how this is handled in
             // \Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem::presave().
             $value[] = [
@@ -286,7 +286,7 @@ class EntityAutocomplete extends Textfield {
           }
 
           foreach ($invalid_new_entities as $entity) {
-            /** @var \Drupal\Core\Entity\EntityInterface $entity */
+            /** @var EntityInterface $entity */
             $form_state->setError($element, t('This entity (%type: %label) cannot be referenced.', [
               '%type' => $element['#target_type'],
               '%label' => $entity->label(),
@@ -312,13 +312,13 @@ class EntityAutocomplete extends Textfield {
    * The method will return an entity ID if one single entity unambiguously
    * matches the incoming input, and assign form errors otherwise.
    *
-   * @param \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface $handler
+   * @param SelectionInterface $handler
    *   Entity reference selection plugin.
    * @param string $input
    *   Single string from autocomplete element.
    * @param array $element
    *   The form element to set a form error.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    * @param bool $strict
    *   Whether to trigger a form error if an element from $input (eg. an entity)
@@ -369,7 +369,7 @@ class EntityAutocomplete extends Textfield {
    * This method is also responsible for checking the 'view label' access on the
    * passed-in entities.
    *
-   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   * @param EntityInterface[] $entities
    *   An array of entity objects.
    *
    * @return string

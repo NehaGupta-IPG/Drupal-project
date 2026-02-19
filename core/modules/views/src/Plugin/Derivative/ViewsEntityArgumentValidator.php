@@ -29,7 +29,7 @@ class ViewsEntityArgumentValidator extends DeriverBase implements ContainerDeriv
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
@@ -45,9 +45,9 @@ class ViewsEntityArgumentValidator extends DeriverBase implements ContainerDeriv
    *
    * @param string $base_plugin_id
    *   The base plugin ID.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param TranslationInterface $string_translation
    *   The string translation.
    */
   public function __construct($base_plugin_id, EntityTypeManagerInterface $entity_type_manager, TranslationInterface $string_translation) {

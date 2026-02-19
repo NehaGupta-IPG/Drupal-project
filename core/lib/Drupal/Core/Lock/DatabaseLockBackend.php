@@ -22,14 +22,14 @@ class DatabaseLockBackend extends LockBackendAbstract {
   /**
    * The database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $database;
 
   /**
    * Constructs a new DatabaseLockBackend.
    *
-   * @param \Drupal\Core\Database\Connection $database
+   * @param Connection $database
    *   The database connection.
    */
   public function __construct(Connection $database) {

@@ -17,7 +17,7 @@ trait ComposerIntegrationTrait {
    * @param string $drupal_root
    *   Absolute path to the root of the Drupal installation.
    *
-   * @return \Symfony\Component\Finder\Finder
+   * @return Finder
    *   A Finder object able to iterate all the composer.json files in core.
    */
   public static function getComposerJsonFinder($drupal_root): Finder {

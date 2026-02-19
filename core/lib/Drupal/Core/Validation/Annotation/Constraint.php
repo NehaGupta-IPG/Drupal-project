@@ -7,7 +7,7 @@ use Drupal\Component\Annotation\Plugin;
 /**
  * Defines a validation constraint annotation object.
  *
- * Plugin Namespace: Plugin\Validation\Constraint
+ * Plugin Namespace: Plugin\Validation\Constraint.
  *
  * For a working example, see
  * \Drupal\Core\Validation\Plugin\Validation\Constraint\LengthConstraint
@@ -31,7 +31,7 @@ class Constraint extends Plugin {
   /**
    * The human-readable name of the constraint plugin.
    *
-   * @var string|\Drupal\Core\Annotation\Translation
+   * @var string|Translation
    *
    * @ingroup plugin_translatable
    */

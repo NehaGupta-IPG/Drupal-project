@@ -35,7 +35,7 @@ class AlertsJsonFeedTest extends OffCanvasTestBase {
   /**
    * A user with permission to access toolbar and access announcements.
    *
-   * @var \Drupal\user\UserInterface
+   * @var UserInterface
    */
   protected UserInterface $user;
 

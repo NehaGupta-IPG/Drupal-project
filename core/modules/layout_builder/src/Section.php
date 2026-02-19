@@ -37,7 +37,7 @@ class Section implements ThirdPartySettingsInterface {
   /**
    * An array of components, keyed by UUID.
    *
-   * @var \Drupal\layout_builder\SectionComponent[]
+   * @var SectionComponent[]
    */
   protected $components = [];
 
@@ -57,7 +57,7 @@ class Section implements ThirdPartySettingsInterface {
    *   The layout plugin ID.
    * @param array $layout_settings
    *   (optional) The layout plugin settings.
-   * @param \Drupal\layout_builder\SectionComponent[] $components
+   * @param SectionComponent[] $components
    *   (optional) The components.
    * @param array[] $third_party_settings
    *   (optional) Any third party settings.
@@ -74,7 +74,7 @@ class Section implements ThirdPartySettingsInterface {
   /**
    * Returns the renderable array for this section.
    *
-   * @param \Drupal\Core\Plugin\Context\ContextInterface[] $contexts
+   * @param ContextInterface[] $contexts
    *   An array of available contexts.
    * @param bool $in_preview
    *   TRUE if the section is being previewed, FALSE otherwise.
@@ -106,7 +106,7 @@ class Section implements ThirdPartySettingsInterface {
   /**
    * Gets the layout plugin for this section.
    *
-   * @param \Drupal\Core\Plugin\Context\ContextInterface[] $contexts
+   * @param ContextInterface[] $contexts
    *   An array of available contexts.
    *
    * @return \Drupal\Core\Layout\LayoutInterface
@@ -172,7 +172,7 @@ class Section implements ThirdPartySettingsInterface {
   /**
    * Returns the components of the section.
    *
-   * @return \Drupal\layout_builder\SectionComponent[]
+   * @return SectionComponent[]
    *   An array of components, keyed by the component UUID.
    */
   public function getComponents() {
@@ -185,7 +185,7 @@ class Section implements ThirdPartySettingsInterface {
    * @param string $uuid
    *   The UUID of the component to retrieve.
    *
-   * @return \Drupal\layout_builder\SectionComponent
+   * @return SectionComponent
    *   The component.
    *
    * @throws \InvalidArgumentException
@@ -202,7 +202,7 @@ class Section implements ThirdPartySettingsInterface {
   /**
    * Helper method to set a component.
    *
-   * @param \Drupal\layout_builder\SectionComponent $component
+   * @param SectionComponent $component
    *   The component.
    *
    * @return $this
@@ -228,7 +228,7 @@ class Section implements ThirdPartySettingsInterface {
   /**
    * Appends a component to the end of a region.
    *
-   * @param \Drupal\layout_builder\SectionComponent $component
+   * @param SectionComponent $component
    *   The component being appended.
    *
    * @return $this
@@ -262,7 +262,7 @@ class Section implements ThirdPartySettingsInterface {
    * @param string $region
    *   The region name.
    *
-   * @return \Drupal\layout_builder\SectionComponent[]
+   * @return SectionComponent[]
    *   An array of components in the specified region, sorted by weight.
    */
   public function getComponentsByRegion($region) {
@@ -280,7 +280,7 @@ class Section implements ThirdPartySettingsInterface {
    *
    * @param string $preceding_uuid
    *   The UUID of the existing component to insert after.
-   * @param \Drupal\layout_builder\SectionComponent $component
+   * @param SectionComponent $component
    *   The component being inserted.
    *
    * @return $this
@@ -303,7 +303,7 @@ class Section implements ThirdPartySettingsInterface {
    *
    * @param int $delta
    *   The zero-based delta in which to insert the component.
-   * @param \Drupal\layout_builder\SectionComponent $new_component
+   * @param SectionComponent $new_component
    *   The component being inserted.
    *
    * @return $this

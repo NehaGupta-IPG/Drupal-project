@@ -3,8 +3,8 @@
 namespace Drupal\Core;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * The interface for DrupalKernel, the core of Drupal.
@@ -58,7 +58,7 @@ interface DrupalKernelInterface extends HttpKernelInterface {
   /**
    * Gets the current container.
    *
-   * @return \Symfony\Component\DependencyInjection\ContainerInterface
+   * @return ContainerInterface
    *   A ContainerInterface instance.
    */
   public function getContainer();
@@ -129,7 +129,7 @@ interface DrupalKernelInterface extends HttpKernelInterface {
   /**
    * Force a container rebuild.
    *
-   * @return \Symfony\Component\DependencyInjection\ContainerInterface
+   * @return ContainerInterface
    *   The rebuilt Symfony container.
    */
   public function rebuildContainer();
@@ -137,7 +137,7 @@ interface DrupalKernelInterface extends HttpKernelInterface {
   /**
    * Force a container reset.
    *
-   * @return \Symfony\Component\DependencyInjection\ContainerInterface
+   * @return ContainerInterface
    *   The Symfony container.
    */
   public function resetContainer(): ContainerInterface;
@@ -150,7 +150,7 @@ interface DrupalKernelInterface extends HttpKernelInterface {
   /**
    * Helper method that does request related initialization.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    */
   public function preHandle(Request $request);

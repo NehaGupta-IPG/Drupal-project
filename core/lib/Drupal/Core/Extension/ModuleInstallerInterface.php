@@ -34,14 +34,14 @@ interface ModuleInstallerInterface {
    * @return bool
    *   TRUE if the modules were successfully installed.
    *
-   * @throws \Drupal\Core\Extension\MissingDependencyException
+   * @throws MissingDependencyException
    *   Thrown when a requested module, or a dependency of one, can not be found.
    *
-   * @throws \Drupal\Core\Extension\ExtensionNameLengthException
+   * @throws ExtensionNameLengthException
    *   Thrown when the extension's name is longer than
    *   DRUPAL_EXTENSION_NAME_MAX_LENGTH.
    *
-   * @throws \Drupal\Core\Extension\ExtensionNameReservedException
+   * @throws ExtensionNameReservedException
    *   Thrown when a module's name is already used by an installed theme.
    *
    * @see hook_module_preinstall()
@@ -63,7 +63,7 @@ interface ModuleInstallerInterface {
    * @return bool
    *   FALSE if one or more dependencies are missing, TRUE otherwise.
    *
-   * @throws \Drupal\Core\Extension\ModuleUninstallValidatorException
+   * @throws ModuleUninstallValidatorException
    *   Thrown when validation prevented the module from being uninstalled.
    *
    * @see hook_module_preuninstall()
@@ -75,7 +75,7 @@ interface ModuleInstallerInterface {
   /**
    * Adds a module uninstall validator.
    *
-   * @param \Drupal\Core\Extension\ModuleUninstallValidatorInterface $uninstall_validator
+   * @param ModuleUninstallValidatorInterface $uninstall_validator
    *   The uninstall validator to add.
    *
    * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Inject

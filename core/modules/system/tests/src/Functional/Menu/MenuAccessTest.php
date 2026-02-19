@@ -358,7 +358,7 @@ class MenuAccessTest extends BrowserTestBase {
    *
    * @param int $expected_status
    *   The expected request status.
-   * @param string|\Drupal\Core\Url ...$paths
+   * @param string|Url ...$paths
    *   The paths as passed to \Drupal\Tests\UiHelperTrait::drupalGet().
    */
   private function assertMenuItemRoutesAccess(int $expected_status, string|Url ...$paths): void {
@@ -385,7 +385,7 @@ class MenuAccessTest extends BrowserTestBase {
   /**
    * Asserts which routes a user has access to.
    *
-   * @param \Drupal\Core\Session\AccountInterface $user
+   * @param AccountInterface $user
    *   The user account for which to check access.
    * @param array $expectedAccessibleRoutes
    *   The routes the user should have access to.

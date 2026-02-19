@@ -21,14 +21,14 @@ class EntityPermissionsRouteProvider implements EntityRouteProviderInterface, En
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * Constructs a new EntityPermissionsRouteProvider.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
@@ -65,10 +65,10 @@ class EntityPermissionsRouteProvider implements EntityRouteProviderInterface, En
    * Built only for entity types that are bundles of other entity types and
    * define the 'entity-permissions-form' link template.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type.
    *
-   * @return \Symfony\Component\Routing\Route|null
+   * @return Route|null
    *   The generated route, if available.
    */
   protected function getEntityPermissionsRoute(EntityTypeInterface $entity_type): ?Route {

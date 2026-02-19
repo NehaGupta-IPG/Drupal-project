@@ -27,7 +27,7 @@ interface ConfigInstallerInterface {
    *   The extension type; e.g., 'module' or 'theme'.
    * @param string $name
    *   The name of the module or theme to install default configuration for.
-   * @param \Drupal\Core\Config\DefaultConfigMode $mode
+   * @param DefaultConfigMode $mode
    *   The default value DefaultConfigMode::All means create install, optional
    *   and site optional configuration. The other modes create a single type
    *   config.
@@ -44,7 +44,7 @@ interface ConfigInstallerInterface {
    * - it's a configuration entity.
    * - its dependencies can be met.
    *
-   * @param \Drupal\Core\Config\StorageInterface|null $storage
+   * @param StorageInterface|null $storage
    *   (optional) The configuration storage to search for optional
    *   configuration. If not provided, all enabled extension's optional
    *   configuration directories including the install profile's will be
@@ -73,7 +73,7 @@ interface ConfigInstallerInterface {
   /**
    * Sets the configuration storage that provides the default configuration.
    *
-   * @param \Drupal\Core\Config\StorageInterface $storage
+   * @param StorageInterface $storage
    *   The storage.
    *
    * @return $this
@@ -83,7 +83,7 @@ interface ConfigInstallerInterface {
   /**
    * Gets the configuration storage that provides the default configuration.
    *
-   * @return \Drupal\Core\Config\StorageInterface|null
+   * @return StorageInterface|null
    *   The configuration storage that provides the default configuration.
    *   Returns null if the source storage has not been set.
    */
@@ -115,8 +115,8 @@ interface ConfigInstallerInterface {
    * @param string|array $name
    *   Name or names of extensions to install.
    *
-   * @throws \Drupal\Core\Config\UnmetDependenciesException
-   * @throws \Drupal\Core\Config\PreExistingConfigException
+   * @throws UnmetDependenciesException
+   * @throws PreExistingConfigException
    */
   public function checkConfigurationToInstall($type, $name);
 

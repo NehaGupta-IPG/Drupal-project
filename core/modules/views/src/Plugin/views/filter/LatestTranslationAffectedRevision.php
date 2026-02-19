@@ -20,14 +20,14 @@ class LatestTranslationAffectedRevision extends FilterPluginBase implements Cont
   /**
    * Entity Type Manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * Views Handler Plugin Manager.
    *
-   * @var \Drupal\views\Plugin\ViewsHandlerManager
+   * @var ViewsHandlerManager
    */
   protected $joinHandler;
 
@@ -40,9 +40,9 @@ class LatestTranslationAffectedRevision extends FilterPluginBase implements Cont
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   Entity Type Manager Service.
-   * @param \Drupal\views\Plugin\ViewsHandlerManager $join_handler
+   * @param ViewsHandlerManager $join_handler
    *   Views Handler Plugin Manager.
    */
   public function __construct(

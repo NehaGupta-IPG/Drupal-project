@@ -21,7 +21,7 @@ class Search extends ArgumentPluginBase {
   /**
    * A search query to use for parsing search keywords.
    *
-   * @var \Drupal\search\ViewsSearchQuery
+   * @var ViewsSearchQuery
    */
   protected $searchQuery = NULL;
 

@@ -26,7 +26,7 @@ class LibraryDiscoveryTest extends UnitTestCase {
   /**
    * The cache tags invalidator.
    *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface|MockObject
    */
   protected $cacheTagsInvalidator;
 

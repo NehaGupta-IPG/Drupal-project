@@ -12,28 +12,28 @@ trait HandlerTestTrait {
   /**
    * The mocked view entity.
    *
-   * @var \Drupal\views\Entity\View|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\Entity\View|MockObject
    */
   protected $view;
 
   /**
    * The mocked view executable.
    *
-   * @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\Entity\ViewExecutable|MockObject
    */
   protected $executable;
 
   /**
    * The mocked views data.
    *
-   * @var \Drupal\views\ViewsData|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\Entity\ViewsData|MockObject
    */
   protected $viewsData;
 
   /**
    * The mocked display.
    *
-   * @var \Drupal\views\Plugin\views\display\DisplayPluginBase|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\Plugin\views\display\DisplayPluginBase|MockObject
    */
   protected $display;
 

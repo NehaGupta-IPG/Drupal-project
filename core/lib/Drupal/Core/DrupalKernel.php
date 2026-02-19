@@ -3,6 +3,7 @@
 namespace Drupal\Core;
 
 use Composer\Autoload\ClassLoader;
+use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Component\EventDispatcher\Event;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Serialization\PhpSerialize;
@@ -12,7 +13,6 @@ use Drupal\Core\ClassLoader\BackwardsCompatibilityClassLoader;
 use Drupal\Core\Config\BootstrapConfigStorageFactory;
 use Drupal\Core\Config\NullStorage;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\DependencyInjection\YamlFileLoader;
@@ -116,7 +116,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * Holds the bootstrap container.
    *
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface
+   * @var ContainerInterface
    */
   protected $bootstrapContainer;
 
@@ -160,7 +160,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * List of available modules and installation profiles.
    *
-   * @var \Drupal\Core\Extension\Extension[]
+   * @var Extension[]
    */
   protected $moduleData = [];
 
@@ -176,7 +176,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * List of available themes.
    *
-   * @var \Drupal\Core\Extension\Extension[]
+   * @var Extension[]
    */
   protected array $themeExtensions = [];
 
@@ -184,7 +184,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * The class loader object.
    *
-   * @var \Composer\Autoload\ClassLoader
+   * @var ClassLoader
    */
   protected $classLoader;
 
@@ -285,9 +285,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * Create a DrupalKernel object from a request.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
-   * @param \Composer\Autoload\ClassLoader $class_loader
+   * @param ClassLoader $class_loader
    *   The class loader. Normally Composer's ClassLoader, as included by the
    *   front controller, but may also be decorated.
    * @param string $environment
@@ -301,7 +301,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *
    * @return static
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws BadRequestHttpException
    *   In case the host name in the request is not trusted.
    */
   public static function createFromRequest(Request $request, $class_loader, $environment, $allow_dumping = TRUE, $app_root = NULL) {
@@ -316,7 +316,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *
    * @param string $environment
    *   String indicating the environment, e.g. 'prod' or 'dev'.
-   * @param \Composer\Autoload\ClassLoader $class_loader
+   * @param ClassLoader $class_loader
    *   The class loader. Normally \Composer\Autoload\ClassLoader, as included by
    *   the front controller, but may also be decorated.
    * @param bool $allow_dumping
@@ -384,7 +384,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * ];
    * @endcode
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    * @param bool $require_settings
    *   Only directories with an existing settings.php file will be recognized.
@@ -398,7 +398,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @return string
    *   The path of the matching directory.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws BadRequestHttpException
    *   In case the host name in the request is invalid.
    *
    * @see \Drupal\Core\DrupalKernelInterface::getSitePath()
@@ -763,13 +763,13 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *
    * @param \Exception $e
    *   An exception.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   A Request instance.
    * @param int $type
    *   The type of the request (one of HttpKernelInterface::MAIN_REQUEST or
    *   HttpKernelInterface::SUB_REQUEST)
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   A Response instance
    *
    * @throws \Exception
@@ -796,7 +796,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @param string $module
    *   The name of the module.
    *
-   * @return \Drupal\Core\Extension\Extension|false
+   * @return Extension|false
    *   Returns an Extension object if the module is found, FALSE otherwise.
    */
   protected function moduleData($module) {
@@ -884,7 +884,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @param string $theme
    *   The name of the theme.
    *
-   * @return \Drupal\Core\Extension\Extension|false
+   * @return Extension|false
    *   Returns an Extension object if the theme is found, FALSE otherwise.
    */
   protected function themeExtensions($theme): Extension|false {
@@ -978,7 +978,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * Initializes the service container.
    *
-   * @return \Symfony\Component\DependencyInjection\ContainerInterface
+   * @return ContainerInterface
    *   An initialized container object.
    */
   protected function initializeContainer() {
@@ -1166,10 +1166,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * Locate site path and initialize settings singleton.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws BadRequestHttpException
    *   In case the host name in the request is not trusted.
    */
   protected function initializeSettings(Request $request) {
@@ -1190,7 +1190,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * Bootstraps the legacy global request variables.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    *
    * @todo D8: Eliminate this entirely in favor of Request object.
@@ -1374,10 +1374,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * Attach synthetic values on to kernel.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @param ContainerInterface $container
    *   Container object.
    *
-   * @return \Symfony\Component\DependencyInjection\ContainerInterface
+   * @return ContainerInterface
    *   The container object with the kernel and the class loader added.
    */
   protected function attachSynthetic(ContainerInterface $container) {
@@ -1401,7 +1401,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * Compiles a new service container.
    *
-   * @return \Drupal\Core\DependencyInjection\ContainerBuilder
+   * @return ContainerBuilder
    *   The compiled service container
    */
   protected function compileContainer() {
@@ -1536,7 +1536,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * Gets a new ContainerBuilder instance used to build the service container.
    *
-   * @return \Drupal\Core\DependencyInjection\ContainerBuilder
+   * @return ContainerBuilder
    *   The Drupal dependency injection container builder.
    */
   protected function getContainerBuilder() {
@@ -1771,7 +1771,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * Validates the hostname supplied from the HTTP request.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    *
    * @return bool
@@ -1813,7 +1813,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * ];
    * @endcode
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    * @param array $host_patterns
    *   The array of trusted host patterns.
@@ -1881,7 +1881,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * session is replaced by a session object backed with persistent storage and
    * a real session handler.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
    * @see \Drupal\Core\StackMiddleware\Session::handle()

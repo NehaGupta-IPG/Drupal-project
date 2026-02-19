@@ -23,35 +23,35 @@ class AliasManagerTest extends UnitTestCase {
   /**
    * The alias manager.
    *
-   * @var \Drupal\path_alias\AliasManager
+   * @var AliasManager
    */
   protected $aliasManager;
 
   /**
    * Alias repository.
    *
-   * @var \Drupal\path_alias\AliasRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var AliasRepositoryInterface|MockObject
    */
   protected $aliasRepository;
 
   /**
    * Alias prefix list.
    *
-   * @var \Drupal\path_alias\AliasPrefixListInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\path_alias\AliasPrefixListInterface|MockObject
    */
   protected $aliasPrefixList;
 
   /**
    * Language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Language\LanguageManagerInterface|MockObject
    */
   protected $languageManager;
 
   /**
    * Cache backend.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Cache\CacheBackendInterface|MockObject
    */
   protected $cache;
 
@@ -295,7 +295,7 @@ class AliasManagerTest extends UnitTestCase {
   /**
    * Sets up the current language.
    *
-   * @return \Drupal\Core\Language\LanguageInterface
+   * @return LanguageInterface
    *   The current language object.
    */
   protected function setUpCurrentLanguage() {

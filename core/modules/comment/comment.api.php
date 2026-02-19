@@ -18,7 +18,7 @@ use Drupal\Core\Url;
  *
  * @param array &$links
  *   A renderable array representing the comment links.
- * @param \Drupal\comment\CommentInterface $entity
+ * @param CommentInterface $entity
  *   The comment being rendered.
  * @param array &$context
  *   Various aspects of the context in which the comment links are going to be

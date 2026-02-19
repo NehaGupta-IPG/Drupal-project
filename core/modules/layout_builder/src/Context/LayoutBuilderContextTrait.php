@@ -33,10 +33,10 @@ trait LayoutBuilderContextTrait {
   /**
    * Returns all populated contexts, both global and section-storage-specific.
    *
-   * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
+   * @param SectionStorageInterface $section_storage
    *   The section storage.
    *
-   * @return \Drupal\Core\Plugin\Context\ContextInterface[]
+   * @return ContextInterface[]
    *   The array of context objects.
    */
   protected function getPopulatedContexts(SectionStorageInterface $section_storage): array {

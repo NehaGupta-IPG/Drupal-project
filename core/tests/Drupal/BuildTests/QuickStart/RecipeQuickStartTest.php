@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\BuildTests\QuickStart;
 
-use Drupal\sqlite\Driver\Database\sqlite\Install\Tasks;
 use Drupal\BuildTests\Framework\BuildTestBase;
 use Drupal\Core\Test\TestDatabase;
+use Drupal\sqlite\Driver\Database\sqlite\Install\Tasks;
 use Drupal\Tests\BrowserTestBase;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
@@ -40,7 +40,7 @@ class RecipeQuickStartTest extends BuildTestBase {
   /**
    * A test database object.
    *
-   * @var \Drupal\Core\Test\TestDatabase
+   * @var TestDatabase
    */
   protected TestDatabase $testDb;
 

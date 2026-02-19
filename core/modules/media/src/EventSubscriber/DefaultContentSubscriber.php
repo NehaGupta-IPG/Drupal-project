@@ -26,7 +26,7 @@ class DefaultContentSubscriber implements EventSubscriberInterface {
   /**
    * Reacts before a media item is exported.
    *
-   * @param \Drupal\Core\DefaultContent\PreExportEvent $event
+   * @param PreExportEvent $event
    *   The event object.
    */
   public function preExport(PreExportEvent $event): void {

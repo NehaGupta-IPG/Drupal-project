@@ -8,10 +8,10 @@ use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Config\Action\Attribute\ConfigAction;
 use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\Action\ConfigActionPluginInterface;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\layout_builder\Plugin\ConfigAction\Deriver\AddComponentDeriver;
 use Drupal\Core\Config\ConfigManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\layout_builder\Plugin\ConfigAction\Deriver\AddComponentDeriver;
 use Drupal\layout_builder\SectionComponent;
 use Drupal\layout_builder\SectionListInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -109,7 +109,7 @@ final class AddComponent implements ConfigActionPluginInterface, ContainerFactor
   /**
    * Adds a single component to the layout.
    *
-   * @param \Drupal\layout_builder\SectionListInterface $entity
+   * @param SectionListInterface $entity
    *   The entity with a layout.
    * @param array $value
    *   The data for the config action.

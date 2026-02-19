@@ -27,7 +27,7 @@ interface DependentAccessInterface {
   /**
    * Gets the access dependency.
    *
-   * @return \Drupal\Core\Access\AccessibleInterface|null
+   * @return AccessibleInterface|null
    *   The access dependency or NULL if none has been set.
    */
   public function getAccessDependency();

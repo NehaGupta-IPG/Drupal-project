@@ -18,7 +18,7 @@ class RelationshipData extends Data {
   /**
    * RelationshipData constructor.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceIdentifier[] $data
+   * @param ResourceIdentifier[] $data
    *   Resource objects that are the primary data for the response.
    * @param int $cardinality
    *   The number of ResourceIdentifiers that this collection may contain.

@@ -16,7 +16,7 @@ interface EntityTypeManagerInterface extends PluginManagerInterface, CachedDisco
    * @param string $entity_type_id
    *   The entity type ID for this access control handler.
    *
-   * @return \Drupal\Core\Entity\EntityAccessControlHandlerInterface
+   * @return EntityAccessControlHandlerInterface
    *   An access control handler instance.
    */
   public function getAccessControlHandler($entity_type_id);
@@ -27,12 +27,12 @@ interface EntityTypeManagerInterface extends PluginManagerInterface, CachedDisco
    * @param string $entity_type_id
    *   The entity type ID for this storage.
    *
-   * @return \Drupal\Core\Entity\EntityStorageInterface
+   * @return EntityStorageInterface
    *   A storage instance.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws PluginNotFoundException
    *   Thrown if the entity type doesn't exist.
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws InvalidPluginDefinitionException
    *   Thrown if the storage handler couldn't be loaded.
    */
   public function getStorage($entity_type_id);
@@ -43,7 +43,7 @@ interface EntityTypeManagerInterface extends PluginManagerInterface, CachedDisco
    * @param string $entity_type_id
    *   The entity type ID for this view builder.
    *
-   * @return \Drupal\Core\Entity\EntityViewBuilderInterface
+   * @return EntityViewBuilderInterface
    *   A view builder instance.
    */
   public function getViewBuilder($entity_type_id);
@@ -54,7 +54,7 @@ interface EntityTypeManagerInterface extends PluginManagerInterface, CachedDisco
    * @param string $entity_type_id
    *   The entity type ID for this list builder.
    *
-   * @return \Drupal\Core\Entity\EntityListBuilderInterface
+   * @return EntityListBuilderInterface
    *   An entity list builder instance.
    */
   public function getListBuilder($entity_type_id);
@@ -67,7 +67,7 @@ interface EntityTypeManagerInterface extends PluginManagerInterface, CachedDisco
    * @param string $operation
    *   The name of the operation to use, e.g., 'default'.
    *
-   * @return \Drupal\Core\Entity\EntityFormInterface
+   * @return EntityFormInterface
    *   A form instance.
    */
   public function getFormObject($entity_type_id, $operation);
@@ -114,7 +114,7 @@ interface EntityTypeManagerInterface extends PluginManagerInterface, CachedDisco
    * @return object
    *   A handler instance.
    *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws InvalidPluginDefinitionException
    */
   public function getHandler($entity_type_id, $handler_type);
 
@@ -127,7 +127,7 @@ interface EntityTypeManagerInterface extends PluginManagerInterface, CachedDisco
    *
    * @param mixed $class
    *   The handler class to instantiate.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $definition
+   * @param EntityTypeInterface $definition
    *   The entity type definition.
    *
    * @return object
@@ -138,7 +138,7 @@ interface EntityTypeManagerInterface extends PluginManagerInterface, CachedDisco
   /**
    * {@inheritdoc}
    *
-   * @return \Drupal\Core\Entity\EntityTypeInterface|null
+   * @return EntityTypeInterface|null
    *   A plugin definition, or NULL if the plugin ID is invalid and
    *   $exception_on_invalid is FALSE.
    */
@@ -147,7 +147,7 @@ interface EntityTypeManagerInterface extends PluginManagerInterface, CachedDisco
   /**
    * {@inheritdoc}
    *
-   * @return \Drupal\Core\Entity\EntityTypeInterface[]
+   * @return EntityTypeInterface[]
    *   An array of plugin definitions (empty array if no definitions were
    *   found). Keys are plugin IDs.
    */

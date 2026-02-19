@@ -24,7 +24,7 @@ interface ContentTranslationHandlerInterface {
   /**
    * Checks that the user can perform the operation on the entity translation.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity whose translation has to be accessed.
    * @param string $op
    *   The operation to be performed on the translation. Possible values are:
@@ -40,7 +40,7 @@ interface ContentTranslationHandlerInterface {
   /**
    * Retrieves the source language for the translation being created.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return string
@@ -51,7 +51,7 @@ interface ContentTranslationHandlerInterface {
   /**
    * Marks translations as outdated.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity being translated.
    * @param string $langcode
    *   (optional) The language code of the updated language: all the other
@@ -64,9 +64,9 @@ interface ContentTranslationHandlerInterface {
    *
    * @param array $form
    *   The entity form to be altered to provide the translation workflow.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity being created or edited.
    */
   public function entityFormAlter(array &$form, FormStateInterface $form_state, EntityInterface $entity);

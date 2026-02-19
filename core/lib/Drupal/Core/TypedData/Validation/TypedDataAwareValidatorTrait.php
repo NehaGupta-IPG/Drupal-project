@@ -15,7 +15,7 @@ trait TypedDataAwareValidatorTrait {
   /**
    * Gets the typed data object for the validated value.
    *
-   * @return \Drupal\Core\TypedData\TypedDataInterface
+   * @return TypedDataInterface
    *   The typed data object.
    */
   public function getTypedData() {

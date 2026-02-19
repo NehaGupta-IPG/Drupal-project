@@ -3,8 +3,8 @@
 namespace Drupal\Core\Action\Plugin\Action;
 
 use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Action\ConfigurableActionBase;
 use Drupal\Core\Action\Attribute\Action;
+use Drupal\Core\Action\ConfigurableActionBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -26,21 +26,21 @@ class MessageAction extends ConfigurableActionBase implements ContainerFactoryPl
   /**
    * The token service.
    *
-   * @var \Drupal\Core\Utility\Token
+   * @var Token
    */
   protected $token;
 
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * The messenger.
    *
-   * @var \Drupal\Core\Messenger\MessengerInterface
+   * @var MessengerInterface
    */
   protected $messenger;
 
@@ -53,11 +53,11 @@ class MessageAction extends ConfigurableActionBase implements ContainerFactoryPl
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Utility\Token $token
+   * @param Token $token
    *   The token service.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, Token $token, RendererInterface $renderer, MessengerInterface $messenger) {

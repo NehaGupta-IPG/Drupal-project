@@ -18,7 +18,7 @@ class FilterUninstallValidator implements ModuleUninstallValidatorInterface {
   /**
    * The filter plugin manager.
    *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   * @var PluginManagerInterface
    */
   protected $filterManager;
 
@@ -32,11 +32,11 @@ class FilterUninstallValidator implements ModuleUninstallValidatorInterface {
   /**
    * Constructs a new FilterUninstallValidator.
    *
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $filter_manager
+   * @param PluginManagerInterface $filter_manager
    *   The filter plugin manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param TranslationInterface $string_translation
    *   The string translation service.
    */
   public function __construct(PluginManagerInterface $filter_manager, EntityTypeManagerInterface $entity_type_manager, TranslationInterface $string_translation) {
@@ -88,7 +88,7 @@ class FilterUninstallValidator implements ModuleUninstallValidatorInterface {
   /**
    * Returns all enabled filter formats.
    *
-   * @return \Drupal\filter\FilterFormatInterface[]
+   * @return FilterFormatInterface[]
    *   An array of enabled filter formats.
    */
   protected function getEnabledFilterFormats() {

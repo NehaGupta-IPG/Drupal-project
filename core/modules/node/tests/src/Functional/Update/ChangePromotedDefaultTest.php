@@ -32,7 +32,7 @@ class ChangePromotedDefaultTest extends UpdatePathTestBase {
    * @legacy-covers node_post_update_create_promote_base_field_overrides
    */
   public function testRunUpdates(): void {
-    /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager */
+    /** @var EntityFieldManagerInterface $entityFieldManager */
     $entityFieldManager = \Drupal::service(EntityFieldManagerInterface::class);
     $promoteFieldDefinition = $entityFieldManager->getBaseFieldDefinitions('node')['promote'];
     $false_result = [0 => ['value' => 0]];

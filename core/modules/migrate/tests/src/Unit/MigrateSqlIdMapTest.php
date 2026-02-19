@@ -94,7 +94,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
   /**
    * Creates a test SQL ID map plugin.
    *
-   * @return \Drupal\Tests\migrate\Unit\TestSqlIdMap
+   * @return TestSqlIdMap
    *   A SQL ID map plugin test instance.
    */
   protected function getIdMap() {
@@ -458,7 +458,7 @@ class MigrateSqlIdMapTest extends MigrateTestCase {
    * @param array $rows
    *   An array of source and destination value arrays for the ID map table.
    *
-   * @return \Drupal\Tests\migrate\Unit\TestSqlIdMap
+   * @return TestSqlIdMap
    *   An ID map instance for testing.
    */
   protected function setupRows($source_keys, $dest_keys, $rows) {

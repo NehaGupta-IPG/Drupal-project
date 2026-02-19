@@ -6,9 +6,9 @@ use Drupal\Component\Utility\Unicode;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\Core\State\StateInterface;
 use Drupal\Core\Routing\RouteCompiler;
 use Drupal\Core\Routing\RouteProviderInterface;
+use Drupal\Core\State\StateInterface;
 use Drupal\Core\Url;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -25,14 +25,14 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
   /**
    * The route provider.
    *
-   * @var \Drupal\Core\Routing\RouteProviderInterface
+   * @var RouteProviderInterface
    */
   protected $routeProvider;
 
   /**
    * The state key value store.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
@@ -45,9 +45,9 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
+   * @param RouteProviderInterface $route_provider
    *   The route provider.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state key value store.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, StateInterface $state) {
@@ -109,7 +109,7 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
    * @param string $display_id
    *   The current display ID.
    *
-   * @return \Symfony\Component\Routing\Route
+   * @return Route
    *   The route for the view.
    */
   protected function getRoute($view_id, $display_id) {
@@ -225,9 +225,9 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
    *
    * @param string $view_path
    *   The path of the view.
-   * @param \Symfony\Component\Routing\Route $view_route
+   * @param Route $view_route
    *   The route of the view.
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route itself.
    *
    * @return bool
@@ -243,9 +243,9 @@ abstract class PathPluginBase extends DisplayPluginBase implements DisplayRouter
    *
    * @param string $view_path
    *   The path of the view.
-   * @param \Symfony\Component\Routing\Route $view_route
+   * @param Route $view_route
    *   The route of the view.
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route itself.
    *
    * @return bool

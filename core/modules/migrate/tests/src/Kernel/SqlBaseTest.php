@@ -28,7 +28,7 @@ class SqlBaseTest extends MigrateTestBase {
   /**
    * The (probably mocked) migration under test.
    *
-   * @var \Drupal\migrate\Plugin\MigrationInterface
+   * @var MigrationInterface
    */
   protected $migration;
 
@@ -210,7 +210,7 @@ class SqlBaseTest extends MigrateTestBase {
     $this->prepareSourceData();
     $this->enableModules(['migrate_sql_prepare_query_test', 'entity_test', 'user']);
 
-    /** @var \Drupal\migrate\Plugin\MigrationInterface $migration */
+    /** @var MigrationInterface $migration */
     $migration = $this->container->get('plugin.manager.migration')
       ->createStubMigration([
         'source' => ['plugin' => 'test_sql_prepare_query'],
@@ -261,7 +261,7 @@ class TestSqlBase extends SqlBase {
   /**
    * The query to execute.
    *
-   * @var \Drupal\Core\Database\Query\SelectInterface
+   * @var SelectInterface
    */
   protected $query;
 
@@ -270,7 +270,7 @@ class TestSqlBase extends SqlBase {
    *
    * @param array $configuration
    *   The plugin instance configuration.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   (optional) The migration being run.
    */
   public function __construct(array $configuration = [], ?MigrationInterface $migration = NULL) {
@@ -319,7 +319,7 @@ class TestSqlBase extends SqlBase {
   /**
    * Sets the query to execute.
    *
-   * @param \Drupal\Core\Database\Query\SelectInterface $query
+   * @param SelectInterface $query
    *   The query to execute.
    */
   public function setQuery(SelectInterface $query): void {

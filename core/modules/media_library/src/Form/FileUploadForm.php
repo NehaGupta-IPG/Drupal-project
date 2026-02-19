@@ -13,8 +13,8 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
-use Drupal\file\FileRepositoryInterface;
 use Drupal\file\FileInterface;
+use Drupal\file\FileRepositoryInterface;
 use Drupal\file\FileUsage\FileUsageInterface;
 use Drupal\file\Plugin\Field\FieldType\FileFieldItemList;
 use Drupal\file\Plugin\Field\FieldType\FileItem;
@@ -35,56 +35,56 @@ class FileUploadForm extends AddFormBase {
   /**
    * The element info manager.
    *
-   * @var \Drupal\Core\Render\ElementInfoManagerInterface
+   * @var ElementInfoManagerInterface
    */
   protected $elementInfo;
 
   /**
    * The renderer service.
    *
-   * @var \Drupal\Core\Render\ElementInfoManagerInterface
+   * @var ElementInfoManagerInterface
    */
   protected $renderer;
 
   /**
    * The file system service.
    *
-   * @var \Drupal\Core\File\FileSystemInterface
+   * @var FileSystemInterface
    */
   protected $fileSystem;
 
   /**
    * The file usage service.
    *
-   * @var \Drupal\file\FileUsage\FileUsageInterface
+   * @var FileUsageInterface
    */
   protected $fileUsage;
 
   /**
    * The file repository service.
    *
-   * @var \Drupal\file\FileRepositoryInterface
+   * @var FileRepositoryInterface
    */
   protected $fileRepository;
 
   /**
    * Constructs a new FileUploadForm.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\media_library\MediaLibraryUiBuilder $library_ui_builder
+   * @param MediaLibraryUiBuilder $library_ui_builder
    *   The media library UI builder.
-   * @param \Drupal\Core\Render\ElementInfoManagerInterface $element_info
+   * @param ElementInfoManagerInterface $element_info
    *   The element info manager.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer service.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
+   * @param FileSystemInterface $file_system
    *   The file system service.
-   * @param \Drupal\media_library\OpenerResolverInterface $opener_resolver
+   * @param OpenerResolverInterface $opener_resolver
    *   The opener resolver.
-   * @param \Drupal\file\FileUsage\FileUsageInterface $file_usage
+   * @param FileUsageInterface $file_usage
    *   The file usage service.
-   * @param \Drupal\file\FileRepositoryInterface $file_repository
+   * @param FileRepositoryInterface $file_repository
    *   The file repository service.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, MediaLibraryUiBuilder $library_ui_builder, ElementInfoManagerInterface $element_info, RendererInterface $renderer, FileSystemInterface $file_system, OpenerResolverInterface $opener_resolver, FileUsageInterface $file_usage, FileRepositoryInterface $file_repository) {
@@ -196,7 +196,7 @@ class FileUploadForm extends AddFormBase {
    *
    * @param array $element
    *   The upload element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    *
    * @return array
@@ -224,7 +224,7 @@ class FileUploadForm extends AddFormBase {
    *
    * @param array $element
    *   The upload element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    *
    * @return array
@@ -274,7 +274,7 @@ class FileUploadForm extends AddFormBase {
    *
    * @param array $element
    *   The entity form source field element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    * @param array $form
    *   The complete form.
@@ -308,7 +308,7 @@ class FileUploadForm extends AddFormBase {
    *
    * @param array $form
    *   The form render array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    */
   public function uploadButtonSubmit(array $form, FormStateInterface $form_state) {
@@ -343,10 +343,10 @@ class FileUploadForm extends AddFormBase {
   /**
    * Create a file field item.
    *
-   * @param \Drupal\media\MediaTypeInterface $media_type
+   * @param MediaTypeInterface $media_type
    *   The media type of the media item.
    *
-   * @return \Drupal\file\Plugin\Field\FieldType\FileItem
+   * @return FileItem
    *   A created file item.
    */
   protected function createFileItem(MediaTypeInterface $media_type) {
@@ -359,7 +359,7 @@ class FileUploadForm extends AddFormBase {
    * {@inheritdoc}
    */
   protected function prepareMediaEntityForSave(MediaInterface $media) {
-    /** @var \Drupal\file\FileInterface $file */
+    /** @var FileInterface $file */
     $file = $media->get($this->getSourceFieldName($media->bundle->entity))->entity;
     $file->setPermanent();
     $file->save();
@@ -370,7 +370,7 @@ class FileUploadForm extends AddFormBase {
    *
    * @param array $form
    *   The form render array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    */
   public function removeButtonSubmit(array $form, FormStateInterface $form_state) {
@@ -379,7 +379,7 @@ class FileUploadForm extends AddFormBase {
     $triggering_element = $form_state->getTriggeringElement();
     $delta = array_slice($triggering_element['#array_parents'], -2, 1)[0];
 
-    /** @var \Drupal\media\MediaInterface $removed_media */
+    /** @var MediaInterface $removed_media */
     $removed_media = $form_state->get(['media', $delta]);
 
     $file = $removed_media->get($this->getSourceFieldName($removed_media->bundle->entity))->entity;

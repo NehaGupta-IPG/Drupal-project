@@ -17,7 +17,7 @@ interface ComplexDataDefinitionInterface extends DataDefinitionInterface {
    * @param string $name
    *   The name of property.
    *
-   * @return \Drupal\Core\TypedData\DataDefinitionInterface|null
+   * @return DataDefinitionInterface|null
    *   The definition of the property or NULL if the property does not exist.
    */
   public function getPropertyDefinition($name);
@@ -25,7 +25,7 @@ interface ComplexDataDefinitionInterface extends DataDefinitionInterface {
   /**
    * Gets an array of property definitions of contained properties.
    *
-   * @return \Drupal\Core\TypedData\DataDefinitionInterface[]
+   * @return DataDefinitionInterface[]
    *   An array of property definitions of contained properties, keyed by
    *   property name.
    */

@@ -55,7 +55,7 @@ interface NodeTypeInterface extends ConfigEntityInterface, RevisionableEntityBun
    *   drupal:13.0.0.
    * phpcs:enable
    *
-   * @return \Drupal\node\NodePreviewMode|int
+   * @return NodePreviewMode|int
    *   Returns the enum case if $returnAsInt is FALSE, otherwise returns the
    *   integer equivalent.
    */
@@ -64,7 +64,7 @@ interface NodeTypeInterface extends ConfigEntityInterface, RevisionableEntityBun
   /**
    * Sets the preview mode.
    *
-   * @param \Drupal\node\NodePreviewMode|int $preview_mode
+   * @param NodePreviewMode|int $preview_mode
    *   A NodePreviewMode case, or the integer equivalent. Passing an integer
    *   is deprecated.
    *

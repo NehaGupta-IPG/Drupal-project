@@ -20,7 +20,7 @@ interface EntityViewsDataInterface {
   /**
    * Gets the table of an entity type to be used as base table in views.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type.
    *
    * @return string

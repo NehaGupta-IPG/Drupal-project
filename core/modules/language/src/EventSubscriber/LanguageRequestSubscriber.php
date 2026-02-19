@@ -7,9 +7,9 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\Translator\TranslatorInterface;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\language\LanguageNegotiatorInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * Sets the $request property on the language manager.
@@ -19,41 +19,41 @@ class LanguageRequestSubscriber implements EventSubscriberInterface {
   /**
    * The language manager service.
    *
-   * @var \Drupal\language\ConfigurableLanguageManagerInterface
+   * @var ConfigurableLanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The language negotiator.
    *
-   * @var \Drupal\language\LanguageNegotiatorInterface
+   * @var LanguageNegotiatorInterface
    */
   protected $negotiator;
 
   /**
    * The translation service.
    *
-   * @var \Drupal\Core\StringTranslation\Translator\TranslatorInterface
+   * @var TranslatorInterface
    */
   protected $translation;
 
   /**
    * The current active user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
   /**
    * Constructs a LanguageRequestSubscriber object.
    *
-   * @param \Drupal\language\ConfigurableLanguageManagerInterface $language_manager
+   * @param ConfigurableLanguageManagerInterface $language_manager
    *   The language manager service.
-   * @param \Drupal\language\LanguageNegotiatorInterface $negotiator
+   * @param LanguageNegotiatorInterface $negotiator
    *   The language negotiator.
-   * @param \Drupal\Core\StringTranslation\Translator\TranslatorInterface $translation
+   * @param TranslatorInterface $translation
    *   The translation service.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current active user.
    */
   public function __construct(ConfigurableLanguageManagerInterface $language_manager, LanguageNegotiatorInterface $negotiator, TranslatorInterface $translation, AccountInterface $current_user) {
@@ -66,7 +66,7 @@ class LanguageRequestSubscriber implements EventSubscriberInterface {
   /**
    * Initializes the language manager at the beginning of the request.
    *
-   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
+   * @param RequestEvent $event
    *   The Event to process.
    */
   public function onKernelRequestLanguage(RequestEvent $event) {

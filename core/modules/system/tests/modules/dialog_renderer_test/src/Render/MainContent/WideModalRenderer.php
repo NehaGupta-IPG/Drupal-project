@@ -31,9 +31,9 @@ class WideModalRenderer extends ModalRenderer {
   /**
    * Constructs a new WideModalRenderer.
    *
-   * @param \Drupal\Core\Controller\TitleResolverInterface $title_resolver
+   * @param TitleResolverInterface $title_resolver
    *   The title resolver.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
    * @param string $mode
    *   The mode, either 'wide' or 'extra_wide'.

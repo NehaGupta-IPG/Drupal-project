@@ -15,14 +15,14 @@ class AliasRepository implements AliasRepositoryInterface {
   /**
    * The database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
   /**
    * Constructs an AliasRepository object.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   A database connection for reading and writing path aliases.
    */
   public function __construct(Connection $connection) {
@@ -126,7 +126,7 @@ class AliasRepository implements AliasRepositoryInterface {
   /**
    * Returns a SELECT query for the path_alias base table.
    *
-   * @return \Drupal\Core\Database\Query\SelectInterface
+   * @return SelectInterface
    *   A Select query object.
    */
   protected function getBaseQuery() {
@@ -139,7 +139,7 @@ class AliasRepository implements AliasRepositoryInterface {
   /**
    * Adds path alias language fallback conditions to a select query object.
    *
-   * @param \Drupal\Core\Database\Query\SelectInterface $query
+   * @param SelectInterface $query
    *   A Select query object.
    * @param string $langcode
    *   Language code to search the path with. If there's no path defined for

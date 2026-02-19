@@ -29,21 +29,21 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
   /**
    * The database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
   /**
    * Cache backend instance for the extracted tree data.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $menuCacheBackend;
 
   /**
    * The cache tags invalidator.
    *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface
+   * @var CacheTagsInvalidatorInterface
    */
   protected $cacheTagsInvalidator;
 
@@ -89,11 +89,11 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
   /**
    * Constructs a new \Drupal\Core\Menu\MenuTreeStorage.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   A Database connection to use for reading and writing configuration data.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $menu_cache_backend
+   * @param CacheBackendInterface $menu_cache_backend
    *   Cache backend instance for the extracted tree data.
-   * @param \Drupal\Core\Cache\CacheTagsInvalidatorInterface $cache_tags_invalidator
+   * @param CacheTagsInvalidatorInterface $cache_tags_invalidator
    *   The cache tags invalidator.
    * @param string $table
    *   A database table name to store configuration data in.
@@ -224,7 +224,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
   /**
    * Executes a select query while making sure the database table exists.
    *
-   * @param \Drupal\Core\Database\Query\SelectInterface $query
+   * @param SelectInterface $query
    *   The select object to be executed.
    *
    * @return \Drupal\Core\Database\StatementInterface|null
@@ -273,7 +273,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    *
    * @throws \Exception
    *   Thrown if the storage back-end does not exist and could not be created.
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws PluginException
    *   Thrown if the definition is invalid, for example, if the specified parent
    *   would cause the links children to be moved to greater than the maximum
    *   depth.
@@ -359,7 +359,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    * @return array
    *   The values which will be stored.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws PluginException
    *   Thrown when the specific depth exceeds the maximum.
    */
   protected function preSave(array &$link, array $original) {
@@ -901,7 +901,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
    *
    * @param string $menu_name
    *   A menu name.
-   * @param \Drupal\Core\Menu\MenuTreeParameters $parameters
+   * @param MenuTreeParameters $parameters
    *   The parameters to determine which menu links to be loaded into a tree.
    *   This method will set the absolute minimum depth, which is used in
    *   MenuTreeStorage::doBuildTreeData().

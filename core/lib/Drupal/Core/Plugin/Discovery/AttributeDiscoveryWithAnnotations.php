@@ -88,7 +88,7 @@ class AttributeDiscoveryWithAnnotations extends AttributeClassDiscovery {
     $parser = new StaticReflectionParser($class, $finder, TRUE);
 
     $reflection_class = $parser->getReflectionClass();
-    /** @var \Drupal\Component\Annotation\AnnotationInterface $annotation */
+    /** @var AnnotationInterface $annotation */
     if ($annotation = $this->getAnnotationReader()->getClassAnnotation($reflection_class, $this->pluginDefinitionAnnotationName)) {
       $this->prepareAnnotationDefinition($annotation, $class);
 
@@ -109,7 +109,7 @@ class AttributeDiscoveryWithAnnotations extends AttributeClassDiscovery {
    * This is a copy of the prepareAnnotationDefinition method from annotated
    * class discovery.
    *
-   * @param \Drupal\Component\Annotation\AnnotationInterface $annotation
+   * @param AnnotationInterface $annotation
    *   The annotation derived from the plugin.
    * @param class-string $class
    *   The class used for the plugin.
@@ -130,7 +130,7 @@ class AttributeDiscoveryWithAnnotations extends AttributeClassDiscovery {
    * This is a copy of the getAnnotationReader method from annotated class
    * discovery.
    *
-   * @return \Drupal\Component\Annotation\Doctrine\SimpleAnnotationReader
+   * @return SimpleAnnotationReader
    *   The annotation reader.
    *
    * @see \Drupal\Component\Annotation\Plugin\Discovery\AnnotatedClassDiscovery::getAnnotationReader()

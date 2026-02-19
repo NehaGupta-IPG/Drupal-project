@@ -3,8 +3,8 @@
 namespace Drupal\user\EventSubscriber;
 
 use Drupal\Core\EventSubscriber\HttpExceptionSubscriberBase;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Routing\RouteMatch;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -22,14 +22,14 @@ class AccessDeniedSubscriber extends HttpExceptionSubscriberBase {
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $account;
 
   /**
    * Constructs a new redirect subscriber.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The current user.
    */
   public function __construct(AccountInterface $account) {
@@ -56,7 +56,7 @@ class AccessDeniedSubscriber extends HttpExceptionSubscriberBase {
   /**
    * Redirects users when access is denied.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   * @param ExceptionEvent $event
    *   The event to process.
    */
   public function on403(ExceptionEvent $event): void {

@@ -22,21 +22,21 @@ class RouteMatch implements RouteMatchInterface {
   /**
    * The route.
    *
-   * @var \Symfony\Component\Routing\Route
+   * @var Route
    */
   protected $route;
 
   /**
    * A key|value store of parameters.
    *
-   * @var \Symfony\Component\HttpFoundation\ParameterBag
+   * @var ParameterBag
    */
   protected $parameters;
 
   /**
    * A key|value store of raw parameters.
    *
-   * @var \Symfony\Component\HttpFoundation\InputBag
+   * @var InputBag
    */
   protected $rawParameters;
 
@@ -45,7 +45,7 @@ class RouteMatch implements RouteMatchInterface {
    *
    * @param string $route_name
    *   The name of the route.
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route.
    * @param array $parameters
    *   The parameters array.
@@ -67,10 +67,10 @@ class RouteMatch implements RouteMatchInterface {
   /**
    * Creates a RouteMatch from a request.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   A request object.
    *
-   * @return \Drupal\Core\Routing\RouteMatchInterface
+   * @return RouteMatchInterface
    *   A new RouteMatch object if there's a matched route for the request.
    *   A new NullRouteMatch object otherwise (e.g., on a 404 page or when
    *   invoked prior to routing).

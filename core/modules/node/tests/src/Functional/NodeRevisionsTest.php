@@ -29,7 +29,7 @@ class NodeRevisionsTest extends NodeTestBase {
   /**
    * An array of node revisions.
    *
-   * @var \Drupal\node\NodeInterface[]
+   * @var NodeInterface[]
    */
   protected $nodes;
 
@@ -417,7 +417,7 @@ class NodeRevisionsTest extends NodeTestBase {
     $this->submitForm([], 'Revert');
     /** @var \Drupal\node\NodeStorage $node_storage */
     $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
-    /** @var \Drupal\node\NodeInterface $node */
+    /** @var NodeInterface $node */
     $node = $node_storage->load($node->id());
     $this->assertGreaterThan($translation_revision_id, $node->getRevisionId());
     $this->assertEquals($default_translation_title, $node->label());
@@ -432,7 +432,7 @@ class NodeRevisionsTest extends NodeTestBase {
     // untranslated field will be reverted as well.
     $this->drupalGet($revert_translation_url);
     $this->submitForm(['revert_untranslated_fields' => TRUE], 'Revert');
-    /** @var \Drupal\node\NodeInterface $node */
+    /** @var NodeInterface $node */
     $node = $node_storage->load($node->id());
     $this->assertGreaterThan($latest_revision_id, $node->getRevisionId());
     $this->assertEquals($default_translation_title, $node->label());
@@ -449,7 +449,7 @@ class NodeRevisionsTest extends NodeTestBase {
     ]);
     $this->drupalGet($revert_url);
     $this->submitForm([], 'Revert');
-    /** @var \Drupal\node\NodeInterface $node */
+    /** @var NodeInterface $node */
     $node = $node_storage->load($node->id());
     $this->assertGreaterThan($latest_revision_id, $node->getRevisionId());
     $this->assertEquals($initial_title, $node->label());
@@ -461,7 +461,7 @@ class NodeRevisionsTest extends NodeTestBase {
   /**
    * Creates a series of revisions for the specified node.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   The node object.
    * @param int $count
    *   The number of revisions to be created.

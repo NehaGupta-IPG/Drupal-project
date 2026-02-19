@@ -102,7 +102,7 @@ class OEmbedResourceConstraintValidatorTest extends KernelTestBase {
   /**
    * Wraps a media entity in an anonymous class to mock a field value.
    *
-   * @param \Drupal\media\Entity\Media $media
+   * @param Media $media
    *   The media object.
    *
    * @return object
@@ -114,7 +114,7 @@ class OEmbedResourceConstraintValidatorTest extends KernelTestBase {
       /**
        * The test entity.
        *
-       * @var \Drupal\media\Entity\Media
+       * @var Media
        */
       private $entity;
 

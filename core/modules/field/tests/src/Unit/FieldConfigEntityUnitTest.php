@@ -24,21 +24,21 @@ class FieldConfigEntityUnitTest extends UnitTestCase {
   /**
    * The entity type used for testing.
    *
-   * @var \Drupal\Core\Config\Entity\ConfigEntityTypeInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Config\Entity\ConfigEntityTypeInterface|MockObject
    */
   protected $entityType;
 
   /**
    * The entity type manager used for testing.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityTypeManagerInterface|MockObject
    */
   protected $entityTypeManager;
 
   /**
    * The entity field manager used for testing.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityFieldManagerInterface|MockObject
    */
   protected $entityFieldManager;
 
@@ -52,21 +52,21 @@ class FieldConfigEntityUnitTest extends UnitTestCase {
   /**
    * The UUID generator used for testing.
    *
-   * @var \Drupal\Component\Uuid\UuidInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Component\Uuid\UuidInterface|MockObject
    */
   protected $uuid;
 
   /**
    * The mock field storage.
    *
-   * @var \Drupal\field\FieldStorageConfigInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\field\FieldStorageConfigInterface|MockObject
    */
   protected $fieldStorage;
 
   /**
    * The mock field type plugin manager.
    *
-   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface|MockObject
    */
   protected $fieldTypePluginManager;
 

@@ -11,14 +11,14 @@ namespace Drupal\Core\Recipe;
 final class RecipeConfigurator {
 
   /**
-   * @var \Drupal\Core\Recipe\Recipe[]
+   * @var Recipe[]
    */
   public readonly array $recipes;
 
   /**
    * A cache of already-loaded recipes, keyed by path.
    *
-   * @var \Drupal\Core\Recipe\Recipe[]
+   * @var Recipe[]
    */
   private static array $cache = [];
 
@@ -41,10 +41,10 @@ final class RecipeConfigurator {
    * @param string $name
    *   The machine name of the recipe to get.
    *
-   * @return \Drupal\Core\Recipe\Recipe
+   * @return Recipe
    *   The recipe object.
    *
-   * @throws \Drupal\Core\Recipe\UnknownRecipeException
+   * @throws UnknownRecipeException
    *   Thrown when the recipe cannot be found.
    */
   public static function getIncludedRecipe(string $include_path, string $name): Recipe {
@@ -76,7 +76,7 @@ final class RecipeConfigurator {
   /**
    * Returns all the recipes installed by this recipe.
    *
-   * @return \Drupal\Core\Recipe\Recipe[]
+   * @return Recipe[]
    *   An array of all the recipes being installed.
    */
   private function listAllRecipes(): array {

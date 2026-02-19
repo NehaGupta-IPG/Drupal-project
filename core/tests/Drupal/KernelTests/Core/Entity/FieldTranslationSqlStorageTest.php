@@ -70,7 +70,7 @@ class FieldTranslationSqlStorageTest extends EntityLanguageTestBase {
   /**
    * Checks whether field languages are correctly stored for the given entity.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The entity fields are attached to.
    * @param string $message
    *   (optional) A message to display with the assertion.

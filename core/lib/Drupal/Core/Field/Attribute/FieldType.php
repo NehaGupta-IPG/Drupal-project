@@ -23,9 +23,9 @@ class FieldType extends Plugin {
    *
    * @param string $id
    *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $label
+   * @param TranslatableMarkup $label
    *   The human-readable name of the field type.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|array|null $description
+   * @param TranslatableMarkup|array|null $description
    *   (optional) A short human-readable description for the field type.
    * @param string $category
    *   (optional) The category under which the field type should be listed in

@@ -27,9 +27,9 @@ interface MigrateProcessInterface extends PluginInspectionInterface {
    *
    * @param mixed $value
    *   The value to be transformed.
-   * @param \Drupal\migrate\MigrateExecutableInterface $migrate_executable
+   * @param MigrateExecutableInterface $migrate_executable
    *   The migration in which this process is being executed.
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The row from the source to process. Normally, just transforming the value
    *   is adequate but very rarely you might need to change two columns at the
    *   same time or something like that.

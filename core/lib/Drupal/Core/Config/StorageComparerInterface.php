@@ -14,7 +14,7 @@ interface StorageComparerInterface {
    *   (optional) The storage collection to use. Defaults to the
    *   default collection.
    *
-   * @return \Drupal\Core\Config\StorageInterface
+   * @return StorageInterface
    *   Storage object used to read configuration.
    */
   public function getSourceStorage($collection = StorageInterface::DEFAULT_COLLECTION);
@@ -26,7 +26,7 @@ interface StorageComparerInterface {
    *   (optional) The storage collection to use. Defaults to the
    *   default collection.
    *
-   * @return \Drupal\Core\Config\StorageInterface
+   * @return StorageInterface
    *   Storage object used to write configuration.
    */
   public function getTargetStorage($collection = StorageInterface::DEFAULT_COLLECTION);

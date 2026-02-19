@@ -17,14 +17,14 @@ class ContentPreprocess implements ContainerInjectionInterface {
   /**
    * The route match service.
    *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
+   * @var RouteMatchInterface
    */
   protected $routeMatch;
 
   /**
    * Constructor.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   Current route match service.
    */
   public function __construct(RouteMatchInterface $route_match) {
@@ -55,7 +55,7 @@ class ContentPreprocess implements ContainerInjectionInterface {
   /**
    * Checks whether a route is the "Latest version" tab of a node.
    *
-   * @param \Drupal\node\Entity\Node $node
+   * @param Node $node
    *   A node.
    *
    * @return bool

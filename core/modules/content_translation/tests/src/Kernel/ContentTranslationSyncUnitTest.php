@@ -19,7 +19,7 @@ class ContentTranslationSyncUnitTest extends KernelTestBase {
   /**
    * The synchronizer class to be tested.
    *
-   * @var \Drupal\content_translation\FieldTranslationSynchronizer
+   * @var FieldTranslationSynchronizer
    */
   protected $synchronizer;
 

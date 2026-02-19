@@ -14,7 +14,7 @@ interface EnhancerInterface {
    *
    * @param array $defaults
    *   The defaults, maps to '_defaults' in the route definition YAML.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The Request instance.
    *
    * @return array

@@ -18,14 +18,14 @@ class BlockPluginHasSettingsTrayFormAccessCheck implements AccessInterface {
   /**
    * Checks access for accessing a block's 'settings_tray' form.
    *
-   * @param \Drupal\block\BlockInterface $block
+   * @param BlockInterface $block
    *   The block whose 'settings_tray' form is being accessed.
    *
    * @return \Drupal\Core\Access\AccessResultInterface
    *   The access result.
    */
   public function access(BlockInterface $block) {
-    /** @var \Drupal\Core\Block\BlockPluginInterface $block_plugin */
+    /** @var BlockPluginInterface $block_plugin */
     $block_plugin = $block->getPlugin();
     return $this->accessBlockPlugin($block_plugin);
   }
@@ -33,7 +33,7 @@ class BlockPluginHasSettingsTrayFormAccessCheck implements AccessInterface {
   /**
    * Checks access for accessing a block plugin's 'settings_tray' form.
    *
-   * @param \Drupal\Core\Block\BlockPluginInterface $block_plugin
+   * @param BlockPluginInterface $block_plugin
    *   The block plugin whose 'settings_tray' form is being accessed.
    *
    * @return \Drupal\Core\Access\AccessResultInterface

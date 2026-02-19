@@ -2,8 +2,8 @@
 
 namespace Drupal\user\Plugin\Validation\Constraint;
 
-use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\ConstraintValidator;
 
 /**
  * Checks if the user's email address is provided if required.

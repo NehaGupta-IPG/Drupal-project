@@ -20,7 +20,7 @@ class BlockLibraryController extends ControllerBase {
   /**
    * The block manager.
    *
-   * @var \Drupal\Core\Block\BlockManagerInterface
+   * @var BlockManagerInterface
    */
   protected $blockManager;
 
@@ -34,27 +34,27 @@ class BlockLibraryController extends ControllerBase {
   /**
    * The route match.
    *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
+   * @var RouteMatchInterface
    */
   protected $routeMatch;
 
   /**
    * The local action manager.
    *
-   * @var \Drupal\Core\Menu\LocalActionManagerInterface
+   * @var LocalActionManagerInterface
    */
   protected $localActionManager;
 
   /**
    * Constructs a BlockLibraryController object.
    *
-   * @param \Drupal\Core\Block\BlockManagerInterface $block_manager
+   * @param BlockManagerInterface $block_manager
    *   The block manager.
-   * @param \Drupal\Core\Plugin\Context\ContextRepositoryInterface $context_repository
+   * @param ContextRepositoryInterface $context_repository
    *   The context repository.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The current route match.
-   * @param \Drupal\Core\Menu\LocalActionManagerInterface $local_action_manager
+   * @param LocalActionManagerInterface $local_action_manager
    *   The local action manager.
    */
   public function __construct(BlockManagerInterface $block_manager, ContextRepositoryInterface $context_repository, RouteMatchInterface $route_match, LocalActionManagerInterface $local_action_manager) {
@@ -67,7 +67,7 @@ class BlockLibraryController extends ControllerBase {
   /**
    * Shows a list of blocks that can be added to a theme's layout.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    * @param string $theme
    *   Theme key of the block list.

@@ -17,7 +17,7 @@ class CalculatedPermissions implements CalculatedPermissionsInterface {
   /**
    * Constructs a new CalculatedPermissions.
    *
-   * @param \Drupal\Core\Session\CalculatedPermissionsInterface $source
+   * @param CalculatedPermissionsInterface $source
    *   The calculated permission to create a value object from.
    */
   public function __construct(CalculatedPermissionsInterface $source) {

@@ -173,7 +173,7 @@ class ImageStylesPathAndUrlTest extends BrowserTestBase {
     // Create a working copy of the file.
     $files = $this->drupalGetTestFiles('image');
     $file = array_shift($files);
-    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
+    /** @var FileSystemInterface $file_system */
     $file_system = \Drupal::service('file_system');
     $original_uri = $file_system->copy($file->uri, $scheme . '://', FileExists::Rename);
     // Let the image_module_test module know about this file, so it can claim

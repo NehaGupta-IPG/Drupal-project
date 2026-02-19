@@ -21,7 +21,7 @@ use Drupal\Core\TypedData\TypedDataInterface;
  *
  * @template T of \Drupal\Core\TypedData\TypedDataInterface
  * @implements \IteratorAggregate<int, T>
- * @implements \Drupal\Core\TypedData\ListInterface<T>
+ * @implements ListInterface<T>
  *
  * @ingroup typed_data
  */
@@ -35,7 +35,7 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
   /**
    * Numerically indexed array of items.
    *
-   * @var \Drupal\Core\TypedData\TypedDataInterface[]
+   * @var TypedDataInterface[]
    */
   protected $list = [];
 
@@ -220,7 +220,7 @@ class ItemList extends TypedData implements \IteratorAggregate, ListInterface {
   /**
    * Helper for creating a list item object.
    *
-   * @return \Drupal\Core\TypedData\TypedDataInterface
+   * @return TypedDataInterface
    *   The new property instance.
    */
   protected function createItem($offset = 0, $value = NULL) {

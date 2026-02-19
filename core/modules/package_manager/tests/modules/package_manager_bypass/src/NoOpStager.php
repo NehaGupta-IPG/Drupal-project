@@ -33,7 +33,7 @@ final class NoOpStager implements StagerInterface {
   /**
    * Constructs a Stager object.
    *
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state service.
    */
   public function __construct(StateInterface $state) {

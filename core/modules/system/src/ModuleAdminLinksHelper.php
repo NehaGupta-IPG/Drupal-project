@@ -21,9 +21,9 @@ class ModuleAdminLinksHelper {
   /**
    * Constructs a new service instance.
    *
-   * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menuLinkTree
+   * @param MenuLinkTreeInterface $menuLinkTree
    *   The menu link tree service.
-   * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memoryCache
+   * @param MemoryCacheInterface $memoryCache
    *   The memory cache.
    */
   public function __construct(

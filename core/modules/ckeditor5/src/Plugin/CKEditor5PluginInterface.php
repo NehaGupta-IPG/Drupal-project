@@ -24,7 +24,7 @@ interface CKEditor5PluginInterface extends PluginInspectionInterface {
    * @param array $static_plugin_config
    *   The ckeditor5.config entry from the YAML or annotation, if any. If none
    *   is specified in the YAML or annotation, then the empty array.
-   * @param \Drupal\editor\EditorInterface $editor
+   * @param EditorInterface $editor
    *   A configured text editor object.
    *
    * @return array

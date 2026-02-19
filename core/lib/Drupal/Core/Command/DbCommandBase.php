@@ -24,7 +24,7 @@ class DbCommandBase extends Command {
   /**
    * Parse input options decide on a database.
    *
-   * @param \Symfony\Component\Console\Input\InputInterface $input
+   * @param InputInterface $input
    *   Input object.
    *
    * @return \Drupal\Core\Database\Connection

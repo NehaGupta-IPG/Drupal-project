@@ -12,7 +12,7 @@ class CountryManager implements CountryManagerInterface {
   /**
    * The module handler service.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
@@ -26,7 +26,7 @@ class CountryManager implements CountryManagerInterface {
   /**
    * Constructor.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
    */
   public function __construct(ModuleHandlerInterface $module_handler) {

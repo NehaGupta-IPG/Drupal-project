@@ -36,7 +36,7 @@ class TestControllers {
   /**
    * Prints out test data.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
    * @return array

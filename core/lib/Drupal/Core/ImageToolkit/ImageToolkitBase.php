@@ -35,11 +35,11 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    *   The plugin ID for the plugin instance.
    * @param array $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\ImageToolkit\ImageToolkitOperationManagerInterface $operationManager
+   * @param ImageToolkitOperationManagerInterface $operationManager
    *   The toolkit operation manager.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   A logger instance.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   * @param ConfigFactoryInterface $configFactory
    *   The config factory.
    */
   public function __construct(
@@ -92,7 +92,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    * @param string $operation
    *   The toolkit operation requested.
    *
-   * @return \Drupal\Core\ImageToolkit\ImageToolkitOperationInterface
+   * @return ImageToolkitOperationInterface
    *   An instance of the requested toolkit operation plugin.
    */
   protected function getToolkitOperation($operation) {

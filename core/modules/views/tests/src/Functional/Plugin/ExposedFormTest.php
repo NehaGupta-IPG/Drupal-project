@@ -497,7 +497,7 @@ class ExposedFormTest extends ViewTestBase {
   /**
    * Returns a views exposed form ID.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view to create an ID for.
    *
    * @return string

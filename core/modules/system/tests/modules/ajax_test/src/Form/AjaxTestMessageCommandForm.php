@@ -76,7 +76,7 @@ class AjaxTestMessageCommandForm implements FormInterface {
   /**
    * Callback for testing MessageCommand with default settings.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   The AJAX response.
    */
   public function makeMessageDefault() {
@@ -87,7 +87,7 @@ class AjaxTestMessageCommandForm implements FormInterface {
   /**
    * Callback for testing MessageCommand using an alternate message location.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   The AJAX response.
    */
   public function makeMessageAlternate() {
@@ -98,7 +98,7 @@ class AjaxTestMessageCommandForm implements FormInterface {
   /**
    * Callback for testing MessageCommand with warning status.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   The AJAX response.
    */
   public function makeMessageWarning() {

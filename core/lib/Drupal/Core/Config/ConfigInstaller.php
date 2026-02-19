@@ -17,42 +17,42 @@ class ConfigInstaller implements ConfigInstallerInterface {
   /**
    * The configuration factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * The active configuration storages, keyed by collection.
    *
-   * @var \Drupal\Core\Config\StorageInterface[]
+   * @var StorageInterface[]
    */
   protected $activeStorages;
 
   /**
    * The typed configuration manager.
    *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface
+   * @var TypedConfigManagerInterface
    */
   protected $typedConfig;
 
   /**
    * The configuration manager.
    *
-   * @var \Drupal\Core\Config\ConfigManagerInterface
+   * @var ConfigManagerInterface
    */
   protected $configManager;
 
   /**
    * The event dispatcher.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+   * @var EventDispatcherInterface
    */
   protected $eventDispatcher;
 
   /**
    * The configuration storage that provides the default configuration.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   protected $sourceStorage;
 
@@ -73,26 +73,26 @@ class ConfigInstaller implements ConfigInstallerInterface {
   /**
    * The extension path resolver.
    *
-   * @var \Drupal\Core\Extension\ExtensionPathResolver
+   * @var ExtensionPathResolver
    */
   protected $extensionPathResolver;
 
   /**
    * Constructs the configuration installer.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The configuration factory.
-   * @param \Drupal\Core\Config\StorageInterface $active_storage
+   * @param StorageInterface $active_storage
    *   The active configuration storage.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
+   * @param TypedConfigManagerInterface $typed_config
    *   The typed configuration manager.
-   * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
+   * @param ConfigManagerInterface $config_manager
    *   The configuration manager.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
    * @param string $install_profile
    *   The name of the currently active installation profile.
-   * @param \Drupal\Core\Extension\ExtensionPathResolver $extension_path_resolver
+   * @param ExtensionPathResolver $extension_path_resolver
    *   The extension path resolver.
    */
   public function __construct(ConfigFactoryInterface $config_factory, StorageInterface $active_storage, TypedConfigManagerInterface $typed_config, ConfigManagerInterface $config_manager, EventDispatcherInterface $event_dispatcher, $install_profile, ExtensionPathResolver $extension_path_resolver) {
@@ -309,7 +309,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
    *   The configuration collection to use.
    * @param string $prefix
    *   (optional) Limit to configuration starting with the provided string.
-   * @param \Drupal\Core\Config\StorageInterface[] $profile_storages
+   * @param StorageInterface[] $profile_storages
    *   An array of storage interfaces containing profile configuration to check
    *   for overrides.
    *
@@ -478,7 +478,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
    *   (optional) The configuration collection. Defaults to the default
    *   collection.
    *
-   * @return \Drupal\Core\Config\StorageInterface
+   * @return StorageInterface
    *   The configuration storage that provides the default configuration.
    */
   protected function getActiveStorages($collection = StorageInterface::DEFAULT_COLLECTION) {
@@ -518,7 +518,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
    *   it and the extension has been uninstalled and is about to the
    *   reinstalled.
    *
-   * @param \Drupal\Core\Config\StorageInterface $storage
+   * @param StorageInterface $storage
    *   The storage containing the default configuration.
    * @param array $previous_config_names
    *   An array of configuration names that have previously been checked.
@@ -611,11 +611,11 @@ class ConfigInstaller implements ConfigInstallerInterface {
   /**
    * Finds default configuration with unmet dependencies.
    *
-   * @param \Drupal\Core\Config\StorageInterface $storage
+   * @param StorageInterface $storage
    *   The storage containing the default configuration.
    * @param array $enabled_extensions
    *   A list of all the currently enabled modules and themes.
-   * @param \Drupal\Core\Config\StorageInterface[] $profile_storages
+   * @param StorageInterface[] $profile_storages
    *   An array of storage interfaces containing profile configuration to check
    *   for overrides.
    * @param string[][] $previously_checked_config
@@ -749,7 +749,7 @@ class ConfigInstaller implements ConfigInstallerInterface {
    * @param string $installing_name
    *   (optional) The name of the extension currently being installed.
    *
-   * @return \Drupal\Core\Config\StorageInterface[]|null
+   * @return StorageInterface[]|null
    *   Storages to access configuration from the installation profile. If we're
    *   installing the profile itself, then it will return an empty array as the
    *   profile storage should not be used.

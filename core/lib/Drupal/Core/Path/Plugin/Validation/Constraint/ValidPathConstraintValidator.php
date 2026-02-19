@@ -16,14 +16,14 @@ class ValidPathConstraintValidator extends ConstraintValidator implements Contai
   /**
    * The path validator.
    *
-   * @var \Drupal\Core\Path\PathValidatorInterface
+   * @var PathValidatorInterface
    */
   protected $pathValidator;
 
   /**
    * Creates a new ValidPathConstraintValidator instance.
    *
-   * @param \Drupal\Core\Path\PathValidatorInterface $path_validator
+   * @param PathValidatorInterface $path_validator
    *   The path validator.
    */
   public function __construct(PathValidatorInterface $path_validator) {

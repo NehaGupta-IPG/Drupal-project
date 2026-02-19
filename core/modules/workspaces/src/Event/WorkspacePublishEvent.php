@@ -2,9 +2,9 @@
 
 namespace Drupal\workspaces\Event;
 
+use Drupal\Component\EventDispatcher\Event;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\workspaces\WorkspaceInterface;
-use Drupal\Component\EventDispatcher\Event;
 
 /**
  * Defines the workspace publish event.
@@ -29,7 +29,7 @@ abstract class WorkspacePublishEvent extends Event {
   /**
    * Constructs a new WorkspacePublishEvent.
    *
-   * @param \Drupal\workspaces\WorkspaceInterface $workspace
+   * @param WorkspaceInterface $workspace
    *   The workspace.
    * @param array $published_revision_ids
    *   The IDs of the entities that are being published.
@@ -44,7 +44,7 @@ abstract class WorkspacePublishEvent extends Event {
   /**
    * Gets the workspace.
    *
-   * @return \Drupal\workspaces\WorkspaceInterface
+   * @return WorkspaceInterface
    *   The workspace.
    */
   public function getWorkspace(): WorkspaceInterface {
@@ -87,7 +87,7 @@ abstract class WorkspacePublishEvent extends Event {
   /**
    * Gets the reason for stopping the workspace publication.
    *
-   * @return string|\Drupal\Core\StringTranslation\TranslatableMarkup
+   * @return string|TranslatableMarkup
    *   The reason for stopping the workspace publication or an empty string if
    *   no reason is provided.
    */

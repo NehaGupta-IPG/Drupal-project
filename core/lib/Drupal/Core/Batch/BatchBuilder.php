@@ -52,28 +52,28 @@ class BatchBuilder {
   /**
    * The title for the batch.
    *
-   * @var string|\Drupal\Core\StringTranslation\TranslatableMarkup
+   * @var string|TranslatableMarkup
    */
   protected $title;
 
   /**
    * The initializing message for the batch.
    *
-   * @var string|\Drupal\Core\StringTranslation\TranslatableMarkup
+   * @var string|TranslatableMarkup
    */
   protected $initMessage;
 
   /**
    * The message to be shown while the batch is in progress.
    *
-   * @var string|\Drupal\Core\StringTranslation\TranslatableMarkup
+   * @var string|TranslatableMarkup
    */
   protected $progressMessage;
 
   /**
    * The message to be shown if a problem occurs.
    *
-   * @var string|\Drupal\Core\StringTranslation\TranslatableMarkup
+   * @var string|TranslatableMarkup
    */
   protected $errorMessage;
 
@@ -147,7 +147,7 @@ class BatchBuilder {
   /**
    * Sets the title.
    *
-   * @param string|\Drupal\Core\StringTranslation\TranslatableMarkup $title
+   * @param string|TranslatableMarkup $title
    *   The title.
    *
    * @return $this
@@ -177,7 +177,7 @@ class BatchBuilder {
    *
    * Defaults to 'Initializing.'.
    *
-   * @param string|\Drupal\Core\StringTranslation\TranslatableMarkup $message
+   * @param string|TranslatableMarkup $message
    *   The text to display.
    *
    * @return $this
@@ -192,7 +192,7 @@ class BatchBuilder {
    *
    * Defaults to 'Completed @current of @total.'.
    *
-   * @param string|\Drupal\Core\StringTranslation\TranslatableMarkup $message
+   * @param string|TranslatableMarkup $message
    *   The text to display.  Available placeholders are:
    *   - '@current'
    *   - '@remaining'
@@ -213,7 +213,7 @@ class BatchBuilder {
    *
    * Defaults to 'An error has occurred.'.
    *
-   * @param string|\Drupal\Core\StringTranslation\TranslatableMarkup $message
+   * @param string|TranslatableMarkup $message
    *   The text to display.
    *
    * @return $this

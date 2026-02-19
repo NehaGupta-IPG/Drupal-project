@@ -10,7 +10,7 @@ interface ThemeHandlerInterface {
   /**
    * Returns a list of currently installed themes.
    *
-   * @return \Drupal\Core\Extension\Extension[]
+   * @return Extension[]
    *   An associative array of the currently installed themes. The keys are the
    *   themes' machine names and the values are Extension objects having the
    *   following properties:
@@ -51,7 +51,7 @@ interface ThemeHandlerInterface {
   /**
    * Adds a theme extension to the internal listing.
    *
-   * @param \Drupal\Core\Extension\Extension $theme
+   * @param Extension $theme
    *   The theme extension.
    */
   public function addTheme(Extension $theme);
@@ -72,7 +72,7 @@ interface ThemeHandlerInterface {
   /**
    * Scans and collects theme extension data and their engines.
    *
-   * @return \Drupal\Core\Extension\Extension[]
+   * @return Extension[]
    *   An associative array of theme extensions.
    *
    * @deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use
@@ -90,7 +90,7 @@ interface ThemeHandlerInterface {
    * Themes can inherit templates and function implementations from earlier
    * themes.
    *
-   * @param \Drupal\Core\Extension\Extension[] $themes
+   * @param Extension[] $themes
    *   An array of available themes.
    * @param string $theme
    *   The name of the theme whose base we are looking for.
@@ -115,7 +115,7 @@ interface ThemeHandlerInterface {
    * @return string
    *   Returns the human readable name of the theme.
    *
-   * @throws \Drupal\Core\Extension\Exception\UnknownExtensionException
+   * @throws UnknownExtensionException
    *   When the specified theme does not exist.
    */
   public function getName($theme);
@@ -157,10 +157,10 @@ interface ThemeHandlerInterface {
    * @param string $name
    *   The name of the theme to return.
    *
-   * @return \Drupal\Core\Extension\Extension
+   * @return Extension
    *   An extension object.
    *
-   * @throws \Drupal\Core\Extension\Exception\UnknownExtensionException
+   * @throws UnknownExtensionException
    *   Thrown when the requested theme does not exist.
    */
   public function getTheme($name);

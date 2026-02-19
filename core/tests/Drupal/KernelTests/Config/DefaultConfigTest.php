@@ -186,7 +186,7 @@ class DefaultConfigTest extends KernelTestBase {
   /**
    * Tests that default config matches the installed config.
    *
-   * @param \Drupal\Core\Config\StorageInterface $default_config_storage
+   * @param StorageInterface $default_config_storage
    *   The default config storage to test.
    * @param string $extension
    *   The extension that is being tested.

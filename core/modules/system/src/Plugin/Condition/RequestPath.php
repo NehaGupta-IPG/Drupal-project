@@ -25,41 +25,41 @@ class RequestPath extends ConditionPluginBase implements ContainerFactoryPluginI
   /**
    * An alias manager to find the alias for the current system path.
    *
-   * @var \Drupal\path_alias\AliasManagerInterface
+   * @var AliasManagerInterface
    */
   protected $aliasManager;
 
   /**
    * The path matcher.
    *
-   * @var \Drupal\Core\Path\PathMatcherInterface
+   * @var PathMatcherInterface
    */
   protected $pathMatcher;
 
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * The current path.
    *
-   * @var \Drupal\Core\Path\CurrentPathStack
+   * @var CurrentPathStack
    */
   protected $currentPath;
 
   /**
    * Constructs a RequestPath condition plugin.
    *
-   * @param \Drupal\path_alias\AliasManagerInterface $alias_manager
+   * @param AliasManagerInterface $alias_manager
    *   An alias manager to find the alias for the current system path.
-   * @param \Drupal\Core\Path\PathMatcherInterface $path_matcher
+   * @param PathMatcherInterface $path_matcher
    *   The path matcher service.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   The request stack.
-   * @param \Drupal\Core\Path\CurrentPathStack $current_path
+   * @param CurrentPathStack $current_path
    *   The current path.
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.

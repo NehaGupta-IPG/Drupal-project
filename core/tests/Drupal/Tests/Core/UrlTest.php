@@ -37,21 +37,21 @@ class UrlTest extends UnitTestCase {
   /**
    * The URL generator.
    *
-   * @var \Drupal\Core\Routing\UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Routing\UrlGeneratorInterface|MockObject
    */
   protected $urlGenerator;
 
   /**
    * The path alias manager.
    *
-   * @var \Drupal\path_alias\AliasManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\path_alias\AliasManagerInterface|MockObject
    */
   protected $pathAliasManager;
 
   /**
    * The router.
    *
-   * @var \Drupal\Tests\Core\Routing\TestRouterInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Tests\Core\Routing\TestRouterInterface|MockObject
    */
   protected $router;
 
@@ -65,7 +65,7 @@ class UrlTest extends UnitTestCase {
   /**
    * The mocked path validator.
    *
-   * @var \Drupal\Core\Path\PathValidatorInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Path\PathValidatorInterface|MockObject
    */
   protected $pathValidator;
 
@@ -285,7 +285,7 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the getUri() method for internal URLs.
    *
-   * @param \Drupal\Core\Url[] $urls
+   * @param Url[] $urls
    *   Array of URL objects.
    */
   #[Depends('testUrlFromRequest')]
@@ -319,7 +319,7 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the getInternalPath method().
    *
-   * @param \Drupal\Core\Url[] $urls
+   * @param Url[] $urls
    *   Array of URL objects.
    */
   #[Depends('testUrlFromRequest')]
@@ -347,7 +347,7 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the toString() method.
    *
-   * @param \Drupal\Core\Url[] $urls
+   * @param Url[] $urls
    *   An array of Url objects.
    */
   #[Depends('testUrlFromRequest')]
@@ -364,7 +364,7 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the getRouteName() method.
    *
-   * @param \Drupal\Core\Url[] $urls
+   * @param Url[] $urls
    *   An array of Url objects.
    */
   #[Depends('testUrlFromRequest')]
@@ -386,7 +386,7 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the getRouteParameters() method.
    *
-   * @param \Drupal\Core\Url[] $urls
+   * @param Url[] $urls
    *   An array of Url objects.
    */
   #[Depends('testUrlFromRequest')]
@@ -433,7 +433,7 @@ class UrlTest extends UnitTestCase {
   /**
    * Tests the getOptions() method.
    *
-   * @param \Drupal\Core\Url[] $urls
+   * @param Url[] $urls
    *   An array of Url objects.
    */
   #[Depends('testUrlFromRequest')]
@@ -834,10 +834,10 @@ class UrlTest extends UnitTestCase {
    *
    * @param bool $access
    *   The access value.
-   * @param \Drupal\Core\Session\AccountInterface|null $account
+   * @param AccountInterface|null $account
    *   The account to test.
    *
-   * @return \Drupal\Core\Access\AccessManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @return AccessManagerInterface|MockObject
    *   The mocked access manager.
    */
   protected function getMockAccessManager($access, $account = NULL) {
@@ -869,7 +869,7 @@ class TestUrl extends Url {
   /**
    * Sets the access manager.
    *
-   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
+   * @param AccessManagerInterface $access_manager
    *   The access manager.
    */
   public function setAccessManager(AccessManagerInterface $access_manager): void {

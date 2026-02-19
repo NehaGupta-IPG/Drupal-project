@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Drupal\package_manager\EventSubscriber;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\package_manager\ComposerInspector;
 use Drupal\package_manager\Event\PostApplyEvent;
 use Drupal\package_manager\Event\PostRequireEvent;
-use Drupal\package_manager\ComposerInspector;
 use Drupal\package_manager\Event\PreCreateEvent;
 use Drupal\package_manager\PathLocator;
 use Psr\Log\LoggerAwareInterface;
@@ -59,7 +59,7 @@ final class ChangeLogger implements EventSubscriberInterface, LoggerAwareInterfa
    * been created, the installed packages won't change -- if they do, a
    * validation error will be raised.
    *
-   * @param \Drupal\package_manager\Event\PreCreateEvent $event
+   * @param PreCreateEvent $event
    *   The event being handled.
    *
    * @see \Drupal\package_manager\Validator\LockFileValidator
@@ -72,7 +72,7 @@ final class ChangeLogger implements EventSubscriberInterface, LoggerAwareInterfa
   /**
    * Records requested packages.
    *
-   * @param \Drupal\package_manager\Event\PostRequireEvent $event
+   * @param PostRequireEvent $event
    *   The event object.
    */
   public function recordRequestedPackageVersions(PostRequireEvent $event): void {
@@ -96,7 +96,7 @@ final class ChangeLogger implements EventSubscriberInterface, LoggerAwareInterfa
   /**
    * Logs changes made by Package Manager.
    *
-   * @param \Drupal\package_manager\Event\PostApplyEvent|\Drupal\package_manager\Event\PostRequireEvent $event
+   * @param PostApplyEvent|PostRequireEvent $event
    *   The event being handled.
    */
   public function logChanges(PostApplyEvent|PostRequireEvent $event): void {

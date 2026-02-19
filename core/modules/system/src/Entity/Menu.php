@@ -2,10 +2,10 @@
 
 namespace Drupal\system\Entity;
 
-use Drupal\Core\Entity\Attribute\ConfigEntityType;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\system\MenuAccessControlHandler;
 use Drupal\system\MenuInterface;
 use Drupal\system\MenuStorage;

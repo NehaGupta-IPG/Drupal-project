@@ -22,28 +22,28 @@ class StorageComparer implements StorageComparerInterface {
   /**
    * The source storage used to discover configuration changes.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   protected $sourceStorage;
 
   /**
    * The source storages keyed by collection.
    *
-   * @var \Drupal\Core\Config\StorageInterface[]
+   * @var StorageInterface[]
    */
   protected $sourceStorages;
 
   /**
    * The target storage used to write configuration changes.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   protected $targetStorage;
 
   /**
    * The target storages keyed by collection.
    *
-   * @var \Drupal\Core\Config\StorageInterface[]
+   * @var StorageInterface[]
    */
   protected $targetStorages;
 
@@ -77,14 +77,14 @@ class StorageComparer implements StorageComparerInterface {
   /**
    * A memory cache backend to statically cache source configuration data.
    *
-   * @var \Drupal\Core\Cache\MemoryBackend
+   * @var MemoryBackend
    */
   protected $sourceCacheStorage;
 
   /**
    * A memory cache backend to statically cache target configuration data.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected CacheBackendInterface $targetCacheStorage;
 
@@ -102,9 +102,9 @@ class StorageComparer implements StorageComparerInterface {
   /**
    * Constructs the Configuration storage comparer.
    *
-   * @param \Drupal\Core\Config\StorageInterface $source_storage
+   * @param StorageInterface $source_storage
    *   Storage object used to read configuration.
-   * @param \Drupal\Core\Config\StorageInterface $target_storage
+   * @param StorageInterface $target_storage
    *   Storage object used to write configuration.
    */
   public function __construct(StorageInterface $source_storage, StorageInterface $target_storage) {

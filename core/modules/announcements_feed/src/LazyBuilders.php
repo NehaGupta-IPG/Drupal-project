@@ -23,7 +23,7 @@ final class LazyBuilders implements TrustedCallbackInterface {
   /**
    * Constructs LazyBuilders object.
    *
-   * @param \Drupal\Core\Render\ElementInfoManagerInterface $elementInfo
+   * @param ElementInfoManagerInterface $elementInfo
    *   Element info.
    */
   public function __construct(

@@ -16,7 +16,7 @@ trait QueryConditionTrait {
    *
    * Condition handling is handled via composition.
    *
-   * @var \Drupal\Core\Database\Query\Condition
+   * @var Condition
    */
   protected $condition;
 

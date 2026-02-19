@@ -24,14 +24,14 @@ class ModulesListConfirmForm extends ConfirmFormBase {
   /**
    * The module handler service.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The expirable key value store.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface
+   * @var KeyValueStoreExpirableInterface
    */
   protected $keyValueExpirable;
 
@@ -45,18 +45,18 @@ class ModulesListConfirmForm extends ConfirmFormBase {
   /**
    * The module installer.
    *
-   * @var \Drupal\Core\Extension\ModuleInstallerInterface
+   * @var ModuleInstallerInterface
    */
   protected $moduleInstaller;
 
   /**
    * Constructs a ModulesListConfirmForm object.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Extension\ModuleInstallerInterface $module_installer
+   * @param ModuleInstallerInterface $module_installer
    *   The module installer.
-   * @param \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface $key_value_expirable
+   * @param KeyValueStoreExpirableInterface $key_value_expirable
    *   The key value expirable factory.
    */
   public function __construct(ModuleHandlerInterface $module_handler, ModuleInstallerInterface $module_installer, KeyValueStoreExpirableInterface $key_value_expirable) {

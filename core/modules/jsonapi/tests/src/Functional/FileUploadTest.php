@@ -70,14 +70,14 @@ class FileUploadTest extends ResourceTestBase {
   /**
    * The test field storage config.
    *
-   * @var \Drupal\field\Entity\FieldStorageConfig
+   * @var FieldStorageConfig
    */
   protected $fieldStorage;
 
   /**
    * The field config.
    *
-   * @var \Drupal\field\Entity\FieldConfig
+   * @var FieldConfig
    */
   protected $field;
 
@@ -91,7 +91,7 @@ class FileUploadTest extends ResourceTestBase {
   /**
    * Created file entity.
    *
-   * @var \Drupal\file\Entity\File
+   * @var File
    */
   protected $file;
 
@@ -819,7 +819,7 @@ class FileUploadTest extends ResourceTestBase {
   /**
    * Performs a file upload request. Wraps the Guzzle HTTP client.
    *
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   URL to request.
    * @param string $file_contents
    *   The file contents to send as the request body.
@@ -828,7 +828,7 @@ class FileUploadTest extends ResourceTestBase {
    *   Content-Type and Content-Disposition. In order to remove the defaults set
    *   the header value to FALSE.
    *
-   * @return \Psr\Http\Message\ResponseInterface
+   * @return ResponseInterface
    *   The received response.
    *
    * @see \GuzzleHttp\ClientInterface::request()
@@ -876,7 +876,7 @@ class FileUploadTest extends ResourceTestBase {
    *
    * @param array $expected
    *   The expected data.
-   * @param \Psr\Http\Message\ResponseInterface $response
+   * @param ResponseInterface $response
    *   The file upload response.
    *
    * @internal

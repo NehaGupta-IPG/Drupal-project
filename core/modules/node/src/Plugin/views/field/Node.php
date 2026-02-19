@@ -5,10 +5,10 @@ namespace Drupal\node\Plugin\views\field;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Drupal\views\Attribute\ViewsField;
-use Drupal\views\ResultRow;
-use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
+use Drupal\views\ResultRow;
+use Drupal\views\ViewExecutable;
 
 /**
  * Field handler to provide simple renderer that allows linking to a node.
@@ -62,7 +62,7 @@ class Node extends FieldPluginBase {
    *
    * @param string $data
    *   The XSS safe string for the link text.
-   * @param \Drupal\views\ResultRow $values
+   * @param ResultRow $values
    *   The values retrieved from a single row of a view's query result.
    *
    * @return string

@@ -31,7 +31,7 @@ class TwigEnvironment extends Environment {
   /**
    * The state service.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
@@ -54,13 +54,13 @@ class TwigEnvironment extends Environment {
    *
    * @param string $root
    *   The app root.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The cache bin.
    * @param string $twig_extension_hash
    *   The Twig extension hash.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state service.
-   * @param \Twig\Loader\LoaderInterface $loader
+   * @param LoaderInterface $loader
    *   The Twig loader or loader chain.
    * @param array $options
    *   The options for the Twig environment.
@@ -162,8 +162,8 @@ class TwigEnvironment extends Environment {
    * @return array
    *   The template metadata, if any.
    *
-   * @throws \Twig\Error\LoaderError
-   * @throws \Twig\Error\SyntaxError
+   * @throws LoaderError
+   * @throws SyntaxError
    */
   public function getTemplateMetadata(string $name): array {
     $loader = $this->getLoader();

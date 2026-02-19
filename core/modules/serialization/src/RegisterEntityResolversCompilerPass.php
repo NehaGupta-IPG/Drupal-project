@@ -2,9 +2,9 @@
 
 namespace Drupal\serialization;
 
-use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Adds services tagged 'entity_resolver' to the Serializer.
@@ -14,7 +14,7 @@ class RegisterEntityResolversCompilerPass implements CompilerPassInterface {
   /**
    * Adds services to the Serializer.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   * @param ContainerBuilder $container
    *   The container to process.
    */
   public function process(ContainerBuilder $container): void {

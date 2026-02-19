@@ -4,11 +4,11 @@ namespace Drupal\jsonapi\EventSubscriber;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableResponseInterface;
+use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
 use Drupal\jsonapi\JsonApiSpec;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -26,7 +26,7 @@ class JsonApiRequestValidator implements EventSubscriberInterface {
   /**
    * Validates JSON:API requests.
    *
-   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
+   * @param RequestEvent $event
    *   The event to process.
    */
   public function onRequest(RequestEvent $event) {
@@ -41,7 +41,7 @@ class JsonApiRequestValidator implements EventSubscriberInterface {
   /**
    * Validates JSON:API requests.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
+   * @param ResponseEvent $event
    *   The event to process.
    */
   public function onResponse(ResponseEvent $event) {
@@ -63,7 +63,7 @@ class JsonApiRequestValidator implements EventSubscriberInterface {
   /**
    * Validates custom (implementation-specific) query parameter names.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request for which to validate JSON:API query parameters.
    *
    * @return \Drupal\jsonapi\ResourceResponse|null

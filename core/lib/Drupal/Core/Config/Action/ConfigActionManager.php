@@ -76,17 +76,17 @@ class ConfigActionManager extends DefaultPluginManager {
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param CacheBackendInterface $cache_backend
    *   Cache backend instance to use.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler to invoke the alter hook with.
-   * @param \Drupal\Core\Config\ConfigManagerInterface $configManager
+   * @param ConfigManagerInterface $configManager
    *   The config manager.
-   * @param \Drupal\Core\Config\StorageInterface $configStorage
+   * @param StorageInterface $configStorage
    *   The active config storage.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfig
+   * @param TypedConfigManagerInterface $typedConfig
    *   The typed configuration manager service.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   * @param ConfigFactoryInterface $configFactory
    *   The config factory service.
    */
   public function __construct(
@@ -123,9 +123,9 @@ class ConfigActionManager extends DefaultPluginManager {
    * @param mixed $data
    *   The data for the action.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws PluginException
    *   Thrown when the config action cannot be found.
-   * @throws \Drupal\Core\Config\Action\ConfigActionException
+   * @throws ConfigActionException
    *   Thrown when the config action fails to apply.
    *
    * @see \Drupal\Core\Config\Action\ConfigActionManager::getConfigNamesMatchingExpression()
@@ -151,7 +151,7 @@ class ConfigActionManager extends DefaultPluginManager {
       }
     }
     try {
-      /** @var \Drupal\Core\Config\Action\ConfigActionPluginInterface $action */
+      /** @var ConfigActionPluginInterface $action */
       $action = $this->createInstance($action_id);
     }
     catch (PluginNotFoundException $e) {
@@ -204,7 +204,7 @@ class ConfigActionManager extends DefaultPluginManager {
    * @return string[]
    *   The names of all active config objects that match the expression.
    *
-   * @throws \Drupal\Core\Config\Action\ConfigActionException
+   * @throws ConfigActionException
    *   Thrown if the expression does not match any known config entity type's
    *   prefix, or if the expression cannot be parsed.
    */

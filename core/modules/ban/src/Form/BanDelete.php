@@ -2,8 +2,8 @@
 
 namespace Drupal\ban\Form;
 
-use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\ban\BanIpManagerInterface;
+use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -26,14 +26,14 @@ class BanDelete extends ConfirmFormBase {
   /**
    * The IP manager.
    *
-   * @var \Drupal\ban\BanIpManagerInterface
+   * @var BanIpManagerInterface
    */
   protected $ipManager;
 
   /**
    * Constructs a new BanDelete object.
    *
-   * @param \Drupal\ban\BanIpManagerInterface $ip_manager
+   * @param BanIpManagerInterface $ip_manager
    *   The IP manager.
    */
   public function __construct(BanIpManagerInterface $ip_manager) {
@@ -82,7 +82,7 @@ class BanDelete extends ConfirmFormBase {
    *
    * @param array $form
    *   A nested array form elements comprising the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param string $ban_id
    *   The IP address record ID to unban.

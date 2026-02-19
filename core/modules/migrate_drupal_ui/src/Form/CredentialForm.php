@@ -7,8 +7,8 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\State\StateInterface;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\State\StateInterface;
 use Drupal\Core\TempStore\PrivateTempStoreFactory;
 use Drupal\migrate\Exception\RequirementsException;
 use Drupal\migrate\Plugin\Exception\BadPluginDefinitionException;
@@ -29,7 +29,7 @@ class CredentialForm extends MigrateUpgradeFormBase {
   /**
    * The HTTP client to fetch the files with.
    *
-   * @var \GuzzleHttp\ClientInterface
+   * @var ClientInterface
    */
   protected $httpClient;
 
@@ -43,15 +43,15 @@ class CredentialForm extends MigrateUpgradeFormBase {
   /**
    * CredentialForm constructor.
    *
-   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $tempstore_private
+   * @param PrivateTempStoreFactory $tempstore_private
    *   The private tempstore factory service.
-   * @param \GuzzleHttp\ClientInterface $http_client
+   * @param ClientInterface $http_client
    *   A Guzzle client object.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory service.
-   * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
+   * @param MigrationPluginManagerInterface $migration_plugin_manager
    *   The migration plugin manager service.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state service.
    */
   public function __construct(PrivateTempStoreFactory $tempstore_private, ClientInterface $http_client, ConfigFactoryInterface $config_factory, MigrationPluginManagerInterface $migration_plugin_manager, StateInterface $state) {
@@ -427,16 +427,16 @@ class CredentialForm extends MigrateUpgradeFormBase {
    * form state. The source base path for public and private files is also
    * put into form state.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection used.
    * @param string $version
    *   The Drupal version.
    * @param array $database
    *   Database array representing the source Drupal database.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
-   * @throws \Drupal\Core\TempStore\TempStoreException
+   * @throws TempStoreException
    *   Thrown when a lock for the backend storage could not be acquired.
    */
   protected function setupMigrations(Connection $connection, $version, array $database, FormStateInterface $form_state) {

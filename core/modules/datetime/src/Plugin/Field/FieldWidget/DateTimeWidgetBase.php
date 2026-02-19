@@ -59,7 +59,7 @@ class DateTimeWidgetBase extends WidgetBase {
 
     foreach ($values as &$item) {
       if (!empty($item['value']) && $item['value'] instanceof DrupalDateTime) {
-        /** @var \Drupal\Core\Datetime\DrupalDateTime $date */
+        /** @var DrupalDateTime $date */
         $date = $item['value'];
 
         // Adjust the date for storage.
@@ -75,12 +75,12 @@ class DateTimeWidgetBase extends WidgetBase {
    * This will take a default value, apply the proper timezone for display in
    * a widget, and set the default time for date-only fields.
    *
-   * @param \Drupal\Core\Datetime\DrupalDateTime $date
+   * @param DrupalDateTime $date
    *   The UTC default date.
    * @param string $timezone
    *   The timezone to apply.
    *
-   * @return \Drupal\Core\Datetime\DrupalDateTime
+   * @return DrupalDateTime
    *   A date object for use as a default value in a field widget.
    */
   protected function createDefaultValue($date, $timezone) {

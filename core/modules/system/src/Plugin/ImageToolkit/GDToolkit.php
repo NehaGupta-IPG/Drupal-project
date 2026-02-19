@@ -66,15 +66,15 @@ class GDToolkit extends ImageToolkitBase {
    *   The plugin ID for the plugin instance.
    * @param array $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\ImageToolkit\ImageToolkitOperationManagerInterface $operation_manager
+   * @param ImageToolkitOperationManagerInterface $operation_manager
    *   The toolkit operation manager.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   A logger instance.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $streamWrapperManager
+   * @param StreamWrapperManagerInterface $streamWrapperManager
    *   The StreamWrapper manager.
-   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
+   * @param FileSystemInterface $fileSystem
    *   The file system.
    */
   public function __construct(

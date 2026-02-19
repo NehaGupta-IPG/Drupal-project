@@ -46,7 +46,7 @@ interface WorkspaceInterface extends ContentEntityInterface, EntityChangedInterf
   /**
    * Gets the provider of this workspace.
    *
-   * @return \Drupal\workspaces\Provider\WorkspaceProviderInterface
+   * @return WorkspaceProviderInterface
    *   The workspace provider.
    */
   public function getProvider(): WorkspaceProviderInterface;

@@ -35,7 +35,7 @@ class FileCacheFactory {
    *   (optional) The default configuration for this FileCache collection. This
    *   can be used to e.g. specify default usage of a FileCache class.
    *
-   * @return \Drupal\Component\FileCache\FileCacheInterface
+   * @return FileCacheInterface
    *   The initialized FileCache object.
    */
   public static function get($collection, $default_configuration = []) {

@@ -30,28 +30,28 @@ class PermissionsHashGeneratorTest extends UnitTestCase {
   /**
    * The mocked user 1 account.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $account1;
 
   /**
    * The mocked user 2 account.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $account2;
 
   /**
    * The mocked cache backend.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var CacheBackendInterface|ObjectProphecy
    */
   protected $staticCache;
 
   /**
    * The mocked access policy processor.
    *
-   * @var \Drupal\Core\Session\AccessPolicyProcessorInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var AccessPolicyProcessorInterface|ObjectProphecy
    */
   protected $processor;
 

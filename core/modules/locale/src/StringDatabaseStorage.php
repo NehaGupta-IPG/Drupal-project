@@ -13,7 +13,7 @@ class StringDatabaseStorage implements StringStorageInterface {
   /**
    * The database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
@@ -27,7 +27,7 @@ class StringDatabaseStorage implements StringStorageInterface {
   /**
    * Constructs a new StringDatabaseStorage class.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   A Database connection to use for reading and writing configuration data.
    * @param array $options
    *   (optional) Any additional database connection options to use in queries.
@@ -132,7 +132,7 @@ class StringDatabaseStorage implements StringStorageInterface {
   /**
    * Update locations for string.
    *
-   * @param \Drupal\locale\StringInterface $string
+   * @param StringInterface $string
    *   The string object.
    */
   protected function updateLocation($string) {
@@ -167,7 +167,7 @@ class StringDatabaseStorage implements StringStorageInterface {
   /**
    * Checks whether the string version matches a given version, fix it if not.
    *
-   * @param \Drupal\locale\StringInterface $string
+   * @param StringInterface $string
    *   The string object.
    * @param string $version
    *   Drupal version to check against.
@@ -265,7 +265,7 @@ class StringDatabaseStorage implements StringStorageInterface {
   /**
    * Gets table name for storing string object.
    *
-   * @param \Drupal\locale\StringInterface $string
+   * @param StringInterface $string
    *   The string object.
    *
    * @return string|null
@@ -284,7 +284,7 @@ class StringDatabaseStorage implements StringStorageInterface {
   /**
    * Gets keys values that are in a database table.
    *
-   * @param \Drupal\locale\StringInterface $string
+   * @param StringInterface $string
    *   The string object.
    *
    * @return array
@@ -315,14 +315,14 @@ class StringDatabaseStorage implements StringStorageInterface {
    * @param string $class
    *   Class name to use for fetching returned objects.
    *
-   * @return \Drupal\locale\StringInterface[]
+   * @return StringInterface[]
    *   Array of objects of the class requested.
    */
   protected function dbStringLoad(array $conditions, array $options, $class) {
     $strings = [];
     $result = $this->dbStringSelect($conditions, $options)->execute();
     foreach ($result as $item) {
-      /** @var \Drupal\locale\StringInterface $string */
+      /** @var StringInterface $string */
       $string = new $class($item);
       $string->setStorage($this);
       $strings[] = $string;
@@ -453,14 +453,14 @@ class StringDatabaseStorage implements StringStorageInterface {
   /**
    * Creates a database record for a string object.
    *
-   * @param \Drupal\locale\StringInterface $string
+   * @param StringInterface $string
    *   The string object.
    *
    * @return bool|int
    *   If the operation failed, returns FALSE.
    *   If it succeeded returns the last insert ID of the query, if one exists.
    *
-   * @throws \Drupal\locale\StringStorageException
+   * @throws StringStorageException
    *   If the string is not suitable for this storage, an exception is thrown.
    */
   protected function dbStringInsert($string) {
@@ -485,14 +485,14 @@ class StringDatabaseStorage implements StringStorageInterface {
   /**
    * Updates string object in the database.
    *
-   * @param \Drupal\locale\StringInterface $string
+   * @param StringInterface $string
    *   The string object.
    *
    * @return bool|int
    *   If the record update failed, returns FALSE. If it succeeded, returns
    *   SAVED_NEW or SAVED_UPDATED.
    *
-   * @throws \Drupal\locale\StringStorageException
+   * @throws StringStorageException
    *   If the string is not suitable for this storage, an exception is thrown.
    */
   protected function dbStringUpdate($string) {

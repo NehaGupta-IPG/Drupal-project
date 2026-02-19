@@ -22,14 +22,14 @@ class ListingEmpty extends AreaPluginBase {
   /**
    * The access manager.
    *
-   * @var \Drupal\Core\Access\AccessManagerInterface
+   * @var AccessManagerInterface
    */
   protected $accessManager;
 
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
@@ -42,9 +42,9 @@ class ListingEmpty extends AreaPluginBase {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
+   * @param AccessManagerInterface $access_manager
    *   The access manager.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, AccessManagerInterface $access_manager, AccountInterface $current_user) {
@@ -59,7 +59,7 @@ class ListingEmpty extends AreaPluginBase {
    */
   public function render($empty = FALSE) {
     if (!$empty || !empty($this->options['empty'])) {
-      /** @var \Drupal\Core\Access\AccessResultInterface|\Drupal\Core\Cache\CacheableDependencyInterface $access_result */
+      /** @var \Drupal\Core\Access\AccessResultInterface|CacheableDependencyInterface $access_result */
       $access_result = $this->accessManager->checkNamedRoute('block_content.add_page', [], $this->currentUser, TRUE);
       $element = [
         '#markup' => $this->t('Add a <a href=":url">content block</a>.', [':url' => Url::fromRoute('block_content.add_page')->toString()]),

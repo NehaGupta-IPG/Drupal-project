@@ -17,7 +17,7 @@ class PoStreamWriter implements PoWriterInterface, PoStreamInterface {
   /**
    * The Gettext PO header.
    *
-   * @var \Drupal\Component\Gettext\PoHeader
+   * @var PoHeader
    */
   protected $header;
 
@@ -38,7 +38,7 @@ class PoStreamWriter implements PoWriterInterface, PoStreamInterface {
   /**
    * Gets the PO header of the current stream.
    *
-   * @return \Drupal\Component\Gettext\PoHeader
+   * @return PoHeader
    *   The Gettext PO header.
    */
   public function getHeader() {
@@ -48,7 +48,7 @@ class PoStreamWriter implements PoWriterInterface, PoStreamInterface {
   /**
    * Set the PO header for the current stream.
    *
-   * @param \Drupal\Component\Gettext\PoHeader $header
+   * @param PoHeader $header
    *   The Gettext PO header to set.
    */
   public function setHeader(PoHeader $header) {

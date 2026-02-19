@@ -41,14 +41,14 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
   /**
    * The serializer.
    *
-   * @var \Symfony\Component\Serializer\SerializerInterface
+   * @var SerializerInterface
    */
   protected $serializer;
 
   /**
    * Constructs a ResourceResponseSubscriber object.
    *
-   * @param \Symfony\Component\Serializer\SerializerInterface $serializer
+   * @param SerializerInterface $serializer
    *   The serializer.
    */
   public function __construct(SerializerInterface $serializer) {
@@ -71,7 +71,7 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
   /**
    * Serializes ResourceResponse responses' data, and removes that data.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
+   * @param ResponseEvent $event
    *   The event to process.
    */
   public function onResponse(ResponseEvent $event) {
@@ -95,11 +95,11 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
    * contexts), so instead, allow those to "leak" and collect them here in
    * a render context.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
-   * @param \Drupal\jsonapi\ResourceResponse $response
+   * @param ResourceResponse $response
    *   The response from the JSON:API resource.
-   * @param \Symfony\Component\Serializer\SerializerInterface $serializer
+   * @param SerializerInterface $serializer
    *   The serializer to use.
    * @param string|null $format
    *   The response format, or NULL in case the response does not need a format,
@@ -134,7 +134,7 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
   /**
    * Generates a top-level JSON:API normalization context.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request from which the context can be derived.
    *
    * @return array
@@ -162,12 +162,12 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
    * requires deserializing the PHP data when reading this response object from
    * cache, which can be very costly, and is unnecessary.
    *
-   * @param \Drupal\jsonapi\ResourceResponse $response
+   * @param ResourceResponse $response
    *   A fully rendered resource response.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request for which this response is generated.
    *
-   * @return \Drupal\Core\Cache\CacheableResponse|\Symfony\Component\HttpFoundation\Response
+   * @return CacheableResponse|Response
    *   The flattened response.
    */
   protected static function flattenResponse(ResourceResponse $response, Request $request) {

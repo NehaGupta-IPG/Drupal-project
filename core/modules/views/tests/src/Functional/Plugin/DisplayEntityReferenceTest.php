@@ -58,14 +58,14 @@ class DisplayEntityReferenceTest extends ViewTestBase {
   /**
    * The field storage.
    *
-   * @var \Drupal\field\Entity\FieldStorageConfig
+   * @var FieldStorageConfig
    */
   protected $fieldStorage;
 
   /**
    * The field config.
    *
-   * @var \Drupal\field\Entity\FieldConfig
+   * @var FieldConfig
    */
   protected $field;
 

@@ -26,7 +26,7 @@ class WorkspaceSwitchSubscriber implements EventSubscriberInterface {
   /**
    * Clears various static caches when a new workspace is activated.
    *
-   * @param \Drupal\workspaces\Event\WorkspaceSwitchEvent $event
+   * @param WorkspaceSwitchEvent $event
    *   An event object.
    */
   public function onWorkspaceSwitch(WorkspaceSwitchEvent $event): void {

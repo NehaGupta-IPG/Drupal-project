@@ -33,7 +33,7 @@ class SettingsTest extends UnitTestCase {
   /**
    * The class under test.
    *
-   * @var \Drupal\Core\Site\Settings
+   * @var Settings
    */
   protected $settings;
 

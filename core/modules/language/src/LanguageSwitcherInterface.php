@@ -13,11 +13,11 @@ interface LanguageSwitcherInterface {
   /**
    * Returns language switch links.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    * @param string $type
    *   The language type.
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   The URL the switch links will be relative to.
    *
    * @return array

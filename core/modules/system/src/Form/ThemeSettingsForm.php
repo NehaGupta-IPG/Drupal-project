@@ -2,21 +2,21 @@
 
 namespace Drupal\system\Form;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Extension\ThemeSettingsProvider;
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
+use Drupal\Core\Theme\ThemeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Form\ConfigFormBase;
-use Drupal\Core\Theme\ThemeManagerInterface;
 
 // cspell:ignore apng
 
@@ -30,14 +30,14 @@ class ThemeSettingsForm extends ConfigFormBase {
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The theme handler.
    *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
+   * @var ThemeHandlerInterface
    */
   protected $themeHandler;
 
@@ -58,35 +58,35 @@ class ThemeSettingsForm extends ConfigFormBase {
   /**
    * The theme manager.
    *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   * @var ThemeManagerInterface
    */
   protected $themeManager;
 
   /**
    * The file system.
    *
-   * @var \Drupal\Core\File\FileSystemInterface
+   * @var FileSystemInterface
    */
   protected $fileSystem;
 
   /**
    * Constructs a ThemeSettingsForm object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
+   * @param TypedConfigManagerInterface $typedConfigManager
    *   The typed config manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler instance to use.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param ThemeHandlerInterface $theme_handler
    *   The theme handler.
-   * @param \Symfony\Component\Mime\MimeTypeGuesserInterface $mime_type_guesser
+   * @param MimeTypeGuesserInterface $mime_type_guesser
    *   The MIME type guesser instance to use.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
+   * @param ThemeManagerInterface $theme_manager
    *   The theme manager.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
+   * @param FileSystemInterface $file_system
    *   The file system.
-   * @param \Drupal\Core\Extension\ThemeSettingsProvider|null $themeSettingsProvider
+   * @param ThemeSettingsProvider|null $themeSettingsProvider
    *   The theme settings helper service.
    */
   public function __construct(
@@ -143,7 +143,7 @@ class ThemeSettingsForm extends ConfigFormBase {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param string $theme
    *   The theme name.

@@ -73,7 +73,7 @@ class ExtractTest extends MigrateProcessTestCase {
    * @param string|null $expected
    *   The expected transformed value.
    *
-   * @throws \Drupal\migrate\MigrateException
+   * @throws MigrateException
    */
   #[DataProvider('providerExtractDefault')]
   public function testExtractDefault(array $value, array $configuration, $expected): void {

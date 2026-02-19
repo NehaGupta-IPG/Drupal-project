@@ -33,35 +33,35 @@ class SectionStorageManagerTest extends UnitTestCase {
   /**
    * The section storage manager.
    *
-   * @var \Drupal\layout_builder\SectionStorage\SectionStorageManager
+   * @var SectionStorageManager
    */
   protected $manager;
 
   /**
    * The plugin.
    *
-   * @var \Drupal\layout_builder\SectionStorageInterface
+   * @var SectionStorageInterface
    */
   protected $plugin;
 
   /**
    * The plugin discovery.
    *
-   * @var \Drupal\Component\Plugin\Discovery\DiscoveryInterface
+   * @var DiscoveryInterface
    */
   protected $discovery;
 
   /**
    * The plugin factory.
    *
-   * @var \Drupal\Component\Plugin\Factory\FactoryInterface
+   * @var FactoryInterface
    */
   protected $factory;
 
   /**
    * The context handler.
    *
-   * @var \Drupal\Core\Plugin\Context\ContextHandlerInterface
+   * @var ContextHandlerInterface
    */
   protected $contextHandler;
 

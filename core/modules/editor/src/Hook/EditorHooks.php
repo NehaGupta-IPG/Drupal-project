@@ -3,20 +3,20 @@
 namespace Drupal\editor\Hook;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\SubformState;
+use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Render\Element;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
 use Drupal\editor\Entity\Editor;
 use Drupal\file\FileInterface;
 use Drupal\filter\FilterFormatInterface;
-use Drupal\Core\Entity\FieldableEntityInterface;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Form\SubformState;
-use Drupal\Core\Render\Element;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\Url;
-use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\text\Plugin\Field\FieldType\TextItemBase;
 
 /**
@@ -310,7 +310,7 @@ class EditorHooks {
       $references = empty($usage_list['editor']) ? [] : $usage_list['editor'];
       foreach ($references as $entity_type => $entity_ids_usage_count) {
         $referencing_entities = \Drupal::entityTypeManager()->getStorage($entity_type)->loadMultiple(array_keys($entity_ids_usage_count));
-        /** @var \Drupal\Core\Entity\EntityInterface $referencing_entity */
+        /** @var EntityInterface $referencing_entity */
         foreach ($referencing_entities as $referencing_entity) {
           if ($referencing_entity->access('view', NULL, TRUE)->isAllowed()) {
             $referencing_entity_is_accessible = TRUE;
@@ -340,7 +340,7 @@ class EditorHooks {
     if ($format->isNew()) {
       return;
     }
-    /** @var \Drupal\filter\FilterFormatInterface $original */
+    /** @var FilterFormatInterface $original */
     $original = \Drupal::entityTypeManager()->getStorage('filter_format')->loadUnchanged($format->getOriginalId());
     // If the text format status is the same, return early.
     if (($status = $format->status()) === $original->status()) {
@@ -359,7 +359,7 @@ class EditorHooks {
    *
    * @param array $uuids
    *   An array of file entity UUIDs.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   An entity whose fields to inspect for file references.
    */
   protected function recordFileUsage(array $uuids, EntityInterface $entity): void {
@@ -387,7 +387,7 @@ class EditorHooks {
    *
    * @param array $uuids
    *   An array of file entity UUIDs.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   An entity whose fields to inspect for file references.
    * @param int $count
    *   The number of references to delete. Should be 1 when deleting a single
@@ -413,7 +413,7 @@ class EditorHooks {
   /**
    * Finds all files referenced (data-entity-uuid) by formatted text fields.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   An entity whose fields to analyze.
    *
    * @return array
@@ -443,7 +443,7 @@ class EditorHooks {
    * A field type is considered to provide formatted text if its class is a
    * subclass of Drupal\text\Plugin\Field\FieldType\TextItemBase.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   An entity whose fields to analyze.
    *
    * @return array

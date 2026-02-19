@@ -22,7 +22,7 @@ class BackendChainImplementationUnitTest extends UnitTestCase {
   /**
    * Chain that will be heavily tested.
    *
-   * @var \Drupal\Core\Cache\BackendChain
+   * @var BackendChain
    */
   protected $chain;
 

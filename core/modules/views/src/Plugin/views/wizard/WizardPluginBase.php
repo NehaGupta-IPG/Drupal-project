@@ -9,10 +9,10 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Menu\MenuParentFormSelectorInterface;
 use Drupal\Core\Url;
 use Drupal\views\Entity\View;
-use Drupal\views\Views;
-use Drupal\views_ui\ViewUI;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\PluginBase;
+use Drupal\views\Views;
+use Drupal\views_ui\ViewUI;
 
 /**
  * @defgroup views_wizard_plugins Views wizard plugins
@@ -115,14 +115,14 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
   /**
    * The bundle info service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @var EntityTypeBundleInfoInterface
    */
   protected $bundleInfoService;
 
   /**
    * The parent form selector service.
    *
-   * @var \Drupal\Core\Menu\MenuParentFormSelectorInterface
+   * @var MenuParentFormSelectorInterface
    */
   protected $parentFormSelector;
 
@@ -499,7 +499,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    * the results of this function for any other purpose besides deciding how to
    * build the next version of the form.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array $parents
    *   An array of parent keys that point to the part of the submitted form
@@ -566,7 +566,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    *
    * @param array $form
    *   The full wizard form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the wizard form.
    * @param string $type
    *   The display ID (e.g. 'page' or 'block').
@@ -681,7 +681,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
   /**
    * Instantiates a view object from form values.
    *
-   * @return \Drupal\views_ui\ViewUI
+   * @return ViewUI
    *   The instantiated view UI object.
    */
   protected function instantiateView($form, FormStateInterface $form_state) {
@@ -886,7 +886,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    *
    * @param array $form
    *   The full wizard form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the wizard form.
    *
    * @return array
@@ -912,7 +912,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    *
    * @param array $form
    *   The full wizard form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the wizard form.
    *
    * @return array
@@ -982,7 +982,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    *
    * @param array $form
    *   The full wizard form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the wizard form.
    *
    * @return array
@@ -1008,7 +1008,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    *
    * @param array $form
    *   The full wizard form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the wizard form.
    *
    * @return array
@@ -1059,7 +1059,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    *
    * @param array $form
    *   The full wizard form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the wizard form.
    *
    * @return array
@@ -1105,7 +1105,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    *
    * @param array $form
    *   The full wizard form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the wizard form.
    *
    * @return array
@@ -1128,7 +1128,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    *
    * @param array $form
    *   The full wizard form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the wizard form.
    *
    * @return array
@@ -1147,7 +1147,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    *
    * @param array $form
    *   The full wizard form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the wizard form.
    *
    * @return array
@@ -1179,11 +1179,11 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    * @param array $options
    *   An array whose keys are the name of each option and whose values are the
    *   desired values to set.
-   * @param \Drupal\views\Plugin\views\display\DisplayPluginBase $display
+   * @param DisplayPluginBase $display
    *   The display handler which the options will be applied to. The default
    *   display will actually be assigned the options (and this display will
    *   inherit them) when possible.
-   * @param \Drupal\views\Plugin\views\display\DisplayPluginBase $default_display
+   * @param DisplayPluginBase $default_display
    *   The default display handler, which will store the options when possible.
    */
   protected function setDefaultOptions($options, DisplayPluginBase $display, DisplayPluginBase $default_display) {
@@ -1215,11 +1215,11 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    * @param array $options
    *   An array whose keys are the name of each option and whose values are the
    *   desired values to set.
-   * @param \Drupal\views\Plugin\views\display\DisplayPluginBase $display
+   * @param DisplayPluginBase $display
    *   The display handler which the options will be applied to. The default
    *   display will actually be assigned the options (and this display will
    *   inherit them) when possible.
-   * @param \Drupal\views\Plugin\views\display\DisplayPluginBase $default_display
+   * @param DisplayPluginBase $default_display
    *   The default display handler, which will store the options when possible.
    */
   protected function setOverrideOptions(array $options, DisplayPluginBase $display, DisplayPluginBase $default_display) {
@@ -1241,12 +1241,12 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    *
    * @param array $form
    *   The full wizard form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the wizard form.
    * @param bool $unset
    *   Should the view be removed from the list of validated views.
    *
-   * @return \Drupal\views_ui\ViewUI
+   * @return ViewUI
    *   The validated view object.
    */
   protected function retrieveValidatedView(array $form, FormStateInterface $form_state, $unset = TRUE) {
@@ -1265,9 +1265,9 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    *
    * @param array $form
    *   The full wizard form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the wizard form.
-   * @param \Drupal\views_ui\ViewUI $view
+   * @param ViewUI $view
    *   The validated view object.
    */
   protected function setValidatedView(array $form, FormStateInterface $form_state, ViewUI $view) {

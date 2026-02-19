@@ -21,7 +21,7 @@ class MysqlDateSqlTest extends UnitTestCase {
   /**
    * The mocked database service.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $database;
 

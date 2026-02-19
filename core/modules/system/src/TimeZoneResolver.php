@@ -22,23 +22,23 @@ class TimeZoneResolver implements EventSubscriberInterface {
   /**
    * The config.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   private $currentUser;
 
   /**
    * TimeZoneResolver constructor.
    *
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
    */
   public function __construct(AccountInterface $current_user, ConfigFactoryInterface $config_factory) {
@@ -58,7 +58,7 @@ class TimeZoneResolver implements EventSubscriberInterface {
   /**
    * Updates the default time zone when time zone config changes.
    *
-   * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   * @param ConfigCrudEvent $event
    *   The config crud event.
    */
   public function onConfigSave(ConfigCrudEvent $event) {

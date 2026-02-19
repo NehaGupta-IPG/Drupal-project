@@ -3,9 +3,9 @@
 namespace Drupal\Core\EventSubscriber;
 
 use Drupal\Core\Config\ConfigEvents;
+use Drupal\Core\Config\ConfigImporterEvent;
 use Drupal\Core\Config\ConfigManagerInterface;
 use Drupal\Core\Config\StorageInterface;
-use Drupal\Core\Config\ConfigImporterEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -16,32 +16,32 @@ class ConfigSnapshotSubscriber implements EventSubscriberInterface {
   /**
    * The configuration manager.
    *
-   * @var \Drupal\Core\Config\ConfigManagerInterface
+   * @var ConfigManagerInterface
    */
   protected $configManager;
 
   /**
    * The source storage used to discover configuration changes.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   protected $sourceStorage;
 
   /**
    * The snapshot storage used to write configuration changes.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   protected $snapshotStorage;
 
   /**
    * Constructs the ConfigSnapshotSubscriber object.
    *
-   * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
+   * @param ConfigManagerInterface $config_manager
    *   The configuration manager.
-   * @param \Drupal\Core\Config\StorageInterface $source_storage
+   * @param StorageInterface $source_storage
    *   The source storage used to discover configuration changes.
-   * @param \Drupal\Core\Config\StorageInterface $snapshot_storage
+   * @param StorageInterface $snapshot_storage
    *   The snapshot storage used to write configuration changes.
    */
   public function __construct(ConfigManagerInterface $config_manager, StorageInterface $source_storage, StorageInterface $snapshot_storage) {
@@ -53,7 +53,7 @@ class ConfigSnapshotSubscriber implements EventSubscriberInterface {
   /**
    * Creates a config snapshot.
    *
-   * @param \Drupal\Core\Config\ConfigImporterEvent $event
+   * @param ConfigImporterEvent $event
    *   The Event to process.
    */
   public function onConfigImporterImport(ConfigImporterEvent $event) {

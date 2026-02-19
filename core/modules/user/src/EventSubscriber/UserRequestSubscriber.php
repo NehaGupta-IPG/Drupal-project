@@ -18,25 +18,25 @@ class UserRequestSubscriber implements EventSubscriberInterface {
   /**
    * The current account.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $account;
 
   /**
    * The entity type manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * Constructs a new UserRequestSubscriber.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The current user.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct(AccountInterface $account, EntityTypeManagerInterface $entity_type_manager, protected TimeInterface $time) {
@@ -47,7 +47,7 @@ class UserRequestSubscriber implements EventSubscriberInterface {
   /**
    * Updates the current user's last access time.
    *
-   * @param \Symfony\Component\HttpKernel\Event\TerminateEvent $event
+   * @param TerminateEvent $event
    *   The event to process.
    */
   public function onKernelTerminate(TerminateEvent $event) {

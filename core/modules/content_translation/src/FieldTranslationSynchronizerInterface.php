@@ -23,7 +23,7 @@ interface FieldTranslationSynchronizerInterface {
    * instance to translate the "alt" and "title" textual elements of an image
    * field, while keeping the same image on every translation.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity whose values should be synchronized.
    * @param string $sync_langcode
    *   The language of the translation whose values should be used as source for
@@ -58,7 +58,7 @@ interface FieldTranslationSynchronizerInterface {
   /**
    * Returns the synchronized properties for the specified field definition.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   A field definition.
    *
    * @return string[]

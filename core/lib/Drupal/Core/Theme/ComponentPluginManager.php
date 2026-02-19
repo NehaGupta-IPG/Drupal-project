@@ -13,14 +13,14 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Plugin\CategorizingPluginManagerTrait;
-use Drupal\Core\Plugin\DefaultPluginManager;
-use Drupal\Core\Plugin\Factory\ContainerFactory;
-use Drupal\Core\Theme\Component\ComponentValidator;
-use Drupal\Core\Theme\Component\SchemaCompatibilityChecker;
 use Drupal\Core\Plugin\Component;
+use Drupal\Core\Plugin\DefaultPluginManager;
+use Drupal\Core\Plugin\Discovery\DirectoryWithMetadataPluginDiscovery;
+use Drupal\Core\Plugin\Factory\ContainerFactory;
 use Drupal\Core\Render\Component\Exception\ComponentNotFoundException;
 use Drupal\Core\Render\Component\Exception\IncompatibleComponentSchema;
-use Drupal\Core\Plugin\Discovery\DirectoryWithMetadataPluginDiscovery;
+use Drupal\Core\Theme\Component\ComponentValidator;
+use Drupal\Core\Theme\Component\SchemaCompatibilityChecker;
 
 /**
  * Defines a plugin manager to deal with components.
@@ -44,23 +44,23 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
   /**
    * Constructs ComponentPluginManager object.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler
+   * @param ThemeHandlerInterface $themeHandler
    *   The theme handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
+   * @param CacheBackendInterface $cacheBackend
    *   Cache backend instance to use.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   * @param ConfigFactoryInterface $configFactory
    *   The configuration factory.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $themeManager
+   * @param ThemeManagerInterface $themeManager
    *   The theme manager.
-   * @param \Drupal\Core\Theme\ComponentNegotiator $componentNegotiator
+   * @param ComponentNegotiator $componentNegotiator
    *   The component negotiator.
-   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
+   * @param FileSystemInterface $fileSystem
    *   The file system service.
-   * @param \Drupal\Core\Theme\Component\SchemaCompatibilityChecker $compatibilityChecker
+   * @param SchemaCompatibilityChecker $compatibilityChecker
    *   The compatibility checker.
-   * @param \Drupal\Core\Theme\Component\ComponentValidator $componentValidator
+   * @param ComponentValidator $componentValidator
    *   The component validator.
    * @param string $appRoot
    *   The application root.
@@ -94,7 +94,7 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
   /**
    * Creates an instance.
    *
-   * @throws \Drupal\Core\Render\Component\Exception\ComponentNotFoundException
+   * @throws ComponentNotFoundException
    *
    * @internal
    */
@@ -130,10 +130,10 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
    * @param string $component_id
    *   The component ID.
    *
-   * @return \Drupal\Core\Plugin\Component
+   * @return Component
    *   The component.
    *
-   * @throws \Drupal\Core\Render\Component\Exception\ComponentNotFoundException
+   * @throws ComponentNotFoundException
    */
   public function find(string $component_id): Component {
     $definitions = $this->getDefinitions();
@@ -147,7 +147,7 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
   /**
    * Gets all components.
    *
-   * @return \Drupal\Core\Plugin\Component[]
+   * @return Component[]
    *   An array of Component objects.
    */
   public function getAllComponents(): array {
@@ -369,7 +369,7 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
    * @return bool
    *   TRUE if it's valid.
    *
-   * @throws \Drupal\Core\Render\Component\Exception\InvalidComponentException
+   * @throws InvalidComponentException
    */
   private function isValidDefinition(array $definition): bool {
     return $this->componentValidator->validateDefinition(

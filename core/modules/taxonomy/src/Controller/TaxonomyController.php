@@ -15,7 +15,7 @@ class TaxonomyController extends ControllerBase {
   /**
    * Returns a form to add a new term to a vocabulary.
    *
-   * @param \Drupal\taxonomy\VocabularyInterface $taxonomy_vocabulary
+   * @param VocabularyInterface $taxonomy_vocabulary
    *   The vocabulary this term will be added to.
    *
    * @return array
@@ -29,7 +29,7 @@ class TaxonomyController extends ControllerBase {
   /**
    * Route title callback.
    *
-   * @param \Drupal\taxonomy\TermInterface $taxonomy_term
+   * @param TermInterface $taxonomy_term
    *   The taxonomy term.
    *
    * @return array

@@ -20,7 +20,7 @@ class ImmutableConfigTest extends UnitTestCase {
   /**
    * The immutable config object under test.
    *
-   * @var \Drupal\Core\Config\ImmutableConfig
+   * @var ImmutableConfig
    */
   protected $config;
 

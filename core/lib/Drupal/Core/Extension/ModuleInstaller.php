@@ -34,14 +34,14 @@ class ModuleInstaller implements ModuleInstallerInterface {
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The drupal kernel.
    *
-   * @var \Drupal\Core\DrupalKernelInterface
+   * @var DrupalKernelInterface
    */
   protected $kernel;
 
@@ -55,14 +55,14 @@ class ModuleInstaller implements ModuleInstallerInterface {
   /**
    * The database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
   /**
    * The update registry service.
    *
-   * @var \Drupal\Core\Update\UpdateHookRegistry
+   * @var UpdateHookRegistry
    */
   protected $updateRegistry;
 
@@ -71,15 +71,15 @@ class ModuleInstaller implements ModuleInstallerInterface {
    *
    * @param string $root
    *   The app root.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\DrupalKernelInterface $kernel
+   * @param DrupalKernelInterface $kernel
    *   The drupal kernel.
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection.
-   * @param \Drupal\Core\Update\UpdateHookRegistry $update_registry
+   * @param UpdateHookRegistry $update_registry
    *   The update registry service.
-   * @param \Psr\Log\LoggerInterface|null $logger
+   * @param LoggerInterface|null $logger
    *   The logger.
    * @param \Traversable|null $uninstallValidators
    *   The uninstall validator services.
@@ -648,7 +648,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
 
       \Drupal::logger('system')->info('%module module uninstalled.', ['%module' => $module]);
 
-      /** @var \Drupal\Core\Update\UpdateHookRegistry $update_registry */
+      /** @var UpdateHookRegistry $update_registry */
       $update_registry = \Drupal::service('update.update_hook_registry');
       $update_registry->deleteInstalledVersion($module);
     }
@@ -710,7 +710,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
   /**
    * Updates the kernel module list.
    *
-   * @param \Drupal\Core\Extension\Extension[] $module_filenames
+   * @param Extension[] $module_filenames
    *   The list of installed modules.
    */
   protected function updateKernel($module_filenames) {

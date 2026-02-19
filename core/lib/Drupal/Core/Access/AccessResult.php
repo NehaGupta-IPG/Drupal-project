@@ -33,7 +33,7 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
    *   (optional) The reason why access is neutral. Intended for developers,
    *   hence not translatable.
    *
-   * @return \Drupal\Core\Access\AccessResultNeutral
+   * @return AccessResultNeutral
    *   isNeutral() will be TRUE.
    */
   public static function neutral($reason = NULL) {
@@ -44,7 +44,7 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
   /**
    * Creates an AccessResultInterface object with isAllowed() === TRUE.
    *
-   * @return \Drupal\Core\Access\AccessResultAllowed
+   * @return AccessResultAllowed
    *   isAllowed() will be TRUE.
    */
   public static function allowed() {
@@ -58,7 +58,7 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
    *   (optional) The reason why access is forbidden. Intended for developers,
    *   hence not translatable.
    *
-   * @return \Drupal\Core\Access\AccessResultForbidden
+   * @return AccessResultForbidden
    *   isForbidden() will be TRUE.
    */
   public static function forbidden($reason = NULL) {
@@ -72,7 +72,7 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
    * @param bool $condition
    *   The condition to evaluate.
    *
-   * @return \Drupal\Core\Access\AccessResult
+   * @return AccessResult
    *   If $condition is TRUE, isAllowed() will be TRUE, otherwise isNeutral()
    *   will be TRUE.
    */
@@ -89,7 +89,7 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
    *   (optional) The reason why access is forbidden. Intended for developers,
    *   hence not translatable.
    *
-   * @return \Drupal\Core\Access\AccessResult
+   * @return AccessResult
    *   If $condition is TRUE, isForbidden() will be TRUE, otherwise isNeutral()
    *   will be TRUE.
    */
@@ -102,12 +102,12 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
    *
    * Checks the permission and adds a 'user.permissions' cache context.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The account for which to check a permission.
    * @param string $permission
    *   The permission to check for.
    *
-   * @return \Drupal\Core\Access\AccessResult
+   * @return AccessResult
    *   If the account has the permission, isAllowed() will be TRUE, otherwise
    *   isNeutral() will be TRUE.
    */
@@ -125,7 +125,7 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
    *
    * Checks the permission and adds a 'user.permissions' cache contexts.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The account for which to check permissions.
    * @param array $permissions
    *   The permissions to check.
@@ -133,7 +133,7 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
    *   (optional) 'AND' if all permissions are required, 'OR' in case just one.
    *   Defaults to 'AND'.
    *
-   * @return \Drupal\Core\Access\AccessResult
+   * @return AccessResult
    *   If the account has the permissions, isAllowed() will be TRUE, otherwise
    *   isNeutral() will be TRUE.
    */
@@ -400,7 +400,7 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
    * "allowed, max-age=0 OR allowed, max-age=1000" needs to yield max-age 1000
    * as the end result.
    *
-   * @param \Drupal\Core\Access\AccessResultInterface $other
+   * @param AccessResultInterface $other
    *   The other access result, whose cacheability (if any) to inherit.
    *
    * @return $this

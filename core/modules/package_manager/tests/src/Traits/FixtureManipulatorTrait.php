@@ -14,7 +14,7 @@ trait FixtureManipulatorTrait {
   /**
    * Gets the stage fixture manipulator service.
    *
-   * @return \Drupal\fixture_manipulator\StageFixtureManipulator|object|null
+   * @return StageFixtureManipulator|object|null
    *   The stage fixture manipulator service.
    */
   protected function getStageFixtureManipulator() {

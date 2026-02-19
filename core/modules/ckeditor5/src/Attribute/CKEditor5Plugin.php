@@ -18,14 +18,14 @@ class CKEditor5Plugin extends Plugin {
   /**
    * The CKEditor 5 aspects of the plugin definition.
    *
-   * @var \Drupal\ckeditor5\Attribute\CKEditor5AspectsOfCKEditor5Plugin|null
+   * @var CKEditor5AspectsOfCKEditor5Plugin|null
    */
   public readonly ?CKEditor5AspectsOfCKEditor5Plugin $ckeditor5;
 
   /**
    * The Drupal aspects of the plugin definition.
    *
-   * @var \Drupal\ckeditor5\Attribute\DrupalAspectsOfCKEditor5Plugin|null
+   * @var DrupalAspectsOfCKEditor5Plugin|null
    */
   public readonly ?DrupalAspectsOfCKEditor5Plugin $drupal;
 
@@ -40,10 +40,10 @@ class CKEditor5Plugin extends Plugin {
    *
    * @param string $id
    *   The plugin ID.
-   * @param array|\Drupal\ckeditor5\Attribute\CKEditor5AspectsOfCKEditor5Plugin|null $ckeditor5
+   * @param array|CKEditor5AspectsOfCKEditor5Plugin|null $ckeditor5
    *   (optional) The CKEditor 5 aspects of the plugin definition. Required
    *   unless set by deriver.
-   * @param array|\Drupal\ckeditor5\Attribute\DrupalAspectsOfCKEditor5Plugin|null $drupal
+   * @param array|DrupalAspectsOfCKEditor5Plugin|null $drupal
    *   (optional) The Drupal aspects of the plugin definition. Required unless
    *   set by deriver.
    * @param class-string|null $deriver

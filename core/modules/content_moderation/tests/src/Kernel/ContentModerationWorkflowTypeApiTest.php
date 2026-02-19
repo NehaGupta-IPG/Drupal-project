@@ -22,7 +22,7 @@ class ContentModerationWorkflowTypeApiTest extends KernelTestBase {
   /**
    * A workflow for testing.
    *
-   * @var \Drupal\workflows\Entity\Workflow
+   * @var Workflow
    */
   protected $workflow;
 
@@ -50,7 +50,7 @@ class ContentModerationWorkflowTypeApiTest extends KernelTestBase {
    * @legacy-covers ::removeEntityTypeAndBundle
    */
   public function testGetBundlesForEntityType(): void {
-    /** @var \Drupal\content_moderation\Plugin\WorkflowType\ContentModeration $workflow_plugin */
+    /** @var ContentModeration $workflow_plugin */
     $workflow_plugin = $this->workflow->getTypePlugin();
     // The content moderation plugin does not validate the existence of the
     // entity type or bundle.
@@ -70,7 +70,7 @@ class ContentModerationWorkflowTypeApiTest extends KernelTestBase {
    * @legacy-covers ::removeEntityTypeAndBundle
    */
   public function testAppliesToEntityTypeAndBundle(): void {
-    /** @var \Drupal\content_moderation\Plugin\WorkflowType\ContentModeration $workflow_plugin */
+    /** @var ContentModeration $workflow_plugin */
     $workflow_plugin = $this->workflow->getTypePlugin();
     // The content moderation plugin does not validate the existence of the
     // entity type or bundle.
@@ -86,7 +86,7 @@ class ContentModerationWorkflowTypeApiTest extends KernelTestBase {
    * Tests add entity type and bundle.
    */
   public function testAddEntityTypeAndBundle(): void {
-    /** @var \Drupal\content_moderation\Plugin\WorkflowType\ContentModeration $workflow_plugin */
+    /** @var ContentModeration $workflow_plugin */
     $workflow_plugin = $this->workflow->getTypePlugin();
 
     // The bundles are intentionally added in reverse alphabetical order.
@@ -112,7 +112,7 @@ class ContentModerationWorkflowTypeApiTest extends KernelTestBase {
    * @legacy-covers ::removeEntityTypeAndBundle
    */
   public function testRemoveEntityTypeAndBundle(): void {
-    /** @var \Drupal\content_moderation\Plugin\WorkflowType\ContentModeration $workflow_plugin */
+    /** @var ContentModeration $workflow_plugin */
     $workflow_plugin = $this->workflow->getTypePlugin();
 
     // There should be no bundles for fake_node to start with.

@@ -39,11 +39,11 @@ class Subquery extends JoinPluginBase {
   /**
    * Builds the SQL for the join this object represents.
    *
-   * @param \Drupal\Core\Database\Query\SelectInterface $select_query
+   * @param SelectInterface $select_query
    *   The select query object.
    * @param string $table
    *   The base table to join.
-   * @param \Drupal\views\Plugin\views\query\QueryPluginBase $view_query
+   * @param QueryPluginBase $view_query
    *   The source views query.
    */
   public function buildJoin($select_query, $table, $view_query) {

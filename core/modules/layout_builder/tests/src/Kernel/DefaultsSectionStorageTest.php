@@ -43,7 +43,7 @@ class DefaultsSectionStorageTest extends KernelTestBase {
   /**
    * The plugin.
    *
-   * @var \Drupal\layout_builder\Plugin\SectionStorage\DefaultsSectionStorage
+   * @var DefaultsSectionStorage
    */
   protected $plugin;
 

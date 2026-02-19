@@ -22,7 +22,7 @@ class CheckProvider implements CheckProviderInterface {
   /**
    * Array of access check objects keyed by service id.
    *
-   * @var \Drupal\Core\Routing\Access\AccessInterface[]
+   * @var AccessInterface[]
    */
   protected $checks;
 
@@ -59,7 +59,7 @@ class CheckProvider implements CheckProviderInterface {
    *
    * @param array $dynamic_requirements_map
    *   An array to map dynamic requirement keys to service IDs.
-   * @param \Psr\Container\ContainerInterface $container
+   * @param ContainerInterface $container
    *   The check provider service locator.
    */
   public function __construct(
@@ -127,7 +127,7 @@ class CheckProvider implements CheckProviderInterface {
   /**
    * Determine which registered access checks apply to a route.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route to get list of access checks for.
    *
    * @return array

@@ -1,11 +1,11 @@
 <?php
 
+use Drupal\Core\Language\LanguageInterface;
 /**
  * @file
  * Hooks provided by the base system for language support.
  */
-
-use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Url;
 
 /**
  * @defgroup i18n Internationalization
@@ -149,7 +149,6 @@ use Drupal\Core\Language\LanguageInterface;
  * @see t()
  * @}
  */
-
 /**
  * @addtogroup hooks
  * @{
@@ -166,10 +165,10 @@ use Drupal\Core\Language\LanguageInterface;
  *   Nested array of links keyed by language code.
  * @param string $type
  *   The language type the links will switch.
- * @param \Drupal\Core\Url $url
+ * @param Url $url
  *   The URL the switch links will be relative to.
  */
-function hook_language_switch_links_alter(array &$links, $type, \Drupal\Core\Url $url) {
+function hook_language_switch_links_alter(array &$links, $type, Url $url) {
   $language_interface = \Drupal::languageManager()->getCurrentLanguage();
 
   if ($type == LanguageInterface::TYPE_CONTENT && isset($links[$language_interface->getId()])) {

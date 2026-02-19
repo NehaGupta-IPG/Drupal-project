@@ -25,7 +25,7 @@ interface RemovableDependentPluginInterface extends DependentPluginInterface {
    *   An array of dependencies that will be deleted keyed by dependency type.
    *   Dependency types are, for example, entity, module and theme.
    *
-   * @return \Drupal\Core\Plugin\RemovableDependentPluginReturn
+   * @return RemovableDependentPluginReturn
    *   - RemovableDependentPluginReturn::Changed if the configuration of the
    *     plugin instance has changed
    *   - RemovableDependentPluginReturn::Remove if the plugin instance should be

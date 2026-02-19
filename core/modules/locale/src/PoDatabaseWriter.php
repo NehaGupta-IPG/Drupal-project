@@ -38,7 +38,7 @@ class PoDatabaseWriter implements PoWriterInterface {
   /**
    * Header of the po file written to the database.
    *
-   * @var \Drupal\Component\Gettext\PoHeader
+   * @var PoHeader
    */
   private $header;
 
@@ -49,7 +49,7 @@ class PoDatabaseWriter implements PoWriterInterface {
    *  - additions: number of source strings newly added
    *  - updates: number of translations updated
    *  - deletes: number of translations deleted
-   *  - skips: number of strings skipped due to disallowed HTML
+   *  - skips: number of strings skipped due to disallowed HTML.
    *
    * @var array
    */
@@ -151,7 +151,7 @@ class PoDatabaseWriter implements PoWriterInterface {
    *
    * A langcode is required to set the current header's PluralForm.
    *
-   * @param \Drupal\Component\Gettext\PoHeader $header
+   * @param PoHeader $header
    *   Header metadata.
    *
    * @throws \Exception
@@ -212,7 +212,7 @@ class PoDatabaseWriter implements PoWriterInterface {
   /**
    * Imports one string into the database.
    *
-   * @param \Drupal\Component\Gettext\PoItem $item
+   * @param PoItem $item
    *   The item being imported.
    *
    * @return int

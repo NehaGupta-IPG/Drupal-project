@@ -31,7 +31,7 @@ class TimestampNormalizerTest extends UnitTestCase {
   /**
    * The tested data type's normalizer.
    *
-   * @var \Drupal\serialization\Normalizer\TimestampNormalizer
+   * @var TimestampNormalizer
    */
   protected $normalizer;
 

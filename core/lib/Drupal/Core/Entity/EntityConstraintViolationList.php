@@ -19,7 +19,7 @@ class EntityConstraintViolationList extends ConstraintViolationList implements E
   /**
    * The entity that has been validated.
    *
-   * @var \Drupal\Core\Entity\FieldableEntityInterface
+   * @var FieldableEntityInterface
    */
   protected $entity;
 
@@ -42,7 +42,7 @@ class EntityConstraintViolationList extends ConstraintViolationList implements E
   /**
    * {@inheritdoc}
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The entity that has been validated.
    * @param iterable $violations
    *   The set of violations.

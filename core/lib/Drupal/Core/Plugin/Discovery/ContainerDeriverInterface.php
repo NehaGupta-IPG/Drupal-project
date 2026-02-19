@@ -16,7 +16,7 @@ interface ContainerDeriverInterface extends DeriverInterface {
   /**
    * Creates a new class instance.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @param ContainerInterface $container
    *   The container to pull out services used in the fetcher.
    * @param string $base_plugin_id
    *   The base plugin ID for the plugin ID.

@@ -16,7 +16,7 @@ class ShortcutForm extends ContentEntityForm {
   /**
    * The entity being used by this form.
    *
-   * @var \Drupal\shortcut\ShortcutInterface
+   * @var ShortcutInterface
    */
   protected $entity;
 

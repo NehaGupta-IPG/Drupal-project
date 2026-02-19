@@ -31,14 +31,14 @@ class RequestPathTest extends KernelTestBase {
   /**
    * The path alias manager used for testing.
    *
-   * @var \Drupal\system\Tests\Routing\MockAliasManager
+   * @var MockAliasManager
    */
   protected $aliasManager;
 
   /**
    * The request stack used for testing.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
@@ -50,7 +50,7 @@ class RequestPathTest extends KernelTestBase {
   /**
    * The current path.
    *
-   * @var \Drupal\Core\Path\CurrentPathStack|\PHPUnit\Framework\MockObject\MockObject
+   * @var CurrentPathStack|MockObject
    */
   protected $currentPath;
 

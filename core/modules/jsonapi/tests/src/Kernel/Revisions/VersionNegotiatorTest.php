@@ -30,14 +30,14 @@ class VersionNegotiatorTest extends JsonapiKernelTestBase {
   /**
    * The user.
    *
-   * @var \Drupal\user\Entity\User
+   * @var User
    */
   protected $user;
 
   /**
    * The node.
    *
-   * @var \Drupal\node\Entity\Node
+   * @var Node
    */
   protected $node;
 
@@ -51,14 +51,14 @@ class VersionNegotiatorTest extends JsonapiKernelTestBase {
   /**
    * The version negotiator service.
    *
-   * @var \Drupal\jsonapi\Revisions\VersionNegotiator
+   * @var VersionNegotiator
    */
   protected $versionNegotiator;
 
   /**
    * The other node.
    *
-   * @var \Drupal\node\Entity\Node
+   * @var Node
    */
   protected $node2;
 

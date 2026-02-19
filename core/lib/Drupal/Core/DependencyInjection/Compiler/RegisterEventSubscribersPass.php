@@ -2,8 +2,8 @@
 
 namespace Drupal\Core\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 
 /**
@@ -14,7 +14,7 @@ class RegisterEventSubscribersPass implements CompilerPassInterface {
   /**
    * Constructs a RegisterEventSubscribersPass object.
    *
-   * @param \Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass $pass
+   * @param RegisterListenersPass $pass
    *   The Symfony compiler pass that registers event subscribers.
    */
   public function __construct(
@@ -33,7 +33,7 @@ class RegisterEventSubscribersPass implements CompilerPassInterface {
   /**
    * Renames tags in the container.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   * @param ContainerBuilder $container
    *   The container.
    * @param string $source_tag
    *   The tag to be renamed.

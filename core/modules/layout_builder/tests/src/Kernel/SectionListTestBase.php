@@ -193,7 +193,7 @@ abstract class SectionListTestBase extends EntityKernelTestBase {
   /**
    * Asserts that the field list has the expected sections.
    *
-   * @param \Drupal\layout_builder\Section[] $expected
+   * @param Section[] $expected
    *   The expected sections.
    */
   protected function assertSections(array $expected) {

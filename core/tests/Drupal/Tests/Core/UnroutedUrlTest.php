@@ -24,14 +24,14 @@ class UnroutedUrlTest extends UnitTestCase {
   /**
    * The URL assembler.
    *
-   * @var \Drupal\Core\Utility\UnroutedUrlAssemblerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Utility\UnroutedUrlAssemblerInterface|MockObject
    */
   protected $urlAssembler;
 
   /**
    * The router.
    *
-   * @var \Drupal\Tests\Core\Routing\TestRouterInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Tests\Core\Routing\TestRouterInterface|MockObject
    */
   protected $router;
 

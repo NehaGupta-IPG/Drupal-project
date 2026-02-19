@@ -4,13 +4,13 @@ namespace Drupal\contact;
 
 use Drupal\Component\Utility\EmailValidatorInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\ConfigFormBaseTrait;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\Render\Element\PathElement;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Base form for contact form edit forms.
@@ -23,23 +23,23 @@ class ContactFormEditForm extends EntityForm implements ContainerInjectionInterf
   /**
    * The email validator.
    *
-   * @var \Drupal\Component\Utility\EmailValidatorInterface
+   * @var EmailValidatorInterface
    */
   protected $emailValidator;
 
   /**
    * The path validator.
    *
-   * @var \Drupal\Core\Path\PathValidatorInterface
+   * @var PathValidatorInterface
    */
   protected $pathValidator;
 
   /**
    * Constructs a new ContactFormEditForm.
    *
-   * @param \Drupal\Component\Utility\EmailValidatorInterface $email_validator
+   * @param EmailValidatorInterface $email_validator
    *   The email validator.
-   * @param \Drupal\Core\Path\PathValidatorInterface $path_validator
+   * @param PathValidatorInterface $path_validator
    *   The path validator service.
    */
   public function __construct(EmailValidatorInterface $email_validator, PathValidatorInterface $path_validator) {

@@ -17,32 +17,32 @@ class ReplicaKillSwitch implements EventSubscriberInterface {
   /**
    * The settings object.
    *
-   * @var \Drupal\Core\Site\Settings
+   * @var Settings
    */
   protected $settings;
 
   /**
    * The time service.
    *
-   * @var \Drupal\Component\Datetime\TimeInterface
+   * @var TimeInterface
    */
   protected $time;
 
   /**
    * The session.
    *
-   * @var \Symfony\Component\HttpFoundation\Session\SessionInterface
+   * @var SessionInterface
    */
   protected $session;
 
   /**
    * Constructs a ReplicaKillSwitch object.
    *
-   * @param \Drupal\Core\Site\Settings $settings
+   * @param Settings $settings
    *   The settings object.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
-   * @param \Symfony\Component\HttpFoundation\Session\SessionInterface $session
+   * @param SessionInterface $session
    *   The session.
    */
   public function __construct(Settings $settings, TimeInterface $time, SessionInterface $session) {
@@ -73,7 +73,7 @@ class ReplicaKillSwitch implements EventSubscriberInterface {
   /**
    * Checks and disables the replica database server if appropriate.
    *
-   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
+   * @param RequestEvent $event
    *   The Event to process.
    */
   public function checkReplicaServer(RequestEvent $event) {

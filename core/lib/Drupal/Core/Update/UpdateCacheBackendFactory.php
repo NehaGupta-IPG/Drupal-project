@@ -17,21 +17,21 @@ class UpdateCacheBackendFactory implements CacheFactoryInterface {
   /**
    * The regular runtime cache_factory service.
    *
-   * @var \Drupal\Core\Cache\CacheFactoryInterface
+   * @var CacheFactoryInterface
    */
   protected $cacheFactory;
 
   /**
    * Instantiated update cache bins.
    *
-   * @var \Drupal\Core\Update\UpdateBackend[]
+   * @var UpdateBackend[]
    */
   protected $bins = [];
 
   /**
    * UpdateCacheBackendFactory constructor.
    *
-   * @param \Drupal\Core\Cache\CacheFactoryInterface $cache_factory
+   * @param CacheFactoryInterface $cache_factory
    *   The regular runtime cache_factory service.
    */
   public function __construct(CacheFactoryInterface $cache_factory) {

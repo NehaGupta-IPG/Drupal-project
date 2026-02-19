@@ -91,9 +91,9 @@ trait EntityDefinitionTestTrait {
    * @param string $op
    *   The operation to perform, possible values are static::DEFINITION_CREATED,
    *   static::DEFINITION_UPDATED or static::DEFINITION_DELETED.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The new field storage definition.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $original_storage_definition
+   * @param FieldStorageDefinitionInterface $original_storage_definition
    *   The original field storage definition.
    */
   protected function doFieldUpdate($op, $storage_definition = NULL, $original_storage_definition = NULL): void {
@@ -492,7 +492,7 @@ trait EntityDefinitionTestTrait {
    *   An array of field storage definition objects.
    */
   protected function getUpdatedFieldStorageDefinitions($revisionable = FALSE, $translatable = FALSE) {
-    /** @var \Drupal\Core\Field\BaseFieldDefinition[] $field_storage_definitions */
+    /** @var BaseFieldDefinition[] $field_storage_definitions */
     $field_storage_definitions = \Drupal::service('entity_field.manager')->getFieldStorageDefinitions('entity_test_update');
 
     if ($revisionable) {

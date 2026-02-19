@@ -2,8 +2,8 @@
 
 namespace Drupal\migrate\Event;
 
-use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\Component\EventDispatcher\Event;
+use Drupal\migrate\Plugin\MigrateIdMapInterface;
 
 /**
  * Wraps a migrate map save event for event listeners.
@@ -13,7 +13,7 @@ class MigrateMapSaveEvent extends Event {
   /**
    * Map plugin.
    *
-   * @var \Drupal\migrate\Plugin\MigrateIdMapInterface
+   * @var MigrateIdMapInterface
    */
   protected $map;
 
@@ -27,7 +27,7 @@ class MigrateMapSaveEvent extends Event {
   /**
    * Constructs a migration map event object.
    *
-   * @param \Drupal\migrate\Plugin\MigrateIdMapInterface $map
+   * @param MigrateIdMapInterface $map
    *   Map plugin.
    * @param array $fields
    *   Array of fields being saved to the map.
@@ -40,7 +40,7 @@ class MigrateMapSaveEvent extends Event {
   /**
    * Gets the map plugin.
    *
-   * @return \Drupal\migrate\Plugin\MigrateIdMapInterface
+   * @return MigrateIdMapInterface
    *   The map plugin that caused the event to fire.
    */
   public function getMap() {

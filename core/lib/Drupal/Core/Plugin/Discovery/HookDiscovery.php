@@ -23,14 +23,14 @@ class HookDiscovery implements DiscoveryInterface {
   /**
    * The module handler used to find and execute the plugin hook.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * Constructs a Drupal\Core\Plugin\Discovery\HookDiscovery object.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
    * @param string $hook
    *   The Drupal hook that a module can implement in order to interface to

@@ -2,13 +2,13 @@
 
 namespace Drupal\user\Plugin\migrate\destination;
 
-use Drupal\migrate\Attribute\MigrateDestination;
-use Drupal\migrate\Plugin\MigrationInterface;
-use Drupal\user\UserData as UserDataStorage;
-use Drupal\migrate\Row;
-use Drupal\migrate\Plugin\migrate\destination\DestinationBase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\migrate\Attribute\MigrateDestination;
+use Drupal\migrate\Plugin\migrate\destination\DestinationBase;
+use Drupal\migrate\Plugin\MigrationInterface;
+use Drupal\migrate\Row;
+use Drupal\user\UserData as UserDataStorage;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Migration destination for user data.
@@ -30,7 +30,7 @@ class UserData extends DestinationBase implements ContainerFactoryPluginInterfac
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration.
    * @param \Drupal\user\UserData $user_data
    *   The user data service.

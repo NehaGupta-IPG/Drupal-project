@@ -57,7 +57,7 @@ final class ComposerPatchesValidator implements EventSubscriberInterface {
   /**
    * Validates the status of the patcher plugin.
    *
-   * @param \Drupal\package_manager\Event\SandboxValidationEvent $event
+   * @param SandboxValidationEvent $event
    *   The event object.
    */
   public function validate(SandboxValidationEvent $event): void {
@@ -108,12 +108,12 @@ final class ComposerPatchesValidator implements EventSubscriberInterface {
   /**
    * Appends a link to online help to an error message.
    *
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $message
+   * @param TranslatableMarkup $message
    *   The error message.
    * @param string $fragment
    *   The fragment of the online help to link to.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   * @return TranslatableMarkup
    *   The final, translated error message.
    */
   private function createErrorMessage(TranslatableMarkup $message, string $fragment): TranslatableMarkup {

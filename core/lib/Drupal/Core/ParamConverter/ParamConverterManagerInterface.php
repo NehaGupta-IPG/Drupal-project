@@ -12,7 +12,7 @@ interface ParamConverterManagerInterface {
   /**
    * Registers a parameter converter with the manager.
    *
-   * @param \Drupal\Core\ParamConverter\ParamConverterInterface $param_converter
+   * @param ParamConverterInterface $param_converter
    *   The added param converter instance.
    * @param string $id
    *   The parameter converter service id to register.
@@ -27,7 +27,7 @@ interface ParamConverterManagerInterface {
    * @param string $id
    *   The service id of converter service to load.
    *
-   * @return \Drupal\Core\ParamConverter\ParamConverterInterface
+   * @return ParamConverterInterface
    *   The loaded converter service identified by the given service id.
    *
    * @throws \InvalidArgumentException
@@ -38,7 +38,7 @@ interface ParamConverterManagerInterface {
   /**
    * Saves a list of applicable converters to each route.
    *
-   * @param \Symfony\Component\Routing\RouteCollection $routes
+   * @param RouteCollection $routes
    *   A collection of routes to apply converters to.
    */
   public function setRouteParameterConverters(RouteCollection $routes);
@@ -52,7 +52,7 @@ interface ParamConverterManagerInterface {
    * @return array
    *   The modified defaults.
    *
-   * @throws \Drupal\Core\ParamConverter\ParamNotConvertedException
+   * @throws ParamNotConvertedException
    *   If one of the assigned converters returned NULL because the given
    *   variable could not be converted.
    */

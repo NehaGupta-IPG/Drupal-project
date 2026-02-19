@@ -2,9 +2,9 @@
 
 namespace Drupal\Core\Entity;
 
-use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountInterface;
 
 /**
@@ -18,18 +18,18 @@ interface EntityAccessControlHandlerInterface {
    * Use \Drupal\Core\Entity\EntityAccessControlHandlerInterface::createAccess()
    * to check access to create an entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity for which to check access.
    * @param string $operation
    *   The operation access should be checked for.
    *   Usually one of "view", "view label", "update" or "delete".
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   (optional) The user session for which to check access, or NULL to check
    *   access for the current user. Defaults to NULL.
    * @param bool $return_as_object
    *   (optional) Defaults to FALSE.
    *
-   * @return ($return_as_object is true ? \Drupal\Core\Access\AccessResultInterface : bool)
+   * @return ($return_as_object is true ? AccessResultInterface : bool)
    *   The access result. Returns a boolean if $return_as_object is FALSE (this
    *   is the default) and otherwise an AccessResultInterface object.
    *   When a boolean is returned, the result of AccessInterface::isAllowed() is
@@ -44,7 +44,7 @@ interface EntityAccessControlHandlerInterface {
    * @param string $entity_bundle
    *   (optional) The bundle of the entity. Required if the entity supports
    *   bundles, defaults to NULL otherwise.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   (optional) The user session for which to check access, or NULL to check
    *   access for the current user. Defaults to NULL.
    * @param array $context
@@ -53,7 +53,7 @@ interface EntityAccessControlHandlerInterface {
    * @param bool $return_as_object
    *   (optional) Defaults to FALSE.
    *
-   * @return ($return_as_object is true ? \Drupal\Core\Access\AccessResultInterface : bool)
+   * @return ($return_as_object is true ? AccessResultInterface : bool)
    *   The access result. Returns a boolean if $return_as_object is FALSE (this
    *   is the default) and otherwise an AccessResultInterface object.
    *   When a boolean is returned, the result of AccessInterface::isAllowed() is
@@ -70,7 +70,7 @@ interface EntityAccessControlHandlerInterface {
   /**
    * Sets the module handler for this access control handler.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
    *
    * @return $this
@@ -89,19 +89,19 @@ interface EntityAccessControlHandlerInterface {
    *   The operation access should be checked for. Usually one of "view" or
    *   "edit". Unlike entity access, for field access there is no distinction
    *   between creating and updating.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   (optional) The user session for which to check access, or NULL to check
    *   access for the current user. Defaults to NULL.
-   * @param \Drupal\Core\Field\FieldItemListInterface $items
+   * @param FieldItemListInterface $items
    *   (optional) The field values for which to check access, or NULL if access
    *    is checked for the field definition, without any specific value
    *    available. Defaults to NULL.
    * @param bool $return_as_object
    *   (optional) Defaults to FALSE.
    *
-   * @return ($return_as_object is true ? \Drupal\Core\Access\AccessResultInterface : bool)
+   * @return ($return_as_object is true ? AccessResultInterface : bool)
    *   The access result. Returns a boolean if $return_as_object is FALSE (this
    *   is the default) and otherwise an AccessResultInterface object.
    *   When a boolean is returned, the result of AccessInterface::isAllowed() is

@@ -15,7 +15,7 @@ interface DisplayRouterInterface extends DisplayPluginInterface {
   /**
    * Adds the route entry of a view to the collection.
    *
-   * @param \Symfony\Component\Routing\RouteCollection $collection
+   * @param RouteCollection $collection
    *   A collection of routes that should be registered for this resource.
    */
   public function collectRoutes(RouteCollection $collection);
@@ -26,7 +26,7 @@ interface DisplayRouterInterface extends DisplayPluginInterface {
    * Most of the collections won't have the needed route, so by the return value
    * the method can specify to break the search.
    *
-   * @param \Symfony\Component\Routing\RouteCollection $collection
+   * @param RouteCollection $collection
    *   The route collection.
    *
    * @return array

@@ -14,7 +14,7 @@ interface MigrateValidatableEntityInterface {
   /**
    * Returns a state of whether an entity needs to be validated before saving.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The entity to check for required validation.
    *
    * @return bool
@@ -25,10 +25,10 @@ interface MigrateValidatableEntityInterface {
   /**
    * Validates the entity.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The entity to validate.
    *
-   * @throws \Drupal\migrate\Exception\EntityValidationException
+   * @throws EntityValidationException
    *   When the validation didn't succeed.
    */
   public function validateEntity(FieldableEntityInterface $entity);

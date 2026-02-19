@@ -26,35 +26,35 @@ class EntityNormalizerTest extends UnitTestCase {
   /**
    * The mock entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityFieldManagerInterface|MockObject
    */
   protected $entityFieldManager;
 
   /**
    * The mock entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityTypeManagerInterface|MockObject
    */
   protected $entityTypeManager;
 
   /**
    * The mock entity type repository.
    *
-   * @var \Drupal\Core\Entity\EntityTypeRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityTypeRepositoryInterface|MockObject
    */
   protected $entityTypeRepository;
 
   /**
    * The mock serializer.
    *
-   * @var \Symfony\Component\Serializer\SerializerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Symfony\Component\Serializer\SerializerInterface|MockObject
    */
   protected $serializer;
 
   /**
    * The entity normalizer.
    *
-   * @var \Drupal\serialization\Normalizer\EntityNormalizer
+   * @var EntityNormalizer
    */
   protected $entityNormalizer;
 

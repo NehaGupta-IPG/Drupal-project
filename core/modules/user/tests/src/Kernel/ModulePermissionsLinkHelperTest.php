@@ -45,7 +45,7 @@ class ModulePermissionsLinkHelperTest extends KernelTestBase {
    */
   public function testGetModulePermissionsLink(): void {
 
-    /** @var \Drupal\user\ModulePermissionsLinkHelper $permsLinkHelper */
+    /** @var ModulePermissionsLinkHelper $permsLinkHelper */
     $permsLinkHelper = $this->container->get('user.module_permissions_link_helper');
 
     $permsLink = $permsLinkHelper->getModulePermissionsLink('user_permissions_test', 'User permissions test');

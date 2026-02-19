@@ -53,7 +53,7 @@ class MediaLibraryWidgetTest extends KernelTestBase {
   /**
    * The base field definition.
    *
-   * @var \Drupal\Core\Field\BaseFieldDefinition
+   * @var BaseFieldDefinition
    */
   protected BaseFieldDefinition $baseField;
 
@@ -137,9 +137,9 @@ class MediaLibraryWidgetTest extends KernelTestBase {
    *
    * @param bool $access
    *   The access result to assert.
-   * @param \Drupal\Core\Session\AccountInterface $user
+   * @param AccountInterface $user
    *   The user account.
-   * @param \Drupal\media_library\MediaLibraryState $state
+   * @param MediaLibraryState $state
    *   The media library state.
    *
    * @throws \Exception
@@ -155,7 +155,7 @@ class MediaLibraryWidgetTest extends KernelTestBase {
   /**
    * Build the media library widget form.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to build the form for.
    *
    * @return array

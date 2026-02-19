@@ -111,7 +111,7 @@ class MigrateNodeTest extends MigrateDrupal7TestBase {
    * @internal
    */
   protected function assertEntity(int $id, string $type, string $langcode, string $title, int $uid, bool $status, int $created, int $changed, bool $promoted, bool $sticky): void {
-    /** @var \Drupal\node\NodeInterface $node */
+    /** @var NodeInterface $node */
     $node = Node::load($id);
     $this->assertInstanceOf(NodeInterface::class, $node);
     $this->assertEquals($type, $node->getType());

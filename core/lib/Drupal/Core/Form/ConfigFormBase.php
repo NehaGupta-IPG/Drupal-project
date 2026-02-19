@@ -2,12 +2,12 @@
 
 namespace Drupal\Core\Form;
 
+use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Render\Element;
-use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -36,9 +36,9 @@ abstract class ConfigFormBase extends FormBase {
   /**
    * Constructs a \Drupal\system\ConfigFormBase object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
+   * @param TypedConfigManagerInterface $typedConfigManager
    *   The typed config manager.
    */
   public function __construct(
@@ -61,7 +61,7 @@ abstract class ConfigFormBase extends FormBase {
   /**
    * Returns the typed config manager service.
    *
-   * @return \Drupal\Core\Config\TypedConfigManagerInterface
+   * @return TypedConfigManagerInterface
    *   The typed config manager service.
    */
   protected function typedConfigManager(): TypedConfigManagerInterface {
@@ -134,7 +134,7 @@ abstract class ConfigFormBase extends FormBase {
    *
    * @param array $element
    *   The element being processed.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    *
    * @return array
@@ -155,7 +155,7 @@ abstract class ConfigFormBase extends FormBase {
    *
    * @param array $element
    *   The element being processed.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    *
    * @return array
@@ -167,7 +167,7 @@ abstract class ConfigFormBase extends FormBase {
     if (array_key_exists('#config_target', $element)) {
       $map = $form_state->get(static::CONFIG_KEY_TO_FORM_ELEMENT_MAP) ?? [];
 
-      /** @var \Drupal\Core\Form\ConfigTarget|string $target */
+      /** @var ConfigTarget|string $target */
       $target = $element['#config_target'];
       if (is_string($target)) {
         $target = ConfigTarget::fromString($target);
@@ -276,10 +276,10 @@ abstract class ConfigFormBase extends FormBase {
    *
    * @param string $form_element_name
    *   The form element for which to format multiple violation messages.
-   * @param \Symfony\Component\Validator\ConstraintViolationListInterface $violations
+   * @param ConstraintViolationListInterface $violations
    *   The list of constraint violations that apply to this form element.
    *
-   * @return \Drupal\Component\Render\MarkupInterface|\Stringable
+   * @return MarkupInterface|\Stringable
    *   The rendered HTML.
    */
   protected function formatMultipleViolationsMessage(string $form_element_name, array $violations): MarkupInterface|\Stringable {
@@ -319,9 +319,9 @@ abstract class ConfigFormBase extends FormBase {
    * This should not change existing Config key-value pairs that are not being
    * edited by this form.
    *
-   * @param \Drupal\Core\Config\Config $config
+   * @param Config $config
    *   The configuration being edited.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array $form
    *   The form array.

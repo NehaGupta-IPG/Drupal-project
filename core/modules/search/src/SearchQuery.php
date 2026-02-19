@@ -219,7 +219,7 @@ class SearchQuery extends SelectExtender {
    * - $this->words
    * - $this->conditions
    * - $this->simple
-   * - $this->matches
+   * - $this->matches.
    */
   protected function parseSearchExpression() {
     // Matches words optionally prefixed by a - sign. A word in this case is
@@ -233,7 +233,7 @@ class SearchQuery extends SelectExtender {
     // Classify tokens.
     $in_or = FALSE;
     $limit_combinations = \Drupal::config('search.settings')->get('and_or_limit');
-    /** @var \Drupal\search\SearchTextProcessorInterface $text_processor */
+    /** @var SearchTextProcessorInterface $text_processor */
     $text_processor = \Drupal::service('search.text_processor');
     // The first search expression does not count as AND.
     $and_count = -1;

@@ -67,9 +67,9 @@ class StageOwnershipTest extends PackageManagerKernelTestBase {
   /**
    * Asserts that ownership is enforced across stage directories.
    *
-   * @param \Drupal\Tests\package_manager\Kernel\TestSandboxManager $will_create
+   * @param TestSandboxManager $will_create
    *   The stage that will be created, and owned by the current user or session.
-   * @param \Drupal\Tests\package_manager\Kernel\TestSandboxManager $never_create
+   * @param TestSandboxManager $never_create
    *   The stage that will not be created, but should still respect the
    *   ownership and status of the other stage.
    */

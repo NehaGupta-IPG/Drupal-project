@@ -29,7 +29,7 @@ abstract class EntityTestMapFieldResourceTestBase extends ConfigEntityResourceTe
   protected static $patchProtectedFieldNames = [];
 
   /**
-   * @var \Drupal\entity_test\Entity\EntityTestMapField
+   * @var EntityTestMapField
    */
   protected $entity;
 

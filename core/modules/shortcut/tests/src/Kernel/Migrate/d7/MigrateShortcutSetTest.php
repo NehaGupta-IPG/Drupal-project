@@ -61,7 +61,7 @@ class MigrateShortcutSetTest extends MigrateDrupal7TestBase {
   protected function assertEntity(string $id, string $label, int $expected_size): void {
     $shortcut_set = ShortcutSet::load($id);
     $this->assertInstanceOf(ShortcutSetInterface::class, $shortcut_set);
-    /** @var \Drupal\shortcut\ShortcutSetInterface $shortcut_set */
+    /** @var ShortcutSetInterface $shortcut_set */
     $this->assertSame($id, $shortcut_set->id());
     $this->assertSame($label, $shortcut_set->label());
 

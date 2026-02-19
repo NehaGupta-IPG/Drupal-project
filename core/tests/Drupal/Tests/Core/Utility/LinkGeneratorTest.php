@@ -30,7 +30,7 @@ class LinkGeneratorTest extends UnitTestCase {
   /**
    * The tested link generator.
    *
-   * @var \Drupal\Core\Utility\LinkGenerator
+   * @var LinkGenerator
    */
   protected $linkGenerator;
 
@@ -51,14 +51,14 @@ class LinkGeneratorTest extends UnitTestCase {
   /**
    * The mocked renderer service.
    *
-   * @var \PHPUnit\Framework\MockObject\MockObject|\Drupal\Core\Render\RendererInterface
+   * @var \PHPUnit\Framework\MockObject\MockObject|RendererInterface
    */
   protected $renderer;
 
   /**
    * The mocked URL Assembler service.
    *
-   * @var \PHPUnit\Framework\MockObject\MockObject|\Drupal\Core\Utility\UnroutedUrlAssemblerInterface
+   * @var \PHPUnit\Framework\MockObject\MockObject|UnroutedUrlAssemblerInterface
    */
   protected $urlAssembler;
 
@@ -633,7 +633,7 @@ class LinkGeneratorTest extends UnitTestCase {
    *   An associative array of link properties, with the following keys:
    *   - attributes: optional array of HTML attributes that should be present.
    *   - content: optional link content.
-   * @param \Drupal\Component\Render\MarkupInterface $html
+   * @param MarkupInterface $html
    *   The HTML to check.
    * @param int $count
    *   How many times the link should be present in the HTML. Defaults to 1.

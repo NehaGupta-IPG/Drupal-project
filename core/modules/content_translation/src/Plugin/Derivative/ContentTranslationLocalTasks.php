@@ -2,12 +2,12 @@
 
 namespace Drupal\content_translation\Plugin\Derivative;
 
-use Drupal\content_translation\ContentTranslationManagerInterface;
 use Drupal\Component\Plugin\Derivative\DeriverBase;
+use Drupal\content_translation\ContentTranslationManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides dynamic local tasks for content translation.
@@ -25,7 +25,7 @@ class ContentTranslationLocalTasks extends DeriverBase implements ContainerDeriv
   /**
    * The content translation manager.
    *
-   * @var \Drupal\content_translation\ContentTranslationManagerInterface
+   * @var ContentTranslationManagerInterface
    */
   protected $contentTranslationManager;
 
@@ -34,9 +34,9 @@ class ContentTranslationLocalTasks extends DeriverBase implements ContainerDeriv
    *
    * @param string $base_plugin_id
    *   The base plugin ID.
-   * @param \Drupal\content_translation\ContentTranslationManagerInterface $content_translation_manager
+   * @param ContentTranslationManagerInterface $content_translation_manager
    *   The content translation manager.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param TranslationInterface $string_translation
    *   The translation manager.
    */
   public function __construct($base_plugin_id, ContentTranslationManagerInterface $content_translation_manager, TranslationInterface $string_translation) {

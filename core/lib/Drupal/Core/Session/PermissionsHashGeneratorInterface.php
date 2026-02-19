@@ -12,7 +12,7 @@ interface PermissionsHashGeneratorInterface {
   /**
    * Generates a hash that uniquely identifies a user's permissions.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user account for which to get the permissions hash.
    *
    * @return string
@@ -23,10 +23,10 @@ interface PermissionsHashGeneratorInterface {
   /**
    * Gets the cacheability metadata for the generated hash.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user account for which to get the permissions hash.
    *
-   * @return \Drupal\Core\Cache\CacheableMetadata
+   * @return CacheableMetadata
    *   A cacheable metadata object.
    */
   public function getCacheableMetadata(AccountInterface $account): CacheableMetadata;

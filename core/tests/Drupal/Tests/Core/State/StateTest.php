@@ -173,7 +173,7 @@ class StateTest extends UnitTestCase {
    * Here with the help of testGetMultiple() function, testing the multiple
    * key value again.
    *
-   * @param \Drupal\Core\State\State $state
+   * @param State $state
    *   The tested state.
    */
   #[Depends('testGetMultiple')]
@@ -230,7 +230,7 @@ class StateTest extends UnitTestCase {
    * Here testing the key value right after we setting it with testSet()
    * function.
    *
-   * @param \Drupal\Core\State\State $state
+   * @param State $state
    *   The tested state.
    *
    * @legacy-covers ::get
@@ -262,7 +262,7 @@ class StateTest extends UnitTestCase {
    * Here testing the key value right after we setting it with testSetMultiple()
    * function.
    *
-   * @param \Drupal\Core\State\State $state
+   * @param State $state
    *   The tested state.
    *
    * @legacy-covers ::getMultiple
@@ -280,7 +280,7 @@ class StateTest extends UnitTestCase {
    *
    * Those value we are getting from testSetMultiple() function.
    *
-   * @param \Drupal\Core\State\State $state
+   * @param State $state
    *   The tested state.
    *
    * @legacy-covers ::delete
@@ -350,7 +350,7 @@ class StateTest extends UnitTestCase {
    * Here testing the get() and getMultiple() functions both before after
    * calling resetCache() function.
    *
-   * @param \Drupal\Core\State\State $state
+   * @param State $state
    *   The tested state.
    *
    * @legacy-covers ::resetCache

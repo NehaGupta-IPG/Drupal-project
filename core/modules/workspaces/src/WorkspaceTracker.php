@@ -524,7 +524,7 @@ class WorkspaceTracker implements WorkspaceTrackerInterface, EventSubscriberInte
   /**
    * Triggers clean-up operations after a workspace is published.
    *
-   * @param \Drupal\workspaces\Event\WorkspacePublishEvent $event
+   * @param WorkspacePublishEvent $event
    *   The workspace publish event.
    */
   public function onPostPublish(WorkspacePublishEvent $event): void {

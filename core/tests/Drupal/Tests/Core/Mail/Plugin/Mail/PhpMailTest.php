@@ -23,21 +23,21 @@ class PhpMailTest extends UnitTestCase {
   /**
    * The configuration factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Config\ConfigFactoryInterface|MockObject
    */
   protected $configFactory;
 
   /**
    * The current request.
    *
-   * @var \Symfony\Component\HttpFoundation\Request
+   * @var Request
    */
   protected $request;
 
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack|\Prophecy\Prophecy\ProphecyInterface
+   * @var RequestStack|ProphecyInterface
    */
   protected $requestStack;
 
@@ -82,7 +82,7 @@ class PhpMailTest extends UnitTestCase {
    *
    * The method "doMail()" gets overridden to avoid a mail() call in tests.
    *
-   * @return \Drupal\Core\Mail\Plugin\Mail\PhpMail|\PHPUnit\Framework\MockObject\MockObject
+   * @return PhpMail|MockObject
    *   A PhpMail instance.
    */
   protected function createPhpMailInstance(): PhpMail {

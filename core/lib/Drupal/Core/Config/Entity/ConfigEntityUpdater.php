@@ -36,7 +36,7 @@ class ConfigEntityUpdater implements ContainerInjectionInterface {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
@@ -50,7 +50,7 @@ class ConfigEntityUpdater implements ContainerInjectionInterface {
   /**
    * ConfigEntityUpdater constructor.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    * @param int $batch_size
    *   The number of entities to process in each batch.
@@ -96,7 +96,7 @@ class ConfigEntityUpdater implements ContainerInjectionInterface {
    *
    * @api
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup|null
+   * @return TranslatableMarkup|null
    *   An error message if $continue_on_error is set to TRUE and an error has
    *   occurred.
    *
@@ -127,13 +127,13 @@ class ConfigEntityUpdater implements ContainerInjectionInterface {
     // The default behavior is to fix dependencies.
     if ($callback === NULL) {
       $callback = function ($entity) {
-        /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
+        /** @var ConfigEntityInterface $entity */
         $original_dependencies = $entity->getDependencies();
         return $original_dependencies !== $entity->calculateDependencies()->getDependencies();
       };
     }
 
-    /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
+    /** @var ConfigEntityInterface $entity */
     $entities = $storage->loadMultiple(array_splice($sandbox[self::SANDBOX_KEY]['entities'], 0, $this->batchSize));
     foreach ($entities as $entity) {
       try {
@@ -182,7 +182,7 @@ class ConfigEntityUpdater implements ContainerInjectionInterface {
   /**
    * Apply the callback an entity and save it if the callback makes changes.
    *
-   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface $entity
+   * @param ConfigEntityInterface $entity
    *   The entity to potentially update.
    * @param callable $callback
    *   The callback to apply.

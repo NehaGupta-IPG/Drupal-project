@@ -10,7 +10,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 /**
  * Defines a Mail attribute for plugin discovery.
  *
- * Plugin Namespace: Plugin\Mail
+ * Plugin Namespace: Plugin\Mail.
  *
  * For a working example, see \Drupal\Core\Mail\Plugin\Mail\PhpMail
  *
@@ -26,9 +26,9 @@ class Mail extends Plugin {
    *
    * @param string $id
    *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $label
+   * @param TranslatableMarkup $label
    *   The label of the plugin.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $description
+   * @param TranslatableMarkup|null $description
    *   (optional) A description of the plugin.
    * @param class-string|null $deriver
    *   (optional) The deriver class.

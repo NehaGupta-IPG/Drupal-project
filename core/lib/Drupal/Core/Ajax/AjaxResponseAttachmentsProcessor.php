@@ -32,21 +32,21 @@ class AjaxResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
   /**
    * Constructs an AjaxResponseAttachmentsProcessor object.
    *
-   * @param \Drupal\Core\Asset\AssetResolverInterface $assetResolver
+   * @param AssetResolverInterface $assetResolver
    *   An asset resolver.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   A config factory for retrieving required config objects.
-   * @param \Drupal\Core\Asset\AssetCollectionRendererInterface $cssCollectionRenderer
+   * @param AssetCollectionRendererInterface $cssCollectionRenderer
    *   The CSS asset collection renderer.
-   * @param \Drupal\Core\Asset\AssetCollectionRendererInterface $jsCollectionRenderer
+   * @param AssetCollectionRendererInterface $jsCollectionRenderer
    *   The JS asset collection renderer.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   * @param RequestStack $requestStack
    *   The request stack.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   * @param ModuleHandlerInterface $moduleHandler
    *   The module handler.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   * @param LanguageManagerInterface $languageManager
    *   The language manager.
    */
   public function __construct(
@@ -80,9 +80,9 @@ class AjaxResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
   /**
    * Prepares the AJAX commands to attach assets.
    *
-   * @param \Drupal\Core\Ajax\AjaxResponse $response
+   * @param AjaxResponse $response
    *   The AJAX response to update.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object that the AJAX is responding to.
    *
    * @return array

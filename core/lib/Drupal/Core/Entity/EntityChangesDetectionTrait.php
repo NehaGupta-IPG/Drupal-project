@@ -12,14 +12,14 @@ trait EntityChangesDetectionTrait {
   /**
    * Returns an array of field names to skip when checking for changes.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   A content entity object.
    *
    * @return string[]
    *   An array of field names.
    */
   protected function getFieldsToSkipFromTranslationChangesCheck(ContentEntityInterface $entity) {
-    /** @var \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type */
+    /** @var ContentEntityTypeInterface $entity_type */
     $entity_type = $entity->getEntityType();
 
     // A list of known revision metadata fields which should be skipped from

@@ -39,7 +39,7 @@ class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
   /**
    * The JSON:API resource type repository under test.
    *
-   * @var \Drupal\jsonapi\ResourceType\ResourceTypeRepository
+   * @var ResourceTypeRepository
    */
   protected $resourceTypeRepository;
 

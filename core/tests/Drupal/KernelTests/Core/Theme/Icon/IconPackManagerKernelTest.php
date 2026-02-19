@@ -42,7 +42,7 @@ class IconPackManagerKernelTest extends KernelTestBase {
   /**
    * The IconPackManager instance.
    *
-   * @var \Drupal\Core\Theme\Icon\Plugin\IconPackManagerInterface
+   * @var IconPackManagerInterface
    */
   private IconPackManagerInterface $pluginManagerIconPack;
 

@@ -42,7 +42,7 @@ class ChainedFastBackendFactory implements CacheFactoryInterface {
   /**
    * Constructs ChainedFastBackendFactory object.
    *
-   * @param \Drupal\Core\Site\Settings|null $settings
+   * @param Settings|null $settings
    *   (optional) The settings object.
    * @param string|null $consistent_service_name
    *   (optional) The service name of the consistent backend factory. Defaults
@@ -82,7 +82,7 @@ class ChainedFastBackendFactory implements CacheFactoryInterface {
    * @param string $bin
    *   The cache bin for which a cache backend object should be returned.
    *
-   * @return \Drupal\Core\Cache\CacheBackendInterface
+   * @return CacheBackendInterface
    *   The cache backend object associated with the specified bin.
    */
   public function get($bin) {

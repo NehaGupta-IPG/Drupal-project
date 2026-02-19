@@ -23,7 +23,7 @@ trait EntityViewTrait {
    * verify the presence of specific values. This method isolates the steps in
    * the render process that produce an entity's renderable array.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to prepare a renderable array for.
    * @param string $view_mode
    *   (optional) The view mode that should be used to build the entity.

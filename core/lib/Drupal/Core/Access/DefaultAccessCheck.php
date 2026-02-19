@@ -13,10 +13,10 @@ class DefaultAccessCheck implements RoutingAccessInterface {
   /**
    * Checks access to the route based on the _access parameter.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route to check against.
    *
-   * @return \Drupal\Core\Access\AccessResultInterface
+   * @return AccessResultInterface
    *   The access result.
    */
   public function access(Route $route) {

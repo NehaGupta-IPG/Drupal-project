@@ -23,10 +23,10 @@ trait EntityTrait {
   /**
    * Reloads the given entity from the storage and returns it.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to be reloaded.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The reloaded entity.
    */
   protected function reloadEntity(EntityInterface $entity): EntityInterface {

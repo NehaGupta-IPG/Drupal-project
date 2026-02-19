@@ -40,7 +40,7 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
    * Test all revisions appear, in order of revision creation.
    */
   public function testOrder(): void {
-    /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $entity */
+    /** @var EntityTestWithRevisionLog $entity */
     $entity = EntityTestWithRevisionLog::create(['type' => 'entity_test_revlog']);
     // Need label to be able to assert order.
     $entity->setName('view all revisions');
@@ -73,7 +73,7 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
    * @legacy-covers \Drupal\Core\Entity\Controller\VersionHistoryController::revisionOverview
    */
   public function testCurrentRevision(): void {
-    /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
+    /** @var EntityTestRev $entity */
     $entity = EntityTestRev::create(['type' => 'entity_test_rev']);
     // Need label to be able to assert order.
     $entity->setName('view all revisions');
@@ -102,7 +102,7 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
    * @legacy-covers ::getRevisionDescription
    */
   public function testDescriptionRevLog(): void {
-    /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $entity */
+    /** @var EntityTestWithRevisionLog $entity */
     $entity = EntityTestWithRevisionLog::create(['type' => 'entity_test_revlog']);
     $entity->setName('view all revisions');
     $user = $this->drupalCreateUser([], $this->randomMachineName());
@@ -140,7 +140,7 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
    * @legacy-covers ::getRevisionDescription
    */
   public function testDescriptionNoRevLogNoLabelAccess(): void {
-    /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
+    /** @var EntityTestRev $entity */
     $entity = EntityTestRev::create(['type' => 'entity_test_rev']);
     $entity->setName('view all revisions');
     $entity->save();
@@ -159,7 +159,7 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
     // Permission grants 'view label' access.
     $this->drupalLogin($this->createUser(['view test entity']));
 
-    /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
+    /** @var EntityTestRev $entity */
     $entity = EntityTestRev::create(['type' => 'entity_test_rev']);
     $entity->setName('view all revisions');
     $entity->save();
@@ -175,7 +175,7 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
    * @legacy-covers ::getRevisionDescription
    */
   public function testDescriptionLinkNoAccess(): void {
-    /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $entity */
+    /** @var EntityTestWithRevisionLog $entity */
     $entity = EntityTestWithRevisionLog::create(['type' => 'entity_test_revlog']);
     $entity->setName('view all revisions');
     $entity->save();
@@ -194,7 +194,7 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
    * @legacy-covers ::getRevisionDescription
    */
   public function testDescriptionLinkWithAccess(): void {
-    /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $entity */
+    /** @var EntityTestWithRevisionLog $entity */
     $entity = EntityTestWithRevisionLog::create(['type' => 'entity_test_revlog']);
     // Revision has access to individual revision.
     $entity->setName('view all revisions, view revision');
@@ -223,7 +223,7 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
    * @legacy-covers ::getRevisionDescription
    */
   public function testDescriptionRevisionLogMessage(): void {
-    /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $entity */
+    /** @var EntityTestWithRevisionLog $entity */
     $entity = EntityTestWithRevisionLog::create(['type' => 'entity_test_revlog']);
     $entity->setName('view all revisions');
     $entity->setRevisionLogMessage('<em>Hello</em> <script>world</script> <strong>123</strong>');
@@ -240,7 +240,7 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
    * @legacy-covers ::buildRevertRevisionLink
    */
   public function testOperationRevertRevision(): void {
-    /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $entity */
+    /** @var EntityTestWithRevisionLog $entity */
     $entity = EntityTestWithRevisionLog::create(['type' => 'entity_test_revlog']);
     $entity->setName('view all revisions');
     $entity->save();
@@ -280,7 +280,7 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
    * @legacy-covers ::buildDeleteRevisionLink
    */
   public function testOperationDeleteRevision(): void {
-    /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $entity */
+    /** @var EntityTestWithRevisionLog $entity */
     $entity = EntityTestWithRevisionLog::create(['type' => 'entity_test_revlog']);
     $entity->setName('view all revisions');
     $entity->save();
@@ -317,7 +317,7 @@ class RevisionVersionHistoryTest extends BrowserTestBase {
    * Test revisions are paginated.
    */
   public function testRevisionsPagination(): void {
-    /** @var \Drupal\entity_test\Entity\EntityTestMulRev $entity */
+    /** @var EntityTestMulRev $entity */
     $entity = EntityTestMulRev::create([
       'type' => 'entity_test_mulrev',
       'name' => 'view all revisions,view revision',

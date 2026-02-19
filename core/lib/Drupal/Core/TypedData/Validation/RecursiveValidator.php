@@ -21,12 +21,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class RecursiveValidator implements ValidatorInterface {
 
   /**
-   * @var \Symfony\Component\Validator\Context\ExecutionContextFactoryInterface
+   * @var ExecutionContextFactoryInterface
    */
   protected $contextFactory;
 
   /**
-   * @var \Symfony\Component\Validator\ConstraintValidatorFactoryInterface
+   * @var ConstraintValidatorFactoryInterface
    */
   protected $constraintValidatorFactory;
 
@@ -38,11 +38,11 @@ class RecursiveValidator implements ValidatorInterface {
   /**
    * Creates a new validator.
    *
-   * @param \Symfony\Component\Validator\Context\ExecutionContextFactoryInterface $context_factory
+   * @param ExecutionContextFactoryInterface $context_factory
    *   The factory for creating new contexts.
-   * @param \Symfony\Component\Validator\ConstraintValidatorFactoryInterface $validator_factory
+   * @param ConstraintValidatorFactoryInterface $validator_factory
    *   The constraint validator factory.
-   * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typed_data_manager
+   * @param TypedDataManagerInterface $typed_data_manager
    *   The typed data manager.
    */
   public function __construct(ExecutionContextFactoryInterface $context_factory, ConstraintValidatorFactoryInterface $validator_factory, TypedDataManagerInterface $typed_data_manager) {
@@ -68,7 +68,7 @@ class RecursiveValidator implements ValidatorInterface {
   /**
    * {@inheritdoc}
    *
-   * @param \Drupal\Core\TypedData\TypedDataInterface $typed_data
+   * @param TypedDataInterface $typed_data
    *   A typed data object containing the value to validate.
    */
   public function getMetadataFor($typed_data): MetadataInterface {

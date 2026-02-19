@@ -39,7 +39,7 @@ interface ContextProviderInterface {
    *   The requested context IDs. The context provider must only return contexts
    *   for those IDs.
    *
-   * @return \Drupal\Core\Plugin\Context\ContextInterface[]
+   * @return ContextInterface[]
    *   The determined available contexts, keyed by the unqualified context_id.
    *
    * @see \Drupal\Core\Plugin\Context\ContextProviderInterface:getAvailableContexts()
@@ -66,7 +66,7 @@ interface ContextProviderInterface {
    *   return ['node' => $context];
    * @endcode
    *
-   * @return \Drupal\Core\Plugin\Context\ContextInterface[]
+   * @return ContextInterface[]
    *   All available contexts keyed by the unqualified context ID.
    *
    * @see \Drupal\Core\Plugin\Context\ContextProviderInterface::getRuntimeContext()

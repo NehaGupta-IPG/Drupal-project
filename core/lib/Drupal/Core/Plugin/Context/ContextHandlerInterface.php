@@ -15,7 +15,7 @@ interface ContextHandlerInterface {
    * @todo Use context definition objects after
    *   https://www.drupal.org/node/2281635.
    *
-   * @param \Drupal\Component\Plugin\Context\ContextInterface[] $contexts
+   * @param ContextInterface[] $contexts
    *   An array of contexts.
    * @param array $definitions
    *   An array of plugin definitions.
@@ -31,9 +31,9 @@ interface ContextHandlerInterface {
    * @todo Use context definition objects after
    *   https://www.drupal.org/node/2281635.
    *
-   * @param \Drupal\Component\Plugin\Context\ContextInterface[] $contexts
+   * @param ContextInterface[] $contexts
    *   An array of available contexts.
-   * @param \Drupal\Core\TypedData\DataDefinitionInterface[] $requirements
+   * @param DataDefinitionInterface[] $requirements
    *   An array of requirements.
    *
    * @return bool
@@ -48,9 +48,9 @@ interface ContextHandlerInterface {
    * @todo Use context definition objects after
    *   https://www.drupal.org/node/2281635.
    *
-   * @param \Drupal\Component\Plugin\Context\ContextInterface[] $contexts
+   * @param ContextInterface[] $contexts
    *   An array of contexts.
-   * @param \Drupal\Core\Plugin\Context\ContextDefinitionInterface $definition
+   * @param ContextDefinitionInterface $definition
    *   The definition to satisfy.
    *
    * @return \Drupal\Component\Plugin\Context\ContextInterface[]
@@ -61,7 +61,7 @@ interface ContextHandlerInterface {
   /**
    * Prepares a plugin for evaluation.
    *
-   * @param \Drupal\Core\Plugin\ContextAwarePluginInterface $plugin
+   * @param ContextAwarePluginInterface $plugin
    *   A plugin about to be evaluated.
    * @param \Drupal\Core\Plugin\Context\ContextInterface[] $contexts
    *   An array of contexts to set on the plugin. They will only be set if they
@@ -72,9 +72,9 @@ interface ContextHandlerInterface {
    *   the plugin expects a context named 'user', then this map would contain
    *   'user' => 'current_user'.
    *
-   * @throws \Drupal\Component\Plugin\Exception\ContextException
+   * @throws ContextException
    *   Thrown when a context assignment was not satisfied.
-   * @throws \Drupal\Component\Plugin\Exception\MissingValueContextException
+   * @throws MissingValueContextException
    *   Thrown when a context is provided but has no value. Only thrown if
    *   no contexts are missing.
    */

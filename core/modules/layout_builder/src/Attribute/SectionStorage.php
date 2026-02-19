@@ -8,7 +8,7 @@ use Drupal\layout_builder\SectionStorage\SectionStorageDefinition;
 /**
  * Defines a SectionStorage attribute.
  *
- * Plugin Namespace: Plugin\SectionStorage
+ * Plugin Namespace: Plugin\SectionStorage.
  *
  * @see \Drupal\layout_builder\SectionStorage\SectionStorageManager
  * @see plugin_api
@@ -26,7 +26,7 @@ class SectionStorage extends Plugin {
    *   When an entity with layout is rendered, section storage plugins are
    *   checked, in order of their weight, to determine which one should be used
    *   to render the layout.
-   * @param \Drupal\Component\Plugin\Context\ContextDefinitionInterface[] $context_definitions
+   * @param ContextDefinitionInterface[] $context_definitions
    *   (optional) Any required context definitions.
    *   When an entity with layout is rendered, all section storage plugins which
    *   match a particular set of contexts are checked, in order of their weight,

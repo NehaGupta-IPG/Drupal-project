@@ -16,7 +16,7 @@ class FileValidationTestSubscriber implements EventSubscriberInterface {
   /**
    * Handles the file validation event.
    *
-   * @param \Drupal\file\Validation\FileValidationEvent $event
+   * @param FileValidationEvent $event
    *   The event.
    */
   public function onFileValidation(FileValidationEvent $event): void {

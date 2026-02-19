@@ -5,8 +5,8 @@ namespace Drupal\Core\Layout;
 use Drupal\Component\Plugin\Definition\ContextAwarePluginDefinitionInterface;
 use Drupal\Component\Plugin\Definition\ContextAwarePluginDefinitionTrait;
 use Drupal\Component\Plugin\Definition\DerivablePluginDefinitionInterface;
-use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
 use Drupal\Component\Plugin\Definition\PluginDefinition;
+use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
 use Drupal\Core\Plugin\Definition\DependentPluginDefinitionInterface;
 use Drupal\Core\Plugin\Definition\DependentPluginDefinitionTrait;
 
@@ -192,7 +192,7 @@ class LayoutDefinition extends PluginDefinition implements PluginDefinitionInter
   /**
    * Gets the human-readable name of the layout definition.
    *
-   * @return string|\Drupal\Core\StringTranslation\TranslatableMarkup
+   * @return string|TranslatableMarkup
    *   The human-readable name of the layout definition.
    */
   public function getLabel() {
@@ -202,7 +202,7 @@ class LayoutDefinition extends PluginDefinition implements PluginDefinitionInter
   /**
    * Sets the human-readable name of the layout definition.
    *
-   * @param string|\Drupal\Core\StringTranslation\TranslatableMarkup $label
+   * @param string|TranslatableMarkup $label
    *   The human-readable name of the layout definition.
    *
    * @return $this
@@ -215,7 +215,7 @@ class LayoutDefinition extends PluginDefinition implements PluginDefinitionInter
   /**
    * Gets the description of the layout definition.
    *
-   * @return string|\Drupal\Core\StringTranslation\TranslatableMarkup
+   * @return string|TranslatableMarkup
    *   The description of the layout definition.
    */
   public function getDescription() {
@@ -225,7 +225,7 @@ class LayoutDefinition extends PluginDefinition implements PluginDefinitionInter
   /**
    * Sets the description of the layout definition.
    *
-   * @param string|\Drupal\Core\StringTranslation\TranslatableMarkup $description
+   * @param string|TranslatableMarkup $description
    *   The description of the layout definition.
    *
    * @return $this
@@ -238,7 +238,7 @@ class LayoutDefinition extends PluginDefinition implements PluginDefinitionInter
   /**
    * Gets the human-readable category of the layout definition.
    *
-   * @return string|\Drupal\Core\StringTranslation\TranslatableMarkup
+   * @return string|TranslatableMarkup
    *   The human-readable category of the layout definition.
    */
   public function getCategory() {
@@ -248,7 +248,7 @@ class LayoutDefinition extends PluginDefinition implements PluginDefinitionInter
   /**
    * Sets the human-readable category of the layout definition.
    *
-   * @param string|\Drupal\Core\StringTranslation\TranslatableMarkup $category
+   * @param string|TranslatableMarkup $category
    *   The human-readable category of the layout definition.
    *
    * @return $this

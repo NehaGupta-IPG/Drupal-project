@@ -105,10 +105,10 @@ class LayoutEntityHelperTraitTest extends KernelTestBase {
 
       $expected_display = EntityViewDisplay::collectRenderDisplay($entity, 'full');
       $this->assertInstanceOf(EntityContext::class, $result['display']);
-      /** @var \Drupal\Core\Plugin\Context\EntityContext $display_entity_context */
+      /** @var EntityContext $display_entity_context */
       $display_entity_context = $result['display'];
 
-      /** @var \Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay $display_entity */
+      /** @var LayoutBuilderEntityViewDisplay $display_entity */
       $display_entity = $display_entity_context->getContextData()->getValue();
       $this->assertInstanceOf(LayoutBuilderEntityViewDisplay::class, $display_entity);
 
@@ -208,7 +208,7 @@ class LayoutEntityHelperTraitTest extends KernelTestBase {
     $section_storage_manager->findByContext(Argument::cetera())->will(function ($arguments) use ($storages, $entity_storages) {
       $contexts = $arguments[0];
       if (isset($contexts['entity'])) {
-        /** @var \Drupal\entity_test\Entity\EntityTest $entity */
+        /** @var EntityTest $entity */
         $entity = $contexts['entity']->getContextData()->getValue();
         return $storages[$entity_storages[$entity->getName()]];
       }

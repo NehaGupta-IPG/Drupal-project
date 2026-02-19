@@ -17,7 +17,7 @@ class TestDomainObjectViewSubscriber implements EventSubscriberInterface {
   /**
    * Sets a response given a TestDomainObject instance.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ViewEvent $event
+   * @param ViewEvent $event
    *   The event to process.
    */
   public function onViewTestDomainObject(ViewEvent $event) {

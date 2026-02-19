@@ -1,15 +1,17 @@
 <?php
 
+use Drupal\Core\Config\Entity\ConfigEntityUpdater;
+use Drupal\Core\Database\Database;
 /**
  * @file
  * Hooks related to module and update systems.
  */
-
-use Drupal\Core\Database\Database;
+use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\UpdateException;
+use Drupal\node\Entity\Node;
 
 /**
  * @defgroup update_api Update API
@@ -118,7 +120,7 @@ function hook_module_implements_alter(&$implementations, $hook) {
  *
  * @param array $info
  *   The .info.yml file contents, passed by reference so that it can be altered.
- * @param \Drupal\Core\Extension\Extension $file
+ * @param Extension $file
  *   Full information about the module or theme.
  * @param string $type
  *   Either 'module' or 'theme', depending on the type of .info.yml file that
@@ -126,7 +128,7 @@ function hook_module_implements_alter(&$implementations, $hook) {
  *
  * @see \Drupal\Core\Extension\ModuleUninstallValidatorInterface
  */
-function hook_system_info_alter(array &$info, \Drupal\Core\Extension\Extension $file, $type) {
+function hook_system_info_alter(array &$info, Extension $file, $type) {
   // Only fill this in if the .info.yml file does not define a 'datestamp'.
   if (empty($info['datestamp'])) {
     $info['datestamp'] = $file->getFileInfo()->getMTime();
@@ -512,7 +514,6 @@ function hook_install_tasks_alter(&$tasks, $install_state) {
 }
 
 // phpcs:disable Drupal.Commenting.DocComment.ParamNotFirst
-
 /**
  * Perform a single update between minor versions.
  *
@@ -738,7 +739,7 @@ function hook_install_tasks_alter(&$tasks, $install_state) {
  *   displayed to the user after the update has completed. If no message is
  *   returned, no message will be presented to the user.
  *
- * @throws \Drupal\Core\Utility\UpdateException|PDOException
+ * @throws UpdateException|PDOException
  *   In case of error, update hooks should throw an instance of
  *   Drupal\Core\Utility\UpdateException with a meaningful message for the user.
  *   If a database query fails for whatever reason, it will throw a
@@ -811,7 +812,6 @@ function hook_update_N(&$sandbox) {
 }
 
 // phpcs:disable Drupal.Commenting.DocComment.ParamNotFirst
-
 /**
  * Executes an update which is intended to update data, like entities.
  *
@@ -860,7 +860,7 @@ function hook_update_N(&$sandbox) {
  *   that will be displayed to the user after the update has completed. If no
  *   message is returned, no message will be presented to the user.
  *
- * @throws \Drupal\Core\Utility\UpdateException|PDOException
+ * @throws UpdateException|PDOException
  *   In case of error, update hooks should throw an instance of
  *   \Drupal\Core\Utility\UpdateException with a meaningful message for the
  *   user. If a database query fails for whatever reason, it will throw a
@@ -875,7 +875,7 @@ function hook_update_N(&$sandbox) {
 // phpcs:ignore Drupal.Commenting.FunctionComment.Missing
 function hook_post_update_NAME(&$sandbox) {
   // Example of updating some content.
-  $node = \Drupal\node\Entity\Node::load(123);
+  $node = Node::load(123);
   $node->setTitle('foo');
   $node->save();
 
@@ -884,7 +884,7 @@ function hook_post_update_NAME(&$sandbox) {
   // Example of updating some config.
   if (\Drupal::moduleHandler()->moduleExists('taxonomy')) {
     // Update the dependencies of all Vocabulary configuration entities.
-    \Drupal::classResolver(\Drupal\Core\Config\Entity\ConfigEntityUpdater::class)->update($sandbox, 'taxonomy_vocabulary');
+    \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'taxonomy_vocabulary');
   }
 
   return $result;
@@ -1036,7 +1036,7 @@ function hook_update_last_removed(): int {
  *   - runtime: The runtime requirements are being checked and shown on the
  *     status report page.
  *
- * @return array<string, array{'title': \Drupal\Core\StringTranslation\TranslatableMarkup, 'value': mixed, description: \Drupal\Core\StringTranslation\TranslatableMarkup, 'severity': \Drupal\Core\Extension\Requirement\RequirementSeverity}>
+ * @return array<string, array{'title': TranslatableMarkup, 'value': mixed, description: TranslatableMarkup, 'severity': RequirementSeverity}>
  *   An associative array where the keys are arbitrary but must be unique (it
  *   is suggested to use the module short name as a prefix) and the values are
  *   themselves associative arrays with the following elements:

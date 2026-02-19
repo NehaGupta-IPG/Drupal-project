@@ -31,7 +31,7 @@ function hook_media_source_info_alter(array &$sources) {
  *
  * @param array $parsed_url
  *   A parsed URL, as returned by \Drupal\Component\Utility\UrlHelper::parse().
- * @param \Drupal\media\OEmbed\Provider $provider
+ * @param Provider $provider
  *   The oEmbed provider for the resource.
  *
  * @see \Drupal\media\OEmbed\UrlResolverInterface::getResourceUrl()

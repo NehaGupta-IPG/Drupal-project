@@ -103,7 +103,7 @@ class TestFieldWidgetMultiple extends WidgetBase {
   /**
    * Test is the widget is applicable to the field definition.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition that should be checked.
    *
    * @return bool

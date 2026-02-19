@@ -21,7 +21,7 @@ class AdvisoryTestController {
    * @param string $json_name
    *   The name of the JSON file without the file extension.
    *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse|\Symfony\Component\HttpFoundation\Response
+   * @return JsonResponse|Response
    *   If a fixture file with the name $json_name + '.json' is found a
    *   JsonResponse will be returned using the contents of the file, otherwise a
    *   Response will be returned with a 404 status code.

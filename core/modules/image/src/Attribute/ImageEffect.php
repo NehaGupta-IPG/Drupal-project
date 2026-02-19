@@ -10,7 +10,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 /**
  * Defines an ImageEffect attribute for plugin discovery.
  *
- * Plugin Namespace: Plugin\ImageEffect
+ * Plugin Namespace: Plugin\ImageEffect.
  *
  * For a working example, see
  * \Drupal\image\Plugin\ImageEffect\ResizeImageEffect
@@ -32,9 +32,9 @@ class ImageEffect extends Plugin {
    *
    * @param string $id
    *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $label
+   * @param TranslatableMarkup $label
    *   The human-readable name of the image effect.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $description
+   * @param TranslatableMarkup|null $description
    *   (optional) A brief description of the image effect. This will be shown
    *   when adding or configuring this image effect.
    * @param class-string|null $deriver

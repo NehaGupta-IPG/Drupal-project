@@ -89,7 +89,7 @@ class BlockDependenciesTest extends ViewsKernelTestBase {
    *   - theme: The default theme.
    *   - visibility: Empty array.
    *
-   * @return \Drupal\block\Entity\Block
+   * @return Block
    *   The block entity.
    */
   protected function createBlock($plugin_id, array $settings = []) {

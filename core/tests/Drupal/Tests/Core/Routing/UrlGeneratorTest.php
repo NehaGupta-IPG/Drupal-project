@@ -33,49 +33,49 @@ class UrlGeneratorTest extends UnitTestCase {
   /**
    * The route provider.
    *
-   * @var \Drupal\Core\Routing\RouteProviderInterface
+   * @var RouteProviderInterface
    */
   protected $provider;
 
   /**
    * The URL generator to test.
    *
-   * @var \Drupal\Core\Routing\UrlGenerator
+   * @var UrlGenerator
    */
   protected $generator;
 
   /**
    * The alias manager.
    *
-   * @var \Drupal\path_alias\AliasManager|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\path_alias\AliasManager|MockObject
    */
   protected $aliasManager;
 
   /**
    * The mock route processor manager.
    *
-   * @var \Drupal\Core\RouteProcessor\RouteProcessorManager|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\RouteProcessor\RouteProcessorManager|MockObject
    */
   protected $routeProcessorManager;
 
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * The request context.
    *
-   * @var \Drupal\Core\Routing\RequestContext
+   * @var RequestContext
    */
   protected $context;
 
   /**
    * The path processor.
    *
-   * @var \Drupal\Core\PathProcessor\PathProcessorManager
+   * @var PathProcessorManager
    */
   protected $processorManager;
 
@@ -558,7 +558,7 @@ class UrlGeneratorTest extends UnitTestCase {
    *   The options to test.
    * @param string $expected_url
    *   The expected generated URL string.
-   * @param \Drupal\Core\Render\BubbleableMetadata $expected_bubbleable_metadata
+   * @param BubbleableMetadata $expected_bubbleable_metadata
    *   The expected generated bubbleable metadata.
    *
    * @internal

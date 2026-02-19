@@ -33,7 +33,7 @@ trait EventWithPackageListTrait {
   /**
    * Constructs the object.
    *
-   * @param \Drupal\package_manager\SandboxManagerBase $sandboxManager
+   * @param SandboxManagerBase $sandboxManager
    *   The stage.
    * @param string[] $runtime_packages
    *   The runtime (i.e., non-dev) packages to be required, in the form

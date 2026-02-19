@@ -38,7 +38,7 @@ class FieldConfigEditForm extends EntityForm {
   /**
    * The entity being used by this form.
    *
-   * @var \Drupal\field\FieldConfigInterface
+   * @var FieldConfigInterface
    */
   protected $entity;
 
@@ -356,10 +356,10 @@ class FieldConfigEditForm extends EntityForm {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   An AJAX response that display validation error messages or represents a
    *   successful submission.
    *
@@ -386,10 +386,10 @@ class FieldConfigEditForm extends EntityForm {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   An AJAX response.
    */
   protected function successfulAjaxSubmit(array $form, FormStateInterface $form_state): AjaxResponse {
@@ -511,7 +511,7 @@ class FieldConfigEditForm extends EntityForm {
   /**
    * The _title_callback for the field settings form.
    *
-   * @param \Drupal\field\FieldConfigInterface $field_config
+   * @param FieldConfigInterface $field_config
    *   The field.
    *
    * @return string
@@ -524,12 +524,12 @@ class FieldConfigEditForm extends EntityForm {
   /**
    * Gets typed data object for the field.
    *
-   * @param \Drupal\field\FieldConfigInterface $field_config
+   * @param FieldConfigInterface $field_config
    *   The field configuration.
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $parent
+   * @param FieldableEntityInterface $parent
    *   The parent entity that the field is attached to.
    *
-   * @return \Drupal\Core\TypedData\TypedDataInterface
+   * @return TypedDataInterface
    *   The typed data object representing the field configuration and its
    *   default value.
    */
@@ -558,7 +558,7 @@ class FieldConfigEditForm extends EntityForm {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function fieldStorageSubmit(&$form, FormStateInterface $form_state) {
@@ -593,9 +593,9 @@ class FieldConfigEditForm extends EntityForm {
   /**
    * Handles entity storage exceptions and redirects the form.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
-   * @param \Drupal\Core\Entity\EntityStorageException $exception
+   * @param EntityStorageException $exception
    *   The exception.
    */
   protected function handleEntityStorageException(FormStateInterface $form_state, EntityStorageException $exception): void {

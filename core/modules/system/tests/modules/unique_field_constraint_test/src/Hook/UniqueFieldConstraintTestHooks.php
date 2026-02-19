@@ -34,7 +34,7 @@ class UniqueFieldConstraintTestHooks {
   #[Hook('query_entity_test_access_alter')]
   public function queryEntityTestAccessAlter(AlterableInterface $query): void {
     // Set an impossible condition to filter out all entities.
-    /** @var \Drupal\Core\Database\Query\Select|\Drupal\Core\Database\Query\AlterableInterface $query */
+    /** @var \Drupal\Core\Database\Query\Select|AlterableInterface $query */
     $query->condition('entity_test.id', 0);
   }
 

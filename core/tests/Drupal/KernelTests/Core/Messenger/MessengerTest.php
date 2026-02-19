@@ -24,7 +24,7 @@ class MessengerTest extends KernelTestBase {
   /**
    * The messenger under test.
    *
-   * @var \Drupal\Core\Messenger\MessengerInterface
+   * @var MessengerInterface
    */
   protected $messenger;
 

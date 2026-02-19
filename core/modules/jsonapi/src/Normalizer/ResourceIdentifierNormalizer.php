@@ -26,14 +26,14 @@ class ResourceIdentifierNormalizer extends NormalizerBase implements Denormalize
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $fieldManager;
 
   /**
    * RelationshipNormalizer constructor.
    *
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager
+   * @param EntityFieldManagerInterface $field_manager
    *   The entity field manager.
    */
   public function __construct(EntityFieldManagerInterface $field_manager) {
@@ -60,7 +60,7 @@ class ResourceIdentifierNormalizer extends NormalizerBase implements Denormalize
    */
   public function denormalize($data, $class, $format = NULL, array $context = []): mixed {
     // If we get here, it's via a relationship POST/PATCH.
-    /** @var \Drupal\jsonapi\ResourceType\ResourceType $resource_type */
+    /** @var ResourceType $resource_type */
     $resource_type = $context['resource_type'];
     $entity_type_id = $resource_type->getEntityTypeId();
     $field_definitions = $this->fieldManager->getFieldDefinitions(

@@ -135,7 +135,7 @@ class FormState implements FormStateInterface {
    * \Symfony\Component\HttpFoundation\RedirectResponse and will populate this
    * key.
    *
-   * @var \Symfony\Component\HttpFoundation\Response|null
+   * @var Response|null
    */
   protected $response;
 
@@ -151,7 +151,7 @@ class FormState implements FormStateInterface {
    *
    * This property is uncacheable.
    *
-   * @var \Drupal\Core\Url|\Symfony\Component\HttpFoundation\RedirectResponse|null
+   * @var Url|RedirectResponse|null
    *
    * @see self::getRedirect()
    */

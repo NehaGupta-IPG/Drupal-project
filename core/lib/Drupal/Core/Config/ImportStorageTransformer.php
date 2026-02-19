@@ -26,28 +26,28 @@ final class ImportStorageTransformer {
   /**
    * The event dispatcher to get changes to the configuration.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+   * @var EventDispatcherInterface
    */
   protected $eventDispatcher;
 
   /**
    * The drupal database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
   /**
    * The normal lock for the duration of the request.
    *
-   * @var \Drupal\Core\Lock\LockBackendInterface
+   * @var LockBackendInterface
    */
   protected $requestLock;
 
   /**
    * The persistent lock which the config importer uses across requests.
    *
-   * @var \Drupal\Core\Lock\LockBackendInterface
+   * @var LockBackendInterface
    *
    * @see \Drupal\Core\Config\ConfigImporter::alreadyImporting()
    */
@@ -56,13 +56,13 @@ final class ImportStorageTransformer {
   /**
    * ImportStorageTransformer constructor.
    *
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection.
-   * @param \Drupal\Core\Lock\LockBackendInterface $requestLock
+   * @param LockBackendInterface $requestLock
    *   The lock for the request.
-   * @param \Drupal\Core\Lock\LockBackendInterface $persistentLock
+   * @param LockBackendInterface $persistentLock
    *   The persistent lock used by the config importer.
    */
   public function __construct(EventDispatcherInterface $event_dispatcher, Connection $connection, LockBackendInterface $requestLock, LockBackendInterface $persistentLock) {
@@ -82,13 +82,13 @@ final class ImportStorageTransformer {
    * with the ConfigImporter which may or may not be as part of the config
    * synchronization.
    *
-   * @param \Drupal\Core\Config\StorageInterface $storage
+   * @param StorageInterface $storage
    *   The storage to transform for importing from it.
    *
-   * @return \Drupal\Core\Config\StorageInterface
+   * @return StorageInterface
    *   The transformed storage ready to be imported from.
    *
-   * @throws \Drupal\Core\Config\StorageTransformerException
+   * @throws StorageTransformerException
    *   Thrown when the lock could not be acquired.
    */
   public function transform(StorageInterface $storage) {

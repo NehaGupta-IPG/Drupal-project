@@ -290,7 +290,7 @@ class SandboxManagerBaseTest extends PackageManagerKernelTestBase {
    *   Whether the stage was forcefully destroyed.
    * @param bool $changes_applied
    *   Whether the changes are applied.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $message
+   * @param TranslatableMarkup|null $message
    *   A message about why the stage was destroyed or null.
    * @param string $expected_exception_message
    *   The expected exception message string.
@@ -422,7 +422,7 @@ class SandboxManagerBaseTest extends PackageManagerKernelTestBase {
    */
   public function testFailureMarkerFileExcluded(): void {
     $this->assertResults([]);
-    /** @var \Drupal\package_manager_bypass\LoggingCommitter $committer */
+    /** @var LoggingCommitter $committer */
     $committer = $this->container->get(CommitterInterface::class);
     $committer_args = $committer->getInvocationArguments();
     $this->assertCount(1, $committer_args);

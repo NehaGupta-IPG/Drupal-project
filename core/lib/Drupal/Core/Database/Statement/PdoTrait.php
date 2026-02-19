@@ -35,7 +35,7 @@ trait PdoTrait {
   /**
    * Converts a FetchAs mode to a \PDO::FETCH_* constant value.
    *
-   * @param \Drupal\Core\Database\Statement\FetchAs $mode
+   * @param FetchAs $mode
    *   The FetchAs mode.
    *
    * @return int
@@ -57,7 +57,7 @@ trait PdoTrait {
    * @param int $mode
    *   The \PDO::FETCH_* constant value.
    *
-   * @return \Drupal\Core\Database\Statement\FetchAs
+   * @return FetchAs
    *   A FetchAs mode.
    */
   protected function pdoToFetchAs(int $mode): FetchAs {
@@ -87,7 +87,7 @@ trait PdoTrait {
   /**
    * Sets the default fetch mode for the PDO statement.
    *
-   * @param \Drupal\Core\Database\Statement\FetchAs $mode
+   * @param FetchAs $mode
    *   One of the cases of the FetchAs enum.
    * @param int|class-string|null $columnOrClass
    *   If $mode is FetchAs::Column, the index of the column to fetch.
@@ -135,7 +135,7 @@ trait PdoTrait {
   /**
    * Fetches the next row from the PDO statement.
    *
-   * @param \Drupal\Core\Database\Statement\FetchAs|null $mode
+   * @param FetchAs|null $mode
    *   (Optional) one of the cases of the FetchAs enum. If not specified,
    *   defaults to what is specified by setFetchMode().
    * @param int|null $cursorOrientation
@@ -192,7 +192,7 @@ trait PdoTrait {
   /**
    * Returns an array containing all of the result set rows.
    *
-   * @param \Drupal\Core\Database\Statement\FetchAs|null $mode
+   * @param FetchAs|null $mode
    *   (Optional) one of the cases of the FetchAs enum. If not specified,
    *   defaults to what is specified by setFetchMode().
    * @param int|class-string|null $columnOrClass

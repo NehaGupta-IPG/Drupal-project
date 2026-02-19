@@ -32,7 +32,7 @@ class FieldFormButtonTest extends FieldPluginBase {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function viewsForm(&$form, FormStateInterface $form_state) {
@@ -62,7 +62,7 @@ class FieldFormButtonTest extends FieldPluginBase {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function viewsFormSubmit(&$form, FormStateInterface $form_state) {

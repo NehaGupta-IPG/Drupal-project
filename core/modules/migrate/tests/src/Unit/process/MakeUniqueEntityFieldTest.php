@@ -22,14 +22,14 @@ class MakeUniqueEntityFieldTest extends MigrateProcessTestCase {
   /**
    * The mock entity query.
    *
-   * @var \Drupal\Core\Entity\Query\QueryInterface
+   * @var QueryInterface
    */
   protected $entityQuery;
 
   /**
    * The mocked entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityTypeManagerInterface|MockObject
    */
   protected $entityTypeManager;
 

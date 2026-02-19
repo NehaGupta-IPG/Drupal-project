@@ -87,7 +87,7 @@ class StageEventsTest extends PackageManagerKernelTestBase implements EventSubsc
   /**
    * Handles a stage life cycle event.
    *
-   * @param \Drupal\package_manager\Event\SandboxEvent $event
+   * @param SandboxEvent $event
    *   The event object.
    */
   public function handleEvent(SandboxEvent $event): void {
@@ -195,7 +195,7 @@ class StageEventsTest extends PackageManagerKernelTestBase implements EventSubsc
       $expected_runtime = ['drupal/core' => '9.8.2'];
       $expected_dev = ['drupal/core-dev' => '9.8.2'];
 
-      /** @var \Drupal\package_manager\Event\PreRequireEvent|\Drupal\package_manager\Event\PostRequireEvent $event */
+      /** @var PreRequireEvent|PostRequireEvent $event */
       $this->assertSame($expected_runtime, $event->getRuntimePackages());
       $this->assertSame($expected_dev, $event->getDevPackages());
     };

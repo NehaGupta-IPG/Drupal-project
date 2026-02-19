@@ -2,10 +2,10 @@
 
 namespace Drupal\Core\Render;
 
+use Drupal\Component\EventDispatcher\Event;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Component\EventDispatcher\Event;
 
 /**
  * Event fired when rendering main content, to select a page display variant.
@@ -40,7 +40,7 @@ class PageDisplayVariantSelectionEvent extends Event implements RefinableCacheab
   /**
    * The current route match.
    *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
+   * @var RouteMatchInterface
    */
   protected $routeMatch;
 
@@ -56,7 +56,7 @@ class PageDisplayVariantSelectionEvent extends Event implements RefinableCacheab
    *
    * @param string $plugin_id
    *   The ID of the page display variant plugin to use by default.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The current route match, for context.
    */
   public function __construct($plugin_id, RouteMatchInterface $route_match) {
@@ -113,7 +113,7 @@ class PageDisplayVariantSelectionEvent extends Event implements RefinableCacheab
   /**
    * Gets the current route match.
    *
-   * @return \Drupal\Core\Routing\RouteMatchInterface
+   * @return RouteMatchInterface
    *   The current route match, for context.
    */
   public function getRouteMatch() {
@@ -133,7 +133,7 @@ class PageDisplayVariantSelectionEvent extends Event implements RefinableCacheab
   /**
    * Sets the contexts to be passed to the page display variant.
    *
-   * @param \Drupal\Component\Plugin\Context\ContextInterface[] $contexts
+   * @param ContextInterface[] $contexts
    *   An array of contexts, keyed by context name.
    *
    * @return $this

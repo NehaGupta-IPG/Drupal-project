@@ -22,7 +22,7 @@ class AllowToolbarPathTest extends UnitTestCase {
   /**
    * The toolbar path policy under test.
    *
-   * @var \Drupal\toolbar\PageCache\AllowToolbarPath
+   * @var AllowToolbarPath
    */
   protected $policy;
 

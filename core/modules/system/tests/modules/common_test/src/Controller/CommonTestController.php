@@ -87,7 +87,7 @@ class CommonTestController {
   /**
    * Prints a destination query parameter.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   A new Response object containing a string with the destination query
    *   parameter.
    */
@@ -100,7 +100,7 @@ class CommonTestController {
   /**
    * Returns a response with early rendering in common_test_page_attachments.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   A new Response object.
    */
   public function attachments() {

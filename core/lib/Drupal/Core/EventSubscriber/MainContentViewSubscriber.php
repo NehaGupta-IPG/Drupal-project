@@ -27,14 +27,14 @@ class MainContentViewSubscriber implements EventSubscriberInterface {
   /**
    * The class resolver service.
    *
-   * @var \Drupal\Core\DependencyInjection\ClassResolverInterface
+   * @var ClassResolverInterface
    */
   protected $classResolver;
 
   /**
    * The current route match.
    *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
+   * @var RouteMatchInterface
    */
   protected $routeMatch;
 
@@ -56,9 +56,9 @@ class MainContentViewSubscriber implements EventSubscriberInterface {
   /**
    * Constructs a new MainContentViewSubscriber object.
    *
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $class_resolver
+   * @param ClassResolverInterface $class_resolver
    *   The class resolver service.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The current route match.
    * @param array $main_content_renderers
    *   The available main content renderer service IDs, keyed by format.
@@ -72,7 +72,7 @@ class MainContentViewSubscriber implements EventSubscriberInterface {
   /**
    * Sets a response given a (main content) render array.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ViewEvent $event
+   * @param ViewEvent $event
    *   The event to process.
    */
   public function onViewRenderArray(ViewEvent $event) {

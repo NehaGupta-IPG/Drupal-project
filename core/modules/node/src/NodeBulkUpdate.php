@@ -58,7 +58,7 @@ class NodeBulkUpdate {
       batch_set($batch_builder->toArray());
     }
     else {
-      /** @var \Drupal\node\NodeStorageInterface $storage */
+      /** @var NodeStorageInterface $storage */
       $storage = $this->entityTypeManager->getStorage('node');
       if ($load) {
         $nodes = $revisions ? $storage->loadMultipleRevisions($nodes) : $storage->loadMultiple($nodes);
@@ -73,7 +73,7 @@ class NodeBulkUpdate {
   /**
    * Updates individual nodes when fewer than 10 are queued.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   A node to update.
    * @param array $updates
    *   Associative array of updates.
@@ -81,7 +81,7 @@ class NodeBulkUpdate {
    *   (optional) The language updates should be applied to. If NULL all
    *   available languages are processed.
    *
-   * @return \Drupal\node\NodeInterface
+   * @return NodeInterface
    *   An updated node object.
    *
    * @see self::process()

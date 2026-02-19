@@ -126,7 +126,7 @@ class JUnitConverter {
    * @param \SimpleXMLElement $test_case
    *   The test case XML element.
    *
-   * @return \Drupal\TestTools\PhpUnitTestCaseJUnitResult
+   * @return PhpUnitTestCaseJUnitResult
    *   The status value to insert into the {simpletest} record.
    */
   protected static function getTestCaseResult(\SimpleXMLElement $test_case): PhpUnitTestCaseJUnitResult {

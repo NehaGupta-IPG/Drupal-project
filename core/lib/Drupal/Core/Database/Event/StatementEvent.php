@@ -16,7 +16,7 @@ enum StatementEvent: string {
   /**
    * Returns an array with all statement related events.
    *
-   * @return list<class-string<\Drupal\Core\Database\Event\DatabaseEvent>>
+   * @return list<class-string<DatabaseEvent>>
    *   An array with all statement related events.
    */
   public static function all(): array {

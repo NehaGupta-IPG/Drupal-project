@@ -66,7 +66,7 @@ interface StorageInterface {
    * @return bool
    *   TRUE on success, FALSE in case of an error.
    *
-   * @throws \Drupal\Core\Config\StorageException
+   * @throws StorageException
    *   If the back-end storage does not exist and cannot be created.
    */
   public function write($name, array $data);
@@ -128,7 +128,7 @@ interface StorageInterface {
    *
    * Given the following configuration objects:
    * - node.type.article
-   * - node.type.page
+   * - node.type.page.
    *
    * Passing the prefix 'node.type.' will return an array containing the above
    * names.
@@ -147,7 +147,7 @@ interface StorageInterface {
    *
    * Given the following configuration object names:
    * - node.type.article
-   * - node.type.page
+   * - node.type.page.
    *
    * Passing the prefix 'node.type.' will delete the above configuration
    * objects.

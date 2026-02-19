@@ -40,7 +40,7 @@ trait UncacheableFieldHandlerTrait {
   /**
    * Actually renders the field markup.
    *
-   * @param \Drupal\views\ResultRow $row
+   * @param ResultRow $row
    *   A result row.
    *
    * @return string

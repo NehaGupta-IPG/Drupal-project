@@ -23,13 +23,13 @@ class DefaultMenuLinkTreeManipulators {
   /**
    * Constructs a \Drupal\Core\Menu\DefaultMenuLinkTreeManipulators object.
    *
-   * @param \Drupal\Core\Access\AccessManagerInterface $accessManager
+   * @param AccessManagerInterface $accessManager
    *   The access manager.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The current user.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   * @param ModuleHandlerInterface $moduleHandler
    *   The module handler.
    */
   public function __construct(
@@ -62,10 +62,10 @@ class DefaultMenuLinkTreeManipulators {
    * subtrees to become accessible again, thus forcing us to conclude that the
    * subtree is unconditionally inaccessible.
    *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
+   * @param MenuLinkTreeElement[] $tree
    *   The menu link tree to manipulate.
    *
-   * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
+   * @return MenuLinkTreeElement[]
    *   The manipulated menu link tree.
    */
   public function checkAccess(array $tree) {
@@ -107,10 +107,10 @@ class DefaultMenuLinkTreeManipulators {
    * This manipulator should be added before the generic ::checkAccess() one,
    * because it provides a performance optimization for ::checkAccess().
    *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
+   * @param MenuLinkTreeElement[] $tree
    *   The menu link tree to manipulate.
    *
-   * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
+   * @return MenuLinkTreeElement[]
    *   The manipulated menu link tree.
    */
   public function checkNodeAccess(array $tree) {
@@ -152,7 +152,7 @@ class DefaultMenuLinkTreeManipulators {
   /**
    * Collects the node links in the menu tree.
    *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
+   * @param MenuLinkTreeElement[] $tree
    *   The menu link tree to manipulate.
    * @param array $node_links
    *   Stores references to menu link elements to effectively set access.
@@ -174,7 +174,7 @@ class DefaultMenuLinkTreeManipulators {
   /**
    * Checks access for one menu link instance.
    *
-   * @param \Drupal\Core\Menu\MenuLinkInterface $instance
+   * @param MenuLinkInterface $instance
    *   The menu link instance.
    *
    * @return \Drupal\Core\Access\AccessResultInterface
@@ -194,10 +194,10 @@ class DefaultMenuLinkTreeManipulators {
   /**
    * Generates a unique index and sorts by it.
    *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
+   * @param MenuLinkTreeElement[] $tree
    *   The menu link tree to manipulate.
    *
-   * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
+   * @return MenuLinkTreeElement[]
    *   The manipulated menu link tree.
    */
   public function generateIndexAndSort(array $tree) {
@@ -220,10 +220,10 @@ class DefaultMenuLinkTreeManipulators {
   /**
    * Flattens the tree to a single level.
    *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
+   * @param MenuLinkTreeElement[] $tree
    *   The menu link tree to manipulate.
    *
-   * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
+   * @return MenuLinkTreeElement[]
    *   The manipulated menu link tree.
    */
   public function flatten(array $tree) {

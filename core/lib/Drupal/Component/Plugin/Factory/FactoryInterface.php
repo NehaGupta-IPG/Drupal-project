@@ -18,7 +18,7 @@ interface FactoryInterface {
    * @return object
    *   A fully configured plugin instance.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws PluginException
    *   If the instance cannot be created, such as if the ID is invalid.
    */
   public function createInstance($plugin_id, array $configuration = []);

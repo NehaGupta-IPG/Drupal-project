@@ -64,7 +64,7 @@ class LatestRevisionCheckTest extends UnitTestCase {
   #[DataProvider('accessSituationProvider')]
   public function testLatestAccessPermissions($entity_class, $entity_type, $has_pending_revision, array $account_permissions, $is_owner, $result_class): void {
 
-    /** @var \Drupal\Core\Session\AccountInterface $account */
+    /** @var AccountInterface $account */
     $account = $this->prophesize(AccountInterface::class);
     $possible_permissions = [
       'view latest version',
@@ -85,7 +85,7 @@ class LatestRevisionCheckTest extends UnitTestCase {
       $entity->getOwnerId()->willReturn($is_owner ? 42 : 3);
     }
 
-    /** @var \Drupal\content_moderation\ModerationInformation $mod_info */
+    /** @var ModerationInformation $mod_info */
     $mod_info = $this->prophesize(ModerationInformation::class);
     $mod_info->hasPendingRevision($entity->reveal())->willReturn($has_pending_revision);
 

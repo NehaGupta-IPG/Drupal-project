@@ -34,7 +34,7 @@ final class EnabledExtensionsValidator implements EventSubscriberInterface {
   /**
    * Validates that no enabled Drupal extensions have been removed.
    *
-   * @param \Drupal\package_manager\Event\PreApplyEvent $event
+   * @param PreApplyEvent $event
    *   The event object.
    */
   public function validate(PreApplyEvent $event): void {

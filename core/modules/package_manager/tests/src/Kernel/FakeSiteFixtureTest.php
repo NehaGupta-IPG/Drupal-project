@@ -36,7 +36,7 @@ class FakeSiteFixtureTest extends PackageManagerKernelTestBase {
    */
   public function testCallToComposerInspectorMethods(): void {
     $active_dir = $this->container->get(PathLocator::class)->getProjectRoot();
-    /** @var \Drupal\package_manager\ComposerInspector $inspector */
+    /** @var ComposerInspector $inspector */
     $inspector = $this->container->get(ComposerInspector::class);
     $list = $inspector->getInstalledPackagesList($active_dir);
     $this->assertNull($list->getPackageByDrupalProjectName('any_random_name'));
@@ -49,7 +49,7 @@ class FakeSiteFixtureTest extends PackageManagerKernelTestBase {
    * @see \Drupal\fixture_manipulator\FixtureManipulator::setVersion()
    */
   public function testCallToSetVersion(): void {
-    /** @var \Drupal\package_manager\ComposerInspector $inspector */
+    /** @var ComposerInspector $inspector */
     $inspector = $this->container->get(ComposerInspector::class);
     $active_dir = $this->container->get(PathLocator::class)->getProjectRoot();
     $installed_packages = $inspector->getInstalledPackagesList($active_dir);
@@ -70,7 +70,7 @@ class FakeSiteFixtureTest extends PackageManagerKernelTestBase {
    * @legacy-covers \Drupal\fixture_manipulator\FixtureManipulator::removePackage
    */
   public function testCallToRemovePackage(): void {
-    /** @var \Drupal\package_manager\ComposerInspector $inspector */
+    /** @var ComposerInspector $inspector */
     $inspector = $this->container->get(ComposerInspector::class);
     $active_dir = $this->container->get(PathLocator::class)->getProjectRoot();
     $expected_packages = self::getExpectedFakeSitePackages();

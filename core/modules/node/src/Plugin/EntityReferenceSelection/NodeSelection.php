@@ -42,7 +42,7 @@ class NodeSelection extends DefaultSelection {
     $node = parent::createNewEntity($entity_type_id, $bundle, $label, $uid);
 
     // In order to create a referenceable node, it needs to published.
-    /** @var \Drupal\node\NodeInterface $node */
+    /** @var NodeInterface $node */
     $node->setPublished();
 
     return $node;
@@ -56,7 +56,7 @@ class NodeSelection extends DefaultSelection {
     // Mirror the conditions checked in buildEntityQuery().
     if (!$this->currentUser->hasPermission('bypass node access') && !$this->moduleHandler->hasImplementations('node_grants')) {
       $entities = array_filter($entities, function ($node) {
-        /** @var \Drupal\node\NodeInterface $node */
+        /** @var NodeInterface $node */
         return $node->isPublished();
       });
     }

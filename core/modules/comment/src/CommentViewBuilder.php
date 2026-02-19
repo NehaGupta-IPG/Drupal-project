@@ -22,33 +22,33 @@ class CommentViewBuilder extends EntityViewBuilder {
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * Constructs a new CommentViewBuilder.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
-   * @param \Drupal\Core\Theme\Registry $theme_registry
+   * @param Registry $theme_registry
    *   The theme registry.
-   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
+   * @param EntityDisplayRepositoryInterface $entity_display_repository
    *   The entity display repository.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(EntityTypeInterface $entity_type, EntityRepositoryInterface $entity_repository, LanguageManagerInterface $language_manager, AccountInterface $current_user, Registry $theme_registry, EntityDisplayRepositoryInterface $entity_display_repository, EntityTypeManagerInterface $entity_type_manager) {
@@ -78,7 +78,7 @@ class CommentViewBuilder extends EntityViewBuilder {
   protected function getBuildDefaults(EntityInterface $entity, $view_mode) {
     $build = parent::getBuildDefaults($entity, $view_mode);
 
-    /** @var \Drupal\comment\CommentInterface $entity */
+    /** @var CommentInterface $entity */
     // Store a threading field setting to use later in self::buildComponents().
     $commented_entity = $entity->getCommentedEntity();
     $build['#comment_threaded'] =
@@ -104,7 +104,7 @@ class CommentViewBuilder extends EntityViewBuilder {
    *   Thrown when a comment is attached to an entity that no longer exists.
    */
   public function buildComponents(array &$build, array $entities, array $displays, $view_mode) {
-    /** @var \Drupal\comment\CommentInterface[] $entities */
+    /** @var CommentInterface[] $entities */
     if (empty($entities)) {
       return;
     }

@@ -3,11 +3,11 @@
 namespace Drupal\system\Form;
 
 use Drupal\Core\Asset\AssetCollectionOptimizerInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
+use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\ConfigFormBase;
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -22,45 +22,45 @@ class PerformanceForm extends ConfigFormBase {
   /**
    * The date formatter service.
    *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
+   * @var DateFormatterInterface
    */
   protected $dateFormatter;
 
   /**
    * The CSS asset collection optimizer service.
    *
-   * @var \Drupal\Core\Asset\AssetCollectionOptimizerInterface
+   * @var AssetCollectionOptimizerInterface
    */
   protected $cssCollectionOptimizer;
 
   /**
    * The JavaScript asset collection optimizer service.
    *
-   * @var \Drupal\Core\Asset\AssetCollectionOptimizerInterface
+   * @var AssetCollectionOptimizerInterface
    */
   protected $jsCollectionOptimizer;
 
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * Constructs a PerformanceForm object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
+   * @param TypedConfigManagerInterface $typedConfigManager
    *   The typed config manager.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   * @param DateFormatterInterface $date_formatter
    *   The date formatter service.
-   * @param \Drupal\Core\Asset\AssetCollectionOptimizerInterface $css_collection_optimizer
+   * @param AssetCollectionOptimizerInterface $css_collection_optimizer
    *   The CSS asset collection optimizer service.
-   * @param \Drupal\Core\Asset\AssetCollectionOptimizerInterface $js_collection_optimizer
+   * @param AssetCollectionOptimizerInterface $js_collection_optimizer
    *   The JavaScript asset collection optimizer service.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
    */
   public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, DateFormatterInterface $date_formatter, AssetCollectionOptimizerInterface $css_collection_optimizer, AssetCollectionOptimizerInterface $js_collection_optimizer, ModuleHandlerInterface $module_handler) {

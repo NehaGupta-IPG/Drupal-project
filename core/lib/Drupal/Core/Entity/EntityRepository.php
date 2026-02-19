@@ -16,32 +16,32 @@ class EntityRepository implements EntityRepositoryInterface {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The context repository service.
    *
-   * @var \Drupal\Core\Plugin\Context\ContextRepositoryInterface
+   * @var ContextRepositoryInterface
    */
   protected $contextRepository;
 
   /**
    * Constructs a new EntityRepository.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Plugin\Context\ContextRepositoryInterface $context_repository
+   * @param ContextRepositoryInterface $context_repository
    *   The context repository service.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager, ContextRepositoryInterface $context_repository) {
@@ -224,12 +224,12 @@ class EntityRepository implements EntityRepositoryInterface {
   /**
    * Returns the latest revision translation of the specified entity.
    *
-   * @param \Drupal\Core\Entity\RevisionableInterface $entity
+   * @param RevisionableInterface $entity
    *   The default revision of the entity being converted.
    * @param string $langcode
    *   The language of the revision translation to be loaded.
    *
-   * @return \Drupal\Core\Entity\RevisionableInterface
+   * @return RevisionableInterface
    *   The latest translation-affecting revision for the specified entity, or
    *   just the latest revision, if the specified entity is not translatable or
    *   does not have a matching translation yet.
@@ -239,7 +239,7 @@ class EntityRepository implements EntityRepositoryInterface {
     $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
 
     if ($entity instanceof TranslatableRevisionableInterface && $entity->isTranslatable()) {
-      /** @var \Drupal\Core\Entity\TranslatableRevisionableStorageInterface $storage */
+      /** @var TranslatableRevisionableStorageInterface $storage */
       $revision_id = $storage->getLatestTranslationAffectedRevisionId($entity->id(), $langcode);
 
       // If the latest translation-affecting revision was a default revision, it
@@ -272,19 +272,19 @@ class EntityRepository implements EntityRepositoryInterface {
   /**
    * Loads the specified entity revision.
    *
-   * @param \Drupal\Core\Entity\RevisionableInterface $entity
+   * @param RevisionableInterface $entity
    *   The default revision of the entity being converted.
    * @param string $revision_id
    *   The identifier of the revision to be loaded.
    *
-   * @return \Drupal\Core\Entity\RevisionableInterface
+   * @return RevisionableInterface
    *   An entity revision object.
    */
   protected function loadRevision(RevisionableInterface $entity, $revision_id) {
     // We explicitly perform a loose equality check, since a revision ID may be
     // returned as an integer or a string.
     if ($entity->getLoadedRevisionId() != $revision_id) {
-      /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+      /** @var RevisionableStorageInterface $storage */
       $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
       return $storage->loadRevision($revision_id);
     }

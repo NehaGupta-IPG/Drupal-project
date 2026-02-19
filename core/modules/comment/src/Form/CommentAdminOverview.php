@@ -22,7 +22,7 @@ class CommentAdminOverview extends FormBase {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
@@ -36,34 +36,34 @@ class CommentAdminOverview extends FormBase {
   /**
    * The date formatter service.
    *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
+   * @var DateFormatterInterface
    */
   protected $dateFormatter;
 
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The tempstore factory.
    *
-   * @var \Drupal\Core\TempStore\PrivateTempStoreFactory
+   * @var PrivateTempStoreFactory
    */
   protected $tempStoreFactory;
 
   /**
    * Creates a CommentAdminOverview form.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   * @param DateFormatterInterface $date_formatter
    *   The date formatter service.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $temp_store_factory
+   * @param PrivateTempStoreFactory $temp_store_factory
    *   The tempstore factory.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, DateFormatterInterface $date_formatter, ModuleHandlerInterface $module_handler, PrivateTempStoreFactory $temp_store_factory) {
@@ -98,7 +98,7 @@ class CommentAdminOverview extends FormBase {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param string $type
    *   The type of the overview form ('approval' or 'new').
@@ -167,7 +167,7 @@ class CommentAdminOverview extends FormBase {
       ->pager(50)
       ->execute();
 
-    /** @var \Drupal\comment\CommentInterface[] $comments */
+    /** @var CommentInterface[] $comments */
     $comments = $this->commentStorage->loadMultiple($cids);
 
     // Build a table listing the appropriate comments.
@@ -268,7 +268,7 @@ class CommentAdminOverview extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $operation = $form_state->getValue('operation');
     $cids = $form_state->getValue('comments');
-    /** @var \Drupal\comment\CommentInterface[] $comments */
+    /** @var CommentInterface[] $comments */
     $comments = $this->commentStorage->loadMultiple($cids);
     if ($operation != 'delete') {
       foreach ($comments as $comment) {
@@ -285,7 +285,7 @@ class CommentAdminOverview extends FormBase {
     }
     else {
       $info = [];
-      /** @var \Drupal\comment\CommentInterface $comment */
+      /** @var CommentInterface $comment */
       foreach ($comments as $comment) {
         $langcode = $comment->language()->getId();
         $info[$comment->id()][$langcode] = $langcode;

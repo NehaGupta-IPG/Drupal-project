@@ -73,7 +73,7 @@ class ImporterTest extends KernelTestBase implements EventSubscriberInterface {
   /**
    * Modify entity data before it is imported.
    *
-   * @param \Drupal\Core\DefaultContent\PreEntityImportEvent $event
+   * @param PreEntityImportEvent $event
    *   The event being handled.
    */
   public function onPreEntityImport(PreEntityImportEvent $event): void {

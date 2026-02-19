@@ -22,21 +22,21 @@ class LibraryDependencyResolverTest extends UnitTestCase {
   /**
    * The mock library discovery parser.
    *
-   * @var \Drupal\Core\Asset\LibraryDiscoveryParser|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Asset\LibraryDiscoveryParser|MockObject
    */
   protected $libraryDiscoveryParser;
 
   /**
    * The tested library dependency resolver.
    *
-   * @var \Drupal\Core\Asset\LibraryDependencyResolver
+   * @var LibraryDependencyResolver
    */
   protected $libraryDependencyResolver;
 
   /**
    * The mocked library discovery service.
    *
-   * @var \Drupal\Core\Asset\LibraryDiscoveryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Asset\LibraryDiscoveryInterface|MockObject
    */
   protected $libraryDiscovery;
 

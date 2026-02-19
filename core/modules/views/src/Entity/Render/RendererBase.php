@@ -18,21 +18,21 @@ abstract class RendererBase implements CacheableDependencyInterface {
   /**
    * The view executable wrapping the view storage entity.
    *
-   * @var \Drupal\views\ViewExecutable
+   * @var ViewExecutable
    */
   public $view;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The type of the entity being rendered.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface
+   * @var EntityTypeInterface
    */
   protected $entityType;
 
@@ -46,11 +46,11 @@ abstract class RendererBase implements CacheableDependencyInterface {
   /**
    * Constructs a renderer object.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The entity row being rendered.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type.
    */
   public function __construct(ViewExecutable $view, LanguageManagerInterface $language_manager, EntityTypeInterface $entity_type) {
@@ -83,7 +83,7 @@ abstract class RendererBase implements CacheableDependencyInterface {
   /**
    * Alters the query if needed.
    *
-   * @param \Drupal\views\Plugin\views\query\QueryPluginBase $query
+   * @param QueryPluginBase $query
    *   The query to alter.
    * @param string $relationship
    *   (optional) The relationship, used by a field.
@@ -93,7 +93,7 @@ abstract class RendererBase implements CacheableDependencyInterface {
   /**
    * Runs before each entity is rendered.
    *
-   * @param \Drupal\views\ResultRow[] $result
+   * @param ResultRow[] $result
    *   The full array of results from the query.
    */
   public function preRender(array $result) {
@@ -102,7 +102,7 @@ abstract class RendererBase implements CacheableDependencyInterface {
   /**
    * Renders entity data.
    *
-   * @param \Drupal\views\ResultRow $row
+   * @param ResultRow $row
    *   A single row of the query result.
    *
    * @return array

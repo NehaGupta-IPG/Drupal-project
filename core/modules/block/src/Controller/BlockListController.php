@@ -15,14 +15,14 @@ class BlockListController extends EntityListController {
   /**
    * The theme handler.
    *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
+   * @var ThemeHandlerInterface
    */
   protected $themeHandler;
 
   /**
    * Constructs the BlockListController.
    *
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param ThemeHandlerInterface $theme_handler
    *   The theme handler.
    */
   public function __construct(ThemeHandlerInterface $theme_handler) {
@@ -34,7 +34,7 @@ class BlockListController extends EntityListController {
    *
    * @param string|null $theme
    *   Theme key of block list.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    *
    * @return array

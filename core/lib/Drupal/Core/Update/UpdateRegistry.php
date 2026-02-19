@@ -54,9 +54,9 @@ class UpdateRegistry implements EventSubscriberInterface {
    *   The site path.
    * @param array $module_list
    *   An associative array whose keys are the names of installed modules.
-   * @param \Drupal\Core\KeyValueStore\KeyValueStoreInterface $keyValue
+   * @param KeyValueStoreInterface $keyValue
    *   The key value store.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param ThemeHandlerInterface $theme_handler
    *   The theme handler.
    * @param string $updateType
    *   The used update name.
@@ -145,7 +145,7 @@ class UpdateRegistry implements EventSubscriberInterface {
   /**
    * Loads all update files for a given list of extension.
    *
-   * @param \Drupal\Core\Extension\Extension[] $extensions
+   * @param Extension[] $extensions
    *   The extensions used for loading.
    */
   protected function loadUpdateFiles(array $extensions) {
@@ -160,7 +160,7 @@ class UpdateRegistry implements EventSubscriberInterface {
   /**
    * Loads the {$this->updateType}.php file for a given extension.
    *
-   * @param \Drupal\Core\Extension\Extension $extension
+   * @param Extension $extension
    *   The extension object to load its file.
    */
   protected function loadUpdateFile(Extension $extension) {
@@ -296,7 +296,7 @@ class UpdateRegistry implements EventSubscriberInterface {
   /**
    * Processes the list of installed extensions when core.extension changes.
    *
-   * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   * @param ConfigCrudEvent $event
    *   The Event to process.
    */
   public function onConfigSave(ConfigCrudEvent $event) {

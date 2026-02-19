@@ -49,7 +49,7 @@ class MapDataDefinition extends ComplexDataDefinitionBase {
    *
    * @param string $name
    *   The name of the property to define.
-   * @param \Drupal\Core\TypedData\DataDefinitionInterface|null $definition
+   * @param DataDefinitionInterface|null $definition
    *   (optional) The property definition to set, or NULL to unset it.
    *
    * @return $this

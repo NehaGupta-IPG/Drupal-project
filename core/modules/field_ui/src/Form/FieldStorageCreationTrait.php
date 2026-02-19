@@ -16,7 +16,7 @@ trait FieldStorageCreationTrait {
    *   (optional) Array of widget settings, keyed by form mode. Defaults to an
    *   empty array.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    */
   protected function configureEntityFormDisplay(string $field_name, array $widget_settings = []) {
     // For a new field, only $mode = 'default' should be set. Use the
@@ -46,7 +46,7 @@ trait FieldStorageCreationTrait {
    *   of the inner array is used, and the value should be the plugin ID of a
    *   formatter. Defaults to an empty array.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    */
   protected function configureEntityViewDisplay(string $field_name, array $formatter_settings = []) {
     // For a new field, only $mode = 'default' should be set. Use the

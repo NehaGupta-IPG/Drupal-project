@@ -7,10 +7,10 @@ use Drupal\Core\Config\Schema\Ignore;
 use Drupal\Core\Config\Schema\Mapping;
 use Drupal\Core\Config\Schema\Sequence;
 use Drupal\Core\Config\Schema\SequenceDataDefinition;
+use Drupal\Core\Config\Schema\Undefined;
 use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\Core\TypedData\Type\FloatInterface;
 use Drupal\Core\TypedData\Type\IntegerInterface;
-use Drupal\Core\Config\Schema\Undefined;
 
 /**
  * Provides a base class for configuration objects with storage support.
@@ -29,7 +29,7 @@ abstract class StorableConfigBase extends ConfigBase {
   /**
    * The storage used to load and save this configuration object.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   protected $storage;
 
@@ -43,7 +43,7 @@ abstract class StorableConfigBase extends ConfigBase {
   /**
    * The typed config manager.
    *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface
+   * @var TypedConfigManagerInterface
    */
   protected $typedConfigManager;
 
@@ -115,7 +115,7 @@ abstract class StorableConfigBase extends ConfigBase {
   /**
    * Retrieves the storage used to load and save this configuration object.
    *
-   * @return \Drupal\Core\Config\StorageInterface
+   * @return StorageInterface
    *   The configuration storage object.
    */
   public function getStorage() {
@@ -188,7 +188,7 @@ abstract class StorableConfigBase extends ConfigBase {
    * @param mixed $value
    *   Value to associate with the key.
    *
-   * @throws \Drupal\Core\Config\UnsupportedDataTypeConfigException
+   * @throws UnsupportedDataTypeConfigException
    *   If the value is unsupported in configuration.
    */
   protected function validateValue($key, $value) {
@@ -215,7 +215,7 @@ abstract class StorableConfigBase extends ConfigBase {
    * @return mixed
    *   The value cast to the type indicated in the schema.
    *
-   * @throws \Drupal\Core\Config\UnsupportedDataTypeConfigException
+   * @throws UnsupportedDataTypeConfigException
    *   If the value is unsupported in configuration.
    */
   protected function castValue($key, $value) {

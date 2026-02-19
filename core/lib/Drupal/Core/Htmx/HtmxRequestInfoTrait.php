@@ -50,7 +50,7 @@ trait HtmxRequestInfoTrait {
   /**
    * Determines if if the request is for history restoration.
    *
-   * Sent after a miss in the local history cache
+   * Sent after a miss in the local history cache.
    *
    * @return bool
    *   TRUE if the 'HX-History-Restore-Request' header is present.

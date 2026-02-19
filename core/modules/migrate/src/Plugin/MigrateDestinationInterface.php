@@ -87,7 +87,7 @@ interface MigrateDestinationInterface extends PluginInspectionInterface {
    *   - Keys: machine names of the fields
    *   - Values: Human-friendly descriptions of the fields.
    *
-   * @throws \Drupal\migrate\MigrateException
+   * @throws MigrateException
    *   Thrown when the destination plugin is not configured correctly.
    */
   public function fields();
@@ -98,7 +98,7 @@ interface MigrateDestinationInterface extends PluginInspectionInterface {
    * Derived classes must implement import(), to construct one new object
    * (pre-populated) using ID mappings in the Migration.
    *
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The row object.
    * @param array $old_destination_id_values
    *   (optional) The destination IDs from the previous import of this source
@@ -111,7 +111,7 @@ interface MigrateDestinationInterface extends PluginInspectionInterface {
    *   map, TRUE to indicate success without saving IDs to the ID map, or
    *   FALSE to indicate a failure.
    *
-   * @throws \Drupal\migrate\MigrateException
+   * @throws MigrateException
    *   Throws an exception if there is a problem importing the row. By default,
    *   this causes the migration system to treat this row as having failed;
    *   however, any \Drupal\migrate\Plugin\MigrateIdMapInterface status constant

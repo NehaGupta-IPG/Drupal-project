@@ -22,9 +22,9 @@ interface EntityHandlerInterface {
    * object, but not the container itself. Every call to this method must return
    * a new instance of this object; that is, it may not implement a singleton.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @param ContainerInterface $container
    *   The service container this object should use.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
    *
    * @return static

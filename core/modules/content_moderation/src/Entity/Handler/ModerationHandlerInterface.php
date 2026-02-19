@@ -31,7 +31,7 @@ interface ModerationHandlerInterface {
    * semantics, such as creating new revisions and changing the publishing
    * status of a revision.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity we may be moderating.
    *
    * @return bool
@@ -42,7 +42,7 @@ interface ModerationHandlerInterface {
   /**
    * Operates on moderated content entities preSave().
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity to modify.
    * @param bool $default_revision
    *   Whether the new revision should be made the default revision.
@@ -56,7 +56,7 @@ interface ModerationHandlerInterface {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param string $form_id
    *   The form id.
@@ -70,7 +70,7 @@ interface ModerationHandlerInterface {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param string $form_id
    *   The form id.

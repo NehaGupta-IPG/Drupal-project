@@ -17,11 +17,11 @@ class HtaccessWriter implements HtaccessWriterInterface {
   /**
    * Htaccess constructor.
    *
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   The logger.
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $streamWrapperManager
+   * @param StreamWrapperManagerInterface $streamWrapperManager
    *   The stream wrapper manager.
-   * @param \Drupal\Core\Site\Settings|null $settings
+   * @param Settings|null $settings
    *   The settings.
    */
   public function __construct(

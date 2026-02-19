@@ -7,15 +7,19 @@
 
 namespace Drupal\Core\ProxyClass\File\MimeType {
 
+    use Symfony\Component\Mime\MimeTypeGuesserInterface;
+    use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+    use Symfony\Component\DependencyInjection\ContainerInterface;
+
     /**
      * Provides a proxy class for \Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser.
      *
      * @see \Drupal\Component\ProxyBuilder
      */
-    class ExtensionMimeTypeGuesser implements \Symfony\Component\Mime\MimeTypeGuesserInterface
+    class ExtensionMimeTypeGuesser implements MimeTypeGuesserInterface
     {
 
-        use \Drupal\Core\DependencyInjection\DependencySerializationTrait;
+        use DependencySerializationTrait;
 
         /**
          * The id of the original proxied service.
@@ -34,19 +38,19 @@ namespace Drupal\Core\ProxyClass\File\MimeType {
         /**
          * The service container.
          *
-         * @var \Symfony\Component\DependencyInjection\ContainerInterface
+         * @var ContainerInterface
          */
         protected $container;
 
         /**
          * Constructs a ProxyClass Drupal proxy object.
          *
-         * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+         * @param ContainerInterface $container
          *   The container.
          * @param string $drupal_proxy_original_service_id
          *   The service ID of the original service.
          */
-        public function __construct(\Symfony\Component\DependencyInjection\ContainerInterface $container, $drupal_proxy_original_service_id)
+        public function __construct(ContainerInterface $container, $drupal_proxy_original_service_id)
         {
             $this->container = $container;
             $this->drupalProxyOriginalServiceId = $drupal_proxy_original_service_id;

@@ -3,13 +3,13 @@
 namespace Drupal\Core\Field\Entity;
 
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
-use Drupal\Core\Field\BaseFieldOverrideAccessControlHandler;
-use Drupal\Core\Field\BaseFieldOverrideStorage;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Field\BaseFieldOverrideAccessControlHandler;
+use Drupal\Core\Field\BaseFieldOverrideStorage;
 use Drupal\Core\Field\FieldConfigBase;
 use Drupal\Core\Field\FieldException;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Defines the base field override entity.
@@ -59,19 +59,19 @@ class BaseFieldOverride extends FieldConfigBase {
   /**
    * The base field definition.
    *
-   * @var \Drupal\Core\Field\BaseFieldDefinition
+   * @var BaseFieldDefinition
    */
   protected $baseFieldDefinition;
 
   /**
    * Creates a base field override object.
    *
-   * @param \Drupal\Core\Field\BaseFieldDefinition $base_field_definition
+   * @param BaseFieldDefinition $base_field_definition
    *   The base field definition to override.
    * @param string $bundle
    *   The bundle to which the override applies.
    *
-   * @return \Drupal\Core\Field\Entity\BaseFieldOverride
+   * @return BaseFieldOverride
    *   A new base field override object.
    */
   public static function createFromBaseFieldDefinition(BaseFieldDefinition $base_field_definition, $bundle) {
@@ -101,7 +101,7 @@ class BaseFieldOverride extends FieldConfigBase {
    *   (optional) The type of the entity to create. Defaults to
    *   'base_field_override'.
    *
-   * @throws \Drupal\Core\Field\FieldException
+   * @throws FieldException
    *   Exception thrown if $values does not contain a field_name, entity_type or
    *   bundle value.
    */
@@ -178,7 +178,7 @@ class BaseFieldOverride extends FieldConfigBase {
   /**
    * Gets the base field definition.
    *
-   * @return \Drupal\Core\Field\BaseFieldDefinition
+   * @return BaseFieldDefinition
    *   An associative array of the base field definition.
    */
   protected function getBaseFieldDefinition() {
@@ -192,7 +192,7 @@ class BaseFieldOverride extends FieldConfigBase {
   /**
    * {@inheritdoc}
    *
-   * @throws \Drupal\Core\Field\FieldException
+   * @throws FieldException
    *   If the bundle is being changed.
    */
   public function preSave(EntityStorageInterface $storage) {
@@ -234,7 +234,7 @@ class BaseFieldOverride extends FieldConfigBase {
     $entity_type_manager = \Drupal::entityTypeManager();
     // Clear the cache upfront, to refresh the results of getBundles().
     \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
-    /** @var \Drupal\Core\Field\Entity\BaseFieldOverride $field_override */
+    /** @var BaseFieldOverride $field_override */
     foreach ($field_overrides as $field_override) {
       // Inform the system that the field definition is being updated back to
       // its non-overridden state.

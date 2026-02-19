@@ -32,16 +32,16 @@ class ResourceResponseValidator implements EventSubscriberInterface {
   /**
    * The schema validator.
    *
-   * @var \JsonSchema\Validator
+   * @var Validator
    */
   protected Validator $validator;
 
   /**
    * Constructs a ResourceResponseValidator object.
    *
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   The JSON:API logger channel.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   * @param ModuleHandlerInterface $moduleHandler
    *   The module handler.
    * @param string $appRoot
    *   The application's root file path.
@@ -61,7 +61,7 @@ class ResourceResponseValidator implements EventSubscriberInterface {
   /**
    * Validates JSON:API responses.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
+   * @param ResponseEvent $event
    *   The event to process.
    */
   public function onResponse(ResponseEvent $event): void {
@@ -77,9 +77,9 @@ class ResourceResponseValidator implements EventSubscriberInterface {
   /**
    * Validates a response against the JSON:API specification.
    *
-   * @param \Symfony\Component\HttpFoundation\Response $response
+   * @param Response $response
    *   The response to validate.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request containing info about what to validate.
    *
    * @return bool

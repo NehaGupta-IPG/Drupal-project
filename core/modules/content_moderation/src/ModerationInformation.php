@@ -8,8 +8,8 @@ use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\TypedData\TranslatableInterface;
 
 /**
  * General service for moderation-related questions about Entity API.
@@ -21,23 +21,23 @@ class ModerationInformation implements ModerationInformationInterface {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The bundle information service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @var EntityTypeBundleInfoInterface
    */
   protected $bundleInfo;
 
   /**
    * Creates a new ModerationInformation instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info
+   * @param EntityTypeBundleInfoInterface $bundle_info
    *   The bundle information service.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $bundle_info) {
@@ -126,7 +126,7 @@ class ModerationInformation implements ModerationInformationInterface {
       $default_revision_id = $entity->isDefaultRevision() && !$entity->isNewRevision() && ($revision_id = $entity->getRevisionId()) ?
         $revision_id : $this->getDefaultRevisionId($entity->getEntityTypeId(), $entity->id());
       if ($latest_revision_id !== NULL && $latest_revision_id != $default_revision_id) {
-        /** @var \Drupal\Core\Entity\ContentEntityInterface $latest_revision */
+        /** @var ContentEntityInterface $latest_revision */
         $latest_revision = $storage->loadRevision($latest_revision_id);
         $result = !$latest_revision->wasDefaultRevision();
       }
@@ -217,7 +217,7 @@ class ModerationInformation implements ModerationInformationInterface {
     if (!$entity->isNew() && !$this->isFirstTimeModeration($entity)) {
       /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
       $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
-      /** @var \Drupal\Core\Entity\ContentEntityInterface $original_entity */
+      /** @var ContentEntityInterface $original_entity */
       $original_entity = $storage->loadRevision($entity->getLoadedRevisionId());
       if (!$entity->isDefaultTranslation() && $original_entity->hasTranslation($entity->language()->getId())) {
         $original_entity = $original_entity->getTranslation($entity->language()->getId());
@@ -235,7 +235,7 @@ class ModerationInformation implements ModerationInformationInterface {
    * If the previous version of the entity has no moderation state, we assume
    * that means it predates the presence of moderation states.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity being moderated.
    *
    * @return bool

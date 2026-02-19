@@ -144,7 +144,7 @@ class NumberItemTest extends FieldKernelTestBase {
    * @param string $expected_constraint_message
    *   The expected constraint violation message.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    */
   #[DataProvider('dataNumberFieldSettingsProvider')]
   public function testConstraints($type, $min, $max, $value, $expect_constraints, $expected_constraint_message = ''): void {

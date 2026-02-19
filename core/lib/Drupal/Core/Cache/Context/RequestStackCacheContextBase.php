@@ -16,14 +16,14 @@ abstract class RequestStackCacheContextBase {
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * Constructs a new RequestStackCacheContextBase class.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   The request stack.
    */
   public function __construct(RequestStack $request_stack) {

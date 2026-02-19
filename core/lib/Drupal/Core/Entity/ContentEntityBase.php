@@ -15,7 +15,7 @@ use Drupal\Core\TypedData\TypedDataInterface;
 /**
  * Implements Entity Field API specific enhancements to the Entity class.
  *
- * @implements \IteratorAggregate<string, \Drupal\Core\Field\FieldItemListInterface>
+ * @implements \IteratorAggregate<string, FieldItemListInterface>
  *
  * @ingroup entity_api
  */
@@ -60,7 +60,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   /**
    * Local cache for the available language objects.
    *
-   * @var \Drupal\Core\Language\LanguageInterface[]
+   * @var LanguageInterface[]
    */
   protected $languages;
 
@@ -360,7 +360,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    * {@inheritdoc}
    */
   public function wasDefaultRevision() {
-    /** @var \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type */
+    /** @var ContentEntityTypeInterface $entity_type */
     $entity_type = $this->getEntityType();
     if (!$entity_type->isRevisionable()) {
       return TRUE;
@@ -375,7 +375,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    * {@inheritdoc}
    */
   public function isLatestRevision() {
-    /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
+    /** @var ContentEntityStorageInterface $storage */
     $storage = $this->entityTypeManager()->getStorage($this->getEntityTypeId());
 
     return $this->getLoadedRevisionId() == $storage->getLatestRevisionId($this->id());
@@ -385,7 +385,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    * {@inheritdoc}
    */
   public function isLatestTranslationAffectedRevision() {
-    /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
+    /** @var ContentEntityStorageInterface $storage */
     $storage = $this->entityTypeManager()->getStorage($this->getEntityTypeId());
 
     return $this->getLoadedRevisionId() == $storage->getLatestTranslationAffectedRevisionId($this->id(), $this->language()->getId());
@@ -615,7 +615,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   /**
    * Gets a translated field.
    *
-   * @return \Drupal\Core\Field\FieldItemListInterface<\Drupal\Core\Field\FieldItemInterface>
+   * @return \Drupal\Core\Field\FieldItemListInterface<FieldItemInterface>
    *   The translated field.
    */
   protected function getTranslatedField($name, $langcode) {
@@ -701,7 +701,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   /**
    * Retrieves the iterator for the object.
    *
-   * @return \ArrayIterator<string, \Drupal\Core\Field\FieldItemListInterface<\Drupal\Core\Field\FieldItemInterface>>
+   * @return \ArrayIterator<string, FieldItemListInterface<FieldItemInterface>>
    *   The iterator.
    */
   public function getIterator(): \ArrayIterator {
@@ -939,7 +939,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
    * @param string $langcode
    *   The language code for the requested translation.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The translation object. The content properties of the translation object
    *   are stored as references to the main entity.
    */
@@ -1006,7 +1006,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     }
 
     // Initialize the translation object.
-    /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
+    /** @var ContentEntityStorageInterface $storage */
     $storage = $this->entityTypeManager()->getStorage($this->getEntityTypeId());
     $this->translations[$langcode]['status'] = !isset($this->translations[$langcode]['status_existed']) ? static::TRANSLATION_CREATED : static::TRANSLATION_EXISTING;
     return $storage->createTranslation($this, $langcode, $values);
@@ -1473,7 +1473,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     // The original entity only exists during save. See
     // \Drupal\Core\Entity\EntityStorageBase::save(). If it exists we re-use it
     // here for performance reasons.
-    /** @var \Drupal\Core\Entity\ContentEntityBase $original */
+    /** @var ContentEntityBase $original */
     $original = $this->getOriginal();
 
     if (!$original) {
@@ -1496,7 +1496,7 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     // sense to mark all translations as changed or none of them. We skip also
     // computed fields as comparing them with their original values might not be
     // possible or be meaningless.
-    /** @var \Drupal\Core\Entity\ContentEntityBase $translation */
+    /** @var ContentEntityBase $translation */
     $translation = $original->getTranslation($this->activeLangcode);
     $langcode = $this->language()->getId();
 

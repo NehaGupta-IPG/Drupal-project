@@ -10,18 +10,18 @@ use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
-use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\Audit\HighestIdInterface;
-use Drupal\migrate\Plugin\MigrationInterface;
+use Drupal\migrate\Event\MigrateEvents;
 use Drupal\migrate\Event\MigrateIdMapMessageEvent;
+use Drupal\migrate\Event\MigrateMapDeleteEvent;
+use Drupal\migrate\Event\MigrateMapSaveEvent;
 use Drupal\migrate\MigrateException;
+use Drupal\migrate\MigrateMessage;
 use Drupal\migrate\MigrateMessageInterface;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
+use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\MigrationPluginManagerInterface;
 use Drupal\migrate\Row;
-use Drupal\migrate\Event\MigrateEvents;
-use Drupal\migrate\Event\MigrateMapSaveEvent;
-use Drupal\migrate\Event\MigrateMapDeleteEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -44,7 +44,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
   /**
    * An event dispatcher instance to use for map events.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+   * @var EventDispatcherInterface
    */
   protected $eventDispatcher;
 
@@ -65,7 +65,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
   /**
    * The migrate message service.
    *
-   * @var \Drupal\migrate\MigrateMessageInterface
+   * @var MigrateMessageInterface
    */
   protected $message;
 
@@ -86,7 +86,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
   /**
    * The migration being done.
    *
-   * @var \Drupal\migrate\Plugin\MigrationInterface
+   * @var MigrationInterface
    */
   protected $migration;
 
@@ -149,7 +149,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
   /**
    * The migration plugin manager.
    *
-   * @var \Drupal\migrate\Plugin\MigrationPluginManagerInterface
+   * @var MigrationPluginManagerInterface
    */
   protected $migrationPluginManager;
 
@@ -164,11 +164,11 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
    *   The plugin ID for the migration process to do.
    * @param mixed $plugin_definition
    *   The configuration for the plugin.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration to do.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
-   * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
+   * @param MigrationPluginManagerInterface $migration_plugin_manager
    *   The migration plugin manager.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EventDispatcherInterface $event_dispatcher, ?MigrationPluginManagerInterface $migration_plugin_manager = NULL) {
@@ -329,7 +329,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
   /**
    * Create the map and message tables if they don't already exist.
    *
-   * @throws \Drupal\Core\Database\DatabaseExceptionWrapper
+   * @throws DatabaseExceptionWrapper
    */
   protected function ensureTables() {
     if (!$this->getDatabase()->schema()->tableExists($this->mapTableName)) {

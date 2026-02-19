@@ -25,7 +25,7 @@ interface MultiItemsFieldHandlerInterface extends FieldHandlerInterface {
   /**
    * Gets an array of items for the field.
    *
-   * @param \Drupal\views\ResultRow $values
+   * @param ResultRow $values
    *   The result row object containing the values.
    *
    * @return array

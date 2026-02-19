@@ -32,49 +32,49 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var ModuleHandlerInterface|ProphecyInterface
    */
   protected $moduleHandler;
 
   /**
    * The cache backend to use.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var CacheBackendInterface|ProphecyInterface
    */
   protected $cacheBackend;
 
   /**
    * The cache tags invalidator.
    *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var CacheTagsInvalidatorInterface|ProphecyInterface
    */
   protected $cacheTagsInvalidator;
 
   /**
    * The typed data manager.
    *
-   * @var \Drupal\Core\TypedData\TypedDataManagerInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var TypedDataManagerInterface|ProphecyInterface
    */
   protected $typedDataManager;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var EntityTypeManagerInterface|ProphecyInterface
    */
   protected $entityTypeManager;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The entity type bundle info under test.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfo
+   * @var EntityTypeBundleInfo
    */
   protected $entityTypeBundleInfo;
 
@@ -113,7 +113,7 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
   /**
    * Sets up the entity type manager to be tested.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface[]|\Prophecy\Prophecy\ProphecyInterface[] $definitions
+   * @param EntityTypeInterface[]|ProphecyInterface[] $definitions
    *   (optional) An array of entity type definitions.
    */
   protected function setUpEntityTypeDefinitions($definitions = []): void {

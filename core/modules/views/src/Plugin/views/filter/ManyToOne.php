@@ -4,9 +4,9 @@ namespace Drupal\views\Plugin\views\filter;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Attribute\ViewsFilter;
-use Drupal\views\ViewExecutable;
-use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\ManyToOneHelper;
+use Drupal\views\Plugin\views\display\DisplayPluginBase;
+use Drupal\views\ViewExecutable;
 
 /**
  * Complex filter to handle filtering for many to one relationships.
@@ -23,8 +23,7 @@ use Drupal\views\ManyToOneHelper;
 class ManyToOne extends InOperator {
 
   /**
-   * @var \Drupal\views\ManyToOneHelper
-   *
+   * @var ManyToOneHelper *
    * Stores the Helper object which handles the many_to_one complexity.
    */
   public $helper = NULL;

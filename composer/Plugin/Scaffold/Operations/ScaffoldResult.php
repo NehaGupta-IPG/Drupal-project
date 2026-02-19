@@ -14,7 +14,7 @@ class ScaffoldResult {
   /**
    * The path to the scaffold file that was processed.
    *
-   * @var \Drupal\Composer\Plugin\Scaffold\ScaffoldFilePath
+   * @var ScaffoldFilePath
    */
   protected $destination;
 
@@ -28,7 +28,7 @@ class ScaffoldResult {
   /**
    * ScaffoldResult constructor.
    *
-   * @param \Drupal\Composer\Plugin\Scaffold\ScaffoldFilePath $destination
+   * @param ScaffoldFilePath $destination
    *   The path to the scaffold file that was processed.
    * @param bool $isManaged
    *   (optional) Whether this result is managed. Defaults to FALSE.
@@ -51,7 +51,7 @@ class ScaffoldResult {
   /**
    * Gets the destination scaffold file that this result refers to.
    *
-   * @return \Drupal\Composer\Plugin\Scaffold\ScaffoldFilePath
+   * @return ScaffoldFilePath
    *   The destination path for the scaffold result.
    */
   public function destination() {

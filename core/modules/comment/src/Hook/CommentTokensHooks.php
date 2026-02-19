@@ -2,12 +2,12 @@
 
 namespace Drupal\comment\Hook;
 
-use Drupal\Core\Entity\FieldableEntityInterface;
-use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\Component\Utility\UrlHelper;
-use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
@@ -231,7 +231,7 @@ class CommentTokensHooks {
       }
     }
     elseif (!empty($data[$type]) && $data[$type] instanceof FieldableEntityInterface) {
-      /** @var \Drupal\Core\Entity\FieldableEntityInterface $entity */
+      /** @var FieldableEntityInterface $entity */
       $entity = $data[$type];
       foreach ($tokens as $name => $original) {
         switch ($name) {

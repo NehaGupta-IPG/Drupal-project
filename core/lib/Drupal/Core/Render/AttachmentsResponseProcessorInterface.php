@@ -20,10 +20,10 @@ interface AttachmentsResponseProcessorInterface {
    * available for processing. For an example, see
    * \Drupal\Core\Render\HtmlResponseAttachmentsProcessor::renderPlaceholders()
    *
-   * @param \Drupal\Core\Render\AttachmentsInterface $response
+   * @param AttachmentsInterface $response
    *   The response to process.
    *
-   * @return \Drupal\Core\Render\AttachmentsInterface
+   * @return AttachmentsInterface
    *   The processed response, with the attachments updated to reflect their
    *   final values.
    *

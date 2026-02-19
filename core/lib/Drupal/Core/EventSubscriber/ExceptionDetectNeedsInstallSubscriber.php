@@ -18,14 +18,14 @@ class ExceptionDetectNeedsInstallSubscriber implements EventSubscriberInterface 
   /**
    * The default database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
   /**
    * Constructs a new ExceptionDetectNeedsInstallSubscriber.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The default database connection.
    */
   public function __construct(Connection $connection) {
@@ -35,7 +35,7 @@ class ExceptionDetectNeedsInstallSubscriber implements EventSubscriberInterface 
   /**
    * Handles errors for this subscriber.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   * @param ExceptionEvent $event
    *   The event to process.
    */
   public function onException(ExceptionEvent $event) {

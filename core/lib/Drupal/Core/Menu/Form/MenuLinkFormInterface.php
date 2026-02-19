@@ -19,7 +19,7 @@ interface MenuLinkFormInterface extends PluginFormInterface {
   /**
    * Injects the menu link plugin instance.
    *
-   * @param \Drupal\Core\Menu\MenuLinkInterface $menu_link
+   * @param MenuLinkInterface $menu_link
    *   A menu link plugin instance.
    */
   public function setMenuLinkInstance(MenuLinkInterface $menu_link);
@@ -29,7 +29,7 @@ interface MenuLinkFormInterface extends PluginFormInterface {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return array

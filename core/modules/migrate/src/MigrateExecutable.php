@@ -2,8 +2,8 @@
 
 namespace Drupal\migrate;
 
-use Drupal\Core\Utility\Error;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Utility\Error;
 use Drupal\migrate\Event\MigrateEvents;
 use Drupal\migrate\Event\MigrateImportEvent;
 use Drupal\migrate\Event\MigratePostRowSaveEvent;
@@ -24,7 +24,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
   /**
    * The configuration of the migration to do.
    *
-   * @var \Drupal\migrate\Plugin\MigrationInterface
+   * @var MigrationInterface
    */
   protected $migration;
 
@@ -62,14 +62,14 @@ class MigrateExecutable implements MigrateExecutableInterface {
   /**
    * The event dispatcher.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+   * @var EventDispatcherInterface
    */
   protected $eventDispatcher;
 
   /**
    * Migration message service.
    *
-   * @var \Drupal\migrate\MigrateMessageInterface
+   * @var MigrateMessageInterface
    *
    * @todo https://www.drupal.org/node/2822663 Make this protected.
    */
@@ -78,11 +78,11 @@ class MigrateExecutable implements MigrateExecutableInterface {
   /**
    * Constructs a MigrateExecutable.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration to run.
-   * @param \Drupal\migrate\MigrateMessageInterface $message
+   * @param MigrateMessageInterface $message
    *   (optional) The migrate message service.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param EventDispatcherInterface $event_dispatcher
    *   (optional) The event dispatcher.
    */
   public function __construct(MigrationInterface $migration, ?MigrateMessageInterface $message = NULL, ?EventDispatcherInterface $event_dispatcher = NULL) {
@@ -110,7 +110,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
   /**
    * Gets the event dispatcher.
    *
-   * @return \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+   * @return EventDispatcherInterface
    *   The event dispatcher service.
    */
   protected function getEventDispatcher() {
@@ -346,7 +346,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
   /**
    * Get the ID map from the current migration.
    *
-   * @return \Drupal\migrate\Plugin\MigrateIdMapInterface
+   * @return MigrateIdMapInterface
    *   The ID map.
    */
   protected function getIdMap() {
@@ -365,7 +365,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
   /**
    * Runs a process pipeline.
    *
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The $row to be processed.
    * @param string $destination
    *   The destination property name.
@@ -376,7 +376,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
    *
    * @see \Drupal\migrate\MigrateExecutableInterface::processRow
    *
-   * @throws \Drupal\migrate\MigrateException
+   * @throws MigrateException
    */
   protected function processPipeline(Row $row, string $destination, array $plugins, $value) {
     $multiple = FALSE;

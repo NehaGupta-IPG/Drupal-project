@@ -4,8 +4,8 @@ namespace Drupal\menu_ui\Form;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityDeleteForm;
-use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -18,23 +18,23 @@ class MenuDeleteForm extends EntityDeleteForm {
   /**
    * The menu link manager.
    *
-   * @var \Drupal\Core\Menu\MenuLinkManagerInterface
+   * @var MenuLinkManagerInterface
    */
   protected $menuLinkManager;
 
   /**
    * The database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
   /**
    * Constructs a new MenuDeleteForm.
    *
-   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager
+   * @param MenuLinkManagerInterface $menu_link_manager
    *   The menu link manager.
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection.
    */
   public function __construct(MenuLinkManagerInterface $menu_link_manager, Connection $connection) {

@@ -39,7 +39,7 @@ interface StringStorageInterface {
    *   (optional) An associative array of additional options. It may contain
    *   any of the options defined by getStrings().
    *
-   * @return \Drupal\locale\StringInterface[]
+   * @return StringInterface[]
    *   Array of \Drupal\locale\StringInterface objects matching the conditions.
    *
    * @see \Drupal\locale\StringStorageInterface::getStrings()
@@ -56,7 +56,7 @@ interface StringStorageInterface {
    *   - 'type', The location type.
    *   - 'name', The location name.
    *
-   * @return \Drupal\locale\StringInterface[]
+   * @return StringInterface[]
    *   Array of \Drupal\locale\StringInterface objects matching the conditions.
    *
    * @see \Drupal\locale\StringStorageInterface::getStrings()
@@ -74,7 +74,7 @@ interface StringStorageInterface {
    *   (optional) Array with conditions that will be used to filter the strings
    *   returned and may include all of the conditions defined by getStrings().
    *
-   * @return \Drupal\locale\SourceString|null
+   * @return SourceString|null
    *   Minimal TranslationString object if found, NULL otherwise.
    */
   public function findString(array $conditions);
@@ -90,7 +90,7 @@ interface StringStorageInterface {
    *   (optional) Array with conditions that will be used to filter the strings
    *   returned and may include all of the conditions defined by getStrings().
    *
-   * @return \Drupal\locale\TranslationString|null
+   * @return TranslationString|null
    *   Minimal TranslationString object if found, NULL otherwise.
    */
   public function findTranslation(array $conditions);
@@ -98,13 +98,13 @@ interface StringStorageInterface {
   /**
    * Save string object to storage.
    *
-   * @param \Drupal\locale\StringInterface $string
+   * @param StringInterface $string
    *   The string object.
    *
    * @return $this
    *   The called object.
    *
-   * @throws \Drupal\locale\StringStorageException
+   * @throws StringStorageException
    *   In case of failures, an exception is thrown.
    */
   public function save($string);
@@ -112,13 +112,13 @@ interface StringStorageInterface {
   /**
    * Delete string from storage.
    *
-   * @param \Drupal\locale\StringInterface $string
+   * @param StringInterface $string
    *   The string object.
    *
    * @return $this
    *   The called object.
    *
-   * @throws \Drupal\locale\StringStorageException
+   * @throws StringStorageException
    *   In case of failures, an exception is thrown.
    */
   public function delete($string);
@@ -161,7 +161,7 @@ interface StringStorageInterface {
    * @param array $values
    *   (optional) Array with initial values. Defaults to empty array.
    *
-   * @return \Drupal\locale\SourceString
+   * @return SourceString
    *   New source string object.
    */
   public function createString($values = []);
@@ -172,7 +172,7 @@ interface StringStorageInterface {
    * @param array $values
    *   (optional) Array with initial values. Defaults to empty array.
    *
-   * @return \Drupal\locale\TranslationString
+   * @return TranslationString
    *   New string translation object.
    */
   public function createTranslation($values = []);

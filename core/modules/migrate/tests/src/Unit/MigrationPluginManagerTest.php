@@ -22,7 +22,7 @@ class MigrationPluginManagerTest extends UnitTestCase {
   /**
    * A plugin manager.
    *
-   * @var \Drupal\migrate\Plugin\MigrationPluginManager
+   * @var MigrationPluginManager
    */
   protected $pluginManager;
 

@@ -12,7 +12,7 @@ interface WorkflowInterface extends ConfigEntityInterface {
   /**
    * Gets the workflow type plugin.
    *
-   * @return \Drupal\workflows\WorkflowTypeInterface
+   * @return WorkflowTypeInterface
    *   The workflow type plugin.
    */
   public function getTypePlugin();

@@ -21,7 +21,7 @@ class PluginBaseTest extends UnitTestCase {
   /**
    * The test helper plugin to use for the tests.
    *
-   * @var \Drupal\views\Tests\TestHelperPlugin
+   * @var TestHelperPlugin
    */
   protected $testHelperPlugin;
 

@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\ckeditor5\Kernel;
 
-// cspell:ignore arta codesnippet
-
 use Drupal\ckeditor5\HTMLRestrictions;
 use Drupal\ckeditor5\SmartDefaultSettings;
+// cspell:ignore arta codesnippet
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\Entity\EntityViewMode;
@@ -64,7 +63,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
   /**
    * Smart default settings utility.
    *
-   * @var \Drupal\ckeditor5\SmartDefaultSettings
+   * @var SmartDefaultSettings
    */
   protected $smartDefaultSettings;
 
@@ -85,7 +84,7 @@ class SmartDefaultSettingsTest extends KernelTestBase {
   /**
    * The message's placeholders parser.
    *
-   * @var \Drupal\Core\Logger\LogMessageParserInterface
+   * @var LogMessageParserInterface
    */
   protected LogMessageParserInterface $parser;
 

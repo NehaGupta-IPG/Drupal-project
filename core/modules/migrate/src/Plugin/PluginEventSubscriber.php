@@ -19,7 +19,7 @@ class PluginEventSubscriber implements EventSubscriberInterface {
    *
    * @param string $method
    *   The method to invoke.
-   * @param \Drupal\migrate\Event\MigrateImportEvent|\Drupal\migrate\Event\MigrateRollbackEvent $event
+   * @param MigrateImportEvent|MigrateRollbackEvent $event
    *   The event that has triggered the invocation.
    * @param string $plugin_interface
    *   The interface which plugins must implement in order to be invoked.
@@ -41,7 +41,7 @@ class PluginEventSubscriber implements EventSubscriberInterface {
   /**
    * Forwards pre-import events to the source and destination plugins.
    *
-   * @param \Drupal\migrate\Event\MigrateImportEvent $event
+   * @param MigrateImportEvent $event
    *   The import event.
    */
   public function preImport(MigrateImportEvent $event) {
@@ -51,7 +51,7 @@ class PluginEventSubscriber implements EventSubscriberInterface {
   /**
    * Forwards post-import events to the source and destination plugins.
    *
-   * @param \Drupal\migrate\Event\MigrateImportEvent $event
+   * @param MigrateImportEvent $event
    *   The import event.
    */
   public function postImport(MigrateImportEvent $event) {
@@ -61,7 +61,7 @@ class PluginEventSubscriber implements EventSubscriberInterface {
   /**
    * Forwards pre-rollback events to the source and destination plugins.
    *
-   * @param \Drupal\migrate\Event\MigrateRollbackEvent $event
+   * @param MigrateRollbackEvent $event
    *   The rollback event.
    */
   public function preRollback(MigrateRollbackEvent $event) {
@@ -71,7 +71,7 @@ class PluginEventSubscriber implements EventSubscriberInterface {
   /**
    * Forwards post-rollback events to the source and destination plugins.
    *
-   * @param \Drupal\migrate\Event\MigrateRollbackEvent $event
+   * @param MigrateRollbackEvent $event
    *   The rollback event.
    */
   public function postRollback(MigrateRollbackEvent $event) {

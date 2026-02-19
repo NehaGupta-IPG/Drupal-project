@@ -24,7 +24,7 @@ class SubProcessTest extends MigrateProcessTestCase {
   /**
    * The sub_process plugin being tested.
    *
-   * @var \Drupal\migrate\Plugin\migrate\process\SubProcess
+   * @var SubProcess
    */
   protected $plugin;
 

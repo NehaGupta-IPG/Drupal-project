@@ -23,7 +23,7 @@ interface EntityAutocompleteMatcherInterface {
    *   An array of matched entity labels, in the format required by the AJAX
    *   autocomplete API. For example, [value' => $value, 'label' => $label].
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   * @throws AccessDeniedHttpException
    *   Thrown when the current user doesn't have access to the specified entity.
    *
    * @see \Drupal\system\Controller\EntityAutocompleteController

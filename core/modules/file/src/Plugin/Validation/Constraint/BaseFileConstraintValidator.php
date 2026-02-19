@@ -19,7 +19,7 @@ abstract class BaseFileConstraintValidator extends ConstraintValidator {
    * @param mixed $value
    *   The value to check.
    *
-   * @return \Drupal\file\FileInterface
+   * @return FileInterface
    *   The file.
    *
    * @throw Symfony\Component\Validator\Exception\UnexpectedTypeException

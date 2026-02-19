@@ -2,12 +2,12 @@
 
 namespace Drupal\Core\Utility;
 
+use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Html;
-use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\GeneratedLink;
 use Drupal\Core\GeneratedButton;
+use Drupal\Core\GeneratedLink;
 use Drupal\Core\GeneratedNoLink;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
@@ -22,32 +22,32 @@ class LinkGenerator implements LinkGeneratorInterface {
   /**
    * The URL generator.
    *
-   * @var \Drupal\Core\Routing\UrlGeneratorInterface
+   * @var UrlGeneratorInterface
    */
   protected $urlGenerator;
 
   /**
    * The module handler firing the route_link alter hook.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The renderer service.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * Constructs a LinkGenerator instance.
    *
-   * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
+   * @param UrlGeneratorInterface $url_generator
    *   The URL generator.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer service.
    */
   public function __construct(UrlGeneratorInterface $url_generator, ModuleHandlerInterface $module_handler, RendererInterface $renderer) {
@@ -184,14 +184,14 @@ class LinkGenerator implements LinkGeneratorInterface {
   /**
    * Generates the link.
    *
-   * @param \Drupal\Core\GeneratedLink $generated_link
+   * @param GeneratedLink $generated_link
    *   The generated link, along with its associated cacheability metadata.
    * @param array $attributes
    *   The attributes of the generated link.
    * @param array $variables
    *   The link text, URL, and other options.
    *
-   * @return \Drupal\Core\GeneratedLink
+   * @return GeneratedLink
    *   The generated link, along with its associated cacheability metadata.
    */
   protected function doGenerate($generated_link, $attributes, $variables) {

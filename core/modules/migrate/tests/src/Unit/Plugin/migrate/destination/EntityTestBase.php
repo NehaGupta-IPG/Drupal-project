@@ -19,28 +19,28 @@ abstract class EntityTestBase extends UnitTestCase {
   /**
    * The migration entity.
    *
-   * @var \Drupal\migrate\Plugin\MigrationInterface
+   * @var MigrationInterface
    */
   protected $migration;
 
   /**
    * The entity storage.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var EntityStorageInterface
    */
   protected $storage;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface
+   * @var EntityTypeInterface
    */
   protected $entityType;
 
   /**
    * The entity field manager service.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 

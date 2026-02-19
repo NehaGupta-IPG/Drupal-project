@@ -46,7 +46,7 @@ interface ModuleHandlerInterface {
   /**
    * Returns the list of currently active modules.
    *
-   * @return array<string, \Drupal\Core\Extension\Extension>
+   * @return array<string, Extension>
    *   An associative array whose keys are the names of the modules and whose
    *   values are Extension objects.
    */
@@ -58,10 +58,10 @@ interface ModuleHandlerInterface {
    * @param string $name
    *   The name of the module to return.
    *
-   * @return \Drupal\Core\Extension\Extension
+   * @return Extension
    *   An extension object.
    *
-   * @throws \Drupal\Core\Extension\Exception\UnknownExtensionException
+   * @throws UnknownExtensionException
    *   Thrown when the requested module does not exist.
    */
   public function getModule($name);
@@ -69,7 +69,7 @@ interface ModuleHandlerInterface {
   /**
    * Sets an explicit list of currently active modules.
    *
-   * @param array<string, \Drupal\Core\Extension\Extension> $module_list
+   * @param array<string, Extension> $module_list
    *   An associative array whose keys are the names of the modules and whose
    *   values are Extension objects.
    */
@@ -78,12 +78,12 @@ interface ModuleHandlerInterface {
   /**
    * Determines which modules require and are required by each module.
    *
-   * @param array<string, \Drupal\Core\Extension\Extension> $modules
+   * @param array<string, Extension> $modules
    *   An array of module objects keyed by module name. Each object contains
    *   information discovered during a Drupal\Core\Extension\ExtensionDiscovery
    *   scan.
    *
-   * @return array<string, \Drupal\Core\Extension\Extension>
+   * @return array<string, Extension>
    *   The same array with the new keys for each module:
    *   - requires: An array with the keys being the modules that this module
    *     requires.

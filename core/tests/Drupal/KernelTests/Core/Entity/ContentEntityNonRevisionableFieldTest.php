@@ -44,14 +44,14 @@ class ContentEntityNonRevisionableFieldTest extends EntityKernelTestBase {
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected EntityFieldManagerInterface $entityFieldManager;
 
   /**
    * The entity definition update manager.
    *
-   * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
+   * @var EntityDefinitionUpdateManagerInterface
    */
   protected EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager;
 

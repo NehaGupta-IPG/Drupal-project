@@ -17,7 +17,7 @@ class DefaultsTestPluginManager extends DefaultPluginManager {
   /**
    * Constructs a new DefaultsTestPluginManager instance.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
    */
   public function __construct(ModuleHandlerInterface $module_handler) {

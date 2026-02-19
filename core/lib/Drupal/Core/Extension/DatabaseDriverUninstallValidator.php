@@ -16,25 +16,25 @@ class DatabaseDriverUninstallValidator implements ModuleUninstallValidatorInterf
   /**
    * The module extension list.
    *
-   * @var \Drupal\Core\Extension\ModuleExtensionList
+   * @var ModuleExtensionList
    */
   protected $moduleExtensionList;
 
   /**
    * The database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
   /**
    * Constructs a new DatabaseDriverUninstallValidator.
    *
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param TranslationInterface $string_translation
    *   The string translation service.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $extension_list_module
+   * @param ModuleExtensionList $extension_list_module
    *   The module extension list.
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection.
    */
   public function __construct(TranslationInterface $string_translation, ModuleExtensionList $extension_list_module, Connection $connection) {

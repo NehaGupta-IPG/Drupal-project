@@ -21,7 +21,7 @@ class ContextualLinkDefaultTest extends UnitTestCase {
   /**
    * The tested contextual link default plugin.
    *
-   * @var \Drupal\Core\Menu\ContextualLinkDefault
+   * @var ContextualLinkDefault
    */
   protected $contextualLinkDefault;
 
@@ -51,7 +51,7 @@ class ContextualLinkDefaultTest extends UnitTestCase {
   /**
    * The mocked translator.
    *
-   * @var \Drupal\Core\StringTranslation\TranslationInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\StringTranslation\TranslationInterface|MockObject
    */
   protected $stringTranslation;
 

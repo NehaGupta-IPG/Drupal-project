@@ -15,14 +15,14 @@ abstract class RoleUserTestBase extends UnitTestCase {
   /**
    * The mocked account.
    *
-   * @var \Drupal\user\UserInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\user\UserInterface|MockObject
    */
   protected $account;
 
   /**
    * The user role entity type.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface|\PHPUnit\Framework\MockObject\Stub
+   * @var EntityTypeInterface|Stub
    */
   protected $userRoleEntityType;
 

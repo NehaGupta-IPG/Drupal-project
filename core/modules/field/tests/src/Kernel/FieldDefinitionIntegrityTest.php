@@ -38,13 +38,13 @@ class FieldDefinitionIntegrityTest extends KernelTestBase {
       )
     );
 
-    /** @var \Drupal\Component\Plugin\Discovery\DiscoveryInterface $field_type_manager */
+    /** @var DiscoveryInterface $field_type_manager */
     $field_type_manager = \Drupal::service('plugin.manager.field.field_type');
 
-    /** @var \Drupal\Component\Plugin\Discovery\DiscoveryInterface $field_type_manager */
+    /** @var DiscoveryInterface $field_type_manager */
     $field_formatter_manager = \Drupal::service('plugin.manager.field.formatter');
 
-    /** @var \Drupal\Component\Plugin\Discovery\DiscoveryInterface $field_type_manager */
+    /** @var DiscoveryInterface $field_type_manager */
     $field_widget_manager = \Drupal::service('plugin.manager.field.widget');
 
     // Load the IDs of all available field type plugins.
@@ -99,10 +99,10 @@ class FieldDefinitionIntegrityTest extends KernelTestBase {
       $this->modulesWithSubdirectory('src' . DIRECTORY_SEPARATOR . 'Entity')
     );
 
-    /** @var \Drupal\Component\Plugin\Discovery\DiscoveryInterface $field_type_manager */
+    /** @var DiscoveryInterface $field_type_manager */
     $field_formatter_manager = $this->container->get('plugin.manager.field.formatter');
 
-    /** @var \Drupal\Component\Plugin\Discovery\DiscoveryInterface $field_type_manager */
+    /** @var DiscoveryInterface $field_type_manager */
     $field_widget_manager = $this->container->get('plugin.manager.field.widget');
 
     /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager */
@@ -111,10 +111,10 @@ class FieldDefinitionIntegrityTest extends KernelTestBase {
     /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */
     $entity_type_manager = $this->container->get('entity_type.manager');
 
-    /** @var \Drupal\Core\Field\BaseFieldDefinition[][] $field_definitions */
+    /** @var BaseFieldDefinition[][] $field_definitions */
     $field_definitions = [];
 
-    /** @var \Drupal\Core\Entity\EntityTypeInterface[] $content_entity_types */
+    /** @var EntityTypeInterface[] $content_entity_types */
     $content_entity_types = array_filter($entity_type_manager->getDefinitions(), function (EntityTypeInterface $entity_type) {
       return $entity_type instanceof ContentEntityTypeInterface;
     });
@@ -138,9 +138,9 @@ class FieldDefinitionIntegrityTest extends KernelTestBase {
    *   Id of entity type. Required by message.
    * @param string $field_id
    *   Id of field. Required by message.
-   * @param \Drupal\Core\Field\BaseFieldDefinition $field_definition
+   * @param BaseFieldDefinition $field_definition
    *   Field definition that provide display options.
-   * @param \Drupal\Component\Plugin\Discovery\DiscoveryInterface $plugin_manager
+   * @param DiscoveryInterface $plugin_manager
    *   Plugin manager that will try to provide plugin definition.
    * @param string $display_context
    *   Defines which display options should be loaded.

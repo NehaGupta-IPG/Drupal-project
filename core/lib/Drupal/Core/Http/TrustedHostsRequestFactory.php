@@ -54,7 +54,7 @@ class TrustedHostsRequestFactory {
    * @param string $content
    *   (optional) The raw body data.
    *
-   * @return \Symfony\Component\HttpFoundation\Request
+   * @return Request
    *   A new request object.
    */
   public function createRequest(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = NULL) {

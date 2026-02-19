@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\image\Functional;
 
-use Drupal\Tests\image\Kernel\ImageFieldCreationTrait;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\image\Kernel\ImageFieldCreationTrait;
 
 /**
  * @todo Test the following functions.
@@ -75,7 +75,7 @@ abstract class ImageFieldTestBase extends BrowserTestBase {
   /**
    * Preview an image in a node.
    *
-   * @param \Drupal\Core\Image\ImageInterface $image
+   * @param ImageInterface $image
    *   A file object representing the image to upload.
    * @param string $field_name
    *   Name of the image field the image should be attached to.

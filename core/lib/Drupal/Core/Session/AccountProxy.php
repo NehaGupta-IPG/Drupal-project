@@ -23,7 +23,7 @@ class AccountProxy implements AccountProxyInterface {
   /**
    * The instantiated account.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $account;
 
@@ -37,14 +37,14 @@ class AccountProxy implements AccountProxyInterface {
   /**
    * Event dispatcher.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+   * @var EventDispatcherInterface
    */
   protected $eventDispatcher;
 
   /**
    * AccountProxy constructor.
    *
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $eventDispatcher
+   * @param EventDispatcherInterface $eventDispatcher
    *   Event dispatcher.
    */
   public function __construct(EventDispatcherInterface $eventDispatcher) {
@@ -209,7 +209,7 @@ class AccountProxy implements AccountProxyInterface {
    * @param int $account_id
    *   The id of an account to load.
    *
-   * @return \Drupal\Core\Session\AccountInterface|null
+   * @return AccountInterface|null
    *   An account or NULL if none is found.
    */
   protected function loadUserEntity($account_id) {

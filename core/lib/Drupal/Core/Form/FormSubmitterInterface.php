@@ -12,10 +12,10 @@ interface FormSubmitterInterface {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
-   * @return null|\Symfony\Component\HttpFoundation\Response
+   * @return null|Response
    *   If a response was set by a submit handler, or if the form needs to
    *   redirect, a Response object will be returned.
    */
@@ -29,7 +29,7 @@ interface FormSubmitterInterface {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form. If the user submitted the form by clicking
    *   a button with custom handler functions defined, those handlers will be
    *   stored here.
@@ -65,7 +65,7 @@ interface FormSubmitterInterface {
    * );
    * @endcode
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse|null

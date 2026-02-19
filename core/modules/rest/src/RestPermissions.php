@@ -16,7 +16,7 @@ class RestPermissions implements ContainerInjectionInterface {
   /**
    * The rest resource plugin manager.
    *
-   * @var \Drupal\rest\Plugin\Type\ResourcePluginManager
+   * @var ResourcePluginManager
    */
   protected $restPluginManager;
 
@@ -30,9 +30,9 @@ class RestPermissions implements ContainerInjectionInterface {
   /**
    * Constructs a new RestPermissions instance.
    *
-   * @param \Drupal\rest\Plugin\Type\ResourcePluginManager $rest_plugin_manager
+   * @param ResourcePluginManager $rest_plugin_manager
    *   The rest resource plugin manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(ResourcePluginManager $rest_plugin_manager, EntityTypeManagerInterface $entity_type_manager) {
@@ -55,7 +55,7 @@ class RestPermissions implements ContainerInjectionInterface {
    */
   public function permissions() {
     $permissions = [];
-    /** @var \Drupal\rest\RestResourceConfigInterface[] $resource_configs */
+    /** @var RestResourceConfigInterface[] $resource_configs */
     $resource_configs = $this->resourceConfigStorage->loadMultiple();
     foreach ($resource_configs as $resource_config) {
       $plugin = $resource_config->getResourcePlugin();

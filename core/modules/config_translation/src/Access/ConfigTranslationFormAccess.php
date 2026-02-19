@@ -16,9 +16,9 @@ class ConfigTranslationFormAccess extends ConfigTranslationOverviewAccess {
   /**
    * Checks access to the overview based on permissions and translatability.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route_match to check against.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The account to check access for.
    * @param string $langcode
    *   The language code of the target language.
@@ -52,13 +52,13 @@ class ConfigTranslationFormAccess extends ConfigTranslationOverviewAccess {
    * Although technically configuration can be overlaid with translations in the
    * same language, that is logically not a good idea.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The account to check access for.
-   * @param \Drupal\config_translation\ConfigMapperInterface $mapper
+   * @param ConfigMapperInterface $mapper
    *   The configuration mapper to check access for.
-   * @param \Drupal\Core\Language\LanguageInterface|null $source_language
+   * @param LanguageInterface|null $source_language
    *   The source language to check for, if any.
-   * @param \Drupal\Core\Language\LanguageInterface|null $target_language
+   * @param LanguageInterface|null $target_language
    *   The target language to check for, if any.
    *
    * @return \Drupal\Core\Access\AccessResultInterface

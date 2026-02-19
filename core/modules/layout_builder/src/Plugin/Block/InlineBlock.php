@@ -37,7 +37,7 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
@@ -51,7 +51,7 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
   /**
    * The entity display repository.
    *
-   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
+   * @var EntityDisplayRepositoryInterface
    */
   protected $entityDisplayRepository;
 
@@ -65,7 +65,7 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
@@ -78,11 +78,11 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
-   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
+   * @param EntityDisplayRepositoryInterface $entity_display_repository
    *   The entity display repository.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityDisplayRepositoryInterface $entity_display_repository, AccountInterface $current_user) {
@@ -141,7 +141,7 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
    *
    * @param array $element
    *   The containing element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    *
    * @return array

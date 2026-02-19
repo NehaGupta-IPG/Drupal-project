@@ -20,14 +20,14 @@ class HookDiscoveryTest extends UnitTestCase {
   /**
    * The mocked module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface|MockObject
    */
   protected $moduleHandler;
 
   /**
    * The tested hook discovery.
    *
-   * @var \Drupal\Core\Plugin\Discovery\HookDiscovery
+   * @var HookDiscovery
    */
   protected $hookDiscovery;
 

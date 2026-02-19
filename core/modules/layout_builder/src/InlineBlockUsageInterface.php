@@ -14,7 +14,7 @@ interface InlineBlockUsageInterface {
    *
    * @param int $block_content_id
    *   The block content ID.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The layout entity.
    */
   public function addUsage($block_content_id, EntityInterface $entity);
@@ -33,7 +33,7 @@ interface InlineBlockUsageInterface {
   /**
    * Remove usage record by layout entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The layout entity.
    */
   public function removeByLayoutEntity(EntityInterface $entity);

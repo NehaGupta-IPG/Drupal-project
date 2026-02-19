@@ -2,12 +2,12 @@
 
 namespace Drupal\image\Form;
 
+use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\SubformState;
 use Drupal\image\ConfigurableImageEffectInterface;
 use Drupal\image\ImageStyleInterface;
-use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -18,14 +18,14 @@ abstract class ImageEffectFormBase extends FormBase {
   /**
    * The image style.
    *
-   * @var \Drupal\image\ImageStyleInterface
+   * @var ImageStyleInterface
    */
   protected $imageStyle;
 
   /**
    * The image effect.
    *
-   * @var \Drupal\image\ImageEffectInterface|\Drupal\image\ConfigurableImageEffectInterface
+   * @var \Drupal\image\ImageEffectInterface|ConfigurableImageEffectInterface
    */
   protected $imageEffect;
 
@@ -41,9 +41,9 @@ abstract class ImageEffectFormBase extends FormBase {
    *
    * @param array $form
    *   A nested array form elements comprising the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
-   * @param \Drupal\image\ImageStyleInterface $image_style
+   * @param ImageStyleInterface $image_style
    *   The image style.
    * @param string $image_effect
    *   The image effect ID.
@@ -51,7 +51,7 @@ abstract class ImageEffectFormBase extends FormBase {
    * @return array
    *   The form structure.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   * @throws NotFoundHttpException
    */
   public function buildForm(array $form, FormStateInterface $form_state, ?ImageStyleInterface $image_style = NULL, $image_effect = NULL) {
     $this->imageStyle = $image_style;

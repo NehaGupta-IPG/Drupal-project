@@ -24,7 +24,7 @@ use Symfony\Component\Routing\RouteCollection;
  * - edit-form
  * - delete-form
  * - collection
- * - delete-multiple-form
+ * - delete-multiple-form.
  *
  * @see \Drupal\Core\Entity\Routing\AdminHtmlRouteProvider.
  */
@@ -33,23 +33,23 @@ class DefaultHtmlRouteProvider implements EntityRouteProviderInterface, EntityHa
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 
   /**
    * Constructs a new DefaultHtmlRouteProvider.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @param EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager) {
@@ -111,10 +111,10 @@ class DefaultHtmlRouteProvider implements EntityRouteProviderInterface, EntityHa
    *
    * Built only for entity types that have bundles.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type.
    *
-   * @return \Symfony\Component\Routing\Route|null
+   * @return Route|null
    *   The generated route, if available.
    */
   protected function getAddPageRoute(EntityTypeInterface $entity_type) {
@@ -132,10 +132,10 @@ class DefaultHtmlRouteProvider implements EntityRouteProviderInterface, EntityHa
   /**
    * Gets the add-form route.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type.
    *
-   * @return \Symfony\Component\Routing\Route|null
+   * @return Route|null
    *   The generated route, if available.
    */
   protected function getAddFormRoute(EntityTypeInterface $entity_type) {
@@ -204,10 +204,10 @@ class DefaultHtmlRouteProvider implements EntityRouteProviderInterface, EntityHa
   /**
    * Gets the canonical route.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type.
    *
-   * @return \Symfony\Component\Routing\Route|null
+   * @return Route|null
    *   The generated route, if available.
    */
   protected function getCanonicalRoute(EntityTypeInterface $entity_type) {
@@ -236,10 +236,10 @@ class DefaultHtmlRouteProvider implements EntityRouteProviderInterface, EntityHa
   /**
    * Gets the edit-form route.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type.
    *
-   * @return \Symfony\Component\Routing\Route|null
+   * @return Route|null
    *   The generated route, if available.
    */
   protected function getEditFormRoute(EntityTypeInterface $entity_type) {
@@ -273,10 +273,10 @@ class DefaultHtmlRouteProvider implements EntityRouteProviderInterface, EntityHa
   /**
    * Gets the delete-form route.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type.
    *
-   * @return \Symfony\Component\Routing\Route|null
+   * @return Route|null
    *   The generated route, if available.
    */
   protected function getDeleteFormRoute(EntityTypeInterface $entity_type) {
@@ -305,10 +305,10 @@ class DefaultHtmlRouteProvider implements EntityRouteProviderInterface, EntityHa
   /**
    * Gets the collection route.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type.
    *
-   * @return \Symfony\Component\Routing\Route|null
+   * @return Route|null
    *   The generated route, if available.
    */
   protected function getCollectionRoute(EntityTypeInterface $entity_type) {
@@ -340,7 +340,7 @@ class DefaultHtmlRouteProvider implements EntityRouteProviderInterface, EntityHa
   /**
    * Gets the type of the ID key for a given entity type.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   An entity type.
    *
    * @return string|null
@@ -366,10 +366,10 @@ class DefaultHtmlRouteProvider implements EntityRouteProviderInterface, EntityHa
   /**
    * Returns the delete multiple form route.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type.
    *
-   * @return \Symfony\Component\Routing\Route|null
+   * @return Route|null
    *   The generated route, if available.
    */
   protected function getDeleteMultipleFormRoute(EntityTypeInterface $entity_type) {

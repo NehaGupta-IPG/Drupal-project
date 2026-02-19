@@ -10,7 +10,7 @@ trait UseCacheBackendTrait {
   /**
    * Cache backend instance.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $cacheBackend;
 

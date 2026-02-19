@@ -35,14 +35,14 @@ abstract class ComponentKernelTestBase extends KernelTestBase {
   /**
    * The component negotiator.
    *
-   * @return \Drupal\Core\Theme\ComponentNegotiator
+   * @return ComponentNegotiator
    */
   protected ComponentNegotiator $negotiator;
 
   /**
    * The component plugin manager.
    *
-   * @var \Drupal\Core\Theme\ComponentPluginManager
+   * @var ComponentPluginManager
    */
   protected ComponentPluginManager $manager;
 
@@ -75,10 +75,10 @@ abstract class ComponentKernelTestBase extends KernelTestBase {
    *
    * @param array $component
    *   Component render array.
-   * @param \Drupal\Core\Render\BubbleableMetadata|null $metadata
+   * @param BubbleableMetadata|null $metadata
    *   Bubble metadata.
    *
-   * @return \Symfony\Component\DomCrawler\Crawler
+   * @return Crawler
    *   Crawler for introspecting the rendered component.
    */
   protected function renderComponentRenderArray(array $component, ?BubbleableMetadata $metadata = NULL): Crawler {

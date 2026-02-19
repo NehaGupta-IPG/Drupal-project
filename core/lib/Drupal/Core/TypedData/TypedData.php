@@ -22,7 +22,7 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
   /**
    * The data definition.
    *
-   * @var \Drupal\Core\TypedData\DataDefinitionInterface
+   * @var DataDefinitionInterface
    */
   protected $definition;
 
@@ -36,7 +36,7 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
   /**
    * The parent typed data object.
    *
-   * @var \Drupal\Core\TypedData\TraversableTypedDataInterface|null
+   * @var TraversableTypedDataInterface|null
    */
   protected $parent;
 
@@ -50,12 +50,12 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
   /**
    * Constructs a TypedData object given its definition and context.
    *
-   * @param \Drupal\Core\TypedData\DataDefinitionInterface $definition
+   * @param DataDefinitionInterface $definition
    *   The data definition.
    * @param string $name
    *   (optional) The name of the created property, or NULL if it is the root
    *   of a typed data tree. Defaults to NULL.
-   * @param \Drupal\Core\TypedData\TypedDataInterface $parent
+   * @param TypedDataInterface $parent
    *   (optional) The parent object of the data property, or NULL if it is the
    *   root of a typed data tree. Defaults to NULL.
    *

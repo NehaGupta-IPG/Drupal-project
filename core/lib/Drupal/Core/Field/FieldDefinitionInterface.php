@@ -216,7 +216,7 @@ interface FieldDefinitionInterface extends ListDataDefinitionInterface, Cacheabl
    * ::getDefaultValueLiteral() or ::getDefaultValueCallback() should be used
    * instead.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The entity for which the default value is generated.
    *
    * @return array
@@ -240,7 +240,7 @@ interface FieldDefinitionInterface extends ListDataDefinitionInterface, Cacheabl
   /**
    * Returns the field storage definition.
    *
-   * @return \Drupal\Core\Field\FieldStorageDefinitionInterface
+   * @return FieldStorageDefinitionInterface
    *   The field storage definition.
    */
   public function getFieldStorageDefinition();
@@ -255,7 +255,7 @@ interface FieldDefinitionInterface extends ListDataDefinitionInterface, Cacheabl
    * @param string $bundle
    *   The bundle to get the configurable field for.
    *
-   * @return \Drupal\Core\Field\FieldConfigInterface
+   * @return FieldConfigInterface
    *   The configuration entity for the field.
    *
    * @see \Drupal\Core\Field\Entity\BaseFieldBundleOverride

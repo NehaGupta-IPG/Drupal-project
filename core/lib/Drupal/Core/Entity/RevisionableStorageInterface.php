@@ -10,13 +10,13 @@ interface RevisionableStorageInterface extends EntityStorageInterface {
   /**
    * Creates a new revision starting off from the specified entity object.
    *
-   * @param \Drupal\Core\Entity\RevisionableInterface $entity
+   * @param RevisionableInterface $entity
    *   The revisionable entity object being modified.
    * @param bool $default
    *   (optional) Whether the new revision should be marked as default. Defaults
    *   to TRUE.
    *
-   * @return \Drupal\Core\Entity\RevisionableInterface
+   * @return RevisionableInterface
    *   A new entity revision object.
    */
   public function createRevision(RevisionableInterface $entity, $default = TRUE);
@@ -27,7 +27,7 @@ interface RevisionableStorageInterface extends EntityStorageInterface {
    * @param int|string $revision_id
    *   The revision ID.
    *
-   * @return \Drupal\Core\Entity\RevisionableInterface|null
+   * @return RevisionableInterface|null
    *   The specified entity revision or NULL if not found.
    *
    * @not-deprecated
@@ -40,7 +40,7 @@ interface RevisionableStorageInterface extends EntityStorageInterface {
    * @param int[]|string[] $revision_ids
    *   An array of revision IDs to load.
    *
-   * @return \Drupal\Core\Entity\RevisionableInterface[]
+   * @return RevisionableInterface[]
    *   An array of entity revisions keyed by their revision ID, or an empty
    *   array if none found.
    */
@@ -52,7 +52,7 @@ interface RevisionableStorageInterface extends EntityStorageInterface {
    * @param int $revision_id
    *   The revision ID of the entity to load.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|null
+   * @return EntityInterface|null
    *   The unchanged entity, or NULL if the entity cannot be loaded.
    *
    * @todo Remove this method once we have a reliable way to retrieve the

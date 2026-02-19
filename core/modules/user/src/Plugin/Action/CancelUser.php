@@ -23,14 +23,14 @@ class CancelUser extends ActionBase implements ContainerFactoryPluginInterface {
   /**
    * The tempstore factory.
    *
-   * @var \Drupal\Core\TempStore\PrivateTempStoreFactory
+   * @var PrivateTempStoreFactory
    */
   protected $tempStoreFactory;
 
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
@@ -43,9 +43,9 @@ class CancelUser extends ActionBase implements ContainerFactoryPluginInterface {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $temp_store_factory
+   * @param PrivateTempStoreFactory $temp_store_factory
    *   The tempstore factory.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   Current user.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, PrivateTempStoreFactory $temp_store_factory, AccountInterface $current_user) {

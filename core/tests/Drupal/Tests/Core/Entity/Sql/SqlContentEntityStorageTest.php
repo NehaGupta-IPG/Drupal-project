@@ -33,42 +33,42 @@ class SqlContentEntityStorageTest extends UnitTestCase {
   /**
    * The content entity database storage used in this test.
    *
-   * @var \Drupal\Core\Entity\Sql\SqlContentEntityStorage|\PHPUnit\Framework\MockObject\MockObject
+   * @var SqlContentEntityStorage|MockObject
    */
   protected $entityStorage;
 
   /**
    * The mocked entity type used in this test.
    *
-   * @var \Drupal\Core\Entity\ContentEntityTypeInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\ContentEntityTypeInterface|MockObject
    */
   protected $entityType;
 
   /**
    * An array of field definitions used for this test, keyed by field name.
    *
-   * @var \Drupal\Core\Field\BaseFieldDefinition[]|\PHPUnit\Framework\MockObject\MockObject[]
+   * @var \Drupal\Core\Field\BaseFieldDefinition[]|MockObject[]
    */
   protected $fieldDefinitions = [];
 
   /**
    * The mocked entity type manager used in this test.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|MockObject
    */
   protected $entityTypeManager;
 
   /**
    * The mocked entity type bundle info used in this test.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityTypeBundleInfoInterface|MockObject
    */
   protected $entityTypeBundleInfo;
 
   /**
    * The mocked entity field manager used in this test.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityFieldManagerInterface|MockObject
    */
   protected $entityFieldManager;
 
@@ -89,28 +89,28 @@ class SqlContentEntityStorageTest extends UnitTestCase {
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface|MockObject
    */
   protected $moduleHandler;
 
   /**
    * The cache backend to use.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Cache\CacheBackendInterface|MockObject
    */
   protected $cache;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Language\LanguageManagerInterface|MockObject
    */
   protected $languageManager;
 
   /**
    * The database connection to use.
    *
-   * @var \Drupal\Core\Database\Connection|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Database\Connection|MockObject
    */
   protected $connection;
 
@@ -1150,7 +1150,7 @@ class SqlContentEntityStorageTest extends UnitTestCase {
    *   (optional) An associative array of mock method return values keyed by
    *   method name.
    *
-   * @return \Drupal\Tests\Core\Field\TestBaseFieldDefinitionInterface[]|\PHPUnit\Framework\MockObject\MockObject[]
+   * @return \Drupal\Tests\Core\Field\TestBaseFieldDefinitionInterface[]|MockObject[]
    *   An array of mock base field definitions.
    */
   protected function mockFieldDefinitions(array $field_names, $methods = []): array {

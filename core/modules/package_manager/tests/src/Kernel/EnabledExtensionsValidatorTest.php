@@ -102,7 +102,7 @@ class EnabledExtensionsValidatorTest extends PackageManagerKernelTestBase {
    * @param array $packages
    *   Packages that will be added to the active directory, and removed from the
    *   stage directory.
-   * @param \Drupal\package_manager\ValidationResult[] $expected_results
+   * @param ValidationResult[] $expected_results
    *   The expected validation results.
    */
   #[DataProvider('providerExtensionRemoved')]
@@ -150,7 +150,7 @@ class EnabledExtensionsValidatorTest extends PackageManagerKernelTestBase {
    * @param string $extension_name
    *   The name of the extension.
    *
-   * @return \Drupal\Core\Extension\Extension
+   * @return Extension
    *   An extension object.
    */
   private static function createExtension(string $project_root, string $package_type, string $extension_name): Extension {

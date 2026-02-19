@@ -27,7 +27,7 @@ class RoleAccessCheckTest extends UnitTestCase {
   /**
    * Generates the test route collection.
    *
-   * @return \Symfony\Component\Routing\RouteCollection
+   * @return RouteCollection
    *   Returns the test route collection.
    */
   protected function getTestRouteCollection(): RouteCollection {

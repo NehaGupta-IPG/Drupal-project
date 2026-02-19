@@ -48,7 +48,7 @@ interface ConfigFactoryOverrideInterface {
    * @param string $collection
    *   The configuration collection.
    *
-   * @return \Drupal\Core\Config\StorableConfigBase|null
+   * @return StorableConfigBase|null
    *   The configuration object for the provided name and collection. NULL
    *   should be returned when the overrider does not use configuration
    *   collections. For example: a module that provides an overrider to avoid

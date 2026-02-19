@@ -207,7 +207,7 @@ class PhpTufValidatorTest extends PackageManagerKernelTestBase {
    *
    * @param array $config
    *   The Composer configuration to set.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup[] $expected_messages
+   * @param TranslatableMarkup[] $expected_messages
    *   The expected error messages.
    */
   #[DataProvider('providerInvalidConfiguration')]
@@ -224,7 +224,7 @@ class PhpTufValidatorTest extends PackageManagerKernelTestBase {
    *
    * @param array $config
    *   The Composer configuration to set.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup[] $expected_messages
+   * @param TranslatableMarkup[] $expected_messages
    *   The expected error messages.
    * @param string $event_class
    *   The event before which the plugin's configuration should be changed.

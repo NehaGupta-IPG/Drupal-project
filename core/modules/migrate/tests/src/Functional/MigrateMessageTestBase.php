@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Functional;
 
-use Drupal\Tests\BrowserTestBase;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
+use Drupal\Tests\BrowserTestBase;
 
 // cspell:ignore destid sourceid
 

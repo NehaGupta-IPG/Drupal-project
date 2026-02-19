@@ -44,7 +44,7 @@ class ModuleHandlerTest extends UnitTestCase {
    * @param bool $loadAll
    *   TRUE to call ModuleHandler->loadAll() on the new module handler.
    *
-   * @return \Drupal\Core\Extension\ModuleHandler
+   * @return ModuleHandler
    *   The module handler to test.
    */
   protected function getModuleHandler($modules = [], $implementations = [], $loadAll = TRUE): ModuleHandler {

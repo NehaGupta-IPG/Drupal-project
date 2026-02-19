@@ -7,8 +7,8 @@ use Drupal\Core\Authentication\AuthenticationProviderFilterInterface;
 use Drupal\Core\Authentication\AuthenticationProviderInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -22,37 +22,37 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
   /**
    * Authentication provider.
    *
-   * @var \Drupal\Core\Authentication\AuthenticationProviderInterface
+   * @var AuthenticationProviderInterface
    */
   protected $authenticationProvider;
 
   /**
    * Authentication provider filter.
    *
-   * @var \Drupal\Core\Authentication\AuthenticationProviderFilterInterface|null
+   * @var AuthenticationProviderFilterInterface|null
    */
   protected $filter;
 
   /**
    * Authentication challenge provider.
    *
-   * @var \Drupal\Core\Authentication\AuthenticationProviderChallengeInterface|null
+   * @var AuthenticationProviderChallengeInterface|null
    */
   protected $challengeProvider;
 
   /**
    * Account proxy.
    *
-   * @var \Drupal\Core\Session\AccountProxyInterface
+   * @var AccountProxyInterface
    */
   protected $accountProxy;
 
   /**
    * Constructs an authentication subscriber.
    *
-   * @param \Drupal\Core\Authentication\AuthenticationProviderInterface $authentication_provider
+   * @param AuthenticationProviderInterface $authentication_provider
    *   An authentication provider.
-   * @param \Drupal\Core\Session\AccountProxyInterface $account_proxy
+   * @param AccountProxyInterface $account_proxy
    *   Account proxy.
    */
   public function __construct(AuthenticationProviderInterface $authentication_provider, AccountProxyInterface $account_proxy) {
@@ -65,7 +65,7 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
   /**
    * Authenticates user on request.
    *
-   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
+   * @param RequestEvent $event
    *   The request event.
    *
    * @see \Drupal\Core\Authentication\AuthenticationProviderInterface::authenticate()
@@ -86,7 +86,7 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
   /**
    * Denies access if authentication provider is not allowed on this route.
    *
-   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
+   * @param RequestEvent $event
    *   The request event.
    */
   public function onKernelRequestFilterProvider(RequestEvent $event) {
@@ -105,7 +105,7 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
    * authentication methods (e.g. basic auth) require that a challenge is sent
    * to the client.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   * @param ExceptionEvent $event
    *   The exception event.
    */
   public function onExceptionSendChallenge(ExceptionEvent $event) {
@@ -124,7 +124,7 @@ class AuthenticationSubscriber implements EventSubscriberInterface {
   /**
    * Detect disallowed authentication methods on access denied exceptions.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   * @param ExceptionEvent $event
    *   The event.
    */
   public function onExceptionAccessDenied(ExceptionEvent $event) {

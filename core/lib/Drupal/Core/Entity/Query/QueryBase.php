@@ -20,7 +20,7 @@ abstract class QueryBase implements QueryInterface {
   /**
    * Information about the entity type.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface
+   * @var EntityTypeInterface
    */
   protected $entityType;
 
@@ -41,7 +41,7 @@ abstract class QueryBase implements QueryInterface {
   /**
    * Conditions.
    *
-   * @var \Drupal\Core\Entity\Query\ConditionInterface
+   * @var ConditionInterface
    */
   protected $condition;
 
@@ -62,7 +62,7 @@ abstract class QueryBase implements QueryInterface {
   /**
    * Aggregate Conditions.
    *
-   * @var \Drupal\Core\Entity\Query\ConditionAggregateInterface
+   * @var ConditionAggregateInterface
    */
   protected $conditionAggregate;
 
@@ -139,7 +139,7 @@ abstract class QueryBase implements QueryInterface {
   /**
    * Constructs this object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
    * @param string $conjunction
    *   - AND: all of the conditions on the query need to match.
@@ -209,7 +209,7 @@ abstract class QueryBase implements QueryInterface {
    *   - AND (default): this is the equivalent of andConditionGroup().
    *   - OR: this is the equivalent of orConditionGroup().
    *
-   * @return \Drupal\Core\Entity\Query\ConditionInterface
+   * @return ConditionInterface
    *   An object holding a group of conditions.
    */
   protected function conditionGroupFactory($conjunction = 'AND') {

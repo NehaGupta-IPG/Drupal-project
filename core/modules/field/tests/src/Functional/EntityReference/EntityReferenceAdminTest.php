@@ -324,7 +324,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
    * to auto-create the target entity.
    */
   public function testMultipleTargetBundles(): void {
-    /** @var \Drupal\taxonomy\Entity\Vocabulary[] $vocabularies */
+    /** @var Vocabulary[] $vocabularies */
     $vocabularies = [];
     for ($i = 0; $i < 2; $i++) {
       $vid = $this->randomMachineName();
@@ -363,7 +363,7 @@ class EntityReferenceAdminTest extends BrowserTestBase {
     ];
     $this->submitForm($edit, 'Save settings');
 
-    /** @var \Drupal\field\Entity\FieldConfig $field_config */
+    /** @var FieldConfig $field_config */
     $field_config = FieldConfig::load($field_id);
     // Expect that the target bundle has been saved in the backend.
     $this->assertEquals($vocabularies[1]->id(), $field_config->getSetting('handler_settings')['auto_create_bundle']);

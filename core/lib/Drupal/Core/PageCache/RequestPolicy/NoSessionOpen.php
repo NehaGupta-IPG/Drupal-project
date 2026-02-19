@@ -19,14 +19,14 @@ class NoSessionOpen implements RequestPolicyInterface {
   /**
    * The session configuration.
    *
-   * @var \Drupal\Core\Session\SessionConfigurationInterface
+   * @var SessionConfigurationInterface
    */
   protected $sessionConfiguration;
 
   /**
    * Constructs a new page cache session policy.
    *
-   * @param \Drupal\Core\Session\SessionConfigurationInterface $session_configuration
+   * @param SessionConfigurationInterface $session_configuration
    *   The session configuration.
    */
   public function __construct(SessionConfigurationInterface $session_configuration) {

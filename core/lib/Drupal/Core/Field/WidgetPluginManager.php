@@ -18,7 +18,7 @@ class WidgetPluginManager extends DefaultPluginManager {
   /**
    * The field type manager to define field.
    *
-   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface
+   * @var FieldTypePluginManagerInterface
    */
   protected $fieldTypeManager;
 
@@ -35,11 +35,11 @@ class WidgetPluginManager extends DefaultPluginManager {
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param CacheBackendInterface $cache_backend
    *   Cache backend instance to use.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager
+   * @param FieldTypePluginManagerInterface $field_type_manager
    *   The 'field type' plugin manager.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, FieldTypePluginManagerInterface $field_type_manager) {
@@ -70,7 +70,7 @@ class WidgetPluginManager extends DefaultPluginManager {
    *     - third_party_settings: (array) Settings provided by other extensions
    *       through hook_field_formatter_third_party_settings_form().
    *
-   * @return \Drupal\Core\Field\WidgetInterface|false
+   * @return WidgetInterface|false
    *   A Widget object or FALSE when plugin is not found.
    */
   public function getInstance(array $options) {

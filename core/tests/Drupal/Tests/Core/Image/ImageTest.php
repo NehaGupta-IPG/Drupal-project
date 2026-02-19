@@ -60,7 +60,7 @@ class ImageTest extends UnitTestCase {
    * @param list<string> $stubs
    *   (optional) Array containing methods to be replaced with stubs.
    *
-   * @return \Drupal\system\Plugin\ImageToolkit\GDToolkit&\PHPUnit\Framework\MockObject\MockObject
+   * @return GDToolkit&MockObject
    *   Mocked GDToolkit instance.
    */
   protected function getToolkitMock(array $stubs = []): GDToolkit&MockObject {
@@ -86,10 +86,10 @@ class ImageTest extends UnitTestCase {
    *
    * @param string $class_name
    *   The short name of the GD toolkit operation class to be mocked.
-   * @param \Drupal\system\Plugin\ImageToolkit\GDToolkit $toolkit
+   * @param GDToolkit $toolkit
    *   The image toolkit object.
    *
-   * @return \Drupal\system\Plugin\ImageToolkit\Operation\gd\GDImageToolkitOperationBase&\PHPUnit\Framework\MockObject\MockObject
+   * @return GDImageToolkitOperationBase&MockObject
    *   Mocked GDToolkit operation instance.
    */
   protected function getToolkitOperationMock(string $class_name, GDToolkit $toolkit): GDImageToolkitOperationBase&MockObject {
@@ -111,7 +111,7 @@ class ImageTest extends UnitTestCase {
    * @param list<string> $stubs
    *   (optional) Array containing toolkit methods to be replaced with stubs.
    *
-   * @return \Drupal\Core\Image\Image
+   * @return Image
    *   An image object.
    */
   protected function getTestImage(bool $load_expected = TRUE, array $stubs = []): Image {
@@ -141,7 +141,7 @@ class ImageTest extends UnitTestCase {
    * @param string $class_name
    *   The name of the GD toolkit operation class to be mocked.
    *
-   * @return \Drupal\Core\Image\Image
+   * @return Image
    *   An image object.
    */
   protected function getTestImageForOperation(string $class_name): Image {

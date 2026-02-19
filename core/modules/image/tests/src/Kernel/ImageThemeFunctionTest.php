@@ -44,7 +44,7 @@ class ImageThemeFunctionTest extends KernelTestBase {
   /**
    * Created file entity.
    *
-   * @var \Drupal\file\Entity\File
+   * @var File
    */
   protected $image;
 

@@ -174,7 +174,7 @@ abstract class Tasks {
    *
    * This method is called during runtime and update requirements checks.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup[]
+   * @return TranslatableMarkup[]
    *   A list of error messages.
    */
   final public function engineVersionRequirementsCheck() {
@@ -347,7 +347,7 @@ abstract class Tasks {
    * @param string[] $database
    *   An array of driver specific configuration options.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup[]
+   * @return TranslatableMarkup[]
    *   An array of driver configuration errors, keyed by form element name.
    */
   public function validateDatabaseSettings(array $database) {
@@ -371,7 +371,7 @@ abstract class Tasks {
    * @param array $options
    *   Options for the translation.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   * @return TranslatableMarkup
    *   An object representing the translatable markup for the given string.
    *
    * @see \Drupal\Core\StringTranslation\TranslatableMarkup::__construct()

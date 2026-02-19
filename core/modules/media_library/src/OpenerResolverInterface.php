@@ -20,10 +20,10 @@ interface OpenerResolverInterface {
   /**
    * Gets a media library opener service from the container.
    *
-   * @param \Drupal\media_library\MediaLibraryState $state
+   * @param MediaLibraryState $state
    *   A value object representing the state of the media library.
    *
-   * @return \Drupal\media_library\MediaLibraryOpenerInterface
+   * @return MediaLibraryOpenerInterface
    *   The media library opener service.
    *
    * @throws \RuntimeException

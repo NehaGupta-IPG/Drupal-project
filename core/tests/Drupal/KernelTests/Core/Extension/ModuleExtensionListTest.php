@@ -31,7 +31,7 @@ class ModuleExtensionListTest extends KernelTestBase {
     // Saving the configuration doesn't automatically trigger invalidation.
     $this->container->get('kernel')->rebuildContainer();
 
-    /** @var \Drupal\Core\Extension\ModuleExtensionList $module_extension_list */
+    /** @var ModuleExtensionList $module_extension_list */
     $module_extension_list = \Drupal::service('extension.list.module');
     $extensions = $module_extension_list->getList();
 

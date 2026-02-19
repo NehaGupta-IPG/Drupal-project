@@ -31,7 +31,7 @@ class OEmbedWidget extends StringTextfieldWidget {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
 
-    /** @var \Drupal\media\Plugin\media\Source\OEmbedInterface $source */
+    /** @var OEmbedInterface $source */
     $source = $items->getEntity()->getSource();
     $message = $this->t('You can link to media from the following services: @providers', ['@providers' => implode(', ', $source->getProviders())]);
 

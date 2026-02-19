@@ -326,7 +326,7 @@ class HookCollectorPassTest extends KernelTestBase {
    * @param array<string, array<string, string>> $implementationsByHook
    *   Expected implementations, as module names keyed by hook name and
    *   "$class::$method" identifier.
-   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   * @param ContainerBuilder $container
    *   The container builder.
    */
   protected function assertRegisteredHooks(array $implementationsByHook, ContainerBuilder $container): void {

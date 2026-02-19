@@ -20,7 +20,7 @@ interface FormatterInterface extends PluginSettingsInterface {
    *
    * @param array $form
    *   The form where the settings form is being included in.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return array
@@ -54,7 +54,7 @@ interface FormatterInterface extends PluginSettingsInterface {
    * Changes or additions to field values are done by directly altering the
    * items.
    *
-   * @param \Drupal\Core\Field\FieldItemListInterface[] $entities_items
+   * @param FieldItemListInterface[] $entities_items
    *   An array with the field values from the multiple entities being rendered.
    */
   public function prepareView(array $entities_items);
@@ -62,7 +62,7 @@ interface FormatterInterface extends PluginSettingsInterface {
   /**
    * Builds a renderable array for a fully themed field.
    *
-   * @param \Drupal\Core\Field\FieldItemListInterface $items
+   * @param FieldItemListInterface $items
    *   The field values to be rendered.
    * @param string $langcode
    *   (optional) The language that should be used to render the field. Defaults
@@ -76,7 +76,7 @@ interface FormatterInterface extends PluginSettingsInterface {
   /**
    * Builds a renderable array for a field value.
    *
-   * @param \Drupal\Core\Field\FieldItemListInterface $items
+   * @param FieldItemListInterface $items
    *   The field values to be rendered.
    * @param string $langcode
    *   The language that should be used to render the field.
@@ -90,7 +90,7 @@ interface FormatterInterface extends PluginSettingsInterface {
   /**
    * Returns if the formatter can be used for the provided field.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition that should be checked.
    *
    * @return bool

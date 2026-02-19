@@ -27,7 +27,7 @@ trait ContentTypeCreationTrait {
    * @param bool $create_body
    *   Whether to create the body field.
    *
-   * @return \Drupal\node\Entity\NodeType
+   * @return NodeType
    *   Created content type.
    */
   protected function createContentType(array $values = [], bool $create_body = TRUE) {

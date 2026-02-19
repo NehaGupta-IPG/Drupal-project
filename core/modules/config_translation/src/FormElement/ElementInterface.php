@@ -15,7 +15,7 @@ interface ElementInterface {
   /**
    * Creates a form element instance from a schema definition.
    *
-   * @param \Drupal\Core\TypedData\TypedDataInterface $schema
+   * @param TypedDataInterface $schema
    *   The configuration schema.
    *
    * @return static
@@ -25,9 +25,9 @@ interface ElementInterface {
   /**
    * Builds a render array containing the source and translation form elements.
    *
-   * @param \Drupal\Core\Language\LanguageInterface $source_language
+   * @param LanguageInterface $source_language
    *   The source language of the configuration object.
-   * @param \Drupal\Core\Language\LanguageInterface $translation_language
+   * @param LanguageInterface $translation_language
    *   The language to display the translation form for.
    * @param mixed $source_config
    *   The configuration value of the element in the source language.
@@ -51,9 +51,9 @@ interface ElementInterface {
    * If the configuration values are the same as the source configuration, the
    * override should be removed from the translation configuration.
    *
-   * @param \Drupal\Core\Config\Config $base_config
+   * @param Config $base_config
    *   Base configuration values, in the source language.
-   * @param \Drupal\language\Config\LanguageConfigOverride $config_translation
+   * @param LanguageConfigOverride $config_translation
    *   Translation configuration override data.
    * @param mixed $config_values
    *   The configuration value of the element taken from the form values.

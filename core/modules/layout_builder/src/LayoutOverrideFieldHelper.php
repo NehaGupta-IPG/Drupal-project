@@ -39,7 +39,7 @@ class LayoutOverrideFieldHelper implements ContainerInjectionInterface {
   /**
    * Updates a layout overrides's entity context when entity values change.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The entity with the overridden layout.
    */
   public function updateTempstoreEntityContext(FieldableEntityInterface $entity): void {

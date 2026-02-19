@@ -37,7 +37,7 @@ class FileEncodingConstraintValidator extends BaseFileConstraintValidator {
    *   The file data.
    * @param string $encoding
    *   The encoding to validate.
-   * @param \Drupal\file\Plugin\Validation\Constraint\FileEncodingConstraint $constraint
+   * @param FileEncodingConstraint $constraint
    *   The constraint.
    */
   protected function validateEncoding(string $data, string $encoding, FileEncodingConstraint $constraint): void {

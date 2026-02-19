@@ -18,7 +18,7 @@ class TestPageDisplayVariantSubscriber implements EventSubscriberInterface {
   /**
    * Selects the page display variant.
    *
-   * @param \Drupal\Core\Render\PageDisplayVariantSelectionEvent $event
+   * @param PageDisplayVariantSelectionEvent $event
    *   The event to process.
    */
   public function onSelectPageDisplayVariant(PageDisplayVariantSelectionEvent $event) {

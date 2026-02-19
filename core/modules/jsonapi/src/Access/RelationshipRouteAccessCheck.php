@@ -33,14 +33,14 @@ final class RelationshipRouteAccessCheck implements AccessInterface {
   /**
    * The JSON:API entity access checker.
    *
-   * @var \Drupal\jsonapi\Access\EntityAccessChecker
+   * @var EntityAccessChecker
    */
   protected $entityAccessChecker;
 
   /**
    * RelationshipRouteAccessCheck constructor.
    *
-   * @param \Drupal\jsonapi\Access\EntityAccessChecker $entity_access_checker
+   * @param EntityAccessChecker $entity_access_checker
    *   The JSON:API entity access checker.
    */
   public function __construct(EntityAccessChecker $entity_access_checker) {
@@ -50,11 +50,11 @@ final class RelationshipRouteAccessCheck implements AccessInterface {
   /**
    * Checks access to the relationship field on the given route.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route to check against.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The currently logged in account.
    *
    * @return \Drupal\Core\Access\AccessResultInterface

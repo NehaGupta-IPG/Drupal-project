@@ -39,7 +39,7 @@ class UpdateFetcher implements UpdateFetcherInterface {
   /**
    * The HTTP client to fetch the feed data with.
    *
-   * @var \GuzzleHttp\ClientInterface
+   * @var ClientInterface
    */
   protected $httpClient;
 
@@ -53,13 +53,13 @@ class UpdateFetcher implements UpdateFetcherInterface {
   /**
    * Constructs an UpdateFetcher.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \GuzzleHttp\ClientInterface $http_client
+   * @param ClientInterface $http_client
    *   A Guzzle client object.
-   * @param \Drupal\Core\Site\Settings $settings
+   * @param Settings $settings
    *   The settings instance.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   The logger.
    */
   public function __construct(ConfigFactoryInterface $config_factory, ClientInterface $http_client, Settings $settings, protected LoggerInterface $logger) {

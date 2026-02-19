@@ -18,7 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class InstallTranslationFilePatternTest extends KernelTestBase {
 
   /**
-   * @var \Drupal\Core\StringTranslation\Translator\FileTranslation
+   * @var FileTranslation
    */
   protected $fileTranslation;
 

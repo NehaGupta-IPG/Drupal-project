@@ -15,7 +15,7 @@ class StubSourcePlugin extends SourcePluginBase {
   /**
    * Helper for setting internal module handler implementation.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
    */
   public function setModuleHandler(ModuleHandlerInterface $module_handler): void {

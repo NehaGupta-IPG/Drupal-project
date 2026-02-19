@@ -851,7 +851,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
     $expected_languages = array_flip($langcodes);
 
     foreach ($entity->getTranslationLanguages() as $language) {
-      /** @var \Drupal\Core\Language\LanguageInterface $language */
+      /** @var LanguageInterface $language */
       $this->assertTrue(isset($expected_languages[$language->getId()]));
       unset($expected_languages[$language->getId()]);
     }
@@ -1000,7 +1000,7 @@ class EntityTranslationTest extends EntityLanguageTestBase {
       'untranslatable_test_field' => $this->randomString(),
     ];
 
-    /** @var \Drupal\Core\Entity\ContentEntityInterface|\Drupal\Core\TypedData\TranslationStatusInterface $entity */
+    /** @var \Drupal\Core\Entity\ContentEntityInterface|TranslationStatusInterface $entity */
     // Test that newly created entity has the translation status
     // TRANSLATION_CREATED.
     $entity = $storage->create($values);

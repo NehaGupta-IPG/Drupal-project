@@ -40,7 +40,7 @@ class ImageItemTest extends FieldKernelTestBase {
   /**
    * Created file entity.
    *
-   * @var \Drupal\file\Entity\File
+   * @var File
    */
   protected $image;
 

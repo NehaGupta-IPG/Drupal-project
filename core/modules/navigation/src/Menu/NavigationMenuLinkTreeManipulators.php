@@ -37,10 +37,10 @@ class NavigationMenuLinkTreeManipulators {
    * item links to, add an "overview" link that links to the page as a child
    * (third-level) menu item.
    *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
+   * @param MenuLinkTreeElement[] $tree
    *   The menu link tree to manipulate.
    *
-   * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
+   * @return MenuLinkTreeElement[]
    *   The manipulated menu link tree.
    */
   public function addSecondLevelOverviewLinks(array $tree): array {
@@ -65,7 +65,7 @@ class NavigationMenuLinkTreeManipulators {
   /**
    * Whether a menu tree element should have an overview link added to it.
    *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement $element
+   * @param MenuLinkTreeElement $element
    *   The menu link tree element to check.
    *
    * @return bool
@@ -121,7 +121,7 @@ class NavigationMenuLinkTreeManipulators {
    * not, treat the link as accessible for the purpose of adding the overview
    * child link.
    *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement $element
+   * @param MenuLinkTreeElement $element
    *   The menu link tree element to be checked.
    *
    * @return bool
@@ -134,7 +134,7 @@ class NavigationMenuLinkTreeManipulators {
   /**
    * Adds "overview" menu tree element as child of a menu tree element.
    *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement $element
+   * @param MenuLinkTreeElement $element
    *   The menu link tree element to add the overview child element to.
    */
   protected function addOverviewLink(MenuLinkTreeElement $element): void {

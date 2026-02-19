@@ -32,7 +32,7 @@ class RsyncValidatorTest extends PackageManagerKernelTestBase {
   /**
    * The mocked executable finder.
    *
-   * @var \PhpTuf\ComposerStager\API\Finder\Service\ExecutableFinderInterface
+   * @var ExecutableFinderInterface
    */
   private $executableFinder;
 
@@ -64,7 +64,7 @@ class RsyncValidatorTest extends PackageManagerKernelTestBase {
    * Tests that the stage cannot be created if rsync is selected, but not found.
    */
   public function testPreCreateFailsIfRsyncNotFound(): void {
-    /** @var \PhpTuf\ComposerStager\API\Translation\Factory\TranslatableFactoryInterface $translatable_factory */
+    /** @var TranslatableFactoryInterface $translatable_factory */
     $translatable_factory = $this->container->get(TranslatableFactoryInterface::class);
     $message = $translatable_factory->createTranslatableMessage('Nope!');
     $this->executableFinder->find('rsync')->willThrow(new LogicException($message));

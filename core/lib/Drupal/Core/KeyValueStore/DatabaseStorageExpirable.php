@@ -19,11 +19,11 @@ class DatabaseStorageExpirable extends DatabaseStorage implements KeyValueStoreE
    *
    * @param string $collection
    *   The name of the collection holding key and value pairs.
-   * @param \Drupal\Component\Serialization\SerializationInterface $serializer
+   * @param SerializationInterface $serializer
    *   The serialization class to use.
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection to use.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    * @param string $table
    *   The name of the SQL table to use, defaults to key_value_expire.

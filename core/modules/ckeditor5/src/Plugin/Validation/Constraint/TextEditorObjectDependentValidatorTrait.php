@@ -19,7 +19,7 @@ trait TextEditorObjectDependentValidatorTrait {
    *
    * Works both for an individual text editor config entity and a pair.
    *
-   * @return \Drupal\editor\EditorInterface
+   * @return EditorInterface
    *   A text editor object, with the text format pre-populated.
    */
   private function createTextEditorObjectFromContext(): EditorInterface {

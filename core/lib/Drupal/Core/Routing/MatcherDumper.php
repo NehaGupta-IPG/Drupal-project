@@ -2,13 +2,12 @@
 
 namespace Drupal\Core\Routing;
 
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\Utility\Error;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\RouteCollection;
-
-use Drupal\Core\Database\Connection;
 
 /**
  * Dumps Route information to a database table.
@@ -35,12 +34,12 @@ class MatcherDumper implements MatcherDumperInterface {
   /**
    * Construct the MatcherDumper.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection which will be used to store the route
    *   information.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   The logger.
    * @param string $table
    *   (optional) The table to store the route info in. Defaults to 'router'.
@@ -119,7 +118,7 @@ class MatcherDumper implements MatcherDumperInterface {
         foreach ($routes as $name => $route) {
           /** @var \Symfony\Component\Routing\Route $route */
           $route->setOption('compiler_class', RouteCompiler::class);
-          /** @var \Drupal\Core\Routing\CompiledRoute $compiled */
+          /** @var CompiledRoute $compiled */
           $compiled = $route->compile();
           // The fit value is a binary number which has 1 at every fixed path
           // position and 0 where there is a wildcard. We keep track of all such

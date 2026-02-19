@@ -62,14 +62,14 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
   /**
    * The consistent cache backend.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $consistentBackend;
 
   /**
    * The fast cache backend.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $fastBackend;
 
@@ -83,9 +83,9 @@ class ChainedFastBackend implements CacheBackendInterface, CacheTagsInvalidatorI
   /**
    * Constructs a ChainedFastBackend object.
    *
-   * @param \Drupal\Core\Cache\CacheBackendInterface $consistent_backend
+   * @param CacheBackendInterface $consistent_backend
    *   The consistent cache backend.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $fast_backend
+   * @param CacheBackendInterface $fast_backend
    *   The fast cache backend.
    * @param string $bin
    *   The cache bin for which the object is created.

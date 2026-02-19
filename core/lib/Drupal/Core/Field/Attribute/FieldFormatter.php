@@ -29,9 +29,9 @@ class FieldFormatter extends Plugin {
    *
    * @param string $id
    *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $label
+   * @param TranslatableMarkup|null $label
    *   (optional) The human-readable name of the formatter type.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $description
+   * @param TranslatableMarkup|null $description
    *   (optional) A short description of the formatter type.
    * @param string[] $field_types
    *   (optional) An array of field types the formatter supports.

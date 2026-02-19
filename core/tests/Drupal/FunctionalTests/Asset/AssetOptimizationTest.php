@@ -191,7 +191,7 @@ class AssetOptimizationTest extends BrowserTestBase {
    * @param string $url
    *   The source URL.
    *
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ExpectationException
    */
   protected function assertInvalidAggregates(string $url): void {
     $url = $this->getAbsoluteUrl($url);

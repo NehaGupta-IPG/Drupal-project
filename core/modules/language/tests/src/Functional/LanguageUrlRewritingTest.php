@@ -86,7 +86,7 @@ class LanguageUrlRewritingTest extends BrowserTestBase {
    * check that language prefixes are not added to it and that the prefixed URL
    * is actually not working.
    *
-   * @param \Drupal\Core\Language\LanguageInterface $language
+   * @param LanguageInterface $language
    *   The language object.
    * @param string $message
    *   Message to display in assertion that language prefixes are not added.

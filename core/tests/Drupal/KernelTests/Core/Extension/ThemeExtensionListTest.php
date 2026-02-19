@@ -32,7 +32,7 @@ class ThemeExtensionListTest extends KernelTestBase {
     // Saving the configuration doesn't automatically trigger invalidation.
     $this->container->get('kernel')->rebuildContainer();
 
-    /** @var \Drupal\Core\Extension\ThemeExtensionList $theme_extension_list */
+    /** @var ThemeExtensionList $theme_extension_list */
     $theme_extension_list = \Drupal::service('extension.list.theme');
     $extensions = $theme_extension_list->getList();
 

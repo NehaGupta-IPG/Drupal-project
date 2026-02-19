@@ -51,7 +51,7 @@ class FileFieldWidgetTest extends FileFieldTestBase {
    *
    * @param string $data
    *   A string containing the contents of the file.
-   * @param \Drupal\user\UserInterface $user
+   * @param UserInterface $user
    *   The user of the file owner.
    *
    * @return \Drupal\file\FileInterface
@@ -555,9 +555,9 @@ class FileFieldWidgetTest extends FileFieldTestBase {
   /**
    * Helper for testing exploiting the temporary file removal using fid.
    *
-   * @param \Drupal\user\UserInterface $victim_user
+   * @param UserInterface $victim_user
    *   The victim user.
-   * @param \Drupal\user\UserInterface $attacker_user
+   * @param UserInterface $attacker_user
    *   The attacker user.
    */
   protected function doTestTemporaryFileRemovalExploit(UserInterface $victim_user, UserInterface $attacker_user): void {

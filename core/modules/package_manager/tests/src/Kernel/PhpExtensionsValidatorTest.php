@@ -67,9 +67,9 @@ class PhpExtensionsValidatorTest extends PackageManagerKernelTestBase {
    * @param string[] $loaded_extensions
    *   The names of the PHP extensions that the validator should think are
    *   loaded.
-   * @param \Drupal\package_manager\ValidationResult[] $expected_status_check_results
+   * @param ValidationResult[] $expected_status_check_results
    *   The expected validation results during the status check event.
-   * @param \Drupal\package_manager\ValidationResult[] $expected_life_cycle_results
+   * @param ValidationResult[] $expected_life_cycle_results
    *   The expected validation results during pre-create and pre-apply event.
    */
   #[DataProvider('providerPhpExtensionsValidation')]

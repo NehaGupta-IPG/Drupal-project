@@ -27,11 +27,11 @@ class HelpTwigExtension extends AbstractExtension {
   /**
    * Constructs a \Drupal\help\HelpTwigExtension.
    *
-   * @param \Drupal\Core\Access\AccessManagerInterface $accessManager
+   * @param AccessManagerInterface $accessManager
    *   The access manager.
-   * @param \Drupal\help\HelpTopicPluginManagerInterface $pluginManager
+   * @param HelpTopicPluginManagerInterface $pluginManager
    *   The help topic plugin manager service.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param TranslationInterface $string_translation
    *   The string translation service.
    */
   public function __construct(protected AccessManagerInterface $accessManager, protected HelpTopicPluginManagerInterface $pluginManager, TranslationInterface $string_translation) {

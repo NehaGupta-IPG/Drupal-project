@@ -24,7 +24,7 @@ class ConfigCollectionInfo extends Event {
    *
    * @param string $collection
    *   Collection name to add.
-   * @param \Drupal\Core\Config\ConfigFactoryOverrideInterface $override_service
+   * @param ConfigFactoryOverrideInterface $override_service
    *   (optional) The configuration factory override service responsible for the
    *   collection.
    *
@@ -63,7 +63,7 @@ class ConfigCollectionInfo extends Event {
    * @param string $collection
    *   The configuration collection.
    *
-   * @return \Drupal\Core\Config\ConfigFactoryOverrideInterface|null
+   * @return ConfigFactoryOverrideInterface|null
    *   The override service responsible for the collection if one exists. NULL
    *   if not.
    */

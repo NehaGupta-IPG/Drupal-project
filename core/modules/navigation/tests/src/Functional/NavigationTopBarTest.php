@@ -127,7 +127,7 @@ class NavigationTopBarTest extends PageCacheTagsTestBase {
   /**
    * Asserts that top bar actions respect local tasks weights.
    *
-   * @param \Behat\Mink\Element\NodeElement $toolbar_links
+   * @param NodeElement $toolbar_links
    *   Action links to assert.
    */
   protected function assertActionsWeight(NodeElement $toolbar_links): void {

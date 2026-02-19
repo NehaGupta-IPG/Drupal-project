@@ -21,7 +21,6 @@ use Drupal\Core\Routing\LocalRedirectResponse;
 use Drupal\Core\Routing\RequestContext;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,6 +28,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Service for sending an HTML response in chunks (to get faster page loads).
@@ -204,7 +204,7 @@ class BigPipe {
   /**
    * Sends a chunk.
    *
-   * @param string|\Drupal\Core\Render\HtmlResponse $chunk
+   * @param string|HtmlResponse $chunk
    *   The string or response to append. String if there's no cacheability
    *   metadata or attachments to merge.
    */
@@ -222,7 +222,7 @@ class BigPipe {
   /**
    * Sends an HTML response in chunks using the BigPipe technique.
    *
-   * @param \Drupal\big_pipe\Render\BigPipeResponse $response
+   * @param BigPipeResponse $response
    *   The BigPipe response to send.
    *
    * @internal
@@ -266,7 +266,7 @@ class BigPipe {
    *   The HTML response's content until the closing </body> tag.
    * @param array $no_js_placeholders
    *   The no-JS BigPipe placeholders.
-   * @param \Drupal\Core\Asset\AttachedAssetsInterface $cumulative_assets
+   * @param AttachedAssetsInterface $cumulative_assets
    *   The cumulative assets sent so far; to be updated while rendering no-JS
    *   BigPipe placeholders.
    */
@@ -328,7 +328,7 @@ class BigPipe {
    * @param array $no_js_placeholders
    *   Associative array; the no-JS BigPipe placeholders. Keys are the BigPipe
    *   selectors.
-   * @param \Drupal\Core\Asset\AttachedAssetsInterface $cumulative_assets
+   * @param AttachedAssetsInterface $cumulative_assets
    *   The cumulative assets sent so far; to be updated while rendering no-JS
    *   BigPipe placeholders.
    *
@@ -458,7 +458,7 @@ class BigPipe {
    *   Indexed array; the order in which the BigPipe placeholders must be sent.
    *   Values are the BigPipe placeholder IDs. (These values correspond to keys
    *   in $placeholders.)
-   * @param \Drupal\Core\Asset\AttachedAssetsInterface $cumulative_assets
+   * @param AttachedAssetsInterface $cumulative_assets
    *   The cumulative assets sent so far; to be updated while rendering BigPipe
    *   placeholders.
    *
@@ -650,14 +650,14 @@ EOF;
   /**
    * Filters the given embedded response, using the cumulative AJAX page state.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $fake_request
+   * @param Request $fake_request
    *   A fake subrequest that contains the cumulative AJAX page state of the
    *   HTML document and all preceding Embedded HTML or AJAX responses.
-   * @param \Symfony\Component\HttpFoundation\Response|\Drupal\Core\Render\HtmlResponse|\Drupal\Core\Ajax\AjaxResponse $embedded_response
+   * @param Response|HtmlResponse|AjaxResponse $embedded_response
    *   Either an HTML response or an AJAX response that will be embedded in the
    *   overall HTML response.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   The filtered response, which will load only the assets that $fake_request
    *   did not indicate to already have been loaded, plus the updated cumulative
    *   AJAX page state.
@@ -670,16 +670,16 @@ EOF;
   /**
    * Filters the given response.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request for which a response is being sent.
    * @param int $request_type
    *   The request type. Can either be
    *   \Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST or
    *   \Symfony\Component\HttpKernel\HttpKernelInterface::SUB_REQUEST.
-   * @param \Symfony\Component\HttpFoundation\Response $response
+   * @param Response $response
    *   The response to filter.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   The filtered response.
    */
   protected function filterResponse(Request $request, $request_type, Response $response) {

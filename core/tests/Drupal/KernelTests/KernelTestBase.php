@@ -139,7 +139,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   /**
    * The test container.
    *
-   * @var \Drupal\Core\DependencyInjection\ContainerBuilder
+   * @var ContainerBuilder
    */
   protected $container;
 
@@ -176,7 +176,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   /**
    * The key_value service that must persist between container rebuilds.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueMemoryFactory
+   * @var KeyValueMemoryFactory
    */
   protected KeyValueMemoryFactory $keyValue;
 
@@ -530,7 +530,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * Extend this method in your test to register additional services. This
    * method is called whenever the kernel is rebuilt.
    *
-   * @param \Drupal\Core\DependencyInjection\ContainerBuilder $container
+   * @param ContainerBuilder $container
    *   The service container to enhance.
    *
    * @see \Drupal\KernelTests\KernelTestBase::bootKernel()

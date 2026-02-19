@@ -22,7 +22,7 @@ class DefaultLazyPluginCollection extends LazyPluginCollection {
   /**
    * The manager used to instantiate the plugins.
    *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   * @var PluginManagerInterface
    */
   protected $manager;
 
@@ -52,7 +52,7 @@ class DefaultLazyPluginCollection extends LazyPluginCollection {
   /**
    * Constructs a new DefaultLazyPluginCollection object.
    *
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $manager
+   * @param PluginManagerInterface $manager
    *   The manager to be used for instantiating plugins.
    * @param array $configurations
    *   (optional) An associative array containing the initial configuration for
@@ -107,7 +107,7 @@ class DefaultLazyPluginCollection extends LazyPluginCollection {
    * @return string
    *   The plugin ID for the instance.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws PluginNotFoundException
    *   Thrown if the plugin key is not present in the instance configuration.
    */
   protected function getPluginId(string $instance_id): string {

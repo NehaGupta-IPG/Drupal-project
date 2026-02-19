@@ -5,15 +5,15 @@ namespace Drupal\Core\Config\Entity;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\Action\Attribute\ActionMethod;
+use Drupal\Core\Config\ConfigDuplicateUUIDException;
 use Drupal\Core\Config\Schema\SchemaIncompleteException;
 use Drupal\Core\Entity\EntityBase;
-use Drupal\Core\Config\ConfigDuplicateUUIDException;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\Core\Entity\SynchronizableEntityTrait;
-use Drupal\Core\Plugin\RemovableDependentPluginInterface;
 use Drupal\Core\Plugin\PluginDependencyTrait;
+use Drupal\Core\Plugin\RemovableDependentPluginInterface;
 use Drupal\Core\Plugin\RemovableDependentPluginReturn;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
@@ -253,7 +253,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    */
   public function toArray() {
     $properties = [];
-    /** @var \Drupal\Core\Config\Entity\ConfigEntityTypeInterface $entity_type */
+    /** @var ConfigEntityTypeInterface $entity_type */
     $entity_type = $this->getEntityType();
 
     $id_key = $entity_type->getKey('id');
@@ -295,7 +295,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    * {@inheritdoc}
    */
   public function preSave(EntityStorageInterface $storage) {
-    /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $storage */
+    /** @var ConfigEntityStorageInterface $storage */
     parent::preSave($storage);
 
     if ($this instanceof EntityWithPluginCollectionInterface && !$this->isSyncing()) {
@@ -586,7 +586,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
       }
       // Fix or remove any dependencies.
       $config_entities = static::getConfigManager()->getConfigEntitiesToChangeOnDependencyRemoval('config', [$entity->getConfigDependencyName()], FALSE);
-      /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $dependent_entity */
+      /** @var ConfigEntityInterface $dependent_entity */
       foreach ($config_entities['update'] as $dependent_entity) {
         $dependent_entity->save();
       }

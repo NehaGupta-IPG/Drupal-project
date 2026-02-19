@@ -5,13 +5,13 @@ namespace Drupal\menu_link_content\Hook;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\path_alias\PathAliasInterface;
-use Drupal\system\MenuInterface;
-use Drupal\Core\Url;
-use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Menu\MenuLinkManagerInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
+use Drupal\path_alias\PathAliasInterface;
+use Drupal\system\MenuInterface;
 
 /**
  * Hook implementations for menu_link_content.

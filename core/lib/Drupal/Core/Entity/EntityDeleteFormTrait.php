@@ -22,7 +22,7 @@ trait EntityDeleteFormTrait {
    *
    * Provided by \Drupal\Core\Entity\EntityForm.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The entity.
    */
   abstract public function getEntity();
@@ -89,7 +89,7 @@ trait EntityDeleteFormTrait {
   /**
    * Returns the URL where the user should be redirected after deletion.
    *
-   * @return \Drupal\Core\Url
+   * @return Url
    *   The redirect URL.
    */
   protected function getRedirectUrl() {

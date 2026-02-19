@@ -21,9 +21,9 @@ use Drupal\package_manager\Event\PostCreateEvent;
 use Drupal\package_manager\Event\PostRequireEvent;
 use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\Event\PreCreateEvent;
-use Drupal\package_manager\Event\SandboxValidationEvent;
 use Drupal\package_manager\Event\PreRequireEvent;
 use Drupal\package_manager\Event\SandboxEvent;
+use Drupal\package_manager\Event\SandboxValidationEvent;
 use Drupal\package_manager\Exception\ApplyFailedException;
 use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\Exception\SandboxException;
@@ -156,7 +156,7 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
   /**
    * The shared temp store.
    *
-   * @var \Drupal\Core\TempStore\SharedTempStore
+   * @var SharedTempStore
    */
   protected SharedTempStore $tempStore;
 
@@ -264,11 +264,11 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
   /**
    * Collects paths that Composer Stager should exclude.
    *
-   * @return \PhpTuf\ComposerStager\API\Path\Value\PathListInterface
+   * @return PathListInterface
    *   A list of paths that Composer Stager should exclude when creating the
    *   stage directory and applying staged changes to the active directory.
    *
-   * @throws \Drupal\package_manager\Exception\SandboxException
+   * @throws SandboxException
    *   Thrown if an exception occurs while collecting paths to exclude.
    *
    * @see ::create()
@@ -301,7 +301,7 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
    *   performing other operations on it. Calling code should store this ID for
    *   as long as the stage needs to exist.
    *
-   * @throws \Drupal\package_manager\Exception\SandboxException
+   * @throws SandboxException
    *   Thrown if a stage directory already exists, or if an error occurs while
    *   creating the stage directory. In the latter situation, the stage
    *   directory will be destroyed.
@@ -395,7 +395,7 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
    *   (optional) How long to allow the Composer operation to run before timing
    *   out, in seconds, or NULL to never time out. Defaults to 300 seconds.
    *
-   * @throws \Drupal\package_manager\Exception\SandboxException
+   * @throws SandboxException
    *   Thrown if the Composer operation cannot be started, or if an error occurs
    *   during the operation. In the latter situation, the stage directory will
    *   be destroyed.
@@ -474,7 +474,7 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
    *   timing out, in seconds, or NULL to never time out. Defaults to 600
    *   seconds.
    *
-   * @throws \Drupal\package_manager\Exception\ApplyFailedException
+   * @throws ApplyFailedException
    *   Thrown if there is an error calling Composer Stager, which may indicate
    *   a failed commit operation.
    */
@@ -566,12 +566,12 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
    * @param bool $force
    *   (optional) If TRUE, the stage directory will be destroyed even if it is
    *   not owned by the current user or session. Defaults to FALSE.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $message
+   * @param TranslatableMarkup|null $message
    *   (optional) A message about why the stage was destroyed.
    *
-   * @throws \Drupal\package_manager\Exception\SandboxException
+   * @throws SandboxException
    *   If the staged changes are being applied to the active directory.
-   * @throws \Drupal\Core\TempStore\TempStoreException
+   * @throws TempStoreException
    */
   public function destroy(bool $force = FALSE, ?TranslatableMarkup $message = NULL): void {
     if (!$force) {
@@ -606,13 +606,13 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
   /**
    * Dispatches an event and handles any errors that it collects.
    *
-   * @param \Drupal\package_manager\Event\SandboxEvent $event
+   * @param SandboxEvent $event
    *   The event object.
    * @param callable|null $on_error
    *   (optional) A callback function to call if an error occurs, before any
    *   exceptions are thrown.
    *
-   * @throws \Drupal\package_manager\Exception\SandboxEventException
+   * @throws SandboxEventException
    *   If the event collects any validation errors.
    */
   protected function dispatch(SandboxEvent $event, ?callable $on_error = NULL): void {
@@ -659,7 +659,7 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
    *
    * @return $this
    *
-   * @throws \Drupal\package_manager\Exception\SandboxOwnershipException
+   * @throws SandboxOwnershipException
    *   If the stage cannot be claimed. This can happen if the current user or
    *   session did not originally create the stage, if $unique_id doesn't match
    *   the unique ID that was generated when the stage was created, or the
@@ -710,10 +710,10 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
    *
    * @param string $unique_id
    *   The unique ID that was returned by ::create().
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $fallback_message
+   * @param TranslatableMarkup $fallback_message
    *   A fallback message, in case no specific message was stored.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   * @return TranslatableMarkup
    *   A message describing why the stage with the given ID was destroyed, or if
    *   no message was associated with that destroyed stage, the provided
    *   fallback message.
@@ -732,7 +732,7 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
    *
    * @throws \LogicException
    *   If ::claim() has not been previously called.
-   * @throws \Drupal\package_manager\Exception\SandboxOwnershipException
+   * @throws SandboxOwnershipException
    *   If the current user or session does not own the stage directory, or it
    *   was created by a different class.
    */
@@ -823,7 +823,7 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
   /**
    * Returns the failure marker message.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   * @return TranslatableMarkup
    *   The translated failure marker message.
    */
   protected function getFailureMarkerMessage(): TranslatableMarkup {
@@ -865,10 +865,10 @@ abstract class SandboxManagerBase implements LoggerAwareInterface {
    *
    * @param bool $force
    *   Whether the stage was force destroyed.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $message
+   * @param TranslatableMarkup|null $message
    *   A message about why the stage was destroyed or null.
    *
-   * @throws \Drupal\Core\TempStore\TempStoreException
+   * @throws TempStoreException
    */
   protected function storeDestroyInfo(bool $force, ?TranslatableMarkup $message): void {
     if (!$message) {

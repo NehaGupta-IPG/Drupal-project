@@ -24,17 +24,17 @@ final class NavigationMenuLinkTree extends MenuLinkTree {
   /**
    * Constructs a \Drupal\navigation\Menu\NavigationMenuLinkTree object.
    *
-   * @param \Drupal\Core\Menu\MenuTreeStorageInterface $treeStorage
+   * @param MenuTreeStorageInterface $treeStorage
    *   The menu link tree storage.
-   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menuLinkManager
+   * @param MenuLinkManagerInterface $menuLinkManager
    *   The menu link plugin manager.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $routeProvider
+   * @param RouteProviderInterface $routeProvider
    *   The route provider to load routes by name.
-   * @param \Drupal\Core\Menu\MenuActiveTrailInterface $menuActiveTrail
+   * @param MenuActiveTrailInterface $menuActiveTrail
    *   The active menu trail service.
-   * @param \Drupal\Core\Utility\CallableResolver $callableResolver
+   * @param CallableResolver $callableResolver
    *   The callable resolver.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   * @param ModuleHandlerInterface $moduleHandler
    *   The module handler.
    */
   public function __construct(

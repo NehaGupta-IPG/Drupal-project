@@ -37,7 +37,7 @@ class ManageOptions {
   /**
    * Gets the root-level scaffold options for this project.
    *
-   * @return \Drupal\Composer\Plugin\Scaffold\ScaffoldOptions
+   * @return ScaffoldOptions
    *   The scaffold options object.
    */
   public function getOptions() {
@@ -50,7 +50,7 @@ class ManageOptions {
    * @param \Composer\Package\PackageInterface $package
    *   The package to fetch the scaffold options from.
    *
-   * @return \Drupal\Composer\Plugin\Scaffold\ScaffoldOptions
+   * @return ScaffoldOptions
    *   The scaffold options object.
    */
   public function packageOptions(PackageInterface $package) {
@@ -65,7 +65,7 @@ class ManageOptions {
    *
    * Note that only the root package may define locations.
    *
-   * @return \Drupal\Composer\Plugin\Scaffold\Interpolator
+   * @return Interpolator
    *   Interpolator that will do replacements in a string using tokens in
    *   'locations' element.
    */

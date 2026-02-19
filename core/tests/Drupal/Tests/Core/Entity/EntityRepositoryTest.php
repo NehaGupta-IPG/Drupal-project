@@ -26,28 +26,28 @@ class EntityRepositoryTest extends UnitTestCase {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var EntityTypeManagerInterface|ProphecyInterface
    */
   protected $entityTypeManager;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var LanguageManagerInterface|ProphecyInterface
    */
   protected $languageManager;
 
   /**
    * The context repository.
    *
-   * @var \Drupal\Core\Plugin\Context\ContextRepositoryInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var ContextRepositoryInterface|ProphecyInterface
    */
   protected $contextRepository;
 
   /**
    * The entity repository under test.
    *
-   * @var \Drupal\Core\Entity\EntityRepository
+   * @var EntityRepository
    */
   protected $entityRepository;
 

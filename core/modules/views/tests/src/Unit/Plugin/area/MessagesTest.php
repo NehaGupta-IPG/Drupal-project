@@ -26,7 +26,7 @@ class MessagesTest extends UnitTestCase {
   /**
    * The message handler.
    *
-   * @var \Drupal\views\Plugin\views\area\Messages
+   * @var Messages
    */
   protected $messagesHandler;
 

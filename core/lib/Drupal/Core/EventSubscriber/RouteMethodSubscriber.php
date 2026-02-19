@@ -20,7 +20,7 @@ class RouteMethodSubscriber implements EventSubscriberInterface {
   /**
    * Sets a default value of GET|POST for the _method route property.
    *
-   * @param \Drupal\Core\Routing\RouteBuildEvent $event
+   * @param RouteBuildEvent $event
    *   The event containing the build routes.
    */
   public function onRouteBuilding(RouteBuildEvent $event) {

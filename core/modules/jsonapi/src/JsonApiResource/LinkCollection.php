@@ -7,7 +7,7 @@ use Drupal\Component\Assertion\Inspector;
 /**
  * Contains a set of JSON:API Link objects.
  *
- * @implements \IteratorAggregate<string, \Drupal\jsonapi\JsonApiResource\Link>
+ * @implements \IteratorAggregate<string, Link>
  *
  * @internal JSON:API maintains no PHP API. The API is the HTTP API. This class
  *   may change at any time and could break any dependencies on it.
@@ -20,7 +20,7 @@ final class LinkCollection implements \IteratorAggregate {
   /**
    * The links in the collection, keyed by unique strings.
    *
-   * @var array<string, \Drupal\jsonapi\JsonApiResource\Link>
+   * @var array<string, Link>
    */
   protected $links;
 
@@ -30,7 +30,7 @@ final class LinkCollection implements \IteratorAggregate {
    * All links objects exist within a context object. Links form a relationship
    * between a source IRI and target IRI. A context is the link's source.
    *
-   * @var \Drupal\jsonapi\JsonApiResource\JsonApiDocumentTopLevel|\Drupal\jsonapi\JsonApiResource\ResourceObject|\Drupal\jsonapi\JsonApiResource\Relationship
+   * @var JsonApiDocumentTopLevel|ResourceObject|Relationship
    *
    * @see https://tools.ietf.org/html/rfc8288#section-3.2
    */
@@ -39,9 +39,9 @@ final class LinkCollection implements \IteratorAggregate {
   /**
    * LinkCollection constructor.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\Link[] $links
+   * @param Link[] $links
    *   An associated array of key names and JSON:API Link objects.
-   * @param \Drupal\jsonapi\JsonApiResource\JsonApiDocumentTopLevel|\Drupal\jsonapi\JsonApiResource\ResourceObject|\Drupal\jsonapi\JsonApiResource\Relationship $context
+   * @param JsonApiDocumentTopLevel|ResourceObject|Relationship $context
    *   (internal use only) The context object. Use the self::withContext()
    *   method to establish a context. This should be done automatically when
    *   a LinkCollection is passed into a context object.
@@ -64,7 +64,7 @@ final class LinkCollection implements \IteratorAggregate {
   /**
    * Returns an iterator for links.
    *
-   * @return \ArrayIterator<string, \Drupal\jsonapi\JsonApiResource\Link>
+   * @return \ArrayIterator<string, Link>
    *   An \ArrayIterator instance.
    */
   public function getIterator(): \ArrayIterator {
@@ -79,7 +79,7 @@ final class LinkCollection implements \IteratorAggregate {
    *   A key for the link. If the key already exists and the link shares an
    *   href, link relation type and attributes with an existing link with that
    *   key, those links will be merged together.
-   * @param \Drupal\jsonapi\JsonApiResource\Link $new_link
+   * @param Link $new_link
    *   The link to insert.
    *
    * @return static
@@ -117,7 +117,7 @@ final class LinkCollection implements \IteratorAggregate {
   /**
    * Establishes a new context for a LinkCollection.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\JsonApiDocumentTopLevel|\Drupal\jsonapi\JsonApiResource\ResourceObject|\Drupal\jsonapi\JsonApiResource\Relationship $context
+   * @param JsonApiDocumentTopLevel|ResourceObject|Relationship $context
    *   The new context object.
    *
    * @return static
@@ -130,7 +130,7 @@ final class LinkCollection implements \IteratorAggregate {
   /**
    * Gets the LinkCollection's context object.
    *
-   * @return \Drupal\jsonapi\JsonApiResource\JsonApiDocumentTopLevel|\Drupal\jsonapi\JsonApiResource\ResourceObject|\Drupal\jsonapi\JsonApiResource\Relationship
+   * @return JsonApiDocumentTopLevel|ResourceObject|Relationship
    *   The LinkCollection's context.
    */
   public function getContext() {
@@ -148,7 +148,7 @@ final class LinkCollection implements \IteratorAggregate {
    *   boolean callback(string $key, \Drupal\jsonapi\JsonApiResource\Link $link, mixed $context))
    * @endcode
    *
-   * @return \Drupal\jsonapi\JsonApiResource\LinkCollection
+   * @return LinkCollection
    *   A new, filtered LinkCollection.
    */
   public function filter(callable $f) {
@@ -165,12 +165,12 @@ final class LinkCollection implements \IteratorAggregate {
   /**
    * Merges two LinkCollections.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\LinkCollection $a
+   * @param LinkCollection $a
    *   The first link collection.
-   * @param \Drupal\jsonapi\JsonApiResource\LinkCollection $b
+   * @param LinkCollection $b
    *   The second link collection.
    *
-   * @return \Drupal\jsonapi\JsonApiResource\LinkCollection
+   * @return LinkCollection
    *   A new LinkCollection with the links of both inputs.
    */
   public static function merge(LinkCollection $a, LinkCollection $b) {

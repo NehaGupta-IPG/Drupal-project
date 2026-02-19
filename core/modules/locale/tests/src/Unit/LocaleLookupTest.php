@@ -24,49 +24,49 @@ class LocaleLookupTest extends UnitTestCase {
   /**
    * A mocked storage to use when instantiating LocaleTranslation objects.
    *
-   * @var \Drupal\locale\StringStorageInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\locale\StringStorageInterface|MockObject
    */
   protected $storage;
 
   /**
    * A mocked cache object.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Cache\CacheBackendInterface|MockObject
    */
   protected $cache;
 
   /**
    * A mocked lock object.
    *
-   * @var \Drupal\Core\Lock\LockBackendInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Lock\LockBackendInterface|MockObject
    */
   protected $lock;
 
   /**
    * A mocked user object built from AccountInterface.
    *
-   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Session\AccountInterface|MockObject
    */
   protected $user;
 
   /**
    * A mocked config factory built with UnitTestCase::getConfigFactoryStub().
    *
-   * @var \Drupal\Core\Config\ConfigFactory|\PHPUnit\Framework\MockObject\MockBuilder
+   * @var \Drupal\Core\Config\ConfigFactory|MockBuilder
    */
   protected $configFactory;
 
   /**
    * A mocked language manager built from LanguageManagerInterface.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Language\LanguageManagerInterface|MockObject
    */
   protected $languageManager;
 
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 

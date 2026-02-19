@@ -12,16 +12,16 @@ class PhpBackendFactory implements CacheFactoryInterface {
   /**
    * The cache tags checksum provider.
    *
-   * @var \Drupal\Core\Cache\CacheTagsChecksumInterface
+   * @var CacheTagsChecksumInterface
    */
   protected $checksumProvider;
 
   /**
    * Constructs a PhpBackendFactory object.
    *
-   * @param \Drupal\Core\Cache\CacheTagsChecksumInterface $checksum_provider
+   * @param CacheTagsChecksumInterface $checksum_provider
    *   The cache tags checksum provider.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct(CacheTagsChecksumInterface $checksum_provider, protected TimeInterface $time) {
@@ -34,7 +34,7 @@ class PhpBackendFactory implements CacheFactoryInterface {
    * @param string $bin
    *   The cache bin for which the object is created.
    *
-   * @return \Drupal\Core\Cache\PhpBackend
+   * @return PhpBackend
    *   The cache backend object for the specified cache bin.
    */
   public function get($bin) {

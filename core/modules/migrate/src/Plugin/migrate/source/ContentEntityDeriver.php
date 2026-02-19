@@ -16,7 +16,7 @@ class ContentEntityDeriver extends DeriverBase implements ContainerDeriverInterf
   /**
    * Constructs a new ContentEntityDeriver.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
   public function __construct(

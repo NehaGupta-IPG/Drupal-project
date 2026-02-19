@@ -2,8 +2,8 @@
 
 namespace Drupal\Core\Template;
 
-use Drupal\Component\Utility\Html;
 use Drupal\Component\Render\MarkupInterface;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
@@ -21,9 +21,9 @@ use Twig\Markup as TwigMarkup;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Node;
+use Twig\Runtime\EscaperRuntime;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
-use Twig\Runtime\EscaperRuntime;
 
 /**
  * A class providing Drupal Twig extensions.
@@ -38,50 +38,50 @@ class TwigExtension extends AbstractExtension {
   /**
    * The URL generator.
    *
-   * @var \Drupal\Core\Routing\UrlGeneratorInterface
+   * @var UrlGeneratorInterface
    */
   protected $urlGenerator;
 
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * The theme manager.
    *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   * @var ThemeManagerInterface
    */
   protected $themeManager;
 
   /**
    * The date formatter.
    *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
+   * @var DateFormatterInterface
    */
   protected $dateFormatter;
 
   /**
    * The file URL generator.
    *
-   * @var \Drupal\Core\File\FileUrlGeneratorInterface
+   * @var FileUrlGeneratorInterface
    */
   protected $fileUrlGenerator;
 
   /**
    * Constructs \Drupal\Core\Template\TwigExtension.
    *
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
+   * @param UrlGeneratorInterface $url_generator
    *   The URL generator.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
+   * @param ThemeManagerInterface $theme_manager
    *   The theme manager.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   * @param DateFormatterInterface $date_formatter
    *   The date formatter.
-   * @param \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator
+   * @param FileUrlGeneratorInterface $file_url_generator
    *   The file URL generator.
    */
   public function __construct(RendererInterface $renderer, UrlGeneratorInterface $url_generator, ThemeManagerInterface $theme_manager, DateFormatterInterface $date_formatter, FileUrlGeneratorInterface $file_url_generator) {
@@ -252,9 +252,9 @@ class TwigExtension extends AbstractExtension {
    *
    * @param string $text
    *   The link text for the anchor tag as a translated string.
-   * @param \Drupal\Core\Url|string $url
+   * @param Url|string $url
    *   The URL object or string used for the link.
-   * @param array|\Drupal\Core\Template\Attribute $attributes
+   * @param array|Attribute $attributes
    *   An optional array or Attribute object of link attributes.
    *
    * @return array
@@ -347,7 +347,7 @@ class TwigExtension extends AbstractExtension {
    * If param1 and param2 reference placeholders in the route, it would not
    * need to be escaped, but we don't know that in advance.
    *
-   * @param \Twig\Node\Node $args_node
+   * @param Node $args_node
    *   The arguments of the path/url functions.
    *
    * @return array
@@ -368,7 +368,7 @@ class TwigExtension extends AbstractExtension {
   /**
    * Attaches an asset library to the template, and hence to the response.
    *
-   * Allows Twig templates to attach asset libraries using
+   * Allows Twig templates to attach asset libraries using.
    * @code
    * {{ attach_library('extension/library_name') }}
    * @endcode
@@ -388,7 +388,7 @@ class TwigExtension extends AbstractExtension {
   /**
    * Provides a placeholder wrapper around ::escapeFilter.
    *
-   * @param \Twig\Environment $env
+   * @param Environment $env
    *   A Twig Environment instance.
    * @param mixed $string
    *   The value to be escaped.
@@ -407,7 +407,7 @@ class TwigExtension extends AbstractExtension {
    *
    * Replacement function for Twig's escape filter.
    *
-   * @param \Twig\Environment $env
+   * @param Environment $env
    *   A Twig Environment instance.
    * @param mixed $arg
    *   The value to be escaped.
@@ -608,7 +608,7 @@ class TwigExtension extends AbstractExtension {
   /**
    * Joins several strings together safely.
    *
-   * @param \Twig\Environment $env
+   * @param Environment $env
    *   A Twig Environment instance.
    * @param mixed[]|\Traversable|null $value
    *   The pieces to join.
@@ -638,7 +638,7 @@ class TwigExtension extends AbstractExtension {
    *   (optional) An existing attribute object or an associative array of
    *   key-value pairs to be converted to HTML attributes.
    *
-   * @return \Drupal\Core\Template\Attribute
+   * @return Attribute
    *   An attributes object that has the given attributes.
    */
   public function createAttribute(Attribute|array $attributes = []) {

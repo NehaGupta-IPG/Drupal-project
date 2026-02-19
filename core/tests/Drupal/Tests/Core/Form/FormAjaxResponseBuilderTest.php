@@ -25,17 +25,17 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class FormAjaxResponseBuilderTest extends UnitTestCase {
 
   /**
-   * @var \Drupal\Core\Render\MainContent\MainContentRendererInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Render\MainContent\MainContentRendererInterface|MockObject
    */
   protected $renderer;
 
   /**
-   * @var \Drupal\Core\Routing\RouteMatchInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Routing\RouteMatchInterface|MockObject
    */
   protected $routeMatch;
 
   /**
-   * @var \Drupal\Core\Form\FormAjaxResponseBuilder
+   * @var FormAjaxResponseBuilder
    */
   protected $formAjaxResponseBuilder;
 

@@ -15,43 +15,43 @@ class ViewExecutableFactory {
   /**
    * Stores the current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $user;
 
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * The views data.
    *
-   * @var \Drupal\views\ViewsData
+   * @var ViewsData
    */
   protected $viewsData;
 
   /**
    * The route provider.
    *
-   * @var \Drupal\Core\Routing\RouteProviderInterface
+   * @var RouteProviderInterface
    */
   protected $routeProvider;
 
   /**
    * Constructs a new ViewExecutableFactory.
    *
-   * @param \Drupal\Core\Session\AccountInterface $user
+   * @param AccountInterface $user
    *   The current user.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   The request stack.
-   * @param \Drupal\views\ViewsData $views_data
+   * @param ViewsData $views_data
    *   The views data.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
+   * @param RouteProviderInterface $route_provider
    *   The route provider.
-   * @param \Drupal\views\Plugin\ViewsPluginManager|null $displayPluginManager
+   * @param ViewsPluginManager|null $displayPluginManager
    *   The display plugin manager.
    */
   public function __construct(AccountInterface $user, RequestStack $request_stack, ViewsData $views_data, RouteProviderInterface $route_provider, protected ?ViewsPluginManager $displayPluginManager = NULL) {
@@ -68,10 +68,10 @@ class ViewExecutableFactory {
   /**
    * Instantiates a ViewExecutable class.
    *
-   * @param \Drupal\views\ViewEntityInterface $view
+   * @param ViewEntityInterface $view
    *   A view entity instance.
    *
-   * @return \Drupal\views\ViewExecutable
+   * @return ViewExecutable
    *   A ViewExecutable instance.
    */
   public function get(ViewEntityInterface $view) {

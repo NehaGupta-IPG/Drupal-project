@@ -2,15 +2,15 @@
 
 namespace Drupal\locale\Hook;
 
-use Drupal\Core\Link;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Asset\AttachedAssetsInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\language\ConfigurableLanguageInterface;
-use Drupal\Core\Url;
-use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
+use Drupal\language\ConfigurableLanguageInterface;
 use Drupal\locale\LocaleDefaultOptions;
 
 /**
@@ -340,7 +340,7 @@ class LocaleHooks {
    */
   #[Hook('form_language_admin_edit_form_alter')]
   public function formLanguageAdminEditFormAlter(&$form, FormStateInterface $form_state) : void {
-    /** @var \Drupal\language\ConfigurableLanguageInterface $language */
+    /** @var ConfigurableLanguageInterface $language */
     $language = $form_state->getFormObject()->getEntity();
     if ($language->id() == 'en') {
       $form['locale_translate_english'] = [

@@ -31,14 +31,14 @@ class PrepareModulesEntityUninstallForm extends ConfirmFormBase {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * Constructs a PrepareModulesEntityUninstallForm object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
@@ -99,10 +99,10 @@ class PrepareModulesEntityUninstallForm extends ConfirmFormBase {
    * @param string $entity_type_id
    *   The entity type ID.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   * @return TranslatableMarkup
    *   The form title.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws PluginNotFoundException
    *   Thrown when the entity-type does not exist.
    */
   public function formTitle(string $entity_type_id): TranslatableMarkup {
@@ -116,7 +116,7 @@ class PrepareModulesEntityUninstallForm extends ConfirmFormBase {
    * @param string $entity_type_id
    *   Entity type ID.
    *
-   * @return \Drupal\Core\Access\AccessResultInterface
+   * @return AccessResultInterface
    *   The access result.
    */
   public static function checkAccess(string $entity_type_id): AccessResultInterface {

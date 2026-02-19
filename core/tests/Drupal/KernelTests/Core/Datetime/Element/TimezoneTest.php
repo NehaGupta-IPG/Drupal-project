@@ -28,7 +28,7 @@ class TimezoneTest extends EntityKernelTestBase implements FormInterface {
   /**
    * The date used in tests.
    *
-   * @var \Drupal\Core\Datetime\DrupalDateTime
+   * @var DrupalDateTime
    */
   protected $date;
 
@@ -359,12 +359,12 @@ class TimezoneTest extends EntityKernelTestBase implements FormInterface {
   /**
    * Simulate form being loaded and default values displayed to user.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   A form_state object.
-   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
+   * @param FormBuilderInterface $form_builder
    *   A form_builder object.
    *
-   * @return \Drupal\Core\Form\FormStateInterface
+   * @return FormStateInterface
    *   The modified form state.
    */
   protected function setupForm(FormStateInterface $form_state, FormBuilderInterface $form_builder) {

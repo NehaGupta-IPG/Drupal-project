@@ -17,7 +17,7 @@ interface EntityOwnerInterface {
   /**
    * Returns the entity owner's user entity.
    *
-   * @return \Drupal\user\UserInterface
+   * @return UserInterface
    *   The owner user entity.
    */
   public function getOwner();
@@ -25,7 +25,7 @@ interface EntityOwnerInterface {
   /**
    * Sets the entity owner's user entity.
    *
-   * @param \Drupal\user\UserInterface $account
+   * @param UserInterface $account
    *   The owner user entity.
    *
    * @return $this

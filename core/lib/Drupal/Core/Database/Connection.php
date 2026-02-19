@@ -51,7 +51,7 @@ abstract class Connection {
   /**
    * The current database logging object for this connection.
    *
-   * @var \Drupal\Core\Database\Log|null
+   * @var Log|null
    */
   protected $logger = NULL;
 
@@ -97,7 +97,7 @@ abstract class Connection {
    *
    * Set to NULL when the schema is destroyed.
    *
-   * @var \Drupal\Core\Database\Schema|null
+   * @var Schema|null
    */
   protected $schema = NULL;
 
@@ -422,13 +422,13 @@ abstract class Connection {
    *   (optional) A flag indicating if row count is allowed on the statement
    *   object. Defaults to FALSE.
    *
-   * @return \Drupal\Core\Database\StatementInterface
+   * @return StatementInterface
    *   A prepared statement ready for its execute() method.
    *
    * @throws \InvalidArgumentException
    *   If multiple statements are included in the string, and delimiters are
    *   not allowed in the query.
-   * @throws \Drupal\Core\Database\DatabaseExceptionWrapper
+   * @throws DatabaseExceptionWrapper
    */
   public function prepareStatement(string $query, array $options, bool $allow_row_count = FALSE): StatementInterface {
     assert(!isset($options['return']), 'Passing "return" option to prepareStatement() has no effect. See https://www.drupal.org/node/3185520');
@@ -543,7 +543,7 @@ abstract class Connection {
   /**
    * Associates a logging object with this connection.
    *
-   * @param \Drupal\Core\Database\Log $logger
+   * @param Log $logger
    *   The logging object we want to use.
    */
   public function setLogger(Log $logger) {
@@ -553,7 +553,7 @@ abstract class Connection {
   /**
    * Gets the current logging object for this connection.
    *
-   * @return \Drupal\Core\Database\Log|null
+   * @return Log|null
    *   The current logging object for this connection. If there isn't one,
    *   NULL is returned.
    */
@@ -638,11 +638,11 @@ abstract class Connection {
    *   Typically, $options['return'] will be set by a default or by a query
    *   builder, and should not be set by a user.
    *
-   * @return \Drupal\Core\Database\StatementInterface|null
+   * @return StatementInterface|null
    *   The executed statement.
    *
-   * @throws \Drupal\Core\Database\DatabaseExceptionWrapper
-   * @throws \Drupal\Core\Database\IntegrityConstraintViolationException
+   * @throws DatabaseExceptionWrapper
+   * @throws IntegrityConstraintViolationException
    * @throws \InvalidArgumentException
    *
    * @see \Drupal\Core\Database\Connection::defaultOptions()
@@ -769,7 +769,7 @@ abstract class Connection {
   /**
    * Returns the database exceptions handler.
    *
-   * @return \Drupal\Core\Database\ExceptionHandler
+   * @return ExceptionHandler
    *   The database exceptions handler.
    */
   public function exceptionHandler() {
@@ -779,7 +779,7 @@ abstract class Connection {
   /**
    * Prepares and returns a SELECT query object.
    *
-   * @param string|\Drupal\Core\Database\Query\SelectInterface $table
+   * @param string|SelectInterface $table
    *   The base table name or subquery for this query, used in the FROM clause.
    *   If a string, the table specified will also be used as the "base" table
    *   for query_alter hook implementations.
@@ -810,7 +810,7 @@ abstract class Connection {
    *   run. The given options will be merged with
    *   \Drupal\Core\Database\Connection::defaultOptions().
    *
-   * @return \Drupal\Core\Database\Query\Insert
+   * @return Insert
    *   A new Insert query object.
    *
    * @see \Drupal\Core\Database\Query\Insert
@@ -840,7 +840,7 @@ abstract class Connection {
    * @return string
    *   The value returned by the wrapped connection.
    *
-   * @throws \Drupal\Core\Database\DatabaseExceptionWrapper
+   * @throws DatabaseExceptionWrapper
    *   In case of failure.
    */
   public function lastInsertId(?string $name = NULL): string {
@@ -858,7 +858,7 @@ abstract class Connection {
    * @param array $options
    *   (optional) An array of options on the query.
    *
-   * @return \Drupal\Core\Database\Query\Merge
+   * @return Merge
    *   A new Merge query object.
    *
    * @see \Drupal\Core\Database\Query\Merge
@@ -892,7 +892,7 @@ abstract class Connection {
    *   run. The given options will be merged with
    *   \Drupal\Core\Database\Connection::defaultOptions().
    *
-   * @return \Drupal\Core\Database\Query\Update
+   * @return Update
    *   A new Update query object.
    *
    * @see \Drupal\Core\Database\Query\Update
@@ -912,7 +912,7 @@ abstract class Connection {
    *   run. The given options will be merged with
    *   \Drupal\Core\Database\Connection::defaultOptions().
    *
-   * @return \Drupal\Core\Database\Query\Delete
+   * @return Delete
    *   A new Delete query object.
    *
    * @see \Drupal\Core\Database\Query\Delete
@@ -930,7 +930,7 @@ abstract class Connection {
    * @param array $options
    *   (optional) An array of options on the query.
    *
-   * @return \Drupal\Core\Database\Query\Truncate
+   * @return Truncate
    *   A new Truncate query object.
    *
    * @see \Drupal\Core\Database\Query\Truncate
@@ -944,7 +944,7 @@ abstract class Connection {
    *
    * This method will lazy-load the appropriate schema library file.
    *
-   * @return \Drupal\Core\Database\Schema
+   * @return Schema
    *   The database Schema object for this connection.
    */
   abstract public function schema();
@@ -955,7 +955,7 @@ abstract class Connection {
    * @param string $conjunction
    *   The operator to use to combine conditions: 'AND' or 'OR'.
    *
-   * @return \Drupal\Core\Database\Query\Condition
+   * @return Condition
    *   A new Condition query object.
    *
    * @see \Drupal\Core\Database\Query\Condition
@@ -1088,7 +1088,7 @@ abstract class Connection {
   /**
    * Returns the transaction manager.
    *
-   * @return \Drupal\Core\Database\Transaction\TransactionManagerInterface
+   * @return TransactionManagerInterface
    *   The transaction manager, or FALSE if not available.
    *
    * @throws \LogicException
@@ -1109,7 +1109,7 @@ abstract class Connection {
    * it here.
    *
    * phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn
-   * @return \Drupal\Core\Database\Transaction\TransactionManagerInterface
+   * @return TransactionManagerInterface
    *   The transaction manager.
    *
    * @throws \LogicException
@@ -1135,7 +1135,7 @@ abstract class Connection {
    * @param string $name
    *   (optional) The name of the savepoint.
    *
-   * @return \Drupal\Core\Database\Transaction
+   * @return Transaction
    *   A Transaction object.
    *
    * @see \Drupal\Core\Database\Transaction
@@ -1164,7 +1164,7 @@ abstract class Connection {
    * @param array $options
    *   (optional) An array of options on the query.
    *
-   * @return \Drupal\Core\Database\StatementInterface
+   * @return StatementInterface
    *   A database query result resource, or NULL if the query was not executed
    *   correctly.
    */
@@ -1442,10 +1442,10 @@ abstract class Connection {
   /**
    * Get the pager manager service, if available.
    *
-   * @return \Drupal\Core\Pager\PagerManagerInterface
+   * @return PagerManagerInterface
    *   The pager manager service, if available.
    *
-   * @throws \Drupal\Core\DependencyInjection\ContainerNotInitializedException
+   * @throws ContainerNotInitializedException
    *   If the container has not been initialized yet.
    */
   public function getPagerManager(): PagerManagerInterface {
@@ -1516,15 +1516,15 @@ abstract class Connection {
   /**
    * Dispatches a database API event via the container dispatcher.
    *
-   * @param \Drupal\Core\Database\Event\DatabaseEvent $event
+   * @param DatabaseEvent $event
    *   The database event.
    * @param string|null $eventName
    *   (Optional) the name of the event to dispatch.
    *
-   * @return \Drupal\Core\Database\Event\DatabaseEvent
+   * @return DatabaseEvent
    *   The database event.
    *
-   * @throws \Drupal\Core\Database\Exception\EventException
+   * @throws EventException
    *   If the container is not initialized.
    */
   public function dispatchEvent(DatabaseEvent $event, ?string $eventName = NULL): DatabaseEvent {

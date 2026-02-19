@@ -26,7 +26,7 @@ class ContentModerationRouteSubscriberTest extends UnitTestCase {
   /**
    * The test content moderation route subscriber.
    *
-   * @var \Drupal\content_moderation\Routing\ContentModerationRouteSubscriber
+   * @var ContentModerationRouteSubscriber
    */
   protected $routeSubscriber;
 
@@ -36,7 +36,7 @@ class ContentModerationRouteSubscriberTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */
+    /** @var EntityTypeManagerInterface $entity_type_manager */
     $entity_type_manager = $this->createMock(EntityTypeManagerInterface::class);
     $this->routeSubscriber = new ContentModerationRouteSubscriber($entity_type_manager);
     $this->setupEntityTypes();

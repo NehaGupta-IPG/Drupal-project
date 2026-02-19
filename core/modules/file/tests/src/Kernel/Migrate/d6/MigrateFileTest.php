@@ -64,7 +64,7 @@ class MigrateFileTest extends MigrateDrupal6TestBase implements MigrateDumpAlter
    * @internal
    */
   protected function assertEntity(int $fid, string $name, int $size, string $uri, string $type, int $uid): void {
-    /** @var \Drupal\file\FileInterface $file */
+    /** @var FileInterface $file */
     $file = File::load($fid);
     $this->assertInstanceOf(FileInterface::class, $file);
     $this->assertSame($name, $file->getFilename());

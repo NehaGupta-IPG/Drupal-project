@@ -66,7 +66,7 @@ class FieldDefaultValueCallbackTest extends BrowserTestBase {
       'entity_type' => 'node',
       'type' => 'text',
     ])->save();
-    /** @var \Drupal\field\Entity\FieldConfig $field_config */
+    /** @var FieldConfig $field_config */
     $field_config = FieldConfig::create([
       'entity_type' => 'node',
       'field_name' => $this->fieldName,

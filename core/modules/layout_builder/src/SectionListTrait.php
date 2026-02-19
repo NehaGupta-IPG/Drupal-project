@@ -15,7 +15,7 @@ trait SectionListTrait {
    * Implementations of this method are expected to call array_values() to rekey
    * the list of sections.
    *
-   * @param \Drupal\layout_builder\Section[] $sections
+   * @param Section[] $sections
    *   An array of section objects.
    *
    * @return $this
@@ -52,7 +52,7 @@ trait SectionListTrait {
    *
    * @param int $delta
    *   The delta of the section.
-   * @param \Drupal\layout_builder\Section $section
+   * @param Section $section
    *   The layout section.
    *
    * @return $this

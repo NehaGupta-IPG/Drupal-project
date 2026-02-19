@@ -44,7 +44,7 @@ class TimestampFormatter extends FormatterBase {
    *   The plugin ID for the formatter.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The definition of the field to which the formatter is associated.
    * @param array $settings
    *   The formatter settings.
@@ -54,11 +54,11 @@ class TimestampFormatter extends FormatterBase {
    *   The view mode.
    * @param array $third_party_settings
    *   Third party settings.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
+   * @param DateFormatterInterface $dateFormatter
    *   The date formatter service.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $dateFormatStorage
+   * @param EntityStorageInterface $dateFormatStorage
    *   The date format storage.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct(

@@ -254,7 +254,7 @@ trait StandardTestTrait {
     $role->save();
     $this->adminUser->addRole($role->id())->save();
     $assert_session = $this->assertSession();
-    /** @var \Drupal\media\Entity\MediaType $media_type */
+    /** @var MediaType $media_type */
     foreach (MediaType::loadMultiple() as $media_type) {
       $media_type_machine_name = $media_type->id();
       $this->drupalGet('media/add/' . $media_type_machine_name);

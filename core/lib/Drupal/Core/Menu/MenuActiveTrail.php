@@ -19,29 +19,29 @@ class MenuActiveTrail extends CacheCollector implements MenuActiveTrailInterface
   /**
    * The menu link plugin manager.
    *
-   * @var \Drupal\Core\Menu\MenuLinkManagerInterface
+   * @var MenuLinkManagerInterface
    */
   protected $menuLinkManager;
 
   /**
    * The route match object for the current page.
    *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
+   * @var RouteMatchInterface
    */
   protected $routeMatch;
 
   /**
    * Constructs a \Drupal\Core\Menu\MenuActiveTrail object.
    *
-   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager
+   * @param MenuLinkManagerInterface $menu_link_manager
    *   The menu link plugin manager.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   A route match object for finding the active link.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The cache backend.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
+   * @param LockBackendInterface $lock
    *   The lock backend.
-   * @param \Drupal\Core\Path\PathMatcherInterface|null $pathMatcher
+   * @param PathMatcherInterface|null $pathMatcher
    *   The path.matcher service.
    */
   public function __construct(

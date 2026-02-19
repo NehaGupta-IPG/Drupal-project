@@ -2,9 +2,9 @@
 
 namespace Drupal\Core\Entity\Enhancer;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\EnhancerInterface;
 use Drupal\Core\Routing\RouteObjectInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
@@ -16,14 +16,14 @@ class EntityBundleRouteEnhancer implements EnhancerInterface {
   /**
    * The entity type manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * Constructs a EntityBundleRouteEnhancer object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {

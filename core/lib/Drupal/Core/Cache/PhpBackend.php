@@ -43,7 +43,7 @@ class PhpBackend implements CacheBackendInterface {
   /**
    * The cache tags checksum provider.
    *
-   * @var \Drupal\Core\Cache\CacheTagsChecksumInterface
+   * @var CacheTagsChecksumInterface
    */
   protected $checksumProvider;
 
@@ -52,9 +52,9 @@ class PhpBackend implements CacheBackendInterface {
    *
    * @param string $bin
    *   The cache bin for which the object is created.
-   * @param \Drupal\Core\Cache\CacheTagsChecksumInterface $checksum_provider
+   * @param CacheTagsChecksumInterface $checksum_provider
    *   The cache tags checksum provider.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct($bin, CacheTagsChecksumInterface $checksum_provider, protected TimeInterface $time) {
@@ -261,7 +261,7 @@ class PhpBackend implements CacheBackendInterface {
   /**
    * Gets the PHP code storage object to use.
    *
-   * @return \Drupal\Component\PhpStorage\PhpStorageInterface
+   * @return PhpStorageInterface
    *   The PHP storage.
    */
   protected function storage() {

@@ -3,9 +3,9 @@
 namespace Drupal\comment;
 
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\user\EntityOwnerInterface;
-use Drupal\Core\Entity\EntityChangedInterface;
 
 /**
  * Provides an interface defining a comment entity.
@@ -63,7 +63,7 @@ interface CommentInterface extends ContentEntityInterface, EntityChangedInterfac
   /**
    * Returns the parent comment entity if this is a reply to a comment.
    *
-   * @return \Drupal\comment\CommentInterface|null
+   * @return CommentInterface|null
    *   A comment entity of the parent comment or NULL if there is no parent.
    */
   public function getParentComment();

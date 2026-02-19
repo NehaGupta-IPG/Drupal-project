@@ -37,7 +37,7 @@ class UserPermissionsModuleSpecificForm extends UserPermissionsForm {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param string $modules
    *   (optional) One or more module machine names, comma-separated.
@@ -53,7 +53,7 @@ class UserPermissionsModuleSpecificForm extends UserPermissionsForm {
    * @param string $modules
    *   (optional) One or more module machine names, comma-separated.
    *
-   * @return \Drupal\Core\Access\AccessResultInterface
+   * @return AccessResultInterface
    *   The access result.
    */
   public function access($modules): AccessResultInterface {

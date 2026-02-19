@@ -4,8 +4,8 @@ namespace Drupal\user;
 
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultReasonInterface;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityAccessControlHandler;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -28,8 +28,7 @@ class UserAccessControlHandler extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
-    /** @var \Drupal\user\UserInterface $entity*/
-
+    /** @var UserInterface $entity*/
     // We don't treat the user label as privileged information, so this check
     // has to be the first one in order to allow labels for all users to be
     // viewed, including the special anonymous user.

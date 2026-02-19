@@ -4,14 +4,14 @@ namespace Drupal\block\Plugin\DisplayVariant;
 
 use Drupal\block\BlockRepositoryInterface;
 use Drupal\Core\Block\MainContentBlockPluginInterface;
-use Drupal\Core\Block\TitleBlockPluginInterface;
 use Drupal\Core\Block\MessagesBlockPluginInterface;
+use Drupal\Core\Block\TitleBlockPluginInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Display\Attribute\PageDisplayVariant;
 use Drupal\Core\Display\PageVariantInterface;
+use Drupal\Core\Display\VariantBase;
 use Drupal\Core\Entity\EntityViewBuilderInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Display\VariantBase;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -35,14 +35,14 @@ class BlockPageVariant extends VariantBase implements PageVariantInterface, Cont
   /**
    * The block repository.
    *
-   * @var \Drupal\block\BlockRepositoryInterface
+   * @var BlockRepositoryInterface
    */
   protected $blockRepository;
 
   /**
    * The block view builder.
    *
-   * @var \Drupal\Core\Entity\EntityViewBuilderInterface
+   * @var EntityViewBuilderInterface
    */
   protected $blockViewBuilder;
 
@@ -76,9 +76,9 @@ class BlockPageVariant extends VariantBase implements PageVariantInterface, Cont
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\block\BlockRepositoryInterface $block_repository
+   * @param BlockRepositoryInterface $block_repository
    *   The block repository.
-   * @param \Drupal\Core\Entity\EntityViewBuilderInterface $block_view_builder
+   * @param EntityViewBuilderInterface $block_view_builder
    *   The block view builder.
    * @param string[] $block_list_cache_tags
    *   The Block entity type list cache tags.

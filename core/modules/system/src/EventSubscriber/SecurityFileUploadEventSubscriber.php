@@ -17,7 +17,7 @@ class SecurityFileUploadEventSubscriber implements EventSubscriberInterface {
   /**
    * Constructs a new file event listener.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   * @param ConfigFactoryInterface $configFactory
    *   The config factory.
    */
   public function __construct(
@@ -40,7 +40,7 @@ class SecurityFileUploadEventSubscriber implements EventSubscriberInterface {
   /**
    * Sanitizes the upload's filename to make it secure.
    *
-   * @param \Drupal\Core\File\Event\FileUploadSanitizeNameEvent $event
+   * @param FileUploadSanitizeNameEvent $event
    *   File upload sanitize name event.
    */
   public function sanitizeName(FileUploadSanitizeNameEvent $event): void {

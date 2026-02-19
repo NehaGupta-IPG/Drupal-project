@@ -35,14 +35,14 @@ class ModuleExtensionList extends ExtensionList {
   /**
    * The config factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * The profile list needed by this module list.
    *
-   * @var \Drupal\Core\Extension\ExtensionList
+   * @var ExtensionList
    */
   protected $profileList;
 
@@ -53,17 +53,17 @@ class ModuleExtensionList extends ExtensionList {
    *   The app root.
    * @param string $type
    *   The extension type.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The cache.
-   * @param \Drupal\Core\Extension\InfoParserInterface $info_parser
+   * @param InfoParserInterface $info_parser
    *   The info parser.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\Core\Extension\ExtensionList $profile_list
+   * @param ExtensionList $profile_list
    *   The site profile listing.
    * @param string $install_profile
    *   The install profile used by the site.
@@ -98,7 +98,7 @@ class ModuleExtensionList extends ExtensionList {
   /**
    * Finds all installation profile paths.
    *
-   * @param \Drupal\Core\Extension\ExtensionDiscovery $discovery
+   * @param ExtensionDiscovery $discovery
    *   The extension discovery.
    *
    * @return string[]
@@ -119,7 +119,7 @@ class ModuleExtensionList extends ExtensionList {
   /**
    * Gets the processed active profile object, or null.
    *
-   * @return \Drupal\Core\Extension\Extension|null
+   * @return Extension|null
    *   The active profile, if there is one.
    */
   protected function getActiveProfile() {
@@ -201,9 +201,9 @@ class ModuleExtensionList extends ExtensionList {
   /**
    * Marks dependencies of required modules as 'required', recursively.
    *
-   * @param \Drupal\Core\Extension\Extension $module
+   * @param Extension $module
    *   The module extension object.
-   * @param \Drupal\Core\Extension\Extension[] $modules
+   * @param Extension[] $modules
    *   Extension objects for all available modules.
    */
   protected function ensureRequiredDependencies(Extension $module, array $modules = []) {

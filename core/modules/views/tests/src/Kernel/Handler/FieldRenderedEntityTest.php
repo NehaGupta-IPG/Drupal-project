@@ -193,7 +193,7 @@ class FieldRenderedEntityTest extends ViewsKernelTestBase {
   /**
    * Ensures that the config dependencies are calculated the right way.
    *
-   * @param \Drupal\views\Entity\View $storage
+   * @param View $storage
    *   The view storage.
    *
    * @internal

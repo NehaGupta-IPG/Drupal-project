@@ -292,7 +292,7 @@ abstract class UpdateTestBase extends BrowserTestBase {
    * @param int $index
    *   (optional) The index of the element.
    *
-   * @return \Behat\Mink\Element\NodeElement
+   * @return NodeElement
    *   The update element.
    */
   protected function findUpdateElementByLabel($label, int $index = 0): NodeElement {

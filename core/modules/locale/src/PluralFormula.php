@@ -13,12 +13,12 @@ use Drupal\Core\State\StateInterface;
 class PluralFormula implements PluralFormulaInterface {
 
   /**
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
@@ -42,9 +42,9 @@ class PluralFormula implements PluralFormulaInterface {
   protected $formulae;
 
   /**
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state.
    */
   public function __construct(LanguageManagerInterface $language_manager, StateInterface $state) {

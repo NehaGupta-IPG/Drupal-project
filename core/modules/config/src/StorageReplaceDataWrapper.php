@@ -14,7 +14,7 @@ class StorageReplaceDataWrapper implements StorageInterface {
   /**
    * The configuration storage to be wrapped.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   protected $storage;
 
@@ -35,7 +35,7 @@ class StorageReplaceDataWrapper implements StorageInterface {
   /**
    * Constructs a new StorageReplaceDataWrapper.
    *
-   * @param \Drupal\Core\Config\StorageInterface $storage
+   * @param StorageInterface $storage
    *   A configuration storage to be used to read and write configuration.
    * @param string $collection
    *   (optional) The collection to store configuration in. Defaults to the

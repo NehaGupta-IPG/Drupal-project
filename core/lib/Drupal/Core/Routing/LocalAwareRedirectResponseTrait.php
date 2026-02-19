@@ -12,7 +12,7 @@ trait LocalAwareRedirectResponseTrait {
   /**
    * The request context.
    *
-   * @var \Drupal\Core\Routing\RequestContext
+   * @var RequestContext
    */
   protected $requestContext;
 
@@ -33,7 +33,7 @@ trait LocalAwareRedirectResponseTrait {
   /**
    * Returns the request context.
    *
-   * @return \Drupal\Core\Routing\RequestContext
+   * @return RequestContext
    *   The request context.
    */
   protected function getRequestContext() {
@@ -46,7 +46,7 @@ trait LocalAwareRedirectResponseTrait {
   /**
    * Sets the request context.
    *
-   * @param \Drupal\Core\Routing\RequestContext $request_context
+   * @param RequestContext $request_context
    *   The request context.
    *
    * @return $this

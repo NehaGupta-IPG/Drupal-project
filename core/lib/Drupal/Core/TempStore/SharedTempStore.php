@@ -44,21 +44,21 @@ class SharedTempStore {
   /**
    * The key/value storage object used for this data.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface
+   * @var KeyValueStoreExpirableInterface
    */
   protected $storage;
 
   /**
    * The lock object used for this data.
    *
-   * @var \Drupal\Core\Lock\LockBackendInterface
+   * @var LockBackendInterface
    */
   protected $lockBackend;
 
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
@@ -72,7 +72,7 @@ class SharedTempStore {
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountProxyInterface
+   * @var AccountProxyInterface
    */
   protected $currentUser;
 
@@ -88,17 +88,17 @@ class SharedTempStore {
   /**
    * Constructs a new object for accessing data from a key/value store.
    *
-   * @param \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface $storage
+   * @param KeyValueStoreExpirableInterface $storage
    *   The key/value storage object used for this data. Each storage object
    *   represents a particular collection of data and will contain any number
    *   of key/value pairs.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock_backend
+   * @param LockBackendInterface $lock_backend
    *   The lock object used for this data.
    * @param mixed $owner
    *   The owner key to store along with the data (e.g. a user or session ID).
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   The request stack.
-   * @param \Drupal\Core\Session\AccountProxyInterface $current_user
+   * @param AccountProxyInterface $current_user
    *   The current user.
    * @param int $expire
    *   The time to live for items, in seconds.
@@ -181,7 +181,7 @@ class SharedTempStore {
    *   TRUE if the data was set, or FALSE if it already exists and is not owned
    *   by $this->user.
    *
-   * @throws \Drupal\Core\TempStore\TempStoreException
+   * @throws TempStoreException
    *   Thrown when a lock for the backend storage could not be acquired.
    */
   public function setIfOwner($key, $value) {
@@ -205,7 +205,7 @@ class SharedTempStore {
    * @param mixed $value
    *   The data to store.
    *
-   * @throws \Drupal\Core\TempStore\TempStoreException
+   * @throws TempStoreException
    *   Thrown when a lock for the backend storage could not be acquired.
    */
   public function set($key, $value) {
@@ -232,7 +232,7 @@ class SharedTempStore {
    * @param string $key
    *   The key of the data to store.
    *
-   * @return \Drupal\Core\TempStore\Lock|null
+   * @return Lock|null
    *   An object with the owner and updated time if the key has a value, or
    *   NULL otherwise.
    */
@@ -252,7 +252,7 @@ class SharedTempStore {
    * @param string $key
    *   The key of the data to delete.
    *
-   * @throws \Drupal\Core\TempStore\TempStoreException
+   * @throws TempStoreException
    *   Thrown when a lock for the backend storage could not be acquired.
    */
   public function delete($key) {
@@ -278,7 +278,7 @@ class SharedTempStore {
    *   TRUE if the object was deleted or does not exist, FALSE if it exists but
    *   is not owned by $this->owner.
    *
-   * @throws \Drupal\Core\TempStore\TempStoreException
+   * @throws TempStoreException
    *   Thrown when a lock for the backend storage could not be acquired.
    */
   public function deleteIfOwner($key) {

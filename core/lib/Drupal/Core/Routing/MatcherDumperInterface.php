@@ -13,7 +13,7 @@ interface MatcherDumperInterface extends SymfonyMatcherDumperInterface {
   /**
    * Adds additional routes to be dumped.
    *
-   * @param \Symfony\Component\Routing\RouteCollection $routes
+   * @param RouteCollection $routes
    *   A collection of routes to add to this dumper.
    */
   public function addRoutes(RouteCollection $routes);

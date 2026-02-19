@@ -22,7 +22,7 @@ class LocalActionDefault extends PluginBase implements LocalActionInterface, Con
   /**
    * The route provider to load routes by name.
    *
-   * @var \Drupal\Core\Routing\RouteProviderInterface
+   * @var RouteProviderInterface
    */
   protected $routeProvider;
 
@@ -35,7 +35,7 @@ class LocalActionDefault extends PluginBase implements LocalActionInterface, Con
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
+   * @param RouteProviderInterface $route_provider
    *   The route provider to load routes by name.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider) {

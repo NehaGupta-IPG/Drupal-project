@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\package_manager_test_validation;
 
-use Drupal\package_manager\Validator\SandboxDatabaseUpdatesValidator as BaseValidator;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\State\StateInterface;
+use Drupal\package_manager\Validator\SandboxDatabaseUpdatesValidator as BaseValidator;
 
 /**
  * Allows tests to dictate which extensions have staged database updates.
@@ -16,14 +16,14 @@ class TestSandboxDatabaseUpdatesValidator extends BaseValidator {
   /**
    * The state service.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   private $state;
 
   /**
    * Sets the state service dependency.
    *
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state service.
    */
   public function setState(StateInterface $state): void {

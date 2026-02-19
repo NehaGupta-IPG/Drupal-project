@@ -2,8 +2,8 @@
 
 namespace Drupal\Core\Config;
 
-use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\Extension;
+use Drupal\Core\Extension\ExtensionDiscovery;
 
 /**
  * Storage used by the Drupal installer.
@@ -98,7 +98,7 @@ class InstallStorage extends FileStorage {
   /**
    * Overrides Drupal\Core\Config\FileStorage::write().
    *
-   * @throws \Drupal\Core\Config\StorageException
+   * @throws StorageException
    */
   public function write($name, array $data) {
     throw new StorageException('Write operation is not allowed.');
@@ -107,7 +107,7 @@ class InstallStorage extends FileStorage {
   /**
    * Overrides Drupal\Core\Config\FileStorage::delete().
    *
-   * @throws \Drupal\Core\Config\StorageException
+   * @throws StorageException
    */
   public function delete($name) {
     throw new StorageException('Delete operation is not allowed.');
@@ -116,7 +116,7 @@ class InstallStorage extends FileStorage {
   /**
    * Overrides Drupal\Core\Config\FileStorage::rename().
    *
-   * @throws \Drupal\Core\Config\StorageException
+   * @throws StorageException
    */
   public function rename($name, $new_name) {
     throw new StorageException('Rename operation is not allowed.');
@@ -180,7 +180,7 @@ class InstallStorage extends FileStorage {
   /**
    * Get all configuration names and folders for a list of modules or themes.
    *
-   * @param \Drupal\Core\Extension\Extension[] $list
+   * @param Extension[] $list
    *   An associative array of Extension objects, keyed by extension name.
    *
    * @return array
@@ -241,7 +241,7 @@ class InstallStorage extends FileStorage {
   /**
    * Get folder inside each component that contains the files.
    *
-   * @param \Drupal\Core\Extension\Extension $extension
+   * @param Extension $extension
    *   The Extension object for the component.
    *
    * @return string
@@ -264,7 +264,7 @@ class InstallStorage extends FileStorage {
   /**
    * Overrides Drupal\Core\Config\FileStorage::deleteAll().
    *
-   * @throws \Drupal\Core\Config\StorageException
+   * @throws StorageException
    */
   public function deleteAll($prefix = '') {
     throw new StorageException('Delete operation is not allowed.');

@@ -19,9 +19,9 @@ use Drupal\file\Entity\File;
 use Drupal\file\FileRepositoryInterface;
 use Drupal\file\Validation\FileValidatorInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Handles validating and creating file entities from file uploads.
@@ -36,7 +36,7 @@ class FileUploadHandler implements FileUploadHandlerInterface {
   /**
    * The file validator.
    *
-   * @var \Drupal\file\Validation\FileValidatorInterface
+   * @var FileValidatorInterface
    */
   protected FileValidatorInterface $fileValidator;
 
@@ -204,7 +204,7 @@ class FileUploadHandler implements FileUploadHandlerInterface {
   /**
    * Move the uploaded file from the temporary path to the destination.
    *
-   * @param \Drupal\file\Upload\UploadedFileInterface $uploadedFile
+   * @param UploadedFileInterface $uploadedFile
    *   The uploaded file.
    * @param string $uri
    *   The destination URI.

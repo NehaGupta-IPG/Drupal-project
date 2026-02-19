@@ -28,7 +28,7 @@ trait BlockContentCreationTrait {
    * @param array $values
    *   (optional) Additional values for the block_content entity.
    *
-   * @return \Drupal\block_content\Entity\BlockContent
+   * @return BlockContent
    *   Created content block.
    */
   protected function createBlockContent(bool|string $title = FALSE, string $bundle = 'basic', bool $save = TRUE, array $values = []): BlockContent {
@@ -57,7 +57,7 @@ trait BlockContentCreationTrait {
    * @param bool $create_body
    *   Whether or not to create the body field.
    *
-   * @return \Drupal\block_content\Entity\BlockContentType
+   * @return BlockContentType
    *   Created block type.
    */
   protected function createBlockContentType(array|string $values, bool $create_body = FALSE): BlockContentType {

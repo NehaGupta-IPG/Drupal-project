@@ -36,14 +36,14 @@ class LocaleConfigManager {
   /**
    * The storage instance for reading configuration data.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   protected $configStorage;
 
   /**
    * The string storage for reading and writing translations.
    *
-   * @var \Drupal\locale\StringStorageInterface
+   * @var StringStorageInterface
    */
   protected $localeStorage;
 
@@ -57,21 +57,21 @@ class LocaleConfigManager {
   /**
    * The configuration factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\language\ConfigurableLanguageManagerInterface
+   * @var ConfigurableLanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The typed config manager.
    *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface
+   * @var TypedConfigManagerInterface
    */
   protected $typedConfigManager;
 
@@ -87,33 +87,33 @@ class LocaleConfigManager {
   /**
    * The locale default config storage instance.
    *
-   * @var \Drupal\locale\LocaleDefaultConfigStorage
+   * @var LocaleDefaultConfigStorage
    */
   protected $defaultConfigStorage;
 
   /**
    * The configuration manager.
    *
-   * @var \Drupal\Core\Config\ConfigManagerInterface
+   * @var ConfigManagerInterface
    */
   protected $configManager;
 
   /**
    * Creates a new typed configuration manager.
    *
-   * @param \Drupal\Core\Config\StorageInterface $config_storage
+   * @param StorageInterface $config_storage
    *   The storage object to use for reading configuration data.
-   * @param \Drupal\locale\StringStorageInterface $locale_storage
+   * @param StringStorageInterface $locale_storage
    *   The locale storage to use for reading string translations.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The configuration factory.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
+   * @param TypedConfigManagerInterface $typed_config
    *   The typed configuration manager.
-   * @param \Drupal\language\ConfigurableLanguageManagerInterface $language_manager
+   * @param ConfigurableLanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\locale\LocaleDefaultConfigStorage $default_config_storage
+   * @param LocaleDefaultConfigStorage $default_config_storage
    *   The locale default configuration storage.
-   * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
+   * @param ConfigManagerInterface $config_manager
    *   The configuration manager.
    */
   public function __construct(StorageInterface $config_storage, StringStorageInterface $locale_storage, ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typed_config, ConfigurableLanguageManagerInterface $language_manager, LocaleDefaultConfigStorage $default_config_storage, ConfigManagerInterface $config_manager) {
@@ -151,10 +151,10 @@ class LocaleConfigManager {
   /**
    * Gets translatable configuration data for a typed configuration element.
    *
-   * @param \Drupal\Core\TypedData\TypedDataInterface $element
+   * @param TypedDataInterface $element
    *   Typed configuration element.
    *
-   * @return array|\Drupal\Core\StringTranslation\TranslatableMarkup
+   * @return array|TranslatableMarkup
    *   A nested array matching the exact structure under $element with only the
    *   elements that are translatable wrapped into a TranslatableMarkup. If the
    *   provided $element is not traversable, the return value is a single
@@ -199,7 +199,7 @@ class LocaleConfigManager {
    *   The configuration name.
    * @param array $active
    *   The active configuration data.
-   * @param array|\Drupal\Core\StringTranslation\TranslatableMarkup[] $translatable
+   * @param array|TranslatableMarkup[] $translatable
    *   The translatable array structure. A nested array matching the exact
    *   structure under of the default configuration for $name with only the
    *   elements that are translatable wrapped into a TranslatableMarkup.
@@ -434,7 +434,7 @@ class LocaleConfigManager {
    * @param string $context
    *   The string context.
    *
-   * @return \Drupal\locale\TranslationString|false
+   * @return TranslationString|false
    *   The translation object if the string was not empty or FALSE otherwise.
    */
   public function getStringTranslation($name, $langcode, $source, $context) {

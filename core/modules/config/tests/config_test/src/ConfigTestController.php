@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\config_test;
 
-use Drupal\Core\Controller\ControllerBase;
 use Drupal\config_test\Entity\ConfigTest;
+use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
@@ -16,7 +16,7 @@ class ConfigTestController extends ControllerBase {
   /**
    * Route title callback.
    *
-   * @param \Drupal\config_test\Entity\ConfigTest $config_test
+   * @param ConfigTest $config_test
    *   The ConfigTest object.
    *
    * @return string
@@ -29,10 +29,10 @@ class ConfigTestController extends ControllerBase {
   /**
    * Enables a ConfigTest object.
    *
-   * @param \Drupal\config_test\Entity\ConfigTest $config_test
+   * @param ConfigTest $config_test
    *   The ConfigTest object to enable.
    *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   * @return RedirectResponse
    *   A redirect response to the config_test listing page.
    */
   public function enable(ConfigTest $config_test) {
@@ -43,10 +43,10 @@ class ConfigTestController extends ControllerBase {
   /**
    * Disables a ConfigTest object.
    *
-   * @param \Drupal\config_test\Entity\ConfigTest $config_test
+   * @param ConfigTest $config_test
    *   The ConfigTest object to disable.
    *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   * @return RedirectResponse
    *   A redirect response to the config_test listing page.
    */
   public function disable(ConfigTest $config_test) {

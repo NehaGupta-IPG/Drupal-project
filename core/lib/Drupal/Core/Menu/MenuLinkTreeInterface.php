@@ -40,7 +40,7 @@ interface MenuLinkTreeInterface {
    *   The menu name, needed for retrieving the active trail and links with the
    *   'expanded' flag enabled.
    *
-   * @return \Drupal\Core\Menu\MenuTreeParameters
+   * @return MenuTreeParameters
    *   The parameters to determine which menu links to be loaded into a tree.
    *
    * @see \Drupal\Core\Menu\MenuTreeParameters
@@ -54,10 +54,10 @@ interface MenuLinkTreeInterface {
    *
    * @param string $menu_name
    *   The name of the menu.
-   * @param \Drupal\Core\Menu\MenuTreeParameters $parameters
+   * @param MenuTreeParameters $parameters
    *   The parameters to determine which menu links to be loaded into a tree.
    *
-   * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
+   * @return MenuLinkTreeElement[]
    *   A menu link tree.
    */
   public function load($menu_name, MenuTreeParameters $parameters);
@@ -65,7 +65,7 @@ interface MenuLinkTreeInterface {
   /**
    * Applies menu link tree manipulators to transform the given tree.
    *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
+   * @param MenuLinkTreeElement[] $tree
    *   The menu tree to manipulate.
    * @param array $manipulators
    *   The menu link tree manipulators to apply. Each is an array with keys:
@@ -81,7 +81,7 @@ interface MenuLinkTreeInterface {
    *   ];
    *   @endcode
    *
-   * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
+   * @return MenuLinkTreeElement[]
    *   The manipulated menu link tree.
    */
   public function transform(array $tree, array $manipulators);
@@ -94,7 +94,7 @@ interface MenuLinkTreeInterface {
    * - collapsed: The menu item has a submenu that is not shown.
    * - leaf: The menu item has no submenu.
    *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
+   * @param MenuLinkTreeElement[] $tree
    *   A data structure representing the tree, as returned from
    *   MenuLinkTreeInterface::load().
    *

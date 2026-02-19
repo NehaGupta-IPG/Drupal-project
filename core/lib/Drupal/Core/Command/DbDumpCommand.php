@@ -68,7 +68,7 @@ class DbDumpCommand extends DbCommandBase {
   /**
    * Generates the database script.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection to use.
    * @param array $schema_only
    *   Table patterns for which to only dump the schema, no data.
@@ -108,7 +108,7 @@ class DbDumpCommand extends DbCommandBase {
   /**
    * Returns a list of tables, not including those set to be excluded.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection to use.
    *
    * @return array
@@ -135,7 +135,7 @@ class DbDumpCommand extends DbCommandBase {
   /**
    * Returns a schema array for a given table.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection to use.
    * @param string $table
    *   The table name.
@@ -230,7 +230,7 @@ class DbDumpCommand extends DbCommandBase {
   /**
    * Adds primary key, unique keys, and index information to the schema.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection to use.
    * @param string $table
    *   The table to find indexes for.
@@ -267,7 +267,7 @@ class DbDumpCommand extends DbCommandBase {
   /**
    * Set the table collation.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection to use.
    * @param string $table
    *   The table to find indexes for.
@@ -294,7 +294,7 @@ class DbDumpCommand extends DbCommandBase {
    *
    * If a table is set to be schema only, and empty array is returned.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection to use.
    * @param string $table
    *   The table to query.
@@ -315,7 +315,7 @@ class DbDumpCommand extends DbCommandBase {
   /**
    * Given a database field type, return a Drupal type.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection to use.
    * @param string $type
    *   The MySQL field type.
@@ -336,7 +336,7 @@ class DbDumpCommand extends DbCommandBase {
   /**
    * Given a database field type, return a Drupal size.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection to use.
    * @param string $type
    *   The MySQL field type.
@@ -365,7 +365,7 @@ class DbDumpCommand extends DbCommandBase {
   /**
    * Gets field ordering for a given table.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection to use.
    * @param string $table
    *   The table name.

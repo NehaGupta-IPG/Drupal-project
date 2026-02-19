@@ -3,10 +3,10 @@
 namespace Drupal\views\Plugin\Derivative;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\views\Plugin\views\display\DisplayMenuInterface;
 use Drupal\views\Views;
-use Drupal\Core\Entity\EntityStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -19,14 +19,14 @@ class ViewsMenuLink extends DeriverBase implements ContainerDeriverInterface {
   /**
    * The view storage.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var EntityStorageInterface
    */
   protected $viewStorage;
 
   /**
    * Constructs a \Drupal\views\Plugin\Derivative\ViewsLocalTask instance.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $view_storage
+   * @param EntityStorageInterface $view_storage
    *   The view storage.
    */
   public function __construct(EntityStorageInterface $view_storage) {

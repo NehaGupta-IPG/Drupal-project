@@ -47,7 +47,7 @@ class QueueWorker extends Plugin {
   /**
    * The human-readable title of the plugin.
    *
-   * @var \Drupal\Core\Annotation\Translation
+   * @var Translation
    *
    * @ingroup plugin_translatable
    */

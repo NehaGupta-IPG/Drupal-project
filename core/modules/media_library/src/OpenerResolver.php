@@ -17,14 +17,14 @@ namespace Drupal\media_library;
 class OpenerResolver implements OpenerResolverInterface {
 
   /**
-   * @var \Drupal\media_library\MediaLibraryOpenerInterface[]
+   * @var MediaLibraryOpenerInterface[]
    */
   protected array $openers = [];
 
   /**
    * Registers an opener.
    *
-   * @param \Drupal\media_library\MediaLibraryOpenerInterface $opener
+   * @param MediaLibraryOpenerInterface $opener
    *   The opener.
    * @param string $id
    *   The service ID.

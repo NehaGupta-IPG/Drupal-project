@@ -26,14 +26,14 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
   /**
    * The decorated form state.
    *
-   * @var \Drupal\Core\Form\FormStateInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var FormStateInterface|ObjectProphecy
    */
   protected $decoratedFormState;
 
   /**
    * The form state decorator base under test.
    *
-   * @var \Drupal\Core\Form\FormStateDecoratorBase
+   * @var FormStateDecoratorBase
    */
   protected $formStateDecoratorBase;
 
@@ -1512,7 +1512,7 @@ class NonAbstractFormStateDecoratorBase extends FormStateDecoratorBase {
   /**
    * Creates a new instance.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $decorated_form_state
+   * @param FormStateInterface $decorated_form_state
    *   The decorated form state.
    */
   public function __construct(FormStateInterface $decorated_form_state) {

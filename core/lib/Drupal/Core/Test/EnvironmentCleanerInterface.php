@@ -44,7 +44,7 @@ interface EnvironmentCleanerInterface {
   /**
    * Clears test results from the results storage.
    *
-   * @param \Drupal\Core\Test\TestRun $test_run
+   * @param TestRun $test_run
    *   The test run object to remove results for, or NULL to remove all
    *   results.
    *

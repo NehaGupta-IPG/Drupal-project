@@ -133,7 +133,7 @@ class Htmx {
   /**
    * Helper method to get the url string and store cache metadata.
    *
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   The URL to generate.
    *
    * @return string
@@ -198,7 +198,7 @@ class Htmx {
    *
    * @param string $method
    *   The request method.
-   * @param \Drupal\Core\Url|null $url
+   * @param Url|null $url
    *   The URL for the request. If NULL, is passed it will use the current URL
    *   without any query parameter.
    *
@@ -304,7 +304,7 @@ class Htmx {
   /**
    * Get the attribute storage.
    *
-   * @return \Drupal\Core\Template\Attribute
+   * @return Attribute
    *   The attribute storage.
    */
   public function getAttributes(): Attribute {
@@ -314,7 +314,7 @@ class Htmx {
   /**
    * Get the header storage.
    *
-   * @return \Symfony\Component\HttpFoundation\HeaderBag
+   * @return HeaderBag
    *   The header storage.
    */
   public function getHeaders(): HeaderBag {
@@ -324,7 +324,7 @@ class Htmx {
   /**
    * Set HX-Location header.
    *
-   * @param \Drupal\Core\Url|\Drupal\Core\Htmx\HtmxLocationResponseData $data
+   * @param Url|HtmxLocationResponseData $data
    *   Use Url if only a path is needed.
    *
    * @return static
@@ -347,7 +347,7 @@ class Htmx {
   /**
    * Set HX-Push-Url header.
    *
-   * @param \Drupal\Core\Url|false $value
+   * @param Url|false $value
    *   URL to push to the location bar or false to prevent a history update.
    *
    * @return static
@@ -367,7 +367,7 @@ class Htmx {
   /**
    * Set HX-Replace-Url header.
    *
-   * @param \Drupal\Core\Url|false $data
+   * @param Url|false $data
    *   URL for history replacement, false  prevents updates to the current URL.
    *
    * @return static
@@ -387,7 +387,7 @@ class Htmx {
   /**
    * Set HX-Redirect header.
    *
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   Destination for a client side redirection.
    *
    * @return static
@@ -535,7 +535,7 @@ class Htmx {
    * This request method also accepts no parameters, which issues a get
    * request to the current url. If parameters are used, both are required.
    *
-   * @param \Drupal\Core\Url|null $url
+   * @param Url|null $url
    *   The URL for the GET request. If NULL, the current page is used without
    *   the query parameters.
    *
@@ -556,7 +556,7 @@ class Htmx {
    *  This request method also accepts no parameters, which issues a post
    *  request to the current url. If parameters are used, both are required.
    *
-   * @param \Drupal\Core\Url|null $url
+   * @param Url|null $url
    *   The URL for the GET request. If NULL, the current page is used without
    *   the query parameters.
    *
@@ -577,7 +577,7 @@ class Htmx {
    *  This request method also accepts no parameters, which issues a put
    *  request to the current url. If parameters are used, both are required.
    *
-   * @param \Drupal\Core\Url|null $url
+   * @param Url|null $url
    *   The URL for the GET request. If NULL, the current page is used without
    *   the query parameters.
    *
@@ -598,7 +598,7 @@ class Htmx {
    *  This request method also accepts no parameters, which issues a patch
    *  request to the current url. If parameters are used, both are required.
    *
-   * @param \Drupal\Core\Url|null $url
+   * @param Url|null $url
    *   The URL for the GET request. If NULL, the current page is used without
    *   the query parameters.
    *
@@ -620,7 +620,7 @@ class Htmx {
    *  This request method also accepts no parameters, which issues a delete
    *  request to the current url. If parameters are used, both are required.
    *
-   * @param \Drupal\Core\Url|null $url
+   * @param Url|null $url
    *   The URL for the GET request. If NULL, the current page is used without
    *   the query parameters.
    *
@@ -676,7 +676,7 @@ class Htmx {
    * Use a URL to cause a push into the location bar. This may be relative or
    * absolute, as per history.pushState()
    *
-   * @param bool|\Drupal\Core\Url $value
+   * @param bool|Url $value
    *   Use a Url object or a boolean, depending on the use case.
    *
    * @return static
@@ -1198,7 +1198,7 @@ class Htmx {
    * Use a URL to replace the value in the location bar. This may be relative or
    * absolute, as per history.replaceState().
    *
-   * @param bool|\Drupal\Core\Url $value
+   * @param bool|Url $value
    *   A Url object, or a boolean, depending on the use case. See details above.
    *
    * @return static

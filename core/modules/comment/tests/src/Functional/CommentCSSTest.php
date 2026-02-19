@@ -59,7 +59,7 @@ class CommentCSSTest extends CommentTestBase {
       $node = $this->drupalCreateNode(['type' => 'article', 'uid' => $case['node_uid']]);
 
       // Add a comment.
-      /** @var \Drupal\comment\CommentInterface $comment */
+      /** @var CommentInterface $comment */
       $comment = Comment::create([
         'entity_id' => $node->id(),
         'entity_type' => 'node',

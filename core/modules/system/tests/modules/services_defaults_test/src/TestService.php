@@ -10,12 +10,12 @@ namespace Drupal\services_defaults_test;
 class TestService {
 
   /**
-   * @var \Drupal\services_defaults_test\TestInjectionInterface
+   * @var TestInjectionInterface
    */
   protected $testInjection;
 
   /**
-   * @var \Drupal\services_defaults_test\TestInjection2
+   * @var TestInjection2
    */
   protected $testInjection2;
 

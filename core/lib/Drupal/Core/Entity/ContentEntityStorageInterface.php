@@ -15,10 +15,10 @@ interface ContentEntityStorageInterface extends TranslatableRevisionableStorageI
    * @param array $values
    *   (optional) Any default values to use during generation.
    *
-   * @return \Drupal\Core\Entity\FieldableEntityInterface
+   * @return FieldableEntityInterface
    *   A fieldable content entity.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   Thrown if the bundle does not exist or was needed but not specified.
    */
   public function createWithSampleValues($bundle = FALSE, array $values = []);

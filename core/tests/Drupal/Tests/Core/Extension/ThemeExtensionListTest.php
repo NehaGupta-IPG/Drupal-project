@@ -251,14 +251,14 @@ trait SettableDiscoveryExtensionListTrait {
   /**
    * The extension discovery for this extension list.
    *
-   * @var \Drupal\Core\Extension\ExtensionDiscovery
+   * @var ExtensionDiscovery
    */
   protected $extensionDiscovery;
 
   /**
    * Sets the extension discovery.
    *
-   * @param \Drupal\Core\Extension\ExtensionDiscovery $discovery
+   * @param ExtensionDiscovery $discovery
    *   The extension discovery.
    */
   public function setExtensionDiscovery(ExtensionDiscovery $discovery): void {

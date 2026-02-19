@@ -29,14 +29,14 @@ class EditorFileReference extends FilterBase implements ContainerFactoryPluginIn
   /**
    * The entity repository.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   * @var EntityRepositoryInterface
    */
   protected $entityRepository;
 
   /**
    * The image factory.
    *
-   * @var \Drupal\Core\Image\ImageFactory
+   * @var ImageFactory
    */
   protected $imageFactory;
 
@@ -49,9 +49,9 @@ class EditorFileReference extends FilterBase implements ContainerFactoryPluginIn
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository.
-   * @param \Drupal\Core\Image\ImageFactory $image_factory
+   * @param ImageFactory $image_factory
    *   The image factory.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityRepositoryInterface $entity_repository, ImageFactory $image_factory) {

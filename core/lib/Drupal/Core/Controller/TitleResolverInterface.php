@@ -2,8 +2,8 @@
 
 namespace Drupal\Core\Controller;
 
-use Symfony\Component\Routing\Route;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Route;
 
 /**
  * Defines a class which knows how to generate the title from a given route.
@@ -21,9 +21,9 @@ interface TitleResolverInterface {
    * If the method returns a string and it is not marked safe then it will be
    * auto-escaped.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object passed to the title callback.
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route information of the route to fetch the title.
    *
    * @return array|string|\Stringable|null

@@ -14,8 +14,8 @@ use Drupal\Core\StringTranslation\ByteSizeMarkup;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -28,25 +28,25 @@ class FormAjaxSubscriber implements EventSubscriberInterface {
   /**
    * The form AJAX response builder.
    *
-   * @var \Drupal\Core\Form\FormAjaxResponseBuilderInterface
+   * @var FormAjaxResponseBuilderInterface
    */
   protected $formAjaxResponseBuilder;
 
   /**
    * The messenger.
    *
-   * @var \Drupal\Core\Messenger\MessengerInterface
+   * @var MessengerInterface
    */
   protected $messenger;
 
   /**
    * Constructs a new FormAjaxSubscriber.
    *
-   * @param \Drupal\Core\Form\FormAjaxResponseBuilderInterface $form_ajax_response_builder
+   * @param FormAjaxResponseBuilderInterface $form_ajax_response_builder
    *   The form AJAX response builder.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param TranslationInterface $string_translation
    *   The string translation.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger.
    */
   public function __construct(FormAjaxResponseBuilderInterface $form_ajax_response_builder, TranslationInterface $string_translation, MessengerInterface $messenger) {
@@ -58,7 +58,7 @@ class FormAjaxSubscriber implements EventSubscriberInterface {
   /**
    * Alters the wrapper format if this is an AJAX form request.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ViewEvent $event
+   * @param ViewEvent $event
    *   The event to process.
    */
   public function onView(ViewEvent $event) {
@@ -77,7 +77,7 @@ class FormAjaxSubscriber implements EventSubscriberInterface {
   /**
    * Catches a form AJAX exception and build a response from it.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   * @param ExceptionEvent $event
    *   The event to process.
    */
   public function onException(ExceptionEvent $event) {
@@ -130,7 +130,7 @@ class FormAjaxSubscriber implements EventSubscriberInterface {
    * @param \Throwable $e
    *   A generic exception that might contain a form AJAX exception.
    *
-   * @return \Drupal\Core\Form\FormAjaxException|null
+   * @return FormAjaxException|null
    *   Either the form AJAX exception, or NULL if none could be found.
    */
   protected function getFormAjaxException(\Throwable $e) {

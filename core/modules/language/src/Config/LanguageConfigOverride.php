@@ -20,7 +20,7 @@ class LanguageConfigOverride extends StorableConfigBase {
   /**
    * The event dispatcher.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+   * @var EventDispatcherInterface
    */
   protected $eventDispatcher;
 
@@ -29,12 +29,12 @@ class LanguageConfigOverride extends StorableConfigBase {
    *
    * @param string $name
    *   The name of the configuration object being overridden.
-   * @param \Drupal\Core\Config\StorageInterface $storage
+   * @param StorageInterface $storage
    *   A storage controller object to use for reading and writing the
    *   configuration override.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
+   * @param TypedConfigManagerInterface $typed_config
    *   The typed configuration manager service.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
    */
   public function __construct($name, StorageInterface $storage, TypedConfigManagerInterface $typed_config, EventDispatcherInterface $event_dispatcher) {

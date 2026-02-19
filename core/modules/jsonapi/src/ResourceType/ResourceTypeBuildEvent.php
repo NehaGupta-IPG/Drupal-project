@@ -3,8 +3,8 @@
 namespace Drupal\jsonapi\ResourceType;
 
 use Drupal\Component\Assertion\Inspector;
-use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Component\EventDispatcher\Event;
+use Drupal\Core\Entity\EntityTypeInterface;
 
 /**
  * An event used to configure the construction of a JSON:API resource type.
@@ -24,7 +24,7 @@ class ResourceTypeBuildEvent extends Event {
   /**
    * The fields of the resource type to be built.
    *
-   * @var \Drupal\jsonapi\ResourceType\ResourceTypeField[]
+   * @var ResourceTypeField[]
    */
   protected $fields;
 
@@ -43,7 +43,7 @@ class ResourceTypeBuildEvent extends Event {
    *
    * @param string $resource_type_name
    *   A JSON:API resource type name.
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeField[] $fields
+   * @param ResourceTypeField[] $fields
    *   The fields of the resource type to be built.
    */
   protected function __construct($resource_type_name, array $fields) {
@@ -55,15 +55,15 @@ class ResourceTypeBuildEvent extends Event {
   /**
    * Creates a new ResourceTypeBuildEvent.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   An entity type for the resource type to be built.
    * @param string $bundle
    *   A bundle name for the resource type to be built. If the entity type does
    *   not have bundles, the entity type ID.
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeField[] $fields
+   * @param ResourceTypeField[] $fields
    *   The fields of the resource type to be built.
    *
-   * @return \Drupal\jsonapi\ResourceType\ResourceTypeBuildEvent
+   * @return ResourceTypeBuildEvent
    *   A new event.
    */
   public static function createFromEntityTypeAndBundle(EntityTypeInterface $entity_type, $bundle, array $fields) {
@@ -112,7 +112,7 @@ class ResourceTypeBuildEvent extends Event {
   /**
    * Gets the current fields of the resource type to be built.
    *
-   * @return \Drupal\jsonapi\ResourceType\ResourceTypeField[]
+   * @return ResourceTypeField[]
    *   The current fields of the resource type to be built.
    */
   public function getFields() {
@@ -122,7 +122,7 @@ class ResourceTypeBuildEvent extends Event {
   /**
    * Sets the public name of the given field on the resource type to be built.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeField $field
+   * @param ResourceTypeField $field
    *   The field for which to set a public name.
    * @param string $public_field_name
    *   The public field name to set.
@@ -139,7 +139,7 @@ class ResourceTypeBuildEvent extends Event {
   /**
    * Disables the given field on the resource type to be built.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeField $field
+   * @param ResourceTypeField $field
    *   The field for which to set a public name.
    */
   public function disableField(ResourceTypeField $field) {
@@ -154,7 +154,7 @@ class ResourceTypeBuildEvent extends Event {
   /**
    * Enables the given field on the resource type to be built.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeField $field
+   * @param ResourceTypeField $field
    *   The field for which to set a public name.
    */
   public function enableField(ResourceTypeField $field): void {

@@ -3,9 +3,9 @@
 namespace Drupal\views\EventSubscriber;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\State\StateInterface;
 use Drupal\Core\Routing\RouteSubscriberBase;
 use Drupal\Core\Routing\RoutingEvents;
+use Drupal\Core\State\StateInterface;
 use Drupal\views\Plugin\views\display\DisplayRouterInterface;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
@@ -39,7 +39,7 @@ class RouteSubscriber extends RouteSubscriberBase {
   /**
    * The state key value store.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
@@ -53,9 +53,9 @@ class RouteSubscriber extends RouteSubscriberBase {
   /**
    * Constructs a \Drupal\views\EventSubscriber\RouteSubscriber instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state key value store.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, StateInterface $state) {
@@ -104,7 +104,7 @@ class RouteSubscriber extends RouteSubscriberBase {
   /**
    * Returns a set of route objects.
    *
-   * @return \Symfony\Component\Routing\RouteCollection
+   * @return RouteCollection
    *   A route collection.
    */
   public function routes() {

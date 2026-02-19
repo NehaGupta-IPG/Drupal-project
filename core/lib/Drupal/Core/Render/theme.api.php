@@ -1,11 +1,13 @@
 <?php
 
+use Drupal\Core\Asset\AttachedAssetsInterface;
+use Drupal\Core\Extension\ThemeSettingsProvider;
 /**
  * @file
  * Hooks and documentation related to the theme and render system.
  */
-
-use Drupal\Core\Extension\ThemeSettingsProvider;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Language\LanguageInterface;
 
 /**
  * @defgroup themeable Theme system overview
@@ -213,7 +215,6 @@ use Drupal\Core\Extension\ThemeSettingsProvider;
  *
  * @}
  */
-
 /**
  * @defgroup theme_render Render API overview
  * @{
@@ -483,7 +484,6 @@ use Drupal\Core\Extension\ThemeSettingsProvider;
  *
  * @}
  */
-
 /**
  * @defgroup listing_page_element Page header for Elements page
  * @{
@@ -513,7 +513,6 @@ use Drupal\Core\Extension\ThemeSettingsProvider;
  *
  * @}
  */
-
 /**
  * @addtogroup hooks
  * @{
@@ -532,10 +531,10 @@ use Drupal\Core\Extension\ThemeSettingsProvider;
  *
  * @param array $form
  *   Nested array of form elements that comprise the form.
- * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param FormStateInterface $form_state
  *   The current state of the form.
  */
-function hook_form_system_theme_settings_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+function hook_form_system_theme_settings_alter(&$form, FormStateInterface $form_state) {
   // Add a checkbox to toggle the breadcrumb trail.
   $form['toggle_breadcrumb'] = [
     '#type' => 'checkbox',
@@ -892,14 +891,14 @@ function hook_element_plugin_alter(array &$definitions) {
  *
  * @param array $javascript
  *   An array of all JavaScript being presented on the page.
- * @param \Drupal\Core\Asset\AttachedAssetsInterface $assets
+ * @param AttachedAssetsInterface $assets
  *   The assets attached to the current response.
- * @param \Drupal\Core\Language\LanguageInterface $language
+ * @param LanguageInterface $language
  *   The language for the page request that the assets will be rendered for.
  *
  * @see \Drupal\Core\Asset\AssetResolver
  */
-function hook_js_alter(&$javascript, \Drupal\Core\Asset\AttachedAssetsInterface $assets, \Drupal\Core\Language\LanguageInterface $language) {
+function hook_js_alter(&$javascript, AttachedAssetsInterface $assets, LanguageInterface $language) {
   // Swap out jQuery to use an updated version of the library.
   $javascript['core/assets/vendor/jquery/jquery.min.js']['data'] = \Drupal::service('extension.list.module')->getPath('jquery_update') . '/jquery.js';
 }
@@ -980,7 +979,7 @@ function hook_library_info_build(): array {
  * @param array &$settings
  *   An array of all JavaScript settings (drupalSettings) being presented on the
  *   page.
- * @param \Drupal\Core\Asset\AttachedAssetsInterface $assets
+ * @param AttachedAssetsInterface $assets
  *   The assets attached to the current response.
  *
  * @see \Drupal\Core\Asset\AssetResolver
@@ -988,7 +987,7 @@ function hook_library_info_build(): array {
  * The results of this hook are cached, however modules may use
  * hook_js_settings_alter() to dynamically alter settings.
  */
-function hook_js_settings_build(array &$settings, \Drupal\Core\Asset\AttachedAssetsInterface $assets): void {
+function hook_js_settings_build(array &$settings, AttachedAssetsInterface $assets): void {
   // Manipulate settings.
   if (isset($settings['dialog'])) {
     $settings['dialog']['autoResize'] = FALSE;
@@ -1001,12 +1000,12 @@ function hook_js_settings_build(array &$settings, \Drupal\Core\Asset\AttachedAss
  * @param array &$settings
  *   An array of all JavaScript settings (drupalSettings) being presented on the
  *   page.
- * @param \Drupal\Core\Asset\AttachedAssetsInterface $assets
+ * @param AttachedAssetsInterface $assets
  *   The assets attached to the current response.
  *
  * @see \Drupal\Core\Asset\AssetResolver
  */
-function hook_js_settings_alter(array &$settings, \Drupal\Core\Asset\AttachedAssetsInterface $assets) {
+function hook_js_settings_alter(array &$settings, AttachedAssetsInterface $assets) {
   // Add settings.
   $settings['user']['uid'] = \Drupal::currentUser();
 
@@ -1077,14 +1076,14 @@ function hook_library_info_alter(&$libraries, $extension) {
  * @param array $css
  *   An array of all CSS items (files and inline CSS) being requested on the
  *   page.
- * @param \Drupal\Core\Asset\AttachedAssetsInterface $assets
+ * @param AttachedAssetsInterface $assets
  *   The assets attached to the current response.
- * @param \Drupal\Core\Language\LanguageInterface $language
+ * @param LanguageInterface $language
  *   The language of the request that the assets will be rendered for.
  *
  * @see Drupal\Core\Asset\LibraryResolverInterface::getCssAssets()
  */
-function hook_css_alter(&$css, \Drupal\Core\Asset\AttachedAssetsInterface $assets, \Drupal\Core\Language\LanguageInterface $language) {
+function hook_css_alter(&$css, AttachedAssetsInterface $assets, LanguageInterface $language) {
   // Remove defaults.css file.
   $file_path = \Drupal::service('extension.list.module')->getPath('system') . '/defaults.css';
   unset($css[$file_path]);

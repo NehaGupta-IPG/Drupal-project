@@ -18,7 +18,7 @@ class Type extends StringArgument {
   /**
    * NodeType storage handler.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var EntityStorageInterface
    */
   protected $nodeTypeStorage;
 
@@ -31,7 +31,7 @@ class Type extends StringArgument {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $node_type_storage
+   * @param EntityStorageInterface $node_type_storage
    *   The entity storage class.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityStorageInterface $node_type_storage) {

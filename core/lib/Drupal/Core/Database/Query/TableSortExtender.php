@@ -28,7 +28,7 @@ class TableSortExtender extends SelectExtender {
    * @param array $header
    *   Table header array.
    *
-   * @return \Drupal\Core\Database\Query\SelectInterface
+   * @return SelectInterface
    *   The called object.
    *
    * @see table.html.twig

@@ -24,7 +24,7 @@ interface ThemeNegotiatorInterface {
   /**
    * Whether this theme negotiator should be used to set the theme.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The current route match object.
    *
    * @return bool
@@ -36,7 +36,7 @@ interface ThemeNegotiatorInterface {
   /**
    * Determine the active theme for the request.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The current route match object.
    *
    * @return string|null

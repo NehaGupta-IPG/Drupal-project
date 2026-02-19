@@ -139,7 +139,7 @@ class DisplayFeedTranslationTest extends ViewTestBase {
    * @param string $link_style
    *   What style of links do we expect? Either 'raw-node-path' or 'path-alias'.
    *   Only used for human-readable assert failure messages.
-   * @param \Drupal\node\Entity\Node $node
+   * @param Node $node
    *   The node entity that's been created.
    */
   protected function checkFeedResults($link_style, Node $node): void {

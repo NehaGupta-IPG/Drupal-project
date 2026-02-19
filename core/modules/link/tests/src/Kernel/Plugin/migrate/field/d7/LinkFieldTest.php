@@ -27,7 +27,7 @@ class LinkFieldTest extends KernelTestBase {
   protected $plugin;
 
   /**
-   * @var \Drupal\migrate\Plugin\MigrationInterface
+   * @var MigrationInterface
    */
   protected $migration;
 

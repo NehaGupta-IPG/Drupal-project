@@ -84,7 +84,7 @@ trait FetchModeTrait {
    *
    * @param array $rowAssoc
    *   A row of data in FetchAs::Associative format.
-   * @param \Drupal\Core\Database\Statement\FetchAs $mode
+   * @param FetchAs $mode
    *   The target target mode.
    * @param array $fetchOptions
    *   The fetch mode options.

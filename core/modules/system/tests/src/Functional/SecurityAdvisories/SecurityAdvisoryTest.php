@@ -223,7 +223,7 @@ class SecurityAdvisoryTest extends BrowserTestBase {
    *
    * @param string[] $expected_link_texts
    *   The expected links' text.
-   * @param \Drupal\Core\Extension\Requirement\RequirementSeverity $error_or_warning
+   * @param RequirementSeverity $error_or_warning
    *   Whether the links are a warning or an error.
    *
    * @internal

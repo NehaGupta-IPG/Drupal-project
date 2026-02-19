@@ -52,7 +52,7 @@ class MigrateImageCacheTest extends MigrateDrupal6TestBase {
   public function testPassingMigration(): void {
     $this->executeMigration('d6_imagecache_presets');
 
-    /** @var \Drupal\image\Entity\ImageStyle $style */
+    /** @var ImageStyle $style */
     $style = ImageStyle::load('big_blue_cheese');
 
     // Check basic Style info.
@@ -146,7 +146,7 @@ class MigrateImageCacheTest extends MigrateDrupal6TestBase {
   /**
    * Assert that a given image effect is migrated.
    *
-   * @param \Drupal\image\ImageEffectPluginCollection $collection
+   * @param ImageEffectPluginCollection $collection
    *   Collection of effects.
    * @param string $id
    *   Id that should exist in the collection.

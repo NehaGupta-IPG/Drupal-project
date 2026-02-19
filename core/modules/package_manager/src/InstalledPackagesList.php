@@ -105,7 +105,7 @@ final class InstalledPackagesList extends \ArrayObject {
    * @param string $project_name
    *   The name of a Drupal project.
    *
-   * @return \Drupal\package_manager\InstalledPackage|null
+   * @return InstalledPackage|null
    *   The Composer package which installs the project, or NULL if it could not
    *   be determined.
    */

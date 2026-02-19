@@ -2,11 +2,11 @@
 
 namespace Drupal\datetime;
 
-use Drupal\datetime\Plugin\Field\FieldType\DateTimeItem;
 use Drupal\Core\Datetime\DrupalDateTime;
 use Drupal\Core\TypedData\DataDefinitionInterface;
-use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\TypedData\TypedData;
+use Drupal\Core\TypedData\TypedDataInterface;
+use Drupal\datetime\Plugin\Field\FieldType\DateTimeItem;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItemInterface;
 
 /**

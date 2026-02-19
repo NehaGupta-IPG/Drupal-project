@@ -34,7 +34,7 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
   /**
    * The config entity being tested.
    *
-   * @var \Drupal\Core\Config\Entity\ConfigEntityInterface
+   * @var ConfigEntityInterface
    */
   protected ConfigEntityInterface $entity;
 
@@ -358,7 +358,7 @@ abstract class ConfigEntityValidationTestBase extends KernelTestBase {
   /**
    * Sets the label of the given config entity.
    *
-   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface $entity
+   * @param ConfigEntityInterface $entity
    *   The config entity to modify.
    * @param string $label
    *   The label to set.

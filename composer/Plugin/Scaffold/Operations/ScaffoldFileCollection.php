@@ -11,7 +11,7 @@ use Drupal\Composer\Plugin\Scaffold\ScaffoldOptions;
 /**
  * Collection of scaffold files.
  *
- * @implements \IteratorAggregate<string, array<string, \Drupal\Composer\Plugin\Scaffold\ScaffoldFileInfo>>
+ * @implements \IteratorAggregate<string, array<string, ScaffoldFileInfo>>
  *
  * @internal
  */
@@ -24,16 +24,16 @@ class ScaffoldFileCollection implements \IteratorAggregate {
    * scaffold files provided by that package. Each collection of scaffold files
    * is keyed by destination path.
    *
-   * @var array<string, array<string, \Drupal\Composer\Plugin\Scaffold\ScaffoldFileInfo>>
+   * @var array<string, array<string, ScaffoldFileInfo>>
    */
   protected $scaffoldFilesByProject = [];
 
   /**
    * ScaffoldFileCollection constructor.
    *
-   * @param \Drupal\Composer\Plugin\Scaffold\Operations\OperationInterface[][] $file_mappings
+   * @param OperationInterface[][] $file_mappings
    *   A multidimensional array of file mappings.
-   * @param \Drupal\Composer\Plugin\Scaffold\Interpolator $location_replacements
+   * @param Interpolator $location_replacements
    *   An object with the location mappings (e.g. [web-root]).
    */
   public function __construct(array $file_mappings, Interpolator $location_replacements) {
@@ -98,7 +98,7 @@ class ScaffoldFileCollection implements \IteratorAggregate {
   /**
    * Scans through a list of scaffold files and determines if any has contents.
    *
-   * @param \Drupal\Composer\Plugin\Scaffold\ScaffoldFileInfo[] $scaffold_files
+   * @param ScaffoldFileInfo[] $scaffold_files
    *   List of scaffold files, path: ScaffoldFileInfo.
    *
    * @return bool
@@ -117,7 +117,7 @@ class ScaffoldFileCollection implements \IteratorAggregate {
   /**
    * Retrieves the iterator for the object.
    *
-   * @return \ArrayIterator<string, array<string, \Drupal\Composer\Plugin\Scaffold\ScaffoldFileInfo>>
+   * @return \ArrayIterator<string, array<string, ScaffoldFileInfo>>
    *   The iterator.
    */
   public function getIterator(): \ArrayIterator {
@@ -127,12 +127,12 @@ class ScaffoldFileCollection implements \IteratorAggregate {
   /**
    * Processes the files in our collection.
    *
-   * @param \Composer\IO\IOInterface $io
+   * @param IOInterface $io
    *   The Composer IO object.
-   * @param \Drupal\Composer\Plugin\Scaffold\ScaffoldOptions $scaffold_options
+   * @param ScaffoldOptions $scaffold_options
    *   The scaffold options.
    *
-   * @return \Drupal\Composer\Plugin\Scaffold\Operations\ScaffoldResult[]
+   * @return ScaffoldResult[]
    *   The results array.
    */
   public function processScaffoldFiles(IOInterface $io, ScaffoldOptions $scaffold_options) {
@@ -149,14 +149,14 @@ class ScaffoldFileCollection implements \IteratorAggregate {
   /**
    * Processes the iterator created by ScaffoldFileCollection::create().
    *
-   * @param \Drupal\Composer\Plugin\Scaffold\Operations\ScaffoldFileCollection $collection
+   * @param ScaffoldFileCollection $collection
    *   The iterator to process.
-   * @param \Composer\IO\IOInterface $io
+   * @param IOInterface $io
    *   The Composer IO object.
-   * @param \Drupal\Composer\Plugin\Scaffold\ScaffoldOptions $scaffold_options
+   * @param ScaffoldOptions $scaffold_options
    *   The scaffold options.
    *
-   * @return \Drupal\Composer\Plugin\Scaffold\Operations\ScaffoldResult[]
+   * @return ScaffoldResult[]
    *   The results array.
    *
    * @deprecated. Called when upgrading from the Core Composer Scaffold plugin

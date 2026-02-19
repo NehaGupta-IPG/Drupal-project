@@ -37,7 +37,7 @@ interface LocalTaskInterface {
   /**
    * Returns the route parameters needed to render a link for the local task.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The current route match.
    *
    * @return array
@@ -56,7 +56,7 @@ interface LocalTaskInterface {
   /**
    * Returns options for rendering a link to the local task.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The current route match.
    *
    * @return array

@@ -37,7 +37,7 @@ class StaticMenuLinkOverrides implements StaticMenuLinkOverridesInterface {
   /**
    * Constructs a StaticMenuLinkOverrides object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   A configuration factory instance.
    */
   public function __construct(ConfigFactoryInterface $config_factory) {

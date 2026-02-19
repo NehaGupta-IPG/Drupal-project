@@ -21,7 +21,7 @@ class Config extends StorableConfigBase {
   /**
    * An event dispatcher instance to use for configuration events.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+   * @var EventDispatcherInterface
    */
   protected $eventDispatcher;
 
@@ -54,12 +54,12 @@ class Config extends StorableConfigBase {
    *
    * @param string $name
    *   The name of the configuration object being constructed.
-   * @param \Drupal\Core\Config\StorageInterface $storage
+   * @param StorageInterface $storage
    *   A storage object to use for reading and writing the
    *   configuration data.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param EventDispatcherInterface $event_dispatcher
    *   An event dispatcher instance to use for configuration events.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
+   * @param TypedConfigManagerInterface $typed_config
    *   The typed configuration manager service.
    */
   public function __construct($name, StorageInterface $storage, EventDispatcherInterface $event_dispatcher, TypedConfigManagerInterface $typed_config) {

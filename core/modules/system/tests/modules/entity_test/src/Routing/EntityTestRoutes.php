@@ -16,7 +16,7 @@ class EntityTestRoutes {
   /**
    * Returns an array of route objects.
    *
-   * @return \Symfony\Component\Routing\Route[]
+   * @return Route[]
    *   An array of route objects.
    */
   public function routes() {

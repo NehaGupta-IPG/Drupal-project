@@ -112,7 +112,7 @@ class Hook implements HookAttributeInterface {
    *   (optional) The module this implementation is for. This allows one module
    *   to implement a hook on behalf of another module. Defaults to the module
    *   the implementation is in.
-   * @param \Drupal\Core\Hook\Order\OrderInterface|null $order
+   * @param OrderInterface|null $order
    *   (optional) Set the order of the implementation.
    */
   public function __construct(

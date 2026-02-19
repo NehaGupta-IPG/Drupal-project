@@ -14,7 +14,7 @@ trait CommandWithAttachedAssetsTrait {
   /**
    * The attached assets for this Ajax command.
    *
-   * @var \Drupal\Core\Asset\AttachedAssets
+   * @var AttachedAssets
    */
   protected $attachedAssets;
 
@@ -24,7 +24,7 @@ trait CommandWithAttachedAssetsTrait {
    * If content is a render array, it may contain attached assets to be
    * processed.
    *
-   * @return string|\Drupal\Component\Render\MarkupInterface
+   * @return string|MarkupInterface
    *   HTML rendered content.
    */
   protected function getRenderedContent() {
@@ -45,7 +45,7 @@ trait CommandWithAttachedAssetsTrait {
   /**
    * Gets the attached assets.
    *
-   * @return \Drupal\Core\Asset\AttachedAssets|null
+   * @return AttachedAssets|null
    *   The attached assets for this command.
    */
   public function getAttachedAssets() {

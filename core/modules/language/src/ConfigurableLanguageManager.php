@@ -3,11 +3,11 @@
 namespace Drupal\language;
 
 use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageDefault;
+use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
@@ -23,35 +23,35 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
   /**
    * The configuration storage service.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * The module handler service.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The language configuration override service.
    *
-   * @var \Drupal\language\Config\LanguageConfigFactoryOverrideInterface
+   * @var LanguageConfigFactoryOverrideInterface
    */
   protected $configFactoryOverride;
 
   /**
    * The request object.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * The language negotiator.
    *
-   * @var \Drupal\language\LanguageNegotiatorInterface
+   * @var LanguageNegotiatorInterface
    */
   protected $negotiator;
 
@@ -72,7 +72,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
   /**
    * An array of language objects keyed by language type.
    *
-   * @var \Drupal\Core\Language\LanguageInterface[]
+   * @var LanguageInterface[]
    */
   protected $negotiatedLanguages;
 
@@ -107,17 +107,17 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
   /**
    * Constructs a new ConfigurableLanguageManager object.
    *
-   * @param \Drupal\Core\Language\LanguageDefault $default_language
+   * @param LanguageDefault $default_language
    *   The default language service.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The configuration factory service.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler service.
-   * @param \Drupal\language\Config\LanguageConfigFactoryOverrideInterface $config_override
+   * @param LanguageConfigFactoryOverrideInterface $config_override
    *   The language configuration override service.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   The request stack object.
-   * @param \Drupal\Core\Cache\CacheBackendInterface|null $cacheBackend
+   * @param CacheBackendInterface|null $cacheBackend
    *   The cache backend.
    */
   public function __construct(LanguageDefault $default_language, ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, LanguageConfigFactoryOverrideInterface $config_override, RequestStack $request_stack, protected ?CacheBackendInterface $cacheBackend = NULL) {
@@ -459,7 +459,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
   /**
    * Sets the configuration override language.
    *
-   * @param \Drupal\Core\Language\LanguageInterface $language
+   * @param LanguageInterface $language
    *   The language to override configuration with.
    *
    * @return $this

@@ -38,12 +38,12 @@ trait UserCreationTrait {
    *   (optional) Whether the user should be an administrator with all the
    *   available permissions.
    *
-   * @return \Drupal\user\UserInterface
+   * @return UserInterface
    *   A user account object.
    *
    * @throws \LogicException
    *   If attempting to assign additional roles to the anonymous user account.
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   If the user could not be saved.
    */
   protected function setUpCurrentUser(array $values = [], array $permissions = [], $admin = FALSE): UserInterface {
@@ -122,7 +122,7 @@ trait UserCreationTrait {
   /**
    * Switch the current logged in user.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user account object.
    */
   protected function setCurrentUser(AccountInterface $account): void {
@@ -143,10 +143,10 @@ trait UserCreationTrait {
    * @param array $values
    *   (optional) An array of initial user field values.
    *
-   * @return \Drupal\user\UserInterface
+   * @return UserInterface
    *   A fully loaded user object with pass_raw property.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   If the user creation fails.
    */
   protected function createUser(array $permissions = [], $name = NULL, $admin = FALSE, array $values = []): UserInterface {
@@ -200,7 +200,7 @@ trait UserCreationTrait {
   protected function createAdminRole($rid = NULL, $name = NULL, $weight = NULL): string {
     $rid = $this->createRole([], $rid, $name, $weight);
 
-    /** @var \Drupal\user\RoleInterface $role */
+    /** @var RoleInterface $role */
     $role = Role::load($rid);
     $role->setIsAdmin(TRUE);
     $role->save();
@@ -283,7 +283,7 @@ trait UserCreationTrait {
   /**
    * Grant permissions to a user role.
    *
-   * @param \Drupal\user\RoleInterface $role
+   * @param RoleInterface $role
    *   The user role entity to alter.
    * @param array $permissions
    *   (optional) A list of permission names to grant.

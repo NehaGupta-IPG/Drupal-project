@@ -10,7 +10,7 @@ interface AuthenticationCollectorInterface {
   /**
    * Adds a provider to the array of registered providers.
    *
-   * @param \Drupal\Core\Authentication\AuthenticationProviderInterface $provider
+   * @param AuthenticationProviderInterface $provider
    *   The provider object.
    * @param string $provider_id
    *   Identifier of the provider.
@@ -41,7 +41,7 @@ interface AuthenticationCollectorInterface {
    * @param string $provider_id
    *   The provider ID.
    *
-   * @return \Drupal\Core\Authentication\AuthenticationProviderInterface|null
+   * @return AuthenticationProviderInterface|null
    *   The authentication provider which matches the ID.
    */
   public function getProvider(string $provider_id);
@@ -49,7 +49,7 @@ interface AuthenticationCollectorInterface {
   /**
    * Returns the sorted array of authentication providers.
    *
-   * @return \Drupal\Core\Authentication\AuthenticationProviderInterface[]
+   * @return AuthenticationProviderInterface[]
    *   An array of authentication provider objects.
    */
   public function getSortedProviders();

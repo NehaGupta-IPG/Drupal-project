@@ -5,8 +5,8 @@ namespace Drupal\Core\Asset;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Asset\Exception\InvalidLibrariesExtendSpecificationException;
 use Drupal\Core\Asset\Exception\InvalidLibrariesOverrideSpecificationException;
-use Drupal\Core\Cache\CacheCollector;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\CacheCollector;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 
@@ -18,27 +18,27 @@ class LibraryDiscoveryCollector extends CacheCollector implements LibraryDiscove
   /**
    * The library discovery parser.
    *
-   * @var \Drupal\Core\Asset\LibraryDiscoveryParser
+   * @var LibraryDiscoveryParser
    */
   protected $discoveryParser;
 
   /**
    * The theme manager.
    *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   * @var ThemeManagerInterface
    */
   protected $themeManager;
 
   /**
    * Constructs a CacheCollector object.
    *
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The cache backend.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
+   * @param LockBackendInterface $lock
    *   The lock backend.
-   * @param \Drupal\Core\Asset\LibraryDiscoveryParser $discovery_parser
+   * @param LibraryDiscoveryParser $discovery_parser
    *   The library discovery parser.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
+   * @param ThemeManagerInterface $theme_manager
    *   The theme manager.
    */
   public function __construct(CacheBackendInterface $cache, LockBackendInterface $lock, LibraryDiscoveryParser $discovery_parser, ThemeManagerInterface $theme_manager) {
@@ -81,7 +81,7 @@ class LibraryDiscoveryCollector extends CacheCollector implements LibraryDiscove
    * @return array
    *   The library definitions for $extension with overrides applied.
    *
-   * @throws \Drupal\Core\Asset\Exception\InvalidLibrariesOverrideSpecificationException
+   * @throws InvalidLibrariesOverrideSpecificationException
    */
   protected function getLibraryDefinitions($extension) {
     $libraries = $this->discoveryParser->buildByExtension($extension);
@@ -130,7 +130,7 @@ class LibraryDiscoveryCollector extends CacheCollector implements LibraryDiscove
    * @return array
    *   The library definition extended as specified by libraries-extend.
    *
-   * @throws \Drupal\Core\Asset\Exception\InvalidLibrariesExtendSpecificationException
+   * @throws InvalidLibrariesExtendSpecificationException
    */
   protected function applyLibrariesExtend($extension, $library_name, $library_definition) {
     $libraries_extend = $this->themeManager->getActiveTheme()->getLibrariesExtend();

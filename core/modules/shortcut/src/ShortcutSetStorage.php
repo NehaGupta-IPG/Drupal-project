@@ -23,33 +23,33 @@ class ShortcutSetStorage extends ConfigEntityStorage implements ShortcutSetStora
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
   /**
    * Constructs a ShortcutSetStorageController object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_info
+   * @param EntityTypeInterface $entity_info
    *   The entity info for the entity type.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory service.
-   * @param \Drupal\Component\Uuid\UuidInterface $uuid_service
+   * @param UuidInterface $uuid_service
    *   The UUID service.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache
+   * @param MemoryCacheInterface $memory_cache
    *   The memory cache.
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection.
    */
   public function __construct(EntityTypeInterface $entity_info, ConfigFactoryInterface $config_factory, UuidInterface $uuid_service, ModuleHandlerInterface $module_handler, LanguageManagerInterface $language_manager, MemoryCacheInterface $memory_cache, Connection $connection) {

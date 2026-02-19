@@ -239,7 +239,7 @@ class NodeRequirementsStatusFilterWarningTest extends KernelTestBase {
    * @param array|null $filters
    *   Filters to apply to the view, or NULL to omit filters.
    *
-   * @return \Drupal\views\Entity\View
+   * @return View
    *   The created view entity.
    */
   private function createTestView(string $id, string $label, bool $status, ?array $filters): View {

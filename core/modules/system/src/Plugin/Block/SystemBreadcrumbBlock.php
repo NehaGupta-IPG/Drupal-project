@@ -22,14 +22,14 @@ class SystemBreadcrumbBlock extends BlockBase implements ContainerFactoryPluginI
   /**
    * The breadcrumb manager.
    *
-   * @var \Drupal\Core\Breadcrumb\BreadcrumbBuilderInterface
+   * @var BreadcrumbBuilderInterface
    */
   protected $breadcrumbManager;
 
   /**
    * The current route match.
    *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
+   * @var RouteMatchInterface
    */
   protected $routeMatch;
 
@@ -42,9 +42,9 @@ class SystemBreadcrumbBlock extends BlockBase implements ContainerFactoryPluginI
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Breadcrumb\BreadcrumbBuilderInterface $breadcrumb_manager
+   * @param BreadcrumbBuilderInterface $breadcrumb_manager
    *   The breadcrumb manager.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The current route match.
    */
   public function __construct(

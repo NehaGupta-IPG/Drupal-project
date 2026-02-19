@@ -18,9 +18,9 @@ class DevelopmentSettingsForm extends FormBase {
   /**
    * Constructs a new development settings form.
    *
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $keyValueFactory
+   * @param KeyValueFactoryInterface $keyValueFactory
    *   The key value factory.
-   * @param \Drupal\Core\DrupalKernelInterface $kernel
+   * @param DrupalKernelInterface $kernel
    *   The Drupal kernel.
    */
   public function __construct(

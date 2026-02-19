@@ -19,7 +19,7 @@ class DynamicMenuLinkMock extends MenuLinkMock {
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
@@ -28,7 +28,7 @@ class DynamicMenuLinkMock extends MenuLinkMock {
    *
    * Allows the menu link to return the right title and route.
    *
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
    *
    * @return $this

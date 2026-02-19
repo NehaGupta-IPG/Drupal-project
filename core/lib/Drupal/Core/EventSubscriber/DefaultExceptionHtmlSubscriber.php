@@ -8,8 +8,8 @@ use Drupal\Core\Utility\Error;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 
 /**
@@ -20,41 +20,41 @@ class DefaultExceptionHtmlSubscriber extends HttpExceptionSubscriberBase {
   /**
    * The HTTP kernel.
    *
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface
+   * @var HttpKernelInterface
    */
   protected $httpKernel;
 
   /**
    * The logger instance.
    *
-   * @var \Psr\Log\LoggerInterface
+   * @var LoggerInterface
    */
   protected $logger;
 
   /**
    * The redirect destination service.
    *
-   * @var \Drupal\Core\Routing\RedirectDestinationInterface
+   * @var RedirectDestinationInterface
    */
   protected $redirectDestination;
 
   /**
    * A router implementation which does not check access.
    *
-   * @var \Symfony\Component\Routing\Matcher\UrlMatcherInterface
+   * @var UrlMatcherInterface
    */
   protected $accessUnawareRouter;
 
   /**
    * Constructs a new DefaultExceptionHtmlSubscriber.
    *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel
+   * @param HttpKernelInterface $http_kernel
    *   The HTTP kernel.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   The logger service.
-   * @param \Drupal\Core\Routing\RedirectDestinationInterface $redirect_destination
+   * @param RedirectDestinationInterface $redirect_destination
    *   The redirect destination service.
-   * @param \Symfony\Component\Routing\Matcher\UrlMatcherInterface $access_unaware_router
+   * @param UrlMatcherInterface $access_unaware_router
    *   A router implementation which does not check access.
    */
   public function __construct(HttpKernelInterface $http_kernel, LoggerInterface $logger, RedirectDestinationInterface $redirect_destination, UrlMatcherInterface $access_unaware_router) {
@@ -83,7 +83,7 @@ class DefaultExceptionHtmlSubscriber extends HttpExceptionSubscriberBase {
   /**
    * Handles a 4xx error for HTML.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   * @param ExceptionEvent $event
    *   The event to process.
    */
   public function on4xx(ExceptionEvent $event) {
@@ -98,7 +98,7 @@ class DefaultExceptionHtmlSubscriber extends HttpExceptionSubscriberBase {
   /**
    * Handles a 401 error for HTML.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   * @param ExceptionEvent $event
    *   The event to process.
    */
   public function on401(ExceptionEvent $event) {
@@ -108,7 +108,7 @@ class DefaultExceptionHtmlSubscriber extends HttpExceptionSubscriberBase {
   /**
    * Handles a 403 error for HTML.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   * @param ExceptionEvent $event
    *   The event to process.
    */
   public function on403(ExceptionEvent $event) {
@@ -118,7 +118,7 @@ class DefaultExceptionHtmlSubscriber extends HttpExceptionSubscriberBase {
   /**
    * Handles a 404 error for HTML.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   * @param ExceptionEvent $event
    *   The event to process.
    */
   public function on404(ExceptionEvent $event) {
@@ -128,7 +128,7 @@ class DefaultExceptionHtmlSubscriber extends HttpExceptionSubscriberBase {
   /**
    * Makes a subrequest to retrieve the default error page.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   * @param ExceptionEvent $event
    *   The event to process.
    * @param string $url
    *   The path/url to which to make a subrequest for this error message.

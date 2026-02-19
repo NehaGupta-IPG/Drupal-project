@@ -20,32 +20,32 @@ class ConfigImportForm extends FormBase {
   /**
    * The configuration storage.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   protected $configStorage;
 
   /**
    * The file system service.
    *
-   * @var \Drupal\Core\File\FileSystemInterface
+   * @var FileSystemInterface
    */
   protected $fileSystem;
 
   /**
    * The settings object.
    *
-   * @var \Drupal\Core\Site\Settings
+   * @var Settings
    */
   protected $settings;
 
   /**
    * Constructs a new ConfigImportForm.
    *
-   * @param \Drupal\Core\Config\StorageInterface $config_storage
+   * @param StorageInterface $config_storage
    *   The configuration storage.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
+   * @param FileSystemInterface $file_system
    *   The file system service.
-   * @param \Drupal\Core\Site\Settings $settings
+   * @param Settings $settings
    *   The settings object.
    */
   public function __construct(StorageInterface $config_storage, FileSystemInterface $file_system, Settings $settings) {

@@ -27,49 +27,49 @@ class DefaultMenuLinkTreeManipulatorsTest extends UnitTestCase {
   /**
    * The mocked access manager.
    *
-   * @var \Drupal\Core\Access\AccessManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Access\AccessManagerInterface|MockObject
    */
   protected $accessManager;
 
   /**
    * The mocked current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Session\AccountInterface|MockObject
    */
   protected $currentUser;
 
   /**
    * The mocked entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityTypeManagerInterface|MockObject
    */
   protected $entityTypeManager;
 
   /**
    * The mocked module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var ModuleHandlerInterface|MockObject
    */
   protected $moduleHandler;
 
   /**
    * The default menu link tree manipulators.
    *
-   * @var \Drupal\Core\Menu\DefaultMenuLinkTreeManipulators
+   * @var DefaultMenuLinkTreeManipulators
    */
   protected $defaultMenuTreeManipulators;
 
   /**
    * Mock cache context manager.
    *
-   * @var \Drupal\Core\Cache\Context\CacheContextsManager|\Prophecy\Prophecy\ObjectProphecy
+   * @var CacheContextsManager|ObjectProphecy
    */
   protected $cacheContextManager;
 
   /**
    * The original menu tree build in mockTree().
    *
-   * @var \Drupal\Core\Menu\MenuLinkTreeElement[]
+   * @var MenuLinkTreeElement[]
    */
   protected $originalTree = [];
 

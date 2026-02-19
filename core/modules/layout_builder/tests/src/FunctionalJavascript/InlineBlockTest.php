@@ -455,8 +455,8 @@ class InlineBlockTest extends InlineBlockTestBase {
   /**
    * Tests the workflow for adding an inline block depending on number of types.
    *
-   * @throws \Behat\Mink\Exception\ElementNotFoundException
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ElementNotFoundException
+   * @throws ExpectationException
    */
   public function testAddWorkFlow(): void {
     $assert_session = $this->assertSession();

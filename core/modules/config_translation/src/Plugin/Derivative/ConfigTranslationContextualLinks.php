@@ -15,14 +15,14 @@ class ConfigTranslationContextualLinks extends DeriverBase implements ContainerD
   /**
    * The mapper plugin discovery service.
    *
-   * @var \Drupal\config_translation\ConfigMapperManagerInterface
+   * @var ConfigMapperManagerInterface
    */
   protected $mapperManager;
 
   /**
    * Constructs a new ConfigTranslationContextualLinks.
    *
-   * @param \Drupal\config_translation\ConfigMapperManagerInterface $mapper_manager
+   * @param ConfigMapperManagerInterface $mapper_manager
    *   The mapper plugin discovery service.
    */
   public function __construct(ConfigMapperManagerInterface $mapper_manager) {

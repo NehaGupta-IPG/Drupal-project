@@ -4,18 +4,18 @@ namespace Drupal\media\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\Attribute\FieldFormatter;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\image\ImageStyleStorageInterface;
 use Drupal\image\Plugin\Field\FieldFormatter\ImageFormatter;
-use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
-use Drupal\Core\Render\RendererInterface;
 use Drupal\media\MediaInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Field\FieldDefinitionInterface;
 
 /**
  * Plugin implementation of the 'media_thumbnail' formatter.
@@ -32,7 +32,7 @@ class MediaThumbnailFormatter extends ImageFormatter {
   /**
    * The renderer service.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
@@ -43,7 +43,7 @@ class MediaThumbnailFormatter extends ImageFormatter {
    *   The plugin ID for the formatter.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The definition of the field to which the formatter is associated.
    * @param array $settings
    *   The formatter settings.
@@ -53,13 +53,13 @@ class MediaThumbnailFormatter extends ImageFormatter {
    *   The view mode.
    * @param array $third_party_settings
    *   Any third party settings.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
-   * @param \Drupal\image\ImageStyleStorageInterface $image_style_storage
+   * @param ImageStyleStorageInterface $image_style_storage
    *   The image style entity storage handler.
-   * @param \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator
+   * @param FileUrlGeneratorInterface $file_url_generator
    *   The file URL generator.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer service.
    */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, AccountInterface $current_user, ImageStyleStorageInterface $image_style_storage, FileUrlGeneratorInterface $file_url_generator, RendererInterface $renderer) {
@@ -141,7 +141,7 @@ class MediaThumbnailFormatter extends ImageFormatter {
 
     $image_style_setting = $this->getSetting('image_style');
 
-    /** @var \Drupal\media\MediaInterface[] $media_items */
+    /** @var MediaInterface[] $media_items */
     foreach ($media_items as $delta => $media) {
       $elements[$delta] = [
         '#theme' => 'image_formatter',
@@ -185,9 +185,9 @@ class MediaThumbnailFormatter extends ImageFormatter {
   /**
    * Get the URL for the media thumbnail.
    *
-   * @param \Drupal\media\MediaInterface $media
+   * @param MediaInterface $media
    *   The media item.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity that the field belongs to.
    *
    * @return \Drupal\Core\Url|null

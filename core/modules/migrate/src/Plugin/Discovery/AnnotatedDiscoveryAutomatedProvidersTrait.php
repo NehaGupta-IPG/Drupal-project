@@ -28,7 +28,7 @@ trait AnnotatedDiscoveryAutomatedProvidersTrait {
    * This is modified from the prepareAnnotationDefinition method from annotated
    * class discovery to account for multiple providers.
    *
-   * @param \Drupal\Component\Annotation\AnnotationInterface $annotation
+   * @param AnnotationInterface $annotation
    *   The annotation derived from the plugin.
    * @param class-string $class
    *   The class used for the plugin.

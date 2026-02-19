@@ -34,7 +34,7 @@ class ConfigValidationTest extends KernelTestBase {
    *   The name of the file (in the recipe's `config` directory) which should
    *   have invalid data.
    *
-   * @return \Drupal\Core\Recipe\Recipe
+   * @return Recipe
    *   A wrapper around the created recipe.
    */
   private function createRecipeWithInvalidDataInFile(string $file): Recipe {

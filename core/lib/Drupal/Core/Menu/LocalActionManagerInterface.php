@@ -17,7 +17,7 @@ interface LocalActionManagerInterface extends PluginManagerInterface {
   /**
    * Gets the title for a local action.
    *
-   * @param \Drupal\Core\Menu\LocalActionInterface $local_action
+   * @param LocalActionInterface $local_action
    *   An object to get the title from.
    *
    * @return string

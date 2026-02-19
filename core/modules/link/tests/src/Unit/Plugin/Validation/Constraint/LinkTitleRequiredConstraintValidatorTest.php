@@ -90,7 +90,7 @@ class LinkTitleRequiredConstraintValidatorTest extends UnitTestCase {
    *
    * @param mixed $value
    *   A link field value.
-   * @param \Symfony\Component\Validator\Context\ExecutionContextInterface&\PHPUnit\Framework\MockObject\MockObject $context
+   * @param ExecutionContextInterface&MockObject $context
    *   The validation context.
    */
   protected function doValidate($value, ExecutionContextInterface&MockObject $context): void {
@@ -105,7 +105,7 @@ class LinkTitleRequiredConstraintValidatorTest extends UnitTestCase {
    * @param int $visibility
    *   The visibility of the Link title field as defined in LinkTitleVisibility.
    *
-   * @return \Drupal\link\LinkItemInterface&\PHPUnit\Framework\MockObject\MockObject
+   * @return LinkItemInterface&MockObject
    *   The mock LinkItemInterface field item.
    */
   protected function getMockLink(int $visibility): LinkItemInterface&MockObject {

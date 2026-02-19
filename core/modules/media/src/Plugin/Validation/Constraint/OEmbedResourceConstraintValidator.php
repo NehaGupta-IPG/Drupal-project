@@ -25,14 +25,14 @@ class OEmbedResourceConstraintValidator extends ConstraintValidator implements C
   /**
    * The oEmbed URL resolver service.
    *
-   * @var \Drupal\media\OEmbed\UrlResolverInterface
+   * @var UrlResolverInterface
    */
   protected $urlResolver;
 
   /**
    * The resource fetcher service.
    *
-   * @var \Drupal\media\OEmbed\ResourceFetcherInterface
+   * @var ResourceFetcherInterface
    */
   protected $resourceFetcher;
 
@@ -46,11 +46,11 @@ class OEmbedResourceConstraintValidator extends ConstraintValidator implements C
   /**
    * Constructs a new OEmbedResourceConstraintValidator.
    *
-   * @param \Drupal\media\OEmbed\UrlResolverInterface $url_resolver
+   * @param UrlResolverInterface $url_resolver
    *   The oEmbed URL resolver service.
-   * @param \Drupal\media\OEmbed\ResourceFetcherInterface $resource_fetcher
+   * @param ResourceFetcherInterface $resource_fetcher
    *   The resource fetcher service.
-   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
+   * @param LoggerChannelFactoryInterface $logger_factory
    *   The logger service.
    */
   public function __construct(UrlResolverInterface $url_resolver, ResourceFetcherInterface $resource_fetcher, LoggerChannelFactoryInterface $logger_factory) {
@@ -76,7 +76,7 @@ class OEmbedResourceConstraintValidator extends ConstraintValidator implements C
   public function validate($value, Constraint $constraint): void {
     /** @var \Drupal\media\MediaInterface $media */
     $media = $value->getEntity();
-    /** @var \Drupal\media\Plugin\media\Source\OEmbedInterface $source */
+    /** @var OEmbedInterface $source */
     $source = $media->getSource();
 
     if (!($source instanceof OEmbedInterface)) {

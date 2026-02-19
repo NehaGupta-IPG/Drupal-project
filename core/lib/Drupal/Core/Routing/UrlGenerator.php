@@ -2,16 +2,16 @@
 
 namespace Drupal\Core\Routing;
 
-use Drupal\Core\GeneratedUrl;
-use Drupal\Core\Render\BubbleableMetadata;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\RequestContext as SymfonyRequestContext;
-use Symfony\Component\Routing\Route as SymfonyRoute;
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\GeneratedUrl;
 use Drupal\Core\PathProcessor\OutboundPathProcessorInterface;
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\RouteProcessor\OutboundRouteProcessorInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
+use Symfony\Component\Routing\RequestContext as SymfonyRequestContext;
+use Symfony\Component\Routing\Route as SymfonyRoute;
 
 /**
  * Generates URLs from route names and parameters.
@@ -21,7 +21,7 @@ class UrlGenerator implements UrlGeneratorInterface {
   /**
    * The route provider.
    *
-   * @var \Drupal\Core\Routing\RouteProviderInterface
+   * @var RouteProviderInterface
    */
   protected $provider;
 
@@ -33,21 +33,21 @@ class UrlGenerator implements UrlGeneratorInterface {
   /**
    * A request stack object.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * The path processor to convert the system path to one suitable for URLs.
    *
-   * @var \Drupal\Core\PathProcessor\OutboundPathProcessorInterface
+   * @var OutboundPathProcessorInterface
    */
   protected $pathProcessor;
 
   /**
    * The route processor.
    *
-   * @var \Drupal\Core\RouteProcessor\OutboundRouteProcessorInterface
+   * @var OutboundRouteProcessorInterface
    */
   protected $routeProcessor;
 
@@ -76,13 +76,13 @@ class UrlGenerator implements UrlGeneratorInterface {
   /**
    * Constructs a new generator object.
    *
-   * @param \Drupal\Core\Routing\RouteProviderInterface $provider
+   * @param RouteProviderInterface $provider
    *   The route provider to be searched for routes.
-   * @param \Drupal\Core\PathProcessor\OutboundPathProcessorInterface $path_processor
+   * @param OutboundPathProcessorInterface $path_processor
    *   The path processor to convert the system path to one suitable for URLs.
-   * @param \Drupal\Core\RouteProcessor\OutboundRouteProcessorInterface $route_processor
+   * @param OutboundRouteProcessorInterface $route_processor
    *   The route processor.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   A request stack object.
    * @param string[] $filter_protocols
    *   (optional) An array of protocols allowed for URL generation.
@@ -174,9 +174,9 @@ class UrlGenerator implements UrlGeneratorInterface {
    *   The URL path, without any base path, without the query string, not URL
    *   encoded.
    *
-   * @throws \Symfony\Component\Routing\Exception\MissingMandatoryParametersException
+   * @throws MissingMandatoryParametersException
    *   When some parameters are missing that are mandatory for the route.
-   * @throws \Symfony\Component\Routing\Exception\InvalidParameterException
+   * @throws InvalidParameterException
    *   When a parameter value for a placeholder is not correct because it does
    *   not match the requirement.
    */
@@ -423,7 +423,7 @@ class UrlGenerator implements UrlGeneratorInterface {
    *   The route object to process.
    * @param array $parameters
    *   An array of parameters to be passed to the route compiler.
-   * @param \Drupal\Core\Render\BubbleableMetadata $bubbleable_metadata
+   * @param BubbleableMetadata $bubbleable_metadata
    *   (optional) Object to collect route processors' bubbleable metadata.
    */
   protected function processRoute(string $name, SymfonyRoute $route, array &$parameters, ?BubbleableMetadata $bubbleable_metadata = NULL) {
@@ -439,7 +439,7 @@ class UrlGenerator implements UrlGeneratorInterface {
    * @return \Symfony\Component\Routing\Route
    *   The found route.
    *
-   * @throws \Symfony\Component\Routing\Exception\RouteNotFoundException
+   * @throws RouteNotFoundException
    *   Thrown if there is no route with that name in this repository.
    *
    * @internal

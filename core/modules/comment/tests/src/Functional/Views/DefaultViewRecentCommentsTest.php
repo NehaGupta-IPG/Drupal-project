@@ -88,7 +88,7 @@ class DefaultViewRecentCommentsTest extends ViewTestBase {
 
     // Create some comments and attach them to the created node.
     for ($i = 0; $i < $this->defaultDisplayResults; $i++) {
-      /** @var \Drupal\comment\CommentInterface $comment */
+      /** @var CommentInterface $comment */
       $comment = Comment::create([
         'status' => CommentInterface::PUBLISHED,
         'field_name' => 'comment',

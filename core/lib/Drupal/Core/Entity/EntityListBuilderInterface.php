@@ -10,7 +10,7 @@ interface EntityListBuilderInterface {
   /**
    * Gets the entity storage.
    *
-   * @return \Drupal\Core\Entity\EntityStorageInterface
+   * @return EntityStorageInterface
    *   The storage used by this list builder.
    */
   public function getStorage();
@@ -21,7 +21,7 @@ interface EntityListBuilderInterface {
    * This allows the implementation to manipulate the listing, like filtering or
    * sorting the loaded entities.
    *
-   * @return \Drupal\Core\Entity\EntityInterface[]
+   * @return EntityInterface[]
    *   An array of entities implementing \Drupal\Core\Entity\EntityInterface
    *   indexed by their IDs. Returns an empty array if no matching entities are
    *   found.
@@ -31,13 +31,13 @@ interface EntityListBuilderInterface {
   /**
    * Provides an array of information to build a list of operation links.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity the operations are for.
    *
    * phpcs:disable Drupal.Commenting
    * @todo Uncomment new method parameters before drupal:12.0.0.
    * @see https://www.drupal.org/project/drupal/issues/3533078
-   * @param \Drupal\Core\Cache\CacheableMetadata|null $cacheability
+   * @param CacheableMetadata|null $cacheability
    *   The cacheable metadata to add to if your operations vary by or depend on
    *   something.
    * phpcs:enable

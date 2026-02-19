@@ -14,14 +14,14 @@ class DefaultTableMapping implements TableMappingInterface {
   /**
    * The entity type definition.
    *
-   * @var \Drupal\Core\Entity\ContentEntityTypeInterface
+   * @var ContentEntityTypeInterface
    */
   protected $entityType;
 
   /**
    * The field storage definitions of this mapping.
    *
-   * @var \Drupal\Core\Field\FieldStorageDefinitionInterface[]
+   * @var FieldStorageDefinitionInterface[]
    */
   protected $fieldStorageDefinitions = [];
 
@@ -116,9 +116,9 @@ class DefaultTableMapping implements TableMappingInterface {
   /**
    * Constructs a DefaultTableMapping.
    *
-   * @param \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type
+   * @param ContentEntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface[] $storage_definitions
+   * @param FieldStorageDefinitionInterface[] $storage_definitions
    *   A list of field storage definitions that should be available for the
    *   field columns of this table mapping.
    * @param string $prefix
@@ -147,9 +147,9 @@ class DefaultTableMapping implements TableMappingInterface {
   /**
    * Initializes the table mapping.
    *
-   * @param \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type
+   * @param ContentEntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface[] $storage_definitions
+   * @param FieldStorageDefinitionInterface[] $storage_definitions
    *   A list of field storage definitions that should be available for the
    *   field columns of this table mapping.
    * @param string $prefix
@@ -503,7 +503,7 @@ class DefaultTableMapping implements TableMappingInterface {
   /**
    * Checks whether the given field can be stored in a shared table.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field storage definition.
    *
    * @return bool
@@ -516,7 +516,7 @@ class DefaultTableMapping implements TableMappingInterface {
   /**
    * Checks whether the given field has to be stored in a dedicated table.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field storage definition.
    *
    * @return bool
@@ -557,7 +557,7 @@ class DefaultTableMapping implements TableMappingInterface {
   /**
    * Generates a table name for a field data table.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field storage definition.
    * @param bool $is_deleted
    *   (optional) Whether the table name holding the values of a deleted field
@@ -583,7 +583,7 @@ class DefaultTableMapping implements TableMappingInterface {
   /**
    * Generates a table name for a field revision archive table.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field storage definition.
    * @param bool $is_deleted
    *   (optional) Whether the table name holding the values of a deleted field
@@ -612,7 +612,7 @@ class DefaultTableMapping implements TableMappingInterface {
    * The method accounts for a maximum table name length of 64 characters, and
    * takes care of disambiguation.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field storage definition.
    * @param bool $revision
    *   TRUE for revision table, FALSE otherwise.

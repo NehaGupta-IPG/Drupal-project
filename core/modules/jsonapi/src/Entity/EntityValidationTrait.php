@@ -20,14 +20,14 @@ trait EntityValidationTrait {
   /**
    * Verifies that an entity does not violate any validation constraints.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity object.
    * @param string[] $field_names
    *   (optional) An array of field names. If specified, filters the violations
    *   list to include only this set of fields. Defaults to NULL,
    *   which means that all violations will be reported.
    *
-   * @throws \Drupal\jsonapi\Exception\UnprocessableHttpEntityException
+   * @throws UnprocessableHttpEntityException
    *   Thrown when violations remain after filtering.
    *
    * @see \Drupal\rest\Plugin\rest\resource\EntityResourceValidationTrait::validate()

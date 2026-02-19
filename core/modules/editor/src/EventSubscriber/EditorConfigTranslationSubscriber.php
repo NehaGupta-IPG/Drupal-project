@@ -5,8 +5,8 @@ namespace Drupal\editor\EventSubscriber;
 use Drupal\config_translation\ConfigEntityMapperInterface;
 use Drupal\config_translation\Event\ConfigMapperPopulateEvent;
 use Drupal\config_translation\Event\ConfigTranslationEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Adds configuration names to configuration mapper on POPULATE_MAPPER event.
@@ -16,14 +16,14 @@ class EditorConfigTranslationSubscriber implements EventSubscriberInterface {
   /**
    * The config factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * EditorConfigTranslationSubscriber constructor.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
    */
   public function __construct(ConfigFactoryInterface $config_factory) {
@@ -44,7 +44,7 @@ class EditorConfigTranslationSubscriber implements EventSubscriberInterface {
   /**
    * Reacts to the populating of a configuration mapper.
    *
-   * @param \Drupal\config_translation\Event\ConfigMapperPopulateEvent $event
+   * @param ConfigMapperPopulateEvent $event
    *   The configuration mapper event.
    */
   public function addConfigNames(ConfigMapperPopulateEvent $event) {

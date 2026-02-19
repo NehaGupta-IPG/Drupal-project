@@ -62,7 +62,7 @@ class IdAuditor implements AuditorInterface {
   /**
    * Audits an EntityComplete migration.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration to audit.
    *
    * @return bool

@@ -22,7 +22,7 @@ use Symfony\Component\Routing\RouteCollection;
 class ParamConverterManagerTest extends UnitTestCase {
 
   /**
-   * @var \Drupal\Core\ParamConverter\ParamConverterManager
+   * @var ParamConverterManager
    */
   protected $manager;
 

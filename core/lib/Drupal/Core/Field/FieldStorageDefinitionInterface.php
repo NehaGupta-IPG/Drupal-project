@@ -133,7 +133,7 @@ interface FieldStorageDefinitionInterface extends CacheableDependencyInterface {
    *
    * @param string $property_name
    *   The name of the property to get options for; e.g., 'value'.
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The entity for which the options should be provided.
    *
    * @return \Drupal\Core\TypedData\OptionsProviderInterface|null

@@ -17,7 +17,7 @@ class ReadOnlyModeMethodFilter implements FilterInterface {
   /**
    * The decorated method filter.
    *
-   * @var \Drupal\Core\Routing\FilterInterface
+   * @var FilterInterface
    */
   protected $inner;
 
@@ -31,9 +31,9 @@ class ReadOnlyModeMethodFilter implements FilterInterface {
   /**
    * ReadOnlyModeMethodFilter constructor.
    *
-   * @param \Drupal\Core\Routing\FilterInterface $inner
+   * @param FilterInterface $inner
    *   The decorated method filter.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The configuration factory.
    */
   public function __construct(FilterInterface $inner, ConfigFactoryInterface $config_factory) {

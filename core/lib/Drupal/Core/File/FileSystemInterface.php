@@ -298,13 +298,13 @@ interface FileSystemInterface {
    * @param string $destination
    *   A URI containing the destination that $source should be copied to. The
    *   URI may be a bare filepath (without a scheme).
-   * @param \Drupal\Core\File\FileExists|int $fileExists
+   * @param FileExists|int $fileExists
    *   The behavior when the destination file already exists.
    *
    * @return string
    *   The path to the new file.
    *
-   * @throws \Drupal\Core\File\Exception\FileException
+   * @throws FileException
    *   Implementation may throw FileException or its subtype on failure.
    * @throws \ValueError
    *   Thrown if $fileExists is a legacy int and not a valid value.
@@ -320,7 +320,7 @@ interface FileSystemInterface {
    * @param string $path
    *   A string containing a file path or (streamwrapper) URI.
    *
-   * @throws \Drupal\Core\File\Exception\FileException
+   * @throws FileException
    *   Implementation may throw FileException or its subtype on failure.
    */
   public function delete($path);
@@ -344,7 +344,7 @@ interface FileSystemInterface {
    *   directory prior to traversing it. For example, can be used to modify
    *   permissions.
    *
-   * @throws \Drupal\Core\File\Exception\FileException
+   * @throws FileException
    *   Implementation may throw FileException or its subtype on failure.
    */
   public function deleteRecursive($path, ?callable $callback = NULL);
@@ -368,13 +368,13 @@ interface FileSystemInterface {
    *   A URI containing the destination that $source should be moved to. The
    *   URI may be a bare filepath (without a scheme) and in that case the
    *   default scheme (public://) will be used.
-   * @param \Drupal\Core\File\FileExists|int $fileExists
+   * @param FileExists|int $fileExists
    *   Replace behavior when the destination file already exists.
    *
    * @return string
    *   The path to the new file.
    *
-   * @throws \Drupal\Core\File\Exception\FileException
+   * @throws FileException
    *   Implementation may throw FileException or its subtype on failure.
    * @throws \ValueError
    *   Thrown if $fileExists is a legacy int and not a valid value.
@@ -396,13 +396,13 @@ interface FileSystemInterface {
    * @param string $destination
    *   A string containing the destination location. This must be a stream
    *   wrapper URI.
-   * @param \Drupal\Core\File\FileExists|int $fileExists
+   * @param FileExists|int $fileExists
    *   Replace behavior when the destination file already exists.
    *
    * @return string
    *   A string with the path of the resulting file, or FALSE on error.
    *
-   * @throws \Drupal\Core\File\Exception\FileException
+   * @throws FileException
    *   Implementation may throw FileException or its subtype on failure.
    * @throws \ValueError
    *   Thrown if $fileExists is a legacy int and not a valid value.
@@ -446,7 +446,7 @@ interface FileSystemInterface {
    *   File path consisting of $directory and a unique filename based off
    *   of $basename.
    *
-   * @throws \Drupal\Core\File\Exception\FileException
+   * @throws FileException
    *   Implementation may throw FileException or its subtype on failure.
    */
   public function createFilename($basename, $directory);
@@ -456,14 +456,14 @@ interface FileSystemInterface {
    *
    * @param string $destination
    *   The desired final URI or filepath.
-   * @param \Drupal\Core\File\FileExists|int $fileExists
+   * @param FileExists|int $fileExists
    *   Replace behavior when the destination file already exists.
    *
    * @return string|false
    *   The destination filepath, or FALSE if the file already exists
    *   and FileExists::Error is specified.
    *
-   * @throws \Drupal\Core\File\Exception\FileException
+   * @throws FileException
    *   Implementation may throw FileException or its subtype on failure.
    * @throws \ValueError
    *   Thrown if $fileExists is a legacy int and not a valid value.
@@ -516,7 +516,7 @@ interface FileSystemInterface {
    *   An associative array (keyed on the chosen key) of objects with 'uri',
    *   'filename', and 'name' properties corresponding to the matched files.
    *
-   * @throws \Drupal\Core\File\Exception\NotRegularDirectoryException
+   * @throws NotRegularDirectoryException
    *   If the directory does not exist.
    */
   public function scanDirectory($dir, $mask, array $options = []);

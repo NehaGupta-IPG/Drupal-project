@@ -39,7 +39,7 @@ class ExtensionDiscoveryTest extends UnitTestCase {
     // Create an ExtensionDiscovery with $root.
     $extension_discovery = new ExtensionDiscovery($root, FALSE, NULL, 'sites/default');
 
-    /** @var \Drupal\Core\Extension\Extension[][] $extensions_by_type */
+    /** @var Extension[][] $extensions_by_type */
     $extensions_by_type = [];
     $files_by_type_and_name = [];
     foreach (['profile', 'module', 'theme', 'theme_engine'] as $type) {

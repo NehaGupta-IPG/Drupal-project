@@ -2,8 +2,8 @@
 
 namespace Drupal\migrate\Event;
 
-use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\MigrateMessageInterface;
+use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
 
 /**
@@ -14,18 +14,18 @@ class MigratePreRowSaveEvent extends EventBase {
   /**
    * Row object.
    *
-   * @var \Drupal\migrate\Row
+   * @var Row
    */
   protected $row;
 
   /**
    * Constructs a pre-save event object.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   Migration entity.
-   * @param \Drupal\migrate\MigrateMessageInterface $message
+   * @param MigrateMessageInterface $message
    *   The current migrate message service.
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The current row.
    */
   public function __construct(MigrationInterface $migration, MigrateMessageInterface $message, Row $row) {
@@ -36,7 +36,7 @@ class MigratePreRowSaveEvent extends EventBase {
   /**
    * Gets the row object.
    *
-   * @return \Drupal\migrate\Row
+   * @return Row
    *   The row object about to be imported.
    */
   public function getRow() {

@@ -16,7 +16,7 @@ interface WorkspaceNegotiatorInterface {
   /**
    * Checks whether the negotiator applies to the current request or not.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The HTTP request.
    *
    * @return bool
@@ -27,7 +27,7 @@ interface WorkspaceNegotiatorInterface {
   /**
    * Notifies the negotiator that the workspace ID returned has been accepted.
    *
-   * @param \Drupal\workspaces\WorkspaceInterface $workspace
+   * @param WorkspaceInterface $workspace
    *   The negotiated workspace entity.
    */
   public function setActiveWorkspace(WorkspaceInterface $workspace);

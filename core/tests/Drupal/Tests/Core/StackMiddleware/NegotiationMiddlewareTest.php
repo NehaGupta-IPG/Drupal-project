@@ -21,12 +21,12 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class NegotiationMiddlewareTest extends UnitTestCase {
 
   /**
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface
+   * @var HttpKernelInterface
    */
   protected $httpKernel;
 
   /**
-   * @var \Drupal\Tests\Core\StackMiddleware\StubNegotiationMiddleware
+   * @var StubNegotiationMiddleware
    */
   protected $contentNegotiation;
 

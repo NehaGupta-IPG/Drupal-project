@@ -74,7 +74,7 @@ class ModuleHandlerTest extends KernelTestBase {
    *
    * @param bool $exists
    *   TRUE if the implementations are expected to exist, FALSE if not.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   * @param ModuleHandlerInterface $moduleHandler
    *   The module handler.
    *
    * @see \module_test_test_reset_implementations_hook()

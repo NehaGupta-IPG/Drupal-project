@@ -10,7 +10,6 @@ use Drupal\Core\Session\AccountInterface;
  * @file
  * Hooks provided by the Shortcut module.
  */
-
 /**
  * @addtogroup hooks
  * @{
@@ -30,7 +29,7 @@ use Drupal\Core\Session\AccountInterface;
  * modules implement this hook, the last (i.e., highest weighted) module which
  * returns a valid shortcut set name will prevail.
  *
- * @param \Drupal\Core\Session\AccountInterface $account
+ * @param AccountInterface $account
  *   The user account whose default shortcut set is being requested.
  *
  * @return string

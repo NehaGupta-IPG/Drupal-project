@@ -17,10 +17,10 @@ interface EntityRepositoryInterface {
    * @param string $uuid
    *   The UUID of the entity to load.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|null
+   * @return EntityInterface|null
    *   The entity object, or NULL if there is no entity with the given UUID.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   Thrown in case the requested entity type does not support UUIDs.
    */
   public function loadEntityByUuid($entity_type_id, $uuid);
@@ -34,11 +34,11 @@ interface EntityRepositoryInterface {
    *   The configuration target to load, as returned from
    *   \Drupal\Core\Entity\EntityInterface::getConfigTarget().
    *
-   * @return \Drupal\Core\Entity\EntityInterface|null
+   * @return EntityInterface|null
    *   The entity object, or NULL if there is no entity with the given config
    *   target identifier.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   Thrown if the target identifier is a UUID but the entity type does not
    *   support UUIDs.
    *
@@ -53,7 +53,7 @@ interface EntityRepositoryInterface {
    * and if not, it will fall back to the most appropriate translation based on
    * the provided context.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity whose translation will be returned.
    * @param string $langcode
    *   (optional) The language of the current context. Defaults to the current
@@ -63,7 +63,7 @@ interface EntityRepositoryInterface {
    *   determine the proper fallback sequence. See
    *   \Drupal\Core\Language\LanguageManagerInterface::getFallbackCandidates().
    *
-   * @return \Drupal\Core\Entity\EntityInterface|null
+   * @return EntityInterface|null
    *   An entity object for the translated data, or NULL if the requested
    *   translation is missing, forbidden, or unavailable.
    *
@@ -98,7 +98,7 @@ interface EntityRepositoryInterface {
    *   \Drupal\Core\Language\LanguageManagerInterface::getFallbackCandidates().
    *   Using context ids from the plugin context system is deprecated.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|null
+   * @return EntityInterface|null
    *   An entity object variant or NULL if the entity does not exist.
    */
   public function getActive($entity_type_id, $entity_id, ?array $contexts = NULL);
@@ -116,7 +116,7 @@ interface EntityRepositoryInterface {
    *   \Drupal\Core\Language\LanguageManagerInterface::getFallbackCandidates().
    *   Using context ids from the plugin context system is deprecated.
    *
-   * @return \Drupal\Core\Entity\EntityInterface[]
+   * @return EntityInterface[]
    *   An array of entity object variants keyed by entity ID.
    *
    * @see getActive()
@@ -146,7 +146,7 @@ interface EntityRepositoryInterface {
    *   \Drupal\Core\Language\LanguageManagerInterface::getFallbackCandidates().
    *   Using context ids from the plugin context system is deprecated.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|null
+   * @return EntityInterface|null
    *   An entity object variant or NULL if the entity does not exist.
    */
   public function getCanonical($entity_type_id, $entity_id, ?array $contexts = NULL);
@@ -164,7 +164,7 @@ interface EntityRepositoryInterface {
    *   \Drupal\Core\Language\LanguageManagerInterface::getFallbackCandidates().
    *   Using context ids from the plugin context system is deprecated.
    *
-   * @return \Drupal\Core\Entity\EntityInterface[]
+   * @return EntityInterface[]
    *   An array of entity object variants keyed by entity ID.
    *
    * @see getCanonical()

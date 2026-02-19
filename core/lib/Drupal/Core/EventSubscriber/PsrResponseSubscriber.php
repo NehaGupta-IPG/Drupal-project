@@ -17,14 +17,14 @@ class PsrResponseSubscriber implements EventSubscriberInterface {
   /**
    * The httpFoundation factory.
    *
-   * @var \Symfony\Bridge\PsrHttpMessage\HttpFoundationFactoryInterface
+   * @var HttpFoundationFactoryInterface
    */
   protected $httpFoundationFactory;
 
   /**
    * Constructs a new PathRootsSubscriber instance.
    *
-   * @param \Symfony\Bridge\PsrHttpMessage\HttpFoundationFactoryInterface $http_foundation_factory
+   * @param HttpFoundationFactoryInterface $http_foundation_factory
    *   The httpFoundation factory.
    */
   public function __construct(HttpFoundationFactoryInterface $http_foundation_factory) {
@@ -34,7 +34,7 @@ class PsrResponseSubscriber implements EventSubscriberInterface {
   /**
    * Converts a PSR-7 response to a Symfony response.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ViewEvent $event
+   * @param ViewEvent $event
    *   The Event to process.
    */
   public function onKernelView(ViewEvent $event) {

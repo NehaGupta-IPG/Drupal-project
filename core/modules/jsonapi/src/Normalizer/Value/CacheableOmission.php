@@ -18,7 +18,7 @@ final class CacheableOmission extends CacheableNormalization {
   /**
    * CacheableOmission constructor.
    *
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $cacheability
+   * @param CacheableDependencyInterface $cacheability
    *   Cacheability related to the omission of the normalization. For example,
    *   if a field is omitted because of an access result that varies by the
    *   `user.permissions` cache context, we need to associate that information

@@ -1,5 +1,6 @@
 <?php
 
+
 /**
  * @file
  * Hooks related to image styles and effects.
@@ -30,7 +31,7 @@ function hook_image_effect_info_alter(&$effects) {
  * be cleared using this hook. This hook is called whenever a style is updated,
  * deleted, or any effect associated with the style is update or deleted.
  *
- * @param \Drupal\image\ImageStyleInterface $style
+ * @param ImageStyleInterface $style
  *   The image style object that is being flushed.
  * @param string|null $path
  *   (optional) The original image path or URI. If it's supplied, only this

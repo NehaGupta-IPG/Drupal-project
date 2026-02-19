@@ -7,11 +7,11 @@ use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
+use Drupal\Core\Layout\Attribute\Layout;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\AttributeDiscoveryWithAnnotations;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Core\Plugin\Discovery\YamlDiscoveryDecorator;
-use Drupal\Core\Layout\Attribute\Layout;
 use Drupal\Core\Plugin\FilteredPluginManagerTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\layout_discovery\Hook\LayoutDiscoveryThemeHooks;
@@ -26,7 +26,7 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
   /**
    * The theme handler.
    *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
+   * @var ThemeHandlerInterface
    */
   protected $themeHandler;
 
@@ -36,11 +36,11 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param CacheBackendInterface $cache_backend
    *   Cache backend instance to use.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler to invoke the alter hook with.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param ThemeHandlerInterface $theme_handler
    *   The theme handler to invoke the alter hook with.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler) {
@@ -180,7 +180,7 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
       'render element' => 'content',
       'initial preprocess' => LayoutDiscoveryThemeHooks::class . ':preprocessLayout',
     ];
-    /** @var \Drupal\Core\Layout\LayoutDefinition[] $definitions */
+    /** @var LayoutDefinition[] $definitions */
     $definitions = $this->getDefinitions();
     foreach ($definitions as $definition) {
       if ($template = $definition->getTemplate()) {
@@ -210,7 +210,7 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
   /**
    * {@inheritdoc}
    *
-   * @return \Drupal\Core\Layout\LayoutDefinition[]
+   * @return LayoutDefinition[]
    *   An array of plugin definitions, sorted by category and label.
    */
   public function getSortedDefinitions(?array $definitions = NULL, $label_key = 'label') {
@@ -228,7 +228,7 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
   /**
    * {@inheritdoc}
    *
-   * @return \Drupal\Core\Layout\LayoutDefinition[][]
+   * @return LayoutDefinition[][]
    *   Keys are category names, and values are arrays of which the keys are
    *   plugin IDs and the values are plugin definitions.
    */

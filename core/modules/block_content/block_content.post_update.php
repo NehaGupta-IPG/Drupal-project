@@ -29,7 +29,7 @@ function block_content_removed_post_updates(): array {
  * Remove deprecated status and info keys from block_content blocks.
  */
 function block_content_post_update_remove_block_content_status_info_keys(array &$sandbox = []): void {
-  /** @var \Drupal\block\BlockConfigUpdater $blockConfigUpdater */
+  /** @var BlockConfigUpdater $blockConfigUpdater */
   $blockConfigUpdater = \Drupal::service(BlockConfigUpdater::class);
   $blockConfigUpdater->setDeprecationsEnabled(FALSE);
   \Drupal::classResolver(ConfigEntityUpdater::class)
@@ -46,7 +46,7 @@ function block_content_post_update_remove_block_content_listing_empty(?array &$s
   if (!\Drupal::moduleHandler()->moduleExists('views')) {
     return;
   }
-  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  /** @var ViewsConfigUpdater $view_config_updater */
   $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
   $view_config_updater->setDeprecationsEnabled(FALSE);
   \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {

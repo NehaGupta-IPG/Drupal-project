@@ -59,7 +59,7 @@ class ResourceObjectNormalizerCacherTest extends KernelTestBase {
   /**
    * The object under test.
    *
-   * @var \Drupal\jsonapi\EventSubscriber\ResourceObjectNormalizationCacher
+   * @var ResourceObjectNormalizationCacher
    */
   protected $cacher;
 

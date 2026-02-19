@@ -34,13 +34,13 @@ class ContextualController implements ContainerInjectionInterface {
    * Given a list of contextual links IDs, render them. Hence this must be
    * robust to handle arbitrary input.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The Symfony request object.
    *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   * @return JsonResponse
    *   The JSON response.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws BadRequestHttpException
    *   Thrown when the request contains no ids.
    *
    * @internal

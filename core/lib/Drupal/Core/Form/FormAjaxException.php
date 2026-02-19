@@ -17,7 +17,7 @@ class FormAjaxException extends \Exception {
   /**
    * The form state.
    *
-   * @var \Drupal\Core\Form\FormStateInterface
+   * @var FormStateInterface
    */
   protected $formState;
 
@@ -26,7 +26,7 @@ class FormAjaxException extends \Exception {
    *
    * @param array $form
    *   The form definition.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    * @param string $message
    *   (optional) The exception message.
@@ -54,7 +54,7 @@ class FormAjaxException extends \Exception {
   /**
    * Gets the form state.
    *
-   * @return \Drupal\Core\Form\FormStateInterface
+   * @return FormStateInterface
    *   The current state of the form.
    */
   public function getFormState() {

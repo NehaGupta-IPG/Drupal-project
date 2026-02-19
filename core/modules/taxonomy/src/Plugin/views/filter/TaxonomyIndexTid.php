@@ -9,9 +9,9 @@ use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\TermStorageInterface;
 use Drupal\taxonomy\VocabularyStorageInterface;
 use Drupal\views\Attribute\ViewsFilter;
-use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\filter\ManyToOne;
+use Drupal\views\ViewExecutable;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -33,21 +33,21 @@ class TaxonomyIndexTid extends ManyToOne {
   /**
    * The vocabulary storage.
    *
-   * @var \Drupal\taxonomy\VocabularyStorageInterface
+   * @var VocabularyStorageInterface
    */
   protected $vocabularyStorage;
 
   /**
    * The term storage.
    *
-   * @var \Drupal\taxonomy\TermStorageInterface
+   * @var TermStorageInterface
    */
   protected $termStorage;
 
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
@@ -60,11 +60,11 @@ class TaxonomyIndexTid extends ManyToOne {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\taxonomy\VocabularyStorageInterface $vocabulary_storage
+   * @param VocabularyStorageInterface $vocabulary_storage
    *   The vocabulary storage.
-   * @param \Drupal\taxonomy\TermStorageInterface $term_storage
+   * @param TermStorageInterface $term_storage
    *   The term storage.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, VocabularyStorageInterface $vocabulary_storage, TermStorageInterface $term_storage, AccountInterface $current_user) {

@@ -294,7 +294,7 @@ class ManageDisplayTest extends BrowserTestBase {
   /**
    * Asserts that a string is found in the rendered node in a view mode.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $node
+   * @param EntityInterface $node
    *   The node.
    * @param string $view_mode
    *   The view mode in which the node should be displayed.
@@ -312,7 +312,7 @@ class ManageDisplayTest extends BrowserTestBase {
   /**
    * Asserts that a string is not found in the rendered node in a view mode.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $node
+   * @param EntityInterface $node
    *   The node.
    * @param string $view_mode
    *   The view mode in which the node should be displayed.
@@ -333,7 +333,7 @@ class ManageDisplayTest extends BrowserTestBase {
    * This helper function is used by assertNodeViewText() and
    * assertNodeViewNoText().
    *
-   * @param \Drupal\Core\Entity\EntityInterface $node
+   * @param EntityInterface $node
    *   The node.
    * @param string $view_mode
    *   The view mode in which the node should be displayed.
@@ -396,7 +396,7 @@ class ManageDisplayTest extends BrowserTestBase {
   /**
    * Extracts all options from a select element.
    *
-   * @param \Behat\Mink\Element\NodeElement $element
+   * @param NodeElement $element
    *   The select element field information.
    *
    * @return array
@@ -423,7 +423,7 @@ class ManageDisplayTest extends BrowserTestBase {
    * @param string[] $items
    *   An ordered list of strings.
    *
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ExpectationException
    *   When any of the given string is not found.
    *
    * @internal

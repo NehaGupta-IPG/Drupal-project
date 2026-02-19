@@ -22,14 +22,14 @@ class DefaultAccessCheckTest extends UnitTestCase {
   /**
    * The access checker to test.
    *
-   * @var \Drupal\Core\Access\DefaultAccessCheck
+   * @var DefaultAccessCheck
    */
   protected $accessChecker;
 
   /**
    * The mocked account.
    *
-   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Session\AccountInterface|MockObject
    */
   protected $account;
 

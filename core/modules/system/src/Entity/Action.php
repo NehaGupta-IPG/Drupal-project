@@ -2,16 +2,16 @@
 
 namespace Drupal\system\Entity;
 
-use Drupal\Core\Entity\Attribute\ConfigEntityType;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Component\Plugin\PluginManagerInterface;
+use Drupal\Core\Action\ActionPluginCollection;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\system\ActionConfigEntityInterface;
-use Drupal\Core\Action\ActionPluginCollection;
 
 /**
  * Defines the configured action entity.
@@ -79,7 +79,7 @@ class Action extends ConfigEntityBase implements ActionConfigEntityInterface, En
   /**
    * The plugin collection that stores action plugins.
    *
-   * @var \Drupal\Core\Action\ActionPluginCollection
+   * @var ActionPluginCollection
    */
   protected $pluginCollection;
 
@@ -172,7 +172,7 @@ class Action extends ConfigEntityBase implements ActionConfigEntityInterface, En
    */
   public static function sort(ConfigEntityInterface $a, ConfigEntityInterface $b) {
     /** @var \Drupal\system\ActionConfigEntityInterface $a */
-    /** @var \Drupal\system\ActionConfigEntityInterface $b */
+    /** @var ActionConfigEntityInterface $b */
     $a_type = $a->getType();
     $b_type = $b->getType();
     if ($a_type != $b_type) {

@@ -14,12 +14,12 @@ interface TypedDataInterface {
   /**
    * Constructs a TypedData object given its definition and context.
    *
-   * @param \Drupal\Core\TypedData\DataDefinitionInterface $definition
+   * @param DataDefinitionInterface $definition
    *   The data definition.
    * @param string|null $name
    *   (optional) The name of the created property, or NULL if it is the root
    *   of a typed data tree. Defaults to NULL.
-   * @param \Drupal\Core\TypedData\TraversableTypedDataInterface $parent
+   * @param TraversableTypedDataInterface $parent
    *   (optional) The parent object of the data property, or NULL if it is the
    *   root of a typed data tree. Defaults to NULL.
    *
@@ -34,7 +34,7 @@ interface TypedDataInterface {
   /**
    * Gets the data definition.
    *
-   * @return \Drupal\Core\TypedData\DataDefinitionInterface
+   * @return DataDefinitionInterface
    *   The data definition object.
    */
   public function getDataDefinition();
@@ -60,7 +60,7 @@ interface TypedDataInterface {
    *
    * @throws \InvalidArgumentException
    *   If the value input is inappropriate.
-   * @throws \Drupal\Core\TypedData\Exception\ReadOnlyException
+   * @throws ReadOnlyException
    *   If the data is read-only.
    */
   public function setValue($value, $notify = TRUE);
@@ -117,7 +117,7 @@ interface TypedDataInterface {
   /**
    * Returns the parent data structure; i.e. either complex data or a list.
    *
-   * @return \Drupal\Core\TypedData\TraversableTypedDataInterface|null
+   * @return TraversableTypedDataInterface|null
    *   The parent data structure, either complex data or a list; or NULL if this
    *   is the root of the typed data tree.
    */
@@ -129,7 +129,7 @@ interface TypedDataInterface {
    * Returns the root data for a tree of typed data objects; e.g. for an entity
    * field item the root of the tree is its parent entity object.
    *
-   * @return \Drupal\Core\TypedData\TraversableTypedDataInterface
+   * @return TraversableTypedDataInterface
    *   The root data structure, either complex data or a list.
    */
   public function getRoot();
@@ -154,7 +154,7 @@ interface TypedDataInterface {
    * @param string|null $name
    *   (optional) The name of the property or the delta of the list item,
    *   or NULL if it is the root of a typed data tree. Defaults to NULL.
-   * @param \Drupal\Core\TypedData\TraversableTypedDataInterface|null $parent
+   * @param TraversableTypedDataInterface|null $parent
    *   (optional) The parent object of the data property, or NULL if it is the
    *   root of a typed data tree. Defaults to NULL.
    */

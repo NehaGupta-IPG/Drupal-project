@@ -73,21 +73,21 @@ class FileUpload {
   /**
    * Handles JSON:API file upload requests.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The HTTP request object.
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The JSON:API resource type for the current request.
    * @param string $file_field_name
    *   The file field for which the file is to be uploaded.
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The entity for which the file is to be uploaded.
    *
-   * @return \Drupal\jsonapi\ResourceResponse
+   * @return ResourceResponse
    *   The response object.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException
+   * @throws UnprocessableEntityHttpException
    *   Thrown when there are validation errors.
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   Thrown if the upload's target resource could not be saved.
    * @throws \Exception
    *   Thrown if an exception occurs during a subrequest to fetch the newly
@@ -116,17 +116,17 @@ class FileUpload {
   /**
    * Handles JSON:API file upload requests.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The HTTP request object.
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The JSON:API resource type for the current request.
    * @param string $file_field_name
    *   The file field for which the file is to be uploaded.
    *
-   * @return \Drupal\jsonapi\ResourceResponse
+   * @return ResourceResponse
    *   The response object.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException
+   * @throws UnprocessableEntityHttpException
    *   Thrown when there are validation errors.
    */
   public function handleFileUploadForNewResource(Request $request, ResourceType $resource_type, string $file_field_name): ResourceResponse {
@@ -147,16 +147,16 @@ class FileUpload {
   /**
    * Handles JSON:API file upload requests.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The HTTP request object.
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The JSON:API resource type for the current request.
    * @param string $file_field_name
    *   The file field for which the file is to be uploaded.
-   * @param \Drupal\Core\Entity\FieldableEntityInterface|null $entity
+   * @param FieldableEntityInterface|null $entity
    *   (optional) The entity for which the file is to be uploaded.
    *
-   * @return \Drupal\file\Upload\FileUploadResult
+   * @return FileUploadResult
    *   The file upload result.
    */
   protected function handleFileUploadForResource(Request $request, ResourceType $resource_type, string $file_field_name, ?FieldableEntityInterface $entity = NULL): FileUploadResult {
@@ -222,11 +222,11 @@ class FileUpload {
   /**
    * Checks if the current user has access to upload the file.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The account for which file upload access should be checked.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition for which to get validators.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   (optional) The entity to which the file is to be uploaded, if it exists.
    *   If the entity does not exist and it is not given, create access to the
    *   entity the file is attached to will be checked.
@@ -253,11 +253,11 @@ class FileUpload {
   /**
    * Ensures that the given account is allowed to upload a file.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The account for which access should be checked.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field for which the file is to be uploaded.
-   * @param \Drupal\Core\Entity\FieldableEntityInterface|null $entity
+   * @param FieldableEntityInterface|null $entity
    *   The entity, if one exists, for which the file is to be uploaded.
    */
   protected static function ensureFileUploadAccess(AccountInterface $account, FieldDefinitionInterface $field_definition, ?FieldableEntityInterface $entity = NULL) {
@@ -283,12 +283,12 @@ class FileUpload {
    * @param string $field_name
    *   The field name.
    *
-   * @return \Drupal\Core\Field\FieldDefinitionInterface
+   * @return FieldDefinitionInterface
    *   The field definition.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   * @throws NotFoundHttpException
    *   Thrown when the field does not exist.
-   * @throws \Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException
+   * @throws AccessDeniedException
    *   Thrown when the target type of the field is not a file, or the current
    *   user does not have 'edit' access for the field.
    */
@@ -298,7 +298,7 @@ class FileUpload {
       throw new NotFoundHttpException(sprintf('Field "%s" does not exist.', $field_name));
     }
 
-    /** @var \Drupal\Core\Field\FieldDefinitionInterface $field_definition */
+    /** @var FieldDefinitionInterface $field_definition */
     $field_definition = $field_definitions[$field_name];
     if ($field_definition->getSetting('target_type') !== 'file') {
       throw new AccessDeniedException(sprintf('"%s" is not a file field', $field_name));

@@ -48,7 +48,7 @@ class RevisionableContentEntityBaseTest extends EntityKernelTestBase {
     $definition = \Drupal::entityTypeManager()->getDefinition($entity_type);
     $user = User::create(['name' => 'test name']);
     $user->save();
-    /** @var \Drupal\entity_test_revlog\Entity\EntityTestMulWithRevisionLog $entity */
+    /** @var EntityTestMulWithRevisionLog $entity */
     $entity = EntityTestMulWithRevisionLog::create([
       'type' => $entity_type,
     ]);
@@ -146,20 +146,20 @@ class RevisionableContentEntityBaseTest extends EntityKernelTestBase {
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = $this->entityTypeManager->getStorage($entity_type_id);
     foreach ([TRUE, FALSE, TRUE, FALSE] as $index => $expected) {
-      /** @var \Drupal\entity_test_revlog\Entity\EntityTestMulWithRevisionLog $revision */
+      /** @var EntityTestMulWithRevisionLog $revision */
       $revision = $storage->loadRevision($index + 1);
       $this->assertEquals($expected, $revision->wasDefaultRevision());
     }
 
     // Check that the default revision is flagged correctly.
-    /** @var \Drupal\entity_test_revlog\Entity\EntityTestMulWithRevisionLog $entity */
+    /** @var EntityTestMulWithRevisionLog $entity */
     $entity = $storage->loadUnchanged($entity->id());
     $this->assertTrue($entity->wasDefaultRevision());
 
     // Check that the "revision_default" flag cannot be changed once set.
     $this->expectException(EntityStorageException::class);
     $this->expectExceptionMessage("An existing default revision of the 'entity_test_mul_revlog' entity type can not be changed to a non-default revision.");
-    /** @var \Drupal\entity_test_revlog\Entity\EntityTestMulWithRevisionLog $entity2 */
+    /** @var EntityTestMulWithRevisionLog $entity2 */
     $entity2 = EntityTestMulWithRevisionLog::create([
       'type' => $entity_type_id,
     ]);
@@ -175,7 +175,7 @@ class RevisionableContentEntityBaseTest extends EntityKernelTestBase {
    *
    * @param int $count
    *   The number of items expected to be in revisions related tables.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $definition
+   * @param EntityTypeInterface $definition
    *   The definition and metadata of the entity being tested.
    *
    * @internal
@@ -192,9 +192,9 @@ class RevisionableContentEntityBaseTest extends EntityKernelTestBase {
   /**
    * Creates a new revision in the entity of this test class.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity where revision will be created.
-   * @param \Drupal\user\UserInterface $user
+   * @param UserInterface $user
    *   The author of the new revision.
    * @param int $timestamp
    *   The timestamp of the new revision.

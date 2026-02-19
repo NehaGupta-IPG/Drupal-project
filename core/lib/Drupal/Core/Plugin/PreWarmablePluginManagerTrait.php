@@ -9,8 +9,8 @@ namespace Drupal\Core\Plugin;
  * exactly the right logic for cache prewarming, so this provides a default
  * implementation that uses that.
  *
- * @phpstan-require-implements \Drupal\Component\Plugin\Discovery\DiscoveryInterface
- * @phpstan-require-implements \Drupal\Core\PreWarm\PreWarmableInterface
+ * @phpstan-require-implements DiscoveryInterface
+ * @phpstan-require-implements PreWarmableInterface
  */
 trait PreWarmablePluginManagerTrait {
 

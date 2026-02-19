@@ -20,7 +20,7 @@ class PathMatcherTest extends UnitTestCase {
   /**
    * The path matcher under test.
    *
-   * @var \Drupal\Core\Path\PathMatcher
+   * @var PathMatcher
    */
   protected $pathMatcher;
 

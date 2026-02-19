@@ -2,8 +2,8 @@
 
 namespace Drupal\Core\StringTranslation\Translator;
 
-use Drupal\Component\Gettext\PoStreamReader;
 use Drupal\Component\Gettext\PoMemoryWriter;
+use Drupal\Component\Gettext\PoStreamReader;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Language\LanguageInterface;
 
@@ -27,7 +27,7 @@ class FileTranslation extends StaticTranslation {
   /**
    * The file system.
    *
-   * @var \Drupal\Core\File\FileSystemInterface
+   * @var FileSystemInterface
    */
   protected $fileSystem;
 
@@ -36,7 +36,7 @@ class FileTranslation extends StaticTranslation {
    *
    * @param string $directory
    *   The directory to retrieve file translations from.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
+   * @param FileSystemInterface $file_system
    *   The file system service.
    */
   public function __construct($directory, FileSystemInterface $file_system) {

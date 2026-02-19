@@ -31,7 +31,7 @@ class DefaultExceptionSubscriber extends HttpExceptionSubscriberBase {
   /**
    * DefaultExceptionSubscriber constructor.
    *
-   * @param \Symfony\Component\Serializer\SerializerInterface $serializer
+   * @param SerializerInterface $serializer
    *   The serializer service.
    * @param array $serializer_formats
    *   The available serialization formats.
@@ -64,7 +64,7 @@ class DefaultExceptionSubscriber extends HttpExceptionSubscriberBase {
   /**
    * Handles all 4xx errors for all serialization failures.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   * @param ExceptionEvent $event
    *   The event to process.
    */
   public function on4xx(ExceptionEvent $event) {

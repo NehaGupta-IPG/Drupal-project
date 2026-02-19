@@ -67,7 +67,7 @@ class MigrateBundleTest extends MigrateTestBase {
     // Import and validate the term entity was created with the correct bundle.
     $term_executable = new MigrateExecutable($term_migration, $this);
     $term_executable->import();
-    /** @var \Drupal\taxonomy\Entity\Term $term */
+    /** @var Term $term */
     $term = Term::load(1);
     $this->assertEquals('categories', $term->bundle());
   }
@@ -106,7 +106,7 @@ class MigrateBundleTest extends MigrateTestBase {
     // bundle.
     $term_executable = new MigrateExecutable($term_migration, $this);
     $term_executable->import();
-    /** @var \Drupal\taxonomy\Entity\Term $term */
+    /** @var Term $term */
     $term = Term::load(1);
     $this->assertEquals('categories', $term->bundle());
     $term = Term::load(2);
@@ -149,7 +149,7 @@ class MigrateBundleTest extends MigrateTestBase {
     // bundle.
     $term_executable = new MigrateExecutable($term_migration, $this);
     $term_executable->import();
-    /** @var \Drupal\taxonomy\Entity\Term $term */
+    /** @var Term $term */
     $term = Term::load(1);
     $this->assertEquals('categories', $term->bundle());
     $term = Term::load(2);

@@ -4,8 +4,8 @@ namespace Drupal\locale\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\locale\StringStorageInterface;
 use Drupal\Core\State\StateInterface;
+use Drupal\locale\StringStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -18,21 +18,21 @@ abstract class TranslateFormBase extends FormBase {
   /**
    * The locale storage.
    *
-   * @var \Drupal\locale\StringStorageInterface
+   * @var StringStorageInterface
    */
   protected $localeStorage;
 
   /**
    * The state store.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
@@ -46,11 +46,11 @@ abstract class TranslateFormBase extends FormBase {
   /**
    * Constructs a new TranslationFormBase object.
    *
-   * @param \Drupal\locale\StringStorageInterface $locale_storage
+   * @param StringStorageInterface $locale_storage
    *   The locale storage.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
    */
   public function __construct(StringStorageInterface $locale_storage, StateInterface $state, LanguageManagerInterface $language_manager) {

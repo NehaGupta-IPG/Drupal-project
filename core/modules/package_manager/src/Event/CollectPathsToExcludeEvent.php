@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\package_manager\Event;
 
-use Drupal\package_manager\SandboxManagerBase;
 use Drupal\package_manager\PathLocator;
+use Drupal\package_manager\SandboxManagerBase;
 use PhpTuf\ComposerStager\API\Path\Factory\PathFactoryInterface;
 use PhpTuf\ComposerStager\API\Path\Factory\PathListFactoryInterface;
 use PhpTuf\ComposerStager\API\Path\Value\PathListInterface;
@@ -21,13 +21,13 @@ final class CollectPathsToExcludeEvent extends SandboxEvent implements PathListI
   /**
    * Constructs a CollectPathsToExcludeEvent object.
    *
-   * @param \Drupal\package_manager\SandboxManagerBase $sandboxManager
+   * @param SandboxManagerBase $sandboxManager
    *   The stage which fired this event.
-   * @param \Drupal\package_manager\PathLocator $pathLocator
+   * @param PathLocator $pathLocator
    *   The path locator service.
-   * @param \PhpTuf\ComposerStager\API\Path\Factory\PathFactoryInterface $pathFactory
+   * @param PathFactoryInterface $pathFactory
    *   The path factory service.
-   * @param \PhpTuf\ComposerStager\API\Path\Value\PathListInterface|null $pathList
+   * @param PathListInterface|null $pathList
    *   (optional) The list of paths to exclude.
    */
   public function __construct(

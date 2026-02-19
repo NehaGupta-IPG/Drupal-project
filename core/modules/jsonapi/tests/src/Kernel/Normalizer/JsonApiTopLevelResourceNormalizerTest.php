@@ -77,42 +77,42 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
   /**
    * The node type.
    *
-   * @var \Drupal\node\Entity\NodeType
+   * @var NodeType
    */
   protected NodeType $nodeType;
 
   /**
    * A user to normalize.
    *
-   * @var \Drupal\user\Entity\User
+   * @var User
    */
   protected $user;
 
   /**
    * A user.
    *
-   * @var \Drupal\user\Entity\User
+   * @var User
    */
   protected User $user2;
 
   /**
    * A vocabulary.
    *
-   * @var \Drupal\taxonomy\Entity\Vocabulary
+   * @var Vocabulary
    */
   protected Vocabulary $vocabulary;
 
   /**
    * A term.
    *
-   * @var \Drupal\taxonomy\Entity\Term
+   * @var Term
    */
   protected Term $term1;
 
   /**
    * A term.
    *
-   * @var \Drupal\taxonomy\Entity\Term
+   * @var Term
    */
   protected Term $term2;
 
@@ -131,7 +131,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
   protected $resourceTypeRepository;
 
   /**
-   * @var \Drupal\file\Entity\File
+   * @var File
    */
   private $file;
 
@@ -654,7 +654,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
         continue;
       }
 
-      /** @var \Drupal\node\Entity\Node $node */
+      /** @var Node $node */
       $this->assertInstanceOf(Node::class, $node);
       $this->assertSame('Testing article', $node->getTitle());
       if (!empty($expected['user_id'])) {
@@ -799,7 +799,7 @@ class JsonApiTopLevelResourceNormalizerTest extends JsonapiKernelTestBase {
   /**
    * Ensure that cacheability metadata is properly added.
    *
-   * @param \Drupal\Core\Cache\CacheableMetadata $expected_metadata
+   * @param CacheableMetadata $expected_metadata
    *   The expected cacheable metadata.
    */
   #[DataProvider('cacheableMetadataProvider')]

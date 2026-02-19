@@ -15,14 +15,14 @@ class ViewAjaxResponse extends AjaxResponse {
   /**
    * The view executed on this ajax request.
    *
-   * @var \Drupal\views\ViewExecutable
+   * @var ViewExecutable
    */
   protected $view;
 
   /**
    * Sets the executed view of this response.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The View executed on this ajax request.
    */
   public function setView(ViewExecutable $view) {
@@ -32,7 +32,7 @@ class ViewAjaxResponse extends AjaxResponse {
   /**
    * Gets the executed view of this response.
    *
-   * @return \Drupal\views\ViewExecutable
+   * @return ViewExecutable
    *   The View executed on this ajax request.
    */
   public function getView() {

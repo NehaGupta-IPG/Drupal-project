@@ -30,15 +30,15 @@ class NavigationHooks {
   /**
    * NavigationHooks constructor.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   * @param ModuleHandlerInterface $moduleHandler
    *   The module handler.
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
+   * @param AccountInterface $currentUser
    *   The current user.
-   * @param \Drupal\navigation\NavigationRenderer $navigationRenderer
+   * @param NavigationRenderer $navigationRenderer
    *   The navigation renderer.
-   * @param \Drupal\Core\Config\Action\ConfigActionManager $configActionManager
+   * @param ConfigActionManager $configActionManager
    *   The config action manager.
-   * @param \Drupal\navigation\TopBarItemManagerInterface $topBarItemManager
+   * @param TopBarItemManagerInterface $topBarItemManager
    *   The Top Bar Item manager.
    */
   public function __construct(

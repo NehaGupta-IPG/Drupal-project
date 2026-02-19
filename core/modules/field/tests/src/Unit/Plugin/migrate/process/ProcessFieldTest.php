@@ -30,35 +30,35 @@ class ProcessFieldTest extends MigrateTestCase {
   /**
    * The migrate field manager.
    *
-   * @var \Drupal\migrate_drupal\Plugin\MigrateFieldPluginManagerInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var MigrateFieldPluginManagerInterface|ObjectProphecy
    */
   protected MigrateFieldPluginManagerInterface|ObjectProphecy $fieldManager;
 
   /**
    * The migrate field plugin.
    *
-   * @var \Drupal\migrate_drupal\Plugin\MigrateFieldInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var MigrateFieldInterface|ObjectProphecy
    */
   protected MigrateFieldInterface|ObjectProphecy $fieldPlugin;
 
   /**
    * The migration executable.
    *
-   * @var \Drupal\migrate\MigrateExecutable|\Prophecy\Prophecy\ObjectProphecy
+   * @var MigrateExecutable|ObjectProphecy
    */
   protected MigrateExecutable|ObjectProphecy $migrateExecutable;
 
   /**
    * The migration.
    *
-   * @var \Drupal\migrate\Plugin\MigrationInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var MigrationInterface|ObjectProphecy
    */
   protected MigrationInterface|ObjectProphecy $migration;
 
   /**
    * The row object.
    *
-   * @var \Drupal\migrate\Row|\Prophecy\Prophecy\ObjectProphecy
+   * @var Row|ObjectProphecy
    */
   protected Row|ObjectProphecy $row;
 

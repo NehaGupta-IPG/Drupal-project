@@ -39,7 +39,7 @@ class ProviderRepository implements ProviderRepositoryInterface {
   /**
    * The time service.
    *
-   * @var \Drupal\Component\Datetime\TimeInterface
+   * @var TimeInterface
    */
   protected $time;
 
@@ -60,15 +60,15 @@ class ProviderRepository implements ProviderRepositoryInterface {
   /**
    * Constructs a ProviderRepository instance.
    *
-   * @param \GuzzleHttp\ClientInterface $http_client
+   * @param ClientInterface $http_client
    *   The HTTP client.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_factory
+   * @param KeyValueFactoryInterface $key_value_factory
    *   The key-value store factory.
-   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
+   * @param LoggerChannelFactoryInterface $logger_factory
    *   The logger channel factory.
    * @param int $max_age
    *   (optional) How long the cache data should be kept. Defaults to a week.

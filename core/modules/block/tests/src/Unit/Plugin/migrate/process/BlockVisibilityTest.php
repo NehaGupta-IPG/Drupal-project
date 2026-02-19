@@ -25,7 +25,7 @@ class BlockVisibilityTest extends MigrateProcessTestCase {
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 

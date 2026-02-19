@@ -22,7 +22,7 @@ class AttributeHelper {
    *
    * @param string $name
    *   The name of the attribute to check for.
-   * @param \Drupal\Core\Template\Attribute|array $collection
+   * @param Attribute|array $collection
    *   An Attribute object or an array of attributes.
    *
    * @return bool
@@ -44,13 +44,13 @@ class AttributeHelper {
   /**
    * Merges two attribute collections.
    *
-   * @param \Drupal\Core\Template\Attribute|array $a
+   * @param Attribute|array $a
    *   First Attribute object or array to merge. The returned value type will
    *   be the same as the type of this argument.
-   * @param \Drupal\Core\Template\Attribute|array $b
+   * @param Attribute|array $b
    *   Second Attribute object or array to merge.
    *
-   * @return \Drupal\Core\Template\Attribute|array
+   * @return Attribute|array
    *   The merged attributes, as an Attribute object or an array.
    *
    * @throws \InvalidArgumentException

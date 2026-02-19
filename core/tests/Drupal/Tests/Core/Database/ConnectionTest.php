@@ -885,7 +885,7 @@ class ConnectionTest extends UnitTestCase {
   /**
    * Provides data for testSupportedFetchModes.
    *
-   * @return array<string,array<\Drupal\Core\Database\Statement\FetchAs>>
+   * @return array<string, array<FetchAs>>
    *   The FetchAs cases.
    */
   public static function providerSupportedFetchModes(): array {

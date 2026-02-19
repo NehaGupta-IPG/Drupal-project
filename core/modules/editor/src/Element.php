@@ -2,11 +2,11 @@
 
 namespace Drupal\editor;
 
+use Drupal\Component\Plugin\PluginManagerInterface;
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
-use Drupal\Component\Plugin\PluginManagerInterface;
-use Drupal\Core\Render\BubbleableMetadata;
 
 /**
  * Defines a service for Text Editor's render elements.
@@ -16,14 +16,14 @@ class Element implements TrustedCallbackInterface {
   /**
    * The Text Editor plugin manager service.
    *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   * @var PluginManagerInterface
    */
   protected $pluginManager;
 
   /**
    * Constructs a new Element object.
    *
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $plugin_manager
+   * @param PluginManagerInterface $plugin_manager
    *   The Text Editor plugin manager service.
    */
   public function __construct(PluginManagerInterface $plugin_manager) {

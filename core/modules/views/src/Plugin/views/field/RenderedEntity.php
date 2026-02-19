@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Plugin\views\field;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
@@ -11,7 +12,6 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\views\Attribute\ViewsField;
 use Drupal\views\Entity\Render\EntityTranslationRenderTrait;
 use Drupal\views\ResultRow;
-use Drupal\Core\Cache\Cache;
 
 /**
  * Provides a field handler which renders an entity in a certain view mode.
@@ -26,28 +26,28 @@ class RenderedEntity extends FieldPluginBase implements CacheableDependencyInter
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity repository service.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   * @var EntityRepositoryInterface
    */
   protected $entityRepository;
 
   /**
    * The entity display repository.
    *
-   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
+   * @var EntityDisplayRepositoryInterface
    */
   protected $entityDisplayRepository;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
@@ -60,13 +60,13 @@ class RenderedEntity extends FieldPluginBase implements CacheableDependencyInter
    *   The plugin ID for the plugin instance.
    * @param array $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository.
-   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
+   * @param EntityDisplayRepositoryInterface $entity_display_repository
    *   The entity display repository.
    */
   public function __construct(array $configuration, $plugin_id, array $plugin_definition, EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager, EntityRepositoryInterface $entity_repository, EntityDisplayRepositoryInterface $entity_display_repository) {

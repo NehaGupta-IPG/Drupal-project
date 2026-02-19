@@ -27,23 +27,23 @@ class WorkspaceActivateForm extends EntityConfirmFormBase implements WorkspaceSa
   /**
    * The workspace replication manager.
    *
-   * @var \Drupal\workspaces\WorkspaceManagerInterface
+   * @var WorkspaceManagerInterface
    */
   protected $workspaceManager;
 
   /**
    * The messenger service.
    *
-   * @var \Drupal\Core\Messenger\MessengerInterface
+   * @var MessengerInterface
    */
   protected $messenger;
 
   /**
    * Constructs a new WorkspaceActivateForm.
    *
-   * @param \Drupal\workspaces\WorkspaceManagerInterface $workspace_manager
+   * @param WorkspaceManagerInterface $workspace_manager
    *   The workspace manager.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger service.
    */
   public function __construct(WorkspaceManagerInterface $workspace_manager, MessengerInterface $messenger) {
@@ -124,10 +124,10 @@ class WorkspaceActivateForm extends EntityConfirmFormBase implements WorkspaceSa
   /**
    * Checks access for the workspace activate form.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
    *
-   * @return \Drupal\Core\Access\AccessResult
+   * @return AccessResult
    *   The access result.
    */
   public function checkAccess(RouteMatchInterface $route_match) {

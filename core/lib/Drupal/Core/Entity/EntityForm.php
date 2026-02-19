@@ -30,21 +30,21 @@ class EntityForm extends FormBase implements EntityFormInterface {
   /**
    * The module handler service.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity being used by this form.
    *
-   * @var \Drupal\Core\Entity\EntityInterface
+   * @var EntityInterface
    */
   protected $entity;
 
@@ -217,7 +217,7 @@ class EntityForm extends FormBase implements EntityFormInterface {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return array
@@ -278,7 +278,7 @@ class EntityForm extends FormBase implements EntityFormInterface {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
@@ -339,11 +339,11 @@ class EntityForm extends FormBase implements EntityFormInterface {
    * This should not change existing entity properties that are not being edited
    * by this form.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity the current form should operate upon.
    * @param array $form
    *   A nested array of form elements comprising the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @see \Drupal\Core\Form\ConfigFormBase::copyFormValuesToConfig()
@@ -415,7 +415,7 @@ class EntityForm extends FormBase implements EntityFormInterface {
    *
    * @param string $hook
    *   The hook variant name.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   protected function prepareInvokeAll($hook, FormStateInterface $form_state) {

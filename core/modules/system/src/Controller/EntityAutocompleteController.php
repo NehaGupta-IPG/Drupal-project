@@ -21,23 +21,23 @@ class EntityAutocompleteController extends ControllerBase {
   /**
    * The autocomplete matcher for entity references.
    *
-   * @var \Drupal\Core\Entity\EntityAutocompleteMatcherInterface
+   * @var EntityAutocompleteMatcherInterface
    */
   protected $matcher;
 
   /**
    * The key value store.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface
+   * @var KeyValueStoreInterface
    */
   protected $keyValue;
 
   /**
    * Constructs an EntityAutocompleteController object.
    *
-   * @param \Drupal\Core\Entity\EntityAutocompleteMatcherInterface $matcher
+   * @param EntityAutocompleteMatcherInterface $matcher
    *   The autocomplete matcher for entity references.
-   * @param \Drupal\Core\KeyValueStore\KeyValueStoreInterface $key_value
+   * @param KeyValueStoreInterface $key_value
    *   The key value factory.
    */
   public function __construct(EntityAutocompleteMatcherInterface $matcher, KeyValueStoreInterface $key_value) {
@@ -58,7 +58,7 @@ class EntityAutocompleteController extends ControllerBase {
   /**
    * Autocomplete the label of an entity.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object that contains the typed tags.
    * @param string $target_type
    *   The ID of the target entity type.
@@ -68,10 +68,10 @@ class EntityAutocompleteController extends ControllerBase {
    *   The hashed key of the key/value entry that holds the selection handler
    *   settings.
    *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   * @return JsonResponse
    *   The matched entity labels as a JSON response.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   * @throws AccessDeniedHttpException
    *   Thrown if the selection settings key is not found in the key/value store
    *   or if it does not match the stored data.
    */

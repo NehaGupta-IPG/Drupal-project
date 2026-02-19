@@ -37,13 +37,13 @@ class CKEditor5ImageController extends ControllerBase {
   /**
    * Constructs a new CKEditor5ImageController.
    *
-   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
+   * @param FileSystemInterface $fileSystem
    *   The file system service.
-   * @param \Drupal\file\Upload\FileUploadHandlerInterface $fileUploadHandler
+   * @param FileUploadHandlerInterface $fileUploadHandler
    *   The file upload handler.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
+   * @param LockBackendInterface $lock
    *   The lock service.
-   * @param \Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface $pluginManager
+   * @param CKEditor5PluginManagerInterface $pluginManager
    *   The CKEditor 5 plugin manager.
    */
   public function __construct(
@@ -58,15 +58,15 @@ class CKEditor5ImageController extends ControllerBase {
   /**
    * Uploads and saves an image from a CKEditor 5 POST.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request object.
    *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   * @return JsonResponse
    *   A JSON object including the file URL.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+   * @throws HttpException
    *   Thrown when file system errors occur.
-   * @throws \Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException
+   * @throws UnprocessableEntityHttpException
    *   Thrown when validation errors occur.
    */
   public function upload(Request $request): Response {
@@ -159,7 +159,7 @@ class CKEditor5ImageController extends ControllerBase {
   /**
    * Access check based on whether image upload is enabled or not.
    *
-   * @param \Drupal\editor\Entity\Editor $editor
+   * @param Editor $editor
    *   The text editor for which an image upload is occurring.
    *
    * @return \Drupal\Core\Access\AccessResultInterface

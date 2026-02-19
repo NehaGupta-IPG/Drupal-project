@@ -16,7 +16,7 @@ class SandboxException extends \RuntimeException {
   /**
    * Constructs a StageException object.
    *
-   * @param \Drupal\package_manager\SandboxManagerBase $sandboxManager
+   * @param SandboxManagerBase $sandboxManager
    *   The stage.
    * @param mixed ...$arguments
    *   Additional arguments to pass to the parent constructor.

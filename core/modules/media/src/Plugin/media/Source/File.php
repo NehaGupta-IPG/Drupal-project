@@ -8,8 +8,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\file\FileInterface;
 use Drupal\media\Attribute\MediaSource;
 use Drupal\media\MediaInterface;
-use Drupal\media\MediaTypeInterface;
 use Drupal\media\MediaSourceBase;
+use Drupal\media\MediaTypeInterface;
 
 /**
  * File entity media source.
@@ -60,7 +60,7 @@ class File extends MediaSourceBase {
    * {@inheritdoc}
    */
   public function getMetadata(MediaInterface $media, $attribute_name) {
-    /** @var \Drupal\file\FileInterface $file */
+    /** @var FileInterface $file */
     $file = $media->get($this->configuration['source_field'])->entity;
     // If the source field is not required, it may be empty.
     if (!$file) {
@@ -98,7 +98,7 @@ class File extends MediaSourceBase {
   /**
    * Gets the thumbnail image URI based on a file entity.
    *
-   * @param \Drupal\file\FileInterface $file
+   * @param FileInterface $file
    *   A file entity.
    *
    * @return string

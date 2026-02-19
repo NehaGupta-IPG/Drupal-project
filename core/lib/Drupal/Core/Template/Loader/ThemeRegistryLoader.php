@@ -16,14 +16,14 @@ class ThemeRegistryLoader extends FilesystemLoader {
   /**
    * The theme registry used to determine which template to use.
    *
-   * @var \Drupal\Core\Theme\Registry
+   * @var Registry
    */
   protected $themeRegistry;
 
   /**
    * Constructs a new ThemeRegistryLoader object.
    *
-   * @param \Drupal\Core\Theme\Registry $theme_registry
+   * @param Registry $theme_registry
    *   The theme registry.
    */
   public function __construct(Registry $theme_registry) {
@@ -41,7 +41,7 @@ class ThemeRegistryLoader extends FilesystemLoader {
    * @return string|null
    *   The path to the template, or NULL if the template is not found.
    *
-   * @throws \Twig\Error\LoaderError
+   * @throws LoaderError
    *   Thrown if a template matching $name cannot be found.
    */
   protected function findTemplate(string $name, bool $throw = TRUE) {

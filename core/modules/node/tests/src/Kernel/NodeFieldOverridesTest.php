@@ -22,7 +22,7 @@ class NodeFieldOverridesTest extends EntityKernelTestBase {
   /**
    * Current logged in user.
    *
-   * @var \Drupal\user\UserInterface
+   * @var UserInterface
    */
   protected $user;
 

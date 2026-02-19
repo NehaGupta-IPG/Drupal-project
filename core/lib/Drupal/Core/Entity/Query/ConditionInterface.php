@@ -26,7 +26,7 @@ interface ConditionInterface {
   /**
    * Adds a condition.
    *
-   * @param string|\Drupal\Core\Entity\Query\ConditionInterface $field
+   * @param string|ConditionInterface $field
    *   The field.
    * @param mixed $value
    *   (optional) The value.
@@ -86,7 +86,7 @@ interface ConditionInterface {
   /**
    * Compiles this conditional clause.
    *
-   * @param \Drupal\Core\Entity\Query\QueryInterface $query
+   * @param QueryInterface $query
    *   The query object this conditional clause belongs to.
    */
   public function compile($query);

@@ -2,13 +2,13 @@
 
 namespace Drupal\settings_tray\Hook;
 
-use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Asset\AttachedAssetsInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\settings_tray\Block\BlockEntitySettingTrayForm;
-use Drupal\Core\Url;
-use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
+use Drupal\settings_tray\Block\BlockEntitySettingTrayForm;
 
 /**
  * Hook implementations for settings_tray.

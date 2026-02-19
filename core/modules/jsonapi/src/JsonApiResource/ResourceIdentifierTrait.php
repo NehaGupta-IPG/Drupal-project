@@ -18,7 +18,7 @@ trait ResourceIdentifierTrait {
   /**
    * A ResourceIdentifier object.
    *
-   * @var \Drupal\jsonapi\JsonApiResource\ResourceIdentifier
+   * @var ResourceIdentifier
    */
   protected $resourceIdentifier;
 

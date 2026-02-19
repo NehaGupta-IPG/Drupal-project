@@ -33,7 +33,7 @@ class ConfigImportTestHooks {
    *
    * @param array $context
    *   The batch context.
-   * @param \Drupal\Core\Config\ConfigImporter $config_importer
+   * @param ConfigImporter $config_importer
    *   The configuration importer.
    */
   public function stepAlter(&$context, ConfigImporter $config_importer): void {

@@ -4,6 +4,7 @@ namespace Drupal\block_content\Entity;
 
 use Drupal\block_content\BlockContentAccessControlHandler;
 use Drupal\block_content\BlockContentForm;
+use Drupal\block_content\BlockContentInterface;
 use Drupal\block_content\BlockContentListBuilder;
 use Drupal\block_content\BlockContentStorageSchema;
 use Drupal\block_content\BlockContentTranslationHandler;
@@ -13,16 +14,15 @@ use Drupal\block_content\Form\BlockContentDeleteForm;
 use Drupal\block_content\Routing\BlockContentRouteProvider;
 use Drupal\Core\Access\RefinableDependentAccessTrait;
 use Drupal\Core\Entity\Attribute\ContentEntityType;
-use Drupal\Core\Entity\Routing\RevisionHtmlRouteProvider;
-use Drupal\Core\Entity\Form\RevisionRevertForm;
-use Drupal\Core\Entity\Form\RevisionDeleteForm;
-use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\EditorialContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\Form\RevisionDeleteForm;
+use Drupal\Core\Entity\Form\RevisionRevertForm;
+use Drupal\Core\Entity\Routing\RevisionHtmlRouteProvider;
+use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\block_content\BlockContentInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Defines the content block entity class.
@@ -158,7 +158,7 @@ class BlockContent extends EditorialContentEntityBase implements BlockContentInt
   public static function preDelete(EntityStorageInterface $storage, array $entities) {
     parent::preDelete($storage, $entities);
 
-    /** @var \Drupal\block_content\BlockContentInterface $block */
+    /** @var BlockContentInterface $block */
     foreach ($entities as $block) {
       foreach ($block->getInstances() as $instance) {
         $instance->delete();
@@ -171,7 +171,7 @@ class BlockContent extends EditorialContentEntityBase implements BlockContentInt
    */
   public static function postDelete(EntityStorageInterface $storage, array $entities) {
     parent::postDelete($storage, $entities);
-    /** @var \Drupal\block_content\BlockContentInterface $block */
+    /** @var BlockContentInterface $block */
     foreach ($entities as $block) {
       if ($block->isReusable()) {
         // If any deleted blocks are reusable clear the block cache.
@@ -206,7 +206,7 @@ class BlockContent extends EditorialContentEntityBase implements BlockContentInt
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    /** @var \Drupal\Core\Field\BaseFieldDefinition[] $fields */
+    /** @var BaseFieldDefinition[] $fields */
     $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['id']->setLabel(t('Content block ID'))

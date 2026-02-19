@@ -18,7 +18,7 @@ class CacheRedirect implements CacheableDependencyInterface {
   /**
    * Constructs a CacheRedirect object.
    *
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $cacheability
+   * @param CacheableDependencyInterface $cacheability
    *   The cacheability to redirect to.
    *
    * @see \Drupal\Core\Cache\VariationCache::createCacheIdFast()

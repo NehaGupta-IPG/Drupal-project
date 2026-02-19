@@ -377,7 +377,7 @@ class ViewsModerationStateFilterTest extends ViewsKernelTestBase {
   /**
    * Assert the nodes appear when the test view is executed.
    *
-   * @param \Drupal\node\NodeInterface[] $nodes
+   * @param NodeInterface[] $nodes
    *   Nodes to assert are in the views result.
    * @param array $filters
    *   An array of filters to apply to the view.

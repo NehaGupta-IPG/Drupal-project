@@ -39,7 +39,7 @@ class MigrateSearchPageTest extends MigrateDrupal7TestBase {
    * @internal
    */
   protected function assertEntity(string $id, string $path, bool $status = FALSE, ?array $expected_config = NULL): void {
-    /** @var \Drupal\search\Entity\SearchPage $search_page */
+    /** @var SearchPage $search_page */
     $search_page = SearchPage::load($id);
     $this->assertSame($id, $search_page->id());
     $this->assertSame($path, $search_page->getPath());
@@ -115,7 +115,7 @@ class MigrateSearchPageTest extends MigrateDrupal7TestBase {
   public function testUserSearchCreate(): void {
     $this->enableModules(['node']);
     $this->installConfig(['search']);
-    /** @var \Drupal\search\Entity\SearchPage $search_page */
+    /** @var SearchPage $search_page */
     $search_page = SearchPage::load('user_search');
     $search_page->delete();
     $this->executeMigration('d7_search_page');

@@ -103,7 +103,7 @@ class ComposerValidatorTest extends PackageManagerKernelTestBase {
    *
    * @param array $config
    *   The config to set.
-   * @param \Drupal\package_manager\ValidationResult[] $expected_results
+   * @param ValidationResult[] $expected_results
    *   The expected validation results, if any.
    */
   #[DataProvider('providerComposerSettingsValidation')]
@@ -118,7 +118,7 @@ class ComposerValidatorTest extends PackageManagerKernelTestBase {
    *
    * @param array $config
    *   The config to set.
-   * @param \Drupal\package_manager\ValidationResult[] $expected_results
+   * @param ValidationResult[] $expected_results
    *   The expected validation results, if any.
    */
   #[DataProvider('providerComposerSettingsValidation')]
@@ -156,7 +156,7 @@ class ComposerValidatorTest extends PackageManagerKernelTestBase {
    *
    * @param array $config
    *   The Composer configuration to set.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup[] $expected_messages
+   * @param TranslatableMarkup[] $expected_messages
    *   The expected validation error messages.
    */
   #[DataProvider('providerLinkToOnlineHelp')]

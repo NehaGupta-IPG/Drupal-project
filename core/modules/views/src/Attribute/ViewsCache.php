@@ -20,11 +20,11 @@ class ViewsCache extends Plugin {
    *
    * @param string $id
    *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $title
+   * @param TranslatableMarkup|null $title
    *   The plugin title used in the views UI.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $short_title
+   * @param TranslatableMarkup|null $short_title
    *   (optional) The short title used in the views UI.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $help
+   * @param TranslatableMarkup|null $help
    *   (optional) A short help string; this is displayed in the views UI.
    * @param string[]|null $display_types
    *   (optional) The types of the display this plugin can be used with.

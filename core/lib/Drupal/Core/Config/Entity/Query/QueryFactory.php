@@ -28,7 +28,7 @@ class QueryFactory implements QueryFactoryInterface, EventSubscriberInterface {
   /**
    * The config factory used by the config entity query.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
@@ -52,11 +52,11 @@ class QueryFactory implements QueryFactoryInterface, EventSubscriberInterface {
   /**
    * Constructs a QueryFactory object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config storage used by the config entity query.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value
+   * @param KeyValueFactoryInterface $key_value
    *   The key value factory.
-   * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
+   * @param ConfigManagerInterface $config_manager
    *   The configuration manager.
    */
   public function __construct(ConfigFactoryInterface $config_factory, KeyValueFactoryInterface $key_value, ConfigManagerInterface $config_manager) {
@@ -83,7 +83,7 @@ class QueryFactory implements QueryFactoryInterface, EventSubscriberInterface {
   /**
    * Gets the key value store used to store fast lookups.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type.
    *
    * @return \Drupal\Core\KeyValueStore\KeyValueStoreInterface
@@ -96,9 +96,9 @@ class QueryFactory implements QueryFactoryInterface, EventSubscriberInterface {
   /**
    * Updates or adds lookup data.
    *
-   * @param \Drupal\Core\Config\Entity\ConfigEntityTypeInterface $entity_type
+   * @param ConfigEntityTypeInterface $entity_type
    *   The entity type.
-   * @param \Drupal\Core\Config\Config $config
+   * @param Config $config
    *   The configuration object that is being saved.
    */
   protected function updateConfigKeyStore(ConfigEntityTypeInterface $entity_type, Config $config) {
@@ -117,9 +117,9 @@ class QueryFactory implements QueryFactoryInterface, EventSubscriberInterface {
   /**
    * Deletes lookup data.
    *
-   * @param \Drupal\Core\Config\Entity\ConfigEntityTypeInterface $entity_type
+   * @param ConfigEntityTypeInterface $entity_type
    *   The entity type.
-   * @param \Drupal\Core\Config\Config $config
+   * @param Config $config
    *   The configuration object that is being deleted.
    */
   protected function deleteConfigKeyStore(ConfigEntityTypeInterface $entity_type, Config $config) {
@@ -144,20 +144,20 @@ class QueryFactory implements QueryFactoryInterface, EventSubscriberInterface {
   /**
    * Creates lookup keys for configuration data.
    *
-   * @param \Drupal\Core\Config\Config $config
+   * @param Config $config
    *   The configuration object.
    * @param string $key
    *   The configuration key to look for.
    * @param string $get_method
    *   Which method on the config object to call to get the value. Either 'get'
    *   or 'getOriginal'.
-   * @param \Drupal\Core\Config\Entity\ConfigEntityTypeInterface $entity_type
+   * @param ConfigEntityTypeInterface $entity_type
    *   The configuration entity type.
    *
    * @return array
    *   An array of lookup keys concatenated to the configuration values.
    *
-   * @throws \Drupal\Core\Config\Entity\Query\InvalidLookupKeyException
+   * @throws InvalidLookupKeyException
    *   The provided $key cannot end with a wildcard. This makes no sense since
    *   you cannot do fast lookups against this.
    */
@@ -191,7 +191,7 @@ class QueryFactory implements QueryFactoryInterface, EventSubscriberInterface {
   /**
    * Finds all the values for a configuration key in a configuration object.
    *
-   * @param \Drupal\Core\Config\Config $config
+   * @param Config $config
    *   The configuration object.
    * @param string $key
    *   The current key being checked.
@@ -232,7 +232,7 @@ class QueryFactory implements QueryFactoryInterface, EventSubscriberInterface {
   /**
    * Updates configuration entity in the key store.
    *
-   * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   * @param ConfigCrudEvent $event
    *   The configuration event.
    */
   public function onConfigSave(ConfigCrudEvent $event) {
@@ -247,7 +247,7 @@ class QueryFactory implements QueryFactoryInterface, EventSubscriberInterface {
   /**
    * Removes configuration entity from key store.
    *
-   * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   * @param ConfigCrudEvent $event
    *   The configuration event.
    */
   public function onConfigDelete(ConfigCrudEvent $event) {

@@ -15,7 +15,7 @@ class ErrorServiceTestServiceProvider implements ServiceModifierInterface {
   /**
    * The in-situ container builder.
    *
-   * @var \Drupal\Core\DependencyInjection\ContainerBuilder
+   * @var ContainerBuilder
    */
   public static $containerBuilder;
 

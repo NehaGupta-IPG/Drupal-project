@@ -20,21 +20,21 @@ class SwitchShortcutSet extends FormBase {
   /**
    * The account the shortcut set is for.
    *
-   * @var \Drupal\user\UserInterface
+   * @var UserInterface
    */
   protected $user;
 
   /**
    * The shortcut set storage.
    *
-   * @var \Drupal\shortcut\ShortcutSetStorageInterface
+   * @var ShortcutSetStorageInterface
    */
   protected $shortcutSetStorage;
 
   /**
    * Constructs a SwitchShortcutSet object.
    *
-   * @param \Drupal\shortcut\ShortcutSetStorageInterface $shortcut_set_storage
+   * @param ShortcutSetStorageInterface $shortcut_set_storage
    *   The shortcut set storage.
    */
   public function __construct(ShortcutSetStorageInterface $shortcut_set_storage) {
@@ -176,7 +176,7 @@ class SwitchShortcutSet extends FormBase {
     $account_is_user = $this->user->id() == $account->id();
     if ($form_state->getValue('set') == 'new') {
       // Save a new shortcut set with links copied from the user's default set.
-      /** @var \Drupal\shortcut\Entity\ShortcutSet $set */
+      /** @var ShortcutSet $set */
       $set = $this->shortcutSetStorage->create([
         'id' => $form_state->getValue('id'),
         'label' => $form_state->getValue('label'),
@@ -202,7 +202,7 @@ class SwitchShortcutSet extends FormBase {
     }
     else {
       // Switch to a different shortcut set.
-      /** @var \Drupal\shortcut\Entity\ShortcutSet $set */
+      /** @var ShortcutSet $set */
       $set = $this->shortcutSetStorage->load($form_state->getValue('set'));
       $replacements = [
         '%user' => $this->user->getDisplayName(),
@@ -218,7 +218,7 @@ class SwitchShortcutSet extends FormBase {
   /**
    * Checks access for the shortcut set switch form.
    *
-   * @param \Drupal\user\UserInterface $user
+   * @param UserInterface $user
    *   (optional) The owner of the shortcut set.
    *
    * @return \Drupal\Core\Access\AccessResultInterface

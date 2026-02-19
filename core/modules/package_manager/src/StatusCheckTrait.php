@@ -22,16 +22,16 @@ trait StatusCheckTrait {
   /**
    * Runs a status check for a stage and returns the results, if any.
    *
-   * @param \Drupal\package_manager\SandboxManagerBase $sandbox_manager
+   * @param SandboxManagerBase $sandbox_manager
    *   The stage to run the status check for.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|null $event_dispatcher
+   * @param EventDispatcherInterface|null $event_dispatcher
    *   (optional) The event dispatcher service.
-   * @param \Drupal\package_manager\PathLocator|null $path_locator
+   * @param PathLocator|null $path_locator
    *   (optional) The path locator service.
-   * @param \PhpTuf\ComposerStager\API\Path\Factory\PathFactoryInterface|null $path_factory
+   * @param PathFactoryInterface|null $path_factory
    *   (optional) The path factory service.
    *
-   * @return \Drupal\package_manager\ValidationResult[]
+   * @return ValidationResult[]
    *   The results of the status check. If a readiness check was also done,
    *   its results will be included.
    */

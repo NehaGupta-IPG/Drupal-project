@@ -29,7 +29,7 @@ class LinkFormatter extends FormatterBase {
   /**
    * The path validator service.
    *
-   * @var \Drupal\Core\Path\PathValidatorInterface
+   * @var PathValidatorInterface
    */
   protected $pathValidator;
 
@@ -40,7 +40,7 @@ class LinkFormatter extends FormatterBase {
    *   The plugin ID for the formatter.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The definition of the field to which the formatter is associated.
    * @param array $settings
    *   The formatter settings.
@@ -50,7 +50,7 @@ class LinkFormatter extends FormatterBase {
    *   The view mode.
    * @param array $third_party_settings
    *   Third party settings.
-   * @param \Drupal\Core\Path\PathValidatorInterface $path_validator
+   * @param PathValidatorInterface $path_validator
    *   The path validator service.
    */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, PathValidatorInterface $path_validator) {
@@ -212,10 +212,10 @@ class LinkFormatter extends FormatterBase {
   /**
    * Builds the \Drupal\Core\Url object for a link field item.
    *
-   * @param \Drupal\link\LinkItemInterface $item
+   * @param LinkItemInterface $item
    *   The link field item being rendered.
    *
-   * @return \Drupal\Core\Url
+   * @return Url
    *   A Url object.
    */
   protected function buildUrl(LinkItemInterface $item) {

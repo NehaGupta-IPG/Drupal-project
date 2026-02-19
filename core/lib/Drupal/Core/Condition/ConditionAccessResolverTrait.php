@@ -12,7 +12,7 @@ trait ConditionAccessResolverTrait {
   /**
    * Resolves the given conditions based on the condition logic ('and'/'or').
    *
-   * @param \Drupal\Core\Condition\ConditionInterface[] $conditions
+   * @param ConditionInterface[] $conditions
    *   A set of conditions.
    * @param string $condition_logic
    *   The logic used to compute access, either 'and' or 'or'.

@@ -17,23 +17,23 @@ class CsrfTokenGenerator {
   /**
    * The private key service.
    *
-   * @var \Drupal\Core\PrivateKey
+   * @var PrivateKey
    */
   protected $privateKey;
 
   /**
    * The session metadata bag.
    *
-   * @var \Drupal\Core\Session\MetadataBag
+   * @var MetadataBag
    */
   protected $sessionMetadata;
 
   /**
    * Constructs the token generator.
    *
-   * @param \Drupal\Core\PrivateKey $private_key
+   * @param PrivateKey $private_key
    *   The private key service.
-   * @param \Drupal\Core\Session\MetadataBag $session_metadata
+   * @param MetadataBag $session_metadata
    *   The session metadata bag.
    */
   public function __construct(PrivateKey $private_key, MetadataBag $session_metadata) {

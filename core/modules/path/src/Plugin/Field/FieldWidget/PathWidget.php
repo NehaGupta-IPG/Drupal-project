@@ -76,7 +76,7 @@ class PathWidget extends WidgetBase {
    *
    * @param array $element
    *   The form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    */
   public static function validateFormElement(array &$element, FormStateInterface $form_state) {

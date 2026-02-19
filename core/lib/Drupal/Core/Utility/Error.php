@@ -80,7 +80,7 @@ class Error {
   /**
    * Log a formatted exception message to the provided logger.
    *
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   The logger.
    * @param \Throwable $exception
    *   The exception.

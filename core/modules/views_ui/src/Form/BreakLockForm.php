@@ -18,7 +18,7 @@ class BreakLockForm extends EntityConfirmFormBase {
   /**
    * Stores the entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
@@ -32,9 +32,9 @@ class BreakLockForm extends EntityConfirmFormBase {
   /**
    * Constructs a \Drupal\views_ui\Form\BreakLockForm object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\TempStore\SharedTempStoreFactory $temp_store_factory
+   * @param SharedTempStoreFactory $temp_store_factory
    *   The factory for the temp store object.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, SharedTempStoreFactory $temp_store_factory) {

@@ -36,7 +36,7 @@ class SqliteDatabaseExcluder implements EventSubscriberInterface {
   /**
    * Excludes SQLite database files from stage operations.
    *
-   * @param \Drupal\package_manager\Event\CollectPathsToExcludeEvent $event
+   * @param CollectPathsToExcludeEvent $event
    *   The event object.
    */
   public function excludeDatabaseFiles(CollectPathsToExcludeEvent $event): void {

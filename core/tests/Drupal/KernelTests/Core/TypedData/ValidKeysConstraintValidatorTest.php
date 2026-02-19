@@ -28,7 +28,7 @@ class ValidKeysConstraintValidatorTest extends KernelTestBase {
   /**
    * The typed config under test.
    *
-   * @var \Drupal\Core\TypedData\TraversableTypedDataInterface
+   * @var TraversableTypedDataInterface
    *
    * @see \Drupal\Core\Config\TypedConfigManagerInterface::get()
    */

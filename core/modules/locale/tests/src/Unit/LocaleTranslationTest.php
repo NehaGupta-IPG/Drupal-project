@@ -45,7 +45,7 @@ class LocaleTranslationTest extends UnitTestCase {
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 

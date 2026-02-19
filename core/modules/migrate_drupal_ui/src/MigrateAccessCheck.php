@@ -20,7 +20,7 @@ class MigrateAccessCheck {
   /**
    * Checks if the user is user 1 and grants access if so.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The current user account.
    *
    * @return \Drupal\Core\Access\AccessResult

@@ -9,8 +9,8 @@ use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use Composer\InstalledVersions;
 use Drupal\Component\FileSystem\FileSystem as DrupalFilesystem;
-use Drupal\Tests\DrupalTestCaseTrait;
 use Drupal\Tests\DrupalTestBrowser;
+use Drupal\Tests\DrupalTestCaseTrait;
 use Drupal\Tests\PhpUnitCompatibilityTrait;
 use Drupal\TestTools\Extension\RequiresComposerTrait;
 use PHPUnit\Framework\TestCase;
@@ -80,7 +80,7 @@ abstract class BuildTestBase extends TestCase {
   /**
    * The process that's running the HTTP server.
    *
-   * @var \Symfony\Component\Process\Process
+   * @var Process
    *
    * @see self::standUpServer()
    * @see self::stopServer()
@@ -139,14 +139,14 @@ abstract class BuildTestBase extends TestCase {
   /**
    * The Mink session manager.
    *
-   * @var \Behat\Mink\Mink
+   * @var Mink
    */
   private $mink;
 
   /**
    * The most recent command process.
    *
-   * @var \Symfony\Component\Process\Process
+   * @var Process
    *
    * @see ::executeCommand()
    */
@@ -155,7 +155,7 @@ abstract class BuildTestBase extends TestCase {
   /**
    * The PHP executable finder.
    *
-   * @var \Symfony\Component\Process\PhpExecutableFinder
+   * @var PhpExecutableFinder
    */
   private PhpExecutableFinder $phpFinder;
 
@@ -224,7 +224,7 @@ abstract class BuildTestBase extends TestCase {
   /**
    * Set up the Mink session manager.
    *
-   * @return \Behat\Mink\Session
+   * @return Session
    *   The Mink session.
    */
   protected function initMink() {
@@ -245,7 +245,7 @@ abstract class BuildTestBase extends TestCase {
    * Use the Mink object to perform assertions against the content returned by a
    * request.
    *
-   * @return \Behat\Mink\Mink
+   * @return Mink
    *   The Mink object.
    */
   public function getMink() {
@@ -329,7 +329,7 @@ abstract class BuildTestBase extends TestCase {
    *   (optional) A working directory relative to the workspace, within which to
    *   execute the command. Defaults to the workspace directory.
    *
-   * @return \Symfony\Component\Process\Process
+   * @return Process
    *   The process object.
    */
   public function executeCommand($command_line, $working_dir = NULL) {
@@ -364,7 +364,7 @@ abstract class BuildTestBase extends TestCase {
    *   (optional) Relative path within the test workspace file system that will
    *   be the docroot for the request. Defaults to the workspace directory.
    *
-   * @return \Behat\Mink\Mink
+   * @return Mink
    *   The Mink object. Perform assertions against this.
    *
    * @throws \InvalidArgumentException
@@ -421,7 +421,7 @@ abstract class BuildTestBase extends TestCase {
    *   (optional) Server docroot relative to the workspace filesystem. Defaults
    *   to the workspace directory.
    *
-   * @return \Symfony\Component\Process\Process
+   * @return Process
    *   The server process.
    *
    * @throws \RuntimeException
@@ -586,7 +586,7 @@ abstract class BuildTestBase extends TestCase {
    * directory exclusions here, so that packages are copied and composer does
    * not attempt to download them from packagist/github during test runs.
    *
-   * @return \Symfony\Component\Finder\Finder
+   * @return Finder
    *   A Finder object ready to iterate over core codebase.
    */
   public function getCodebaseFinder() {

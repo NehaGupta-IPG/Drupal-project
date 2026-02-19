@@ -43,7 +43,7 @@ class SettingsValidatorTest extends PackageManagerKernelTestBase {
    *
    * @param bool $setting
    *   The value of the update_fetch_with_http_fallback setting.
-   * @param \Drupal\package_manager\ValidationResult[] $expected_results
+   * @param ValidationResult[] $expected_results
    *   The expected validation results.
    */
   #[DataProvider('providerSettingsValidation')]
@@ -58,7 +58,7 @@ class SettingsValidatorTest extends PackageManagerKernelTestBase {
    *
    * @param bool $setting
    *   The value of the update_fetch_with_http_fallback setting.
-   * @param \Drupal\package_manager\ValidationResult[] $expected_results
+   * @param ValidationResult[] $expected_results
    *   The expected validation results.
    */
   #[DataProvider('providerSettingsValidation')]

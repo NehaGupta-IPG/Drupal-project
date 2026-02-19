@@ -29,43 +29,43 @@ class CommentController extends ControllerBase {
   /**
    * The HTTP kernel.
    *
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface
+   * @var HttpKernelInterface
    */
   protected $httpKernel;
 
   /**
    * The comment manager service.
    *
-   * @var \Drupal\comment\CommentManagerInterface
+   * @var CommentManagerInterface
    */
   protected $commentManager;
 
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 
   /**
    * The entity repository.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   * @var EntityRepositoryInterface
    */
   protected $entityRepository;
 
   /**
    * Constructs a CommentController object.
    *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel
+   * @param HttpKernelInterface $http_kernel
    *   HTTP kernel to handle requests.
-   * @param \Drupal\comment\CommentManagerInterface $comment_manager
+   * @param CommentManagerInterface $comment_manager
    *   The comment manager service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @param EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager service.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository service.
    */
   public function __construct(HttpKernelInterface $http_kernel, CommentManagerInterface $comment_manager, EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, EntityRepositoryInterface $entity_repository) {
@@ -79,10 +79,10 @@ class CommentController extends ControllerBase {
   /**
    * Publishes the specified comment.
    *
-   * @param \Drupal\comment\CommentInterface $comment
+   * @param CommentInterface $comment
    *   A comment entity.
    *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   * @return RedirectResponse
    *   A redirect response to the comment's permalink after approval.
    */
   public function commentApprove(CommentInterface $comment) {
@@ -106,16 +106,16 @@ class CommentController extends ControllerBase {
    * which calculates the page number based on current comment settings and
    * returns the full comment view with the pager set dynamically.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request of the page.
-   * @param \Drupal\comment\CommentInterface $comment
+   * @param CommentInterface $comment
    *   A comment entity.
    *
    * @return \Symfony\Component\HttpFoundation\Response
    *   The comment listing set to the page on which the comment appears.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   * @throws NotFoundHttpException
+   * @throws AccessDeniedHttpException
    */
   public function commentPermalink(Request $request, CommentInterface $comment) {
     if ($entity = $comment->getCommentedEntity()) {
@@ -150,7 +150,7 @@ class CommentController extends ControllerBase {
   /**
    * The _title_callback for the page that renders the comment permalink.
    *
-   * @param \Drupal\comment\CommentInterface $comment
+   * @param CommentInterface $comment
    *   The current comment.
    *
    * @return string
@@ -163,13 +163,13 @@ class CommentController extends ControllerBase {
   /**
    * Redirects legacy node links to the new path.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $node
+   * @param EntityInterface $node
    *   The node object identified by the legacy URL.
    *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   * @return RedirectResponse
    *   Redirects user to new URL.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   * @throws NotFoundHttpException
    */
   public function redirectNode(EntityInterface $node) {
     $fields = $this->commentManager->getFields('node');
@@ -190,11 +190,11 @@ class CommentController extends ControllerBase {
    *
    * There are several cases that have to be handled, including:
    *   - replies to comments
-   *   - replies to entities
+   *   - replies to entities.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request object.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity this comment belongs to.
    * @param string $field_name
    *   The field_name to which the comment belongs.
@@ -209,7 +209,7 @@ class CommentController extends ControllerBase {
    *     - comment_parent: If the comment is a reply to another comment.
    *   - comment_form: The comment form as a renderable array.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   * @throws NotFoundHttpException
    */
   public function getReplyForm(Request $request, EntityInterface $entity, $field_name, $pid = NULL) {
     $account = $this->currentUser();
@@ -256,10 +256,10 @@ class CommentController extends ControllerBase {
   /**
    * Title callback for the reply form.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity this comment belongs to.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   * @return TranslatableMarkup
    *   The reply form title.
    */
   public function replyFormTitle(EntityInterface $entity): TranslatableMarkup {
@@ -269,7 +269,7 @@ class CommentController extends ControllerBase {
   /**
    * Access check for the reply form.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity this comment belongs to.
    * @param string $field_name
    *   The field_name to which the comment belongs.
@@ -280,7 +280,7 @@ class CommentController extends ControllerBase {
    * @return \Drupal\Core\Access\AccessResultInterface
    *   An access result
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   * @throws NotFoundHttpException
    */
   public function replyFormAccess(EntityInterface $entity, $field_name, $pid = NULL) {
     // Check if entity and field exists.

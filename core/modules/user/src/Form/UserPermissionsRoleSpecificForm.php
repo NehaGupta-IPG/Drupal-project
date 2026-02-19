@@ -15,7 +15,7 @@ class UserPermissionsRoleSpecificForm extends UserPermissionsForm {
   /**
    * The specific role for this form.
    *
-   * @var \Drupal\user\RoleInterface
+   * @var RoleInterface
    */
   protected $userRole;
 
@@ -31,9 +31,9 @@ class UserPermissionsRoleSpecificForm extends UserPermissionsForm {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
-   * @param \Drupal\user\RoleInterface|null $user_role
+   * @param RoleInterface|null $user_role
    *   (optional) The user role used for this form. Defaults to NULL.
    */
   public function buildForm(array $form, FormStateInterface $form_state, ?RoleInterface $user_role = NULL) {

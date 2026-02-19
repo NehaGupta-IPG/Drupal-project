@@ -6,9 +6,9 @@ use Drupal\Component\Plugin\DependentPluginInterface;
 use Drupal\Core\Entity\DependencyTrait;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\State\StateInterface;
-use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Exception\RequirementsException;
 use Drupal\migrate\Plugin\migrate\source\SqlBase;
+use Drupal\migrate\Plugin\MigrationInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -53,7 +53,7 @@ abstract class DrupalSqlBase extends SqlBase implements DependentPluginInterface
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 

@@ -10,7 +10,7 @@ interface ChainEntityResolverInterface extends EntityResolverInterface {
   /**
    * Adds an entity resolver.
    *
-   * @param \Drupal\serialization\EntityResolver\EntityResolverInterface $resolver
+   * @param EntityResolverInterface $resolver
    *   The entity resolver to add.
    */
   public function addResolver(EntityResolverInterface $resolver);

@@ -28,7 +28,7 @@ class Time implements TimeInterface {
   /**
    * Constructs a Time object.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack|null $request_stack
+   * @param RequestStack|null $request_stack
    *   (Optional) The request stack.
    */
   public function __construct(?RequestStack $request_stack = NULL) {

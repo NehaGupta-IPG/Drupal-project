@@ -33,21 +33,21 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The media library UI builder.
    *
-   * @var \Drupal\media_library\MediaLibraryUiBuilder
+   * @var MediaLibraryUiBuilder
    */
   protected $libraryUiBuilder;
 
   /**
    * The type of media items being created by this form.
    *
-   * @var \Drupal\media\MediaTypeInterface
+   * @var MediaTypeInterface
    */
   protected $mediaType;
 
@@ -61,18 +61,18 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
   /**
    * The opener resolver.
    *
-   * @var \Drupal\media_library\OpenerResolverInterface
+   * @var OpenerResolverInterface
    */
   protected $openerResolver;
 
   /**
    * Constructs an AddFormBase object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\media_library\MediaLibraryUiBuilder $library_ui_builder
+   * @param MediaLibraryUiBuilder $library_ui_builder
    *   The media library UI builder.
-   * @param \Drupal\media_library\OpenerResolverInterface $opener_resolver
+   * @param OpenerResolverInterface $opener_resolver
    *   The opener resolver.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, MediaLibraryUiBuilder $library_ui_builder, OpenerResolverInterface $opener_resolver) {
@@ -103,10 +103,10 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
   /**
    * Get the media type from the form state.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    *
-   * @return \Drupal\media\MediaTypeInterface
+   * @return MediaTypeInterface
    *   The media type.
    *
    * @throws \InvalidArgumentException
@@ -226,7 +226,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
    *
    * @param array $form
    *   The complete form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    *
    * @return array
@@ -239,11 +239,11 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
   /**
    * Builds the sub-form for setting required fields on a new media item.
    *
-   * @param \Drupal\media\MediaInterface $media
+   * @param MediaInterface $media
    *   A new, unsaved media item.
    * @param array $form
    *   The complete form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    * @param int $delta
    *   The delta of the media item.
@@ -374,7 +374,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
    *
    * @param array $form
    *   The complete form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    *
    * @return array
@@ -405,11 +405,11 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
   /**
    * Returns a render array for a single pre-selected media item.
    *
-   * @param \Drupal\media\MediaInterface $media
+   * @param MediaInterface $media
    *   The media item.
    * @param array $form
    *   The complete form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    *
    * @return array
@@ -453,7 +453,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
    *
    * @param array $form
    *   The complete form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    *
    * @return array
@@ -493,7 +493,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
    *   The values for source fields of the media items.
    * @param array $form
    *   The complete form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    */
   protected function processInputValues(array $source_field_values, array $form, FormStateInterface $form_state) {
@@ -519,16 +519,16 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
   /**
    * Creates a new, unsaved media item from a source field value.
    *
-   * @param \Drupal\media\MediaTypeInterface $media_type
+   * @param MediaTypeInterface $media_type
    *   The media type of the media item.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $media_storage
+   * @param EntityStorageInterface $media_storage
    *   The media storage.
    * @param string $source_field_name
    *   The name of the media type's source field.
    * @param mixed $source_field_value
    *   The value for the source field of the media item.
    *
-   * @return \Drupal\media\MediaInterface
+   * @return MediaInterface
    *   An unsaved media entity.
    */
   protected function createMediaFromValue(MediaTypeInterface $media_type, EntityStorageInterface $media_storage, $source_field_name, $source_field_value) {
@@ -543,7 +543,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
   /**
    * Prepares a created media item to be permanently saved.
    *
-   * @param \Drupal\media\MediaInterface $media
+   * @param MediaInterface $media
    *   The unsaved media item.
    */
   protected function prepareMediaEntityForSave(MediaInterface $media) {
@@ -555,7 +555,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
    *
    * @param array $form
    *   The form render array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    */
   public function removeButtonSubmit(array $form, FormStateInterface $form_state) {
@@ -582,10 +582,10 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
    *
    * @param array $form
    *   The complete form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse|array
+   * @return AjaxResponse|array
    *   The form render array or an AJAX response object.
    */
   public function updateFormCallback(array &$form, FormStateInterface $form_state) {
@@ -654,11 +654,11 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
   /**
    * Validate a created media item.
    *
-   * @param \Drupal\media\MediaInterface $media
+   * @param MediaInterface $media
    *   The media item to validate.
    * @param array $form
    *   The complete form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    * @param int $delta
    *   The delta of the media item.
@@ -686,10 +686,10 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
    *
    * @param array $form
    *   The complete form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    *
-   * @return array|\Drupal\Core\Ajax\AjaxResponse
+   * @return array|AjaxResponse
    *   The form array if there are validation errors, or an AJAX response to add
    *   the created items to the current selection.
    */
@@ -724,7 +724,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
   /**
    * Build the render array of the media library UI.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    *
    * @return array
@@ -748,10 +748,10 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
    *
    * @param array $form
    *   The complete form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    *
-   * @return array|\Drupal\Core\Ajax\AjaxResponse
+   * @return array|AjaxResponse
    *   The form array when there are form errors or an AJAX response to select
    *   the created items in the media library.
    */
@@ -787,7 +787,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
    *
    * @param array $media_ids
    *   Array with the media IDs.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    *
    * @return int
@@ -804,7 +804,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
   /**
    * Get the media library state from the form state.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    *
    * @return \Drupal\media_library\MediaLibraryState
@@ -824,7 +824,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
   /**
    * Returns the name of the source field for a media type.
    *
-   * @param \Drupal\media\MediaTypeInterface $media_type
+   * @param MediaTypeInterface $media_type
    *   The media type to get the source field name for.
    *
    * @return string
@@ -839,10 +839,10 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
   /**
    * Get all pre-selected media items from the form state.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    *
-   * @return \Drupal\media\MediaInterface[]
+   * @return MediaInterface[]
    *   An array containing the pre-selected media items keyed by ID.
    */
   protected function getPreSelectedMediaItems(FormStateInterface $form_state) {
@@ -854,10 +854,10 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
   /**
    * Get all added media items from the form state.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    *
-   * @return \Drupal\media\MediaInterface[]
+   * @return MediaInterface[]
    *   An array containing the added media items keyed by delta. The media items
    *   won't have an ID until they are saved in ::submitForm().
    */
@@ -868,10 +868,10 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
   /**
    * Get all pre-selected and added media items from the form state.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    *
-   * @return \Drupal\media\MediaInterface[]
+   * @return MediaInterface[]
    *   An array containing all pre-selected and added media items with
    *   renumbered numeric keys.
    */

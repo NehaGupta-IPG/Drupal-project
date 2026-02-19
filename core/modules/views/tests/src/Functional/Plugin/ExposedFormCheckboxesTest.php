@@ -48,7 +48,7 @@ class ExposedFormCheckboxesTest extends ViewTestBase {
   /**
    * Vocabulary for testing checkbox options.
    *
-   * @var \Drupal\taxonomy\Entity\Vocabulary
+   * @var Vocabulary
    */
   public $vocabulary;
 

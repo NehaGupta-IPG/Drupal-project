@@ -2,12 +2,12 @@
 
 namespace Drupal\views\Hook;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\field\FieldStorageConfigInterface;
-use Drupal\Component\Utility\NestedArray;
 use Drupal\system\ActionConfigEntityInterface;
-use Drupal\Core\Hook\Attribute\Hook;
 
 /**
  * Hook implementations for views.
@@ -172,7 +172,7 @@ class ViewsViewsHooks {
     $module_handler = \Drupal::moduleHandler();
     $entity_type_manager = \Drupal::entityTypeManager();
     if ($entity_type_manager->hasDefinition('field_storage_config')) {
-      /** @var \Drupal\field\FieldStorageConfigInterface $field_storage */
+      /** @var FieldStorageConfigInterface $field_storage */
       foreach ($entity_type_manager->getStorage('field_storage_config')->loadMultiple() as $field_storage) {
         if (\Drupal::service('views.field_data_provider')->getSqlStorageForField($field_storage)) {
           $provider = $field_storage->getTypeProvider();

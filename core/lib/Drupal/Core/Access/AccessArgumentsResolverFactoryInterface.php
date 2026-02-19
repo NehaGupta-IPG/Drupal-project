@@ -14,11 +14,11 @@ interface AccessArgumentsResolverFactoryInterface {
   /**
    * Returns the arguments resolver to use when running access checks.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match object to be checked.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The account being checked.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   Optional, the request object.
    *
    * @return \Drupal\Component\Utility\ArgumentsResolverInterface

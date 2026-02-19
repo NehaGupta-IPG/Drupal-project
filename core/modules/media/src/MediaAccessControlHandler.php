@@ -19,16 +19,16 @@ class MediaAccessControlHandler extends EntityAccessControlHandler implements En
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * Constructs a MediaAccessControlHandler object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(EntityTypeInterface $entity_type, EntityTypeManagerInterface $entity_type_manager) {
@@ -50,7 +50,7 @@ class MediaAccessControlHandler extends EntityAccessControlHandler implements En
    * {@inheritdoc}
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
-    /** @var \Drupal\media\MediaInterface $entity */
+    /** @var MediaInterface $entity */
     // Allow admin permission to override all operations.
     if ($account->hasPermission($this->entityType->getAdminPermission())) {
       return AccessResult::allowed()->cachePerPermissions();

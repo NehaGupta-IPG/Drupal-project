@@ -108,7 +108,7 @@ class Log {
   /**
    * Log a query to all active logging keys, from a statement execution event.
    *
-   * @param \Drupal\Core\Database\Event\StatementExecutionEndEvent $event
+   * @param StatementExecutionEndEvent $event
    *   The statement execution event.
    */
   public function logFromEvent(StatementExecutionEndEvent $event): void {

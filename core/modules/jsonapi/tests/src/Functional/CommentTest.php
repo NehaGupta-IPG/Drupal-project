@@ -78,7 +78,7 @@ class CommentTest extends ResourceTestBase {
   protected $entity;
 
   /**
-   * @var \Drupal\entity_test\Entity\EntityTest
+   * @var EntityTest
    */
   private $commentedEntity;
 

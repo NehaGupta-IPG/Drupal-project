@@ -42,7 +42,7 @@ class EventWithPackageListTraitTest extends UnitTestCase {
       '\Drupal\package_manager\Event\PreRequireEvent',
     ];
     foreach ($events as $event) {
-      /** @var \Drupal\package_manager\Event\EventWithPackageListTrait $event */
+      /** @var EventWithPackageListTrait $event */
       $event = new $event($stage, $runtime_packages, $dev_packages);
       $this->assertSame($expected_runtime_packages, $event->getRuntimePackages());
       $this->assertSame($expected_dev_packages, $event->getDevPackages());

@@ -2,10 +2,10 @@
 
 namespace Drupal\content_moderation\Plugin\Validation\Constraint;
 
+use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\content_moderation\StateTransitionValidationInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\NotNullConstraint;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -20,41 +20,41 @@ class ModerationStateConstraintValidator extends ConstraintValidator implements 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   private $entityTypeManager;
 
   /**
    * The moderation info.
    *
-   * @var \Drupal\content_moderation\ModerationInformationInterface
+   * @var ModerationInformationInterface
    */
   protected $moderationInformation;
 
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
   /**
    * The state transition validation service.
    *
-   * @var \Drupal\content_moderation\StateTransitionValidationInterface
+   * @var StateTransitionValidationInterface
    */
   protected $stateTransitionValidation;
 
   /**
    * Creates a new ModerationStateConstraintValidator instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_information
+   * @param ModerationInformationInterface $moderation_information
    *   The moderation information.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
-   * @param \Drupal\content_moderation\StateTransitionValidationInterface $state_transition_validation
+   * @param StateTransitionValidationInterface $state_transition_validation
    *   The state transition validation service.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, ModerationInformationInterface $moderation_information, AccountInterface $current_user, StateTransitionValidationInterface $state_transition_validation) {

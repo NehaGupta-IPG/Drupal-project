@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Discovers available extensions in the filesystem.
  *
- * To also discover test modules, add
+ * To also discover test modules, add.
  * @code
  * $settings['extension_discovery_scan_tests'] = TRUE;
  * @endcode
@@ -101,7 +101,7 @@ class ExtensionDiscovery {
    *
    * Reads .info.yml files efficiently.
    *
-   * @var \Drupal\Core\Extension\InfoParser|null
+   * @var InfoParser|null
    */
   protected ?InfoParser $infoParser;
 
@@ -164,7 +164,7 @@ class ExtensionDiscovery {
    *   (optional) Whether to explicitly include or exclude test extensions. By
    *   default, test extensions are only discovered when in a test environment.
    *
-   * @return \Drupal\Core\Extension\Extension[]
+   * @return Extension[]
    *   An associative array of Extension objects, keyed by extension name.
    */
   public function scan($type, $include_tests = NULL) {
@@ -297,10 +297,10 @@ class ExtensionDiscovery {
   /**
    * Filters out extensions not belonging to the scanned installation profiles.
    *
-   * @param \Drupal\Core\Extension\Extension[] $all_files
+   * @param Extension[] $all_files
    *   The list of all extensions.
    *
-   * @return \Drupal\Core\Extension\Extension[]
+   * @return Extension[]
    *   The filtered list of extensions.
    */
   protected function filterByProfileDirectories(array $all_files) {
@@ -330,12 +330,12 @@ class ExtensionDiscovery {
   /**
    * Sorts the discovered extensions.
    *
-   * @param \Drupal\Core\Extension\Extension[] $all_files
+   * @param Extension[] $all_files
    *   The list of all extensions.
    * @param array $weights
    *   An array of weights, keyed by originating directory.
    *
-   * @return \Drupal\Core\Extension\Extension[]
+   * @return Extension[]
    *   The sorted list of extensions.
    */
   protected function sort(array $all_files, array $weights) {
@@ -387,10 +387,10 @@ class ExtensionDiscovery {
    * Extensions discovered in later search paths override earlier, unless they
    * are not compatible with the current version of Drupal core.
    *
-   * @param \Drupal\Core\Extension\Extension[] $all_files
+   * @param Extension[] $all_files
    *   The sorted list of all extensions that were found.
    *
-   * @return \Drupal\Core\Extension\Extension[]
+   * @return Extension[]
    *   The filtered list of extensions, keyed by extension name.
    */
   protected function process(array $all_files) {

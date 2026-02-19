@@ -23,7 +23,7 @@ class QueryTest extends UnitTestCase {
   /**
    * The query object.
    *
-   * @var \Drupal\Core\Entity\Query\Sql\Query
+   * @var Query
    */
   protected $query;
 

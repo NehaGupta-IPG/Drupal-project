@@ -119,7 +119,7 @@ class UserTest extends ResourceTestBase {
    * {@inheritdoc}
    */
   protected function createAnotherEntity($key) {
-    /** @var \Drupal\user\UserInterface $user */
+    /** @var UserInterface $user */
     $user = $this->getEntityDuplicate($this->entity, $key);
     $user->setUsername($user->label() . '_' . $key);
     $user->setEmail("$key@example.com");
@@ -834,7 +834,7 @@ class UserTest extends ResourceTestBase {
   }
 
   /**
-   * @param \Drupal\user\UserInterface $account
+   * @param UserInterface $account
    *   The user account.
    * @param string $cancel_method
    *   The cancel method.

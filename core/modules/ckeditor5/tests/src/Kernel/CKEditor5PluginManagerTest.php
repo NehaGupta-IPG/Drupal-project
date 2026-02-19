@@ -114,7 +114,7 @@ class CKEditor5PluginManagerTest extends KernelTestBase {
    * @param array $additional_files
    *   The additional files to create.
    *
-   * @return \Symfony\Component\DependencyInjection\ContainerInterface
+   * @return ContainerInterface
    *   The container that has the VFS-mocked CKEditor 5 plugin-providing module
    *   installed in it; this container must be used to simulate this module
    *   being installed.

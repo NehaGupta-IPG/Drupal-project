@@ -6,8 +6,8 @@ use Drupal\Core\Entity\TranslatableInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\ParamConverter\EntityConverter;
-use Drupal\jsonapi\Routing\Routes;
 use Drupal\Core\Routing\RouteObjectInterface;
+use Drupal\jsonapi\Routing\Routes;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\Routing\Route;
 
@@ -29,14 +29,14 @@ class EntityUuidConverter extends EntityConverter {
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * Injects the language manager.
    *
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager to get the current content language.
    */
   public function setLanguageManager(LanguageManagerInterface $language_manager) {

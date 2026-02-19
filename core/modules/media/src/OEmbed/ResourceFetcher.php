@@ -18,11 +18,11 @@ class ResourceFetcher implements ResourceFetcherInterface {
   /**
    * Constructs a ResourceFetcher object.
    *
-   * @param \GuzzleHttp\ClientInterface $httpClient
+   * @param ClientInterface $httpClient
    *   The HTTP client.
-   * @param \Drupal\media\OEmbed\ProviderRepositoryInterface $providers
+   * @param ProviderRepositoryInterface $providers
    *   The oEmbed provider repository service.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
+   * @param CacheBackendInterface $cacheBackend
    *   The cache backend.
    * @param int $timeout
    *   The length of time to wait for the request before the request
@@ -87,10 +87,10 @@ class ResourceFetcher implements ResourceFetcherInterface {
    * @param string $url
    *   The URL of the resource.
    *
-   * @return \Drupal\media\OEmbed\Resource
+   * @return Resource
    *   A value object representing the resource.
    *
-   * @throws \Drupal\media\OEmbed\ResourceException
+   * @throws ResourceException
    *   If the resource cannot be created.
    */
   protected function createResource(array $data, $url) {
@@ -200,7 +200,7 @@ class ResourceFetcher implements ResourceFetcherInterface {
    * @return array
    *   The parsed resource data.
    *
-   * @throws \Drupal\media\OEmbed\ResourceException
+   * @throws ResourceException
    *   If the resource data could not be parsed.
    */
   protected function parseResourceXml($data, $url) {

@@ -21,14 +21,14 @@ class Condition extends ConditionBase {
   /**
    * The SQL entity query object this condition belongs to.
    *
-   * @var \Drupal\Core\Entity\Query\Sql\Query
+   * @var Query
    */
   protected $query;
 
   /**
    * The current SQL query, set by parent condition compile() method calls.
    *
-   * @var \Drupal\Core\Database\Query\SelectInterface
+   * @var SelectInterface
    */
   protected SelectInterface $sqlQuery;
 
@@ -99,7 +99,7 @@ class Condition extends ConditionBase {
    *
    * @param array $condition
    *   The condition array.
-   * @param \Drupal\Core\Database\Query\SelectInterface $sql_query
+   * @param SelectInterface $sql_query
    *   Select query instance.
    * @param bool|null $case_sensitive
    *   If the condition should be case sensitive or not, NULL if the field does

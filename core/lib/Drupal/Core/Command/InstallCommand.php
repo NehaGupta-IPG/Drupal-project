@@ -147,7 +147,7 @@ class InstallCommand extends Command {
    *
    * @param object $class_loader
    *   The class loader.
-   * @param \Symfony\Component\Console\Style\SymfonyStyle $io
+   * @param SymfonyStyle $io
    *   The Symfony output decorator.
    * @param string $profile
    *   The installation profile to use.
@@ -277,7 +277,7 @@ class InstallCommand extends Command {
   /**
    * Selects the install profile to use.
    *
-   * @param \Symfony\Component\Console\Style\SymfonyStyle $io
+   * @param SymfonyStyle $io
    *   Symfony style output decorator.
    *
    * @return string

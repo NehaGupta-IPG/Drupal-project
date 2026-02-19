@@ -51,9 +51,9 @@ abstract class EntityDisplayModeFormBase extends EntityForm {
   /**
    * Constructs a EntityDisplayModeFormBase object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entityTypeBundleInfo
+   * @param EntityTypeBundleInfoInterface $entityTypeBundleInfo
    *   The entity type bundle service.
-   * @param \Drupal\Core\Entity\EntityDisplayRepository $entityDisplayRepository
+   * @param EntityDisplayRepository $entityDisplayRepository
    *   The entity display repository.
    */
   public function __construct(protected EntityTypeBundleInfoInterface $entityTypeBundleInfo, protected EntityDisplayRepositoryInterface $entityDisplayRepository) {}
@@ -250,7 +250,7 @@ abstract class EntityDisplayModeFormBase extends EntityForm {
    * @param string $bundle
    *   The entity bundle name.
    *
-   * @return \Drupal\Core\Url
+   * @return Url
    *   A Url object for the overview route.
    */
   private function getOverviewUrl($mode, $bundle): Url {
@@ -273,7 +273,7 @@ abstract class EntityDisplayModeFormBase extends EntityForm {
    * @param string $view_mode_name
    *   The view mode name such as "full_content" to load the view display for.
    *
-   * @return \Drupal\Core\Entity\Display\EntityViewDisplayInterface|null
+   * @return EntityViewDisplayInterface|null
    *   Returns the view display, or NULL if one does not exist.
    */
   private function getViewDisplay(string $bundle, string $view_mode_name): ?EntityViewDisplayInterface {
@@ -289,7 +289,7 @@ abstract class EntityDisplayModeFormBase extends EntityForm {
    * @param string $form_mode_name
    *   The form mode name to load the form display for.
    *
-   * @return \Drupal\Core\Entity\Display\EntityFormDisplayInterface|null
+   * @return EntityFormDisplayInterface|null
    *   Returns the form display, or NULL if one does not exist.
    */
   private function getFormDisplay(string $bundle, string $form_mode_name): ?EntityFormDisplayInterface {
@@ -305,7 +305,7 @@ abstract class EntityDisplayModeFormBase extends EntityForm {
    * @param string $display_mode_name
    *   The display mode name to load the display for.
    *
-   * @return \Drupal\Core\Entity\Display\EntityFormDisplayInterface|\Drupal\Core\Entity\Display\EntityViewDisplayInterface|null
+   * @return EntityFormDisplayInterface|EntityViewDisplayInterface|null
    *   Returns the display, or NULL if one does not exist.
    */
   private function getDisplayByContext(string $bundle, string $display_mode_name): EntityFormDisplayInterface|EntityViewDisplayInterface|null {

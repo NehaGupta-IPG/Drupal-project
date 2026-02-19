@@ -7,14 +7,14 @@ use Drupal\Core\TypedData\ComplexDataInterface;
 /**
  * Defines a generic configuration element that contains multiple properties.
  *
- * @implements \IteratorAggregate<string, \Drupal\Core\TypedData\TypedDataInterface>
+ * @implements \IteratorAggregate<string, TypedDataInterface>
  */
 abstract class ArrayElement extends Element implements \IteratorAggregate, TypedConfigInterface, ComplexDataInterface {
 
   /**
    * Parsed elements.
    *
-   * @var array<string, \Drupal\Core\TypedData\TypedDataInterface>
+   * @var array<string, TypedDataInterface>
    */
   protected $elements;
 
@@ -138,7 +138,7 @@ abstract class ArrayElement extends Element implements \IteratorAggregate, Typed
   /**
    * Retrieves the iterator for the object.
    *
-   * @return \ArrayIterator<string, \Drupal\Core\TypedData\TypedDataInterface>
+   * @return \ArrayIterator<string, TypedDataInterface>
    *   The iterator.
    */
   public function getIterator(): \ArrayIterator {
@@ -148,7 +148,7 @@ abstract class ArrayElement extends Element implements \IteratorAggregate, Typed
   /**
    * Creates a contained typed configuration object.
    *
-   * @param \Drupal\Core\TypedData\DataDefinitionInterface $definition
+   * @param DataDefinitionInterface $definition
    *   The data definition object.
    * @param mixed $value
    *   (optional) The data value. If set, it has to match one of the supported

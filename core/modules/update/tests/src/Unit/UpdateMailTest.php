@@ -22,35 +22,35 @@ class UpdateMailTest extends UnitTestCase {
   /**
    * The container.
    *
-   * @var \Drupal\Core\DependencyInjection\ContainerBuilder
+   * @var ContainerBuilder
    */
   protected $container;
 
   /**
    * The mocked current user service.
    *
-   * @var \Drupal\Core\Session\AccountProxy|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Session\AccountProxy|MockObject
    */
   protected $currentUser;
 
   /**
    * Mocked language manager.
    *
-   * @var \Drupal\language\ConfigurableLanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\language\ConfigurableLanguageManagerInterface|MockObject
    */
   protected $languageManager;
 
   /**
    * Mocked config factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactory|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Config\ConfigFactory|MockObject
    */
   protected $configFactory;
 
   /**
    * Mocked URL generator.
    *
-   * @var \Drupal\Core\Render\MetadataBubblingUrlGenerator|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Render\MetadataBubblingUrlGenerator|MockObject
    */
   protected $urlGenerator;
 

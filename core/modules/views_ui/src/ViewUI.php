@@ -5,20 +5,20 @@ namespace Drupal\views_ui;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Timer;
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Database\Database;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
+use Drupal\Core\Routing\RouteObjectInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\TempStore\Lock;
 use Drupal\views\Controller\ViewAjaxController;
-use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\views\ViewExecutable;
-use Drupal\Core\Database\Database;
-use Drupal\Core\Session\AccountInterface;
-use Drupal\views\Plugin\views\query\Sql;
 use Drupal\views\Entity\View;
+use Drupal\views\Plugin\views\query\Sql;
 use Drupal\views\ViewEntityInterface;
-use Drupal\Core\Routing\RouteObjectInterface;
+use Drupal\views\ViewExecutable;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -59,7 +59,7 @@ class ViewUI implements ViewEntityInterface {
    * If this view is locked it will contain the result of
    * \Drupal\Core\TempStore\SharedTempStore::getMetadata().
    *
-   * @var \Drupal\Core\TempStore\Lock|null
+   * @var Lock|null
    */
   private $lock;
 
@@ -96,7 +96,7 @@ class ViewUI implements ViewEntityInterface {
   /**
    * The View storage object.
    *
-   * @var \Drupal\views\ViewEntityInterface
+   * @var ViewEntityInterface
    */
   protected $storage;
 
@@ -151,7 +151,7 @@ class ViewUI implements ViewEntityInterface {
   /**
    * Constructs a View UI object.
    *
-   * @param \Drupal\views\ViewEntityInterface $storage
+   * @param ViewEntityInterface $storage
    *   The View storage object to wrap.
    */
   public function __construct(ViewEntityInterface $storage) {
@@ -1364,7 +1364,7 @@ class ViewUI implements ViewEntityInterface {
   /**
    * Gets the lock on this View.
    *
-   * @return \Drupal\Core\TempStore\Lock|null
+   * @return Lock|null
    *   The lock, if one exists.
    */
   public function getLock() {
@@ -1374,7 +1374,7 @@ class ViewUI implements ViewEntityInterface {
   /**
    * Sets a lock on this View.
    *
-   * @param \Drupal\Core\TempStore\Lock $lock
+   * @param Lock $lock
    *   The lock object.
    *
    * @return $this

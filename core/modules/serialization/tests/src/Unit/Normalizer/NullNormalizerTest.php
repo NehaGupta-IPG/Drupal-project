@@ -23,7 +23,7 @@ class NullNormalizerTest extends UnitTestCase {
   /**
    * The NullNormalizer instance.
    *
-   * @var \Drupal\serialization\Normalizer\NullNormalizer
+   * @var NullNormalizer
    */
   protected $normalizer;
 

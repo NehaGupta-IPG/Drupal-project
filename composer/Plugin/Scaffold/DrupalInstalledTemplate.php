@@ -15,9 +15,9 @@ class DrupalInstalledTemplate {
   /**
    * Gets the code for the DrupalInstalled class.
    *
-   * @param \Composer\Package\PackageInterface $root_package
+   * @param PackageInterface $root_package
    *   The root package.
-   * @param \Composer\Repository\InstalledRepositoryInterface $repository
+   * @param InstalledRepositoryInterface $repository
    *   The local installed repository.
    *
    * @return string

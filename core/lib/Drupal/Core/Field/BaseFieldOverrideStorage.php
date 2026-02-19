@@ -2,12 +2,12 @@
 
 namespace Drupal\Core\Field;
 
+use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Component\Uuid\UuidInterface;
 
 /**
  * Storage class for base field overrides.
@@ -17,17 +17,17 @@ class BaseFieldOverrideStorage extends FieldConfigStorageBase {
   /**
    * Constructs a BaseFieldOverrideStorage object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory service.
-   * @param \Drupal\Component\Uuid\UuidInterface $uuid_service
+   * @param UuidInterface $uuid_service
    *   The UUID service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager
+   * @param FieldTypePluginManagerInterface $field_type_manager
    *   The field type plugin manager.
-   * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache
+   * @param MemoryCacheInterface $memory_cache
    *   The memory cache.
    */
   public function __construct(EntityTypeInterface $entity_type, ConfigFactoryInterface $config_factory, UuidInterface $uuid_service, LanguageManagerInterface $language_manager, FieldTypePluginManagerInterface $field_type_manager, MemoryCacheInterface $memory_cache) {

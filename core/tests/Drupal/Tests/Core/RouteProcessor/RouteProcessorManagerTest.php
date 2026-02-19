@@ -22,7 +22,7 @@ class RouteProcessorManagerTest extends UnitTestCase {
   /**
    * The route processor manager.
    *
-   * @var \Drupal\Core\RouteProcessor\RouteProcessorManager
+   * @var RouteProcessorManager
    */
   protected $processorManager;
 
@@ -65,12 +65,12 @@ class RouteProcessorManagerTest extends UnitTestCase {
    *
    * @param string $route_name
    *   The route name.
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The Route to use in mock with() expectation.
    * @param array $parameters
    *   The parameters to use in mock with() expectation.
    *
-   * @return \Drupal\Core\RouteProcessor\OutboundRouteProcessorInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @return \Drupal\Core\RouteProcessor\OutboundRouteProcessorInterface|MockObject
    *   The mock processor object.
    */
   protected function getMockProcessor($route_name, $route, $parameters) {

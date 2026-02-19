@@ -18,7 +18,7 @@ class MultipleStaticContext implements ContextProviderInterface {
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $account;
 
@@ -32,9 +32,9 @@ class MultipleStaticContext implements ContextProviderInterface {
   /**
    * Constructs a new MultipleStaticContext.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The current user.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(AccountInterface $account, EntityTypeManagerInterface $entity_type_manager) {

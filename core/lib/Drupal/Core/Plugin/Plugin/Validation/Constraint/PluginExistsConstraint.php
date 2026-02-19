@@ -24,7 +24,7 @@ class PluginExistsConstraint extends SymfonyConstraint implements ContainerFacto
   /**
    * Constructs a PluginExistsConstraint object.
    *
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $pluginManager
+   * @param PluginManagerInterface $pluginManager
    *   The plugin manager.
    * @param string $manager
    *   The ID of the plugin manager service.

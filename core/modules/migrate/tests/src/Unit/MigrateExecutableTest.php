@@ -35,28 +35,28 @@ class MigrateExecutableTest extends MigrateTestCase {
   /**
    * The mocked migration entity.
    *
-   * @var \Drupal\migrate\Plugin\MigrationInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var MigrationInterface|MockObject
    */
   protected $migration;
 
   /**
    * The mocked migrate message.
    *
-   * @var \Drupal\migrate\MigrateMessageInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\migrate\MigrateMessageInterface|MockObject
    */
   protected $message;
 
   /**
    * The tested migrate executable.
    *
-   * @var \Drupal\Tests\migrate\Unit\TestMigrateExecutable
+   * @var TestMigrateExecutable
    */
   protected $executable;
 
   /**
    * A mocked event dispatcher.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|MockObject
    */
   protected $eventDispatcher;
 
@@ -420,7 +420,7 @@ class MigrateExecutableTest extends MigrateTestCase {
   /**
    * Returns a mock migration source instance.
    *
-   * @return \Drupal\migrate\Plugin\MigrateSourceInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @return \Drupal\migrate\Plugin\MigrateSourceInterface|MockObject
    *   The mocked migration source.
    */
   protected function getMockSource() {
@@ -560,7 +560,7 @@ class MigrateExecutableTest extends MigrateTestCase {
   /**
    * Returns an ID map object prophecy used in ::testRollback.
    *
-   * @return \Prophecy\Prophecy\ObjectProphecy<\Drupal\migrate\Plugin\MigrateIdMapInterface>
+   * @return ObjectProphecy<MigrateIdMapInterface>
    *   An ID map object prophecy.
    */
   public function getTestRollbackIdMap(array $items, array $source_id_keys, array $destination_id_keys): ObjectProphecy {

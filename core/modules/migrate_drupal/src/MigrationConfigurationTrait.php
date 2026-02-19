@@ -48,7 +48,7 @@ trait MigrationConfigurationTrait {
    * @param array $database
    *   Database array representing the source Drupal database.
    *
-   * @return \Drupal\Core\Database\Connection
+   * @return Connection
    *   The database connection for the source Drupal database.
    */
   protected function getConnection(array $database) {
@@ -61,7 +61,7 @@ trait MigrationConfigurationTrait {
   /**
    * Gets the system data from the system table of the source Drupal database.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   Database connection to the source Drupal database.
    *
    * @return array
@@ -196,7 +196,7 @@ trait MigrationConfigurationTrait {
   /**
    * Determines what version of Drupal the source database contains.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection object.
    *
    * @return string|false

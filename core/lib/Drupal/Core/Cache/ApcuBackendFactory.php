@@ -20,7 +20,7 @@ class ApcuBackendFactory implements CacheFactoryInterface {
   /**
    * The cache tags checksum provider.
    *
-   * @var \Drupal\Core\Cache\CacheTagsChecksumInterface
+   * @var CacheTagsChecksumInterface
    */
   protected $checksumProvider;
 
@@ -38,9 +38,9 @@ class ApcuBackendFactory implements CacheFactoryInterface {
    *   The app root.
    * @param string $site_path
    *   The site path.
-   * @param \Drupal\Core\Cache\CacheTagsChecksumInterface $checksum_provider
+   * @param CacheTagsChecksumInterface $checksum_provider
    *   The cache tags checksum provider.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct($root, $site_path, CacheTagsChecksumInterface $checksum_provider, protected TimeInterface $time) {
@@ -55,7 +55,7 @@ class ApcuBackendFactory implements CacheFactoryInterface {
    * @param string $bin
    *   The cache bin for which the object is created.
    *
-   * @return \Drupal\Core\Cache\ApcuBackend
+   * @return ApcuBackend
    *   The cache backend object for the specified cache bin.
    */
   public function get($bin) {

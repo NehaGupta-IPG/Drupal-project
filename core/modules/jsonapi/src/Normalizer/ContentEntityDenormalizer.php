@@ -22,7 +22,7 @@ final class ContentEntityDenormalizer extends EntityDenormalizerBase {
    *
    * @param array $data
    *   The input data to modify.
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   Contains the info about the resource type.
    * @param string $format
    *   Format the given data was extracted from.

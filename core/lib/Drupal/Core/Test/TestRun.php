@@ -32,7 +32,7 @@ class TestRun {
   /**
    * TestRun constructor.
    *
-   * @param \Drupal\Core\Test\TestRunResultsStorageInterface $testRunResultsStorage
+   * @param TestRunResultsStorageInterface $testRunResultsStorage
    *   The test run results storage.
    * @param int|string $testId
    *   A unique test run id.
@@ -46,7 +46,7 @@ class TestRun {
   /**
    * Returns a new test run object.
    *
-   * @param \Drupal\Core\Test\TestRunResultsStorageInterface $test_run_results_storage
+   * @param TestRunResultsStorageInterface $test_run_results_storage
    *   The test run results storage.
    *
    * @return self
@@ -60,7 +60,7 @@ class TestRun {
   /**
    * Returns a test run object from storage.
    *
-   * @param \Drupal\Core\Test\TestRunResultsStorageInterface $test_run_results_storage
+   * @param TestRunResultsStorageInterface $test_run_results_storage
    *   The test run results storage.
    * @param int|string $test_id
    *   The test run id.

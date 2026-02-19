@@ -15,14 +15,14 @@ class FormUploadedFile implements UploadedFileInterface {
   /**
    * The wrapped uploaded file.
    *
-   * @var \Symfony\Component\HttpFoundation\File\UploadedFile
+   * @var UploadedFile
    */
   protected $uploadedFile;
 
   /**
    * Creates a new FormUploadedFile.
    *
-   * @param \Symfony\Component\HttpFoundation\File\UploadedFile $uploadedFile
+   * @param UploadedFile $uploadedFile
    *   The wrapped Symfony uploaded file.
    */
   public function __construct(UploadedFile $uploadedFile) {

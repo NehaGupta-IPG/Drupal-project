@@ -15,7 +15,7 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
   /**
    * Constructs a StreamWrapperManager object.
    *
-   * @param \Psr\Container\ContainerInterface $container
+   * @param ContainerInterface $container
    *   The stream wrapper service locator.
    */
   public function __construct(
@@ -42,7 +42,7 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
    *   - class: stream wrapper class name
    *   - type: a bitmask corresponding to the type constants in
    *     StreamWrapperInterface
-   *   - service_id: name of service
+   *   - service_id: name of service.
    *
    * The array on key StreamWrapperInterface::ALL contains representations of
    * all schemes and corresponding wrappers.
@@ -131,7 +131,7 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
    * @param string $uri
    *   The URI of the stream.
    *
-   * @return \Drupal\Core\StreamWrapper\StreamWrapperInterface|false
+   * @return StreamWrapperInterface|false
    *   A stream wrapper object, or false if the scheme is not available.
    */
   protected function getWrapper($scheme, $uri) {

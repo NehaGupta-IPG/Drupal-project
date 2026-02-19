@@ -6,20 +6,20 @@ use Drupal\Component\Assertion\Inspector;
 use Drupal\Component\Plugin\Attribute\AttributeInterface;
 use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
 use Drupal\Component\Plugin\Discovery\CachedDiscoveryInterface;
-use Drupal\Core\Extension\ModuleExtensionList;
-use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\Core\Cache\CacheBackendInterface;
-use Drupal\Core\Cache\UseCacheBackendTrait;
 use Drupal\Component\Plugin\Discovery\DiscoveryCachedTrait;
-use Drupal\Core\Plugin\Discovery\AttributeClassDiscovery;
-use Drupal\Core\Plugin\Discovery\AttributeDiscoveryWithAnnotations;
-use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Component\Plugin\PluginManagerBase;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\UseCacheBackendTrait;
+use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\Discovery\AnnotatedClassDiscovery;
+use Drupal\Core\Plugin\Discovery\AttributeClassDiscovery;
+use Drupal\Core\Plugin\Discovery\AttributeDiscoveryWithAnnotations;
+use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
 use Drupal\Core\Plugin\Factory\ContainerFactory;
 
 /**
@@ -65,14 +65,14 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
   /**
    * The module handler to invoke the alter hook.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The module extension list.
    *
-   * @var \Drupal\Core\Extension\ModuleExtensionList
+   * @var ModuleExtensionList
    */
   protected ?ModuleExtensionList $moduleExtensionList;
 
@@ -135,7 +135,7 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
    * @param string|null $plugin_interface
    *   (optional) The interface each plugin should implement.
@@ -176,7 +176,7 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
    *
    * Plugin definitions are cached using the provided cache backend.
    *
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param CacheBackendInterface $cache_backend
    *   Cache backend instance to use.
    * @param string $cache_key
    *   Cache key prefix to use.

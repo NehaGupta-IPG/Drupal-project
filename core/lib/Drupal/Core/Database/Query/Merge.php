@@ -125,7 +125,7 @@ class Merge extends Query implements ConditionInterface {
   /**
    * Constructs a Merge object.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   A Connection object.
    * @param string $table
    *   Name of the table to associate with this query.
@@ -142,7 +142,7 @@ class Merge extends Query implements ConditionInterface {
   /**
    * Sets the table or subquery to be used for the condition.
    *
-   * @param \Drupal\Core\Database\Query\Select|string $table
+   * @param Select|string $table
    *   The table name or the subquery to be used. Use a Select query object to
    *   pass in a subquery.
    *
@@ -351,7 +351,7 @@ class Merge extends Query implements ConditionInterface {
    *   - Merge::STATUS_UPDATE: If the entry already exists,
    *     and an UPDATE query is executed.
    *
-   * @throws \Drupal\Core\Database\Query\InvalidMergeQueryException
+   * @throws InvalidMergeQueryException
    *   When there are no conditions found to merge.
    */
   public function execute() {

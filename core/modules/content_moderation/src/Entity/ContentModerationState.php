@@ -5,11 +5,11 @@ namespace Drupal\content_moderation\Entity;
 use Drupal\content_moderation\ContentModerationStateAccessControlHandler;
 use Drupal\content_moderation\ContentModerationStateStorageSchema;
 use Drupal\Core\Entity\Attribute\ContentEntityType;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\user\EntityOwnerTrait;
 use Drupal\views\EntityViewsData;
@@ -106,7 +106,7 @@ class ContentModerationState extends ContentEntityBase implements ContentModerat
   /**
    * Creates or updates an entity's moderation state whilst saving that entity.
    *
-   * @param \Drupal\content_moderation\Entity\ContentModerationState $content_moderation_state
+   * @param ContentModerationState $content_moderation_state
    *   The content moderation entity content entity to create or save.
    *
    * @internal
@@ -120,10 +120,10 @@ class ContentModerationState extends ContentEntityBase implements ContentModerat
   /**
    * Loads a content moderation state entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   A moderated entity object.
    *
-   * @return \Drupal\content_moderation\Entity\ContentModerationStateInterface|null
+   * @return ContentModerationStateInterface|null
    *   The related content moderation state or NULL if none could be found.
    *
    * @internal
@@ -153,7 +153,7 @@ class ContentModerationState extends ContentEntityBase implements ContentModerat
         ->execute();
 
       if ($ids) {
-        /** @var \Drupal\content_moderation\Entity\ContentModerationStateInterface $content_moderation_state */
+        /** @var ContentModerationStateInterface $content_moderation_state */
         $content_moderation_state = $storage->loadRevision(key($ids));
       }
     }
@@ -186,7 +186,7 @@ class ContentModerationState extends ContentEntityBase implements ContentModerat
    * @return int
    *   Either SAVED_NEW or SAVED_UPDATED, depending on the operation performed.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   In case of failures an exception is thrown.
    */
   protected function realSave() {

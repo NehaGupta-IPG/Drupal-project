@@ -76,7 +76,7 @@ class ContentEntityTest extends KernelTestBase {
   /**
    * The test user.
    *
-   * @var \Drupal\user\Entity\User
+   * @var User
    */
   protected $user;
 
@@ -183,7 +183,7 @@ class ContentEntityTest extends KernelTestBase {
   /**
    * Helper to assert IDs structure.
    *
-   * @param \Drupal\migrate\Plugin\MigrateSourceInterface $source
+   * @param MigrateSourceInterface $source
    *   The source plugin.
    * @param array $configuration
    *   The source plugin configuration (Nope, no getter available).

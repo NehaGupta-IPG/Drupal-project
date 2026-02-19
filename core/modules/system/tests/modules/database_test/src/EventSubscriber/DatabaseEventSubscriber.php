@@ -48,7 +48,7 @@ class DatabaseEventSubscriber implements EventSubscriberInterface {
   /**
    * Subscribes to a statement execution started event.
    *
-   * @param \Drupal\Core\Database\Event\StatementExecutionStartEvent $event
+   * @param StatementExecutionStartEvent $event
    *   The database event.
    */
   public function onStatementExecutionStart(StatementExecutionStartEvent $event): void {
@@ -59,7 +59,7 @@ class DatabaseEventSubscriber implements EventSubscriberInterface {
   /**
    * Subscribes to a statement execution finished event.
    *
-   * @param \Drupal\Core\Database\Event\StatementExecutionEndEvent $event
+   * @param StatementExecutionEndEvent $event
    *   The database event.
    */
   public function onStatementExecutionEnd(StatementExecutionEndEvent $event): void {
@@ -70,7 +70,7 @@ class DatabaseEventSubscriber implements EventSubscriberInterface {
   /**
    * Subscribes to a statement execution failure event.
    *
-   * @param \Drupal\Core\Database\Event\StatementExecutionFailureEvent $event
+   * @param StatementExecutionFailureEvent $event
    *   The database event.
    */
   public function onStatementExecutionFailure(StatementExecutionFailureEvent $event): void {

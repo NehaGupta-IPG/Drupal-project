@@ -3,11 +3,11 @@
 namespace Drupal\menu_link_content\Entity;
 
 use Drupal\Core\Entity\Attribute\ContentEntityType;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\EditorialContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\link\AttributeXss;
 use Drupal\link\LinkItemInterface;
@@ -23,8 +23,8 @@ use Drupal\menu_link_content\MenuLinkListBuilder;
 /**
  * Defines the menu link content entity class.
  *
- * @property \Drupal\Core\Field\FieldItemList $link
- * @property \Drupal\Core\Field\FieldItemList $rediscover
+ * @property FieldItemList $link
+ * @property FieldItemList $rediscover
  */
 #[ContentEntityType(
   id: 'menu_link_content',
@@ -265,14 +265,14 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
     $menu_link_manager = \Drupal::service('plugin.manager.menu.link');
 
     foreach ($entities as $menu_link) {
-      /** @var \Drupal\menu_link_content\Entity\MenuLinkContent $menu_link */
+      /** @var MenuLinkContent $menu_link */
       $menu_link_manager->removeDefinition($menu_link->getPluginId(), FALSE);
 
       // Children get re-attached to the menu link's parent.
       $parent_plugin_id = $menu_link->getParentId();
       $children = $storage->loadByProperties(['parent' => $menu_link->getPluginId()]);
       foreach ($children as $child) {
-        /** @var \Drupal\menu_link_content\Entity\MenuLinkContent $child */
+        /** @var MenuLinkContent $child */
         $child->set('parent', $parent_plugin_id)->save();
       }
     }
@@ -282,7 +282,7 @@ class MenuLinkContent extends EditorialContentEntityBase implements MenuLinkCont
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    /** @var \Drupal\Core\Field\BaseFieldDefinition[] $fields */
+    /** @var BaseFieldDefinition[] $fields */
     $fields = parent::baseFieldDefinitions($entity_type);
 
     // Add the publishing status field.

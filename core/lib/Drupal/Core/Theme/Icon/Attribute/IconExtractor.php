@@ -21,9 +21,9 @@ class IconExtractor extends AttributeBase {
    *
    * @param string $id
    *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $label
+   * @param TranslatableMarkup|null $label
    *   (optional) The human-readable name of the plugin.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $description
+   * @param TranslatableMarkup|null $description
    *   (optional) A brief description of the plugin.
    * @param class-string|null $deriver
    *   (optional) The deriver class.

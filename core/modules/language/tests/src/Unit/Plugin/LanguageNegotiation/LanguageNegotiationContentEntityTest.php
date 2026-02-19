@@ -31,14 +31,14 @@ class LanguageNegotiationContentEntityTest extends LanguageNegotiationTestBase {
   /**
    * An array of mock LanguageInterface objects.
    *
-   * @var \Drupal\Core\Language\LanguageInterface
+   * @var LanguageInterface
    */
   protected array $languages;
 
   /**
    * A mock LanguageManager object.
    *
-   * @var \Drupal\language\ConfigurableLanguageManagerInterface
+   * @var ConfigurableLanguageManagerInterface
    */
   protected $languageManager;
 

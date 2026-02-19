@@ -154,7 +154,7 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
   /**
    * Compiles and returns an array of the arguments for this prepared statement.
    *
-   * @param \Drupal\Core\Database\Query\PlaceholderInterface|null $queryPlaceholder
+   * @param PlaceholderInterface|null $queryPlaceholder
    *   When collecting the arguments of a subquery, the main placeholder
    *   object should be passed as this parameter.
    *
@@ -247,7 +247,7 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
    *
    * This method is a convenience method for innerJoin().
    *
-   * @param \Drupal\Core\Database\Query\SelectInterface|string $table
+   * @param SelectInterface|string $table
    *   The table against which to join. May be a string or another SelectQuery
    *   object. If a query object is passed, it will be used as a subselect.
    *   Unless the table name starts with the database / schema name and a dot
@@ -274,7 +274,7 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
   /**
    * Inner Join against another table in the database.
    *
-   * @param \Drupal\Core\Database\Query\SelectInterface|string $table
+   * @param SelectInterface|string $table
    *   The table against which to join. May be a string or another SelectQuery
    *   object. If a query object is passed, it will be used as a subselect.
    *   Unless the table name starts with the database / schema name and a dot
@@ -301,7 +301,7 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
   /**
    * Left Outer Join against another table in the database.
    *
-   * @param \Drupal\Core\Database\Query\SelectInterface|string $table
+   * @param SelectInterface|string $table
    *   The table against which to join. May be a string or another SelectQuery
    *   object. If a query object is passed, it will be used as a subselect.
    *   Unless the table name starts with the database / schema name and a dot
@@ -334,7 +334,7 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
    *
    * @param string $type
    *   The type of join. Typically one of INNER, LEFT OUTER, and RIGHT OUTER.
-   * @param \Drupal\Core\Database\Query\SelectInterface|string $table
+   * @param SelectInterface|string $table
    *   The table against which to join. May be a string or another SelectQuery
    *   object. If a query object is passed, it will be used as a subselect.
    *   Unless the table name starts with the database / schema name and a dot
@@ -446,7 +446,7 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
    * caller to ensure that they match properly. If they do
    * not, an SQL syntax error will result.
    *
-   * @param \Drupal\Core\Database\Query\SelectInterface $query
+   * @param SelectInterface $query
    *   The query to UNION to this query.
    * @param string $type
    *   The type of UNION to add to the query. Defaults to plain
@@ -471,7 +471,7 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
   /**
    * Get the equivalent COUNT query of this query as a new query object.
    *
-   * @return \Drupal\Core\Database\Query\SelectInterface
+   * @return SelectInterface
    *   A new SelectQuery object with no fields or expressions besides COUNT(*).
    */
   public function countQuery();
@@ -519,7 +519,7 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
    *   complex options such as IN, LIKE, or BETWEEN. Defaults to IN if $value is
    *   an array = otherwise.
    *
-   * @return \Drupal\Core\Database\Query\ConditionInterface
+   * @return ConditionInterface
    *   The called object.
    */
   public function havingCondition($field, $value = NULL, $operator = NULL);
@@ -561,7 +561,7 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
   /**
    * Compiles the HAVING clause for later retrieval.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection for which to compile the clause.
    */
   public function havingCompile(Connection $connection);
@@ -589,7 +589,7 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
   /**
    * Sets a HAVING condition that the specified subquery returns values.
    *
-   * @param \Drupal\Core\Database\Query\SelectInterface $select
+   * @param SelectInterface $select
    *   The subquery that must contain results.
    *
    * @return $this
@@ -599,7 +599,7 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
   /**
    * Sets a HAVING condition that the specified subquery returns no values.
    *
-   * @param \Drupal\Core\Database\Query\SelectInterface $select
+   * @param SelectInterface $select
    *   The subquery that must contain results.
    *
    * @return $this
@@ -626,7 +626,7 @@ interface SelectInterface extends ConditionInterface, AlterableInterface, Extend
    * @param bool|null $set
    *   IF TRUE, FOR UPDATE will be added to the query, if FALSE then it won't.
    *
-   * @return \Drupal\Core\Database\Query\ConditionInterface
+   * @return ConditionInterface
    *   The called object.
    */
   public function forUpdate($set = TRUE);

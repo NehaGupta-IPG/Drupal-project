@@ -17,7 +17,7 @@ class FieldConfigListController extends EntityListController {
    *   The entity type.
    * @param string $bundle
    *   The entity bundle.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The current route match.
    *
    * @return array

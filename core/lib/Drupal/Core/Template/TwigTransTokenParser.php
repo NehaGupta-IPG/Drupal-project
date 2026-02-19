@@ -85,12 +85,12 @@ class TwigTransTokenParser extends AbstractTokenParser {
   /**
    * Ensure that any nodes that are parsed are only of allowed types.
    *
-   * @param \Twig\Node\Node $body
+   * @param Node $body
    *   The expression to check.
    * @param int $lineno
    *   The source line.
    *
-   * @throws \Twig\Error\SyntaxError
+   * @throws SyntaxError
    */
   protected function checkTransString(Node $body, $lineno) {
     foreach ($body as $node) {

@@ -12,7 +12,7 @@ interface AuthenticationProviderInterface {
   /**
    * Checks whether suitable authentication credentials are on the request.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    *
    * @return bool
@@ -24,7 +24,7 @@ interface AuthenticationProviderInterface {
   /**
    * Authenticates the user.
    *
-   * @param \Symfony\Component\HttpFoundation\Request|null $request
+   * @param Request|null $request
    *   The request object.
    *
    * @return \Drupal\Core\Session\AccountInterface|null

@@ -47,9 +47,9 @@ class QueueTest extends KernelTestBase {
   /**
    * Queues and unqueues a set of items to check the basic queue functionality.
    *
-   * @param \Drupal\Core\Queue\QueueInterface $queue1
+   * @param QueueInterface $queue1
    *   An instantiated queue object.
-   * @param \Drupal\Core\Queue\QueueInterface $queue2
+   * @param QueueInterface $queue2
    *   An instantiated queue object.
    */
   protected function runQueueTest($queue1, $queue2): void {

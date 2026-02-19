@@ -13,8 +13,8 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Url;
 use Drupal\locale\LocaleConfigManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Route;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Configuration mapper for configuration entities.
@@ -24,7 +24,7 @@ class ConfigEntityMapper extends ConfigNamesMapper implements ConfigEntityMapper
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
@@ -38,7 +38,7 @@ class ConfigEntityMapper extends ConfigNamesMapper implements ConfigEntityMapper
   /**
    * Loaded entity instance to help produce the translation interface.
    *
-   * @var \Drupal\Core\Config\Entity\ConfigEntityInterface
+   * @var ConfigEntityInterface
    */
   protected $entity;
 
@@ -58,23 +58,23 @@ class ConfigEntityMapper extends ConfigNamesMapper implements ConfigEntityMapper
    *   An array of plugin information as documented in
    *   ConfigNamesMapper::__construct() with the following additional keys:
    *   - entity_type: The name of the entity type this mapper belongs to.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The configuration factory.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
+   * @param TypedConfigManagerInterface $typed_config
    *   The typed configuration manager.
-   * @param \Drupal\locale\LocaleConfigManager $locale_config_manager
+   * @param LocaleConfigManager $locale_config_manager
    *   The locale configuration manager.
-   * @param \Drupal\config_translation\ConfigMapperManagerInterface $config_mapper_manager
+   * @param ConfigMapperManagerInterface $config_mapper_manager
    *   The mapper plugin discovery service.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
+   * @param RouteProviderInterface $route_provider
    *   The route provider.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation_manager
+   * @param TranslationInterface $translation_manager
    *   The string translation manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
    */
   public function __construct($plugin_id, $plugin_definition, ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typed_config, LocaleConfigManager $locale_config_manager, ConfigMapperManagerInterface $config_mapper_manager, RouteProviderInterface $route_provider, TranslationInterface $translation_manager, EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager, ?EventDispatcherInterface $event_dispatcher = NULL) {

@@ -2,9 +2,9 @@
 
 namespace Drupal\Core\Cache;
 
-use Drupal\Component\Serialization\ObjectAwareSerializationInterface;
 use Drupal\Component\Assertion\Inspector;
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Component\Serialization\ObjectAwareSerializationInterface;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseException;
@@ -57,29 +57,29 @@ class DatabaseBackend implements CacheBackendInterface {
   /**
    * The database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
   /**
    * The cache tags checksum provider.
    *
-   * @var \Drupal\Core\Cache\CacheTagsChecksumInterface
+   * @var CacheTagsChecksumInterface
    */
   protected $checksumProvider;
 
   /**
    * Constructs a DatabaseBackend object.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection.
-   * @param \Drupal\Core\Cache\CacheTagsChecksumInterface $checksum_provider
+   * @param CacheTagsChecksumInterface $checksum_provider
    *   The cache tags checksum provider.
    * @param string $bin
    *   The cache bin for which the object is created.
-   * @param \Drupal\Component\Serialization\ObjectAwareSerializationInterface|int|string|null $serializer
+   * @param ObjectAwareSerializationInterface|int|string|null $serializer
    *   (optional) The serializer to use.
-   * @param \Drupal\Component\Datetime\TimeInterface|int|string|null $time
+   * @param TimeInterface|int|string|null $time
    *   The time service.
    * @param int $max_rows
    *   (optional) The maximum number of rows that are allowed in this cache bin

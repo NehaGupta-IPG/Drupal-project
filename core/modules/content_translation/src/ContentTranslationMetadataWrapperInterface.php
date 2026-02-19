@@ -51,7 +51,7 @@ interface ContentTranslationMetadataWrapperInterface {
   /**
    * Returns the translation author.
    *
-   * @return \Drupal\user\UserInterface
+   * @return UserInterface
    *   The user entity for the translation author.
    */
   public function getAuthor();
@@ -61,7 +61,7 @@ interface ContentTranslationMetadataWrapperInterface {
    *
    * The metadata field will be updated, only if it's translatable.
    *
-   * @param \Drupal\user\UserInterface $account
+   * @param UserInterface $account
    *   The translation author user entity.
    *
    * @return $this

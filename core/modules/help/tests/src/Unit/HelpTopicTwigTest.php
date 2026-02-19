@@ -26,7 +26,7 @@ class HelpTopicTwigTest extends UnitTestCase {
   /**
    * The help topic instance to test.
    *
-   * @var \Drupal\help\HelpTopicTwig
+   * @var HelpTopicTwig
    */
   protected $helpTopic;
 

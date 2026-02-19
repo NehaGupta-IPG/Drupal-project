@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\block_content\Functional\Rest;
 
-use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
 use Drupal\block_content\Entity\BlockContentType;
+use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
 
 /**
  * Resource test base for the BlockContentType entity.

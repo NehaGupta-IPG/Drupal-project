@@ -7,7 +7,7 @@ use Drupal\Component\Annotation\Plugin;
 /**
  * Defines an Action annotation object.
  *
- * Plugin Namespace: Plugin\Action
+ * Plugin Namespace: Plugin\Action.
  *
  * @see \Drupal\Core\Action\ActionInterface
  * @see \Drupal\Core\Action\ActionManager
@@ -29,7 +29,7 @@ class Action extends Plugin {
   /**
    * The human-readable name of the action plugin.
    *
-   * @var \Drupal\Core\Annotation\Translation
+   * @var Translation
    *
    * @ingroup plugin_translatable
    */
@@ -58,7 +58,7 @@ class Action extends Plugin {
   /**
    * The category under which the action should be listed in the UI.
    *
-   * @var \Drupal\Core\Annotation\Translation
+   * @var Translation
    *
    * @ingroup plugin_translatable
    */

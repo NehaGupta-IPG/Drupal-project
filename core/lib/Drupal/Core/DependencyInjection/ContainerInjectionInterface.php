@@ -20,7 +20,7 @@ interface ContainerInjectionInterface {
    * class, but not the container itself. Every call to this method must return
    * a new instance of this class; that is, it may not implement a singleton.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @param ContainerInterface $container
    *   The service container this instance should use.
    */
   public static function create(ContainerInterface $container);

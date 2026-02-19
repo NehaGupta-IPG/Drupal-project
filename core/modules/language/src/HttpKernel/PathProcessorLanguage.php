@@ -7,11 +7,11 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\PathProcessor\InboundPathProcessorInterface;
 use Drupal\Core\PathProcessor\OutboundPathProcessorInterface;
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\language\EventSubscriber\ConfigSubscriber;
 use Drupal\language\LanguageNegotiatorInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Drupal\Core\Session\AccountInterface;
 
 /**
  * Processes the inbound path using path alias lookups.
@@ -21,21 +21,21 @@ class PathProcessorLanguage implements InboundPathProcessorInterface, OutboundPa
   /**
    * A config factory for retrieving required config settings.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $config;
 
   /**
    * Language manager for retrieving the URL language type.
    *
-   * @var \Drupal\language\ConfigurableLanguageManagerInterface
+   * @var ConfigurableLanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The language negotiator.
    *
-   * @var \Drupal\language\LanguageNegotiatorInterface
+   * @var LanguageNegotiatorInterface
    */
   protected $negotiator;
 
@@ -56,22 +56,22 @@ class PathProcessorLanguage implements InboundPathProcessorInterface, OutboundPa
   /**
    * The language configuration event subscriber.
    *
-   * @var \Drupal\language\EventSubscriber\ConfigSubscriber
+   * @var ConfigSubscriber
    */
   protected $configSubscriber;
 
   /**
    * Constructs a PathProcessorLanguage object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config
+   * @param ConfigFactoryInterface $config
    *   A config factory object for retrieving configuration settings.
-   * @param \Drupal\language\ConfigurableLanguageManagerInterface $language_manager
+   * @param ConfigurableLanguageManagerInterface $language_manager
    *   The configurable language manager.
-   * @param \Drupal\language\LanguageNegotiatorInterface $negotiator
+   * @param LanguageNegotiatorInterface $negotiator
    *   The language negotiator.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current active user.
-   * @param \Drupal\language\EventSubscriber\ConfigSubscriber $config_subscriber
+   * @param ConfigSubscriber $config_subscriber
    *   The language configuration event subscriber.
    */
   public function __construct(ConfigFactoryInterface $config, ConfigurableLanguageManagerInterface $language_manager, LanguageNegotiatorInterface $negotiator, AccountInterface $current_user, ConfigSubscriber $config_subscriber) {

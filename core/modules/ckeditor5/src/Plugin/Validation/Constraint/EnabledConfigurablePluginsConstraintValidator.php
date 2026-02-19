@@ -23,7 +23,7 @@ class EnabledConfigurablePluginsConstraintValidator extends ConstraintValidator 
   /**
    * {@inheritdoc}
    *
-   * @throws \Symfony\Component\Validator\Exception\UnexpectedTypeException
+   * @throws UnexpectedTypeException
    *   Thrown when the given constraint is not supported by this validator.
    */
   public function validate($settings, Constraint $constraint): void {
@@ -65,7 +65,7 @@ class EnabledConfigurablePluginsConstraintValidator extends ConstraintValidator 
   /**
    * Gets all configurable CKEditor 5 plugin definitions that are enabled.
    *
-   * @return \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition[]
+   * @return CKEditor5PluginDefinition[]
    *   An array of enabled configurable CKEditor 5 plugin definitions.
    */
   private function getConfigurableEnabledDefinitions(): array {

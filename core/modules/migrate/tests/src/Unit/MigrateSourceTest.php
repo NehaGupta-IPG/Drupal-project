@@ -61,7 +61,7 @@ class MigrateSourceTest extends MigrateTestCase {
   /**
    * The migrate executable.
    *
-   * @var \Drupal\migrate\MigrateExecutable
+   * @var MigrateExecutable
    */
   protected $executable;
 
@@ -79,7 +79,7 @@ class MigrateSourceTest extends MigrateTestCase {
    * @param int $high_water_value
    *   (optional) The high water mark to start from, if set.
    *
-   * @return \Drupal\migrate\Plugin\MigrateSourceInterface
+   * @return MigrateSourceInterface
    *   A mocked source plugin.
    */
   protected function getSource($configuration = [], $migrate_config = [], $status = MigrateIdMapInterface::STATUS_NEEDS_UPDATE, $high_water_value = NULL) {
@@ -428,10 +428,10 @@ class MigrateSourceTest extends MigrateTestCase {
   /**
    * Gets a mock executable for the test.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration entity.
    *
-   * @return \Drupal\migrate\MigrateExecutable
+   * @return MigrateExecutable
    *   The migrate executable.
    */
   protected function getMigrateExecutable($migration) {

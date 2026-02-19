@@ -46,7 +46,7 @@ class SpaceUsedTest extends FileManagedUnitTestBase {
    * @param int $status
    *   Whether the file should be permanent or temporary.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The file entity.
    */
   protected function createFileWithSize($uri, $size, $uid, $status = FileInterface::STATUS_PERMANENT): EntityInterface {

@@ -12,7 +12,7 @@ class AuditException extends \RuntimeException {
   /**
    * AuditException constructor.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration that caused the exception.
    * @param string $message
    *   The reason the audit failed.

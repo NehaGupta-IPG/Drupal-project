@@ -18,10 +18,10 @@ trait AjaxFormHelperTrait {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   An AJAX response that display validation error messages or represents a
    *   successful submission.
    */
@@ -46,10 +46,10 @@ trait AjaxFormHelperTrait {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   An AJAX response.
    */
   abstract protected function successfulAjaxSubmit(array $form, FormStateInterface $form_state);

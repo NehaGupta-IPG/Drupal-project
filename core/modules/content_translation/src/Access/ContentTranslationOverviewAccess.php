@@ -16,14 +16,14 @@ class ContentTranslationOverviewAccess implements AccessInterface {
   /**
    * The entity type manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * Constructs a ContentTranslationOverviewAccess object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
@@ -33,9 +33,9 @@ class ContentTranslationOverviewAccess implements AccessInterface {
   /**
    * Checks access to the translation overview for the entity and bundle.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The parametrized route.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The currently logged in account.
    * @param string $entity_type_id
    *   The entity type ID.

@@ -18,23 +18,23 @@ class ViewsData {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The moderation information.
    *
-   * @var \Drupal\content_moderation\ModerationInformationInterface
+   * @var ModerationInformationInterface
    */
   protected $moderationInformation;
 
   /**
    * Creates a new ViewsData instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_information
+   * @param ModerationInformationInterface $moderation_information
    *   The moderation information.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, ModerationInformationInterface $moderation_information) {

@@ -24,7 +24,7 @@ class NodeAccessPagerTest extends BrowserTestBase {
   /**
    * An user.
    *
-   * @var \Drupal\user\Entity\User
+   * @var User
    */
   protected User $webUser;
 

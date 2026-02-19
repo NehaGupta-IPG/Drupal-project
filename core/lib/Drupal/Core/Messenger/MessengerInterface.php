@@ -29,7 +29,7 @@ interface MessengerInterface {
    *
    * The messages will be displayed in the order they got added later.
    *
-   * @param string|\Drupal\Component\Render\MarkupInterface $message
+   * @param string|MarkupInterface $message
    *   The translated message to be displayed to the user. For consistency with
    *   other messages, it should begin with a capital letter and end with a
    *   period.
@@ -47,7 +47,7 @@ interface MessengerInterface {
   /**
    * Adds a new status message to the queue.
    *
-   * @param string|\Drupal\Component\Render\MarkupInterface $message
+   * @param string|MarkupInterface $message
    *   The translated message to be displayed to the user. For consistency with
    *   other messages, it should begin with a capital letter and end with a
    *   period.
@@ -62,7 +62,7 @@ interface MessengerInterface {
   /**
    * Adds a new error message to the queue.
    *
-   * @param string|\Drupal\Component\Render\MarkupInterface $message
+   * @param string|MarkupInterface $message
    *   The translated message to be displayed to the user. For consistency with
    *   other messages, it should begin with a capital letter and end with a
    *   period.
@@ -77,7 +77,7 @@ interface MessengerInterface {
   /**
    * Adds a new warning message to the queue.
    *
-   * @param string|\Drupal\Component\Render\MarkupInterface $message
+   * @param string|MarkupInterface $message
    *   The translated message to be displayed to the user. For consistency with
    *   other messages, it should begin with a capital letter and end with a
    *   period.
@@ -92,7 +92,7 @@ interface MessengerInterface {
   /**
    * Gets all messages.
    *
-   * @return string[][]|\Drupal\Component\Render\MarkupInterface[][]
+   * @return string[][]|MarkupInterface[][]
    *   Keys are message types and values are indexed arrays of messages. Message
    *   types are either self::TYPE_STATUS, self::TYPE_WARNING, or
    *   self::TYPE_ERROR.
@@ -106,7 +106,7 @@ interface MessengerInterface {
    *   The messages' type. Either self::TYPE_STATUS, self::TYPE_WARNING,
    *   or self::TYPE_ERROR.
    *
-   * @return string[]|\Drupal\Component\Render\MarkupInterface[]
+   * @return string[]|MarkupInterface[]
    *   The messages of given type.
    */
   public function messagesByType($type);
@@ -114,7 +114,7 @@ interface MessengerInterface {
   /**
    * Deletes all messages.
    *
-   * @return string[]|\Drupal\Component\Render\MarkupInterface[]
+   * @return string[]|MarkupInterface[]
    *   The deleted messages.
    */
   public function deleteAll();
@@ -126,7 +126,7 @@ interface MessengerInterface {
    *   The messages' type. Either self::TYPE_STATUS, self::TYPE_WARNING, or
    *   self::TYPE_ERROR.
    *
-   * @return string[]|\Drupal\Component\Render\MarkupInterface[]
+   * @return string[]|MarkupInterface[]
    *   The deleted messages of given type.
    */
   public function deleteByType($type);

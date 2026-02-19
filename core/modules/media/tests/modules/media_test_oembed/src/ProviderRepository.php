@@ -37,7 +37,7 @@ class ProviderRepository extends BaseProviderRepository {
   /**
    * Stores an oEmbed provider value object in state.
    *
-   * @param \Drupal\media\OEmbed\Provider $provider
+   * @param Provider $provider
    *   The provider to store.
    */
   public function setProvider(Provider $provider) {

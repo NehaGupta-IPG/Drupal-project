@@ -10,8 +10,8 @@ use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\HookAttributeInterface;
 use Drupal\Core\Hook\Attribute\LegacyHook;
-use Drupal\Core\Hook\Attribute\RemoveHook;
 use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
+use Drupal\Core\Hook\Attribute\RemoveHook;
 use Drupal\Core\Hook\Attribute\ReorderHook;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -82,7 +82,7 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
   /**
    * Writes collected definitions to the container builder.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   * @param ContainerBuilder $container
    *   Container builder.
    */
   protected function writeToContainer(ContainerBuilder $container): void {
@@ -144,7 +144,7 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
   /**
    * Collects all hook implementations.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   * @param ContainerBuilder $container
    *   The container.
    *
    * @return static
@@ -308,7 +308,7 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
   /**
    * Registers the hook implementation services.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   * @param ContainerBuilder $container
    *   The container builder.
    * @param array<string, array<string, string>> $implementationsByHook
    *   Implementations, as module names keyed by hook name and "$class::$method"
@@ -362,7 +362,7 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
   /**
    * Checks for hooks which can't be supported in theme classes.
    *
-   * @param \Drupal\Core\Hook\Attribute\Hook $hookAttribute
+   * @param Hook $hookAttribute
    *   The hook to check.
    * @param class-string $class
    *   The class the hook is implemented on.
@@ -384,7 +384,7 @@ class ThemeHookCollectorPass implements CompilerPassInterface {
    * @param \ReflectionClass $reflectionClass
    *   A reflected class.
    *
-   * @return array<string, list<\Drupal\Core\Hook\Attribute\HookAttributeInterface>>
+   * @return array<string, list<HookAttributeInterface>>
    *   Lists of Hook attribute instances by method name.
    */
   protected static function getAttributeInstances(\ReflectionClass $reflectionClass): array {

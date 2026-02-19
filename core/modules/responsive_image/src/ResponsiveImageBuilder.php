@@ -154,12 +154,12 @@ class ResponsiveImageBuilder {
    *     - width: The width of the image (if known).
    *     - height: The height of the image (if known).
    *     - uri: The URI of the image file.
-   * @param \Drupal\breakpoint\BreakpointInterface $breakpoint
+   * @param BreakpointInterface $breakpoint
    *   The breakpoint for this source tag.
    * @param array $multipliers
    *   An array with multipliers as keys and image style mappings as values.
    *
-   * @return \Drupal\Core\Template\Attribute
+   * @return Attribute
    *   An object of attributes for the source tag.
    */
   public function buildSourceAttributes(array $variables, BreakpointInterface $breakpoint, array $multipliers): Attribute {

@@ -2,17 +2,17 @@
 
 namespace Drupal\block\Hook;
 
+use Drupal\block\Entity\Block;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Block\BlockPluginInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\language\ConfigurableLanguageInterface;
-use Drupal\system\Entity\Menu;
-use Drupal\block\Entity\Block;
-use Drupal\Core\Link;
-use Drupal\Core\Url;
-use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Installer\InstallerKernel;
+use Drupal\Core\Link;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
+use Drupal\language\ConfigurableLanguageInterface;
+use Drupal\system\Entity\Menu;
 
 /**
  * Hook implementations for block.

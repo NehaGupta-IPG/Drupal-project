@@ -12,7 +12,7 @@ interface ConfigEntityMapperInterface extends ConfigMapperInterface {
   /**
    * Gets the entity instance for this mapper.
    *
-   * @return \Drupal\Core\Config\Entity\ConfigEntityInterface
+   * @return ConfigEntityInterface
    *   The configuration entity.
    */
   public function getEntity();
@@ -26,7 +26,7 @@ interface ConfigEntityMapperInterface extends ConfigMapperInterface {
    * configuration names to use to check permissions or display a translation
    * screen.
    *
-   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface $entity
+   * @param ConfigEntityInterface $entity
    *   The configuration entity to set.
    *
    * @return bool

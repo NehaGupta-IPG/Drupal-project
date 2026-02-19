@@ -14,14 +14,14 @@ final class UnpackCollection implements \Iterator, \Countable {
   /**
    * The queue of packages to unpack.
    *
-   * @var \Composer\Package\PackageInterface[]
+   * @var PackageInterface[]
    */
   private array $packagesToUnpack = [];
 
   /**
    * The list of packages that have been unpacked.
    *
-   * @var array<string, \Composer\Package\PackageInterface>
+   * @var array<string, PackageInterface>
    */
   private array $unpackedPackages = [];
 
@@ -70,7 +70,7 @@ final class UnpackCollection implements \Iterator, \Countable {
   /**
    * Adds a package to the queue of packages to unpack.
    *
-   * @param \Composer\Package\PackageInterface $package
+   * @param PackageInterface $package
    *   The package to add to the queue.
    */
   public function add(PackageInterface $package): self {
@@ -81,7 +81,7 @@ final class UnpackCollection implements \Iterator, \Countable {
   /**
    * Marks a package as unpacked.
    *
-   * @param \Composer\Package\PackageInterface $package
+   * @param PackageInterface $package
    *   The package that has been unpacked.
    */
   public function markPackageUnpacked(PackageInterface $package): void {
@@ -91,7 +91,7 @@ final class UnpackCollection implements \Iterator, \Countable {
   /**
    * Checks if a package has been unpacked, or it's queued for unpacking.
    *
-   * @param \Composer\Package\PackageInterface $package
+   * @param PackageInterface $package
    *   The package to check.
    *
    * @return bool

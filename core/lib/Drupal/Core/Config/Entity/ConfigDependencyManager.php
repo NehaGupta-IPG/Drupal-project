@@ -134,7 +134,7 @@ class ConfigDependencyManager {
   /**
    * The config entity data.
    *
-   * @var \Drupal\Core\Config\Entity\ConfigEntityDependency[]
+   * @var ConfigEntityDependency[]
    */
   protected $data = [];
 
@@ -156,7 +156,7 @@ class ConfigDependencyManager {
    *   should be a module name or theme name. In the case of entity it should be
    *   the full configuration object name.
    *
-   * @return \Drupal\Core\Config\Entity\ConfigEntityDependency[]
+   * @return ConfigEntityDependency[]
    *   An array of config entity dependency objects that are dependent.
    */
   public function getDependentEntities($type, $name) {
@@ -236,7 +236,7 @@ class ConfigDependencyManager {
    *   The configuration entity full configuration names to determine the
    *   dependencies for.
    *
-   * @return \Drupal\Core\Config\Entity\ConfigEntityDependency[]
+   * @return ConfigEntityDependency[]
    *   A graph of config entity dependency objects that are dependent on the
    *   supplied entities to check.
    */

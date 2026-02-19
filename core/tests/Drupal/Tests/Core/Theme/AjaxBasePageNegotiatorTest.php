@@ -24,22 +24,19 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class AjaxBasePageNegotiatorTest extends UnitTestCase {
 
   /**
-   * @var \Drupal\Core\Theme\AjaxBasePageNegotiator
-   *
+   * @var AjaxBasePageNegotiator *
    * The AJAX base page negotiator.
    */
   protected $negotiator;
 
   /**
-   * @var \Drupal\Core\Access\CsrfTokenGenerator|\Prophecy\Prophecy\ProphecyInterface
-   *
+   * @var CsrfTokenGenerator|ProphecyInterface *
    * The CSRF token generator.
    */
   protected $tokenGenerator;
 
   /**
-   * @var \Symfony\Component\HttpFoundation\RequestStack
-   *
+   * @var RequestStack *
    * The request stack.
    */
   protected $requestStack;

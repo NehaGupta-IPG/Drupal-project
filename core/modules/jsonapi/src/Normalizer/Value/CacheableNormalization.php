@@ -30,7 +30,7 @@ class CacheableNormalization extends TemporaryArrayObjectThrowingExceptions impl
   /**
    * CacheableNormalization constructor.
    *
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $cacheability
+   * @param CacheableDependencyInterface $cacheability
    *   The cacheability metadata for the normalized data.
    * @param array|string|int|float|bool|null $normalization
    *   The normalized data. This value must not contain any
@@ -69,7 +69,7 @@ class CacheableNormalization extends TemporaryArrayObjectThrowingExceptions impl
   /**
    * Converts the object to a CacheableOmission if the normalization is empty.
    *
-   * @return self|\Drupal\jsonapi\Normalizer\Value\CacheableOmission
+   * @return self|CacheableOmission
    *   A CacheableOmission if the normalization is considered empty, self
    *   otherwise.
    */
@@ -80,7 +80,7 @@ class CacheableNormalization extends TemporaryArrayObjectThrowingExceptions impl
   /**
    * Gets a new CacheableNormalization with an additional dependency.
    *
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $dependency
+   * @param CacheableDependencyInterface $dependency
    *   The new cacheable dependency.
    *
    * @return static
@@ -94,7 +94,7 @@ class CacheableNormalization extends TemporaryArrayObjectThrowingExceptions impl
   /**
    * Collects an array of CacheableNormalizations into a single instance.
    *
-   * @param \Drupal\jsonapi\Normalizer\Value\CacheableNormalization[] $cacheable_normalizations
+   * @param CacheableNormalization[] $cacheable_normalizations
    *   An array of CacheableNormalizations.
    *
    * @return static

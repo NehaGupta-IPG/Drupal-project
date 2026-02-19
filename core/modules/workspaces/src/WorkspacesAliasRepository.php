@@ -12,14 +12,14 @@ class WorkspacesAliasRepository extends AliasRepository {
   /**
    * The workspace manager.
    *
-   * @var \Drupal\workspaces\WorkspaceManagerInterface
+   * @var WorkspaceManagerInterface
    */
   protected $workspaceManager;
 
   /**
    * Sets the workspace manager.
    *
-   * @param \Drupal\workspaces\WorkspaceManagerInterface $workspace_manager
+   * @param WorkspaceManagerInterface $workspace_manager
    *   The workspace manager service.
    *
    * @return $this

@@ -44,7 +44,7 @@ final class BaseRequirementsFulfilledValidator implements EventSubscriberInterfa
   /**
    * Validates that base requirements are fulfilled.
    *
-   * @param \Drupal\package_manager\Event\SandboxValidationEvent $event
+   * @param SandboxValidationEvent $event
    *   The event.
    */
   public function validate(SandboxValidationEvent $event): void {

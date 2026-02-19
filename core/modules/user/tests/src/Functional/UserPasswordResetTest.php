@@ -28,7 +28,7 @@ class UserPasswordResetTest extends BrowserTestBase {
   /**
    * The user object to test password resetting.
    *
-   * @var \Drupal\user\UserInterface
+   * @var UserInterface
    */
   protected $account;
 

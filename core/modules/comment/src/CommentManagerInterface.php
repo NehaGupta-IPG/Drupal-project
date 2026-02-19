@@ -49,7 +49,7 @@ interface CommentManagerInterface {
    * prompts the anonymous user to log in (or register, if applicable) that
    * redirects to entity comment form. Otherwise, no message is returned.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to which comments are attached to.
    * @param string $field_name
    *   The field name on the entity to which comments are attached to.

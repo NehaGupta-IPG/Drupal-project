@@ -39,21 +39,21 @@ class AccessManagerTest extends UnitTestCase {
   /**
    * The dependency injection container.
    *
-   * @var \Symfony\Component\DependencyInjection\ContainerBuilder
+   * @var ContainerBuilder
    */
   protected $container;
 
   /**
    * The collection of routes, which are tested.
    *
-   * @var \Symfony\Component\Routing\RouteCollection
+   * @var RouteCollection
    */
   protected $routeCollection;
 
   /**
    * The access manager to test.
    *
-   * @var \Drupal\Core\Access\AccessManager
+   * @var AccessManager
    */
   protected $accessManager;
 
@@ -83,7 +83,7 @@ class AccessManagerTest extends UnitTestCase {
   protected AccountInterface&MockObject $currentUser;
 
   /**
-   * @var \Drupal\Core\Access\CheckProvider
+   * @var CheckProvider
    */
   protected $checkProvider;
 

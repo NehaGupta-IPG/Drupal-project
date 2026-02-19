@@ -31,42 +31,42 @@ class MenuActiveTrailTest extends UnitTestCase {
   /**
    * The tested active menu trail service.
    *
-   * @var \Drupal\Core\Menu\MenuActiveTrail
+   * @var MenuActiveTrail
    */
   protected $menuActiveTrail;
 
   /**
    * The test request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * The current route match service.
    *
-   * @var \Drupal\Core\Routing\CurrentRouteMatch
+   * @var CurrentRouteMatch
    */
   protected $currentRouteMatch;
 
   /**
    * The mocked menu link manager.
    *
-   * @var \Drupal\Core\Menu\MenuLinkManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Menu\MenuLinkManagerInterface|MockObject
    */
   protected $menuLinkManager;
 
   /**
    * The mocked cache backend.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Cache\CacheBackendInterface|MockObject
    */
   protected $cache;
 
   /**
    * The mocked lock.
    *
-   * @var \Drupal\Core\Lock\LockBackendInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Lock\LockBackendInterface|MockObject
    */
   protected $lock;
 
@@ -79,7 +79,7 @@ class MenuActiveTrailTest extends UnitTestCase {
   /**
    * The mocked cache tags invalidator.
    *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var CacheTagsInvalidatorInterface|MockObject
    */
   protected CacheTagsInvalidatorInterface|MockObject $cacheTagsInvalidator;
 
@@ -284,9 +284,9 @@ class MenuActiveTrailTest extends UnitTestCase {
    */
   public function testGetCid(): void {
     $data = $this->provider()[1];
-    /** @var \Symfony\Component\HttpFoundation\Request $request */
+    /** @var Request $request */
     $request = $data[0];
-    /** @var \Symfony\Component\Routing\Route $route */
+    /** @var Route $route */
     $route = $request->attributes->get(RouteObjectInterface::ROUTE_OBJECT);
     $route->setPath('/test/{b}/{a}');
     $request->attributes->get('_raw_variables')->add(['b' => 1, 'a' => 0]);

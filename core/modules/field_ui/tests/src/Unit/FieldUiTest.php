@@ -20,7 +20,7 @@ class FieldUiTest extends UnitTestCase {
   /**
    * The path validator.
    *
-   * @var \Drupal\Core\Path\PathValidatorInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Path\PathValidatorInterface|MockObject
    */
   protected $pathValidator;
 

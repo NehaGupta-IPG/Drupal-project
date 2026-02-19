@@ -18,7 +18,7 @@ trait PrecedingConstraintAwareValidatorTrait {
   /**
    * Checks whether any preceding constraints have been violated.
    *
-   * @param \Symfony\Component\Validator\Constraint $current_constraint
+   * @param Constraint $current_constraint
    *   The constraint currently being validated.
    *
    * @return bool
@@ -39,7 +39,7 @@ trait PrecedingConstraintAwareValidatorTrait {
   /**
    * Gets the constraints preceding the given constraint in the current context.
    *
-   * @param \Symfony\Component\Validator\Constraint $needle
+   * @param Constraint $needle
    *   The constraint to find the preceding constraints for.
    *
    * @return iterable

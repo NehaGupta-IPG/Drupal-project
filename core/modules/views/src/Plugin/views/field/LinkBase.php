@@ -25,7 +25,7 @@ abstract class LinkBase extends FieldPluginBase {
   /**
    * The access manager service.
    *
-   * @var \Drupal\Core\Access\AccessManagerInterface
+   * @var AccessManagerInterface
    */
   protected $accessManager;
 
@@ -39,21 +39,21 @@ abstract class LinkBase extends FieldPluginBase {
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity repository.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   * @var EntityRepositoryInterface
    */
   protected $entityRepository;
 
@@ -66,13 +66,13 @@ abstract class LinkBase extends FieldPluginBase {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
+   * @param AccessManagerInterface $access_manager
    *   The access manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, AccessManagerInterface $access_manager, EntityTypeManagerInterface $entity_type_manager, EntityRepositoryInterface $entity_repository, LanguageManagerInterface $language_manager) {
@@ -159,7 +159,7 @@ abstract class LinkBase extends FieldPluginBase {
   /**
    * Checks access to the link route.
    *
-   * @param \Drupal\views\ResultRow $row
+   * @param ResultRow $row
    *   A view result row.
    *
    * @return \Drupal\Core\Access\AccessResultInterface|null
@@ -174,7 +174,7 @@ abstract class LinkBase extends FieldPluginBase {
   /**
    * Returns the URI elements of the link.
    *
-   * @param \Drupal\views\ResultRow $row
+   * @param ResultRow $row
    *   A view result row.
    *
    * @return \Drupal\Core\Url|null
@@ -185,7 +185,7 @@ abstract class LinkBase extends FieldPluginBase {
   /**
    * Prepares the link to view an entity.
    *
-   * @param \Drupal\views\ResultRow $row
+   * @param ResultRow $row
    *   A view result row.
    *
    * @return string
@@ -202,7 +202,7 @@ abstract class LinkBase extends FieldPluginBase {
   /**
    * Adds language information to the options.
    *
-   * @param \Drupal\views\ResultRow $row
+   * @param ResultRow $row
    *   A view result row.
    */
   protected function addLangcode(ResultRow $row) {

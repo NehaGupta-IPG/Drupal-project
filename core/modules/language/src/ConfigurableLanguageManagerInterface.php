@@ -18,7 +18,7 @@ interface ConfigurableLanguageManagerInterface extends LanguageManagerInterface 
   /**
    * Returns the language negotiator.
    *
-   * @return \Drupal\language\LanguageNegotiatorInterface
+   * @return LanguageNegotiatorInterface
    *   The language negotiator.
    */
   public function getNegotiator();
@@ -26,7 +26,7 @@ interface ConfigurableLanguageManagerInterface extends LanguageManagerInterface 
   /**
    * Injects the language negotiator.
    *
-   * @param \Drupal\language\LanguageNegotiatorInterface $negotiator
+   * @param LanguageNegotiatorInterface $negotiator
    *   The language negotiator.
    */
   public function setNegotiator(LanguageNegotiatorInterface $negotiator);

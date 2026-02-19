@@ -23,9 +23,9 @@ interface EntityStorageSchemaInterface extends EntityTypeListenerInterface {
   /**
    * Checks if the changes to the entity type requires storage schema changes.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The updated entity type definition.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $original
+   * @param EntityTypeInterface $original
    *   The original entity type definition.
    *
    * @return bool
@@ -57,9 +57,9 @@ interface EntityStorageSchemaInterface extends EntityTypeListenerInterface {
    * perform an automated update, and will instead need to perform a site
    * migration or invoke some custom update process.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The updated entity type definition.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $original
+   * @param EntityTypeInterface $original
    *   The original entity type definition.
    *
    * @return bool

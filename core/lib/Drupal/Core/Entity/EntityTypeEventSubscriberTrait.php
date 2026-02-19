@@ -32,7 +32,7 @@ trait EntityTypeEventSubscriberTrait {
   /**
    * Listener method for any entity type definition event.
    *
-   * @param \Drupal\Core\Entity\EntityTypeEvent $event
+   * @param EntityTypeEvent $event
    *   The field storage definition event object.
    * @param string $event_name
    *   The event name.

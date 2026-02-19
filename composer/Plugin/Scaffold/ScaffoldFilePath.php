@@ -150,7 +150,7 @@ class ScaffoldFilePath {
    *   The name of the package defining the destination path.
    * @param string $destination
    *   The relative path to the destination file being scaffolded.
-   * @param \Drupal\Composer\Plugin\Scaffold\Interpolator $location_replacements
+   * @param Interpolator $location_replacements
    *   Interpolator that includes the [web-root] and any other available
    *   placeholder replacements.
    *
@@ -165,7 +165,7 @@ class ScaffoldFilePath {
   /**
    * Adds data about the relative and full path to the provided interpolator.
    *
-   * @param \Drupal\Composer\Plugin\Scaffold\Interpolator $interpolator
+   * @param Interpolator $interpolator
    *   Interpolator to add data to.
    * @param string $name_prefix
    *   (optional) Prefix to add before -rel-path and -full-path item names.
@@ -190,7 +190,7 @@ class ScaffoldFilePath {
    *   (optional) Prefix to add before -rel-path and -full-path item names.
    *   Defaults to path type provided when constructing this object.
    *
-   * @return \Drupal\Composer\Plugin\Scaffold\Interpolator
+   * @return Interpolator
    *   An interpolator for making string replacements.
    */
   public function getInterpolator($name_prefix = '') {

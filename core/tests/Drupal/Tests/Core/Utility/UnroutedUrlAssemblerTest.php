@@ -25,28 +25,28 @@ class UnroutedUrlAssemblerTest extends UnitTestCase {
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * The mocked config factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Config\ConfigFactoryInterface|MockObject
    */
   protected $configFactory;
 
   /**
    * The tested unrouted URL assembler.
    *
-   * @var \Drupal\Core\Utility\UnroutedUrlAssembler
+   * @var UnroutedUrlAssembler
    */
   protected $unroutedUrlAssembler;
 
   /**
    * The mocked outbound path processor.
    *
-   * @var \Drupal\Core\PathProcessor\OutboundPathProcessorInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\PathProcessor\OutboundPathProcessorInterface|MockObject
    */
   protected $pathProcessor;
 

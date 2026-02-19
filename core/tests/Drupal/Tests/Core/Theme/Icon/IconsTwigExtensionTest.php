@@ -19,7 +19,7 @@ class IconsTwigExtensionTest extends TestCase {
   /**
    * The twig extension.
    *
-   * @var \Drupal\Core\Template\IconsTwigExtension
+   * @var IconsTwigExtension
    */
   private IconsTwigExtension $iconsTwigExtension;
 

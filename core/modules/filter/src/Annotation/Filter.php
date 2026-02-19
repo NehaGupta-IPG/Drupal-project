@@ -7,7 +7,7 @@ use Drupal\Component\Annotation\Plugin;
 /**
  * Defines a filter annotation object.
  *
- * Plugin Namespace: Plugin\Filter
+ * Plugin Namespace: Plugin\Filter.
  *
  * For a working example, see \Drupal\filter\Plugin\Filter\FilterHtml
  *

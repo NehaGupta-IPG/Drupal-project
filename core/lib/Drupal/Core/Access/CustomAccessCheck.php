@@ -24,9 +24,9 @@ class CustomAccessCheck implements RoutingAccessInterface {
   /**
    * Constructs a CustomAccessCheck instance.
    *
-   * @param \Drupal\Core\Utility\CallableResolver $callableResolver
+   * @param CallableResolver $callableResolver
    *   The callable resolver.
-   * @param \Drupal\Core\Access\AccessArgumentsResolverFactoryInterface $argumentsResolverFactory
+   * @param AccessArgumentsResolverFactoryInterface $argumentsResolverFactory
    *   The arguments resolver factory.
    */
   public function __construct(
@@ -38,17 +38,17 @@ class CustomAccessCheck implements RoutingAccessInterface {
   /**
    * Checks access for the account and route using the custom access checker.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match object to be checked.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The account being checked.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   Optional, a request. Only supply this parameter when checking the
    *   incoming request.
    *
-   * @return \Drupal\Core\Access\AccessResultInterface
+   * @return AccessResultInterface
    *   The access result.
    */
   public function access(Route $route, RouteMatchInterface $route_match, AccountInterface $account, ?Request $request = NULL) {

@@ -10,7 +10,7 @@ interface RollbackAwareInterface {
   /**
    * Performs pre-rollback tasks.
    *
-   * @param \Drupal\migrate\Event\MigrateRollbackEvent $event
+   * @param MigrateRollbackEvent $event
    *   The pre-rollback event object.
    */
   public function preRollback(MigrateRollbackEvent $event);
@@ -18,7 +18,7 @@ interface RollbackAwareInterface {
   /**
    * Performs post-rollback tasks.
    *
-   * @param \Drupal\migrate\Event\MigrateRollbackEvent $event
+   * @param MigrateRollbackEvent $event
    *   The post-rollback event object.
    */
   public function postRollback(MigrateRollbackEvent $event);

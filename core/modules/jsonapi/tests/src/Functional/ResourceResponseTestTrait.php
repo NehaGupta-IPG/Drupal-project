@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\jsonapi\Functional;
 
-use Drupal\jsonapi\JsonApiSpec;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Access\AccessResultInterface;
@@ -15,6 +14,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Url;
 use Drupal\jsonapi\CacheableResourceResponse;
+use Drupal\jsonapi\JsonApiSpec;
 use Drupal\jsonapi\Normalizer\HttpExceptionNormalizer;
 use Psr\Http\Message\ResponseInterface;
 
@@ -32,7 +32,7 @@ trait ResourceResponseTestTrait {
    * objects. Not necessarily to a response to a collection route. In both
    * cases, the document should indistinguishable.
    *
-   * @param \Drupal\jsonapi\ResourceResponse[] $responses
+   * @param ResourceResponse[] $responses
    *   An array or ResourceResponses to be merged.
    * @param string|null $self_link
    *   The self link for the merged document if one should be set.
@@ -41,7 +41,7 @@ trait ResourceResponseTestTrait {
    *   be deduced from the number of responses, because a multiple cardinality
    *   field may have only one value.
    *
-   * @return \Drupal\jsonapi\CacheableResourceResponse
+   * @return CacheableResourceResponse
    *   The merged ResourceResponse.
    */
   protected static function toCollectionResourceResponse(array $responses, $self_link, $is_multiple) {
@@ -126,7 +126,7 @@ trait ResourceResponseTestTrait {
     $resource_type = $this->resourceType;
     $resource_data = array_reduce($include_paths, function ($data, $path) use ($request_options, $resource_type) {
       $field_names = explode('.', $path);
-      /** @var \Drupal\Core\Entity\EntityInterface $entity */
+      /** @var EntityInterface $entity */
       $entity = $this->entity;
       $collected_responses = [];
       foreach ($field_names as $public_field_name) {
@@ -213,7 +213,7 @@ trait ResourceResponseTestTrait {
   /**
    * Maps an array of PSR responses to JSON:API ResourceResponses.
    *
-   * @param \Psr\Http\Message\ResponseInterface[] $responses
+   * @param ResponseInterface[] $responses
    *   The PSR responses to be mapped.
    *
    * @return \Drupal\jsonapi\ResourceResponse[]
@@ -230,10 +230,10 @@ trait ResourceResponseTestTrait {
    * cacheable responses and to have easier access to the JSON:API document as
    * an array instead of a string.
    *
-   * @param \Psr\Http\Message\ResponseInterface $response
+   * @param ResponseInterface $response
    *   A PSR response to be mapped.
    *
-   * @return \Drupal\jsonapi\CacheableResourceResponse
+   * @return CacheableResourceResponse
    *   The ResourceResponse.
    */
   protected static function toResourceResponse(ResponseInterface $response) {
@@ -255,7 +255,7 @@ trait ResourceResponseTestTrait {
   /**
    * Maps an entity to a resource identifier.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to map to a resource identifier.
    *
    * @return array
@@ -425,7 +425,7 @@ trait ResourceResponseTestTrait {
    *   The list of relationship field names for which to get responses.
    * @param array $request_options
    *   Request options to apply.
-   * @param \Drupal\Core\Entity\EntityInterface|null $entity
+   * @param EntityInterface|null $entity
    *   (optional) The entity for which to get expected related responses.
    *
    * @return array
@@ -484,11 +484,11 @@ trait ResourceResponseTestTrait {
   /**
    * Gets a generic forbidden response.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity for which to generate the forbidden response.
-   * @param \Drupal\Core\Access\AccessResultInterface $access
+   * @param AccessResultInterface $access
    *   The denied AccessResult. This can carry a reason and cacheability data.
-   * @param \Drupal\Core\Url $via_link
+   * @param Url $via_link
    *   The source URL for the errors of the response.
    * @param string|null $relationship_field_name
    *   (optional) The field name to which the forbidden result applies. Useful
@@ -499,7 +499,7 @@ trait ResourceResponseTestTrait {
    *   (optional) Document pointer for the JSON:API error object. FALSE to omit
    *   the pointer.
    *
-   * @return \Drupal\jsonapi\CacheableResourceResponse
+   * @return CacheableResourceResponse
    *   The forbidden ResourceResponse.
    */
   protected static function getAccessDeniedResponse(EntityInterface $entity, AccessResultInterface $access, Url $via_link, $relationship_field_name = NULL, $detail = NULL, $pointer = NULL) {
@@ -541,7 +541,7 @@ trait ResourceResponseTestTrait {
    * @param string $self_link
    *   The self link for collection ResourceResponse.
    *
-   * @return \Drupal\jsonapi\CacheableResourceResponse
+   * @return CacheableResourceResponse
    *   The empty collection ResourceResponse.
    */
   protected function getEmptyCollectionResponse($cardinality, $self_link) {

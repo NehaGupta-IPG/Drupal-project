@@ -23,25 +23,25 @@ final class ConfigImporterFactory {
   /**
    * Creates a ConfigImporterFactory instance.
    *
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
+   * @param EventDispatcherInterface $eventDispatcher
    *   The event dispatcher service.
-   * @param \Drupal\Core\Config\ConfigManagerInterface $configManager
+   * @param ConfigManagerInterface $configManager
    *   The config manager.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
+   * @param LockBackendInterface $lock
    *   The lock backend to prevent multiple imports occurring at the same time.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
+   * @param TypedConfigManagerInterface $typedConfigManager
    *   The typed config manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   * @param ModuleHandlerInterface $moduleHandler
    *   The module handler.
-   * @param \Drupal\Core\Extension\ModuleInstallerInterface $moduleInstaller
+   * @param ModuleInstallerInterface $moduleInstaller
    *   The module installer service.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler
+   * @param ThemeHandlerInterface $themeHandler
    *   The theme handler service.
-   * @param \Drupal\Core\StringTranslation\TranslationManager $stringTranslation
+   * @param TranslationManager $stringTranslation
    *   The string translation service.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
+   * @param ModuleExtensionList $moduleExtensionList
    *   The module extension list service.
-   * @param \Drupal\Core\Extension\ThemeExtensionList $themeExtensionList
+   * @param ThemeExtensionList $themeExtensionList
    *   The theme extension list service.
    */
   public function __construct(
@@ -61,12 +61,12 @@ final class ConfigImporterFactory {
   /**
    * Creates a ConfigImporter instance.
    *
-   * @param \Drupal\Core\Config\StorageComparer $storage_comparer
+   * @param StorageComparer $storage_comparer
    *   The storage comparer object. The type is the class and not
    *   StorageComparerInterface because that is due to be removed: see
    *   https://www.drupal.org/project/drupal/issues/3410037.
    *
-   * @return \Drupal\Core\Config\ConfigImporter
+   * @return ConfigImporter
    *   A config importer instance.
    */
   public function get(StorageComparer $storage_comparer): ConfigImporter {

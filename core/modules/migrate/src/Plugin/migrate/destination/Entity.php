@@ -73,7 +73,7 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
   /**
    * The entity storage.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var EntityStorageInterface
    */
   protected $storage;
 
@@ -98,9 +98,9 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The storage for this entity type.
    * @param array $bundles
    *   The list of bundles this entity type has.
@@ -134,7 +134,7 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
   /**
    * Gets the bundle for the row taking into account the default.
    *
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The current row we're importing.
    *
    * @return string
@@ -156,12 +156,12 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
   /**
    * Creates or loads an entity.
    *
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The row object.
    * @param array $old_destination_id_values
    *   The old destination IDs.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The entity we are importing into.
    */
   protected function getEntity(Row $row, array $old_destination_id_values) {
@@ -191,12 +191,12 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
    *
    * This method should be implemented in extending classes.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to update.
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The row object to update from.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   An updated entity from row values.
    *
    * @throws \LogicException
@@ -210,7 +210,7 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
    *
    * This method can be implemented in extending classes when needed.
    *
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The row of data.
    */
   protected function processStubRow(Row $row) {}
@@ -218,7 +218,7 @@ abstract class Entity extends DestinationBase implements ContainerFactoryPluginI
   /**
    * Gets the entity ID of the row.
    *
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The row of data.
    *
    * @return string

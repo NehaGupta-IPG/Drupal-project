@@ -16,14 +16,14 @@ class ShortcutSetController extends ControllerBase {
   /**
    * The path validator.
    *
-   * @var \Drupal\Core\Path\PathValidatorInterface
+   * @var PathValidatorInterface
    */
   protected $pathValidator;
 
   /**
    * Creates a new ShortcutSetController instance.
    *
-   * @param \Drupal\Core\Path\PathValidatorInterface $path_validator
+   * @param PathValidatorInterface $path_validator
    *   The path validator.
    */
   public function __construct(PathValidatorInterface $path_validator) {
@@ -33,15 +33,15 @@ class ShortcutSetController extends ControllerBase {
   /**
    * Creates a new link in the provided shortcut set.
    *
-   * @param \Drupal\shortcut\ShortcutSetInterface $shortcut_set
+   * @param ShortcutSetInterface $shortcut_set
    *   The shortcut set to add a link to.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    *   A redirect response to the front page, or the previous location.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   * @throws AccessDeniedHttpException
    */
   public function addShortcutLinkInline(ShortcutSetInterface $shortcut_set, Request $request) {
     $link = $request->query->get('link');

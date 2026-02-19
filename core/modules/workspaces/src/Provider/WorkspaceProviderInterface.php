@@ -28,15 +28,15 @@ interface WorkspaceProviderInterface {
    * It is strongly recommended to inherit this method from the base provider
    * class, and call the parent method before or after any custom logic.
    *
-   * @param \Drupal\workspaces\WorkspaceInterface $workspace
+   * @param WorkspaceInterface $workspace
    *   The workspace for which to check access.
    * @param string $operation
    *   The entity operation. Usually one of 'view', 'view label', 'update' or
    *   'delete'.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user session for which to check access.
    *
-   * @return \Drupal\Core\Access\AccessResultInterface
+   * @return AccessResultInterface
    *   The access result.
    */
   public function checkAccess(WorkspaceInterface $workspace, string $operation, AccountInterface $account): AccessResultInterface;
@@ -44,7 +44,7 @@ interface WorkspaceProviderInterface {
   /**
    * Acts before an entity is created.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity being created.
    */
   public function entityCreate(EntityInterface $entity): void;
@@ -65,7 +65,7 @@ interface WorkspaceProviderInterface {
   /**
    * Acts before an entity is saved.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity being saved.
    *
    * @throws \RuntimeException
@@ -76,7 +76,7 @@ interface WorkspaceProviderInterface {
   /**
    * Acts after an entity has been added.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity that was inserted.
    */
   public function entityInsert(EntityInterface $entity): void;
@@ -84,7 +84,7 @@ interface WorkspaceProviderInterface {
   /**
    * Acts after an entity has been updated.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity that was updated.
    */
   public function entityUpdate(EntityInterface $entity): void;
@@ -92,7 +92,7 @@ interface WorkspaceProviderInterface {
   /**
    * Acts after an entity translation has been added.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $translation
+   * @param EntityInterface $translation
    *   The entity translation that was inserted.
    */
   public function entityTranslationInsert(EntityInterface $translation): void;
@@ -100,7 +100,7 @@ interface WorkspaceProviderInterface {
   /**
    * Acts before an entity is deleted.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity being deleted.
    *
    * @throws \RuntimeException
@@ -111,7 +111,7 @@ interface WorkspaceProviderInterface {
   /**
    * Acts after an entity has been deleted.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity that was deleted.
    */
   public function entityDelete(EntityInterface $entity): void;
@@ -119,7 +119,7 @@ interface WorkspaceProviderInterface {
   /**
    * Acts after an entity revision has been deleted.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity revision that was deleted.
    */
   public function entityRevisionDelete(EntityInterface $entity): void;

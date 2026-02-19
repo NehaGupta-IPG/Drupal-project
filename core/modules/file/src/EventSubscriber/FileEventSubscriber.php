@@ -4,9 +4,9 @@ namespace Drupal\file\EventSubscriber;
 
 use Drupal\Component\Transliteration\TransliterationInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\File\Event\FileUploadSanitizeNameEvent;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\File\Event\FileUploadSanitizeNameEvent;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -20,11 +20,11 @@ class FileEventSubscriber implements EventSubscriberInterface {
   /**
    * Constructs a new file event listener.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   * @param ConfigFactoryInterface $configFactory
    *   The config factory.
-   * @param \Drupal\Component\Transliteration\TransliterationInterface $transliteration
+   * @param TransliterationInterface $transliteration
    *   The transliteration service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   * @param LanguageManagerInterface $languageManager
    *   The language manager.
    */
   public function __construct(
@@ -46,7 +46,7 @@ class FileEventSubscriber implements EventSubscriberInterface {
   /**
    * Sanitizes the filename of a file being uploaded.
    *
-   * @param \Drupal\Core\File\Event\FileUploadSanitizeNameEvent $event
+   * @param FileUploadSanitizeNameEvent $event
    *   File upload sanitize name event.
    *
    * @see file_form_system_file_system_settings_alter()

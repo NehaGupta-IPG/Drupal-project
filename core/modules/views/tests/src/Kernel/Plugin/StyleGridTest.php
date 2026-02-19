@@ -49,7 +49,7 @@ class StyleGridTest extends PluginKernelTestBase {
   /**
    * Generates a grid and asserts that it is displaying correctly.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The executable to prepare.
    * @param string $alignment
    *   The alignment of the grid to test.

@@ -14,23 +14,23 @@ class LayoutBuilderSampleEntityGenerator implements SampleEntityGeneratorInterfa
   /**
    * The shared tempstore factory.
    *
-   * @var \Drupal\Core\TempStore\SharedTempStoreFactory
+   * @var SharedTempStoreFactory
    */
   protected $tempStoreFactory;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * LayoutBuilderSampleEntityGenerator constructor.
    *
-   * @param \Drupal\Core\TempStore\SharedTempStoreFactory $temp_store_factory
+   * @param SharedTempStoreFactory $temp_store_factory
    *   The tempstore factory.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(SharedTempStoreFactory $temp_store_factory, EntityTypeManagerInterface $entity_type_manager) {

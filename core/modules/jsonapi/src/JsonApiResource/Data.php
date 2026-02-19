@@ -8,7 +8,7 @@ use Drupal\jsonapi\Exception\EntityAccessDeniedHttpException;
 /**
  * Represents the `data` and `included` objects of a top-level object.
  *
- * @implements \IteratorAggregate<int, \Drupal\jsonapi\JsonApiResource\ResourceIdentifierInterface>
+ * @implements \IteratorAggregate<int, ResourceIdentifierInterface>
  *
  * @internal JSON:API maintains no PHP API. The API is the HTTP API. This class
  *   may change at any time and could break any dependencies on it.
@@ -21,7 +21,7 @@ abstract class Data implements \IteratorAggregate, \Countable {
   /**
    * Various representations of JSON:API objects.
    *
-   * @var list<\Drupal\jsonapi\JsonApiResource\ResourceIdentifierInterface>
+   * @var list<ResourceIdentifierInterface>
    */
   protected $data;
 
@@ -49,7 +49,7 @@ abstract class Data implements \IteratorAggregate, \Countable {
   /**
    * Instantiates a Data object.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceIdentifierInterface[] $data
+   * @param ResourceIdentifierInterface[] $data
    *   The resources or resource identifiers for the collection.
    * @param int $cardinality
    *   The number of resources that this collection may contain. Related
@@ -68,7 +68,7 @@ abstract class Data implements \IteratorAggregate, \Countable {
   /**
    * Returns an iterator for entities.
    *
-   * @return \ArrayIterator<int, \Drupal\jsonapi\JsonApiResource\ResourceIdentifierInterface>
+   * @return \ArrayIterator<int, ResourceIdentifierInterface>
    *   An \ArrayIterator instance.
    */
   public function getIterator(): \ArrayIterator {
@@ -102,7 +102,7 @@ abstract class Data implements \IteratorAggregate, \Countable {
   /**
    * Returns the collection as an array.
    *
-   * @return \Drupal\jsonapi\JsonApiResource\ResourceIdentifierInterface[]
+   * @return ResourceIdentifierInterface[]
    *   Array of contained data.
    */
   public function toArray() {
@@ -145,9 +145,9 @@ abstract class Data implements \IteratorAggregate, \Countable {
   /**
    * Returns a new Data object containing the entities of $this and $other.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\Data $a
+   * @param Data $a
    *   A Data object to be merged.
-   * @param \Drupal\jsonapi\JsonApiResource\Data $b
+   * @param Data $b
    *   A Data object to be merged.
    *
    * @return static
@@ -160,7 +160,7 @@ abstract class Data implements \IteratorAggregate, \Countable {
   /**
    * Returns a new, deduplicated Data object.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\Data $collection
+   * @param Data $collection
    *   The Data object to deduplicate.
    *
    * @return static

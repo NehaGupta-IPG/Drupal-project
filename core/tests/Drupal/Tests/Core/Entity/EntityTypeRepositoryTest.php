@@ -28,21 +28,21 @@ class EntityTypeRepositoryTest extends UnitTestCase {
   /**
    * The entity type repository under test.
    *
-   * @var \Drupal\Core\Entity\EntityTypeRepository
+   * @var EntityTypeRepository
    */
   protected $entityTypeRepository;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var EntityTypeManagerInterface|ProphecyInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity type bundle info service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var EntityTypeBundleInfoInterface|ProphecyInterface
    */
   protected $entityTypeBundleInfo;
 
@@ -61,7 +61,7 @@ class EntityTypeRepositoryTest extends UnitTestCase {
   /**
    * Sets up the entity type manager to be tested.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface[]|\Prophecy\Prophecy\ProphecyInterface[] $definitions
+   * @param EntityTypeInterface[]|ProphecyInterface[] $definitions
    *   (optional) An array of entity type definitions.
    */
   protected function setUpEntityTypeDefinitions($definitions = []): void {

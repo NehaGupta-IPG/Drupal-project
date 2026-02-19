@@ -22,7 +22,7 @@ interface ImageEffectInterface extends PluginInspectionInterface, ConfigurableIn
   /**
    * Applies an image effect to the image object.
    *
-   * @param \Drupal\Core\Image\ImageInterface $image
+   * @param ImageInterface $image
    *   An image file object.
    *
    * @return bool

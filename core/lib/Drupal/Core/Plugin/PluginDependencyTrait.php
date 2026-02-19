@@ -24,7 +24,7 @@ trait PluginDependencyTrait {
    * method, if it implements
    * \Drupal\Component\Plugin\DependentPluginInterface.
    *
-   * @param \Drupal\Component\Plugin\PluginInspectionInterface $instance
+   * @param PluginInspectionInterface $instance
    *   The plugin instance.
    *
    * @return array
@@ -82,7 +82,7 @@ trait PluginDependencyTrait {
    * method, if it implements
    * \Drupal\Component\Plugin\DependentPluginInterface.
    *
-   * @param \Drupal\Component\Plugin\PluginInspectionInterface $instance
+   * @param PluginInspectionInterface $instance
    *   The plugin instance.
    */
   protected function calculatePluginDependencies(PluginInspectionInterface $instance) {

@@ -37,7 +37,7 @@ trait DiscoveryTrait {
    *   A plugin definition, or NULL if the plugin ID is invalid and
    *   $exception_on_invalid is TRUE.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws PluginNotFoundException
    *   Thrown if $plugin_id is invalid and $exception_on_invalid is TRUE.
    */
   protected function doGetDefinition(array $definitions, $plugin_id, $exception_on_invalid) {

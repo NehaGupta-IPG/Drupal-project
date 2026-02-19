@@ -12,6 +12,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\MissingDependencyException;
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\Session\UserSession;
 use Drupal\Core\Site\Settings;
@@ -20,11 +21,10 @@ use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Tests\SessionTestTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Yaml\Yaml as SymfonyYaml;
-use Drupal\Core\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Yaml\Yaml as SymfonyYaml;
 
 /**
  * Defines a trait for shared functional test setup functionality.
@@ -279,7 +279,7 @@ trait FunctionalTestSetupTrait {
    * @param array $override_server_vars
    *   An array of server variables to override.
    *
-   * @return \Symfony\Component\HttpFoundation\Request
+   * @return Request
    *   The mocked request object.
    */
   protected function prepareRequestForGenerator($clean_urls = TRUE, $override_server_vars = []) {
@@ -348,7 +348,7 @@ trait FunctionalTestSetupTrait {
   /**
    * Initialize various configurations post-installation.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @param ContainerInterface $container
    *   The container.
    */
   protected function initConfig(ContainerInterface $container) {
@@ -418,10 +418,10 @@ trait FunctionalTestSetupTrait {
   /**
    * Initializes the kernel after installation.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   Request object.
    *
-   * @return \Symfony\Component\DependencyInjection\ContainerInterface
+   * @return ContainerInterface
    *   The container.
    */
   protected function initKernel(Request $request) {
@@ -437,13 +437,13 @@ trait FunctionalTestSetupTrait {
   /**
    * Installs the default theme defined by `static::$defaultTheme` when needed.
    *
-   * To install a test theme outside of the testing environment, add
+   * To install a test theme outside of the testing environment, add.
    * @code
    * $settings['extension_discovery_scan_tests'] = TRUE;
    * @endcode
    * to your settings.php.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @param ContainerInterface $container
    *   The container.
    *
    * @throws \Exception
@@ -487,13 +487,13 @@ trait FunctionalTestSetupTrait {
   /**
    * Install modules defined by `static::$modules`.
    *
-   * To install test modules outside of the testing environment, add
+   * To install test modules outside of the testing environment, add.
    * @code
    * $settings['extension_discovery_scan_tests'] = TRUE;
    * @endcode
    * to your settings.php.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @param ContainerInterface $container
    *   The container.
    */
   protected function installModulesFromClassProperty(ContainerInterface $container) {

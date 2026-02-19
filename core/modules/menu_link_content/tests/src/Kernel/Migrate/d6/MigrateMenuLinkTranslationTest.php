@@ -49,7 +49,7 @@ class MigrateMenuLinkTranslationTest extends MigrateDrupal6TestBase {
    * Tests migration of menu links.
    */
   public function testMenuLinks(): void {
-    /** @var \Drupal\menu_link_content\Entity\MenuLinkContent $menu_link */
+    /** @var MenuLinkContent $menu_link */
     $menu_link = MenuLinkContent::load(139)->getTranslation('fr');
     $this->assertInstanceOf(MenuLinkContent::class, $menu_link);
     $this->assertSame('fr - Test 2', $menu_link->getTitle());

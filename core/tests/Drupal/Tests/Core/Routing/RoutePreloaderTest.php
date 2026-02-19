@@ -23,21 +23,21 @@ class RoutePreloaderTest extends UnitTestCase {
   /**
    * The mocked preloadable route provider.
    *
-   * @var \Drupal\Core\Routing\PreloadableRouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Routing\PreloadableRouteProviderInterface|MockObject
    */
   protected $routeProvider;
 
   /**
    * The mocked state.
    *
-   * @var \Drupal\Core\State\StateInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\State\StateInterface|MockObject
    */
   protected $state;
 
   /**
    * The tested preloader.
    *
-   * @var \Drupal\Core\Routing\RoutePreloader
+   * @var RoutePreloader
    */
   protected $preloader;
 

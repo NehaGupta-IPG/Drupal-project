@@ -35,9 +35,9 @@ final class PageActions extends TopBarItemBase implements ContainerFactoryPlugin
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\navigation\NavigationRenderer $navigationRenderer
+   * @param NavigationRenderer $navigationRenderer
    *   The navigation renderer.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
+   * @param RouteMatchInterface $routeMatch
    *   The route match.
    */
   public function __construct(

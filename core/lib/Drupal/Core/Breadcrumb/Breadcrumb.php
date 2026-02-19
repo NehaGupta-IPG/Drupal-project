@@ -17,14 +17,14 @@ class Breadcrumb implements RenderableInterface, RefinableCacheableDependencyInt
   /**
    * An ordered list of links for the breadcrumb.
    *
-   * @var \Drupal\Core\Link[]
+   * @var Link[]
    */
   protected $links = [];
 
   /**
    * Gets the breadcrumb links.
    *
-   * @return \Drupal\Core\Link[]
+   * @return Link[]
    *   An ordered list of the links for the breadcrumb.
    */
   public function getLinks() {
@@ -34,7 +34,7 @@ class Breadcrumb implements RenderableInterface, RefinableCacheableDependencyInt
   /**
    * Sets the breadcrumb links.
    *
-   * @param \Drupal\Core\Link[] $links
+   * @param Link[] $links
    *   The breadcrumb links.
    *
    * @return $this
@@ -55,7 +55,7 @@ class Breadcrumb implements RenderableInterface, RefinableCacheableDependencyInt
   /**
    * Appends a link to the end of the ordered list of breadcrumb links.
    *
-   * @param \Drupal\Core\Link $link
+   * @param Link $link
    *   The link appended to the breadcrumb.
    *
    * @return $this

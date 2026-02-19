@@ -49,14 +49,14 @@ final class NavigationSectionStorage extends PluginBase implements SectionStorag
   /**
    * The config factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected ConfigFactoryInterface $configFactory;
 
   /**
    * An array of sections.
    *
-   * @var \Drupal\layout_builder\Section[]|null
+   * @var Section[]|null
    */
   protected $sections;
 

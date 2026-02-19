@@ -481,7 +481,7 @@ class Ckeditor5Hooks {
    *
    * @param array $form
    *   The form render array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state object.
    */
   public function filterFormatEditFormSubmit(array $form, FormStateInterface $form_state): void {
@@ -526,10 +526,10 @@ class Ckeditor5Hooks {
    *
    * @param array $form
    *   The form render array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state interface.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   The Ajax response.
    */
   public function updateCkeditor5HtmlFilter(array $form, FormStateInterface $form_state): AjaxResponse {

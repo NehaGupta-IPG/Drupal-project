@@ -34,7 +34,7 @@ trait BlockCreationTrait {
    *   - theme: The default theme.
    *   - visibility: Empty array (block will be visible on all pages).
    *
-   * @return \Drupal\block\Entity\Block
+   * @return Block
    *   The block entity.
    *
    * @todo Add support for creating content block instances.

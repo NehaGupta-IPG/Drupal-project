@@ -25,7 +25,7 @@ class FieldMigration extends Migration implements ContainerFactoryPluginInterfac
   /**
    * The migration field discovery service.
    *
-   * @var \Drupal\migrate_drupal\FieldDiscoveryInterface
+   * @var FieldDiscoveryInterface
    */
   protected $fieldDiscovery;
 
@@ -38,17 +38,17 @@ class FieldMigration extends Migration implements ContainerFactoryPluginInterfac
    *   The plugin ID.
    * @param mixed $plugin_definition
    *   The plugin definition.
-   * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
+   * @param MigrationPluginManagerInterface $migration_plugin_manager
    *   The migration plugin manager.
-   * @param \Drupal\migrate\Plugin\MigratePluginManager $source_plugin_manager
+   * @param MigratePluginManager $source_plugin_manager
    *   The source migration plugin manager.
-   * @param \Drupal\migrate\Plugin\MigratePluginManager $process_plugin_manager
+   * @param MigratePluginManager $process_plugin_manager
    *   The process migration plugin manager.
-   * @param \Drupal\migrate\Plugin\MigrateDestinationPluginManager $destination_plugin_manager
+   * @param MigrateDestinationPluginManager $destination_plugin_manager
    *   The destination migration plugin manager.
-   * @param \Drupal\migrate\Plugin\MigratePluginManager $id_map_plugin_manager
+   * @param MigratePluginManager $id_map_plugin_manager
    *   The ID map migration plugin manager.
-   * @param \Drupal\migrate_drupal\FieldDiscoveryInterface $field_discovery
+   * @param FieldDiscoveryInterface $field_discovery
    *   The migration field discovery service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationPluginManagerInterface $migration_plugin_manager, MigratePluginManager $source_plugin_manager, MigratePluginManager $process_plugin_manager, MigrateDestinationPluginManager $destination_plugin_manager, MigratePluginManager $id_map_plugin_manager, FieldDiscoveryInterface $field_discovery) {

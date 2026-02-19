@@ -5,8 +5,8 @@ namespace Drupal\views_ui;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Base form for Views forms.
@@ -82,7 +82,7 @@ abstract class ViewFormBase extends EntityForm {
    * having them as secondary local tasks isn't desired. The caller is
    * responsible for setting the active tab's #active property to TRUE.
    *
-   * @param \Drupal\views_ui\ViewUI $view
+   * @param ViewUI $view
    *   The ViewUI entity.
    *
    * @return array

@@ -17,14 +17,14 @@ class FilterPermissions implements ContainerInjectionInterface {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * Constructs a new FilterPermissions instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
@@ -48,7 +48,7 @@ class FilterPermissions implements ContainerInjectionInterface {
     $permissions = [];
     // Generate permissions for each text format. Warn the administrator that
     // any of them are potentially unsafe.
-    /** @var \Drupal\filter\FilterFormatInterface[] $formats */
+    /** @var FilterFormatInterface[] $formats */
     $formats = $this->entityTypeManager->getStorage('filter_format')->loadByProperties(['status' => TRUE]);
     uasort($formats, 'Drupal\Core\Config\Entity\ConfigEntityBase::sort');
     foreach ($formats as $format) {

@@ -19,7 +19,7 @@ class LayoutBuilderController {
   /**
    * Provides a title callback.
    *
-   * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
+   * @param SectionStorageInterface $section_storage
    *   The section storage.
    *
    * @return string
@@ -33,7 +33,7 @@ class LayoutBuilderController {
   /**
    * Renders the Layout UI.
    *
-   * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
+   * @param SectionStorageInterface $section_storage
    *   The section storage.
    *
    * @return array

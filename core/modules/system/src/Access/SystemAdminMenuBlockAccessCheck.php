@@ -24,11 +24,11 @@ class SystemAdminMenuBlockAccessCheck implements AccessInterface {
   /**
    * Constructs a new SystemAdminMenuBlockAccessCheck.
    *
-   * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menuLinkTree
+   * @param MenuLinkTreeInterface $menuLinkTree
    *   The menu link tree service.
-   * @param \Drupal\Core\Routing\AccessAwareRouter $router
+   * @param AccessAwareRouter $router
    *   The router service.
-   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menuLinkManager
+   * @param MenuLinkManagerInterface $menuLinkManager
    *   The menu link manager service.
    */
   public function __construct(
@@ -41,12 +41,12 @@ class SystemAdminMenuBlockAccessCheck implements AccessInterface {
   /**
    * Checks access.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match object to be checked.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The current user.
    *
-   * @return \Drupal\Core\Access\AccessResultInterface
+   * @return AccessResultInterface
    *   The access result.
    */
   public function access(RouteMatchInterface $route_match, AccountInterface $account): AccessResultInterface {
@@ -78,12 +78,12 @@ class SystemAdminMenuBlockAccessCheck implements AccessInterface {
   /**
    * Check that the given route has access to child routes.
    *
-   * @param \Drupal\Core\Menu\MenuLinkInterface $link
+   * @param MenuLinkInterface $link
    *   The menu link.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The account.
    *
-   * @return \Drupal\Core\Access\AccessResultInterface
+   * @return AccessResultInterface
    *   The access result.
    */
   protected function hasAccessToChildMenuItems(MenuLinkInterface $link, AccountInterface $account): AccessResultInterface {

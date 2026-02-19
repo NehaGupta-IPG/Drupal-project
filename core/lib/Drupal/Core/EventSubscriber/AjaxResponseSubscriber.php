@@ -6,8 +6,8 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Ajax\AjaxResponse;
 use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -34,7 +34,7 @@ class AjaxResponseSubscriber implements EventSubscriberInterface {
   /**
    * Sets the AJAX parameter from the current request.
    *
-   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
+   * @param RequestEvent $event
    *   The response event, which contains the current request.
    */
   public function onRequest(RequestEvent $event) {
@@ -48,7 +48,7 @@ class AjaxResponseSubscriber implements EventSubscriberInterface {
   /**
    * Renders the ajax commands right before preparing the result.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
+   * @param ResponseEvent $event
    *   The response event, which contains the possible AjaxResponse object.
    */
   public function onResponse(ResponseEvent $event) {

@@ -52,7 +52,7 @@ class Update extends Query implements ConditionInterface {
   /**
    * Constructs an Update query object.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   A Connection object.
    * @param string $table
    *   Name of the table to associate with this query.

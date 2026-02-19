@@ -50,7 +50,7 @@ class MigrateFieldTest extends MigrateDrupal7TestBase {
   protected function assertEntity(string $id, string $expected_type, bool $expected_translatable, int $expected_cardinality): void {
     [$expected_entity_type, $expected_name] = explode('.', $id);
 
-    /** @var \Drupal\field\FieldStorageConfigInterface $field */
+    /** @var FieldStorageConfigInterface $field */
     $field = FieldStorageConfig::load($id);
     $this->assertInstanceOf(FieldStorageConfigInterface::class, $field);
     $this->assertEquals($expected_name, $field->getName());

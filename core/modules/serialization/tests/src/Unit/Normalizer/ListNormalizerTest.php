@@ -23,14 +23,14 @@ class ListNormalizerTest extends UnitTestCase {
   /**
    * The ListNormalizer instance.
    *
-   * @var \Drupal\serialization\Normalizer\ListNormalizer
+   * @var ListNormalizer
    */
   protected $normalizer;
 
   /**
    * The mock list instance.
    *
-   * @var \Drupal\Core\TypedData\ListInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\TypedData\ListInterface|MockObject
    */
   protected $list;
 
@@ -44,7 +44,7 @@ class ListNormalizerTest extends UnitTestCase {
   /**
    * The mocked typed data.
    *
-   * @var \PHPUnit\Framework\MockObject\MockObject|\Drupal\Core\TypedData\TypedDataInterface
+   * @var \PHPUnit\Framework\MockObject\MockObject|TypedDataInterface
    */
   protected $typedData;
 

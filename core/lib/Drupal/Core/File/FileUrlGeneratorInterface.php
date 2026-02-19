@@ -35,7 +35,7 @@ interface FileUrlGeneratorInterface {
    *   URL that may be used to access the file. An absolute URL may be returned
    *   when using a CDN or a remote stream wrapper.
    *
-   * @throws \Drupal\Core\File\Exception\InvalidStreamWrapperException
+   * @throws InvalidStreamWrapperException
    *   If a stream wrapper could not be found to generate an external URL.
    */
   public function generateString(string $uri): string;
@@ -51,7 +51,7 @@ interface FileUrlGeneratorInterface {
    *   An absolute string containing a URL that may be used to access the
    *   file.
    *
-   * @throws \Drupal\Core\File\Exception\InvalidStreamWrapperException
+   * @throws InvalidStreamWrapperException
    *   If a stream wrapper could not be found to generate an external URL.
    */
   public function generateAbsoluteString(string $uri): string;
@@ -63,13 +63,13 @@ interface FileUrlGeneratorInterface {
    *   The URI to a file for which we need an external URL, or the path to a
    *   shipped file.
    *
-   * @return \Drupal\Core\Url
+   * @return Url
    *   For a local URL (matching domain), a base-relative Url object containing
    *   a URL that may be used to access the file. An Url object with absolute
    *   URL may be returned when using a CDN or a remote stream wrapper. Use
    *   setAbsolute() on the Url object to build an absolute URL.
    *
-   * @throws \Drupal\Core\File\Exception\InvalidStreamWrapperException
+   * @throws InvalidStreamWrapperException
    *   If a stream wrapper could not be found to generate an external URL.
    */
   public function generate(string $uri): Url;

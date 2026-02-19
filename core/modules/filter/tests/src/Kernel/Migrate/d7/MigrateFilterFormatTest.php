@@ -75,7 +75,7 @@ class MigrateFilterFormatTest extends MigrateDrupal7TestBase implements MigrateD
    * @internal
    */
   protected function assertEntity(string $id, string $label, array $enabled_filters, int $weight, bool $status): void {
-    /** @var \Drupal\filter\FilterFormatInterface $entity */
+    /** @var FilterFormatInterface $entity */
     $entity = FilterFormat::load($id);
     $this->assertInstanceOf(FilterFormatInterface::class, $entity);
     $this->assertSame($label, $entity->label());
@@ -112,7 +112,7 @@ class MigrateFilterFormatTest extends MigrateDrupal7TestBase implements MigrateD
     $this->assertNull(FilterFormat::load('plain_text1'));
 
     // Ensure that filter-specific settings were migrated.
-    /** @var \Drupal\filter\FilterFormatInterface $format */
+    /** @var FilterFormatInterface $format */
     $format = FilterFormat::load('filtered_html');
     $this->assertInstanceOf(FilterFormatInterface::class, $format);
     $config = $format->filters('filter_html')->getConfiguration();

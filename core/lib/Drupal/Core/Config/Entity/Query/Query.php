@@ -23,28 +23,28 @@ class Query extends QueryBase implements QueryInterface {
   /**
    * The config factory used by the config entity query.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * The key value factory.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueFactoryInterface
+   * @var KeyValueFactoryInterface
    */
   protected $keyValueFactory;
 
   /**
    * Constructs a Query object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
    * @param string $conjunction
    *   - AND: all of the conditions on the query need to match.
    *   - OR: at least one of the conditions on the query need to match.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_factory
+   * @param KeyValueFactoryInterface $key_value_factory
    *   The key value factory.
    * @param array $namespaces
    *   List of potential namespaces of the classes belonging to this query.

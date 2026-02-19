@@ -78,7 +78,7 @@ class TranslatableFieldTest extends KernelTestBase {
     $this->assertFalse($entity->get(OverridesSectionStorage::FIELD_NAME)->isEmpty());
 
     $entity = EntityTest::load($entity->id());
-    /** @var \Drupal\entity_test\Entity\EntityTest $translation */
+    /** @var EntityTest $translation */
     $translation = $entity->addTranslation('es', $entity->toArray());
 
     // Per-language layouts are not supported.

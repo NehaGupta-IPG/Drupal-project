@@ -4,6 +4,7 @@ namespace Drupal\system\SecurityAdvisories;
 
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Extension\ExtensionVersion;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ProfileExtensionList;
 use Drupal\Core\Extension\ThemeExtensionList;
@@ -11,7 +12,6 @@ use Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Utility\Error;
 use Drupal\Core\Utility\ProjectInfo;
-use Drupal\Core\Extension\ExtensionVersion;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -58,7 +58,7 @@ final class SecurityAdvisoriesFetcher {
   /**
    * The logger.
    *
-   * @var \Psr\Log\LoggerInterface
+   * @var LoggerInterface
    */
   protected $logger;
 
@@ -72,21 +72,21 @@ final class SecurityAdvisoriesFetcher {
   /**
    * Constructs a new SecurityAdvisoriesFetcher object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface $key_value_factory
+   * @param KeyValueExpirableFactoryInterface $key_value_factory
    *   The expirable key/value factory.
-   * @param \GuzzleHttp\ClientInterface $client
+   * @param ClientInterface $client
    *   The HTTP client.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $module_list
+   * @param ModuleExtensionList $module_list
    *   The module extension list.
-   * @param \Drupal\Core\Extension\ThemeExtensionList $theme_list
+   * @param ThemeExtensionList $theme_list
    *   The theme extension list.
-   * @param \Drupal\Core\Extension\ProfileExtensionList $profile_list
+   * @param ProfileExtensionList $profile_list
    *   The profile extension list.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   The logger.
-   * @param \Drupal\Core\Site\Settings $settings
+   * @param Settings $settings
    *   The settings instance.
    */
   public function __construct(ConfigFactoryInterface $config_factory, KeyValueExpirableFactoryInterface $key_value_factory, ClientInterface $client, ModuleExtensionList $module_list, ThemeExtensionList $theme_list, ProfileExtensionList $profile_list, LoggerInterface $logger, Settings $settings) {
@@ -110,12 +110,12 @@ final class SecurityAdvisoriesFetcher {
    *   (optional) The timeout in seconds for the request. Defaults to 0, which
    *   is no timeout.
    *
-   * @return \Drupal\system\SecurityAdvisories\SecurityAdvisory[]|null
+   * @return SecurityAdvisory[]|null
    *   The upstream security advisories, if any. NULL if there was a problem
    *   retrieving the JSON feed, or if there was no stored response and
    *   $allow_outgoing_request was set to FALSE.
    *
-   * @throws \Psr\Http\Client\ClientExceptionInterface
+   * @throws ClientExceptionInterface
    *   Thrown if an error occurs while retrieving security advisories.
    */
   public function getSecurityAdvisories(bool $allow_outgoing_request = TRUE, int $timeout = 0): ?array {
@@ -174,7 +174,7 @@ final class SecurityAdvisoriesFetcher {
   /**
    * Determines if an advisory matches the existing version of a project.
    *
-   * @param \Drupal\system\SecurityAdvisories\SecurityAdvisory $sa
+   * @param SecurityAdvisory $sa
    *   The security advisory.
    *
    * @return bool
@@ -231,7 +231,7 @@ final class SecurityAdvisoriesFetcher {
   /**
    * Gets the information for an extension affected by the security advisory.
    *
-   * @param \Drupal\system\SecurityAdvisories\SecurityAdvisory $sa
+   * @param SecurityAdvisory $sa
    *   The security advisory.
    *
    * @return mixed[]|null
@@ -259,7 +259,7 @@ final class SecurityAdvisoriesFetcher {
   /**
    * Gets the existing project version.
    *
-   * @param \Drupal\system\SecurityAdvisories\SecurityAdvisory $sa
+   * @param SecurityAdvisory $sa
    *   The security advisory.
    *
    * @return string|null
@@ -277,7 +277,7 @@ final class SecurityAdvisoriesFetcher {
   /**
    * Determines if a security advisory is applicable for the current site.
    *
-   * @param \Drupal\system\SecurityAdvisories\SecurityAdvisory $sa
+   * @param SecurityAdvisory $sa
    *   The security advisory.
    *
    * @return bool

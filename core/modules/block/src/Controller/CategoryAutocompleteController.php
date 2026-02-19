@@ -17,14 +17,14 @@ class CategoryAutocompleteController implements ContainerInjectionInterface {
   /**
    * The block manager.
    *
-   * @var \Drupal\Core\Block\BlockManagerInterface
+   * @var BlockManagerInterface
    */
   protected $blockManager;
 
   /**
    * Constructs a new CategoryAutocompleteController.
    *
-   * @param \Drupal\Core\Block\BlockManagerInterface $block_manager
+   * @param BlockManagerInterface $block_manager
    *   The block manager.
    */
   public function __construct(BlockManagerInterface $block_manager) {
@@ -43,10 +43,10 @@ class CategoryAutocompleteController implements ContainerInjectionInterface {
   /**
    * Retrieves suggestions for block category autocompletion.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   * @return JsonResponse
    *   A JSON response containing autocomplete suggestions.
    */
   public function autocomplete(Request $request) {

@@ -15,14 +15,14 @@ class ActiveWorkspaceCheck implements AccessInterface {
   /**
    * The workspace manager.
    *
-   * @var \Drupal\workspaces\WorkspaceManagerInterface
+   * @var WorkspaceManagerInterface
    */
   protected $workspaceManager;
 
   /**
    * Constructs a new ActiveWorkspaceCheck.
    *
-   * @param \Drupal\workspaces\WorkspaceManagerInterface $workspace_manager
+   * @param WorkspaceManagerInterface $workspace_manager
    *   The workspace manager.
    */
   public function __construct(WorkspaceManagerInterface $workspace_manager) {
@@ -32,7 +32,7 @@ class ActiveWorkspaceCheck implements AccessInterface {
   /**
    * Checks access.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route to check against.
    *
    * @return \Drupal\Core\Access\AccessResultInterface

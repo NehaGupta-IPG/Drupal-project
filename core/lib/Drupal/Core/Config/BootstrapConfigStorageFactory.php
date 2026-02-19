@@ -13,11 +13,11 @@ class BootstrapConfigStorageFactory {
   /**
    * Returns a configuration storage implementation.
    *
-   * @param \Composer\Autoload\ClassLoader $class_loader
+   * @param ClassLoader $class_loader
    *   The class loader. Normally Composer's ClassLoader, as included by the
    *   front controller, but may also be decorated.
    *
-   * @return \Drupal\Core\Config\StorageInterface
+   * @return StorageInterface
    *   A configuration storage implementation.
    */
   public static function get($class_loader = NULL) {
@@ -33,7 +33,7 @@ class BootstrapConfigStorageFactory {
   /**
    * Returns a Database configuration storage implementation.
    *
-   * @return \Drupal\Core\Config\DatabaseStorage
+   * @return DatabaseStorage
    *   The database storage object.
    */
   public static function getDatabaseStorage() {

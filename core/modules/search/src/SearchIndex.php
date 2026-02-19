@@ -16,17 +16,17 @@ class SearchIndex implements SearchIndexInterface {
   /**
    * SearchIndex constructor.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   * @param ConfigFactoryInterface $configFactory
    *   The config factory.
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection.
-   * @param \Drupal\Core\Database\Connection $replica
+   * @param Connection $replica
    *   The database replica connection.
-   * @param \Drupal\Core\Cache\CacheTagsInvalidatorInterface $cacheTagsInvalidator
+   * @param CacheTagsInvalidatorInterface $cacheTagsInvalidator
    *   The cache tags invalidator.
-   * @param \Drupal\search\SearchTextProcessorInterface $textProcessor
+   * @param SearchTextProcessorInterface $textProcessor
    *   The text processor.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct(

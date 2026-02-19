@@ -3,8 +3,8 @@
 namespace Drupal\Core\Theme\Component;
 
 use Drupal\Core\Extension\ExtensionLifecycle;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Render\Component\Exception\InvalidComponentException;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
@@ -117,7 +117,7 @@ class ComponentMetadata {
    * @param bool $enforce_schemas
    *   Enforces the definition of schemas for props and slots.
    *
-   * @throws \Drupal\Core\Render\Component\Exception\InvalidComponentException
+   * @throws InvalidComponentException
    */
   public function __construct(array $metadata_info, string $app_root, bool $enforce_schemas) {
     $path = $metadata_info['path'];
@@ -157,7 +157,7 @@ class ComponentMetadata {
    * @return array|null
    *   The schema for the component props.
    *
-   * @throws \Drupal\Core\Render\Component\Exception\InvalidComponentException
+   * @throws InvalidComponentException
    */
   private function parseSchemaInfo(array $metadata_info): ?array {
     if (empty($metadata_info['props'])) {

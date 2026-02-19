@@ -20,7 +20,7 @@ class MailHandler implements MailHandlerInterface {
   /**
    * Language manager service.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
@@ -34,7 +34,7 @@ class MailHandler implements MailHandlerInterface {
   /**
    * Mail manager service.
    *
-   * @var \Drupal\Core\Mail\MailManagerInterface
+   * @var MailManagerInterface
    */
   protected $mailManager;
 
@@ -48,15 +48,15 @@ class MailHandler implements MailHandlerInterface {
   /**
    * Constructs a new \Drupal\contact\MailHandler object.
    *
-   * @param \Drupal\Core\Mail\MailManagerInterface $mail_manager
+   * @param MailManagerInterface $mail_manager
    *   Mail manager service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   Language manager service.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   A logger instance.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param TranslationInterface $string_translation
    *   String translation service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(MailManagerInterface $mail_manager, LanguageManagerInterface $language_manager, LoggerInterface $logger, TranslationInterface $string_translation, EntityTypeManagerInterface $entity_type_manager) {

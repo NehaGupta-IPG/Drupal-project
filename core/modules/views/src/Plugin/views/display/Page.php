@@ -7,8 +7,8 @@ use Drupal\Component\Utility\Xss;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Menu\MenuParentFormSelectorInterface;
-use Drupal\Core\State\StateInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
+use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsDisplay;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -48,14 +48,14 @@ class Page extends PathPluginBase {
   /**
    * The menu storage.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var EntityStorageInterface
    */
   protected $menuStorage;
 
   /**
    * The parent form selector service.
    *
-   * @var \Drupal\Core\Menu\MenuParentFormSelectorInterface
+   * @var MenuParentFormSelectorInterface
    */
   protected $parentFormSelector;
 
@@ -68,13 +68,13 @@ class Page extends PathPluginBase {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
+   * @param RouteProviderInterface $route_provider
    *   The route provider.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state key value store.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $menu_storage
+   * @param EntityStorageInterface $menu_storage
    *   The menu storage.
-   * @param \Drupal\Core\Menu\MenuParentFormSelectorInterface $parent_form_selector
+   * @param MenuParentFormSelectorInterface $parent_form_selector
    *   The parent form selector service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, StateInterface $state, EntityStorageInterface $menu_storage, MenuParentFormSelectorInterface $parent_form_selector) {

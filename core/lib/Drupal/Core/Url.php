@@ -6,12 +6,12 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
-use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
+use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Utility\UnroutedUrlAssemblerInterface;
-use Drupal\Core\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 // cspell:ignore abempty
@@ -33,14 +33,14 @@ class Url implements TrustedCallbackInterface {
   /**
    * The URL generator.
    *
-   * @var \Drupal\Core\Routing\UrlGeneratorInterface
+   * @var UrlGeneratorInterface
    */
   protected $urlGenerator;
 
   /**
    * The unrouted URL assembler.
    *
-   * @var \Drupal\Core\Utility\UnroutedUrlAssemblerInterface
+   * @var UnroutedUrlAssemblerInterface
    */
   protected $urlAssembler;
 
@@ -157,7 +157,7 @@ class Url implements TrustedCallbackInterface {
   /**
    * Creates a new URL object from a route match.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
    *
    * @return static
@@ -194,8 +194,8 @@ class Url implements TrustedCallbackInterface {
    *   to search for existing resources, but also may type one of these
    *   characters to link to (e.g.) a specific path on the site.
    *   (With regard to the URI specification, the user input is treated as a
-   *   @link https://tools.ietf.org/html/rfc3986#section-4.2 relative URI reference @endlink
-   *   where the relative part is of type
+   *
+   * @link
    *   @link https://tools.ietf.org/html/rfc3986#section-3.3 path-abempty @endlink.)
    * @param array $options
    *   (optional) An array of options. See Url::fromUri() for details.
@@ -474,7 +474,7 @@ class Url implements TrustedCallbackInterface {
    * router name and parameters stored in the Url object returned by this
    * method.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   A request object.
    *
    * @return static
@@ -482,11 +482,11 @@ class Url implements TrustedCallbackInterface {
    *   would get an access denied running the same request via the normal page
    *   flow.
    *
-   * @throws Symfony\Component\Routing\Exception\NoConfigurationException
+   * @throws NoConfigurationException
    *   If no routing configuration could be found.
-   * @throws Symfony\Component\Routing\Exception\ResourceNotFoundException
+   * @throws ResourceNotFoundException
    *   If no matching resource could be found.
-   * @throws Symfony\Component\Routing\Exception\MethodNotAllowedException
+   * @throws MethodNotAllowedException
    *   If a matching resource was found but the request method is not allowed.
    */
   public static function createFromRequest(Request $request) {
@@ -760,7 +760,7 @@ class Url implements TrustedCallbackInterface {
    *   (optional) Defaults to FALSE. When TRUE, both the generated URL and its
    *   associated bubbleable metadata are returned.
    *
-   * @return string|\Drupal\Core\GeneratedUrl
+   * @return string|GeneratedUrl
    *   A string URL.
    *   When $collect_bubbleable_metadata is TRUE, a GeneratedUrl object is
    *   returned, containing the generated URL plus bubbleable metadata.
@@ -800,12 +800,12 @@ class Url implements TrustedCallbackInterface {
    *
    * Determines whether the route is accessible or not.
    *
-   * @param \Drupal\Core\Session\AccountInterface|null $account
+   * @param AccountInterface|null $account
    *   (optional) Run access checks for this account. NULL for the current user.
    * @param bool $return_as_object
    *   (optional) Defaults to FALSE.
    *
-   * @return ($return_as_object is true ? \Drupal\Core\Access\AccessResultInterface : bool)
+   * @return ($return_as_object is true ? AccessResultInterface : bool)
    *   The access result. Returns a boolean if $return_as_object is FALSE (this
    *   is the default) and otherwise an AccessResultInterface object.
    *   When a boolean is returned, the result of AccessInterface::isAllowed() is
@@ -833,7 +833,7 @@ class Url implements TrustedCallbackInterface {
   /**
    * Gets the URL generator.
    *
-   * @return \Drupal\Core\Routing\UrlGeneratorInterface
+   * @return UrlGeneratorInterface
    *   The URL generator.
    */
   protected function urlGenerator() {
@@ -846,7 +846,7 @@ class Url implements TrustedCallbackInterface {
   /**
    * Gets the unrouted URL assembler for non-Drupal URLs.
    *
-   * @return \Drupal\Core\Utility\UnroutedUrlAssemblerInterface
+   * @return UnroutedUrlAssemblerInterface
    *   The unrouted URL assembler.
    */
   protected function unroutedUrlAssembler() {
@@ -859,7 +859,7 @@ class Url implements TrustedCallbackInterface {
   /**
    * Sets the URL generator.
    *
-   * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
+   * @param UrlGeneratorInterface $url_generator
    *   (optional) The URL generator, specify NULL to reset it.
    *
    * @return $this
@@ -873,7 +873,7 @@ class Url implements TrustedCallbackInterface {
   /**
    * Sets the unrouted URL assembler.
    *
-   * @param \Drupal\Core\Utility\UnroutedUrlAssemblerInterface $url_assembler
+   * @param UnroutedUrlAssemblerInterface $url_assembler
    *   The unrouted URL assembler.
    *
    * @return $this

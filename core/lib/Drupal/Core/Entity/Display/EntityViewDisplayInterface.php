@@ -14,7 +14,7 @@ interface EntityViewDisplayInterface extends EntityDisplayInterface {
    *
    * See the buildMultiple() method for details.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The entity being displayed.
    *
    * @return array
@@ -35,7 +35,7 @@ interface EntityViewDisplayInterface extends EntityDisplayInterface {
    * hook_entity_display_build_alter() is invoked on each entity, allowing 3rd
    * party code to alter the render array.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface[] $entities
+   * @param FieldableEntityInterface[] $entities
    *   The entities being displayed.
    *
    * @return array

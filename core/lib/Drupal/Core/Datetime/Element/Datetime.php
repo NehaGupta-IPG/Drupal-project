@@ -5,8 +5,8 @@ namespace Drupal\Core\Datetime\Element;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Variable;
 use Drupal\Core\Datetime\DrupalDateTime;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Datetime\Entity\DateFormat;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Security\DoTrustedCallbackTrait;
 use Drupal\Core\Security\StaticTrustedCallbackHelper;
@@ -224,7 +224,7 @@ class Datetime extends DateElementBase {
    *
    * @param array $element
    *   The form element whose value is being processed.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array $complete_form
    *   The complete form structure.
@@ -359,7 +359,7 @@ class Datetime extends DateElementBase {
    *
    * @param array $element
    *   The form element whose value is being validated.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array $complete_form
    *   The complete form structure.

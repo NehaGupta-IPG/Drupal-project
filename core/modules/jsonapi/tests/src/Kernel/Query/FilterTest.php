@@ -59,7 +59,7 @@ class FilterTest extends JsonapiKernelTestBase {
   protected $resourceTypeRepository;
 
   /**
-   * @var \Drupal\jsonapi\Context\FieldResolver
+   * @var FieldResolver
    */
   protected FieldResolver $fieldResolver;
 

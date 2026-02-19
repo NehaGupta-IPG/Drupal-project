@@ -37,14 +37,14 @@ class BlockComponentRenderArrayTest extends UnitTestCase {
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $account;
 
   /**
    * The block plugin manager.
    *
-   * @var \Drupal\Core\Block\BlockManagerInterface
+   * @var BlockManagerInterface
    */
   protected $blockManager;
 

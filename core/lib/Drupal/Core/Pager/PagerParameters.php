@@ -15,14 +15,14 @@ class PagerParameters implements PagerParametersInterface {
   /**
    * The HTTP request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * Construct a PagerManager object.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $stack
+   * @param RequestStack $stack
    *   The current HTTP request stack.
    */
   public function __construct(RequestStack $stack) {

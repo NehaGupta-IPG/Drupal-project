@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 class TestLocalActionWithConfig extends LocalActionDefault {
 
   /**
-   * @var \Drupal\Core\Config\Config
+   * @var Config
    */
   protected $config;
 
@@ -36,9 +36,9 @@ class TestLocalActionWithConfig extends LocalActionDefault {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
+   * @param RouteProviderInterface $route_provider
    *   The route provider to load routes by name.
-   * @param \Drupal\Core\Config\Config $config
+   * @param Config $config
    *   The 'menu_test.links.action' config.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, Config $config) {

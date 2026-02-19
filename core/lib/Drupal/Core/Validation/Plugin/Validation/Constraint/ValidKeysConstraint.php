@@ -62,7 +62,7 @@ class ValidKeysConstraint extends SymfonyConstraint {
   /**
    * Returns the list of valid keys.
    *
-   * @param \Symfony\Component\Validator\Context\ExecutionContextInterface $context
+   * @param ExecutionContextInterface $context
    *   The current execution context.
    *
    * @return string[]

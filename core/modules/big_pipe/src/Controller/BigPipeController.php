@@ -18,16 +18,16 @@ class BigPipeController {
   /**
    * Sets a BigPipe no-JS cookie, redirects back to the original location.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    *
-   * @return \Drupal\Core\Routing\LocalRedirectResponse
+   * @return LocalRedirectResponse
    *   A response that sets the no-JS cookie and redirects back to the original
    *   location.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   * @throws AccessDeniedHttpException
    *   Thrown when the no-JS cookie is already set or when there is no session.
-   * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+   * @throws HttpException
    *   Thrown when the original location is missing, i.e. when no 'destination'
    *   query argument is set.
    *

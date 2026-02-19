@@ -154,7 +154,7 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
   /**
    * Modify a migration's configuration before executing it.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration to execute.
    */
   protected function prepareMigration(MigrationInterface $migration) {
@@ -164,7 +164,7 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
   /**
    * Executes a single migration.
    *
-   * @param string|\Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param string|MigrationInterface $migration
    *   The migration to execute, or its ID.
    */
   protected function executeMigration($migration) {
@@ -227,7 +227,7 @@ abstract class MigrateTestBase extends KernelTestBase implements MigrateMessageI
    *
    * This is done in order to test scenarios which require a failed row.
    *
-   * @param string|\Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param string|MigrationInterface $migration
    *   The migration entity, or its ID.
    * @param array $row
    *   The raw source row which "failed".

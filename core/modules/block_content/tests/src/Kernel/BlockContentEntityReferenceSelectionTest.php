@@ -55,7 +55,7 @@ class BlockContentEntityReferenceSelectionTest extends KernelTestBase {
   /**
    * Test selection handler.
    *
-   * @var \Drupal\block_content_test\Plugin\EntityReferenceSelection\TestSelection
+   * @var TestSelection
    */
   protected $selectionHandler;
 
@@ -119,8 +119,8 @@ class BlockContentEntityReferenceSelectionTest extends KernelTestBase {
   /**
    * Tests to make sure queries without the expected tags are not altered.
    *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws InvalidPluginDefinitionException
+   * @throws PluginNotFoundException
    */
   public function testQueriesNotAltered(): void {
     // Ensure that queries without all the tags are not altered.
@@ -145,7 +145,7 @@ class BlockContentEntityReferenceSelectionTest extends KernelTestBase {
   /**
    * Tests with no conditions set.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    */
   #[IgnoreDeprecations]
   public function testNoConditions(): void {

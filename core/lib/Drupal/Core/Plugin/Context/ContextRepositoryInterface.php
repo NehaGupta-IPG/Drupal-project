@@ -25,7 +25,7 @@ interface ContextRepositoryInterface {
    *   @{service_id}:{unqualified_context_id}, so for example
    *   node.node_route_context:node.
    *
-   * @return \Drupal\Core\Plugin\Context\ContextInterface[]
+   * @return ContextInterface[]
    *   The determined contexts, keyed by the fully qualified context ID.
    */
   public function getRuntimeContexts(array $context_ids);
@@ -33,7 +33,7 @@ interface ContextRepositoryInterface {
   /**
    * Gets all available contexts for the purposes of configuration.
    *
-   * @return \Drupal\Core\Plugin\Context\ContextInterface[]
+   * @return ContextInterface[]
    *   All available contexts.
    */
   public function getAvailableContexts();

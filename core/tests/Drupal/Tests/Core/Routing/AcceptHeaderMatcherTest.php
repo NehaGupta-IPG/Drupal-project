@@ -20,14 +20,14 @@ class AcceptHeaderMatcherTest extends UnitTestCase {
   /**
    * A collection of shared fixture data for tests.
    *
-   * @var \Drupal\Tests\Core\Routing\RoutingFixtures
+   * @var RoutingFixtures
    */
   protected $fixtures;
 
   /**
    * The matcher object that is going to be tested.
    *
-   * @var \Drupal\accept_header_routing_test\Routing\AcceptHeaderMatcher
+   * @var AcceptHeaderMatcher
    */
   protected $matcher;
 

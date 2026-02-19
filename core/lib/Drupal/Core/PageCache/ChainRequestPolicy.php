@@ -23,7 +23,7 @@ class ChainRequestPolicy implements ChainRequestPolicyInterface {
   /**
    * A list of policy rules to apply when this policy is evaluated.
    *
-   * @var \Drupal\Core\PageCache\RequestPolicyInterface[]
+   * @var RequestPolicyInterface[]
    */
   protected $rules = [];
 

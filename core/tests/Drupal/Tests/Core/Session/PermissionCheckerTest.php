@@ -24,21 +24,21 @@ class PermissionCheckerTest extends UnitTestCase {
   /**
    * The permission checker to run tests on.
    *
-   * @var \Drupal\Core\Session\PermissionChecker
+   * @var PermissionChecker
    */
   protected $checker;
 
   /**
    * The mocked access policy processor.
    *
-   * @var \Drupal\Core\Session\AccessPolicyProcessorInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var AccessPolicyProcessorInterface|ObjectProphecy
    */
   protected $processor;
 
   /**
    * The mocked account to use for testing.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $account;
 

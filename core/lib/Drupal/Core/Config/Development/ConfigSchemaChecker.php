@@ -2,8 +2,8 @@
 
 namespace Drupal\Core\Config\Development;
 
-use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Config\ConfigCrudEvent;
 use Drupal\Core\Config\ConfigEvents;
 use Drupal\Core\Config\Schema\SchemaCheckTrait;
@@ -28,7 +28,7 @@ class ConfigSchemaChecker implements EventSubscriberInterface {
   /**
    * The typed config manger.
    *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface
+   * @var TypedConfigManagerInterface
    */
   protected $typedManager;
 
@@ -49,7 +49,7 @@ class ConfigSchemaChecker implements EventSubscriberInterface {
   /**
    * Constructs the ConfigSchemaChecker object.
    *
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_manager
+   * @param TypedConfigManagerInterface $typed_manager
    *   The typed config manager.
    * @param string[] $exclude
    *   An array of config object names that are excluded from schema checking.
@@ -66,10 +66,10 @@ class ConfigSchemaChecker implements EventSubscriberInterface {
   /**
    * Checks that configuration complies with its schema on config save.
    *
-   * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   * @param ConfigCrudEvent $event
    *   The configuration event.
    *
-   * @throws \Drupal\Core\Config\Schema\SchemaIncompleteException
+   * @throws SchemaIncompleteException
    *   Exception thrown when configuration does not match its schema.
    */
   public function onConfigSave(ConfigCrudEvent $event) {

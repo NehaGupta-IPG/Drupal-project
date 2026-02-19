@@ -48,7 +48,7 @@ interface ConditionAggregateInterface extends \Countable {
    *   (optional) For which language the entity should be prepared, defaults to
    *   the current content language.
    *
-   * @return \Drupal\Core\Entity\Query\ConditionInterface
+   * @return ConditionInterface
    *   A condition testing for the existence of a field.
    *
    * @see \Drupal\Core\Entity\Query\QueryInterface::exists()
@@ -66,7 +66,7 @@ interface ConditionAggregateInterface extends \Countable {
    *   (optional) For which language the entity should be prepared, defaults to
    *   the current content language.
    *
-   * @return \Drupal\Core\Entity\Query\ConditionInterface
+   * @return ConditionInterface
    *   A condition testing for the nonexistence of a field.
    *
    * @see \Drupal\Core\Entity\Query\QueryInterface::notExists()
@@ -87,7 +87,7 @@ interface ConditionAggregateInterface extends \Countable {
   /**
    * Compiles this conditional clause.
    *
-   * @param \Drupal\Core\Entity\Query\QueryInterface $query
+   * @param QueryInterface $query
    *   The query object this conditional clause belongs to.
    */
   public function compile($query);

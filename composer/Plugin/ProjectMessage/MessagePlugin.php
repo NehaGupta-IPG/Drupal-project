@@ -2,6 +2,7 @@
 
 namespace Drupal\Composer\Plugin\ProjectMessage;
 
+use Drupal\Composer\Plugin\VendorHardening\Config;
 use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\IO\IOInterface;
@@ -33,7 +34,7 @@ class MessagePlugin implements PluginInterface, EventSubscriberInterface {
   /**
    * Configuration.
    *
-   * @var \Drupal\Composer\Plugin\VendorHardening\Config
+   * @var Config
    */
   protected $config;
 

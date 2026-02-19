@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Composer\Plugin\VendorHardening;
 
+use Composer\Composer\Package\CompletePackage;
 use Composer\Composer;
 use Composer\EventDispatcher\EventSubscriberInterface;
 use Composer\Installer\PackageEvent;
@@ -46,7 +47,7 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
   /**
    * Configuration.
    *
-   * @var \Drupal\Composer\Plugin\VendorHardening\Config
+   * @var Config
    */
   protected $config;
 
@@ -122,7 +123,7 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
    *   The package event.
    */
   public function onPrePackageInstall(PackageEvent $event): void {
-    /** @var \Composer\Package\CompletePackage $package */
+    /** @var CompletePackage $package */
     $package = $event->getOperation()->getPackage();
     $this->removeBinBeforeCleanup($package);
   }
@@ -134,7 +135,7 @@ class VendorHardeningPlugin implements PluginInterface, EventSubscriberInterface
    *   The package event.
    */
   public function onPrePackageUpdate(PackageEvent $event): void {
-    /** @var \Composer\Package\CompletePackage $package */
+    /** @var CompletePackage $package */
     $package = $event->getOperation()->getTargetPackage();
     $this->removeBinBeforeCleanup($package);
   }

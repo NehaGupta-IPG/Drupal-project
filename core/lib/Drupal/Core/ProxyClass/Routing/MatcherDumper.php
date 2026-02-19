@@ -7,15 +7,20 @@
 
 namespace Drupal\Core\ProxyClass\Routing {
 
+    use Drupal\Core\Routing\MatcherDumperInterface;
+    use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+    use Symfony\Component\DependencyInjection\ContainerInterface;
+    use Symfony\Component\Routing\RouteCollection;
+
     /**
      * Provides a proxy class for \Drupal\Core\Routing\MatcherDumper.
      *
      * @see \Drupal\Component\ProxyBuilder
      */
-    class MatcherDumper implements \Drupal\Core\Routing\MatcherDumperInterface
+    class MatcherDumper implements MatcherDumperInterface
     {
 
-        use \Drupal\Core\DependencyInjection\DependencySerializationTrait;
+        use DependencySerializationTrait;
 
         /**
          * The id of the original proxied service.
@@ -34,19 +39,19 @@ namespace Drupal\Core\ProxyClass\Routing {
         /**
          * The service container.
          *
-         * @var \Symfony\Component\DependencyInjection\ContainerInterface
+         * @var ContainerInterface
          */
         protected $container;
 
         /**
          * Constructs a ProxyClass Drupal proxy object.
          *
-         * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+         * @param ContainerInterface $container
          *   The container.
          * @param string $drupal_proxy_original_service_id
          *   The service ID of the original service.
          */
-        public function __construct(\Symfony\Component\DependencyInjection\ContainerInterface $container, $drupal_proxy_original_service_id)
+        public function __construct(ContainerInterface $container, $drupal_proxy_original_service_id)
         {
             $this->container = $container;
             $this->drupalProxyOriginalServiceId = $drupal_proxy_original_service_id;
@@ -70,7 +75,7 @@ namespace Drupal\Core\ProxyClass\Routing {
         /**
          * {@inheritdoc}
          */
-        public function addRoutes(\Symfony\Component\Routing\RouteCollection $routes)
+        public function addRoutes(RouteCollection $routes)
         {
             return $this->lazyLoadItself()->addRoutes($routes);
         }
@@ -87,7 +92,7 @@ namespace Drupal\Core\ProxyClass\Routing {
         /**
          * {@inheritdoc}
          */
-        public function getRoutes(): \Symfony\Component\Routing\RouteCollection
+        public function getRoutes(): RouteCollection
         {
             return $this->lazyLoadItself()->getRoutes();
         }

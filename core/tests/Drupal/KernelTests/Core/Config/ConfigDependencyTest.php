@@ -742,7 +742,7 @@ class ConfigDependencyTest extends EntityKernelTestBase {
   /**
    * Gets a list of identifiers from an array of configuration entities.
    *
-   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface[] $dependents
+   * @param ConfigEntityInterface[] $dependents
    *   An array of configuration entities.
    *
    * @return array

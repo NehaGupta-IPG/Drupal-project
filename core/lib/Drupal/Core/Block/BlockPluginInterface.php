@@ -2,11 +2,11 @@
 
 namespace Drupal\Core\Block;
 
-use Drupal\Component\Plugin\DerivativeInspectionInterface;
-use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\Component\Plugin\DependentPluginInterface;
+use Drupal\Component\Plugin\DerivativeInspectionInterface;
+use Drupal\Component\Plugin\PluginInspectionInterface;
+use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -45,12 +45,12 @@ interface BlockPluginInterface extends ConfigurableInterface, DependentPluginInt
    * This method allows base implementations to add general access restrictions
    * that should apply to all extending block plugins.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user session for which to check access.
    * @param bool $return_as_object
    *   (optional) Defaults to FALSE.
    *
-   * @return ($return_as_object is true ? \Drupal\Core\Access\AccessResultInterface : bool)
+   * @return ($return_as_object is true ? AccessResultInterface : bool)
    *   The access result. Returns a boolean if $return_as_object is FALSE (this
    *   is the default) and otherwise an AccessResultInterface object.
    *   When a boolean is returned, the result of AccessInterface::isAllowed() is
@@ -113,7 +113,7 @@ interface BlockPluginInterface extends ConfigurableInterface, DependentPluginInt
    *
    * @param array $form
    *   The form definition array for the block configuration form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return array
@@ -130,7 +130,7 @@ interface BlockPluginInterface extends ConfigurableInterface, DependentPluginInt
    *
    * @param array $form
    *   The form definition array for the full block configuration form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @see \Drupal\Core\Block\BlockPluginInterface::blockForm()
@@ -147,7 +147,7 @@ interface BlockPluginInterface extends ConfigurableInterface, DependentPluginInt
    *
    * @param array $form
    *   The form definition array for the full block configuration form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @see \Drupal\Core\Block\BlockPluginInterface::blockForm()

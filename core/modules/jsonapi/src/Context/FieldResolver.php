@@ -15,14 +15,14 @@ use Drupal\Core\Entity\TypedData\EntityDataDefinitionInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\TypedData\FieldItemDataDefinitionInterface;
 use Drupal\Core\Http\Exception\CacheableAccessDeniedHttpException;
+use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TypedData\ComplexDataDefinitionInterface;
 use Drupal\Core\TypedData\DataReferenceDefinitionInterface;
 use Drupal\Core\TypedData\DataReferenceTargetDefinition;
 use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\jsonapi\ResourceType\ResourceTypeRelationship;
 use Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface;
-use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
-use Drupal\Core\Session\AccountInterface;
 
 /**
  * A service that evaluates external path expressions against Drupal fields.
@@ -73,59 +73,59 @@ class FieldResolver {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $fieldManager;
 
   /**
    * The entity type bundle information service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @var EntityTypeBundleInfoInterface
    */
   protected $entityTypeBundleInfo;
 
   /**
    * The JSON:API resource type repository service.
    *
-   * @var \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface
+   * @var ResourceTypeRepositoryInterface
    */
   protected $resourceTypeRepository;
 
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The current user account.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
   /**
    * Creates a FieldResolver instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager
+   * @param EntityFieldManagerInterface $field_manager
    *   The field manager.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The bundle info service.
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
+   * @param ResourceTypeRepositoryInterface $resource_type_repository
    *   The resource type repository.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user account.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $field_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, ResourceTypeRepositoryInterface $resource_type_repository, ModuleHandlerInterface $module_handler, AccountInterface $current_user) {
@@ -163,7 +163,7 @@ class FieldResolver {
    * (like `node--profile` and `node--migrated_profile`) which have the external
    * field name "account" aliased to different internal field names.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The resource type for which the path should be validated.
    * @param string[] $path_parts
    *   The include path as an array of strings. For example, the include query
@@ -176,7 +176,7 @@ class FieldResolver {
    * @return string[][]
    *   The resolved internal include paths.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws BadRequestHttpException
    *   Thrown if the path contains invalid specifiers.
    */
   public static function resolveInternalIncludePath(ResourceType $resource_type, array $path_parts, $depth = 0) {
@@ -258,7 +258,7 @@ class FieldResolver {
    *   'uid.field_first_name' -> 'uid.entity.field_first_name'.
    *   'author.firstName' -> 'field_author.entity.field_first_name'
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The JSON:API resource type from which to resolve the field name.
    * @param string $external_field_name
    *   The public field name to map to a Drupal field name.
@@ -269,7 +269,7 @@ class FieldResolver {
    * @return string
    *   The mapped field name.
    *
-   * @throws \Drupal\Core\Http\Exception\CacheableBadRequestHttpException
+   * @throws CacheableBadRequestHttpException
    */
   public function resolveInternalEntityQueryPath(ResourceType $resource_type, $external_field_name, $operator = NULL) {
     $cacheability = (new CacheableMetadata())->addCacheContexts(['url.query_args:filter', 'url.query_args:sort']);
@@ -283,7 +283,7 @@ class FieldResolver {
     $parts = explode('.', $external_field_name);
     $unresolved_path_parts = $parts;
     $reference_breadcrumbs = [];
-    /** @var \Drupal\jsonapi\ResourceType\ResourceType[] $resource_types */
+    /** @var ResourceType[] $resource_types */
     $resource_types = [$resource_type];
     // This complex expression is needed to handle the string, "0", which would
     // otherwise be evaluated as FALSE.
@@ -469,17 +469,17 @@ class FieldResolver {
   /**
    * Get all item definitions from a set of resources types by a field name.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType[] $resource_types
+   * @param ResourceType[] $resource_types
    *   The resource types on which the field might exist.
    * @param string $field_name
    *   The field for which to retrieve field item definitions.
    *
-   * @return \Drupal\Core\TypedData\ComplexDataDefinitionInterface[]
+   * @return ComplexDataDefinitionInterface[]
    *   The found field item definitions.
    */
   protected function getFieldItemDefinitions(array $resource_types, $field_name) {
     return array_reduce($resource_types, function ($result, ResourceType $resource_type) use ($field_name) {
-      /** @var \Drupal\jsonapi\ResourceType\ResourceType $resource_type */
+      /** @var ResourceType $resource_type */
       $entity_type = $resource_type->getEntityTypeId();
       $bundle = $resource_type->getBundle();
       $definitions = $this->fieldManager->getFieldDefinitions($entity_type, $bundle);
@@ -493,7 +493,7 @@ class FieldResolver {
   /**
    * Resolves the UUID field name for a resource type.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The resource type for which to get the UUID field name.
    *
    * @return string
@@ -509,7 +509,7 @@ class FieldResolver {
    *
    * @param string $field_name
    *   The external field name.
-   * @param \Drupal\jsonapi\ResourceType\ResourceType[] $resource_types
+   * @param ResourceType[] $resource_types
    *   The resource types from which to get an internal name.
    *
    * @return string
@@ -530,7 +530,7 @@ class FieldResolver {
    *
    * @param string $external_name
    *   The external field or member name.
-   * @param \Drupal\jsonapi\ResourceType\ResourceType[] $resource_types
+   * @param ResourceType[] $resource_types
    *   The resource types to test.
    *
    * @return bool
@@ -549,13 +549,13 @@ class FieldResolver {
   /**
    * Get the referenceable ResourceTypes for a set of field definitions.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType[] $resource_types
+   * @param ResourceType[] $resource_types
    *   The resource types on which the reference field might exist.
-   * @param \Drupal\Core\Field\TypedData\FieldItemDataDefinitionInterface[] $definitions
+   * @param FieldItemDataDefinitionInterface[] $definitions
    *   The field item definitions of targeted fields, keyed by the resource
    *   type name on which they reside.
    *
-   * @return \Drupal\jsonapi\ResourceType\ResourceType[]
+   * @return ResourceType[]
    *   The referenceable target resource types.
    */
   protected function getRelatableResourceTypes(array $resource_types, array $definitions) {
@@ -575,7 +575,7 @@ class FieldResolver {
   /**
    * Whether the given resources can be traversed to other resources.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType[] $resource_types
+   * @param ResourceType[] $resource_types
    *   The resources types to evaluate.
    *
    * @return bool
@@ -601,7 +601,7 @@ class FieldResolver {
   /**
    * Gets all unique reference property names from the given field definitions.
    *
-   * @param \Drupal\Core\TypedData\ComplexDataDefinitionInterface[] $candidate_definitions
+   * @param ComplexDataDefinitionInterface[] $candidate_definitions
    *   A list of targeted field item definitions specified by the path.
    *
    * @return string[]
@@ -625,7 +625,7 @@ class FieldResolver {
   /**
    * Determines the reference property name for the remaining unresolved parts.
    *
-   * @param \Drupal\Core\TypedData\ComplexDataDefinitionInterface[] $candidate_definitions
+   * @param ComplexDataDefinitionInterface[] $candidate_definitions
    *   A list of targeted field item definitions specified by the path.
    * @param string[] $remaining_parts
    *   The remaining path parts.
@@ -668,7 +668,7 @@ class FieldResolver {
    *
    * @param string $part
    *   The path part.
-   * @param \Drupal\Core\TypedData\ComplexDataDefinitionInterface[] $candidate_definitions
+   * @param ComplexDataDefinitionInterface[] $candidate_definitions
    *   A list of targeted field item definitions which are specified by the
    *   path.
    *
@@ -698,7 +698,7 @@ class FieldResolver {
    *
    * @param string $part
    *   The path part.
-   * @param \Drupal\Core\TypedData\ComplexDataDefinitionInterface[] $candidate_definitions
+   * @param ComplexDataDefinitionInterface[] $candidate_definitions
    *   A list of targeted field item definitions which are specified by the
    *   path.
    *
@@ -738,12 +738,12 @@ class FieldResolver {
   /**
    * Gets the field access result for the 'view' operation.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The JSON:API resource type on which the field exists.
    * @param string $internal_field_name
    *   The field name for which access should be checked.
    *
-   * @return \Drupal\Core\Access\AccessResultInterface
+   * @return AccessResultInterface
    *   The 'view' access result.
    */
   protected function getFieldAccess(ResourceType $resource_type, $internal_field_name) {

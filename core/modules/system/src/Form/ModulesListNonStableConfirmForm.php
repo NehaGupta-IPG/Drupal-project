@@ -22,7 +22,7 @@ class ModulesListNonStableConfirmForm extends ModulesListConfirmForm {
   /**
    * Module extension list.
    *
-   * @var \Drupal\Core\Extension\ModuleExtensionList
+   * @var ModuleExtensionList
    */
   protected ModuleExtensionList $moduleExtensionList;
 
@@ -50,13 +50,13 @@ class ModulesListNonStableConfirmForm extends ModulesListConfirmForm {
   /**
    * Constructs a new ModulesListNonStableConfirmForm.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Extension\ModuleInstallerInterface $module_installer
+   * @param ModuleInstallerInterface $module_installer
    *   The module installer.
-   * @param \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface $key_value_expirable
+   * @param KeyValueStoreExpirableInterface $key_value_expirable
    *   The key value expirable factory.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
+   * @param ModuleExtensionList $moduleExtensionList
    *   The module extension list.
    */
   public function __construct(ModuleHandlerInterface $module_handler, ModuleInstallerInterface $module_installer, KeyValueStoreExpirableInterface $key_value_expirable, ModuleExtensionList $moduleExtensionList) {
@@ -144,7 +144,7 @@ class ModulesListNonStableConfirmForm extends ModulesListConfirmForm {
    * @param bool $contrib_deprecated_modules
    *   TRUE if a contrib deprecated module is being enabled.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   * @return TranslatableMarkup
    *   The relevant message.
    */
   protected function buildDeprecatedMessage(bool $core_deprecated_modules, bool $contrib_deprecated_modules): TranslatableMarkup {

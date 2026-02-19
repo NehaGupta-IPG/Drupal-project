@@ -18,13 +18,13 @@ class EnvironmentCleaner implements EnvironmentCleanerInterface {
    *
    * @param string $root
    *   The path to the root of the Drupal installation.
-   * @param \Drupal\Core\Database\Connection $testDatabase
+   * @param Connection $testDatabase
    *   Connection to the database against which tests were run.
-   * @param \Drupal\Core\Test\TestRunResultsStorageInterface $testRunResultsStorage
+   * @param TestRunResultsStorageInterface $testRunResultsStorage
    *   The test run results storage.
-   * @param \Symfony\Component\Console\Output\OutputInterface $output
+   * @param OutputInterface $output
    *   A Symfony console output object.
-   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
+   * @param FileSystemInterface $fileSystem
    *   Drupal's file_system service.
    */
   public function __construct(

@@ -2,33 +2,33 @@
 
 namespace Drupal\content_moderation\Hook;
 
+use Drupal\content_moderation\EntityOperations;
+use Drupal\content_moderation\EntityTypeInfo;
+use Drupal\content_moderation\Plugin\Action\ModerationOptOutPublish;
+use Drupal\content_moderation\Plugin\Action\ModerationOptOutUnpublish;
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Action\Plugin\Action\PublishAction;
+use Drupal\Core\Action\Plugin\Action\UnpublishAction;
+use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityPublishedInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
+use Drupal\views\Entity\View;
 use Drupal\views\Plugin\views\filter\Broken;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
 use Drupal\workflows\Entity\Workflow;
-use Drupal\content_moderation\Plugin\Action\ModerationOptOutUnpublish;
-use Drupal\Core\Action\Plugin\Action\UnpublishAction;
-use Drupal\content_moderation\Plugin\Action\ModerationOptOutPublish;
-use Drupal\Core\Action\Plugin\Action\PublishAction;
-use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\workflows\WorkflowInterface;
-use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Entity\EntityPublishedInterface;
-use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
-use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\content_moderation\EntityOperations;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\content_moderation\EntityTypeInfo;
-use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\views\Entity\View;
-use Drupal\Core\Url;
-use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Hook\Attribute\Hook;
 
 /**
  * Hook implementations for content_moderation.
@@ -298,7 +298,7 @@ class ContentModerationHooks {
   #[Hook('entity_bundle_info_alter')]
   public function entityBundleInfoAlter(&$bundles): void {
     $translatable = FALSE;
-    /** @var \Drupal\workflows\WorkflowInterface $workflow */
+    /** @var WorkflowInterface $workflow */
     foreach (Workflow::loadMultipleByType('content_moderation') as $workflow) {
       /** @var \Drupal\content_moderation\Plugin\WorkflowType\ContentModeration $plugin */
       $plugin = $workflow->getTypePlugin();

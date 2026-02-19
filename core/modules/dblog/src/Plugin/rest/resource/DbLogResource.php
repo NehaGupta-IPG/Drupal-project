@@ -30,12 +30,12 @@ class DbLogResource extends ResourceBase {
    * @param int $id
    *   The ID of the watchdog log entry.
    *
-   * @return \Drupal\rest\ResourceResponse
+   * @return ResourceResponse
    *   The response containing the log entry.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   * @throws NotFoundHttpException
    *   Thrown when the log entry was not found.
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws BadRequestHttpException
    *   Thrown when no log entry was provided.
    */
   public function get($id = NULL) {

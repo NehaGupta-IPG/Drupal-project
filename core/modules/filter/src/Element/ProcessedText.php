@@ -4,8 +4,8 @@ namespace Drupal\filter\Element;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\Attribute\RenderElement;
+use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\filter\Plugin\FilterInterface;
@@ -76,7 +76,7 @@ class ProcessedText extends RenderElementBase {
         ->addCacheableDependency($filter_settings)
         ->applyTo($element);
     }
-    /** @var \Drupal\filter\Entity\FilterFormat $format **/
+    /** @var FilterFormat $format **/
     $format = FilterFormat::load($format_id);
     // If the requested text format doesn't exist or its disabled, the text
     // cannot be filtered.
@@ -105,7 +105,7 @@ class ProcessedText extends RenderElementBase {
     $text = str_replace(["\r\n", "\r"], "\n", $text);
 
     // Get a complete list of filters, ordered properly.
-    /** @var \Drupal\filter\Plugin\FilterInterface[] $filters **/
+    /** @var FilterInterface[] $filters **/
     $filters = $format->filters();
 
     // Give filters a chance to escape HTML-like data such as code or formulas.

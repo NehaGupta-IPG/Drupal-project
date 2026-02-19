@@ -143,7 +143,7 @@ interface IconDefinitionInterface {
   /**
    * Get the icon pack label.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup|null
+   * @return TranslatableMarkup|null
    *   The icon pack label.
    */
   public function getPackLabel(): ?TranslatableMarkup;

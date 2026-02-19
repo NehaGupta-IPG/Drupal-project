@@ -16,32 +16,32 @@ class SearchTextProcessor implements SearchTextProcessorInterface {
   /**
    * The transliteration service.
    *
-   * @var \Drupal\Component\Transliteration\TransliterationInterface
+   * @var TransliterationInterface
    */
   protected $transliteration;
 
   /**
    * The config factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * SearchTextProcessor constructor.
    *
-   * @param \Drupal\Component\Transliteration\TransliterationInterface $transliteration
+   * @param TransliterationInterface $transliteration
    *   The transliteration service.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
    */
   public function __construct(TransliterationInterface $transliteration, ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler) {

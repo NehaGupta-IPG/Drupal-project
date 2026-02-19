@@ -2,8 +2,8 @@
 
 namespace Drupal\comment;
 
-use Drupal\Core\Breadcrumb\BreadcrumbBuilderInterface;
 use Drupal\Core\Breadcrumb\Breadcrumb;
+use Drupal\Core\Breadcrumb\BreadcrumbBuilderInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Link;
@@ -19,14 +19,14 @@ class CommentBreadcrumbBuilder implements BreadcrumbBuilderInterface {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * Constructs the CommentBreadcrumbBuilder.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
@@ -58,7 +58,7 @@ class CommentBreadcrumbBuilder implements BreadcrumbBuilderInterface {
     $breadcrumb->addCacheableDependency($entity);
 
     if (($pid = $route_match->getParameter('pid')) && ($comment = $this->entityTypeManager->getStorage('comment')->load($pid))) {
-      /** @var \Drupal\comment\CommentInterface $comment */
+      /** @var CommentInterface $comment */
       $breadcrumb->addCacheableDependency($comment);
       // Display link to parent comment.
       // @todo Clean-up permalink in https://www.drupal.org/node/2198041

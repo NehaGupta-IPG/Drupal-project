@@ -24,14 +24,14 @@ class CurrentPathStack {
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * Constructs a new CurrentPathStack instance.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   The request stack.
    */
   public function __construct(RequestStack $request_stack) {
@@ -42,7 +42,7 @@ class CurrentPathStack {
   /**
    * Returns the path of the current request.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   (optional) The request.
    *
    * @return string
@@ -64,7 +64,7 @@ class CurrentPathStack {
    *
    * @param string $path
    *   The path.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   (optional) The request.
    *
    * @return $this

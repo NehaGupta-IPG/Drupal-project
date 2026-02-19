@@ -19,7 +19,7 @@ class RoleExistsConstraintValidator extends ConstraintValidator implements Conta
   /**
    * Create a new RoleExistsConstraintValidator instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(private readonly EntityTypeManagerInterface $entity_type_manager) {}

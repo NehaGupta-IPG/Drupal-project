@@ -80,7 +80,7 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
   /**
    * The messenger.
    *
-   * @var \Drupal\Core\Messenger\MessengerInterface
+   * @var MessengerInterface
    */
   protected $messenger;
 
@@ -177,7 +177,7 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
    * This method can assume that $this->isSearchExecutable() has already been
    * checked and returned TRUE.
    *
-   * @return \Drupal\Core\Database\StatementInterface|null
+   * @return StatementInterface|null
    *   Results from search query execute() method, or NULL if the search
    *   failed.
    */
@@ -267,7 +267,7 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
   /**
    * Prepares search results for rendering.
    *
-   * @param \Drupal\Core\Database\StatementInterface $found
+   * @param StatementInterface $found
    *   Results found from a successful search query execute() method.
    *
    * @return array
@@ -282,7 +282,7 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
 
     foreach ($found as $item) {
       // Render the node.
-      /** @var \Drupal\node\NodeInterface $node */
+      /** @var NodeInterface $node */
       $node = $node_storage->load($item->sid)->getTranslation($item->langcode);
       $build = $node_render->view($node, 'search_result', $item->langcode);
 
@@ -358,7 +358,7 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
   /**
    * Adds the configured rankings to the search query.
    *
-   * @param \Drupal\Core\Database\Query\SelectExtender $query
+   * @param SelectExtender $query
    *   A query object that has been extended with the Search DB Extender.
    */
   protected function addNodeRankings(SelectExtender $query) {
@@ -423,7 +423,7 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
   /**
    * Indexes a single node.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   The node to index.
    *
    * @return array

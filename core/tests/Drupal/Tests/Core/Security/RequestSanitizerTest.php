@@ -51,7 +51,7 @@ class RequestSanitizerTest extends UnitTestCase {
   /**
    * Tests RequestSanitizer class.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request to sanitize.
    * @param array $expected
    *   An array of expected request parameters after sanitization. The possible
@@ -380,7 +380,7 @@ class RequestSanitizerTest extends UnitTestCase {
    * @param array $request
    *   (optional) The POST parameters.
    *
-   * @return \Symfony\Component\HttpFoundation\Request
+   * @return Request
    *   The request object.
    */
   protected function createRequestForTesting(array $query = [], array $request = []): Request {

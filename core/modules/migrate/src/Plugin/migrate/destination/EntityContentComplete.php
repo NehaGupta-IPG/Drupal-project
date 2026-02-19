@@ -62,12 +62,12 @@ class EntityContentComplete extends EntityContentBase {
   /**
    * Gets the entity.
    *
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The row object.
    * @param array $old_destination_id_values
    *   The old destination IDs.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The entity.
    */
   protected function getEntity(Row $row, array $old_destination_id_values) {
@@ -114,7 +114,7 @@ class EntityContentComplete extends EntityContentBase {
     if ($entity instanceof EntityChangedInterface && $entity instanceof ContentEntityInterface) {
       // If we updated any untranslatable fields, update the timestamp for the
       // other translations.
-      /** @var \Drupal\Core\Entity\ContentEntityInterface|\Drupal\Core\Entity\EntityChangedInterface $entity */
+      /** @var ContentEntityInterface|EntityChangedInterface $entity */
       foreach ($entity->getTranslationLanguages() as $langcode => $language) {
         // If we updated an untranslated field, then set the changed time for
         // for all translations to match the current row that we are saving.

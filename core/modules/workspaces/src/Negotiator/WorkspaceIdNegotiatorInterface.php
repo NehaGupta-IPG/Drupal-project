@@ -12,7 +12,7 @@ interface WorkspaceIdNegotiatorInterface {
   /**
    * Performs workspace negotiation.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The HTTP request.
    *
    * @return string|null

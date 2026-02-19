@@ -38,7 +38,7 @@ class BlockConfigUpdater {
   /**
    * Performs the required update.
    *
-   * @param \Drupal\block\BlockInterface $block
+   * @param BlockInterface $block
    *   The block to update.
    *
    * @return bool
@@ -58,7 +58,7 @@ class BlockConfigUpdater {
   /**
    * Checks if the block contains deprecated info and status settings.
    *
-   * @param \Drupal\block\BlockInterface $block
+   * @param BlockInterface $block
    *   The block to update.
    *
    * @return bool

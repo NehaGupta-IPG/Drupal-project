@@ -22,7 +22,7 @@ class PagerPluginBaseTest extends UnitTestCase {
   /**
    * The mock pager plugin instance.
    *
-   * @var \Drupal\views\Plugin\views\pager\PagerPluginBase|\PHPUnit\Framework\MockObject\MockObject
+   * @var PagerPluginBase|MockObject
    */
   protected $pager;
 

@@ -60,7 +60,7 @@ class Filter {
   /**
    * Constructs a new Filter object.
    *
-   * @param \Drupal\jsonapi\Query\EntityConditionGroup $root
+   * @param EntityConditionGroup $root
    *   An entity condition group which can be applied to an entity query.
    */
   public function __construct(EntityConditionGroup $root) {
@@ -77,7 +77,7 @@ class Filter {
   /**
    * Applies the root condition to the given query.
    *
-   * @param \Drupal\Core\Entity\Query\QueryInterface $query
+   * @param QueryInterface $query
    *   The query for which the condition should be constructed.
    *
    * @return \Drupal\Core\Entity\Query\ConditionInterface
@@ -91,9 +91,9 @@ class Filter {
   /**
    * Applies the root condition to the given query.
    *
-   * @param \Drupal\Core\Entity\Query\QueryInterface $query
+   * @param QueryInterface $query
    *   The query to which the filter should be applied.
-   * @param \Drupal\jsonapi\Query\EntityConditionGroup $condition_group
+   * @param EntityConditionGroup $condition_group
    *   The condition group to build.
    *
    * @return \Drupal\Core\Entity\Query\ConditionInterface
@@ -139,9 +139,9 @@ class Filter {
    *
    * @param mixed $parameter
    *   The `filter` query parameter from the Symfony request object.
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The JSON:API resource type.
-   * @param \Drupal\jsonapi\Context\FieldResolver $field_resolver
+   * @param FieldResolver $field_resolver
    *   The JSON:API field resolver.
    *
    * @return self
@@ -250,7 +250,7 @@ class Filter {
    * @param array $items
    *   The normalized entity conditions and groups.
    *
-   * @return \Drupal\jsonapi\Query\EntityConditionGroup
+   * @return EntityConditionGroup
    *   A root group containing all the denormalized conditions and groups.
    */
   protected static function buildEntityConditionGroup(array $items) {
@@ -269,7 +269,7 @@ class Filter {
    * @param array $items
    *   The normalized entity conditions and groups.
    *
-   * @return \Drupal\jsonapi\Query\EntityConditionGroup
+   * @return EntityConditionGroup
    *   The entity condition group
    */
   protected static function buildTree(array $root, array $items) {

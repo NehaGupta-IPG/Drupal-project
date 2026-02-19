@@ -18,7 +18,7 @@ trait ModuleDependencyMessageTrait {
    *   The list of existing modules.
    * @param string $dependency
    *   The module dependency to check.
-   * @param \Drupal\Core\Extension\Dependency $dependency_object
+   * @param Dependency $dependency_object
    *   Dependency object used for comparing version requirement data.
    *
    * @return string|null

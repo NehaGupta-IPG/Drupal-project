@@ -46,7 +46,7 @@ class ToolbarActiveTrailTest extends WebDriverTestBase {
    * @param string $orientation
    *   The toolbar orientation.
    *
-   * @throws \Behat\Mink\Exception\ElementNotFoundException
+   * @throws ElementNotFoundException
    */
   #[TestWith(["vertical"])]
   #[TestWith(["horizontal"])]

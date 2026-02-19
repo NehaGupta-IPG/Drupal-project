@@ -22,14 +22,14 @@ class MenuLinkEditForm extends FormBase {
   /**
    * The class resolver.
    *
-   * @var \Drupal\Core\DependencyInjection\ClassResolverInterface
+   * @var ClassResolverInterface
    */
   protected $classResolver;
 
   /**
    * Constructs a MenuLinkEditForm object.
    *
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $class_resolver
+   * @param ClassResolverInterface $class_resolver
    *   The class resolver.
    */
   public function __construct(ClassResolverInterface $class_resolver) {
@@ -57,9 +57,9 @@ class MenuLinkEditForm extends FormBase {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
-   * @param \Drupal\Core\Menu\MenuLinkInterface $menu_link_plugin
+   * @param MenuLinkInterface $menu_link_plugin
    *   The plugin instance to use for this form.
    */
   public function buildForm(array $form, FormStateInterface $form_state, ?MenuLinkInterface $menu_link_plugin = NULL) {

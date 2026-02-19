@@ -22,7 +22,7 @@ class LazyContextRepositoryTest extends UnitTestCase {
   /**
    * The container.
    *
-   * @var \Symfony\Component\DependencyInjection\ContainerBuilder
+   * @var ContainerBuilder
    */
   protected $container;
 

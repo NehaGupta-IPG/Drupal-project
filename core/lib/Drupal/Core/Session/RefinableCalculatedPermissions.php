@@ -63,12 +63,12 @@ class RefinableCalculatedPermissions implements RefinableCalculatedPermissionsIn
   /**
    * Merges two items of identical scope and identifier.
    *
-   * @param \Drupal\Core\Session\CalculatedPermissionsItemInterface $a
+   * @param CalculatedPermissionsItemInterface $a
    *   The first item to merge.
-   * @param \Drupal\Core\Session\CalculatedPermissionsItemInterface $b
+   * @param CalculatedPermissionsItemInterface $b
    *   The second item to merge.
    *
-   * @return \Drupal\Core\Session\CalculatedPermissionsItemInterface
+   * @return CalculatedPermissionsItemInterface
    *   A new item representing the merger of both items.
    */
   protected static function mergeItems(CalculatedPermissionsItemInterface $a, CalculatedPermissionsItemInterface $b): CalculatedPermissionsItemInterface {

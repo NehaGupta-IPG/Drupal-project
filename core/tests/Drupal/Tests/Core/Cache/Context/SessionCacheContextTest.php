@@ -21,21 +21,21 @@ class SessionCacheContextTest extends UnitTestCase {
   /**
    * The request.
    *
-   * @var \Symfony\Component\HttpFoundation\Request
+   * @var Request
    */
   protected $request;
 
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * The session object.
    *
-   * @var \Symfony\Component\HttpFoundation\Session\SessionInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Symfony\Component\HttpFoundation\Session\SessionInterface|MockObject
    */
   protected $session;
 

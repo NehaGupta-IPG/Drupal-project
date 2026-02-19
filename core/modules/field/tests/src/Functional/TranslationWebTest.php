@@ -45,14 +45,14 @@ class TranslationWebTest extends FieldTestBase {
   /**
    * The field storage to use in this test.
    *
-   * @var \Drupal\field\Entity\FieldStorageConfig
+   * @var FieldStorageConfig
    */
   protected $fieldStorage;
 
   /**
    * The field to use in this test.
    *
-   * @var \Drupal\field\Entity\FieldConfig
+   * @var FieldConfig
    */
   protected $field;
 

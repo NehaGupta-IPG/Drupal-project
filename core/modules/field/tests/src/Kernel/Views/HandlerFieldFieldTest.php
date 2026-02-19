@@ -311,7 +311,7 @@ class HandlerFieldFieldTest extends KernelTestBase {
   /**
    * Sets up the testing view with random field data.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view to add field data to.
    */
   protected function prepareView(ViewExecutable $view): void {

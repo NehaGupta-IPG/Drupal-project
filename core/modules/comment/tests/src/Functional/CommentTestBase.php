@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\comment\Functional;
 
 use Drupal\comment\AnonymousContact;
-use Drupal\comment\CommentPreviewMode;
-use Drupal\Component\Render\FormattableMarkup;
-use Drupal\comment\Entity\CommentType;
-use Drupal\comment\Entity\Comment;
 use Drupal\comment\CommentInterface;
-use Drupal\comment\Tests\CommentTestTrait;
-use Drupal\field\Entity\FieldConfig;
+use Drupal\comment\CommentPreviewMode;
+use Drupal\comment\Entity\Comment;
+use Drupal\comment\Entity\CommentType;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
+use Drupal\comment\Tests\CommentTestTrait;
+use Drupal\Component\Render\FormattableMarkup;
+use Drupal\field\Entity\FieldConfig;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\BrowserTestBase;
 
@@ -103,7 +103,7 @@ abstract class CommentTestBase extends BrowserTestBase {
   /**
    * Posts a comment.
    *
-   * @param \Drupal\Core\Entity\EntityInterface|null $entity
+   * @param EntityInterface|null $entity
    *   Node to post comment on or NULL to post to the previously loaded page.
    * @param string $comment
    *   Comment body.
@@ -116,7 +116,7 @@ abstract class CommentTestBase extends BrowserTestBase {
    *   (optional) Field name through which the comment should be posted.
    *   Defaults to 'comment'.
    *
-   * @return \Drupal\comment\CommentInterface|null
+   * @return CommentInterface|null
    *   The posted comment or NULL when posted comment was not found.
    */
   protected function postComment($entity, $comment, $subject = '', $contact = NULL, $field_name = 'comment') {
@@ -192,7 +192,7 @@ abstract class CommentTestBase extends BrowserTestBase {
   /**
    * Checks current page for specified comment.
    *
-   * @param \Drupal\comment\CommentInterface $comment
+   * @param CommentInterface $comment
    *   The comment object.
    * @param bool $reply
    *   Boolean indicating whether the comment is a reply to another comment.
@@ -227,7 +227,7 @@ abstract class CommentTestBase extends BrowserTestBase {
   /**
    * Deletes a comment.
    *
-   * @param \Drupal\comment\CommentInterface $comment
+   * @param CommentInterface $comment
    *   Comment to delete.
    */
   protected function deleteComment(CommentInterface $comment) {
@@ -260,7 +260,7 @@ abstract class CommentTestBase extends BrowserTestBase {
   /**
    * Sets the value governing the previewing mode for the comment form.
    *
-   * @param \Drupal\comment\CommentPreviewMode|int $mode
+   * @param CommentPreviewMode|int $mode
    *   The preview mode, a case of the CommentPreviewMode enum.
    * @param string $field_name
    *   (optional) Field name through which the comment should be posted.
@@ -291,7 +291,7 @@ abstract class CommentTestBase extends BrowserTestBase {
   /**
    * Sets the value governing restrictions on anonymous comments.
    *
-   * @param \Drupal\comment\AnonymousContact|int $level
+   * @param AnonymousContact|int $level
    *   The level of the contact information allowed for anonymous comments.
    */
   protected function setCommentAnonymous(AnonymousContact|int $level) {
@@ -347,7 +347,7 @@ abstract class CommentTestBase extends BrowserTestBase {
   /**
    * Performs the specified operation on the specified comment.
    *
-   * @param \Drupal\comment\CommentInterface $comment
+   * @param CommentInterface $comment
    *   Comment to perform operation on.
    * @param string $operation
    *   Operation to perform.
@@ -392,7 +392,7 @@ abstract class CommentTestBase extends BrowserTestBase {
    * @param string $label
    *   The comment type label.
    *
-   * @return \Drupal\comment\Entity\CommentType
+   * @return CommentType
    *   Created comment type.
    */
   protected function createCommentType($label) {

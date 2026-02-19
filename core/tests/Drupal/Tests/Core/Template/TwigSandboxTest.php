@@ -27,7 +27,7 @@ class TwigSandboxTest extends UnitTestCase {
   /**
    * The Twig environment loaded with the sandbox extension.
    *
-   * @var \Twig\Environment
+   * @var Environment
    */
   protected $twig;
 

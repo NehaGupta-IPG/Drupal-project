@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Drupal\entity_test;
 
 use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityAccessControlHandler;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\entity_test\Entity\EntityTestLabel;
@@ -37,7 +37,6 @@ class EntityTestAccessControlHandler extends EntityAccessControlHandler {
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     /** @var \Drupal\entity_test\Entity\EntityTest $entity */
-
     // Always forbid access to entities with the label 'forbid_access', used for
     // \Drupal\system\Tests\Entity\EntityAccessControlHandlerTest::testDefaultEntityAccess().
     if ($entity->label() == 'forbid_access') {

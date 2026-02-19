@@ -38,12 +38,12 @@ interface SelectionPluginManagerInterface extends PluginManagerInterface {
   /**
    * Gets the selection handler for a given entity_reference field.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition for the operation.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   (optional) The entity for the operation. Defaults to NULL.
    *
-   * @return \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface
+   * @return SelectionInterface
    *   The selection plugin.
    */
   public function getSelectionHandler(FieldDefinitionInterface $field_definition, ?EntityInterface $entity = NULL);

@@ -58,23 +58,23 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
   /**
    * The resource object's links.
    *
-   * @var \Drupal\jsonapi\JsonApiResource\LinkCollection
+   * @var LinkCollection
    */
   protected $links;
 
   /**
    * The resource language.
    *
-   * @var \Drupal\Core\Language\LanguageInterface
+   * @var LanguageInterface
    */
   protected $language;
 
   /**
    * ResourceObject constructor.
    *
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $cacheability
+   * @param CacheableDependencyInterface $cacheability
    *   The cacheability for the resource object.
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The JSON:API resource type of the resource object.
    * @param string $id
    *   The resource object's ID.
@@ -83,9 +83,9 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
    *   not versionable.
    * @param array $fields
    *   An array of the resource object's fields, keyed by public field name.
-   * @param \Drupal\jsonapi\JsonApiResource\LinkCollection $links
+   * @param LinkCollection $links
    *   The links for the resource object.
-   * @param \Drupal\Core\Language\LanguageInterface|null $language
+   * @param LanguageInterface|null $language
    *   (optional) The resource language.
    */
   public function __construct(CacheableDependencyInterface $cacheability, ResourceType $resource_type, $id, $revision_id, array $fields, LinkCollection $links, ?LanguageInterface $language = NULL) {
@@ -106,11 +106,11 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
   /**
    * Creates a new ResourceObject from an entity.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The JSON:API resource type of the resource object.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to be represented by this resource object.
-   * @param \Drupal\jsonapi\JsonApiResource\LinkCollection $links
+   * @param LinkCollection $links
    *   (optional) Any links for the resource object, if a `self` link is not
    *   provided, one will be automatically added if the resource is locatable
    *   and is not an internal entity.
@@ -149,7 +149,7 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
    * @param string $public_field_name
    *   A public field name.
    *
-   * @return mixed|\Drupal\Core\Field\FieldItemListInterface|null
+   * @return mixed|FieldItemListInterface|null
    *   The field or NULL if the resource object does not have the given field.
    *
    * @see ::extractFields()
@@ -173,7 +173,7 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
   /**
    * Gets the ResourceObject's language.
    *
-   * @return \Drupal\Core\Language\LanguageInterface
+   * @return LanguageInterface
    *   The resource language.
    */
   public function getLanguage(): LanguageInterface {
@@ -183,7 +183,7 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
   /**
    * Gets the ResourceObject's links.
    *
-   * @return \Drupal\jsonapi\JsonApiResource\LinkCollection
+   * @return LinkCollection
    *   The resource object's links.
    */
   public function getLinks() {
@@ -207,7 +207,7 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
   /**
    * Gets a Url for the ResourceObject.
    *
-   * @return \Drupal\Core\Url
+   * @return Url
    *   The URL for the identified resource object.
    *
    * @throws \LogicException
@@ -228,12 +228,12 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
   /**
    * Extracts the entity's fields.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The JSON:API resource type of the given entity.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity from which fields should be extracted.
    *
-   * @return mixed|\Drupal\Core\Field\FieldItemListInterface[]
+   * @return mixed|FieldItemListInterface[]
    *   If the resource object represents a content entity, the fields will be
    *   objects satisfying FieldItemListInterface. If it represents a config
    *   entity, the fields will be scalar values or arrays.
@@ -248,16 +248,16 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
   /**
    * Builds a LinkCollection for the given entity.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The JSON:API resource type of the given entity.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity for which to build links.
-   * @param \Drupal\jsonapi\JsonApiResource\LinkCollection $links
+   * @param LinkCollection $links
    *   (optional) Any extra links for the resource object, if a `self` link is
    *   not provided, one will be automatically added if the resource is
    *   locatable and is not an internal entity.
    *
-   * @return \Drupal\jsonapi\JsonApiResource\LinkCollection
+   * @return LinkCollection
    *   The built links.
    */
   protected static function buildLinksFromEntity(ResourceType $resource_type, EntityInterface $entity, LinkCollection $links) {
@@ -293,12 +293,12 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
   /**
    * Extracts a content entity's fields.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The JSON:API resource type of the given entity.
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The config entity from which fields should be extracted.
    *
-   * @return array<string, \Drupal\Core\Field\FieldItemListInterface<\Drupal\Core\Field\FieldItemInterface>>
+   * @return array<string, FieldItemListInterface<FieldItemInterface>>
    *   The fields extracted from a content entity.
    */
   protected static function extractContentEntityFields(ResourceType $resource_type, ContentEntityInterface $entity) {
@@ -334,7 +334,7 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
   /**
    * Determines the entity type's (internal) label field name.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity from which fields should be extracted.
    *
    * @return string
@@ -356,9 +356,9 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
   /**
    * Extracts a config entity's fields.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The JSON:API resource type of the given entity.
-   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface $entity
+   * @param ConfigEntityInterface $entity
    *   The config entity from which fields should be extracted.
    *
    * @return array
@@ -376,7 +376,7 @@ class ResourceObject implements CacheableDependencyInterface, ResourceIdentifier
     });
     // Return a sub-array of $output containing the keys in $enabled_fields.
     $input = array_intersect_key($fields, array_flip($enabled_field_names));
-    /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
+    /** @var ConfigEntityInterface $entity */
     foreach ($input as $field_name => $field_value) {
       $public_field_name = $resource_type->getPublicName($field_name);
       $enabled_public_fields[$public_field_name] = $field_value;

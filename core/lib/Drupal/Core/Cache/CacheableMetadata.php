@@ -61,7 +61,7 @@ class CacheableMetadata implements RefinableCacheableDependencyInterface {
   /**
    * Sets the maximum age (in seconds).
    *
-   * Defaults to Cache::PERMANENT
+   * Defaults to Cache::PERMANENT.
    *
    * @param int $max_age
    *   The max age to associate.
@@ -83,7 +83,7 @@ class CacheableMetadata implements RefinableCacheableDependencyInterface {
   /**
    * Merges the values of another CacheableMetadata object with this one.
    *
-   * @param \Drupal\Core\Cache\CacheableMetadata $other
+   * @param CacheableMetadata $other
    *   The other CacheableMetadata object.
    *
    * @return static
@@ -157,7 +157,7 @@ class CacheableMetadata implements RefinableCacheableDependencyInterface {
   /**
    * Creates a CacheableMetadata object from a depended object.
    *
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface|mixed $object
+   * @param CacheableDependencyInterface|mixed $object
    *   The object whose cacheability metadata to retrieve. If it implements
    *   CacheableDependencyInterface, its cacheability metadata will be used,
    *   otherwise, the passed in object must be assumed to be uncacheable, so

@@ -4,8 +4,8 @@ namespace Drupal\views\Plugin\views\field;
 
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Form\WorkspaceSafeFormTrait;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -13,8 +13,8 @@ use Drupal\Core\Form\WorkspaceDynamicSafeFormInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Routing\RedirectDestinationTrait;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Routing\ResettableStackedRouteMatchInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\TranslatableInterface;
 use Drupal\views\Attribute\ViewsField;
 use Drupal\views\Entity\Render\EntityTranslationRenderTrait;
@@ -38,14 +38,14 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity repository service.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   * @var EntityRepositoryInterface
    */
   protected $entityRepository;
 
@@ -66,21 +66,21 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The messenger.
    *
-   * @var \Drupal\Core\Messenger\MessengerInterface
+   * @var MessengerInterface
    */
   protected $messenger;
 
   /**
    * The current route match service.
    *
-   * @var \Drupal\Core\Routing\ResettableStackedRouteMatchInterface
+   * @var ResettableStackedRouteMatchInterface
    */
   protected ResettableStackedRouteMatchInterface $routeMatch;
 
@@ -93,19 +93,19 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository.
-   * @param \Drupal\Core\Routing\ResettableStackedRouteMatchInterface $route_match
+   * @param ResettableStackedRouteMatchInterface $route_match
    *   The current route match service.
    *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws InvalidPluginDefinitionException
+   * @throws PluginNotFoundException
    */
   public function __construct(
     array $configuration,
@@ -282,7 +282,7 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function viewsForm(&$form, FormStateInterface $form_state) {
@@ -388,10 +388,10 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   * @throws AccessDeniedHttpException
    *   Thrown when the user tried to access an action without access to it.
    */
   public function viewsFormSubmit(&$form, FormStateInterface $form_state) {
@@ -465,7 +465,7 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
   /**
    * Returns the message that is displayed when no action is selected.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   * @return TranslatableMarkup
    *   Message displayed when no action is selected.
    */
   protected function emptyActionMessage(): TranslatableMarkup {
@@ -510,7 +510,7 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
    * submitting a bulk form. This key allows the entity for the row to be loaded
    * totally independent of the executed view row.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to calculate a bulk form key for.
    * @param bool $use_revision
    *   Whether the revision id should be added to the bulk form key. This should
@@ -543,7 +543,7 @@ class BulkForm extends FieldPluginBase implements CacheableDependencyInterface, 
    *   The bulk form key representing the entity's id, language and revision (if
    *   applicable) as one string.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The entity loaded in the state (language, optionally revision) specified
    *   as part of the bulk form key.
    */

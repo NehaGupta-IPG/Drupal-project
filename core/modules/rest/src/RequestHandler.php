@@ -12,8 +12,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
-use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -26,14 +26,14 @@ class RequestHandler implements ContainerInjectionInterface {
   /**
    * The serializer.
    *
-   * @var \Symfony\Component\Serializer\SerializerInterface|\Symfony\Component\Serializer\Encoder\DecoderInterface
+   * @var SerializerInterface|DecoderInterface
    */
   protected $serializer;
 
   /**
    * Creates a new RequestHandler instance.
    *
-   * @param \Symfony\Component\Serializer\SerializerInterface|\Symfony\Component\Serializer\Encoder\DecoderInterface $serializer
+   * @param SerializerInterface|DecoderInterface $serializer
    *   The serializer.
    */
   public function __construct(SerializerInterface $serializer) {
@@ -52,14 +52,14 @@ class RequestHandler implements ContainerInjectionInterface {
   /**
    * Handles a REST API request.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The HTTP request object.
-   * @param \Drupal\rest\RestResourceConfigInterface $_rest_resource_config
+   * @param RestResourceConfigInterface $_rest_resource_config
    *   The REST resource config entity.
    *
-   * @return \Drupal\rest\ResourceResponseInterface|\Symfony\Component\HttpFoundation\Response
+   * @return ResourceResponseInterface|Response
    *   The REST resource response.
    */
   public function handle(RouteMatchInterface $route_match, Request $request, RestResourceConfigInterface $_rest_resource_config) {
@@ -72,14 +72,14 @@ class RequestHandler implements ContainerInjectionInterface {
   /**
    * Handles a REST API request without deserializing the request body.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The HTTP request object.
-   * @param \Drupal\rest\RestResourceConfigInterface $_rest_resource_config
+   * @param RestResourceConfigInterface $_rest_resource_config
    *   The REST resource config entity.
    *
-   * @return \Symfony\Component\HttpFoundation\Response|\Drupal\rest\ResourceResponseInterface
+   * @return \Symfony\Component\HttpFoundation\Response|ResourceResponseInterface
    *   The REST resource response.
    */
   public function handleRaw(RouteMatchInterface $route_match, Request $request, RestResourceConfigInterface $_rest_resource_config) {
@@ -91,12 +91,12 @@ class RequestHandler implements ContainerInjectionInterface {
   /**
    * Prepares the REST resource response.
    *
-   * @param \Drupal\rest\ResourceResponseInterface $response
+   * @param ResourceResponseInterface $response
    *   The REST resource response.
-   * @param \Drupal\rest\RestResourceConfigInterface $resource_config
+   * @param RestResourceConfigInterface $resource_config
    *   The REST resource config entity.
    *
-   * @return \Drupal\rest\ResourceResponseInterface
+   * @return ResourceResponseInterface
    *   The prepared REST resource response.
    */
   protected function prepareResponse($response, RestResourceConfigInterface $resource_config) {
@@ -110,7 +110,7 @@ class RequestHandler implements ContainerInjectionInterface {
   /**
    * Gets the normalized HTTP request method of the matched route.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
    *
    * @return string
@@ -136,20 +136,20 @@ class RequestHandler implements ContainerInjectionInterface {
   /**
    * Deserializes request body, if any.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The HTTP request object.
-   * @param \Drupal\rest\Plugin\ResourceInterface $resource
+   * @param ResourceInterface $resource
    *   The REST resource plugin.
    *
    * @return array|null
    *   An object normalization, ikf there is a valid request body. NULL if there
    *   is no request body.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws BadRequestHttpException
    *   Thrown if the request body cannot be decoded.
-   * @throws \Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException
+   * @throws UnprocessableEntityHttpException
    *   Thrown if the request body cannot be denormalized.
    */
   protected function deserialize(RouteMatchInterface $route_match, Request $request, ResourceInterface $resource) {
@@ -195,16 +195,16 @@ class RequestHandler implements ContainerInjectionInterface {
   /**
    * Delegates an incoming request to the appropriate REST resource plugin.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The HTTP request object.
    * @param mixed|null $unserialized
    *   The unserialized request body, if any.
-   * @param \Drupal\rest\Plugin\ResourceInterface $resource
+   * @param ResourceInterface $resource
    *   The REST resource plugin.
    *
-   * @return \Symfony\Component\HttpFoundation\Response|\Drupal\rest\ResourceResponseInterface
+   * @return \Symfony\Component\HttpFoundation\Response|ResourceResponseInterface
    *   The REST resource response.
    */
   protected function delegateToRestResourcePlugin(RouteMatchInterface $route_match, Request $request, $unserialized, ResourceInterface $resource) {
@@ -222,14 +222,14 @@ class RequestHandler implements ContainerInjectionInterface {
   /**
    * Creates an argument resolver, containing all REST parameters.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
    * @param mixed $unserialized
    *   The unserialized data.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
-   * @return \Drupal\Component\Utility\ArgumentsResolver
+   * @return ArgumentsResolver
    *   An instance of the argument resolver containing information like the
    *   'entity' we process and the 'unserialized' content from the request body.
    */

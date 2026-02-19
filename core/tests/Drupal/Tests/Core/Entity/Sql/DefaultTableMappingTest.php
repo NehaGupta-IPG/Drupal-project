@@ -21,7 +21,7 @@ class DefaultTableMappingTest extends UnitTestCase {
   /**
    * The entity type definition.
    *
-   * @var \Drupal\Core\Entity\ContentEntityTypeInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\ContentEntityTypeInterface|MockObject
    */
   protected $entityType;
 
@@ -581,7 +581,7 @@ class DefaultTableMappingTest extends UnitTestCase {
    *   Flag indicating whether the field should be treated as a base or bundle
    *   field.
    *
-   * @return \Drupal\Core\Field\FieldStorageDefinitionInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @return \Drupal\Core\Field\FieldStorageDefinitionInterface|MockObject
    *   A mock field storage definition with configured field properties.
    */
   protected function setUpDefinition($name, array $column_names, $base_field = TRUE) {

@@ -41,7 +41,7 @@ class TestSiteUserLoginCommand extends Command {
   /**
    * {@inheritdoc}
    *
-   * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+   * @throws InvalidArgumentException
    */
   protected function execute(InputInterface $input, OutputInterface $output): int {
     $root = dirname(__DIR__, 5);

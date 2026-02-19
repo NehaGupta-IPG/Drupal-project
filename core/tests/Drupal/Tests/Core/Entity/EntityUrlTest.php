@@ -30,7 +30,7 @@ class EntityUrlTest extends UnitTestCase {
   /**
    * The entity type bundle info service mock used in this test.
    *
-   * @var \Prophecy\Prophecy\ProphecyInterface|\Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @var \Prophecy\Prophecy\ProphecyInterface|EntityTypeBundleInfoInterface
    */
   protected $entityTypeBundleInfo;
 
@@ -42,7 +42,7 @@ class EntityUrlTest extends UnitTestCase {
   /**
    * The entity type mock used in this test.
    *
-   * @var \Prophecy\Prophecy\ProphecyInterface|\Drupal\Core\Entity\EntityTypeInterface
+   * @var \Prophecy\Prophecy\ProphecyInterface|EntityTypeInterface
    */
   protected $entityType;
 
@@ -128,12 +128,12 @@ class EntityUrlTest extends UnitTestCase {
     $values = ['id' => static::ENTITY_ID, 'langcode' => $this->langcode];
     $entity = $this->getEntity(StubEntityBase::class, $values);
     $this->registerLinkTemplate('edit-form');
-    /** @var \Drupal\Core\Url $url */
+    /** @var Url $url */
     $url = $entity->toUrl();
     $this->assertUrl('entity.test_entity.edit_form', ['test_entity' => static::ENTITY_ID], $entity, TRUE, $url);
 
     $this->registerLinkTemplate('canonical');
-    /** @var \Drupal\Core\Url $url */
+    /** @var Url $url */
     $url = $entity->toUrl();
     $this->assertUrl('entity.test_entity.canonical', ['test_entity' => static::ENTITY_ID], $entity, TRUE, $url);
 
@@ -165,7 +165,7 @@ class EntityUrlTest extends UnitTestCase {
     $entity = $this->getEntity(StubEntityBase::class, $values);
     $this->registerLinkTemplate($link_template);
 
-    /** @var \Drupal\Core\Url $url */
+    /** @var Url $url */
     $url = $entity->toUrl($link_template);
     // The entity ID is the sole route parameter for the link templates tested
     // here.
@@ -219,7 +219,7 @@ class EntityUrlTest extends UnitTestCase {
     // template instead of 'canonical', to test that it falls back to the
     // 'canonical' link template in case of the default revision.
     $link_template = $link_template === 'canonical' ? 'revision' : $link_template;
-    /** @var \Drupal\Core\Url $url */
+    /** @var Url $url */
     $url = $entity->toUrl($link_template);
     $this->assertUrl($expected_route_name, $expected_route_parameters, $entity, TRUE, $url);
 
@@ -276,7 +276,7 @@ class EntityUrlTest extends UnitTestCase {
     $entity = $this->getEntity(StubEntityBase::class, ['id' => static::ENTITY_ID]);
     $this->registerLinkTemplate($link_template);
 
-    /** @var \Drupal\Core\Url $url */
+    /** @var Url $url */
     $url = $entity->toUrl($link_template);
     $this->assertUrl($expected_route_name, [], $entity, FALSE, $url);
   }
@@ -324,7 +324,7 @@ class EntityUrlTest extends UnitTestCase {
     $link_template = 'add-form';
     $this->registerLinkTemplate($link_template);
 
-    /** @var \Drupal\Core\Url $url */
+    /** @var Url $url */
     $url = $entity->toUrl($link_template);
     $this->assertUrl('entity.test_entity.add_form', $expected_route_parameters, $entity, FALSE, $url);
   }
@@ -406,7 +406,7 @@ class EntityUrlTest extends UnitTestCase {
     $this->registerBundleInfo($bundle_info);
     $this->entityType->getUriCallback()->willReturn($uri_callback);
 
-    /** @var \Drupal\Core\Url $url */
+    /** @var Url $url */
     $url = $entity->toUrl('canonical');
     $this->assertUrl('<none>', [], $entity, TRUE, $url);
 
@@ -465,7 +465,7 @@ class EntityUrlTest extends UnitTestCase {
   /**
    * Returns a mock entity for testing.
    *
-   * @param class-string<\Drupal\Tests\Core\Entity\StubEntityBase> $class
+   * @param class-string<StubEntityBase> $class
    *   The class name to mock. Should be
    *   \Drupal\Tests\Core\Entity\StubEntityBase or a subclass.
    * @param array<string,int|string> $values
@@ -474,7 +474,7 @@ class EntityUrlTest extends UnitTestCase {
    *   (optional) A list of additional methods to mock on the entity object.
    *   The getEntityType() and entityTypeBundleInfo() methods are always mocked.
    *
-   * @return \Drupal\Tests\Core\Entity\StubEntityBase&\PHPUnit\Framework\MockObject\MockObject
+   * @return StubEntityBase&MockObject
    *   A mock entity object with predefined methods and properties for testing.
    */
   protected function getEntity(string $class, array $values, array $methods = []): StubEntityBase&MockObject {
@@ -506,11 +506,11 @@ class EntityUrlTest extends UnitTestCase {
    *   The expected route name of the generated URL.
    * @param array $expected_route_parameters
    *   The expected route parameters of the generated URL.
-   * @param \Drupal\Tests\Core\Entity\StubEntityBase|\PHPUnit\Framework\MockObject\MockObject $entity
+   * @param StubEntityBase|MockObject $entity
    *   The entity that is expected to be set as a URL option.
    * @param bool $has_language
    *   Whether or not the URL is expected to have a language option.
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   The URL option to make the assertions on.
    *
    * @internal

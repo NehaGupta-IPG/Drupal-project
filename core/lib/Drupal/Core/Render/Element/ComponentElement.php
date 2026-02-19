@@ -48,7 +48,7 @@ class ComponentElement extends RenderElementBase {
    * @return array
    *   The form element.
    *
-   * @throws \Drupal\Core\Render\Component\Exception\InvalidComponentDataException
+   * @throws InvalidComponentDataException
    */
   public function preRenderComponent(array $element): array {
     $this->mergeElementAttributesToPropAttributes($element);
@@ -108,7 +108,7 @@ class ComponentElement extends RenderElementBase {
    * @return string
    *   The template.
    *
-   * @throws \Drupal\Core\Render\Component\Exception\InvalidComponentDataException
+   * @throws InvalidComponentDataException
    *   When slots are not render arrays.
    */
   private function generateComponentTemplate(

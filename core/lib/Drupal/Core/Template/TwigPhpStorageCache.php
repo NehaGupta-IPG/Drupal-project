@@ -27,7 +27,7 @@ class TwigPhpStorageCache implements CacheInterface {
   /**
    * The cache object used for auto-refresh via mtime.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $cache;
 
@@ -48,7 +48,7 @@ class TwigPhpStorageCache implements CacheInterface {
   /**
    * Store cache backend and other information internally.
    *
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The cache bin.
    * @param string $twig_cache_prefix
    *   A Twig cache file prefix that changes when Twig extensions change.

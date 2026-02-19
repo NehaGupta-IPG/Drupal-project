@@ -51,21 +51,21 @@ class DefaultsSectionStorage extends SectionStorageBase implements ContainerFact
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity type bundle info.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @var EntityTypeBundleInfoInterface
    */
   protected $entityTypeBundleInfo;
 
   /**
    * The sample entity generator.
    *
-   * @var \Drupal\layout_builder\Entity\SampleEntityGeneratorInterface
+   * @var SampleEntityGeneratorInterface
    */
   protected $sampleEntityGenerator;
 
@@ -201,7 +201,7 @@ class DefaultsSectionStorage extends SectionStorageBase implements ContainerFact
   /**
    * Returns an array of relevant entity types.
    *
-   * @return \Drupal\Core\Entity\EntityTypeInterface[]
+   * @return EntityTypeInterface[]
    *   An array of entity types.
    */
   protected function getEntityTypes() {

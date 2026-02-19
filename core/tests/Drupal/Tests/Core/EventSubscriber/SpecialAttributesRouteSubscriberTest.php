@@ -73,7 +73,7 @@ class SpecialAttributesRouteSubscriberTest extends UnitTestCase {
   /**
    * Tests the onAlterRoutes method for valid variables.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route to check.
    *
    * @legacy-covers ::onAlterRoutes
@@ -91,7 +91,7 @@ class SpecialAttributesRouteSubscriberTest extends UnitTestCase {
   /**
    * Tests the onAlterRoutes method for invalid variables.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route to check.
    *
    * @legacy-covers ::onAlterRoutes

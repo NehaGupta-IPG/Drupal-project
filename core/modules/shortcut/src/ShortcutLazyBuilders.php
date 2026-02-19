@@ -19,18 +19,18 @@ class ShortcutLazyBuilders implements TrustedCallbackInterface {
   /**
    * The renderer service.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * Constructs a new ShortcutLazyBuilders object.
    *
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
+   * @param AccountInterface $currentUser
    *   The current user.
    */
   public function __construct(RendererInterface $renderer, protected EntityTypeManagerInterface $entityTypeManager, protected AccountInterface $currentUser) {

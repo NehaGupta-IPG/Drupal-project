@@ -62,7 +62,7 @@ trait AssertPageCacheContextsAndTagsTrait {
   /**
    * Asserts page cache miss, then hit for the given URL; checks cache headers.
    *
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   The URL to test.
    * @param string[] $expected_contexts
    *   The expected cache contexts for the given URL.

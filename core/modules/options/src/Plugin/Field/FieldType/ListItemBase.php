@@ -254,7 +254,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
    *
    * @param array $form
    *   The form array to add elements to.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public static function addMoreSubmit(array $form, FormStateInterface $form_state) {
@@ -290,7 +290,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
    *
    * @param array $form
    *   The form array to add elements to.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public static function deleteSubmit(array $form, FormStateInterface $form_state) {
@@ -343,7 +343,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
    * @param array $element
    *   An associative array containing the properties and children of the
    *   generic form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form for the form this element belongs to.
    *
    * @see \Drupal\Core\Render\Element\FormElementBase::processPattern()
@@ -452,7 +452,7 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
    * @param string $option
    *   The option value entered by the user.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup|string|null
+   * @return TranslatableMarkup|string|null
    *   The error message if the specified value is invalid, NULL otherwise.
    */
   protected static function validateAllowedValue($option) {

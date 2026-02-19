@@ -60,7 +60,7 @@ class ViewsConfigUpdater {
   /**
    * Performs all required updates.
    *
-   * @param \Drupal\views\ViewEntityInterface $view
+   * @param ViewEntityInterface $view
    *   The View to update.
    *
    * @return bool
@@ -91,7 +91,7 @@ class ViewsConfigUpdater {
   /**
    * Processes all display handlers.
    *
-   * @param \Drupal\views\ViewEntityInterface $view
+   * @param ViewEntityInterface $view
    *   The View to update.
    * @param bool $return_on_changed
    *   Whether processing should stop after a change is detected.
@@ -151,7 +151,7 @@ class ViewsConfigUpdater {
   /**
    * Checks if 'numeric' arguments should be converted to 'entity_target_id'.
    *
-   * @param \Drupal\views\ViewEntityInterface $view
+   * @param ViewEntityInterface $view
    *   The view entity.
    *
    * @return bool
@@ -173,7 +173,7 @@ class ViewsConfigUpdater {
    * invoked from post_update. We must directly update the view here, so that
    * it's already correct by the time views_view_presave() sees it.
    *
-   * @param \Drupal\views\ViewEntityInterface $view
+   * @param ViewEntityInterface $view
    *   The View being updated.
    *
    * @return bool
@@ -217,7 +217,7 @@ class ViewsConfigUpdater {
   /**
    * Checks for fields with the format plural option set.
    *
-   * @param \Drupal\views\ViewEntityInterface $view
+   * @param ViewEntityInterface $view
    *   The View to update.
    *
    * @return bool
@@ -256,7 +256,7 @@ class ViewsConfigUpdater {
   /**
    * Checks if 'remember_roles' setting of an exposed filter has disabled roles.
    *
-   * @param \Drupal\views\ViewEntityInterface $view
+   * @param ViewEntityInterface $view
    *   The view entity.
    *
    * @return bool
@@ -294,7 +294,7 @@ class ViewsConfigUpdater {
   /**
    * Checks for table style views needing a default CSS table class value.
    *
-   * @param \Drupal\views\ViewEntityInterface $view
+   * @param ViewEntityInterface $view
    *   The view entity.
    *
    * @return bool
@@ -310,7 +310,7 @@ class ViewsConfigUpdater {
   /**
    * Processes views and adds default CSS table class value if necessary.
    *
-   * @param \Drupal\views\ViewEntityInterface $view
+   * @param ViewEntityInterface $view
    *   The view entity.
    *
    * @return bool
@@ -348,7 +348,7 @@ class ViewsConfigUpdater {
   /**
    * Checks if 'block_content_listing_empty' needs to be removed.
    *
-   * @param \Drupal\views\ViewEntityInterface $view
+   * @param ViewEntityInterface $view
    *   The view entity.
    *
    * @return bool
@@ -363,7 +363,7 @@ class ViewsConfigUpdater {
   /**
    * Processes area plugins and removes block_content_listing_empty.
    *
-   * @param \Drupal\views\ViewEntityInterface $view
+   * @param ViewEntityInterface $view
    *   The view entity.
    *
    * @return bool
@@ -398,7 +398,7 @@ class ViewsConfigUpdater {
   /**
    * Checks for views needing a default RSS view mode.
    *
-   * @param \Drupal\views\ViewEntityInterface $view
+   * @param ViewEntityInterface $view
    *   The view entity.
    * @param string|null $previous_view_mode
    *   The previous view mode.
@@ -413,7 +413,7 @@ class ViewsConfigUpdater {
   /**
    * Processes views and sets the default RSS view mode if necessary.
    *
-   * @param \Drupal\views\ViewEntityInterface $view
+   * @param ViewEntityInterface $view
    *   The view entity.
    * @param string|null $previous_view_mode
    *   The previous view mode.

@@ -18,7 +18,7 @@ trait IconTestTrait {
    * @param array $data
    *   The icon data to create.
    *
-   * @return \Drupal\Core\Theme\Icon\IconDefinitionInterface
+   * @return IconDefinitionInterface
    *   The icon mocked.
    */
   protected function createTestIcon(array $data = []): IconDefinitionInterface {

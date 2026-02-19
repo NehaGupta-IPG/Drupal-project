@@ -27,14 +27,14 @@ class ProviderRepositoryTest extends UnitTestCase {
   /**
    * The provider repository under test.
    *
-   * @var \Drupal\media\OEmbed\ProviderRepository
+   * @var ProviderRepository
    */
   private $repository;
 
   /**
    * The HTTP client handler which will serve responses.
    *
-   * @var \GuzzleHttp\Handler\MockHandler
+   * @var MockHandler
    */
   private $responses;
 
@@ -55,7 +55,7 @@ class ProviderRepositoryTest extends UnitTestCase {
   /**
    * The mocked logger channel.
    *
-   * @var \Psr\Log\LoggerInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var \Psr\Log\LoggerInterface|ObjectProphecy
    */
   private $logger;
 

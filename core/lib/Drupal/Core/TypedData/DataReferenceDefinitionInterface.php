@@ -15,7 +15,7 @@ interface DataReferenceDefinitionInterface extends DataDefinitionInterface {
   /**
    * Gets the data definition of the referenced data.
    *
-   * @return \Drupal\Core\TypedData\DataDefinitionInterface
+   * @return DataDefinitionInterface
    *   The data definition of the referenced data.
    */
   public function getTargetDefinition();

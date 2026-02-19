@@ -29,68 +29,68 @@ class ConfigTranslationController extends ControllerBase {
   /**
    * The configuration mapper manager.
    *
-   * @var \Drupal\config_translation\ConfigMapperManagerInterface
+   * @var ConfigMapperManagerInterface
    */
   protected $configMapperManager;
 
   /**
    * The menu link access service.
    *
-   * @var \Drupal\Core\Access\AccessManagerInterface
+   * @var AccessManagerInterface
    */
   protected $accessManager;
 
   /**
    * The dynamic router service.
    *
-   * @var \Symfony\Component\Routing\Matcher\RequestMatcherInterface
+   * @var RequestMatcherInterface
    */
   protected $router;
 
   /**
    * The path processor service.
    *
-   * @var \Drupal\Core\PathProcessor\InboundPathProcessorInterface
+   * @var InboundPathProcessorInterface
    */
   protected $pathProcessor;
 
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $account;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * Constructs a ConfigTranslationController.
    *
-   * @param \Drupal\config_translation\ConfigMapperManagerInterface $config_mapper_manager
+   * @param ConfigMapperManagerInterface $config_mapper_manager
    *   The configuration mapper manager.
-   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
+   * @param AccessManagerInterface $access_manager
    *   The menu link access service.
-   * @param \Symfony\Component\Routing\Matcher\RequestMatcherInterface $router
+   * @param RequestMatcherInterface $router
    *   The dynamic router service.
-   * @param \Drupal\Core\PathProcessor\InboundPathProcessorInterface $path_processor
+   * @param InboundPathProcessorInterface $path_processor
    *   The inbound path processor.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The current user.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
    */
   public function __construct(
@@ -115,9 +115,9 @@ class ConfigTranslationController extends ControllerBase {
   /**
    * Language translations overview page for a configuration name.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   Page request object.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
    * @param string $plugin_id
    *   The plugin ID of the mapper.

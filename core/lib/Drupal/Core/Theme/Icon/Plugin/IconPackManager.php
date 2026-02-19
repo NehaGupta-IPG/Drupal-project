@@ -152,22 +152,22 @@ class IconPackManager extends DefaultPluginManager implements IconPackManagerInt
    *
    * This property will only be set if the validator library is available.
    *
-   * @var \JsonSchema\Validator|null
+   * @var Validator|null
    */
   private ?Validator $validator = NULL;
 
   /**
    * Constructs the IconPackPluginManager object.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler
+   * @param ThemeHandlerInterface $themeHandler
    *   The theme handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
+   * @param CacheBackendInterface $cacheBackend
    *   The cache backend.
-   * @param \Drupal\Core\Theme\Icon\IconExtractorPluginManager $iconPackExtractorManager
+   * @param IconExtractorPluginManager $iconPackExtractorManager
    *   The icon plugin extractor service.
-   * @param \Drupal\Core\Theme\Icon\IconCollector $iconCollector
+   * @param IconCollector $iconCollector
    *   The icon cache collector service.
    * @param string $appRoot
    *   The application root.
@@ -189,7 +189,7 @@ class IconPackManager extends DefaultPluginManager implements IconPackManagerInt
   /**
    * Sets the validator service if available.
    *
-   * @param \JsonSchema\Validator|null $validator
+   * @param Validator|null $validator
    *   The JSON Validator class.
    */
   public function setValidator(?Validator $validator = NULL): void {
@@ -397,7 +397,7 @@ class IconPackManager extends DefaultPluginManager implements IconPackManagerInt
    * @return bool
    *   FALSE if the response failed validation, otherwise TRUE.
    *
-   * @throws \Drupal\Core\Theme\Icon\Exception\IconPackConfigErrorException
+   * @throws IconPackConfigErrorException
    *   Thrown when the definition is not valid.
    */
   private function validateDefinition(array $definition): bool {

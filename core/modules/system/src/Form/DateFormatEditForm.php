@@ -21,11 +21,11 @@ class DateFormatEditForm extends DateFormatFormBase {
   /**
    * Constructs a DateFormatEditForm object.
    *
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   * @param DateFormatterInterface $date_formatter
    *   The date service.
-   * @param \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $date_format_storage
+   * @param ConfigEntityStorageInterface $date_format_storage
    *   The date format storage.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct(

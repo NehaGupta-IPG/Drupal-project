@@ -71,7 +71,7 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function viewsForm(array &$form, FormStateInterface $form_state) {
@@ -144,12 +144,12 @@ class MediaLibrarySelectForm extends FieldPluginBase implements WorkspaceSafeFor
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   A command to send the selection to the current field widget.
    */
   public static function updateWidget(array &$form, FormStateInterface $form_state, Request $request) {

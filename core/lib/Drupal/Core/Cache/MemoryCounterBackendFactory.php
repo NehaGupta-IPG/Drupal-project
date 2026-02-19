@@ -12,14 +12,14 @@ class MemoryCounterBackendFactory implements CacheFactoryInterface {
   /**
    * Instantiated memory cache bins.
    *
-   * @var \Drupal\Core\Cache\MemoryBackend[]
+   * @var MemoryBackend[]
    */
   protected $bins = [];
 
   /**
    * Constructs a MemoryCounterBackendFactory object.
    *
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct(protected TimeInterface $time) {

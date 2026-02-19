@@ -28,7 +28,7 @@ class BlockEntitySettingTrayForm extends BlockForm {
   /**
    * Provides a title callback to get the block's admin label.
    *
-   * @param \Drupal\block\BlockInterface $block
+   * @param BlockInterface $block
    *   The block entity.
    *
    * @return \Drupal\Core\StringTranslation\TranslatableMarkup
@@ -160,7 +160,7 @@ class BlockEntitySettingTrayForm extends BlockForm {
   /**
    * Gets the form's redirect URL from 'destination' provide in the request.
    *
-   * @return \Drupal\Core\Url|null
+   * @return Url|null
    *   The redirect URL or NULL if dialog should just be closed.
    */
   protected function getRedirectUrl() {

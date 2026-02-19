@@ -29,27 +29,27 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
   /**
    * Module extension list.
    *
-   * @var \Drupal\Core\Extension\ModuleExtensionList
+   * @var ModuleExtensionList
    */
   protected $moduleExtensionList;
 
   /**
    * The theme extension list.
    *
-   * @var \Drupal\Core\Extension\ThemeExtensionList
+   * @var ThemeExtensionList
    */
   protected ThemeExtensionList $themeList;
 
   /**
    * Constructs the ConfigImportSubscriber.
    *
-   * @param \Drupal\Core\Extension\ThemeExtensionList $theme_extension_list
+   * @param ThemeExtensionList $theme_extension_list
    *   The theme extension list.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $extension_list_module
+   * @param ModuleExtensionList $extension_list_module
    *   The module extension list.
    * @param \Traversable $uninstallValidators
    *   The uninstall validator services.
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection.
    */
   public function __construct(
@@ -66,10 +66,10 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
   /**
    * Validates the configuration to be imported.
    *
-   * @param \Drupal\Core\Config\ConfigImporterEvent $event
+   * @param ConfigImporterEvent $event
    *   The Event to process.
    *
-   * @throws \Drupal\Core\Config\ConfigNameException
+   * @throws ConfigNameException
    */
   public function onConfigImporterValidate(ConfigImporterEvent $event) {
     foreach (['delete', 'create', 'update'] as $op) {
@@ -97,7 +97,7 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
   /**
    * Validates module installations and uninstallations.
    *
-   * @param \Drupal\Core\Config\ConfigImporter $config_importer
+   * @param ConfigImporter $config_importer
    *   The configuration importer.
    */
   protected function validateModules(ConfigImporter $config_importer) {
@@ -192,7 +192,7 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
   /**
    * Validates theme installations and uninstallations.
    *
-   * @param \Drupal\Core\Config\ConfigImporter $config_importer
+   * @param ConfigImporter $config_importer
    *   The configuration importer.
    */
   protected function validateThemes(ConfigImporter $config_importer) {
@@ -258,7 +258,7 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
   /**
    * Validates configuration being imported does not have unmet dependencies.
    *
-   * @param \Drupal\Core\Config\ConfigImporter $config_importer
+   * @param ConfigImporter $config_importer
    *   The configuration importer.
    */
   protected function validateDependencies(ConfigImporter $config_importer) {
@@ -374,7 +374,7 @@ class ConfigImportSubscriber extends ConfigImportValidateEventSubscriberBase {
    *
    * @param array $names
    *   A list of extension machine names.
-   * @param \Drupal\Core\Extension\Extension[] $extension_data
+   * @param Extension[] $extension_data
    *   Extension data.
    *
    * @return array

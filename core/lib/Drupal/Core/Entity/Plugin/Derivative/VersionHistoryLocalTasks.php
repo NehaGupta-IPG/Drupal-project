@@ -15,7 +15,7 @@ class VersionHistoryLocalTasks extends DeriverBase implements ContainerDeriverIn
   /**
    * Creates a new VersionHistoryLocalTasks instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
   public function __construct(

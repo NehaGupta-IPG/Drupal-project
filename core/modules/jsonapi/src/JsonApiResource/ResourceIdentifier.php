@@ -49,7 +49,7 @@ class ResourceIdentifier implements ResourceIdentifierInterface {
   /**
    * The JSON:API resource type.
    *
-   * @var \Drupal\jsonapi\ResourceType\ResourceType
+   * @var ResourceType
    */
   protected $resourceType;
 
@@ -70,7 +70,7 @@ class ResourceIdentifier implements ResourceIdentifierInterface {
   /**
    * ResourceIdentifier constructor.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType|string $resource_type
+   * @param ResourceType|string $resource_type
    *   The JSON:API resource type or a JSON:API resource type name.
    * @param string $id
    *   The resource ID.
@@ -173,9 +173,9 @@ class ResourceIdentifier implements ResourceIdentifierInterface {
    * This method does not consider parallel relationships with different arity
    * values to be duplicates. For that, use the isParallel() method.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceIdentifier $a
+   * @param ResourceIdentifier $a
    *   The first ResourceIdentifier object.
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceIdentifier $b
+   * @param ResourceIdentifier $b
    *   The second ResourceIdentifier object.
    *
    * @return bool
@@ -196,9 +196,9 @@ class ResourceIdentifier implements ResourceIdentifierInterface {
    *
    * This method does not consider arity.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceIdentifier $a
+   * @param ResourceIdentifier $a
    *   The first ResourceIdentifier object.
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceIdentifier $b
+   * @param ResourceIdentifier $b
    *   The second ResourceIdentifier object.
    *
    * @return bool
@@ -212,9 +212,9 @@ class ResourceIdentifier implements ResourceIdentifierInterface {
   /**
    * Compares ResourceIdentifier objects.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceIdentifier $a
+   * @param ResourceIdentifier $a
    *   The first ResourceIdentifier object.
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceIdentifier $b
+   * @param ResourceIdentifier $b
    *   The second ResourceIdentifier object.
    *
    * @return int
@@ -238,10 +238,10 @@ class ResourceIdentifier implements ResourceIdentifierInterface {
   /**
    * Deduplicates an array of ResourceIdentifier objects.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceIdentifier[] $resource_identifiers
+   * @param ResourceIdentifier[] $resource_identifiers
    *   The list of ResourceIdentifiers to deduplicate.
    *
-   * @return \Drupal\jsonapi\JsonApiResource\ResourceIdentifier[]
+   * @return ResourceIdentifier[]
    *   A deduplicated array of ResourceIdentifier objects.
    *
    * @see self::isDuplicate()
@@ -258,7 +258,7 @@ class ResourceIdentifier implements ResourceIdentifierInterface {
   /**
    * Determines if an array of ResourceIdentifier objects is duplicate free.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceIdentifier[] $resource_identifiers
+   * @param ResourceIdentifier[] $resource_identifiers
    *   The list of ResourceIdentifiers to assess.
    *
    * @return bool
@@ -271,7 +271,7 @@ class ResourceIdentifier implements ResourceIdentifierInterface {
   /**
    * Creates a ResourceIdentifier object.
    *
-   * @param \Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem $item
+   * @param EntityReferenceItem $item
    *   The entity reference field item from which to create the relationship.
    * @param int $arity
    *   (optional) The arity of the relationship.
@@ -304,7 +304,7 @@ class ResourceIdentifier implements ResourceIdentifierInterface {
   /**
    * Creates an array of ResourceIdentifier objects.
    *
-   * @param \Drupal\Core\Field\EntityReferenceFieldItemListInterface $items
+   * @param EntityReferenceFieldItemListInterface $items
    *   The entity reference field items from which to create the relationship
    *   array.
    *
@@ -326,7 +326,7 @@ class ResourceIdentifier implements ResourceIdentifierInterface {
       // order. Reverse order is important so that when a parallel relationship
       // is encountered, it will have the highest arity value so the current
       // relationship's arity value can simply be incremented by one.
-      /** @var \Drupal\jsonapi\JsonApiResource\ResourceIdentifier $existing */
+      /** @var ResourceIdentifier $existing */
       foreach (array_reverse($relationships, TRUE) as $index => $existing) {
         $is_parallel = static::isParallel($existing, $relationship);
         if ($is_parallel) {
@@ -352,7 +352,7 @@ class ResourceIdentifier implements ResourceIdentifierInterface {
   /**
    * Creates an array of ResourceIdentifier objects with arity on every value.
    *
-   * @param \Drupal\Core\Field\EntityReferenceFieldItemListInterface $items
+   * @param EntityReferenceFieldItemListInterface $items
    *   The entity reference field items from which to create the relationship
    *   array.
    *
@@ -370,7 +370,7 @@ class ResourceIdentifier implements ResourceIdentifierInterface {
   /**
    * Creates a ResourceIdentifier object.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity from which to create the resource identifier.
    *
    * @return self
@@ -386,7 +386,7 @@ class ResourceIdentifier implements ResourceIdentifierInterface {
   /**
    * Helper method to determine which field item property contains an entity.
    *
-   * @param \Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem $item
+   * @param EntityReferenceItem $item
    *   The entity reference item for which to determine the entity property
    *   name.
    *
@@ -405,7 +405,7 @@ class ResourceIdentifier implements ResourceIdentifierInterface {
   /**
    * Creates a ResourceIdentifier for a NULL or FALSE entity reference item.
    *
-   * @param \Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem $item
+   * @param EntityReferenceItem $item
    *   The entity reference field item.
    *
    * @return self

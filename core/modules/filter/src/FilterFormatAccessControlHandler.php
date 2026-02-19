@@ -18,8 +18,7 @@ class FilterFormatAccessControlHandler extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   protected function checkAccess(EntityInterface $filter_format, $operation, AccountInterface $account) {
-    /** @var \Drupal\filter\FilterFormatInterface $filter_format */
-
+    /** @var FilterFormatInterface $filter_format */
     // All users are allowed to use the fallback filter.
     if ($operation == 'use') {
       if ($filter_format->isFallbackFormat()) {

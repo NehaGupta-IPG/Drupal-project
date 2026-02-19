@@ -4,10 +4,10 @@ namespace Drupal\file\Validation;
 
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
-use Drupal\Core\Validation\ExecutionContextFactory;
 use Drupal\Core\TypedData\Validation\RecursiveValidator;
 use Drupal\Core\Validation\ConstraintValidatorFactory;
 use Drupal\Core\Validation\DrupalTranslator;
+use Drupal\Core\Validation\ExecutionContextFactory;
 
 /**
  * Factory for creating a new RecursiveValidator.
@@ -17,9 +17,9 @@ class RecursiveValidatorFactory {
   /**
    * Constructs a new RecursiveValidatorFactory.
    *
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $classResolver
+   * @param ClassResolverInterface $classResolver
    *   The class resolver.
-   * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typedDataManager
+   * @param TypedDataManagerInterface $typedDataManager
    *   The typed data manager.
    */
   public function __construct(
@@ -30,7 +30,7 @@ class RecursiveValidatorFactory {
   /**
    * Creates a new RecursiveValidator.
    *
-   * @return \Drupal\Core\TypedData\Validation\RecursiveValidator
+   * @return RecursiveValidator
    *   The validator.
    */
   public function createValidator(): RecursiveValidator {

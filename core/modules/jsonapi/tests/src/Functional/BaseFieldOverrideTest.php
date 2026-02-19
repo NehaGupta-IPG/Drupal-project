@@ -36,7 +36,7 @@ class BaseFieldOverrideTest extends ConfigEntityResourceTestBase {
   /**
    * {@inheritdoc}
    *
-   * @var \Drupal\Core\Field\Entity\BaseFieldOverride
+   * @var BaseFieldOverride
    */
   protected $entity;
 

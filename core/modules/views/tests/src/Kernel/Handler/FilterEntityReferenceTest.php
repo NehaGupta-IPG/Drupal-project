@@ -62,14 +62,14 @@ class FilterEntityReferenceTest extends ViewsKernelTestBase {
   /**
    * First test user as node author.
    *
-   * @var \Drupal\user\UserInterface
+   * @var UserInterface
    */
   protected UserInterface $user1;
 
   /**
    * Second test user as node author.
    *
-   * @var \Drupal\user\UserInterface
+   * @var UserInterface
    */
   protected UserInterface $user2;
 

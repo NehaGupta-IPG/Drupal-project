@@ -117,7 +117,7 @@ abstract class ViewsKernelTestBase extends KernelTestBase {
   /**
    * Executes a view.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view object.
    * @param array $args
    *   (optional) An array of the view arguments to use for the view.

@@ -3,11 +3,11 @@
 namespace Drupal\menu_ui\Form;
 
 use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Url;
 use Drupal\Core\Form\ConfirmFormBase;
-use Drupal\Core\Menu\MenuLinkManagerInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Menu\MenuLinkInterface;
+use Drupal\Core\Menu\MenuLinkManagerInterface;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -20,21 +20,21 @@ class MenuLinkResetForm extends ConfirmFormBase {
   /**
    * The menu link manager.
    *
-   * @var \Drupal\Core\Menu\MenuLinkManagerInterface
+   * @var MenuLinkManagerInterface
    */
   protected $menuLinkManager;
 
   /**
    * The menu link.
    *
-   * @var \Drupal\Core\Menu\MenuLinkInterface
+   * @var MenuLinkInterface
    */
   protected $link;
 
   /**
    * Constructs a MenuLinkResetForm object.
    *
-   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager
+   * @param MenuLinkManagerInterface $menu_link_manager
    *   The menu link manager.
    */
   public function __construct(MenuLinkManagerInterface $menu_link_manager) {
@@ -109,7 +109,7 @@ class MenuLinkResetForm extends ConfirmFormBase {
   /**
    * Checks access based on whether the link can be reset.
    *
-   * @param \Drupal\Core\Menu\MenuLinkInterface $menu_link_plugin
+   * @param MenuLinkInterface $menu_link_plugin
    *   The menu link plugin being checked.
    *
    * @return \Drupal\Core\Access\AccessResultInterface

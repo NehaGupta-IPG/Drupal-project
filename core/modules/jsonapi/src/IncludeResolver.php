@@ -32,14 +32,14 @@ class IncludeResolver {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The JSON:API entity access checker.
    *
-   * @var \Drupal\jsonapi\Access\EntityAccessChecker
+   * @var EntityAccessChecker
    */
   protected $entityAccessChecker;
 
@@ -54,17 +54,17 @@ class IncludeResolver {
   /**
    * Resolves included resources.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceIdentifierInterface|\Drupal\jsonapi\JsonApiResource\ResourceObjectData $data
+   * @param ResourceIdentifierInterface|ResourceObjectData $data
    *   The resource(s) for which to resolve includes.
    * @param string $include_parameter
    *   The include query parameter to resolve.
    *
-   * @return \Drupal\jsonapi\JsonApiResource\IncludedData
+   * @return IncludedData
    *   An IncludedData object of resolved resources to be included.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws PluginNotFoundException
    *   Thrown if an included entity type doesn't exist.
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws InvalidPluginDefinitionException
    *   Thrown if a storage handler couldn't be loaded.
    */
   public function resolve($data, $include_parameter) {
@@ -85,17 +85,17 @@ class IncludeResolver {
    *
    * @param array $include_tree
    *   The include paths, represented as a tree.
-   * @param \Drupal\jsonapi\JsonApiResource\Data $data
+   * @param Data $data
    *   The entity collection from which includes should be resolved.
-   * @param \Drupal\jsonapi\JsonApiResource\Data|null $includes
+   * @param Data|null $includes
    *   (Internal use only) Any prior resolved includes.
    *
-   * @return \Drupal\jsonapi\JsonApiResource\Data
+   * @return Data
    *   A JSON:API Data of included items.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws PluginNotFoundException
    *   Thrown if an included entity type doesn't exist.
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws InvalidPluginDefinitionException
    *   Thrown if a storage handler couldn't be loaded.
    */
   protected function resolveIncludeTree(array $include_tree, Data $data, ?Data $includes = NULL) {
@@ -169,7 +169,7 @@ class IncludeResolver {
   /**
    * Returns a tree of field names to include from an include parameter.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceObjectData $data
+   * @param ResourceObjectData $data
    *   The base resources for which includes should be resolved.
    * @param string $include_parameter
    *   The raw include parameter value.
@@ -186,7 +186,7 @@ class IncludeResolver {
       return array_map('trim', explode('.', $include_path));
     }, $include_paths);
     $resolved_paths_per_resource_type = [];
-    /** @var \Drupal\jsonapi\JsonApiResource\ResourceIdentifierInterface $resource_object */
+    /** @var ResourceIdentifierInterface $resource_object */
     foreach ($data as $resource_object) {
       $resource_type = $resource_object->getResourceType();
       $resource_type_name = $resource_type->getTypeName();
@@ -202,7 +202,7 @@ class IncludeResolver {
   /**
    * Resolves an array of public field paths.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $base_resource_type
+   * @param ResourceType $base_resource_type
    *   The base resource type from which to resolve an internal include path.
    * @param array $paths
    *   An array of exploded include paths.

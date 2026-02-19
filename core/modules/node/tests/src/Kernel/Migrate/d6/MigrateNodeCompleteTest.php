@@ -103,7 +103,7 @@ class MigrateNodeCompleteTest extends MigrateNodeTestBase {
    * @internal
    */
   protected function assertRevision(array $revision, array $data): void {
-    /** @var  \Drupal\node\NodeInterface $actual */
+    /** @var NodeInterface $actual */
     $actual = $this->nodeStorage->loadRevision($revision['vid'])
       ->getTranslation($revision['langcode']);
     $this->assertInstanceOf(NodeInterface::class, $actual);

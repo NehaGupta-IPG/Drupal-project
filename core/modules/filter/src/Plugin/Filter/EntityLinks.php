@@ -110,10 +110,10 @@ class EntityLinks extends FilterBase implements ContainerFactoryPluginInterface 
   /**
    * Gets the generated URL object for a linked entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   A linked entity.
    *
-   * @return \Drupal\Core\GeneratedUrl
+   * @return GeneratedUrl
    *   The generated URL plus cacheability metadata.
    */
   protected static function getUrl(EntityInterface $entity): GeneratedUrl {

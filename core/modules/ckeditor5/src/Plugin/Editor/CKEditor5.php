@@ -9,6 +9,7 @@ use Drupal\ckeditor5\LanguageMapper;
 use Drupal\ckeditor5\Plugin\CKEditor5Plugin\Heading;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface;
+use Drupal\ckeditor5\SmartDefaultSettings;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -19,7 +20,6 @@ use Drupal\Core\Form\SubformStateInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\ckeditor5\SmartDefaultSettings;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\PrimitiveTypeConstraint;
 use Drupal\editor\Attribute\Editor;
@@ -53,28 +53,28 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
   /**
    * The CKEditor plugin manager.
    *
-   * @var \Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface
+   * @var CKEditor5PluginManagerInterface
    */
   protected $ckeditor5PluginManager;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * Smart default settings utility.
    *
-   * @var \Drupal\ckeditor5\SmartDefaultSettings
+   * @var SmartDefaultSettings
    */
   protected $smartDefaultSettings;
 
@@ -88,28 +88,28 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
   /**
    * The submitted editor.
    *
-   * @var \Drupal\editor\EditorInterface
+   * @var EditorInterface
    */
   private $submittedEditor;
 
   /**
    * The cache.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $cache;
 
   /**
    * A logger instance.
    *
-   * @var \Psr\Log\LoggerInterface
+   * @var LoggerInterface
    */
   protected $logger;
 
   /**
    * The ckeditor language mapper.
    *
-   * @var \Drupal\ckeditor5\LanguageMapper
+   * @var LanguageMapper
    */
   protected LanguageMapper $languageMapper;
 
@@ -122,19 +122,19 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface $ckeditor5_plugin_manager
+   * @param CKEditor5PluginManagerInterface $ckeditor5_plugin_manager
    *   The CKEditor 5 plugin manager.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\ckeditor5\SmartDefaultSettings $smart_default_settings
+   * @param SmartDefaultSettings $smart_default_settings
    *   The smart default settings utility.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The cache.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   A logger instance.
-   * @param \Drupal\ckeditor5\LanguageMapper $languageMapper
+   * @param LanguageMapper $languageMapper
    *   The ckeditor language mapper.
    */
   public function __construct(
@@ -190,14 +190,14 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
    * Because not every text editor is guaranteed to be compatible with every
    * text format, the pair must be validated.
    *
-   * @param \Drupal\editor\EditorInterface $text_editor
+   * @param EditorInterface $text_editor
    *   The paired text editor to validate.
-   * @param \Drupal\filter\FilterFormatInterface $text_format
+   * @param FilterFormatInterface $text_format
    *   The paired text format to validate.
    * @param bool $all_compatibility_problems
    *   Get all compatibility problems (default) or only fundamental ones.
    *
-   * @return \Symfony\Component\Validator\ConstraintViolationListInterface
+   * @return ConstraintViolationListInterface
    *   The validation constraint violations.
    *
    * @throws \InvalidArgumentException
@@ -395,9 +395,9 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
   /**
    * Determines whether the plugin settings form should be visible.
    *
-   * @param \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition $definition
+   * @param CKEditor5PluginDefinition $definition
    *   The configurable CKEditor 5 plugin to assess the visibility for.
-   * @param \Drupal\editor\EditorInterface $editor
+   * @param EditorInterface $editor
    *   A configured text editor object.
    *
    * @return bool
@@ -454,9 +454,9 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
    *
    * @param array &$form
    *   A reference to an associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
-   * @param \Drupal\editor\EditorInterface $editor
+   * @param EditorInterface $editor
    *   A configured text editor object.
    */
   private function injectPluginSettingsForm(array &$form, FormStateInterface $form_state, EditorInterface $editor): void {
@@ -555,7 +555,7 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
    * @param mixed $input
    *   The incoming input to populate the form element. If this is FALSE,
    *   the element's default value should be returned.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return string
@@ -714,10 +714,10 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
    *
    * Needed for validation.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $filter_format_form_state
+   * @param FormStateInterface $filter_format_form_state
    *   The text format configuration form's form state.
    *
-   * @return \Drupal\filter\FilterFormatInterface
+   * @return FilterFormatInterface
    *   A FilterFormat config entity representing the current filter form state.
    */
   protected static function getSubmittedFilterFormat(FormStateInterface $filter_format_form_state): FilterFormatInterface {
@@ -751,12 +751,12 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
    *
    * Needed for validation.
    *
-   * @param \Drupal\Core\Form\SubformStateInterface $editor_form_state
+   * @param SubformStateInterface $editor_form_state
    *   The text editor configuration form's form state.
-   * @param \Drupal\editor\EditorInterface $submitted_editor
+   * @param EditorInterface $submitted_editor
    *   The current text editor config entity.
    *
-   * @return \Drupal\editor\EditorInterface
+   * @return EditorInterface
    *   A clone of the received Editor config entity , with a primed associated
    *   FilterFormat that corresponds to the current form state, to avoid the
    *   stored FilterFormat config entity being loaded.
@@ -812,12 +812,12 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
    *   forms to show
    * - for validating them.
    *
-   * @param \Drupal\editor\EditorInterface $editor
+   * @param EditorInterface $editor
    *   The submitted text editor config entity, constructed from form values.
-   * @param \Drupal\filter\FilterFormatInterface $filter_format
+   * @param FilterFormatInterface $filter_format
    *   The submitted text format config entity, constructed from form values.
    *
-   * @return \Drupal\editor\EditorInterface
+   * @return EditorInterface
    *   A clone of the given text editor config entity, with its $filterFormat
    *   property set to a clone of the given text format config entity.
    *

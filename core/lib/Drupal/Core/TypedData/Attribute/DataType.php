@@ -43,9 +43,9 @@ class DataType extends Plugin {
    *
    * @param string $id
    *   The data type plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $label
+   * @param TranslatableMarkup $label
    *   The human-readable name of the data type.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $description
+   * @param TranslatableMarkup|null $description
    *   (optional) The description of the data type.
    * @param string|null $definition_class
    *   (optional) The definition class to use for defining data of this type.

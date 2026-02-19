@@ -2,17 +2,21 @@
 
 namespace Drupal\image\Entity;
 
-use Drupal\Core\Entity\Attribute\ConfigEntityType;
+use Drupal\Component\Utility\Crypt;
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\Action\Attribute\ActionMethod;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Routing\RequestHelper;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
@@ -20,16 +24,12 @@ use Drupal\image\Form\ImageStyleAddForm;
 use Drupal\image\Form\ImageStyleDeleteForm;
 use Drupal\image\Form\ImageStyleEditForm;
 use Drupal\image\Form\ImageStyleFlushForm;
-use Drupal\image\ImageEffectPluginCollection;
 use Drupal\image\ImageEffectInterface;
+use Drupal\image\ImageEffectPluginCollection;
 use Drupal\image\ImageStyleInterface;
-use Drupal\Component\Utility\Crypt;
-use Drupal\Component\Utility\UrlHelper;
-use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\image\ImageStyleListBuilder;
 use Drupal\image\ImageStyleStorage;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
-use Drupal\Core\Entity\Entity\EntityViewDisplay;
 
 /**
  * Defines an image style configuration entity.
@@ -99,7 +99,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
   /**
    * Holds the collection of image effects that are used by this image style.
    *
-   * @var \Drupal\image\ImageEffectPluginCollection
+   * @var ImageEffectPluginCollection
    */
   protected $effectsCollection;
 
@@ -138,7 +138,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
   public static function postDelete(EntityStorageInterface $storage, array $entities) {
     parent::postDelete($storage, $entities);
 
-    /** @var \Drupal\image\ImageStyleInterface[] $entities */
+    /** @var ImageStyleInterface[] $entities */
     foreach ($entities as $style) {
       // Flush cached media for the deleted style.
       $style->flush();
@@ -151,7 +151,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
   /**
    * Update field settings if the image style name is changed.
    *
-   * @param \Drupal\image\ImageStyleInterface $style
+   * @param ImageStyleInterface $style
    *   The image style.
    */
   protected static function replaceImageStyle(ImageStyleInterface $style) {
@@ -275,7 +275,7 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
    */
   public function flush($path = NULL) {
     // A specific image path has been provided. Flush only that derivative.
-    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
+    /** @var FileSystemInterface $file_system */
     $file_system = \Drupal::service('file_system');
     if (isset($path)) {
       $derivative_uri = $this->buildUri($path);

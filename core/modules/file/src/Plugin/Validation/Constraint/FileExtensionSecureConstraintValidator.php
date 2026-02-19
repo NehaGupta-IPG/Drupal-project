@@ -19,7 +19,7 @@ class FileExtensionSecureConstraintValidator extends BaseFileConstraintValidator
   /**
    * Creates a new FileExtensionSecureConstraintValidator.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   * @param ConfigFactoryInterface $configFactory
    *   The config factory.
    */
   public function __construct(

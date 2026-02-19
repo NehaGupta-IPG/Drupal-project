@@ -32,7 +32,7 @@ interface SearchIndexInterface {
    * @return string[]
    *   The words to be updated.
    *
-   * @throws \Drupal\search\Exception\SearchIndexException
+   * @throws SearchIndexException
    *   If there is an error indexing the text.
    */
   public function index($type, $sid, $langcode, $text, $update_weights = TRUE);
@@ -55,7 +55,7 @@ interface SearchIndexInterface {
    *   (optional) Language code of the item to remove from the search index. If
    *   omitted, all items matching $sid and $type are cleared.
    *
-   * @throws \Drupal\search\Exception\SearchIndexException
+   * @throws SearchIndexException
    *   If there is an error clearing the index.
    */
   public function clear($type = NULL, $sid = NULL, $langcode = NULL);
@@ -79,7 +79,7 @@ interface SearchIndexInterface {
    *   (optional) The language code to mark. If omitted, everything matching
    *   $type and $sid is marked.
    *
-   * @throws \Drupal\search\Exception\SearchIndexException
+   * @throws SearchIndexException
    *   If there is an error marking the index for re-indexing.
    */
   public function markForReindex($type = NULL, $sid = NULL, $langcode = NULL);
@@ -91,7 +91,7 @@ interface SearchIndexInterface {
    *   An array whose keys are words from self::index() whose total weights
    *   need to be updated.
    *
-   * @throws \Drupal\search\Exception\SearchIndexException
+   * @throws SearchIndexException
    *   If there is an error updating the totals.
    */
   public function updateWordWeights(array $words);

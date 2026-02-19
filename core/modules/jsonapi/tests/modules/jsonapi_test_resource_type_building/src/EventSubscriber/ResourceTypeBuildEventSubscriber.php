@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\jsonapi_test_resource_type_building\EventSubscriber;
 
-use Drupal\jsonapi\ResourceType\ResourceTypeBuildEvents;
 use Drupal\jsonapi\ResourceType\ResourceTypeBuildEvent;
+use Drupal\jsonapi\ResourceType\ResourceTypeBuildEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -32,7 +32,7 @@ class ResourceTypeBuildEventSubscriber implements EventSubscriberInterface {
   /**
    * Disables any resource types that have been disabled by a test.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeBuildEvent $event
+   * @param ResourceTypeBuildEvent $event
    *   The build event.
    */
   public function disableResourceType(ResourceTypeBuildEvent $event) {
@@ -45,7 +45,7 @@ class ResourceTypeBuildEventSubscriber implements EventSubscriberInterface {
   /**
    * Aliases any resource type fields that have been aliased by a test.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeBuildEvent $event
+   * @param ResourceTypeBuildEvent $event
    *   The build event.
    */
   public function aliasResourceTypeFields(ResourceTypeBuildEvent $event) {
@@ -63,7 +63,7 @@ class ResourceTypeBuildEventSubscriber implements EventSubscriberInterface {
   /**
    * Disables any resource type fields that have been aliased by a test.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeBuildEvent $event
+   * @param ResourceTypeBuildEvent $event
    *   The build event.
    */
   public function disableResourceTypeFields(ResourceTypeBuildEvent $event) {
@@ -81,7 +81,7 @@ class ResourceTypeBuildEventSubscriber implements EventSubscriberInterface {
   /**
    * Renames any resource types that have been renamed by a test.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeBuildEvent $event
+   * @param ResourceTypeBuildEvent $event
    *   The build event.
    */
   public function renameResourceType(ResourceTypeBuildEvent $event) {

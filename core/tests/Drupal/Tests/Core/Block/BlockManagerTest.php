@@ -26,14 +26,14 @@ class BlockManagerTest extends UnitTestCase {
   /**
    * The block manager under test.
    *
-   * @var \Drupal\Core\Block\BlockManager
+   * @var BlockManager
    */
   protected $blockManager;
 
   /**
    * The logger.
    *
-   * @var \Psr\Log\LoggerInterface
+   * @var LoggerInterface
    */
   protected $logger;
 

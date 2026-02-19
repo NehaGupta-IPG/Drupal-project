@@ -129,7 +129,7 @@ class LatestRevisionFilterTest extends ViewsKernelTestBase {
   /**
    * Asserts that a list of revision IDs are not in the result.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   An executed View.
    * @param array $not_expected_revision_ids
    *   An array of revision IDs which should not be part of the result set.

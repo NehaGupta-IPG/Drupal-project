@@ -18,7 +18,7 @@ interface VariationCacheInterface {
    *
    * @param string[] $keys
    *   The cache keys to retrieve the cache entry for.
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $initial_cacheability
+   * @param CacheableDependencyInterface $initial_cacheability
    *   The cache metadata of the data to store before other systems had a chance
    *   to adjust it. This is also commonly known as "pre-bubbling" cacheability.
    *
@@ -57,9 +57,9 @@ interface VariationCacheInterface {
    *   The cache keys of the data to store.
    * @param mixed $data
    *   The data to store in the cache.
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $cacheability
+   * @param CacheableDependencyInterface $cacheability
    *   The cache metadata of the data to store.
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $initial_cacheability
+   * @param CacheableDependencyInterface $initial_cacheability
    *   The cache metadata of the data to store before other systems had a chance
    *   to adjust it. This is also commonly known as "pre-bubbling" cacheability.
    *
@@ -79,7 +79,7 @@ interface VariationCacheInterface {
    *
    * @param string[] $keys
    *   The cache keys of the data to delete.
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $initial_cacheability
+   * @param CacheableDependencyInterface $initial_cacheability
    *   The cache metadata of the data to store before other systems had a chance
    *   to adjust it. This is also commonly known as "pre-bubbling" cacheability.
    *
@@ -95,7 +95,7 @@ interface VariationCacheInterface {
    *
    * @param string[] $keys
    *   The cache keys of the data to invalidate.
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $initial_cacheability
+   * @param CacheableDependencyInterface $initial_cacheability
    *   The cache metadata of the data to store before other systems had a chance
    *   to adjust it. This is also commonly known as "pre-bubbling" cacheability.
    *

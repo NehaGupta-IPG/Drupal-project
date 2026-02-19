@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\system\Install\Requirements;
 
-use Drupal\Core\Extension\InstallRequirementsInterface;
 use Drupal\Component\FileSystem\FileSystem as FileSystemComponent;
 use Drupal\Component\Utility\Environment;
 use Drupal\Component\Utility\OpCodeCache;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DrupalKernel;
+use Drupal\Core\Extension\InstallRequirementsInterface;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Link;

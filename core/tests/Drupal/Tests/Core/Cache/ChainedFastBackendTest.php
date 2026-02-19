@@ -23,14 +23,14 @@ class ChainedFastBackendTest extends UnitTestCase {
   /**
    * The consistent cache backend.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $consistentCache;
 
   /**
    * The fast cache backend.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $fastCache;
 

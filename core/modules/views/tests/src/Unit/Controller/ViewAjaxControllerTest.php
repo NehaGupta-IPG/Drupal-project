@@ -35,49 +35,49 @@ class ViewAjaxControllerTest extends UnitTestCase {
   /**
    * The mocked view entity storage.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityStorageInterface|MockObject
    */
   protected $viewStorage;
 
   /**
    * The mocked executable factory.
    *
-   * @var \Drupal\views\ViewExecutableFactory|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\ViewExecutableFactory|MockObject
    */
   protected $executableFactory;
 
   /**
    * The tested views ajax controller.
    *
-   * @var \Drupal\views\Controller\ViewAjaxController
+   * @var ViewAjaxController
    */
   protected $viewAjaxController;
 
   /**
    * The mocked current path.
    *
-   * @var \Drupal\Core\Path\CurrentPathStack|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Path\CurrentPathStack|MockObject
    */
   protected $currentPath;
 
   /**
    * The redirect destination.
    *
-   * @var \Drupal\Core\Routing\RedirectDestinationInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Routing\RedirectDestinationInterface|MockObject
    */
   protected $redirectDestination;
 
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Render\RendererInterface|MockObject
    */
   protected $renderer;
 
   /**
    * The path validator service.
    *
-   * @var \Drupal\Core\Path\PathValidatorInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var PathValidatorInterface|MockObject
    */
   protected $pathValidator;
 
@@ -447,7 +447,7 @@ class ViewAjaxControllerTest extends UnitTestCase {
    *   Whether the 'use_ajax' option is set on the view display. Defaults to
    *   using ajax (TRUE).
    *
-   * @return \Drupal\views\ViewExecutable
+   * @return ViewExecutable
    *   The view executable.
    */
   protected function setupValidMocks($use_ajax = self::USE_AJAX): ViewExecutable {
@@ -512,7 +512,7 @@ class ViewAjaxControllerTest extends UnitTestCase {
   /**
    * Gets the commands entry from the response object.
    *
-   * @param \Drupal\views\Ajax\ViewAjaxResponse $response
+   * @param ViewAjaxResponse $response
    *   The views ajax response object.
    *
    * @return mixed
@@ -527,7 +527,7 @@ class ViewAjaxControllerTest extends UnitTestCase {
   /**
    * Ensures that the main view content command is added.
    *
-   * @param \Drupal\views\Ajax\ViewAjaxResponse $response
+   * @param ViewAjaxResponse $response
    *   The response object.
    * @param int $position
    *   The position where the view content command is expected.

@@ -14,7 +14,7 @@ interface CommentLinkBuilderInterface {
   /**
    * Builds links for the given entity.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   Entity for which the links are being built.
    * @param array $context
    *   Array of context passed from the entity view builder.

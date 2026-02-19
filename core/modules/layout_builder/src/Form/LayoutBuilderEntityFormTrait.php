@@ -23,7 +23,7 @@ trait LayoutBuilderEntityFormTrait {
   /**
    * Build the message container.
    *
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $message
+   * @param TranslatableMarkup $message
    *   The message to display.
    * @param string $type
    *   The form type this is being attached to.
@@ -61,7 +61,7 @@ trait LayoutBuilderEntityFormTrait {
   /**
    * Retrieves the section storage object.
    *
-   * @return \Drupal\layout_builder\SectionStorageInterface
+   * @return SectionStorageInterface
    *   The section storage for the current form.
    */
   public function getSectionStorage(): SectionStorageInterface {
@@ -95,9 +95,9 @@ trait LayoutBuilderEntityFormTrait {
   /**
    * Performs tasks that are needed during the save process.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $formState
+   * @param FormStateInterface $formState
    *   The form state.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $message
+   * @param TranslatableMarkup $message
    *   The message to display.
    */
   protected function saveTasks(FormStateInterface $formState, TranslatableMarkup $message): void {

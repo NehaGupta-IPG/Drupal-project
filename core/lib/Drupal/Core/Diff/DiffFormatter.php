@@ -24,7 +24,7 @@ class DiffFormatter extends DiffFormatterBase {
   /**
    * Creates a DiffFormatter to render diffs in a table.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
    */
   public function __construct(ConfigFactoryInterface $config_factory) {

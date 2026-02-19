@@ -20,22 +20,22 @@ class IncrementalForm extends MigrateUpgradeFormBase {
   /**
    * The date formatter service.
    *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
+   * @var DateFormatterInterface
    */
   protected $dateFormatter;
 
   /**
    * IncrementalForm constructor.
    *
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state service.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   * @param DateFormatterInterface $date_formatter
    *   The date formatter service.
-   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $tempstore_private
+   * @param PrivateTempStoreFactory $tempstore_private
    *   The private tempstore factory service.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory service.
-   * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
+   * @param MigrationPluginManagerInterface $migration_plugin_manager
    *   The migration plugin manager service.
    */
   public function __construct(StateInterface $state, DateFormatterInterface $date_formatter, PrivateTempStoreFactory $tempstore_private, ConfigFactoryInterface $config_factory, MigrationPluginManagerInterface $migration_plugin_manager) {

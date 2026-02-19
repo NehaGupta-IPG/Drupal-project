@@ -77,7 +77,7 @@ class NodeOperationAccessTest extends UnitTestCase {
       ->willReturn('de');
 
     $nid = 333;
-    /** @var \Drupal\node\NodeInterface|\PHPUnit\Framework\MockObject\MockObject $node */
+    /** @var NodeInterface|MockObject $node */
     $node = $this->createMock(NodeInterface::class);
     $node->expects($this->any())
       ->method('language')

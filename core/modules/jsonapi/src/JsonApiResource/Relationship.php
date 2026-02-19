@@ -33,7 +33,7 @@ class Relationship implements TopLevelDataInterface {
    * directly via a relationship URL, from its `self` URL, which should identify
    * the resource to which it belongs.
    *
-   * @var \Drupal\jsonapi\JsonApiResource\ResourceObject
+   * @var ResourceObject
    *
    * @see https://jsonapi.org/format/#document-resource-object-relationships
    * @see https://jsonapi.org/recommendations/#urls-relationships
@@ -43,7 +43,7 @@ class Relationship implements TopLevelDataInterface {
   /**
    * The data of the relationship object.
    *
-   * @var \Drupal\jsonapi\JsonApiResource\RelationshipData
+   * @var RelationshipData
    */
   protected $data;
 
@@ -57,7 +57,7 @@ class Relationship implements TopLevelDataInterface {
   /**
    * The relationship object's links.
    *
-   * @var \Drupal\jsonapi\JsonApiResource\LinkCollection
+   * @var LinkCollection
    */
   protected $links;
 
@@ -76,15 +76,15 @@ class Relationship implements TopLevelDataInterface {
    *
    * @param string $public_field_name
    *   The public field name of the relationship field.
-   * @param \Drupal\jsonapi\JsonApiResource\RelationshipData $data
+   * @param RelationshipData $data
    *   The relationship data.
-   * @param \Drupal\jsonapi\JsonApiResource\LinkCollection $links
+   * @param LinkCollection $links
    *   Any links for the resource object, if a `self` link is not
    *   provided, one will be automatically added if the resource is locatable
    *   and is not internal.
    * @param array $meta
    *   Any relationship metadata.
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceObject $context
+   * @param ResourceObject $context
    *   The relationship's context resource object. Use the
    *   self::withContext() method to establish a context.
    *
@@ -101,11 +101,11 @@ class Relationship implements TopLevelDataInterface {
   /**
    * Creates a new Relationship from an entity reference field.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceObject $context
+   * @param ResourceObject $context
    *   The context resource object of the relationship to be created.
-   * @param \Drupal\Core\Field\EntityReferenceFieldItemListInterface $field
+   * @param EntityReferenceFieldItemListInterface $field
    *   The entity reference field from which to create the relationship.
-   * @param \Drupal\jsonapi\JsonApiResource\LinkCollection $links
+   * @param LinkCollection $links
    *   (optional) Any extra links for the Relationship, if a `self` link is not
    *   provided, one will be automatically added if the context resource is
    *   locatable and is not internal.
@@ -130,7 +130,7 @@ class Relationship implements TopLevelDataInterface {
   /**
    * Gets context resource object of the relationship.
    *
-   * @return \Drupal\jsonapi\JsonApiResource\ResourceObject
+   * @return ResourceObject
    *   The context ResourceObject.
    *
    * @see \Drupal\jsonapi\JsonApiResource\Relationship::$context
@@ -152,7 +152,7 @@ class Relationship implements TopLevelDataInterface {
   /**
    * Gets the relationship object's data.
    *
-   * @return \Drupal\jsonapi\JsonApiResource\RelationshipData
+   * @return RelationshipData
    *   The relationship's data.
    */
   public function getData() {
@@ -162,7 +162,7 @@ class Relationship implements TopLevelDataInterface {
   /**
    * Gets the relationship object's links.
    *
-   * @return \Drupal\jsonapi\JsonApiResource\LinkCollection
+   * @return LinkCollection
    *   The relationship object's links.
    */
   public function getLinks() {
@@ -213,16 +213,16 @@ class Relationship implements TopLevelDataInterface {
   /**
    * Builds a LinkCollection for the given entity reference field.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceObject $context
+   * @param ResourceObject $context
    *   The context resource object of the relationship object.
-   * @param \Drupal\Core\Field\EntityReferenceFieldItemListInterface $field
+   * @param EntityReferenceFieldItemListInterface $field
    *   The entity reference field from which to create the links.
-   * @param \Drupal\jsonapi\JsonApiResource\LinkCollection $links
+   * @param LinkCollection $links
    *   Any extra links for the Relationship, if a `self` link is not provided,
    *   one will be automatically added if the context resource is locatable and
    *   is not internal.
    *
-   * @return \Drupal\jsonapi\JsonApiResource\LinkCollection
+   * @return LinkCollection
    *   The built links.
    */
   protected static function buildLinkCollectionFromEntityReferenceField(ResourceObject $context, EntityReferenceFieldItemListInterface $field, LinkCollection $links) {

@@ -15,7 +15,7 @@ interface TermStorageInterface extends ContentEntityStorageInterface {
    * @param int $tid
    *   Term ID to retrieve parents for.
    *
-   * @return \Drupal\taxonomy\TermInterface[]
+   * @return TermInterface[]
    *   An array of term objects which are the parents of the term $tid.
    */
   public function loadParents($tid);
@@ -26,7 +26,7 @@ interface TermStorageInterface extends ContentEntityStorageInterface {
    * @param int $tid
    *   Term ID to retrieve ancestors for.
    *
-   * @return \Drupal\taxonomy\TermInterface[]
+   * @return TermInterface[]
    *   An array of term objects which are the ancestors of the term $tid.
    */
   public function loadAllParents($tid);
@@ -39,7 +39,7 @@ interface TermStorageInterface extends ContentEntityStorageInterface {
    * @param string $vid
    *   An optional vocabulary ID to restrict the child search.
    *
-   * @return \Drupal\taxonomy\TermInterface[]
+   * @return TermInterface[]
    *   An array of term objects that are the children of the term $tid.
    */
   public function loadChildren($tid, $vid = NULL);
@@ -61,7 +61,7 @@ interface TermStorageInterface extends ContentEntityStorageInterface {
    *   table to save execution time and memory consumption when listing large
    *   numbers of terms. Defaults to FALSE.
    *
-   * @return object[]|\Drupal\taxonomy\TermInterface[]
+   * @return object[]|TermInterface[]
    *   A numerically indexed array of term objects that are the children of the
    *   vocabulary $vid.
    */

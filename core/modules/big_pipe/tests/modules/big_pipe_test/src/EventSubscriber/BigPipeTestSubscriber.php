@@ -6,9 +6,9 @@ namespace Drupal\big_pipe_test\EventSubscriber;
 
 use Drupal\Core\Render\AttachmentsInterface;
 use Drupal\Core\Render\HtmlResponse;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Defines a test BigPipe subscriber that checks whether the session is empty.
@@ -25,7 +25,7 @@ class BigPipeTestSubscriber implements EventSubscriberInterface {
   /**
    * Triggers exception for embedded HTML/AJAX responses with certain content.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
+   * @param ResponseEvent $event
    *   The event to process.
    *
    * @throws \Exception
@@ -50,7 +50,7 @@ class BigPipeTestSubscriber implements EventSubscriberInterface {
   /**
    * Exposes all BigPipe placeholders (JS and no-JS) via headers for testing.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
+   * @param ResponseEvent $event
    *   The event to process.
    */
   public function onRespondSetBigPipeDebugPlaceholderHeaders(ResponseEvent $event) {

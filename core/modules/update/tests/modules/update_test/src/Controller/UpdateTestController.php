@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Drupal\update_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Provides different routes of the update_test module.
@@ -16,7 +16,7 @@ class UpdateTestController extends ControllerBase {
   /**
    * Displays an Error 503 (Service unavailable) page.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   Returns the response with a special header.
    */
   public function updateError() {
@@ -44,7 +44,7 @@ class UpdateTestController extends ControllerBase {
    * @param string $version
    *   The version of Drupal core.
    *
-   * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|Response
+   * @return BinaryFileResponse|Response
    *   A BinaryFileResponse object containing the content of the XML release
    *   file for the specified project if one is available; a Response object
    *   with no content otherwise.

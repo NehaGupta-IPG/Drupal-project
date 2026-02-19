@@ -398,9 +398,9 @@ abstract class StylePluginBase extends PluginBase {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
-   * @param \Drupal\views\Plugin\views\wizard\WizardInterface $wizard
+   * @param WizardInterface $wizard
    *   The current used wizard.
    * @param array $display_options
    *   The options which will be used on the view. The style plugin should

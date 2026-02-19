@@ -40,7 +40,7 @@ trait BlockPluginTrait {
   /**
    * The transliteration service.
    *
-   * @var \Drupal\Component\Transliteration\TransliterationInterface
+   * @var TransliterationInterface
    */
   protected $transliteration;
 
@@ -135,7 +135,7 @@ trait BlockPluginTrait {
    * than access(), in order to avoid repeating the handling of the
    * $return_as_object argument.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user session for which to check access.
    *
    * @return \Drupal\Core\Access\AccessResultInterface
@@ -269,7 +269,7 @@ trait BlockPluginTrait {
   /**
    * Wraps the transliteration service.
    *
-   * @return \Drupal\Component\Transliteration\TransliterationInterface
+   * @return TransliterationInterface
    *   The transliteration service.
    */
   protected function transliteration() {
@@ -282,7 +282,7 @@ trait BlockPluginTrait {
   /**
    * Sets the transliteration service.
    *
-   * @param \Drupal\Component\Transliteration\TransliterationInterface $transliteration
+   * @param TransliterationInterface $transliteration
    *   The transliteration service.
    */
   public function setTransliteration(TransliterationInterface $transliteration) {

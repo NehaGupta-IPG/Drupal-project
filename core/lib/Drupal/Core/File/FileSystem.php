@@ -44,23 +44,23 @@ class FileSystem implements FileSystemInterface {
   /**
    * The site settings.
    *
-   * @var \Drupal\Core\Site\Settings
+   * @var Settings
    */
   protected $settings;
 
   /**
    * The stream wrapper manager.
    *
-   * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface
+   * @var StreamWrapperManagerInterface
    */
   protected $streamWrapperManager;
 
   /**
    * Constructs a new FileSystem.
    *
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager
+   * @param StreamWrapperManagerInterface $stream_wrapper_manager
    *   The stream wrapper manager.
-   * @param \Drupal\Core\Site\Settings $settings
+   * @param Settings $settings
    *   The site settings.
    */
   public function __construct(StreamWrapperManagerInterface $stream_wrapper_manager, Settings $settings) {
@@ -438,7 +438,7 @@ class FileSystem implements FileSystemInterface {
    *   A URI containing the destination that $source should be moved/copied to.
    *   The URI may be a bare filepath (without a scheme) and in that case the
    *   default scheme (file://) will be used.
-   * @param \Drupal\Core\File\FileExists|int $fileExists
+   * @param FileExists|int $fileExists
    *   Replace behavior when the destination file already exists.
    *
    * @throws \TypeError
@@ -693,7 +693,7 @@ class FileSystem implements FileSystemInterface {
    * @return array
    *   An associative array as per ::scanDirectory().
    *
-   * @throws \Drupal\Core\File\Exception\NotRegularDirectoryException
+   * @throws NotRegularDirectoryException
    *   If the directory does not exist.
    *
    * @see \Drupal\Core\File\FileSystemInterface::scanDirectory()

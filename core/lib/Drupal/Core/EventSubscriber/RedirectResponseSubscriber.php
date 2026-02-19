@@ -29,9 +29,9 @@ class RedirectResponseSubscriber implements EventSubscriberInterface {
   /**
    * Constructs a RedirectResponseSubscriber object.
    *
-   * @param \Drupal\Core\Utility\UnroutedUrlAssemblerInterface $unroutedUrlAssembler
+   * @param UnroutedUrlAssemblerInterface $unroutedUrlAssembler
    *   The unrouted URL assembler service.
-   * @param \Drupal\Core\Routing\RequestContext $requestContext
+   * @param RequestContext $requestContext
    *   The request context.
    * @param \Closure $loggerClosure
    *   A closure that wraps the 'logger.channel.php' service.
@@ -47,7 +47,7 @@ class RedirectResponseSubscriber implements EventSubscriberInterface {
   /**
    * Allows manipulation of the response object when performing a redirect.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
+   * @param ResponseEvent $event
    *   The Event to process.
    */
   public function checkRedirectUrl(ResponseEvent $event) {

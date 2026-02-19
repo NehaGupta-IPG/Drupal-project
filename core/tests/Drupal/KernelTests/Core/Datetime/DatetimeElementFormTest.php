@@ -155,7 +155,7 @@ class DatetimeElementFormTest extends KernelTestBase implements FormInterface, T
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {}

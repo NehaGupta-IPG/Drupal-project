@@ -2,8 +2,8 @@
 
 namespace Drupal\Core\StringTranslation\Translator;
 
-use Drupal\Core\Site\Settings;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Drupal\Core\Site\Settings;
 
 /**
  * String translator using overrides from variables.
@@ -18,14 +18,14 @@ class CustomStrings extends StaticTranslation {
   /**
    * The settings read only object.
    *
-   * @var \Drupal\Core\Site\Settings
+   * @var Settings
    */
   protected $settings;
 
   /**
    * Constructs a CustomStrings object.
    *
-   * @param \Drupal\Core\Site\Settings $settings
+   * @param Settings $settings
    *   The settings read only object.
    */
   public function __construct(Settings $settings) {

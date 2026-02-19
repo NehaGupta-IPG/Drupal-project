@@ -3,12 +3,12 @@
 namespace Drupal\workflows;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityHandlerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Access\AccessResult;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -21,7 +21,7 @@ class WorkflowAccessControlHandler extends EntityAccessControlHandler implements
   /**
    * The workflow type plugin manager.
    *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   * @var PluginManagerInterface
    */
   protected $workflowTypeManager;
 
@@ -38,9 +38,9 @@ class WorkflowAccessControlHandler extends EntityAccessControlHandler implements
   /**
    * Constructs the workflow access control handler instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $workflow_type_manager
+   * @param PluginManagerInterface $workflow_type_manager
    *   The workflow type plugin manager.
    */
   public function __construct(EntityTypeInterface $entity_type, PluginManagerInterface $workflow_type_manager) {

@@ -21,28 +21,28 @@ class SystemManager {
   /**
    * Module handler service.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * The menu link tree manager.
    *
-   * @var \Drupal\Core\Menu\MenuLinkTreeInterface
+   * @var MenuLinkTreeInterface
    */
   protected $menuTree;
 
   /**
    * The active menu trail service.
    *
-   * @var \Drupal\Core\Menu\MenuActiveTrailInterface
+   * @var MenuActiveTrailInterface
    */
   protected $menuActiveTrail;
 
@@ -79,13 +79,13 @@ class SystemManager {
   /**
    * Constructs a SystemManager object.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   The request stack.
-   * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menu_tree
+   * @param MenuLinkTreeInterface $menu_tree
    *   The menu tree manager.
-   * @param \Drupal\Core\Menu\MenuActiveTrailInterface $menu_active_trail
+   * @param MenuActiveTrailInterface $menu_active_trail
    *   The active menu trail service.
    */
   public function __construct(ModuleHandlerInterface $module_handler, RequestStack $request_stack, MenuLinkTreeInterface $menu_tree, MenuActiveTrailInterface $menu_active_trail) {
@@ -191,7 +191,7 @@ class SystemManager {
   /**
    * Provide a single block on the administration overview page.
    *
-   * @param \Drupal\Core\Menu\MenuLinkInterface $instance
+   * @param MenuLinkInterface $instance
    *   The menu item to be displayed.
    *
    * @return array
@@ -218,7 +218,7 @@ class SystemManager {
         continue;
       }
 
-      /** @var \Drupal\Core\Menu\MenuLinkInterface $link */
+      /** @var MenuLinkInterface $link */
       $link = $element->link;
       $content[$key]['title'] = $link->getTitle();
       $content[$key]['options'] = $link->getOptions();

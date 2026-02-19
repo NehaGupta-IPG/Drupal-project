@@ -26,7 +26,7 @@ class TestToolkit extends ImageToolkitBase {
   /**
    * The state service.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
@@ -60,13 +60,13 @@ class TestToolkit extends ImageToolkitBase {
    *   The plugin ID for the plugin instance.
    * @param array $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\ImageToolkit\ImageToolkitOperationManagerInterface $operation_manager
+   * @param ImageToolkitOperationManagerInterface $operation_manager
    *   The toolkit operation manager.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   A logger instance.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state key value store.
    */
   public function __construct(

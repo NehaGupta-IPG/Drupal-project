@@ -11,8 +11,8 @@ use Drupal\Core\Site\Settings;
  *
  * @see \Drupal\Core\Entity\EntityTypeListenerInterface
  *
- * @property \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
- * @property \Drupal\Core\Database\Connection $database
+ * @property EntityTypeManagerInterface $entityTypeManager
+ * @property Connection $database
  *
  * @internal
  */
@@ -85,13 +85,13 @@ trait SqlFieldableEntityTypeListenerTrait {
   /**
    * Allows subscribers to prepare their schema before data copying.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The updated entity type definition.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $original
+   * @param EntityTypeInterface $original
    *   The original entity type definition.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface[] $field_storage_definitions
+   * @param FieldStorageDefinitionInterface[] $field_storage_definitions
    *   The updated field storage definitions, including possibly new ones.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface[] $original_field_storage_definitions
+   * @param FieldStorageDefinitionInterface[] $original_field_storage_definitions
    *   The original field storage definitions.
    * @param array &$sandbox
    *   (optional) A sandbox array provided by a hook_update_N() implementation
@@ -104,13 +104,13 @@ trait SqlFieldableEntityTypeListenerTrait {
   /**
    * Allows subscribers to do any cleanup necessary after data copying.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The updated entity type definition.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $original
+   * @param EntityTypeInterface $original
    *   The original entity type definition.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface[] $field_storage_definitions
+   * @param FieldStorageDefinitionInterface[] $field_storage_definitions
    *   The updated field storage definitions, including possibly new ones.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface[] $original_field_storage_definitions
+   * @param FieldStorageDefinitionInterface[] $original_field_storage_definitions
    *   The original field storage definitions.
    * @param array &$sandbox
    *   (optional) A sandbox array provided by a hook_update_N() implementation
@@ -123,13 +123,13 @@ trait SqlFieldableEntityTypeListenerTrait {
   /**
    * Copies entity data from the original storage to the temporary one.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The updated entity type definition.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $original
+   * @param EntityTypeInterface $original
    *   The original entity type definition.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface[] $field_storage_definitions
+   * @param FieldStorageDefinitionInterface[] $field_storage_definitions
    *   The updated field storage definitions, including possibly new ones.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface[] $original_field_storage_definitions
+   * @param FieldStorageDefinitionInterface[] $original_field_storage_definitions
    *   The original field storage definitions.
    * @param array &$sandbox
    *   The sandbox array from a hook_update_N() implementation.
@@ -177,7 +177,7 @@ trait SqlFieldableEntityTypeListenerTrait {
     /** @var \Drupal\Core\Entity\ContentEntityInterface[] $entities */
     $entities = $load_revisions ? $this->storage->loadMultipleRevisions($entity_identifiers) : $this->storage->loadMultiple($entity_identifiers);
 
-    /** @var \Drupal\Core\Entity\Sql\SqlContentEntityStorage $temporary_storage */
+    /** @var SqlContentEntityStorage $temporary_storage */
     $temporary_storage = $this->entityTypeManager->createHandlerInstance($entity_type->getStorageClass(), $entity_type);
     $temporary_storage->setEntityType($entity_type);
     $temporary_storage->setFieldStorageDefinitions($field_storage_definitions);
@@ -241,9 +241,9 @@ trait SqlFieldableEntityTypeListenerTrait {
   /**
    * Handles the case when an error occurs during the data copying step.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The updated entity type definition.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $original
+   * @param EntityTypeInterface $original
    *   The original entity type definition.
    * @param array &$sandbox
    *   The sandbox array from a hook_update_N() implementation.

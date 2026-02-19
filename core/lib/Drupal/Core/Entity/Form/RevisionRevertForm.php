@@ -11,10 +11,10 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\Core\Entity\RevisionableStorageInterface;
+use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -37,36 +37,36 @@ class RevisionRevertForm extends ConfirmFormBase implements EntityFormInterface 
   /**
    * The entity revision.
    *
-   * @var \Drupal\Core\Entity\RevisionableInterface
+   * @var RevisionableInterface
    */
   protected RevisionableInterface $revision;
 
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected ModuleHandlerInterface $moduleHandler;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * Creates a new RevisionRevertForm instance.
    *
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
+   * @param DateFormatterInterface $dateFormatter
    *   The date formatter.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundleInformation
+   * @param EntityTypeBundleInfoInterface $bundleInformation
    *   The bundle information.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
+   * @param AccountInterface $currentUser
    *   The current user.
    */
   public function __construct(
@@ -202,12 +202,12 @@ class RevisionRevertForm extends ConfirmFormBase implements EntityFormInterface 
   /**
    * Prepares a revision to be reverted.
    *
-   * @param \Drupal\Core\Entity\RevisionableInterface $revision
+   * @param RevisionableInterface $revision
    *   The revision to be reverted.
-   * @param \Drupal\Core\Form\FormStateInterface $formState
+   * @param FormStateInterface $formState
    *   The current state of the form.
    *
-   * @return \Drupal\Core\Entity\RevisionableInterface
+   * @return RevisionableInterface
    *   The new revision, the same type as passed to $revision.
    */
   protected function prepareRevision(RevisionableInterface $revision, FormStateInterface $formState): RevisionableInterface {
@@ -238,7 +238,7 @@ class RevisionRevertForm extends ConfirmFormBase implements EntityFormInterface 
   /**
    * Returns the bundle label of an entity.
    *
-   * @param \Drupal\Core\Entity\RevisionableInterface $entity
+   * @param RevisionableInterface $entity
    *   The entity.
    *
    * @return string|null

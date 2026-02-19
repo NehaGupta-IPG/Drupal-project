@@ -34,7 +34,7 @@ class SandboxDatabaseUpdatesValidator implements EventSubscriberInterface {
   /**
    * Checks that the staged update does not have changes to its install files.
    *
-   * @param \Drupal\package_manager\Event\StatusCheckEvent $event
+   * @param StatusCheckEvent $event
    *   The event object.
    */
   public function checkForStagedDatabaseUpdates(StatusCheckEvent $event): void {
@@ -55,7 +55,7 @@ class SandboxDatabaseUpdatesValidator implements EventSubscriberInterface {
    *
    * @param string $stage_dir
    *   The path of the stage directory.
-   * @param \Drupal\Core\Extension\Extension $extension
+   * @param Extension $extension
    *   The extension to check.
    *
    * @return bool
@@ -98,7 +98,7 @@ class SandboxDatabaseUpdatesValidator implements EventSubscriberInterface {
    *
    * @param string $root_dir
    *   The root directory of the Drupal code base.
-   * @param \Drupal\Core\Extension\Extension $extension
+   * @param Extension $extension
    *   The module to check.
    *
    * @return string[]

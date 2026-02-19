@@ -19,7 +19,7 @@ class RequestHelper {
    * Unclean URLs are required on sites hosted by web servers that cannot be
    * configured to implicitly route URLs to index.php.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
    * @return bool

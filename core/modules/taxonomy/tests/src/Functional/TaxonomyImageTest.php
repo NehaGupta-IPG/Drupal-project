@@ -26,7 +26,7 @@ class TaxonomyImageTest extends TaxonomyTestBase {
   /**
    * The taxonomy vocabulary used for the test.
    *
-   * @var \Drupal\taxonomy\VocabularyInterface
+   * @var VocabularyInterface
    */
   protected VocabularyInterface $vocabulary;
 

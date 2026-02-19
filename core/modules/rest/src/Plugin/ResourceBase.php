@@ -36,7 +36,7 @@ abstract class ResourceBase extends PluginBase implements ContainerFactoryPlugin
   /**
    * A logger instance.
    *
-   * @var \Psr\Log\LoggerInterface
+   * @var LoggerInterface
    */
   protected $logger;
 
@@ -51,7 +51,7 @@ abstract class ResourceBase extends PluginBase implements ContainerFactoryPlugin
    *   The plugin implementation definition.
    * @param array $serializer_formats
    *   The available serialization formats.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   A logger instance.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, array $serializer_formats, LoggerInterface $logger) {
@@ -168,7 +168,7 @@ abstract class ResourceBase extends PluginBase implements ContainerFactoryPlugin
    * @param string $method
    *   The HTTP method to be used for the route.
    *
-   * @return \Symfony\Component\Routing\Route
+   * @return Route
    *   The created base route.
    */
   protected function getBaseRoute($canonical_path, $method) {

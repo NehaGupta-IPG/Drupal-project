@@ -20,7 +20,7 @@ interface ConfigImportModuleUninstallValidatorInterface extends ModuleUninstallV
    *
    * @param string $module
    *   A module name.
-   * @param \Drupal\Core\Config\StorageInterface $source_storage
+   * @param StorageInterface $source_storage
    *   Storage object used to read configuration that is about to be imported.
    *
    * @return string[]

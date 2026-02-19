@@ -10,9 +10,9 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\migrate\Exception\RequirementsException;
 use Drupal\migrate\MigrateException;
-use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\migrate\id_map\Sql;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
+use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\RequirementsInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -86,7 +86,7 @@ abstract class SqlBase extends SourcePluginBase implements ContainerFactoryPlugi
   /**
    * State service for retrieving database info.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
@@ -180,7 +180,7 @@ abstract class SqlBase extends SourcePluginBase implements ContainerFactoryPlugi
    * @return \Drupal\Core\Database\Connection
    *   The connection to use for this plugin's queries.
    *
-   * @throws \Drupal\migrate\Exception\RequirementsException
+   * @throws RequirementsException
    *   Thrown if no source database connection is configured.
    */
   protected function setUpDatabase(array $database_info) {

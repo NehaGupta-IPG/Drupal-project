@@ -14,14 +14,14 @@ class ThemeAccessCheck implements AccessInterface {
   /**
    * The theme handler.
    *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
+   * @var ThemeHandlerInterface
    */
   protected $themeHandler;
 
   /**
    * Constructs a \Drupal\Core\Theme\Registry object.
    *
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param ThemeHandlerInterface $theme_handler
    *   The theme handler.
    */
   public function __construct(ThemeHandlerInterface $theme_handler) {

@@ -10,14 +10,14 @@ trait MessengerTrait {
   /**
    * The messenger.
    *
-   * @var \Drupal\Core\Messenger\MessengerInterface
+   * @var MessengerInterface
    */
   protected $messenger;
 
   /**
    * Sets the messenger.
    *
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger.
    */
   public function setMessenger(MessengerInterface $messenger) {
@@ -27,7 +27,7 @@ trait MessengerTrait {
   /**
    * Gets the messenger.
    *
-   * @return \Drupal\Core\Messenger\MessengerInterface
+   * @return MessengerInterface
    *   The messenger.
    */
   public function messenger() {

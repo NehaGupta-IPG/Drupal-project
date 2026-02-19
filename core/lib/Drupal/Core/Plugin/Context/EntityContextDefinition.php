@@ -92,7 +92,7 @@ class EntityContextDefinition extends ContextDefinition {
   /**
    * Creates a context definition from a given entity type.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type from which to derive a context definition.
    *
    * @return static
@@ -104,7 +104,7 @@ class EntityContextDefinition extends ContextDefinition {
   /**
    * Creates a context definition from a given entity object.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity from which to derive a context definition.
    *
    * @return static

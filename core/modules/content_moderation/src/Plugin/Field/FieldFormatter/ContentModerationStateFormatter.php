@@ -5,8 +5,8 @@ namespace Drupal\content_moderation\Plugin\Field\FieldFormatter;
 use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
@@ -24,7 +24,7 @@ class ContentModerationStateFormatter extends FormatterBase {
   /**
    * The moderation information service.
    *
-   * @var \Drupal\content_moderation\ModerationInformationInterface
+   * @var ModerationInformationInterface
    */
   protected $moderationInformation;
 

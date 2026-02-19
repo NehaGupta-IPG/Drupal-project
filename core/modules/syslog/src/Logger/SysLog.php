@@ -25,7 +25,7 @@ class SysLog implements LoggerInterface {
   /**
    * The message's placeholders parser.
    *
-   * @var \Drupal\Core\Logger\LogMessageParserInterface
+   * @var LogMessageParserInterface
    */
   protected $parser;
 
@@ -39,9 +39,9 @@ class SysLog implements LoggerInterface {
   /**
    * Constructs a SysLog object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The configuration factory object.
-   * @param \Drupal\Core\Logger\LogMessageParserInterface $parser
+   * @param LogMessageParserInterface $parser
    *   The parser to use when extracting message variables.
    */
   public function __construct(ConfigFactoryInterface $config_factory, LogMessageParserInterface $parser) {

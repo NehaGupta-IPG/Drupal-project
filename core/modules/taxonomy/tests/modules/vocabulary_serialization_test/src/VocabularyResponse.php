@@ -13,7 +13,7 @@ use Drupal\taxonomy\VocabularyInterface;
 class VocabularyResponse extends CacheableResponse {
 
   /**
-   * @var \Drupal\taxonomy\VocabularyInterface
+   * @var VocabularyInterface
    */
   protected $vocabulary;
 

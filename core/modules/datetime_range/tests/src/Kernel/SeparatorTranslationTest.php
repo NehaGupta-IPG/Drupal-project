@@ -25,14 +25,14 @@ class SeparatorTranslationTest extends KernelTestBase {
   /**
    * A field storage to use in this test class.
    *
-   * @var \Drupal\field\Entity\FieldStorageConfig
+   * @var FieldStorageConfig
    */
   protected $fieldStorage;
 
   /**
    * The field used in this test class.
    *
-   * @var \Drupal\field\Entity\FieldConfig
+   * @var FieldConfig
    */
   protected $field;
 

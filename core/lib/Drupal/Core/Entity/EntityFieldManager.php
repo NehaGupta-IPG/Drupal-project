@@ -100,79 +100,79 @@ class EntityFieldManager implements EntityFieldManagerInterface, PreWarmableInte
   /**
    * The typed data manager.
    *
-   * @var \Drupal\Core\TypedData\TypedDataManagerInterface
+   * @var TypedDataManagerInterface
    */
   protected $typedDataManager;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The key-value factory.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueFactoryInterface
+   * @var KeyValueFactoryInterface
    */
   protected $keyValueFactory;
 
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity type bundle info.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @var EntityTypeBundleInfoInterface
    */
   protected $entityTypeBundleInfo;
 
   /**
    * The entity display repository.
    *
-   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
+   * @var EntityDisplayRepositoryInterface
    */
   protected $entityDisplayRepository;
 
   /**
    * The entity last installed schema repository.
    *
-   * @var \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface
+   * @var EntityLastInstalledSchemaRepositoryInterface
    */
   protected $entityLastInstalledSchemaRepository;
 
   /**
    * Constructs a new EntityFieldManager.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle info.
-   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
+   * @param EntityDisplayRepositoryInterface $entity_display_repository
    *   The entity display repository.
-   * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typed_data_manager
+   * @param TypedDataManagerInterface $typed_data_manager
    *   The typed data manager.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_factory
+   * @param KeyValueFactoryInterface $key_value_factory
    *   The key-value factory.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param CacheBackendInterface $cache_backend
    *   The cache backend.
-   * @param \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository
+   * @param EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository
    *   The entity last installed schema repository.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_type_bundle_info, EntityDisplayRepositoryInterface $entity_display_repository, TypedDataManagerInterface $typed_data_manager, LanguageManagerInterface $language_manager, KeyValueFactoryInterface $key_value_factory, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository) {
@@ -226,7 +226,7 @@ class EntityFieldManager implements EntityFieldManagerInterface, PreWarmableInte
    *   flagged as translatable.
    */
   protected function buildBaseFieldDefinitions($entity_type_id) {
-    /** @var \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type */
+    /** @var ContentEntityTypeInterface $entity_type */
     $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
     $class = $entity_type->getClass();
     /** @var string[] $keys */
@@ -408,7 +408,7 @@ class EntityFieldManager implements EntityFieldManagerInterface, PreWarmableInte
    *   \Drupal\Core\Entity\FieldableEntityInterface are supported.
    * @param string $bundle
    *   The bundle.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface[] $base_field_definitions
+   * @param FieldDefinitionInterface[] $base_field_definitions
    *   The list of base field definitions.
    *
    * @return \Drupal\Core\Field\FieldDefinitionInterface[]

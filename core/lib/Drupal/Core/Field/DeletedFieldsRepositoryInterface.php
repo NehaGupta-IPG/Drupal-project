@@ -16,7 +16,7 @@ interface DeletedFieldsRepositoryInterface {
    *   (optional) A unique ID of field storage definition for filtering the
    *   deleted fields. Defaults to NULL.
    *
-   * @return \Drupal\Core\Field\FieldDefinitionInterface[]
+   * @return FieldDefinitionInterface[]
    *   An array of field definition objects, keyed by their unique identifier.
    */
   public function getFieldDefinitions($field_storage_unique_id = NULL);
@@ -24,7 +24,7 @@ interface DeletedFieldsRepositoryInterface {
   /**
    * Returns a list of deleted field storage definitions.
    *
-   * @return \Drupal\Core\Field\FieldStorageDefinitionInterface[]
+   * @return FieldStorageDefinitionInterface[]
    *   An array of field storage definition objects, keyed by their unique
    *   storage identifier.
    */
@@ -33,7 +33,7 @@ interface DeletedFieldsRepositoryInterface {
   /**
    * Adds a field definition object to the deleted list.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   A field definition object.
    *
    * @return $this
@@ -43,7 +43,7 @@ interface DeletedFieldsRepositoryInterface {
   /**
    * Adds a field storage definition object to the deleted list.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $field_storage_definition
+   * @param FieldStorageDefinitionInterface $field_storage_definition
    *   A field storage definition object.
    *
    * @return $this
@@ -53,7 +53,7 @@ interface DeletedFieldsRepositoryInterface {
   /**
    * Removes a field definition object from the deleted list.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   A field definition object.
    *
    * @return $this
@@ -63,7 +63,7 @@ interface DeletedFieldsRepositoryInterface {
   /**
    * Removes a field storage definition object from the deleted list.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $field_storage_definition
+   * @param FieldStorageDefinitionInterface $field_storage_definition
    *   A field storage definition object.
    *
    * @return $this

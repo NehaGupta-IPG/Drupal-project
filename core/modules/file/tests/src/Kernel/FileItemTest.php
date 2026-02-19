@@ -33,7 +33,7 @@ class FileItemTest extends FieldKernelTestBase {
   /**
    * Created file entity.
    *
-   * @var \Drupal\file\Entity\File
+   * @var File
    */
   protected $file;
 
@@ -207,7 +207,7 @@ class FileItemTest extends FieldKernelTestBase {
    * Tests sample value generation with actual allowed file extensions.
    */
   public function testGenerateSampleValue(): void {
-    /** @var \Drupal\field\Entity\FieldConfig $field_definition */
+    /** @var FieldConfig $field_definition */
     $field_definition = FieldConfig::loadByName('entity_test', 'entity_test', 'file_test');
     $field_definition->setSetting('file_extensions', 'pdf');
     $field_definition->save();

@@ -3,8 +3,8 @@
 namespace Drupal\Core\Plugin;
 
 use Drupal\Component\Plugin\ConfigurableInterface;
-use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Component\Plugin\LazyPluginCollection;
+use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 
 /**
@@ -22,7 +22,7 @@ class DefaultSingleLazyPluginCollection extends LazyPluginCollection {
   /**
    * The manager used to instantiate the plugins.
    *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   * @var PluginManagerInterface
    */
   protected $manager;
 
@@ -43,7 +43,7 @@ class DefaultSingleLazyPluginCollection extends LazyPluginCollection {
   /**
    * Constructs a new DefaultSingleLazyPluginCollection object.
    *
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $manager
+   * @param PluginManagerInterface $manager
    *   The manager to be used for instantiating plugins.
    * @param string $instance_id
    *   The ID of the plugin instance.

@@ -44,7 +44,7 @@ class EntityTypeInfoTest extends KernelTestBase {
   /**
    * The entity type info class.
    *
-   * @var \Drupal\content_moderation\EntityTypeInfo
+   * @var EntityTypeInfo
    */
   protected $entityTypeInfo;
 

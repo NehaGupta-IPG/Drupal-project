@@ -21,35 +21,35 @@ class LanguageConfigOverrideTest extends UnitTestCase {
   /**
    * Language configuration override.
    *
-   * @var \Drupal\language\Config\LanguageConfigOverride
+   * @var LanguageConfigOverride
    */
   protected $configTranslation;
 
   /**
    * Storage.
    *
-   * @var \Drupal\Core\Config\StorageInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Config\StorageInterface|MockObject
    */
   protected $storage;
 
   /**
    * Event Dispatcher.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|MockObject
    */
   protected $eventDispatcher;
 
   /**
    * Typed Config.
    *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Config\TypedConfigManagerInterface|MockObject
    */
   protected $typedConfig;
 
   /**
    * The mocked cache tags invalidator.
    *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface|MockObject
    */
   protected $cacheTagsInvalidator;
 

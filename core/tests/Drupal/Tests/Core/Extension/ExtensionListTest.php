@@ -282,7 +282,7 @@ class ExtensionListTest extends UnitTestCase {
    *   will be encoded using '\Drupal\Component\Serialization\Yaml::encode()'.
    *   The array keys should be valid top level yaml file keys.
    *
-   * @return \Drupal\Tests\Core\Extension\TestExtension
+   * @return TestExtension
    *   The test extension list.
    */
   protected function setupTestExtensionList(array $extension_names = ['test_name'], array $additional_info_values = []): TestExtension {
@@ -339,12 +339,12 @@ class TestExtension extends ExtensionList {
   protected $installedExtensions = [];
 
   /**
-   * @var \Drupal\Core\Extension\ExtensionDiscovery|null
+   * @var ExtensionDiscovery|null
    */
   protected $extensionDiscovery;
 
   /**
-   * @param \Drupal\Core\Extension\ExtensionDiscovery $extension_discovery
+   * @param ExtensionDiscovery $extension_discovery
    *   The extension discovery class.
    */
   public function setExtensionDiscovery(ExtensionDiscovery $extension_discovery): void {

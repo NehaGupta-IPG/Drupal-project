@@ -21,7 +21,7 @@ class ContentEntityDeriver extends DeriverBase implements ContainerDeriverInterf
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
@@ -30,7 +30,7 @@ class ContentEntityDeriver extends DeriverBase implements ContainerDeriverInterf
    *
    * @param string $base_plugin_id
    *   The base plugin ID.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
   public function __construct($base_plugin_id, EntityTypeManagerInterface $entityTypeManager) {

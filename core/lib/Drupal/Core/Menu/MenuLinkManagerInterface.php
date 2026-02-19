@@ -53,7 +53,7 @@ interface MenuLinkManagerInterface extends PluginManagerInterface {
    *   external storage by invoking MenuLinkInterface::deleteLink() on the
    *   plugin that is being deleted.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws PluginException
    *   Thrown if the $id is not a valid, existing, plugin ID or if the link
    *   cannot be deleted.
    */
@@ -69,7 +69,7 @@ interface MenuLinkManagerInterface extends PluginManagerInterface {
    * @param string $menu_name
    *   (optional) Restricts the found links to just those in the named menu.
    *
-   * @return \Drupal\Core\Menu\MenuLinkInterface[]
+   * @return MenuLinkInterface[]
    *   An array of instances keyed by plugin ID.
    */
   public function loadLinksByRoute($route_name, array $route_parameters = [], $menu_name = NULL);
@@ -85,10 +85,10 @@ interface MenuLinkManagerInterface extends PluginManagerInterface {
    * @param array $definition
    *   The values of the link definition.
    *
-   * @return \Drupal\Core\Menu\MenuLinkInterface
+   * @return MenuLinkInterface
    *   A plugin instance created using the newly added definition.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws PluginException
    *   Thrown when the $id is not valid or is an already existing plugin ID.
    */
   public function addDefinition($id, array $definition);
@@ -110,10 +110,10 @@ interface MenuLinkManagerInterface extends PluginManagerInterface {
    *   any additional storage by invoking MenuLinkInterface::updateDefinition()
    *   on the plugin that is being updated.
    *
-   * @return \Drupal\Core\Menu\MenuLinkInterface
+   * @return MenuLinkInterface
    *   A plugin instance created using the updated definition.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws PluginException
    *   Thrown if the $id is not a valid, existing, plugin ID.
    */
   public function updateDefinition($id, array $new_definition_values, $persist = TRUE);
@@ -124,10 +124,10 @@ interface MenuLinkManagerInterface extends PluginManagerInterface {
    * @param string $id
    *   The menu link plugin ID.
    *
-   * @return \Drupal\Core\Menu\MenuLinkInterface
+   * @return MenuLinkInterface
    *   The menu link instance after being reset.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws PluginException
    *   Thrown if the $id is not a valid, existing, plugin ID or if the link
    *   cannot be reset.
    */

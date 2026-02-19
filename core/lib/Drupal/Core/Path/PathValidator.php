@@ -7,9 +7,9 @@ use Drupal\Core\ParamConverter\ParamNotConvertedException;
 use Drupal\Core\PathProcessor\InboundPathProcessorInterface;
 use Drupal\Core\Routing\AccessAwareRouterInterface;
 use Drupal\Core\Routing\RequestContext;
+use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
-use Drupal\Core\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -25,41 +25,41 @@ class PathValidator implements PathValidatorInterface {
   /**
    * The access aware router.
    *
-   * @var \Drupal\Core\Routing\AccessAwareRouterInterface
+   * @var AccessAwareRouterInterface
    */
   protected $accessAwareRouter;
 
   /**
    * A router implementation which does not check access.
    *
-   * @var \Symfony\Component\Routing\Matcher\UrlMatcherInterface
+   * @var UrlMatcherInterface
    */
   protected $accessUnawareRouter;
 
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $account;
 
   /**
    * The path processor.
    *
-   * @var \Drupal\Core\PathProcessor\InboundPathProcessorInterface
+   * @var InboundPathProcessorInterface
    */
   protected $pathProcessor;
 
   /**
    * Creates a new PathValidator.
    *
-   * @param \Drupal\Core\Routing\AccessAwareRouterInterface $access_aware_router
+   * @param AccessAwareRouterInterface $access_aware_router
    *   The access aware router.
-   * @param \Symfony\Component\Routing\Matcher\UrlMatcherInterface $access_unaware_router
+   * @param UrlMatcherInterface $access_unaware_router
    *   A router implementation which does not check access.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The current user.
-   * @param \Drupal\Core\PathProcessor\InboundPathProcessorInterface $path_processor
+   * @param InboundPathProcessorInterface $path_processor
    *   The path processor.
    */
   public function __construct(AccessAwareRouterInterface $access_aware_router, UrlMatcherInterface $access_unaware_router, AccountInterface $account, InboundPathProcessorInterface $path_processor) {
@@ -142,7 +142,7 @@ class PathValidator implements PathValidatorInterface {
    *
    * @param string $path
    *   The path to check.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   A request object with the given path.
    * @param bool $access_check
    *   If FALSE then skip access check and check only whether the path is

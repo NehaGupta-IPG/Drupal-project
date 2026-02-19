@@ -121,7 +121,7 @@ interface StreamWrapperManagerInterface {
    * @param string $scheme
    *   If the stream was "public://target", "public" would be the scheme.
    *
-   * @return \Drupal\Core\StreamWrapper\StreamWrapperInterface|false
+   * @return StreamWrapperInterface|false
    *   Returns a new stream wrapper object appropriate for the given $scheme.
    *   For example, for the public scheme a stream wrapper object
    *   (Drupal\Core\StreamWrapper\PublicStream).
@@ -138,7 +138,7 @@ interface StreamWrapperManagerInterface {
    * @param string $uri
    *   A stream, referenced as "scheme://target".
    *
-   * @return \Drupal\Core\StreamWrapper\StreamWrapperInterface|false
+   * @return StreamWrapperInterface|false
    *   Returns a new stream wrapper object appropriate for the given URI or
    *   FALSE if no registered handler could be found. For example, a URI of
    *   "private://example.txt" would return a new private stream wrapper object

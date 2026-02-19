@@ -46,7 +46,7 @@ class CacheCollectorTest extends UnitTestCase {
   /**
    * Cache collector implementation to test.
    *
-   * @var \Drupal\Tests\Core\Cache\CacheCollectorHelper
+   * @var CacheCollectorHelper
    */
   protected $collector;
 

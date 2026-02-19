@@ -18,7 +18,7 @@ class SendmailCommandValidationTransportFactory implements TransportFactoryInter
   /**
    * Construct command validation decorator for sendmail transport factory.
    *
-   * @param \Symfony\Component\Mailer\Transport\TransportFactoryInterface $inner
+   * @param TransportFactoryInterface $inner
    *   The decorated sendmail transport factory.
    */
   public function __construct(

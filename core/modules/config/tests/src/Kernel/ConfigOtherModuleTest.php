@@ -150,7 +150,7 @@ class ConfigOtherModuleTest extends KernelTestBase {
    *   (optional) The entity type ID to get a storage for. Defaults to
    *   'config_test'.
    *
-   * @return \Drupal\Core\Entity\EntityStorageInterface
+   * @return EntityStorageInterface
    *   The entity type's storage.
    */
   protected function getStorage(string $entity_type_id = 'config_test'): EntityStorageInterface {

@@ -26,56 +26,56 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
   /**
    * The mocked DB schema handler.
    *
-   * @var \Drupal\Core\Database\Schema|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Database\Schema|MockObject
    */
   protected $dbSchemaHandler;
 
   /**
    * The mocked entity type manager used in this test.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|ObjectProphecy
    */
   protected $entityTypeManager;
 
   /**
    * The mocked entity field manager used in this test.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var \Drupal\Core\Entity\EntityFieldManagerInterface|ObjectProphecy
    */
   protected $entityFieldManager;
 
   /**
    * The mocked entity last installed schema repository used in this test.
    *
-   * @var \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityLastInstalledSchemaRepositoryInterface|MockObject
    */
   protected $entityLastInstalledSchemaRepository;
 
   /**
    * The mocked entity type used in this test.
    *
-   * @var \Drupal\Core\Entity\ContentEntityTypeInterface
+   * @var ContentEntityTypeInterface
    */
   protected $entityType;
 
   /**
    * The mocked SQL storage used in this test.
    *
-   * @var \Drupal\Core\Entity\Sql\SqlContentEntityStorage|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\Sql\SqlContentEntityStorage|MockObject
    */
   protected $storage;
 
   /**
    * The mocked field definitions used in this test.
    *
-   * @var \Drupal\Core\Field\FieldStorageDefinitionInterface[]|\PHPUnit\Framework\MockObject\MockObject[]
+   * @var \Drupal\Core\Field\FieldStorageDefinitionInterface[]|MockObject[]
    */
   protected $storageDefinitions;
 
   /**
    * The storage schema handler used in this test.
    *
-   * @var \Drupal\Core\Entity\Sql\SqlContentEntityStorageSchema|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\Sql\SqlContentEntityStorageSchema|MockObject
    */
   protected $storageSchema;
 

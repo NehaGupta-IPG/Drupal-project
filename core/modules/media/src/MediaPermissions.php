@@ -18,14 +18,14 @@ class MediaPermissions implements ContainerInjectionInterface {
   /**
    * The entity type manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * MediaPermissions constructor.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
@@ -56,7 +56,7 @@ class MediaPermissions implements ContainerInjectionInterface {
   /**
    * Returns a list of media permissions for a given media type.
    *
-   * @param \Drupal\media\MediaTypeInterface $type
+   * @param MediaTypeInterface $type
    *   The media type.
    *
    * @return array

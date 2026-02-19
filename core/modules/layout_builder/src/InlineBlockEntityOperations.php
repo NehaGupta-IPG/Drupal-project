@@ -23,7 +23,7 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
   /**
    * Inline block usage tracking service.
    *
-   * @var \Drupal\layout_builder\InlineBlockUsageInterface
+   * @var \Drupal\layout_builder\Plugin\Block\InlineBlockUsageInterface
    */
   protected $usage;
 
@@ -37,18 +37,18 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * Constructs a new EntityOperations object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager service.
-   * @param \Drupal\layout_builder\InlineBlockUsageInterface $usage
+   * @param InlineBlockUsageInterface $usage
    *   Inline block usage tracking service.
-   * @param \Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface $section_storage_manager
+   * @param SectionStorageManagerInterface $section_storage_manager
    *   The section storage manager.
    */
   public function __construct(EntityTypeManagerInterface $entityTypeManager, InlineBlockUsageInterface $usage, SectionStorageManagerInterface $section_storage_manager) {
@@ -75,7 +75,7 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
    * Entities that were used in prevision revisions will be removed if not
    * saving a new revision.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The parent entity.
    */
   protected function removeUnusedForEntityOnSave(EntityInterface $entity) {
@@ -103,7 +103,7 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
   /**
    * Gets the IDs of the inline blocks that were removed.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The layout entity.
    *
    * @return int[]
@@ -130,7 +130,7 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
   /**
    * Handles entity tracking on deleting a parent entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The parent entity.
    */
   public function handleEntityDelete(EntityInterface $entity) {
@@ -140,7 +140,7 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
   /**
    * Handles saving a parent entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The parent entity.
    */
   public function handlePreSave(EntityInterface $entity) {
@@ -215,9 +215,9 @@ class InlineBlockEntityOperations implements ContainerInjectionInterface {
   /**
    * Saves an inline block component.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity with the layout.
-   * @param \Drupal\layout_builder\SectionComponent $component
+   * @param SectionComponent $component
    *   The section component with an inline block.
    * @param bool $new_revision
    *   Whether a new revision of the block should be created when modified.

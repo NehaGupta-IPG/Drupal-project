@@ -115,7 +115,7 @@ class NavigationMenuLinkTreeManipulatorsTest extends UnitTestCase {
    *
    * With link 9 linking to a page that contains a list of child menu links.
    *
-   * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
+   * @return MenuLinkTreeElement[]
    *   The mock menu tree.
    */
   protected function mockTree(): array {

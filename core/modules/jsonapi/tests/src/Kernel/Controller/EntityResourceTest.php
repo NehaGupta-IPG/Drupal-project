@@ -58,49 +58,49 @@ class EntityResourceTest extends JsonapiKernelTestBase {
   /**
    * The user.
    *
-   * @var \Drupal\user\Entity\User
+   * @var User
    */
   protected $user;
 
   /**
    * The node.
    *
-   * @var \Drupal\node\Entity\Node
+   * @var Node
    */
   protected $node;
 
   /**
    * The other node.
    *
-   * @var \Drupal\node\Entity\Node
+   * @var Node
    */
   protected $node2;
 
   /**
    * An unpublished node.
    *
-   * @var \Drupal\node\Entity\Node
+   * @var Node
    */
   protected $node3;
 
   /**
    * A node with related nodes.
    *
-   * @var \Drupal\node\Entity\Node
+   * @var Node
    */
   protected Node $node4;
 
   /**
    * A fake request.
    *
-   * @var \Symfony\Component\HttpFoundation\Request
+   * @var Request
    */
   protected $request;
 
   /**
    * The EntityResource under test.
    *
-   * @var \Drupal\jsonapi\Controller\EntityResource
+   * @var EntityResource
    */
   protected $entityResource;
 
@@ -190,7 +190,7 @@ class EntityResourceTest extends JsonapiKernelTestBase {
   /**
    * Creates an instance of the subject under test.
    *
-   * @return \Drupal\jsonapi\Controller\EntityResource
+   * @return EntityResource
    *   An EntityResource instance.
    */
   protected function createEntityResource() {

@@ -114,7 +114,7 @@ class WorkspacePublisherTest extends KernelTestBase {
    * @legacy-covers \Drupal\workspaces\Form\WorkspacePublishForm::submitForm
    */
   public function testSubmitFormWithException(): void {
-    /** @var \Drupal\Core\Messenger\MessengerInterface $messenger */
+    /** @var MessengerInterface $messenger */
     $messenger = \Drupal::service('messenger');
 
     $workspaceOperationFactory = $this->createMock(WorkspaceOperationFactory::class);

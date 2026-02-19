@@ -32,7 +32,7 @@ class ComposerRequirementTest extends PackageManagerTestBase {
    */
   public function testComposerInfoShown(): void {
     // Ensure we can locate the Composer executable.
-    /** @var \PhpTuf\ComposerStager\API\Finder\Service\ExecutableFinderInterface $executable_finder */
+    /** @var ExecutableFinderInterface $executable_finder */
     $executable_finder = $this->container->get(ExecutableFinderInterface::class);
     $composer_path = $executable_finder->find('composer');
     $composer_version = $this->container->get(ComposerInspector::class)->getVersion();

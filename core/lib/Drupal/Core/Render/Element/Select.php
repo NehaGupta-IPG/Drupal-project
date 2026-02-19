@@ -117,7 +117,7 @@ class Select extends FormElementBase {
    *
    * @param array $element
    *   The form element to process.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array $complete_form
    *   The complete form structure.

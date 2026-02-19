@@ -21,14 +21,14 @@ class OptionsRequestSubscriber implements EventSubscriberInterface {
   /**
    * The route provider.
    *
-   * @var \Drupal\Core\Routing\RouteProviderInterface
+   * @var RouteProviderInterface
    */
   protected $routeProvider;
 
   /**
    * Creates a new OptionsRequestSubscriber instance.
    *
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
+   * @param RouteProviderInterface $route_provider
    *   The route provider.
    */
   public function __construct(RouteProviderInterface $route_provider) {
@@ -38,7 +38,7 @@ class OptionsRequestSubscriber implements EventSubscriberInterface {
   /**
    * Tries to handle the options request.
    *
-   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
+   * @param RequestEvent $event
    *   The request event.
    */
   public function onRequest(RequestEvent $event) {

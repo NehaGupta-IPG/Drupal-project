@@ -3,9 +3,9 @@
 namespace Drupal\Core\Database;
 
 use Composer\Autoload\ClassLoader;
+use Drupal\Core\Cache\NullBackend;
 use Drupal\Core\Database\Event\StatementEvent;
 use Drupal\Core\Extension\DatabaseDriverList;
-use Drupal\Core\Cache\NullBackend;
 
 /**
  * Primary front-controller for the database system.
@@ -69,7 +69,7 @@ abstract class Database {
    * @param string $key
    *   The database connection key for which we want to log.
    *
-   * @return \Drupal\Core\Database\Log
+   * @return Log
    *   The query log object. Note that the log object does support richer
    *   methods than the few exposed through the Database class, so in some
    *   cases it may be desirable to access it directly.
@@ -129,7 +129,7 @@ abstract class Database {
    * @param string $key
    *   The database connection key. Defaults to NULL which means the active key.
    *
-   * @return \Drupal\Core\Database\Connection
+   * @return Connection
    *   The corresponding connection object.
    */
   final public static function getConnection($target = 'default', $key = NULL) {
@@ -262,7 +262,7 @@ abstract class Database {
    *   The database connection information, as defined in settings.php. The
    *   structure of this array depends on the database driver it is connecting
    *   to.
-   * @param \Composer\Autoload\ClassLoader $class_loader
+   * @param ClassLoader $class_loader
    *   The class loader. Used for adding the database driver to the autoloader
    *   if $info['autoload'] is set.
    * @param string $app_root
@@ -331,7 +331,7 @@ abstract class Database {
    * @param array $databases
    *   A multi-dimensional array specifying database connection parameters, as
    *   defined in settings.php.
-   * @param \Composer\Autoload\ClassLoader $class_loader
+   * @param ClassLoader $class_loader
    *   The class loader. Used for adding the database driver(s) to the
    *   autoloader if $databases[$key][$target]['autoload'] is set.
    * @param string $app_root
@@ -404,8 +404,8 @@ abstract class Database {
    * @param string $target
    *   The database target to open.
    *
-   * @throws \Drupal\Core\Database\ConnectionNotDefinedException
-   * @throws \Drupal\Core\Database\DriverNotSpecifiedException
+   * @throws ConnectionNotDefinedException
+   * @throws DriverNotSpecifiedException
    */
   final protected static function openConnection($key, $target) {
     // If the requested database does not exist then it is an unrecoverable

@@ -2,9 +2,9 @@
 
 namespace Drupal\workflows\Form;
 
-use Drupal\workflows\WorkflowInterface;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\workflows\WorkflowInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -17,7 +17,7 @@ class WorkflowTransitionDeleteForm extends ConfirmFormBase {
   /**
    * The workflow entity the transition being deleted belongs to.
    *
-   * @var \Drupal\workflows\WorkflowInterface
+   * @var WorkflowInterface
    */
   protected $workflow;
 
@@ -71,9 +71,9 @@ class WorkflowTransitionDeleteForm extends ConfirmFormBase {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
-   * @param \Drupal\workflows\WorkflowInterface $workflow
+   * @param WorkflowInterface $workflow
    *   The workflow entity being edited.
    * @param string|null $workflow_transition
    *   The workflow transition being deleted.

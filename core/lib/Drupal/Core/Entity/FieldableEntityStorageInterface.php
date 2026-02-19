@@ -13,7 +13,7 @@ interface FieldableEntityStorageInterface extends EntityStorageInterface {
   /**
    * Determines the number of entities with values for a given field.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field for which to count data records.
    * @param bool $as_bool
    *   (Optional) Optimizes the query for checking whether there are any records
@@ -30,7 +30,7 @@ interface FieldableEntityStorageInterface extends EntityStorageInterface {
   /**
    * Purges a batch of field data.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The deleted field whose data is being purged.
    * @param int $batch_size
    *   The maximum number of field data records to purge before returning,
@@ -45,7 +45,7 @@ interface FieldableEntityStorageInterface extends EntityStorageInterface {
   /**
    * Performs final cleanup after all data of a field has been purged.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field storage being purged.
    */
   public function finalizePurge(FieldStorageDefinitionInterface $storage_definition);

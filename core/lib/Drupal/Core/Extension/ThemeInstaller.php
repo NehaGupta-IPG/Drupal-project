@@ -243,7 +243,7 @@ class ThemeInstaller implements ThemeInstallerInterface {
   /**
    * Resets some other systems like rebuilding the route information or caches.
    *
-   * @param array<string, \Drupal\Core\Extension\Extension> $register_themes
+   * @param array<string, Extension> $register_themes
    *   Extension data for themes that should be registered, keyed by name.
    */
   protected function resetSystem(array $register_themes) {

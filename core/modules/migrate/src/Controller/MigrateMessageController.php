@@ -26,11 +26,11 @@ class MigrateMessageController extends ControllerBase {
   /**
    * Constructs a MigrateController.
    *
-   * @param \Drupal\Core\Database\Connection $database
+   * @param Connection $database
    *   A database connection.
-   * @param \Drupal\Core\Form\FormBuilderInterface $formBuilder
+   * @param FormBuilderInterface $formBuilder
    *   The form builder service.
-   * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migrationPluginManager
+   * @param MigrationPluginManagerInterface $migrationPluginManager
    *   The migration plugin manager.
    */
   public function __construct(
@@ -109,14 +109,14 @@ class MigrateMessageController extends ControllerBase {
    *
    * @param string $migration_id
    *   A migration ID.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
    * @return array
    *   A render array.
    */
   public function details(string $migration_id, Request $request): array {
-    /** @var \Drupal\migrate\Plugin\MigrationInterface $migration */
+    /** @var MigrationInterface $migration */
     $migration = $this->migrationPluginManager->createInstance($migration_id);
 
     if (!$migration) {
@@ -242,9 +242,9 @@ class MigrateMessageController extends ControllerBase {
    * applies them to the provided query object. If no filters are present, the
    * query is left unchanged.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
-   * @param \Drupal\Core\Database\Query\SelectInterface $query
+   * @param SelectInterface $query
    *   The database query.
    */
   protected function addFilterToQuery(Request $request, SelectInterface $query): void {
@@ -283,7 +283,7 @@ class MigrateMessageController extends ControllerBase {
    * @param string $migration_id
    *   A migration ID.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   * @return TranslatableMarkup
    *   The translated title.
    */
   public function title(string $migration_id): TranslatableMarkup {

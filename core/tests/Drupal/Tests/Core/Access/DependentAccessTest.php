@@ -90,7 +90,7 @@ class DependentAccessTest extends UnitTestCase {
     $this->assertEquals('Because I said so', $accessResult->getReason());
 
     $testRefinable->addAccessDependency($this->neutral);
-    /** @var \Drupal\Core\Access\AccessGroupAnd $dependency */
+    /** @var AccessGroupAnd $dependency */
     $dependency = $testRefinable->getAccessDependency();
     // Ensure the new dependency create a new AND group when merged.
     $this->assertInstanceOf(AccessGroupAnd::class, $dependency);
@@ -119,7 +119,7 @@ class DependentAccessTest extends UnitTestCase {
     }
 
     $testRefinable->addAccessDependency($this->neutral);
-    /** @var \Drupal\Core\Access\AccessGroupAnd $dependency */
+    /** @var AccessGroupAnd $dependency */
     $dependency = $testRefinable->getAccessDependency();
 
     // Ensure the new dependency is merged with the existing group.

@@ -26,11 +26,11 @@ class SiteConfigureForm extends ConfigFormBase {
    *   The app root.
    * @param string $sitePath
    *   The site path.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
-   * @param \Drupal\Core\Extension\ModuleInstallerInterface $moduleInstaller
+   * @param ModuleInstallerInterface $moduleInstaller
    *   The module installer.
-   * @param \Drupal\user\UserNameValidator $userNameValidator
+   * @param UserNameValidator $userNameValidator
    *   The user validator.
    * @param bool $superUserAccessPolicy
    *   The value of the 'security.enable_super_user' container parameter.
@@ -275,7 +275,7 @@ class SiteConfigureForm extends ConfigFormBase {
     }
 
     // We created user 1 with placeholder values. Let's save the real values.
-    /** @var \Drupal\user\UserInterface $account */
+    /** @var UserInterface $account */
     $account = $this->entityTypeManager->getStorage('user')->load(1);
     $account->init = $account->mail = $account_values['mail'];
     $account->roles = $account->getRoles();

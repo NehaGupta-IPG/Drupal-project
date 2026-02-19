@@ -21,7 +21,7 @@ class BreadcrumbManager implements ChainBreadcrumbBuilderInterface {
   /**
    * The module handler to invoke the alter hook.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
@@ -37,14 +37,14 @@ class BreadcrumbManager implements ChainBreadcrumbBuilderInterface {
    *
    * Set to NULL if the array needs to be re-calculated.
    *
-   * @var \Drupal\Core\Breadcrumb\BreadcrumbBuilderInterface[]|null
+   * @var BreadcrumbBuilderInterface[]|null
    */
   protected $sortedBuilders;
 
   /**
    * Constructs a \Drupal\Core\Breadcrumb\BreadcrumbManager object.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
    */
   public function __construct(ModuleHandlerInterface $module_handler) {
@@ -104,7 +104,7 @@ class BreadcrumbManager implements ChainBreadcrumbBuilderInterface {
   /**
    * Returns the sorted array of breadcrumb builders.
    *
-   * @return \Drupal\Core\Breadcrumb\BreadcrumbBuilderInterface[]
+   * @return BreadcrumbBuilderInterface[]
    *   An array of breadcrumb builder objects.
    */
   protected function getSortedBuilders() {

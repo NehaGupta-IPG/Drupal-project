@@ -47,11 +47,11 @@ final class EntityMethod implements ConfigActionPluginInterface, ContainerFactor
    *
    * @param string $pluginId
    *   The config action plugin ID.
-   * @param \Drupal\Core\Config\ConfigManagerInterface $configManager
+   * @param ConfigManagerInterface $configManager
    *   The config manager.
    * @param string $method
    *   The method to call on the config entity.
-   * @param \Drupal\Core\Config\Action\Exists $exists
+   * @param Exists $exists
    *   Determines behavior of action depending on entity existence.
    * @param int $numberOfParams
    *   The number of parameters the method has.
@@ -87,7 +87,7 @@ final class EntityMethod implements ConfigActionPluginInterface, ContainerFactor
    * {@inheritdoc}
    */
   public function apply(string $configName, mixed $value): void {
-    /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface|null $entity */
+    /** @var ConfigEntityInterface|null $entity */
     $entity = $this->configManager->loadConfigEntityByName($configName);
     if ($this->exists->returnEarly($configName, $entity)) {
       return;
@@ -100,12 +100,12 @@ final class EntityMethod implements ConfigActionPluginInterface, ContainerFactor
   /**
    * Applies the action to entity treating the $values array as multiple calls.
    *
-   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface $entity
+   * @param ConfigEntityInterface $entity
    *   The entity to apply the action to.
    * @param mixed $values
    *   The values for the action to use.
    *
-   * @return \Drupal\Core\Config\Entity\ConfigEntityInterface
+   * @return ConfigEntityInterface
    *   The unsaved entity with the action applied.
    */
   private function applyPluralized(ConfigEntityInterface $entity, mixed $values): ConfigEntityInterface {
@@ -121,12 +121,12 @@ final class EntityMethod implements ConfigActionPluginInterface, ContainerFactor
   /**
    * Applies the action to entity treating the $values array a single call.
    *
-   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface $entity
+   * @param ConfigEntityInterface $entity
    *   The entity to apply the action to.
    * @param mixed $value
    *   The value for the action to use.
    *
-   * @return \Drupal\Core\Config\Entity\ConfigEntityInterface
+   * @return ConfigEntityInterface
    *   The unsaved entity with the action applied.
    */
   private function applySingle(ConfigEntityInterface $entity, mixed $value): ConfigEntityInterface {

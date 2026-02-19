@@ -24,10 +24,10 @@ use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\views\Attribute\ViewsField;
-use Drupal\views\FieldAPIHandlerTrait;
 use Drupal\views\Entity\Render\EntityFieldRenderer;
-use Drupal\views\Plugin\views\display\DisplayPluginBase;
+use Drupal\views\FieldAPIHandlerTrait;
 use Drupal\views\Plugin\DependentWithRemovalPluginInterface;
+use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\ResultRow;
 use Drupal\views\ViewExecutable;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -83,56 +83,56 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity repository service.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   * @var EntityRepositoryInterface
    */
   protected $entityRepository;
 
   /**
    * The field formatter plugin manager.
    *
-   * @var \Drupal\Core\Field\FormatterPluginManager
+   * @var FormatterPluginManager
    */
   protected $formatterPluginManager;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * The field type plugin manager.
    *
-   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface
+   * @var FieldTypePluginManagerInterface
    */
   protected $fieldTypePluginManager;
 
   /**
    * Static cache for ::getEntityFieldRenderer().
    *
-   * @var \Drupal\views\Entity\Render\EntityFieldRenderer
+   * @var EntityFieldRenderer
    */
   protected $entityFieldRenderer;
 
   /**
    * The entity type bundle info service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @var EntityTypeBundleInfoInterface
    */
   protected $entityTypeBundleInfo;
 
@@ -151,21 +151,21 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Field\FormatterPluginManager $formatter_plugin_manager
+   * @param FormatterPluginManager $formatter_plugin_manager
    *   The field formatter plugin manager.
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_plugin_manager
+   * @param FieldTypePluginManagerInterface $field_type_plugin_manager
    *   The field plugin type manager.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @param EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle info service.
    */
   public function __construct(
@@ -348,7 +348,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
   /**
    * Gets the field storage definition.
    *
-   * @return \Drupal\Core\Field\FieldStorageDefinitionInterface
+   * @return FieldStorageDefinitionInterface
    *   The field storage definition used by this handler.
    *
    * @throws \Exception
@@ -831,7 +831,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
   /**
    * Returns the entity field renderer.
    *
-   * @return \Drupal\views\Entity\Render\EntityFieldRenderer
+   * @return EntityFieldRenderer
    *   The entity field renderer.
    */
   protected function getEntityFieldRenderer() {
@@ -858,7 +858,7 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
   /**
    * Gets an array of items for the field.
    *
-   * @param \Drupal\views\ResultRow $values
+   * @param ResultRow $values
    *   The result row object containing the values.
    *
    * @return array
@@ -921,12 +921,12 @@ class EntityField extends FieldPluginBase implements CacheableDependencyInterfac
   /**
    * Creates a fake entity with grouped field values.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to be processed.
-   * @param \Drupal\views\ResultRow $row
+   * @param ResultRow $row
    *   The result row object containing the values.
    *
-   * @return bool|\Drupal\Core\Entity\FieldableEntityInterface
+   * @return bool|FieldableEntityInterface
    *   Returns a new entity object containing the grouped field values.
    */
   protected function createEntityForGroupBy(EntityInterface $entity, ResultRow $row) {

@@ -60,7 +60,7 @@ class ConfigDependencies implements ContainerInjectionInterface {
    * \Drupal\rest\Entity\RestResourceConfig::calculateDependencies() does this
    * via its \Drupal\Core\Entity\DependencyTrait::addDependency() method.
    *
-   * @param \Drupal\rest\RestResourceConfigInterface $rest_config
+   * @param RestResourceConfigInterface $rest_config
    *   The rest configuration.
    *
    * @return string[][]
@@ -113,7 +113,7 @@ class ConfigDependencies implements ContainerInjectionInterface {
   /**
    * Informs the entity that entities it depends on will be deleted.
    *
-   * @param \Drupal\rest\RestResourceConfigInterface $rest_config
+   * @param RestResourceConfigInterface $rest_config
    *   The rest configuration.
    * @param array $dependencies
    *   An array of dependencies that will be deleted keyed by dependency type.
@@ -141,7 +141,7 @@ class ConfigDependencies implements ContainerInjectionInterface {
   /**
    * Informs the entity that entities it depends on will be deleted.
    *
-   * @param \Drupal\rest\RestResourceConfigInterface $rest_config
+   * @param RestResourceConfigInterface $rest_config
    *   The rest configuration.
    * @param array $dependencies
    *   An array of dependencies that will be deleted keyed by dependency type.
@@ -207,7 +207,7 @@ class ConfigDependencies implements ContainerInjectionInterface {
   /**
    * Informs the entity that entities it depends on will be deleted.
    *
-   * @param \Drupal\rest\RestResourceConfigInterface $rest_config
+   * @param RestResourceConfigInterface $rest_config
    *   The rest configuration.
    * @param array $dependencies
    *   An array of dependencies that will be deleted keyed by dependency type.

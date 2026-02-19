@@ -44,7 +44,7 @@ class ReviewForm extends MigrateUpgradeFormBase {
   /**
    * Migration state service.
    *
-   * @var \Drupal\migrate_drupal\MigrationState
+   * @var MigrationState
    */
   protected $migrationState;
 
@@ -58,19 +58,19 @@ class ReviewForm extends MigrateUpgradeFormBase {
   /**
    * ReviewForm constructor.
    *
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state service.
-   * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
+   * @param MigrationPluginManagerInterface $migration_plugin_manager
    *   The migration plugin manager service.
-   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $tempstore_private
+   * @param PrivateTempStoreFactory $tempstore_private
    *   The private tempstore factory service.
-   * @param \Drupal\migrate_drupal\MigrationState $migrationState
+   * @param MigrationState $migrationState
    *   Migration state service.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory service.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
+   * @param ModuleExtensionList $moduleExtensionList
    *   The module extension list.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct(

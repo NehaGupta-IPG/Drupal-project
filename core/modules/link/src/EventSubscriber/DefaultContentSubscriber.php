@@ -37,7 +37,7 @@ class DefaultContentSubscriber implements EventSubscriberInterface {
    * points to a content entity, it is marked as a dependency of the entity
    * being exported.
    *
-   * @param \Drupal\Core\DefaultContent\PreExportEvent $event
+   * @param PreExportEvent $event
    *   The event object.
    */
   public function preExport(PreExportEvent $event): void {

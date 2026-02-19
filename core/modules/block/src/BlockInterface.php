@@ -52,7 +52,7 @@ interface BlockInterface extends ConfigEntityInterface {
   /**
    * Gets conditions for this block.
    *
-   * @return \Drupal\Core\Condition\ConditionInterface[]|\Drupal\Core\Condition\ConditionPluginCollection
+   * @return \Drupal\Core\Condition\ConditionInterface[]|ConditionPluginCollection
    *   An array or collection of configured condition plugins.
    */
   public function getVisibilityConditions();

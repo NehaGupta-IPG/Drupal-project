@@ -57,7 +57,7 @@ class MigrateUpgradeFormStepsTest extends BrowserTestBase {
    * then Credential, Id conflict, if conflicts are detected, and lastly Review.
    */
   public function testMigrateUpgradeReviewPage(): void {
-    /** @var \Drupal\Core\TempStore\PrivateTempStore  $store */
+    /** @var \Drupal\Core\TempStore\PrivateTempStore $store */
     $store = \Drupal::service('tempstore.private')->get('migrate_drupal_ui');
     $state = \Drupal::service('state');
 
@@ -127,7 +127,7 @@ class MigrateUpgradeFormStepsTest extends BrowserTestBase {
   /**
    * Helper to test that a path goes to the Overview form.
    *
-   * @param \Drupal\Tests\WebAssert $session
+   * @param WebAssert $session
    *   The WebAssert object.
    * @param string $expected
    *   The expected response text.

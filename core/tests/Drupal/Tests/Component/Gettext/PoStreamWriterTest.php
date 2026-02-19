@@ -27,14 +27,14 @@ class PoStreamWriterTest extends TestCase {
   /**
    * The PO writer object under test.
    *
-   * @var \Drupal\Component\Gettext\PoStreamWriter
+   * @var PoStreamWriter
    */
   protected $poWriter;
 
   /**
    * The mock po file.
    *
-   * @var \org\bovigo\vfs\vfsStreamFile
+   * @var vfsStreamFile
    */
   protected $poFile;
 

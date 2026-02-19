@@ -35,7 +35,7 @@ interface SelectionWithAutocreateInterface {
    * \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface::validateReferenceableEntities(),
    * but applied to newly created entities that have not been saved yet.
    *
-   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   * @param EntityInterface[] $entities
    *   An array of entities to check.
    *
    * @return \Drupal\Core\Entity\EntityInterface[]

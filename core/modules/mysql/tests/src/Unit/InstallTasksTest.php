@@ -21,7 +21,7 @@ class InstallTasksTest extends UnitTestCase {
   /**
    * A connection object prophecy.
    *
-   * @var \Drupal\mysql\Driver\Database\mysql\Connection|\Prophecy\Prophecy\ObjectProphecy
+   * @var Connection|ObjectProphecy
    */
   private $connection;
 
@@ -37,11 +37,11 @@ class InstallTasksTest extends UnitTestCase {
   /**
    * Creates a Tasks object for testing.
    *
-   * @return \Drupal\mysql\Driver\Database\mysql\Install\Tasks
+   * @return Tasks
    *   A Tasks object.
    */
   private function createTasks(): Tasks {
-    /** @var \Drupal\mysql\Driver\Database\mysql\Connection $connection */
+    /** @var Connection $connection */
     $connection = $this->connection->reveal();
 
     return new class($connection) extends Tasks {
@@ -84,7 +84,7 @@ class InstallTasksTest extends UnitTestCase {
   /**
    * Creates a Tasks object for testing, without connection.
    *
-   * @return \Drupal\mysql\Driver\Database\mysql\Install\Tasks
+   * @return Tasks
    *   A Tasks object.
    */
   private function createTasksNoConnection(): Tasks {

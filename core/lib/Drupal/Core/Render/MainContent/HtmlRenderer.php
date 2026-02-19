@@ -5,9 +5,9 @@ namespace Drupal\Core\Render\MainContent;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Controller\TitleResolverInterface;
+use Drupal\Core\Display\ContextAwareVariantInterface;
 use Drupal\Core\Display\PageVariantInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Display\ContextAwareVariantInterface;
 use Drupal\Core\Render\HtmlResponse;
 use Drupal\Core\Render\PageDisplayVariantSelectionEvent;
 use Drupal\Core\Render\RenderCacheInterface;
@@ -16,15 +16,15 @@ use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Render\RenderEvents;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Default main content renderer for HTML requests.
  *
  * Attachments in HTML responses are handled by
  * \Drupal\Core\Render\AttachmentsResponseProcessorInterface and
- * \Drupal\Core\Render\HtmlResponseAttachmentsProcessor
+ * \Drupal\Core\Render\HtmlResponseAttachmentsProcessor.
  *
  * @see \Drupal\Core\Theme\ThemePreprocess::preprocessHtml()
  * @see \Drupal\Core\Render\AttachmentsResponseProcessorInterface
@@ -37,41 +37,41 @@ class HtmlRenderer implements MainContentRendererInterface {
   /**
    * The title resolver.
    *
-   * @var \Drupal\Core\Controller\TitleResolverInterface
+   * @var TitleResolverInterface
    */
   protected $titleResolver;
 
   /**
    * The display variant manager.
    *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   * @var PluginManagerInterface
    */
   protected $displayVariantManager;
 
   /**
    * The event dispatcher.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+   * @var EventDispatcherInterface
    */
   protected $eventDispatcher;
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The renderer service.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * The render cache service.
    *
-   * @var \Drupal\Core\Render\RenderCacheInterface
+   * @var RenderCacheInterface
    */
   protected $renderCache;
 
@@ -87,28 +87,28 @@ class HtmlRenderer implements MainContentRendererInterface {
   /**
    * The theme manager.
    *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   * @var ThemeManagerInterface
    */
   protected $themeManager;
 
   /**
    * Constructs a new HtmlRenderer.
    *
-   * @param \Drupal\Core\Controller\TitleResolverInterface $title_resolver
+   * @param TitleResolverInterface $title_resolver
    *   The title resolver.
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $display_variant_manager
+   * @param PluginManagerInterface $display_variant_manager
    *   The display variant manager.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer service.
-   * @param \Drupal\Core\Render\RenderCacheInterface $render_cache
+   * @param RenderCacheInterface $render_cache
    *   The render cache service.
    * @param array $renderer_config
    *   The renderer configuration array.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
+   * @param ThemeManagerInterface $theme_manager
    *   The theme manager.
    */
   public function __construct(TitleResolverInterface $title_resolver, PluginManagerInterface $display_variant_manager, EventDispatcherInterface $event_dispatcher, ModuleHandlerInterface $module_handler, RendererInterface $renderer, RenderCacheInterface $render_cache, array $renderer_config, ThemeManagerInterface $theme_manager) {
@@ -188,9 +188,9 @@ class HtmlRenderer implements MainContentRendererInterface {
    *
    * @param array $main_content
    *   The render array representing the main content.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object, for context.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match, for context.
    *
    * @return array

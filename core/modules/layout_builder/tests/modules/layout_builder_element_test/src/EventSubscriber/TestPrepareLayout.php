@@ -26,23 +26,23 @@ class TestPrepareLayout implements EventSubscriberInterface {
   /**
    * The layout tempstore repository.
    *
-   * @var \Drupal\layout_builder\LayoutTempstoreRepositoryInterface
+   * @var LayoutTempstoreRepositoryInterface
    */
   protected $layoutTempstoreRepository;
 
   /**
    * The messenger service.
    *
-   * @var \Drupal\Core\Messenger\MessengerInterface
+   * @var MessengerInterface
    */
   protected $messenger;
 
   /**
    * Constructs a new TestPrepareLayout.
    *
-   * @param \Drupal\layout_builder\LayoutTempstoreRepositoryInterface $layout_tempstore_repository
+   * @param LayoutTempstoreRepositoryInterface $layout_tempstore_repository
    *   The tempstore repository.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger service.
    */
   public function __construct(LayoutTempstoreRepositoryInterface $layout_tempstore_repository, MessengerInterface $messenger) {
@@ -64,7 +64,7 @@ class TestPrepareLayout implements EventSubscriberInterface {
   /**
    * Subscriber to test acting before the LB subscriber.
    *
-   * @param \Drupal\layout_builder\Event\PrepareLayoutEvent $event
+   * @param PrepareLayoutEvent $event
    *   The prepare layout event.
    */
   public function onBeforePrepareLayout(PrepareLayoutEvent $event) {
@@ -97,7 +97,7 @@ class TestPrepareLayout implements EventSubscriberInterface {
   /**
    * Subscriber to test acting after the LB subscriber.
    *
-   * @param \Drupal\layout_builder\Event\PrepareLayoutEvent $event
+   * @param PrepareLayoutEvent $event
    *   The prepare layout event.
    */
   public function onAfterPrepareLayout(PrepareLayoutEvent $event) {

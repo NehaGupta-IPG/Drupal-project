@@ -3,9 +3,9 @@
 namespace Drupal\media_library;
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormState;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
@@ -27,14 +27,14 @@ class MediaLibraryUiBuilder {
   /**
    * The form builder.
    *
-   * @var \Drupal\Core\Form\FormBuilderInterface
+   * @var FormBuilderInterface
    */
   protected $formBuilder;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
@@ -48,29 +48,29 @@ class MediaLibraryUiBuilder {
   /**
    * The views executable factory.
    *
-   * @var \Drupal\views\ViewExecutableFactory
+   * @var ViewExecutableFactory
    */
   protected $viewsExecutableFactory;
 
   /**
    * The media library opener resolver.
    *
-   * @var \Drupal\media_library\OpenerResolverInterface
+   * @var OpenerResolverInterface
    */
   protected $openerResolver;
 
   /**
    * Constructs a MediaLibraryUiBuilder instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   The request stack.
-   * @param \Drupal\views\ViewExecutableFactory $views_executable_factory
+   * @param ViewExecutableFactory $views_executable_factory
    *   The views executable factory.
-   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
+   * @param FormBuilderInterface $form_builder
    *   The currently active request object.
-   * @param \Drupal\media_library\OpenerResolverInterface $opener_resolver
+   * @param OpenerResolverInterface $opener_resolver
    *   The opener resolver.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, RequestStack $request_stack, ViewExecutableFactory $views_executable_factory, FormBuilderInterface $form_builder, OpenerResolverInterface $opener_resolver) {
@@ -101,7 +101,7 @@ class MediaLibraryUiBuilder {
   /**
    * Build the media library UI.
    *
-   * @param \Drupal\media_library\MediaLibraryState $state
+   * @param MediaLibraryState $state
    *   (optional) The current state of the media library, derived from the
    *   current request.
    *
@@ -144,7 +144,7 @@ class MediaLibraryUiBuilder {
   /**
    * Build the media library content area.
    *
-   * @param \Drupal\media_library\MediaLibraryState $state
+   * @param MediaLibraryState $state
    *   The current state of the media library, derived from the current request.
    *
    * @return array
@@ -167,13 +167,13 @@ class MediaLibraryUiBuilder {
   /**
    * Check access to the media library.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   Run access checks for this account.
-   * @param \Drupal\media_library\MediaLibraryState $state
+   * @param MediaLibraryState $state
    *   (optional) The current state of the media library, derived from the
    *   current request.
    *
-   * @return \Drupal\Core\Access\AccessResult
+   * @return AccessResult
    *   The access result.
    */
   public function checkAccess(AccountInterface $account, ?MediaLibraryState $state = NULL) {
@@ -213,7 +213,7 @@ class MediaLibraryUiBuilder {
   /**
    * Get the media type menu for the media library.
    *
-   * @param \Drupal\media_library\MediaLibraryState $state
+   * @param MediaLibraryState $state
    *   The current state of the media library, derived from the current request.
    *
    * @return array
@@ -274,7 +274,7 @@ class MediaLibraryUiBuilder {
   /**
    * Get the add form for the selected media type.
    *
-   * @param \Drupal\media_library\MediaLibraryState $state
+   * @param MediaLibraryState $state
    *   The current state of the media library, derived from the current request.
    *
    * @return array
@@ -314,7 +314,7 @@ class MediaLibraryUiBuilder {
   /**
    * Get the media library view.
    *
-   * @param \Drupal\media_library\MediaLibraryState $state
+   * @param MediaLibraryState $state
    *   The current state of the media library, derived from the current request.
    *
    * @return array

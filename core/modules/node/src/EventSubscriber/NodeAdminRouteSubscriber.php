@@ -17,23 +17,23 @@ class NodeAdminRouteSubscriber extends RouteSubscriberBase {
   /**
    * The config factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * The router builder.
    *
-   * @var \Drupal\Core\Routing\RouteBuilderInterface
+   * @var RouteBuilderInterface
    */
   protected $routerBuilder;
 
   /**
    * Constructs a new NodeAdminRouteSubscriber.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\Core\Routing\RouteBuilderInterface $router_builder
+   * @param RouteBuilderInterface $router_builder
    *   The router builder service.
    */
   public function __construct(ConfigFactoryInterface $config_factory, RouteBuilderInterface $router_builder) {
@@ -57,7 +57,7 @@ class NodeAdminRouteSubscriber extends RouteSubscriberBase {
   /**
    * Rebuilds the router when node.settings:use_admin_theme is changed.
    *
-   * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   * @param ConfigCrudEvent $event
    *   The event object.
    */
   public function onConfigSave(ConfigCrudEvent $event) {

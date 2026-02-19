@@ -25,7 +25,7 @@ class ContentEntityDeleteForm extends ContentEntityConfirmFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
 
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     $entity = $this->getEntity();
     if ($entity->isDefaultTranslation()) {
       if (count($entity->getTranslationLanguages()) > 1) {
@@ -56,7 +56,7 @@ class ContentEntityDeleteForm extends ContentEntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     $entity = $this->getEntity();
     $message = $this->getDeletionMessage();
 
@@ -80,7 +80,7 @@ class ContentEntityDeleteForm extends ContentEntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     $entity = $this->getEntity();
     return $entity->isDefaultTranslation() ? $this->traitGetCancelUrl() : $entity->toUrl('canonical');
   }
@@ -89,7 +89,7 @@ class ContentEntityDeleteForm extends ContentEntityConfirmFormBase {
    * {@inheritdoc}
    */
   protected function getDeletionMessage() {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     $entity = $this->getEntity();
 
     if (!$entity->isDefaultTranslation()) {
@@ -107,7 +107,7 @@ class ContentEntityDeleteForm extends ContentEntityConfirmFormBase {
    * {@inheritdoc}
    */
   protected function logDeletionMessage() {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     $entity = $this->getEntity();
 
     if (!$entity->isDefaultTranslation()) {
@@ -126,7 +126,7 @@ class ContentEntityDeleteForm extends ContentEntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     $entity = $this->getEntity();
 
     if (!$entity->isDefaultTranslation()) {

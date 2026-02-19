@@ -25,7 +25,7 @@ class CKEditor5HeightTest extends CKEditor5TestBase {
    */
   public function testCKEditor5Height(): void {
     $this->addNewTextFormat();
-    /** @var \Drupal\editor\Entity\Editor $editor */
+    /** @var Editor $editor */
     $editor = Editor::load('ckeditor5');
     $editor->setSettings([
       'toolbar' => [

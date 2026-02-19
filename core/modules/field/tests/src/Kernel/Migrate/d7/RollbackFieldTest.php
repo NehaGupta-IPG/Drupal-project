@@ -64,7 +64,7 @@ class RollbackFieldTest extends MigrateFieldTest {
   /**
    * Executes a single rollback.
    *
-   * @param string|\Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param string|MigrationInterface $migration
    *   The migration to rollback, or its ID.
    */
   protected function executeRollback($migration): void {

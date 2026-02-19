@@ -2,8 +2,8 @@
 
 namespace Drupal\system\Access;
 
-use Drupal\Core\Routing\Access\AccessInterface;
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Routing\Access\AccessInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Site\Settings;
 
@@ -18,7 +18,7 @@ class DbUpdateAccessCheck implements AccessInterface {
    * Grants access if 'update_free_access' is set in settings.php.
    * Otherwise, requires the 'administer software updates' permission.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The currently logged in account.
    *
    * @return \Drupal\Core\Access\AccessResultInterface

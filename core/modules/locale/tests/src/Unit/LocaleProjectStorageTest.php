@@ -22,14 +22,14 @@ class LocaleProjectStorageTest extends UnitTestCase {
   /**
    * The local project storage.
    *
-   * @var \Drupal\locale\LocaleProjectStorage
+   * @var LocaleProjectStorage
    */
   private LocaleProjectStorage $projectStorage;
 
   /**
    * The key value memory factory.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueMemoryFactory
+   * @var KeyValueMemoryFactory
    */
   private KeyValueMemoryFactory $keyValueMemoryFactory;
 

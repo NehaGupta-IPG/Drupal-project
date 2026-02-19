@@ -41,7 +41,7 @@ final class LayoutForm extends FormBase {
   /**
    * The section storage.
    *
-   * @var \Drupal\layout_builder\SectionStorageInterface
+   * @var SectionStorageInterface
    */
   protected $sectionStorage;
 
@@ -128,7 +128,7 @@ final class LayoutForm extends FormBase {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function save(array &$form, FormStateInterface $form_state): void {

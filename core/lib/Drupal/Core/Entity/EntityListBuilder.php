@@ -2,13 +2,13 @@
 
 namespace Drupal\Core\Entity;
 
+use Drupal\Component\Serialization\Json;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Messenger\MessengerTrait;
 use Drupal\Core\Routing\RedirectDestinationTrait;
 use Drupal\Core\Url;
-use Drupal\Component\Serialization\Json;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Entity\Query\QueryInterface;
 
 /**
  * Defines a generic implementation to build a listing of entities.
@@ -23,7 +23,7 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
   /**
    * The entity storage class.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var EntityStorageInterface
    */
   protected $storage;
 
@@ -37,7 +37,7 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
   /**
    * Information about the entity type.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface
+   * @var EntityTypeInterface
    */
   protected $entityType;
 
@@ -72,9 +72,9 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
   /**
    * Constructs a new EntityListBuilder object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The entity storage class.
    */
   public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage) {
@@ -111,7 +111,7 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
   /**
    * Returns a query object for loading entity IDs from the storage.
    *
-   * @return \Drupal\Core\Entity\Query\QueryInterface
+   * @return QueryInterface
    *   A query object used to load entity IDs.
    */
   protected function getEntityListQuery(): QueryInterface {
@@ -143,12 +143,12 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
   /**
    * Gets this list's default operations.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity the operations are for.
    * phpcs:disable Drupal.Commenting
    * @todo Uncomment new method parameters before drupal:12.0.0.
    * @see https://www.drupal.org/project/drupal/issues/3533078
-   * @param \Drupal\Core\Cache\CacheableMetadata|null $cacheability
+   * @param CacheableMetadata|null $cacheability
    *   The cacheable metadata to add to if your operations vary by or depend on
    *   something.
    * phpcs:enable
@@ -247,7 +247,7 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
   /**
    * Builds a row for an entity in the entity listing.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity for this row of the list.
    *
    * @return array
@@ -263,7 +263,7 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
   /**
    * Builds a renderable list of operation links for the entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity on which the linked operations will be performed.
    *
    * @return array
@@ -327,10 +327,10 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
   /**
    * Ensures that a destination is present on the given URL.
    *
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   The URL object to which the destination should be added.
    *
-   * @return \Drupal\Core\Url
+   * @return Url
    *   The updated URL object.
    */
   protected function ensureDestination(Url $url) {
