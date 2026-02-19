@@ -4,9 +4,12 @@ namespace Drupal\Core\Entity\Element;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Tags;
+use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\Plugin\Field\FieldType\StringItem;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element\Textfield;
@@ -221,15 +224,10 @@ class EntityAutocomplete extends Textfield {
         $input_values = $element['#tags'] ? Tags::explode($element['#value']) : [$element['#value']];
 
         foreach ($input_values as $input) {
-          $match = static::extractEntityIdFromAutocompleteInput($input);
-          // Verify that the extracted ID actually corresponds to an existing
-          // entity. If not, treat the entire input as a new entity label to
-          // support titles containing parentheses with numbers like "(1)".
-          if ($match !== NULL) {
-            $entity_storage = \Drupal::entityTypeManager()->getStorage($element['#target_type']);
-            if (!$entity_storage->load($match)) {
-              $match = NULL;
-            }
+          $match = static::extractEntityIdFromAutocompleteInput($input, $element['#target_type']);
+          // Handling the case when the entity label contains parentheses.
+          if (!empty($match)) {
+            $match = static::matchEntityByTitle($handler, $input, $element, $form_state, FALSE) ?? $match;
           }
 
           if ($match === NULL) {
@@ -415,24 +413,71 @@ class EntityAutocomplete extends Textfield {
    *
    * @param string $input
    *   The input coming from the autocompletion result.
+   * @param string $target_type_id
+   *   The type of entity being autocompleted. Defaults to NULL, where it is
+   *   assumed that the target type uses integer IDs.
    *
    * @return mixed|null
    *   An entity ID or NULL if the input does not contain one.
    */
-  public static function extractEntityIdFromAutocompleteInput($input) {
-    $match = NULL;
-
+  public static function extractEntityIdFromAutocompleteInput($input, $target_type_id = NULL) {
     // Take "label (entity id)', match the ID from inside the parentheses.
     // @todo Add support for entities containing parentheses in their ID.
     // @see https://www.drupal.org/node/2520416
-    if (preg_match("/.+\s\(([^\)]+)\)/", $input, $matches)) {
-      // Check if string is an integer and does not start with a "0".
-      if (ctype_digit($matches[1]) && !str_starts_with($matches[1], "0")) {
-        $match = $matches[1];
+    if (preg_match("/.+\s\(([^\)]+)\)\z/", $input, $matches)) {
+      if ($target_type_id === NULL) {
+        return static::matchNumeric($matches[1]) ? $matches[1] : NULL;
       }
-    }
 
-    return $match;
+      $target_type = \Drupal::entityTypeManager()->getDefinition($target_type_id);
+      if ($target_type instanceof ConfigEntityTypeInterface) {
+        // XXX: Config entities do not provide any means to typify their
+        // properties, so let us assume that config entity IDs are strings.
+        return static::matchString($matches[1]) ? $matches[1] : NULL;
+      }
+      if ($target_type->entityClassImplements(FieldableEntityInterface::class)) {
+        /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager */
+        $field_manager = \Drupal::service('entity_field.manager');
+        $id_field_def = $field_manager->getFieldStorageDefinitions($target_type_id)[$target_type->getKey('id')];
+
+        $id_item_def = $id_field_def->getItemDefinition();
+        $matcher = match (TRUE) {
+          $id_item_def instanceof StringItem => static::matchString(...),
+          default => static::matchNumeric(...),
+        };
+        return $matcher($matches[1]) ? $matches[1] : NULL;
+      }
+
+      // Fallback to base numeric check.
+      return static::matchNumeric($matches[1]) ? $matches[1] : NULL;
+    }
+  }
+
+  /**
+   * Helper; match an integer ID.
+   *
+   * @param $value
+   *   The value to test.
+   *
+   * @return bool
+   *    TRUE if matched; otherwise, FALSE.
+   */
+  private static function matchNumeric($value) : bool {
+    // Check if string is an integer and does not start with a "0".
+    return ctype_digit($value) && !str_starts_with($value, "0");
+  }
+
+  /**
+   * Helper; match a string ID.
+   *
+   * @param $value
+   *   The value to test.
+   *
+   * @return bool
+   *   TRUE if matched; otherwise, FALSE.
+   */
+  private static function matchString($value) : bool {
+    return $value !== "";
   }
 
 }
