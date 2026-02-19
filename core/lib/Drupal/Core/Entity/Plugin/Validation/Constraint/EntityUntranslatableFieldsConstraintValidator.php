@@ -69,11 +69,11 @@ class EntityUntranslatableFieldsConstraintValidator extends ConstraintValidator 
     // translations, so that is forbidden too. For the same reason, when changes
     // to untranslatable fields affect all translations, we can only allow them
     // in default revisions.
-    if ($this->hasUntranslatableFieldsChanges($entity)) {
+    if ($field_name = $this->hasUntranslatableFieldsChanges($entity)) {
       if ($entity->isDefaultTranslationAffectedOnly()) {
         foreach ($entity->getTranslationLanguages(FALSE) as $langcode => $language) {
           if ($entity->getTranslation($langcode)->hasTranslationChanges()) {
-            $this->context->addViolation($constraint->defaultTranslationMessage);
+            $this->context->addViolation($constraint->defaultTranslationMessage, ['%field' => $field_name]);
             break;
           }
         }
@@ -112,7 +112,7 @@ class EntityUntranslatableFieldsConstraintValidator extends ConstraintValidator 
       $items = $entity->get($field_name)->filterEmptyItems();
       $original_items = $original->get($field_name)->filterEmptyItems();
       if ($items->hasAffectingChanges($original_items, $entity->getUntranslated()->language()->getId())) {
-        return TRUE;
+        return $definition->getLabel();
       }
     }
 
