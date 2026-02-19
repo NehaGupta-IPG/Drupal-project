@@ -15,11 +15,19 @@ use Drupal\Component\Utility\Html as HtmlUtility;
  *
  * Properties:
  * - #header: An array of table header labels.
- * - #rows: An array of the rows to be displayed. Each row is either an array
- *   of cell contents or an array of properties as described in table.html.twig
- *   Alternatively specify the data for the table as child elements of the table
- *   element. Table elements would contain rows elements that would in turn
- *   contain column elements.
+ * - #rows: An array of table rows.
+ *   Each row can be provided in one of the following formats:
+ *   - An indexed array of cell values (strings, render arrays, or cell definition arrays).
+ *   - An associative array of cell definitions. Each cell definition
+ *     may include a 'data' key and optional HTML attributes.
+ *   Each cell may be provided as:
+ *   - A string.
+ *   - An associative array with:
+ *     - data: A string or renderable array representing the cell contents.
+ *     - attributes: (optional) An array of HTML attributes for the cell
+ *       (for example: class, id).
+ *   Alternatively, table data may be provided as child elements of the table
+ *   render element. In this case, rows contain column elements.
  * - #empty: Text to display when no rows are present.
  * - #responsive: Indicates whether to add the drupal.tableresponsive library
  *   providing responsive tables.  Defaults to TRUE.
