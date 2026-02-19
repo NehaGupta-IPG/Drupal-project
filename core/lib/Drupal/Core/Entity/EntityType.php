@@ -928,7 +928,7 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
   /**
    * {@inheritdoc}
    */
-  public function addConstraint($constraint_name, $options = NULL) {
+  public function addConstraint($constraint_name, /* ?array */$options = NULL) {
     $this->constraints[$constraint_name] = $options;
     return $this;
   }
@@ -957,6 +957,13 @@ class EntityType extends PluginDefinition implements EntityTypeInterface {
     }
 
     return $config_dependency;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function hasIntegerId(): ?bool {
+    return FALSE;
   }
 
 }
