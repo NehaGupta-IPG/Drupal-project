@@ -38,7 +38,7 @@ class DiscoveryCachedTraitTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::getDefinition
+   * Tests get definition.
    */
   #[DataProvider('providerGetDefinition')]
   public function testGetDefinition($expected, $cached_definitions, $get_definitions, $plugin_id): void {
@@ -61,6 +61,8 @@ class DiscoveryCachedTraitTest extends TestCase {
         });
     }
     else {
+      $trait->expects($this->never())
+        ->method('getDefinitions');
       // Put $cached_definitions into our mocked ::$definitions.
       $reflection_definitions->setValue($trait, $cached_definitions);
     }

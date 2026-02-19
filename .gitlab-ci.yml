@@ -11,6 +11,8 @@
 # - DrupalSpoons
 ################
 
+include: '.gitlab-ci/php.yml'
+
 ################
 # Workflow
 #
@@ -34,7 +36,7 @@ variables:
   FF_USE_FASTZIP: 1
   _CONFIG_DOCKERHUB_ROOT: "registry.gitlab.com/drupal-infrastructure/drupalci/drupalci-environments"
   # Let composer know what self.version means.
-  COMPOSER_ROOT_VERSION: "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}${CI_COMMIT_BRANCH}-dev"
+  COMPOSER_ROOT_VERSION: dev-main
   COMPOSER_ALLOW_SUPERUSER: 1
   GIT_DEPTH: "50"
   # PHPStan, ESLint and Stylelint store absolute paths in caches.
@@ -42,10 +44,9 @@ variables:
   # and on Kubernetes there is no risk of conflict between jobs.
   GIT_CLONE_PATH: $CI_BUILDS_DIR
   PARENT_PIPELINE_ID: $CI_PIPELINE_ID
-  PRIMARY_PHP: "8.5-ubuntu"
-  _TARGET_PHP: "${PRIMARY_PHP}"
   PHPUNIT_CONFIGURATION_FILE_PATH: $CI_PROJECT_DIR/core
   PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
+  _TARGET_PHP: "${PRIMARY_PHP}"
   # Use local cache for yarn, see .yarn-install-from-cache.
   YARN_ENABLE_GLOBAL_CACHE: false
   YARN_ENABLE_MIRROR: false

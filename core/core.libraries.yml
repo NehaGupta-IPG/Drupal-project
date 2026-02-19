@@ -339,6 +339,18 @@ ckeditor5.autoformat:
   dependencies:
     - core/ckeditor5
 
+ckeditor5.fullscreen:
+  remote: https://github.com/ckeditor/ckeditor5
+  version: "47.3.0"
+  license:
+    name: GPL-2.0-or-later
+    url: https://raw.githubusercontent.com/ckeditor/ckeditor5/v47.3.0/LICENSE.md
+    gpl-compatible: true
+  js:
+    assets/vendor/ckeditor5/fullscreen/fullscreen.js: { minified: true }
+  dependencies:
+    - core/ckeditor5
+
 drupal:
   version: VERSION
   js:
@@ -853,10 +865,10 @@ internal.floating-ui:
 
 jquery:
   remote: https://github.com/jquery/jquery
-  version: "4.0.0-rc.1"
+  version: "4.0.0"
   license:
     name: MIT
-    url: https://raw.githubusercontent.com/jquery/jquery/4.0.0-rc.1/LICENSE.txt
+    url: https://raw.githubusercontent.com/jquery/jquery/4.0.0/LICENSE.txt
     gpl-compatible: true
   js:
     # jquery.min.js is explicitly set to preprocess: false to prevent its
