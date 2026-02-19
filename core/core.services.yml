@@ -421,7 +421,6 @@ services:
   config.installer:
     class: Drupal\Core\Config\ConfigInstaller
     arguments: ['@config.factory', '@config.storage', '@config.typed', '@config.manager', '@event_dispatcher', '%install_profile%', '@extension.path.resolver']
-    lazy: true
   Drupal\Core\Config\ConfigInstallerInterface: '@config.installer'
   config.storage:
     class: Drupal\Core\Config\CachedStorage
@@ -689,7 +688,6 @@ services:
   module_installer:
     class: Drupal\Core\Extension\ModuleInstaller
     autowire: true
-    lazy: true
   Drupal\Core\Extension\ModuleInstallerInterface: '@module_installer'
   module_installer.uninstall_validators:
     class: \IteratorIterator
@@ -1164,10 +1162,6 @@ services:
     arguments: ['@database']
     tags:
       - { name: backend_overridable }
-  pgsql.entity.query.sql:
-    class: Drupal\Core\Entity\Query\Sql\pgsql\QueryFactory
-    arguments: ['@database']
-    deprecated: The "%service_id%" service is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Install the pgsql module to replace this service. See https://www.drupal.org/node/3488580
   entity.query.null:
     class: Drupal\Core\Entity\Query\Null\QueryFactory
   entity.query.keyvalue:
