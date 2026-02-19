@@ -7,6 +7,7 @@ use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Field\FieldItemList;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 
 /**
  * Defines an item list class for comment fields.
@@ -62,6 +63,18 @@ class CommentFieldItemList extends FieldItemList {
       $result = $this->access('view comment list', $account, TRUE);
       if (!$result->isAllowed()) {
         $result = $result->orIf($this->access('create', $account, TRUE));
+      }
+
+      // When comments are open and neither check above granted access (e.g. an
+      // anonymous user without 'post comments' on a node with no existing
+      // comments), the field must still be accessible so the formatter can
+      // display a login-to-comment prompt. Without this the formatter is
+      // skipped entirely and no prompt is ever shown.
+      if (!$result->isAllowed() && (int) $this->status === CommentItemInterface::OPEN) {
+        $result = $result->orIf(
+          AccessResult::allowedIfHasPermission($account, 'access comments')
+            ->addCacheableDependency($this->getEntity())
+        );
       }
 
       return $return_as_object ? $result : $result->isAllowed();
