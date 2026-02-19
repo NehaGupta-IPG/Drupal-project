@@ -17,7 +17,8 @@ use Drupal\Component\Utility\Html as HtmlUtility;
  * - #header: An array of table header labels.
  * - #rows: An array of table rows.
  *   Each row can be provided in one of the following formats:
- *   - An indexed array of cell values (strings, render arrays, or cell definition arrays).
+ *   - An indexed array of cell values (strings, render arrays, or cell
+ *     definition arrays).
  *   - An associative array of cell definitions. Each cell definition
  *     may include a 'data' key and optional HTML attributes.
  *   Each cell may be provided as:
