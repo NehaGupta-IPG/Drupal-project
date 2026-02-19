@@ -9,7 +9,6 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface;
 use Drupal\Core\Entity\EntityReferenceSelection\SelectionWithAutocreateInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
-use Drupal\Core\Field\Plugin\Field\FieldType\StringItem;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element\Textfield;
@@ -439,10 +438,8 @@ class EntityAutocomplete extends Textfield {
         /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager */
         $field_manager = \Drupal::service('entity_field.manager');
         $id_field_def = $field_manager->getFieldStorageDefinitions($target_type_id)[$target_type->getKey('id')];
-
-        $id_item_def = $id_field_def->getItemDefinition();
-        $matcher = match (TRUE) {
-          $id_item_def instanceof StringItem => static::matchString(...),
+        $matcher = match($id_field_def->getType()) {
+          'string' => static::matchString(...),
           default => static::matchNumeric(...),
         };
         return $matcher($matches[1]) ? $matches[1] : NULL;
