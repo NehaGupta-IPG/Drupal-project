@@ -413,14 +413,14 @@ class EntityAutocomplete extends Textfield {
    *
    * @param string $input
    *   The input coming from the autocompletion result.
-   * @param string $target_type_id
+   * @param string|null $target_type_id
    *   The type of entity being autocompleted. Defaults to NULL, where it is
    *   assumed that the target type uses integer IDs.
    *
    * @return mixed|null
    *   An entity ID or NULL if the input does not contain one.
    */
-  public static function extractEntityIdFromAutocompleteInput($input, $target_type_id = NULL) {
+  public static function extractEntityIdFromAutocompleteInput($input, ?string $target_type_id = NULL) {
     // Take "label (entity id)', match the ID from inside the parentheses.
     // @todo Add support for entities containing parentheses in their ID.
     // @see https://www.drupal.org/node/2520416
@@ -456,13 +456,13 @@ class EntityAutocomplete extends Textfield {
   /**
    * Helper; match an integer ID.
    *
-   * @param $value
+   * @param string $value
    *   The value to test.
    *
    * @return bool
-   *    TRUE if matched; otherwise, FALSE.
+   *   TRUE if matched; otherwise, FALSE.
    */
-  private static function matchNumeric($value) : bool {
+  private static function matchNumeric(string $value) : bool {
     // Check if string is an integer and does not start with a "0".
     return ctype_digit($value) && !str_starts_with($value, "0");
   }
@@ -470,13 +470,13 @@ class EntityAutocomplete extends Textfield {
   /**
    * Helper; match a string ID.
    *
-   * @param $value
+   * @param string $value
    *   The value to test.
    *
    * @return bool
    *   TRUE if matched; otherwise, FALSE.
    */
-  private static function matchString($value) : bool {
+  private static function matchString(string $value) : bool {
     return $value !== "";
   }
 
