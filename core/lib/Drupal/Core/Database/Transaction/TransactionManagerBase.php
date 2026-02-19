@@ -174,7 +174,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    *   relying on object destruction order to commit transactions. Xdebug 3.3.0
    *   changes the order of object destruction when the develop mode is enabled.
    *
-   * @deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no
    *   replacement.
    *
    * @see https://www.drupal.org/node/3524461
@@ -183,7 +183,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     // Only soft deprecation (no @trigger_error) to avoid thousands of
     // occurrences per test run. PHPStan reports usage errors anyway.
     if ($this->stackDepth() !== 0) {
-      @trigger_error('Committing transactions via ' . __METHOD__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3524461', E_USER_DEPRECATED);
+      @trigger_error('Committing transactions via ' . __METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3524461', E_USER_DEPRECATED);
     }
     foreach (array_reverse($this->stack()) as $id => $item) {
       $this->unpile($item->name, $id);
@@ -346,7 +346,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     // underlying database transaction, so we do not trigger the error in such
     // circumstance.
     if (!$this->exceptionThrown) {
-      @trigger_error('Database commit by letting a Transaction object go out of scope is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. Commit explicitly via Transaction::commitOrRelease() instead. See https://www.drupal.org/node/3524461', E_USER_DEPRECATED);
+      @trigger_error('Database commit by letting a Transaction object go out of scope is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Commit explicitly via Transaction::commitOrRelease() instead. See https://www.drupal.org/node/3524461', E_USER_DEPRECATED);
     }
 
     // Commit the transaction.

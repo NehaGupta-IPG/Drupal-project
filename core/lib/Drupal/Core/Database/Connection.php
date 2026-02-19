@@ -224,7 +224,7 @@ abstract class Connection {
    *   relying on object destruction order to commit transactions. Xdebug 3.3.0
    *   changes the order of object destruction when the develop mode is enabled.
    *
-   * @deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no
    *   replacement.
    *
    * @see https://www.drupal.org/node/3524461
