@@ -286,10 +286,9 @@ EOF;
 To run this script you will normally invoke it from the root directory of your
 Drupal installation as the webserver user (differs per configuration), or root:
 
-sudo -u [wwwrun|www-data|etc] php ./core/scripts/{$script_basename}
-  --url http://example.com/ --all
-sudo -u [wwwrun|www-data|etc] php ./core/scripts/{$script_basename}
-  --url http://example.com/ --class Drupal\Tests\block\Functional\BlockTest
+sudo -u [wwwrun|www-data|etc] php ./core/scripts/{$script_basename} --url http://example.com/ --all
+ 
+sudo -u [wwwrun|www-data|etc] php ./core/scripts/{$script_basename} --url http://example.com/ --class 'Drupal\Tests\block\Functional\BlockTest'
 
 Without a preinstalled Drupal site, specify a SQLite database pathname to create
 (for the test runner) and the default database connection info (for Drupal) to
