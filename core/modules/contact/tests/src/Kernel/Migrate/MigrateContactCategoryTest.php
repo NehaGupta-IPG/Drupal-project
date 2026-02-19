@@ -56,7 +56,7 @@ class MigrateContactCategoryTest extends MigrateDrupal6TestBase {
    * @internal
    */
   protected function assertEntity(string $id, string $expected_label, array $expected_recipients, string $expected_reply, int $expected_weight): void {
-    /** @var \Drupal\contact\ContactFormInterface $entity */
+    /** @var ContactFormInterface $entity */
     $entity = ContactForm::load($id);
     $this->assertInstanceOf(ContactFormInterface::class, $entity);
     $this->assertSame($expected_label, $entity->label());

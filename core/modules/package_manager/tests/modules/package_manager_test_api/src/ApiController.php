@@ -60,11 +60,11 @@ class ApiController extends ControllerBase {
    * Creates a stage directory, requires packages into it, applies changes to
    * the active directory.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request. The runtime and dev dependencies are expected to be in
    *   the query string, under the 'runtime' and 'dev' keys, respectively.
    *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   * @return RedirectResponse
    *   A response that directs to the ::finish() method.
    *
    * @see ::finish()
@@ -85,7 +85,7 @@ class ApiController extends ControllerBase {
    * @param string $id
    *   The stage ID.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   The response.
    */
   public function finish(string $id): Response {
@@ -97,7 +97,7 @@ class ApiController extends ControllerBase {
   /**
    * Creates a stage, requires packages into it, and applies the changes.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request. The runtime and dev dependencies are expected to be in
    *   the query string, under the 'runtime' and 'dev' keys, respectively.
    *
@@ -119,7 +119,7 @@ class ApiController extends ControllerBase {
   /**
    * Returns the information about current PHP server used for build tests.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   The response.
    */
   public function checkSetup(): Response {

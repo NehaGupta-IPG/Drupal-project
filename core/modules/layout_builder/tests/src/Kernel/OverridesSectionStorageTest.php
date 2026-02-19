@@ -47,7 +47,7 @@ class OverridesSectionStorageTest extends KernelTestBase {
   /**
    * The plugin.
    *
-   * @var \Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage
+   * @var OverridesSectionStorage
    */
   protected $plugin;
 

@@ -26,7 +26,7 @@ class AjaxResponseTest extends UnitTestCase {
   /**
    * The tested ajax response object.
    *
-   * @var \Drupal\Core\Ajax\AjaxResponse
+   * @var AjaxResponse
    */
   protected $ajaxResponse;
 
@@ -109,7 +109,7 @@ class AjaxResponseTest extends UnitTestCase {
    *
    * @see \Drupal\Core\Ajax\AjaxResponse::mergeWith()
    *
-   * @throws \PHPUnit\Framework\MockObject\Exception
+   * @throws Exception
    */
   public function testMergeWithOtherAjaxResponse(): void {
     $response = new AjaxResponse([]);

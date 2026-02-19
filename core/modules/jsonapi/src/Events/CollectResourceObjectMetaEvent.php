@@ -4,11 +4,11 @@ declare(strict_types = 1);
 
 namespace Drupal\jsonapi\Events;
 
+use Drupal\Component\EventDispatcher\Event;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\jsonapi\JsonApiResource\ResourceObject;
-use Drupal\Component\EventDispatcher\Event;
 
 /**
  * Event for collecting resource object metadata of a JSON:API resource types.
@@ -33,7 +33,7 @@ final class CollectResourceObjectMetaEvent extends Event implements RefinableCac
   /**
    * Constructs a new CollectResourceObjectMetaEvent object.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceObject $resourceObject
+   * @param ResourceObject $resourceObject
    *   The resource object.
    * @param array $context
    *   The context options for the normalizer.
@@ -50,7 +50,7 @@ final class CollectResourceObjectMetaEvent extends Event implements RefinableCac
   /**
    * Gets the resource object.
    *
-   * @return \Drupal\jsonapi\JsonApiResource\ResourceObject
+   * @return ResourceObject
    *   The resource object.
    */
   public function getResourceObject(): ResourceObject {

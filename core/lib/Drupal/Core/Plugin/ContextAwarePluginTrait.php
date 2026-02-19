@@ -175,7 +175,7 @@ trait ContextAwarePluginTrait {
     // Applied contexts can affect the cache contexts when this plugin is
     // involved in caching, collect and return them.
     foreach ($this->getContexts() as $context) {
-      /** @var \Drupal\Core\Cache\CacheableDependencyInterface $context */
+      /** @var CacheableDependencyInterface $context */
       if ($context instanceof CacheableDependencyInterface) {
         $cache_contexts = Cache::mergeContexts($cache_contexts, $context->getCacheContexts());
       }
@@ -191,7 +191,7 @@ trait ContextAwarePluginTrait {
     // Applied contexts can affect the cache tags when this plugin is
     // involved in caching, collect and return them.
     foreach ($this->getContexts() as $context) {
-      /** @var \Drupal\Core\Cache\CacheableDependencyInterface $context */
+      /** @var CacheableDependencyInterface $context */
       if ($context instanceof CacheableDependencyInterface) {
         $tags = Cache::mergeTags($tags, $context->getCacheTags());
       }
@@ -208,7 +208,7 @@ trait ContextAwarePluginTrait {
     // Applied contexts can affect the cache max age when this plugin is
     // involved in caching, collect and return them.
     foreach ($this->getContexts() as $context) {
-      /** @var \Drupal\Core\Cache\CacheableDependencyInterface $context */
+      /** @var CacheableDependencyInterface $context */
       if ($context instanceof CacheableDependencyInterface) {
         $max_age = Cache::mergeMaxAges($max_age, $context->getCacheMaxAge());
       }

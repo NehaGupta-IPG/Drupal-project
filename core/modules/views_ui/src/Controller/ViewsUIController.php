@@ -2,20 +2,20 @@
 
 namespace Drupal\views_ui\Controller;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Tags;
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
-use Drupal\views\ViewExecutable;
 use Drupal\views\ViewEntityInterface;
+use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
-use Drupal\views_ui\ViewUI;
 use Drupal\views\ViewsData;
-use Symfony\Component\HttpFoundation\Request;
+use Drupal\views_ui\ViewUI;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Drupal\Core\Ajax\AjaxResponse;
-use Drupal\Core\Ajax\ReplaceCommand;
-use Drupal\Component\Utility\Html;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Returns responses for Views UI routes.
@@ -25,14 +25,14 @@ class ViewsUIController extends ControllerBase {
   /**
    * Stores the Views data cache object.
    *
-   * @var \Drupal\views\ViewsData
+   * @var ViewsData
    */
   protected $viewsData;
 
   /**
    * Constructs a new \Drupal\views_ui\Controller\ViewsUIController object.
    *
-   * @param \Drupal\views\ViewsData $views_data
+   * @param ViewsData $views_data
    *   The Views data cache object.
    */
   public function __construct(ViewsData $views_data) {
@@ -135,14 +135,14 @@ class ViewsUIController extends ControllerBase {
   /**
    * Calls a method on a view and reloads the listing page.
    *
-   * @param \Drupal\views\ViewEntityInterface $view
+   * @param ViewEntityInterface $view
    *   The view being acted upon.
    * @param string $op
    *   The operation to perform, e.g., 'enable' or 'disable'.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse|\Symfony\Component\HttpFoundation\RedirectResponse
+   * @return AjaxResponse|RedirectResponse
    *   Either returns a rebuilt listing page as an AJAX response, or redirects
    *   back to the listing page.
    */
@@ -168,7 +168,7 @@ class ViewsUIController extends ControllerBase {
    * Like other autocomplete functions, this function inspects the 'q' query
    * parameter for the string to use to search for suggestions.
    *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   * @return JsonResponse
    *   A JSON response containing the autocomplete suggestions for Views tags.
    */
   public function autocompleteTag(Request $request) {
@@ -199,7 +199,7 @@ class ViewsUIController extends ControllerBase {
   /**
    * Returns the form to edit a view.
    *
-   * @param \Drupal\views_ui\ViewUI $view
+   * @param ViewUI $view
    *   The view to be edited.
    * @param string|null $display_id
    *   (optional) The display ID being edited. Defaults to NULL, which will load

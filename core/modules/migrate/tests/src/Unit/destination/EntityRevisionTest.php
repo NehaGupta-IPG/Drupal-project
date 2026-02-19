@@ -32,42 +32,42 @@ class EntityRevisionTest extends UnitTestCase {
   /**
    * The migration.
    *
-   * @var \Drupal\migrate\Plugin\MigrationInterface
+   * @var MigrationInterface
    */
   protected MigrationInterface $migration;
 
   /**
    * The destination storage.
    *
-   * @var \Prophecy\Prophecy\ObjectProphecy
+   * @var ObjectProphecy
    */
   protected ObjectProphecy $storage;
 
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected EntityFieldManagerInterface $entityFieldManager;
 
   /**
    * The field type manager.
    *
-   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface
+   * @var FieldTypePluginManagerInterface
    */
   protected FieldTypePluginManagerInterface $fieldTypeManager;
 
   /**
    * The account switcher.
    *
-   * @var \Drupal\Core\Session\AccountSwitcherInterface
+   * @var AccountSwitcherInterface
    */
   protected AccountSwitcherInterface $accountSwitcher;
 
   /**
    * The entity type bundle information.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @var EntityTypeBundleInfoInterface
    */
   protected EntityTypeBundleInfoInterface $entityTypeBundle;
 
@@ -241,12 +241,12 @@ class EntityRevision extends RealEntityRevision {
    * workings of its implementation which would trickle into mock assertions. An
    * empty implementation avoids this.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to update.
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The row object to update from.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   An updated entity from row values.
    */
   protected function updateEntity(EntityInterface $entity, Row $row) {

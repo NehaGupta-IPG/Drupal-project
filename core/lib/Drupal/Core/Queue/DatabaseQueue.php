@@ -30,7 +30,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
   /**
    * The database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
@@ -39,7 +39,7 @@ class DatabaseQueue implements ReliableQueueInterface, QueueGarbageCollectionInt
    *
    * @param string $name
    *   The name of the queue.
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The Connection object containing the key-value tables.
    */
   public function __construct($name, Connection $connection) {

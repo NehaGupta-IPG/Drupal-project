@@ -12,7 +12,7 @@ class ViewsDataHelper {
   /**
    * The views data object, containing the cached information.
    *
-   * @var \Drupal\views\ViewsData
+   * @var ViewsData
    */
   protected $data;
 
@@ -26,7 +26,7 @@ class ViewsDataHelper {
   /**
    * Constructs a ViewsData object.
    *
-   * @param \Drupal\views\ViewsData $views_data
+   * @param ViewsData $views_data
    *   The views data object, containing the cached table information.
    */
   public function __construct(ViewsData $views_data) {

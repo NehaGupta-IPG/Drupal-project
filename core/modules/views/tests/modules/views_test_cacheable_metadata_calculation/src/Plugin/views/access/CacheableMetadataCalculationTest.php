@@ -26,7 +26,7 @@ class CacheableMetadataCalculationTest extends AccessPluginBase implements Cache
   /**
    * The state service.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
@@ -39,7 +39,7 @@ class CacheableMetadataCalculationTest extends AccessPluginBase implements Cache
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, StateInterface $state) {

@@ -171,7 +171,7 @@ abstract class MediaEmbedFilterTestBase extends KernelTestBase {
    * @param string $langcode
    *   The language code of the text to be filtered.
    *
-   * @return \Drupal\filter\FilterProcessResult
+   * @return FilterProcessResult
    *   The filtered text, wrapped in a FilterProcessResult object, and possibly
    *   with associated assets, cacheability metadata and placeholders.
    *
@@ -219,7 +219,7 @@ abstract class MediaEmbedFilterTestBase extends KernelTestBase {
    *   (optional) The filter plugin IDs to apply to the given text, in the order
    *   they are being requested to be executed.
    *
-   * @return \Drupal\filter\FilterProcessResult
+   * @return FilterProcessResult
    *   The filtered text, wrapped in a FilterProcessResult object, and possibly
    *   with associated assets, cacheability metadata and placeholders.
    *
@@ -234,11 +234,11 @@ abstract class MediaEmbedFilterTestBase extends KernelTestBase {
     }
 
     $render_context = new RenderContext();
-    /** @var \Drupal\filter\FilterProcessResult $filter_result */
+    /** @var FilterProcessResult $filter_result */
     $filter_result = $this->container->get('renderer')->executeInRenderContext($render_context, function () use ($text, $filters, $langcode) {
       $metadata = new BubbleableMetadata();
       foreach ($filters as $filter) {
-        /** @var \Drupal\filter\FilterProcessResult $result */
+        /** @var FilterProcessResult $result */
         $result = $filter->process($text, $langcode);
         $metadata = $metadata->merge($result);
         $text = $result->getProcessedText();

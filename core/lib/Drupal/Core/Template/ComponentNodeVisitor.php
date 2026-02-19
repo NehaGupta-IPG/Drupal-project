@@ -9,15 +9,15 @@ use Drupal\Core\Render\Component\Exception\ComponentNotFoundException;
 use Drupal\Core\Render\Component\Exception\InvalidComponentException;
 use Drupal\Core\Theme\ComponentPluginManager;
 use Twig\Environment;
-use Twig\Node\Expression\Variable\ContextVariable;
-use Twig\Node\Nodes;
-use Twig\TwigFunction;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\FunctionExpression;
+use Twig\Node\Expression\Variable\ContextVariable;
 use Twig\Node\ModuleNode;
 use Twig\Node\Node;
+use Twig\Node\Nodes;
 use Twig\Node\PrintNode;
 use Twig\NodeVisitor\NodeVisitorInterface;
+use Twig\TwigFunction;
 
 /**
  * Provides a ComponentNodeVisitor to change the generated parse-tree.
@@ -27,7 +27,7 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
   /**
    * Creates a new ComponentNodeVisitor object.
    *
-   * @param \Drupal\Core\Theme\ComponentPluginManager $pluginManager
+   * @param ComponentPluginManager $pluginManager
    *   The plugin manager for components.
    */
   public function __construct(protected ComponentPluginManager $pluginManager) {}
@@ -109,10 +109,10 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
   /**
    * Finds the SDC for the current module node.
    *
-   * @param \Twig\Node\Node $node
+   * @param Node $node
    *   The node.
    *
-   * @return \Drupal\Core\Plugin\Component|null
+   * @return Component|null
    *   The component, if any.
    */
   protected function getComponent(Node $node): ?Component {
@@ -144,7 +144,7 @@ class ComponentNodeVisitor implements NodeVisitorInterface {
    * undeclared slots. This cheap validation lets us validate during runtime
    * even in production.
    *
-   * @throws \Drupal\Core\Render\Component\Exception\InvalidComponentException
+   * @throws InvalidComponentException
    *   When the slots don't pass validation.
    */
   protected function validateSlots(Component $component, Node $node): void {

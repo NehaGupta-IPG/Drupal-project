@@ -20,14 +20,14 @@ class AuthenticationManager implements AuthenticationProviderInterface, Authenti
   /**
    * The authentication provider collector.
    *
-   * @var \Drupal\Core\Authentication\AuthenticationCollectorInterface
+   * @var AuthenticationCollectorInterface
    */
   protected $authCollector;
 
   /**
    * Creates a new authentication manager instance.
    *
-   * @param \Drupal\Core\Authentication\AuthenticationCollectorInterface $auth_collector
+   * @param AuthenticationCollectorInterface $auth_collector
    *   The authentication provider collector.
    */
   public function __construct(AuthenticationCollectorInterface $auth_collector) {
@@ -94,7 +94,7 @@ class AuthenticationManager implements AuthenticationProviderInterface, Authenti
   /**
    * Returns the id of the authentication provider for a request.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The incoming request.
    *
    * @return string|null
@@ -112,7 +112,7 @@ class AuthenticationManager implements AuthenticationProviderInterface, Authenti
   /**
    * Returns the ID of the challenge provider for a request.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The incoming request.
    *
    * @return string|null
@@ -133,7 +133,7 @@ class AuthenticationManager implements AuthenticationProviderInterface, Authenti
    * If no filter is registered for the given provider id, the default filter
    * is applied.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The incoming request.
    * @param bool $authenticated
    *   Whether or not the request is authenticated.
@@ -166,7 +166,7 @@ class AuthenticationManager implements AuthenticationProviderInterface, Authenti
    * If no filter is registered for the given provider id, the default filter
    * is applied.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The incoming request.
    * @param string $provider_id
    *   The id of the authentication provider to check access for.

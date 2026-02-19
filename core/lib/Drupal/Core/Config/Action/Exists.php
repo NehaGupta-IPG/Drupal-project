@@ -22,13 +22,13 @@ enum Exists {
    *
    * @param string $configName
    *   The config name supplied to the action.
-   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface|null $entity
+   * @param ConfigEntityInterface|null $entity
    *   The entity, if it exists.
    *
    * @return bool
    *   TRUE if the action should return early, FALSE if not.
    *
-   * @throws \Drupal\Core\Config\Action\ConfigActionException
+   * @throws ConfigActionException
    *   Thrown depending on $entity and the value of $this.
    */
   public function returnEarly(string $configName, ?ConfigEntityInterface $entity): bool {

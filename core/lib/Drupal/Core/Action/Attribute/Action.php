@@ -8,7 +8,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 /**
  * Defines an Action attribute object.
  *
- * Plugin Namespace: Plugin\Action
+ * Plugin Namespace: Plugin\Action.
  *
  * @see \Drupal\Core\Action\ActionInterface
  * @see \Drupal\Core\Action\ActionManager
@@ -24,11 +24,11 @@ class Action extends Plugin {
    *
    * @param string $id
    *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $label
+   * @param TranslatableMarkup|null $label
    *   The label of the action.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $action_label
+   * @param TranslatableMarkup|null $action_label
    *   (optional) A label that can be used by the action deriver.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $category
+   * @param TranslatableMarkup|null $category
    *   (optional) The category under which the action should be listed in the
    *   UI.
    * @param class-string|null $deriver

@@ -45,14 +45,14 @@ class FieldSqlStorageTest extends EntityKernelTestBase {
   /**
    * A field storage to use in this class.
    *
-   * @var \Drupal\field\Entity\FieldStorageConfig
+   * @var FieldStorageConfig
    */
   protected $fieldStorage;
 
   /**
    * A field to use in this test class.
    *
-   * @var \Drupal\field\Entity\FieldConfig
+   * @var FieldConfig
    */
   protected $field;
 

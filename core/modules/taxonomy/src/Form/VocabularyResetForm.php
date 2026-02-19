@@ -17,14 +17,14 @@ class VocabularyResetForm extends EntityConfirmFormBase {
   /**
    * The term storage.
    *
-   * @var \Drupal\taxonomy\TermStorageInterface
+   * @var TermStorageInterface
    */
   protected $termStorage;
 
   /**
    * Constructs a new VocabularyResetForm object.
    *
-   * @param \Drupal\taxonomy\TermStorageInterface $term_storage
+   * @param TermStorageInterface $term_storage
    *   The term storage.
    */
   public function __construct(TermStorageInterface $term_storage) {

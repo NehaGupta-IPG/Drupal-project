@@ -41,7 +41,7 @@ class Fixtures extends FixturesBase {
    * @param string $source
    *   The name of the asset; path is "assets/$source".
    *
-   * @return \Drupal\Composer\Plugin\Scaffold\ScaffoldFilePath
+   * @return ScaffoldFilePath
    *   The full and relative path to the desired asset
    *
    * @see \Drupal\Composer\Plugin\Scaffold\ScaffoldFilePath::sourcePath()
@@ -58,7 +58,7 @@ class Fixtures extends FixturesBase {
    *
    * Use in place of ManageOptions::getLocationReplacements().
    *
-   * @return \Drupal\Composer\Plugin\Scaffold\Interpolator
+   * @return Interpolator
    *   An interpolator with location replacements, including 'web-root'.
    *
    * @see \Drupal\Composer\Plugin\Scaffold\ManageOptions::getLocationReplacements()
@@ -79,7 +79,7 @@ class Fixtures extends FixturesBase {
    * @param string $source
    *   The name of the asset; path is "assets/$source".
    *
-   * @return \Drupal\Composer\Plugin\Scaffold\Operations\ReplaceOp
+   * @return ReplaceOp
    *   A replace operation object.
    */
   public function replaceOp($project_name, $source): ReplaceOp {
@@ -96,7 +96,7 @@ class Fixtures extends FixturesBase {
    * @param string $source
    *   The name of the asset; path is "assets/$source".
    *
-   * @return \Drupal\Composer\Plugin\Scaffold\Operations\AppendOp
+   * @return AppendOp
    *   An append operation object.
    */
   public function appendOp($project_name, $source): AppendOp {
@@ -113,14 +113,14 @@ class Fixtures extends FixturesBase {
    *   Destination path; should be in the form '[web-root]/robots.txt', where
    *   '[web-root]' is always literally '[web-root]', with any arbitrarily
    *   desired filename following.
-   * @param \Drupal\Composer\Plugin\Scaffold\Interpolator $interpolator
+   * @param Interpolator $interpolator
    *   Location replacements. Obtain via Fixtures::getLocationReplacements()
    *   when creating multiple scaffold destinations.
    * @param string $package_name
    *   (optional) The name of the fixture package that this path came from.
    *   Taken from interpolator if not provided.
    *
-   * @return \Drupal\Composer\Plugin\Scaffold\ScaffoldFilePath
+   * @return ScaffoldFilePath
    *   A destination scaffold file backed by temporary storage.
    *
    * @see \Drupal\Composer\Plugin\Scaffold\ScaffoldFilePath::destinationPath()

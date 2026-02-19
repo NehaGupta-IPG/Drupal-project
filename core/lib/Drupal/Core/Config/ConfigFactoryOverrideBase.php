@@ -12,7 +12,7 @@ abstract class ConfigFactoryOverrideBase implements EventSubscriberInterface {
   /**
    * Reacts to the ConfigCollectionEvents::COLLECTION_INFO event.
    *
-   * @param \Drupal\Core\Config\ConfigCollectionInfo $collection_info
+   * @param ConfigCollectionInfo $collection_info
    *   The configuration collection info event.
    */
   abstract public function addCollections(ConfigCollectionInfo $collection_info);
@@ -20,7 +20,7 @@ abstract class ConfigFactoryOverrideBase implements EventSubscriberInterface {
   /**
    * Actions to be performed to configuration override on configuration save.
    *
-   * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   * @param ConfigCrudEvent $event
    *   The config CRUD event.
    */
   abstract public function onConfigSave(ConfigCrudEvent $event);
@@ -28,7 +28,7 @@ abstract class ConfigFactoryOverrideBase implements EventSubscriberInterface {
   /**
    * Actions to be performed to configuration override on configuration delete.
    *
-   * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   * @param ConfigCrudEvent $event
    *   The config CRUD event.
    */
   abstract public function onConfigDelete(ConfigCrudEvent $event);
@@ -36,7 +36,7 @@ abstract class ConfigFactoryOverrideBase implements EventSubscriberInterface {
   /**
    * Actions to be performed to configuration override on configuration rename.
    *
-   * @param \Drupal\Core\Config\ConfigRenameEvent $event
+   * @param ConfigRenameEvent $event
    *   The config rename event.
    */
   abstract public function onConfigRename(ConfigRenameEvent $event);
@@ -55,9 +55,9 @@ abstract class ConfigFactoryOverrideBase implements EventSubscriberInterface {
   /**
    * Filters data in the override based on what is currently in configuration.
    *
-   * @param \Drupal\Core\Config\Config $config
+   * @param Config $config
    *   Current configuration object.
-   * @param \Drupal\Core\Config\StorableConfigBase $override
+   * @param StorableConfigBase $override
    *   Override object corresponding to the configuration to filter data in.
    */
   protected function filterOverride(Config $config, StorableConfigBase $override) {

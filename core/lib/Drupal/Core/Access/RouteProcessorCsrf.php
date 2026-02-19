@@ -4,8 +4,8 @@ namespace Drupal\Core\Access;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Render\BubbleableMetadata;
-use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\RouteProcessor\OutboundRouteProcessorInterface;
+use Drupal\Core\Security\TrustedCallbackInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Route;
 
@@ -19,9 +19,9 @@ class RouteProcessorCsrf implements OutboundRouteProcessorInterface, TrustedCall
   /**
    * Constructs a RouteProcessorCsrf object.
    *
-   * @param \Drupal\Core\Access\CsrfTokenGenerator $csrfToken
+   * @param CsrfTokenGenerator $csrfToken
    *   The CSRF token generator.
-   * @param \Symfony\Component\HttpFoundation\RequestStack|null $requestStack
+   * @param RequestStack|null $requestStack
    *   The request stack.
    */
   public function __construct(

@@ -50,7 +50,7 @@ final class DirectWriteSubscriber implements EventSubscriberInterface {
   /**
    * Logs a warning about direct-write mode, if it is in use.
    *
-   * @param \Drupal\package_manager\Event\StatusCheckEvent $event
+   * @param StatusCheckEvent $event
    *   The event being handled.
    */
   public function warnAboutDirectWrite(StatusCheckEvent $event): void {
@@ -64,7 +64,7 @@ final class DirectWriteSubscriber implements EventSubscriberInterface {
   /**
    * Enters maintenance mode before a direct-mode require operation.
    *
-   * @param \Drupal\package_manager\Event\PreRequireEvent $event
+   * @param PreRequireEvent $event
    *   The event being handled.
    */
   public function enterMaintenanceMode(PreRequireEvent $event): void {
@@ -79,7 +79,7 @@ final class DirectWriteSubscriber implements EventSubscriberInterface {
   /**
    * Leaves maintenance mode after a direct-mode require operation.
    *
-   * @param \Drupal\package_manager\Event\PreRequireEvent $event
+   * @param PreRequireEvent $event
    *   The event being handled.
    */
   public function exitMaintenanceMode(PostRequireEvent $event): void {

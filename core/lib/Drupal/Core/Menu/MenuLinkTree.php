@@ -18,15 +18,15 @@ class MenuLinkTree implements MenuLinkTreeInterface {
   /**
    * Constructs a \Drupal\Core\Menu\MenuLinkTree object.
    *
-   * @param \Drupal\Core\Menu\MenuTreeStorageInterface $treeStorage
+   * @param MenuTreeStorageInterface $treeStorage
    *   The menu link tree storage.
-   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menuLinkManager
+   * @param MenuLinkManagerInterface $menuLinkManager
    *   The menu link plugin manager.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $routeProvider
+   * @param RouteProviderInterface $routeProvider
    *   The route provider to load routes by name.
-   * @param \Drupal\Core\Menu\MenuActiveTrailInterface $menuActiveTrail
+   * @param MenuActiveTrailInterface $menuActiveTrail
    *   The active menu trail service.
-   * @param \Drupal\Core\Utility\CallableResolver $callableResolver
+   * @param CallableResolver $callableResolver
    *   The callable resolver.
    */
   public function __construct(
@@ -77,7 +77,7 @@ class MenuLinkTree implements MenuLinkTreeInterface {
    * @param array $data_tree
    *   The tree data coming from the menu tree storage.
    *
-   * @return \Drupal\Core\Menu\MenuLinkTreeElement[]
+   * @return MenuLinkTreeElement[]
    *   An array containing the elements of a menu tree.
    */
   protected function createInstances(array $data_tree) {
@@ -160,13 +160,13 @@ class MenuLinkTree implements MenuLinkTreeInterface {
    *
    * Helper function for ::build().
    *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
+   * @param MenuLinkTreeElement[] $tree
    *   A data structure representing the tree, as returned from
    *   MenuLinkTreeInterface::load().
-   * @param \Drupal\Core\Cache\CacheableMetadata &$tree_access_cacheability
+   * @param CacheableMetadata &$tree_access_cacheability
    *   Internal use only. The aggregated cacheability metadata for the access
    *   results across the entire tree. Used when rendering the root level.
-   * @param \Drupal\Core\Cache\CacheableMetadata &$tree_link_cacheability
+   * @param CacheableMetadata &$tree_link_cacheability
    *   Internal use only. The aggregated cacheability metadata for the menu
    *   links across the entire tree. Used when rendering the root level.
    *
@@ -179,7 +179,7 @@ class MenuLinkTree implements MenuLinkTreeInterface {
     $items = [];
 
     foreach ($tree as $data) {
-      /** @var \Drupal\Core\Menu\MenuLinkInterface $link */
+      /** @var MenuLinkInterface $link */
       $link = $data->link;
       // Generally we only deal with visible links, but just in case.
       if (!$link->isEnabled()) {

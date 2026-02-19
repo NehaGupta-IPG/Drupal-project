@@ -16,14 +16,14 @@ class ConfigTranslationMapperList extends ControllerBase {
   /**
    * An array of configuration mapper instances.
    *
-   * @var \Drupal\config_translation\ConfigMapperInterface[]
+   * @var ConfigMapperInterface[]
    */
   protected $mappers;
 
   /**
    * Constructs a new ConfigTranslationMapperList object.
    *
-   * @param \Drupal\config_translation\ConfigMapperInterface[] $mappers
+   * @param ConfigMapperInterface[] $mappers
    *   The configuration mapper manager.
    */
   public function __construct(array $mappers) {
@@ -79,7 +79,7 @@ class ConfigTranslationMapperList extends ControllerBase {
   /**
    * Builds a row for a mapper in the mapper listing.
    *
-   * @param \Drupal\config_translation\ConfigMapperInterface $mapper
+   * @param ConfigMapperInterface $mapper
    *   The mapper.
    *
    * @return array
@@ -106,7 +106,7 @@ class ConfigTranslationMapperList extends ControllerBase {
   /**
    * Builds a renderable list of operation links for the entity.
    *
-   * @param \Drupal\config_translation\ConfigMapperInterface $mapper
+   * @param ConfigMapperInterface $mapper
    *   The mapper.
    *
    * @return array

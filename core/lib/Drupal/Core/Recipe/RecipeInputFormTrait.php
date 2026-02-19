@@ -18,7 +18,7 @@ trait RecipeInputFormTrait {
   /**
    * Generates a tree of form elements for a recipe's inputs.
    *
-   * @param \Drupal\Core\Recipe\Recipe $recipe
+   * @param Recipe $recipe
    *   A recipe.
    *
    * @return array[]
@@ -95,12 +95,12 @@ trait RecipeInputFormTrait {
   /**
    * Validates user-inputted values to a recipe and its dependencies.
    *
-   * @param \Drupal\Core\Recipe\Recipe $recipe
+   * @param Recipe $recipe
    *   A recipe.
    * @param array $form
    *   The form being validated, which should include the tree of elements
    *   returned by ::buildRecipeInputForm().
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state. The values should be organized in the tree
    *   structure that was returned by ::buildRecipeInputForm().
    */
@@ -126,9 +126,9 @@ trait RecipeInputFormTrait {
   /**
    * Supplies user-inputted values to a recipe and its dependencies.
    *
-   * @param \Drupal\Core\Recipe\Recipe $recipe
+   * @param Recipe $recipe
    *   A recipe.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state. The values should be organized in the tree
    *   structure that was returned by ::buildRecipeInputForm().
    */

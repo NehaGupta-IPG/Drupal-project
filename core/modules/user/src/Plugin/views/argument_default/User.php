@@ -7,10 +7,10 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\node\NodeInterface;
+use Drupal\user\UserInterface;
 use Drupal\views\Attribute\ViewsArgumentDefault;
 use Drupal\views\Plugin\views\argument_default\ArgumentDefaultPluginBase;
-use Drupal\user\UserInterface;
-use Drupal\node\NodeInterface;
 
 /**
  * Default argument plugin to extract a user from request.
@@ -24,7 +24,7 @@ class User extends ArgumentDefaultPluginBase implements CacheableDependencyInter
   /**
    * The route match.
    *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
+   * @var RouteMatchInterface
    */
   protected $routeMatch;
 
@@ -37,7 +37,7 @@ class User extends ArgumentDefaultPluginBase implements CacheableDependencyInter
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteMatchInterface $route_match) {

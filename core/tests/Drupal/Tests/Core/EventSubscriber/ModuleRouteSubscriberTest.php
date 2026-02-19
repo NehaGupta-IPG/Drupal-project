@@ -23,7 +23,7 @@ class ModuleRouteSubscriberTest extends UnitTestCase {
   /**
    * The mock module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface|MockObject
    */
   protected $moduleHandler;
 

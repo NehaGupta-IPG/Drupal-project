@@ -7,8 +7,8 @@ use Drupal\Core\Entity\ContentEntityDeleteForm;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\workspaces\WorkspaceTrackerInterface;
 use Drupal\workspaces\WorkspaceRepositoryInterface;
+use Drupal\workspaces\WorkspaceTrackerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -28,14 +28,14 @@ class WorkspaceDeleteForm extends ContentEntityDeleteForm {
   /**
    * The workspace tracker service.
    *
-   * @var \Drupal\workspaces\WorkspaceTrackerInterface
+   * @var WorkspaceTrackerInterface
    */
   protected $workspaceTracker;
 
   /**
    * The workspace repository service.
    *
-   * @var \Drupal\workspaces\WorkspaceRepositoryInterface
+   * @var WorkspaceRepositoryInterface
    */
   protected $workspaceRepository;
 
@@ -55,16 +55,16 @@ class WorkspaceDeleteForm extends ContentEntityDeleteForm {
   /**
    * Constructs a WorkspaceDeleteForm object.
    *
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository service.
-   * @param \Drupal\workspaces\WorkspaceTrackerInterface $workspace_tracker
+   * @param WorkspaceTrackerInterface $workspace_tracker
    *   The workspace tracker service to check how many revisions will be
    *   deleted.
-   * @param \Drupal\workspaces\WorkspaceRepositoryInterface $workspace_repository
+   * @param WorkspaceRepositoryInterface $workspace_repository
    *   The workspace repository service.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct(EntityRepositoryInterface $entity_repository, WorkspaceTrackerInterface $workspace_tracker, WorkspaceRepositoryInterface $workspace_repository, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL) {

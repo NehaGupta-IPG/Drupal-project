@@ -24,7 +24,7 @@ abstract class ConfigAfterInstallerTestBase extends InstallerTestBase {
    */
   protected function assertInstalledConfig(array $skipped_config) {
     $this->addToAssertionCount(1);
-    /** @var \Drupal\Core\Config\StorageInterface $active_config_storage */
+    /** @var StorageInterface $active_config_storage */
     $active_config_storage = $this->container->get('config.storage');
     /** @var \Drupal\Core\Config\ConfigManagerInterface $config_manager */
     $config_manager = $this->container->get('config.manager');

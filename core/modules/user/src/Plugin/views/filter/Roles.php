@@ -26,9 +26,9 @@ class Roles extends ManyToOne {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\user\RoleStorageInterface $roleStorage
+   * @param RoleStorageInterface $roleStorage
    *   The role storage.
-   * @param \Psr\Log\LoggerInterface|null $logger
+   * @param LoggerInterface|null $logger
    *   The logger service.
    */
   public function __construct(

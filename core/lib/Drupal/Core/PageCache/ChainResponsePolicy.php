@@ -22,7 +22,7 @@ class ChainResponsePolicy implements ChainResponsePolicyInterface {
   /**
    * A list of policy rules to apply when this policy is checked.
    *
-   * @var \Drupal\Core\PageCache\ResponsePolicyInterface[]
+   * @var ResponsePolicyInterface[]
    */
   protected $rules = [];
 

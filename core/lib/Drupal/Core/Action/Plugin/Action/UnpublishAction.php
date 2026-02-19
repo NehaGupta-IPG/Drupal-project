@@ -2,8 +2,8 @@
 
 namespace Drupal\Core\Action\Plugin\Action;
 
-use Drupal\Core\Action\Plugin\Action\Derivative\EntityPublishedActionDeriver;
 use Drupal\Core\Action\Attribute\Action;
+use Drupal\Core\Action\Plugin\Action\Derivative\EntityPublishedActionDeriver;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 

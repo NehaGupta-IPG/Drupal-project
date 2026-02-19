@@ -21,7 +21,7 @@ interface DiscoveryInterface {
    *   A plugin definition, or NULL if the plugin ID is invalid and
    *   $exception_on_invalid is FALSE.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws PluginNotFoundException
    *   Thrown if $plugin_id is invalid and $exception_on_invalid is TRUE.
    */
   public function getDefinition($plugin_id, $exception_on_invalid = TRUE);

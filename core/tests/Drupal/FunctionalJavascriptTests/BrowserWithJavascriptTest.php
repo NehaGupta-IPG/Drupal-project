@@ -109,7 +109,7 @@ JS;
   /**
    * Retrieves a Drupal path or an absolute path.
    *
-   * @param string|\Drupal\Core\Url $path
+   * @param string|Url $path
    *   Drupal path or URL to load into Mink controlled browser.
    * @param array $options
    *   (optional) Options to be forwarded to the URL generator.

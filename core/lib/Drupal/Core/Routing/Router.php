@@ -2,8 +2,8 @@
 
 namespace Drupal\Core\Routing;
 
-use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\DependencyInjection\DeprecatedServicePropertyTrait;
+use Drupal\Core\Path\CurrentPathStack;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
@@ -40,30 +40,30 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
   /**
    * The route provider responsible for the first-pass match.
    *
-   * @var \Drupal\Core\Routing\RouteProviderInterface
+   * @var RouteProviderInterface
    */
   protected $routeProvider;
 
   /**
    * The list of available enhancers.
    *
-   * @var \Drupal\Core\Routing\EnhancerInterface[]
+   * @var EnhancerInterface[]
    */
   protected $enhancers = [];
 
   /**
    * The list of available route filters.
    *
-   * @var \Drupal\Core\Routing\FilterInterface[]
+   * @var FilterInterface[]
    */
   protected $filters = [];
 
   /**
    * Constructs a new Router.
    *
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
+   * @param RouteProviderInterface $route_provider
    *   The route provider.
-   * @param \Drupal\Core\Path\CurrentPathStack $current_path
+   * @param CurrentPathStack $current_path
    *   The current path stack.
    */
   public function __construct(RouteProviderInterface $route_provider, CurrentPathStack $current_path) {
@@ -74,7 +74,7 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
   /**
    * Adds a route filter.
    *
-   * @param \Drupal\Core\Routing\FilterInterface $route_filter
+   * @param FilterInterface $route_filter
    *   The route filter.
    */
   public function addRouteFilter(FilterInterface $route_filter) {
@@ -84,7 +84,7 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
   /**
    * Adds a route enhancer.
    *
-   * @param \Drupal\Core\Routing\EnhancerInterface $route_enhancer
+   * @param EnhancerInterface $route_enhancer
    *   The route enhancer.
    */
   public function addRouteEnhancer(EnhancerInterface $route_enhancer) {
@@ -148,7 +148,7 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
    *
    * @param string $pathinfo
    *   The path info to be parsed.
-   * @param \Symfony\Component\Routing\RouteCollection $routes
+   * @param RouteCollection $routes
    *   The set of routes.
    * @param bool $case_sensitive
    *   Determines if the match should be case-sensitive of not.
@@ -212,10 +212,10 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
   /**
    * Returns a collection of potential matching routes for a request.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    *
-   * @return \Symfony\Component\Routing\RouteCollection
+   * @return RouteCollection
    *   The initial fetched route collection.
    */
   protected function getInitialRouteCollection(Request $request) {
@@ -227,7 +227,7 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
    *
    * @param array $defaults
    *   The defaults coming from the final matched route.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
    * @return array
@@ -249,12 +249,12 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
    * This method reduces the sets of routes further down, for example by
    * checking the HTTP method.
    *
-   * @param \Symfony\Component\Routing\RouteCollection $collection
+   * @param RouteCollection $collection
    *   The route collection.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
-   * @return \Symfony\Component\Routing\RouteCollection
+   * @return RouteCollection
    *   The filtered/sorted route collection.
    */
   protected function applyRouteFilters(RouteCollection $collection, Request $request) {
@@ -277,10 +277,10 @@ class Router extends UrlMatcher implements RequestMatcherInterface, RouterInterf
    * routes, we need to reapply the fit order. We also need to ensure that order
    * within each group of the same fit is preserved.
    *
-   * @param \Symfony\Component\Routing\RouteCollection $collection
+   * @param RouteCollection $collection
    *   The route collection.
    *
-   * @return \Symfony\Component\Routing\RouteCollection
+   * @return RouteCollection
    *   The reordered route collection.
    */
   protected function applyFitOrder(RouteCollection $collection) {

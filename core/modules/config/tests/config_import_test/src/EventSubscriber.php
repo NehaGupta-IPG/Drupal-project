@@ -19,14 +19,14 @@ class EventSubscriber implements EventSubscriberInterface {
   /**
    * The key value store.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
   /**
    * Constructs the event subscriber.
    *
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The key value store.
    */
   public function __construct(StateInterface $state) {
@@ -36,10 +36,10 @@ class EventSubscriber implements EventSubscriberInterface {
   /**
    * Validates the configuration to be imported.
    *
-   * @param \Drupal\Core\Config\ConfigImporterEvent $event
+   * @param ConfigImporterEvent $event
    *   The Event to process.
    *
-   * @throws \Drupal\Core\Config\ConfigNameException
+   * @throws ConfigNameException
    */
   public function onConfigImporterValidate(ConfigImporterEvent $event) {
     if ($this->state->get('config_import_test.config_import_validate_fail', FALSE)) {
@@ -52,7 +52,7 @@ class EventSubscriber implements EventSubscriberInterface {
   /**
    * Handles the missing content event.
    *
-   * @param \Drupal\Core\Config\Importer\MissingContentEvent $event
+   * @param MissingContentEvent $event
    *   The missing content event.
    */
   public function onConfigImporterMissingContentOne(MissingContentEvent $event) {
@@ -70,7 +70,7 @@ class EventSubscriber implements EventSubscriberInterface {
   /**
    * Handles the missing content event.
    *
-   * @param \Drupal\Core\Config\Importer\MissingContentEvent $event
+   * @param MissingContentEvent $event
    *   The missing content event.
    */
   public function onConfigImporterMissingContentTwo(MissingContentEvent $event) {
@@ -85,7 +85,7 @@ class EventSubscriber implements EventSubscriberInterface {
   /**
    * Reacts to a config save and records information in state for testing.
    *
-   * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   * @param ConfigCrudEvent $event
    *   The event.
    */
   public function onConfigSave(ConfigCrudEvent $event) {
@@ -118,7 +118,7 @@ class EventSubscriber implements EventSubscriberInterface {
   /**
    * Reacts to a config delete and records information in state for testing.
    *
-   * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   * @param ConfigCrudEvent $event
    *   The event.
    */
   public function onConfigDelete(ConfigCrudEvent $event) {

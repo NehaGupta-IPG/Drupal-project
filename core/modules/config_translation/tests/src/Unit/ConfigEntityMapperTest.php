@@ -19,42 +19,42 @@ class ConfigEntityMapperTest extends UnitTestCase {
   /**
    * The configuration entity mapper to test.
    *
-   * @var \Drupal\config_translation\ConfigEntityMapper
+   * @var ConfigEntityMapper
    */
   protected $configEntityMapper;
 
   /**
    * The entity type manager used for testing.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|MockObject
    */
   protected $entityTypeManager;
 
   /**
    * The entity instance used for testing.
    *
-   * @var \Drupal\Core\Entity\EntityInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityInterface|MockObject
    */
   protected $entity;
 
   /**
    * The route provider used for testing.
    *
-   * @var \Drupal\Core\Routing\RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Routing\RouteProviderInterface|MockObject
    */
   protected $routeProvider;
 
   /**
    * The mocked language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Language\LanguageManagerInterface|MockObject
    */
   protected $languageManager;
 
   /**
    * The mocked event dispatcher.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|MockObject
    */
   protected $eventDispatcher;
 

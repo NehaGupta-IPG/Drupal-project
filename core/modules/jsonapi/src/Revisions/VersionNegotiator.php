@@ -30,14 +30,14 @@ class VersionNegotiator {
   /**
    * An array of named version negotiators.
    *
-   * @var \Drupal\jsonapi\Revisions\VersionNegotiatorInterface[]
+   * @var VersionNegotiatorInterface[]
    */
   protected $negotiators = [];
 
   /**
    * Adds a version negotiator.
    *
-   * @param \Drupal\jsonapi\Revisions\VersionNegotiatorInterface $version_negotiator
+   * @param VersionNegotiatorInterface $version_negotiator
    *   The version negotiator.
    * @param string $negotiator_name
    *   The name of the negotiation strategy used by the version negotiator.
@@ -50,17 +50,17 @@ class VersionNegotiator {
   /**
    * Gets a negotiated entity revision.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity.
    * @param string $resource_version_identifier
    *   A value used to derive a revision for the given entity.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The loaded revision.
    *
-   * @throws \Drupal\Core\Http\Exception\CacheableNotFoundHttpException
+   * @throws CacheableNotFoundHttpException
    *   When the revision does not exist.
-   * @throws \Drupal\Core\Http\Exception\CacheableBadRequestHttpException
+   * @throws CacheableBadRequestHttpException
    *   When the revision ID cannot be negotiated.
    */
   public function getRevision(EntityInterface $entity, $resource_version_identifier) {
@@ -82,12 +82,12 @@ class VersionNegotiator {
   /**
    * Throws a cacheable error exception.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity for which a revision was requested.
    * @param string $resource_version_identifier
    *   The user input for the revision negotiation.
    *
-   * @throws \Drupal\Core\Http\Exception\CacheableNotFoundHttpException
+   * @throws CacheableNotFoundHttpException
    */
   protected static function throwNotFoundHttpException(EntityInterface $entity, $resource_version_identifier) {
     $cacheability = CacheableMetadata::createFromObject($entity)->addCacheContexts(['url.path', 'url.query_args:' . ResourceVersionRouteEnhancer::RESOURCE_VERSION_QUERY_PARAMETER]);
@@ -101,7 +101,7 @@ class VersionNegotiator {
    * @param string $resource_version_identifier
    *   The user input for the revision negotiation.
    *
-   * @throws \Drupal\Core\Http\Exception\CacheableBadRequestHttpException
+   * @throws CacheableBadRequestHttpException
    */
   protected static function throwBadRequestHttpException($resource_version_identifier) {
     $cacheability = (new CacheableMetadata())->addCacheContexts(['url.query_args:' . ResourceVersionRouteEnhancer::RESOURCE_VERSION_QUERY_PARAMETER]);

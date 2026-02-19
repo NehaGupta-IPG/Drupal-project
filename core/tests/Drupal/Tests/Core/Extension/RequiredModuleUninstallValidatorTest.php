@@ -17,7 +17,7 @@ use PHPUnit\Framework\Attributes\Group;
 class RequiredModuleUninstallValidatorTest extends UnitTestCase {
 
   /**
-   * @var \Drupal\Core\Extension\RequiredModuleUninstallValidator|\PHPUnit\Framework\MockObject\MockObject
+   * @var RequiredModuleUninstallValidator|MockObject
    */
   protected $uninstallValidator;
 

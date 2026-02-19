@@ -5,9 +5,9 @@ namespace Drupal\block\Plugin\migrate\process;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Attribute\MigrateProcess;
+use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\MigrateLookupInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
-use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -26,14 +26,14 @@ class BlockPluginId extends ProcessPluginBase implements ContainerFactoryPluginI
   /**
    * The migrate lookup service.
    *
-   * @var \Drupal\migrate\MigrateLookupInterface
+   * @var MigrateLookupInterface
    */
   protected $migrateLookup;
 
   /**
    * The block_content entity storage handler.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface|null
+   * @var EntityStorageInterface|null
    */
   protected $blockContentStorage;
 
@@ -46,10 +46,10 @@ class BlockPluginId extends ProcessPluginBase implements ContainerFactoryPluginI
    *   The plugin ID.
    * @param array $plugin_definition
    *   The plugin definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface|null $storage
+   * @param EntityStorageInterface|null $storage
    *   The block content storage object. NULL if the block_content module is
    *   not installed.
-   * @param \Drupal\migrate\MigrateLookupInterface $migrate_lookup
+   * @param MigrateLookupInterface $migrate_lookup
    *   The migrate lookup service.
    */
   public function __construct(array $configuration, $plugin_id, array $plugin_definition, ?EntityStorageInterface $storage, MigrateLookupInterface $migrate_lookup) {

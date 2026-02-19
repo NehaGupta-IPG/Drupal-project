@@ -149,7 +149,7 @@ class MediaType extends ConfigEntityBundleBase implements MediaTypeInterface, En
   /**
    * Lazy collection for the media source.
    *
-   * @var \Drupal\Core\Plugin\DefaultSingleLazyPluginCollection
+   * @var DefaultSingleLazyPluginCollection
    */
   protected $sourcePluginCollection;
 
@@ -210,7 +210,7 @@ class MediaType extends ConfigEntityBundleBase implements MediaTypeInterface, En
   /**
    * Returns media source lazy plugin collection.
    *
-   * @return \Drupal\Core\Plugin\DefaultSingleLazyPluginCollection|null
+   * @return DefaultSingleLazyPluginCollection|null
    *   The tag plugin collection or NULL if the plugin ID was not set yet.
    */
   protected function sourcePluginCollection() {

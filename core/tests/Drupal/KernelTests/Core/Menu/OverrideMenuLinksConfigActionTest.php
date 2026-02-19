@@ -49,7 +49,7 @@ final class OverrideMenuLinksConfigActionTest extends KernelTestBase {
     /** @var \Drupal\Core\Config\Action\ConfigActionManager $action_manager */
     $action_manager = $this->container->get('plugin.manager.config_action');
 
-    /** @var \Drupal\Core\Menu\MenuLinkManagerInterface $link_manager */
+    /** @var MenuLinkManagerInterface $link_manager */
     $link_manager = $this->container->get(MenuLinkManagerInterface::class);
     $link_manager->rebuild();
     $definition = $link_manager->getDefinition('menu_test.menu_name_test');

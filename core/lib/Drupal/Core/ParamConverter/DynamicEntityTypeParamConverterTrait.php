@@ -20,7 +20,7 @@ trait DynamicEntityTypeParamConverterTrait {
    * @return string
    *   The entity type ID.
    *
-   * @throws \Drupal\Core\ParamConverter\ParamNotConvertedException
+   * @throws ParamNotConvertedException
    *   Thrown when the dynamic entity type is not found in the route defaults.
    */
   protected function getEntityTypeFromDefaults($definition, $name, array $defaults) {

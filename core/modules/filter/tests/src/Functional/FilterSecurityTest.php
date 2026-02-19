@@ -43,7 +43,7 @@ class FilterSecurityTest extends BrowserTestBase {
     // Create Basic page node type.
     $this->drupalCreateContentType(['type' => 'page', 'name' => 'Basic page']);
 
-    /** @var \Drupal\filter\Entity\FilterFormat $filtered_html_format */
+    /** @var FilterFormat $filtered_html_format */
     $filtered_html_format = FilterFormat::load('filtered_html');
     $filtered_html_permission = $filtered_html_format->getPermissionName();
     user_role_grant_permissions(RoleInterface::ANONYMOUS_ID, [$filtered_html_permission]);

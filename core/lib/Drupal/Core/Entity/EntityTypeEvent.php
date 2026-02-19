@@ -12,23 +12,23 @@ class EntityTypeEvent extends Event {
   /**
    * The entity type.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface
+   * @var EntityTypeInterface
    */
   protected $entityType;
 
   /**
    * The original entity type.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface
+   * @var EntityTypeInterface
    */
   protected $original;
 
   /**
    * Constructs a new EntityTypeEvent.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The field storage definition.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $original
+   * @param EntityTypeInterface $original
    *   (optional) The original entity type. This should be passed only when
    *   updating the entity type.
    */
@@ -40,7 +40,7 @@ class EntityTypeEvent extends Event {
   /**
    * The entity type the event refers to.
    *
-   * @return \Drupal\Core\Entity\EntityTypeInterface
+   * @return EntityTypeInterface
    *   The entity type.
    */
   public function getEntityType() {
@@ -50,7 +50,7 @@ class EntityTypeEvent extends Event {
   /**
    * The original entity type.
    *
-   * @return \Drupal\Core\Entity\EntityTypeInterface
+   * @return EntityTypeInterface
    *   The original entity type.
    */
   public function getOriginal() {

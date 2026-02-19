@@ -24,7 +24,7 @@ class ChangeLoggerTest extends PackageManagerKernelTestBase {
   /**
    * The logger to which change lists will be written.
    *
-   * @var \ColinODell\PsrTestLogger\TestLogger
+   * @var TestLogger
    */
   private TestLogger $logger;
 

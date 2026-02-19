@@ -6,11 +6,11 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\PathProcessor\PathProcessorManager;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\AdminContext;
+use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Core\Routing\StackedRouteMatchInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\language\Attribute\LanguageNegotiation;
 use Drupal\language\LanguageNegotiationMethodBase;
-use Drupal\Core\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -37,7 +37,7 @@ class LanguageNegotiationUserAdmin extends LanguageNegotiationMethodBase impleme
   /**
    * The admin context.
    *
-   * @var \Drupal\Core\Routing\AdminContext
+   * @var AdminContext
    */
   protected $adminContext;
 
@@ -47,34 +47,34 @@ class LanguageNegotiationUserAdmin extends LanguageNegotiationMethodBase impleme
    * This is only used when called from an event subscriber, before the request
    * has been populated with the route info.
    *
-   * @var \Symfony\Component\Routing\Matcher\UrlMatcherInterface
+   * @var UrlMatcherInterface
    */
   protected $router;
 
   /**
    * The path processor manager.
    *
-   * @var \Drupal\Core\PathProcessor\PathProcessorManager
+   * @var PathProcessorManager
    */
   protected $pathProcessorManager;
 
   /**
    * The stacked route match.
    *
-   * @var \Drupal\Core\Routing\StackedRouteMatchInterface
+   * @var StackedRouteMatchInterface
    */
   protected $stackedRouteMatch;
 
   /**
    * Constructs a new LanguageNegotiationUserAdmin instance.
    *
-   * @param \Drupal\Core\Routing\AdminContext $admin_context
+   * @param AdminContext $admin_context
    *   The admin context.
-   * @param \Symfony\Component\Routing\Matcher\UrlMatcherInterface $router
+   * @param UrlMatcherInterface $router
    *   The router.
-   * @param \Drupal\Core\PathProcessor\PathProcessorManager $path_processor_manager
+   * @param PathProcessorManager $path_processor_manager
    *   The path processor manager.
-   * @param \Drupal\Core\Routing\StackedRouteMatchInterface $stacked_route_match
+   * @param StackedRouteMatchInterface $stacked_route_match
    *   The stacked route match.
    */
   public function __construct(AdminContext $admin_context, UrlMatcherInterface $router, PathProcessorManager $path_processor_manager, StackedRouteMatchInterface $stacked_route_match) {
@@ -114,7 +114,7 @@ class LanguageNegotiationUserAdmin extends LanguageNegotiationMethodBase impleme
   /**
    * Checks whether the given path is an administrative one.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    *
    * @return bool

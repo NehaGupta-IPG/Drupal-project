@@ -24,7 +24,7 @@ abstract class BaseFieldOverrideResourceTestBase extends ConfigEntityResourceTes
   protected static $entityTypeId = 'base_field_override';
 
   /**
-   * @var \Drupal\Core\Field\Entity\BaseFieldOverride
+   * @var BaseFieldOverride
    */
   protected $entity;
 

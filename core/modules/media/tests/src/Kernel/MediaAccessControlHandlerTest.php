@@ -33,7 +33,7 @@ class MediaAccessControlHandlerTest extends MediaKernelTestBase {
    *   Initial values from which to create the media entity.
    * @param string $operation
    *   The operation, one of 'view', 'update' or 'delete'.
-   * @param \Drupal\Core\Access\AccessResultInterface $expected_result
+   * @param AccessResultInterface $expected_result
    *   Expected result.
    * @param string[] $expected_cache_contexts
    *   Expected cache contexts.
@@ -86,7 +86,7 @@ class MediaAccessControlHandlerTest extends MediaKernelTestBase {
    *
    * @param string[] $permissions
    *   User permissions.
-   * @param \Drupal\Core\Access\AccessResultInterface $expected_result
+   * @param AccessResultInterface $expected_result
    *   Expected result.
    * @param string[] $expected_cache_contexts
    *   Expected cache contexts.
@@ -107,13 +107,13 @@ class MediaAccessControlHandlerTest extends MediaKernelTestBase {
   /**
    * Asserts an access result.
    *
-   * @param \Drupal\Core\Access\AccessResultInterface $expected_access_result
+   * @param AccessResultInterface $expected_access_result
    *   The expected access result.
    * @param string[] $expected_cache_contexts
    *   Expected contexts.
    * @param string[] $expected_cache_tags
    *   Expected cache tags.
-   * @param \Drupal\Core\Access\AccessResultInterface $actual
+   * @param AccessResultInterface $actual
    *   The actual access result.
    *
    * @internal

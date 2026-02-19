@@ -153,7 +153,7 @@ class Workspace extends ContentEntityBase implements WorkspaceInterface {
    * {@inheritdoc}
    */
   public function getProvider(): WorkspaceProviderInterface {
-    /** @var \Drupal\workspaces\Provider\WorkspaceProviderCollector $provider_collector */
+    /** @var WorkspaceProviderCollector $provider_collector */
     $provider_collector = \Drupal::service(WorkspaceProviderCollector::class);
     return $provider_collector->getProvider($this->get('provider')->value);
   }

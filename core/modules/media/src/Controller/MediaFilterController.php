@@ -28,32 +28,32 @@ class MediaFilterController implements ContainerInjectionInterface {
   /**
    * The renderer service.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * The media storage.
    *
-   * @var \Drupal\Core\Entity\ContentEntityStorageInterface
+   * @var ContentEntityStorageInterface
    */
   protected $mediaStorage;
 
   /**
    * The entity repository.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   * @var EntityRepositoryInterface
    */
   protected $entityRepository;
 
   /**
    * Constructs an MediaFilterController instance.
    *
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer service.
-   * @param \Drupal\Core\Entity\ContentEntityStorageInterface $media_storage
+   * @param ContentEntityStorageInterface $media_storage
    *   The media storage.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository.
    */
   public function __construct(RendererInterface $renderer, ContentEntityStorageInterface $media_storage, EntityRepositoryInterface $entity_repository) {
@@ -80,15 +80,15 @@ class MediaFilterController implements ContainerInjectionInterface {
    * filter, because for example `filter_align` and `filter_caption` may apply
    * to it as well.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
-   * @param \Drupal\filter\FilterFormatInterface $filter_format
+   * @param FilterFormatInterface $filter_format
    *   The text format.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   The filtered text.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   * @throws NotFoundHttpException
    *   Throws an exception if 'text' parameter is not found in the query
    *   string.
    *
@@ -132,7 +132,7 @@ class MediaFilterController implements ContainerInjectionInterface {
   /**
    * Checks access based on media_embed filter status on the text format.
    *
-   * @param \Drupal\filter\FilterFormatInterface $filter_format
+   * @param FilterFormatInterface $filter_format
    *   The text format for which to check access.
    *
    * @return \Drupal\Core\Access\AccessResultInterface

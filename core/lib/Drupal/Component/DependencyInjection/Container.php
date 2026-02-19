@@ -3,12 +3,12 @@
 namespace Drupal\Component\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
-use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
-use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -218,9 +218,9 @@ class Container implements ContainerInterface, ResetInterface {
    * @return object
    *   The service described by the service definition.
    *
-   * @throws \Symfony\Component\DependencyInjection\Exception\RuntimeException
+   * @throws RuntimeException
    *   Thrown when the service is a synthetic service.
-   * @throws \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+   * @throws InvalidArgumentException
    *   Thrown when the configurator callable in $definition['configurator'] is
    *   not actually a callable.
    * @throws \ReflectionException
@@ -368,9 +368,9 @@ class Container implements ContainerInterface, ResetInterface {
    * @return array
    *   The resolved arguments.
    *
-   * @throws \Symfony\Component\DependencyInjection\Exception\RuntimeException
+   * @throws RuntimeException
    *   If a parameter/service could not be resolved.
-   * @throws \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+   * @throws InvalidArgumentException
    *   If an unknown type is met while resolving parameters and services.
    */
   protected function resolveServicesAndParameters($arguments) {

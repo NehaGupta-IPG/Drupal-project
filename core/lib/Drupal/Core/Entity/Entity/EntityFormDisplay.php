@@ -3,14 +3,14 @@
 namespace Drupal\Core\Entity\Entity;
 
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
+use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Entity\Entity\Access\EntityFormDisplayAccessControlHandler;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\EntityConstraintViolationListInterface;
+use Drupal\Core\Entity\EntityDisplayBase;
 use Drupal\Core\Entity\EntityDisplayPluginCollection;
 use Drupal\Core\Entity\FieldableEntityInterface;
-use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
-use Drupal\Core\Entity\EntityDisplayBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
@@ -76,7 +76,7 @@ class EntityFormDisplay extends EntityDisplayBase implements EntityFormDisplayIn
    * party code to alter the display options held in the display before they are
    * used to generate render arrays.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The entity for which the form is being built.
    * @param string $form_mode
    *   The form mode.
@@ -85,7 +85,7 @@ class EntityFormDisplay extends EntityDisplayBase implements EntityFormDisplayIn
    *   form display in case the specified display does not exist. Defaults to
    *   TRUE.
    *
-   * @return \Drupal\Core\Entity\Display\EntityFormDisplayInterface
+   * @return EntityFormDisplayInterface
    *   The display object that should be used to build the entity form.
    *
    * @see \Drupal\Core\Entity\EntityDisplayRepositoryInterface::getFormDisplay()
@@ -298,10 +298,10 @@ class EntityFormDisplay extends EntityDisplayBase implements EntityFormDisplayIn
    *
    * @param string $field_name
    *   The field name.
-   * @param \Symfony\Component\Validator\ConstraintViolationListInterface $violations
+   * @param ConstraintViolationListInterface $violations
    *   The violations.
    *
-   * @return \Symfony\Component\Validator\ConstraintViolationList
+   * @return ConstraintViolationList
    *   A new constraint violation list with the changed property path.
    */
   protected function movePropertyPathViolationsRelativeToField($field_name, ConstraintViolationListInterface $violations) {

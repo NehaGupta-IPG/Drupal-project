@@ -87,7 +87,7 @@ class ModuleUninstallFilterTest extends WebDriverTestBase {
   /**
    * Removes any non-visible elements from the passed array.
    *
-   * @param \Behat\Mink\Element\NodeElement[] $elements
+   * @param NodeElement[] $elements
    *   An array of node elements.
    *
    * @return \Behat\Mink\Element\NodeElement[]

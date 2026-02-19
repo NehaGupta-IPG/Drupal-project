@@ -180,7 +180,7 @@ class ResourceType {
   /**
    * Gets the attribute and relationship fields of this resource type.
    *
-   * @return \Drupal\jsonapi\ResourceType\ResourceTypeField[]
+   * @return ResourceTypeField[]
    *   The field objects on this resource type.
    */
   public function getFields() {
@@ -193,7 +193,7 @@ class ResourceType {
    * @param string $public_field_name
    *   The public field name of the desired field.
    *
-   * @return \Drupal\jsonapi\ResourceType\ResourceTypeField|null
+   * @return ResourceTypeField|null
    *   A resource type field object or NULL if the field does not exist on this
    *   resource type.
    */
@@ -209,7 +209,7 @@ class ResourceType {
    * @param string $internal_field_name
    *   The internal field name of the desired field.
    *
-   * @return \Drupal\jsonapi\ResourceType\ResourceTypeField|null
+   * @return ResourceTypeField|null
    *   A resource type field object or NULL if the field does not exist on this
    *   resource type.
    */
@@ -343,7 +343,7 @@ class ResourceType {
    *   (optional) Whether the resource type is mutable.
    * @param bool $is_versionable
    *   (optional) Whether the resource type is versionable.
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeField[] $fields
+   * @param ResourceTypeField[] $fields
    *   (optional) The resource type fields, keyed by internal field name.
    * @param null|string $type_name
    *   The resource type name.
@@ -420,7 +420,7 @@ class ResourceType {
    * @param string $field_name
    *   The public field name.
    *
-   * @return \Drupal\jsonapi\ResourceType\ResourceType[]
+   * @return ResourceType[]
    *   The relatable JSON:API resource types.
    *
    * @see self::getRelatableResourceTypes()

@@ -3,11 +3,11 @@
 namespace Drupal\contact\Hook;
 
 use Drupal\contact\Plugin\rest\resource\ContactMessageResource;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\user\Entity\User;
-use Drupal\Core\Url;
-use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
+use Drupal\user\Entity\User;
 
 /**
  * Hook implementations for contact.

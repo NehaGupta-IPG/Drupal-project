@@ -11,8 +11,8 @@ use Drupal\Core\Field\Plugin\Field\FieldType\EmailItem;
 use Drupal\Core\Password\PasswordInterface;
 use Drupal\Core\Session\AccountSwitcherInterface;
 use Drupal\migrate\Attribute\MigrateDestination;
-use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\migrate\destination\EntityContentBase;
+use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
 use Drupal\user\UserNameItem;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -70,7 +70,7 @@ class EntityUser extends EntityContentBase {
   /**
    * The password service class.
    *
-   * @var \Drupal\Core\Password\PasswordInterface
+   * @var PasswordInterface
    */
   protected $password;
 
@@ -83,21 +83,21 @@ class EntityUser extends EntityContentBase {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The storage for this entity type.
    * @param array $bundles
    *   The list of bundles this entity type has.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @param EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager
+   * @param FieldTypePluginManagerInterface $field_type_manager
    *   The field type plugin manager service.
-   * @param \Drupal\Core\Password\PasswordInterface $password
+   * @param PasswordInterface $password
    *   The password service.
-   * @param \Drupal\Core\Session\AccountSwitcherInterface|null $account_switcher
+   * @param AccountSwitcherInterface|null $account_switcher
    *   The account switcher service.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface|null $entity_type_bundle_info
+   * @param EntityTypeBundleInfoInterface|null $entity_type_bundle_info
    *   The entity type bundle info service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityStorageInterface $storage, array $bundles, EntityFieldManagerInterface $entity_field_manager, FieldTypePluginManagerInterface $field_type_manager, PasswordInterface $password, ?AccountSwitcherInterface $account_switcher = NULL, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL) {
@@ -128,7 +128,7 @@ class EntityUser extends EntityContentBase {
   /**
    * {@inheritdoc}
    *
-   * @throws \Drupal\migrate\MigrateException
+   * @throws MigrateException
    */
   public function import(Row $row, array $old_destination_id_values = []) {
     // Do not overwrite the root account password.

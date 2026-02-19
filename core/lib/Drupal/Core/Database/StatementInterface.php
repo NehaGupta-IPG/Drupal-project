@@ -58,14 +58,14 @@ interface StatementInterface extends \Traversable {
    *   statement executed or throws \Drupal\Core\Database\RowCountException
    *   if the last executed statement was SELECT.
    *
-   * @throws \Drupal\Core\Database\RowCountException
+   * @throws RowCountException
    */
   public function rowCount();
 
   /**
    * Sets the default fetch mode for this statement.
    *
-   * @param \Drupal\Core\Database\Statement\FetchAs $mode
+   * @param FetchAs $mode
    *   One of the cases of the FetchAs enum.
    * @param string|int|null $a1
    *   An option depending of the fetch mode specified by $mode:
@@ -83,7 +83,7 @@ interface StatementInterface extends \Traversable {
   /**
    * Fetches the next row from a result set.
    *
-   * @param \Drupal\Core\Database\Statement\FetchAs|null $mode
+   * @param FetchAs|null $mode
    *   (Optional) one of the cases of the FetchAs enum. If not specified,
    *   defaults to what is specified by setFetchMode().
    * @param int|null $cursor_orientation
@@ -142,7 +142,7 @@ interface StatementInterface extends \Traversable {
   /**
    * Returns an array containing all of the result set rows.
    *
-   * @param \Drupal\Core\Database\Statement\FetchAs|null $mode
+   * @param FetchAs|null $mode
    *   (Optional) one of the cases of the FetchAs enum. If not specified,
    *   defaults to what is specified by setFetchMode().
    * @param int|null $column_index
@@ -200,7 +200,7 @@ interface StatementInterface extends \Traversable {
    *
    * @param string $key
    *   The name of the field on which to index the array.
-   * @param \Drupal\Core\Database\Statement\FetchAs|string|null $fetch
+   * @param FetchAs|string|null $fetch
    *   (Optional) the fetch mode to use. One of the cases of the FetchAs enum.
    *   If set to FetchAs::Associative or FetchAs::List the returned value will
    *   be an array of arrays. For any other value it will be an array of

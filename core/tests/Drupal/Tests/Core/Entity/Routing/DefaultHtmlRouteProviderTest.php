@@ -32,21 +32,21 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
   /**
    * The entity type manager prophecy used in the test.
    *
-   * @var \Prophecy\Prophecy\ProphecyInterface|\Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var \Prophecy\Prophecy\ProphecyInterface|EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity field manager prophecy used in the test.
    *
-   * @var \Prophecy\Prophecy\ProphecyInterface|\Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var \Prophecy\Prophecy\ProphecyInterface|EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 
   /**
    * The HTML route provider used in the test.
    *
-   * @var \Drupal\Tests\Core\Entity\Routing\TestDefaultHtmlRouteProvider
+   * @var TestDefaultHtmlRouteProvider
    */
   protected $routeProvider;
 
@@ -401,10 +401,10 @@ class DefaultHtmlRouteProviderTest extends UnitTestCase {
   }
 
   /**
-   * @param \Prophecy\Prophecy\ObjectProphecy|null $base_entity_type
+   * @param ObjectProphecy|null $base_entity_type
    *   (optional) The prophesize base entity type.
    *
-   * @return \Prophecy\Prophecy\ObjectProphecy<\Drupal\Core\Entity\EntityTypeInterface>
+   * @return ObjectProphecy<EntityTypeInterface>
    *   The entity type prophecy.
    */
   protected static function getEntityType(?ObjectProphecy $base_entity_type = NULL): ObjectProphecy {

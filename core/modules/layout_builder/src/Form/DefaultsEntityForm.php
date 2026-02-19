@@ -25,30 +25,30 @@ class DefaultsEntityForm extends EntityForm {
   /**
    * Layout tempstore repository.
    *
-   * @var \Drupal\layout_builder\LayoutTempstoreRepositoryInterface
+   * @var LayoutTempstoreRepositoryInterface
    */
   protected $layoutTempstoreRepository;
 
   /**
    * The entity type bundle info service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @var EntityTypeBundleInfoInterface
    */
   protected $entityTypeBundleInfo;
 
   /**
    * The section storage.
    *
-   * @var \Drupal\layout_builder\SectionStorageInterface
+   * @var SectionStorageInterface
    */
   protected $sectionStorage;
 
   /**
    * Constructs a new DefaultsEntityForm.
    *
-   * @param \Drupal\layout_builder\LayoutTempstoreRepositoryInterface $layout_tempstore_repository
+   * @param LayoutTempstoreRepositoryInterface $layout_tempstore_repository
    *   The layout tempstore repository.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle info service.
    */
   public function __construct(LayoutTempstoreRepositoryInterface $layout_tempstore_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info) {
@@ -84,7 +84,7 @@ class DefaultsEntityForm extends EntityForm {
   /**
    * Renders a message to display at the top of the layout builder.
    *
-   * @param \Drupal\layout_builder\Entity\LayoutEntityDisplayInterface $entity
+   * @param LayoutEntityDisplayInterface $entity
    *   The entity view display being edited.
    *
    * @return array

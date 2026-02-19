@@ -3,10 +3,10 @@
 namespace Drupal\workflows\Form;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
-use Drupal\workflows\Entity\Workflow;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\workflows\Entity\Workflow;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -19,14 +19,14 @@ class WorkflowAddForm extends EntityForm {
   /**
    * The workflow type plugin manager.
    *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   * @var PluginManagerInterface
    */
   protected $workflowTypePluginManager;
 
   /**
    * WorkflowAddForm constructor.
    *
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $workflow_type_plugin_manager
+   * @param PluginManagerInterface $workflow_type_plugin_manager
    *   The workflow type plugin manager.
    */
   public function __construct(PluginManagerInterface $workflow_type_plugin_manager) {

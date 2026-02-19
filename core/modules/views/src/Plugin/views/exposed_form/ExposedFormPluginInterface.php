@@ -65,7 +65,7 @@ interface ExposedFormPluginInterface extends ViewsPluginInterface {
    * Implement if your exposed form needs to run code before the view is
    * rendered.
    *
-   * @param \Drupal\views\ResultRow[] $values
+   * @param ResultRow[] $values
    *   An array of all ResultRow objects returned from the query.
    *
    * @see \Drupal\views\ViewExecutable::render()
@@ -111,7 +111,7 @@ interface ExposedFormPluginInterface extends ViewsPluginInterface {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @see \Drupal\views\Plugin\views\exposed_form\ExposedFormPluginInterface::renderExposedForm()
@@ -124,7 +124,7 @@ interface ExposedFormPluginInterface extends ViewsPluginInterface {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @see \Drupal\views\Form\ViewsExposedForm::validateForm()
@@ -136,7 +136,7 @@ interface ExposedFormPluginInterface extends ViewsPluginInterface {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array $exclude
    *   Array of keys that will not appear in $view->exposed_raw_input; for

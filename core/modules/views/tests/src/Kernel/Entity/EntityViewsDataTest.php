@@ -38,14 +38,14 @@ class EntityViewsDataTest extends KernelTestBase {
    *
    * Uses a custom class which allows changing entity keys.
    *
-   * @var \Drupal\Tests\views\Kernel\Entity\TestEntityType
+   * @var TestEntityType
    */
   protected $baseEntityType;
 
   /**
    * The common base fields for test entity types.
    *
-   * @var \Drupal\Core\Field\BaseFieldDefinition[]
+   * @var BaseFieldDefinition[]
    */
   protected $commonBaseFields;
 
@@ -143,9 +143,9 @@ class EntityViewsDataTest extends KernelTestBase {
    * - setting the base fields on the ViewsTestEntity class as a static property
    *   for its baseFieldsDefinitions() method to use.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $definition
+   * @param EntityTypeInterface $definition
    *   An entity type definition to add to the entity type manager.
-   * @param \Drupal\Core\Field\BaseFieldDefinition[] $base_fields
+   * @param BaseFieldDefinition[] $base_fields
    *   An array of base field definitions.
    */
   protected function setUpEntityType(EntityTypeInterface $definition, array $base_fields = []): void {

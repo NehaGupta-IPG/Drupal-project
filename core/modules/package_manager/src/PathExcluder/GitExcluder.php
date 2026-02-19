@@ -39,7 +39,7 @@ final class GitExcluder implements EventSubscriberInterface {
    * Any .git directories that are a part of an installed package -- for
    * example, a module that Composer installed from source -- are included.
    *
-   * @param \Drupal\package_manager\Event\CollectPathsToExcludeEvent $event
+   * @param CollectPathsToExcludeEvent $event
    *   The event object.
    *
    * @throws \Exception

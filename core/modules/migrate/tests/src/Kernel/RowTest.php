@@ -122,7 +122,7 @@ class RowTest extends KernelTestBase {
    *
    * Checks row destinations and prevents the removal of the second field.
    *
-   * @param \Drupal\migrate\Event\MigratePreRowSaveEvent $event
+   * @param MigratePreRowSaveEvent $event
    *   The migration event.
    * @param string $name
    *   The event name.

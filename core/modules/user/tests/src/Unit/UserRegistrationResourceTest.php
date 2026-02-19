@@ -29,7 +29,7 @@ class UserRegistrationResourceTest extends UnitTestCase {
   /**
    * Class to be tested.
    *
-   * @var \Drupal\user\Plugin\rest\resource\UserRegistrationResource
+   * @var UserRegistrationResource
    */
   protected $testClass;
 
@@ -43,28 +43,28 @@ class UserRegistrationResourceTest extends UnitTestCase {
   /**
    * A user settings config instance.
    *
-   * @var \Drupal\Core\Config\ImmutableConfig|\PHPUnit\Framework\MockObject\MockObject
+   * @var ImmutableConfig|MockObject
    */
   protected $userSettings;
 
   /**
    * Logger service.
    *
-   * @var \Psr\Log\LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var LoggerInterface|MockObject
    */
   protected $logger;
 
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var AccountInterface|MockObject
    */
   protected $currentUser;
 
   /**
    * The password generator.
    *
-   * @var \Drupal\Core\Password\PasswordGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var PasswordGeneratorInterface|MockObject
    */
   protected $passwordGenerator;
 

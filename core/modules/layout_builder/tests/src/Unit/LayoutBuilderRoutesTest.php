@@ -26,14 +26,14 @@ class LayoutBuilderRoutesTest extends UnitTestCase {
   /**
    * The Layout Builder route builder.
    *
-   * @var \Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface
+   * @var SectionStorageManagerInterface
    */
   protected $sectionStorageManager;
 
   /**
    * The Layout Builder route builder.
    *
-   * @var \Drupal\layout_builder\Routing\LayoutBuilderRoutes
+   * @var LayoutBuilderRoutes
    */
   protected $routeBuilder;
 
@@ -59,14 +59,14 @@ class LayoutBuilderRoutesTest extends UnitTestCase {
 
     $section_storage_first = $this->prophesize(SectionStorageInterface::class);
     $section_storage_first->buildRoutes(Argument::type(RouteCollection::class))->shouldBeCalled()->will(function ($args) {
-      /** @var \Symfony\Component\Routing\RouteCollection $collection */
+      /** @var RouteCollection $collection */
       $collection = $args[0];
       $collection->add('test_route_shared', new Route('/test/path/shared1'));
       $collection->add('test_route1', new Route('/test/path1'));
     });
     $section_storage_second = $this->prophesize(SectionStorageInterface::class);
     $section_storage_second->buildRoutes(Argument::type(RouteCollection::class))->shouldBeCalled()->will(function ($args) {
-      /** @var \Symfony\Component\Routing\RouteCollection $collection */
+      /** @var RouteCollection $collection */
       $collection = $args[0];
       $collection->add('test_route_shared', new Route('/test/path/shared2'));
       $collection->add('test_route2', new Route('/test/path2'));

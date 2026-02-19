@@ -40,7 +40,7 @@ class ViewStorageTest extends ViewsKernelTestBase {
   /**
    * The entity type definition.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface
+   * @var EntityTypeInterface
    */
   protected $entityType;
 

@@ -550,7 +550,7 @@ class ComponentRenderTest extends ComponentKernelTestBase {
   /**
    * Ensures some key aspects of the plugin definition are correctly computed.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws PluginNotFoundException
    */
   public function testPluginDefinition(): void {
     $plugin_manager = \Drupal::service('plugin.manager.sdc');

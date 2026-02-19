@@ -20,7 +20,7 @@ interface NodeAccessControlHandlerInterface {
    * hook_node_access_records_alter() implementations, and returns the grants to
    * the caller.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   The $node to acquire grants for.
    *
    * @return array
@@ -51,7 +51,7 @@ interface NodeAccessControlHandlerInterface {
   /**
    * Checks all grants for a given account.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   A user object representing the user for whom the operation is to be
    *   performed.
    *

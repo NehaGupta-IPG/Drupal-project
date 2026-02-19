@@ -28,41 +28,41 @@ class ActiveLinkResponseFilter implements EventSubscriberInterface {
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
   /**
    * The current path.
    *
-   * @var \Drupal\Core\Path\CurrentPathStack
+   * @var CurrentPathStack
    */
   protected $currentPath;
 
   /**
    * The path matcher.
    *
-   * @var \Drupal\Core\Path\PathMatcherInterface
+   * @var PathMatcherInterface
    */
   protected $pathMatcher;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * Constructs a new ActiveLinkResponseFilter instance.
    *
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
-   * @param \Drupal\Core\Path\CurrentPathStack $current_path
+   * @param CurrentPathStack $current_path
    *   The current path.
-   * @param \Drupal\Core\Path\PathMatcherInterface $path_matcher
+   * @param PathMatcherInterface $path_matcher
    *   The path matcher.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
    */
   public function __construct(AccountInterface $current_user, CurrentPathStack $current_path, PathMatcherInterface $path_matcher, LanguageManagerInterface $language_manager) {
@@ -75,7 +75,7 @@ class ActiveLinkResponseFilter implements EventSubscriberInterface {
   /**
    * Sets the 'is-active' class on links.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
+   * @param ResponseEvent $event
    *   The response event.
    */
   public function onResponse(ResponseEvent $event) {

@@ -26,7 +26,7 @@ class ExtensionAvailableConstraintValidator extends ConstraintValidator implemen
   /**
    * Extension discovery objects for when the profile has changed.
    *
-   * @var \Drupal\Core\Extension\ExtensionDiscovery[]
+   * @var ExtensionDiscovery[]
    */
   protected array $extensionDiscovery;
 
@@ -36,11 +36,11 @@ class ExtensionAvailableConstraintValidator extends ConstraintValidator implemen
   protected static ?bool $inTestEnvironment;
 
   /**
-   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
+   * @param ModuleExtensionList $moduleExtensionList
    *   The module extension list.
-   * @param \Drupal\Core\Extension\ThemeExtensionList $themeExtensionList
+   * @param ThemeExtensionList $themeExtensionList
    *   The theme extension list.
-   * @param \Drupal\Core\Extension\ProfileExtensionList $profileExtensionList
+   * @param ProfileExtensionList $profileExtensionList
    *   The profile extension list.
    * @param string $appRoot
    *   The app root.
@@ -158,7 +158,7 @@ class ExtensionAvailableConstraintValidator extends ConstraintValidator implemen
    *   The extension type.
    * @param string $name
    *   The extension name.
-   * @param \Drupal\Core\Extension\ExtensionDiscovery|null $discovery
+   * @param ExtensionDiscovery|null $discovery
    *   The discovery service to use if set.
    *
    * @return bool
@@ -176,7 +176,7 @@ class ExtensionAvailableConstraintValidator extends ConstraintValidator implemen
   /**
    * Gets an extension discovery object for the given profile.
    *
-   * @return \Drupal\Core\Extension\ExtensionDiscovery
+   * @return ExtensionDiscovery
    *   An extension discovery object to look for extensions.
    */
   protected function getExtensionDiscovery(?string $profile = NULL): ExtensionDiscovery {

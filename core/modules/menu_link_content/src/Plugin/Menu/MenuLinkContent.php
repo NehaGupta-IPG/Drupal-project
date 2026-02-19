@@ -44,7 +44,7 @@ class MenuLinkContent extends MenuLinkBase implements ContainerFactoryPluginInte
   /**
    * The menu link content entity connected to this plugin instance.
    *
-   * @var \Drupal\menu_link_content\MenuLinkContentInterface
+   * @var MenuLinkContentInterface
    */
   protected $entity;
 
@@ -58,21 +58,21 @@ class MenuLinkContent extends MenuLinkBase implements ContainerFactoryPluginInte
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity repository.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   * @var EntityRepositoryInterface
    */
   protected $entityRepository;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
@@ -85,11 +85,11 @@ class MenuLinkContent extends MenuLinkBase implements ContainerFactoryPluginInte
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, LanguageManagerInterface $language_manager, EntityRepositoryInterface $entity_repository) {
@@ -110,10 +110,10 @@ class MenuLinkContent extends MenuLinkBase implements ContainerFactoryPluginInte
   /**
    * Loads the entity associated with this menu link.
    *
-   * @return \Drupal\menu_link_content\MenuLinkContentInterface
+   * @return MenuLinkContentInterface
    *   The menu link content entity.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws PluginException
    *   If the entity ID and UUID are both invalid or missing.
    */
   public function getEntity(): MenuLinkContentInterface {
@@ -141,7 +141,7 @@ class MenuLinkContent extends MenuLinkBase implements ContainerFactoryPluginInte
       // Clone the entity object to avoid tampering with the static cache.
       $this->entity = clone $entity;
       $the_entity = $this->entityRepository->getTranslationFromContext($this->entity);
-      /** @var \Drupal\menu_link_content\MenuLinkContentInterface $the_entity */
+      /** @var MenuLinkContentInterface $the_entity */
       $this->entity = $the_entity;
       $this->entity->setInsidePlugin();
     }

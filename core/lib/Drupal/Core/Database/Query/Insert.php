@@ -14,14 +14,14 @@ class Insert extends Query implements \Countable {
   /**
    * A SelectQuery object to fetch the rows that should be inserted.
    *
-   * @var \Drupal\Core\Database\Query\SelectInterface
+   * @var SelectInterface
    */
   protected $fromQuery;
 
   /**
    * Constructs an Insert object.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   A Connection object.
    * @param string $table
    *   Name of the table to associate with this query.
@@ -36,7 +36,7 @@ class Insert extends Query implements \Countable {
   /**
    * Sets the fromQuery on this InsertQuery object.
    *
-   * @param \Drupal\Core\Database\Query\SelectInterface $query
+   * @param SelectInterface $query
    *   The query to fetch the rows that should be inserted.
    *
    * @return $this
@@ -135,8 +135,8 @@ class Insert extends Query implements \Countable {
    * @return bool
    *   TRUE if the validation was successful, FALSE if not.
    *
-   * @throws \Drupal\Core\Database\Query\FieldsOverlapException
-   * @throws \Drupal\Core\Database\Query\NoFieldsException
+   * @throws FieldsOverlapException
+   * @throws NoFieldsException
    */
   protected function preExecute() {
     // Confirm that the user did not try to specify an identical

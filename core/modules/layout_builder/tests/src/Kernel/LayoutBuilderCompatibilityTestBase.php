@@ -109,7 +109,7 @@ abstract class LayoutBuilderCompatibilityTestBase extends EntityKernelTestBase {
   /**
    * Asserts that the rendered entity has the correct fields.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to render.
    * @param array $attributes
    *   An array of field attributes to assert.

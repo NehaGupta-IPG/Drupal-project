@@ -2,9 +2,9 @@
 
 namespace Drupal\migrate\Event;
 
-use Drupal\migrate\Plugin\MigrationInterface;
-use Drupal\migrate\MigrateMessageInterface;
 use Drupal\Component\EventDispatcher\Event;
+use Drupal\migrate\MigrateMessageInterface;
+use Drupal\migrate\Plugin\MigrationInterface;
 
 /**
  * Base class for migration events.
@@ -14,23 +14,23 @@ class EventBase extends Event {
   /**
    * The migration.
    *
-   * @var \Drupal\migrate\Plugin\MigrationInterface
+   * @var MigrationInterface
    */
   protected $migration;
 
   /**
    * The current message service.
    *
-   * @var \Drupal\migrate\MigrateMessageInterface
+   * @var MigrateMessageInterface
    */
   protected $message;
 
   /**
    * Constructs a Migrate event object.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration being run.
-   * @param \Drupal\migrate\MigrateMessageInterface $message
+   * @param MigrateMessageInterface $message
    *   The Migrate message service.
    */
   public function __construct(MigrationInterface $migration, MigrateMessageInterface $message) {
@@ -41,7 +41,7 @@ class EventBase extends Event {
   /**
    * Gets the migration.
    *
-   * @return \Drupal\migrate\Plugin\MigrationInterface
+   * @return MigrationInterface
    *   The migration being run.
    */
   public function getMigration() {

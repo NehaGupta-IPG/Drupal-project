@@ -38,7 +38,7 @@ final class SiteFilesExcluder implements EventSubscriberInterface {
   /**
    * Excludes public and private files from stage operations.
    *
-   * @param \Drupal\package_manager\Event\CollectPathsToExcludeEvent $event
+   * @param CollectPathsToExcludeEvent $event
    *   The event object.
    */
   public function excludeSiteFiles(CollectPathsToExcludeEvent $event): void {

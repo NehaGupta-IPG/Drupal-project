@@ -31,17 +31,17 @@ interface VersionNegotiatorInterface {
    * Each version negotiator provides one of these strategies and is able to map
    * a version argument to an existing revision.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity for which a revision should be resolved.
    * @param string $version_argument
    *   A value used to derive a revision for the given entity.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The identified entity revision.
    *
-   * @throws \Drupal\jsonapi\Revisions\VersionNotFoundException
+   * @throws VersionNotFoundException
    *   When the revision does not exist.
-   * @throws \Drupal\jsonapi\Revisions\InvalidVersionIdentifierException
+   * @throws InvalidVersionIdentifierException
    *   When the revision ID is invalid.
    */
   public function getRevision(EntityInterface $entity, $version_argument);

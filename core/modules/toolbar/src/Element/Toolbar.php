@@ -4,8 +4,8 @@ namespace Drupal\toolbar\Element;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Render\Attribute\RenderElement;
-use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\Element\RenderElementBase;
 
 /**
  * Provides a render element for the default Drupal toolbar.

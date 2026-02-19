@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Drupal\language_events_test;
 
 use Drupal\Core\State\StateInterface;
-use Drupal\language\Config\LanguageConfigOverrideEvents;
 use Drupal\language\Config\LanguageConfigOverrideCrudEvent;
+use Drupal\language\Config\LanguageConfigOverrideEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -17,7 +17,7 @@ class EventSubscriber implements EventSubscriberInterface {
   /**
    * Constructs the Event Subscriber object.
    *
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state key value store.
    */
   public function __construct(private StateInterface $state) {
@@ -26,7 +26,7 @@ class EventSubscriber implements EventSubscriberInterface {
   /**
    * Reacts to config event.
    *
-   * @param \Drupal\language\Config\LanguageConfigOverrideCrudEvent $event
+   * @param LanguageConfigOverrideCrudEvent $event
    *   The language configuration event.
    * @param string $event_name
    *   The event name.

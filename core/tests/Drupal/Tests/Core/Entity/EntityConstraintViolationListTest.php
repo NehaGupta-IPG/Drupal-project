@@ -120,10 +120,10 @@ class EntityConstraintViolationListTest extends UnitTestCase {
   /**
    * Builds the entity.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   An account.
    *
-   * @return \Drupal\Core\Entity\FieldableEntityInterface
+   * @return FieldableEntityInterface
    *   A fieldable entity.
    */
   protected function setupEntity(AccountInterface $account): FieldableEntityInterface {
@@ -151,10 +151,10 @@ class EntityConstraintViolationListTest extends UnitTestCase {
   /**
    * Builds an entity constraint violation list without composite constraints.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   A fieldable entity.
    *
-   * @return \Drupal\Core\Entity\EntityConstraintViolationList
+   * @return EntityConstraintViolationList
    *   The entity constraint violation list.
    */
   protected function setupConstraintListWithoutCompositeConstraint(FieldableEntityInterface $entity): EntityConstraintViolationList {
@@ -177,10 +177,10 @@ class EntityConstraintViolationListTest extends UnitTestCase {
   /**
    * Builds an entity constraint violation list with composite constraints.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   A fieldable entity.
    *
-   * @return \Drupal\Core\Entity\EntityConstraintViolationList
+   * @return EntityConstraintViolationList
    *   The entity constraint violation list.
    */
   protected function setupConstraintListWithCompositeConstraint(FieldableEntityInterface $entity): EntityConstraintViolationList {

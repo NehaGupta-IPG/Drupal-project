@@ -18,7 +18,7 @@ class PerformanceDataCollector implements EventSubscriberInterface, Destructable
   /**
    * Database events collected during the request.
    *
-   * @var \Drupal\Core\Database\Event\DatabaseEvent[]
+   * @var DatabaseEvent[]
    */
   protected array $databaseEvents = [];
 

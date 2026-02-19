@@ -344,7 +344,7 @@ class LruMemoryCacheTest extends UnitTestCase {
   /**
    * Asserts that the given cache data matches the data in the memory cache.
    *
-   * @param \Drupal\Core\Cache\MemoryCache\LruMemoryCache $lru_cache
+   * @param LruMemoryCache $lru_cache
    *   The LRU cache under test.
    * @param array $cache_data
    *   Array whose first element is the cache ID and whose second element is
@@ -375,7 +375,7 @@ class LruMemoryCacheTest extends UnitTestCase {
    * @param int $slots
    *   The number of slots in the LRU cache.
    *
-   * @return \Drupal\Core\Cache\MemoryCache\LruMemoryCache
+   * @return LruMemoryCache
    *   The LRU cache.
    */
   private function getLruMemoryCache(int $slots): LruMemoryCache {

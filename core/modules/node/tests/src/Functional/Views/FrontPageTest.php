@@ -159,7 +159,7 @@ class FrontPageTest extends ViewTestBase {
   /**
    * Verifies that an amount of nids aren't in the result.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   An executed View.
    * @param array $not_expected_nids
    *   An array of nids which should not be part of the resultset.

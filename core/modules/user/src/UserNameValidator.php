@@ -24,7 +24,7 @@ class UserNameValidator {
   /**
    * Validates a user name.
    *
-   * @return \Symfony\Component\Validator\ConstraintViolationListInterface
+   * @return ConstraintViolationListInterface
    *   The list of constraint violations.
    */
   public function validateName(string $name): ConstraintViolationListInterface {

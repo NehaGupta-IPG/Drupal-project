@@ -36,7 +36,7 @@ final class StringFormatterTest extends UnitTestCase {
    * @param bool $expectIsLinkElement
    *   Whether to expect the text to be wrapped in a link element.
    *
-   * @phpstan-param class-string<\Drupal\Core\Access\AccessResultInterface>|null $accessClass
+   * @phpstan-param class-string<AccessResultInterface>|null $accessClass
    */
   #[DataProvider('providerAccessLinkToEntity')]
   public function testLinkToEntity(bool $hasUrl, ?string $accessClass, bool $expectIsLinkElement): void {

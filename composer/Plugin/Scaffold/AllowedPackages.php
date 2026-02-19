@@ -34,7 +34,7 @@ class AllowedPackages implements PostPackageEventListenerInterface {
   /**
    * Manager of the options in the top-level composer.json's 'extra' section.
    *
-   * @var \Drupal\Composer\Plugin\Scaffold\ManageOptions
+   * @var ManageOptions
    */
   protected $manageOptions;
 
@@ -52,7 +52,7 @@ class AllowedPackages implements PostPackageEventListenerInterface {
    *   The composer object.
    * @param \Composer\IO\IOInterface $io
    *   IOInterface to write to.
-   * @param \Drupal\Composer\Plugin\Scaffold\ManageOptions $manage_options
+   * @param ManageOptions $manage_options
    *   Manager of the options in the top-level composer.json's 'extra' section.
    */
   public function __construct(Composer $composer, IOInterface $io, ManageOptions $manage_options) {

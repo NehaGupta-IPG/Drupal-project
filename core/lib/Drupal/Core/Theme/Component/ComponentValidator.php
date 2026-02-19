@@ -2,9 +2,9 @@
 
 namespace Drupal\Core\Theme\Component;
 
+use Drupal\Core\Plugin\Component;
 use Drupal\Core\Render\Component\Exception\InvalidComponentException;
 use Drupal\Core\Render\Element;
-use Drupal\Core\Plugin\Component;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Validator;
 
@@ -18,7 +18,7 @@ class ComponentValidator {
    *
    * This property will only be set if the validator library is available.
    *
-   * @var \JsonSchema\Validator|null
+   * @var Validator|null
    */
   protected ?Validator $validator = NULL;
 
@@ -50,7 +50,7 @@ class ComponentValidator {
    * @return bool
    *   TRUE if the component is valid.
    *
-   * @throws \Drupal\Core\Render\Component\Exception\InvalidComponentException
+   * @throws InvalidComponentException
    */
   public function validateDefinition(array $definition, bool $enforce_schemas): bool {
     // First ensure there are no name collisions between props and slots.
@@ -161,13 +161,13 @@ class ComponentValidator {
    *
    * @param array $context
    *   The Twig context that contains the prop data.
-   * @param \Drupal\Core\Plugin\Component $component
+   * @param Component $component
    *   The component to validate the props against.
    *
    * @return bool
    *   TRUE if the props adhere to the component definition.
    *
-   * @throws \Drupal\Core\Render\Component\Exception\InvalidComponentException
+   * @throws InvalidComponentException
    */
   public function validateProps(array $context, Component $component): bool {
     // If the validator isn't set, then the validation library is not installed.
@@ -264,7 +264,7 @@ class ComponentValidator {
    *   Schema. We can do this because we have already validated these props
    *   manually.
    *
-   * @throws \Drupal\Core\Render\Component\Exception\InvalidComponentException
+   * @throws InvalidComponentException
    */
   private function validateClassProps(array $props_schema, array $props_raw, string $component_id): array {
     $error_messages = [];

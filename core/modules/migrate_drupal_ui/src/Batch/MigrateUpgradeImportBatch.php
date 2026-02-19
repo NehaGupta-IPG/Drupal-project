@@ -6,7 +6,6 @@ use Drupal\Core\Link;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
-use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Event\MigrateEvents;
 use Drupal\migrate\Event\MigrateIdMapMessageEvent;
 use Drupal\migrate\Event\MigrateImportEvent;
@@ -15,6 +14,7 @@ use Drupal\migrate\Event\MigrateMapSaveEvent;
 use Drupal\migrate\Event\MigratePostRowSaveEvent;
 use Drupal\migrate\Event\MigrateRowDeleteEvent;
 use Drupal\migrate\MigrateExecutable;
+use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate_drupal\Plugin\MigrationWithFollowUpInterface;
 
 // cspell:ignore idmap
@@ -55,7 +55,7 @@ class MigrateUpgradeImportBatch {
   /**
    * MigrateMessage instance to capture messages during the migration process.
    *
-   * @var \Drupal\migrate_drupal_ui\Batch\MigrateMessageCapture
+   * @var MigrateMessageCapture
    */
   protected static $messages;
 
@@ -288,7 +288,7 @@ class MigrateUpgradeImportBatch {
   /**
    * Reacts to item import.
    *
-   * @param \Drupal\migrate\Event\MigratePostRowSaveEvent $event
+   * @param MigratePostRowSaveEvent $event
    *   The post-save event.
    */
   public static function onPostRowSave(MigratePostRowSaveEvent $event) {
@@ -302,7 +302,7 @@ class MigrateUpgradeImportBatch {
   /**
    * Adds follow-up migrations.
    *
-   * @param \Drupal\migrate\Event\MigrateImportEvent $event
+   * @param MigrateImportEvent $event
    *   The import event.
    */
   public static function onPostImport(MigrateImportEvent $event) {
@@ -320,7 +320,7 @@ class MigrateUpgradeImportBatch {
   /**
    * Reacts to item deletion.
    *
-   * @param \Drupal\migrate\Event\MigrateRowDeleteEvent $event
+   * @param MigrateRowDeleteEvent $event
    *   The post-save event.
    */
   public static function onPostRowDelete(MigrateRowDeleteEvent $event) {
@@ -334,7 +334,7 @@ class MigrateUpgradeImportBatch {
   /**
    * Counts up any map save events.
    *
-   * @param \Drupal\migrate\Event\MigrateMapSaveEvent $event
+   * @param MigrateMapSaveEvent $event
    *   The map event.
    */
   public static function onMapSave(MigrateMapSaveEvent $event) {
@@ -344,7 +344,7 @@ class MigrateUpgradeImportBatch {
   /**
    * Counts up any map delete events.
    *
-   * @param \Drupal\migrate\Event\MigrateMapDeleteEvent $event
+   * @param MigrateMapDeleteEvent $event
    *   The map event.
    */
   public static function onMapDelete(MigrateMapDeleteEvent $event) {
@@ -354,7 +354,7 @@ class MigrateUpgradeImportBatch {
   /**
    * Displays any messages being logged to the ID map.
    *
-   * @param \Drupal\migrate\Event\MigrateIdMapMessageEvent $event
+   * @param MigrateIdMapMessageEvent $event
    *   The message event.
    */
   public static function onIdMapMessage(MigrateIdMapMessageEvent $event) {

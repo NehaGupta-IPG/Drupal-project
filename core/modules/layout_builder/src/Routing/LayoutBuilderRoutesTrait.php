@@ -17,9 +17,9 @@ trait LayoutBuilderRoutesTrait {
   /**
    * Builds the layout routes for the given values.
    *
-   * @param \Symfony\Component\Routing\RouteCollection $collection
+   * @param RouteCollection $collection
    *   The route collection.
-   * @param \Drupal\layout_builder\SectionStorage\SectionStorageDefinition $definition
+   * @param SectionStorageDefinition $definition
    *   The definition of the section storage.
    * @param string $path
    *   The path patten for the routes.

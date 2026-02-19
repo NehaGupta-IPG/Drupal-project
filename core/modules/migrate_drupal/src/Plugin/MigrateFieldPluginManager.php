@@ -44,9 +44,9 @@ class MigrateFieldPluginManager extends MigratePluginManager implements MigrateF
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param CacheBackendInterface $cache_backend
    *   Cache backend instance to use.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler to invoke the alter hook with.
    * @param string $attribute
    *   (optional) The attribute class name. Defaults to
@@ -72,13 +72,13 @@ class MigrateFieldPluginManager extends MigratePluginManager implements MigrateF
    *   The field type being migrated.
    * @param array $configuration
    *   (optional) An array of configuration relevant to the plugin instance.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   (optional) The current migration instance.
    *
    * @return string
    *   The ID of the plugin for the field type if available.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws PluginNotFoundException
    *   If the plugin cannot be determined, such as if the field type is invalid.
    *
    * @see \Drupal\migrate_drupal\Attribute\MigrateField

@@ -30,7 +30,7 @@ class SchemaCompatibilityChecker {
    * @param array $new_schema
    *   The new schema that should be compatible with.
    *
-   * @throws \Drupal\Core\Render\Component\Exception\IncompatibleComponentSchema
+   * @throws IncompatibleComponentSchema
    */
   public function isCompatible(array $original_schema, array $new_schema): void {
     $error_messages = [];

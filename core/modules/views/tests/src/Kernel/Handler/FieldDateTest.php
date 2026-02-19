@@ -148,7 +148,7 @@ class FieldDateTest extends ViewsKernelTestBase {
   /**
    * Asserts properly formatted display against 'created' field in view.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   View to be tested.
    * @param array $map
    *   Data map.
@@ -175,7 +175,7 @@ class FieldDateTest extends ViewsKernelTestBase {
   /**
    * Asserts properly formatted display against 'destroyed' field in view.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   View to be tested.
    * @param array $map
    *   Data map.

@@ -23,7 +23,7 @@ class Git {
   /**
    * Determines whether the specified scaffold file is already ignored.
    *
-   * @param \Composer\IO\IOInterface $io
+   * @param IOInterface $io
    *   The Composer IO interface.
    * @param string $path
    *   Path to scaffold file to check.
@@ -43,7 +43,7 @@ class Git {
   /**
    * Determines whether the specified scaffold file is tracked by git.
    *
-   * @param \Composer\IO\IOInterface $io
+   * @param IOInterface $io
    *   The Composer IO interface.
    * @param string $path
    *   Path to scaffold file to check.
@@ -63,7 +63,7 @@ class Git {
   /**
    * Checks to see if the project root dir is in a git repository.
    *
-   * @param \Composer\IO\IOInterface $io
+   * @param IOInterface $io
    *   The Composer IO interface.
    * @param string $dir
    *   Base directory for git process.

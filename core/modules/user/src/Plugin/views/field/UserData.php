@@ -5,10 +5,10 @@ namespace Drupal\user\Plugin\views\field;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\user\UserDataInterface;
 use Drupal\views\Attribute\ViewsField;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
 use Drupal\views\ResultRow;
-use Drupal\user\UserDataInterface;
 
 /**
  * Provides access to the user data service.
@@ -23,14 +23,14 @@ class UserData extends FieldPluginBase {
   /**
    * Provides the user data service object.
    *
-   * @var \Drupal\user\UserDataInterface
+   * @var UserDataInterface
    */
   protected $userData;
 
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 

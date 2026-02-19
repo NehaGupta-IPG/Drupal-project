@@ -2,10 +2,10 @@
 
 namespace Drupal\user;
 
-use Drupal\Core\Config\TypedConfigManagerInterface;
-use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Url;
@@ -21,27 +21,27 @@ class AccountSettingsForm extends ConfigFormBase {
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The role storage used when changing the admin role.
    *
-   * @var \Drupal\user\RoleStorageInterface
+   * @var RoleStorageInterface
    */
   protected $roleStorage;
 
   /**
    * Constructs a \Drupal\user\AccountSettingsForm object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
+   * @param TypedConfigManagerInterface $typedConfigManager
    *   The typed config manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\user\RoleStorageInterface $role_storage
+   * @param RoleStorageInterface $role_storage
    *   The role storage.
    */
   public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, ModuleHandlerInterface $module_handler, RoleStorageInterface $role_storage) {

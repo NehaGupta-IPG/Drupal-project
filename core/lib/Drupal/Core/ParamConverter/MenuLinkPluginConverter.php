@@ -2,8 +2,8 @@
 
 namespace Drupal\Core\ParamConverter;
 
-use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Component\Plugin\Exception\PluginException;
+use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -14,14 +14,14 @@ class MenuLinkPluginConverter implements ParamConverterInterface {
   /**
    * Plugin manager which creates the instance from the value.
    *
-   * @var \Drupal\Core\Menu\MenuLinkManagerInterface
+   * @var MenuLinkManagerInterface
    */
   protected $menuLinkManager;
 
   /**
    * Constructs a new MenuLinkPluginConverter.
    *
-   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager
+   * @param MenuLinkManagerInterface $menu_link_manager
    *   The menu link plugin manager.
    */
   public function __construct(MenuLinkManagerInterface $menu_link_manager) {

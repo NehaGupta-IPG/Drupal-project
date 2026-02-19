@@ -33,9 +33,9 @@ class MigrateFieldPluginManagerTest extends UnitTestCase {
    */
   #[DataProvider('weightsData')]
   public function testWeights($field_type, $core, $expected_plugin_id): void {
-    /** @var \Drupal\Core\Cache\CacheBackendInterface $cache */
+    /** @var CacheBackendInterface $cache */
     $cache = $this->prophesize(CacheBackendInterface::class)->reveal();
-    /** @var \Drupal\Core\Extension\ModuleHandlerInterface $module_handler */
+    /** @var ModuleHandlerInterface $module_handler */
     $module_handler = $this->prophesize(ModuleHandlerInterface::class)->reveal();
     $discovery = $this->prophesize(AnnotatedClassDiscovery::class);
     $discovery->getDefinitions()->willReturn($this->pluginFixtureData());
@@ -213,13 +213,13 @@ class MigrateFieldPluginManagerTestClass extends MigrateFieldPluginManager {
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param CacheBackendInterface $cache_backend
    *   Cache backend instance to use.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler to invoke the alter hook with.
    * @param string $annotation
    *   The annotation class name.
-   * @param \Drupal\Core\Plugin\Discovery\AnnotatedClassDiscovery $discovery
+   * @param AnnotatedClassDiscovery $discovery
    *   A mock plugin discovery object for the test class to use.
    */
   public function __construct($type, \Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, $annotation, AnnotatedClassDiscovery $discovery) {

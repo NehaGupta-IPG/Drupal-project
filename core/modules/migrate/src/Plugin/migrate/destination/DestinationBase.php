@@ -3,10 +3,10 @@
 namespace Drupal\migrate\Plugin\migrate\destination;
 
 use Drupal\Core\Plugin\PluginBase;
-use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Exception\RequirementsException;
 use Drupal\migrate\Plugin\MigrateDestinationInterface;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
+use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\RequirementsInterface;
 
 // cspell:ignore sourceid
@@ -45,7 +45,7 @@ abstract class DestinationBase extends PluginBase implements MigrateDestinationI
   /**
    * The migration.
    *
-   * @var \Drupal\migrate\Plugin\MigrationInterface
+   * @var MigrationInterface
    */
   protected $migration;
 
@@ -58,7 +58,7 @@ abstract class DestinationBase extends PluginBase implements MigrateDestinationI
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration) {

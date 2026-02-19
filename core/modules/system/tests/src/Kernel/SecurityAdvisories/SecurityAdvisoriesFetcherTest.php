@@ -718,7 +718,7 @@ class SecurityAdvisoriesFetcherTest extends KernelTestBase implements LoggerInte
   /**
    * Sets test feed responses.
    *
-   * @param \GuzzleHttp\Psr7\Response[] $responses
+   * @param Response[] $responses
    *   The responses for the http_client service to return.
    */
   protected function setTestFeedResponses(array $responses): void {

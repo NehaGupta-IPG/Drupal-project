@@ -34,28 +34,28 @@ class OverridesSectionStorageTest extends UnitTestCase {
   /**
    * The plugin.
    *
-   * @var \Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage
+   * @var OverridesSectionStorage
    */
   protected $plugin;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 
   /**
    * The entity repository.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   * @var EntityRepositoryInterface
    */
   protected $entityRepository;
 

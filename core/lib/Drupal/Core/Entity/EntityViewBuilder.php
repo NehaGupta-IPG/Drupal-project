@@ -32,21 +32,21 @@ class EntityViewBuilder extends EntityHandlerBase implements EntityHandlerInterf
   /**
    * Information about the entity type.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface
+   * @var EntityTypeInterface
    */
   protected $entityType;
 
   /**
    * The entity repository service.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   * @var EntityRepositoryInterface
    */
   protected $entityRepository;
 
   /**
    * The entity display repository.
    *
-   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
+   * @var EntityDisplayRepositoryInterface
    */
   protected $entityDisplayRepository;
 
@@ -60,21 +60,21 @@ class EntityViewBuilder extends EntityHandlerBase implements EntityHandlerInterf
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The theme registry.
    *
-   * @var \Drupal\Core\Theme\Registry
+   * @var Registry
    */
   protected $themeRegistry;
 
   /**
    * The EntityViewDisplay objects created for individual field rendering.
    *
-   * @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface[]
+   * @var EntityViewDisplayInterface[]
    *
    * @see \Drupal\Core\Entity\EntityViewBuilder::getSingleFieldDisplay()
    */
@@ -90,15 +90,15 @@ class EntityViewBuilder extends EntityHandlerBase implements EntityHandlerInterf
   /**
    * Constructs a new EntityViewBuilder.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Theme\Registry $theme_registry
+   * @param Registry $theme_registry
    *   The theme registry.
-   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
+   * @param EntityDisplayRepositoryInterface $entity_display_repository
    *   The entity display repository.
    */
   public function __construct(EntityTypeInterface $entity_type, EntityRepositoryInterface $entity_repository, LanguageManagerInterface $language_manager, Registry $theme_registry, EntityDisplayRepositoryInterface $entity_display_repository) {
@@ -179,7 +179,7 @@ class EntityViewBuilder extends EntityHandlerBase implements EntityHandlerInterf
   /**
    * Provides entity-specific defaults to the build process.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity for which the defaults should be provided.
    * @param string $view_mode
    *   The view mode that should be used.
@@ -365,7 +365,7 @@ class EntityViewBuilder extends EntityHandlerBase implements EntityHandlerInterf
    *
    * @param array $build
    *   The render array that is being created.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to be prepared.
    */
   protected function addContextualLinks(array &$build, EntityInterface $entity) {
@@ -395,9 +395,9 @@ class EntityViewBuilder extends EntityHandlerBase implements EntityHandlerInterf
    *
    * @param array $build
    *   The render array that is being created.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to be prepared.
-   * @param \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display
+   * @param EntityViewDisplayInterface $display
    *   The entity view display holding the display options configured for the
    *   entity components.
    * @param string $view_mode
@@ -461,7 +461,7 @@ class EntityViewBuilder extends EntityHandlerBase implements EntityHandlerInterf
    * {@inheritdoc}
    */
   public function viewField(FieldItemListInterface $items, $display_options = []) {
-    /** @var \Drupal\Core\Entity\FieldableEntityInterface $entity */
+    /** @var FieldableEntityInterface $entity */
     $entity = $items->getEntity();
     // If the field is not translatable and the entity is, then the field item
     // list always points to the default translation of the entity. Attempt to
@@ -509,14 +509,14 @@ class EntityViewBuilder extends EntityHandlerBase implements EntityHandlerInterf
   /**
    * Gets an EntityViewDisplay for rendering an individual field.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The entity.
    * @param string $field_name
    *   The field name.
    * @param string|array $display_options
    *   The display options passed to the viewField() method.
    *
-   * @return \Drupal\Core\Entity\Display\EntityViewDisplayInterface
+   * @return EntityViewDisplayInterface
    *   The EntityViewDisplay objects created for individual field rendering.
    */
   protected function getSingleFieldDisplay($entity, $field_name, $display_options) {
@@ -592,7 +592,7 @@ class EntityViewBuilder extends EntityHandlerBase implements EntityHandlerInterf
    *   The key to ID the build array within recursion tracking.
    */
   protected function getRenderRecursionKey(array $build): string {
-    /** @var \Drupal\Core\Entity\EntityInterface $entity */
+    /** @var EntityInterface $entity */
     $entity = $build['#' . $this->entityTypeId];
 
     $recursion_keys = [

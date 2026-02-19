@@ -25,14 +25,14 @@ class PluginFormFactoryTest extends UnitTestCase {
   /**
    * The class resolver.
    *
-   * @var \Drupal\Core\DependencyInjection\ClassResolverInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var ClassResolverInterface|ProphecyInterface
    */
   protected $classResolver;
 
   /**
    * The manager being tested.
    *
-   * @var \Drupal\Core\Plugin\PluginFormFactory
+   * @var PluginFormFactory
    */
   protected $manager;
 

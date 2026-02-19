@@ -60,14 +60,14 @@ class EntityReferenceItemTest extends FieldKernelTestBase {
   /**
    * The taxonomy term to test with.
    *
-   * @var \Drupal\taxonomy\TermInterface
+   * @var TermInterface
    */
   protected $term;
 
   /**
    * The test entity with a string ID.
    *
-   * @var \Drupal\entity_test\Entity\EntityTestStringId
+   * @var EntityTestStringId
    */
   protected $entityStringId;
 

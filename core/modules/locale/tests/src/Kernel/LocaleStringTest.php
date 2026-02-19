@@ -208,7 +208,7 @@ class LocaleStringTest extends KernelTestBase {
    * @param array $values
    *   The values array.
    *
-   * @return \Drupal\locale\StringInterface
+   * @return StringInterface
    *   A locale string.
    */
   protected function buildSourceString(array $values = []) {
@@ -221,7 +221,7 @@ class LocaleStringTest extends KernelTestBase {
   /**
    * Creates translations for source string and all languages.
    *
-   * @param \Drupal\locale\StringInterface $source
+   * @param StringInterface $source
    *   The source string.
    * @param array $values
    *   The values array.
@@ -242,14 +242,14 @@ class LocaleStringTest extends KernelTestBase {
   /**
    * Creates single translation for source string.
    *
-   * @param \Drupal\locale\StringInterface $source
+   * @param StringInterface $source
    *   The source string.
    * @param string $langcode
    *   The language code.
    * @param array $values
    *   The values array.
    *
-   * @return \Drupal\locale\StringInterface
+   * @return StringInterface
    *   The translated string object.
    */
   protected function createTranslation(StringInterface $source, $langcode, array $values = []) {

@@ -2,10 +2,10 @@
 
 namespace Drupal\Core\Render\Element;
 
+use Drupal\Component\Utility\Html as HtmlUtility;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\FormElement;
 use Drupal\Core\Render\Element;
-use Drupal\Component\Utility\Html as HtmlUtility;
 
 /**
  * Provides a render element for a table.
@@ -177,7 +177,7 @@ class Table extends FormElementBase {
    * @param array $element
    *   An associative array containing the properties and children of the
    *   table element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array $complete_form
    *   The complete form structure.
@@ -306,7 +306,7 @@ class Table extends FormElementBase {
    * @param array $element
    *   An associative array containing the properties and children of the
    *   table element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array $complete_form
    *   The complete form structure.

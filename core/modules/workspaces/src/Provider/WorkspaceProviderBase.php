@@ -123,7 +123,7 @@ abstract class WorkspaceProviderBase implements WorkspaceProviderInterface {
       throw new \RuntimeException(sprintf('The "%s" entity type can only be saved in the default workspace.', $entity->getEntityTypeId()));
     }
 
-    /** @var \Drupal\Core\Entity\ContentEntityInterface|\Drupal\Core\Entity\EntityPublishedInterface $entity */
+    /** @var \Drupal\Core\Entity\ContentEntityInterface|EntityPublishedInterface $entity */
     if (!$entity->isNew() && !$entity->isSyncing()) {
       // Force a new revision if the entity is not replicating.
       $entity->setNewRevision(TRUE);
@@ -202,7 +202,7 @@ abstract class WorkspaceProviderBase implements WorkspaceProviderInterface {
    */
   public function entityUpdate(EntityInterface $entity): void {
     // Only track new revisions.
-    /** @var \Drupal\Core\Entity\RevisionableInterface $entity */
+    /** @var RevisionableInterface $entity */
     if ($entity->getLoadedRevisionId() != $entity->getRevisionId()) {
       $this->workspaceTracker->trackEntity($this->workspaceManager->getActiveWorkspace()->id(), $entity);
     }

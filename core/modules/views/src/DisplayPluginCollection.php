@@ -18,7 +18,7 @@ class DisplayPluginCollection extends DefaultLazyPluginCollection {
   /**
    * Stores a reference to the view which has this displays attached.
    *
-   * @var \Drupal\views\ViewExecutable
+   * @var ViewExecutable
    */
   protected $view;
 
@@ -30,9 +30,9 @@ class DisplayPluginCollection extends DefaultLazyPluginCollection {
   /**
    * Constructs a DisplayPluginCollection object.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view which has this displays attached.
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $manager
+   * @param PluginManagerInterface $manager
    *   The manager to be used for instantiating plugins.
    */
   public function __construct(ViewExecutable $view, PluginManagerInterface $manager) {

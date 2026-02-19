@@ -85,7 +85,7 @@ class FieldItemListTest extends UnitTestCase {
     // Tests field item lists with no values.
     $datasets[] = [TRUE];
 
-    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_a */
+    /** @var FieldItemBase $field_item_a */
     $field_item_a = new FieldItemTestClass();
     $field_item_a->setValue([1]);
     // Tests field item lists where one has a value and one does not.
@@ -94,13 +94,13 @@ class FieldItemListTest extends UnitTestCase {
     // Tests field item lists where both have the same value.
     $datasets[] = [TRUE, $field_item_a, $field_item_a];
 
-    /** @var \Drupal\Core\Field\FieldItemBase  $fv */
+    /** @var FieldItemBase $fv */
     $field_item_b = new FieldItemTestClass();
     $field_item_b->setValue([2]);
     // Tests field item lists where both have the different values.
     $datasets[] = [FALSE, $field_item_a, $field_item_b];
 
-    /** @var \Drupal\Core\Field\FieldItemBase  $fv */
+    /** @var FieldItemBase $fv */
     $field_item_c = new FieldItemTestClass();
     $field_item_c->setValue(['0' => 1, '1' => 2]);
     $field_item_d = new FieldItemTestClass();
@@ -109,7 +109,7 @@ class FieldItemListTest extends UnitTestCase {
     // Tests field item lists where both have the differently ordered values.
     $datasets[] = [TRUE, $field_item_c, $field_item_d];
 
-    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_e */
+    /** @var FieldItemBase $field_item_e */
     $field_item_e = new FieldItemTestClass();
     $field_item_e->setValue(['2']);
 
@@ -117,10 +117,10 @@ class FieldItemListTest extends UnitTestCase {
     // types.
     $datasets[] = [TRUE, $field_item_b, $field_item_e];
 
-    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_f */
+    /** @var FieldItemBase $field_item_f */
     $field_item_f = new FieldItemTestClass();
     $field_item_f->setValue(['0' => 1, '1' => 2, '2' => 3]);
-    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_g */
+    /** @var FieldItemBase $field_item_g */
     $field_item_g = new FieldItemTestClass();
     $field_item_g->setValue(['0' => 1, '1' => 2, '2' => 4]);
 
@@ -129,10 +129,10 @@ class FieldItemListTest extends UnitTestCase {
     // ('2').
     $datasets[] = [TRUE, $field_item_f, $field_item_g];
 
-    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_h */
+    /** @var FieldItemBase $field_item_h */
     $field_item_h = new FieldItemTestClass();
     $field_item_h->setValue(['0' => 1, '1' => 2, '3' => 3]);
-    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_i */
+    /** @var FieldItemBase $field_item_i */
     $field_item_i = new FieldItemTestClass();
     $field_item_i->setValue(['0' => 1, '1' => 2, '3' => 4]);
 
@@ -141,16 +141,16 @@ class FieldItemListTest extends UnitTestCase {
     // not exist ('3').
     $datasets[] = [TRUE, $field_item_h, $field_item_i];
 
-    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_j */
+    /** @var FieldItemBase $field_item_j */
     $field_item_j = new FieldItemTestClass();
     $field_item_j->setValue(['0' => 1]);
-    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_k */
+    /** @var FieldItemBase $field_item_k */
     $field_item_k = new FieldItemTestClass();
     $field_item_k->setValue(['0' => 1, '1' => NULL]);
-    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_l */
+    /** @var FieldItemBase $field_item_l */
     $field_item_l = new FieldItemTestClass();
     $field_item_l->setValue(['0' => 1, '1' => FALSE]);
-    /** @var \Drupal\Core\Field\FieldItemBase  $field_item_m */
+    /** @var FieldItemBase $field_item_m */
     $field_item_m = new FieldItemTestClass();
     $field_item_m->setValue(['0' => 1, '1' => '']);
 
@@ -229,7 +229,7 @@ class FieldItemListTest extends UnitTestCase {
    * Tests equals empty items.
    */
   public function testEqualsEmptyItems(): void {
-    /** @var \Drupal\Core\Field\FieldItemBase  $fv */
+    /** @var FieldItemBase $fv */
     $first_field_item = new FieldItemTestClass();
     $first_field_item->setValue(['0' => 1, '1' => 2]);
     $second_field_item = new FieldItemTestClass();
@@ -297,7 +297,7 @@ class FieldItemListTest extends UnitTestCase {
     $field_definition->expects($this->any())
       ->method('getType')
       ->willReturn('field_type');
-    /** @var \Drupal\Core\Field\FieldItemList|\PHPUnit\Framework\MockObject\MockObject $field_list */
+    /** @var FieldItemList|MockObject $field_list */
     $field_list = $this->getMockBuilder(FieldItemList::class)
       ->onlyMethods(['defaultValueWidget'])
       ->setConstructorArgs([$field_definition])
@@ -318,7 +318,7 @@ class FieldItemListTest extends UnitTestCase {
    */
   public function testDefaultValuesFormValidate(): void {
     $field_definition = $this->createMock(FieldDefinitionInterface::class);
-    /** @var \Drupal\Core\Field\FieldItemList|\PHPUnit\Framework\MockObject\MockObject $field_list */
+    /** @var FieldItemList|MockObject $field_list */
     $field_list = $this->getMockBuilder(FieldItemList::class)
       ->onlyMethods(['defaultValueWidget', 'validate'])
       ->setConstructorArgs([$field_definition])
@@ -339,7 +339,7 @@ class FieldItemListTest extends UnitTestCase {
    */
   public function testDefaultValuesFormSubmit(): void {
     $field_definition = $this->createMock(FieldDefinitionInterface::class);
-    /** @var \Drupal\Core\Field\FieldItemList|\PHPUnit\Framework\MockObject\MockObject $field_list */
+    /** @var FieldItemList|MockObject $field_list */
     $field_list = $this->getMockBuilder(FieldItemList::class)
       ->onlyMethods(['defaultValueWidget', 'getValue'])
       ->setConstructorArgs([$field_definition])

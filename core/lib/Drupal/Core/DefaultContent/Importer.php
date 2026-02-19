@@ -53,20 +53,20 @@ final class Importer implements LoggerAwareInterface {
   /**
    * Imports content entities from disk.
    *
-   * @param \Drupal\Core\DefaultContent\Finder $content
+   * @param Finder $content
    *   The content finder, which has information on the entities to create
    *   in the necessary dependency order.
-   * @param \Drupal\Core\DefaultContent\Existing $existing
+   * @param Existing $existing
    *   (optional) What to do if one of the entities being imported already
    *   exists, by UUID:
    *   - \Drupal\Core\DefaultContent\Existing::Error: Throw an exception.
    *   - \Drupal\Core\DefaultContent\Existing::Skip: Leave the existing entity
    *     as-is.
-   * @param \Drupal\Core\Session\AccountInterface|null $account
+   * @param AccountInterface|null $account
    *   (optional) The account to use when importing the entities. Defaults to
    *   the administrator account.
    *
-   * @throws \Drupal\Core\DefaultContent\ImportException
+   * @throws ImportException
    *   - If any of the entities being imported are not content entities.
    *   - If any of the entities being imported already exists, by UUID, and
    *     $existing is \Drupal\Core\DefaultContent\Existing::Error.
@@ -152,7 +152,7 @@ final class Importer implements LoggerAwareInterface {
    *
    * @param string $path
    *   The path to the file to copy.
-   * @param \Drupal\file\FileInterface $entity
+   * @param FileInterface $entity
    *   The file entity.
    */
   private function copyFileAssociatedWithEntity(string $path, FileInterface &$entity): void {
@@ -201,10 +201,10 @@ final class Importer implements LoggerAwareInterface {
    * @param array<string, array<mixed>> $data
    *   The entity data.
    *
-   * @return \Drupal\Core\Entity\ContentEntityInterface
+   * @return ContentEntityInterface
    *   The unsaved entity.
    *
-   * @throws \Drupal\Core\DefaultContent\ImportException
+   * @throws ImportException
    *   If the `entity_type` or `uuid` meta keys are not set.
    */
   private function toEntity(array $data): ContentEntityInterface {
@@ -248,7 +248,7 @@ final class Importer implements LoggerAwareInterface {
       $values[$entity_type->getKey('langcode')] = $data['_meta']['default_langcode'];
     }
 
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     $entity = $this->entityTypeManager->getStorage($entity_type->id())->create($values);
     foreach ($data['default'] as $field_name => $values) {
       $this->setFieldValues($entity, $field_name, $values);
@@ -272,7 +272,7 @@ final class Importer implements LoggerAwareInterface {
   /**
    * Sets field values based on the normalized data.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The content entity.
    * @param string $field_name
    *   The name of the field.
@@ -284,7 +284,7 @@ final class Importer implements LoggerAwareInterface {
       if (!$entity->get($field_name)->get($delta)) {
         $entity->get($field_name)->appendItem();
       }
-      /** @var \Drupal\Core\Field\FieldItemInterface $item */
+      /** @var FieldItemInterface $item */
       $item = $entity->get($field_name)->get($delta);
 
       // Update the URI based on the target UUID for link fields.
@@ -328,7 +328,7 @@ final class Importer implements LoggerAwareInterface {
    * handle serialized data themselves and do not rely on the serialized schema
    * flag.
    *
-   * @param \Drupal\Core\Field\FieldItemInterface $field_item
+   * @param FieldItemInterface $field_item
    *   The field item.
    *
    * @return string[]
@@ -357,7 +357,7 @@ final class Importer implements LoggerAwareInterface {
    * @param string $target_uuid
    *   The entity UUID.
    *
-   * @return \Drupal\Core\Entity\ContentEntityInterface|null
+   * @return ContentEntityInterface|null
    *   The loaded entity.
    */
   private function loadEntityDependency(string $target_uuid): ?ContentEntityInterface {

@@ -75,7 +75,7 @@ abstract class OffCanvasTestBase extends WebDriverTestBase {
    * @param string $position
    *   The position of the dialog.
    *
-   * @throws \Behat\Mink\Exception\ElementNotFoundException
+   * @throws ElementNotFoundException
    */
   protected function waitForOffCanvasToOpen($position = 'side') {
     $this->waitForOffCanvasArea();

@@ -19,7 +19,7 @@ class MetadataBag extends SymfonyMetadataBag {
   /**
    * Constructs a new metadata bag instance.
    *
-   * @param \Drupal\Core\Site\Settings $settings
+   * @param Settings $settings
    *   The settings instance.
    */
   public function __construct(Settings $settings) {

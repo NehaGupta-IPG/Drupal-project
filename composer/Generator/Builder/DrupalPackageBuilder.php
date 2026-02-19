@@ -13,14 +13,14 @@ abstract class DrupalPackageBuilder implements BuilderInterface {
   /**
    * Information about composer.json, composer.lock etc. in current release.
    *
-   * @var \Drupal\Composer\Generator\Util\DrupalCoreComposer
+   * @var DrupalCoreComposer
    */
   protected $drupalCoreInfo;
 
   /**
    * DrupalPackageBuilder constructor.
    *
-   * @param \Drupal\Composer\Generator\Util\DrupalCoreComposer $drupalCoreInfo
+   * @param DrupalCoreComposer $drupalCoreInfo
    *   Information about composer.json and composer.lock from current release.
    */
   public function __construct(DrupalCoreComposer $drupalCoreInfo) {

@@ -12,7 +12,7 @@ interface RefinableCalculatedPermissionsInterface extends RefinableCacheableDepe
   /**
    * Adds a calculated permission item.
    *
-   * @param \Drupal\Core\Session\CalculatedPermissionsItemInterface $item
+   * @param CalculatedPermissionsItemInterface $item
    *   The calculated permission item.
    * @param bool $overwrite
    *   (optional) Whether to overwrite an item if there already is one for the
@@ -58,7 +58,7 @@ interface RefinableCalculatedPermissionsInterface extends RefinableCacheableDepe
    *
    * This merges (not replaces) all permissions and cacheable metadata.
    *
-   * @param \Drupal\Core\Session\CalculatedPermissionsInterface $other
+   * @param CalculatedPermissionsInterface $other
    *   The other calculated permissions object to merge into this one.
    *
    * @return $this

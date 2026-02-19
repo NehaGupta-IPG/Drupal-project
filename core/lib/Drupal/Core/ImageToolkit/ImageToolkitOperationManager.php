@@ -24,7 +24,7 @@ class ImageToolkitOperationManager extends DefaultPluginManager implements Image
   /**
    * A logger instance.
    *
-   * @var \Psr\Log\LoggerInterface
+   * @var LoggerInterface
    *
    * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no replacement.
    *
@@ -43,13 +43,13 @@ class ImageToolkitOperationManager extends DefaultPluginManager implements Image
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param CacheBackendInterface $cache_backend
    *   Cache backend instance to use.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler to invoke the alter hook with.
-   * @param \Drupal\Core\ImageToolkit\ImageToolkitManager|\Psr\Log\LoggerInterface $logger
+   * @param ImageToolkitManager|LoggerInterface $logger
    *   (deprecated) A logger instance.
-   * @param \Drupal\Core\ImageToolkit\ImageToolkitManager|null $toolkit_manager
+   * @param ImageToolkitManager|null $toolkit_manager
    *   The image toolkit manager.
    */
   public function __construct(
@@ -88,7 +88,7 @@ class ImageToolkitOperationManager extends DefaultPluginManager implements Image
   /**
    * Returns the plugin ID for a given toolkit and operation.
    *
-   * @param \Drupal\Core\ImageToolkit\ImageToolkitInterface $toolkit
+   * @param ImageToolkitInterface $toolkit
    *   The toolkit instance.
    * @param string $operation
    *   The operation (e.g. "crop").
@@ -96,7 +96,7 @@ class ImageToolkitOperationManager extends DefaultPluginManager implements Image
    * @return string
    *   The plugin ID.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws PluginNotFoundException
    *   When no plugin is available.
    */
   protected function getToolkitOperationPluginId(ImageToolkitInterface $toolkit, $operation) {

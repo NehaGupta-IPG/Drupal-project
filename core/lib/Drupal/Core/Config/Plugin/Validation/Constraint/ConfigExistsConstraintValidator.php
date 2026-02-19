@@ -19,14 +19,14 @@ class ConfigExistsConstraintValidator extends ConstraintValidator implements Con
   /**
    * The config factory service.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected ConfigFactoryInterface $configFactory;
 
   /**
    * Constructs a ConfigExistsConstraintValidator object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory service.
    */
   public function __construct(ConfigFactoryInterface $config_factory) {

@@ -22,11 +22,11 @@ class FieldReuseAccessCheck implements AccessInterface {
   /**
    * Creates a new FieldReuseAccessCheck.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $fieldTypePluginManager
+   * @param FieldTypePluginManagerInterface $fieldTypePluginManager
    *   The field type plugin manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager
+   * @param EntityFieldManagerInterface $entityFieldManager
    *   The entity field manager.
    */
   public function __construct(
@@ -38,11 +38,11 @@ class FieldReuseAccessCheck implements AccessInterface {
   /**
    * Checks access to the reuse existing fields form.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route to check against.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The parametrized route.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The currently logged in account.
    * @param string|null $bundle
    *   (optional) The bundle. Different entity types can have different names
@@ -52,7 +52,7 @@ class FieldReuseAccessCheck implements AccessInterface {
    *   nodes, the bundle key is "node_type", so the value would be available via
    *   the {node_type} parameter rather than a {bundle} parameter.
    *
-   * @return \Drupal\Core\Access\AccessResultInterface
+   * @return AccessResultInterface
    *   The access result.
    */
   public function access(Route $route, RouteMatchInterface $route_match, AccountInterface $account, ?string $bundle = NULL): AccessResultInterface {

@@ -6,11 +6,11 @@ namespace Drupal\router_test;
 
 use Drupal\Core\Cache\CacheableResponse;
 use Drupal\Core\ParamConverter\ParamNotConvertedException;
-use Drupal\user\UserInterface;
 use Drupal\Core\Routing\RouteObjectInterface;
+use Drupal\user\UserInterface;
+use GuzzleHttp\Psr7\Response as Psr7Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use GuzzleHttp\Psr7\Response as Psr7Response;
 
 /**
  * Controller routines for testing the routing system.
@@ -123,7 +123,7 @@ class TestControllers {
   /**
    * Rejects requests with query keys.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The given request.
    *
    * @return \Symfony\Component\HttpFoundation\Response

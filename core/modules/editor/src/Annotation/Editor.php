@@ -7,7 +7,7 @@ use Drupal\Component\Annotation\Plugin;
 /**
  * Defines an Editor annotation object.
  *
- * Plugin Namespace: Plugin\Editor
+ * Plugin Namespace: Plugin\Editor.
  *
  * Text editor plugin implementations need to define a plugin definition array
  * through annotation. These definition arrays may be altered through
@@ -27,17 +27,7 @@ use Drupal\Component\Annotation\Plugin;
  * A complete sample plugin definition should be defined as in this example:
  *
  * @code
- * @Editor(
- *   id = "my_editor",
- *   label = @Translation("My Editor"),
- *   supports_content_filtering = FALSE,
- *   supports_inline_editing = FALSE,
- *   is_xss_safe = FALSE,
- *   supported_element_types = {
- *     "textarea",
- *     "textfield",
- *   }
- * )
+ * @Editor(id="my_editor", label=@Translation("My Editor"), supports_content_filtering=false, supports_inline_editing=false, is_xss_safe=false, supported_element_types={"textarea", "textfield"})
  * @endcode
  *
  * For a working example, see \Drupal\ckeditor5\Plugin\Editor\CKEditor5

@@ -22,32 +22,33 @@ use Drupal\Core\Entity\RevisionableStorageInterface;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\jsonapi\Access\EntityAccessChecker;
+use Drupal\jsonapi\Access\TemporaryQueryGuard;
 use Drupal\jsonapi\CacheableResourceResponse;
 use Drupal\jsonapi\Context\FieldResolver;
 use Drupal\jsonapi\Entity\EntityValidationTrait;
-use Drupal\jsonapi\Access\TemporaryQueryGuard;
 use Drupal\jsonapi\Events\CollectRelationshipMetaEvent;
 use Drupal\jsonapi\Exception\EntityAccessDeniedHttpException;
 use Drupal\jsonapi\IncludeResolver;
+use Drupal\jsonapi\JsonApiResource\Data;
 use Drupal\jsonapi\JsonApiResource\IncludedData;
+use Drupal\jsonapi\JsonApiResource\JsonApiDocumentTopLevel;
+use Drupal\jsonapi\JsonApiResource\Link;
 use Drupal\jsonapi\JsonApiResource\LinkCollection;
 use Drupal\jsonapi\JsonApiResource\NullIncludedData;
 use Drupal\jsonapi\JsonApiResource\Relationship;
 use Drupal\jsonapi\JsonApiResource\ResourceIdentifier;
-use Drupal\jsonapi\JsonApiResource\Link;
 use Drupal\jsonapi\JsonApiResource\ResourceObject;
 use Drupal\jsonapi\JsonApiResource\ResourceObjectData;
 use Drupal\jsonapi\JsonApiResource\TopLevelDataInterface;
 use Drupal\jsonapi\Query\Filter;
-use Drupal\jsonapi\Query\Sort;
 use Drupal\jsonapi\Query\OffsetPage;
-use Drupal\jsonapi\JsonApiResource\Data;
-use Drupal\jsonapi\JsonApiResource\JsonApiDocumentTopLevel;
+use Drupal\jsonapi\Query\Sort;
 use Drupal\jsonapi\ResourceResponse;
 use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\jsonapi\ResourceType\ResourceTypeField;
@@ -56,7 +57,6 @@ use Drupal\jsonapi\Revisions\ResourceVersionRouteEnhancer;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -79,113 +79,113 @@ class EntityResource {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $fieldManager;
 
   /**
    * The resource type repository.
    *
-   * @var \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface
+   * @var ResourceTypeRepositoryInterface
    */
   protected $resourceTypeRepository;
 
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * The entity repository.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   * @var EntityRepositoryInterface
    */
   protected $entityRepository;
 
   /**
    * The include resolver.
    *
-   * @var \Drupal\jsonapi\IncludeResolver
+   * @var IncludeResolver
    */
   protected $includeResolver;
 
   /**
    * The JSON:API entity access checker.
    *
-   * @var \Drupal\jsonapi\Access\EntityAccessChecker
+   * @var EntityAccessChecker
    */
   protected $entityAccessChecker;
 
   /**
    * The JSON:API field resolver.
    *
-   * @var \Drupal\jsonapi\Context\FieldResolver
+   * @var FieldResolver
    */
   protected $fieldResolver;
 
   /**
    * The JSON:API serializer.
    *
-   * @var \Symfony\Component\Serializer\SerializerInterface|\Symfony\Component\Serializer\Normalizer\DenormalizerInterface
+   * @var SerializerInterface|DenormalizerInterface
    */
   protected $serializer;
 
   /**
    * The time service.
    *
-   * @var \Drupal\Component\Datetime\TimeInterface
+   * @var TimeInterface
    */
   protected $time;
 
   /**
    * The current user account.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $user;
 
   /**
    * The event dispatcher.
    *
-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   * @var EventDispatcherInterface
    */
   protected EventDispatcherInterface $eventDispatcher;
 
   /**
    * Instantiates an EntityResource object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager
+   * @param EntityFieldManagerInterface $field_manager
    *   The entity type field manager.
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
+   * @param ResourceTypeRepositoryInterface $resource_type_repository
    *   The JSON:API resource type repository.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository.
-   * @param \Drupal\jsonapi\IncludeResolver $include_resolver
+   * @param IncludeResolver $include_resolver
    *   The include resolver.
-   * @param \Drupal\jsonapi\Access\EntityAccessChecker $entity_access_checker
+   * @param EntityAccessChecker $entity_access_checker
    *   The JSON:API entity access checker.
-   * @param \Drupal\jsonapi\Context\FieldResolver $field_resolver
+   * @param FieldResolver $field_resolver
    *   The JSON:API field resolver.
-   * @param \Symfony\Component\Serializer\SerializerInterface|\Symfony\Component\Serializer\Normalizer\DenormalizerInterface $serializer
+   * @param SerializerInterface|DenormalizerInterface $serializer
    *   The JSON:API serializer.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
-   * @param \Drupal\Core\Session\AccountInterface $user
+   * @param AccountInterface $user
    *   The current user account.
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $field_manager, ResourceTypeRepositoryInterface $resource_type_repository, RendererInterface $renderer, EntityRepositoryInterface $entity_repository, IncludeResolver $include_resolver, EntityAccessChecker $entity_access_checker, FieldResolver $field_resolver, SerializerInterface $serializer, TimeInterface $time, AccountInterface $user, ?EventDispatcherInterface $event_dispatcher = NULL) {
@@ -211,15 +211,15 @@ class EntityResource {
   /**
    * Gets the individual entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The loaded entity.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    *
-   * @return \Drupal\jsonapi\ResourceResponse
+   * @return ResourceResponse
    *   The response.
    *
-   * @throws \Drupal\jsonapi\Exception\EntityAccessDeniedHttpException
+   * @throws EntityAccessDeniedHttpException
    *   Thrown when access to the entity is not allowed.
    */
   public function getIndividual(EntityInterface $entity, Request $request) {
@@ -235,17 +235,17 @@ class EntityResource {
   /**
    * Creates an individual entity.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The JSON:API resource type for the request to be served.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    *
-   * @return \Drupal\jsonapi\ResourceResponse
+   * @return ResourceResponse
    *   The response.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\ConflictHttpException
+   * @throws ConflictHttpException
    *   Thrown when the entity already exists.
-   * @throws \Drupal\jsonapi\Exception\UnprocessableHttpEntityException
+   * @throws UnprocessableHttpEntityException
    *   Thrown when the entity does not pass validation.
    */
   public function createIndividual(ResourceType $resource_type, Request $request) {
@@ -308,19 +308,19 @@ class EntityResource {
   /**
    * Patches an individual entity.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The JSON:API resource type for the request to be served.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The loaded entity.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    *
-   * @return \Drupal\jsonapi\ResourceResponse
+   * @return ResourceResponse
    *   The response.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws BadRequestHttpException
    *   Thrown when the selected entity does not match the id in th payload.
-   * @throws \Drupal\jsonapi\Exception\UnprocessableHttpEntityException
+   * @throws UnprocessableHttpEntityException
    *   Thrown when the patched entity does not pass validation.
    */
   public function patchIndividual(ResourceType $resource_type, EntityInterface $entity, Request $request) {
@@ -379,10 +379,10 @@ class EntityResource {
   /**
    * Deletes an individual entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The loaded entity.
    *
-   * @return \Drupal\jsonapi\ResourceResponse
+   * @return ResourceResponse
    *   The response.
    */
   public function deleteIndividual(EntityInterface $entity) {
@@ -411,15 +411,15 @@ class EntityResource {
   /**
    * Gets the collection of entities.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The JSON:API resource type for the request to be served.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    *
-   * @return \Drupal\jsonapi\ResourceResponse
+   * @return ResourceResponse
    *   The response.
    *
-   * @throws \Drupal\Core\Http\Exception\CacheableBadRequestHttpException
+   * @throws CacheableBadRequestHttpException
    *   Thrown when filtering on a config entity which does not support it.
    */
   public function getCollection(ResourceType $resource_type, Request $request) {
@@ -504,9 +504,9 @@ class EntityResource {
   /**
    * Executes the query in a render context, to catch bubbled cacheability.
    *
-   * @param \Drupal\Core\Entity\Query\QueryInterface $query
+   * @param QueryInterface $query
    *   The query to execute to get the return results.
-   * @param \Drupal\Core\Cache\CacheableMetadata $query_cacheability
+   * @param CacheableMetadata $query_cacheability
    *   The value object to carry the query cacheability.
    *
    * @return int|array
@@ -533,16 +533,16 @@ class EntityResource {
   /**
    * Gets the related resource.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The JSON:API resource type for the request to be served.
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The requested entity.
    * @param string $related
    *   The related field name.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    *
-   * @return \Drupal\jsonapi\ResourceResponse
+   * @return ResourceResponse
    *   The response.
    */
   public function getRelated(ResourceType $resource_type, FieldableEntityInterface $entity, $related, Request $request) {
@@ -553,7 +553,7 @@ class EntityResource {
     // Remove the entities pointing to a resource that may be disabled. Even
     // though the normalizer skips disabled references, we can avoid unnecessary
     // work by checking here too.
-    /** @var \Drupal\Core\Entity\EntityInterface[] $referenced_entities */
+    /** @var EntityInterface[] $referenced_entities */
     $referenced_entities = array_filter(
       $field_list->referencedEntities(),
       function (EntityInterface $entity) {
@@ -582,18 +582,18 @@ class EntityResource {
   /**
    * Gets the relationship of an entity.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The base JSON:API resource type for the request to be served.
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The requested entity.
    * @param string $related
    *   The related field name.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    * @param int $response_code
    *   The response code. Defaults to 200.
    *
-   * @return \Drupal\jsonapi\ResourceResponse
+   * @return ResourceResponse
    *   The response.
    */
   public function getRelationship(ResourceType $resource_type, FieldableEntityInterface $entity, $related, Request $request, $response_code = 200) {
@@ -623,26 +623,26 @@ class EntityResource {
   /**
    * Adds a relationship to a to-many relationship.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The base JSON:API resource type for the request to be served.
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The requested entity.
    * @param string $related
    *   The related field name.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    *
-   * @return \Drupal\jsonapi\ResourceResponse
+   * @return ResourceResponse
    *   The response.
    *
-   * @throws \Drupal\jsonapi\Exception\EntityAccessDeniedHttpException
+   * @throws EntityAccessDeniedHttpException
    *   Thrown when the current user is not allowed to PATCH the selected
    *   field(s).
-   * @throws \Symfony\Component\HttpKernel\Exception\ConflictHttpException
+   * @throws ConflictHttpException
    *   Thrown when POSTing to a "to-one" relationship.
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   Thrown when the underlying entity cannot be saved.
-   * @throws \Drupal\jsonapi\Exception\UnprocessableHttpEntityException
+   * @throws UnprocessableHttpEntityException
    *   Thrown when the updated entity does not pass validation.
    */
   public function addToRelationshipData(ResourceType $resource_type, FieldableEntityInterface $entity, $related, Request $request) {
@@ -693,21 +693,21 @@ class EntityResource {
   /**
    * Updates the relationship of an entity.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The base JSON:API resource type for the request to be served.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The requested entity.
    * @param string $related
    *   The related field name.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    *
-   * @return \Drupal\jsonapi\ResourceResponse
+   * @return ResourceResponse
    *   The response.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   Thrown when the underlying entity cannot be saved.
-   * @throws \Drupal\jsonapi\Exception\UnprocessableHttpEntityException
+   * @throws UnprocessableHttpEntityException
    *   Thrown when the updated entity does not pass validation.
    */
   public function replaceRelationshipData(ResourceType $resource_type, EntityInterface $entity, $related, Request $request) {
@@ -731,15 +731,15 @@ class EntityResource {
   /**
    * Update a to-one relationship.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The requested entity.
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceIdentifier[] $resource_identifiers
+   * @param ResourceIdentifier[] $resource_identifiers
    *   The client-sent resource identifiers which should be set on the given
    *   entity. Should be an empty array or an array with a single value.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition of the entity field to be updated.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws BadRequestHttpException
    *   Thrown when a "to-one" relationship is not provided.
    */
   protected function doPatchIndividualRelationship(EntityInterface $entity, array $resource_identifiers, FieldDefinitionInterface $field_definition) {
@@ -752,12 +752,12 @@ class EntityResource {
   /**
    * Update a to-many relationship.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The requested entity.
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceIdentifier[] $resource_identifiers
+   * @param ResourceIdentifier[] $resource_identifiers
    *   The client-sent resource identifiers which should be set on the given
    *   entity.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition of the entity field to be updated.
    */
   protected function doPatchMultipleRelationship(EntityInterface $entity, array $resource_identifiers, FieldDefinitionInterface $field_definition) {
@@ -775,23 +775,23 @@ class EntityResource {
   /**
    * Deletes the relationship of an entity.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The base JSON:API resource type for the request to be served.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The requested entity.
    * @param string $related
    *   The related field name.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    *
-   * @return \Drupal\jsonapi\ResourceResponse
+   * @return ResourceResponse
    *   The response.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws BadRequestHttpException
    *   Thrown when not body was provided for the DELETE operation.
-   * @throws \Symfony\Component\HttpKernel\Exception\ConflictHttpException
+   * @throws ConflictHttpException
    *   Thrown when deleting a "to-one" relationship.
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   Thrown when the underlying entity cannot be saved.
    */
   public function removeFromRelationshipData(ResourceType $resource_type, EntityInterface $entity, $related, Request $request) {
@@ -839,9 +839,9 @@ class EntityResource {
   /**
    * Deserializes a request body, if any.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The JSON:API resource type for the current request.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    * @param string $class
    *   The class into which the request data needs to be deserialized.
@@ -853,10 +853,10 @@ class EntityResource {
    * @return array
    *   An object normalization.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws BadRequestHttpException
    *   Thrown if the request body cannot be decoded, or when no request body was
    *   provided with a POST or PATCH request.
-   * @throws \Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException
+   * @throws UnprocessableEntityHttpException
    *   Thrown if the request body cannot be denormalized.
    */
   protected function deserialize(ResourceType $resource_type, Request $request, $class, $relationship_field_name = NULL) {
@@ -902,14 +902,14 @@ class EntityResource {
   /**
    * Gets a basic query for a collection.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The base JSON:API resource type for the query.
    * @param array $params
    *   The parameters for the query.
-   * @param \Drupal\Core\Cache\CacheableMetadata $query_cacheability
+   * @param CacheableMetadata $query_cacheability
    *   Collects cacheability for the query.
    *
-   * @return \Drupal\Core\Entity\Query\QueryInterface
+   * @return QueryInterface
    *   A new query.
    */
   protected function getCollectionQuery(ResourceType $resource_type, array $params, CacheableMetadata $query_cacheability) {
@@ -964,14 +964,14 @@ class EntityResource {
   /**
    * Gets a basic query for a collection count.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The base JSON:API resource type for the query.
    * @param array $params
    *   The parameters for the query.
-   * @param \Drupal\Core\Cache\CacheableMetadata $query_cacheability
+   * @param CacheableMetadata $query_cacheability
    *   Collects cacheability for the query.
    *
-   * @return \Drupal\Core\Entity\Query\QueryInterface
+   * @return QueryInterface
    *   A new query.
    */
   protected function getCollectionCountQuery(ResourceType $resource_type, array $params, CacheableMetadata $query_cacheability) {
@@ -982,13 +982,13 @@ class EntityResource {
   /**
    * Loads the entity targeted by a resource identifier.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceIdentifier $resource_identifier
+   * @param ResourceIdentifier $resource_identifier
    *   A resource identifier.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The entity targeted by a resource identifier.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws BadRequestHttpException
    *   Thrown if the given resource identifier targets a resource type or
    *   resource which does not exist.
    */
@@ -1028,23 +1028,23 @@ class EntityResource {
   /**
    * Builds a response with the appropriate wrapped document.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\TopLevelDataInterface $data
+   * @param TopLevelDataInterface $data
    *   The data to wrap.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
-   * @param \Drupal\jsonapi\JsonApiResource\IncludedData $includes
+   * @param IncludedData $includes
    *   The resources to be included in the document. Use NullData if
    *   there should be no included resources in the document.
    * @param int $response_code
    *   The response code.
    * @param array $headers
    *   An array of response headers.
-   * @param \Drupal\jsonapi\JsonApiResource\LinkCollection $links
+   * @param LinkCollection $links
    *   The URLs to which to link. A 'self' link is added automatically.
    * @param array $meta
    *   (optional) The top-level metadata.
    *
-   * @return \Drupal\jsonapi\ResourceResponse
+   * @return ResourceResponse
    *   The response.
    */
   protected function buildWrappedResponse(TopLevelDataInterface $data, Request $request, IncludedData $includes, $response_code = 200, array $headers = [], ?LinkCollection $links = NULL, array $meta = []) {
@@ -1071,18 +1071,18 @@ class EntityResource {
   /**
    * Respond with an entity collection.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceObjectData $primary_data
+   * @param ResourceObjectData $primary_data
    *   The collection of entities.
-   * @param \Drupal\jsonapi\JsonApiResource\IncludedData|\Drupal\jsonapi\JsonApiResource\NullIncludedData $includes
+   * @param IncludedData|NullIncludedData $includes
    *   The resources to be included in the document.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The base JSON:API resource type for the request to be served.
-   * @param \Drupal\jsonapi\Query\OffsetPage $page_param
+   * @param OffsetPage $page_param
    *   The pagination parameter for the requested collection.
    *
-   * @return \Drupal\jsonapi\ResourceResponse
+   * @return ResourceResponse
    *   The response.
    */
   protected function respondWithCollection(ResourceObjectData $primary_data, Data $includes, Request $request, ResourceType $resource_type, OffsetPage $page_param) {
@@ -1111,16 +1111,16 @@ class EntityResource {
   /**
    * Takes a field from the origin entity and puts it to the destination entity.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The JSON:API resource type of the entity to be updated.
-   * @param \Drupal\Core\Entity\EntityInterface $origin
+   * @param EntityInterface $origin
    *   The entity that contains the field values.
-   * @param \Drupal\Core\Entity\EntityInterface $destination
+   * @param EntityInterface $destination
    *   The entity that needs to be updated.
    * @param string $field_name
    *   The name of the field to extract and update.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws BadRequestHttpException
    *   Thrown when the serialized and destination entities are of different
    *   types.
    */
@@ -1148,17 +1148,17 @@ class EntityResource {
   /**
    * Gets includes for the given response data.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceObject|\Drupal\jsonapi\JsonApiResource\ResourceObjectData $data
+   * @param ResourceObject|ResourceObjectData $data
    *   The response data from which to resolve includes.
    *
-   * @return \Drupal\jsonapi\JsonApiResource\Data
+   * @return Data
    *   A Data object to be included or a NullData object if the request does not
    *   specify any include paths.
    *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws InvalidPluginDefinitionException
+   * @throws PluginNotFoundException
    */
   public function getIncludes(Request $request, $data) {
     assert($data instanceof ResourceObject || $data instanceof ResourceObjectData);
@@ -1170,15 +1170,15 @@ class EntityResource {
   /**
    * Checks whether the given field should be PATCHed.
    *
-   * @param \Drupal\Core\Field\FieldItemListInterface $original_field
+   * @param FieldItemListInterface $original_field
    *   The original (stored) value for the field.
-   * @param \Drupal\Core\Field\FieldItemListInterface $received_field
+   * @param FieldItemListInterface $received_field
    *   The received value for the field.
    *
    * @return bool
    *   Whether the field should be PATCHed or not.
    *
-   * @throws \Drupal\jsonapi\Exception\EntityAccessDeniedHttpException
+   * @throws EntityAccessDeniedHttpException
    *   Thrown when the user sending the request is not allowed to update the
    *   field. Only thrown when the user could not abuse this information to
    *   determine the stored value.
@@ -1216,7 +1216,7 @@ class EntityResource {
   /**
    * Build a collection of the entities to respond with and access objects.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The entity storage to load the entities from.
    * @param int[] $ids
    *   An array of entity IDs, keyed by revision ID if the entity type is
@@ -1245,7 +1245,7 @@ class EntityResource {
   /**
    * Checks if the given entity exists.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity for which to test existence.
    *
    * @return bool
@@ -1261,9 +1261,9 @@ class EntityResource {
   /**
    * Extracts JSON:API query parameters from the request.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The JSON:API resource type.
    *
    * @return array
@@ -1293,13 +1293,13 @@ class EntityResource {
   /**
    * Get the full URL for a given request object.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    * @param array|null $query
    *   The query parameters to use. Leave it empty to get the query from the
    *   request object.
    *
-   * @return \Drupal\Core\Url
+   * @return Url
    *   The full URL.
    */
   protected static function getRequestLink(Request $request, $query = NULL) {
@@ -1314,14 +1314,14 @@ class EntityResource {
   /**
    * Get the pager links for a given request object.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
-   * @param \Drupal\jsonapi\Query\OffsetPage $page_param
+   * @param OffsetPage $page_param
    *   The current pagination parameter for the requested collection.
    * @param array $link_context
    *   An associative array with extra data to build the links.
    *
-   * @return \Drupal\jsonapi\JsonApiResource\LinkCollection
+   * @return LinkCollection
    *   A LinkCollection, with:
    *   - a 'next' key if it is not the last page;
    *   - 'prev' and 'first' keys if it's not the first page.

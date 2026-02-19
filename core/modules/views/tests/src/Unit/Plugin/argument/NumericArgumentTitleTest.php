@@ -54,7 +54,7 @@ class NumericArgumentTitleTest extends UnitTestCase {
   /**
    * Creates a NumericArgument instance for testing.
    *
-   * @return \Drupal\views\Plugin\views\argument\NumericArgument
+   * @return NumericArgument
    *   A NumericArgument instance.
    */
   protected function createNumericArgument(): NumericArgument {

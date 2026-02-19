@@ -23,9 +23,9 @@ use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\field\FieldConfigInterface;
+use Drupal\field\FieldLabelOptionsTrait;
 use Drupal\layout_builder\Plugin\Derivative\FieldBlockDeriver;
 use Psr\Log\LoggerInterface;
-use Drupal\field\FieldLabelOptionsTrait;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -44,14 +44,14 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 
   /**
    * The formatter manager.
    *
-   * @var \Drupal\Core\Field\FormatterPluginManager
+   * @var FormatterPluginManager
    */
   protected $formatterManager;
 
@@ -79,21 +79,21 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
   /**
    * The field definition.
    *
-   * @var \Drupal\Core\Field\FieldDefinitionInterface
+   * @var FieldDefinitionInterface
    */
   protected $fieldDefinition;
 
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The logger.
    *
-   * @var \Psr\Log\LoggerInterface
+   * @var LoggerInterface
    */
   protected $logger;
 
@@ -106,13 +106,13 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @param EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
-   * @param \Drupal\Core\Field\FormatterPluginManager $formatter_manager
+   * @param FormatterPluginManager $formatter_manager
    *   The formatter manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   The logger.
    */
   public function __construct(
@@ -143,7 +143,7 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
   /**
    * Gets the entity that has the field.
    *
-   * @return \Drupal\Core\Entity\FieldableEntityInterface
+   * @return FieldableEntityInterface
    *   The entity.
    */
   protected function getEntity() {
@@ -293,13 +293,13 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
   /**
    * Adds the formatter third party settings forms.
    *
-   * @param \Drupal\Core\Field\FormatterInterface $plugin
+   * @param FormatterInterface $plugin
    *   The formatter.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition.
    * @param array $form
    *   The (entire) configuration form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    *
    * @return array
@@ -342,7 +342,7 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
   /**
    * Gets the field definition.
    *
-   * @return \Drupal\Core\Field\FieldDefinitionInterface
+   * @return FieldDefinitionInterface
    *   The field definition.
    */
   protected function getFieldDefinition() {
@@ -356,7 +356,7 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
   /**
    * Returns an array of applicable formatter options for a field.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition.
    *
    * @return array
@@ -381,10 +381,10 @@ class FieldBlock extends BlockBase implements ContextAwarePluginInterface, Conta
    *
    * @param array $parents
    *   The #parents of the element representing the formatter.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
-   * @return \Drupal\Core\Field\FormatterInterface
+   * @return FormatterInterface
    *   The formatter object.
    */
   protected function getFormatter(array $parents, FormStateInterface $form_state) {

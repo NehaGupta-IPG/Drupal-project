@@ -10,10 +10,10 @@ class TypedDataInternalPropertiesHelper {
   /**
    * Gets an array non-internal properties from a complex data object.
    *
-   * @param \Drupal\Core\TypedData\ComplexDataInterface $data
+   * @param ComplexDataInterface $data
    *   The complex data object.
    *
-   * @return \Drupal\Core\TypedData\TypedDataInterface[]
+   * @return TypedDataInterface[]
    *   The non-internal properties, keyed by property name.
    */
   public static function getNonInternalProperties(ComplexDataInterface $data) {

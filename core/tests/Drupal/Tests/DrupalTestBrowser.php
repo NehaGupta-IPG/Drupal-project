@@ -24,14 +24,14 @@ class DrupalTestBrowser extends AbstractBrowser {
   /**
    * The Guzzle client.
    *
-   * @var \GuzzleHttp\ClientInterface
+   * @var ClientInterface
    */
   protected $client;
 
   /**
    * Sets the Guzzle client.
    *
-   * @param \GuzzleHttp\ClientInterface $client
+   * @param ClientInterface $client
    *   The Guzzle client.
    *
    * @return $this
@@ -65,7 +65,7 @@ class DrupalTestBrowser extends AbstractBrowser {
   /**
    * Gets the Guzzle client.
    *
-   * @return \GuzzleHttp\ClientInterface
+   * @return ClientInterface
    *   The Guzzle client.
    */
   public function getClient() {
@@ -231,10 +231,10 @@ class DrupalTestBrowser extends AbstractBrowser {
   /**
    * Converts a Guzzle response to a BrowserKit response.
    *
-   * @param \Psr\Http\Message\ResponseInterface $response
+   * @param ResponseInterface $response
    *   The Guzzle response.
    *
-   * @return \Symfony\Component\BrowserKit\Response
+   * @return Response
    *   A BrowserKit Response instance.
    */
   protected function createResponse(ResponseInterface $response): Response {

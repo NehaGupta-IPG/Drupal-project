@@ -39,7 +39,7 @@ class CallableResolver {
   /**
    * Constructs a CallableResolver object.
    *
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $classResolver
+   * @param ClassResolverInterface $classResolver
    *   The class resolver.
    */
   public function __construct(

@@ -15,18 +15,18 @@ class VariationCacheFactory implements VariationCacheFactoryInterface {
   /**
    * Instantiated variation cache bins.
    *
-   * @var \Drupal\Core\Cache\VariationCacheInterface[]
+   * @var VariationCacheInterface[]
    */
   protected $bins = [];
 
   /**
    * Constructs a new VariationCacheFactory object.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   * @param RequestStack $requestStack
    *   The request stack.
-   * @param \Drupal\Core\Cache\CacheFactoryInterface $cacheFactory
+   * @param CacheFactoryInterface $cacheFactory
    *   The cache factory.
-   * @param \Drupal\Core\Cache\Context\CacheContextsManager $cacheContextsManager
+   * @param CacheContextsManager $cacheContextsManager
    *   The cache contexts manager.
    */
   public function __construct(

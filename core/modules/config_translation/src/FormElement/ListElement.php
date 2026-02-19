@@ -2,9 +2,9 @@
 
 namespace Drupal\config_translation\FormElement;
 
+use Drupal\config_translation\Form\ConfigTranslationFormBase;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\config_translation\Form\ConfigTranslationFormBase;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\TraversableTypedDataInterface;
@@ -21,14 +21,14 @@ class ListElement implements ElementInterface {
   /**
    * The schema element this form is for.
    *
-   * @var \Drupal\Core\TypedData\TraversableTypedDataInterface
+   * @var TraversableTypedDataInterface
    */
   protected $element;
 
   /**
    * Constructs a ListElement.
    *
-   * @param \Drupal\Core\TypedData\TraversableTypedDataInterface $element
+   * @param TraversableTypedDataInterface $element
    *   The schema element this form element is for.
    */
   public function __construct(TraversableTypedDataInterface $element) {
@@ -101,7 +101,7 @@ class ListElement implements ElementInterface {
    * there is an element which contains these words and use those. Fall back
    * to the generic definition label if no such element is found.
    *
-   * @param \Drupal\Core\TypedData\DataDefinitionInterface $definition
+   * @param DataDefinitionInterface $definition
    *   The definition of the schema element.
    * @param array $group_build
    *   The renderable array for the group of schema elements.

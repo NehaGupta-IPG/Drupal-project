@@ -92,7 +92,7 @@ trait PerformanceTestTrait {
    *   An optional human readable identifier to enable sending traces to an Open
    *   Telemetry endpoint (if configured).
    *
-   * @return \Drupal\Tests\PerformanceData
+   * @return PerformanceData
    *   A PerformanceData value object.
    */
   public function collectPerformanceData(callable $callable, ?string $service_name = NULL): PerformanceData {
@@ -193,7 +193,7 @@ trait PerformanceTestTrait {
   /**
    * Logs a query in the performance data.
    *
-   * @param \Drupal\Tests\PerformanceData $performance_data
+   * @param PerformanceData $performance_data
    *   The performance data object to log the query on.
    * @param string $query
    *   The raw query.
@@ -304,7 +304,7 @@ trait PerformanceTestTrait {
    *   An optional human readable identifier so that traces can be grouped
    *   together.
    *
-   * @return \Drupal\Tests\PerformanceData
+   * @return PerformanceData
    *   An instance of the performance data value object.
    */
   protected function processChromeDriverPerformanceLogs(?string $service_name): PerformanceData {
@@ -365,7 +365,7 @@ trait PerformanceTestTrait {
    *
    * @param array $messages
    *   The chromedriver performance log messages.
-   * @param \Drupal\Tests\PerformanceData $performance_data
+   * @param PerformanceData $performance_data
    *   An instance of the performance data value object.
    */
   private function collectNetworkData(array $messages, PerformanceData $performance_data): void {
@@ -627,7 +627,7 @@ trait PerformanceTestTrait {
    * @return void
    *   No return value.
    *
-   * @throws \PHPUnit\Framework\ExpectationFailedException
+   * @throws ExpectationFailedException
    */
   protected function assertCountBetween(int $min, int $max, int $actual, string $message = '') {
     if (!empty($message)) {
@@ -643,7 +643,7 @@ trait PerformanceTestTrait {
   /**
    * Checks whether a database event is from the database cache implementation.
    *
-   * @param \Drupal\Core\Database\Event\DatabaseEvent $event
+   * @param DatabaseEvent $event
    *   The database event.
    *
    * @return bool
@@ -663,7 +663,7 @@ trait PerformanceTestTrait {
    *
    * @param array $expected
    *   The expected metrics.
-   * @param \Drupal\Tests\PerformanceData $performance_data
+   * @param PerformanceData $performance_data
    *   An instance of the performance data value object.
    *
    * @return void
@@ -696,7 +696,7 @@ trait PerformanceTestTrait {
   /**
    * Get metrics from a performance data value object.
    *
-   * @param \Drupal\Tests\PerformanceData $performance_data
+   * @param PerformanceData $performance_data
    *   An instance of the performance data value object.
    *
    * @return array

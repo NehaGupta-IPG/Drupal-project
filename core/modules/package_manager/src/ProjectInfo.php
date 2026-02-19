@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Drupal\package_manager;
 
 use Composer\Semver\Comparator;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\update\ProjectRelease;
 use Drupal\Core\Extension\ExtensionVersion;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Utility\Error;
+use Drupal\update\ProjectRelease;
 use Drupal\update\UpdateManagerInterface;
 
 /**
@@ -27,7 +27,7 @@ final class ProjectInfo {
   /**
    * Determines if a release can be installed.
    *
-   * @param \Drupal\update\ProjectRelease $release
+   * @param ProjectRelease $release
    *   The project release.
    * @param string[] $support_branches
    *   The supported branches.
@@ -75,7 +75,7 @@ final class ProjectInfo {
   /**
    * Gets all project releases to which the site can update.
    *
-   * @return \Drupal\update\ProjectRelease[]|null
+   * @return ProjectRelease[]|null
    *   If the project information is available, an array of releases that can be
    *   installed, keyed by version number; otherwise NULL. The releases are in
    *   descending order by version number (i.e., higher versions are listed
@@ -185,7 +185,7 @@ final class ProjectInfo {
     // we will retrieve the project information from Package Manager's own
     // update processor service.
     if (!isset($available_projects[$this->name])) {
-      /** @var \Drupal\package_manager\PackageManagerUpdateProcessor $update_processor */
+      /** @var PackageManagerUpdateProcessor $update_processor */
       $update_processor = \Drupal::service(PackageManagerUpdateProcessor::class);
       if ($project_data = $update_processor->getProjectData($this->name)) {
         $available_projects[$this->name] = $project_data;

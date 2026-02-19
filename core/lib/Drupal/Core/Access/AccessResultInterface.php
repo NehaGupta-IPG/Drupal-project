@@ -6,7 +6,7 @@ namespace Drupal\Core\Access;
  * Interface for access result value objects.
  *
  * IMPORTANT NOTE: You have to call isAllowed() when you want to know whether
- * someone has access. Just using
+ * someone has access. Just using.
  * @code
  * if ($access_result) {
  *   // The user has access!
@@ -74,7 +74,7 @@ interface AccessResultInterface {
    * F |F F F
    * @endcode
    *
-   * @param \Drupal\Core\Access\AccessResultInterface $other
+   * @param AccessResultInterface $other
    *   The other access result to OR this one with.
    *
    * @return static
@@ -98,7 +98,7 @@ interface AccessResultInterface {
    * F |F F F
    * @endcode
    *
-   * @param \Drupal\Core\Access\AccessResultInterface $other
+   * @param AccessResultInterface $other
    *   The other access result to AND this one with.
    *
    * @return static

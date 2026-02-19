@@ -52,7 +52,7 @@ class UploadedFileConstraintValidatorTest extends KernelTestBase {
   /**
    * A validator.
    *
-   * @var \Symfony\Component\Validator\Validator\ValidatorInterface
+   * @var ValidatorInterface
    */
   private ValidatorInterface $validator;
 

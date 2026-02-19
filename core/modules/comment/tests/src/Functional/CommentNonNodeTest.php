@@ -58,7 +58,7 @@ class CommentNonNodeTest extends BrowserTestBase {
   /**
    * The entity to use within tests.
    *
-   * @var \Drupal\entity_test\Entity\EntityTest
+   * @var EntityTest
    */
   protected $entity;
 
@@ -117,7 +117,7 @@ class CommentNonNodeTest extends BrowserTestBase {
   /**
    * Posts a comment.
    *
-   * @param \Drupal\Core\Entity\EntityInterface|null $entity
+   * @param EntityInterface|null $entity
    *   Entity to post comment on or NULL to post to the previously loaded page.
    * @param string $comment
    *   Comment body.
@@ -127,7 +127,7 @@ class CommentNonNodeTest extends BrowserTestBase {
    *   Set to NULL for no contact info, TRUE to ignore success checking, and
    *   array of values to set contact info.
    *
-   * @return \Drupal\comment\CommentInterface
+   * @return CommentInterface
    *   The new comment entity.
    */
   public function postComment(?EntityInterface $entity, $comment, $subject = '', $contact = NULL) {
@@ -195,7 +195,7 @@ class CommentNonNodeTest extends BrowserTestBase {
   /**
    * Checks current page for specified comment.
    *
-   * @param \Drupal\comment\CommentInterface $comment
+   * @param CommentInterface $comment
    *   The comment object.
    * @param bool $reply
    *   Boolean indicating whether the comment is a reply to another comment.
@@ -297,7 +297,7 @@ class CommentNonNodeTest extends BrowserTestBase {
     $this->assertSession()->elementTextEquals('xpath', '//nav[@aria-labelledby="system-breadcrumb"]/ol/li[last()]/a', $this->entity->label());
 
     // Post a comment.
-    /** @var \Drupal\comment\CommentInterface $comment1 */
+    /** @var CommentInterface $comment1 */
     $comment1 = $this->postComment($this->entity, $this->randomMachineName(), $this->randomMachineName());
     $this->assertTrue($this->commentExists($comment1), 'Comment on test entity exists.');
 

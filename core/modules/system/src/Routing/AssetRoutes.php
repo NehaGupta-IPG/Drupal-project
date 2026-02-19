@@ -15,7 +15,7 @@ class AssetRoutes implements ContainerInjectionInterface {
   /**
    * Constructs an asset routes object.
    *
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $streamWrapperManager
+   * @param StreamWrapperManagerInterface $streamWrapperManager
    *   The stream wrapper manager service.
    */
   public function __construct(
@@ -34,7 +34,7 @@ class AssetRoutes implements ContainerInjectionInterface {
   /**
    * Returns an array of route objects.
    *
-   * @return \Symfony\Component\Routing\Route[]
+   * @return Route[]
    *   An array of route objects.
    */
   public function routes(): array {

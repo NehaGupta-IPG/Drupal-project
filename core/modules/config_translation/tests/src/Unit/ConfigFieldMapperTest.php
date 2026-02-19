@@ -19,28 +19,28 @@ class ConfigFieldMapperTest extends UnitTestCase {
   /**
    * The configuration field mapper to test.
    *
-   * @var \Drupal\config_translation\ConfigFieldMapper
+   * @var ConfigFieldMapper
    */
   protected $configFieldMapper;
 
   /**
    * The field config instance used for testing.
    *
-   * @var \Drupal\field\FieldConfigInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\field\FieldConfigInterface|MockObject
    */
   protected $entity;
 
   /**
    * The entity type manager used for testing.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|MockObject
    */
   protected $entityTypeManager;
 
   /**
    * The mocked event dispatcher.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|MockObject
    */
   protected $eventDispatcher;
 

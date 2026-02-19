@@ -11,7 +11,7 @@ use Drupal\Core\Url;
  *
  * Form elements are a subset of render elements, representing elements for
  * HTML forms, which can be referenced in form arrays. See the
- * @link theme_render Render API topic @endlink for an overview of render
+ * @link @endlink for an overview of render
  * arrays and render elements, and the @link form_api Form API topic @endlink
  * for an overview of forms and form arrays.
  *
@@ -111,7 +111,7 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
    * @param array $element
    *   An associative array containing the properties and children of the
    *   generic input element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array $complete_form
    *   The complete form structure.
@@ -136,7 +136,7 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
    * @param array $element
    *   An associative array containing the properties and children of the
    *   generic form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array $complete_form
    *   The complete form structure.
@@ -183,7 +183,7 @@ abstract class FormElementBase extends RenderElementBase implements FormElementI
    *     conjunction with the route name.
    *   - #autocomplete_query_parameters: The parameters to be used in
    *     query string.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array $complete_form
    *   The complete form structure.

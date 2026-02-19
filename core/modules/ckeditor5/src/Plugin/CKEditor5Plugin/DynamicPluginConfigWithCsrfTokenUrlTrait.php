@@ -34,7 +34,7 @@ trait DynamicPluginConfigWithCsrfTokenUrlTrait {
   /**
    * Gets the given URL with all placeholders replaced.
    *
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   A URL which generates CSRF token placeholders.
    *
    * @return string

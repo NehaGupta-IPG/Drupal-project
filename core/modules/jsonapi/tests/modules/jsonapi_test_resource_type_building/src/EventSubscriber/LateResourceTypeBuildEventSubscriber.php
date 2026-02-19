@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\jsonapi_test_resource_type_building\EventSubscriber;
 
-use Drupal\jsonapi\ResourceType\ResourceTypeBuildEvents;
 use Drupal\jsonapi\ResourceType\ResourceTypeBuildEvent;
+use Drupal\jsonapi\ResourceType\ResourceTypeBuildEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -29,7 +29,7 @@ class LateResourceTypeBuildEventSubscriber implements EventSubscriberInterface {
   /**
    * Disables any resource type fields that have been aliased by a test.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeBuildEvent $event
+   * @param ResourceTypeBuildEvent $event
    *   The build event.
    */
   public function enableResourceTypeFields(ResourceTypeBuildEvent $event): void {

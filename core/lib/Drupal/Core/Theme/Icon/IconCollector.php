@@ -16,11 +16,11 @@ class IconCollector extends CacheCollector {
   /**
    * Constructs a IconCollector instance.
    *
-   * @param \Drupal\Core\Theme\Icon\IconExtractorPluginManager $iconPackExtractorManager
+   * @param IconExtractorPluginManager $iconPackExtractorManager
    *   The icon plugin extractor service.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The cache backend.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
+   * @param LockBackendInterface $lock
    *   The lock backend.
    */
   public function __construct(
@@ -74,7 +74,7 @@ class IconCollector extends CacheCollector {
    * @param array $definitions
    *   The icon pack definitions.
    *
-   * @return \Drupal\Core\Theme\Icon\IconDefinitionInterface|null
+   * @return IconDefinitionInterface|null
    *   The icon loaded.
    */
   private function getIconFromExtractor(string $icon_full_id, array $definitions): ?IconDefinitionInterface {
@@ -98,7 +98,7 @@ class IconCollector extends CacheCollector {
     // Clean to data to reduce the array passed to createInstance().
     unset($definition['icons']);
 
-    /** @var \Drupal\Core\Theme\Icon\IconExtractorInterface $extractor */
+    /** @var IconExtractorInterface $extractor */
     $extractor = $this->iconPackExtractorManager->createInstance($definition['extractor'], $definition);
     return $extractor->loadIcon($icon_definition);
   }

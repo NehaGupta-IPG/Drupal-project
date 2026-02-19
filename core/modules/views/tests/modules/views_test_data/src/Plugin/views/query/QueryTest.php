@@ -7,8 +7,8 @@ namespace Drupal\views_test_data\Plugin\views\query;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsQuery;
-use Drupal\views\Plugin\views\query\QueryPluginBase;
 use Drupal\views\Plugin\views\join\JoinPluginBase;
+use Drupal\views\Plugin\views\query\QueryPluginBase;
 use Drupal\views\ResultRow;
 use Drupal\views\ViewExecutable;
 
@@ -120,7 +120,7 @@ class QueryTest extends QueryPluginBase {
   /**
    * Implements Drupal\views\Plugin\views\query\QueryPluginBase::build().
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view executable.
    */
   public function build(ViewExecutable $view) {

@@ -73,7 +73,7 @@ class Select extends Query implements SelectInterface {
   /**
    * The conditional object for the HAVING clause.
    *
-   * @var \Drupal\Core\Database\Query\Condition
+   * @var Condition
    */
   protected $having;
 
@@ -132,9 +132,9 @@ class Select extends Query implements SelectInterface {
   /**
    * Constructs a Select object.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   Database connection object.
-   * @param string|\Drupal\Core\Database\Query\SelectInterface $table
+   * @param string|SelectInterface $table
    *   The table name or subquery that is being queried.
    * @param string $alias
    *   The alias for the table.
@@ -734,7 +734,7 @@ class Select extends Query implements SelectInterface {
   /**
    * Prepares a count query from the current query object.
    *
-   * @return \Drupal\Core\Database\Query\Select
+   * @return Select
    *   A new query object ready to have COUNT(*) performed on it.
    */
   protected function prepareCountQuery() {

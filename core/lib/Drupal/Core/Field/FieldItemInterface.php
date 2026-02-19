@@ -57,7 +57,7 @@ interface FieldItemInterface extends ComplexDataInterface {
    *
    * Computed fields having no schema should return an empty array.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $field_definition
+   * @param FieldStorageDefinitionInterface $field_definition
    *   The field definition.
    *
    * @return array
@@ -85,7 +85,7 @@ interface FieldItemInterface extends ComplexDataInterface {
    *     specify another field as related, only existing SQL tables,
    *     such as {taxonomy_term_data}.
    *
-   * @throws \Drupal\Core\Field\FieldException
+   * @throws FieldException
    *   Throws an exception if the schema is invalid.
    */
   public static function schema(FieldStorageDefinitionInterface $field_definition);
@@ -109,7 +109,7 @@ interface FieldItemInterface extends ComplexDataInterface {
   /**
    * Gets the field definition.
    *
-   * @return \Drupal\Core\Field\FieldDefinitionInterface
+   * @return FieldDefinitionInterface
    *   The field definition.
    */
   public function getFieldDefinition();
@@ -238,7 +238,7 @@ interface FieldItemInterface extends ComplexDataInterface {
    * Useful when populating site with placeholder content during site building
    * or profiling.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition.
    *
    * @return array
@@ -278,7 +278,7 @@ interface FieldItemInterface extends ComplexDataInterface {
    * case of a reference field, the configured target entity type is a crucial
    * piece of information for understanding how the field can be used.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field storage definition.
    *
    * @return array
@@ -294,7 +294,7 @@ interface FieldItemInterface extends ComplexDataInterface {
    * a reference field, the selected target entity bundles are a crucial
    * piece of information for understanding how the field can be used.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field entity.
    *
    * @return array
@@ -403,7 +403,7 @@ interface FieldItemInterface extends ComplexDataInterface {
    *
    * @param array $form
    *   The form where the settings form is being included in.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state of the (entire) configuration form.
    * @param bool $has_data
    *   TRUE if the field already has data, FALSE if not.
@@ -421,7 +421,7 @@ interface FieldItemInterface extends ComplexDataInterface {
    *
    * @param array $form
    *   The form where the settings form is being included in.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state of the (entire) configuration form.
    *
    * @return array
@@ -437,7 +437,7 @@ interface FieldItemInterface extends ComplexDataInterface {
    * type's default value is a content entity, this method should return an
    * array of dependencies listing the content entities.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition.
    *
    * @return array
@@ -470,7 +470,7 @@ interface FieldItemInterface extends ComplexDataInterface {
    * configuration and are always considered hard dependencies. If the
    * dependency is removed the field storage configuration must be deleted.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $field_storage_definition
+   * @param FieldStorageDefinitionInterface $field_storage_definition
    *   The field storage definition.
    *
    * @return array
@@ -493,7 +493,7 @@ interface FieldItemInterface extends ComplexDataInterface {
   /**
    * Informs the plugin that a dependency of the field will be deleted.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition.
    * @param array $dependencies
    *   An array of dependencies that will be deleted keyed by dependency type.

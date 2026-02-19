@@ -6,12 +6,12 @@ use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\migrate\MigrateException;
+use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\MigrateLookupInterface;
 use Drupal\migrate\MigrateSkipRowException;
 use Drupal\migrate\MigrateStubInterface;
-use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Plugin\MigrationInterface;
-use Drupal\migrate\MigrateExecutableInterface;
+use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -128,21 +128,21 @@ class MigrationLookup extends ProcessPluginBase implements ContainerFactoryPlugi
   /**
    * The migration to be executed.
    *
-   * @var \Drupal\migrate\Plugin\MigrationInterface
+   * @var MigrationInterface
    */
   protected $migration;
 
   /**
    * The migrate lookup service.
    *
-   * @var \Drupal\migrate\MigrateLookupInterface
+   * @var MigrateLookupInterface
    */
   protected $migrateLookup;
 
   /**
    * The migrate stub service.
    *
-   * @var \Drupal\migrate\MigrateStubInterface
+   * @var MigrateStubInterface
    */
   protected $migrateStub;
 
@@ -155,11 +155,11 @@ class MigrationLookup extends ProcessPluginBase implements ContainerFactoryPlugi
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The Migration the plugin is being used in.
-   * @param \Drupal\migrate\MigrateLookupInterface $migrate_lookup
+   * @param MigrateLookupInterface $migrate_lookup
    *   The migrate lookup service.
-   * @param \Drupal\migrate\MigrateStubInterface $migrate_stub
+   * @param MigrateStubInterface $migrate_stub
    *   The migrate stub service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, MigrateLookupInterface $migrate_lookup, MigrateStubInterface $migrate_stub) {
@@ -186,7 +186,7 @@ class MigrationLookup extends ProcessPluginBase implements ContainerFactoryPlugi
   /**
    * {@inheritdoc}
    *
-   * @throws \Drupal\migrate\MigrateException
+   * @throws MigrateException
    */
   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
     $lookup_migration_ids = (array) $this->configuration['migration'];

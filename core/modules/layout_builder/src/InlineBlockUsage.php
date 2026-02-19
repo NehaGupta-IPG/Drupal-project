@@ -13,14 +13,14 @@ class InlineBlockUsage implements InlineBlockUsageInterface {
   /**
    * The database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $database;
 
   /**
    * Creates an InlineBlockUsage object.
    *
-   * @param \Drupal\Core\Database\Connection $database
+   * @param Connection $database
    *   The database connection.
    */
   public function __construct(Connection $database) {

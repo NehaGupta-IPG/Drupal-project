@@ -165,7 +165,7 @@ class OverriddenConfigurationTest extends SettingsTrayTestBase {
   /**
    * Asserts that an overridden block has Settings Tray disabled.
    *
-   * @param \Drupal\block\Entity\Block $overridden_block
+   * @param Block $overridden_block
    *   The overridden block.
    * @param string $override_text
    *   The override text that should appear in the block.

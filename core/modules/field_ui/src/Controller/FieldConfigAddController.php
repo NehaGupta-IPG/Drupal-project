@@ -19,7 +19,7 @@ final class FieldConfigAddController extends ControllerBase {
   /**
    * FieldConfigAddController constructor.
    *
-   * @param \Drupal\Core\TempStore\PrivateTempStore $tempStore
+   * @param PrivateTempStore $tempStore
    *   The private tempstore.
    */
   public function __construct(

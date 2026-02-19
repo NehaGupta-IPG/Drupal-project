@@ -29,21 +29,21 @@ class NodeQueryAlterTest extends NodeTestBase {
   /**
    * User with permission to view content.
    *
-   * @var \Drupal\user\Entity\User|false
+   * @var User|false
    */
   protected $accessUser;
 
   /**
    * User without permission to view content.
    *
-   * @var \Drupal\user\Entity\User|false
+   * @var User|false
    */
   protected $noAccessUser;
 
   /**
    * User without permission to view content.
    *
-   * @var \Drupal\user\Entity\User
+   * @var User
    */
   protected User $noAccessUser2;
 

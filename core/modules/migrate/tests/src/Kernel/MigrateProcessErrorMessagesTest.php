@@ -34,21 +34,21 @@ class MigrateProcessErrorMessagesTest extends MigrateTestBase {
   /**
    * A mock Process Plugin Manager.
    *
-   * @var \Prophecy\Prophecy\ObjectProphecy
+   * @var ObjectProphecy
    */
   protected ObjectProphecy $processPluginManager;
 
   /**
    * A mock ID Map Plugin Manager.
    *
-   * @var \Prophecy\Prophecy\ObjectProphecy
+   * @var ObjectProphecy
    */
   protected ObjectProphecy $idMapPluginManager;
 
   /**
    * A mock ID Map.
    *
-   * @var \Prophecy\Prophecy\ObjectProphecy
+   * @var ObjectProphecy
    */
   protected ObjectProphecy $idMap;
 
@@ -105,7 +105,7 @@ class MigrateProcessErrorMessagesTest extends MigrateTestBase {
     $this->idMap->saveMessage(['id' => 1], "process_errors_migration:error:test_error: Process exception.", MigrationInterface::MESSAGE_ERROR)->shouldBeCalled();
     $this->setPluginManagers();
 
-    /** @var \Drupal\migrate\Plugin\MigrationInterface $migration */
+    /** @var MigrationInterface $migration */
     $migration = \Drupal::service('plugin.manager.migration')->createStubMigration($this->definition);
 
     $executable = new MigrateExecutable($migration, $this);
@@ -138,7 +138,7 @@ class MigrateProcessErrorMessagesTest extends MigrateTestBase {
     $this->idMap->saveMessage(['id' => 1], "process_errors_migration:subprocess_error:sub_process: test_error: Process exception.", MigrationInterface::MESSAGE_ERROR)->shouldBeCalled();
     $this->setPluginManagers();
 
-    /** @var \Drupal\migrate\Plugin\MigrationInterface $migration */
+    /** @var MigrationInterface $migration */
     $migration = \Drupal::service('plugin.manager.migration')->createStubMigration($this->definition);
 
     $executable = new MigrateExecutable($migration, $this);

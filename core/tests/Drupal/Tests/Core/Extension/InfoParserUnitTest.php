@@ -28,7 +28,7 @@ class InfoParserUnitTest extends UnitTestCase {
   /**
    * The InfoParser object.
    *
-   * @var \Drupal\Core\Extension\InfoParser
+   * @var InfoParser
    */
   protected $infoParser;
 

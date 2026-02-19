@@ -32,7 +32,7 @@ class SettingsTrayTest extends BrowserTestBase {
   /**
    * Gets the block CSS selector.
    *
-   * @param \Drupal\block\Entity\Block $block
+   * @param Block $block
    *   The block.
    *
    * @return string

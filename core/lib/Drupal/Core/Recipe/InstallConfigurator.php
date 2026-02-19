@@ -38,9 +38,9 @@ final class InstallConfigurator {
   /**
    * @param string[] $extensions
    *   A list of extensions for a recipe to install.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $module_list
+   * @param ModuleExtensionList $module_list
    *   The module list service.
-   * @param \Drupal\Core\Extension\ThemeExtensionList $theme_list
+   * @param ThemeExtensionList $theme_list
    *   The theme list service.
    */
   public function __construct(array $extensions, ModuleExtensionList $module_list, ThemeExtensionList $theme_list) {

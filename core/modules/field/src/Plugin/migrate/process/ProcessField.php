@@ -49,14 +49,14 @@ class ProcessField extends ProcessPluginBase implements ContainerFactoryPluginIn
   /**
    * The field plugin manager.
    *
-   * @var \Drupal\migrate_drupal\Plugin\MigrateFieldPluginManagerInterface
+   * @var MigrateFieldPluginManagerInterface
    */
   protected $fieldPluginManager;
 
   /**
    * The migration being run.
    *
-   * @var \Drupal\migrate\Plugin\MigrationInterface
+   * @var MigrationInterface
    */
   protected $migration;
 
@@ -69,9 +69,9 @@ class ProcessField extends ProcessPluginBase implements ContainerFactoryPluginIn
    *   The plugin ID.
    * @param mixed $plugin_definition
    *   The plugin definition.
-   * @param \Drupal\migrate_drupal\Plugin\MigrateFieldPluginManagerInterface $field_plugin_manager
+   * @param MigrateFieldPluginManagerInterface $field_plugin_manager
    *   The field plugin manager.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration being run.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrateFieldPluginManagerInterface $field_plugin_manager, ?MigrationInterface $migration = NULL) {
@@ -119,13 +119,13 @@ class ProcessField extends ProcessPluginBase implements ContainerFactoryPluginIn
   /**
    * Instantiate a field plugin and call a method on it.
    *
-   * @param \Drupal\migrate_drupal\Plugin\MigrateFieldPluginManagerInterface $field_plugin_manager
+   * @param MigrateFieldPluginManagerInterface $field_plugin_manager
    *   The field plugin manager.
    * @param string $field_type
    *   The field type for which to get the field plugin.
    * @param string $method
    *   The method to call on the field plugin.
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The row from the source to process.
    *
    * @return mixed

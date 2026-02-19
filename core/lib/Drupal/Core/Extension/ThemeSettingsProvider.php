@@ -57,7 +57,7 @@ class ThemeSettingsProvider {
     $cid = 'theme_settings:' . $theme;
     $cacheItem = $this->memoryCache->get($cid);
     if ($cacheItem) {
-      /** @var \Drupal\Core\Theme\ThemeSettings $themeSettings */
+      /** @var ThemeSettings $themeSettings */
       $themeSettings = $cacheItem->data;
     }
     else {

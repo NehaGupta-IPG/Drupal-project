@@ -2,17 +2,17 @@
 
 namespace Drupal\views\Entity;
 
-use Drupal\Core\Entity\Attribute\ConfigEntityType;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Plugin\DependentWithRemovalPluginInterface;
-use Drupal\views\Views;
 use Drupal\views\ViewEntityInterface;
+use Drupal\views\Views;
 
 /**
  * Defines a View configuration entity class.
@@ -313,7 +313,7 @@ class View extends ConfigEntityBase implements ViewEntityInterface {
    * the view's configuration. This allows Views to determine very efficiently:
    * - the max-age
    * - the cache contexts
-   * - the cache tags
+   * - the cache tags.
    *
    * In other words: this allows us to do the (expensive) work of initializing
    * Views plugins and handlers to determine their effect on the cacheability of
@@ -405,7 +405,7 @@ class View extends ConfigEntityBase implements ViewEntityInterface {
     parent::preDelete($storage, $entities);
 
     // Call the remove() hook on the individual displays.
-    /** @var \Drupal\views\ViewEntityInterface $entity */
+    /** @var ViewEntityInterface $entity */
     foreach ($entities as $entity) {
       $executable = Views::executableFactory()->get($entity);
       foreach ($entity->get('display') as $display_id => $display) {

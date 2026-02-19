@@ -27,7 +27,7 @@ class ContentTranslationManageAccessCheckTest extends UnitTestCase {
   /**
    * The cache contexts manager.
    *
-   * @var \Drupal\Core\Cache\Context\CacheContextsManager|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Cache\Context\CacheContextsManager|MockObject
    */
   protected $cacheContextsManager;
 

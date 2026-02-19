@@ -85,7 +85,7 @@ abstract class ViewsFormBase extends FormBase implements ViewsFormInterface {
    * {@inheritdoc}
    */
   public function getForm(ViewEntityInterface $view, $display_id, $js) {
-    /** @var \Drupal\Core\Form\FormStateInterface $form_state */
+    /** @var FormStateInterface $form_state */
     $form_state = $this->getFormState($view, $display_id, $js);
     $view = $form_state->get('view');
     $form_key = $form_state->get('form_key');
@@ -191,14 +191,14 @@ abstract class ViewsFormBase extends FormBase implements ViewsFormInterface {
    * handle some AJAX stuff automatically.
    * This makes some assumptions about the client.
    *
-   * @param \Drupal\Core\Form\FormInterface|string $form_class
+   * @param FormInterface|string $form_class
    *   The value must be one of the following:
    *   - The name of a class that implements \Drupal\Core\Form\FormInterface.
    *   - An instance of a class that implements \Drupal\Core\Form\FormInterface.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse|string|array
+   * @return AjaxResponse|string|array
    *   Returns one of three possible values:
    *   - A \Drupal\Core\Ajax\AjaxResponse object.
    *   - The rendered form, as a string.

@@ -38,42 +38,42 @@ class EntityTypeManagerTest extends UnitTestCase {
   /**
    * The entity type manager under test.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManager
+   * @var EntityTypeManager
    */
   protected $entityTypeManager;
 
   /**
    * The translation manager.
    *
-   * @var \Drupal\Core\StringTranslation\TranslationInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var TranslationInterface|ProphecyInterface
    */
   protected $translationManager;
 
   /**
    * The plugin discovery.
    *
-   * @var \Drupal\Component\Plugin\Discovery\DiscoveryInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var DiscoveryInterface|ProphecyInterface
    */
   protected $discovery;
 
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var ModuleHandlerInterface|ProphecyInterface
    */
   protected $moduleHandler;
 
   /**
    * The cache backend.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var CacheBackendInterface|ProphecyInterface
    */
   protected $cacheBackend;
 
   /**
    * The entity last installed schema repository.
    *
-   * @var \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var EntityLastInstalledSchemaRepositoryInterface|ProphecyInterface
    */
   protected $entityLastInstalledSchemaRepository;
 
@@ -98,7 +98,7 @@ class EntityTypeManagerTest extends UnitTestCase {
   /**
    * Sets up the entity type manager to be tested.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface[]|\Prophecy\Prophecy\ProphecyInterface[] $definitions
+   * @param EntityTypeInterface[]|ProphecyInterface[] $definitions
    *   (optional) An array of entity type definitions.
    */
   protected function setUpEntityTypeDefinitions($definitions = []): void {
@@ -446,7 +446,7 @@ class TestEntityTypeManager extends EntityTypeManager {
   /**
    * Sets the discovery for the manager.
    *
-   * @param \Drupal\Component\Plugin\Discovery\DiscoveryInterface $discovery
+   * @param DiscoveryInterface $discovery
    *   The discovery object.
    */
   public function setDiscovery(DiscoveryInterface $discovery): void {

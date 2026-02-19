@@ -2,7 +2,6 @@
 
 namespace Drupal\migrate\Plugin\migrate\process;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Attribute\MigrateProcess;
@@ -10,6 +9,7 @@ use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Sets the destination route information based on the source link_path.
@@ -63,7 +63,7 @@ class Route extends ProcessPluginBase implements ContainerFactoryPluginInterface
   /**
    * The path validator service.
    *
-   * @var \Drupal\Core\Path\PathValidatorInterface
+   * @var PathValidatorInterface
    */
   protected $pathValidator;
 

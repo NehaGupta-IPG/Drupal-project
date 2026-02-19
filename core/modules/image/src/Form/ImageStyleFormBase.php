@@ -22,14 +22,14 @@ abstract class ImageStyleFormBase extends EntityForm {
   /**
    * The image style entity storage.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var EntityStorageInterface
    */
   protected $imageStyleStorage;
 
   /**
    * Constructs a base class for image style add and edit forms.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $image_style_storage
+   * @param EntityStorageInterface $image_style_storage
    *   The image style entity storage.
    */
   public function __construct(EntityStorageInterface $image_style_storage) {

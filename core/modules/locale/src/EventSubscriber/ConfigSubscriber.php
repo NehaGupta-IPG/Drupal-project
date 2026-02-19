@@ -2,9 +2,9 @@
 
 namespace Drupal\locale\EventSubscriber;
 
-use Drupal\Core\DrupalKernel;
 use Drupal\Core\Config\ConfigCrudEvent;
 use Drupal\Core\Config\ConfigEvents;
+use Drupal\Core\DrupalKernel;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -19,7 +19,7 @@ class ConfigSubscriber implements EventSubscriberInterface {
   /**
    * Causes the container to be rebuilt on the next request if necessary.
    *
-   * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   * @param ConfigCrudEvent $event
    *   The configuration event.
    */
   public function onConfigSave(ConfigCrudEvent $event): void {

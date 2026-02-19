@@ -71,7 +71,7 @@ class WorkspaceQueryParameterNegotiatorTest extends KernelTestBase {
     $request->query->set('workspace', $workspace);
     $request->query->set('token', $token);
 
-    /** @var \Drupal\workspaces\Negotiator\QueryParameterWorkspaceNegotiator $negotiator */
+    /** @var QueryParameterWorkspaceNegotiator $negotiator */
     $negotiator = $this->container->get('workspaces.negotiator.query_parameter');
 
     $this->assertSame($negotiated_workspace, $negotiator->getActiveWorkspaceId($request));

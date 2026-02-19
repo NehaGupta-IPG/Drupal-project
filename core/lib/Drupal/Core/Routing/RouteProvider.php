@@ -5,6 +5,7 @@ namespace Drupal\Core\Routing;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
@@ -16,7 +17,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Alias;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\RouteCollection;
-use Drupal\Core\Database\Connection;
 
 // cspell:ignore filesort
 
@@ -28,7 +28,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
   /**
    * The database connection from which to read route information.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
@@ -42,7 +42,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
   /**
    * The state.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
@@ -63,35 +63,35 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
   /**
    * The current path.
    *
-   * @var \Drupal\Core\Path\CurrentPathStack
+   * @var CurrentPathStack
    */
   protected $currentPath;
 
   /**
    * The cache backend.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $cache;
 
   /**
    * The cache tag invalidator.
    *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface
+   * @var CacheTagsInvalidatorInterface
    */
   protected $cacheTagInvalidator;
 
   /**
    * A path processor manager for resolving the system path.
    *
-   * @var \Drupal\Core\PathProcessor\InboundPathProcessorInterface
+   * @var InboundPathProcessorInterface
    */
   protected $pathProcessor;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
@@ -110,22 +110,22 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
   /**
    * Constructs a new PathMatcher.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   A database connection object.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state.
-   * @param \Drupal\Core\Path\CurrentPathStack $current_path
+   * @param CurrentPathStack $current_path
    *   The current path.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param CacheBackendInterface $cache_backend
    *   The cache backend.
-   * @param \Drupal\Core\PathProcessor\InboundPathProcessorInterface $path_processor
+   * @param InboundPathProcessorInterface $path_processor
    *   The path processor.
-   * @param \Drupal\Core\Cache\CacheTagsInvalidatorInterface $cache_tag_invalidator
+   * @param CacheTagsInvalidatorInterface $cache_tag_invalidator
    *   The cache tag invalidator.
    * @param string $table
    *   (Optional) The table in the database to use for matching. Defaults to
    *   'router'.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   (Optional) The language manager.
    */
   public function __construct(Connection $connection, StateInterface $state, CurrentPathStack $current_path, CacheBackendInterface $cache_backend, InboundPathProcessorInterface $path_processor, CacheTagsInvalidatorInterface $cache_tag_invalidator, $table = 'router', ?LanguageManagerInterface $language_manager = NULL) {
@@ -156,7 +156,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    * very large route sets to be filtered down to likely candidates, which
    * may then be filtered in memory more completely.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   A request against which to match.
    *
    * @return \Symfony\Component\Routing\RouteCollection
@@ -205,7 +205,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    * @return \Symfony\Component\Routing\Route
    *   The found route.
    *
-   * @throws \Symfony\Component\Routing\Exception\RouteNotFoundException
+   * @throws RouteNotFoundException
    *   Thrown if there is no route with that name in this repository.
    */
   public function getRouteByName($name) {
@@ -458,7 +458,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
   /**
    * Returns the cache ID for the route collection cache.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    *
    * @return string
@@ -491,7 +491,7 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
    * both the query string from the client and the parameter bag after incoming
    * route processors have modified the request object.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   Request.
    *
    * @return string

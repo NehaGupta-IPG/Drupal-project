@@ -39,7 +39,7 @@ class MediaRevisionTest extends MediaFunctionalTestBase {
    * @param string $title
    *   Title of media item.
    *
-   * @return \Drupal\media\Entity\Media
+   * @return Media
    *   A media item.
    */
   protected function createMedia(string $title): Media {
@@ -81,7 +81,7 @@ class MediaRevisionTest extends MediaFunctionalTestBase {
 
     // Test permissions.
     $this->drupalLogin($this->nonAdminUser);
-    /** @var \Drupal\user\RoleInterface $role */
+    /** @var RoleInterface $role */
     $role = Role::load(RoleInterface::AUTHENTICATED_ID);
 
     // Test 'view all media revisions' permission ('view media' permission is
@@ -197,10 +197,10 @@ class MediaRevisionTest extends MediaFunctionalTestBase {
   /**
    * Creates a new revision for a given media item.
    *
-   * @param \Drupal\media\MediaInterface $media
+   * @param MediaInterface $media
    *   A media object.
    *
-   * @return \Drupal\media\MediaInterface
+   * @return MediaInterface
    *   A media object with up to date revision information.
    */
   protected function createMediaRevision(MediaInterface $media) {
@@ -213,7 +213,7 @@ class MediaRevisionTest extends MediaFunctionalTestBase {
   /**
    * Asserts that an entity has a certain number of revisions.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity in question.
    * @param int $expected_revisions
    *   The expected number of revisions.
@@ -239,7 +239,7 @@ class MediaRevisionTest extends MediaFunctionalTestBase {
   /**
    * Creates a media with a revision.
    *
-   * @param \Drupal\media\Entity\Media $media
+   * @param Media $media
    *   The media object.
    */
   private function createMediaWithRevision(Media $media): void {

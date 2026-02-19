@@ -25,14 +25,14 @@ class HttpExceptionNormalizer extends NormalizerBase {
   /**
    * The current user making the request.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
   /**
    * HttpExceptionNormalizer constructor.
    *
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
    */
   public function __construct(AccountInterface $current_user) {
@@ -67,7 +67,7 @@ class HttpExceptionNormalizer extends NormalizerBase {
   /**
    * Builds the normalized JSON:API error objects for the response.
    *
-   * @param \Symfony\Component\HttpKernel\Exception\HttpException $exception
+   * @param HttpException $exception
    *   The Exception.
    *
    * @return array

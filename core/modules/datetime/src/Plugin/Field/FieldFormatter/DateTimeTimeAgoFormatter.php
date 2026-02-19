@@ -41,7 +41,7 @@ class DateTimeTimeAgoFormatter extends TimestampAgoFormatter {
   /**
    * Formats a date/time as a time interval.
    *
-   * @param \Drupal\Core\Datetime\DrupalDateTime|object $date
+   * @param DrupalDateTime|object $date
    *   A date/time object.
    *
    * @return array

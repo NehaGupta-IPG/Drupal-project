@@ -108,7 +108,7 @@ class CacheTagTest extends ViewTestBase {
   /**
    * Gets the render cache for a given view.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view.
    *
    * @return array|false

@@ -38,14 +38,14 @@ class EntityContextDefinitionIsSatisfiedTest extends UnitTestCase {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity type bundle info.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @var EntityTypeBundleInfoInterface
    */
   protected $entityTypeBundleInfo;
 
@@ -90,9 +90,9 @@ class EntityContextDefinitionIsSatisfiedTest extends UnitTestCase {
    *
    * @param bool $expected
    *   The expected outcome.
-   * @param \Drupal\Core\Plugin\Context\ContextDefinition $requirement
+   * @param ContextDefinition $requirement
    *   The requirement to check against.
-   * @param \Drupal\Core\Plugin\Context\ContextDefinition $definition
+   * @param ContextDefinition $definition
    *   The context definition to check.
    * @param mixed $value
    *   (optional) The value to set on the context, defaults to NULL.

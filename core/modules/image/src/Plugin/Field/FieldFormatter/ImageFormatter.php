@@ -2,19 +2,19 @@
 
 namespace Drupal\image\Plugin\Field\FieldFormatter;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\Attribute\FieldFormatter;
-use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\image\Entity\ImageStyle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Cache\Cache;
 
 /**
  * Plugin implementation of the 'image' formatter.
@@ -31,7 +31,7 @@ class ImageFormatter extends ImageFormatterBase {
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
@@ -45,7 +45,7 @@ class ImageFormatter extends ImageFormatterBase {
   /**
    * The file URL generator.
    *
-   * @var \Drupal\Core\File\FileUrlGeneratorInterface
+   * @var FileUrlGeneratorInterface
    */
   protected $fileUrlGenerator;
 
@@ -56,7 +56,7 @@ class ImageFormatter extends ImageFormatterBase {
    *   The plugin ID for the formatter.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The definition of the field to which the formatter is associated.
    * @param array $settings
    *   The formatter settings.
@@ -66,11 +66,11 @@ class ImageFormatter extends ImageFormatterBase {
    *   The view mode.
    * @param array $third_party_settings
    *   Any third party settings.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $image_style_storage
+   * @param EntityStorageInterface $image_style_storage
    *   The image style storage.
-   * @param \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator
+   * @param FileUrlGeneratorInterface $file_url_generator
    *   The file URL generator.
    */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, AccountInterface $current_user, EntityStorageInterface $image_style_storage, FileUrlGeneratorInterface $file_url_generator) {

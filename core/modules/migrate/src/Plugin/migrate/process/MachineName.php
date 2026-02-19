@@ -6,9 +6,9 @@ use Drupal\Component\Transliteration\TransliterationInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Attribute\MigrateProcess;
-use Drupal\migrate\ProcessPluginBase;
-use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\MigrateException;
+use Drupal\migrate\MigrateExecutableInterface;
+use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -65,7 +65,7 @@ class MachineName extends ProcessPluginBase implements ContainerFactoryPluginInt
   /**
    * The transliteration service.
    *
-   * @var \Drupal\Component\Transliteration\TransliterationInterface
+   * @var TransliterationInterface
    */
   protected $transliteration;
 
@@ -85,7 +85,7 @@ class MachineName extends ProcessPluginBase implements ContainerFactoryPluginInt
    *   The plugin ID.
    * @param mixed $plugin_definition
    *   The plugin definition.
-   * @param \Drupal\Component\Transliteration\TransliterationInterface $transliteration
+   * @param TransliterationInterface $transliteration
    *   The transliteration service.
    */
   public function __construct(

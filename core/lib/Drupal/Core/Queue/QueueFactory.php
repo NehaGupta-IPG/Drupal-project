@@ -21,16 +21,16 @@ class QueueFactory {
   /**
    * The settings object.
    *
-   * @var \Drupal\Core\Site\Settings
+   * @var Settings
    */
   protected $settings;
 
   /**
    * Constructs QueueFactory object.
    *
-   * @param \Drupal\Core\Site\Settings $settings
+   * @param Settings $settings
    *   The site settings.
-   * @param \Psr\Container\ContainerInterface $container
+   * @param ContainerInterface $container
    *   A service locator that contains the queue services.
    */
   public function __construct(
@@ -51,7 +51,7 @@ class QueueFactory {
    *   executes at least once is important, FALSE if scalability is the main
    *   concern. Defaults to FALSE.
    *
-   * @return \Drupal\Core\Queue\QueueInterface
+   * @return QueueInterface
    *   A queue implementation for the given name.
    */
   public function get($name, $reliable = FALSE) {

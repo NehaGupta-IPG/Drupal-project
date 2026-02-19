@@ -26,7 +26,7 @@ class MigrationPluginManagerTest extends MigrateTestBase {
   /**
    * The migration plugin manager.
    *
-   * @var \Drupal\migrate\Plugin\MigrationPluginManager
+   * @var MigrationPluginManager
    */
   protected $migrationPluginManager;
 

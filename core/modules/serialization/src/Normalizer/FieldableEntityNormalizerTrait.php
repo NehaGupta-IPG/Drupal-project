@@ -60,13 +60,13 @@ trait FieldableEntityNormalizerTrait {
    * @param string $entity_type_id
    *   The entity type ID to load the definition for.
    *
-   * @return \Drupal\Core\Entity\EntityTypeInterface
+   * @return EntityTypeInterface
    *   The loaded entity type definition.
    *
-   * @throws \Symfony\Component\Serializer\Exception\UnexpectedValueException
+   * @throws UnexpectedValueException
    */
   protected function getEntityTypeDefinition($entity_type_id) {
-    /** @var \Drupal\Core\Entity\EntityTypeInterface $entity_type_definition */
+    /** @var EntityTypeInterface $entity_type_definition */
     // Get the entity type definition.
     $entity_type_definition = $this->getEntityTypeManager()->getDefinition($entity_type_id, FALSE);
 
@@ -83,10 +83,10 @@ trait FieldableEntityNormalizerTrait {
    *
    * @param array $data
    *   The data being denormalized. The bundle information will be removed.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type_definition
+   * @param EntityTypeInterface $entity_type_definition
    *   The entity type definition.
    *
-   * @throws \Symfony\Component\Serializer\Exception\UnexpectedValueException
+   * @throws UnexpectedValueException
    *   If the bundle value is invalid or the bundle type is ineligible.
    *
    * @return array
@@ -128,7 +128,7 @@ trait FieldableEntityNormalizerTrait {
    *
    * @param array $data
    *   The data to denormalize.
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The fieldable entity to set field values for.
    * @param string $format
    *   The serialization format.

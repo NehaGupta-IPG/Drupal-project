@@ -75,7 +75,7 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
    * definition in places where a full field definition is required; e.g., with
    * widgets or formatters.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $definition
+   * @param FieldStorageDefinitionInterface $definition
    *   The field storage definition to base the new field definition upon.
    *
    * @return $this

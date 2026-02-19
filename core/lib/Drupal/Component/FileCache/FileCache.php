@@ -31,7 +31,7 @@ class FileCache implements FileCacheInterface {
   /**
    * The cache backend backing this FileCache object.
    *
-   * @var \Drupal\Component\FileCache\FileCacheBackendInterface
+   * @var FileCacheBackendInterface
    */
   protected $cache;
 

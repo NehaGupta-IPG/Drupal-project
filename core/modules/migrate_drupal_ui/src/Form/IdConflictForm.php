@@ -81,7 +81,7 @@ class IdConflictForm extends MigrateUpgradeFormBase {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\migrate\Audit\AuditResult[] $conflicts
+   * @param AuditResult[] $conflicts
    *   The failing audit results.
    *
    * @return array
@@ -112,7 +112,7 @@ class IdConflictForm extends MigrateUpgradeFormBase {
    * failed the audit, keyed by the destination plugin ID in order to prevent
    * duplication.
    *
-   * @param \Drupal\migrate\Audit\AuditResult[] $conflicts
+   * @param AuditResult[] $conflicts
    *   The failing audit results.
    *
    * @return string[]
@@ -136,7 +136,7 @@ class IdConflictForm extends MigrateUpgradeFormBase {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\migrate\Audit\AuditResult[] $conflicts
+   * @param AuditResult[] $conflicts
    *   The failing audit results.
    *
    * @return array

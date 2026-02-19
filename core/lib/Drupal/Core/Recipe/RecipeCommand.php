@@ -155,7 +155,7 @@ final class RecipeCommand extends Command {
   /**
    * Rolls config back to a particular checkpoint.
    *
-   * @param \Drupal\Core\Config\Checkpoint\Checkpoint $checkpoint
+   * @param Checkpoint $checkpoint
    *   The checkpoint to roll back to.
    */
   private function rollBackToCheckpoint(Checkpoint $checkpoint): void {

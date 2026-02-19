@@ -13,7 +13,7 @@ interface WorkspaceInformationInterface {
   /**
    * Determines whether an entity can belong to a workspace.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to check.
    *
    * @return bool
@@ -24,7 +24,7 @@ interface WorkspaceInformationInterface {
   /**
    * Determines whether an entity type can belong to a workspace.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type to check.
    *
    * @return bool
@@ -35,7 +35,7 @@ interface WorkspaceInformationInterface {
   /**
    * Returns an array of entity types that can belong to workspaces.
    *
-   * @return \Drupal\Core\Entity\EntityTypeInterface[]
+   * @return EntityTypeInterface[]
    *   An array of entity type definition objects.
    */
   public function getSupportedEntityTypes(): array;
@@ -46,7 +46,7 @@ interface WorkspaceInformationInterface {
    * CRUD operations for an ignored entity are allowed in a workspace, but their
    * revisions are not tracked.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to check.
    *
    * @return bool
@@ -61,7 +61,7 @@ interface WorkspaceInformationInterface {
    * CRUD operations for an ignored entity type are allowed in a workspace, but
    * their revisions are not tracked.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type to check.
    *
    * @return bool
@@ -73,9 +73,9 @@ interface WorkspaceInformationInterface {
   /**
    * Determines whether an entity can be deleted in the given workspace.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity object which needs to be checked.
-   * @param \Drupal\workspaces\WorkspaceInterface $workspace
+   * @param WorkspaceInterface $workspace
    *   The workspace in which the entity needs to be checked.
    *
    * @return bool

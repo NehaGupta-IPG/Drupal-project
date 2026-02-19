@@ -104,7 +104,7 @@ class ConfigEntityImportTest extends KernelTestBase {
     // Create a test filter format with a known label.
     $name = 'filter.format.plain_text';
 
-    /** @var \Drupal\filter\Entity\FilterFormat $entity */
+    /** @var FilterFormat $entity */
     $entity = FilterFormat::load('plain_text');
     $plugin_collection = $entity->getPluginCollections()['filters'];
 
@@ -136,7 +136,7 @@ class ConfigEntityImportTest extends KernelTestBase {
     // Create a test image style with a known label.
     $name = 'image.style.thumbnail';
 
-    /** @var \Drupal\image\Entity\ImageStyle $entity */
+    /** @var ImageStyle $entity */
     $entity = ImageStyle::load('thumbnail');
     $plugin_collection = $entity->getPluginCollections()['effects'];
 
@@ -219,7 +219,7 @@ class ConfigEntityImportTest extends KernelTestBase {
   /**
    * Tests that a single set of plugin config stays in sync.
    *
-   * @param \Drupal\Core\Entity\EntityWithPluginCollectionInterface $entity
+   * @param EntityWithPluginCollectionInterface $entity
    *   The entity.
    * @param string $config_key
    *   Where the plugin config is stored.

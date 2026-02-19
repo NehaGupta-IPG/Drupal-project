@@ -13,7 +13,7 @@ class CacheFactory implements CacheFactoryInterface {
   /**
    * The site settings.
    *
-   * @var \Drupal\Core\Site\Settings
+   * @var Settings
    */
   protected $settings;
 
@@ -56,7 +56,7 @@ class CacheFactory implements CacheFactoryInterface {
   /**
    * Constructs CacheFactory object.
    *
-   * @param \Drupal\Core\Site\Settings $settings
+   * @param Settings $settings
    *   The site settings.
    * @param array $default_bin_backends
    *   (optional) A mapping of bin to backend service name. Mappings in
@@ -83,7 +83,7 @@ class CacheFactory implements CacheFactoryInterface {
    * @param string $bin
    *   The cache bin for which a cache backend object should be returned.
    *
-   * @return \Drupal\Core\Cache\CacheBackendInterface
+   * @return CacheBackendInterface
    *   The cache backend object associated with the specified bin.
    */
   public function get($bin) {

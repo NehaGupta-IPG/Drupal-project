@@ -47,14 +47,14 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
   /**
    * The config factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * Constructs a new FinalExceptionSubscriber.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The configuration factory.
    */
   public function __construct(ConfigFactoryInterface $config_factory) {
@@ -77,7 +77,7 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
   /**
    * Handles exceptions for this subscriber.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   * @param ExceptionEvent $event
    *   The event to process.
    */
   public function onException(ExceptionEvent $event) {
@@ -148,7 +148,7 @@ class FinalExceptionSubscriber implements EventSubscriberInterface {
    * For example, we catch 406s and 403s generated when handling unsupported
    * formats.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   * @param ExceptionEvent $event
    *   The event to process.
    */
   public function on4xx(ExceptionEvent $event) {

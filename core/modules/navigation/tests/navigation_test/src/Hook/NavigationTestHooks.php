@@ -16,7 +16,7 @@ class NavigationTestHooks {
   /**
    * NavigationTestHooks constructor.
    *
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state service.
    */
   public function __construct(

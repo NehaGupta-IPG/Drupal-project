@@ -28,13 +28,13 @@ class FieldTypePluginManager extends DefaultPluginManager implements FieldTypePl
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param CacheBackendInterface $cache_backend
    *   Cache backend instance to use.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typedDataManager
+   * @param TypedDataManagerInterface $typedDataManager
    *   The typed data manager.
-   * @param \Drupal\Core\Field\FieldTypeCategoryManagerInterface $fieldTypeCategoryManager
+   * @param FieldTypeCategoryManagerInterface $fieldTypeCategoryManager
    *   The field type category plugin manager.
    */
   public function __construct(
@@ -69,7 +69,7 @@ class FieldTypePluginManager extends DefaultPluginManager implements FieldTypePl
    *   - field_definition: The field definition object, i.e. an instance of
    *     Drupal\Core\Field\FieldDefinitionInterface.
    *
-   * @return \Drupal\Core\Field\FieldItemInterface
+   * @return FieldItemInterface
    *   The instantiated object.
    */
   public function createInstance($field_type, array $configuration = []) {

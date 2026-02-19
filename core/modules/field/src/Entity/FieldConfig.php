@@ -3,15 +3,15 @@
 namespace Drupal\field\Entity;
 
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\FieldableEntityStorageInterface;
 use Drupal\Core\Field\FieldConfigBase;
 use Drupal\Core\Field\FieldException;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\field\FieldConfigAccessControlHandler;
+use Drupal\field\FieldConfigInterface;
 use Drupal\field\FieldConfigStorage;
 use Drupal\field\FieldStorageConfigInterface;
-use Drupal\field\FieldConfigInterface;
 
 /**
  * Defines the Field entity.
@@ -82,7 +82,7 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
   /**
    * The associated FieldStorageConfig entity.
    *
-   * @var \Drupal\field\Entity\FieldStorageConfig
+   * @var FieldStorageConfig
    */
   protected $fieldStorage;
 
@@ -159,9 +159,9 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
   /**
    * Overrides \Drupal\Core\Entity\EntityBase::preSave().
    *
-   * @throws \Drupal\Core\Field\FieldException
+   * @throws FieldException
    *   If the field definition is invalid.
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   In case of failures at the configuration storage level.
    */
   public function preSave(EntityStorageInterface $storage) {
@@ -219,7 +219,7 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
 
     // Keep the field definitions in the deleted fields repository so we can use
     // them later during field_purge_batch().
-    /** @var \Drupal\field\FieldConfigInterface $field */
+    /** @var FieldConfigInterface $field */
     foreach ($fields as $field) {
       // Only mark a field for purging if there is data. Otherwise, just remove
       // it.
@@ -374,7 +374,7 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
    * @param string $field_name
    *   Name of the field.
    *
-   * @return \Drupal\field\FieldConfigInterface|null
+   * @return FieldConfigInterface|null
    *   The field config entity if one exists for the provided field
    *   name, otherwise NULL.
    */

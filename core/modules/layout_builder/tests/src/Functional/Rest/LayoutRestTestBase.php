@@ -136,7 +136,7 @@ abstract class LayoutRestTestBase extends ResourceTestBase {
   /**
    * Gets the decoded contents.
    *
-   * @param \Psr\Http\Message\ResponseInterface $response
+   * @param ResponseInterface $response
    *   The response.
    *
    * @return array

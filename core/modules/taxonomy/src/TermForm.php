@@ -19,7 +19,7 @@ class TermForm extends ContentEntityForm {
   public function form(array $form, FormStateInterface $form_state) {
     $term = $this->entity;
     $vocab_storage = $this->entityTypeManager->getStorage('taxonomy_vocabulary');
-    /** @var \Drupal\taxonomy\TermStorageInterface $taxonomy_storage */
+    /** @var TermStorageInterface $taxonomy_storage */
     $taxonomy_storage = $this->entityTypeManager->getStorage('taxonomy_term');
     $vocabulary = $vocab_storage->load($term->bundle());
 
@@ -127,7 +127,7 @@ class TermForm extends ContentEntityForm {
    *
    * @param array[] $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function overview(array $form, FormStateInterface $form_state): void {
@@ -230,7 +230,7 @@ class TermForm extends ContentEntityForm {
   /**
    * Returns term parent IDs, including the root.
    *
-   * @param \Drupal\taxonomy\TermInterface $term
+   * @param TermInterface $term
    *   The taxonomy term entity.
    *
    * @return array

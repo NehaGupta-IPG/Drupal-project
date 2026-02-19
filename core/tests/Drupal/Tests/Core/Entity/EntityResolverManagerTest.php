@@ -28,28 +28,28 @@ class EntityResolverManagerTest extends UnitTestCase {
   /**
    * The tested entity resolver manager.
    *
-   * @var \Drupal\Core\Entity\EntityResolverManager
+   * @var EntityResolverManager
    */
   protected $entityResolverManager;
 
   /**
    * The mocked entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|MockObject
    */
   protected $entityTypeManager;
 
   /**
    * The mocked class resolver.
    *
-   * @var \Drupal\Core\DependencyInjection\ClassResolverInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\DependencyInjection\ClassResolverInterface|MockObject
    */
   protected $classResolver;
 
   /**
    * The mocked dependency injection container.
    *
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Symfony\Component\DependencyInjection\ContainerInterface|MockObject
    */
   protected $container;
 

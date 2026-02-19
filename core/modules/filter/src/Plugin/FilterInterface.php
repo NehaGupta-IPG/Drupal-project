@@ -2,9 +2,9 @@
 
 namespace Drupal\filter\Plugin;
 
-use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\Component\Plugin\DependentPluginInterface;
+use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -131,7 +131,7 @@ interface FilterInterface extends ConfigurableInterface, DependentPluginInterfac
    *
    * @param array $form
    *   A minimally prepopulated form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The state of the (entire) configuration form.
    *
    * @return array

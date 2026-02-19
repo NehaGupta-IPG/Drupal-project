@@ -5,11 +5,11 @@ namespace Drupal\system\Form;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Datetime\TimeZoneFormHelper;
+use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\ConfigTarget;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\RedundantEditableConfigNamesTrait;
 use Drupal\Core\Locale\CountryManagerInterface;
-use Drupal\Core\Form\ConfigFormBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -23,18 +23,18 @@ class RegionalForm extends ConfigFormBase {
   /**
    * The country manager.
    *
-   * @var \Drupal\Core\Locale\CountryManagerInterface
+   * @var CountryManagerInterface
    */
   protected $countryManager;
 
   /**
    * Constructs a RegionalForm object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
+   * @param TypedConfigManagerInterface $typedConfigManager
    *   The typed config manager.
-   * @param \Drupal\Core\Locale\CountryManagerInterface $country_manager
+   * @param CountryManagerInterface $country_manager
    *   The country manager.
    */
   public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, CountryManagerInterface $country_manager) {

@@ -14,7 +14,7 @@ class ContentLength implements HttpKernelInterface {
   /**
    * Constructs a new ContentLength instance.
    *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
+   * @param HttpKernelInterface $httpKernel
    *   The wrapped HTTP kernel.
    */
   public function __construct(

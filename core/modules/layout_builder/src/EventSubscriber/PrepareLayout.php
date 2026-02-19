@@ -26,23 +26,23 @@ class PrepareLayout implements EventSubscriberInterface {
   /**
    * The layout tempstore repository.
    *
-   * @var \Drupal\layout_builder\LayoutTempstoreRepositoryInterface
+   * @var LayoutTempstoreRepositoryInterface
    */
   protected $layoutTempstoreRepository;
 
   /**
    * The messenger service.
    *
-   * @var \Drupal\Core\Messenger\MessengerInterface
+   * @var MessengerInterface
    */
   protected $messenger;
 
   /**
    * Constructs a new PrepareLayout.
    *
-   * @param \Drupal\layout_builder\LayoutTempstoreRepositoryInterface $layout_tempstore_repository
+   * @param LayoutTempstoreRepositoryInterface $layout_tempstore_repository
    *   The tempstore repository.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger service.
    */
   public function __construct(LayoutTempstoreRepositoryInterface $layout_tempstore_repository, MessengerInterface $messenger) {
@@ -61,7 +61,7 @@ class PrepareLayout implements EventSubscriberInterface {
   /**
    * Prepares a layout for use in the UI.
    *
-   * @param \Drupal\layout_builder\Event\PrepareLayoutEvent $event
+   * @param PrepareLayoutEvent $event
    *   The prepare layout event.
    */
   public function onPrepareLayout(PrepareLayoutEvent $event) {

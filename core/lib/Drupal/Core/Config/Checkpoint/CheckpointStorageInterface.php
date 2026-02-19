@@ -23,7 +23,7 @@ interface CheckpointStorageInterface extends StorageInterface {
    * @param string|\Stringable $label
    *   The checkpoint label to use if a new checkpoint is created.
    *
-   * @return \Drupal\Core\Config\Checkpoint\Checkpoint
+   * @return Checkpoint
    *   The currently active checkpoint.
    */
   public function checkpoint(string|\Stringable $label): Checkpoint;
@@ -35,12 +35,12 @@ interface CheckpointStorageInterface extends StorageInterface {
    * time of the checkpoint that was set here. If none is set, then the
    * configuration from the initial checkpoint will be returned.
    *
-   * @param string|\Drupal\Core\Config\Checkpoint\Checkpoint $checkpoint_id
+   * @param string|Checkpoint $checkpoint_id
    *   The checkpoint ID to read from.
    *
    * @return $this
    *
-   * @throws \Drupal\Core\Config\Checkpoint\UnknownCheckpointException
+   * @throws UnknownCheckpointException
    *   Thrown when the provided checkpoint does not exist.
    */
   public function setCheckpointToReadFrom(string|Checkpoint $checkpoint_id): static;

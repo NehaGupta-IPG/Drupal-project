@@ -16,7 +16,7 @@ interface TopLevelDataInterface {
   /**
    * Returns the data for the top-level data member of a JSON:API document.
    *
-   * @return \Drupal\jsonapi\JsonApiResource\Data
+   * @return Data
    *   The top-level data.
    */
   public function getData();
@@ -24,7 +24,7 @@ interface TopLevelDataInterface {
   /**
    * Returns the data that was omitted from the JSON:API document.
    *
-   * @return \Drupal\jsonapi\JsonApiResource\OmittedData
+   * @return OmittedData
    *   The omitted data.
    */
   public function getOmissions();
@@ -32,10 +32,10 @@ interface TopLevelDataInterface {
   /**
    * Merges the object's links with the top-level links.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\LinkCollection $top_level_links
+   * @param LinkCollection $top_level_links
    *   The top-level links to merge.
    *
-   * @return \Drupal\jsonapi\JsonApiResource\LinkCollection
+   * @return LinkCollection
    *   The merged links.
    */
   public function getMergedLinks(LinkCollection $top_level_links);

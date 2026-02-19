@@ -16,7 +16,7 @@ interface MigrateDumpAlterInterface {
   /**
    * Allows tests to alter dumps after they have loaded.
    *
-   * @param \Drupal\KernelTests\KernelTestBase $test
+   * @param KernelTestBase $test
    *   The test that is being run.
    */
   public static function migrateDumpAlter(KernelTestBase $test);

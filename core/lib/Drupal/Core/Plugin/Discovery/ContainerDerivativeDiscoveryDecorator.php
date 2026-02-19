@@ -21,7 +21,7 @@ class ContainerDerivativeDiscoveryDecorator extends DerivativeDiscoveryDecorator
       if ($class) {
         // If the deriver provides a factory method, pass the container to it.
         if (is_subclass_of($class, '\Drupal\Core\Plugin\Discovery\ContainerDeriverInterface')) {
-          /** @var \Drupal\Core\Plugin\Discovery\ContainerDeriverInterface $class */
+          /** @var ContainerDeriverInterface $class */
           $this->derivers[$base_plugin_id] = $class::create(\Drupal::getContainer(), $base_plugin_id);
         }
         else {

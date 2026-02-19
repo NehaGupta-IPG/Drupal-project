@@ -10,7 +10,7 @@ class ListDataDefinition extends DataDefinition implements ListDataDefinitionInt
   /**
    * The data definition of a list item.
    *
-   * @var \Drupal\Core\TypedData\DataDefinitionInterface
+   * @var DataDefinitionInterface
    */
   protected $itemDefinition;
 
@@ -96,7 +96,7 @@ class ListDataDefinition extends DataDefinition implements ListDataDefinitionInt
   /**
    * Sets the item definition.
    *
-   * @param \Drupal\Core\TypedData\DataDefinitionInterface $definition
+   * @param DataDefinitionInterface $definition
    *   A list item's data definition.
    *
    * @return $this

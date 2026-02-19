@@ -115,7 +115,7 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
     $project_root = $this->container->get(PathLocator::class)
       ->getProjectRoot();
 
-    /** @var \Drupal\package_manager\ComposerInspector $inspector */
+    /** @var ComposerInspector $inspector */
     $inspector = $this->container->get(ComposerInspector::class);
     $list = $inspector->getInstalledPackagesList($project_root);
 
@@ -180,7 +180,7 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
       ->shouldBeCalledOnce();
 
     $project_root = $this->container->get(PathLocator::class)->getProjectRoot();
-    /** @var \Drupal\package_manager\ComposerInspector $inspector */
+    /** @var ComposerInspector $inspector */
     $inspector = $this->container->get(ComposerInspector::class);
     try {
       $inspector->validate($project_root);
@@ -215,7 +215,7 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
     $file_path = $project_root . '/' . $filename;
     unlink($file_path);
 
-    /** @var \Drupal\package_manager\ComposerInspector $inspector */
+    /** @var ComposerInspector $inspector */
     $inspector = $this->container->get(ComposerInspector::class);
     try {
       $inspector->validate($project_root);
@@ -285,7 +285,7 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
 
     $project_root = $this->container->get(PathLocator::class)
       ->getProjectRoot();
-    /** @var \Drupal\package_manager\ComposerInspector $inspector */
+    /** @var ComposerInspector $inspector */
     $inspector = $this->container->get(ComposerInspector::class);
     try {
       $inspector->validate($project_root);
@@ -545,7 +545,7 @@ class ComposerInspectorTest extends PackageManagerKernelTestBase {
    * @param string|null $reported_version
    *   The version number that `composer --format=json` should return.
    *
-   * @return \Prophecy\Prophecy\ObjectProphecy<\PhpTuf\ComposerStager\API\Process\Service\ComposerProcessRunnerInterface>
+   * @return ObjectProphecy<ComposerProcessRunnerInterface>
    *   The configurator for the mocked Composer runner.
    */
   private function mockComposerRunner(?string $reported_version): ObjectProphecy {

@@ -19,7 +19,7 @@ class LruMemoryCache extends MemoryCache {
   /**
    * Constructs an LruMemoryCache object.
    *
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    * @param int $allowedSlots
    *   The number of slots to allocate for items in the cache.

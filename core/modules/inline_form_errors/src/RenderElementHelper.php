@@ -29,7 +29,7 @@ class RenderElementHelper {
    *   An associative array containing the properties and children of the
    *   element. Note that $element must be taken by reference here, so processed
    *   child elements are taken over into $form_state.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array $complete_form
    *   The complete form structure.

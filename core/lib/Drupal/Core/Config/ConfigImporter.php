@@ -2,15 +2,15 @@
 
 namespace Drupal\Core\Config;
 
+use Drupal\Core\Config\Entity\ImportableEntityStorageInterface;
 use Drupal\Core\Config\Importer\MissingContentEvent;
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Extension\ThemeHandlerInterface;
-use Drupal\Core\Config\Entity\ImportableEntityStorageInterface;
-use Drupal\Core\DependencyInjection\DependencySerializationTrait;
-use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -48,35 +48,35 @@ class ConfigImporter {
   /**
    * The storage comparer used to discover configuration changes.
    *
-   * @var \Drupal\Core\Config\StorageComparerInterface
+   * @var StorageComparerInterface
    */
   protected $storageComparer;
 
   /**
    * The event dispatcher used to notify subscribers.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+   * @var EventDispatcherInterface
    */
   protected $eventDispatcher;
 
   /**
    * The configuration manager.
    *
-   * @var \Drupal\Core\Config\ConfigManagerInterface
+   * @var ConfigManagerInterface
    */
   protected $configManager;
 
   /**
    * The used lock backend instance.
    *
-   * @var \Drupal\Core\Lock\LockBackendInterface
+   * @var LockBackendInterface
    */
   protected $lock;
 
   /**
    * The typed config manager.
    *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface
+   * @var TypedConfigManagerInterface
    */
   protected $typedConfigManager;
 
@@ -111,14 +111,14 @@ class ConfigImporter {
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The theme handler.
    *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
+   * @var ThemeHandlerInterface
    */
   protected $themeHandler;
 
@@ -157,50 +157,50 @@ class ConfigImporter {
   /**
    * The module installer.
    *
-   * @var \Drupal\Core\Extension\ModuleInstallerInterface
+   * @var ModuleInstallerInterface
    */
   protected $moduleInstaller;
 
   /**
    * The module extension list.
    *
-   * @var \Drupal\Core\Extension\ModuleExtensionList
+   * @var ModuleExtensionList
    */
   protected $moduleExtensionList;
 
   /**
    * The theme extension list.
    *
-   * @var \Drupal\Core\Extension\ThemeExtensionList
+   * @var ThemeExtensionList
    */
   protected $themeExtensionList;
 
   /**
    * Constructs a configuration import object.
    *
-   * @param \Drupal\Core\Config\StorageComparerInterface $storage_comparer
+   * @param StorageComparerInterface $storage_comparer
    *   A storage comparer object used to determine configuration changes and
    *   access the source and target storage objects.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param EventDispatcherInterface $event_dispatcher
    *   The event dispatcher used to notify subscribers of config import events.
-   * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
+   * @param ConfigManagerInterface $config_manager
    *   The configuration manager.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
+   * @param LockBackendInterface $lock
    *   The lock backend to ensure multiple imports do not occur at the same
    *   time.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
+   * @param TypedConfigManagerInterface $typed_config
    *   The typed configuration manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Extension\ModuleInstallerInterface $module_installer
+   * @param ModuleInstallerInterface $module_installer
    *   The module installer.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param ThemeHandlerInterface $theme_handler
    *   The theme handler.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param TranslationInterface $string_translation
    *   The string translation service.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $extension_list_module
+   * @param ModuleExtensionList $extension_list_module
    *   The module extension list.
-   * @param \Drupal\Core\Extension\ThemeExtensionList $extension_list_theme
+   * @param ThemeExtensionList $extension_list_theme
    *   The theme extension list.
    */
   public function __construct(StorageComparerInterface $storage_comparer, EventDispatcherInterface $event_dispatcher, ConfigManagerInterface $config_manager, LockBackendInterface $lock, TypedConfigManagerInterface $typed_config, ModuleHandlerInterface $module_handler, ModuleInstallerInterface $module_installer, ThemeHandlerInterface $theme_handler, TranslationInterface $string_translation, ModuleExtensionList $extension_list_module, ThemeExtensionList $extension_list_theme) {
@@ -244,7 +244,7 @@ class ConfigImporter {
   /**
    * Gets the configuration storage comparer.
    *
-   * @return \Drupal\Core\Config\StorageComparerInterface
+   * @return StorageComparerInterface
    *   Storage comparer object used to calculate configuration changes.
    */
   public function getStorageComparer() {
@@ -530,7 +530,7 @@ class ConfigImporter {
    * @return $this
    *   The ConfigImporter instance.
    *
-   * @throws \Drupal\Core\Config\ConfigException
+   * @throws ConfigException
    */
   public function import() {
     if ($this->hasUnprocessedConfigurationChanges()) {
@@ -586,7 +586,7 @@ class ConfigImporter {
    *   that are invoked to complete the import. If there are modules or themes
    *   to process then an extra step is added.
    *
-   * @throws \Drupal\Core\Config\ConfigImporterException
+   * @throws ConfigImporterException
    *   If the configuration is already importing.
    */
   public function initialize() {
@@ -812,7 +812,7 @@ class ConfigImporter {
    * Events should throw a \Drupal\Core\Config\ConfigImporterException to
    * prevent an import from occurring.
    *
-   * @throws \Drupal\Core\Config\ConfigImporterException
+   * @throws ConfigImporterException
    *   Exception thrown if the validate event logged any errors.
    */
   public function validate() {
@@ -948,7 +948,7 @@ class ConfigImporter {
    * @return bool
    *   TRUE is to continue processing, FALSE otherwise.
    *
-   * @throws \Drupal\Core\Config\ConfigImporterException
+   * @throws ConfigImporterException
    */
   protected function checkOp($collection, $op, $name) {
     if ($op == 'rename') {
@@ -1063,7 +1063,7 @@ class ConfigImporter {
    *   TRUE if the configuration was imported as a configuration entity. FALSE
    *   otherwise.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   Thrown if the data is owned by an entity type, but the entity storage
    *   does not support imports.
    */
@@ -1113,7 +1113,7 @@ class ConfigImporter {
    *   TRUE if the configuration was imported as a configuration entity. FALSE
    *   otherwise.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   Thrown if the data is owned by an entity type, but the entity storage
    *   does not support imports.
    *

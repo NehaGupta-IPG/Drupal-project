@@ -22,7 +22,7 @@ interface FieldItemDataDefinitionInterface extends ComplexDataDefinitionInterfac
   /**
    * Sets the field item's field definition.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The new field definition to assign to this item definition.
    *
    * @return static

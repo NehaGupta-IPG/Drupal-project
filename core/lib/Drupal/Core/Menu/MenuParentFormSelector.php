@@ -2,8 +2,8 @@
 
 namespace Drupal\Core\Menu;
 
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
@@ -19,25 +19,25 @@ class MenuParentFormSelector implements MenuParentFormSelectorInterface {
   /**
    * The menu link tree service.
    *
-   * @var \Drupal\Core\Menu\MenuLinkTreeInterface
+   * @var MenuLinkTreeInterface
    */
   protected $menuLinkTree;
 
   /**
    * The entity type manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * Constructs a \Drupal\Core\Menu\MenuParentFormSelector.
    *
-   * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menu_link_tree
+   * @param MenuLinkTreeInterface $menu_link_tree
    *   The menu link tree service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param TranslationInterface $string_translation
    *   The string translation service.
    */
   public function __construct(MenuLinkTreeInterface $menu_link_tree, EntityTypeManagerInterface $entity_type_manager, TranslationInterface $string_translation) {
@@ -123,7 +123,7 @@ class MenuParentFormSelector implements MenuParentFormSelectorInterface {
   /**
    * Iterates over all items in the tree to prepare the parents select options.
    *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
+   * @param MenuLinkTreeElement[] $tree
    *   The menu tree.
    * @param string $menu_name
    *   The menu name.
@@ -135,7 +135,7 @@ class MenuParentFormSelector implements MenuParentFormSelectorInterface {
    *   An excluded menu link.
    * @param int $depth_limit
    *   The maximum depth of menu links considered for the select options.
-   * @param \Drupal\Core\Cache\CacheableMetadata|null &$cacheability
+   * @param CacheableMetadata|null &$cacheability
    *   The object to add cacheability metadata to, if not NULL.
    */
   protected function parentSelectOptionsTreeWalk(array $tree, $menu_name, $indent, array &$options, $exclude, $depth_limit, ?CacheableMetadata &$cacheability = NULL) {

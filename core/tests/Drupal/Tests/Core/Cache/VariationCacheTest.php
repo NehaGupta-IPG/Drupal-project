@@ -28,21 +28,21 @@ class VariationCacheTest extends UnitTestCase {
   /**
    * The mock request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack|\Prophecy\Prophecy\ProphecyInterface
+   * @var RequestStack|ProphecyInterface
    */
   protected $requestStack;
 
   /**
    * The backend used by the variation cache.
    *
-   * @var \Drupal\Core\Cache\MemoryBackend
+   * @var MemoryBackend
    */
   protected $memoryBackend;
 
   /**
    * The mock cache contexts manager.
    *
-   * @var \Drupal\Core\Cache\Context\CacheContextsManager|\Prophecy\Prophecy\ProphecyInterface
+   * @var CacheContextsManager|ProphecyInterface
    */
   protected $cacheContextsManager;
 
@@ -79,7 +79,7 @@ class VariationCacheTest extends UnitTestCase {
   /**
    * The cacheability for something that only varies per housing type.
    *
-   * @var \Drupal\Core\Cache\CacheableMetadata
+   * @var CacheableMetadata
    */
   protected $housingTypeCacheability;
 
@@ -95,7 +95,7 @@ class VariationCacheTest extends UnitTestCase {
   /**
    * The cacheability for something that varies per housing and garden type.
    *
-   * @var \Drupal\Core\Cache\CacheableMetadata
+   * @var CacheableMetadata
    */
   protected $gardenTypeCacheability;
 
@@ -111,7 +111,7 @@ class VariationCacheTest extends UnitTestCase {
   /**
    * The cacheability for varying per housing, garden and orientation.
    *
-   * @var \Drupal\Core\Cache\CacheableMetadata
+   * @var CacheableMetadata
    */
   protected $houseOrientationCacheability;
 
@@ -631,9 +631,9 @@ class VariationCacheTest extends UnitTestCase {
    *
    * @param mixed $data
    *   The data that should be stored.
-   * @param \Drupal\Core\Cache\CacheableMetadata $cacheability
+   * @param CacheableMetadata $cacheability
    *   The cacheability that should be used.
-   * @param \Drupal\Core\Cache\CacheableMetadata $initial_cacheability
+   * @param CacheableMetadata $initial_cacheability
    *   The initial cacheability that should be used.
    */
   protected function setVariationCacheItem($data, CacheableMetadata $cacheability, CacheableMetadata $initial_cacheability): void {
@@ -645,9 +645,9 @@ class VariationCacheTest extends UnitTestCase {
    *
    * @param mixed $data
    *   The data that should have been stored.
-   * @param \Drupal\Core\Cache\CacheableMetadata $cacheability
+   * @param CacheableMetadata $cacheability
    *   The cacheability that should have been used.
-   * @param \Drupal\Core\Cache\CacheableMetadata $initial_cacheability
+   * @param CacheableMetadata $initial_cacheability
    *   The initial cacheability that should be used.
    */
   protected function assertVariationCacheItem($data, CacheableMetadata $cacheability, CacheableMetadata $initial_cacheability): void {
@@ -660,7 +660,7 @@ class VariationCacheTest extends UnitTestCase {
   /**
    * Asserts that an item could not be retrieved from the variation cache.
    *
-   * @param \Drupal\Core\Cache\CacheableMetadata $initial_cacheability
+   * @param CacheableMetadata $initial_cacheability
    *   The initial cacheability that should be used.
    */
   protected function assertVariationCacheMiss(CacheableMetadata $initial_cacheability): void {
@@ -674,7 +674,7 @@ class VariationCacheTest extends UnitTestCase {
    *   The cache ID that should have been used.
    * @param mixed $data
    *   The data that should have been stored.
-   * @param \Drupal\Core\Cache\CacheableMetadata|null $cacheability
+   * @param CacheableMetadata|null $cacheability
    *   (optional) The cacheability that should have been used. Does not apply
    *   when checking for cache redirects.
    */

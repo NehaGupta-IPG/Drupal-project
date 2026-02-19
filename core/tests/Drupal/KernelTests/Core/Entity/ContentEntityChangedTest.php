@@ -90,7 +90,7 @@ class ContentEntityChangedTest extends EntityKernelTestBase {
 
     $changed_en = $entity->getChangedTime();
 
-    /** @var \Drupal\entity_test\Entity\EntityTestMulRevChanged $german */
+    /** @var EntityTestMulRevChanged $german */
     $german = $entity->addTranslation('de');
 
     $entity->save();
@@ -299,7 +299,7 @@ class ContentEntityChangedTest extends EntityKernelTestBase {
 
     $changed_en = $entity->getChangedTime();
 
-    /** @var \Drupal\entity_test\Entity\EntityTestMulRevChanged $german */
+    /** @var EntityTestMulRevChanged $german */
     $german = $entity->addTranslation('de');
 
     $entity->save();
@@ -492,7 +492,7 @@ class ContentEntityChangedTest extends EntityKernelTestBase {
   /**
    * Retrieves the revision translation affected flag value.
    *
-   * @param \Drupal\entity_test\Entity\EntityTestMulRevChanged $entity
+   * @param EntityTestMulRevChanged $entity
    *   The entity object to be checked.
    *
    * @return bool

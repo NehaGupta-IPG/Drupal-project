@@ -210,7 +210,7 @@ class UserLoginTest extends BrowserTestBase {
   /**
    * Helper to test log in with a maximum length password.
    *
-   * @param \Drupal\user\UserInterface $account
+   * @param UserInterface $account
    *   An object containing the user account.
    * @param string $current_password
    *   The current password associated with the user.
@@ -280,7 +280,7 @@ class UserLoginTest extends BrowserTestBase {
   /**
    * Make an unsuccessful login attempt.
    *
-   * @param \Drupal\user\Entity\User $account
+   * @param User $account
    *   A user object with name and passRaw attributes for the login attempt.
    * @param string $flood_trigger
    *   (optional) Whether or not to expect that the flood control mechanism

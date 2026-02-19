@@ -70,7 +70,7 @@ class ContactStorageTest extends ContactSitewideTest {
     $this->assertSession()->pageTextContains('Your message has been sent.');
 
     $messages = Message::loadMultiple();
-    /** @var \Drupal\contact\Entity\Message $message */
+    /** @var Message $message */
     $message = reset($messages);
     $this->assertEquals($id, $message->getContactForm()->id());
     $this->assertTrue($message->getContactForm()->getThirdPartySetting('contact_storage_test', 'send_a_pony', FALSE));

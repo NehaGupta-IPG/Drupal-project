@@ -49,7 +49,7 @@ class TestSectionList implements SectionListInterface {
   /**
    * An array of sections.
    *
-   * @var \Drupal\layout_builder\Section[]
+   * @var Section[]
    */
   protected $sections;
 

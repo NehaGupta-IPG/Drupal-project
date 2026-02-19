@@ -103,9 +103,9 @@ class NodeDisplayConfigurableTest extends NodeTestBase {
   /**
    * Asserts that the node HTML is as expected.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   The node being tested.
-   * @param \Drupal\user\UserInterface $user
+   * @param UserInterface $user
    *   The author of the node.
    * @param bool $is_inline
    *   Whether the fields are rendered inline or not.

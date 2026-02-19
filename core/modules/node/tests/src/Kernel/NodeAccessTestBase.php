@@ -87,9 +87,9 @@ abstract class NodeAccessTestBase extends KernelTestBase {
    *   and account, with each key as the name of an operation (e.g. 'view',
    *   'delete') and each value a Boolean indicating whether access to that
    *   operation should be granted.
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   The node object to check.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user account for which to check access.
    *
    * @internal
@@ -108,7 +108,7 @@ abstract class NodeAccessTestBase extends KernelTestBase {
    *   The node bundle to check access to.
    * @param bool $result
    *   Whether access should be granted or not.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user account for which to check access.
    * @param string $langcode
    *   (optional) The language code indicating which translation of the node

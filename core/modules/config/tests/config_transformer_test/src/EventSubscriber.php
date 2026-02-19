@@ -23,32 +23,32 @@ class EventSubscriber implements EventSubscriberInterface {
   /**
    * The active config storage.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   protected $active;
 
   /**
    * The sync config storage.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   protected $sync;
 
   /**
    * The Drupal state.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
   /**
    * EventSubscriber constructor.
    *
-   * @param \Drupal\Core\Config\StorageInterface $active
+   * @param StorageInterface $active
    *   The active config storage.
-   * @param \Drupal\Core\Config\StorageInterface $sync
+   * @param StorageInterface $sync
    *   The sync config storage.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The Drupal state.
    */
   public function __construct(StorageInterface $active, StorageInterface $sync, StateInterface $state) {
@@ -65,7 +65,7 @@ class EventSubscriber implements EventSubscriberInterface {
    * so that there will always be something to import.
    * Do not do this outside of tests.
    *
-   * @param \Drupal\Core\Config\StorageTransformEvent $event
+   * @param StorageTransformEvent $event
    *   The config storage transform event.
    */
   public function onImportTransform(StorageTransformEvent $event) {
@@ -89,7 +89,7 @@ class EventSubscriber implements EventSubscriberInterface {
    * there will always be something new exported.
    * Do not do this outside of tests.
    *
-   * @param \Drupal\Core\Config\StorageTransformEvent $event
+   * @param StorageTransformEvent $event
    *   The config storage transform event.
    */
   public function onExportTransform(StorageTransformEvent $event) {

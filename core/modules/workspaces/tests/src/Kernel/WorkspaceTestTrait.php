@@ -172,7 +172,7 @@ trait WorkspaceTestTrait {
    * @param array $values
    *   An array of values for the entity.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The created entity.
    */
   protected function createEntity(string $entity_type_id, array $values = []): EntityInterface {

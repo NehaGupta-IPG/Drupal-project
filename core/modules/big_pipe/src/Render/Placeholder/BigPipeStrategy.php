@@ -68,32 +68,32 @@ class BigPipeStrategy implements PlaceholderStrategyInterface {
   /**
    * The session configuration.
    *
-   * @var \Drupal\Core\Session\SessionConfigurationInterface
+   * @var SessionConfigurationInterface
    */
   protected $sessionConfiguration;
 
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * The current route match.
    *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
+   * @var RouteMatchInterface
    */
   protected $routeMatch;
 
   /**
    * Constructs a new BigPipeStrategy class.
    *
-   * @param \Drupal\Core\Session\SessionConfigurationInterface $session_configuration
+   * @param SessionConfigurationInterface $session_configuration
    *   The session configuration.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   The request stack.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The current route match.
    */
   public function __construct(SessionConfigurationInterface $session_configuration, RequestStack $request_stack, RouteMatchInterface $route_match) {

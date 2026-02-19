@@ -3,11 +3,11 @@
 namespace Drupal\update\Hook;
 
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\update\UpdateManagerInterface;
-use Drupal\Core\Url;
-use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
+use Drupal\update\UpdateManagerInterface;
 
 /**
  * Hook implementations for update.

@@ -34,7 +34,7 @@ interface OrderInterface {
    *   is the class followed by "::" then the method name. For example,
    *   "Drupal\my_module\Hook\MyModuleHooks::methodName".
    *
-   * @return \Drupal\Core\Hook\OrderOperation\OrderOperation
+   * @return OrderOperation
    *   Order operation to apply to a hook implementation list.
    */
   public function getOperation(string $identifier): OrderOperation;

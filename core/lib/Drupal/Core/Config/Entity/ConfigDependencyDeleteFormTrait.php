@@ -31,9 +31,9 @@ trait ConfigDependencyDeleteFormTrait {
    *   The specific names to check. If $type equals 'module' or 'theme' then it
    *   should be a list of module names or theme names. In the case of 'config'
    *   or 'content' it should be a list of configuration dependency names.
-   * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
+   * @param ConfigManagerInterface $config_manager
    *   The config manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    *
    * @see \Drupal\Core\Config\ConfigManagerInterface::getConfigEntitiesToChangeOnDependencyRemoval()
@@ -52,7 +52,7 @@ trait ConfigDependencyDeleteFormTrait {
     ];
 
     foreach ($dependent_entities['update'] as $entity) {
-      /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface  $entity */
+      /** @var ConfigEntityInterface $entity */
       $entity_type_id = $entity->getEntityTypeId();
       if (!isset($form['entity_updates'][$entity_type_id])) {
         $entity_type = $entity_type_manager->getDefinition($entity_type_id);

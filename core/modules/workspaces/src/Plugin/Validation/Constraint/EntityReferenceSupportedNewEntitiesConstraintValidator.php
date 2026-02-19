@@ -18,21 +18,21 @@ class EntityReferenceSupportedNewEntitiesConstraintValidator extends ConstraintV
   /**
    * The workspace manager.
    *
-   * @var \Drupal\workspaces\WorkspaceManagerInterface
+   * @var WorkspaceManagerInterface
    */
   protected $workspaceManager;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The workspace information service.
    *
-   * @var \Drupal\workspaces\WorkspaceInformationInterface
+   * @var WorkspaceInformationInterface
    */
   protected $workspaceInfo;
 

@@ -17,7 +17,7 @@ trait AssertBreadcrumbTrait {
   /**
    * Assert that a given path shows certain breadcrumb links.
    *
-   * @param \Drupal\Core\Url|string|null $goto
+   * @param Url|string|null $goto
    *   (optional) A path or URL to pass to
    *   \Drupal\Tests\UiHelperTrait::drupalGet() otherwise a NULL value can be
    *   passed.

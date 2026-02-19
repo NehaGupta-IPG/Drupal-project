@@ -4,8 +4,8 @@ namespace Drupal\Core\Entity;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
-use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Config\Entity\Exception\ConfigEntityIdLengthException;
+use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\Exception\UndefinedLinkTemplateException;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageInterface;
@@ -79,7 +79,7 @@ abstract class EntityBase implements EntityInterface {
   /**
    * Gets the entity type manager.
    *
-   * @return \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @return EntityTypeManagerInterface
    *   The entity type manager.
    */
   protected function entityTypeManager() {
@@ -89,7 +89,7 @@ abstract class EntityBase implements EntityInterface {
   /**
    * Gets the entity type bundle info service.
    *
-   * @return \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @return EntityTypeBundleInfoInterface
    *   The entity type bundle info service.
    */
   protected function entityTypeBundleInfo() {
@@ -574,9 +574,9 @@ abstract class EntityBase implements EntityInterface {
   /**
    * Invalidates an entity's cache tags upon delete.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   * @param EntityInterface[] $entities
    *   An array of entities.
    */
   protected static function invalidateTagsOnDelete(EntityTypeInterface $entity_type, array $entities) {

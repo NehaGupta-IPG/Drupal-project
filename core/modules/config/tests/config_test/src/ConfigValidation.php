@@ -25,7 +25,7 @@ class ConfigValidation {
    *
    * @param string $string
    *   The string to validate.
-   * @param \Symfony\Component\Validator\Context\ExecutionContextInterface $context
+   * @param ExecutionContextInterface $context
    *   The validation execution context.
    */
   public static function validateLlama($string, ExecutionContextInterface $context) {
@@ -39,7 +39,7 @@ class ConfigValidation {
    *
    * @param string $string
    *   The string to validate.
-   * @param \Symfony\Component\Validator\Context\ExecutionContextInterface $context
+   * @param ExecutionContextInterface $context
    *   The validation execution context.
    */
   public static function validateCats($string, ExecutionContextInterface $context) {
@@ -54,7 +54,7 @@ class ConfigValidation {
    *
    * @param int $count
    *   The integer to validate.
-   * @param \Symfony\Component\Validator\Context\ExecutionContextInterface $context
+   * @param ExecutionContextInterface $context
    *   The validation execution context.
    */
   public static function validateCatCount($count, ExecutionContextInterface $context) {
@@ -69,7 +69,7 @@ class ConfigValidation {
    *
    * @param string $string
    *   The string to validate.
-   * @param \Symfony\Component\Validator\Context\ExecutionContextInterface $context
+   * @param ExecutionContextInterface $context
    *   The validation execution context.
    */
   public static function validateGiraffes($string, ExecutionContextInterface $context) {
@@ -83,7 +83,7 @@ class ConfigValidation {
    *
    * @param array $mapping
    *   The data to validate.
-   * @param \Symfony\Component\Validator\Context\ExecutionContextInterface $context
+   * @param ExecutionContextInterface $context
    *   The validation execution context.
    */
   public static function validateMapping($mapping, ExecutionContextInterface $context) {
@@ -102,7 +102,7 @@ class ConfigValidation {
    *
    * @param array $sequence
    *   The data to validate.
-   * @param \Symfony\Component\Validator\Context\ExecutionContextInterface $context
+   * @param ExecutionContextInterface $context
    *   The validation execution context.
    */
   public static function validateSequence($sequence, ExecutionContextInterface $context) {

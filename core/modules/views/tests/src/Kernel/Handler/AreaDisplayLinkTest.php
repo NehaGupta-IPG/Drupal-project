@@ -304,7 +304,7 @@ class AreaDisplayLinkTest extends ViewsKernelTestBase {
   /**
    * Assert the display options contains only path based displays.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view to check.
    * @param string $display_link_id
    *   The display link ID to check the options for.
@@ -325,7 +325,7 @@ class AreaDisplayLinkTest extends ViewsKernelTestBase {
   /**
    * Assert the display links are correctly rendered for a display.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view to check.
    * @param string $display_id
    *   The display ID to check the links for.
@@ -360,7 +360,7 @@ class AreaDisplayLinkTest extends ViewsKernelTestBase {
   /**
    * Render a display link.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view to render the link for.
    * @param string $display_link_id
    *   The display link ID to render.
@@ -378,7 +378,7 @@ class AreaDisplayLinkTest extends ViewsKernelTestBase {
   /**
    * Assert no warning messages are shown when all display are equal.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view to check.
    *
    * @internal
@@ -393,7 +393,7 @@ class AreaDisplayLinkTest extends ViewsKernelTestBase {
   /**
    * Assert the warning messages are shown after changing the page_1 display.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view to check.
    * @param array $unequal_options
    *   An array of options that should be unequal.

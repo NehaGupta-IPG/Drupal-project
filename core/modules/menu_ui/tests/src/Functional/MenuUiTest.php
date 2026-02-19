@@ -73,7 +73,7 @@ class MenuUiTest extends BrowserTestBase {
   /**
    * A test menu.
    *
-   * @var \Drupal\system\Entity\Menu
+   * @var Menu
    */
   protected $menu;
 
@@ -276,7 +276,7 @@ class MenuUiTest extends BrowserTestBase {
   /**
    * Creates a custom menu.
    *
-   * @return \Drupal\system\Entity\Menu
+   * @return Menu
    *   The custom menu that has been created.
    */
   public function addCustomMenu() {
@@ -774,7 +774,7 @@ class MenuUiTest extends BrowserTestBase {
    * @param string $weight
    *   Menu weight. Defaults to 0.
    *
-   * @return \Drupal\menu_link_content\Entity\MenuLinkContent
+   * @return MenuLinkContent
    *   A menu link entity.
    */
   public function addMenuLink($parent = '', $path = '/', $menu_name = 'tools', $expanded = FALSE, $weight = '0') {
@@ -878,11 +878,11 @@ class MenuUiTest extends BrowserTestBase {
   /**
    * Verifies a menu link using the UI.
    *
-   * @param \Drupal\menu_link_content\Entity\MenuLinkContent $item
+   * @param MenuLinkContent $item
    *   Menu link.
    * @param object $item_node
    *   Menu link content node.
-   * @param \Drupal\menu_link_content\Entity\MenuLinkContent $parent
+   * @param MenuLinkContent $parent
    *   Parent menu link.
    * @param object $parent_node
    *   Parent menu link content node.
@@ -917,7 +917,7 @@ class MenuUiTest extends BrowserTestBase {
   /**
    * Changes the parent of a menu link using the UI.
    *
-   * @param \Drupal\menu_link_content\Entity\MenuLinkContent $item
+   * @param MenuLinkContent $item
    *   The menu link item to move.
    * @param string $parent
    *   The id of the new parent.
@@ -938,7 +938,7 @@ class MenuUiTest extends BrowserTestBase {
   /**
    * Modifies a menu link using the UI.
    *
-   * @param \Drupal\menu_link_content\Entity\MenuLinkContent $item
+   * @param MenuLinkContent $item
    *   Menu link entity.
    */
   public function modifyMenuLink(MenuLinkContent $item): void {
@@ -962,7 +962,7 @@ class MenuUiTest extends BrowserTestBase {
   /**
    * Verifies that the "Add child" link selects the correct parent item.
    *
-   * @param \Drupal\menu_link_content\Entity\MenuLinkContent $item
+   * @param MenuLinkContent $item
    *   Menu link entity.
    */
   public function verifyAddChildLink(MenuLinkContent $item): void {
@@ -981,7 +981,7 @@ class MenuUiTest extends BrowserTestBase {
   /**
    * Resets a standard menu link using the UI.
    *
-   * @param \Drupal\Core\Menu\MenuLinkInterface $menu_link
+   * @param MenuLinkInterface $menu_link
    *   The Menu link.
    * @param int $old_weight
    *   Original title for menu link.
@@ -1001,7 +1001,7 @@ class MenuUiTest extends BrowserTestBase {
   /**
    * Deletes a menu link using the UI.
    *
-   * @param \Drupal\menu_link_content\Entity\MenuLinkContent $item
+   * @param MenuLinkContent $item
    *   Menu link.
    */
   public function deleteMenuLink(MenuLinkContent $item): void {
@@ -1022,7 +1022,7 @@ class MenuUiTest extends BrowserTestBase {
   /**
    * Alternately disables and enables a menu link.
    *
-   * @param \Drupal\menu_link_content\Entity\MenuLinkContent $item
+   * @param MenuLinkContent $item
    *   Menu link.
    */
   public function toggleMenuLink(MenuLinkContent $item): void {
@@ -1041,7 +1041,7 @@ class MenuUiTest extends BrowserTestBase {
   /**
    * Disables a menu link.
    *
-   * @param \Drupal\menu_link_content\Entity\MenuLinkContent $item
+   * @param MenuLinkContent $item
    *   Menu link.
    */
   public function disableMenuLink(MenuLinkContent $item): void {
@@ -1058,7 +1058,7 @@ class MenuUiTest extends BrowserTestBase {
   /**
    * Enables a menu link.
    *
-   * @param \Drupal\menu_link_content\Entity\MenuLinkContent $item
+   * @param MenuLinkContent $item
    *   Menu link.
    */
   public function enableMenuLink(MenuLinkContent $item): void {
@@ -1131,7 +1131,7 @@ class MenuUiTest extends BrowserTestBase {
   /**
    * Returns standard menu link.
    *
-   * @return \Drupal\Core\Menu\MenuLinkInterface
+   * @return MenuLinkInterface
    *   A menu link plugin.
    */
   private function getStandardMenuLink() {

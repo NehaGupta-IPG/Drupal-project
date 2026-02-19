@@ -4,24 +4,24 @@ namespace Drupal\comment\Entity;
 
 use Drupal\comment\CommentAccessControlHandler;
 use Drupal\comment\CommentForm;
+use Drupal\comment\CommentInterface;
 use Drupal\comment\CommentStorage;
 use Drupal\comment\CommentStorageSchema;
 use Drupal\comment\CommentTranslationHandler;
 use Drupal\comment\CommentViewBuilder;
 use Drupal\comment\CommentViewsData;
 use Drupal\comment\Form\DeleteForm;
-use Drupal\Core\Entity\Attribute\ContentEntityType;
-use Drupal\Core\Entity\EntityListBuilder;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Component\Utility\Number;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Entity\Attribute\ContentEntityType;
 use Drupal\Core\Entity\ContentEntityBase;
-use Drupal\comment\CommentInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
+use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\user\Entity\User;
 use Drupal\user\EntityOwnerTrait;
@@ -231,7 +231,7 @@ class Comment extends ContentEntityBase implements CommentInterface {
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    /** @var \Drupal\Core\Field\BaseFieldDefinition[] $fields */
+    /** @var BaseFieldDefinition[] $fields */
     $fields = parent::baseFieldDefinitions($entity_type);
     $fields += static::publishedBaseFieldDefinitions($entity_type);
     $fields += static::ownerBaseFieldDefinitions($entity_type);

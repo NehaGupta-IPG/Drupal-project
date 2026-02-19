@@ -10,15 +10,15 @@ interface ImageToolkitOperationManagerInterface {
   /**
    * Returns a toolkit operation plugin instance.
    *
-   * @param \Drupal\Core\ImageToolkit\ImageToolkitInterface $toolkit
+   * @param ImageToolkitInterface $toolkit
    *   The toolkit instance.
    * @param string $operation
    *   The operation (e.g. "crop").
    *
-   * @return \Drupal\Core\ImageToolkit\ImageToolkitOperationInterface
+   * @return ImageToolkitOperationInterface
    *   An instance of the requested toolkit operation plugin.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws PluginNotFoundException
    *   When no plugin is available.
    */
   public function getToolkitOperation(ImageToolkitInterface $toolkit, $operation);

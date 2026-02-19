@@ -32,21 +32,21 @@ class PageCache implements HttpKernelInterface {
   /**
    * The cache bin.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $cache;
 
   /**
    * A policy rule determining the cacheability of a request.
    *
-   * @var \Drupal\Core\PageCache\RequestPolicyInterface
+   * @var RequestPolicyInterface
    */
   protected $requestPolicy;
 
   /**
    * A policy rule determining the cacheability of the response.
    *
-   * @var \Drupal\Core\PageCache\ResponsePolicyInterface
+   * @var ResponsePolicyInterface
    */
   protected $responsePolicy;
 
@@ -60,13 +60,13 @@ class PageCache implements HttpKernelInterface {
   /**
    * Constructs a PageCache object.
    *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface|\Closure $http_kernel
+   * @param HttpKernelInterface|\Closure $http_kernel
    *   The decorated kernel.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The cache bin.
-   * @param \Drupal\Core\PageCache\RequestPolicyInterface $request_policy
+   * @param RequestPolicyInterface $request_policy
    *   A policy rule determining the cacheability of a request.
-   * @param \Drupal\Core\PageCache\ResponsePolicyInterface $response_policy
+   * @param ResponsePolicyInterface $response_policy
    *   A policy rule determining the cacheability of the response.
    */
   public function __construct(HttpKernelInterface|\Closure $http_kernel, CacheBackendInterface $cache, RequestPolicyInterface $request_policy, ResponsePolicyInterface $response_policy) {
@@ -103,7 +103,7 @@ class PageCache implements HttpKernelInterface {
   /**
    * Sidesteps the page cache and directly forwards a request to the backend.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   A request object.
    * @param int $type
    *   The type of the request (one of HttpKernelInterface::MAIN_REQUEST or
@@ -111,7 +111,7 @@ class PageCache implements HttpKernelInterface {
    * @param bool $catch
    *   Whether to catch exceptions or not.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   A response object.
    */
   protected function pass(Request $request, $type = self::MAIN_REQUEST, $catch = TRUE) {
@@ -121,7 +121,7 @@ class PageCache implements HttpKernelInterface {
   /**
    * Retrieves a response from the cache or fetches it from the backend.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   A request object.
    * @param int $type
    *   The type of the request (one of HttpKernelInterface::MAIN_REQUEST or
@@ -129,7 +129,7 @@ class PageCache implements HttpKernelInterface {
    * @param bool $catch
    *   Whether to catch exceptions or not.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   A response object.
    */
   protected function lookup(Request $request, $type = self::MAIN_REQUEST, $catch = TRUE) {
@@ -185,7 +185,7 @@ class PageCache implements HttpKernelInterface {
   /**
    * Fetches a response from the backend and stores it in the cache.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   A request object.
    * @param int $type
    *   The type of the request (one of HttpKernelInterface::MAIN_REQUEST or
@@ -193,13 +193,13 @@ class PageCache implements HttpKernelInterface {
    * @param bool $catch
    *   Whether to catch exceptions or not.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   A response object.
    *
    * @see drupal_page_header()
    */
   protected function fetch(Request $request, $type = self::MAIN_REQUEST, $catch = TRUE) {
-    /** @var \Symfony\Component\HttpFoundation\Response $response */
+    /** @var Response $response */
     $response = ($this->httpKernel)()->handle($request, $type, $catch);
 
     // Only set the 'X-Drupal-Cache' header if caching is allowed for this
@@ -214,9 +214,9 @@ class PageCache implements HttpKernelInterface {
   /**
    * Stores a response in the page cache.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   A request object.
-   * @param \Symfony\Component\HttpFoundation\Response $response
+   * @param Response $response
    *   A response object that should be stored in the page cache.
    *
    * @return bool
@@ -303,7 +303,7 @@ class PageCache implements HttpKernelInterface {
   /**
    * Returns a response object from the page cache.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   A request object.
    * @param bool $allow_invalid
    *   (optional) If TRUE, a cache item may be returned even if it is expired or
@@ -313,7 +313,7 @@ class PageCache implements HttpKernelInterface {
    *   The "valid" property of the returned object indicates whether the item is
    *   valid or not. Defaults to FALSE.
    *
-   * @return \Symfony\Component\HttpFoundation\Response|false
+   * @return Response|false
    *   The cached response or FALSE on failure.
    */
   protected function get(Request $request, $allow_invalid = FALSE) {
@@ -327,9 +327,9 @@ class PageCache implements HttpKernelInterface {
   /**
    * Stores a response object in the page cache.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   A request object.
-   * @param \Symfony\Component\HttpFoundation\Response $response
+   * @param Response $response
    *   The response to store in the cache.
    * @param int $expire
    *   One of the following values:
@@ -354,7 +354,7 @@ class PageCache implements HttpKernelInterface {
   /**
    * Gets the page cache ID for this request.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   A request object.
    *
    * @return string

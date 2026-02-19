@@ -14,7 +14,7 @@ class LoginLogoutMenuLink extends MenuLinkDefault {
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
@@ -27,9 +27,9 @@ class LoginLogoutMenuLink extends MenuLinkDefault {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Menu\StaticMenuLinkOverridesInterface $static_override
+   * @param StaticMenuLinkOverridesInterface $static_override
    *   The static override storage.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, StaticMenuLinkOverridesInterface $static_override, AccountInterface $current_user) {

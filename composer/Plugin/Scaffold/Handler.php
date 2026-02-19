@@ -2,6 +2,7 @@
 
 namespace Drupal\Composer\Plugin\Scaffold;
 
+use Drupal\Composer\Plugin\Scaffold\Operations\OperationInterface;
 use Composer\Composer;
 use Composer\Installer\PackageEvent;
 use Composer\IO\IOInterface;
@@ -48,21 +49,21 @@ class Handler {
   /**
    * The scaffold options in the top-level composer.json's 'extra' section.
    *
-   * @var \Drupal\Composer\Plugin\Scaffold\ManageOptions
+   * @var ManageOptions
    */
   protected $manageOptions;
 
   /**
    * The manager that keeps track of which packages are allowed to scaffold.
    *
-   * @var \Drupal\Composer\Plugin\Scaffold\AllowedPackages
+   * @var AllowedPackages
    */
   protected $manageAllowedPackages;
 
   /**
    * The list of listeners that are notified after a package event.
    *
-   * @var \Drupal\Composer\Plugin\Scaffold\PostPackageEventListenerInterface[]
+   * @var PostPackageEventListenerInterface[]
    */
   protected $postPackageListeners = [];
 
@@ -115,7 +116,7 @@ class Handler {
    *   The package file mappings array keyed by destination path and the values
    *   are operation metadata arrays.
    *
-   * @return \Drupal\Composer\Plugin\Scaffold\Operations\OperationInterface[]
+   * @return OperationInterface[]
    *   A list of scaffolding operation objects
    */
   protected function createScaffoldOperations(PackageInterface $package, array $package_file_mappings) {
@@ -200,7 +201,7 @@ class Handler {
    *   A multidimensional array of file mappings, as returned by
    *   self::getAllowedPackages().
    *
-   * @return \Drupal\Composer\Plugin\Scaffold\Operations\OperationInterface[][]
+   * @return OperationInterface[][]
    *   An array of destination paths => scaffold operation objects.
    */
   protected function getFileMappingsFromPackages(array $allowed_packages) {
@@ -217,7 +218,7 @@ class Handler {
    * @param \Composer\Package\PackageInterface $package
    *   The Composer package from which to get the file mappings.
    *
-   * @return \Drupal\Composer\Plugin\Scaffold\Operations\OperationInterface[]
+   * @return OperationInterface[]
    *   An array of destination paths => scaffold operation objects.
    */
   protected function getPackageFileMappings(PackageInterface $package) {

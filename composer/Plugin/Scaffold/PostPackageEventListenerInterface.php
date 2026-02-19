@@ -16,7 +16,7 @@ interface PostPackageEventListenerInterface {
   /**
    * Handles package events during a 'composer require' operation.
    *
-   * @param \Composer\Installer\PackageEvent $event
+   * @param PackageEvent $event
    *   Composer package event sent on install/update/remove.
    */
   public function event(PackageEvent $event);

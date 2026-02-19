@@ -14,7 +14,7 @@ interface MigrateFieldInterface extends PluginInspectionInterface {
   /**
    * Apply any custom processing to the field migration.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration entity.
    */
   public function alterFieldMigration(MigrationInterface $migration);
@@ -22,7 +22,7 @@ interface MigrateFieldInterface extends PluginInspectionInterface {
   /**
    * Apply any custom processing to the field instance migration.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration entity.
    */
   public function alterFieldInstanceMigration(MigrationInterface $migration);
@@ -30,7 +30,7 @@ interface MigrateFieldInterface extends PluginInspectionInterface {
   /**
    * Apply any custom processing to the field widget migration.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration entity.
    */
   public function alterFieldWidgetMigration(MigrationInterface $migration);
@@ -38,7 +38,7 @@ interface MigrateFieldInterface extends PluginInspectionInterface {
   /**
    * Apply any custom processing to the field formatter migration.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration entity.
    */
   public function alterFieldFormatterMigration(MigrationInterface $migration);
@@ -46,7 +46,7 @@ interface MigrateFieldInterface extends PluginInspectionInterface {
   /**
    * Get the field formatter type from the source.
    *
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The field being migrated.
    *
    * @return string
@@ -67,7 +67,7 @@ interface MigrateFieldInterface extends PluginInspectionInterface {
   /**
    * Get the field widget type from the source.
    *
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The field being migrated.
    *
    * @return string
@@ -86,7 +86,7 @@ interface MigrateFieldInterface extends PluginInspectionInterface {
   /**
    * Apply any custom processing to the field bundle migrations.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration entity.
    * @param string $field_name
    *   The field name we're processing the value for.
@@ -98,7 +98,7 @@ interface MigrateFieldInterface extends PluginInspectionInterface {
   /**
    * Computes the destination type of a migrated field.
    *
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The field being migrated.
    *
    * @return string

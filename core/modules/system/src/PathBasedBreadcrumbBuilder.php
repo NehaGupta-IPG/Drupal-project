@@ -38,28 +38,28 @@ class PathBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
   /**
    * The router request context.
    *
-   * @var \Drupal\Core\Routing\RequestContext
+   * @var RequestContext
    */
   protected $context;
 
   /**
    * The access check service.
    *
-   * @var \Drupal\Core\Access\AccessManagerInterface
+   * @var AccessManagerInterface
    */
   protected $accessManager;
 
   /**
    * The dynamic router service.
    *
-   * @var \Symfony\Component\Routing\Matcher\RequestMatcherInterface
+   * @var RequestMatcherInterface
    */
   protected $router;
 
   /**
    * The inbound path processor.
    *
-   * @var \Drupal\Core\PathProcessor\InboundPathProcessorInterface
+   * @var InboundPathProcessorInterface
    */
   protected $pathProcessor;
 
@@ -73,51 +73,51 @@ class PathBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
   /**
    * The title resolver.
    *
-   * @var \Drupal\Core\Controller\TitleResolverInterface
+   * @var TitleResolverInterface
    */
   protected $titleResolver;
 
   /**
    * The current user object.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
   /**
    * The current path service.
    *
-   * @var \Drupal\Core\Path\CurrentPathStack
+   * @var CurrentPathStack
    */
   protected $currentPath;
 
   /**
    * The patch matcher service.
    *
-   * @var \Drupal\Core\Path\PathMatcherInterface
+   * @var PathMatcherInterface
    */
   protected $pathMatcher;
 
   /**
    * Constructs the PathBasedBreadcrumbBuilder.
    *
-   * @param \Drupal\Core\Routing\RequestContext $context
+   * @param RequestContext $context
    *   The router request context.
-   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
+   * @param AccessManagerInterface $access_manager
    *   The access check service.
-   * @param \Symfony\Component\Routing\Matcher\RequestMatcherInterface $router
+   * @param RequestMatcherInterface $router
    *   The dynamic router service.
-   * @param \Drupal\Core\PathProcessor\InboundPathProcessorInterface $path_processor
+   * @param InboundPathProcessorInterface $path_processor
    *   The inbound path processor.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory service.
-   * @param \Drupal\Core\Controller\TitleResolverInterface $title_resolver
+   * @param TitleResolverInterface $title_resolver
    *   The title resolver service.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user object.
-   * @param \Drupal\Core\Path\CurrentPathStack $current_path
+   * @param CurrentPathStack $current_path
    *   The current path.
-   * @param \Drupal\Core\Path\PathMatcherInterface $path_matcher
+   * @param PathMatcherInterface $path_matcher
    *   The path matcher service.
    */
   public function __construct(RequestContext $context, AccessManagerInterface $access_manager, RequestMatcherInterface $router, InboundPathProcessorInterface $path_processor, ConfigFactoryInterface $config_factory, TitleResolverInterface $title_resolver, AccountInterface $current_user, CurrentPathStack $current_path, ?PathMatcherInterface $path_matcher = NULL) {
@@ -201,7 +201,7 @@ class PathBasedBreadcrumbBuilder implements BreadcrumbBuilderInterface {
    * @param array $exclude
    *   An array of paths or system paths to skip.
    *
-   * @return \Symfony\Component\HttpFoundation\Request
+   * @return Request
    *   A populated request object or NULL if the path couldn't be matched.
    */
   protected function getRequestForPath($path, array $exclude) {

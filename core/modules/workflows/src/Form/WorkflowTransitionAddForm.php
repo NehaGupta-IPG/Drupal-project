@@ -21,14 +21,14 @@ class WorkflowTransitionAddForm extends EntityForm {
   /**
    * The plugin form factory.
    *
-   * @var \Drupal\Core\Plugin\PluginFormFactoryInterface
+   * @var PluginFormFactoryInterface
    */
   protected $pluginFormFactory;
 
   /**
    * Creates an instance of WorkflowStateEditForm.
    *
-   * @param \Drupal\Core\Plugin\PluginFormFactoryInterface $pluginFormFactory
+   * @param PluginFormFactoryInterface $pluginFormFactory
    *   The plugin form factory.
    */
   public function __construct(PluginFormFactoryInterface $pluginFormFactory) {
@@ -127,11 +127,11 @@ class WorkflowTransitionAddForm extends EntityForm {
    *
    * This form can only change values for a state, which is part of workflow.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity the current form should operate upon.
    * @param array $form
    *   A nested array of form elements comprising the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   protected function copyFormValuesToEntity(EntityInterface $entity, array $form, FormStateInterface $form_state) {

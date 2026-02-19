@@ -32,11 +32,11 @@ interface EntityTypeRepositoryInterface {
    * @return string
    *   The entity type ID.
    *
-   * @throws \Drupal\Core\Entity\Exception\AmbiguousEntityClassException
+   * @throws AmbiguousEntityClassException
    *   Thrown when multiple subclasses correspond to the called class.
-   * @throws \Drupal\Core\Entity\Exception\AmbiguousBundleClassException
+   * @throws AmbiguousBundleClassException
    *   Thrown when multiple subclasses correspond to the called bundle class.
-   * @throws \Drupal\Core\Entity\Exception\NoCorrespondingEntityClassException
+   * @throws NoCorrespondingEntityClassException
    *   Thrown when no entity class corresponds to the called class.
    *
    * @see \Drupal\Core\Entity\EntityBase::load()

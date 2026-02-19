@@ -11,16 +11,17 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\jsonapi\JsonApiResource\Data;
 use Drupal\jsonapi\JsonApiResource\ErrorCollection;
 use Drupal\jsonapi\JsonApiResource\IncludedData;
+use Drupal\jsonapi\JsonApiResource\JsonApiDocumentTopLevel;
 use Drupal\jsonapi\JsonApiResource\NullIncludedData;
 use Drupal\jsonapi\JsonApiResource\OmittedData;
 use Drupal\jsonapi\JsonApiResource\RelationshipData;
 use Drupal\jsonapi\JsonApiResource\ResourceIdentifier;
 use Drupal\jsonapi\JsonApiResource\ResourceObjectData;
 use Drupal\jsonapi\JsonApiSpec;
-use Drupal\jsonapi\Normalizer\Value\CacheableOmission;
-use Drupal\jsonapi\JsonApiResource\JsonApiDocumentTopLevel;
 use Drupal\jsonapi\Normalizer\Value\CacheableNormalization;
+use Drupal\jsonapi\Normalizer\Value\CacheableOmission;
 use Drupal\jsonapi\ResourceType\ResourceType;
+use Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface;
 use Drupal\serialization\Normalizer\SchematicNormalizerTrait;
 use Drupal\serialization\Serializer\JsonSchemaProviderSerializerInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -29,7 +30,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface;
 
 /**
  * Normalizes the top-level document according to the JSON:API specification.
@@ -49,23 +49,23 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The JSON:API resource type repository.
    *
-   * @var \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface
+   * @var ResourceTypeRepositoryInterface
    */
   protected $resourceTypeRepository;
 
   /**
    * Constructs a JsonApiDocumentTopLevelNormalizer object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
+   * @param ResourceTypeRepositoryInterface $resource_type_repository
    *   The JSON:API resource type repository.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, ResourceTypeRepositoryInterface $resource_type_repository) {
@@ -215,14 +215,14 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
   /**
    * Normalizes an error collection.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\JsonApiDocumentTopLevel $document
+   * @param JsonApiDocumentTopLevel $document
    *   The document to normalize.
    * @param string $format
    *   The normalization format.
    * @param array $context
    *   The normalization context.
    *
-   * @return \Drupal\jsonapi\Normalizer\Value\CacheableNormalization
+   * @return CacheableNormalization
    *   The normalized document.
    *
    * @todo Refactor this to use CacheableNormalization::aggregate in https://www.drupal.org/project/drupal/issues/3036284.
@@ -243,14 +243,14 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
   /**
    * Normalizes omitted data into a set of omission links.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\OmittedData $omissions
+   * @param OmittedData $omissions
    *   The omitted response data.
    * @param string $format
    *   The normalization format.
    * @param array $context
    *   The normalization context.
    *
-   * @return \Drupal\jsonapi\Normalizer\Value\CacheableNormalization|\Drupal\jsonapi\Normalizer\Value\CacheableOmission
+   * @return CacheableNormalization|CacheableOmission
    *   The normalized omissions.
    *
    * @todo Refactor this to use link collections in https://www.drupal.org/project/drupal/issues/3036279.
@@ -440,7 +440,7 @@ class JsonApiDocumentTopLevelNormalizer extends NormalizerBase implements Denorm
   /**
    * Retrieve an array of schemas for the resource types in a data object.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\Data $data
+   * @param Data $data
    *   JSON:API data value objects.
    * @param array $context
    *   Normalization context.

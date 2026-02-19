@@ -114,7 +114,7 @@ interface MigrationInterface extends PluginInspectionInterface, DerivativeInspec
   /**
    * Returns the initialized source plugin.
    *
-   * @return \Drupal\migrate\Plugin\MigrateSourceInterface
+   * @return MigrateSourceInterface
    *   The source plugin.
    */
   public function getSourcePlugin();
@@ -128,7 +128,7 @@ interface MigrationInterface extends PluginInspectionInterface, DerivativeInspec
    *   specified, then the plugins from this migration's process array are
    *   returned.
    *
-   * @return \Drupal\migrate\Plugin\MigrateProcessInterface[][]
+   * @return MigrateProcessInterface[][]
    *   An associative array. The keys are the destination property names. Values
    *   are process pipelines. Each pipeline contains an array of plugins.
    */
@@ -140,7 +140,7 @@ interface MigrationInterface extends PluginInspectionInterface, DerivativeInspec
    * @param bool $stub_being_requested
    *   TRUE to indicate that this destination will be asked to construct a stub.
    *
-   * @return \Drupal\migrate\Plugin\MigrateDestinationInterface
+   * @return MigrateDestinationInterface
    *   The destination plugin.
    */
   public function getDestinationPlugin($stub_being_requested = FALSE);
@@ -148,7 +148,7 @@ interface MigrationInterface extends PluginInspectionInterface, DerivativeInspec
   /**
    * Returns the initialized id_map plugin.
    *
-   * @return \Drupal\migrate\Plugin\MigrateIdMapInterface
+   * @return MigrateIdMapInterface
    *   The ID map.
    */
   public function getIdMap();

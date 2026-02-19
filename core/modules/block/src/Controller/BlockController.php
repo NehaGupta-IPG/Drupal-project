@@ -2,8 +2,8 @@
 
 namespace Drupal\block\Controller;
 
-use Drupal\Component\Utility\Html;
 use Drupal\block\BlockInterface;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -16,14 +16,14 @@ class BlockController extends ControllerBase {
   /**
    * The theme handler.
    *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
+   * @var ThemeHandlerInterface
    */
   protected $themeHandler;
 
   /**
    * Constructs a new BlockController instance.
    *
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param ThemeHandlerInterface $theme_handler
    *   The theme handler.
    */
   public function __construct(ThemeHandlerInterface $theme_handler) {
@@ -33,7 +33,7 @@ class BlockController extends ControllerBase {
   /**
    * Calls a method on a block and reloads the listing page.
    *
-   * @param \Drupal\block\BlockInterface $block
+   * @param BlockInterface $block
    *   The block being acted upon.
    * @param string $op
    *   The operation to perform, e.g., 'enable' or 'disable'.

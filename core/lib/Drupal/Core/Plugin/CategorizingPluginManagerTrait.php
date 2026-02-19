@@ -81,7 +81,7 @@ trait CategorizingPluginManagerTrait {
   /**
    * Returns the module extension list used.
    *
-   * @return \Drupal\Core\Extension\ModuleExtensionList
+   * @return ModuleExtensionList
    *   The module extension list.
    */
   protected function getModuleExtensionList(): ModuleExtensionList {

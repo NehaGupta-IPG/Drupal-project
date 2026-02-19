@@ -6,8 +6,8 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
-use Drupal\Core\Plugin\Discovery\YamlDiscoveryDecorator;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
+use Drupal\Core\Plugin\Discovery\YamlDiscoveryDecorator;
 
 /**
  * Provides the default help_topic manager.
@@ -86,11 +86,11 @@ class HelpTopicPluginManager extends DefaultPluginManager implements HelpTopicPl
   /**
    * Constructs a new HelpTopicManager object.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler
+   * @param ThemeHandlerInterface $themeHandler
    *   The theme handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param CacheBackendInterface $cache_backend
    *   Cache backend instance to use.
    * @param string $root
    *   The app root.

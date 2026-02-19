@@ -18,23 +18,23 @@ abstract class FormController {
   /**
    * The argument resolver.
    *
-   * @var \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface
+   * @var ArgumentResolverInterface
    */
   protected $argumentResolver;
 
   /**
    * The form builder.
    *
-   * @var \Drupal\Core\Form\FormBuilderInterface
+   * @var FormBuilderInterface
    */
   protected $formBuilder;
 
   /**
    * Constructs a new \Drupal\Core\Controller\FormController object.
    *
-   * @param \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface $argument_resolver
+   * @param ArgumentResolverInterface $argument_resolver
    *   The argument resolver.
-   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
+   * @param FormBuilderInterface $form_builder
    *   The form builder.
    */
   public function __construct(ArgumentResolverInterface $argument_resolver, FormBuilderInterface $form_builder) {
@@ -45,9 +45,9 @@ abstract class FormController {
   /**
    * Invokes the form and returns the result.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
    *
    * @return array
@@ -85,7 +85,7 @@ abstract class FormController {
    *     _form: Drupal\example\Form\ExampleForm
    * @endcode
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match object from which to extract a form definition string.
    *
    * @return string
@@ -96,7 +96,7 @@ abstract class FormController {
   /**
    * Returns the object used to build the form.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
    * @param string $form_arg
    *   Either a class name or a service ID.

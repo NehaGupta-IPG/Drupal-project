@@ -29,7 +29,7 @@ class CurrentUser extends ArgumentDefaultPluginBase implements CacheableDependen
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Session\AccountInterface|null $currentUser
+   * @param AccountInterface|null $currentUser
    *   The current user.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, protected ?AccountInterface $currentUser = NULL) {

@@ -22,21 +22,21 @@ class SqlBaseTest extends UnitTestCase {
   /**
    * The mock pager plugin instance.
    *
-   * @var \Drupal\views\Plugin\views\pager\SqlBase|\PHPUnit\Framework\MockObject\MockObject
+   * @var SqlBase|MockObject
    */
   protected $pager;
 
   /**
    * The mock view instance.
    *
-   * @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\ViewExecutable|MockObject
    */
   protected $view;
 
   /**
    * The mock display plugin instance.
    *
-   * @var \Drupal\views\Plugin\views\display\DisplayPluginBase|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\Plugin\views\display\DisplayPluginBase|MockObject
    */
   protected $display;
 

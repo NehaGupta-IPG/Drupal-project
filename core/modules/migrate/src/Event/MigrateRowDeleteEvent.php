@@ -2,8 +2,8 @@
 
 namespace Drupal\migrate\Event;
 
-use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\Component\EventDispatcher\Event;
+use Drupal\migrate\Plugin\MigrationInterface;
 
 /**
  * Wraps a row deletion event for event listeners.
@@ -13,7 +13,7 @@ class MigrateRowDeleteEvent extends Event {
   /**
    * Migration entity.
    *
-   * @var \Drupal\migrate\Plugin\MigrationInterface
+   * @var MigrationInterface
    */
   protected $migration;
 
@@ -27,7 +27,7 @@ class MigrateRowDeleteEvent extends Event {
   /**
    * Constructs a row deletion event object.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   Migration entity.
    * @param array $destination_id_values
    *   Values represent the destination ID.
@@ -40,7 +40,7 @@ class MigrateRowDeleteEvent extends Event {
   /**
    * Gets the migration entity.
    *
-   * @return \Drupal\migrate\Plugin\MigrationInterface
+   * @return MigrationInterface
    *   The migration being rolled back.
    */
   public function getMigration() {

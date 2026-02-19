@@ -4,8 +4,8 @@ namespace Drupal\views\Plugin\views\cache;
 
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\views\Plugin\views\PluginBase;
 use Drupal\Core\Database\Query\SelectInterface;
+use Drupal\views\Plugin\views\PluginBase;
 use Drupal\views\ResultRow;
 
 /**
@@ -280,10 +280,10 @@ abstract class CachePluginBase extends PluginBase {
   /**
    * Prepares the view result before putting it into cache.
    *
-   * @param \Drupal\views\ResultRow[] $result
+   * @param ResultRow[] $result
    *   The result containing loaded entities.
    *
-   * @return \Drupal\views\ResultRow[]
+   * @return ResultRow[]
    *   The result without loaded entities.
    */
   protected function prepareViewResult(array $result) {
@@ -303,7 +303,7 @@ abstract class CachePluginBase extends PluginBase {
   /**
    * Alters the cache metadata of a display upon saving a view.
    *
-   * @param \Drupal\Core\Cache\CacheableMetadata $cache_metadata
+   * @param CacheableMetadata $cache_metadata
    *   The cache metadata.
    */
   public function alterCacheMetadata(CacheableMetadata $cache_metadata) {
@@ -312,7 +312,7 @@ abstract class CachePluginBase extends PluginBase {
   /**
    * Returns the row cache tags.
    *
-   * @param \Drupal\views\ResultRow $row
+   * @param ResultRow $row
    *   A result row.
    *
    * @return string[]
@@ -333,7 +333,7 @@ abstract class CachePluginBase extends PluginBase {
   /**
    * Returns the row cache keys.
    *
-   * @param \Drupal\views\ResultRow $row
+   * @param ResultRow $row
    *   A result row.
    *
    * @return string[]
@@ -357,7 +357,7 @@ abstract class CachePluginBase extends PluginBase {
   /**
    * Returns a unique identifier for the specified row.
    *
-   * @param \Drupal\views\ResultRow $row
+   * @param ResultRow $row
    *   A result row.
    *
    * @return string

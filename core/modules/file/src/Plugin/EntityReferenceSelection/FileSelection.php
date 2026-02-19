@@ -43,7 +43,7 @@ class FileSelection extends DefaultSelection {
 
     // In order to create a referenceable file, it needs to have a "permanent"
     // status.
-    /** @var \Drupal\file\FileInterface $file */
+    /** @var FileInterface $file */
     $file->setPermanent();
 
     return $file;
@@ -55,7 +55,7 @@ class FileSelection extends DefaultSelection {
   public function validateReferenceableNewEntities(array $entities) {
     $entities = parent::validateReferenceableNewEntities($entities);
     $entities = array_filter($entities, function ($file) {
-      /** @var \Drupal\file\FileInterface $file */
+      /** @var FileInterface $file */
       return $file->isPermanent() || $file->getOwnerId() === $this->currentUser->id();
     });
     return $entities;

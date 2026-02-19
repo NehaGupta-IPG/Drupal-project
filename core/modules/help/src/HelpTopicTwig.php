@@ -27,7 +27,7 @@ class HelpTopicTwig extends HelpTopicPluginBase implements ContainerFactoryPlugi
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Template\TwigEnvironment $twig
+   * @param TwigEnvironment $twig
    *   The Twig environment.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, protected TwigEnvironment $twig) {

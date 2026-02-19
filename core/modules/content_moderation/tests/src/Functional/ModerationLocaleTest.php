@@ -351,7 +351,7 @@ class ModerationLocaleTest extends ModerationStateTestBase {
     /** @var \Drupal\node\NodeStorageInterface $storage */
     $storage = $this->container->get('entity_type.manager')->getStorage('node');
     foreach (range(11, 16) as $revision_id) {
-      /** @var \Drupal\node\NodeInterface $revision */
+      /** @var NodeInterface $revision */
       $revision = $storage->loadRevision($revision_id);
       foreach (array_keys($revision->getTranslationLanguages()) as $langcode) {
         if ($revision->isRevisionTranslationAffected()) {
@@ -562,7 +562,7 @@ class ModerationLocaleTest extends ModerationStateTestBase {
    * @param string|null $langcode
    *   (optional) The node language. Defaults to English.
    *
-   * @return \Drupal\node\NodeInterface|null
+   * @return NodeInterface|null
    *   A node object if a new one is being created, NULL otherwise.
    */
   protected function submitNodeForm($title, $moderation_state, $default_translation = FALSE, $langcode = 'en') {
@@ -585,12 +585,12 @@ class ModerationLocaleTest extends ModerationStateTestBase {
   /**
    * Loads the node translation for the specified language.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   A node object.
    * @param string $langcode
    *   The translation language code.
    *
-   * @return \Drupal\node\NodeInterface
+   * @return NodeInterface
    *   The node translation object.
    */
   protected function loadTranslation(NodeInterface $node, $langcode) {
@@ -599,7 +599,7 @@ class ModerationLocaleTest extends ModerationStateTestBase {
     // Explicitly invalidate the cache for that node, as the call below is
     // statically cached.
     $storage->resetCache([$node->id()]);
-    /** @var \Drupal\node\NodeInterface $node */
+    /** @var NodeInterface $node */
     $node = $storage->loadRevision($storage->getLatestRevisionId($node->id()));
     return $node->getTranslation($langcode);
   }
@@ -607,7 +607,7 @@ class ModerationLocaleTest extends ModerationStateTestBase {
   /**
    * Asserts that this is the "latest version" page for the specified node.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   A node object.
    *
    * @internal
@@ -620,7 +620,7 @@ class ModerationLocaleTest extends ModerationStateTestBase {
   /**
    * Asserts that this is not the "latest version" page for the specified node.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   A node object.
    * @param bool $moderation_form
    *   (optional) Whether the page should contain the moderation form. Defaults
@@ -641,7 +641,7 @@ class ModerationLocaleTest extends ModerationStateTestBase {
   /**
    * Asserts that the moderation form is displayed for the specified node.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   A node object.
    * @param bool $latest_tab
    *   (optional) Whether the node form is expected to be displayed on the
@@ -659,7 +659,7 @@ class ModerationLocaleTest extends ModerationStateTestBase {
   /**
    * Asserts that the moderation form is not displayed for the specified node.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   A node object.
    *
    * @internal

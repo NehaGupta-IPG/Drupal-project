@@ -19,7 +19,7 @@ class UserLangcode extends ProcessPluginBase implements ContainerFactoryPluginIn
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManager
+   * @var LanguageManager
    */
   protected $languageManager;
 
@@ -32,7 +32,7 @@ class UserLangcode extends ProcessPluginBase implements ContainerFactoryPluginIn
    *   The plugin ID.
    * @param mixed $plugin_definition
    *   The plugin definition.
-   * @param \Drupal\Core\Language\LanguageManager $language_manager
+   * @param LanguageManager $language_manager
    *   The language manager service.
    */
   public function __construct(

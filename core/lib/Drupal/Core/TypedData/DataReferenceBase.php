@@ -19,7 +19,7 @@ abstract class DataReferenceBase extends TypedData implements DataReferenceInter
   /**
    * The referenced data.
    *
-   * @var \Drupal\Core\TypedData\TypedDataInterface
+   * @var TypedDataInterface
    */
   protected $target;
 

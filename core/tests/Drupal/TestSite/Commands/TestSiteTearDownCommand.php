@@ -74,7 +74,7 @@ class TestSiteTearDownCommand extends Command {
   /**
    * Removes a given instance by deleting all the database tables and files.
    *
-   * @param \Drupal\Core\Test\TestDatabase $test_database
+   * @param TestDatabase $test_database
    *   The test database object.
    * @param string $db_url
    *   The database URL.

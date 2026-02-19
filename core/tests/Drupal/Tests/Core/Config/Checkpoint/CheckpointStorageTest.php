@@ -35,14 +35,14 @@ class CheckpointStorageTest extends UnitTestCase {
   /**
    * The memory storage containing the data.
    *
-   * @var \Drupal\Core\Config\MemoryStorage
+   * @var MemoryStorage
    */
   protected MemoryStorage $memory;
 
   /**
    * The checkpoint storage under test.
    *
-   * @var \Drupal\Core\Config\Checkpoint\CheckpointStorage
+   * @var CheckpointStorage
    */
   protected CheckpointStorage $storage;
 

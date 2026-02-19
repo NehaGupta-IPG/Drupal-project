@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Rest;
 
-use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
 use Drupal\Core\Entity\Entity\EntityFormMode;
+use Drupal\Tests\rest\Functional\EntityResource\ConfigEntityResourceTestBase;
 
 /**
  * Resource test base for the entity_form_mode entity.

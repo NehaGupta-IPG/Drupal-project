@@ -14,7 +14,7 @@ class DatabaseFileUsageBackend extends FileUsageBase {
   /**
    * The database connection used to store file usage information.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
@@ -28,9 +28,9 @@ class DatabaseFileUsageBackend extends FileUsageBase {
   /**
    * Construct the DatabaseFileUsageBackend.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection which will be used to store the file usage
    *   information.
    * @param string $table

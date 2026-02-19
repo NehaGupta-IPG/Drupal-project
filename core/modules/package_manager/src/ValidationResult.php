@@ -12,7 +12,7 @@ use PhpTuf\ComposerStager\API\Exception\ExceptionInterface;
 /**
  * A value object to contain the results of a validation.
  *
- * @property \Drupal\Core\StringTranslation\TranslatableMarkup[] $messages
+ * @property TranslatableMarkup[] $messages
  */
 final class ValidationResult {
 
@@ -23,9 +23,9 @@ final class ValidationResult {
    *   The severity of the result. Should be one of the
    *   SystemManager::REQUIREMENT_* constants.
    *   @todo Refactor this to use RequirementSeverity in https://www.drupal.org/i/3525121.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup[]|string[] $messages
+   * @param TranslatableMarkup[]|string[] $messages
    *   The result messages.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $summary
+   * @param TranslatableMarkup|null $summary
    *   A succinct summary of the result.
    * @param bool $assert_translatable
    *   Whether to assert the messages are translatable. Internal use only.
@@ -68,7 +68,7 @@ final class ValidationResult {
    *
    * @param \Throwable $throwable
    *   The throwable.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $summary
+   * @param TranslatableMarkup|null $summary
    *   The errors summary.
    *
    * @return static
@@ -83,9 +83,9 @@ final class ValidationResult {
   /**
    * Creates an error ValidationResult object.
    *
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup[] $messages
+   * @param TranslatableMarkup[] $messages
    *   The error messages.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $summary
+   * @param TranslatableMarkup|null $summary
    *   The errors summary.
    *
    * @return static
@@ -97,9 +97,9 @@ final class ValidationResult {
   /**
    * Creates a warning ValidationResult object.
    *
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup[] $messages
+   * @param TranslatableMarkup[] $messages
    *   The error messages.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $summary
+   * @param TranslatableMarkup|null $summary
    *   The errors summary.
    *
    * @return static
@@ -111,7 +111,7 @@ final class ValidationResult {
   /**
    * Returns the overall severity for a set of validation results.
    *
-   * @param \Drupal\package_manager\ValidationResult[] $results
+   * @param ValidationResult[] $results
    *   The validation results.
    *
    * @return int

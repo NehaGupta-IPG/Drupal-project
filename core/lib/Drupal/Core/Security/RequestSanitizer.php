@@ -30,14 +30,14 @@ class RequestSanitizer {
   /**
    * Strips dangerous keys from user input.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The incoming request to sanitize.
    * @param string[] $safe_keys
    *   An array of keys to consider safe.
    * @param bool $log_sanitized_keys
    *   (optional) Set to TRUE to log keys that are sanitized.
    *
-   * @return \Symfony\Component\HttpFoundation\Request
+   * @return Request
    *   The sanitized request.
    */
   public static function sanitize(Request $request, array $safe_keys, $log_sanitized_keys = FALSE) {
@@ -67,7 +67,7 @@ class RequestSanitizer {
   /**
    * Processes a request parameter bag.
    *
-   * @param \Symfony\Component\HttpFoundation\ParameterBag $bag
+   * @param ParameterBag $bag
    *   The parameter bag to process.
    * @param string[] $safe_keys
    *   An array of keys to consider safe.

@@ -2,8 +2,8 @@
 
 namespace Drupal\config_translation\Plugin\Derivative;
 
-use Drupal\config_translation\ConfigMapperManagerInterface;
 use Drupal\Component\Plugin\Derivative\DeriverBase;
+use Drupal\config_translation\ConfigMapperManagerInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -15,7 +15,7 @@ class ConfigTranslationLocalTasks extends DeriverBase implements ContainerDerive
   /**
    * The mapper plugin discovery service.
    *
-   * @var \Drupal\config_translation\ConfigMapperManagerInterface
+   * @var ConfigMapperManagerInterface
    */
   protected $mapperManager;
 
@@ -31,7 +31,7 @@ class ConfigTranslationLocalTasks extends DeriverBase implements ContainerDerive
    *
    * @param string $base_plugin_id
    *   The base plugin ID.
-   * @param \Drupal\config_translation\ConfigMapperManagerInterface $mapper_manager
+   * @param ConfigMapperManagerInterface $mapper_manager
    *   The mapper plugin discovery service.
    */
   public function __construct($base_plugin_id, ConfigMapperManagerInterface $mapper_manager) {

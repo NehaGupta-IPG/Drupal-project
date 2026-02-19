@@ -63,13 +63,13 @@ enum RequirementSeverity: int {
   /**
    * Determines the most severe requirement in a list of requirements.
    *
-   * @param array<string, array{'title': \Drupal\Core\StringTranslation\TranslatableMarkup, 'value': mixed, description: \Drupal\Core\StringTranslation\TranslatableMarkup, 'severity': \Drupal\Core\Extension\Requirement\RequirementSeverity}> $requirements
+   * @param array<string, array{'title': TranslatableMarkup, 'value': mixed, description: TranslatableMarkup, 'severity': RequirementSeverity}> $requirements
    *   An array of requirements, in the same format as is returned by
    *   hook_requirements(), hook_runtime_requirements(),
    *   hook_update_requirements(), and
    *   \Drupal\Core\Extension\InstallRequirementsInterface.
    *
-   * @return \Drupal\Core\Extension\Requirement\RequirementSeverity
+   * @return RequirementSeverity
    *   The most severe requirement.
    *
    * @see \Drupal\Core\Extension\InstallRequirementsInterface::getRequirements()
@@ -92,7 +92,7 @@ enum RequirementSeverity: int {
   /**
    * Converts legacy int value severities to enums.
    *
-   * @param array<string, array{'title': \Drupal\Core\StringTranslation\TranslatableMarkup, 'value': mixed, description: \Drupal\Core\StringTranslation\TranslatableMarkup, 'severity': \Drupal\Core\Extension\Requirement\RequirementSeverity}> $requirements
+   * @param array<string, array{'title': TranslatableMarkup, 'value': mixed, description: TranslatableMarkup, 'severity': RequirementSeverity}> $requirements
    *   An array of requirements, in the same format as is returned by
    *   hook_requirements(), hook_runtime_requirements(),
    *   hook_update_requirements(), and

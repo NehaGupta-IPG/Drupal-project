@@ -2,11 +2,11 @@
 
 namespace Drupal\rest\Entity;
 
-use Drupal\Core\Entity\Attribute\ConfigEntityType;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\rest\RestResourceConfigInterface;
 
 /**
@@ -55,7 +55,7 @@ class RestResourceConfig extends ConfigEntityBase implements RestResourceConfigI
    *
    * Currently either:
    * - \Drupal\rest\RestResourceConfigInterface::METHOD_GRANULARITY
-   * - \Drupal\rest\RestResourceConfigInterface::RESOURCE_GRANULARITY
+   * - \Drupal\rest\RestResourceConfigInterface::RESOURCE_GRANULARITY.
    *
    * @var string
    */
@@ -240,7 +240,7 @@ class RestResourceConfig extends ConfigEntityBase implements RestResourceConfigI
   /**
    * Returns the REST resource dependencies.
    *
-   * @return \Drupal\rest\Entity\ConfigDependencies
+   * @return ConfigDependencies
    *   The REST resource dependencies.
    */
   protected function getRestResourceDependencies() {

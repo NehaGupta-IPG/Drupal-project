@@ -153,7 +153,7 @@ class NumericFormatPluralTest extends ViewTestBase {
   /**
    * Creates and saves a test file.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   A file entity.
    */
   protected function createFile(): EntityInterface {

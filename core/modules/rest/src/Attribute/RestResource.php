@@ -10,7 +10,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 /**
  * Defines a REST resource attribute object.
  *
- * Plugin Namespace: Plugin\rest\resource
+ * Plugin Namespace: Plugin\rest\resource.
  *
  * For a working example, see \Drupal\dblog\Plugin\rest\resource\DbLogResource
  *
@@ -29,7 +29,7 @@ class RestResource extends Plugin {
    *
    * @param string $id
    *   The REST resource plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $label
+   * @param TranslatableMarkup $label
    *   The human-readable name of the REST resource plugin.
    * @param string|null $serialization_class
    *   (optional) The serialization class to deserialize serialized data into.

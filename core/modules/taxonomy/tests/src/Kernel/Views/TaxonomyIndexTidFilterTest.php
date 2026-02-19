@@ -64,7 +64,7 @@ class TaxonomyIndexTidFilterTest extends TaxonomyTestBase {
    * Tests dependencies are not added for terms that do not exist.
    */
   public function testConfigDependency(): void {
-    /** @var \Drupal\views\Entity\View $view */
+    /** @var View $view */
     $view = View::load('test_filter_taxonomy_index_tid__non_existing_dependency');
 
     // Dependencies are sorted.

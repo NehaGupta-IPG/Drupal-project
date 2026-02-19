@@ -6,9 +6,9 @@ namespace Drupal\ajax_test\Form;
 
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\MessageCommand;
-use Drupal\Core\Url;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 
 /**
  * Dummy form for testing DialogRenderer with _form routes.
@@ -69,10 +69,10 @@ class AjaxTestForm extends FormBase {
    *
    * @param array $form
    *   The form array to remove elements from.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   An AJAX response.
    */
   public function helloWorld(array &$form, FormStateInterface $form_state) {

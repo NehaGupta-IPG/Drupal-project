@@ -96,12 +96,12 @@ class TaggedHandlersPass implements CompilerPassInterface {
    *   - { name: breadcrumb_builder, priority: 100 }
    * @endcode
    *
-   * @throws \Symfony\Component\DependencyInjection\Exception\LogicException
+   * @throws LogicException
    *   If the method of a consumer service to be called does not type-hint an
    *   interface.
-   * @throws \Symfony\Component\DependencyInjection\Exception\LogicException
+   * @throws LogicException
    *   If a tagged handler does not implement the required interface.
-   * @throws \Symfony\Component\DependencyInjection\Exception\LogicException
+   * @throws LogicException
    *   If at least one tagged service is required but none are found.
    */
   public function process(ContainerBuilder $container): void {
@@ -132,7 +132,7 @@ class TaggedHandlersPass implements CompilerPassInterface {
    *   The service collector pass data.
    * @param string $consumer_id
    *   The consumer service ID.
-   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   * @param ContainerBuilder $container
    *   The service container.
    */
   protected function processServiceCollectorPass(array $pass, $consumer_id, ContainerBuilder $container) {
@@ -227,7 +227,7 @@ class TaggedHandlersPass implements CompilerPassInterface {
    *   The service collector pass data.
    * @param string $consumer_id
    *   The consumer service ID.
-   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   * @param ContainerBuilder $container
    *   The service container.
    */
   protected function processServiceIdCollectorPass(array $pass, $consumer_id, ContainerBuilder $container) {
@@ -255,9 +255,9 @@ class TaggedHandlersPass implements CompilerPassInterface {
   /**
    * Resolves the definition class.
    *
-   * @param \Symfony\Component\DependencyInjection\Definition $definition
+   * @param Definition $definition
    *   The service definition.
-   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   * @param ContainerBuilder $container
    *   The service container.
    *
    * @return class-string|null

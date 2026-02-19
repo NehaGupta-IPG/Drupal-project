@@ -8,12 +8,12 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\PathProcessor\OutboundPathProcessorInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\language\Attribute\LanguageNegotiation;
 use Drupal\language\LanguageNegotiationMethodBase;
 use Drupal\language\LanguageSwitcherInterface;
-use Drupal\Core\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
@@ -66,14 +66,14 @@ class LanguageNegotiationContentEntity extends LanguageNegotiationMethodBase imp
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * Constructs a new LanguageNegotiationContentEntity instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
@@ -213,9 +213,9 @@ class LanguageNegotiationContentEntity extends LanguageNegotiationMethodBase imp
    * Requirements: currently being on a content entity route and processing
    * outbound URL pointing to the same content entity.
    *
-   * @param \Symfony\Component\Routing\Route $outbound_route
+   * @param Route $outbound_route
    *   The route object for the current outbound URL being processed.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The HttpRequest object representing the current request.
    *
    * @return bool
@@ -243,7 +243,7 @@ class LanguageNegotiationContentEntity extends LanguageNegotiationMethodBase imp
   /**
    * Returns the content entity type ID from the current request for the route.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The HttpRequest object representing the current request.
    *
    * @return string

@@ -19,7 +19,7 @@ class FileAccessControlHandler extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
-    /** @var \Drupal\file\FileInterface $entity */
+    /** @var FileInterface $entity */
     if ($operation == 'download' || $operation == 'view') {
       if (\Drupal::service('stream_wrapper_manager')->getScheme($entity->getFileUri()) === 'public') {
         if ($operation === 'download') {
@@ -32,7 +32,7 @@ class FileAccessControlHandler extends EntityAccessControlHandler {
       elseif ($references = $this->getFileReferences($entity)) {
         foreach ($references as $field_name => $entity_map) {
           foreach ($entity_map as $referencing_entities) {
-            /** @var \Drupal\Core\Entity\EntityInterface $referencing_entity */
+            /** @var EntityInterface $referencing_entity */
             foreach ($referencing_entities as $referencing_entity) {
               $entity_and_field_access = $referencing_entity->access('view', $account, TRUE)->andIf($referencing_entity->$field_name->access('view', $account, TRUE));
               if ($entity_and_field_access->isAllowed()) {
@@ -84,7 +84,7 @@ class FileAccessControlHandler extends EntityAccessControlHandler {
   /**
    * Wrapper for file_get_file_references().
    *
-   * @param \Drupal\file\FileInterface $file
+   * @param FileInterface $file
    *   The file object for which to get references.
    *
    * @return array

@@ -68,7 +68,7 @@ class MigrateActionsTest extends MigrateDrupal6TestBase {
     $action = Action::load($id);
 
     $this->assertInstanceOf(Action::class, $action);
-    /** @var \Drupal\system\Entity\Action $action */
+    /** @var Action $action */
     $this->assertSame($id, $action->id());
     $this->assertSame($label, $action->label());
     $this->assertSame($type, $action->getType());

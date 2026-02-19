@@ -35,28 +35,28 @@ class NodeAccessJoinTest extends NodeTestBase {
   /**
    * The user that will create the articles.
    *
-   * @var \Drupal\user\UserInterface
+   * @var UserInterface
    */
   protected UserInterface $authorUser;
 
   /**
    * Another user that will create articles.
    *
-   * @var \Drupal\user\UserInterface
+   * @var UserInterface
    */
   protected UserInterface $otherUser;
 
   /**
    * A user with just access content permissions.
    *
-   * @var \Drupal\user\UserInterface
+   * @var UserInterface
    */
   protected UserInterface $regularUser;
 
   /**
    * A user with access to private articles.
    *
-   * @var \Drupal\user\UserInterface
+   * @var UserInterface
    */
   protected UserInterface $accessUser;
 

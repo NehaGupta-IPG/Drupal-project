@@ -29,7 +29,7 @@ class UserSaveTest extends KernelTestBase {
   public function testExistingPasswordRemoval(): void {
     $this->installEntitySchema('user');
 
-    /** @var \Drupal\user\Entity\User $user */
+    /** @var User $user */
     $user = User::create(['name' => $this->randomMachineName()]);
     $user->save();
     $user->setExistingPassword('existing password');

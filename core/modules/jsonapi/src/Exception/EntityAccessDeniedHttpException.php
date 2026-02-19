@@ -42,9 +42,9 @@ class EntityAccessDeniedHttpException extends CacheableAccessDeniedHttpException
   /**
    * EntityAccessDeniedHttpException constructor.
    *
-   * @param \Drupal\Core\Entity\EntityInterface|null $entity
+   * @param EntityInterface|null $entity
    *   The entity, or NULL when an entity is being created.
-   * @param \Drupal\Core\Access\AccessResultInterface $entity_access
+   * @param AccessResultInterface $entity_access
    *   The access result.
    * @param string $pointer
    *   (optional) The pointer.

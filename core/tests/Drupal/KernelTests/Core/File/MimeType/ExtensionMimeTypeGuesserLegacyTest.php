@@ -65,7 +65,7 @@ class ExtensionMimeTypeGuesserLegacyTest extends KernelTestBase {
       'The deprecated alter hook hook_file_mimetype_mapping_alter() is implemented in these locations: Drupal\file_deprecated_test\Hook\FileDeprecatedTestThemeHooks::fileMimetypeMappingAlter. This hook is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Implement a \Drupal\Core\File\Event\MimeTypeMapLoadedEvent listener instead. See https://www.drupal.org/node/3494040'
     );
 
-    /** @var \Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser $guesser */
+    /** @var ExtensionMimeTypeGuesser $guesser */
     $guesser = \Drupal::service('file.mime_type.guesser.extension');
     // Test using default mappings.
     foreach ($test_case as $input => $expected) {
@@ -88,7 +88,7 @@ class ExtensionMimeTypeGuesserLegacyTest extends KernelTestBase {
    * @legacy-covers ::setMapping
    */
   public function testFileMimeTypeDetectionCustomMapping(): void {
-    /** @var \Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser $extension_guesser */
+    /** @var ExtensionMimeTypeGuesser $extension_guesser */
     $extension_guesser = \Drupal::service('file.mime_type.guesser.extension');
 
     // Pass in a custom mapping.

@@ -6,10 +6,10 @@ use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\Schema\ConfigSchemaAlterException;
 use Drupal\Core\Config\Schema\ConfigSchemaDiscovery;
-use Drupal\Core\Config\Schema\TypeResolver;
 use Drupal\Core\Config\Schema\SequenceDataDefinition;
-use Drupal\Core\DependencyInjection\ClassResolverInterface;
+use Drupal\Core\Config\Schema\TypeResolver;
 use Drupal\Core\Config\Schema\Undefined;
+use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\TypedData\MapDataDefinition;
 use Drupal\Core\TypedData\TraversableTypedDataInterface;
@@ -24,14 +24,14 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
   /**
    * A storage instance for reading configuration data.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   protected $configStorage;
 
   /**
    * A storage instance for reading configuration schema data.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   protected $schemaStorage;
 
@@ -45,15 +45,15 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
   /**
    * Creates a new typed configuration manager.
    *
-   * @param \Drupal\Core\Config\StorageInterface $configStorage
+   * @param StorageInterface $configStorage
    *   The storage object to use for reading schema data.
-   * @param \Drupal\Core\Config\StorageInterface $schemaStorage
+   * @param StorageInterface $schemaStorage
    *   The storage object to use for reading schema data.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The cache backend to use for caching the definitions.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $class_resolver
+   * @param ClassResolverInterface $class_resolver
    *   (optional) The class resolver.
    */
   public function __construct(StorageInterface $configStorage, StorageInterface $schemaStorage, CacheBackendInterface $cache, ModuleHandlerInterface $module_handler, ?ClassResolverInterface $class_resolver = NULL) {
@@ -188,10 +188,10 @@ class TypedConfigManager extends TypedDataManager implements TypedConfigManagerI
   /**
    * Gets the static type root for a config schema object.
    *
-   * @param \Drupal\Core\TypedData\TraversableTypedDataInterface $object
+   * @param TraversableTypedDataInterface $object
    *   A config schema object to get the static type root for.
    *
-   * @return \Drupal\Core\TypedData\TraversableTypedDataInterface
+   * @return TraversableTypedDataInterface
    *   The ancestral config schema object at which the static type root lies:
    *   either the first ancestor with a dynamic type (for example:
    *   `block.block.*:settings`, which has the `block.settings.[%parent.plugin]`

@@ -38,70 +38,70 @@ class LocalActionManagerTest extends UnitTestCase {
   /**
    * The mocked argument resolver.
    *
-   * @var \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var ArgumentResolverInterface|MockObject
    */
   protected $argumentResolver;
 
   /**
    * The mocked request.
    *
-   * @var \Symfony\Component\HttpFoundation\Request|\PHPUnit\Framework\MockObject\MockObject
+   * @var Request|MockObject
    */
   protected $request;
 
   /**
    * The mocked module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var ModuleHandlerInterface|MockObject
    */
   protected $moduleHandler;
 
   /**
    * The mocked router provider.
    *
-   * @var \Drupal\Core\Routing\RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var RouteProviderInterface|MockObject
    */
   protected $routeProvider;
 
   /**
    * The mocked cache backend.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var CacheBackendInterface|MockObject
    */
   protected $cacheBackend;
 
   /**
    * The mocked access manager.
    *
-   * @var \Drupal\Core\Access\AccessManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var AccessManagerInterface|MockObject
    */
   protected $accessManager;
 
   /**
    * The mocked account.
    *
-   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var AccountInterface|MockObject
    */
   protected $account;
 
   /**
    * The mocked factory.
    *
-   * @var \Drupal\Component\Plugin\Factory\FactoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var FactoryInterface|MockObject
    */
   protected $factory;
 
   /**
    * The mocked plugin discovery.
    *
-   * @var \Drupal\Component\Plugin\Discovery\DiscoveryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var DiscoveryInterface|MockObject
    */
   protected $discovery;
 
   /**
    * The tested local action manager.
    *
-   * @var \Drupal\Tests\Core\Menu\TestLocalActionManager
+   * @var TestLocalActionManager
    */
   protected $localActionManager;
 

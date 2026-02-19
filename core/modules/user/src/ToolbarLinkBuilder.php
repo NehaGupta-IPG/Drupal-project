@@ -17,14 +17,14 @@ class ToolbarLinkBuilder implements TrustedCallbackInterface {
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountProxyInterface
+   * @var AccountProxyInterface
    */
   protected $account;
 
   /**
    * ToolbarHandler constructor.
    *
-   * @param \Drupal\Core\Session\AccountProxyInterface $account
+   * @param AccountProxyInterface $account
    *   The current user.
    */
   public function __construct(AccountProxyInterface $account) {

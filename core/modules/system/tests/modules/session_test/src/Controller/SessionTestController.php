@@ -18,7 +18,7 @@ class SessionTestController extends ControllerBase {
   /**
    * Prints the stored session value to the screen.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The incoming request.
    */
   public function get(Request $request): array {
@@ -31,7 +31,7 @@ class SessionTestController extends ControllerBase {
   /**
    * Prints the stored session value to the screen.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The incoming request.
    */
   public function getFromSessionObject(Request $request): array {
@@ -44,7 +44,7 @@ class SessionTestController extends ControllerBase {
   /**
    * Print the current session ID.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The incoming request.
    */
   public function getId(Request $request): array {
@@ -60,7 +60,7 @@ class SessionTestController extends ControllerBase {
   /**
    * Print the current session ID as read from the cookie.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    */
   public function getIdFromCookie(Request $request): array {
@@ -73,7 +73,7 @@ class SessionTestController extends ControllerBase {
   /**
    * Stores a value in 'session_test_value' session attribute.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    * @param string $test_value
    *   A session value.
@@ -87,7 +87,7 @@ class SessionTestController extends ControllerBase {
   /**
    * Turns off session saving and then tries to save a value anyway.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    * @param string $test_value
    *   A session value.
@@ -128,7 +128,7 @@ class SessionTestController extends ControllerBase {
   /**
    * Returns the trace recorded by test proxy session handlers as JSON.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The incoming request.
    */
   public function traceHandler(Request $request): Response {
@@ -153,7 +153,7 @@ class SessionTestController extends ControllerBase {
    * Expects that there is an existing stacked session handler trace as recorded
    * by `traceHandler()`.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The incoming request.
    *
    * @throws \AssertionError
@@ -182,7 +182,7 @@ class SessionTestController extends ControllerBase {
   /**
    * Returns the values stored in the active session and the user ID.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    */
   public function getSession(Request $request): Response {
@@ -192,7 +192,7 @@ class SessionTestController extends ControllerBase {
   /**
    * Sets a test value on the session.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    * @param string $test_value
    *   A value to set on the session.
@@ -206,11 +206,11 @@ class SessionTestController extends ControllerBase {
   /**
    * Sets the test flag in the session test bag.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    */
   public function setSessionBagFlag(Request $request): Response {
-    /** @var \Drupal\session_test\Session\TestSessionBag */
+    /** @var TestSessionBag */
     $bag = $request->getSession()->getBag(TestSessionBag::BAG_NAME);
     $bag->setFlag();
     return new Response();
@@ -219,11 +219,11 @@ class SessionTestController extends ControllerBase {
   /**
    * Clears the test flag from the session test bag.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    */
   public function clearSessionBagFlag(Request $request): Response {
-    /** @var \Drupal\session_test\Session\TestSessionBag */
+    /** @var TestSessionBag */
     $bag = $request->getSession()->getBag(TestSessionBag::BAG_NAME);
     $bag->clearFlag();
     return new Response();
@@ -232,11 +232,11 @@ class SessionTestController extends ControllerBase {
   /**
    * Prints a message if the flag in the session bag is set.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    */
   public function hasSessionBagFlag(Request $request): Response {
-    /** @var \Drupal\session_test\Session\TestSessionBag */
+    /** @var TestSessionBag */
     $bag = $request->getSession()->getBag(TestSessionBag::BAG_NAME);
     return new Response(empty($bag->hasFlag())
       ? (string) $this->t('Flag is absent from session bag')
@@ -247,7 +247,7 @@ class SessionTestController extends ControllerBase {
   /**
    * Trigger an exception when the session is written.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    */
   public function triggerWriteException(Request $request): Response {

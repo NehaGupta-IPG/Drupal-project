@@ -6,13 +6,13 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityHandlerInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\Core\Entity\EntityAccessControlHandler;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -27,14 +27,14 @@ class NodeAccessControlHandler extends EntityAccessControlHandler implements Nod
   /**
    * The node grant storage.
    *
-   * @var \Drupal\node\NodeGrantDatabaseStorageInterface
+   * @var NodeGrantDatabaseStorageInterface
    */
   protected $grantStorage;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
@@ -61,11 +61,11 @@ class NodeAccessControlHandler extends EntityAccessControlHandler implements Nod
   /**
    * Constructs a NodeAccessControlHandler object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\node\NodeGrantDatabaseStorageInterface $grant_storage
+   * @param NodeGrantDatabaseStorageInterface $grant_storage
    *   The node grant storage.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(EntityTypeInterface $entity_type, NodeGrantDatabaseStorageInterface $grant_storage, EntityTypeManagerInterface $entity_type_manager) {
@@ -131,7 +131,7 @@ class NodeAccessControlHandler extends EntityAccessControlHandler implements Nod
     assert($node instanceof NodeInterface);
     $cacheability = new CacheableMetadata();
 
-    /** @var \Drupal\node\NodeInterface $node */
+    /** @var NodeInterface $node */
     if ($operation === 'view') {
       $result = $this->checkViewAccess($node, $account, $cacheability);
       if ($result !== NULL) {
@@ -192,14 +192,14 @@ class NodeAccessControlHandler extends EntityAccessControlHandler implements Nod
   /**
    * Performs view access checks.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   The node for which to check access.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user for which to check access.
-   * @param \Drupal\Core\Cache\CacheableMetadata $cacheability
+   * @param CacheableMetadata $cacheability
    *   Allows cacheability information bubble up from this method.
    *
-   * @return \Drupal\Core\Access\AccessResultInterface|null
+   * @return AccessResultInterface|null
    *   The calculated access result or null when no opinion.
    */
   protected function checkViewAccess(NodeInterface $node, AccountInterface $account, CacheableMetadata $cacheability): ?AccessResultInterface {

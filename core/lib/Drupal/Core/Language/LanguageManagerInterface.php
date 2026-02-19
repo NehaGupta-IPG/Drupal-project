@@ -45,7 +45,7 @@ interface LanguageManagerInterface {
    *   language. Defaults to
    *   \Drupal\Core\Language\LanguageInterface::TYPE_INTERFACE.
    *
-   * @return \Drupal\Core\Language\LanguageInterface
+   * @return LanguageInterface
    *   The current language object for the given type of language.
    */
   public function getCurrentLanguage($type = LanguageInterface::TYPE_INTERFACE);
@@ -66,7 +66,7 @@ interface LanguageManagerInterface {
   /**
    * Returns a language object representing the site's default language.
    *
-   * @return \Drupal\Core\Language\LanguageInterface
+   * @return LanguageInterface
    *   A language object.
    */
   public function getDefaultLanguage();
@@ -79,7 +79,7 @@ interface LanguageManagerInterface {
    *   It can be: LanguageInterface::STATE_CONFIGURABLE,
    *   LanguageInterface::STATE_LOCKED, or LanguageInterface::STATE_ALL.
    *
-   * @return \Drupal\Core\Language\LanguageInterface[]
+   * @return LanguageInterface[]
    *   An associative array of languages, keyed by the language code.
    */
   public function getLanguages($flags = LanguageInterface::STATE_CONFIGURABLE);
@@ -87,7 +87,7 @@ interface LanguageManagerInterface {
   /**
    * Returns a list of languages set up on the site in their native form.
    *
-   * @return \Drupal\Core\Language\LanguageInterface[]
+   * @return LanguageInterface[]
    *   An associative array of languages, keyed by the language code, ordered
    *   by weight ascending and name ascending.
    */
@@ -99,7 +99,7 @@ interface LanguageManagerInterface {
    * @param string $langcode
    *   The language code.
    *
-   * @return \Drupal\Core\Language\LanguageInterface|null
+   * @return LanguageInterface|null
    *   A fully-populated language object or NULL.
    */
   public function getLanguage($langcode);
@@ -122,7 +122,7 @@ interface LanguageManagerInterface {
    *   (optional) An integer value that is used as the start value for the
    *   weights of the locked languages.
    *
-   * @return \Drupal\Core\Language\LanguageInterface[]
+   * @return LanguageInterface[]
    *   An array of language objects.
    */
   public function getDefaultLockedLanguages($weight = 0);
@@ -168,7 +168,7 @@ interface LanguageManagerInterface {
    *
    * @param string $type
    *   The language type.
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   The URL the switch links will be relative to.
    *
    * @return object|null
@@ -182,7 +182,7 @@ interface LanguageManagerInterface {
   /**
    * Sets the configuration override language.
    *
-   * @param \Drupal\Core\Language\LanguageInterface $language
+   * @param LanguageInterface $language
    *   The language to override configuration with.
    *
    * @return $this
@@ -192,7 +192,7 @@ interface LanguageManagerInterface {
   /**
    * Gets the current configuration override language.
    *
-   * @return \Drupal\Core\Language\LanguageInterface
+   * @return LanguageInterface
    *   The current configuration override language.
    */
   public function getConfigOverrideLanguage();

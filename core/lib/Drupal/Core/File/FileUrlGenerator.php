@@ -18,32 +18,32 @@ class FileUrlGenerator implements FileUrlGeneratorInterface {
   /**
    * The stream wrapper manager.
    *
-   * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface
+   * @var StreamWrapperManagerInterface
    */
   protected $streamWrapperManager;
 
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * Constructs a new file URL generator object.
    *
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager
+   * @param StreamWrapperManagerInterface $stream_wrapper_manager
    *   The stream wrapper manager.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   The request stack.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
    */
   public function __construct(StreamWrapperManagerInterface $stream_wrapper_manager, RequestStack $request_stack, ModuleHandlerInterface $module_handler) {
@@ -79,7 +79,7 @@ class FileUrlGenerator implements FileUrlGeneratorInterface {
    *   An absolute string containing a URL that may be used to access the
    *   file.
    *
-   * @throws \Drupal\Core\File\Exception\InvalidStreamWrapperException
+   * @throws InvalidStreamWrapperException
    *   If a stream wrapper could not be found to generate an external URL.
    */
   protected function doGenerateString(string $uri, bool $relative): string {

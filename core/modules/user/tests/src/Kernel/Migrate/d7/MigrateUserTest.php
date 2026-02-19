@@ -94,7 +94,7 @@ class MigrateUserTest extends MigrateDrupal7TestBase {
    * @internal
    */
   protected function assertEntity(string $id, string $label, string $mail, string $password, int $created, int $access, int $login, bool $blocked, string $entity_langcode, string $prefered_langcode, string $timezone, string $init, array $roles, ?array $field_integer, $field_file_target_id = FALSE, bool $has_picture = FALSE): void {
-    /** @var \Drupal\user\UserInterface $user */
+    /** @var UserInterface $user */
     $user = User::load($id);
     $this->assertInstanceOf(UserInterface::class, $user);
     $this->assertSame($label, $user->label());

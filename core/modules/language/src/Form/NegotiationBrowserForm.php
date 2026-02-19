@@ -20,7 +20,7 @@ class NegotiationBrowserForm extends ConfigFormBase {
   /**
    * The configurable language manager.
    *
-   * @var \Drupal\language\ConfigurableLanguageManagerInterface
+   * @var ConfigurableLanguageManagerInterface
    */
   protected $languageManager;
 

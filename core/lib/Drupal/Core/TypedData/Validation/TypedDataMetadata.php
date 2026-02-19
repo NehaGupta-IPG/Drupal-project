@@ -17,14 +17,14 @@ class TypedDataMetadata implements MetadataInterface {
   /**
    * The typed data object the metadata is about.
    *
-   * @var \Drupal\Core\TypedData\TypedDataInterface
+   * @var TypedDataInterface
    */
   protected $typedData;
 
   /**
    * Constructs the object.
    *
-   * @param \Drupal\Core\TypedData\TypedDataInterface $typed_data
+   * @param TypedDataInterface $typed_data
    *   The typed data object the metadata is about.
    */
   public function __construct(TypedDataInterface $typed_data) {

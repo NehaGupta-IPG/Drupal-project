@@ -24,7 +24,7 @@ class LocalTaskDefaultTest extends UnitTestCase {
   /**
    * The tested local task default plugin.
    *
-   * @var \Drupal\Core\Menu\LocalTaskDefault
+   * @var LocalTaskDefault
    */
   protected $localTaskBase;
 
@@ -54,14 +54,14 @@ class LocalTaskDefaultTest extends UnitTestCase {
   /**
    * The mocked translator.
    *
-   * @var \Drupal\Core\StringTranslation\TranslationInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\StringTranslation\TranslationInterface|MockObject
    */
   protected $stringTranslation;
 
   /**
    * The mocked route provider.
    *
-   * @var \Drupal\Core\Routing\RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var RouteProviderInterface|MockObject
    */
   protected $routeProvider;
 

@@ -24,16 +24,16 @@ class BlockContentAccessControlHandler extends EntityAccessControlHandler implem
   /**
    * The event dispatcher.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+   * @var EventDispatcherInterface
    */
   protected $eventDispatcher;
 
   /**
    * BlockContentAccessControlHandler constructor.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher
+   * @param EventDispatcherInterface $dispatcher
    *   The event dispatcher.
    */
   public function __construct(EntityTypeInterface $entity_type, EventDispatcherInterface $dispatcher) {
@@ -95,7 +95,7 @@ class BlockContentAccessControlHandler extends EntityAccessControlHandler implem
           return AccessResult::forbidden("Non-reusable blocks must set an access dependency for access control.");
         }
       }
-      /** @var \Drupal\Core\Entity\EntityInterface $dependency */
+      /** @var EntityInterface $dependency */
       $access = $access->andIf($dependency->access($operation, $account, TRUE));
     }
     return $access;

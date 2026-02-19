@@ -19,7 +19,7 @@ class EntityTypeRepository implements EntityTypeRepositoryInterface {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 

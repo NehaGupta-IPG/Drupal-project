@@ -5,8 +5,8 @@ namespace Drupal\Core\Entity;
 use Drupal\Core\Config\Action\Attribute\ActionMethod;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
-use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Entity\Display\EntityDisplayInterface;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
@@ -46,7 +46,7 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
   /**
    * A list of field definitions eligible for configuration in this display.
    *
-   * @var \Drupal\Core\Field\FieldDefinitionInterface[]
+   * @var FieldDefinitionInterface[]
    */
   protected $fieldDefinitions;
 
@@ -435,7 +435,7 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
   /**
    * Determines if a field has options for a given display.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $definition
+   * @param FieldDefinitionInterface $definition
    *   A field definition.
    *
    * @return array|null

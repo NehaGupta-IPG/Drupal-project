@@ -90,7 +90,7 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
    *
    * @param int $options
    *   What aspects of the patcher are installed how.
-   * @param \Drupal\package_manager\ValidationResult[] $expected_results
+   * @param ValidationResult[] $expected_results
    *   The expected validation results.
    */
   #[DataProvider('providerErrorDuringPreCreate')]
@@ -206,7 +206,7 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
    *   Whether patcher is installed in active.
    * @param int $in_stage
    *   Whether patcher is installed in stage.
-   * @param \Drupal\package_manager\ValidationResult[] $expected_results
+   * @param ValidationResult[] $expected_results
    *   The expected validation results.
    * @param string[] $help_page_sections
    *   An associative array of fragments (anchors) in the online help. The keys
@@ -283,7 +283,7 @@ class ComposerPatchesValidatorTest extends PackageManagerKernelTestBase {
    *   Whether patcher is installed in active.
    * @param int $in_stage
    *   Whether patcher is installed in stage.
-   * @param \Drupal\package_manager\ValidationResult[] $expected_results
+   * @param ValidationResult[] $expected_results
    *   The expected validation results.
    * @param string[] $help_page_sections
    *   An associative array of fragments (anchors) in the online help. The keys

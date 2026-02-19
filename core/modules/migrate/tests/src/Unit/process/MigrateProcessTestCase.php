@@ -21,14 +21,14 @@ abstract class MigrateProcessTestCase extends MigrateTestCase {
   /**
    * A mock of a process row.
    *
-   * @var \Drupal\migrate\Row|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\migrate\Row|MockObject
    */
   protected $row;
 
   /**
    * The migration executable or a mock.
    *
-   * @var \Drupal\migrate\MigrateExecutable|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\migrate\MigrateExecutable|MockObject
    */
   protected $migrateExecutable;
 

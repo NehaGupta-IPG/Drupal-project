@@ -26,14 +26,14 @@ class ReadOnlyStorageTest extends UnitTestCase {
   /**
    * The memory storage containing the data.
    *
-   * @var \Drupal\Core\Config\MemoryStorage
+   * @var MemoryStorage
    */
   protected $memory;
 
   /**
    * The read-only storage under test.
    *
-   * @var \Drupal\Core\Config\ReadOnlyStorage
+   * @var ReadOnlyStorage
    */
   protected $storage;
 

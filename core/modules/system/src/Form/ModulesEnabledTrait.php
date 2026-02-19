@@ -30,7 +30,7 @@ trait ModulesEnabledTrait {
    * @param string[] $modules
    *   Enabled module names, keyed by machine names.
    *
-   * @return \Drupal\Core\StringTranslation\PluralTranslatableMarkup
+   * @return PluralTranslatableMarkup
    *   A confirmation message. If any of the enabled modules have permissions
    *   that the current user can manage, then include a link to the permissions
    *   page for those modules.
@@ -63,10 +63,10 @@ trait ModulesEnabledTrait {
    *
    * @param string[] $modules
    *   Enabled module names, keyed by machine names.
-   * @param \Drupal\Core\Config\PreExistingConfigException $exception
+   * @param PreExistingConfigException $exception
    *   Exception thrown if configuration with the same name already exists.
    *
-   * @return \Drupal\Core\StringTranslation\PluralTranslatableMarkup
+   * @return PluralTranslatableMarkup
    *   A confirmation message. If any of the enabled modules have permissions
    *   that the current user can manage, then include a link to the permissions
    *   page for those modules.

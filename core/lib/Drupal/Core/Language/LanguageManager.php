@@ -19,7 +19,7 @@ class LanguageManager implements LanguageManagerInterface {
    * language the list is translated to (first level) and the flags provided to
    * the method (second level).
    *
-   * @var \Drupal\Core\Language\LanguageInterface[]
+   * @var LanguageInterface[]
    *
    * @see \Drupal\Core\Language\LanguageManager::getLanguages()
    */
@@ -28,7 +28,7 @@ class LanguageManager implements LanguageManagerInterface {
   /**
    * The default language object.
    *
-   * @var \Drupal\Core\Language\LanguageDefault
+   * @var LanguageDefault
    */
   protected $defaultLanguage;
 
@@ -40,7 +40,7 @@ class LanguageManager implements LanguageManagerInterface {
   /**
    * Constructs the language manager.
    *
-   * @param \Drupal\Core\Language\LanguageDefault $default_language
+   * @param LanguageDefault $default_language
    *   The default language.
    */
   public function __construct(LanguageDefault $default_language) {
@@ -377,7 +377,7 @@ class LanguageManager implements LanguageManagerInterface {
    * language unless the Language module is enabled. That replaces the default
    * language manager with a configurable language manager.
    *
-   * @param \Drupal\Core\Language\LanguageInterface $language
+   * @param LanguageInterface $language
    *   The language to override configuration with.
    *
    * @return $this
@@ -400,14 +400,14 @@ class LanguageManager implements LanguageManagerInterface {
    *
    * The locked languages are removed by default.
    *
-   * @param \Drupal\Core\Language\LanguageInterface[] $languages
+   * @param LanguageInterface[] $languages
    *   Array with languages to be filtered.
    * @param int $flags
    *   (optional) Specifies the state of the languages that have to be returned.
    *   It can be: LanguageInterface::STATE_CONFIGURABLE,
    *   LanguageInterface::STATE_LOCKED, or LanguageInterface::STATE_ALL.
    *
-   * @return \Drupal\Core\Language\LanguageInterface[]
+   * @return LanguageInterface[]
    *   An associative array of languages, keyed by the language code.
    */
   protected function filterLanguages(array $languages, $flags = LanguageInterface::STATE_CONFIGURABLE) {

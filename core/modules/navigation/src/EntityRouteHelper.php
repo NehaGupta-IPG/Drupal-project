@@ -30,11 +30,11 @@ class EntityRouteHelper {
   /**
    * EntityRouteHelper constructor.
    *
-   * @param \Drupal\Core\Routing\CurrentRouteMatch $routeMatch
+   * @param CurrentRouteMatch $routeMatch
    *   The route match.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
+   * @param CacheBackendInterface $cacheBackend
    *   The cache backend.
    */
   public function __construct(
@@ -114,7 +114,7 @@ class EntityRouteHelper {
   /**
    * Returns the path for the link template for a given content entity type.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
    *
    * @return array
@@ -131,7 +131,7 @@ class EntityRouteHelper {
   /**
    * Determines if a given entity type is layout builder relevant or not.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type.
    *
    * @return bool

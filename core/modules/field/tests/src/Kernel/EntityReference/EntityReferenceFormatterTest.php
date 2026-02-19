@@ -570,7 +570,7 @@ class EntityReferenceFormatterTest extends EntityKernelTestBase {
    * The render array structure is as built by
    * \Drupal\Core\Field\FieldItemListInterface::view().
    *
-   * @param \Drupal\Core\Entity\EntityInterface[] $referenced_entities
+   * @param EntityInterface[] $referenced_entities
    *   An array of entity objects that will be referenced.
    * @param string $formatter
    *   The formatted plugin that will be used for building the render array.

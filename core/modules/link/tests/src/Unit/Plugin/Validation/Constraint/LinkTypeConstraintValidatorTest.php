@@ -212,7 +212,7 @@ class LinkTypeConstraintValidatorTest extends UnitTestCase {
    *
    * @param mixed $link
    *   A field value to validate.
-   * @param \Symfony\Component\Validator\Context\ExecutionContextInterface&\PHPUnit\Framework\MockObject\MockObject $context
+   * @param ExecutionContextInterface&MockObject $context
    *   The execution context.
    */
   protected function doValidate($link, ExecutionContextInterface&MockObject $context): void {
@@ -227,7 +227,7 @@ class LinkTypeConstraintValidatorTest extends UnitTestCase {
    * @param int $type
    *   The type of Link field as defined in LinkItemInterface.
    *
-   * @return \Drupal\Core\Field\FieldDefinitionInterface
+   * @return FieldDefinitionInterface
    *   The mock field definition.
    */
   protected function getMockFieldDefinition(int $type): FieldDefinitionInterface {

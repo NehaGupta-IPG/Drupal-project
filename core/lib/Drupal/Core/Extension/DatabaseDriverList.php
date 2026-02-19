@@ -35,7 +35,7 @@ class DatabaseDriverList extends ExtensionList {
    *   The app root.
    * @param string $type
    *   The extension type.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The cache.
    */
   public function __construct($root, $type, CacheBackendInterface $cache) {
@@ -100,7 +100,7 @@ class DatabaseDriverList extends ExtensionList {
   /**
    * Returns the list of installable database drivers.
    *
-   * @return \Drupal\Core\Extension\DatabaseDriver[]
+   * @return DatabaseDriver[]
    *   An array of installable database driver extension objects.
    */
   public function getInstallableList(): array {

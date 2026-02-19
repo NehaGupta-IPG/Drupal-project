@@ -9,17 +9,17 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Url;
 use Drupal\locale\LocaleConfigManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Configuration mapper base implementation.
@@ -29,49 +29,49 @@ class ConfigNamesMapper extends PluginBase implements ConfigMapperInterface, Con
   /**
    * The configuration factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * The typed config manager.
    *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface
+   * @var TypedConfigManagerInterface
    */
   protected $typedConfigManager;
 
   /**
    * The typed configuration manager.
    *
-   * @var \Drupal\locale\LocaleConfigManager
+   * @var LocaleConfigManager
    */
   protected $localeConfigManager;
 
   /**
    * The mapper plugin discovery service.
    *
-   * @var \Drupal\config_translation\ConfigMapperManagerInterface
+   * @var ConfigMapperManagerInterface
    */
   protected $configMapperManager;
 
   /**
    * The route provider.
    *
-   * @var \Drupal\Core\Routing\RouteProviderInterface
+   * @var RouteProviderInterface
    */
   protected $routeProvider;
 
   /**
    * The base route object that the mapper is attached to.
    *
-   * @var \Symfony\Component\Routing\Route
+   * @var Route
    */
   protected $baseRoute;
 
   /**
    * The available routes.
    *
-   * @var \Symfony\Component\Routing\RouteCollection
+   * @var RouteCollection
    */
   protected $routeCollection;
 
@@ -85,14 +85,14 @@ class ConfigNamesMapper extends PluginBase implements ConfigMapperInterface, Con
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The event dispatcher.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+   * @var EventDispatcherInterface
    */
   protected $eventDispatcher;
 
@@ -111,24 +111,24 @@ class ConfigNamesMapper extends PluginBase implements ConfigMapperInterface, Con
    *     Defaults to 20.
    *   - list_controller: (optional) Class name for list controller used to
    *     generate lists of this type of configuration.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The configuration factory.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
+   * @param TypedConfigManagerInterface $typed_config
    *   The typed configuration manager.
-   * @param \Drupal\locale\LocaleConfigManager $locale_config_manager
+   * @param LocaleConfigManager $locale_config_manager
    *   The locale configuration manager.
-   * @param \Drupal\config_translation\ConfigMapperManagerInterface $config_mapper_manager
+   * @param ConfigMapperManagerInterface $config_mapper_manager
    *   The mapper plugin discovery service.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
+   * @param RouteProviderInterface $route_provider
    *   The route provider.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param TranslationInterface $string_translation
    *   The string translation manager.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param EventDispatcherInterface $event_dispatcher
    *   (optional) The event dispatcher.
    *
-   * @throws \Symfony\Component\Routing\Exception\RouteNotFoundException
+   * @throws RouteNotFoundException
    *   Throws an exception if the route specified by the 'base_route_name' in
    *   the plugin definition could not be found by the route provider.
    */
@@ -213,7 +213,7 @@ class ConfigNamesMapper extends PluginBase implements ConfigMapperInterface, Con
   /**
    * Allows to process all config translation routes.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route object to process.
    */
   protected function processRoute(Route $route) {

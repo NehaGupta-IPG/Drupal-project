@@ -17,7 +17,7 @@ class FileValidationConstraintValidator extends ConstraintValidator implements C
   /**
    * Creates a new FileValidationConstraintValidator.
    *
-   * @param \Drupal\file\Validation\FileValidatorInterface $fileValidator
+   * @param FileValidatorInterface $fileValidator
    *   The file validator.
    */
   public function __construct(

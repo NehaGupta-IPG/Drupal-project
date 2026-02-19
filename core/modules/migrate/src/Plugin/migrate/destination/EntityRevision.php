@@ -19,7 +19,7 @@ use Drupal\migrate\Row;
  * Provides entity revision destination plugin.
  *
  * Refer to the parent class for configuration keys:
- * \Drupal\migrate\Plugin\migrate\destination\EntityContentBase
+ * \Drupal\migrate\Plugin\migrate\destination\EntityContentBase.
  *
  * Entity revisions can only be migrated after the entity to which the revisions
  * belong has been migrated. For example, revisions of a given content type can
@@ -127,7 +127,7 @@ class EntityRevision extends EntityContentBase {
   /**
    * Gets the entity.
    *
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The row object.
    * @param array $old_destination_id_values
    *   The old destination IDs.

@@ -26,7 +26,7 @@ class ReorderHook implements HookAttributeInterface {
    *   The method name of the targeted hook implementation.
    *   If the #[Hook] attribute is on the class itself, this should be
    *   '__invoke'.
-   * @param \Drupal\Core\Hook\Order\OrderInterface $order
+   * @param OrderInterface $order
    *   Specifies a new position for the targeted hook implementation relative to
    *   other implementations.
    */

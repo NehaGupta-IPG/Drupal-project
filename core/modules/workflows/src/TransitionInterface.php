@@ -47,7 +47,7 @@ interface TransitionInterface {
   /**
    * Gets the transition's from states.
    *
-   * @return \Drupal\workflows\StateInterface[]
+   * @return StateInterface[]
    *   The transition's from states.
    */
   public function from();
@@ -55,7 +55,7 @@ interface TransitionInterface {
   /**
    * Gets the transition's to state.
    *
-   * @return \Drupal\workflows\StateInterface
+   * @return StateInterface
    *   The transition's to state.
    */
   public function to();

@@ -28,20 +28,20 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * Constructs a new AccountForm object.
    *
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct(EntityRepositoryInterface $entity_repository, LanguageManagerInterface $language_manager, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, ?TimeInterface $time = NULL) {
@@ -65,7 +65,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
    * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state) {
-    /** @var \Drupal\user\UserInterface $account */
+    /** @var UserInterface $account */
     $account = $this->entity;
     $user = $this->currentUser();
     $config = \Drupal::config('user.settings');
@@ -346,11 +346,11 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
    *
    * @param string $entity_type_id
    *   The entity type identifier.
-   * @param \Drupal\user\UserInterface $user
+   * @param UserInterface $user
    *   The entity updated with the submitted values.
    * @param array $form
    *   The complete form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function syncUserLangcode($entity_type_id, UserInterface $user, array &$form, FormStateInterface &$form_state) {
@@ -371,7 +371,7 @@ abstract class AccountForm extends ContentEntityForm implements TrustedCallbackI
       $form_state->setValue('roles', array_keys(array_filter($form_state->getValue('roles'))));
     }
 
-    /** @var \Drupal\user\UserInterface $account */
+    /** @var UserInterface $account */
     $account = parent::buildEntity($form, $form_state);
 
     // Translate the empty value '' of language selects to an unset field.

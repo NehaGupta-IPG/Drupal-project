@@ -27,9 +27,9 @@ trait ContextAwarePluginAssignmentTrait {
   /**
    * Builds a form element for assigning a context to a given slot.
    *
-   * @param \Drupal\Core\Plugin\ContextAwarePluginInterface $plugin
+   * @param ContextAwarePluginInterface $plugin
    *   The context-aware plugin.
-   * @param \Drupal\Component\Plugin\Context\ContextInterface[] $contexts
+   * @param ContextInterface[] $contexts
    *   An array of contexts.
    *
    * @return array

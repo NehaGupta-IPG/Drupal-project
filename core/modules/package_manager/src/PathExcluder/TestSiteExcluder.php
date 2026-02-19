@@ -29,7 +29,7 @@ final class TestSiteExcluder implements EventSubscriberInterface {
   /**
    * Excludes sites/simpletest from stage operations.
    *
-   * @param \Drupal\package_manager\Event\CollectPathsToExcludeEvent $event
+   * @param CollectPathsToExcludeEvent $event
    *   The event object.
    */
   public function excludeTestSites(CollectPathsToExcludeEvent $event): void {

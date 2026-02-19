@@ -63,16 +63,16 @@ interface UrlGeneratorInterface extends SymfonyUrlGeneratorInterface {
    *   (optional) Defaults to FALSE. When TRUE, both the generated URL and its
    *   associated bubbleable metadata are returned.
    *
-   * @return string|\Drupal\Core\GeneratedUrl
+   * @return string|GeneratedUrl
    *   The generated URL for the given route.
    *   When $collect_bubbleable_metadata is TRUE, a GeneratedUrl object is
    *   returned, containing the generated URL plus bubbleable metadata.
    *
-   * @throws \Symfony\Component\Routing\Exception\RouteNotFoundException
+   * @throws RouteNotFoundException
    *   Thrown when the named route does not exist.
-   * @throws \Symfony\Component\Routing\Exception\MissingMandatoryParametersException
+   * @throws MissingMandatoryParametersException
    *   Thrown when some parameters are missing that are mandatory for the route.
-   * @throws \Symfony\Component\Routing\Exception\InvalidParameterException
+   * @throws InvalidParameterException
    *   Thrown when a parameter value for a placeholder is not correct because it
    *   does not match the requirement.
    *

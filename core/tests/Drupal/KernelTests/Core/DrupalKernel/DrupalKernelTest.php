@@ -51,12 +51,12 @@ class DrupalKernelTest extends KernelTestBase {
    * settings from the filesystem we need to go to extra lengths to build a
    * kernel for testing.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   A request object to use in booting the kernel.
    * @param array $modules_enabled
    *   A list of modules to install on the kernel.
    *
-   * @return \Drupal\Core\DrupalKernel
+   * @return DrupalKernel
    *   New kernel for testing.
    */
   protected function getTestKernel(Request $request, ?array $modules_enabled = NULL) {

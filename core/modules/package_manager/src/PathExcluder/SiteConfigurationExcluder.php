@@ -31,7 +31,7 @@ class SiteConfigurationExcluder implements EventSubscriberInterface {
   /**
    * Excludes site configuration files from stage operations.
    *
-   * @param \Drupal\package_manager\Event\CollectPathsToExcludeEvent $event
+   * @param CollectPathsToExcludeEvent $event
    *   The event object.
    */
   public function excludeSiteConfiguration(CollectPathsToExcludeEvent $event): void {
@@ -69,7 +69,7 @@ class SiteConfigurationExcluder implements EventSubscriberInterface {
    * from Package Manager operations. This allows the scaffold plugin to change
    * those files in the stage directory.
    *
-   * @param \Drupal\package_manager\Event\PostCreateEvent $event
+   * @param PostCreateEvent $event
    *   The event being handled.
    *
    * @see ::excludeSiteConfiguration()
@@ -88,10 +88,10 @@ class SiteConfigurationExcluder implements EventSubscriberInterface {
   /**
    * Makes `sites/default` permissions the same in live and stage directories.
    *
-   * @param \Drupal\package_manager\Event\PreApplyEvent $event
+   * @param PreApplyEvent $event
    *   The event being handled.
    *
-   * @throws \Drupal\Core\File\Exception\FileException
+   * @throws FileException
    *   If the permissions of the live `sites/default` cannot be determined, or
    *   cannot be changed on the staged `sites/default`.
    */

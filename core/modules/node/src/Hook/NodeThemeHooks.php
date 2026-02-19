@@ -96,8 +96,7 @@ class NodeThemeHooks {
       // displayed inline by node.html.twig. Skip this if the field
       // display is configurable and skipping has been enabled.
       // @todo Delete as part of https://www.drupal.org/node/3015623
-
-      /** @var \Drupal\node\NodeInterface $node */
+      /** @var NodeInterface $node */
       $node = $variables['element']['#object'];
       $skip_custom_preprocessing = $node->getEntityType()->get('enable_base_field_custom_preprocess_skipping');
       $variables['is_inline'] = !$skip_custom_preprocessing || !$node->getFieldDefinition($variables['field_name'])->isDisplayConfigurable('view');
@@ -144,7 +143,7 @@ class NodeThemeHooks {
     $variables['deprecations']['metadata'] = "'metadata' is deprecated in drupal:11.1.0 and is removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3458638";
 
     $variables['node'] = $variables['elements']['#node'];
-    /** @var \Drupal\node\NodeInterface $node */
+    /** @var NodeInterface $node */
     $node = $variables['node'];
     $skip_custom_preprocessing = $node->getEntityType()->get('enable_base_field_custom_preprocess_skipping');
 

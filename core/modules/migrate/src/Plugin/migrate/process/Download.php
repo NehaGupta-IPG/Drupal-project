@@ -64,7 +64,7 @@ class Download extends FileProcessBase implements ContainerFactoryPluginInterfac
   /**
    * The file system service.
    *
-   * @var \Drupal\Core\File\FileSystemInterface
+   * @var FileSystemInterface
    */
   protected $fileSystem;
 
@@ -84,9 +84,9 @@ class Download extends FileProcessBase implements ContainerFactoryPluginInterfac
    *   The plugin ID.
    * @param array $plugin_definition
    *   The plugin definition.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
+   * @param FileSystemInterface $file_system
    *   The file system service.
-   * @param \GuzzleHttp\ClientInterface $http_client
+   * @param ClientInterface $http_client
    *   The HTTP client.
    */
   public function __construct(array $configuration, $plugin_id, array $plugin_definition, FileSystemInterface $file_system, ClientInterface $http_client) {

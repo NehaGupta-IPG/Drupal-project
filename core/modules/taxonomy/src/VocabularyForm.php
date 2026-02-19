@@ -19,14 +19,14 @@ class VocabularyForm extends BundleEntityFormBase {
   /**
    * The vocabulary storage.
    *
-   * @var \Drupal\taxonomy\VocabularyStorageInterface
+   * @var VocabularyStorageInterface
    */
   protected $vocabularyStorage;
 
   /**
    * Constructs a new vocabulary form.
    *
-   * @param \Drupal\taxonomy\VocabularyStorageInterface $vocabulary_storage
+   * @param VocabularyStorageInterface $vocabulary_storage
    *   The vocabulary storage.
    */
   public function __construct(VocabularyStorageInterface $vocabulary_storage) {
@@ -46,7 +46,7 @@ class VocabularyForm extends BundleEntityFormBase {
    * {@inheritdoc}
    */
   public function buildEntity(array $form, FormStateInterface $form_state) {
-    /** @var \Drupal\taxonomy\VocabularyInterface $entity */
+    /** @var VocabularyInterface $entity */
     $entity = parent::buildEntity($form, $form_state);
 
     // The description cannot be an empty string.

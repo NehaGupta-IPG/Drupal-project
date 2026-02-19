@@ -13,20 +13,20 @@ class ExtensionPathResolver {
   /**
    * A associative array of ExtensionList objects keyed by type.
    *
-   * @var \Drupal\Core\Extension\ExtensionList[]
+   * @var ExtensionList[]
    */
   protected $extensionLists;
 
   /**
    * ExtensionPathResolver constructor.
    *
-   * @param \Drupal\Core\Extension\ModuleExtensionList $module_extension_list
+   * @param ModuleExtensionList $module_extension_list
    *   The module extension list.
-   * @param \Drupal\Core\Extension\ProfileExtensionList $profile_extension_list
+   * @param ProfileExtensionList $profile_extension_list
    *   The profile extension list.
-   * @param \Drupal\Core\Extension\ThemeExtensionList $theme_extension_list
+   * @param ThemeExtensionList $theme_extension_list
    *   The theme extension list.
-   * @param \Drupal\Core\Extension\ThemeEngineExtensionList $theme_engine_extension_list
+   * @param ThemeEngineExtensionList $theme_engine_extension_list
    *   The theme engine extension list.
    */
   public function __construct(ModuleExtensionList $module_extension_list, ProfileExtensionList $profile_extension_list, ThemeExtensionList $theme_extension_list, ThemeEngineExtensionList $theme_engine_extension_list) {
@@ -76,9 +76,9 @@ class ExtensionPathResolver {
    * @return string
    *   The extension info file path.
    *
-   * @throws \Drupal\Core\Extension\Exception\UnknownExtensionTypeException
+   * @throws UnknownExtensionTypeException
    *   If the extension type is unknown.
-   * @throws \Drupal\Core\Extension\Exception\UnknownExtensionException
+   * @throws UnknownExtensionException
    *   If the extension is unknown.
    */
   public function getPath(string $type, string $name): string {

@@ -4,16 +4,15 @@
  * @file
  */
 
-use Drupal\Core\Field\FormatterInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Field\FormatterInterface;
 use Drupal\Core\Field\WidgetInterface;
+use Drupal\Core\Form\FormStateInterface;
 
 /**
  * @file
  * Hooks provided by the Field UI module.
  */
-
 /**
  * @addtogroup field_types
  * @{
@@ -22,15 +21,15 @@ use Drupal\Core\Field\WidgetInterface;
 /**
  * Allow modules to add settings to field formatters provided by other modules.
  *
- * @param \Drupal\Core\Field\FormatterInterface $plugin
+ * @param FormatterInterface $plugin
  *   The instantiated field formatter plugin.
- * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+ * @param FieldDefinitionInterface $field_definition
  *   The field definition.
  * @param string $view_mode
  *   The entity view mode.
  * @param array $form
  *   The (entire) configuration form array.
- * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param FormStateInterface $form_state
  *   The form state.
  *
  * @return array
@@ -55,15 +54,15 @@ function hook_field_formatter_third_party_settings_form(FormatterInterface $plug
 /**
  * Allow modules to add settings to field widgets provided by other modules.
  *
- * @param \Drupal\Core\Field\WidgetInterface $plugin
+ * @param WidgetInterface $plugin
  *   The instantiated field widget plugin.
- * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+ * @param FieldDefinitionInterface $field_definition
  *   The field definition.
  * @param string $form_mode
  *   The entity form mode.
  * @param array $form
  *   The (entire) configuration form array.
- * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param FormStateInterface $form_state
  *   The form state.
  *
  * @return array

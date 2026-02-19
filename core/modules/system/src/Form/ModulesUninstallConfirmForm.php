@@ -9,9 +9,9 @@ use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleInstallerInterface;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface;
 
 /**
  * Builds a confirmation form to uninstall selected modules.
@@ -24,28 +24,28 @@ class ModulesUninstallConfirmForm extends ConfirmFormBase {
   /**
    * The module installer service.
    *
-   * @var \Drupal\Core\Extension\ModuleInstallerInterface
+   * @var ModuleInstallerInterface
    */
   protected $moduleInstaller;
 
   /**
    * The expirable key value store.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface
+   * @var KeyValueStoreExpirableInterface
    */
   protected $keyValueExpirable;
 
   /**
    * The configuration manager.
    *
-   * @var \Drupal\Core\Config\ConfigManagerInterface
+   * @var ConfigManagerInterface
    */
   protected $configManager;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
@@ -59,22 +59,22 @@ class ModulesUninstallConfirmForm extends ConfirmFormBase {
   /**
    * The module extension list.
    *
-   * @var \Drupal\Core\Extension\ModuleExtensionList
+   * @var ModuleExtensionList
    */
   protected $moduleExtensionList;
 
   /**
    * Constructs a ModulesUninstallConfirmForm object.
    *
-   * @param \Drupal\Core\Extension\ModuleInstallerInterface $module_installer
+   * @param ModuleInstallerInterface $module_installer
    *   The module installer.
-   * @param \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface $key_value_expirable
+   * @param KeyValueStoreExpirableInterface $key_value_expirable
    *   The key value expirable factory.
-   * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
+   * @param ConfigManagerInterface $config_manager
    *   The configuration manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $extension_list_module
+   * @param ModuleExtensionList $extension_list_module
    *   The module extension list.
    * @param string|false|null $installProfile
    *   The install profile.

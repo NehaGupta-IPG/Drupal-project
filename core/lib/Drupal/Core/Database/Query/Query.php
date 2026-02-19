@@ -2,8 +2,8 @@
 
 namespace Drupal\Core\Database\Query;
 
-use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Database;
 
 /**
  * Base class for query builders.
@@ -16,7 +16,7 @@ abstract class Query implements PlaceholderInterface {
   /**
    * The connection object on which to run this query.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
@@ -65,7 +65,7 @@ abstract class Query implements PlaceholderInterface {
   /**
    * Constructs a Query object.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   Database connection object.
    * @param array $options
    *   Array of query options.
@@ -186,7 +186,7 @@ abstract class Query implements PlaceholderInterface {
   /**
    * Gets the database connection to be used for the query.
    *
-   * @return \Drupal\Core\Database\Connection
+   * @return Connection
    *   The database connection to be used for the query.
    */
   public function getConnection() {

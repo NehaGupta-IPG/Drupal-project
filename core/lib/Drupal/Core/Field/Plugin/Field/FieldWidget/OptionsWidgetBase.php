@@ -86,7 +86,7 @@ abstract class OptionsWidgetBase extends WidgetBase {
    *
    * @param array $element
    *   The form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    */
   public static function validateElement(array $element, FormStateInterface $form_state) {
@@ -129,7 +129,7 @@ abstract class OptionsWidgetBase extends WidgetBase {
   /**
    * Returns the array of options for the widget.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The entity for which to return options.
    *
    * @return array
@@ -172,7 +172,7 @@ abstract class OptionsWidgetBase extends WidgetBase {
   /**
    * Determines selected options from the incoming field values.
    *
-   * @param \Drupal\Core\Field\FieldItemListInterface $items
+   * @param FieldItemListInterface $items
    *   The field values.
    *
    * @return array

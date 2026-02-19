@@ -21,7 +21,7 @@ class UserUid extends ArgumentPluginBase {
   /**
    * Database Service Object.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $database;
 
@@ -34,7 +34,7 @@ class UserUid extends ArgumentPluginBase {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Database\Connection $database
+   * @param Connection $database
    *   Database Service Object.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, Connection $database) {

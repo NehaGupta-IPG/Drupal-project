@@ -84,7 +84,7 @@ class WorkspacesTestHooks {
       return;
     }
 
-    /** @var \Drupal\Core\Entity\RevisionableInterface|\Drupal\Core\Entity\EntityPublishedInterface $entity */
+    /** @var \Drupal\Core\Entity\RevisionableInterface|EntityPublishedInterface $entity */
     // Track the sequence of revisions created for this entity.
     $sequence_key = $entity->getEntityTypeId() . '.' . $entity->uuid() . '.revision_sequence';
     $sequence = $this->keyValueFactory->get('ws_test')->get($sequence_key, []);
@@ -128,7 +128,7 @@ class WorkspacesTestHooks {
    *
    * @param string $hook_name
    *   The name of the hook being invoked (e.g., 'hook_entity_create').
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity object involved in the hook.
    */
   protected function incrementHookCount(string $hook_name, EntityInterface $entity): void {

@@ -5,8 +5,8 @@ namespace Drupal\search\Plugin\views\filter;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\search\ViewsSearchQuery;
 use Drupal\views\Attribute\ViewsFilter;
-use Drupal\views\Plugin\views\filter\FilterPluginBase;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
+use Drupal\views\Plugin\views\filter\FilterPluginBase;
 use Drupal\views\ViewExecutable;
 
 /**
@@ -27,7 +27,7 @@ class Search extends FilterPluginBase {
   /**
    * A search query to use for parsing search keywords.
    *
-   * @var \Drupal\search\ViewsSearchQuery
+   * @var ViewsSearchQuery
    */
   protected $searchQuery = NULL;
 

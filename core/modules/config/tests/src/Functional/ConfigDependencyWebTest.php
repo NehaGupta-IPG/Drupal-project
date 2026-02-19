@@ -41,7 +41,7 @@ class ConfigDependencyWebTest extends BrowserTestBase {
       'administer site configuration',
     ]));
 
-    /** @var \Drupal\Core\Config\Entity\ConfigEntityStorage $storage */
+    /** @var ConfigEntityStorage $storage */
     $storage = $this->container->get('entity_type.manager')->getStorage('config_test');
     // Entity1 will be deleted by the test.
     $entity1 = $storage->create(

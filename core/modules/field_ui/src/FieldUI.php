@@ -19,7 +19,7 @@ class FieldUI {
    * @param string $bundle
    *   The entity bundle.
    *
-   * @return \Drupal\Core\Url
+   * @return Url
    *   A URL object.
    */
   public static function getOverviewRouteInfo($entity_type_id, $bundle) {
@@ -35,7 +35,7 @@ class FieldUI {
    * @param array $destinations
    *   An array of destinations to redirect to.
    *
-   * @return \Drupal\Core\Url|null
+   * @return Url|null
    *   The next destination to redirect to.
    */
   public static function getNextDestination(array $destinations) {
@@ -67,7 +67,7 @@ class FieldUI {
   /**
    * Gets the route parameter that should be used for Field UI routes.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The actual entity type, not the bundle (e.g. the content entity type).
    * @param string $bundle
    *   The bundle name.

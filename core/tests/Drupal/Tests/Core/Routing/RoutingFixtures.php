@@ -16,7 +16,7 @@ class RoutingFixtures {
   /**
    * Create the tables required for the sample data.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The connection to use to create the tables.
    */
   public function createTables(Connection $connection): void {
@@ -32,7 +32,7 @@ class RoutingFixtures {
   /**
    * Drop the tables used for the sample data.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The connection to use to drop the tables.
    */
   public function dropTables(Connection $connection): void {
@@ -81,7 +81,7 @@ class RoutingFixtures {
   /**
    * Returns a standard set of routes for testing.
    *
-   * @return \Symfony\Component\Routing\RouteCollection
+   * @return RouteCollection
    *   An array of of predefined routes for testing.
    */
   public function sampleRouteCollection(): RouteCollection {
@@ -114,7 +114,7 @@ class RoutingFixtures {
   /**
    * Returns a complex set of routes for testing.
    *
-   * @return \Symfony\Component\Routing\RouteCollection
+   * @return RouteCollection
    *   A RouteCollection with varied route structures.
    */
   public function complexRouteCollection(): RouteCollection {
@@ -145,7 +145,7 @@ class RoutingFixtures {
   /**
    * Returns a complex set of routes for testing.
    *
-   * @return \Symfony\Component\Routing\RouteCollection
+   * @return RouteCollection
    *   A RouteCollection containing routes with mixed casing and Unicode characters.
    */
   public function mixedCaseRouteCollection(): RouteCollection {
@@ -180,7 +180,7 @@ class RoutingFixtures {
   /**
    * Returns a complex set of routes for testing.
    *
-   * @return \Symfony\Component\Routing\RouteCollection
+   * @return RouteCollection
    *   A RouteCollection containing duplicate paths with different route names.
    */
   public function duplicatePathsRouteCollection(): RouteCollection {
@@ -219,7 +219,7 @@ class RoutingFixtures {
   /**
    * Returns a Content-type restricted set of routes for testing.
    *
-   * @return \Symfony\Component\Routing\RouteCollection
+   * @return RouteCollection
    *   A RouteCollection containing routes with Content-type restrictions for testing.
    */
   public function contentRouteCollection(): RouteCollection {

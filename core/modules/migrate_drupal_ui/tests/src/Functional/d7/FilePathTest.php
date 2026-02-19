@@ -41,7 +41,7 @@ class FilePathTest extends MigrateUpgradeTestBase {
   /**
    * The file system service.
    *
-   * @var \Drupal\Core\File\FileSystemInterface
+   * @var FileSystemInterface
    */
   protected $fs;
 

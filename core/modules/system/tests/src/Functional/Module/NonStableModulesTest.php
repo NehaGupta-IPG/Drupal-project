@@ -21,7 +21,7 @@ class NonStableModulesTest extends BrowserTestBase {
   /**
    * The admin user.
    *
-   * @var \Drupal\user\UserInterface
+   * @var UserInterface
    */
   protected UserInterface $adminUser;
 

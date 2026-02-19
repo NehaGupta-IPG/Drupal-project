@@ -17,12 +17,12 @@ interface MailHandlerInterface {
    * - Auto-reply to the sender; and
    * - Carbon copy to the sender.
    *
-   * @param \Drupal\contact\MessageInterface $message
+   * @param MessageInterface $message
    *   Submitted message entity.
-   * @param \Drupal\Core\Session\AccountInterface $sender
+   * @param AccountInterface $sender
    *   User that submitted the message entity form.
    *
-   * @throws \Drupal\contact\MailHandlerException
+   * @throws MailHandlerException
    *   When unable to determine message recipient.
    */
   public function sendMailMessages(MessageInterface $message, AccountInterface $sender);

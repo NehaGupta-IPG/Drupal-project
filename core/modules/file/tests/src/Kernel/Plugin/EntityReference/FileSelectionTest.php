@@ -31,7 +31,7 @@ class FileSelectionTest extends KernelTestBase {
   /**
    * The selection handler.
    *
-   * @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface
+   * @var SelectionInterface
    */
   protected SelectionInterface $selectionHandler;
 

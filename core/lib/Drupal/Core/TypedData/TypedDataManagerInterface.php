@@ -2,8 +2,8 @@
 
 namespace Drupal\Core\TypedData;
 
-use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Component\Plugin\Discovery\CachedDiscoveryInterface;
+use Drupal\Component\Plugin\PluginManagerInterface;
 use Drupal\Core\Validation\ConstraintManager;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -29,7 +29,7 @@ interface TypedDataManagerInterface extends PluginManagerInterface, CachedDiscov
    *     to be created. Otherwise, this should be set to NULL, but the key must
    *     be specified.
    *
-   * @return \Drupal\Core\TypedData\TypedDataInterface
+   * @return TypedDataInterface
    *   The instantiated typed data object.
    *
    * @see \Drupal\Core\TypedData\TypedDataManager::create()
@@ -39,7 +39,7 @@ interface TypedDataManagerInterface extends PluginManagerInterface, CachedDiscov
   /**
    * Creates a new typed data object instance.
    *
-   * @param \Drupal\Core\TypedData\DataDefinitionInterface $definition
+   * @param DataDefinitionInterface $definition
    *   The data definition of the typed data object. For backwards-compatibility
    *   an array representation of the data definition may be passed also.
    * @param mixed $value
@@ -53,7 +53,7 @@ interface TypedDataManagerInterface extends PluginManagerInterface, CachedDiscov
    *   data object implementing either the ListInterface or the
    *   ComplexDataInterface.
    *
-   * @return \Drupal\Core\TypedData\TypedDataInterface
+   * @return TypedDataInterface
    *   The instantiated typed data object.
    *
    * @see \Drupal\Core\TypedData\TypedDataManager::getPropertyInstance()
@@ -85,7 +85,7 @@ interface TypedDataManagerInterface extends PluginManagerInterface, CachedDiscov
    *   The data type plugin ID, for which a data definition object should be
    *   created.
    *
-   * @return \Drupal\Core\TypedData\DataDefinitionInterface
+   * @return DataDefinitionInterface
    *   A data definition object for the given data type. The class of this
    *   object is provided by the definition_class in the plugin annotation.
    *
@@ -99,7 +99,7 @@ interface TypedDataManagerInterface extends PluginManagerInterface, CachedDiscov
    * @param string $item_type
    *   The item type, for which a list data definition should be created.
    *
-   * @return \Drupal\Core\TypedData\ListDataDefinitionInterface
+   * @return ListDataDefinitionInterface
    *   A list definition for items of the given data type.
    *
    * @see \Drupal\Core\TypedData\TypedDataManager::createDataDefinition()
@@ -119,7 +119,7 @@ interface TypedDataManagerInterface extends PluginManagerInterface, CachedDiscov
    *   - value: The value to set. If set, it has to match one of the supported
    *     data type formats as documented by the data type classes.
    *
-   * @return \Drupal\Core\TypedData\TypedDataInterface
+   * @return TypedDataInterface
    *   The new property instance.
    *
    * @throws \InvalidArgumentException
@@ -142,7 +142,7 @@ interface TypedDataManagerInterface extends PluginManagerInterface, CachedDiscov
    * property path, i.e. all property instances having the same property path
    * and inheriting from the same data type are prototyped.
    *
-   * @param \Drupal\Core\TypedData\TypedDataInterface $object
+   * @param TypedDataInterface $object
    *   The parent typed data object, implementing the TypedDataInterface and
    *   either the ListInterface or the ComplexDataInterface.
    * @param string $property_name
@@ -151,7 +151,7 @@ interface TypedDataManagerInterface extends PluginManagerInterface, CachedDiscov
    *   (optional) The data value. If set, it has to match one of the supported
    *   data type formats as documented by the data type classes.
    *
-   * @return \Drupal\Core\TypedData\TypedDataInterface
+   * @return TypedDataInterface
    *   The new property instance.
    *
    * @throws \InvalidArgumentException
@@ -165,7 +165,7 @@ interface TypedDataManagerInterface extends PluginManagerInterface, CachedDiscov
   /**
    * Gets the validator for validating typed data.
    *
-   * @return \Symfony\Component\Validator\Validator\ValidatorInterface
+   * @return ValidatorInterface
    *   The validator object.
    */
   public function getValidator();
@@ -173,7 +173,7 @@ interface TypedDataManagerInterface extends PluginManagerInterface, CachedDiscov
   /**
    * Sets the validator for validating typed data.
    *
-   * @param \Symfony\Component\Validator\Validator\ValidatorInterface $validator
+   * @param ValidatorInterface $validator
    *   The validator object to set.
    */
   public function setValidator(ValidatorInterface $validator);
@@ -181,7 +181,7 @@ interface TypedDataManagerInterface extends PluginManagerInterface, CachedDiscov
   /**
    * Gets the validation constraint manager.
    *
-   * @return \Drupal\Core\Validation\ConstraintManager
+   * @return ConstraintManager
    *   The constraint manager.
    */
   public function getValidationConstraintManager();
@@ -192,7 +192,7 @@ interface TypedDataManagerInterface extends PluginManagerInterface, CachedDiscov
    * The validation constraint manager is used to instantiate validation
    * constraint plugins.
    *
-   * @param \Drupal\Core\Validation\ConstraintManager $constraintManager
+   * @param ConstraintManager $constraintManager
    *   The constraint manager to set.
    */
   public function setValidationConstraintManager(ConstraintManager $constraintManager);
@@ -206,7 +206,7 @@ interface TypedDataManagerInterface extends PluginManagerInterface, CachedDiscov
    * below the 'constraint' key of the type's plugin definition) are taken into
    * account.
    *
-   * @param \Drupal\Core\TypedData\DataDefinitionInterface $definition
+   * @param DataDefinitionInterface $definition
    *   A data definition.
    *
    * @return array
@@ -236,7 +236,7 @@ interface TypedDataManagerInterface extends PluginManagerInterface, CachedDiscov
    * 'unwrap_for_canonical_representation' property in the data definition
    * (defaults to TRUE).
    *
-   * @param \Drupal\Core\TypedData\TypedDataInterface $data
+   * @param TypedDataInterface $data
    *   The data.
    *
    * @return mixed

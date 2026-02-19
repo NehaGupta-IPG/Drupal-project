@@ -44,7 +44,7 @@ class LibrariesDirectoryFileFinder {
    *   The app root.
    * @param string $site_path
    *   The site path.
-   * @param \Drupal\Core\Extension\ProfileExtensionList $profile_extension_list
+   * @param ProfileExtensionList $profile_extension_list
    *   The profile extension list.
    * @param string $install_profile
    *   The install profile.

@@ -95,7 +95,7 @@ class ViewExecutable {
    *
    * The array must use a numeric index starting at 0.
    *
-   * @var \Drupal\views\ResultRow[]
+   * @var ResultRow[]
    */
   public $result = [];
 
@@ -186,7 +186,7 @@ class ViewExecutable {
   /**
    * Used to store views that were previously running if we recurse.
    *
-   * @var \Drupal\views\ViewExecutable[]
+   * @var \Drupal\views\Entity\ViewExecutable[]
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $old_view = [];
@@ -194,7 +194,7 @@ class ViewExecutable {
   /**
    * To avoid recursion in views embedded into areas.
    *
-   * @var \Drupal\views\ViewExecutable[]
+   * @var \Drupal\views\Entity\ViewExecutable[]
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $parent_views = [];
@@ -218,7 +218,7 @@ class ViewExecutable {
   /**
    * Where the $query object will reside.
    *
-   * @var \Drupal\views\Plugin\views\query\QueryPluginBase
+   * @var QueryPluginBase
    */
   public ?QueryPluginBase $query = NULL;
 
@@ -244,7 +244,7 @@ class ViewExecutable {
    * An array containing Drupal\views\Plugin\views\display\DisplayPluginBase
    * objects.
    *
-   * @var \Drupal\views\DisplayPluginCollection
+   * @var DisplayPluginCollection
    */
   public $displayHandlers;
 
@@ -297,7 +297,6 @@ class ViewExecutable {
   public $base_database = NULL;
 
   // Handlers which are active on this view.
-
   /**
    * Stores the field handlers which are initialized on this view.
    *
@@ -359,14 +358,14 @@ class ViewExecutable {
   /**
    * Stores the current response object.
    *
-   * @var \Symfony\Component\HttpFoundation\Response
+   * @var Response
    */
   protected $response = NULL;
 
   /**
    * Stores the current request object.
    *
-   * @var \Symfony\Component\HttpFoundation\Request
+   * @var Request
    */
   protected $request;
 
@@ -455,7 +454,7 @@ class ViewExecutable {
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $user;
 
@@ -469,14 +468,14 @@ class ViewExecutable {
   /**
    * The views data.
    *
-   * @var \Drupal\views\ViewsData
+   * @var \Drupal\views\Entity\ViewsData
    */
   protected $viewsData;
 
   /**
    * The route provider.
    *
-   * @var \Drupal\Core\Routing\RouteProviderInterface
+   * @var RouteProviderInterface
    */
   protected $routeProvider;
 
@@ -497,15 +496,15 @@ class ViewExecutable {
   /**
    * Constructs a new ViewExecutable object.
    *
-   * @param \Drupal\views\ViewEntityInterface $storage
+   * @param ViewEntityInterface $storage
    *   The view config entity the actual information is stored on.
-   * @param \Drupal\Core\Session\AccountInterface $user
+   * @param AccountInterface $user
    *   The current user.
-   * @param \Drupal\views\ViewsData $views_data
+   * @param ViewsData $views_data
    *   The views data.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
+   * @param RouteProviderInterface $route_provider
    *   The route provider.
-   * @param \Drupal\views\Plugin\ViewsPluginManager|null $displayPluginManager
+   * @param ViewsPluginManager|null $displayPluginManager
    *   The plugin manager for display.
    */
   public function __construct(ViewEntityInterface $storage, AccountInterface $user, ViewsData $views_data, RouteProviderInterface $route_provider, protected ?ViewsPluginManager $displayPluginManager = NULL) {
@@ -1206,7 +1205,7 @@ class ViewExecutable {
   /**
    * Gets the current query plugin.
    *
-   * @return \Drupal\views\Plugin\views\query\QueryPluginBase
+   * @return QueryPluginBase
    *   The current query plugin.
    */
   public function getQuery() {
@@ -1794,7 +1793,7 @@ class ViewExecutable {
    *
    * @param string $displays
    *   The machine name of the display.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user object.
    *
    * @return bool
@@ -1831,7 +1830,7 @@ class ViewExecutable {
   /**
    * Sets the used response object of the view.
    *
-   * @param \Symfony\Component\HttpFoundation\Response $response
+   * @param Response $response
    *   The response object which should be set.
    */
   public function setResponse(Response $response) {
@@ -1841,7 +1840,7 @@ class ViewExecutable {
   /**
    * Gets the response object used by the view.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   The response object of the view.
    */
   public function getResponse() {
@@ -1854,7 +1853,7 @@ class ViewExecutable {
   /**
    * Sets the request object.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    */
   public function setRequest(Request $request) {
@@ -1864,7 +1863,7 @@ class ViewExecutable {
   /**
    * Gets the request object.
    *
-   * @return \Symfony\Component\HttpFoundation\Request
+   * @return Request
    *   The request object.
    */
   public function getRequest() {
@@ -2084,7 +2083,7 @@ class ViewExecutable {
    * Views plugins can receive the current user in order to not need dependency
    * injection.
    *
-   * @return \Drupal\Core\Session\AccountInterface
+   * @return AccountInterface
    *   The current user.
    */
   public function getUser() {

@@ -84,14 +84,14 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
   /**
    * The logger channel for media.
    *
-   * @var \Psr\Log\LoggerInterface
+   * @var LoggerInterface
    */
   protected $logger;
 
   /**
    * The messenger service.
    *
-   * @var \Drupal\Core\Messenger\MessengerInterface
+   * @var MessengerInterface
    */
   protected $messenger;
 
@@ -105,35 +105,35 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
   /**
    * The oEmbed resource fetcher service.
    *
-   * @var \Drupal\media\OEmbed\ResourceFetcherInterface
+   * @var ResourceFetcherInterface
    */
   protected $resourceFetcher;
 
   /**
    * The OEmbed manager service.
    *
-   * @var \Drupal\media\OEmbed\UrlResolverInterface
+   * @var UrlResolverInterface
    */
   protected $urlResolver;
 
   /**
    * The iFrame URL helper service.
    *
-   * @var \Drupal\media\IFrameUrlHelper
+   * @var IFrameUrlHelper
    */
   protected $iFrameUrlHelper;
 
   /**
    * The file system.
    *
-   * @var \Drupal\Core\File\FileSystemInterface
+   * @var FileSystemInterface
    */
   protected $fileSystem;
 
   /**
    * The token replacement service.
    *
-   * @var \Drupal\Core\Utility\Token
+   * @var Token
    */
   protected $token;
 
@@ -146,29 +146,29 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @param EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager service.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory service.
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager
+   * @param FieldTypePluginManagerInterface $field_type_manager
    *   The field type plugin manager service.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   The logger channel for media.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger service.
-   * @param \GuzzleHttp\ClientInterface $http_client
+   * @param ClientInterface $http_client
    *   The HTTP client.
-   * @param \Drupal\media\OEmbed\ResourceFetcherInterface $resource_fetcher
+   * @param ResourceFetcherInterface $resource_fetcher
    *   The oEmbed resource fetcher service.
-   * @param \Drupal\media\OEmbed\UrlResolverInterface $url_resolver
+   * @param UrlResolverInterface $url_resolver
    *   The oEmbed URL resolver service.
-   * @param \Drupal\media\IFrameUrlHelper $iframe_url_helper
+   * @param IFrameUrlHelper $iframe_url_helper
    *   The iFrame URL helper service.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
+   * @param FileSystemInterface $file_system
    *   The file system.
-   * @param \Drupal\Core\Utility\Token $token
+   * @param Token $token
    *   The token replacement service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, ConfigFactoryInterface $config_factory, FieldTypePluginManagerInterface $field_type_manager, LoggerInterface $logger, MessengerInterface $messenger, ClientInterface $http_client, ResourceFetcherInterface $resource_fetcher, UrlResolverInterface $url_resolver, IFrameUrlHelper $iframe_url_helper, FileSystemInterface $file_system, Token $token) {
@@ -396,9 +396,9 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
    * If the thumbnail is not already locally stored, this method will attempt
    * to download it.
    *
-   * @param \Drupal\media\OEmbed\Resource $resource
+   * @param Resource $resource
    *   The oEmbed resource.
-   * @param \Drupal\media\MediaInterface $media
+   * @param MediaInterface $media
    *   The media entity that contains the resource.
    *
    * @return string|null
@@ -478,7 +478,7 @@ class OEmbed extends MediaSourceBase implements OEmbedInterface {
    *
    * @param string $thumbnail_url
    *   The remote URL of the thumbnail.
-   * @param \Psr\Http\Message\ResponseInterface $response
+   * @param ResponseInterface $response
    *   The response for the downloaded thumbnail.
    *
    * @return string|null

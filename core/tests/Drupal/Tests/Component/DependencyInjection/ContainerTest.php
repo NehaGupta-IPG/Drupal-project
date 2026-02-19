@@ -1112,7 +1112,7 @@ class MockInstantiationService {
 class MockService {
 
   /**
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface
+   * @var ContainerInterface
    */
   protected $container;
 
@@ -1155,7 +1155,7 @@ class MockService {
   /**
    * Sets the container object.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @param ContainerInterface $container
    *   The container to inject via setter injection.
    */
   public function setContainer(ContainerInterface $container): void {
@@ -1165,7 +1165,7 @@ class MockService {
   /**
    * Gets the container object.
    *
-   * @return \Symfony\Component\DependencyInjection\ContainerInterface
+   * @return ContainerInterface
    *   The internally set container.
    */
   public function getContainer() {

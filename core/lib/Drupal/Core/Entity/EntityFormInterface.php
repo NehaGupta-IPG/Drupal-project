@@ -36,7 +36,7 @@ interface EntityFormInterface extends BaseFormIdInterface {
    *
    * The form entity which has been used for populating form element defaults.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The current form entity.
    */
   public function getEntity();
@@ -50,7 +50,7 @@ interface EntityFormInterface extends BaseFormIdInterface {
    * be used to completely exchange the form entity, e.g. when preparing the
    * rebuild of a multi-step form.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity the current form should operate upon.
    *
    * @return $this
@@ -60,12 +60,12 @@ interface EntityFormInterface extends BaseFormIdInterface {
   /**
    * Determines which entity will be used by this form from a RouteMatch object.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
    * @param string $entity_type_id
    *   The entity type identifier.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The entity object as determined from the passed-in route match.
    */
   public function getEntityFromRouteMatch(RouteMatchInterface $route_match, $entity_type_id);
@@ -79,10 +79,10 @@ interface EntityFormInterface extends BaseFormIdInterface {
    *
    * @param array $form
    *   A nested array form elements comprising the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   An updated copy of the form's entity object.
    *
    * @see \Drupal\Core\Entity\EntityFormInterface::getEntity()
@@ -97,7 +97,7 @@ interface EntityFormInterface extends BaseFormIdInterface {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return int
@@ -108,7 +108,7 @@ interface EntityFormInterface extends BaseFormIdInterface {
   /**
    * Sets the string translation service for this form.
    *
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param TranslationInterface $string_translation
    *   The translation manager.
    *
    * @return $this
@@ -118,7 +118,7 @@ interface EntityFormInterface extends BaseFormIdInterface {
   /**
    * Sets the module handler for this form.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
    *
    * @return $this
@@ -128,7 +128,7 @@ interface EntityFormInterface extends BaseFormIdInterface {
   /**
    * Sets the entity type manager for this form.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    *
    * @return $this

@@ -7,7 +7,7 @@ use Drupal\Component\Annotation\Plugin;
 /**
  * Defines an archiver annotation object.
  *
- * Plugin Namespace: Plugin\Archiver
+ * Plugin Namespace: Plugin\Archiver.
  *
  * For a working example, see \Drupal\system\Plugin\Archiver\Zip
  *

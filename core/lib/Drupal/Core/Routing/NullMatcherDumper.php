@@ -12,7 +12,7 @@ class NullMatcherDumper implements MatcherDumperInterface {
   /**
    * The routes to be dumped.
    *
-   * @var \Symfony\Component\Routing\RouteCollection
+   * @var RouteCollection
    */
   protected $routes;
 
@@ -48,7 +48,7 @@ class NullMatcherDumper implements MatcherDumperInterface {
   /**
    * Gets the routes to match.
    *
-   * @return \Symfony\Component\Routing\RouteCollection
+   * @return RouteCollection
    *   A RouteCollection instance representing all routes currently in the
    *   dumper.
    */

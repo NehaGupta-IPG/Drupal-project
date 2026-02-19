@@ -121,8 +121,8 @@ abstract class MigrateUpgradeExecuteTestBase extends MigrateUpgradeTestBase {
    * @param int $expected_revision_count
    *   The expected number of the revisions.
    *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws InvalidPluginDefinitionException
+   * @throws PluginNotFoundException
    */
   protected function assertEntityRevisionsCount(string $content_entity_type_id, int $expected_revision_count) {
     $entity_storage = \Drupal::entityTypeManager()->getStorage($content_entity_type_id);

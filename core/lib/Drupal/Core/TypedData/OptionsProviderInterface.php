@@ -34,7 +34,7 @@ interface OptionsProviderInterface {
    * If the optional $account parameter is passed, then the array is filtered to
    * values viewable by the account.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   (optional) The user account for which to filter the possible values. If
    *   omitted, all possible values are returned.
    *
@@ -49,7 +49,7 @@ interface OptionsProviderInterface {
    * If the optional $account parameter is passed, then the array is filtered to
    * values viewable by the account.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   (optional) The user account for which to filter the possible options.
    *   If omitted, all possible options are returned.
    *
@@ -68,7 +68,7 @@ interface OptionsProviderInterface {
    * If the optional $account parameter is passed, then the array is filtered to
    * values settable by the account.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   (optional) The user account for which to filter the settable values. If
    *   omitted, all settable values are returned.
    *
@@ -83,7 +83,7 @@ interface OptionsProviderInterface {
    * If the optional $account parameter is passed, then the array is filtered to
    * values settable by the account.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   (optional) The user account for which to filter the settable options. If
    *   omitted, all settable options are returned.
    *

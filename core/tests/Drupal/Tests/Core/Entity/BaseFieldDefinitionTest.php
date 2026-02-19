@@ -387,9 +387,9 @@ class BaseFieldDefinitionTest extends UnitTestCase {
   /**
    * Provides a Mock base field default value callback.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   Entity interface.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $definition
+   * @param FieldDefinitionInterface $definition
    *   Field definition.
    *
    * @return string

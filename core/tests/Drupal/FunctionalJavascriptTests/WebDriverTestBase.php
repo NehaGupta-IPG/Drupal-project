@@ -6,8 +6,8 @@ namespace Drupal\FunctionalJavascriptTests;
 
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Tests\BrowserTestBase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use PHPUnit\Framework\Attributes\PostCondition;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Runs a browser test using a driver that supports JavaScript.
@@ -116,7 +116,7 @@ abstract class WebDriverTestBase extends BrowserTestBase {
   /**
    * Triggers a test failure if a JavaScript error was encountered.
    *
-   * @throws \PHPUnit\Framework\AssertionFailedError
+   * @throws AssertionFailedError
    */
   #[PostCondition]
   protected function failOnJavaScriptErrors(): void {
@@ -149,7 +149,7 @@ abstract class WebDriverTestBase extends BrowserTestBase {
    *   (optional) A message to display with the assertion. If left blank, a
    *   default message will be displayed.
    *
-   * @throws \PHPUnit\Framework\AssertionFailedError
+   * @throws AssertionFailedError
    *
    * @see \Behat\Mink\Driver\DriverInterface::evaluateScript()
    */
@@ -169,9 +169,9 @@ abstract class WebDriverTestBase extends BrowserTestBase {
    *   (optional) By default this method will set the background color to white.
    *   Set to FALSE to override this behavior.
    *
-   * @throws \Behat\Mink\Exception\UnsupportedDriverActionException
+   * @throws UnsupportedDriverActionException
    *   When operation not supported by the driver.
-   * @throws \Behat\Mink\Exception\DriverException
+   * @throws DriverException
    *   When the operation cannot be done.
    */
   protected function createScreenshot($filename, $set_background_color = TRUE) {
@@ -189,7 +189,7 @@ abstract class WebDriverTestBase extends BrowserTestBase {
    * @param string $name
    *   (optional) Name of the session. Defaults to the active session.
    *
-   * @return \Drupal\FunctionalJavascriptTests\WebDriverWebAssert
+   * @return WebDriverWebAssert
    *   A new web-assert option for asserting the presence of elements with.
    */
   public function assertSession($name = NULL) {

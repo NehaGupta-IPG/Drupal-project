@@ -20,7 +20,7 @@ final class LabelOnlyResourceObject extends ResourceObject {
   /**
    * The entity represented by this resource object.
    *
-   * @var \Drupal\Core\Entity\EntityInterface
+   * @var EntityInterface
    */
   protected $entity;
 
@@ -43,7 +43,7 @@ final class LabelOnlyResourceObject extends ResourceObject {
   /**
    * Gets the decorated entity.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The label for which to only normalize its label.
    */
   public function getEntity() {
@@ -53,7 +53,7 @@ final class LabelOnlyResourceObject extends ResourceObject {
   /**
    * Sets the underlying entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   An entity.
    */
   protected function setEntity(EntityInterface $entity) {

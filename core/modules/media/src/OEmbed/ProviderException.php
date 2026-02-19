@@ -14,7 +14,7 @@ class ProviderException extends \Exception {
   /**
    * Information about the oEmbed provider which caused the exception.
    *
-   * @var \Drupal\media\OEmbed\Provider
+   * @var Provider
    *
    * @see \Drupal\media\OEmbed\ProviderRepositoryInterface::get()
    */
@@ -26,7 +26,7 @@ class ProviderException extends \Exception {
    * @param string $message
    *   The exception message. '@name' will be replaced with the provider name
    *   if available, or '<unknown>' if not.
-   * @param \Drupal\media\OEmbed\Provider $provider
+   * @param Provider $provider
    *   (optional) The provider information.
    * @param \Throwable $previous
    *   (optional) The previous exception, if any.

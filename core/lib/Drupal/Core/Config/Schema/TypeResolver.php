@@ -68,7 +68,7 @@ class TypeResolver {
    *
    * @param string $expression
    *   Expression to be resolved.
-   * @param array|\Drupal\Core\TypedData\TypedDataInterface $data
+   * @param array|TypedDataInterface $data
    *   Configuration data for the element.
    *
    * @return string
@@ -112,7 +112,7 @@ class TypeResolver {
       }
       // Get nested value and continue processing.
       if ($name == '%parent') {
-        /** @var \Drupal\Core\Config\Schema\ArrayElement $parent */
+        /** @var ArrayElement $parent */
         // Switch replacement values with values from the parent.
         $parent = $data['%parent'];
         $data = $parent->getValue();

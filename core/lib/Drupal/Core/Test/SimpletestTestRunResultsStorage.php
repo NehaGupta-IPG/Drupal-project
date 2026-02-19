@@ -2,9 +2,9 @@
 
 namespace Drupal\Core\Test;
 
-use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\ConnectionNotDefinedException;
+use Drupal\Core\Database\Database;
 
 /**
  * Implements a test run results storage compatible with legacy Simpletest.
@@ -16,7 +16,7 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
   /**
    * SimpletestTestRunResultsStorage constructor.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection to use for inserting assertions.
    */
   public function __construct(
@@ -27,7 +27,7 @@ class SimpletestTestRunResultsStorage implements TestRunResultsStorageInterface 
   /**
    * Returns the database connection to use for inserting assertions.
    *
-   * @return \Drupal\Core\Database\Connection
+   * @return Connection
    *   The database connection to use for inserting assertions.
    */
   public static function getConnection(): Connection {

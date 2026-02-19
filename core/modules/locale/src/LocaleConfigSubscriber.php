@@ -36,14 +36,14 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
   /**
    * The configuration factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * The typed configuration manager.
    *
-   * @var \Drupal\locale\LocaleConfigManager
+   * @var LocaleConfigManager
    */
   protected $localeConfigManager;
 
@@ -57,9 +57,9 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
   /**
    * Constructs a LocaleConfigSubscriber.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The configuration factory.
-   * @param \Drupal\locale\LocaleConfigManager $locale_config_manager
+   * @param LocaleConfigManager $locale_config_manager
    *   The typed configuration manager.
    */
   public function __construct(ConfigFactoryInterface $config_factory, LocaleConfigManager $locale_config_manager) {
@@ -80,7 +80,7 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
   /**
    * Updates the locale strings when a translated active configuration is saved.
    *
-   * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   * @param ConfigCrudEvent $event
    *   The configuration event.
    */
   public function onConfigSave(ConfigCrudEvent $event) {
@@ -96,7 +96,7 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
   /**
    * Updates the locale strings when a configuration override is saved/deleted.
    *
-   * @param \Drupal\language\Config\LanguageConfigOverrideCrudEvent $event
+   * @param LanguageConfigOverrideCrudEvent $event
    *   The language configuration event.
    */
   public function onOverrideChange(LanguageConfigOverrideCrudEvent $event) {
@@ -113,7 +113,7 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
   /**
    * Update locale storage based on configuration translations.
    *
-   * @param \Drupal\Core\Config\StorableConfigBase $config
+   * @param StorableConfigBase $config
    *   Active configuration or configuration translation override.
    * @param string $langcode
    *   The language code of $config.
@@ -137,7 +137,7 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
    *   The configuration name.
    * @param array $config
    *   The active configuration data or override data.
-   * @param array|\Drupal\Core\StringTranslation\TranslatableMarkup[] $translatable
+   * @param array|TranslatableMarkup[] $translatable
    *   The translatable array structure.
    *   @see \Drupal\locale\LocaleConfigManager::getTranslatableData()
    * @param string $langcode
@@ -173,7 +173,7 @@ class LocaleConfigSubscriber implements EventSubscriberInterface {
    *
    * @param string $name
    *   The configuration name.
-   * @param array|\Drupal\Core\StringTranslation\TranslatableMarkup $translatable
+   * @param array|TranslatableMarkup $translatable
    *   Either a possibly nested array with TranslatableMarkup objects at the
    *   leaf items or a TranslatableMarkup object directly.
    * @param array|string $reference_config

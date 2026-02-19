@@ -8,10 +8,10 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Ajax\TabledragWarningCommand;
+use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
@@ -35,14 +35,14 @@ abstract class EntityDisplayFormBase extends EntityForm {
   /**
    * The widget or formatter plugin manager.
    *
-   * @var \Drupal\Component\Plugin\PluginManagerBase
+   * @var PluginManagerBase
    */
   protected $pluginManager;
 
   /**
    * The entity display repository.
    *
-   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
+   * @var EntityDisplayRepositoryInterface
    */
   protected $entityDisplayRepository;
 
@@ -50,7 +50,7 @@ abstract class EntityDisplayFormBase extends EntityForm {
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 
@@ -71,13 +71,13 @@ abstract class EntityDisplayFormBase extends EntityForm {
   /**
    * Constructs a new EntityDisplayFormBase.
    *
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager
+   * @param FieldTypePluginManagerInterface $field_type_manager
    *   The field type manager.
-   * @param \Drupal\Component\Plugin\PluginManagerBase $plugin_manager
+   * @param PluginManagerBase $plugin_manager
    *   The widget or formatter plugin manager.
-   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface|null $entity_display_repository
+   * @param EntityDisplayRepositoryInterface|null $entity_display_repository
    *   (optional) The entity display_repository.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface|null $entity_field_manager
+   * @param EntityFieldManagerInterface|null $entity_field_manager
    *   (optional) The entity field manager.
    */
   public function __construct(FieldTypePluginManagerInterface $field_type_manager, PluginManagerBase $plugin_manager, EntityDisplayRepositoryInterface $entity_display_repository, EntityFieldManagerInterface $entity_field_manager) {
@@ -146,7 +146,7 @@ abstract class EntityDisplayFormBase extends EntityForm {
   /**
    * Collects the definitions of fields whose display is configurable.
    *
-   * @return \Drupal\Core\Field\FieldDefinitionInterface[]
+   * @return FieldDefinitionInterface[]
    *   The array of field definitions
    */
   protected function getFieldDefinitions() {
@@ -290,11 +290,11 @@ abstract class EntityDisplayFormBase extends EntityForm {
   /**
    * Builds the table row structure for a single field.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition.
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return array
@@ -775,7 +775,7 @@ abstract class EntityDisplayFormBase extends EntityForm {
   /**
    * Returns an array of applicable widget or formatter options for a field.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition.
    *
    * @return array
@@ -922,13 +922,13 @@ abstract class EntityDisplayFormBase extends EntityForm {
   /**
    * Adds the widget or formatter third party settings forms.
    *
-   * @param \Drupal\Core\Field\PluginSettingsInterface $plugin
+   * @param PluginSettingsInterface $plugin
    *   The widget or formatter.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition.
    * @param array $form
    *   The (entire) configuration form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    *
    * @return array
@@ -941,9 +941,9 @@ abstract class EntityDisplayFormBase extends EntityForm {
    *
    * @param array $summary
    *   The widget or formatter settings summary.
-   * @param \Drupal\Core\Field\PluginSettingsInterface $plugin
+   * @param PluginSettingsInterface $plugin
    *   The widget or formatter.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition.
    */
   abstract protected function alterSettingsSummary(array &$summary, PluginSettingsInterface $plugin, FieldDefinitionInterface $field_definition);

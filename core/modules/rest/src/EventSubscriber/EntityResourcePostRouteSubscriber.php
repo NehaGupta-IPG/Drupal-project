@@ -22,7 +22,7 @@ class EntityResourcePostRouteSubscriber implements EventSubscriberInterface {
   /**
    * Constructs a new EntityResourcePostRouteSubscriber instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
@@ -32,7 +32,7 @@ class EntityResourcePostRouteSubscriber implements EventSubscriberInterface {
   /**
    * Provides routes on route rebuild time.
    *
-   * @param \Drupal\Core\Routing\RouteBuildEvent $event
+   * @param RouteBuildEvent $event
    *   The route build event.
    */
   public function onDynamicRouteEvent(RouteBuildEvent $event) {

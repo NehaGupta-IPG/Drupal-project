@@ -29,21 +29,21 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
   /**
    * The entity field manager service.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 
   /**
    * The entity bundle info.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @var EntityTypeBundleInfoInterface
    */
   protected $entityTypeBundleInfo;
 
   /**
    * Cache backend.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $cacheBackend;
 
@@ -64,15 +64,15 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
   /**
    * Constructs a ContentEntityStorageBase object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @param EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The cache backend to be used.
-   * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache
+   * @param MemoryCacheInterface $memory_cache
    *   The memory cache backend.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle info.
    */
   public function __construct(EntityTypeInterface $entity_type, EntityFieldManagerInterface $entity_field_manager, CacheBackendInterface $cache, MemoryCacheInterface $memory_cache, EntityTypeBundleInfoInterface $entity_type_bundle_info) {
@@ -245,7 +245,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     }
     // Forbid sample generation on any keys whose values were submitted.
     $forbidden_keys = array_merge($forbidden_keys, array_keys($values));
-    /** @var \Drupal\Core\Entity\FieldableEntityInterface $entity */
+    /** @var FieldableEntityInterface $entity */
     $entity = $this->create($values);
     foreach ($entity as $field_name => $value) {
       if (!in_array($field_name, $forbidden_keys, TRUE)) {
@@ -258,7 +258,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
   /**
    * Initializes field values.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   An entity object.
    * @param array $values
    *   (optional) An associative array of initial field values keyed by field
@@ -293,7 +293,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
   /**
    * Checks whether any entity revision is translated.
    *
-   * @param \Drupal\Core\Entity\TranslatableInterface $entity
+   * @param TranslatableInterface $entity
    *   The entity object to be checked.
    *
    * @return bool
@@ -315,7 +315,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    * the entity has any translation in the storage and thus should be considered
    * as multilingual.
    *
-   * @param \Drupal\Core\Entity\TranslatableInterface $entity
+   * @param TranslatableInterface $entity
    *   The entity object to be checked.
    *
    * @return bool
@@ -326,7 +326,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    * @see \Drupal\Core\Entity\ContentEntityStorageBase::isAnyRevisionTranslated()
    */
   protected function isAnyStoredRevisionTranslated(TranslatableInterface $entity) {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     if ($entity->isNew()) {
       return FALSE;
     }
@@ -375,7 +375,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    * {@inheritdoc}
    */
   public function createRevision(RevisionableInterface $entity, $default = TRUE, $keep_untranslatable_fields = NULL) {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     $new_revision = clone $entity;
 
     $original_keep_untranslatable_fields = $keep_untranslatable_fields;
@@ -397,7 +397,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
         $keep_untranslatable_fields = $entity->isDefaultTranslation() && $entity->isDefaultTranslationAffectedOnly();
       }
 
-      /** @var \Drupal\Core\Entity\ContentEntityInterface $default_revision */
+      /** @var ContentEntityInterface $default_revision */
       $default_revision = $this->load($entity->id());
       $translation_languages = $default_revision->getTranslationLanguages();
       foreach ($translation_languages as $langcode => $language) {
@@ -465,7 +465,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    *   An array of field names.
    */
   protected function getRevisionTranslationMergeSkippedFieldNames() {
-    /** @var \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type */
+    /** @var ContentEntityTypeInterface $entity_type */
     $entity_type = $this->getEntityType();
 
     // A list of known revision metadata fields which should be skipped from
@@ -585,12 +585,12 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    * This method is called during field data purge, on fields for which
    * onFieldDefinitionDelete() has previously run.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition.
    * @param int $batch_size
    *   The maximum number of field data records to purge before returning.
    *
-   * @return array<int,\Drupal\Core\Field\FieldItemListInterface<\Drupal\Core\Field\FieldItemInterface>>
+   * @return array<int, FieldItemListInterface<FieldItemInterface>>
    *   An array of field item lists, keyed by entity revision id.
    */
   abstract protected function readFieldItemsToPurge(FieldDefinitionInterface $field_definition, $batch_size);
@@ -600,7 +600,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    *
    * @param ContentEntityInterface $entity
    *   The entity revision, whose values are being purged.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field whose values are bing purged.
    */
   abstract protected function purgeFieldItems(ContentEntityInterface $entity, FieldDefinitionInterface $field_definition);
@@ -710,7 +710,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       // Add revisions to the static cache, but only with the revision ID.
       // This avoids issues with entity preloading as that might not
       // result in actually being the default revision.
-      /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+      /** @var ContentEntityInterface $entity */
       foreach ($queried_revisions + $persistent_cache_revisions as $entity) {
         $id = $entity->id();
         // @see \Drupal\Core\Entity\ContentEntityStorageBase::setPersistentCache()
@@ -756,10 +756,10 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    * ];
    * @endcode
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface[] $revisions
+   * @param ContentEntityInterface[] $revisions
    *   List of revisions.
    *
-   * @return array<int, array<int, \Drupal\Core\Entity\ContentEntityInterface>>
+   * @return array<int, array<int, ContentEntityInterface>>
    *   Groups of entities keyed by entity ID.
    */
   protected function getGroupedEntitiesFromRevisions(array $revisions): array {
@@ -800,7 +800,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    * @param array $revision_ids
    *   An array of revision identifiers.
    *
-   * @return \Drupal\Core\Entity\ContentEntityInterface[]
+   * @return ContentEntityInterface[]
    *   The specified entity revisions or an empty array if none are found.
    */
   abstract protected function doLoadMultipleRevisionsFieldItems($revision_ids);
@@ -809,8 +809,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    * {@inheritdoc}
    */
   protected function doSave($id, EntityInterface $entity) {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-
+    /** @var ContentEntityInterface $entity */
     if ($entity->isNew()) {
       // Ensure the entity is still seen as new after assigning it an id, while
       // storing its data.
@@ -849,7 +848,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    * This method is responsible for allocating entity and revision identifiers
    * and updating the entity object with their values.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity object.
    * @param string[] $names
    *   (optional) The name of the fields to be written to the storage. If an
@@ -861,8 +860,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    * {@inheritdoc}
    */
   protected function doPreSave(EntityInterface $entity) {
-    /** @var \Drupal\Core\Entity\ContentEntityBase $entity */
-
+    /** @var ContentEntityBase $entity */
     // Sync the changes made in the fields array to the internal values array.
     $entity->updateOriginalValues();
 
@@ -909,8 +907,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    * {@inheritdoc}
    */
   protected function doPostSave(EntityInterface $entity, $update) {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-
+    /** @var ContentEntityInterface $entity */
     if ($update && $this->entityType->isTranslatable()) {
       $this->invokeTranslationHooks($entity);
     }
@@ -928,7 +925,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    * {@inheritdoc}
    */
   protected function doDelete($entities) {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface[] $entities */
+    /** @var ContentEntityInterface[] $entities */
     foreach ($entities as $entity) {
       $this->invokeFieldMethod('delete', $entity);
     }
@@ -938,7 +935,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
   /**
    * Deletes entity field values from the storage.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface[] $entities
+   * @param ContentEntityInterface[] $entities
    *   An array of entity objects to be deleted.
    */
   abstract protected function doDeleteFieldItems($entities);
@@ -947,7 +944,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    * {@inheritdoc}
    */
   public function deleteRevision($revision_id) {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $revision */
+    /** @var ContentEntityInterface $revision */
     if ($revision = $this->loadRevision($revision_id)) {
       // Prevent deletion if this is the default revision.
       if ($revision->isDefaultRevision()) {
@@ -963,7 +960,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
   /**
    * Deletes field values of an entity revision from the storage.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $revision
+   * @param ContentEntityInterface $revision
    *   An entity revision object to be deleted.
    */
   abstract protected function doDeleteRevisionFieldItems(ContentEntityInterface $revision);
@@ -971,7 +968,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
   /**
    * Checks translation statuses and invokes the related hooks if needed.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity being saved.
    */
   protected function invokeTranslationHooks(ContentEntityInterface $entity) {
@@ -993,7 +990,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
   /**
    * Invokes hook_entity_storage_load().
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface[] $entities
+   * @param ContentEntityInterface[] $entities
    *   List of entities, keyed on the entity ID.
    */
   protected function invokeStorageLoadHook(array &$entities) {
@@ -1019,8 +1016,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    * {@inheritdoc}
    */
   protected function invokeHook($hook, EntityInterface $entity) {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
-
+    /** @var ContentEntityInterface $entity */
     switch ($hook) {
       case 'presave':
         $this->invokeFieldMethod('preSave', $entity);
@@ -1045,7 +1041,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    *
    * @param string $method
    *   The name of the method to be invoked.
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity object.
    *
    * @return array
@@ -1082,7 +1078,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
     if ($method == 'postSave' && $entity->getOriginal()) {
       $original_langcodes = array_keys($entity->getOriginal()->getTranslationLanguages());
       foreach (array_diff($original_langcodes, $langcodes) as $removed_langcode) {
-        /** @var \Drupal\Core\Entity\ContentEntityInterface $translation */
+        /** @var ContentEntityInterface $translation */
         $translation = $entity->getOriginal()->getTranslation($removed_langcode);
 
         // Fields may rely on the isDefaultTranslation() method to determine
@@ -1105,7 +1101,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
   /**
    * Invokes the post save method on the Field objects within an entity.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity object.
    * @param bool $update
    *   Specifies whether the entity is being updated or created.
@@ -1125,11 +1121,11 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
   /**
    * Checks whether the field values changed compared to the original entity.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   Field definition of field to compare for changes.
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   Entity to check for field changes.
-   * @param \Drupal\Core\Entity\ContentEntityInterface $original
+   * @param ContentEntityInterface $original
    *   Original entity to compare against.
    *
    * @return bool
@@ -1157,7 +1153,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
   /**
    * Populates the affected flag for all the revision translations.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   An entity object being saved.
    */
   protected function populateAffectedRevisionTranslations(ContentEntityInterface $entity) {
@@ -1213,7 +1209,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    *   If not empty, return entities that match these IDs. IDs that were found
    *   will be removed from the list.
    *
-   * @return \Drupal\Core\Entity\ContentEntityInterface[]
+   * @return ContentEntityInterface[]
    *   Array of entities from the persistent cache.
    */
   protected function getFromPersistentCache(?array &$ids = NULL) {
@@ -1247,7 +1243,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    *   Revision IDs to load from the revision cache. IDs that were found will be
    *   removed from the list.
    *
-   * @return \Drupal\Core\Entity\ContentEntityInterface[]
+   * @return ContentEntityInterface[]
    *   Array of entities from the persistent cache.
    */
   protected function getFromPersistentRevisionCache(array &$ids): array {
@@ -1277,7 +1273,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
   /**
    * Stores entities in the persistent cache backend.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface[] $entities
+   * @param ContentEntityInterface[] $entities
    *   Entities to store in the cache.
    */
   protected function setPersistentCache($entities) {
@@ -1298,7 +1294,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
   /**
    * Stores revisions in the persistent cache backend.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface[] $entities
+   * @param ContentEntityInterface[] $entities
    *   Entities to store in the cache.
    */
   protected function setPersistentRevisionCache(array $entities): void {
@@ -1341,7 +1337,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    * @param int[] $revision_ids
    *   Revision IDs to return from the static revision cache.
    *
-   * @return \Drupal\Core\Entity\ContentEntityInterface[]
+   * @return ContentEntityInterface[]
    *   An array of revisions from the cache.
    */
   protected function getFromStaticRevisionCache(array $revision_ids): array {
@@ -1364,7 +1360,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
   /**
    * Stores entities in the static entity and entity revision cache.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface[] $entities
+   * @param ContentEntityInterface[] $entities
    *   Entities to store in the cache.
    */
   protected function setStaticCache(array $entities) {

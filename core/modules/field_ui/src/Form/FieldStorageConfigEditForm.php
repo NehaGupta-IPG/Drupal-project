@@ -30,7 +30,7 @@ class FieldStorageConfigEditForm extends EntityForm {
   /**
    * FieldStorageConfigEditForm constructor.
    *
-   * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typedDataManager
+   * @param TypedDataManagerInterface $typedDataManager
    *   The typed data manager.
    */
   public function __construct(
@@ -64,9 +64,9 @@ class FieldStorageConfigEditForm extends EntityForm {
    *
    * @param array $form
    *   A nested array form elements comprising the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
-   * @param \Drupal\field\FieldConfigInterface|string $field_config
+   * @param FieldConfigInterface|string $field_config
    *   The ID of the field config whose field storage config is being edited.
    */
   public function buildForm(array $form, FormStateInterface $form_state, FieldConfigInterface|string|null $field_config = NULL) {
@@ -200,7 +200,7 @@ class FieldStorageConfigEditForm extends EntityForm {
    *
    * @param array $element
    *   The cardinality form render array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    */
   public function validateCardinality(array &$element, FormStateInterface $form_state) {

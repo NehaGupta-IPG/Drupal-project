@@ -42,7 +42,7 @@ class DateTimeNormalizer extends NormalizerBase implements DenormalizerInterface
   /**
    * Constructs a new DateTimeNormalizer instance.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   A config factory for retrieving required config objects.
    */
   public function __construct(ConfigFactoryInterface $config_factory) {

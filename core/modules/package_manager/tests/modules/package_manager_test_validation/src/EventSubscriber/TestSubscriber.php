@@ -30,14 +30,14 @@ class TestSubscriber implements EventSubscriberInterface {
   /**
    * The state service.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
   /**
    * Creates a TestSubscriber object.
    *
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state service.
    */
   public function __construct(StateInterface $state) {
@@ -63,7 +63,7 @@ class TestSubscriber implements EventSubscriberInterface {
    * This method is static to enable setting the expected results before this
    * module is enabled.
    *
-   * @param \Drupal\package_manager\ValidationResult[]|null $results
+   * @param ValidationResult[]|null $results
    *   The validation results, or NULL to delete stored results.
    * @param string $event
    *   The event class.
@@ -120,7 +120,7 @@ class TestSubscriber implements EventSubscriberInterface {
   /**
    * Adds validation results to a stage event.
    *
-   * @param \Drupal\package_manager\Event\SandboxEvent $event
+   * @param SandboxEvent $event
    *   The event object.
    */
   public function handleEvent(SandboxEvent $event): void {

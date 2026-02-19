@@ -12,7 +12,7 @@ trait RefinableDependentAccessTrait {
   /**
    * The access dependency.
    *
-   * @var \Drupal\Core\Access\AccessibleInterface
+   * @var AccessibleInterface
    */
   protected $accessDependency;
 

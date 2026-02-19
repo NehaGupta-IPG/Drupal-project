@@ -28,7 +28,7 @@ interface WorkflowTypeInterface extends PluginWithFormsInterface, DerivativeInsp
   /**
    * Determines if the workflow is being has data associated with it.
    *
-   * @param \Drupal\workflows\WorkflowInterface $workflow
+   * @param WorkflowInterface $workflow
    *   The workflow to check.
    *
    * @return bool
@@ -43,9 +43,9 @@ interface WorkflowTypeInterface extends PluginWithFormsInterface, DerivativeInsp
   /**
    * Determines if the workflow state has data associated with it.
    *
-   * @param \Drupal\workflows\WorkflowInterface $workflow
+   * @param WorkflowInterface $workflow
    *   The workflow to check.
-   * @param \Drupal\workflows\StateInterface $state
+   * @param StateInterface $state
    *   The workflow state to check.
    *
    * @return bool
@@ -60,7 +60,7 @@ interface WorkflowTypeInterface extends PluginWithFormsInterface, DerivativeInsp
   /**
    * Gets the initial state for the workflow.
    *
-   * @return \Drupal\workflows\StateInterface
+   * @return StateInterface
    *   The initial state.
    */
   public function getInitialState();
@@ -124,7 +124,7 @@ interface WorkflowTypeInterface extends PluginWithFormsInterface, DerivativeInsp
    * @param string[] $state_ids
    *   A list of state IDs to get. If NULL then all states will be returned.
    *
-   * @return \Drupal\workflows\StateInterface[]
+   * @return StateInterface[]
    *   An array of workflow states, keyed by state IDs.
    *
    * @throws \InvalidArgumentException
@@ -138,7 +138,7 @@ interface WorkflowTypeInterface extends PluginWithFormsInterface, DerivativeInsp
    * @param string $state_id
    *   The state's ID.
    *
-   * @return \Drupal\workflows\StateInterface
+   * @return StateInterface
    *   The workflow state.
    *
    * @throws \InvalidArgumentException
@@ -209,7 +209,7 @@ interface WorkflowTypeInterface extends PluginWithFormsInterface, DerivativeInsp
    * @param string $transition_id
    *   A transition ID.
    *
-   * @return \Drupal\workflows\TransitionInterface
+   * @return TransitionInterface
    *   The transition.
    *
    * @throws \InvalidArgumentException
@@ -235,7 +235,7 @@ interface WorkflowTypeInterface extends PluginWithFormsInterface, DerivativeInsp
    *   A list of transition IDs to get. If NULL then all transitions will be
    *   returned.
    *
-   * @return \Drupal\workflows\TransitionInterface[]
+   * @return TransitionInterface[]
    *   An array of transition objects.
    *
    * @throws \InvalidArgumentException
@@ -253,7 +253,7 @@ interface WorkflowTypeInterface extends PluginWithFormsInterface, DerivativeInsp
    *   TransitionInterface::DIRECTION_FROM. Possible values are:
    *   TransitionInterface::DIRECTION_FROM or TransitionInterface::DIRECTION_TO.
    *
-   * @return \Drupal\workflows\TransitionInterface[]
+   * @return TransitionInterface[]
    *   An array of the transition objects for the state in the given direction,
    *   keyed by transition ID.
    *
@@ -270,7 +270,7 @@ interface WorkflowTypeInterface extends PluginWithFormsInterface, DerivativeInsp
    * @param string $to_state_id
    *   The state ID to transition to.
    *
-   * @return \Drupal\workflows\TransitionInterface
+   * @return TransitionInterface
    *   The transitions.
    *
    * @throws \InvalidArgumentException

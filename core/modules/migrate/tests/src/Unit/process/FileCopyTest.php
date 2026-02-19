@@ -25,7 +25,7 @@ class FileCopyTest extends MigrateProcessTestCase {
    *
    * @param array $configuration
    *   The plugin configuration.
-   * @param \Drupal\Core\File\FileExists $expected
+   * @param FileExists $expected
    *   The expected value of the plugin configuration.
    */
   #[DataProvider('providerFileProcessBaseConstructor')]
@@ -51,7 +51,7 @@ class FileCopyTest extends MigrateProcessTestCase {
    *
    * @param array $configuration
    *   The plugin configuration.
-   * @param \Drupal\Core\File\FileExists $expected
+   * @param FileExists $expected
    *   The expected value of the plugin configuration.
    *
    * @internal

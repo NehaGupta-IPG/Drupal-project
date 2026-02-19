@@ -26,7 +26,7 @@ class Provider {
   /**
    * The provider endpoints.
    *
-   * @var \Drupal\media\OEmbed\Endpoint[]
+   * @var Endpoint[]
    */
   protected $endpoints = [];
 
@@ -40,7 +40,7 @@ class Provider {
    * @param array[] $endpoints
    *   List of endpoints this provider exposes.
    *
-   * @throws \Drupal\media\OEmbed\ProviderException
+   * @throws ProviderException
    */
   public function __construct($name, $url, array $endpoints) {
     $this->name = $name;
@@ -90,7 +90,7 @@ class Provider {
   /**
    * Returns the provider endpoints.
    *
-   * @return \Drupal\media\OEmbed\Endpoint[]
+   * @return Endpoint[]
    *   List of endpoints this provider exposes.
    */
   public function getEndpoints() {

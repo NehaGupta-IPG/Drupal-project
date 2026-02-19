@@ -107,7 +107,7 @@ final class CKEditor5PluginDefinition extends PluginDefinition implements Plugin
    * @param array $definition
    *   The plugin definition to validate.
    *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws InvalidPluginDefinitionException
    *
    * @internal
    * @see \Drupal\ckeditor5\Plugin\CKEditor5PluginManager::processDefinition()
@@ -151,7 +151,7 @@ final class CKEditor5PluginDefinition extends PluginDefinition implements Plugin
    * @param array $definition
    *   The plugin definition to validate.
    *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws InvalidPluginDefinitionException
    *
    * @internal
    * @see \Drupal\ckeditor5\Plugin\CKEditor5PluginManager::processDefinition()
@@ -273,7 +273,7 @@ final class CKEditor5PluginDefinition extends PluginDefinition implements Plugin
   /**
    * Returns the typed configuration service.
    *
-   * @return \Drupal\Core\Config\TypedConfigManagerInterface
+   * @return TypedConfigManagerInterface
    *   The typed configuration service.
    */
   private function getTypedConfig(): TypedConfigManagerInterface {
@@ -377,7 +377,7 @@ final class CKEditor5PluginDefinition extends PluginDefinition implements Plugin
   /**
    * Gets the human-readable name of the CKEditor plugin.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   * @return TranslatableMarkup
    *   The human-readable name of the CKEditor plugin.
    *
    * @see \Drupal\ckeditor5\Annotation\DrupalAspectsOfCKEditor5Plugin::$label

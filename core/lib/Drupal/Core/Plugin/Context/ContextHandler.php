@@ -39,7 +39,7 @@ class ContextHandler implements ContextHandlerInterface {
   /**
    * Returns the context definitions associated with a plugin definition.
    *
-   * @param array|\Drupal\Component\Plugin\Definition\ContextAwarePluginDefinitionInterface $plugin_definition
+   * @param array|ContextAwarePluginDefinitionInterface $plugin_definition
    *   The plugin definition.
    *
    * @return \Drupal\Component\Plugin\Context\ContextDefinitionInterface[]|null
@@ -81,7 +81,7 @@ class ContextHandler implements ContextHandlerInterface {
    * {@inheritdoc}
    */
   public function applyContextMapping(ContextAwarePluginInterface $plugin, $contexts, $mappings = []) {
-    /** @var \Drupal\Core\Plugin\Context\ContextInterface[] $contexts */
+    /** @var ContextInterface[] $contexts */
     $mappings += $plugin->getContextMapping();
     // Loop through each of the expected contexts.
 

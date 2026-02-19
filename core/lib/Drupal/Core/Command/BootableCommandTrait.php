@@ -29,7 +29,7 @@ trait BootableCommandTrait {
   /**
    * Boots up a Drupal environment.
    *
-   * @return \Drupal\Core\DrupalKernelInterface
+   * @return DrupalKernelInterface
    *   The Drupal kernel.
    *
    * @throws \Exception

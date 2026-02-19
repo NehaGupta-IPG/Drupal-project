@@ -31,14 +31,14 @@ class UserRolesAccessPolicyTest extends UnitTestCase {
   /**
    * The access policy to test.
    *
-   * @var \Drupal\Core\Session\UserRolesAccessPolicy
+   * @var UserRolesAccessPolicy
    */
   protected $accessPolicy;
 
   /**
    * The mocked entity type manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var EntityTypeManagerInterface|ObjectProphecy
    */
   protected $entityTypeManager;
 

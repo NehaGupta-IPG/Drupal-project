@@ -17,7 +17,7 @@ interface EntityConstraintViolationListInterface extends ConstraintViolationList
   /**
    * Gets violations flagged on entity level, not associated with any field.
    *
-   * @return \Drupal\Core\Entity\EntityConstraintViolationListInterface
+   * @return EntityConstraintViolationListInterface
    *   A list of violations on the entity level.
    */
   public function getEntityViolations();
@@ -28,7 +28,7 @@ interface EntityConstraintViolationListInterface extends ConstraintViolationList
    * @param string $field_name
    *   The name of the field to get violations for.
    *
-   * @return \Symfony\Component\Validator\ConstraintViolationListInterface
+   * @return ConstraintViolationListInterface
    *   The violations of the given field.
    */
   public function getByField($field_name);
@@ -42,7 +42,7 @@ interface EntityConstraintViolationListInterface extends ConstraintViolationList
    * @param string[] $field_names
    *   The names of the fields to get violations for.
    *
-   * @return \Drupal\Core\Entity\EntityConstraintViolationListInterface
+   * @return EntityConstraintViolationListInterface
    *   A list of violations of the given fields.
    */
   public function getByFields(array $field_names);
@@ -56,7 +56,7 @@ interface EntityConstraintViolationListInterface extends ConstraintViolationList
    * @param string|string[] $codes
    *   The codes to find.
    *
-   * @return \Drupal\Core\Entity\EntityConstraintViolationListInterface
+   * @return EntityConstraintViolationListInterface
    *   A list of violations of the given fields.
    */
   public function findByCodes(string|array $codes): static;
@@ -80,7 +80,7 @@ interface EntityConstraintViolationListInterface extends ConstraintViolationList
    * Violations for inaccessible fields are removed so the returned object just
    * has the remaining violations.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   (optional) The user for which to check access, or NULL to check access
    *   for the current user. Defaults to NULL.
    *
@@ -99,7 +99,7 @@ interface EntityConstraintViolationListInterface extends ConstraintViolationList
   /**
    * The entity which has been validated.
    *
-   * @return \Drupal\Core\Entity\FieldableEntityInterface
+   * @return FieldableEntityInterface
    *   The entity object.
    */
   public function getEntity();

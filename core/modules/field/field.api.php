@@ -1,14 +1,13 @@
 <?php
 
+use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
 /**
  * @file
  */
-
-use Drupal\field\FieldStorageConfigInterface;
-use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\field\FieldStorageConfigInterface;
 
 /**
  * @file
@@ -127,9 +126,9 @@ function hook_field_ui_preconfigured_options_alter(array &$options, $field_type)
  * To forbid the update from occurring, throw a
  * \Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException.
  *
- * @param \Drupal\field\FieldStorageConfigInterface $field_storage
+ * @param FieldStorageConfigInterface $field_storage
  *   The field storage as it will be post-update.
- * @param \Drupal\field\FieldStorageConfigInterface $prior_field_storage
+ * @param FieldStorageConfigInterface $prior_field_storage
  *   The field storage as it is pre-update.
  *
  * @see entity_crud
@@ -201,7 +200,7 @@ function hook_field_widget_info_alter(array &$info) {
  * @param array $element
  *   The field widget form element as constructed by
  *   \Drupal\Core\Field\WidgetBaseInterface::form().
- * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param FormStateInterface $form_state
  *   The current state of the form.
  * @param array $context
  *   An associative array containing the following key-value pairs:
@@ -245,7 +244,7 @@ function hook_field_widget_single_element_form_alter(array &$element, FormStateI
  * @param array $element
  *   The field widget form element as constructed by
  *   \Drupal\Core\Field\WidgetBaseInterface::form().
- * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param FormStateInterface $form_state
  *   The current state of the form.
  * @param array $context
  *   An associative array. See hook_field_widget_single_element_form_alter()
@@ -270,7 +269,7 @@ function hook_field_widget_single_element_WIDGET_TYPE_form_alter(array &$element
  * @param array $field_widget_complete_form
  *   The field widget form element as constructed by
  *   \Drupal\Core\Field\WidgetBaseInterface::form().
- * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param FormStateInterface $form_state
  *   The current state of the form.
  * @param array $context
  *   An associative array containing the following key-value pairs:
@@ -302,7 +301,7 @@ function hook_field_widget_complete_form_alter(&$field_widget_complete_form, For
  * @param array $field_widget_complete_form
  *   The field widget form element as constructed by
  *   \Drupal\Core\Field\WidgetBaseInterface::form().
- * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param FormStateInterface $form_state
  *   The current state of the form.
  * @param array $context
  *   An associative array containing the following key-value pairs:
@@ -414,7 +413,7 @@ function hook_field_info_max_weight($entity_type, $bundle, $context, $context_mo
  * field definitions cache has been cleared, this hook is invoked on all modules
  * to allow them to respond to the field storage being purged.
  *
- * @param \Drupal\field\Entity\FieldStorageConfig $field_storage
+ * @param FieldStorageConfig $field_storage
  *   The field storage being purged.
  */
 function hook_field_purge_field_storage(FieldStorageConfig $field_storage) {
@@ -431,7 +430,7 @@ function hook_field_purge_field_storage(FieldStorageConfig $field_storage) {
  * field info cache has been cleared, this hook is invoked on all modules to
  * allow them to respond to the field being purged.
  *
- * @param \Drupal\field\Entity\FieldConfig $field
+ * @param FieldConfig $field
  *   The field being purged.
  */
 function hook_field_purge_field(FieldConfig $field) {

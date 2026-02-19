@@ -16,7 +16,7 @@ class ImageEffectDeleteForm extends ConfirmFormBase {
   /**
    * The image style containing the image effect to be deleted.
    *
-   * @var \Drupal\image\ImageStyleInterface
+   * @var ImageStyleInterface
    */
   protected $imageStyle;
 

@@ -14,14 +14,14 @@ class LanguageConverter implements ParamConverterInterface {
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * Constructs a new LanguageConverter.
    *
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
    */
   public function __construct(LanguageManagerInterface $language_manager) {

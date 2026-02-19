@@ -191,8 +191,8 @@ class MigrationLookupTest extends MigrationLookupTestCase {
    * @param string|array $expected_value
    *   The expected value(s) of the migration process plugin.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
-   * @throws \Drupal\migrate\MigrateException
+   * @throws PluginException
+   * @throws MigrateException
    */
   #[DataProvider('successfulLookupDataProvider')]
   public function testSuccessfulLookup(array $source_id_values, array $destination_id_values, $source_value, $expected_value): void {

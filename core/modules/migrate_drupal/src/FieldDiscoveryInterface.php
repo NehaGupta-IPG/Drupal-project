@@ -23,7 +23,7 @@ interface FieldDiscoveryInterface {
    * migrations to allow field plugins to alter the process for these
    * migrations.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration to add process plugins to.
    *
    * @throws \InvalidArgumentException
@@ -42,7 +42,7 @@ interface FieldDiscoveryInterface {
    * migrations to allow field plugins to alter the process for these
    * migrations.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration to add processes to.
    * @param string $entity_type_id
    *   The legacy entity type to add processes for.
@@ -54,7 +54,7 @@ interface FieldDiscoveryInterface {
   /**
    * Adds the field processes for a bundle to a migration.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration to add processes to.
    * @param string $entity_type_id
    *   The legacy entity type to add processes for.

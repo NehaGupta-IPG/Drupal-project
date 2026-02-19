@@ -39,7 +39,7 @@ class FieldItemDataDefinition extends DataDefinition implements FieldItemDataDef
   /**
    * Creates a new field item definition.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition the item definition belongs to.
    *
    * @return static
@@ -96,7 +96,7 @@ class FieldItemDataDefinition extends DataDefinition implements FieldItemDataDef
    * @return string
    *   The label of the field type.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws PluginNotFoundException
    */
   public function getLabel() {
     return parent::getLabel() ?: $this->getTypedDataManager()->getDefinition($this->getDataType())['label'];

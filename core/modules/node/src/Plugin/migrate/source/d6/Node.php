@@ -73,7 +73,7 @@ class Node extends DrupalSqlBase {
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
@@ -209,7 +209,7 @@ class Node extends DrupalSqlBase {
   /**
    * Gets field values for a node.
    *
-   * @param \Drupal\migrate\Row $node
+   * @param Row $node
    *   The node.
    *
    * @return array
@@ -265,7 +265,7 @@ class Node extends DrupalSqlBase {
    *
    * @param array $field
    *   A field and instance definition from getFieldInfo().
-   * @param \Drupal\migrate\Row $node
+   * @param Row $node
    *   The node.
    *
    * @return array
@@ -338,7 +338,7 @@ class Node extends DrupalSqlBase {
   /**
    * Adapt our query for translations.
    *
-   * @param \Drupal\Core\Database\Query\SelectInterface $query
+   * @param SelectInterface $query
    *   The generated query.
    */
   protected function handleTranslations(SelectInterface $query) {

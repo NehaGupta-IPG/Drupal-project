@@ -25,20 +25,20 @@ final class ExportStorageManager implements StorageManagerInterface {
   /**
    * The database storage.
    *
-   * @var \Drupal\Core\Config\DatabaseStorage
+   * @var DatabaseStorage
    */
   protected $storage;
 
   /**
    * ExportStorageManager constructor.
    *
-   * @param \Drupal\Core\Config\StorageInterface $active
+   * @param StorageInterface $active
    *   The active config storage to prime the export storage.
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $eventDispatcher
+   * @param EventDispatcherInterface $eventDispatcher
    *   The event dispatcher.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
+   * @param LockBackendInterface $lock
    *   The used lock backend instance.
    */
   public function __construct(

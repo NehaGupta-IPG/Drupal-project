@@ -29,7 +29,7 @@ final class Serializer extends SymfonySerializer implements JsonSchemaProviderSe
   /**
    * A normalizer to fall back on when JSON:API cannot normalize an object.
    *
-   * @var \Symfony\Component\Serializer\Normalizer\NormalizerInterface|\Symfony\Component\Serializer\Normalizer\DenormalizerInterface
+   * @var NormalizerInterface|DenormalizerInterface
    */
   protected $fallbackNormalizer;
 
@@ -51,7 +51,7 @@ final class Serializer extends SymfonySerializer implements JsonSchemaProviderSe
    * This normalizer will be attempted when JSON:API has no applicable
    * normalizer.
    *
-   * @param \Symfony\Component\Serializer\Normalizer\NormalizerInterface $normalizer
+   * @param NormalizerInterface $normalizer
    *   The secondary normalizer.
    */
   public function setFallbackNormalizer(NormalizerInterface $normalizer) {

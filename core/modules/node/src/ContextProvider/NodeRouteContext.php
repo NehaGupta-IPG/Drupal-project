@@ -8,8 +8,8 @@ use Drupal\Core\Plugin\Context\ContextProviderInterface;
 use Drupal\Core\Plugin\Context\EntityContext;
 use Drupal\Core\Plugin\Context\EntityContextDefinition;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\node\Entity\Node;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\node\Entity\Node;
 
 /**
  * Sets the current node as a context on node routes.
@@ -21,14 +21,14 @@ class NodeRouteContext implements ContextProviderInterface {
   /**
    * The route match object.
    *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
+   * @var RouteMatchInterface
    */
   protected $routeMatch;
 
   /**
    * Constructs a new NodeRouteContext.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match object.
    */
   public function __construct(RouteMatchInterface $route_match) {

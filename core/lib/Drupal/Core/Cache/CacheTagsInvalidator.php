@@ -12,14 +12,14 @@ class CacheTagsInvalidator implements CacheTagsInvalidatorInterface, CacheTagsPu
   /**
    * Holds an array of cache tags invalidators.
    *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface[]
+   * @var CacheTagsInvalidatorInterface[]
    */
   protected $invalidators = [];
 
   /**
    * Holds an array of cache bins that support invalidations.
    *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface[]
+   * @var CacheTagsInvalidatorInterface[]
    */
   protected array $bins = [];
 
@@ -67,7 +67,7 @@ class CacheTagsInvalidator implements CacheTagsInvalidatorInterface, CacheTagsPu
   /**
    * Adds a cache tags invalidator.
    *
-   * @param \Drupal\Core\Cache\CacheTagsInvalidatorInterface $invalidator
+   * @param CacheTagsInvalidatorInterface $invalidator
    *   A cache invalidator.
    */
   public function addInvalidator(CacheTagsInvalidatorInterface $invalidator) {
@@ -77,7 +77,7 @@ class CacheTagsInvalidator implements CacheTagsInvalidatorInterface, CacheTagsPu
   /**
    * Adds a cache bin.
    *
-   * @param \Drupal\Core\Cache\CacheBackendInterface $bin
+   * @param CacheBackendInterface $bin
    *   A cache bin.
    */
   public function addBin(CacheBackendInterface $bin): void {

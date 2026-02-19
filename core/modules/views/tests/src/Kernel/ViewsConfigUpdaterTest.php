@@ -46,7 +46,7 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
   public function testUpdateRssViewMode(): void {
     $this->strictConfigSchema = FALSE;
 
-    /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+    /** @var ViewsConfigUpdater $view_config_updater */
     $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
 
     // Load the test view.
@@ -76,7 +76,7 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
 
     $this->strictConfigSchema = FALSE;
 
-    /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+    /** @var ViewsConfigUpdater $view_config_updater */
     $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
 
     // Load the test view.
@@ -133,7 +133,7 @@ class ViewsConfigUpdaterTest extends ViewsKernelTestBase {
   public function testUpdateRssViewModeSkipsOtherType(): void {
     $this->strictConfigSchema = FALSE;
 
-    /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+    /** @var ViewsConfigUpdater $view_config_updater */
     $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
 
     // Load the test view.

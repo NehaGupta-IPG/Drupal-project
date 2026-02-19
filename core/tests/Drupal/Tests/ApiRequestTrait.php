@@ -29,12 +29,12 @@ trait ApiRequestTrait {
    *
    * @param string $method
    *   HTTP method.
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   URL to request.
    * @param array $request_options
    *   Request options to apply.
    *
-   * @return \Psr\Http\Message\ResponseInterface
+   * @return ResponseInterface
    *   The response.
    *
    * @see \GuzzleHttp\ClientInterface::request()

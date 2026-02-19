@@ -27,7 +27,7 @@ class ConfigActionsTest extends KernelTestBase {
   /**
    * The configuration action manager.
    *
-   * @var \Drupal\Core\Config\Action\ConfigActionManager
+   * @var ConfigActionManager
    */
   private readonly ConfigActionManager $configActionManager;
 

@@ -17,9 +17,9 @@ trait CKEditor5ValidationTestTrait {
   /**
    * Decorator for CKEditor5::validatePair() that returns an assertable array.
    *
-   * @param \Drupal\editor\EditorInterface $text_editor
+   * @param EditorInterface $text_editor
    *   The paired text editor to validate.
-   * @param \Drupal\filter\FilterFormatInterface $text_format
+   * @param FilterFormatInterface $text_format
    *   The paired text format to validate.
    * @param bool $all_compatibility_problems
    *   Only fundamental compatibility violations are returned unless TRUE.
@@ -37,7 +37,7 @@ trait CKEditor5ValidationTestTrait {
   /**
    * Transforms a constraint violation list object to an assertable array.
    *
-   * @param \Symfony\Component\Validator\ConstraintViolationListInterface $violations
+   * @param ConstraintViolationListInterface $violations
    *   Validation constraint violations.
    *
    * @return array

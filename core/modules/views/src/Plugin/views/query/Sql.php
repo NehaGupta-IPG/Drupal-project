@@ -5,16 +5,16 @@ namespace Drupal\views\Plugin\views\query;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\views\Plugin\views\display\DisplayPluginBase;
-use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\views\Attribute\ViewsQuery;
-use Drupal\views\Plugin\views\join\JoinPluginBase;
+use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\HandlerBase;
+use Drupal\views\Plugin\views\join\JoinPluginBase;
 use Drupal\views\ResultRow;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
@@ -141,21 +141,21 @@ class Sql extends QueryPluginBase {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The database-specific date handler.
    *
-   * @var \Drupal\views\Plugin\views\query\DateSqlInterface
+   * @var DateSqlInterface
    */
   protected $dateSql;
 
   /**
    * The messenger.
    *
-   * @var \Drupal\Core\Messenger\MessengerInterface
+   * @var MessengerInterface
    */
   protected $messenger;
 
@@ -174,11 +174,11 @@ class Sql extends QueryPluginBase {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\views\Plugin\views\query\DateSqlInterface $date_sql
+   * @param DateSqlInterface $date_sql
    *   The database-specific date handler.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger.
    */
   public function __construct(
@@ -383,7 +383,7 @@ class Sql extends QueryPluginBase {
    * @param string $alias
    *   What this relationship will be called, and is also the alias
    *   for the table.
-   * @param \Drupal\views\Plugin\views\join\JoinPluginBase $join
+   * @param JoinPluginBase $join
    *   A Join object (or derived object) to join the alias in.
    * @param string $base
    *   The name of the 'base' table this relationship represents; this
@@ -455,7 +455,7 @@ class Sql extends QueryPluginBase {
    *   tables exist and are properly aliased. If set to NULL the path to
    *   the primary table will be ensured. If the path cannot be made, the
    *   table will NOT be added.
-   * @param \Drupal\views\Plugin\views\join\JoinPluginBase $join
+   * @param JoinPluginBase $join
    *   In some join configurations this table may actually join back through
    *   a different method; this is most likely to be used when tracing
    *   a hierarchy path. (node->parent->parent2->parent3). This parameter
@@ -494,7 +494,7 @@ class Sql extends QueryPluginBase {
    * @param string|null $relationship
    *   The primary table alias this table is related to. If not set, the
    *   primary table will be used.
-   * @param \Drupal\views\Plugin\views\join\JoinPluginBase $join
+   * @param JoinPluginBase $join
    *   In some join configurations this table may actually join back through
    *   a different method; this is most likely to be used when tracing
    *   a hierarchy path. (node->parent->parent2->parent3). This parameter
@@ -611,7 +611,7 @@ class Sql extends QueryPluginBase {
    *   The relationship to ensure the table links to. Each relationship will
    *   get a unique instance of the table being added. If not specified,
    *   will be the primary table.
-   * @param \Drupal\views\Plugin\views\join\JoinPluginBase $join
+   * @param JoinPluginBase $join
    *   A Join object (or derived object) to join the alias in.
    *
    * @return string|null
@@ -802,7 +802,7 @@ class Sql extends QueryPluginBase {
    * @param string $base_table
    *   The path we're following to get this join.
    *
-   * @return \Drupal\views\Plugin\views\join\JoinPluginBase
+   * @return JoinPluginBase
    *   A Join object or child object, if one exists.
    */
   public function getJoinData($table, $base_table) {
@@ -1257,7 +1257,7 @@ class Sql extends QueryPluginBase {
   /**
    * Adds fields to the query.
    *
-   * @param \Drupal\Core\Database\Query\SelectInterface $query
+   * @param SelectInterface $query
    *   The drupal query object.
    */
   protected function compileFields($query) {
@@ -1607,7 +1607,7 @@ class Sql extends QueryPluginBase {
    * $result->_entity. Otherwise, it gets stored in
    * $result->_relationship_entities[$relationship_id];
    *
-   * @param \Drupal\views\ResultRow[] $results
+   * @param ResultRow[] $results
    *   The result of the SQL query.
    */
   public function loadEntities(&$results) {
@@ -1687,12 +1687,12 @@ class Sql extends QueryPluginBase {
    * @param mixed[][] $ids
    *   A two dimensional array of identifiers (entity ID / revision ID) keyed by
    *   relationship.
-   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   * @param EntityInterface[] $entities
    *   An array of entities keyed by their identified (entity ID / revision ID).
-   * @param \Drupal\views\ResultRow[] $results
+   * @param ResultRow[] $results
    *   The entire views result.
    *
-   * @return \Drupal\views\ResultRow[]
+   * @return ResultRow[]
    *   The changed views results.
    */
   protected function assignEntitiesToResult($ids, array $entities, array $results) {

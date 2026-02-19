@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\comment_test\Hook;
 
-use Drupal\Core\Url;
 use Drupal\comment\CommentInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Url;
 
 /**
  * Hook implementations for comment_test.

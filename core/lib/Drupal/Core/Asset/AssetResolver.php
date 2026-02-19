@@ -8,8 +8,8 @@ use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
-use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 
 /**
@@ -20,68 +20,68 @@ class AssetResolver implements AssetResolverInterface {
   /**
    * The library discovery service.
    *
-   * @var \Drupal\Core\Asset\LibraryDiscoveryInterface
+   * @var LibraryDiscoveryInterface
    */
   protected $libraryDiscovery;
 
   /**
    * The library dependency resolver.
    *
-   * @var \Drupal\Core\Asset\LibraryDependencyResolverInterface
+   * @var LibraryDependencyResolverInterface
    */
   protected $libraryDependencyResolver;
 
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The theme manager.
    *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   * @var ThemeManagerInterface
    */
   protected $themeManager;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The cache backend.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $cache;
 
   /**
    * The theme handler service.
    *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
+   * @var ThemeHandlerInterface
    */
   protected $themeHandler;
 
   /**
    * Constructs a new AssetResolver instance.
    *
-   * @param \Drupal\Core\Asset\LibraryDiscoveryInterface $library_discovery
+   * @param LibraryDiscoveryInterface $library_discovery
    *   The library discovery service.
-   * @param \Drupal\Core\Asset\LibraryDependencyResolverInterface $library_dependency_resolver
+   * @param LibraryDependencyResolverInterface $library_dependency_resolver
    *   The library dependency resolver.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
+   * @param ThemeManagerInterface $theme_manager
    *   The theme manager.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The cache backend.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param ThemeHandlerInterface $theme_handler
    *   The theme handler service.
    */
   public function __construct(LibraryDiscoveryInterface $library_discovery, LibraryDependencyResolverInterface $library_dependency_resolver, ModuleHandlerInterface $module_handler, ThemeManagerInterface $theme_manager, LanguageManagerInterface $language_manager, CacheBackendInterface $cache, ?ThemeHandlerInterface $theme_handler = NULL) {
@@ -116,7 +116,7 @@ class AssetResolver implements AssetResolverInterface {
    * include the asset type being built as well as ensuring a reliable order of
    * the libraries based on their dependencies.
    *
-   * @param \Drupal\Core\Asset\AttachedAssetsInterface $assets
+   * @param AttachedAssetsInterface $assets
    *   The assets attached to the current response.
    * @param string|null $asset_type
    *   The asset type to load.
@@ -262,7 +262,7 @@ class AssetResolver implements AssetResolverInterface {
    * Gathers all drupalSettings from all libraries in the attached assets
    * collection and merges them.
    *
-   * @param \Drupal\Core\Asset\AttachedAssetsInterface $assets
+   * @param AttachedAssetsInterface $assets
    *   The assets attached to the current response.
    *
    * @return array

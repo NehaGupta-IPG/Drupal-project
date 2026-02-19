@@ -20,21 +20,21 @@ class LazyContextRepository implements ContextRepositoryInterface {
   /**
    * The service container.
    *
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface
+   * @var ContainerInterface
    */
   protected $container;
 
   /**
    * The statically cached contexts.
    *
-   * @var \Drupal\Core\Plugin\Context\ContextInterface[]
+   * @var ContextInterface[]
    */
   protected $contexts = [];
 
   /**
    * Constructs a LazyContextRepository object.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @param ContainerInterface $container
    *   The current service container.
    * @param string[] $context_provider_service_ids
    *   The set of the available context provider service IDs.

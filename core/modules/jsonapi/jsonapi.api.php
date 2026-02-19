@@ -1,14 +1,13 @@
 <?php
 
+use Drupal\Core\Access\AccessResult;
 /**
  * @file
  * Documentation related to JSON:API.
  */
-
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\jsonapi\JsonApiFilter;
 
 /**
@@ -210,7 +209,6 @@ use Drupal\jsonapi\JsonApiFilter;
  *
  * @}
  */
-
 /**
  * @addtogroup hooks
  * @{
@@ -250,9 +248,9 @@ use Drupal\jsonapi\JsonApiFilter;
  *   implemented using the 'entity_access' or 'ENTITY_TYPE_access' query tag.
  *   See node_query_node_access_alter() for an example.
  *
- * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+ * @param EntityTypeInterface $entity_type
  *   The entity type of the entity to be filtered upon.
- * @param \Drupal\Core\Session\AccountInterface $account
+ * @param AccountInterface $account
  *   The account for which to check access.
  *
  * @return \Drupal\Core\Access\AccessResultInterface[]
@@ -293,9 +291,9 @@ function hook_jsonapi_entity_filter_access(EntityTypeInterface $entity_type, Acc
  * rather than the generic hook_jsonapi_entity_filter_access() hook, which is
  * called for every entity type.
  *
- * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+ * @param EntityTypeInterface $entity_type
  *   The entity type of the entities to be filtered upon.
- * @param \Drupal\Core\Session\AccountInterface $account
+ * @param AccountInterface $account
  *   The account for which to check access.
  *
  * @return \Drupal\Core\Access\AccessResultInterface[]
@@ -334,9 +332,9 @@ function hook_jsonapi_ENTITY_TYPE_filter_access(EntityTypeInterface $entity_type
  * forbidden for one or more values of the `$items` argument, this hook *MUST*
  * return AccessResult::forbidden().
  *
- * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+ * @param FieldDefinitionInterface $field_definition
  *   The field definition of the field to be filtered upon.
- * @param \Drupal\Core\Session\AccountInterface $account
+ * @param AccountInterface $account
  *   The account for which to check access.
  *
  * @return \Drupal\Core\Access\AccessResultInterface

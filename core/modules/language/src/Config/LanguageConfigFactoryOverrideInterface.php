@@ -13,7 +13,7 @@ interface LanguageConfigFactoryOverrideInterface extends ConfigFactoryOverrideIn
   /**
    * Gets the language object used to override configuration data.
    *
-   * @return \Drupal\Core\Language\LanguageInterface
+   * @return LanguageInterface
    *   The language object used to override configuration data.
    */
   public function getLanguage();
@@ -21,7 +21,7 @@ interface LanguageConfigFactoryOverrideInterface extends ConfigFactoryOverrideIn
   /**
    * Sets the language to be used in configuration overrides.
    *
-   * @param \Drupal\Core\Language\LanguageInterface $language
+   * @param LanguageInterface $language
    *   The language object used to override configuration data.
    *
    * @return $this

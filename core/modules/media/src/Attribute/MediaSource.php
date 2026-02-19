@@ -32,9 +32,9 @@ class MediaSource extends Plugin {
    *
    * @param string $id
    *   The attribute class ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $label
+   * @param TranslatableMarkup $label
    *   The human-readable name of the media source.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $description
+   * @param TranslatableMarkup|null $description
    *   (optional) A brief description of the media source.
    * @param string[] $allowed_field_types
    *   (optional) The field types that can be used as a source field for this

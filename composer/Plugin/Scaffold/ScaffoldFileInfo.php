@@ -2,6 +2,7 @@
 
 namespace Drupal\Composer\Plugin\Scaffold;
 
+use Drupal\Composer\Plugin\Scaffold\Operations\ScaffoldResult;
 use Composer\IO\IOInterface;
 use Drupal\Composer\Plugin\Scaffold\Operations\OperationInterface;
 
@@ -20,24 +21,24 @@ class ScaffoldFileInfo {
   /**
    * The path to the destination.
    *
-   * @var \Drupal\Composer\Plugin\Scaffold\ScaffoldFilePath
+   * @var ScaffoldFilePath
    */
   protected $destination;
 
   /**
    * The operation used to create the destination.
    *
-   * @var \Drupal\Composer\Plugin\Scaffold\Operations\OperationInterface
+   * @var OperationInterface
    */
   protected $op;
 
   /**
    * Constructs a ScaffoldFileInfo object.
    *
-   * @param \Drupal\Composer\Plugin\Scaffold\ScaffoldFilePath $destination
+   * @param ScaffoldFilePath $destination
    *   The full and relative paths to the destination file and the package
    *   defining it.
-   * @param \Drupal\Composer\Plugin\Scaffold\Operations\OperationInterface $op
+   * @param OperationInterface $op
    *   Operations object that will handle scaffolding operations.
    */
   public function __construct(ScaffoldFilePath $destination, OperationInterface $op) {
@@ -48,7 +49,7 @@ class ScaffoldFileInfo {
   /**
    * Gets the Scaffold operation.
    *
-   * @return \Drupal\Composer\Plugin\Scaffold\Operations\OperationInterface
+   * @return OperationInterface
    *   Operations object that handles scaffolding (copy, make symlink, etc).
    */
   public function op() {
@@ -68,7 +69,7 @@ class ScaffoldFileInfo {
   /**
    * Gets the destination.
    *
-   * @return \Drupal\Composer\Plugin\Scaffold\ScaffoldFilePath
+   * @return ScaffoldFilePath
    *   The scaffold path to the destination file.
    */
   public function destination() {
@@ -110,13 +111,13 @@ class ScaffoldFileInfo {
   /**
    * Moves a single scaffold file from source to destination.
    *
-   * @param \Composer\IO\IOInterface $io
+   * @param IOInterface $io
    *   The scaffold file to be processed.
-   * @param \Drupal\Composer\Plugin\Scaffold\ScaffoldOptions $options
+   * @param ScaffoldOptions $options
    *   Assorted operational options, e.g. whether the destination should be a
    *   symlink.
    *
-   * @return \Drupal\Composer\Plugin\Scaffold\Operations\ScaffoldResult
+   * @return ScaffoldResult
    *   The scaffold result.
    */
   public function process(IOInterface $io, ScaffoldOptions $options) {

@@ -15,23 +15,23 @@ class Messenger implements MessengerInterface {
   /**
    * The flash bag.
    *
-   * @var \Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface
+   * @var FlashBagInterface
    */
   protected $flashBag;
 
   /**
    * The kill switch.
    *
-   * @var \Drupal\Core\PageCache\ResponsePolicy\KillSwitch
+   * @var KillSwitch
    */
   protected $killSwitch;
 
   /**
    * Messenger constructor.
    *
-   * @param \Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface $flash_bag
+   * @param FlashBagInterface $flash_bag
    *   The flash bag.
-   * @param \Drupal\Core\PageCache\ResponsePolicy\KillSwitch $killSwitch
+   * @param KillSwitch $killSwitch
    *   The kill switch.
    */
   public function __construct(FlashBagInterface $flash_bag, KillSwitch $killSwitch) {

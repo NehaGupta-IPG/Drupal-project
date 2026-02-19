@@ -31,7 +31,7 @@ class ConfigNamesMapperTest extends UnitTestCase {
   /**
    * The configuration names mapper to test.
    *
-   * @var \Drupal\Tests\config_translation\Unit\TestConfigNamesMapper
+   * @var TestConfigNamesMapper
    *
    * @see \Drupal\config_translation\ConfigNamesMapper
    */
@@ -40,56 +40,56 @@ class ConfigNamesMapperTest extends UnitTestCase {
   /**
    * The locale configuration manager.
    *
-   * @var \Drupal\locale\LocaleConfigManager|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\locale\LocaleConfigManager|MockObject
    */
   protected $localeConfigManager;
 
   /**
    * The typed configuration manager.
    *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Config\TypedConfigManagerInterface|MockObject
    */
   protected $typedConfigManager;
 
   /**
    * The configuration mapper manager.
    *
-   * @var \Drupal\config_translation\ConfigMapperManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\config_translation\ConfigMapperManagerInterface|MockObject
    */
   protected $configMapperManager;
 
   /**
    * The base route used for testing.
    *
-   * @var \Symfony\Component\Routing\Route
+   * @var Route
    */
   protected $baseRoute;
 
   /**
    * The route provider used for testing.
    *
-   * @var \Drupal\Core\Routing\RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Routing\RouteProviderInterface|MockObject
    */
   protected $routeProvider;
 
   /**
    * The mocked URL generator.
    *
-   * @var \Drupal\Core\Routing\UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Routing\UrlGeneratorInterface|MockObject
    */
   protected $urlGenerator;
 
   /**
    * The mocked language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Language\LanguageManagerInterface|MockObject
    */
   protected $languageManager;
 
   /**
    * The mocked event dispatcher.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|MockObject
    */
   protected $eventDispatcher;
 
@@ -679,7 +679,7 @@ class TestConfigNamesMapper extends ConfigNamesMapper {
   /**
    * Sets the configuration factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @var ConfigFactoryInterface $config_factory
    *   The config factory to set.
    */
   public function setConfigFactory(ConfigFactoryInterface $config_factory): void {

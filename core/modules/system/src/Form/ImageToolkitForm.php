@@ -26,11 +26,11 @@ class ImageToolkitForm extends ConfigFormBase {
   /**
    * Constructs an ImageToolkitForm object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
+   * @param TypedConfigManagerInterface $typedConfigManager
    *   The typed config manager.
-   * @param \Drupal\Core\ImageToolkit\ImageToolkitManager $manager
+   * @param ImageToolkitManager $manager
    *   The image toolkit plugin manager.
    */
   public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, ImageToolkitManager $manager) {

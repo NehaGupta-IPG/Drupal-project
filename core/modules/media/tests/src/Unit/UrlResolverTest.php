@@ -27,10 +27,10 @@ class UrlResolverTest extends UnitTestCase {
   /**
    * Creates a UrlResolver with exposed protected methods for testing.
    *
-   * @param \GuzzleHttp\Client $client
+   * @param Client $client
    *   The HTTP client.
    *
-   * @return \Drupal\media\OEmbed\UrlResolver
+   * @return UrlResolver
    *   A UrlResolver instance with a public discoverResourceUrl method.
    */
   protected function createTestableUrlResolver(Client $client): UrlResolver {

@@ -17,7 +17,7 @@ class YamlDiscoveryDecoratorTest extends UnitTestCase {
   /**
    * The YamlDiscovery instance to test.
    *
-   * @var \Drupal\Core\Plugin\Discovery\YamlDiscoveryDecorator
+   * @var YamlDiscoveryDecorator
    */
   protected $discoveryDecorator;
 

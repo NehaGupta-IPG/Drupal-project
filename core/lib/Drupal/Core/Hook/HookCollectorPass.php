@@ -12,8 +12,8 @@ use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\HookAttributeInterface;
 use Drupal\Core\Hook\Attribute\LegacyHook;
 use Drupal\Core\Hook\Attribute\LegacyModuleImplementsAlter;
-use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
 use Drupal\Core\Hook\Attribute\LegacyRequirementsHook;
+use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
 use Drupal\Core\Hook\Attribute\RemoveHook;
 use Drupal\Core\Hook\Attribute\ReorderHook;
 use Drupal\Core\Hook\OrderOperation\OrderOperation;
@@ -62,7 +62,7 @@ class HookCollectorPass implements CompilerPassInterface {
    * Operations with higher weight are applied last, which means they can
    * override the changes from previous operations.
    *
-   * @var array<string, array<int, list<\Drupal\Core\Hook\OrderOperation\OrderOperation>>>
+   * @var array<string, array<int, list<OrderOperation>>>
    *
    * @todo Review how to combine operations from different hooks.
    */
@@ -119,7 +119,7 @@ class HookCollectorPass implements CompilerPassInterface {
   /**
    * Writes collected definitions to the container builder.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   * @param ContainerBuilder $container
    *   Container builder.
    */
   protected function writeToContainer(ContainerBuilder $container): void {
@@ -223,7 +223,7 @@ class HookCollectorPass implements CompilerPassInterface {
   /**
    * Gets order operations by hook.
    *
-   * @return array<string, list<\Drupal\Core\Hook\OrderOperation\OrderOperation>>
+   * @return array<string, list<OrderOperation>>
    *   Order operations by hook name.
    */
   protected function getOrderOperations(): array {
@@ -248,7 +248,7 @@ class HookCollectorPass implements CompilerPassInterface {
    * @param array<string, string> $implementation_list
    *   Implementation list for one hook, as module names keyed by
    *   "$class::$method" identifiers.
-   * @param list<\Drupal\Core\Hook\OrderOperation\OrderOperation> $order_operations
+   * @param list<OrderOperation> $order_operations
    *   A list of order operations for one hook.
    */
   protected static function applyOrderOperations(array &$implementation_list, array $order_operations): void {
@@ -270,7 +270,7 @@ class HookCollectorPass implements CompilerPassInterface {
   /**
    * Registers the hook implementation services.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   * @param ContainerBuilder $container
    *   The container builder.
    * @param array<string, array<string, string>> $implementationsByHook
    *   Implementations, as module names keyed by hook name and "$class::$method"
@@ -302,7 +302,7 @@ class HookCollectorPass implements CompilerPassInterface {
   /**
    * Collects all hook implementations.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   * @param ContainerBuilder $container
    *   The ContainerBuilder to get module parameters from.
    *
    * @return static
@@ -544,7 +544,7 @@ class HookCollectorPass implements CompilerPassInterface {
   /**
    * Checks for hooks which can't be supported in classes.
    *
-   * @param \Drupal\Core\Hook\Attribute\Hook $hookAttribute
+   * @param Hook $hookAttribute
    *   The hook to check.
    * @param class-string $class
    *   The class the hook is implemented on.
@@ -574,7 +574,7 @@ class HookCollectorPass implements CompilerPassInterface {
    * @param \ReflectionClass $reflectionClass
    *   A reflected class.
    *
-   * @return array<string, list<\Drupal\Core\Hook\Attribute\HookAttributeInterface>>
+   * @return array<string, list<HookAttributeInterface>>
    *   Lists of Hook attribute instances by method name.
    */
   protected static function getAttributeInstances(\ReflectionClass $reflectionClass): array {

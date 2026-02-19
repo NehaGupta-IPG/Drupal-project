@@ -58,7 +58,7 @@ interface MediaTypeInterface extends ConfigEntityInterface, EntityDescriptionInt
   /**
    * Returns the media source plugin.
    *
-   * @return \Drupal\media\MediaSourceInterface
+   * @return MediaSourceInterface
    *   The media source.
    */
   public function getSource();

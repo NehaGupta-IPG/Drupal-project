@@ -46,7 +46,7 @@ interface ViewsHandlerInterface extends ViewsPluginInterface {
   /**
    * Check whether given user has access to this handler.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user account to check.
    *
    * @return bool
@@ -113,7 +113,7 @@ interface ViewsHandlerInterface extends ViewsPluginInterface {
    *
    * @param array $form
    *   The form array to alter, passed by reference.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function showExposeForm(&$form, FormStateInterface $form_state);

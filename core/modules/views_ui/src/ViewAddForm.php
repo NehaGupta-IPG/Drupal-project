@@ -2,12 +2,12 @@
 
 namespace Drupal\views_ui;
 
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\views\Plugin\views\wizard\WizardPluginBase;
 use Drupal\views\Plugin\views\wizard\WizardException;
+use Drupal\views\Plugin\views\wizard\WizardPluginBase;
 use Drupal\views\Plugin\ViewsPluginManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
  * Form controller for the Views add form.
@@ -19,23 +19,23 @@ class ViewAddForm extends ViewFormBase {
   /**
    * The wizard plugin manager.
    *
-   * @var \Drupal\views\Plugin\ViewsPluginManager
+   * @var ViewsPluginManager
    */
   protected $wizardManager;
 
   /**
    * The module handler service.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * Constructs a new ViewAddForm object.
    *
-   * @param \Drupal\views\Plugin\ViewsPluginManager $wizard_manager
+   * @param ViewsPluginManager $wizard_manager
    *   The wizard plugin manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler service.
    */
   public function __construct(ViewsPluginManager $wizard_manager, ModuleHandlerInterface $module_handler) {
@@ -218,7 +218,7 @@ class ViewAddForm extends ViewFormBase {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function cancel(array $form, FormStateInterface $form_state) {

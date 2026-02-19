@@ -12,7 +12,7 @@ class NoProfilesException extends InstallerException {
   /**
    * Constructs a new "no profiles available" exception.
    *
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param TranslationInterface $string_translation
    *   The string translation manager.
    */
   public function __construct(TranslationInterface $string_translation) {

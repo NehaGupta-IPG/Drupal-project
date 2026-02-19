@@ -20,7 +20,7 @@ interface BuilderInterface {
   /**
    * BuilderInterface constructor.
    *
-   * @param \Drupal\Composer\Generator\Util\DrupalCoreComposer $drupalCoreInfo
+   * @param DrupalCoreComposer $drupalCoreInfo
    *   Information about the composer.json, composer.lock, and repository path.
    */
   public function __construct(DrupalCoreComposer $drupalCoreInfo);

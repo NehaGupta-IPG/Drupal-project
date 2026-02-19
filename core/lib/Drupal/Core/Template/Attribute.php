@@ -2,8 +2,8 @@
 
 namespace Drupal\Core\Template;
 
-use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Render\MarkupInterface;
+use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Serialization\Attribute\JsonSchema;
 
@@ -63,8 +63,8 @@ use Drupal\Core\Serialization\Attribute\JsonSchema;
  *   // Produces <input value="Highlight the &lt;em&gt; tag">
  * @endcode
  *
- * @implements \ArrayAccess<string, \Drupal\Core\Template\AttributeValueBase>
- * @implements \IteratorAggregate<string, \Drupal\Core\Template\AttributeValueBase>
+ * @implements \ArrayAccess<string, AttributeValueBase>
+ * @implements \IteratorAggregate<string, AttributeValueBase>
  *
  * @see \Drupal\Component\Utility\Html::escape()
  * @see \Drupal\Component\Render\PlainTextOutput::renderFromHtml()
@@ -75,7 +75,7 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
   /**
    * Stores the attribute data.
    *
-   * @var array<string, \Drupal\Core\Template\AttributeValueBase>
+   * @var array<string, AttributeValueBase>
    */
   protected $storage = [];
 
@@ -123,7 +123,7 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
    * @param mixed $value
    *   The attribute value.
    *
-   * @return \Drupal\Core\Template\AttributeValueBase
+   * @return AttributeValueBase
    *   An AttributeValueBase representation of the attribute's value.
    */
   protected function createAttributeValue($name, $value) {
@@ -294,7 +294,7 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
    *
    * This method is implemented to take precedence over hasClass() for Twig 2.0.
    *
-   * @return \Drupal\Core\Template\AttributeValueBase
+   * @return AttributeValueBase
    *   The class attribute value if set.
    *
    * @see twig_get_attribute()
@@ -327,7 +327,7 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
   #[JsonSchema(['type' => 'string', 'description' => 'Rendered HTML element attributes'])]
   public function __toString() {
     $return = '';
-    /** @var \Drupal\Core\Template\AttributeValueBase $value */
+    /** @var AttributeValueBase $value */
     foreach ($this->storage as $value) {
       $rendered = $value->render();
       if ($rendered) {
@@ -364,7 +364,7 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
   /**
    * Retrieves the iterator for the object.
    *
-   * @return \ArrayIterator<string, \Drupal\Core\Template\AttributeValueBase>
+   * @return \ArrayIterator<string, AttributeValueBase>
    *   The iterator.
    */
   public function getIterator(): \ArrayIterator {
@@ -391,7 +391,7 @@ class Attribute implements \ArrayAccess, \IteratorAggregate, MarkupInterface {
   /**
    * Merges an Attribute object into the current storage.
    *
-   * @param \Drupal\Core\Template\Attribute $collection
+   * @param Attribute $collection
    *   The Attribute object to merge.
    *
    * @return $this

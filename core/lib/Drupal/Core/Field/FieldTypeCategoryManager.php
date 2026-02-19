@@ -5,8 +5,8 @@ namespace Drupal\Core\Field;
 use Drupal\Component\Plugin\FallbackPluginManagerInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\Core\Plugin\Discovery\YamlDiscovery;
 use Drupal\Core\Plugin\DefaultPluginManager;
+use Drupal\Core\Plugin\Discovery\YamlDiscovery;
 
 /**
  * Defines a field type category info plugin manager.
@@ -55,9 +55,9 @@ class FieldTypeCategoryManager extends DefaultPluginManager implements FieldType
    *
    * @param string $root
    *   The app root.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param CacheBackendInterface $cache_backend
    *   The cache backend.
    */
   public function __construct(protected readonly string $root, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend) {

@@ -4,12 +4,12 @@ namespace Drupal\system\Routing;
 
 use Drupal\Core\Config\ConfigCrudEvent;
 use Drupal\Core\Config\ConfigEvents;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Routing\RouteBuilderInterface;
+use Drupal\Core\Routing\RouteSubscriberBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Routing\RouteSubscriberBase;
-use Drupal\Core\Routing\RouteBuilderInterface;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -29,9 +29,9 @@ class MenuLinksetRoutes extends RouteSubscriberBase implements ContainerInjectio
    *
    * @param string[] $authenticationProviders
    *   An array of authentication providers, keyed by ID.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   * @param ConfigFactoryInterface $configFactory
    *   The config factory.
-   * @param \Drupal\Core\Routing\RouteBuilderInterface $routeBuilder
+   * @param RouteBuilderInterface $routeBuilder
    *   The route builder.
    */
   public function __construct(array $authenticationProviders, protected readonly ConfigFactoryInterface $configFactory, protected readonly RouteBuilderInterface $routeBuilder) {
@@ -45,7 +45,7 @@ class MenuLinksetRoutes extends RouteSubscriberBase implements ContainerInjectio
    * authentication providers on this module's routes since they cannot be known
    * in advance.
    *
-   * @param \Symfony\Component\Routing\RouteCollection $collection
+   * @param RouteCollection $collection
    *   A collection of routes.
    */
   public function alterRoutes(RouteCollection $collection) {
@@ -88,7 +88,7 @@ class MenuLinksetRoutes extends RouteSubscriberBase implements ContainerInjectio
   /**
    * Returns an array of route objects.
    *
-   * @return \Symfony\Component\Routing\Route[]
+   * @return Route[]
    *   An array of route objects.
    */
   public function routes() {

@@ -26,14 +26,14 @@ class PathProcessorTest extends UnitTestCase {
   /**
    * Configuration for the languageManager stub.
    *
-   * @var \Drupal\Core\Language\LanguageInterface[]
+   * @var LanguageInterface[]
    */
   protected $languages;
 
   /**
    * The language manager stub used to construct a PathProcessorLanguage object.
    *
-   * @var \Drupal\language\ConfigurableLanguageManagerInterface|\PHPUnit\Framework\MockObject\MockBuilder
+   * @var \Drupal\language\ConfigurableLanguageManagerInterface|MockBuilder
    */
   protected $languageManager;
 

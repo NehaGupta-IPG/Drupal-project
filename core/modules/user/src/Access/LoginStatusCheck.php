@@ -15,9 +15,9 @@ class LoginStatusCheck implements AccessInterface {
   /**
    * Checks access.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The currently logged in account.
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route to check against.
    *
    * @return \Drupal\Core\Access\AccessResultInterface

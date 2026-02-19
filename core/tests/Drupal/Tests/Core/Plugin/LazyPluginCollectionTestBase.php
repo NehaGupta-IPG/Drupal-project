@@ -16,14 +16,14 @@ abstract class LazyPluginCollectionTestBase extends UnitTestCase {
   /**
    * The mocked plugin manager.
    *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Component\Plugin\PluginManagerInterface|MockObject
    */
   protected $pluginManager;
 
   /**
    * The tested plugin collection.
    *
-   * @var \Drupal\Core\Plugin\DefaultLazyPluginCollection|\PHPUnit\Framework\MockObject\MockObject
+   * @var DefaultLazyPluginCollection|MockObject
    */
   protected $defaultPluginCollection;
 
@@ -61,7 +61,7 @@ abstract class LazyPluginCollectionTestBase extends UnitTestCase {
   /**
    * Sets up the default plugin collection.
    *
-   * @param \PHPUnit\Framework\MockObject\Rule\InvocationOrder|null $create_count
+   * @param InvocationOrder|null $create_count
    *   (optional) The number of times that createInstance() is expected to be
    *   called. For example, $this->any(), $this->once(), $this->exactly(6).
    *   Defaults to $this->never().
@@ -89,7 +89,7 @@ abstract class LazyPluginCollectionTestBase extends UnitTestCase {
    * @param string $plugin_id
    *   The plugin ID to return the mock plugin for.
    *
-   * @return \Drupal\Component\Plugin\PluginInspectionInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @return \Drupal\Component\Plugin\PluginInspectionInterface|MockObject
    *   The mock plugin object.
    */
   public function returnPluginMap($plugin_id) {
@@ -104,7 +104,7 @@ abstract class LazyPluginCollectionTestBase extends UnitTestCase {
    * @param array $definition
    *   The plugin definition.
    *
-   * @return \Drupal\Component\Plugin\PluginInspectionInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @return \Drupal\Component\Plugin\PluginInspectionInterface|MockObject
    *   The mocked plugin object.
    */
   protected function getPluginMock($plugin_id, array $definition) {

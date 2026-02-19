@@ -2,13 +2,13 @@
 
 namespace Drupal\workflows\Entity;
 
-use Drupal\Core\Entity\Attribute\ConfigEntityType;
-use Drupal\Core\Entity\Routing\AdminHtmlRouteProvider;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
+use Drupal\Core\Entity\Routing\AdminHtmlRouteProvider;
 use Drupal\Core\Plugin\DefaultSingleLazyPluginCollection;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\workflows\Exception\RequiredStateMissingException;
 use Drupal\workflows\Form\WorkflowAddForm;
 use Drupal\workflows\Form\WorkflowDeleteForm;
@@ -142,7 +142,7 @@ class Workflow extends ConfigEntityBase implements WorkflowInterface, EntityWith
   /**
    * Encapsulates the creation of the workflow's plugin collection.
    *
-   * @return \Drupal\Core\Plugin\DefaultSingleLazyPluginCollection
+   * @return DefaultSingleLazyPluginCollection
    *   The workflow's plugin collection.
    */
   protected function getPluginCollection() {

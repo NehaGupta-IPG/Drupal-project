@@ -7,11 +7,11 @@ use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Parameter;
-use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Dumper\Dumper;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\DependencyInjection\Dumper\Dumper;
+use Symfony\Component\DependencyInjection\Parameter;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\ExpressionLanguage\Expression;
 
 /**
@@ -195,13 +195,13 @@ class OptimizedPhpArrayDumper extends Dumper {
   /**
    * Gets a service definition as PHP array.
    *
-   * @param \Symfony\Component\DependencyInjection\Definition $definition
+   * @param Definition $definition
    *   The definition to process.
    *
    * @return array
    *   The service definition as PHP array.
    *
-   * @throws \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+   * @throws InvalidArgumentException
    *   Thrown when the definition is marked as decorated, or with an explicit
    *   scope different from SCOPE_CONTAINER and SCOPE_PROTOTYPE.
    */
@@ -355,7 +355,7 @@ class OptimizedPhpArrayDumper extends Dumper {
    *
    * @param string|null $id
    *   The ID of the service to get a private definition for.
-   * @param \Symfony\Component\DependencyInjection\Definition $definition
+   * @param Definition $definition
    *   The definition to process.
    * @param bool $shared
    *   (optional) Whether the service will be shared with others.
@@ -387,7 +387,7 @@ class OptimizedPhpArrayDumper extends Dumper {
    * @return mixed
    *   The dumped value in a suitable format.
    *
-   * @throws \Symfony\Component\DependencyInjection\Exception\RuntimeException
+   * @throws RuntimeException
    *   When trying to dump object or resource.
    */
   protected function dumpValue($value) {
@@ -430,7 +430,7 @@ class OptimizedPhpArrayDumper extends Dumper {
     }
     elseif ($value instanceof ServiceClosureArgument) {
       $reference = $value->getValues();
-      /** @var \Symfony\Component\DependencyInjection\Reference $reference */
+      /** @var Reference $reference */
       $reference = reset($reference);
 
       return $this->getServiceClosureCall((string) $reference, $reference->getInvalidBehavior());
@@ -457,7 +457,7 @@ class OptimizedPhpArrayDumper extends Dumper {
    *
    * @param string $id
    *   The ID of the service to get a reference for.
-   * @param \Symfony\Component\DependencyInjection\Reference|null $reference
+   * @param Reference|null $reference
    *   (optional) The reference object to process; needed to get the invalid
    *   behavior value.
    *
@@ -553,7 +553,7 @@ class OptimizedPhpArrayDumper extends Dumper {
   /**
    * Gets a service iterator in a suitable PHP array format.
    *
-   * @param \Symfony\Component\DependencyInjection\Argument\IteratorArgument $iterator
+   * @param IteratorArgument $iterator
    *   The iterator.
    *
    * @return object

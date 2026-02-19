@@ -38,35 +38,35 @@ class ConfigureSectionForm extends FormBase implements WorkspaceDynamicSafeFormI
   /**
    * The layout tempstore repository.
    *
-   * @var \Drupal\layout_builder\LayoutTempstoreRepositoryInterface
+   * @var LayoutTempstoreRepositoryInterface
    */
   protected $layoutTempstoreRepository;
 
   /**
    * The plugin being configured.
    *
-   * @var \Drupal\Core\Layout\LayoutInterface|\Drupal\Core\Plugin\PluginFormInterface
+   * @var LayoutInterface|PluginFormInterface
    */
   protected $layout;
 
   /**
    * The section being configured.
    *
-   * @var \Drupal\layout_builder\Section
+   * @var Section
    */
   protected $section;
 
   /**
    * The plugin form manager.
    *
-   * @var \Drupal\Core\Plugin\PluginFormFactoryInterface
+   * @var PluginFormFactoryInterface
    */
   protected $pluginFormFactory;
 
   /**
    * The section storage.
    *
-   * @var \Drupal\layout_builder\SectionStorageInterface
+   * @var SectionStorageInterface
    */
   protected $sectionStorage;
 
@@ -94,9 +94,9 @@ class ConfigureSectionForm extends FormBase implements WorkspaceDynamicSafeFormI
   /**
    * Constructs a new ConfigureSectionForm.
    *
-   * @param \Drupal\layout_builder\LayoutTempstoreRepositoryInterface $layout_tempstore_repository
+   * @param LayoutTempstoreRepositoryInterface $layout_tempstore_repository
    *   The layout tempstore repository.
-   * @param \Drupal\Core\Plugin\PluginFormFactoryInterface $plugin_form_manager
+   * @param PluginFormFactoryInterface $plugin_form_manager
    *   The plugin form manager.
    */
   public function __construct(LayoutTempstoreRepositoryInterface $layout_tempstore_repository, PluginFormFactoryInterface $plugin_form_manager) {
@@ -216,13 +216,13 @@ class ConfigureSectionForm extends FormBase implements WorkspaceDynamicSafeFormI
   /**
    * Retrieves the plugin form for a given layout.
    *
-   * @param \Drupal\Core\Layout\LayoutInterface $layout
+   * @param LayoutInterface $layout
    *   The layout plugin.
    *
-   * @return \Drupal\Core\Plugin\PluginFormInterface
+   * @return PluginFormInterface
    *   The plugin form for the layout.
    *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws InvalidPluginDefinitionException
    */
   protected function getPluginForm(LayoutInterface $layout) {
     if ($layout instanceof PluginWithFormsInterface) {
@@ -239,7 +239,7 @@ class ConfigureSectionForm extends FormBase implements WorkspaceDynamicSafeFormI
   /**
    * Retrieves the section storage property.
    *
-   * @return \Drupal\layout_builder\SectionStorageInterface
+   * @return SectionStorageInterface
    *   The section storage for the current form.
    */
   public function getSectionStorage() {
@@ -249,7 +249,7 @@ class ConfigureSectionForm extends FormBase implements WorkspaceDynamicSafeFormI
   /**
    * Retrieves the layout being modified by the form.
    *
-   * @return \Drupal\Core\Layout\LayoutInterface|\Drupal\Core\Plugin\PluginFormInterface
+   * @return LayoutInterface|PluginFormInterface
    *   The layout for the current form.
    */
   public function getCurrentLayout(): LayoutInterface {
@@ -259,7 +259,7 @@ class ConfigureSectionForm extends FormBase implements WorkspaceDynamicSafeFormI
   /**
    * Retrieves the section being modified by the form.
    *
-   * @return \Drupal\layout_builder\Section
+   * @return Section
    *   The section for the current form.
    */
   public function getCurrentSection(): Section {

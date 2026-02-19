@@ -41,7 +41,7 @@ interface ListDataDefinitionInterface extends DataDefinitionInterface {
   /**
    * Gets the data definition of an item of the list.
    *
-   * @return \Drupal\Core\TypedData\DataDefinitionInterface
+   * @return DataDefinitionInterface
    *   A data definition describing the list items.
    */
   public function getItemDefinition();

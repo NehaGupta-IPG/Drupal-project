@@ -16,7 +16,7 @@ class TestMiddleware implements HttpKernelInterface {
   /**
    * The decorated kernel.
    *
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface
+   * @var HttpKernelInterface
    */
   protected $httpKernel;
 
@@ -30,7 +30,7 @@ class TestMiddleware implements HttpKernelInterface {
   /**
    * Constructs a new TestMiddleware object.
    *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel
+   * @param HttpKernelInterface $http_kernel
    *   The decorated kernel.
    * @param mixed $optional_argument
    *   (optional) An optional argument.

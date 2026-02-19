@@ -3,8 +3,8 @@
 namespace Drupal\Core\EventSubscriber;
 
 use Drupal\Core\Routing\RouteBuildEvent;
-use Drupal\Core\Routing\RouteSubscriberBase;
 use Drupal\Core\Routing\RouteObjectInterface;
+use Drupal\Core\Routing\RouteSubscriberBase;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
@@ -37,7 +37,7 @@ class SpecialAttributesRouteSubscriber extends RouteSubscriberBase {
   /**
    * Delegates the route altering to self::alterRoutes().
    *
-   * @param \Drupal\Core\Routing\RouteBuildEvent $event
+   * @param RouteBuildEvent $event
    *   The route build event.
    */
   public function onAlterRoutes(RouteBuildEvent $event) {

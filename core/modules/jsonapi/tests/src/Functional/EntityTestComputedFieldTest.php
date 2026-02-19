@@ -47,7 +47,7 @@ class EntityTestComputedFieldTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    *
-   * @var \Drupal\entity_test\Entity\EntityTestComputedField
+   * @var EntityTestComputedField
    */
   protected $entity;
 

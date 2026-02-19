@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests;
 
-use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Config\Schema\SchemaCheckTrait;
+use Drupal\Core\Config\TypedConfigManagerInterface;
 
 /**
  * Provides a class for checking configuration schema.
@@ -17,7 +17,7 @@ trait SchemaCheckTestTrait {
   /**
    * Asserts the TypedConfigManager has a valid schema for the configuration.
    *
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
+   * @param TypedConfigManagerInterface $typed_config
    *   The TypedConfigManager.
    * @param string $config_name
    *   The configuration name.

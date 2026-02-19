@@ -425,7 +425,7 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
   /**
    * Returns the form action value when submitting a new translation.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity being tested.
    * @param string $langcode
    *   Language code for the form.
@@ -441,7 +441,7 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
   /**
    * Returns the form action value to be used to submit the entity form.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity being tested.
    * @param string $langcode
    *   Language code for the form.
@@ -456,7 +456,7 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
   /**
    * Returns appropriate submit button suffix based on translatability.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity being tested.
    * @param string $langcode
    *   Language code for the form.
@@ -471,7 +471,7 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
   /**
    * Returns the translation object to use to retrieve the translated values.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity being tested.
    * @param string $langcode
    *   The language code identifying the translation to be retrieved.
@@ -486,7 +486,7 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
   /**
    * Returns the value for the specified property in the given language.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $translation
+   * @param EntityInterface $translation
    *   The translation object the property value should be retrieved from.
    * @param string $property
    *   The property name.
@@ -504,7 +504,7 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
   /**
    * Returns the name of the field that implements the changed timestamp.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity being tested.
    *
    * @return string

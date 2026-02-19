@@ -18,9 +18,9 @@ use Drupal\package_manager\Event\SandboxValidationEvent;
 use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\FailureMarker;
 use Drupal\package_manager\PathLocator;
+use Drupal\package_manager\SandboxManagerBase;
 use Drupal\package_manager\StatusCheckTrait;
 use Drupal\package_manager\Validator\DiskSpaceValidator;
-use Drupal\package_manager\SandboxManagerBase;
 use Drupal\Tests\package_manager\Traits\AssertPreconditionsTrait;
 use Drupal\Tests\package_manager\Traits\ComposerStagerTestTrait;
 use Drupal\Tests\package_manager\Traits\FixtureManipulatorTrait;
@@ -58,7 +58,7 @@ abstract class PackageManagerKernelTestBase extends KernelTestBase {
    * We need to preserve this as a class property so that we can re-inject it
    * into the container when a rebuild is triggered by module installation.
    *
-   * @var \GuzzleHttp\Client
+   * @var Client
    *
    * @see ::register()
    */
@@ -103,7 +103,7 @@ abstract class PackageManagerKernelTestBase extends KernelTestBase {
   /**
    * A logger that will fail the test if Package Manager logs any errors.
    *
-   * @var \ColinODell\PsrTestLogger\TestLogger
+   * @var TestLogger
    *
    * @see ::tearDown()
    */
@@ -178,7 +178,7 @@ abstract class PackageManagerKernelTestBase extends KernelTestBase {
    *   (optional) The class of the sandbox manager to create. Defaults to
    *   \Drupal\Tests\package_manager\Kernel\TestSandboxManager.
    *
-   * @return \Drupal\Tests\package_manager\Kernel\TestSandboxManager
+   * @return TestSandboxManager
    *   A stage object, with test-only modifications.
    */
   protected function createStage(?string $class = TestSandboxManager::class): TestSandboxManager {
@@ -199,13 +199,13 @@ abstract class PackageManagerKernelTestBase extends KernelTestBase {
   /**
    * Asserts validation results are returned from a stage life cycle event.
    *
-   * @param \Drupal\package_manager\ValidationResult[] $expected_results
+   * @param ValidationResult[] $expected_results
    *   The expected validation results.
    * @param string|null $event_class
    *   (optional) The class of the event which should return the results. Must
    *   be passed if $expected_results is not empty.
    *
-   * @return \Drupal\package_manager\SandboxManagerBase
+   * @return SandboxManagerBase
    *   The stage that was used to collect the validation results.
    */
   protected function assertResults(array $expected_results, ?string $event_class = NULL): SandboxManagerBase {
@@ -232,9 +232,9 @@ abstract class PackageManagerKernelTestBase extends KernelTestBase {
   /**
    * Asserts validation results are returned from the status check event.
    *
-   * @param \Drupal\package_manager\ValidationResult[] $expected_results
+   * @param ValidationResult[] $expected_results
    *   The expected validation results.
-   * @param \Drupal\Tests\package_manager\Kernel\TestSandboxManager|null $stage
+   * @param TestSandboxManager|null $stage
    *   (optional) The test stage to use to create the status check event. If
    *   none is provided a new stage will be created.
    */
@@ -441,7 +441,7 @@ abstract class PackageManagerKernelTestBase extends KernelTestBase {
    *
    * @param array $expected_results
    *   The expected results.
-   * @param \Drupal\package_manager\Exception\SandboxEventException $exception
+   * @param SandboxEventException $exception
    *   The exception.
    */
   protected function assertExpectedResultsFromException(array $expected_results, SandboxEventException $exception): void {

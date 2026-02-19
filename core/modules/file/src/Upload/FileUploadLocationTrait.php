@@ -15,7 +15,7 @@ trait FileUploadLocationTrait {
   /**
    * Resolves the file upload location from a file field definition.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $fieldDefinition
+   * @param FieldDefinitionInterface $fieldDefinition
    *   The file field definition.
    *
    * @return string

@@ -52,28 +52,28 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
   /**
    * The entity type used for testing.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityTypeInterface|MockObject
    */
   protected $entityType;
 
   /**
    * The entity field manager used for testing.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityFieldManagerInterface|MockObject
    */
   protected $entityFieldManager;
 
   /**
    * The entity type bundle manager used for testing.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityTypeBundleInfoInterface|MockObject
    */
   protected $entityTypeBundleInfo;
 
   /**
    * The entity type manager used for testing.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityTypeManagerInterface|MockObject
    */
   protected $entityTypeManager;
 
@@ -87,28 +87,28 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
   /**
    * The typed data manager used for testing.
    *
-   * @var \Drupal\Core\TypedData\TypedDataManager|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\TypedData\TypedDataManager|MockObject
    */
   protected $typedDataManager;
 
   /**
    * The field type manager used for testing.
    *
-   * @var \Drupal\Core\Field\FieldTypePluginManager|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Field\FieldTypePluginManager|MockObject
    */
   protected $fieldTypePluginManager;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Language\LanguageManagerInterface|MockObject
    */
   protected $languageManager;
 
   /**
    * The UUID generator used for testing.
    *
-   * @var \Drupal\Component\Uuid\UuidInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Component\Uuid\UuidInterface|MockObject
    */
   protected $uuid;
 
@@ -122,7 +122,7 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
   /**
    * Field definitions.
    *
-   * @var \Drupal\Core\Field\BaseFieldDefinition[]
+   * @var BaseFieldDefinition[]
    */
   protected $fieldDefinitions;
 
@@ -437,7 +437,7 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
    */
   public function testValidate(): void {
     $validator = $this->createMock(ValidatorInterface::class);
-    /** @var \Symfony\Component\Validator\ConstraintViolationList $empty_violation_list */
+    /** @var ConstraintViolationList $empty_violation_list */
     $empty_violation_list = new ConstraintViolationList();
     $non_empty_violation_list = clone $empty_violation_list;
     $violation = $this->createMock('\Symfony\Component\Validator\ConstraintViolationInterface');
@@ -464,7 +464,7 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
    */
   public function testRequiredValidation(): void {
     $validator = $this->createMock(ValidatorInterface::class);
-    /** @var \Symfony\Component\Validator\ConstraintViolationList $empty_violation_list */
+    /** @var ConstraintViolationList $empty_violation_list */
     $empty_violation_list = new ConstraintViolationList();
     $validator->expects($this->once())
       ->method('validate')
@@ -474,7 +474,7 @@ class ContentEntityBaseUnitTest extends UnitTestCase {
       ->method('getValidator')
       ->willReturn($validator);
 
-    /** @var \Drupal\Core\Entity\EntityStorageInterface|\PHPUnit\Framework\MockObject\MockObject $storage */
+    /** @var \Drupal\Core\Entity\EntityStorageInterface|MockObject $storage */
     $storage = $this->createMock('\Drupal\Core\Entity\EntityStorageInterface');
     $storage->expects($this->any())
       ->method('save')

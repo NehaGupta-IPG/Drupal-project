@@ -52,7 +52,7 @@ class PluginDependencyTraitTest extends UnitTestCase {
   /**
    * Tests calculate plugin dependencies.
    *
-   * @param \Prophecy\Prophecy\ProphecyInterface $plugin
+   * @param ProphecyInterface $plugin
    *   A prophecy of a plugin instance.
    * @param mixed $definition
    *   A plugin definition.
@@ -185,14 +185,14 @@ class TestPluginDependency {
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The theme handler.
    *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
+   * @var ThemeHandlerInterface
    */
   protected $themeHandler;
 

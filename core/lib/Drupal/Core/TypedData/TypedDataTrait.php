@@ -10,14 +10,14 @@ trait TypedDataTrait {
   /**
    * The typed data manager used for creating the data types.
    *
-   * @var \Drupal\Core\TypedData\TypedDataManagerInterface
+   * @var TypedDataManagerInterface
    */
   protected $typedDataManager;
 
   /**
    * Sets the typed data manager.
    *
-   * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typed_data_manager
+   * @param TypedDataManagerInterface $typed_data_manager
    *   The typed data manager.
    *
    * @return $this
@@ -30,7 +30,7 @@ trait TypedDataTrait {
   /**
    * Gets the typed data manager.
    *
-   * @return \Drupal\Core\TypedData\TypedDataManagerInterface
+   * @return TypedDataManagerInterface
    *   The typed data manager.
    */
   public function getTypedDataManager() {

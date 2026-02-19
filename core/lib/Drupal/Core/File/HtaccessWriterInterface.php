@@ -15,7 +15,7 @@ interface HtaccessWriterInterface {
   /**
    * Returns a list of the default protected directories.
    *
-   * @return \Drupal\Core\File\ProtectedDirectory[]
+   * @return ProtectedDirectory[]
    *   The default protected directories.
    */
   public function defaultProtectedDirs();

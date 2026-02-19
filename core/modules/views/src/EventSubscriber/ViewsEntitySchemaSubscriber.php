@@ -72,30 +72,30 @@ class ViewsEntitySchemaSubscriber implements EntityTypeListenerInterface, EventS
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The default logger service.
    *
-   * @var \Psr\Log\LoggerInterface
+   * @var LoggerInterface
    */
   protected $logger;
 
   /**
    * Array of views that need to be saved, indexed by view name.
    *
-   * @var \Drupal\views\ViewEntityInterface[]
+   * @var \Drupal\views\Entity\ViewEntityInterface[]
    */
   protected $viewsToSave = [];
 
   /**
    * Constructs a ViewsEntitySchemaSubscriber.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   A logger instance.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, LoggerInterface $logger) {
@@ -262,7 +262,7 @@ class ViewsEntitySchemaSubscriber implements EntityTypeListenerInterface, EventS
   /**
    * Applies a callable onto all handlers of all passed in views.
    *
-   * @param \Drupal\views\Entity\View[] $all_views
+   * @param View[] $all_views
    *   All views entities.
    * @param callable $process
    *   A callable which retrieves a handler config array.
@@ -290,7 +290,7 @@ class ViewsEntitySchemaSubscriber implements EntityTypeListenerInterface, EventS
   /**
    * Updates views if a base table is renamed.
    *
-   * @param \Drupal\views\Entity\View[] $all_views
+   * @param View[] $all_views
    *   All views.
    * @param string $entity_type_id
    *   The entity type ID.
@@ -318,7 +318,7 @@ class ViewsEntitySchemaSubscriber implements EntityTypeListenerInterface, EventS
   /**
    * Updates views if a data table is renamed.
    *
-   * @param \Drupal\views\Entity\View[] $all_views
+   * @param View[] $all_views
    *   All views.
    * @param string $entity_type_id
    *   The entity type ID.
@@ -346,9 +346,9 @@ class ViewsEntitySchemaSubscriber implements EntityTypeListenerInterface, EventS
   /**
    * Updates views if a data table is added.
    *
-   * @param \Drupal\views\Entity\View[] $all_views
+   * @param View[] $all_views
    *   All views.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type.
    * @param string $new_data_table
    *   The new data table.
@@ -356,7 +356,7 @@ class ViewsEntitySchemaSubscriber implements EntityTypeListenerInterface, EventS
    *   The base table.
    */
   protected function dataTableAddition($all_views, EntityTypeInterface $entity_type, $new_data_table, $base_table) {
-    /** @var \Drupal\Core\Entity\Sql\SqlContentEntityStorage $storage */
+    /** @var SqlContentEntityStorage $storage */
     $entity_type_id = $entity_type->id();
     $storage = $this->entityTypeManager->getStorage($entity_type_id);
     $storage->setEntityType($entity_type);
@@ -380,7 +380,7 @@ class ViewsEntitySchemaSubscriber implements EntityTypeListenerInterface, EventS
   /**
    * Updates views if a data table is removed.
    *
-   * @param \Drupal\views\Entity\View[] $all_views
+   * @param View[] $all_views
    *   All views.
    * @param string $entity_type_id
    *   The entity type ID.
@@ -404,9 +404,9 @@ class ViewsEntitySchemaSubscriber implements EntityTypeListenerInterface, EventS
   /**
    * Updates views if revision support is removed.
    *
-   * @param \Drupal\views\Entity\View[] $all_views
+   * @param View[] $all_views
    *   All views.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $original
+   * @param EntityTypeInterface $original
    *   The origin entity type.
    */
   protected function revisionRemoval($all_views, EntityTypeInterface $original) {

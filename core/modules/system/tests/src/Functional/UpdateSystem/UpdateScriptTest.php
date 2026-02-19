@@ -47,7 +47,7 @@ class UpdateScriptTest extends BrowserTestBase {
   /**
    * The URL to the status report page.
    *
-   * @var \Drupal\Core\Url
+   * @var Url
    */
   protected $statusReportUrl;
 

@@ -20,7 +20,7 @@ class PostgresqlDateSql implements DateSqlInterface {
   /**
    * The database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $database;
 
@@ -53,7 +53,7 @@ class PostgresqlDateSql implements DateSqlInterface {
   /**
    * Constructs the PostgreSQL-specific date sql class.
    *
-   * @param \Drupal\Core\Database\Connection $database
+   * @param Connection $database
    *   The database connection.
    */
   public function __construct(Connection $database) {

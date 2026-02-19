@@ -18,7 +18,7 @@ interface InboundPathProcessorInterface {
    *
    * @param string $path
    *   The path to process, with a leading slash.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The HttpRequest object representing the request to process. Note, if this
    *   method is being called via the path_processor_manager service and is not
    *   part of routing, the current request object must be cloned before being

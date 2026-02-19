@@ -2,13 +2,13 @@
 
 namespace Drupal\link\Plugin\Field\FieldWidget;
 
-use Drupal\Core\Field\Attribute\FieldWidget;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\Url;
 use Drupal\Core\Entity\Element\EntityAutocomplete;
+use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
 use Drupal\link\LinkItemInterface;
 use Drupal\link\LinkTitleVisibility;
 use Symfony\Component\Validator\ConstraintViolation;
@@ -210,7 +210,7 @@ class LinkWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
-    /** @var \Drupal\link\LinkItemInterface $item */
+    /** @var LinkItemInterface $item */
     $item = $items[$delta];
 
     $display_uri = NULL;
@@ -476,7 +476,7 @@ class LinkWidget extends WidgetBase {
    * show a validation error message that doesn't mention that scheme.
    */
   public function flagErrors(FieldItemListInterface $items, ConstraintViolationListInterface $violations, array $form, FormStateInterface $form_state) {
-    /** @var \Symfony\Component\Validator\ConstraintViolationInterface $violation */
+    /** @var ConstraintViolationInterface $violation */
     foreach ($violations as $offset => $violation) {
       $parameters = $violation->getParameters();
       if (isset($parameters['@uri'])) {

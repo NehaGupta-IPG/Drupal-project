@@ -361,7 +361,7 @@ class NodeTest extends ResourceTestBase {
   /**
    * Asserts that normalizations are cached in an incremental way.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *
    * @internal
    */

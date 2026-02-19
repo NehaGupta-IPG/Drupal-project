@@ -83,14 +83,14 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
   /**
    * Test taxonomy terms.
    *
-   * @var \Drupal\taxonomy\Entity\Term[]
+   * @var Term[]
    */
   protected $tags = [];
 
   /**
    * Test files.
    *
-   * @var \Drupal\file\Entity\File[]
+   * @var File[]
    */
   protected $files = [];
 
@@ -222,15 +222,15 @@ abstract class JsonApiFunctionalTestBase extends BrowserTestBase {
    *
    * @param string $method
    *   HTTP method.
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   URL to request.
    * @param array $request_options
    *   Request options to apply.
    *
-   * @return \Psr\Http\Message\ResponseInterface
+   * @return ResponseInterface
    *   The request response.
    *
-   * @throws \Psr\Http\Client\ClientExceptionInterface
+   * @throws ClientExceptionInterface
    *
    * @see \GuzzleHttp\ClientInterface::request
    */

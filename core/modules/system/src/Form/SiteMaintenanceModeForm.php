@@ -4,9 +4,9 @@ namespace Drupal\system\Form;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
+use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\State\StateInterface;
-use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Url;
 use Drupal\user\PermissionHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -21,27 +21,27 @@ class SiteMaintenanceModeForm extends ConfigFormBase {
   /**
    * The state keyvalue collection.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
   /**
    * The permission handler.
    *
-   * @var \Drupal\user\PermissionHandlerInterface
+   * @var PermissionHandlerInterface
    */
   protected $permissionHandler;
 
   /**
    * Constructs a new SiteMaintenanceModeForm.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
+   * @param TypedConfigManagerInterface $typedConfigManager
    *   The typed config manager.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state keyvalue collection to use.
-   * @param \Drupal\user\PermissionHandlerInterface $permission_handler
+   * @param PermissionHandlerInterface $permission_handler
    *   The permission handler.
    */
   public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, StateInterface $state, PermissionHandlerInterface $permission_handler) {

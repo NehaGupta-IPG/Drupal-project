@@ -34,28 +34,28 @@ class PrivateTempStore {
   /**
    * The key/value storage object used for this data.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface
+   * @var KeyValueStoreExpirableInterface
    */
   protected $storage;
 
   /**
    * The lock object used for this data.
    *
-   * @var \Drupal\Core\Lock\LockBackendInterface
+   * @var LockBackendInterface
    */
   protected $lockBackend;
 
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountProxyInterface
+   * @var AccountProxyInterface
    */
   protected $currentUser;
 
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
@@ -71,15 +71,15 @@ class PrivateTempStore {
   /**
    * Constructs a new object for accessing data from a key/value store.
    *
-   * @param \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface $storage
+   * @param KeyValueStoreExpirableInterface $storage
    *   The key/value storage object used for this data. Each storage object
    *   represents a particular collection of data and will contain any number
    *   of key/value pairs.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock_backend
+   * @param LockBackendInterface $lock_backend
    *   The lock object used for this data.
-   * @param \Drupal\Core\Session\AccountProxyInterface $current_user
+   * @param AccountProxyInterface $current_user
    *   The current user account.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   The request stack.
    * @param int $expire
    *   The time to live for items, in seconds.
@@ -116,7 +116,7 @@ class PrivateTempStore {
    * @param mixed $value
    *   The data to store.
    *
-   * @throws \Drupal\Core\TempStore\TempStoreException
+   * @throws TempStoreException
    *   Thrown when a lock for the backend storage could not be acquired.
    */
   public function set($key, $value) {
@@ -150,7 +150,7 @@ class PrivateTempStore {
    * @param string $key
    *   The key of the data to store.
    *
-   * @return \Drupal\Core\TempStore\Lock|null
+   * @return Lock|null
    *   An object with the owner and updated time if the key has a value, or
    *   NULL otherwise.
    */
@@ -175,7 +175,7 @@ class PrivateTempStore {
    *   TRUE if the object was deleted or does not exist, FALSE if it exists but
    *   is not owned by $this->owner.
    *
-   * @throws \Drupal\Core\TempStore\TempStoreException
+   * @throws TempStoreException
    *   Thrown when a lock for the backend storage could not be acquired.
    */
   public function delete($key) {

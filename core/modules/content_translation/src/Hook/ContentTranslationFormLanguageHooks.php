@@ -15,10 +15,10 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Form hook implementations for content_translation.
@@ -164,7 +164,7 @@ class ContentTranslationFormLanguageHooks {
    * @see content_translation_admin_settings_form_validate()
    */
   public static function languageContentSettingsSubmit(array $form, FormStateInterface $form_state): void {
-    /** @var \Drupal\content_translation\ContentTranslationManagerInterface $content_translation_manager */
+    /** @var ContentTranslationManagerInterface $content_translation_manager */
     $content_translation_manager = \Drupal::service('content_translation.manager');
     $entity_types = $form_state->getValue('entity_types');
     $settings = &$form_state->getValue('settings');
@@ -229,9 +229,9 @@ class ContentTranslationFormLanguageHooks {
   /**
    * Checks whether translatability should be configurable for a field.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $definition
+   * @param FieldStorageDefinitionInterface $definition
    *   The field storage definition.
    *
    * @return bool

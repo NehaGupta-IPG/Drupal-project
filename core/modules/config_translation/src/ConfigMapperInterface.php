@@ -22,7 +22,7 @@ interface ConfigMapperInterface {
   /**
    * Sets the route collection.
    *
-   * @param \Symfony\Component\Routing\RouteCollection $collection
+   * @param RouteCollection $collection
    *   The route collection.
    */
   public function setRouteCollection(RouteCollection $collection);
@@ -277,7 +277,7 @@ interface ConfigMapperInterface {
   /**
    * Checks whether there is already a translation for this mapper.
    *
-   * @param \Drupal\Core\Language\LanguageInterface $language
+   * @param LanguageInterface $language
    *   A language object.
    *
    * @return bool
@@ -289,7 +289,7 @@ interface ConfigMapperInterface {
   /**
    * Populate the config mapper with route match data.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
    *
    * @see \Drupal\config_translation\Event\ConfigTranslationEvents::POPULATE_MAPPER

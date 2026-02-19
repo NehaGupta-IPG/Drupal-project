@@ -8,7 +8,7 @@ use Drupal\Component\Render\FormattableMarkup;
  * Implements Gettext PO stream reader.
  *
  * The PO file format parsing is implemented according to the documentation at
- * http://www.gnu.org/software/gettext/manual/gettext.html#PO-Files
+ * http://www.gnu.org/software/gettext/manual/gettext.html#PO-Files.
  */
 class PoStreamReader implements PoStreamInterface, PoReaderInterface {
 
@@ -72,14 +72,14 @@ class PoStreamReader implements PoStreamInterface, PoReaderInterface {
   /**
    * The PO stream header.
    *
-   * @var \Drupal\Component\Gettext\PoHeader
+   * @var PoHeader
    */
   protected $header;
 
   /**
    * Object wrapper for the last read source/translation pair.
    *
-   * @var \Drupal\Component\Gettext\PoItem
+   * @var PoItem
    */
   protected $lastItem;
 

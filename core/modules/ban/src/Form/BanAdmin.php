@@ -2,8 +2,8 @@
 
 namespace Drupal\ban\Form;
 
-use Drupal\Core\Form\FormBase;
 use Drupal\ban\BanIpManagerInterface;
+use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -16,14 +16,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class BanAdmin extends FormBase {
 
   /**
-   * @var \Drupal\ban\BanIpManagerInterface
+   * @var BanIpManagerInterface
    */
   protected $ipManager;
 
   /**
    * Constructs a new BanAdmin object.
    *
-   * @param \Drupal\ban\BanIpManagerInterface $ip_manager
+   * @param BanIpManagerInterface $ip_manager
    *   The ban IP manager.
    */
   public function __construct(BanIpManagerInterface $ip_manager) {
@@ -51,7 +51,7 @@ class BanAdmin extends FormBase {
    *
    * @param array $form
    *   A nested array form elements comprising the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param string $default_ip
    *   (optional) IP address to be passed on to

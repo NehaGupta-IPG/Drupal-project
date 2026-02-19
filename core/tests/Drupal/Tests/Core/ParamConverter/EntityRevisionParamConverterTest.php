@@ -26,7 +26,7 @@ class EntityRevisionParamConverterTest extends UnitTestCase {
   /**
    * The tested entity revision param converter.
    *
-   * @var \Drupal\Core\ParamConverter\EntityRevisionParamConverter
+   * @var EntityRevisionParamConverter
    */
   protected $converter;
 

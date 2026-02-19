@@ -20,7 +20,7 @@ class MemoryCacheFactory implements CacheFactoryInterface {
   /**
    * Constructs a MemoryCounterBackendFactory object.
    *
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct(protected TimeInterface $time) {

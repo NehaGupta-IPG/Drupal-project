@@ -27,35 +27,35 @@ class RouteBuilderTest extends UnitTestCase {
   /**
    * The actual tested route builder.
    *
-   * @var \Drupal\Core\Routing\RouteBuilder
+   * @var RouteBuilder
    */
   protected $routeBuilder;
 
   /**
    * The mocked matcher dumper.
    *
-   * @var \Drupal\Core\Routing\MatcherDumperInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Routing\MatcherDumperInterface|MockObject
    */
   protected $dumper;
 
   /**
    * The mocked lock backend.
    *
-   * @var \Drupal\Core\Lock\LockBackendInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Lock\LockBackendInterface|MockObject
    */
   protected $lock;
 
   /**
    * The mocked event dispatcher.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|ObjectProphecy
    */
   protected $dispatcher;
 
   /**
    * The mocked YAML discovery.
    *
-   * @var \Drupal\Core\Discovery\YamlDiscovery|\PHPUnit\Framework\MockObject\MockObject
+   * @var YamlDiscovery|MockObject
    */
   protected $yamlDiscovery;
 
@@ -69,12 +69,12 @@ class RouteBuilderTest extends UnitTestCase {
   /**
    * The controller resolver.
    *
-   * @var \Drupal\Core\Controller\ControllerResolverInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Controller\ControllerResolverInterface|MockObject
    */
   protected $controllerResolver;
 
   /**
-   * @var \Drupal\Core\Access\CheckProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Access\CheckProviderInterface|MockObject
    */
   protected $checkProvider;
 
@@ -332,14 +332,14 @@ class TestRouteBuilder extends RouteBuilder {
   /**
    * The mocked YAML discovery.
    *
-   * @var \Drupal\Core\Discovery\YamlDiscovery|\PHPUnit\Framework\MockObject\MockObject
+   * @var YamlDiscovery|MockObject
    */
   protected $yamlDiscovery;
 
   /**
    * Sets the YAML discovery.
    *
-   * @param \Drupal\Core\Discovery\YamlDiscovery $yaml_discovery
+   * @param YamlDiscovery $yaml_discovery
    *   The YAML discovery to set.
    */
   public function setYamlDiscovery(YamlDiscovery $yaml_discovery): void {

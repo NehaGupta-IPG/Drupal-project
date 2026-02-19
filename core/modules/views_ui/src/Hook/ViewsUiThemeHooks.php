@@ -723,7 +723,7 @@ class ViewsUiThemeHooks {
    * @todo Refactor this function to use much stuff of
    *    views_ui_edit_form_get_bucket.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view executable.
    * @param string $type
    *   The section type.

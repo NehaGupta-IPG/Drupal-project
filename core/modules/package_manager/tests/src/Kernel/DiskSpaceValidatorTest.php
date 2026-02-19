@@ -148,14 +148,14 @@ class DiskSpaceValidatorTest extends PackageManagerKernelTestBase {
    *   are the paths, and the values are the free space that should be reported,
    *   in a format that can be parsed by
    *   \Drupal\Component\Utility\Bytes::toNumber().
-   * @param \Drupal\package_manager\ValidationResult[] $expected_results
+   * @param ValidationResult[] $expected_results
    *   The expected validation results.
    */
   #[DataProvider('providerDiskSpaceValidation')]
   public function testDiskSpaceValidation(bool $shared_disk, array $free_space, array $expected_results): void {
     $free_space = array_flip($this->resolvePlaceholdersInArrayValuesWithRealPaths(array_flip($free_space)));
 
-    /** @var \Drupal\Tests\package_manager\Kernel\TestDiskSpaceValidator $validator */
+    /** @var TestDiskSpaceValidator $validator */
     $validator = $this->container->get(DiskSpaceValidator::class);
     $validator->sharedDisk = $shared_disk;
     $validator->freeSpace = array_map([Bytes::class, 'toNumber'], $free_space);
@@ -174,7 +174,7 @@ class DiskSpaceValidatorTest extends PackageManagerKernelTestBase {
    *   are the paths, and the values are the free space that should be reported,
    *   in a format that can be parsed by
    *   \Drupal\Component\Utility\Bytes::toNumber().
-   * @param \Drupal\package_manager\ValidationResult[] $expected_results
+   * @param ValidationResult[] $expected_results
    *   The expected validation results.
    */
   #[DataProvider('providerDiskSpaceValidation')]
@@ -182,7 +182,7 @@ class DiskSpaceValidatorTest extends PackageManagerKernelTestBase {
     $free_space = array_flip($this->resolvePlaceholdersInArrayValuesWithRealPaths(array_flip($free_space)));
 
     $this->addEventTestListener(function () use ($shared_disk, $free_space): void {
-      /** @var \Drupal\Tests\package_manager\Kernel\TestDiskSpaceValidator $validator */
+      /** @var TestDiskSpaceValidator $validator */
       $validator = $this->container->get(DiskSpaceValidator::class);
       $validator->sharedDisk = $shared_disk;
       $validator->freeSpace = array_map([Bytes::class, 'toNumber'], $free_space);

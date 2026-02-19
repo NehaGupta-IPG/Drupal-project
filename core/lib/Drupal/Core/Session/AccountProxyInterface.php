@@ -24,7 +24,7 @@ interface AccountProxyInterface extends AccountInterface {
    * \Drupal\Core\Session\AccountSwitcherInterface::switchTo() and
    * \Drupal\Core\Session\AccountSwitcherInterface::switchBack().
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The current account.
    */
   public function setAccount(AccountInterface $account);
@@ -32,7 +32,7 @@ interface AccountProxyInterface extends AccountInterface {
   /**
    * Gets the currently wrapped account.
    *
-   * @return \Drupal\Core\Session\AccountInterface
+   * @return AccountInterface
    *   The current account.
    */
   public function getAccount();

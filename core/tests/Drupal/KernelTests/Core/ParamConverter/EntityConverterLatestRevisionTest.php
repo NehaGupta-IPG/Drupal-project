@@ -37,7 +37,7 @@ class EntityConverterLatestRevisionTest extends KernelTestBase {
   /**
    * The entity converter service.
    *
-   * @var \Drupal\Core\ParamConverter\EntityConverter
+   * @var EntityConverter
    */
   protected $converter;
 

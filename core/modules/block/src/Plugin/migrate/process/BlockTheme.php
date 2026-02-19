@@ -3,11 +3,11 @@
 namespace Drupal\block\Plugin\migrate\process;
 
 use Drupal\Core\Config\Config;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -42,7 +42,7 @@ class BlockTheme extends ProcessPluginBase implements ContainerFactoryPluginInte
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Config\Config $theme_config
+   * @param Config $theme_config
    *   The system.theme configuration factory object.
    * @param array $themes
    *   The list of themes available on the destination.

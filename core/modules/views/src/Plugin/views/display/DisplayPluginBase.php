@@ -3,23 +3,23 @@
 namespace Drupal\views\Plugin\views\display;
 
 use Drupal\Component\Plugin\DependentPluginInterface;
-use Drupal\Component\Utility\Html;
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Link;
 use Drupal\Core\Plugin\PluginDependencyTrait;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\views\Form\ViewsForm;
 use Drupal\views\Plugin\views\area\AreaPluginBase;
-use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\PluginBase;
+use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
 
 /**
@@ -31,7 +31,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   /**
    * The top object of a view.
    *
-   * @var \Drupal\views\ViewExecutable
+   * @var ViewExecutable
    */
   public $view = NULL;
 
@@ -41,7 +41,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
    * The array keys are the handler type, and each value is an array of
    * handlers for that type.
    *
-   * @var array<string, \Drupal\views\Plugin\views\ViewsHandlerInterface[]>
+   * @var array<string, ViewsHandlerInterface[]>
    */
   public $handlers = [];
 
@@ -2131,7 +2131,7 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
    *
    * Uses the custom URL if there is one, otherwise the display path.
    *
-   * @return \Drupal\Core\Url
+   * @return Url
    *   The more link as Url object.
    */
   protected function getMoreUrl() {

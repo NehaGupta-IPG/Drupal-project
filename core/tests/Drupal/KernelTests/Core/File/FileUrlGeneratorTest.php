@@ -31,7 +31,7 @@ class FileUrlGeneratorTest extends FileTestBase {
   /**
    * The file URL generator under test.
    *
-   * @var \Drupal\Core\File\FileUrlGenerator
+   * @var FileUrlGenerator
    */
   protected $fileUrlGenerator;
 

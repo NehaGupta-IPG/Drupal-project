@@ -26,23 +26,23 @@ class ContentTranslationDeleteAccess implements AccessInterface {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The content translation manager.
    *
-   * @var \Drupal\content_translation\ContentTranslationManagerInterface
+   * @var ContentTranslationManagerInterface
    */
   protected $contentTranslationManager;
 
   /**
    * Constructs a ContentTranslationDeleteAccess object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $manager
+   * @param EntityTypeManagerInterface $manager
    *   The entity type manager.
-   * @param \Drupal\content_translation\ContentTranslationManagerInterface $content_translation_manager
+   * @param ContentTranslationManagerInterface $content_translation_manager
    *   The content translation manager.
    */
   public function __construct(EntityTypeManagerInterface $manager, ContentTranslationManagerInterface $content_translation_manager) {
@@ -53,9 +53,9 @@ class ContentTranslationDeleteAccess implements AccessInterface {
   /**
    * Checks access to translation deletion for the specified route match.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The parameterized route.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The currently logged in account.
    *
    * @return \Drupal\Core\Access\AccessResultInterface
@@ -71,7 +71,7 @@ class ContentTranslationDeleteAccess implements AccessInterface {
   /**
    * Checks access to translation deletion for the specified entity.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity translation to be deleted.
    *
    * @return \Drupal\Core\Access\AccessResultInterface
@@ -106,7 +106,7 @@ class ContentTranslationDeleteAccess implements AccessInterface {
       return $result;
     }
 
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $revision */
+    /** @var ContentEntityInterface $revision */
     $revision = $storage->loadRevision($revision_id);
     if ($revision->wasDefaultRevision()) {
       return $result;

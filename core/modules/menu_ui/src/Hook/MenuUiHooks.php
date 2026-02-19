@@ -3,22 +3,22 @@
 namespace Drupal\menu_ui\Hook;
 
 use Drupal\block\BlockInterface;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Link;
-use Drupal\Core\Menu\MenuLinkInterface;
+use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Breadcrumb\Breadcrumb;
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\system\MenuInterface;
-use Drupal\system\Entity\Menu;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Block\BlockPluginInterface;
-use Drupal\Core\Url;
-use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\menu_link_content\Entity\MenuLinkContent;
-use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Link;
+use Drupal\Core\Menu\MenuLinkInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
+use Drupal\menu_link_content\Entity\MenuLinkContent;
+use Drupal\system\Entity\Menu;
+use Drupal\system\MenuInterface;
 
 /**
  * Hook implementations for menu_ui.
@@ -30,7 +30,7 @@ class MenuUiHooks {
   /**
    * Constructs a new MenuUiHooks object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
   public function __construct(
@@ -143,7 +143,7 @@ class MenuUiHooks {
     if (empty($type_menus_ids)) {
       return;
     }
-    /** @var \Drupal\system\MenuInterface[] $type_menus */
+    /** @var MenuInterface[] $type_menus */
     $type_menus = Menu::loadMultiple($type_menus_ids);
     $available_menus = [];
     foreach ($type_menus as $menu) {

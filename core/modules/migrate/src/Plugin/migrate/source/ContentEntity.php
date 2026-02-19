@@ -165,7 +165,7 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
     $storage = $this->entityTypeManager
       ->getStorage($this->entityType->id());
     foreach ($ids as $id) {
-      /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+      /** @var ContentEntityInterface $entity */
       $entity = $storage->load($id);
       yield $this->toArray($entity);
       if ($this->configuration['include_translations']) {
@@ -182,7 +182,7 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
    * Makes all IDs into flat values. All other values are returned as per
    * $entity->toArray(), which is a nested array.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity to convert.
    *
    * @return array
@@ -204,7 +204,7 @@ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginIn
   /**
    * Query to retrieve the entities.
    *
-   * @return \Drupal\Core\Entity\Query\QueryInterface
+   * @return QueryInterface
    *   The query.
    */
   public function query(): QueryInterface {

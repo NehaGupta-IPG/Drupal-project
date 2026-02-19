@@ -12,7 +12,7 @@ class AttributeBridgeDecorator implements DiscoveryInterface {
   /**
    * AttributeBridgeDecorator constructor.
    *
-   * @param \Drupal\Component\Plugin\Discovery\DiscoveryInterface $decorated
+   * @param DiscoveryInterface $decorated
    *   The discovery object that is being decorated.
    * @param string $pluginDefinitionAttributeName
    *   The name of the attribute that contains the plugin definition. The class

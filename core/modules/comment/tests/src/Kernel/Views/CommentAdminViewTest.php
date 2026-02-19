@@ -25,7 +25,7 @@ class CommentAdminViewTest extends ViewsKernelTestBase {
   /**
    * Comments.
    *
-   * @var \Drupal\comment\Entity\Comment[]
+   * @var Comment[]
    */
   protected $comments = [];
 

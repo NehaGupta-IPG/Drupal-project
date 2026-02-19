@@ -34,7 +34,7 @@ final class EquivalentUpdate {
   /**
    * Creates a message to explain why an update has been skipped.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   * @return TranslatableMarkup
    *   An message explaining why an update has been skipped.
    */
   public function toSkipMessage(): TranslatableMarkup {

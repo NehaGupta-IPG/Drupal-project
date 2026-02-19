@@ -2,19 +2,19 @@
 
 namespace Drupal\path\Hook;
 
-use Drupal\Core\Language\LanguageInterface;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\path\PathAliasListBuilder;
-use Drupal\Core\Entity\Routing\AdminHtmlRouteProvider;
 use Drupal\Core\Entity\ContentEntityDeleteForm;
-use Drupal\path\PathAliasForm;
-use Drupal\Core\Url;
-use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\Routing\AdminHtmlRouteProvider;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
+use Drupal\path\PathAliasForm;
+use Drupal\path\PathAliasListBuilder;
 
 /**
  * Hook implementations for path.
@@ -68,7 +68,7 @@ class PathHooks {
   public function entityTypeAlter(array &$entity_types) : void {
     // @todo Remove the conditional once core fully supports "path_alias" as an
     //   optional module. See https://drupal.org/node/3092090.
-    /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
+    /** @var EntityTypeInterface[] $entity_types */
     if (isset($entity_types['path_alias'])) {
       $entity_types['path_alias']->setFormClass('default', PathAliasForm::class);
       $entity_types['path_alias']->setFormClass('delete', ContentEntityDeleteForm::class);
@@ -86,7 +86,7 @@ class PathHooks {
    */
   #[Hook('entity_base_field_info_alter')]
   public function entityBaseFieldInfoAlter(&$fields, EntityTypeInterface $entity_type): void {
-    /** @var \Drupal\Core\Field\BaseFieldDefinition[] $fields */
+    /** @var BaseFieldDefinition[] $fields */
     if ($entity_type->id() === 'path_alias') {
       $fields['langcode']->setDisplayOptions('form', [
         'type' => 'language_select',

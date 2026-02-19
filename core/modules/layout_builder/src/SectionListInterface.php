@@ -12,7 +12,7 @@ interface SectionListInterface extends \Countable {
   /**
    * Gets the layout sections.
    *
-   * @return \Drupal\layout_builder\Section[]
+   * @return Section[]
    *   A sequentially and numerically keyed array of section objects.
    */
   public function getSections();
@@ -23,7 +23,7 @@ interface SectionListInterface extends \Countable {
    * @param int $delta
    *   The delta of the section.
    *
-   * @return \Drupal\layout_builder\Section
+   * @return Section
    *   The layout section.
    */
   public function getSection($delta);
@@ -31,7 +31,7 @@ interface SectionListInterface extends \Countable {
   /**
    * Appends a new section to the end of the list.
    *
-   * @param \Drupal\layout_builder\Section $section
+   * @param Section $section
    *   The section to append.
    *
    * @return $this
@@ -46,7 +46,7 @@ interface SectionListInterface extends \Countable {
    *
    * @param int $delta
    *   The delta of the section.
-   * @param \Drupal\layout_builder\Section $section
+   * @param Section $section
    *   The section to insert.
    *
    * @return $this

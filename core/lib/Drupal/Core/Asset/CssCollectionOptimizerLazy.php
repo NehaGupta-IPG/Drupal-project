@@ -8,8 +8,8 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\Theme\ThemeManagerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -22,25 +22,25 @@ class CssCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfa
   /**
    * Constructs a CssCollectionOptimizerLazy.
    *
-   * @param \Drupal\Core\Asset\AssetCollectionGrouperInterface $grouper
+   * @param AssetCollectionGrouperInterface $grouper
    *   The grouper for CSS assets.
-   * @param \Drupal\Core\Asset\AssetOptimizerInterface $optimizer
+   * @param AssetOptimizerInterface $optimizer
    *   The asset optimizer.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $themeManager
+   * @param ThemeManagerInterface $themeManager
    *   The theme manager.
-   * @param \Drupal\Core\Asset\LibraryDependencyResolverInterface $dependencyResolver
+   * @param LibraryDependencyResolverInterface $dependencyResolver
    *   The library dependency resolver.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   * @param RequestStack $requestStack
    *   The request stack.
-   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
+   * @param FileSystemInterface $fileSystem
    *   The file system service.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   * @param ConfigFactoryInterface $configFactory
    *   The config factory.
-   * @param \Drupal\Core\File\FileUrlGeneratorInterface $fileUrlGenerator
+   * @param FileUrlGeneratorInterface $fileUrlGenerator
    *   The file URL generator.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   * @param LanguageManagerInterface $languageManager
    *   The language manager.
    */
   public function __construct(

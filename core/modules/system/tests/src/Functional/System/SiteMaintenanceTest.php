@@ -42,7 +42,7 @@ class SiteMaintenanceTest extends BrowserTestBase {
   /**
    * User allowed to access site in maintenance mode.
    *
-   * @var \Drupal\user\Entity\User
+   * @var User
    */
   protected User $user;
 

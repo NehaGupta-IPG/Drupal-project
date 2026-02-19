@@ -30,14 +30,14 @@ class PathExtractorTest extends UnitTestCase {
   /**
    * The PathExtractor instance.
    *
-   * @var \Drupal\Core\Theme\Plugin\IconExtractor\PathExtractor
+   * @var PathExtractor
    */
   private PathExtractor $pathExtractorPlugin;
 
   /**
    * The IconFinder instance.
    *
-   * @var \Drupal\Core\Theme\Icon\IconFinder|\PHPUnit\Framework\MockObject\MockObject
+   * @var IconFinder|MockObject
    */
   private IconFinder $iconFinder;
 

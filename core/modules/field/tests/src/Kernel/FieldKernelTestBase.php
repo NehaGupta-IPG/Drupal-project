@@ -132,10 +132,10 @@ abstract class FieldKernelTestBase extends KernelTestBase {
   /**
    * Saves and reloads an entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to save.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The entity, freshly reloaded from storage.
    */
   protected function entitySaveReload(EntityInterface $entity): EntityInterface {
@@ -148,7 +148,7 @@ abstract class FieldKernelTestBase extends KernelTestBase {
   /**
    * Validate and save entity. Fail if violations are found.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to save.
    */
   protected function entityValidateAndSave(EntityInterface $entity) {
@@ -184,7 +184,7 @@ abstract class FieldKernelTestBase extends KernelTestBase {
    *
    * This function only checks a single column in the field values.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to test.
    * @param string $field_name
    *   The name of the field to test.

@@ -32,9 +32,9 @@ trait DateTimeRangeTrait {
 
     foreach ($items as $delta => $item) {
       if (!empty($item->start_date) && !empty($item->end_date)) {
-        /** @var \Drupal\Core\Datetime\DrupalDateTime $start_date */
+        /** @var DrupalDateTime $start_date */
         $start_date = $item->start_date;
-        /** @var \Drupal\Core\Datetime\DrupalDateTime $end_date */
+        /** @var DrupalDateTime $end_date */
         $end_date = $item->end_date;
 
         if ($start_date->getTimestamp() !== $end_date->getTimestamp()) {
@@ -161,11 +161,11 @@ trait DateTimeRangeTrait {
   /**
    * Creates a render array given start/end dates.
    *
-   * @param \Drupal\Core\Datetime\DrupalDateTime $start_date
+   * @param DrupalDateTime $start_date
    *   The start date to be rendered.
    * @param string $separator
    *   The separator string.
-   * @param \Drupal\Core\Datetime\DrupalDateTime $end_date
+   * @param DrupalDateTime $end_date
    *   The end date to be rendered.
    *
    * @return array
@@ -188,11 +188,11 @@ trait DateTimeRangeTrait {
   /**
    * Creates a render array with ISO attributes given start/end dates.
    *
-   * @param \Drupal\Core\Datetime\DrupalDateTime $start_date
+   * @param DrupalDateTime $start_date
    *   The start date to be rendered.
    * @param string $separator
    *   The separator string.
-   * @param \Drupal\Core\Datetime\DrupalDateTime $end_date
+   * @param DrupalDateTime $end_date
    *   The end date to be rendered.
    *
    * @return array

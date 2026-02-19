@@ -2,17 +2,17 @@
 
 namespace Drupal\Core\Entity\Controller;
 
+use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityDescriptionInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
-use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Url;
@@ -78,7 +78,7 @@ class EntityController implements ContainerInjectionInterface {
    *   (optional) The HTTP redirect status code for the redirect. The default is
    *   302 Found.
    *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   * @return RedirectResponse
    *   A redirect response object that may be returned by the controller.
    */
   protected function redirect($route_name, array $route_parameters = [], array $options = [], $status = 302) {
@@ -93,10 +93,10 @@ class EntityController implements ContainerInjectionInterface {
    *
    * @param string $entity_type_id
    *   The entity type ID.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request object.
    *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse|array
+   * @return RedirectResponse|array
    *   If there's only one available bundle, a redirect response.
    *   Otherwise, a render array with the add links for each bundle.
    */
@@ -177,7 +177,7 @@ class EntityController implements ContainerInjectionInterface {
   /**
    * Provides a generic add title callback for entities with bundles.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
    * @param string $entity_type_id
    *   The entity type ID.
@@ -206,9 +206,9 @@ class EntityController implements ContainerInjectionInterface {
   /**
    * Provides a generic title callback for a single entity.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
-   * @param \Drupal\Core\Entity\EntityInterface $_entity
+   * @param EntityInterface $_entity
    *   (optional) An entity, passed in directly from the request attributes.
    *
    * @return string|null
@@ -223,9 +223,9 @@ class EntityController implements ContainerInjectionInterface {
   /**
    * Provides a generic edit title callback.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
-   * @param \Drupal\Core\Entity\EntityInterface $_entity
+   * @param EntityInterface $_entity
    *   (optional) An entity, passed in directly from the request attributes.
    *
    * @return string|null
@@ -240,9 +240,9 @@ class EntityController implements ContainerInjectionInterface {
   /**
    * Provides a generic delete title callback.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
-   * @param \Drupal\Core\Entity\EntityInterface $_entity
+   * @param EntityInterface $_entity
    *   (optional) An entity, passed in directly from the request attributes, and
    *   set in \Drupal\Core\Entity\Enhancer\EntityRouteEnhancer.
    *
@@ -257,13 +257,13 @@ class EntityController implements ContainerInjectionInterface {
   /**
    * Determines the entity.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
-   * @param \Drupal\Core\Entity\EntityInterface $_entity
+   * @param EntityInterface $_entity
    *   (optional) The entity, set in
    *   \Drupal\Core\Entity\Enhancer\EntityRouteEnhancer.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|null
+   * @return EntityInterface|null
    *   The entity, if it is passed in directly or if the first parameter of the
    *   active route is an entity; otherwise, NULL.
    */
@@ -293,7 +293,7 @@ class EntityController implements ContainerInjectionInterface {
    *
    * @param array $bundles
    *   An array of bundle information.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $bundle_entity_type
+   * @param EntityTypeInterface $bundle_entity_type
    *   The bundle entity type definition.
    *
    * @return array
@@ -305,7 +305,7 @@ class EntityController implements ContainerInjectionInterface {
     }
     $bundle_names = array_keys($bundles);
     $storage = $this->entityTypeManager->getStorage($bundle_entity_type->id());
-    /** @var \Drupal\Core\Entity\EntityDescriptionInterface[] $bundle_entities */
+    /** @var EntityDescriptionInterface[] $bundle_entities */
     $bundle_entities = $storage->loadMultiple($bundle_names);
 
     uasort($bundle_entities, [$bundle_entity_type->getClass(), 'sort']);

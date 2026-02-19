@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\package_manager\Exception;
 
-use Drupal\package_manager\Event\SandboxValidationEvent;
 use Drupal\package_manager\Event\SandboxEvent;
+use Drupal\package_manager\Event\SandboxValidationEvent;
 
 /**
  * Exception thrown if an error related to an event occurs.
@@ -20,7 +20,7 @@ class SandboxEventException extends SandboxException {
   /**
    * Constructs a StageEventException object.
    *
-   * @param \Drupal\package_manager\Event\SandboxEvent $event
+   * @param SandboxEvent $event
    *   The stage event during which this exception is thrown.
    * @param string|null $message
    *   (optional) The exception message. Defaults to a plain text representation

@@ -20,7 +20,7 @@ final class InputConfigurator {
   /**
    * The input data.
    *
-   * @var \Drupal\Core\TypedData\TypedDataInterface[]
+   * @var TypedDataInterface[]
    */
   private array $data = [];
 
@@ -45,13 +45,13 @@ final class InputConfigurator {
    *     config schema).
    *   - `default`: A default value for the input, if it cannot be collected
    *     the user. See ::getDefaultValue() for more information.
-   * @param \Drupal\Core\Recipe\RecipeConfigurator $dependencies
+   * @param RecipeConfigurator $dependencies
    *   The recipes that this recipe depends on.
    * @param string $prefix
    *   A prefix for each input definition, to give each one a unique name
    *   when collecting input for multiple recipes. Usually this is the unique
    *   name of the recipe.
-   * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typedDataManager
+   * @param TypedDataManagerInterface $typedDataManager
    *   The typed data manager service.
    */
   public function __construct(
@@ -122,13 +122,13 @@ final class InputConfigurator {
   /**
    * Collects input values for this recipe and its dependencies.
    *
-   * @param \Drupal\Core\Recipe\InputCollectorInterface $collector
+   * @param InputCollectorInterface $collector
    *   The input collector to use.
    * @param string[] $processed
    *   The names of the recipes for which input has already been collected.
    *   Internal use only, should not be passed in by calling code.
    *
-   * @throws \Symfony\Component\Validator\Exception\ValidationFailedException
+   * @throws ValidationFailedException
    *   Thrown if any of the collected values violate their validation
    *   constraints.
    */
@@ -139,7 +139,7 @@ final class InputConfigurator {
     }
 
     // First, collect values for the recipe's dependencies.
-    /** @var \Drupal\Core\Recipe\Recipe $dependency */
+    /** @var Recipe $dependency */
     foreach ($this->dependencies->recipes as $dependency) {
       $dependency->input->collectAll($collector, $processed);
     }

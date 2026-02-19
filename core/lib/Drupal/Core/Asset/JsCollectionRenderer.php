@@ -14,11 +14,11 @@ class JsCollectionRenderer implements AssetCollectionRendererInterface {
   /**
    * Constructs a JsCollectionRenderer.
    *
-   * @param \Drupal\Core\Asset\AssetQueryStringInterface $assetQueryString
+   * @param AssetQueryStringInterface $assetQueryString
    *   The asset query string.
-   * @param \Drupal\Core\File\FileUrlGeneratorInterface $fileUrlGenerator
+   * @param FileUrlGeneratorInterface $fileUrlGenerator
    *   The file URL generator.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct(

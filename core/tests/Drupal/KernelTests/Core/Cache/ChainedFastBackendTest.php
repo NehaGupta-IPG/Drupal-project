@@ -21,7 +21,7 @@ class ChainedFastBackendTest extends GenericCacheBackendUnitTestBase {
   /**
    * Creates a new instance of ChainedFastBackend.
    *
-   * @return \Drupal\Core\Cache\ChainedFastBackend
+   * @return ChainedFastBackend
    *   A new ChainedFastBackend object.
    */
   protected function createCacheBackend($bin): ChainedFastBackend {

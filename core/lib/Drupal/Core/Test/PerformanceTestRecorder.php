@@ -29,7 +29,7 @@ class PerformanceTestRecorder implements EventSubscriberInterface {
    *
    * @param bool $persistent
    *   Whether to save the record to state.
-   * @param \Drupal\Core\State\StateInterface|null $state
+   * @param StateInterface|null $state
    *   (optional) The state service for persistent storage. Required if
    *   $persistent is TRUE.
    */

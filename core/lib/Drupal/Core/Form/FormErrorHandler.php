@@ -34,7 +34,7 @@ class FormErrorHandler implements FormErrorHandlerInterface {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   protected function displayErrorMessages(array $form, FormStateInterface $form_state) {
@@ -97,7 +97,7 @@ class FormErrorHandler implements FormErrorHandlerInterface {
    * @param array $form
    *   An associative array containing a reference to the complete structure of
    *   the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array $elements
    *   An associative array containing the part of the form structure that will

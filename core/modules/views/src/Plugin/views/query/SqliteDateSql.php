@@ -22,7 +22,7 @@ class SqliteDateSql implements DateSqlInterface {
   /**
    * The database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $database;
 
@@ -62,7 +62,7 @@ class SqliteDateSql implements DateSqlInterface {
   /**
    * Constructs the SQLite-specific date sql class.
    *
-   * @param \Drupal\Core\Database\Connection $database
+   * @param Connection $database
    *   The database connection.
    */
   public function __construct(Connection $database) {

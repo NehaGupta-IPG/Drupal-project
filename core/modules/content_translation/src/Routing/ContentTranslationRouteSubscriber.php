@@ -17,14 +17,14 @@ class ContentTranslationRouteSubscriber extends RouteSubscriberBase {
   /**
    * The content translation manager.
    *
-   * @var \Drupal\content_translation\ContentTranslationManagerInterface
+   * @var ContentTranslationManagerInterface
    */
   protected $contentTranslationManager;
 
   /**
    * Constructs a ContentTranslationRouteSubscriber object.
    *
-   * @param \Drupal\content_translation\ContentTranslationManagerInterface $content_translation_manager
+   * @param ContentTranslationManagerInterface $content_translation_manager
    *   The content translation manager.
    */
   public function __construct(ContentTranslationManagerInterface $content_translation_manager) {

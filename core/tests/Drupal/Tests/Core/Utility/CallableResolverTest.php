@@ -24,7 +24,7 @@ class CallableResolverTest extends UnitTestCase {
   /**
    * The callable resolver.
    *
-   * @var \Drupal\Core\Utility\CallableResolver
+   * @var CallableResolver
    */
   protected CallableResolver $resolver;
 

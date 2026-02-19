@@ -28,7 +28,7 @@ class EntityContext extends Context {
   /**
    * Gets a context from an entity type.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   Entity type from which a definition will be derived.
    * @param string $label
    *   (optional) The label of the context.
@@ -46,7 +46,7 @@ class EntityContext extends Context {
   /**
    * Gets a context object from an entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   Entity that provides a context.
    * @param string $label
    *   (optional) The label of the context.

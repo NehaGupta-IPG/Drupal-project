@@ -31,7 +31,7 @@ class ViewsTest extends UnitTestCase {
   /**
    * The test container.
    *
-   * @var \Drupal\Core\DependencyInjection\ContainerBuilder
+   * @var ContainerBuilder
    */
   protected $container;
 

@@ -32,7 +32,7 @@ class StaticTrustedCallbackHelper {
    * @return mixed
    *   The callback's return value.
    *
-   * @throws \Drupal\Core\Security\UntrustedCallbackException
+   * @throws UntrustedCallbackException
    *   Exception thrown if the callback is not trusted and $error_type equals
    *   TrustedCallbackInterface::THROW_EXCEPTION.
    *

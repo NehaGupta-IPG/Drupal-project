@@ -23,21 +23,21 @@ class ThemeHandlerTest extends UnitTestCase {
   /**
    * The mocked config factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Config\ConfigFactoryInterface|MockObject
    */
   protected $configFactory;
 
   /**
    * The theme listing service.
    *
-   * @var \Drupal\Core\Extension\ThemeExtensionList|\PHPUnit\Framework\MockObject\MockObject
+   * @var ThemeExtensionList|MockObject
    */
   protected $themeList;
 
   /**
    * The tested theme handler.
    *
-   * @var \Drupal\Core\Extension\ThemeHandler|\Drupal\Tests\Core\Extension\StubThemeHandler
+   * @var ThemeHandler|StubThemeHandler
    */
   protected $themeHandler;
 

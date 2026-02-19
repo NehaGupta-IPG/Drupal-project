@@ -12,7 +12,7 @@ trait CacheableResponseTrait {
   /**
    * The cacheability metadata.
    *
-   * @var \Drupal\Core\Cache\CacheableMetadata
+   * @var CacheableMetadata
    */
   protected $cacheabilityMetadata;
 

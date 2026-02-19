@@ -21,7 +21,7 @@ class SourceEditingPreventSelfXssConstraintValidator extends ConstraintValidator
   /**
    * {@inheritdoc}
    *
-   * @throws \Symfony\Component\Validator\Exception\UnexpectedTypeException
+   * @throws UnexpectedTypeException
    *   Thrown when the given constraint is not supported by this validator.
    */
   public function validate($value, Constraint $constraint): void {

@@ -151,7 +151,7 @@ class Drupal {
   /**
    * Sets a new global container.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @param ContainerInterface $container
    *   A new container instance to replace the current.
    */
   public static function setContainer(ContainerInterface $container) {
@@ -171,7 +171,7 @@ class Drupal {
    * @return \Drupal\Component\DependencyInjection\ContainerInterface
    *   The currently active global container.
    *
-   * @throws \Drupal\Core\DependencyInjection\ContainerNotInitializedException
+   * @throws ContainerNotInitializedException
    */
   public static function getContainer() {
     if (static::$container === NULL) {

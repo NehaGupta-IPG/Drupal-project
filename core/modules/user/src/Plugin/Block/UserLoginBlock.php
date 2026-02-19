@@ -5,15 +5,15 @@ namespace Drupal\user\Plugin\Block;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Block\Attribute\Block;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Security\TrustedCallbackInterface;
-use Drupal\Core\Routing\RedirectDestinationTrait;
-use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\Url;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Form\FormBuilderInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Routing\RedirectDestinationTrait;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Security\TrustedCallbackInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
 use Drupal\user\Form\UserLoginForm;
 use Drupal\user\UserInterface;
 
@@ -32,7 +32,7 @@ class UserLoginBlock extends BlockBase implements ContainerFactoryPluginInterfac
   /**
    * The route match.
    *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
+   * @var RouteMatchInterface
    */
   protected $routeMatch;
 
@@ -48,9 +48,9 @@ class UserLoginBlock extends BlockBase implements ContainerFactoryPluginInterfac
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
-   * @param \Drupal\Core\Form\FormBuilderInterface $formBuilder
+   * @param FormBuilderInterface $formBuilder
    *   The form builder.
    */
   public function __construct(

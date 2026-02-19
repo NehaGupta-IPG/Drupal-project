@@ -4,8 +4,8 @@ namespace Drupal\filter\Element;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\RenderElement;
-use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Render\Element;
+use Drupal\Core\Render\Element\RenderElementBase;
 
 /**
  * Provides a text format render element.
@@ -69,7 +69,7 @@ class TextFormat extends RenderElementBase {
    *
    * @param array $element
    *   The form element to process. See main class documentation for properties.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array $complete_form
    *   The complete form structure.
@@ -269,7 +269,7 @@ class TextFormat extends RenderElementBase {
   /**
    * Wraps the current user.
    *
-   * \Drupal\Core\Session\AccountInterface
+   * \Drupal\Core\Session\AccountInterface.
    */
   protected static function currentUser() {
     return \Drupal::currentUser();

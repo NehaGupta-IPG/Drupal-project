@@ -32,7 +32,7 @@ class StyleSummaryTest extends ViewTestBase {
   public static $testViews = ['test_summary'];
 
   /**
-   * @var \Drupal\entity_test\Entity\EntityTest[]
+   * @var EntityTest[]
    */
   protected $entities = [];
 

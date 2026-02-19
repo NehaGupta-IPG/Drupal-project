@@ -36,21 +36,21 @@ class RecursiveContextualValidator implements ContextualValidatorInterface {
   /**
    * The execution context.
    *
-   * @var \Symfony\Component\Validator\Context\ExecutionContextInterface
+   * @var ExecutionContextInterface
    */
   protected $context;
 
   /**
    * The metadata factory.
    *
-   * @var \Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface
+   * @var MetadataFactoryInterface
    */
   protected $metadataFactory;
 
   /**
    * The constraint validator factory.
    *
-   * @var \Symfony\Component\Validator\ConstraintValidatorFactoryInterface
+   * @var ConstraintValidatorFactoryInterface
    */
   protected $constraintValidatorFactory;
 
@@ -62,13 +62,13 @@ class RecursiveContextualValidator implements ContextualValidatorInterface {
   /**
    * Creates a validator for the given context.
    *
-   * @param \Symfony\Component\Validator\Context\ExecutionContextInterface $context
+   * @param ExecutionContextInterface $context
    *   The factory for creating new contexts.
-   * @param \Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface $metadata_factory
+   * @param MetadataFactoryInterface $metadata_factory
    *   The metadata factory.
-   * @param \Symfony\Component\Validator\ConstraintValidatorFactoryInterface $validator_factory
+   * @param ConstraintValidatorFactoryInterface $validator_factory
    *   The constraint validator factory.
-   * @param \Drupal\Core\TypedData\TypedDataManagerInterface $typed_data_manager
+   * @param TypedDataManagerInterface $typed_data_manager
    *   The typed data manager.
    */
   public function __construct(ExecutionContextInterface $context, MetadataFactoryInterface $metadata_factory, ConstraintValidatorFactoryInterface $validator_factory, TypedDataManagerInterface $typed_data_manager) {
@@ -128,9 +128,9 @@ class RecursiveContextualValidator implements ContextualValidatorInterface {
    * list and no constraints are passed, the contained properties or list items
    * are validated recursively.
    *
-   * @param \Drupal\Core\TypedData\TypedDataInterface $data
+   * @param TypedDataInterface $data
    *   The data to validated.
-   * @param \Symfony\Component\Validator\Constraint[]|null $constraints
+   * @param Constraint[]|null $constraints
    *   (optional) If set, an array of constraints to validate.
    * @param bool $is_root_call
    *   (optional) Whether its the most upper call in the type data tree.
@@ -207,7 +207,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface {
    * @param string $cache_key
    *   The cache key used internally to ensure we don't validate the same
    *   constraint twice.
-   * @param \Symfony\Component\Validator\Constraint[] $constraints
+   * @param Constraint[] $constraints
    *   The constraints which should be ensured for the given value.
    */
   protected function validateConstraints($value, $cache_key, $constraints) {

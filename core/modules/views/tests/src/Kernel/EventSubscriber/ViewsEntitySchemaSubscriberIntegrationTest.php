@@ -60,7 +60,7 @@ class ViewsEntitySchemaSubscriberIntegrationTest extends ViewsKernelTestBase {
   /**
    * The tested event subscriber of views.
    *
-   * @var \Drupal\views\EventSubscriber\ViewsEntitySchemaSubscriber
+   * @var \Drupal\views\Entity\ViewsEntitySchemaSubscriber
    */
   protected $eventSubscriber;
 

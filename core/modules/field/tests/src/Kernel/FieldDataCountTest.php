@@ -54,7 +54,7 @@ class FieldDataCountTest extends FieldKernelTestBase {
   public function testEntityCountAndHasData(): void {
     // Create a field with a cardinality of 2 to show that we are counting
     // entities and not rows in a table.
-    /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
+    /** @var FieldStorageConfig $field_storage */
     $field_storage = FieldStorageConfig::create([
       'field_name' => 'field_int',
       'entity_type' => 'entity_test',
@@ -151,7 +151,7 @@ class FieldDataCountTest extends FieldKernelTestBase {
    */
   public function testCountWithIndex0(): void {
     // Create a field that will require dedicated storage.
-    /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
+    /** @var FieldStorageConfig $field_storage */
     $field_storage = FieldStorageConfig::create([
       'field_name' => 'field_int',
       'entity_type' => 'user',

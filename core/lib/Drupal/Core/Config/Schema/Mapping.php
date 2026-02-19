@@ -218,7 +218,7 @@ class Mapping extends ArrayElement {
    * - If the `requiredKey` flag is not set, nor the `deprecated` flag,
    *   will set `requiredKey: true`.
    *
-   * @param \Drupal\Core\TypedData\MapDataDefinition $definition
+   * @param MapDataDefinition $definition
    *   The config schema definition for a `type: mapping`.
    *
    * @throws \LogicException

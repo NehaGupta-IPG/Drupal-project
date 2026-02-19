@@ -3,9 +3,9 @@
 namespace Drupal\Core\Action\Plugin\Action\Derivative;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
-use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -20,16 +20,16 @@ abstract class EntityActionDeriverBase extends DeriverBase implements ContainerD
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * Constructs a new EntityActionDeriverBase object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param TranslationInterface $string_translation
    *   The string translation service.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, TranslationInterface $string_translation) {
@@ -50,7 +50,7 @@ abstract class EntityActionDeriverBase extends DeriverBase implements ContainerD
   /**
    * Indicates whether the deriver can be used for the provided entity type.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type.
    *
    * @return bool
@@ -84,7 +84,7 @@ abstract class EntityActionDeriverBase extends DeriverBase implements ContainerD
    * For example, if the action applies to entities that are publishable,
    * this method will find all entity types that are publishable.
    *
-   * @return \Drupal\Core\Entity\EntityTypeInterface[]
+   * @return EntityTypeInterface[]
    *   The applicable entity types, keyed by entity type ID.
    */
   protected function getApplicableEntityTypes() {

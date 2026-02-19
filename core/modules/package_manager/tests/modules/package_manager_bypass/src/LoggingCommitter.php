@@ -24,16 +24,16 @@ final class LoggingCommitter implements CommitterInterface {
   /**
    * The decorated service.
    *
-   * @var \PhpTuf\ComposerStager\API\Core\CommitterInterface
+   * @var CommitterInterface
    */
   private $inner;
 
   /**
    * Constructs a Committer object.
    *
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state service.
-   * @param \PhpTuf\ComposerStager\API\Core\CommitterInterface $inner
+   * @param CommitterInterface $inner
    *   The decorated committer service.
    */
   public function __construct(StateInterface $state, CommitterInterface $inner) {

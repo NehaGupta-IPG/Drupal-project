@@ -35,7 +35,7 @@ class MenuUiNodeTypeTest extends KernelTestBase {
   /**
    * Asserts that the available menu names are sorted alphabetically by label.
    *
-   * @param \Drupal\node\Entity\NodeType $node_type
+   * @param NodeType $node_type
    *   The node type under test.
    */
   private function assertMenuNamesAreSorted(NodeType $node_type): void {

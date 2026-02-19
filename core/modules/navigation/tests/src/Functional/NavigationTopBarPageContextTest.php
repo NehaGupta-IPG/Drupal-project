@@ -39,7 +39,7 @@ class NavigationTopBarPageContextTest extends BrowserTestBase {
   /**
    * An admin user to configure the test environment.
    *
-   * @var \Drupal\user\UserInterface
+   * @var UserInterface
    */
   protected UserInterface $adminUser;
 

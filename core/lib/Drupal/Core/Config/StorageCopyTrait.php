@@ -14,9 +14,9 @@ trait StorageCopyTrait {
    * Configuration is only copied and not imported, should not be used
    * with the active storage as the target.
    *
-   * @param \Drupal\Core\Config\StorageInterface $source
+   * @param StorageInterface $source
    *   The configuration storage to copy from.
-   * @param \Drupal\Core\Config\StorageInterface $target
+   * @param StorageInterface $target
    *   The configuration storage to copy to.
    */
   protected static function replaceStorageContents(StorageInterface $source, StorageInterface &$target) {

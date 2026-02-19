@@ -17,7 +17,7 @@ trait AssertConfigEntityImportTrait {
   /**
    * Asserts that a config entity can be imported without changing it.
    *
-   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface $entity
+   * @param ConfigEntityInterface $entity
    *   The config entity to test importing.
    */
   public function assertConfigEntityImport(ConfigEntityInterface $entity) {

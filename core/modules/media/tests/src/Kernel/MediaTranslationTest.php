@@ -24,7 +24,7 @@ class MediaTranslationTest extends MediaKernelTestBase {
   /**
    * The test media translation type.
    *
-   * @var \Drupal\media\MediaTypeInterface
+   * @var \Drupal\media\Entity\MediaTypeInterface
    */
   protected $testTranslationMediaType;
 
@@ -92,7 +92,7 @@ class MediaTranslationTest extends MediaKernelTestBase {
 
     // Check if the correct source field values were saved/loaded.
     foreach ($field_translations as $langcode => $items) {
-      /** @var \Drupal\media\MediaInterface $media_translation */
+      /** @var \Drupal\media\Entity\MediaInterface $media_translation */
       $media_translation = $media->getTranslation($langcode);
       $result = TRUE;
       foreach ($items as $delta => $item) {

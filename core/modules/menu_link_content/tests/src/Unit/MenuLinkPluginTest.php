@@ -22,7 +22,7 @@ class MenuLinkPluginTest extends UnitTestCase {
    * @legacy-covers ::getUuid
    */
   public function testGetInstanceReflection(): void {
-    /** @var \Drupal\menu_link_content\Plugin\Menu\MenuLinkContent $menu_link_content_plugin */
+    /** @var MenuLinkContent $menu_link_content_plugin */
     $menu_link_content_plugin = $this->prophesize(MenuLinkContent::class);
     $menu_link_content_plugin->getDerivativeId()->willReturn('test_id');
     $menu_link_content_plugin = $menu_link_content_plugin->reveal();

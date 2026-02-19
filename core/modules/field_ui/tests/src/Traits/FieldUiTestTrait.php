@@ -201,7 +201,7 @@ trait FieldUiTestTrait {
    * @param string $label
    *   The field label.
    *
-   * @throws \Behat\Mink\Exception\ElementNotFoundException
+   * @throws ElementNotFoundException
    */
   protected function assertFieldExistsOnOverview(string $label) {
     $field_labels = array_map(

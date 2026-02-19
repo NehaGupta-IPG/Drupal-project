@@ -1,15 +1,27 @@
 <?php
 
+use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\DynamicallyFieldableEntityStorageInterface;
 /**
  * @file
  * Hooks and documentation related to entities.
  */
-
-use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Entity\DynamicallyFieldableEntityStorageInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldDefinition;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Url;
 use Drupal\language\Entity\ContentLanguageSettings;
 use Drupal\node\Entity\NodeType;
 
@@ -328,7 +340,6 @@ use Drupal\node\Entity\NodeType;
  *   - hook_node_update_index()
  * @}
  */
-
 /**
  * @defgroup entity_api Entity API
  * @{
@@ -650,7 +661,6 @@ use Drupal\node\Entity\NodeType;
  * @see \Drupal\Core\Entity\EntityRepositoryInterface::getTranslationFromContext()
  * @}
  */
-
 /**
  * @defgroup entity_type_characteristics Entity type characteristics
  * @{
@@ -675,7 +685,6 @@ use Drupal\node\Entity\NodeType;
  *
  * @}
  */
-
 /**
  * @addtogroup hooks
  * @{
@@ -688,17 +697,17 @@ use Drupal\node\Entity\NodeType;
  * and Views). For nodes, see @link node_access Node access rights @endlink for
  * a full explanation. For other entity types, see hook_query_TAG_alter().
  *
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity to check access to.
  * @param string $operation
  *   The operation that is to be performed on $entity. Usually one of:
  *   - "view".
  *   - "update".
  *   - "delete".
- * @param \Drupal\Core\Session\AccountInterface $account
+ * @param AccountInterface $account
  *   The account trying to access the entity.
  *
- * @return \Drupal\Core\Access\AccessResultInterface
+ * @return AccessResultInterface
  *   The access result. The final result is calculated by using
  *   \Drupal\Core\Access\AccessResultInterface::orIf() on the result of every
  *   hook_entity_access() and hook_ENTITY_TYPE_access() implementation, and the
@@ -715,7 +724,7 @@ use Drupal\node\Entity\NodeType;
  *
  * @ingroup entity_api
  */
-function hook_entity_access(\Drupal\Core\Entity\EntityInterface $entity, $operation, \Drupal\Core\Session\AccountInterface $account): \Drupal\Core\Access\AccessResultInterface {
+function hook_entity_access(EntityInterface $entity, $operation, AccountInterface $account): AccessResultInterface {
   // No opinion.
   return AccessResult::neutral();
 }
@@ -727,17 +736,17 @@ function hook_entity_access(\Drupal\Core\Entity\EntityInterface $entity, $operat
  * and Views). For nodes, see @link node_access Node access rights @endlink for
  * a full explanation. For other entity types, see hook_query_TAG_alter().
  *
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity to check access to.
  * @param string $operation
  *   The operation that is to be performed on $entity. Usually one of:
  *   - "view"
  *   - "update"
  *   - "delete".
- * @param \Drupal\Core\Session\AccountInterface $account
+ * @param AccountInterface $account
  *   The account trying to access the entity.
  *
- * @return \Drupal\Core\Access\AccessResultInterface
+ * @return AccessResultInterface
  *   The access result. hook_entity_access() has detailed documentation.
  *
  * @see \Drupal\Core\Entity\EntityAccessControlHandler
@@ -747,7 +756,7 @@ function hook_entity_access(\Drupal\Core\Entity\EntityInterface $entity, $operat
  *
  * @ingroup entity_api
  */
-function hook_ENTITY_TYPE_access(\Drupal\Core\Entity\EntityInterface $entity, $operation, \Drupal\Core\Session\AccountInterface $account): \Drupal\Core\Access\AccessResultInterface {
+function hook_ENTITY_TYPE_access(EntityInterface $entity, $operation, AccountInterface $account): AccessResultInterface {
   // No opinion.
   return AccessResult::neutral();
 }
@@ -755,7 +764,7 @@ function hook_ENTITY_TYPE_access(\Drupal\Core\Entity\EntityInterface $entity, $o
 /**
  * Control entity create access.
  *
- * @param \Drupal\Core\Session\AccountInterface $account
+ * @param AccountInterface $account
  *   The account trying to access the entity.
  * @param array $context
  *   An associative array of additional context values. By default it contains
@@ -765,7 +774,7 @@ function hook_ENTITY_TYPE_access(\Drupal\Core\Entity\EntityInterface $entity, $o
  * @param string $entity_bundle
  *   The entity bundle name.
  *
- * @return \Drupal\Core\Access\AccessResultInterface
+ * @return AccessResultInterface
  *   The access result.
  *
  * @see \Drupal\Core\Entity\EntityAccessControlHandler
@@ -774,7 +783,7 @@ function hook_ENTITY_TYPE_access(\Drupal\Core\Entity\EntityInterface $entity, $o
  *
  * @ingroup entity_api
  */
-function hook_entity_create_access(\Drupal\Core\Session\AccountInterface $account, array $context, $entity_bundle): \Drupal\Core\Access\AccessResultInterface {
+function hook_entity_create_access(AccountInterface $account, array $context, $entity_bundle): AccessResultInterface {
   // No opinion.
   return AccessResult::neutral();
 }
@@ -782,7 +791,7 @@ function hook_entity_create_access(\Drupal\Core\Session\AccountInterface $accoun
 /**
  * Control entity create access for a specific entity type.
  *
- * @param \Drupal\Core\Session\AccountInterface $account
+ * @param AccountInterface $account
  *   The account trying to access the entity.
  * @param array $context
  *   An associative array of additional context values. By default it contains
@@ -791,7 +800,7 @@ function hook_entity_create_access(\Drupal\Core\Session\AccountInterface $accoun
  * @param string $entity_bundle
  *   The entity bundle name.
  *
- * @return \Drupal\Core\Access\AccessResultInterface
+ * @return AccessResultInterface
  *   The access result.
  *
  * @see \Drupal\Core\Entity\EntityAccessControlHandler
@@ -800,7 +809,7 @@ function hook_entity_create_access(\Drupal\Core\Session\AccountInterface $accoun
  *
  * @ingroup entity_api
  */
-function hook_ENTITY_TYPE_create_access(\Drupal\Core\Session\AccountInterface $account, array $context, $entity_bundle): \Drupal\Core\Access\AccessResultInterface {
+function hook_ENTITY_TYPE_create_access(AccountInterface $account, array $context, $entity_bundle): AccessResultInterface {
   // No opinion.
   return AccessResult::neutral();
 }
@@ -814,7 +823,7 @@ function hook_ENTITY_TYPE_create_access(\Drupal\Core\Session\AccountInterface $a
  * To alter existing information or to add information dynamically, use
  * hook_entity_type_alter().
  *
- * @param \Drupal\Core\Entity\EntityTypeInterface[] $entity_types
+ * @param EntityTypeInterface[] $entity_types
  *   An associative array of all entity type definitions, keyed by the entity
  *   type name. Passed by reference.
  *
@@ -823,7 +832,7 @@ function hook_ENTITY_TYPE_create_access(\Drupal\Core\Session\AccountInterface $a
  * @see hook_entity_type_alter()
  */
 function hook_entity_type_build(array &$entity_types): void {
-  /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
+  /** @var EntityTypeInterface[] $entity_types */
   // Add a form for a custom node form without overriding the default
   // node form. To override the default node form, use hook_entity_type_alter().
   $entity_types['node']->setFormClass('my_module_foo', 'Drupal\my_module\NodeFooForm');
@@ -844,7 +853,7 @@ function hook_entity_type_build(array &$entity_types): void {
  * - Your hook needs to run after hook_entity_type_build() implementations.
  * Use hook_entity_type_build() instead in all other cases.
  *
- * @param \Drupal\Core\Entity\EntityTypeInterface[] $entity_types
+ * @param EntityTypeInterface[] $entity_types
  *   An associative array of all entity type definitions, keyed by the entity
  *   type name. Passed by reference.
  *
@@ -852,7 +861,7 @@ function hook_entity_type_build(array &$entity_types): void {
  * @see \Drupal\Core\Entity\EntityTypeInterface
  */
 function hook_entity_type_alter(array &$entity_types): void {
-  /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
+  /** @var EntityTypeInterface[] $entity_types */
   // Set the controller class for nodes to an alternate implementation of the
   // Drupal\Core\Entity\EntityStorageInterface interface.
   $entity_types['node']->setStorageClass('Drupal\my_module\MyCustomNodeStorage');
@@ -958,13 +967,13 @@ function hook_entity_bundle_delete($entity_type_id, $bundle): void {
  *
  * This hook runs after a new entity object has just been instantiated.
  *
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity object.
  *
  * @ingroup entity_crud
  * @see hook_ENTITY_TYPE_create()
  */
-function hook_entity_create(\Drupal\Core\Entity\EntityInterface $entity): void {
+function hook_entity_create(EntityInterface $entity): void {
   \Drupal::logger('example')->info('Entity created: @label', ['@label' => $entity->label()]);
 }
 
@@ -973,52 +982,52 @@ function hook_entity_create(\Drupal\Core\Entity\EntityInterface $entity): void {
  *
  * This hook runs after a new entity object has just been instantiated.
  *
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity object.
  *
  * @ingroup entity_crud
  * @see hook_entity_create()
  */
-function hook_ENTITY_TYPE_create(\Drupal\Core\Entity\EntityInterface $entity): void {
+function hook_ENTITY_TYPE_create(EntityInterface $entity): void {
   \Drupal::logger('example')->info('ENTITY_TYPE created: @label', ['@label' => $entity->label()]);
 }
 
 /**
  * Acts when duplicating an existing entity.
  *
- * @param \Drupal\Core\Entity\EntityInterface $duplicate
+ * @param EntityInterface $duplicate
  *   The duplicated entity object.
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The original entity object.
  *
  * @ingroup entity_crud
  * @see hook_ENTITY_TYPE_duplicate()
  */
-function hook_entity_duplicate(\Drupal\Core\Entity\EntityInterface $duplicate, \Drupal\Core\Entity\EntityInterface $entity): void {
+function hook_entity_duplicate(EntityInterface $duplicate, EntityInterface $entity): void {
   \Drupal::logger('example')->info('Entity duplicated: @label', ['@label' => $entity->label()]);
 }
 
 /**
  * Acts when duplicating an existing entity of a specific type.
  *
- * @param \Drupal\Core\Entity\EntityInterface $duplicate
+ * @param EntityInterface $duplicate
  *   The duplicated entity object.
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The original entity object.
  *
  * @ingroup entity_crud
  * @see hook_entity_duplicate()
  */
-function hook_ENTITY_TYPE_duplicate(\Drupal\Core\Entity\EntityInterface $duplicate, \Drupal\Core\Entity\EntityInterface $entity): void {
+function hook_ENTITY_TYPE_duplicate(EntityInterface $duplicate, EntityInterface $entity): void {
   \Drupal::logger('example')->info('ENTITY_TYPE duplicated: @label', ['@label' => $entity->label()]);
 }
 
 /**
  * Respond to entity revision creation.
  *
- * @param \Drupal\Core\Entity\EntityInterface $new_revision
+ * @param EntityInterface $new_revision
  *   The new revision that was created.
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The original entity that was used to create the revision from.
  * @param bool|null $keep_untranslatable_fields
  *   Whether untranslatable field values were kept (TRUE) or copied from the
@@ -1031,7 +1040,7 @@ function hook_ENTITY_TYPE_duplicate(\Drupal\Core\Entity\EntityInterface $duplica
  * @see \Drupal\Core\Entity\RevisionableStorageInterface::createRevision()
  * @see \Drupal\Core\Entity\TranslatableRevisionableStorageInterface::createRevision()
  */
-function hook_entity_revision_create(\Drupal\Core\Entity\EntityInterface $new_revision, \Drupal\Core\Entity\EntityInterface $entity, $keep_untranslatable_fields): void {
+function hook_entity_revision_create(EntityInterface $new_revision, EntityInterface $entity, $keep_untranslatable_fields): void {
   // Retain the value from an untranslatable field, which are by default
   // synchronized from the default revision.
   $new_revision->set('untranslatable_field', $entity->get('untranslatable_field'));
@@ -1040,9 +1049,9 @@ function hook_entity_revision_create(\Drupal\Core\Entity\EntityInterface $new_re
 /**
  * Respond to entity revision creation.
  *
- * @param \Drupal\Core\Entity\EntityInterface $new_revision
+ * @param EntityInterface $new_revision
  *   The new revision that was created.
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The original entity that was used to create the revision from.
  * @param bool|null $keep_untranslatable_fields
  *   Whether untranslatable field values were kept (TRUE) or copied from the
@@ -1055,7 +1064,7 @@ function hook_entity_revision_create(\Drupal\Core\Entity\EntityInterface $new_re
  * @see \Drupal\Core\Entity\RevisionableStorageInterface::createRevision()
  * @see \Drupal\Core\Entity\TranslatableRevisionableStorageInterface::createRevision()
  */
-function hook_ENTITY_TYPE_revision_create(\Drupal\Core\Entity\EntityInterface $new_revision, \Drupal\Core\Entity\EntityInterface $entity, $keep_untranslatable_fields): void {
+function hook_ENTITY_TYPE_revision_create(EntityInterface $new_revision, EntityInterface $entity, $keep_untranslatable_fields): void {
   // Retain the value from an untranslatable field, which are by default
   // synchronized from the default revision.
   $new_revision->set('untranslatable_field', $entity->get('untranslatable_field'));
@@ -1072,7 +1081,7 @@ function hook_ENTITY_TYPE_revision_create(\Drupal\Core\Entity\EntityInterface $n
  * @param string $entity_type_id
  *   The type of entities being loaded (i.e. node, user, comment).
  *
- * @return \Drupal\Core\Entity\EntityInterface[]
+ * @return EntityInterface[]
  *   An array of pre-loaded entity objects.
  *
  * @ingroup entity_crud
@@ -1096,7 +1105,7 @@ function hook_entity_preload(array $ids, $entity_type_id): array {
  * hook_entity_storage_load() should be used to load additional data for
  * content entities.
  *
- * @param \Drupal\Core\Entity\EntityInterface[] $entities
+ * @param EntityInterface[] $entities
  *   The entities keyed by entity ID.
  * @param string $entity_type_id
  *   The type of entities being loaded (i.e. node, user, comment).
@@ -1130,7 +1139,7 @@ function hook_ENTITY_TYPE_load($entities): void {
  *
  * The results of this hook will be cached.
  *
- * @param \Drupal\Core\Entity\EntityInterface[] $entities
+ * @param EntityInterface[] $entities
  *   The entities keyed by entity ID.
  * @param string $entity_type
  *   The type of entities being loaded (i.e. node, user, comment).
@@ -1148,7 +1157,7 @@ function hook_entity_storage_load(array $entities, $entity_type): void {
  *
  * The results of this hook will be cached if the entity type supports it.
  *
- * @param \Drupal\Core\Entity\EntityInterface[] $entities
+ * @param EntityInterface[] $entities
  *   The entities keyed by entity ID.
  *
  * @see hook_entity_storage_load()
@@ -1165,13 +1174,13 @@ function hook_ENTITY_TYPE_storage_load(array $entities) {
  * You can get the original entity object from
  * $entity->getOriginal() when it is an update of the entity.
  *
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity object.
  *
  * @ingroup entity_crud
  * @see hook_ENTITY_TYPE_presave()
  */
-function hook_entity_presave(\Drupal\Core\Entity\EntityInterface $entity): void {
+function hook_entity_presave(EntityInterface $entity): void {
   if ($entity instanceof ContentEntityInterface && $entity->isTranslatable()) {
     $route_match = \Drupal::routeMatch();
     \Drupal::service('content_translation.synchronizer')->synchronizeFields($entity, $entity->language()->getId(), $route_match->getParameter('source_langcode'));
@@ -1184,13 +1193,13 @@ function hook_entity_presave(\Drupal\Core\Entity\EntityInterface $entity): void 
  * You can get the original entity object from
  * $entity->getOriginal() when it is an update of the entity.
  *
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity object.
  *
  * @ingroup entity_crud
  * @see hook_entity_presave()
  */
-function hook_ENTITY_TYPE_presave(\Drupal\Core\Entity\EntityInterface $entity): void {
+function hook_ENTITY_TYPE_presave(EntityInterface $entity): void {
   if ($entity->isTranslatable()) {
     $route_match = \Drupal::routeMatch();
     \Drupal::service('content_translation.synchronizer')->synchronizeFields($entity, $entity->language()->getId(), $route_match->getParameter('source_langcode'));
@@ -1203,13 +1212,13 @@ function hook_ENTITY_TYPE_presave(\Drupal\Core\Entity\EntityInterface $entity): 
  * This hook runs once the entity has been stored. Note that hook
  * implementations may not alter the stored entity data.
  *
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity object.
  *
  * @ingroup entity_crud
  * @see hook_ENTITY_TYPE_insert()
  */
-function hook_entity_insert(\Drupal\Core\Entity\EntityInterface $entity): void {
+function hook_entity_insert(EntityInterface $entity): void {
   // Insert the new entity into a fictional table of all entities.
   \Drupal::database()->insert('example_entity')
     ->fields([
@@ -1227,13 +1236,13 @@ function hook_entity_insert(\Drupal\Core\Entity\EntityInterface $entity): void {
  * This hook runs once the entity has been stored. Note that hook
  * implementations may not alter the stored entity data.
  *
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity object.
  *
  * @ingroup entity_crud
  * @see hook_entity_insert()
  */
-function hook_ENTITY_TYPE_insert(\Drupal\Core\Entity\EntityInterface $entity): void {
+function hook_ENTITY_TYPE_insert(EntityInterface $entity): void {
   // Insert the new entity into a fictional table of this type of entity.
   \Drupal::database()->insert('example_entity')
     ->fields([
@@ -1251,13 +1260,13 @@ function hook_ENTITY_TYPE_insert(\Drupal\Core\Entity\EntityInterface $entity): v
  * implementations may not alter the stored entity data. Get the original entity
  * object from $entity->getOriginal().
  *
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity object.
  *
  * @ingroup entity_crud
  * @see hook_ENTITY_TYPE_update()
  */
-function hook_entity_update(\Drupal\Core\Entity\EntityInterface $entity): void {
+function hook_entity_update(EntityInterface $entity): void {
   // Update the entity's entry in a fictional table of all entities.
   \Drupal::database()->update('example_entity')
     ->fields([
@@ -1275,13 +1284,13 @@ function hook_entity_update(\Drupal\Core\Entity\EntityInterface $entity): void {
  * implementations may not alter the stored entity data. Get the original entity
  * object from $entity->getOriginal().
  *
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity object.
  *
  * @ingroup entity_crud
  * @see hook_entity_update()
  */
-function hook_ENTITY_TYPE_update(\Drupal\Core\Entity\EntityInterface $entity): void {
+function hook_ENTITY_TYPE_update(EntityInterface $entity): void {
   // Update the entity's entry in a fictional table of this type of entity.
   \Drupal::database()->update('example_entity')
     ->fields([
@@ -1297,13 +1306,13 @@ function hook_ENTITY_TYPE_update(\Drupal\Core\Entity\EntityInterface $entity): v
  * This hook runs after a new entity translation object has just been
  * instantiated.
  *
- * @param \Drupal\Core\Entity\EntityInterface $translation
+ * @param EntityInterface $translation
  *   The entity object.
  *
  * @ingroup entity_crud
  * @see hook_ENTITY_TYPE_translation_create()
  */
-function hook_entity_translation_create(\Drupal\Core\Entity\EntityInterface $translation): void {
+function hook_entity_translation_create(EntityInterface $translation): void {
   \Drupal::logger('example')->info('Entity translation created: @label', ['@label' => $translation->label()]);
 }
 
@@ -1313,13 +1322,13 @@ function hook_entity_translation_create(\Drupal\Core\Entity\EntityInterface $tra
  * This hook runs after a new entity translation object has just been
  * instantiated.
  *
- * @param \Drupal\Core\Entity\EntityInterface $translation
+ * @param EntityInterface $translation
  *   The entity object.
  *
  * @ingroup entity_crud
  * @see hook_entity_translation_create()
  */
-function hook_ENTITY_TYPE_translation_create(\Drupal\Core\Entity\EntityInterface $translation): void {
+function hook_ENTITY_TYPE_translation_create(EntityInterface $translation): void {
   \Drupal::logger('example')->info('ENTITY_TYPE translation created: @label', ['@label' => $translation->label()]);
 }
 
@@ -1329,13 +1338,13 @@ function hook_ENTITY_TYPE_translation_create(\Drupal\Core\Entity\EntityInterface
  * This hook runs once the entity translation has been stored. Note that hook
  * implementations may not alter the stored entity translation data.
  *
- * @param \Drupal\Core\Entity\EntityInterface $translation
+ * @param EntityInterface $translation
  *   The entity object of the translation just stored.
  *
  * @ingroup entity_crud
  * @see hook_ENTITY_TYPE_translation_insert()
  */
-function hook_entity_translation_insert(\Drupal\Core\Entity\EntityInterface $translation): void {
+function hook_entity_translation_insert(EntityInterface $translation): void {
   $variables = [
     '@language' => $translation->language()->getName(),
     '@label' => $translation->getUntranslated()->label(),
@@ -1349,13 +1358,13 @@ function hook_entity_translation_insert(\Drupal\Core\Entity\EntityInterface $tra
  * This hook runs once the entity translation has been stored. Note that hook
  * implementations may not alter the stored entity translation data.
  *
- * @param \Drupal\Core\Entity\EntityInterface $translation
+ * @param EntityInterface $translation
  *   The entity object of the translation just stored.
  *
  * @ingroup entity_crud
  * @see hook_entity_translation_insert()
  */
-function hook_ENTITY_TYPE_translation_insert(\Drupal\Core\Entity\EntityInterface $translation): void {
+function hook_ENTITY_TYPE_translation_insert(EntityInterface $translation): void {
   $variables = [
     '@language' => $translation->language()->getName(),
     '@label' => $translation->getUntranslated()->label(),
@@ -1368,13 +1377,13 @@ function hook_ENTITY_TYPE_translation_insert(\Drupal\Core\Entity\EntityInterface
  *
  * This hook runs once the entity translation has been deleted from storage.
  *
- * @param \Drupal\Core\Entity\EntityInterface $translation
+ * @param EntityInterface $translation
  *   The original entity object.
  *
  * @ingroup entity_crud
  * @see hook_ENTITY_TYPE_translation_delete()
  */
-function hook_entity_translation_delete(\Drupal\Core\Entity\EntityInterface $translation): void {
+function hook_entity_translation_delete(EntityInterface $translation): void {
   $variables = [
     '@language' => $translation->language()->getName(),
     '@label' => $translation->label(),
@@ -1387,13 +1396,13 @@ function hook_entity_translation_delete(\Drupal\Core\Entity\EntityInterface $tra
  *
  * This hook runs once the entity translation has been deleted from storage.
  *
- * @param \Drupal\Core\Entity\EntityInterface $translation
+ * @param EntityInterface $translation
  *   The original entity object.
  *
  * @ingroup entity_crud
  * @see hook_entity_translation_delete()
  */
-function hook_ENTITY_TYPE_translation_delete(\Drupal\Core\Entity\EntityInterface $translation): void {
+function hook_ENTITY_TYPE_translation_delete(EntityInterface $translation): void {
   $variables = [
     '@language' => $translation->language()->getName(),
     '@label' => $translation->label(),
@@ -1404,13 +1413,13 @@ function hook_ENTITY_TYPE_translation_delete(\Drupal\Core\Entity\EntityInterface
 /**
  * Act before entity deletion.
  *
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity object for the entity that is about to be deleted.
  *
  * @ingroup entity_crud
  * @see hook_ENTITY_TYPE_predelete()
  */
-function hook_entity_predelete(\Drupal\Core\Entity\EntityInterface $entity): void {
+function hook_entity_predelete(EntityInterface $entity): void {
   $connection = \Drupal::database();
   // Count references to this entity in a custom table before they are removed
   // upon entity deletion.
@@ -1433,13 +1442,13 @@ function hook_entity_predelete(\Drupal\Core\Entity\EntityInterface $entity): voi
 /**
  * Act before entity deletion of a particular entity type.
  *
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity object for the entity that is about to be deleted.
  *
  * @ingroup entity_crud
  * @see hook_entity_predelete()
  */
-function hook_ENTITY_TYPE_predelete(\Drupal\Core\Entity\EntityInterface $entity): void {
+function hook_ENTITY_TYPE_predelete(EntityInterface $entity): void {
   $connection = \Drupal::database();
   // Count references to this entity in a custom table before they are removed
   // upon entity deletion.
@@ -1464,13 +1473,13 @@ function hook_ENTITY_TYPE_predelete(\Drupal\Core\Entity\EntityInterface $entity)
  *
  * This hook runs once the entity has been deleted from the storage.
  *
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity object for the entity that has been deleted.
  *
  * @ingroup entity_crud
  * @see hook_ENTITY_TYPE_delete()
  */
-function hook_entity_delete(\Drupal\Core\Entity\EntityInterface $entity): void {
+function hook_entity_delete(EntityInterface $entity): void {
   // Delete the entity's entry from a fictional table of all entities.
   \Drupal::database()->delete('example_entity')
     ->condition('type', $entity->getEntityTypeId())
@@ -1483,13 +1492,13 @@ function hook_entity_delete(\Drupal\Core\Entity\EntityInterface $entity): void {
  *
  * This hook runs once the entity has been deleted from the storage.
  *
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity object for the entity that has been deleted.
  *
  * @ingroup entity_crud
  * @see hook_entity_delete()
  */
-function hook_ENTITY_TYPE_delete(\Drupal\Core\Entity\EntityInterface $entity): void {
+function hook_ENTITY_TYPE_delete(EntityInterface $entity): void {
   // Delete the entity's entry from a fictional table of all entities.
   \Drupal::database()->delete('example_entity')
     ->condition('type', $entity->getEntityTypeId())
@@ -1502,13 +1511,13 @@ function hook_ENTITY_TYPE_delete(\Drupal\Core\Entity\EntityInterface $entity): v
  *
  * This hook runs once the entity revision has been deleted from the storage.
  *
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity object for the entity revision that has been deleted.
  *
  * @ingroup entity_crud
  * @see hook_ENTITY_TYPE_revision_delete()
  */
-function hook_entity_revision_delete(\Drupal\Core\Entity\EntityInterface $entity): void {
+function hook_entity_revision_delete(EntityInterface $entity): void {
   \Drupal::messenger()->addStatus(t('Deleted revision @revision from @type entity type', [
     '@revision' => $entity->getRevisionId(),
     '@type' => $entity->getEntityType()->getLabel(),
@@ -1520,13 +1529,13 @@ function hook_entity_revision_delete(\Drupal\Core\Entity\EntityInterface $entity
  *
  * This hook runs once the entity revision has been deleted from the storage.
  *
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity object for the entity revision that has been deleted.
  *
  * @ingroup entity_crud
  * @see hook_entity_revision_delete()
  */
-function hook_ENTITY_TYPE_revision_delete(\Drupal\Core\Entity\EntityInterface $entity): void {
+function hook_ENTITY_TYPE_revision_delete(EntityInterface $entity): void {
   \Drupal::messenger()->addStatus(t('Deleted revision @revision from Content entity type', [
     '@revision' => $entity->getRevisionId(),
   ]));
@@ -1540,9 +1549,9 @@ function hook_ENTITY_TYPE_revision_delete(\Drupal\Core\Entity\EntityInterface $e
  *   elements to $build prior to rendering. The structure of $build is a
  *   renderable array as expected by
  *   \Drupal\Core\Render\RendererInterface::render().
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity object.
- * @param \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display
+ * @param EntityViewDisplayInterface $display
  *   The entity view display holding the display options configured for the
  *   entity components.
  * @param string $view_mode
@@ -1553,7 +1562,7 @@ function hook_ENTITY_TYPE_revision_delete(\Drupal\Core\Entity\EntityInterface $e
  *
  * @ingroup entity_crud
  */
-function hook_entity_view(array &$build, \Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, $view_mode): void {
+function hook_entity_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode): void {
   // Only do the extra work if the component is configured to be displayed.
   // This assumes a 'my_module_addition' extra field has been defined for the
   // entity bundle in hook_entity_extra_field_info().
@@ -1573,9 +1582,9 @@ function hook_entity_view(array &$build, \Drupal\Core\Entity\EntityInterface $en
  *   elements to $build prior to rendering. The structure of $build is a
  *   renderable array as expected by
  *   \Drupal\Core\Render\RendererInterface::render().
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity object.
- * @param \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display
+ * @param EntityViewDisplayInterface $display
  *   The entity view display holding the display options configured for the
  *   entity components.
  * @param string $view_mode
@@ -1586,7 +1595,7 @@ function hook_entity_view(array &$build, \Drupal\Core\Entity\EntityInterface $en
  *
  * @ingroup entity_crud
  */
-function hook_ENTITY_TYPE_view(array &$build, \Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, $view_mode): void {
+function hook_ENTITY_TYPE_view(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display, $view_mode): void {
   // Only do the extra work if the component is configured to be displayed.
   // This assumes a 'my_module_addition' extra field has been defined for the
   // entity bundle in hook_entity_extra_field_info().
@@ -1615,9 +1624,9 @@ function hook_ENTITY_TYPE_view(array &$build, \Drupal\Core\Entity\EntityInterfac
  *
  * @param array &$build
  *   A renderable array representing the entity content.
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity object being rendered.
- * @param \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display
+ * @param EntityViewDisplayInterface $display
  *   The entity view display holding the display options configured for the
  *   entity components.
  *
@@ -1626,7 +1635,7 @@ function hook_ENTITY_TYPE_view(array &$build, \Drupal\Core\Entity\EntityInterfac
  * @see hook_entity_view()
  * @see hook_ENTITY_TYPE_view_alter()
  */
-function hook_entity_view_alter(array &$build, \Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display): void {
+function hook_entity_view_alter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display): void {
   if ($build['#view_mode'] == 'full' && isset($build['an_additional_field'])) {
     // Change its weight.
     $build['an_additional_field']['#weight'] = -10;
@@ -1654,9 +1663,9 @@ function hook_entity_view_alter(array &$build, \Drupal\Core\Entity\EntityInterfa
  *
  * @param array &$build
  *   A renderable array representing the entity content.
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity object being rendered.
- * @param \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display
+ * @param EntityViewDisplayInterface $display
  *   The entity view display holding the display options configured for the
  *   entity components.
  *
@@ -1665,7 +1674,7 @@ function hook_entity_view_alter(array &$build, \Drupal\Core\Entity\EntityInterfa
  * @see hook_ENTITY_TYPE_view()
  * @see hook_entity_view_alter()
  */
-function hook_ENTITY_TYPE_view_alter(array &$build, \Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display): void {
+function hook_ENTITY_TYPE_view_alter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display): void {
   if ($build['#view_mode'] == 'full' && isset($build['an_additional_field'])) {
     // Change its weight.
     $build['an_additional_field']['#weight'] = -10;
@@ -1686,7 +1695,7 @@ function hook_ENTITY_TYPE_view_alter(array &$build, \Drupal\Core\Entity\EntityIn
  *   The type of entities being viewed (i.e. node, user, comment).
  * @param array $entities
  *   The entities keyed by entity ID.
- * @param \Drupal\Core\Entity\Display\EntityViewDisplayInterface[] $displays
+ * @param EntityViewDisplayInterface[] $displays
  *   The array of entity view displays holding the display options configured
  *   for the entity components, keyed by bundle name.
  * @param string $view_mode
@@ -1720,12 +1729,12 @@ function hook_entity_prepare_view($entity_type_id, array $entities, array $displ
  *
  * @param string $view_mode
  *   The view_mode that is to be used to display the entity.
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity that is being viewed.
  *
  * @ingroup entity_crud
  */
-function hook_entity_view_mode_alter(&$view_mode, \Drupal\Core\Entity\EntityInterface $entity): void {
+function hook_entity_view_mode_alter(&$view_mode, EntityInterface $entity): void {
   // For nodes, change the view mode when it is teaser.
   if ($entity->getEntityTypeId() == 'node' && $view_mode == 'teaser') {
     $view_mode = 'my_custom_view_mode';
@@ -1737,12 +1746,12 @@ function hook_entity_view_mode_alter(&$view_mode, \Drupal\Core\Entity\EntityInte
  *
  * @param string $view_mode
  *   The view_mode currently displaying the entity.
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity that is being viewed.
  *
  * @ingroup entity_crud
  */
-function hook_ENTITY_TYPE_view_mode_alter(string &$view_mode, \Drupal\Core\Entity\EntityInterface $entity): void {
+function hook_ENTITY_TYPE_view_mode_alter(string &$view_mode, EntityInterface $entity): void {
   // Change the view mode to teaser.
   if ($view_mode == 'full') {
     $view_mode = 'teaser';
@@ -1760,7 +1769,7 @@ function hook_ENTITY_TYPE_view_mode_alter(string &$view_mode, \Drupal\Core\Entit
  *
  * @param array &$build
  *   A renderable array containing the entity's caching and view mode values.
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity that is being viewed.
  * @param string $view_mode
  *   The view_mode that is to be used to display the entity.
@@ -1771,7 +1780,7 @@ function hook_ENTITY_TYPE_view_mode_alter(string &$view_mode, \Drupal\Core\Entit
  *
  * @ingroup entity_crud
  */
-function hook_ENTITY_TYPE_build_defaults_alter(array &$build, \Drupal\Core\Entity\EntityInterface $entity, $view_mode): void {
+function hook_ENTITY_TYPE_build_defaults_alter(array &$build, EntityInterface $entity, $view_mode): void {
 
 }
 
@@ -1784,7 +1793,7 @@ function hook_ENTITY_TYPE_build_defaults_alter(array &$build, \Drupal\Core\Entit
  *
  * @param array &$build
  *   A renderable array containing the entity's caching and view mode values.
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity that is being viewed.
  * @param string $view_mode
  *   The view_mode that is to be used to display the entity.
@@ -1795,14 +1804,14 @@ function hook_ENTITY_TYPE_build_defaults_alter(array &$build, \Drupal\Core\Entit
  *
  * @ingroup entity_crud
  */
-function hook_entity_build_defaults_alter(array &$build, \Drupal\Core\Entity\EntityInterface $entity, $view_mode): void {
+function hook_entity_build_defaults_alter(array &$build, EntityInterface $entity, $view_mode): void {
 
 }
 
 /**
  * Alter the settings used for displaying an entity.
  *
- * @param \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display
+ * @param EntityViewDisplayInterface $display
  *   The entity view display that will be used to display the entity
  *   components.
  * @param array $context
@@ -1813,7 +1822,7 @@ function hook_entity_build_defaults_alter(array &$build, \Drupal\Core\Entity\Ent
  *
  * @ingroup entity_crud
  */
-function hook_entity_view_display_alter(\Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, array $context): void {
+function hook_entity_view_display_alter(EntityViewDisplayInterface $display, array $context): void {
   // Leave field labels out of the search index.
   if ($context['entity_type'] == 'node' && $context['view_mode'] == 'search_index') {
     foreach ($display->getComponents() as $name => $options) {
@@ -1839,7 +1848,7 @@ function hook_entity_view_display_alter(\Drupal\Core\Entity\Display\EntityViewDi
  * @ingroup entity_crud
  */
 function hook_entity_display_build_alter(&$build, $context): void {
-  /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+  /** @var ContentEntityInterface $entity */
   $entity = $context['entity'];
   if ($entity->getEntityTypeId() === 'my_entity' && $entity->bundle() === 'display_build_alter_bundle') {
     $build['entity_display_build_alter']['#markup'] = 'Content added in hook_entity_display_build_alter for entity id ' . $entity->id();
@@ -1853,11 +1862,11 @@ function hook_entity_display_build_alter(&$build, $context): void {
  * before the entity form is built. It is invoked just once when first building
  * the entity form. Rebuilds will not trigger a new invocation.
  *
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity that is about to be shown on the form.
  * @param string $operation
  *   The current operation.
- * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param FormStateInterface $form_state
  *   The current state of the form.
  *
  * @see \Drupal\Core\Entity\EntityForm::prepareEntity()
@@ -1865,7 +1874,7 @@ function hook_entity_display_build_alter(&$build, $context): void {
  *
  * @ingroup entity_crud
  */
-function hook_entity_prepare_form(\Drupal\Core\Entity\EntityInterface $entity, $operation, \Drupal\Core\Form\FormStateInterface $form_state): void {
+function hook_entity_prepare_form(EntityInterface $entity, $operation, FormStateInterface $form_state): void {
   if ($operation == 'edit') {
     $entity->label->value = 'Altered label';
     $form_state->set('label_altered', TRUE);
@@ -1879,11 +1888,11 @@ function hook_entity_prepare_form(\Drupal\Core\Entity\EntityInterface $entity, $
  * before the entity form is built. It is invoked just once when first building
  * the entity form. Rebuilds will not trigger a new invocation.
  *
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity that is about to be shown on the form.
  * @param string $operation
  *   The current operation.
- * @param \Drupal\Core\Form\FormStateInterface $form_state
+ * @param FormStateInterface $form_state
  *   The current state of the form.
  *
  * @see \Drupal\Core\Entity\EntityForm::prepareEntity()
@@ -1891,7 +1900,7 @@ function hook_entity_prepare_form(\Drupal\Core\Entity\EntityInterface $entity, $
  *
  * @ingroup entity_crud
  */
-function hook_ENTITY_TYPE_prepare_form(\Drupal\Core\Entity\EntityInterface $entity, $operation, \Drupal\Core\Form\FormStateInterface $form_state): void {
+function hook_ENTITY_TYPE_prepare_form(EntityInterface $entity, $operation, FormStateInterface $form_state): void {
   if ($operation == 'edit') {
     $entity->label->value = 'Altered label';
     $form_state->set('label_altered', TRUE);
@@ -1903,12 +1912,12 @@ function hook_ENTITY_TYPE_prepare_form(\Drupal\Core\Entity\EntityInterface $enti
  *
  * @param string $form_mode
  *   The form_mode that is to be used to build the entity form.
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity for which the form is being built.
  *
  * @ingroup entity_crud
  */
-function hook_entity_form_mode_alter(&$form_mode, \Drupal\Core\Entity\EntityInterface $entity): void {
+function hook_entity_form_mode_alter(&$form_mode, EntityInterface $entity): void {
   // Change the form mode for users with Administrator role.
   if ($entity->getEntityTypeId() == 'user' && $entity->hasRole('administrator')) {
     $form_mode = 'my_custom_form_mode';
@@ -1920,12 +1929,12 @@ function hook_entity_form_mode_alter(&$form_mode, \Drupal\Core\Entity\EntityInte
  *
  * @param string $form_mode
  *   The form_mode currently displaying the entity.
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity that is being viewed.
  *
  * @ingroup entity_crud
  */
-function hook_ENTITY_TYPE_form_mode_alter(string &$form_mode, \Drupal\Core\Entity\EntityInterface $entity): void {
+function hook_ENTITY_TYPE_form_mode_alter(string &$form_mode, EntityInterface $entity): void {
   // Change the form mode for nodes with 'article' bundle.
   if ($entity->bundle() == 'article') {
     $form_mode = 'custom_article_form_mode';
@@ -1935,7 +1944,7 @@ function hook_ENTITY_TYPE_form_mode_alter(string &$form_mode, \Drupal\Core\Entit
 /**
  * Alter the settings used for displaying an entity form.
  *
- * @param \Drupal\Core\Entity\Display\EntityFormDisplayInterface $form_display
+ * @param EntityFormDisplayInterface $form_display
  *   The entity_form_display object that will be used to display the entity form
  *   components.
  * @param array $context
@@ -1946,7 +1955,7 @@ function hook_ENTITY_TYPE_form_mode_alter(string &$form_mode, \Drupal\Core\Entit
  *
  * @ingroup entity_crud
  */
-function hook_entity_form_display_alter(\Drupal\Core\Entity\Display\EntityFormDisplayInterface $form_display, array $context): void {
+function hook_entity_form_display_alter(EntityFormDisplayInterface $form_display, array $context): void {
   // Hide the 'user_picture' field from the register form.
   if ($context['entity_type'] == 'user' && $context['form_mode'] == 'register') {
     $form_display->setComponent('user_picture', [
@@ -1963,10 +1972,10 @@ function hook_entity_form_display_alter(\Drupal\Core\Entity\Display\EntityFormDi
  * installed, updated, and uninstalled. This would typically be done through the
  * Entity Update API provided by the entity definition update manager.
  *
- * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+ * @param EntityTypeInterface $entity_type
  *   The entity type definition.
  *
- * @return \Drupal\Core\Field\FieldDefinitionInterface[]
+ * @return FieldDefinitionInterface[]
  *   An array of field definitions, keyed by field name.
  *
  * @see hook_entity_base_field_info_alter()
@@ -1977,7 +1986,7 @@ function hook_entity_form_display_alter(\Drupal\Core\Entity\Display\EntityFormDi
  * @see \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
  * @see https://www.drupal.org/node/3034742
  */
-function hook_entity_base_field_info(\Drupal\Core\Entity\EntityTypeInterface $entity_type): array {
+function hook_entity_base_field_info(EntityTypeInterface $entity_type): array {
   $fields = [];
   if ($entity_type->id() == 'node') {
     $fields['my_module_text'] = BaseFieldDefinition::create('string')
@@ -1993,9 +2002,9 @@ function hook_entity_base_field_info(\Drupal\Core\Entity\EntityTypeInterface $en
 /**
  * Alter base field definitions for a content entity type.
  *
- * @param \Drupal\Core\Field\FieldDefinitionInterface[] $fields
+ * @param FieldDefinitionInterface[] $fields
  *   The array of base field definitions for the entity type.
- * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+ * @param EntityTypeInterface $entity_type
  *   The entity type definition.
  *
  * @see hook_entity_base_field_info()
@@ -2005,7 +2014,7 @@ function hook_entity_base_field_info(\Drupal\Core\Entity\EntityTypeInterface $en
  * @todo WARNING: This hook will be changed in
  * https://www.drupal.org/node/2346329.
  */
-function hook_entity_base_field_info_alter(&$fields, \Drupal\Core\Entity\EntityTypeInterface $entity_type) {
+function hook_entity_base_field_info_alter(&$fields, EntityTypeInterface $entity_type) {
   // Alter the my_module_text field to use a custom class.
   if ($entity_type->id() == 'node' && !empty($fields['my_module_text'])) {
     $fields['my_module_text']->setClass('\Drupal\another_module\EntityComputedText');
@@ -2019,14 +2028,14 @@ function hook_entity_base_field_info_alter(&$fields, \Drupal\Core\Entity\EntityT
  * provide a field storage definition via hook_entity_field_storage_info()
  * unless they are computed.
  *
- * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+ * @param EntityTypeInterface $entity_type
  *   The entity type definition.
  * @param string $bundle
  *   The bundle.
- * @param \Drupal\Core\Field\FieldDefinitionInterface[] $base_field_definitions
+ * @param FieldDefinitionInterface[] $base_field_definitions
  *   The list of base field definitions for the entity type.
  *
- * @return \Drupal\Core\Field\FieldDefinitionInterface[]
+ * @return FieldDefinitionInterface[]
  *   An array of bundle field definitions, keyed by field name.
  *
  * @see hook_entity_base_field_info()
@@ -2041,7 +2050,7 @@ function hook_entity_base_field_info_alter(&$fields, \Drupal\Core\Entity\EntityT
  * @todo WARNING: This hook will be changed in
  * https://www.drupal.org/node/2346347.
  */
-function hook_entity_bundle_field_info(\Drupal\Core\Entity\EntityTypeInterface $entity_type, $bundle, array $base_field_definitions): array {
+function hook_entity_bundle_field_info(EntityTypeInterface $entity_type, $bundle, array $base_field_definitions): array {
   $fields = [];
   // Add a property only to nodes of the 'article' bundle.
   if ($entity_type->id() == 'node' && $bundle == 'article') {
@@ -2055,9 +2064,9 @@ function hook_entity_bundle_field_info(\Drupal\Core\Entity\EntityTypeInterface $
 /**
  * Alter bundle field definitions.
  *
- * @param \Drupal\Core\Field\FieldDefinitionInterface[] $fields
+ * @param FieldDefinitionInterface[] $fields
  *   The array of bundle field definitions.
- * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+ * @param EntityTypeInterface $entity_type
  *   The entity type definition.
  * @param string $bundle
  *   The bundle.
@@ -2069,7 +2078,7 @@ function hook_entity_bundle_field_info(\Drupal\Core\Entity\EntityTypeInterface $
  * @todo WARNING: This hook will be changed in
  * https://www.drupal.org/node/2346347.
  */
-function hook_entity_bundle_field_info_alter(&$fields, \Drupal\Core\Entity\EntityTypeInterface $entity_type, $bundle) {
+function hook_entity_bundle_field_info_alter(&$fields, EntityTypeInterface $entity_type, $bundle) {
   if ($entity_type->id() == 'node' && $bundle == 'article' && !empty($fields['my_module_text'])) {
     // Alter the my_module_text field to use a custom class.
     $fields['my_module_text']->setClass('\Drupal\another_module\EntityComputedText');
@@ -2084,7 +2093,7 @@ function hook_entity_bundle_field_info_alter(&$fields, \Drupal\Core\Entity\Entit
  * updated, and uninstalled. This would typically be done through the Entity
  * Update API provided by the entity definition update manager.
  *
- * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+ * @param EntityTypeInterface $entity_type
  *   The entity type definition.
  *
  * @return \Drupal\Core\Field\FieldStorageDefinitionInterface[]
@@ -2096,7 +2105,7 @@ function hook_entity_bundle_field_info_alter(&$fields, \Drupal\Core\Entity\Entit
  * @see \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
  * @see https://www.drupal.org/node/3034742
  */
-function hook_entity_field_storage_info(\Drupal\Core\Entity\EntityTypeInterface $entity_type): array {
+function hook_entity_field_storage_info(EntityTypeInterface $entity_type): array {
   $result = [];
   if (\Drupal::entityTypeManager()->getStorage($entity_type->id()) instanceof DynamicallyFieldableEntityStorageInterface) {
     // Query by filtering on the ID as this is more efficient than filtering
@@ -2116,14 +2125,14 @@ function hook_entity_field_storage_info(\Drupal\Core\Entity\EntityTypeInterface 
 /**
  * Alter field storage definitions for a content entity type.
  *
- * @param \Drupal\Core\Field\FieldStorageDefinitionInterface[] $fields
+ * @param FieldStorageDefinitionInterface[] $fields
  *   The array of field storage definitions for the entity type.
- * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+ * @param EntityTypeInterface $entity_type
  *   The entity type definition.
  *
  * @see hook_entity_field_storage_info()
  */
-function hook_entity_field_storage_info_alter(&$fields, \Drupal\Core\Entity\EntityTypeInterface $entity_type) {
+function hook_entity_field_storage_info_alter(&$fields, EntityTypeInterface $entity_type) {
   // Alter the max_length setting.
   if ($entity_type->id() == 'node' && !empty($fields['my_module_text'])) {
     $fields['my_module_text']->setSetting('max_length', 128);
@@ -2133,9 +2142,9 @@ function hook_entity_field_storage_info_alter(&$fields, \Drupal\Core\Entity\Enti
 /**
  * Declares entity operations.
  *
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity on which the linked operations will be performed.
- * @param \Drupal\Core\Cache\CacheableMetadata $cacheability
+ * @param CacheableMetadata $cacheability
  *   The cacheable metadata to add to if your operations vary by or depend on
  *   something.
  *
@@ -2145,11 +2154,11 @@ function hook_entity_field_storage_info_alter(&$fields, \Drupal\Core\Entity\Enti
  *
  * @see \Drupal\Core\Entity\EntityListBuilderInterface::getOperations()
  */
-function hook_entity_operation(\Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Cache\CacheableMetadata $cacheability): array {
+function hook_entity_operation(EntityInterface $entity, CacheableMetadata $cacheability): array {
   $operations = [];
   $operations['translate'] = [
     'title' => t('Translate'),
-    'url' => \Drupal\Core\Url::fromRoute('foo_module.entity.translate'),
+    'url' => Url::fromRoute('foo_module.entity.translate'),
     'weight' => 50,
   ];
 
@@ -2162,13 +2171,13 @@ function hook_entity_operation(\Drupal\Core\Entity\EntityInterface $entity, \Dru
  * @param array $operations
  *   Operations array as returned by
  *   \Drupal\Core\Entity\EntityListBuilderInterface::getOperations().
- * @param \Drupal\Core\Entity\EntityInterface $entity
+ * @param EntityInterface $entity
  *   The entity on which the linked operations will be performed.
- * @param \Drupal\Core\Cache\CacheableMetadata $cacheability
+ * @param CacheableMetadata $cacheability
  *   The cacheable metadata to add to if your operations vary by or depend on
  *   something.
  */
-function hook_entity_operation_alter(array &$operations, \Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Cache\CacheableMetadata $cacheability) {
+function hook_entity_operation_alter(array &$operations, EntityInterface $entity, CacheableMetadata $cacheability) {
   // Alter the title and weight.
   $operations['translate']['title'] = t('Translate @entity_type', [
     '@entity_type' => $entity->getEntityTypeId(),
@@ -2187,21 +2196,21 @@ function hook_entity_operation_alter(array &$operations, \Drupal\Core\Entity\Ent
  *   The operation to be performed. See
  *   \Drupal\Core\Entity\EntityAccessControlHandlerInterface::fieldAccess()
  *   for possible values.
- * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+ * @param FieldDefinitionInterface $field_definition
  *   The field definition.
- * @param \Drupal\Core\Session\AccountInterface $account
+ * @param AccountInterface $account
  *   The user account to check.
- * @param \Drupal\Core\Field\FieldItemListInterface $items
+ * @param FieldItemListInterface $items
  *   (optional) The entity field object for which to check access, or NULL if
  *   access is checked for the field definition, without any specific value
  *   available. Defaults to NULL.
  *
- * @return \Drupal\Core\Access\AccessResultInterface
+ * @return AccessResultInterface
  *   The access result.
  *
  * @see \Drupal\Core\Entity\EntityAccessControlHandlerInterface::fieldAccess()
  */
-function hook_entity_field_access($operation, \Drupal\Core\Field\FieldDefinitionInterface $field_definition, \Drupal\Core\Session\AccountInterface $account, ?\Drupal\Core\Field\FieldItemListInterface $items = NULL): \Drupal\Core\Access\AccessResultInterface {
+function hook_entity_field_access($operation, FieldDefinitionInterface $field_definition, AccountInterface $account, ?FieldItemListInterface $items = NULL): AccessResultInterface {
   if ($field_definition->getName() == 'field_of_interest' && $operation == 'edit') {
     return AccessResult::allowedIfHasPermission($account, 'update field of interest');
   }
@@ -2214,7 +2223,7 @@ function hook_entity_field_access($operation, \Drupal\Core\Field\FieldDefinition
  * Use this hook to override access grants from another module. Note that the
  * original default access flag is masked under the ':default' key.
  *
- * @param \Drupal\Core\Access\AccessResultInterface[] $grants
+ * @param AccessResultInterface[] $grants
  *   An array of grants gathered by hook_entity_field_access(). The array is
  *   keyed by the module that defines the field's access control; the values are
  *   grant responses for each module (\Drupal\Core\Access\AccessResult).
@@ -2229,7 +2238,7 @@ function hook_entity_field_access($operation, \Drupal\Core\Field\FieldDefinition
  *     (\Drupal\Core\Field\FieldItemListInterface).
  */
 function hook_entity_field_access_alter(array &$grants, array $context) {
-  /** @var \Drupal\Core\Field\FieldDefinitionInterface $field_definition */
+  /** @var FieldDefinitionInterface $field_definition */
   $field_definition = $context['field_definition'];
   if ($field_definition->getName() == 'field_of_interest' && $grants['node']->isForbidden()) {
     // Override node module's restriction to no opinion (neither allowed nor
@@ -2249,14 +2258,14 @@ function hook_entity_field_access_alter(array &$grants, array $context) {
  * has just been instantiated. It can be used to set initial values, e.g. to
  * provide defaults.
  *
- * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+ * @param FieldableEntityInterface $entity
  *   The entity object.
  *
  * @ingroup entity_crud
  * @see hook_ENTITY_TYPE_field_values_init()
  */
-function hook_entity_field_values_init(\Drupal\Core\Entity\FieldableEntityInterface $entity): void {
-  if ($entity instanceof \Drupal\Core\Entity\ContentEntityInterface && !$entity->foo->value) {
+function hook_entity_field_values_init(FieldableEntityInterface $entity): void {
+  if ($entity instanceof ContentEntityInterface && !$entity->foo->value) {
     $entity->foo->value = 'some_initial_value';
   }
 }
@@ -2268,13 +2277,13 @@ function hook_entity_field_values_init(\Drupal\Core\Entity\FieldableEntityInterf
  * has just been instantiated. It can be used to set initial values, e.g. to
  * provide defaults.
  *
- * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+ * @param FieldableEntityInterface $entity
  *   The entity object.
  *
  * @ingroup entity_crud
  * @see hook_entity_field_values_init()
  */
-function hook_ENTITY_TYPE_field_values_init(\Drupal\Core\Entity\FieldableEntityInterface $entity): void {
+function hook_ENTITY_TYPE_field_values_init(FieldableEntityInterface $entity): void {
   if (!$entity->foo->value) {
     $entity->foo->value = 'some_initial_value';
   }
@@ -2351,14 +2360,14 @@ function hook_entity_extra_field_info_alter(&$info) {
 /**
  * Alter an entity query.
  *
- * @param \Drupal\Core\Entity\Query\QueryInterface $query
+ * @param QueryInterface $query
  *   The entity query.
  *
  * @see hook_entity_query_ENTITY_TYPE_alter()
  * @see hook_entity_query_tag__TAG_alter()
  * @see \Drupal\Core\Entity\Query\QueryInterface
  */
-function hook_entity_query_alter(\Drupal\Core\Entity\Query\QueryInterface $query): void {
+function hook_entity_query_alter(QueryInterface $query): void {
   if ($query->hasTag('entity_reference')) {
     $entityType = \Drupal::entityTypeManager()->getDefinition($query->getEntityTypeId());
     $query->sort($entityType->getKey('id'), 'desc');
@@ -2368,27 +2377,27 @@ function hook_entity_query_alter(\Drupal\Core\Entity\Query\QueryInterface $query
 /**
  * Alter an entity query for a specific entity type.
  *
- * @param \Drupal\Core\Entity\Query\QueryInterface $query
+ * @param QueryInterface $query
  *   The entity query.
  *
  * @see hook_entity_query_alter()
  * @see \Drupal\Core\Entity\Query\QueryInterface
  */
-function hook_entity_query_ENTITY_TYPE_alter(\Drupal\Core\Entity\Query\QueryInterface $query): void {
+function hook_entity_query_ENTITY_TYPE_alter(QueryInterface $query): void {
   $query->condition('id', '1', '<>');
 }
 
 /**
  * Alter an entity query that has a specific tag.
  *
- * @param \Drupal\Core\Entity\Query\QueryInterface $query
+ * @param QueryInterface $query
  *   The entity query.
  *
  * @see hook_entity_query_alter()
  * @see hook_entity_query_tag__ENTITY_TYPE__TAG_alter()
  * @see \Drupal\Core\Entity\Query\QueryInterface
  */
-function hook_entity_query_tag__TAG_alter(\Drupal\Core\Entity\Query\QueryInterface $query): void {
+function hook_entity_query_tag__TAG_alter(QueryInterface $query): void {
   $entityType = \Drupal::entityTypeManager()->getDefinition($query->getEntityTypeId());
   $query->sort($entityType->getKey('id'), 'desc');
 }
@@ -2396,14 +2405,14 @@ function hook_entity_query_tag__TAG_alter(\Drupal\Core\Entity\Query\QueryInterfa
 /**
  * Alter an entity query for a specific entity type that has a specific tag.
  *
- * @param \Drupal\Core\Entity\Query\QueryInterface $query
+ * @param QueryInterface $query
  *   The entity query.
  *
  * @see hook_entity_query_ENTITY_TYPE_alter()
  * @see hook_entity_query_tag__TAG_alter()
  * @see \Drupal\Core\Entity\Query\QueryInterface
  */
-function hook_entity_query_tag__ENTITY_TYPE__TAG_alter(\Drupal\Core\Entity\Query\QueryInterface $query): void {
+function hook_entity_query_tag__ENTITY_TYPE__TAG_alter(QueryInterface $query): void {
   $query->condition('id', '1', '<>');
 }
 

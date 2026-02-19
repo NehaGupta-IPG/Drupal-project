@@ -31,14 +31,14 @@ class ToolkitTest extends KernelTestBase {
   /**
    * Testing image.
    *
-   * @var \Drupal\Core\Image\ImageInterface
+   * @var ImageInterface
    */
   protected $image;
 
   /**
    * The image effect plugin manager service.
    *
-   * @var \Drupal\image\ImageEffectManager
+   * @var ImageEffectManager
    */
   protected ImageEffectManager $imageEffectPluginManager;
 

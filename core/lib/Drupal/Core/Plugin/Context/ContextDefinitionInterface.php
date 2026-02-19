@@ -23,7 +23,7 @@ interface ContextDefinitionInterface extends ComponentContextDefinitionInterface
   /**
    * Determines if this definition is satisfied by a context object.
    *
-   * @param \Drupal\Core\Plugin\Context\ContextInterface $context
+   * @param ContextInterface $context
    *   The context object.
    *
    * @return bool

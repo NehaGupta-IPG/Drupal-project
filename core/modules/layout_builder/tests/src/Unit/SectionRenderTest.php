@@ -37,35 +37,35 @@ class SectionRenderTest extends UnitTestCase {
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $account;
 
   /**
    * The block plugin manager.
    *
-   * @var \Drupal\Core\Block\BlockManagerInterface
+   * @var BlockManagerInterface
    */
   protected $blockManager;
 
   /**
    * The plugin context handler.
    *
-   * @var \Drupal\Core\Plugin\Context\ContextHandlerInterface
+   * @var ContextHandlerInterface
    */
   protected $contextHandler;
 
   /**
    * The context manager service.
    *
-   * @var \Drupal\Core\Plugin\Context\ContextRepositoryInterface
+   * @var ContextRepositoryInterface
    */
   protected $contextRepository;
 
   /**
    * The event dispatcher.
    *
-   * @var \Symfony\Component\EventDispatcher\EventDispatcher
+   * @var EventDispatcher
    */
   protected $eventDispatcher;
 

@@ -24,21 +24,21 @@ class BlockPageVariantTest extends UnitTestCase {
   /**
    * The block repository.
    *
-   * @var \Drupal\block\BlockRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\block\BlockRepositoryInterface|MockObject
    */
   protected $blockRepository;
 
   /**
    * The block view builder.
    *
-   * @var \Drupal\Core\Entity\EntityViewBuilderInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityViewBuilderInterface|MockObject
    */
   protected $blockViewBuilder;
 
   /**
    * The plugin context handler.
    *
-   * @var \Drupal\Core\Plugin\Context\ContextHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Plugin\Context\ContextHandlerInterface|MockObject
    */
   protected $contextHandler;
 
@@ -50,7 +50,7 @@ class BlockPageVariantTest extends UnitTestCase {
    * @param array $definition
    *   The plugin definition array.
    *
-   * @return \Drupal\block\Plugin\DisplayVariant\BlockPageVariant
+   * @return BlockPageVariant
    *   A test display variant plugin.
    */
   public function setUpDisplayVariant($configuration = [], $definition = []) {

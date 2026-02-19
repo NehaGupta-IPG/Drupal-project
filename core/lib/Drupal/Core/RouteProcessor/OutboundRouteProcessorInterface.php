@@ -15,12 +15,12 @@ interface OutboundRouteProcessorInterface {
    *
    * @param string $route_name
    *   The route name.
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The outbound route to process.
    * @param array $parameters
    *   An array of parameters to be passed to the route compiler. Passed by
    *   reference.
-   * @param \Drupal\Core\Render\BubbleableMetadata $bubbleable_metadata
+   * @param BubbleableMetadata $bubbleable_metadata
    *   (optional) Object to collect route processors' bubbleable metadata.
    */
   public function processOutbound($route_name, Route $route, array &$parameters, ?BubbleableMetadata $bubbleable_metadata = NULL);

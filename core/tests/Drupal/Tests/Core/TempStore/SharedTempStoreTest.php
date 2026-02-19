@@ -26,21 +26,21 @@ class SharedTempStoreTest extends UnitTestCase {
   /**
    * The mock key value expirable backend.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface|MockObject
    */
   protected $keyValue;
 
   /**
    * The mock lock backend.
    *
-   * @var \Drupal\Core\Lock\LockBackendInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Lock\LockBackendInterface|MockObject
    */
   protected $lock;
 
   /**
    * The temp store.
    *
-   * @var \Drupal\Core\TempStore\SharedTempStore
+   * @var SharedTempStore
    */
   protected $tempStore;
 
@@ -54,7 +54,7 @@ class SharedTempStoreTest extends UnitTestCase {
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 

@@ -20,7 +20,7 @@ interface LocalActionInterface {
   /**
    * Returns the route parameters needed to render a link for the local action.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The current route match.
    *
    * @return array
@@ -39,7 +39,7 @@ interface LocalActionInterface {
   /**
    * Returns options for rendering a link for the local action.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The current route match.
    *
    * @return array

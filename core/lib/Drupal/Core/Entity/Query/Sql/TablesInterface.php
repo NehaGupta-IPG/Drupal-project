@@ -25,7 +25,7 @@ interface TablesInterface {
    *   and the appropriate SQL column as passed in. This allows the direct use
    *   of this in a query for a condition or sort.
    *
-   * @throws \Drupal\Core\Entity\Query\QueryException
+   * @throws QueryException
    *   If $field specifies an invalid relationship.
    */
   public function addField($field, $type, $langcode);

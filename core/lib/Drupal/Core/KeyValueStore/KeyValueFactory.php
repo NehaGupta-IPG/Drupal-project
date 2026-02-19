@@ -42,7 +42,7 @@ class KeyValueFactory implements KeyValueFactoryInterface {
   /**
    * The service container.
    *
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface
+   * @var ContainerInterface
    */
   protected $container;
 
@@ -54,7 +54,7 @@ class KeyValueFactory implements KeyValueFactoryInterface {
   protected $options;
 
   /**
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @param ContainerInterface $container
    *   The service container.
    * @param array $options
    *   (optional) Collection-specific storage override options.

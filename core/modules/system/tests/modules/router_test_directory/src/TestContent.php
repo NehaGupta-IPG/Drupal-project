@@ -17,7 +17,7 @@ class TestContent extends ControllerBase {
   /**
    * The HTTP kernel.
    *
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface
+   * @var HttpKernelInterface
    */
   protected $httpKernel;
 

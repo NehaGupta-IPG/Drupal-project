@@ -24,7 +24,7 @@ class ToolbarItemConditionsMetConstraintValidator extends ConstraintValidator im
   /**
    * {@inheritdoc}
    *
-   * @throws \Symfony\Component\Validator\Exception\UnexpectedTypeException
+   * @throws UnexpectedTypeException
    *   Thrown when the given constraint is not supported by this validator.
    */
   public function validate($toolbar_item, Constraint $constraint): void {
@@ -117,7 +117,7 @@ class ToolbarItemConditionsMetConstraintValidator extends ConstraintValidator im
    * @param string $toolbar_item
    *   The toolbar item to be searched for within plugin definitions.
    *
-   * @return \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition
+   * @return CKEditor5PluginDefinition
    *   The corresponding plugin definition.
    *
    * @throws \OutOfBoundsException

@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Drupal\theme_test\EventSubscriber;
 
 use Drupal\Core\Render\RendererInterface;
-use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Drupal\Core\Url;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * Theme test subscriber for controller requests.
@@ -29,23 +29,23 @@ class ThemeTestSubscriber implements EventSubscriberInterface {
   /**
    * The current route match.
    *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
+   * @var RouteMatchInterface
    */
   protected $currentRouteMatch;
 
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * Constructs a new ThemeTestSubscriber.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $current_route_match
+   * @param RouteMatchInterface $current_route_match
    *   The route match handler.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
    */
   public function __construct(RouteMatchInterface $current_route_match, RendererInterface $renderer) {

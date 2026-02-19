@@ -24,7 +24,7 @@ class LayoutBuilderAccessCheck implements AccessInterface {
   /**
    * Constructs a new LayoutBuilderAccessCheck class.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
    */
   public function __construct(
@@ -34,11 +34,11 @@ class LayoutBuilderAccessCheck implements AccessInterface {
   /**
    * Checks routing access to the layout.
    *
-   * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
+   * @param SectionStorageInterface $section_storage
    *   The section storage.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The current user.
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route to check against.
    *
    * @return \Drupal\Core\Access\AccessResultInterface

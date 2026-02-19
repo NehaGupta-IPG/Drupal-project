@@ -18,7 +18,7 @@ interface EntityFormBuilderInterface {
    * previous page load. The form is then passed on for processing, validation,
    * and submission if there is proper input.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to be created or edited.
    * @param string $operation
    *   (optional) The operation identifying the form variation to be returned.
@@ -39,6 +39,19 @@ interface EntityFormBuilderInterface {
    *   (optional) An associative array used to build the current state of the
    *   form. Use this to pass additional information to the form, such as the
    *   langcode. Defaults to an empty array.
+   *
+   * @code
+   *   $form_state_additions['langcode'] = $langcode;
+   *   $form = \Drupal::service('entity.form_builder')->getForm($entity, 'default', $form_state_additions);
+   * @endcode
+   *
+   * @return array
+   *   The processed form for the given entity and operation.
+   *
+   * @see \Drupal\Core\Form\FormBuilderInterface::getForm()
+   * @see \Drupal\Core\Entity\EntityTypeInterface::getFormClass()
+   * @see \Drupal\Core\Entity\EntityTypeInterface::setFormClass()
+   * @see system_entity_type_build()
    *
    * @code
    *   $form_state_additions['langcode'] = $langcode;

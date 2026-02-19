@@ -4,11 +4,11 @@ namespace Drupal\migrate_drupal\Plugin\migrate\source;
 
 use Drupal\Component\Plugin\DependentPluginInterface;
 use Drupal\Core\Entity\DependencyTrait;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\migrate\Plugin\MigrationInterface;
-use Drupal\migrate\Plugin\migrate\source\EmptySource as BaseEmptySource;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\migrate\Plugin\migrate\source\EmptySource as BaseEmptySource;
+use Drupal\migrate\Plugin\MigrationInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Source returning an empty row with Drupal specific config dependencies.
@@ -36,7 +36,7 @@ class EmptySource extends BaseEmptySource implements ContainerFactoryPluginInter
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 

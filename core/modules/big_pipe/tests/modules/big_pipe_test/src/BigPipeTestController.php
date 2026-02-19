@@ -254,7 +254,7 @@ class BigPipeTestController implements TrustedCallbackInterface {
   /**
    * Supports Big Pipe testing of the enforced redirect response.
    *
-   * @throws \Drupal\Core\Form\EnforcedResponseException
+   * @throws EnforcedResponseException
    *   Trigger catch of Big Pipe enforced redirect response exception.
    */
   public static function redirectTrusted(): void {
@@ -280,7 +280,7 @@ class BigPipeTestController implements TrustedCallbackInterface {
   /**
    * Supports Big Pipe testing of an untrusted external URL.
    *
-   * @throws \Drupal\Core\Form\EnforcedResponseException
+   * @throws EnforcedResponseException
    *   Trigger catch of Big Pipe enforced redirect response exception.
    */
   public static function redirectUntrusted(): void {

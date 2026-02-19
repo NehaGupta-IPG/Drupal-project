@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Ajax\PrependCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\Ajax\ScrollTopCommand;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
@@ -14,14 +15,13 @@ use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RedirectDestinationInterface;
-use Drupal\Core\Ajax\ScrollTopCommand;
 use Drupal\views\Ajax\SetBrowserUrl;
 use Drupal\views\Ajax\ViewAjaxResponse;
 use Drupal\views\ViewExecutableFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Defines a controller to load a view via AJAX.
@@ -72,13 +72,13 @@ class ViewAjaxController implements ContainerInjectionInterface {
   /**
    * Loads and renders a view via AJAX.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request object.
    *
-   * @return \Drupal\views\Ajax\ViewAjaxResponse
+   * @return ViewAjaxResponse
    *   The view response as ajax response.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   * @throws NotFoundHttpException
    *   Thrown when the view was not found.
    */
   public function ajaxView(Request $request) {

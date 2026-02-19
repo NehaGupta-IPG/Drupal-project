@@ -2,12 +2,12 @@
 
 namespace Drupal\language\EventSubscriber;
 
+use Drupal\Core\Config\ConfigCrudEvent;
+use Drupal\Core\Config\ConfigEvents;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Config\ConfigCrudEvent;
-use Drupal\Core\Config\ConfigEvents;
 use Drupal\language\ConfigurableLanguageManager;
 use Drupal\language\HttpKernel\PathProcessorLanguage;
 use Drupal\language\LanguageNegotiatorInterface;
@@ -21,48 +21,48 @@ class ConfigSubscriber implements EventSubscriberInterface {
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The default language.
    *
-   * @var \Drupal\Core\Language\LanguageDefault
+   * @var LanguageDefault
    */
   protected $languageDefault;
 
   /**
    * The configuration factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * The language negotiator.
    *
-   * @var \Drupal\language\LanguageNegotiatorInterface
+   * @var LanguageNegotiatorInterface
    */
   protected $languageNegotiator;
 
   /**
    * The language path processor.
    *
-   * @var \Drupal\language\HttpKernel\PathProcessorLanguage
+   * @var PathProcessorLanguage
    */
   protected $pathProcessorLanguage;
 
   /**
    * Constructs a new class object.
    *
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Language\LanguageDefault $language_default
+   * @param LanguageDefault $language_default
    *   The default language.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The configuration factory.
-   * @param \Drupal\language\LanguageNegotiatorInterface $language_negotiator
+   * @param LanguageNegotiatorInterface $language_negotiator
    *   The language negotiator.
    */
   public function __construct(LanguageManagerInterface $language_manager, LanguageDefault $language_default, ConfigFactoryInterface $config_factory, LanguageNegotiatorInterface $language_negotiator) {
@@ -81,7 +81,7 @@ class ConfigSubscriber implements EventSubscriberInterface {
    * then this event must be changed to work with both the old and new schema
    * definition so this event is update safe.
    *
-   * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   * @param ConfigCrudEvent $event
    *   The configuration event.
    */
   public function onConfigSave(ConfigCrudEvent $event) {
@@ -130,7 +130,7 @@ class ConfigSubscriber implements EventSubscriberInterface {
   /**
    * Injects the language path processors on multilingual site configuration.
    *
-   * @param \Drupal\language\HttpKernel\PathProcessorLanguage $path_processor_language
+   * @param PathProcessorLanguage $path_processor_language
    *   The language path processor.
    */
   public function setPathProcessorLanguage(PathProcessorLanguage $path_processor_language) {

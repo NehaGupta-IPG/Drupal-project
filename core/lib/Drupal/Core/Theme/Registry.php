@@ -48,14 +48,14 @@ class Registry implements DestructableInterface {
   /**
    * The theme object representing the active theme for this registry.
    *
-   * @var \Drupal\Core\Theme\ActiveTheme
+   * @var ActiveTheme
    */
   protected $theme;
 
   /**
    * The lock backend that should be used.
    *
-   * @var \Drupal\Core\Lock\LockBackendInterface
+   * @var LockBackendInterface
    */
   protected $lock;
 
@@ -104,21 +104,21 @@ class Registry implements DestructableInterface {
   /**
    * The cache backend to use for the complete theme registry data.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $cache;
 
   /**
    * The module handler to use to load modules.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * An array of incomplete, runtime theme registries, keyed by theme name.
    *
-   * @var \Drupal\Core\Utility\ThemeRegistry[]
+   * @var ThemeRegistry[]
    */
   protected $runtimeRegistry = [];
 
@@ -146,35 +146,35 @@ class Registry implements DestructableInterface {
   /**
    * The theme handler.
    *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
+   * @var ThemeHandlerInterface
    */
   protected $themeHandler;
 
   /**
    * The theme initialization.
    *
-   * @var \Drupal\Core\Theme\ThemeInitializationInterface
+   * @var ThemeInitializationInterface
    */
   protected $themeInitialization;
 
   /**
    * The theme manager.
    *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   * @var ThemeManagerInterface
    */
   protected $themeManager;
 
   /**
    * The runtime cache.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $runtimeCache;
 
   /**
    * The module list.
    *
-   * @var \Drupal\Core\Extension\ModuleExtensionList
+   * @var ModuleExtensionList
    */
   protected $moduleList;
 
@@ -200,7 +200,7 @@ class Registry implements DestructableInterface {
   /**
    * The key value factory.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueFactoryInterface
+   * @var KeyValueFactoryInterface
    */
   protected $keyValueFactory;
 
@@ -209,25 +209,25 @@ class Registry implements DestructableInterface {
    *
    * @param string $root
    *   The app root.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The cache backend interface to use for the complete theme registry data.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
+   * @param LockBackendInterface $lock
    *   The lock backend.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler to use to load modules.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param ThemeHandlerInterface $theme_handler
    *   The theme handler.
-   * @param \Drupal\Core\Theme\ThemeInitializationInterface $theme_initialization
+   * @param ThemeInitializationInterface $theme_initialization
    *   The theme initialization.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $runtime_cache
+   * @param CacheBackendInterface $runtime_cache
    *   The cache backend interface to use for the runtime theme registry data.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $module_list
+   * @param ModuleExtensionList $module_list
    *   The module list.
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $kernel
+   * @param HttpKernelInterface $kernel
    *   The kernel.
    * @param string $theme_name
    *   (optional) The name of the theme for which to construct the registry.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface|null $key_value_factory
+   * @param KeyValueFactoryInterface|null $key_value_factory
    *   The key value factory.
    */
   public function __construct($root, CacheBackendInterface $cache, LockBackendInterface $lock, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler, ThemeInitializationInterface $theme_initialization, CacheBackendInterface $runtime_cache, ModuleExtensionList $module_list, protected HttpKernelInterface $kernel, $theme_name = NULL, ?KeyValueFactoryInterface $key_value_factory = NULL) {
@@ -250,7 +250,7 @@ class Registry implements DestructableInterface {
   /**
    * Sets the theme manager.
    *
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
+   * @param ThemeManagerInterface $theme_manager
    *   The theme manager.
    */
   public function setThemeManager(ThemeManagerInterface $theme_manager) {
@@ -357,7 +357,7 @@ class Registry implements DestructableInterface {
   /**
    * Returns the incomplete, runtime theme registry.
    *
-   * @return \Drupal\Core\Utility\ThemeRegistry
+   * @return ThemeRegistry
    *   A shared instance of the ThemeRegistry class, provides an ArrayObject
    *   that allows it to be accessed with array syntax and isset(), and is more
    *   lightweight than the full registry.
@@ -413,7 +413,7 @@ class Registry implements DestructableInterface {
    * - Base theme engines
    * - Base themes
    * - Theme engine
-   * - Theme
+   * - Theme.
    *
    * All theme hook definitions are essentially just collated and merged in the
    * above order. However, various extension-specific default values and
@@ -811,7 +811,7 @@ class Registry implements DestructableInterface {
    * @param array $cache
    *   The theme registry as documented in
    *   \Drupal\Core\Theme\Registry::processExtension().
-   * @param \Drupal\Core\Theme\ActiveTheme $theme
+   * @param ActiveTheme $theme
    *   Current active theme.
    *
    * @see ::processExtension()

@@ -18,30 +18,30 @@ class EntityResolverManager {
   /**
    * The entity type manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The class resolver.
    *
-   * @var \Drupal\Core\DependencyInjection\ClassResolverInterface
+   * @var ClassResolverInterface
    */
   protected $classResolver;
 
   /**
    * The list of all entity types.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface[]
+   * @var EntityTypeInterface[]
    */
   protected ?array $entityTypes;
 
   /**
    * Constructs a new EntityRouteAlterSubscriber.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $class_resolver
+   * @param ClassResolverInterface $class_resolver
    *   The class resolver.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, ClassResolverInterface $class_resolver) {
@@ -119,7 +119,7 @@ class EntityResolverManager {
    *
    * @param string|array $controller
    *   A PHP callable representing the controller.
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route object to populate without upcasting information.
    *
    * @return bool
@@ -169,7 +169,7 @@ class EntityResolverManager {
    *
    * Supports the '_entity_view' and '_entity_form' route defaults.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route object.
    */
   protected function setParametersFromEntityInformation(Route $route) {
@@ -213,7 +213,7 @@ class EntityResolverManager {
   /**
    * Set the upcasting route objects.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route object to add the upcasting information onto.
    */
   public function setRouteOptions(Route $route) {
@@ -231,7 +231,7 @@ class EntityResolverManager {
   /**
    * Gets the list of all entity types.
    *
-   * @return \Drupal\Core\Entity\EntityTypeInterface[]
+   * @return EntityTypeInterface[]
    *   An array of the entity types.
    */
   protected function getEntityTypes() {

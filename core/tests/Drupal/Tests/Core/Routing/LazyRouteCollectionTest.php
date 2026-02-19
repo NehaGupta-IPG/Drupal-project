@@ -22,7 +22,7 @@ class LazyRouteCollectionTest extends UnitTestCase {
   /**
    * The route provider.
    *
-   * @var \Drupal\Core\Routing\RouteProviderInterface
+   * @var RouteProviderInterface
    */
   private $routeProvider;
 

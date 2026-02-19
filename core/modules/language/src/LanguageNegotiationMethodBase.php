@@ -21,14 +21,14 @@ abstract class LanguageNegotiationMethodBase implements LanguageNegotiationMetho
   /**
    * The configuration factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $config;
 
   /**
    * The current active user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 

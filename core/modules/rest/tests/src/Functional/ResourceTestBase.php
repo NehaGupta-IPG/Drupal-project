@@ -76,7 +76,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
   /**
    * The account to use for authentication, if any.
    *
-   * @var null|\Drupal\Core\Session\AccountInterface
+   * @var null|AccountInterface
    */
   protected $account = NULL;
 
@@ -172,7 +172,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * Refreshes the state of the tester to be in sync with the testee.
    *
    * Should be called after every change made to:
-   * - RestResourceConfig entities
+   * - RestResourceConfig entities.
    */
   protected function refreshTestStateAfterRestConfigChange() {
     // Ensure that the cache tags invalidator has its internal values reset.
@@ -226,7 +226,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * @param string $method
    *   HTTP method.
-   * @param \Psr\Http\Message\ResponseInterface $response
+   * @param ResponseInterface $response
    *   The response to assert.
    */
   abstract protected function assertResponseWhenMissingAuthentication($method, ResponseInterface $response);
@@ -238,7 +238,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * @param string $method
    *   HTTP method.
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   URL to request.
    * @param array $request_options
    *   Request options to apply.
@@ -254,7 +254,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * @param string $method
    *   HTTP method.
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   URL to request.
    * @param array $request_options
    *   Request options to apply.
@@ -338,7 +338,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   The expected response status.
    * @param string|false $expected_body
    *   The expected response body. FALSE in case this should not be asserted.
-   * @param \Psr\Http\Message\ResponseInterface $response
+   * @param ResponseInterface $response
    *   The response to assert.
    * @param string[]|false $expected_cache_tags
    *   (optional) The expected cache tags in the X-Drupal-Cache-Tags response
@@ -412,7 +412,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   The expected response status.
    * @param string|false $expected_message
    *   The expected error message.
-   * @param \Psr\Http\Message\ResponseInterface $response
+   * @param ResponseInterface $response
    *   The error response to assert.
    * @param string[]|false $expected_cache_tags
    *   (optional) The expected cache tags in the X-Drupal-Cache-Tags response

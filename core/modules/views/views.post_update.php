@@ -58,7 +58,7 @@ function views_removed_post_updates(): array {
  * Post update configured views for entity reference argument plugin IDs.
  */
 function views_post_update_views_data_argument_plugin_id(?array &$sandbox = NULL): void {
-  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  /** @var ViewsConfigUpdater $view_config_updater */
   $view_config_updater = \Drupal::service(ViewsConfigUpdater::class);
   $view_config_updater->setDeprecationsEnabled(FALSE);
   \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
@@ -70,7 +70,7 @@ function views_post_update_views_data_argument_plugin_id(?array &$sandbox = NULL
  * Updates the format plural option for those views using aggregation.
  */
 function views_post_update_format_plural(?array &$sandbox = NULL): void {
-  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  /** @var ViewsConfigUpdater $view_config_updater */
   $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
   $view_config_updater->setDeprecationsEnabled(FALSE);
   \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
@@ -82,7 +82,7 @@ function views_post_update_format_plural(?array &$sandbox = NULL): void {
  * Clean-up empty remember_roles display settings for views filters.
  */
 function views_post_update_update_remember_role_empty(?array &$sandbox = NULL): void {
-  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  /** @var ViewsConfigUpdater $view_config_updater */
   $view_config_updater = \Drupal::service(ViewsConfigUpdater::class);
   $view_config_updater->setDeprecationsEnabled(FALSE);
   \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
@@ -94,7 +94,7 @@ function views_post_update_update_remember_role_empty(?array &$sandbox = NULL): 
  * Adds a default table CSS class.
  */
 function views_post_update_table_css_class(?array &$sandbox = NULL): void {
-  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  /** @var ViewsConfigUpdater $view_config_updater */
   $view_config_updater = \Drupal::service(ViewsConfigUpdater::class);
   $view_config_updater->setDeprecationsEnabled(FALSE);
   \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {

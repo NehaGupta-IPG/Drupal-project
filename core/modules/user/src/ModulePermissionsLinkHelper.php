@@ -19,11 +19,11 @@ class ModulePermissionsLinkHelper {
   /**
    * Constructs a new service instance.
    *
-   * @param \Drupal\user\PermissionHandlerInterface $permissionHandler
+   * @param PermissionHandlerInterface $permissionHandler
    *   The user permissions handler service.
-   * @param \Drupal\Core\Access\AccessManagerInterface $accessManager
+   * @param AccessManagerInterface $accessManager
    *   The access manager service.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
+   * @param ModuleExtensionList $moduleExtensionList
    *   The module handler service.
    */
   public function __construct(

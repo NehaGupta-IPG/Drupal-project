@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class ReverseProxyMiddlewareTest extends UnitTestCase {
 
   /**
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var HttpKernelInterface|MockObject
    */
   protected $mockHttpKernel;
 
@@ -97,7 +97,7 @@ class ReverseProxyMiddlewareTest extends UnitTestCase {
    * \Symfony\Component\HttpFoundation\Request::setTrustedProxies() should
    * always be called when reverse proxy settings are enabled.
    *
-   * @param \Drupal\Core\Site\Settings $settings
+   * @param Settings $settings
    *   The settings object that holds reverse proxy configuration.
    * @param int $expected_trusted_header_set
    *   The expected bit value returned by

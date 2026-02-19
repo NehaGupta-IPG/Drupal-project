@@ -49,7 +49,7 @@ class AreaTitleWebTest extends ViewTestBase {
     $this->assertSession()->titleEquals('test_title_header | Drupal');
 
     // Change the view to return no result.
-    /** @var \Drupal\views\Entity\View $view */
+    /** @var View $view */
     $view = View::load('test_area_title');
     $display =& $view->getDisplay('default');
     $display['display_options']['filters']['name'] = [
@@ -68,7 +68,7 @@ class AreaTitleWebTest extends ViewTestBase {
     $this->assertSession()->titleEquals('test_title_empty | Drupal');
 
     // Change the view to return a result instead.
-    /** @var \Drupal\views\Entity\View $view */
+    /** @var View $view */
     $view = View::load('test_area_title');
     $display =& $view->getDisplay('default');
     $display['display_options']['filters']['name'] = [

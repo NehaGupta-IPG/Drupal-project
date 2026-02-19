@@ -3,8 +3,8 @@
 namespace Drupal\content_translation\Plugin\Derivative;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
-use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\content_translation\ContentTranslationManagerInterface;
+use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -20,14 +20,14 @@ class ContentTranslationContextualLinks extends DeriverBase implements Container
   /**
    * The content translation manager.
    *
-   * @var \Drupal\content_translation\ContentTranslationManagerInterface
+   * @var ContentTranslationManagerInterface
    */
   protected $contentTranslationManager;
 
   /**
    * Constructs a new ContentTranslationContextualLinks.
    *
-   * @param \Drupal\content_translation\ContentTranslationManagerInterface $content_translation_manager
+   * @param ContentTranslationManagerInterface $content_translation_manager
    *   The content translation manager.
    */
   public function __construct(ContentTranslationManagerInterface $content_translation_manager) {

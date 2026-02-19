@@ -17,7 +17,7 @@ class EditorAccessControlHandler extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   protected function checkAccess(EntityInterface $editor, $operation, AccountInterface $account) {
-    /** @var \Drupal\editor\EditorInterface $editor */
+    /** @var EditorInterface $editor */
     return $editor->getFilterFormat()->access($operation, $account, TRUE);
   }
 

@@ -5,8 +5,8 @@ namespace Drupal\Core\Action\Plugin\Action;
 use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Utility\EmailValidatorInterface;
 use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Action\ConfigurableActionBase;
 use Drupal\Core\Action\Attribute\Action;
+use Drupal\Core\Action\ConfigurableActionBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
@@ -31,7 +31,7 @@ class EmailAction extends ConfigurableActionBase implements ContainerFactoryPlug
   /**
    * The token service.
    *
-   * @var \Drupal\Core\Utility\Token
+   * @var Token
    */
   protected $token;
 
@@ -45,28 +45,28 @@ class EmailAction extends ConfigurableActionBase implements ContainerFactoryPlug
   /**
    * A logger instance.
    *
-   * @var \Psr\Log\LoggerInterface
+   * @var LoggerInterface
    */
   protected $logger;
 
   /**
    * The mail manager.
    *
-   * @var \Drupal\Core\Mail\MailManagerInterface
+   * @var MailManagerInterface
    */
   protected $mailManager;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The email validator.
    *
-   * @var \Drupal\Component\Utility\EmailValidatorInterface
+   * @var EmailValidatorInterface
    */
   protected $emailValidator;
 
@@ -79,17 +79,17 @@ class EmailAction extends ConfigurableActionBase implements ContainerFactoryPlug
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Utility\Token $token
+   * @param Token $token
    *   The token service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   A logger instance.
-   * @param \Drupal\Core\Mail\MailManagerInterface $mail_manager
+   * @param MailManagerInterface $mail_manager
    *   The mail manager.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Component\Utility\EmailValidatorInterface $email_validator
+   * @param EmailValidatorInterface $email_validator
    *   The email validator.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, Token $token, EntityTypeManagerInterface $entity_type_manager, LoggerInterface $logger, MailManagerInterface $mail_manager, LanguageManagerInterface $language_manager, EmailValidatorInterface $email_validator) {

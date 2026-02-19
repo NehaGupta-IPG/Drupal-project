@@ -24,7 +24,7 @@ trait RecipeTestTrait {
    * @param string|null $machine_name
    *   The machine name for the recipe. Will be used as the directory name.
    *
-   * @return \Drupal\Core\Recipe\Recipe
+   * @return Recipe
    *   The recipe object.
    */
   protected function createRecipe(string|array $data, ?string $machine_name = NULL): Recipe {
@@ -57,7 +57,7 @@ trait RecipeTestTrait {
    * @param string $command
    *   (optional) The name of the command to run. Defaults to `recipe`.
    *
-   * @return \Symfony\Component\Process\Process
+   * @return Process
    *   The `drupal recipe` command process, after having run.
    */
   protected function applyRecipe(string $path, int $expected_exit_code = 0, array $options = [], string $command = 'recipe'): Process {
@@ -91,7 +91,7 @@ trait RecipeTestTrait {
    *   (optional) How long the command should run before timing out, in seconds.
    *   Defaults to 500.
    *
-   * @return \Symfony\Component\Process\Process
+   * @return Process
    *   The started process.
    */
   protected function runDrupalCommand(array $arguments, int $timeout = 500): Process {

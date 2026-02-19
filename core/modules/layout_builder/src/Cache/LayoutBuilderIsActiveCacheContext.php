@@ -24,14 +24,14 @@ class LayoutBuilderIsActiveCacheContext implements CalculatedCacheContextInterfa
   /**
    * The current route match.
    *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
+   * @var RouteMatchInterface
    */
   protected $routeMatch;
 
   /**
    * LayoutBuilderCacheContext constructor.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The current route match.
    */
   public function __construct(RouteMatchInterface $route_match) {
@@ -78,7 +78,7 @@ class LayoutBuilderIsActiveCacheContext implements CalculatedCacheContextInterfa
    * @param string $entity_type_id
    *   The entity type ID.
    *
-   * @return \Drupal\layout_builder\Entity\LayoutEntityDisplayInterface|null
+   * @return LayoutEntityDisplayInterface|null
    *   The entity view display, if it exists.
    */
   protected function getDisplay($entity_type_id) {

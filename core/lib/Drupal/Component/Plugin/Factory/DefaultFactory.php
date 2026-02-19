@@ -22,7 +22,7 @@ class DefaultFactory implements FactoryInterface {
    * The plugin definition includes the plugin class and possibly other
    * information necessary for proper instantiation.
    *
-   * @var \Drupal\Component\Plugin\Discovery\DiscoveryInterface
+   * @var DiscoveryInterface
    */
   protected $discovery;
 
@@ -36,7 +36,7 @@ class DefaultFactory implements FactoryInterface {
   /**
    * Constructs a Drupal\Component\Plugin\Factory\DefaultFactory object.
    *
-   * @param \Drupal\Component\Plugin\Discovery\DiscoveryInterface $discovery
+   * @param DiscoveryInterface $discovery
    *   The plugin discovery.
    * @param string|null $plugin_interface
    *   (optional) The interface each plugin should implement.
@@ -60,7 +60,7 @@ class DefaultFactory implements FactoryInterface {
    *
    * @param string $plugin_id
    *   The id of a plugin.
-   * @param \Drupal\Component\Plugin\Definition\PluginDefinitionInterface|mixed[] $plugin_definition
+   * @param PluginDefinitionInterface|mixed[] $plugin_definition
    *   The plugin definition associated with the plugin ID.
    * @param string $required_interface
    *   (optional) The required plugin interface.
@@ -68,7 +68,7 @@ class DefaultFactory implements FactoryInterface {
    * @return string
    *   The appropriate class name.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws PluginException
    *   Thrown when there is no class specified, the class doesn't exist, or
    *   the class does not implement the specified required interface.
    */

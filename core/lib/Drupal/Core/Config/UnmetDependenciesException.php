@@ -60,7 +60,7 @@ class UnmetDependenciesException extends ConfigException {
   /**
    * Gets a translated message from the exception.
    *
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param TranslationInterface $string_translation
    *   The string translation service.
    * @param string $extension
    *   The name of the extension that is being installed.
@@ -87,7 +87,7 @@ class UnmetDependenciesException extends ConfigException {
    *   A list of configuration keyed by configuration name, with unmet
    *   dependencies as the value.
    *
-   * @return \Drupal\Core\Config\PreExistingConfigException
+   * @return PreExistingConfigException
    *   An exception for the extension with a list of configuration objects.
    */
   public static function create($extension, array $config_objects) {

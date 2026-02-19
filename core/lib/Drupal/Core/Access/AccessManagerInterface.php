@@ -2,9 +2,9 @@
 
 namespace Drupal\Core\Access;
 
-use Symfony\Component\HttpFoundation\Request;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\AccountInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Provides an interface for attaching and running access check services.
@@ -20,13 +20,13 @@ interface AccessManagerInterface {
    *   The route to check access to.
    * @param array $parameters
    *   Optional array of values to substitute into the route path pattern.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   (optional) Run access checks for this account. Defaults to the current
    *   user.
    * @param bool $return_as_object
    *   (optional) Defaults to FALSE.
    *
-   * @return ($return_as_object is true ? \Drupal\Core\Access\AccessResultInterface : bool)
+   * @return ($return_as_object is true ? AccessResultInterface : bool)
    *   The access result. Returns a boolean if $return_as_object is FALSE (this
    *   is the default) and otherwise an AccessResultInterface object.
    *   When a boolean is returned, the result of AccessInterface::isAllowed() is
@@ -38,15 +38,15 @@ interface AccessManagerInterface {
   /**
    * Execute access checks against the incoming request.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The incoming request.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   (optional) Run access checks for this account. Defaults to the current
    *   user.
    * @param bool $return_as_object
    *   (optional) Defaults to FALSE.
    *
-   * @return ($return_as_object is true ? \Drupal\Core\Access\AccessResultInterface : bool)
+   * @return ($return_as_object is true ? AccessResultInterface : bool)
    *   The access result. Returns a boolean if $return_as_object is FALSE (this
    *   is the default) and otherwise an AccessResultInterface object.
    *   When a boolean is returned, the result of AccessInterface::isAllowed() is
@@ -60,18 +60,18 @@ interface AccessManagerInterface {
    *
    * Determines whether the route is accessible or not.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   (optional) Run access checks for this account. Defaults to the current
    *   user.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   Optional, a request. Only supply this parameter when checking the
    *   incoming request, do not specify when checking routes on output.
    * @param bool $return_as_object
    *   (optional) Defaults to FALSE.
    *
-   * @return ($return_as_object is true ? \Drupal\Core\Access\AccessResultInterface : bool)
+   * @return ($return_as_object is true ? AccessResultInterface : bool)
    *   The access result. Returns a boolean if $return_as_object is FALSE (this
    *   is the default) and otherwise an AccessResultInterface object.
    *   When a boolean is returned, the result of AccessInterface::isAllowed() is

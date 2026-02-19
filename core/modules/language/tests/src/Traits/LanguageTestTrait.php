@@ -43,7 +43,7 @@ trait LanguageTestTrait {
    * @param string|null $default_langcode
    *   The language code to use as the default language.
    *
-   * @return \Drupal\language\ContentLanguageSettingsInterface
+   * @return ContentLanguageSettingsInterface
    *   The saved content language config entity.
    */
   public static function enableBundleTranslation(string $entity_type_id, string $bundle, ?string $default_langcode = LanguageInterface::LANGCODE_SITE_DEFAULT): ContentLanguageSettingsInterface {

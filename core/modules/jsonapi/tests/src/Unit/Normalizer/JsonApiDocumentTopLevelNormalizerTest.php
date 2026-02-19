@@ -34,7 +34,7 @@ class JsonApiDocumentTopLevelNormalizerTest extends UnitTestCase {
   /**
    * The normalizer under test.
    *
-   * @var \Drupal\jsonapi\Normalizer\JsonApiDocumentTopLevelNormalizer
+   * @var JsonApiDocumentTopLevelNormalizer
    */
   protected $normalizer;
 

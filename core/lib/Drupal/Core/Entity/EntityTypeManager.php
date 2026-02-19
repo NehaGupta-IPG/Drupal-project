@@ -6,10 +6,10 @@ use Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
+use Drupal\Core\Entity\Attribute\EntityType;
 use Drupal\Core\Entity\Exception\InvalidLinkTemplateException;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
-use Drupal\Core\Entity\Attribute\EntityType;
 use Drupal\Core\Plugin\Discovery\AttributeDiscoveryWithAnnotations;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -45,21 +45,21 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
   /**
    * The string translation service.
    *
-   * @var \Drupal\Core\StringTranslation\TranslationInterface
+   * @var TranslationInterface
    */
   protected $stringTranslation;
 
   /**
    * The class resolver.
    *
-   * @var \Drupal\Core\DependencyInjection\ClassResolverInterface
+   * @var ClassResolverInterface
    */
   protected $classResolver;
 
   /**
    * The entity last installed schema repository.
    *
-   * @var \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface
+   * @var EntityLastInstalledSchemaRepositoryInterface
    */
   protected $entityLastInstalledSchemaRepository;
 
@@ -69,17 +69,17 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The cache backend to use.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param TranslationInterface $string_translation
    *   The string translation.
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $class_resolver
+   * @param ClassResolverInterface $class_resolver
    *   The class resolver.
-   * @param \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository
+   * @param EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository
    *   The entity last installed schema repository.
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @param ContainerInterface $container
    *   The service container.
    */
   public function __construct(\Traversable $namespaces, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache, TranslationInterface $string_translation, ClassResolverInterface $class_resolver, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository, protected ContainerInterface $container) {
@@ -98,7 +98,7 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
    * {@inheritdoc}
    */
   public function processDefinition(&$definition, $plugin_id) {
-    /** @var \Drupal\Core\Entity\EntityTypeInterface $definition */
+    /** @var EntityTypeInterface $definition */
     parent::processDefinition($definition, $plugin_id);
 
     // All link templates must have a leading slash.
@@ -145,7 +145,7 @@ class EntityTypeManager extends DefaultPluginManager implements EntityTypeManage
    * @param string $entity_type_id
    *   The entity type ID.
    *
-   * @return \Drupal\Core\Entity\EntityTypeInterface
+   * @return EntityTypeInterface
    *   The active entity type definition.
    *
    * @internal

@@ -13,7 +13,7 @@ trait MigrationDeriverTrait {
    * @param string $source_plugin_id
    *   The source plugin ID.
    *
-   * @return \Drupal\migrate\Plugin\MigrateSourceInterface|\Drupal\migrate\Plugin\RequirementsInterface
+   * @return MigrateSourceInterface|RequirementsInterface
    *   The fully initialized source plugin.
    */
   public static function getSourcePlugin($source_plugin_id) {

@@ -49,7 +49,7 @@ class MigrateCustomBlockTest extends MigrateDrupal7TestBase {
   public function testCustomBlockMigration(): void {
     $block = BlockContent::load(1);
     $this->assertInstanceOf(BlockContentInterface::class, $block);
-    /** @var \Drupal\block_content\BlockContentInterface $block */
+    /** @var BlockContentInterface $block */
     $this->assertSame('Limerick', $block->label());
 
     $expected_body = "A fellow jumped off a high wall\r\nAnd had a most terrible fall\r\nHe went back to bed\r\nWith a bump on his head\r\nThat's why you don't jump off a wall";

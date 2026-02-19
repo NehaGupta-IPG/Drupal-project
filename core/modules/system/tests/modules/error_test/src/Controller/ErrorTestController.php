@@ -16,14 +16,14 @@ class ErrorTestController extends ControllerBase {
   /**
    * The database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $database;
 
   /**
    * Constructs a \Drupal\error_test\Controller\ErrorTestController object.
    *
-   * @param \Drupal\Core\Database\Connection $database
+   * @param Connection $database
    *   The database connection.
    */
   public function __construct(Connection $database) {

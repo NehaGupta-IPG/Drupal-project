@@ -34,7 +34,7 @@ class WebAssert extends MinkWebAssert {
   /**
    * Constructor.
    *
-   * @param \Behat\Mink\Session $session
+   * @param Session $session
    *   The Behat session object.
    * @param string $base_url
    *   The base URL of the site under test.
@@ -47,7 +47,7 @@ class WebAssert extends MinkWebAssert {
   /**
    * Trims the base URL from the URL.
    *
-   * @param string|\Drupal\Core\Url $url
+   * @param string|Url $url
    *   A url string, or object.
    * @param bool $include_query
    *   Whether to include the query string in the return value.
@@ -137,13 +137,13 @@ class WebAssert extends MinkWebAssert {
    *
    * @param string $button
    *   One of id|name|label|value for the button.
-   * @param \Behat\Mink\Element\TraversableElement $container
+   * @param TraversableElement $container
    *   (optional) The document to check against. Defaults to the current page.
    *
    * @return \Behat\Mink\Element\NodeElement
    *   The matching element.
    *
-   * @throws \Behat\Mink\Exception\ElementNotFoundException
+   * @throws ElementNotFoundException
    *   When the element doesn't exist.
    */
   public function buttonExists($button, ?TraversableElement $container = NULL) {
@@ -167,10 +167,10 @@ class WebAssert extends MinkWebAssert {
    *
    * @param string $button
    *   One of id|name|label|value for the button.
-   * @param \Behat\Mink\Element\TraversableElement $container
+   * @param TraversableElement $container
    *   (optional) The document to check against. Defaults to the current page.
    *
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ExpectationException
    *   When the button exists.
    */
   public function buttonNotExists($button, ?TraversableElement $container = NULL): void {
@@ -185,13 +185,13 @@ class WebAssert extends MinkWebAssert {
    *
    * @param string $select
    *   One of id|name|label|value for the select field.
-   * @param \Behat\Mink\Element\TraversableElement $container
+   * @param TraversableElement $container
    *   (optional) The document to check against. Defaults to the current page.
    *
    * @return \Behat\Mink\Element\NodeElement
    *   The matching element
    *
-   * @throws \Behat\Mink\Exception\ElementNotFoundException
+   * @throws ElementNotFoundException
    *   When the element doesn't exist.
    */
   public function selectExists($select, ?TraversableElement $container = NULL) {
@@ -215,13 +215,13 @@ class WebAssert extends MinkWebAssert {
    *   One of id|name|label|value for the select field.
    * @param string $option
    *   The option value.
-   * @param \Behat\Mink\Element\TraversableElement $container
+   * @param TraversableElement $container
    *   (optional) The document to check against. Defaults to the current page.
    *
    * @return \Behat\Mink\Element\NodeElement
    *   The matching option element
    *
-   * @throws \Behat\Mink\Exception\ElementNotFoundException
+   * @throws ElementNotFoundException
    *   When the element doesn't exist.
    */
   public function optionExists($select, $option, ?TraversableElement $container = NULL) {
@@ -251,10 +251,10 @@ class WebAssert extends MinkWebAssert {
    *   One of id|name|label|value for the select field.
    * @param string $option
    *   The option value that should not exist.
-   * @param \Behat\Mink\Element\TraversableElement $container
+   * @param TraversableElement $container
    *   (optional) The document to check against. Defaults to the current page.
    *
-   * @throws \Behat\Mink\Exception\ElementNotFoundException
+   * @throws ElementNotFoundException
    *   When the select element doesn't exist.
    */
   public function optionNotExists($select, $option, ?TraversableElement $container = NULL): void {
@@ -279,7 +279,7 @@ class WebAssert extends MinkWebAssert {
    * @param string $expected_title
    *   The string the page title should be.
    *
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ExpectationException
    *   Thrown when element doesn't exist, or the title is a different one.
    */
   public function titleEquals($expected_title): void {
@@ -305,7 +305,7 @@ class WebAssert extends MinkWebAssert {
    *   messages: use strtr() to embed variables in the message text, not
    *   t(). If left blank, a default message will be displayed.
    *
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ExpectationException
    *   Thrown when element doesn't exist, or the link label is a different one.
    */
   public function linkExists($label, $index = 0, $message = ''): void {
@@ -328,7 +328,7 @@ class WebAssert extends MinkWebAssert {
    *   messages: use strtr() to embed variables in the message text, not
    *   t(). If left blank, a default message will be displayed.
    *
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ExpectationException
    *   Thrown when element doesn't exist, or the link label is a different one.
    */
   public function linkExistsExact($label, $index = 0, $message = ''): void {
@@ -349,7 +349,7 @@ class WebAssert extends MinkWebAssert {
    *   messages: use strtr() to embed variables in the message text, not
    *   t(). If left blank, a default message will be displayed.
    *
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ExpectationException
    *   Thrown when element doesn't exist, or the link label is a different one.
    */
   public function linkNotExists($label, $message = ''): void {
@@ -370,7 +370,7 @@ class WebAssert extends MinkWebAssert {
    *   messages: use strtr() to embed variables in the message text, not
    *   t(). If left blank, a default message will be displayed.
    *
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ExpectationException
    *   Thrown when element doesn't exist, or the link label is a different one.
    */
   public function linkNotExistsExact($label, $message = ''): void {
@@ -393,7 +393,7 @@ class WebAssert extends MinkWebAssert {
    *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
    *   a string. If left blank, a default message will be displayed.
    *
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ExpectationException
    *   Thrown when element doesn't exist, or the link label is a different one.
    */
   public function linkByHrefExists($href, $index = 0, $message = ''): void {
@@ -417,7 +417,7 @@ class WebAssert extends MinkWebAssert {
    *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
    *   a string. If left blank, a default message will be displayed.
    *
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ExpectationException
    *   Thrown when element doesn't exist, or the link label is a different one.
    */
   public function linkByHrefExistsExact(string $href, int $index = 0, string $message = ''): void {
@@ -439,7 +439,7 @@ class WebAssert extends MinkWebAssert {
    *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
    *   a string. If left blank, a default message will be displayed.
    *
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ExpectationException
    *   Thrown when element doesn't exist, or the link label is a different one.
    */
   public function linkByHrefNotExists($href, $message = ''): void {
@@ -461,7 +461,7 @@ class WebAssert extends MinkWebAssert {
    *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
    *   a string. If left blank, a default message will be displayed.
    *
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ExpectationException
    *   Thrown when element doesn't exist, or the link label is a different one.
    */
   public function linkByHrefNotExistsExact(string $href, string $message = ''): void {
@@ -553,7 +553,7 @@ class WebAssert extends MinkWebAssert {
    * @param string|object $text
    *   Text value. Any non-string value will be cast to string.
    *
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ExpectationException
    */
   public function responseContains($text): void {
     parent::responseContains((string) $text);
@@ -565,7 +565,7 @@ class WebAssert extends MinkWebAssert {
    * @param string|object $text
    *   Text value. Any non-string value will be cast to string.
    *
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ExpectationException
    */
   public function responseNotContains($text): void {
     parent::responseNotContains((string) $text);
@@ -581,7 +581,7 @@ class WebAssert extends MinkWebAssert {
    * @param string $message
    *   The success message.
    *
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ExpectationException
    *   When the condition is not fulfilled.
    */
   public function assert($condition, $message) {
@@ -597,14 +597,14 @@ class WebAssert extends MinkWebAssert {
    *
    * @param string $field
    *   One of id|name|label|value for the field.
-   * @param \Behat\Mink\Element\TraversableElement $container
+   * @param TraversableElement $container
    *   (optional) The document to check against. Defaults to the current page.
    *
    * @return \Behat\Mink\Element\NodeElement
    *   The matching element.
    *
-   * @throws \Behat\Mink\Exception\ElementNotFoundException
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ElementNotFoundException
+   * @throws ExpectationException
    */
   public function fieldDisabled($field, ?TraversableElement $container = NULL) {
     $container = $container ?: $this->session->getPage();
@@ -626,14 +626,14 @@ class WebAssert extends MinkWebAssert {
    *
    * @param string $field
    *   One of id|name|label|value for the field.
-   * @param \Behat\Mink\Element\TraversableElement $container
+   * @param TraversableElement $container
    *   (optional) The document to check against. Defaults to the current page.
    *
    * @return \Behat\Mink\Element\NodeElement
    *   The matching element.
    *
-   * @throws \Behat\Mink\Exception\ElementNotFoundException
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ElementNotFoundException
+   * @throws ExpectationException
    */
   public function fieldEnabled($field, ?TraversableElement $container = NULL) {
     $container = $container ?: $this->session->getPage();
@@ -655,13 +655,13 @@ class WebAssert extends MinkWebAssert {
    *
    * @param string $field
    *   One of id|name|value for the hidden field.
-   * @param \Behat\Mink\Element\TraversableElement $container
+   * @param TraversableElement $container
    *   (optional) The document to check against. Defaults to the current page.
    *
    * @return \Behat\Mink\Element\NodeElement
    *   The matching element.
    *
-   * @throws \Behat\Mink\Exception\ElementNotFoundException
+   * @throws ElementNotFoundException
    */
   public function hiddenFieldExists($field, ?TraversableElement $container = NULL) {
     $container = $container ?: $this->session->getPage();
@@ -676,10 +676,10 @@ class WebAssert extends MinkWebAssert {
    *
    * @param string $field
    *   One of id|name|value for the hidden field.
-   * @param \Behat\Mink\Element\TraversableElement $container
+   * @param TraversableElement $container
    *   (optional) The document to check against. Defaults to the current page.
    *
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ExpectationException
    */
   public function hiddenFieldNotExists($field, ?TraversableElement $container = NULL): void {
     $container = $container ?: $this->session->getPage();
@@ -694,11 +694,11 @@ class WebAssert extends MinkWebAssert {
    *   One of id|name|value for the hidden field.
    * @param string $value
    *   The hidden field value that needs to be checked.
-   * @param \Behat\Mink\Element\TraversableElement $container
+   * @param TraversableElement $container
    *   (optional) The document to check against. Defaults to the current page.
    *
-   * @throws \Behat\Mink\Exception\ElementNotFoundException
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ElementNotFoundException
+   * @throws ExpectationException
    */
   public function hiddenFieldValueEquals($field, $value, ?TraversableElement $container = NULL): void {
     $node = $this->hiddenFieldExists($field, $container);
@@ -715,11 +715,11 @@ class WebAssert extends MinkWebAssert {
    *   One of id|name|value for the hidden field.
    * @param string $value
    *   The hidden field value that needs to be checked.
-   * @param \Behat\Mink\Element\TraversableElement $container
+   * @param TraversableElement $container
    *   (optional) The document to check against. Defaults to the current page.
    *
-   * @throws \Behat\Mink\Exception\ElementNotFoundException
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ElementNotFoundException
+   * @throws ExpectationException
    */
   public function hiddenFieldValueNotEquals($field, $value, ?TraversableElement $container = NULL): void {
     $node = $this->hiddenFieldExists($field, $container);
@@ -750,7 +750,7 @@ class WebAssert extends MinkWebAssert {
   /**
    * Asserts that each HTML ID is used for just a single element on the page.
    *
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ExpectationException
    */
   public function pageContainsNoDuplicateId(): void {
     $seen_ids = [];
@@ -766,13 +766,13 @@ class WebAssert extends MinkWebAssert {
   /**
    * Checks that current session address is equals to provided one.
    *
-   * @param string|\Drupal\Core\Url $page
+   * @param string|Url $page
    *   A url string, or object.
    *
    * @return void
    *   No return value.
    *
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ExpectationException
    */
   public function addressEquals(string|Url $page): void {
     $expected = $this->cleanUrl($page, TRUE);
@@ -784,10 +784,10 @@ class WebAssert extends MinkWebAssert {
   /**
    * Checks that current session address is not equals to provided one.
    *
-   * @param string|\Drupal\Core\Url $page
+   * @param string|Url $page
    *   A url string, or object.
    *
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ExpectationException
    */
   public function addressNotEquals(string|Url $page): void {
     $expected = $this->cleanUrl($page, TRUE);

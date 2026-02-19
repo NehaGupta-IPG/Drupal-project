@@ -2,10 +2,10 @@
 
 namespace Drupal\Core\Layout;
 
-use Drupal\Component\Plugin\DerivativeInspectionInterface;
-use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\Component\Plugin\DependentPluginInterface;
+use Drupal\Component\Plugin\DerivativeInspectionInterface;
+use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Plugin\ContextAwarePluginInterface;
 
 /**
@@ -28,7 +28,7 @@ interface LayoutInterface extends PluginInspectionInterface, DerivativeInspectio
   /**
    * {@inheritdoc}
    *
-   * @return \Drupal\Core\Layout\LayoutDefinition
+   * @return LayoutDefinition
    *   The layout plugin definition for this plugin.
    */
   public function getPluginDefinition();

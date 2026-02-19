@@ -5,8 +5,8 @@ namespace Drupal\Core\Render;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
-use Drupal\Core\Plugin\PreWarmablePluginManagerTrait;
 use Drupal\Core\Plugin\DefaultPluginManager;
+use Drupal\Core\Plugin\PreWarmablePluginManagerTrait;
 use Drupal\Core\PreWarm\PreWarmableInterface;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element\ElementInterface;
@@ -41,13 +41,13 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param CacheBackendInterface $cache_backend
    *   Cache backend instance to use.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $themeHandler
+   * @param ThemeHandlerInterface $themeHandler
    *   The theme handler.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler to invoke the alter hook with.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $themeManager
+   * @param ThemeManagerInterface $themeManager
    *   The theme manager.
    */
   public function __construct(
@@ -142,7 +142,7 @@ class ElementInfoManager extends DefaultPluginManager implements ElementInfoMana
   /**
    * {@inheritdoc}
    *
-   * @return \Drupal\Core\Render\Element\ElementInterface
+   * @return ElementInterface
    *   The render element plugin instance.
    */
   public function createInstance($plugin_id, array $configuration = []) {

@@ -23,23 +23,23 @@ class ThemeNegotiator implements ThemeNegotiatorInterface {
   /**
    * The access checker for themes.
    *
-   * @var \Drupal\Core\Theme\ThemeAccessCheck
+   * @var ThemeAccessCheck
    */
   protected $themeAccess;
 
   /**
    * The class resolver.
    *
-   * @var \Drupal\Core\DependencyInjection\ClassResolverInterface
+   * @var ClassResolverInterface
    */
   protected $classResolver;
 
   /**
    * Constructs a new ThemeNegotiator.
    *
-   * @param \Drupal\Core\Theme\ThemeAccessCheck $theme_access
+   * @param ThemeAccessCheck $theme_access
    *   The access checker for themes.
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $class_resolver
+   * @param ClassResolverInterface $class_resolver
    *   The class resolver.
    * @param string[] $negotiators
    *   An array of negotiator IDs.

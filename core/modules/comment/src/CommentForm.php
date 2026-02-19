@@ -30,21 +30,21 @@ class CommentForm extends ContentEntityForm {
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 
@@ -65,17 +65,17 @@ class CommentForm extends ContentEntityForm {
   /**
    * Constructs a new CommentForm.
    *
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface|null $entity_field_manager
+   * @param EntityFieldManagerInterface|null $entity_field_manager
    *   (optional) The entity field manager service.
    */
   public function __construct(
@@ -96,7 +96,7 @@ class CommentForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state) {
-    /** @var \Drupal\comment\CommentInterface $comment */
+    /** @var CommentInterface $comment */
     $comment = $this->entity;
     $entity = $this->entityTypeManager->getStorage($comment->getCommentedEntityTypeId())->load($comment->getCommentedEntityId());
     $field_name = $comment->getFieldName();
@@ -250,7 +250,7 @@ class CommentForm extends ContentEntityForm {
    */
   protected function actions(array $form, FormStateInterface $form_state) {
     $element = parent::actions($form, $form_state);
-    /** @var \Drupal\comment\CommentInterface $comment */
+    /** @var CommentInterface $comment */
     $comment = $this->entity;
     $entity = $comment->getCommentedEntity();
     $field_definition = $this->entityFieldManager->getFieldDefinitions($entity->getEntityTypeId(), $entity->bundle())[$comment->getFieldName()];
@@ -280,7 +280,7 @@ class CommentForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function buildEntity(array $form, FormStateInterface $form_state) {
-    /** @var \Drupal\comment\CommentInterface $comment */
+    /** @var CommentInterface $comment */
     $comment = parent::buildEntity($form, $form_state);
     if (!$form_state->isValueEmpty('date') && $form_state->getValue('date') instanceof DrupalDateTime) {
       $comment->setCreatedTime($form_state->getValue('date')->getTimestamp());
@@ -356,7 +356,7 @@ class CommentForm extends ContentEntityForm {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function preview(array &$form, FormStateInterface $form_state) {
@@ -451,14 +451,14 @@ class CommentForm extends ContentEntityForm {
   /**
    * Gets an appropriate status message when a comment is saved.
    *
-   * @param \Drupal\comment\CommentInterface $comment
+   * @param CommentInterface $comment
    *   The comment being saved.
    * @param bool $is_new
    *   TRUE if a new comment is created. $comment->isNew() cannot be used here
    *   because the comment has already been saved by the time the message is
    *   rendered.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   * @return TranslatableMarkup
    *   A translatable string containing the appropriate status message.
    */
   protected function getStatusMessage(CommentInterface $comment, bool $is_new): TranslatableMarkup {

@@ -17,7 +17,7 @@ interface SessionConfigurationInterface {
    * normally passed along using cookies and hence a typical implementation
    * checks whether the session cookie is on the request.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
    * @return bool
@@ -28,7 +28,7 @@ interface SessionConfigurationInterface {
   /**
    * Returns a list of options suitable for passing to the session storage.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
    * @return array

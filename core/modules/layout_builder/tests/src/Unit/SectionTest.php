@@ -25,7 +25,7 @@ class SectionTest extends UnitTestCase {
   /**
    * The section object to test.
    *
-   * @var \Drupal\layout_builder\Section
+   * @var Section
    */
   protected $section;
 
@@ -198,9 +198,9 @@ class SectionTest extends UnitTestCase {
   /**
    * Asserts that the section has the expected components.
    *
-   * @param \Drupal\layout_builder\SectionComponent[] $expected
+   * @param SectionComponent[] $expected
    *   The expected sections.
-   * @param \Drupal\layout_builder\Section $section
+   * @param Section $section
    *   The section storage to check.
    *
    * @internal

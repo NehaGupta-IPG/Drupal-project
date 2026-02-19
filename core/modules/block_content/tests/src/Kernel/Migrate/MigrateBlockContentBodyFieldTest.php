@@ -42,14 +42,14 @@ class MigrateBlockContentBodyFieldTest extends MigrateDrupal7TestBase {
    * Tests the block content body field migration.
    */
   public function testBlockContentBodyFieldMigration(): void {
-    /** @var \Drupal\field\FieldStorageConfigInterface $storage */
+    /** @var FieldStorageConfigInterface $storage */
     $storage = FieldStorageConfig::load('block_content.body');
     $this->assertInstanceOf(FieldStorageConfigInterface::class, $storage);
     $this->assertSame('block_content', $storage->getTargetEntityTypeId());
     $this->assertSame(['basic'], array_values($storage->getBundles()));
     $this->assertSame('body', $storage->getName());
 
-    /** @var \Drupal\field\FieldConfigInterface $field */
+    /** @var FieldConfigInterface $field */
     $field = FieldConfig::load('block_content.basic.body');
     $this->assertInstanceOf(FieldConfigInterface::class, $field);
     $this->assertSame('block_content', $field->getTargetEntityTypeId());

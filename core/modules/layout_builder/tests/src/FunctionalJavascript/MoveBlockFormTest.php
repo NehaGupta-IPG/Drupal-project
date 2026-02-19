@@ -199,7 +199,7 @@ class MoveBlockFormTest extends WebDriverTestBase {
     $this->assertSession()->assertWaitOnAjaxRequest();
     $block_tds = $page->findAll('css', '.layout-builder-components-table__block-label');
     $this->assertSameSize($block_tds, $expected_block_labels);
-    /** @var \Behat\Mink\Element\NodeElement $block_td */
+    /** @var NodeElement $block_td */
     foreach ($block_tds as $block_td) {
       $this->assertSame(array_shift($expected_block_labels), trim($block_td->getText()));
     }
@@ -236,7 +236,7 @@ class MoveBlockFormTest extends WebDriverTestBase {
    * @param string $block_label
    *   The block label.
    *
-   * @return \Behat\Mink\Element\NodeElement
+   * @return NodeElement
    *   The row handle element.
    */
   protected function findRowHandle($block_label): NodeElement {
@@ -269,7 +269,7 @@ class MoveBlockFormTest extends WebDriverTestBase {
     $blocks = $page->findAll('css', "$region_selector [data-layout-block-uuid]");
     $this->assertSameSize($expected_block_selectors, $blocks);
 
-    /** @var \Behat\Mink\Element\NodeElement $block */
+    /** @var NodeElement $block */
     foreach ($blocks as $block) {
       $block_selector = array_shift($expected_block_selectors);
       $assert_session->elementsCount('css', "$region_selector $block_selector", 1);

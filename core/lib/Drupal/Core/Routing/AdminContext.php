@@ -12,14 +12,14 @@ class AdminContext {
   /**
    * The route match.
    *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
+   * @var RouteMatchInterface
    */
   protected $routeMatch;
 
   /**
    * Construct a new admin context helper instance.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
    */
   public function __construct(RouteMatchInterface $route_match) {
@@ -29,7 +29,7 @@ class AdminContext {
   /**
    * Determines whether the active route is an admin one.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   (optional) The route to determine whether it is an admin one. Per default
    *   this falls back to the route object on the active request.
    *

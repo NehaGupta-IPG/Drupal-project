@@ -17,7 +17,7 @@ trait LoggerChannelTrait {
   /**
    * The logger channel factory service.
    *
-   * @var \Drupal\Core\Logger\LoggerChannelFactoryInterface
+   * @var LoggerChannelFactoryInterface
    */
   protected $loggerFactory;
 
@@ -44,7 +44,7 @@ trait LoggerChannelTrait {
   /**
    * Injects the logger channel factory.
    *
-   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
+   * @param LoggerChannelFactoryInterface $logger_factory
    *   The logger channel factory service.
    *
    * @return $this

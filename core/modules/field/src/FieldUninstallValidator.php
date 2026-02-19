@@ -26,18 +26,18 @@ class FieldUninstallValidator implements ConfigImportModuleUninstallValidatorInt
   /**
    * The field type plugin manager.
    *
-   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface
+   * @var FieldTypePluginManagerInterface
    */
   protected $fieldTypeManager;
 
   /**
    * Constructs a new FieldUninstallValidator.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param TranslationInterface $string_translation
    *   The string translation service.
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager
+   * @param FieldTypePluginManagerInterface $field_type_manager
    *   The field type plugin manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, TranslationInterface $string_translation, FieldTypePluginManagerInterface $field_type_manager) {
@@ -88,7 +88,7 @@ class FieldUninstallValidator implements ConfigImportModuleUninstallValidatorInt
    * @param string $module
    *   The module to filter field storages by.
    *
-   * @return \Drupal\field\FieldStorageConfigInterface[]
+   * @return FieldStorageConfigInterface[]
    *   An array of field storages for a specified module.
    */
   protected function getFieldStoragesByModule($module) {

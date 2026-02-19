@@ -29,55 +29,55 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * The lock service.
    *
-   * @var \Drupal\Core\Lock\LockBackendInterface
+   * @var LockBackendInterface
    */
   protected $lock;
 
   /**
    * The persistent lock service.
    *
-   * @var \Drupal\Core\Lock\LockBackendInterface
+   * @var LockBackendInterface
    */
   protected $persistentLock;
 
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * The messenger service.
    *
-   * @var \Drupal\Core\Messenger\MessengerInterface
+   * @var MessengerInterface
    */
   protected $messenger;
 
   /**
    * Constructs the SystemTestController.
    *
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
+   * @param LockBackendInterface $lock
    *   The lock service.
-   * @param \Drupal\Core\Lock\LockBackendInterface $persistent_lock
+   * @param LockBackendInterface $persistent_lock
    *   The persistent lock service.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger service.
-   * @param \Drupal\Core\PageCache\ResponsePolicy\KillSwitch|null $killSwitch
+   * @param KillSwitch|null $killSwitch
    *   The page cache kill switch. This is here to test nullable types with
    *   \Drupal\Core\DependencyInjection\AutowireTrait::create().
-   * @param \Drupal\Core\PageCache\ResponsePolicy\KillSwitch|null $killSwitch2
+   * @param KillSwitch|null $killSwitch2
    *   The page cache kill switch. This is here to test nullable types with
    *   \Drupal\Core\DependencyInjection\AutowireTrait::create().
    */
@@ -177,10 +177,10 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * Controller to return $_GET['destination'] for testing.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   The response.
    */
   public function getDestination(Request $request) {
@@ -191,10 +191,10 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * Controller to return $_REQUEST['destination'] for testing.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   The response.
    */
   public function requestDestination(Request $request) {
@@ -392,7 +392,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * Returns the current date.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   A Response object containing the current date.
    */
   public function getCurrentDate() {
@@ -404,7 +404,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   /**
    * Returns a response with a test header set from the request.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   A Response object containing the test header.
    */
   public function getTestHeader(Request $request) {

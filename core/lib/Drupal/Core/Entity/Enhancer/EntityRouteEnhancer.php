@@ -3,8 +3,8 @@
 namespace Drupal\Core\Entity\Enhancer;
 
 use Drupal\Core\Routing\EnhancerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\Routing\RouteObjectInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -38,7 +38,7 @@ class EntityRouteEnhancer implements EnhancerInterface {
   /**
    * Returns whether the enhancer runs on the current route.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The current route.
    *
    * @return bool
@@ -57,7 +57,7 @@ class EntityRouteEnhancer implements EnhancerInterface {
    *
    * @param array $defaults
    *   The defaults to modify.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The Request instance.
    *
    * @return array
@@ -74,7 +74,7 @@ class EntityRouteEnhancer implements EnhancerInterface {
    *
    * @param array $defaults
    *   The defaults to modify.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The Request instance.
    *
    * @return array
@@ -93,7 +93,7 @@ class EntityRouteEnhancer implements EnhancerInterface {
    *
    * @param array $defaults
    *   The defaults to modify.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The Request instance.
    *
    * @return array

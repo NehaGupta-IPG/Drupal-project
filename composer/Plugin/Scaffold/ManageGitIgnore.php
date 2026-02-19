@@ -2,6 +2,7 @@
 
 namespace Drupal\Composer\Plugin\Scaffold;
 
+use Drupal\Composer\Plugin\Scaffold\Operations\ScaffoldResult;
 use Composer\IO\IOInterface;
 
 /**
@@ -14,7 +15,7 @@ class ManageGitIgnore {
   /**
    * Composer's I/O service.
    *
-   * @var \Composer\IO\IOInterface
+   * @var IOInterface
    */
   protected $io;
 
@@ -28,7 +29,7 @@ class ManageGitIgnore {
   /**
    * ManageGitIgnore constructor.
    *
-   * @param \Composer\IO\IOInterface $io
+   * @param IOInterface $io
    *   The Composer IO interface.
    * @param string $dir
    *   The directory where the project is located.
@@ -41,10 +42,10 @@ class ManageGitIgnore {
   /**
    * Manages gitignore files.
    *
-   * @param \Drupal\Composer\Plugin\Scaffold\Operations\ScaffoldResult[] $files
+   * @param ScaffoldResult[] $files
    *   A list of scaffold results, each of which holds a path and whether
    *   or not that file is managed.
-   * @param \Drupal\Composer\Plugin\Scaffold\ScaffoldOptions $options
+   * @param ScaffoldOptions $options
    *   Configuration options from the composer.json extras section.
    */
   public function manageIgnored(array $files, ScaffoldOptions $options) {
@@ -76,7 +77,7 @@ class ManageGitIgnore {
   /**
    * Determines whether we should manage gitignore files.
    *
-   * @param \Drupal\Composer\Plugin\Scaffold\ScaffoldOptions $options
+   * @param ScaffoldOptions $options
    *   Configuration options from the composer.json extras section.
    *
    * @return bool

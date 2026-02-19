@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\user\RoleInterface;
 use Drupal\user\RoleStorageInterface;
@@ -13,7 +14,6 @@ use Drupal\views\Attribute\ViewsAccess;
 use Drupal\views\Plugin\views\access\AccessPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
-use Drupal\Core\Session\AccountInterface;
 
 /**
  * Access plugin that provides role-based access control.
@@ -35,7 +35,7 @@ class Role extends AccessPluginBase implements CacheableDependencyInterface {
   /**
    * The role storage.
    *
-   * @var \Drupal\user\RoleStorageInterface
+   * @var RoleStorageInterface
    */
   protected $roleStorage;
 
@@ -48,7 +48,7 @@ class Role extends AccessPluginBase implements CacheableDependencyInterface {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\user\RoleStorageInterface $role_storage
+   * @param RoleStorageInterface $role_storage
    *   The role storage.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, RoleStorageInterface $role_storage) {

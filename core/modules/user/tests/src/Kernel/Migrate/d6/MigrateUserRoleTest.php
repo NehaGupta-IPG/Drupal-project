@@ -35,7 +35,7 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
    *   An array of role data keyed by the destination role id. The role data
    *   contains the source role id, an array of valid permissions and an array
    *   of invalid permissions.
-   * @param \Drupal\migrate\Plugin\MigrateIdMapInterface $id_map
+   * @param MigrateIdMapInterface $id_map
    *   The migration ID map plugin.
    */
   public function assertMessages(array $role_data, MigrateIdMapInterface $id_map): void {
@@ -73,13 +73,13 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
    *   An array of user permissions.
    * @param int $lookupId
    *   The original numeric ID of the role in the source database.
-   * @param \Drupal\migrate\Plugin\MigrateIdMapInterface $id_map
+   * @param MigrateIdMapInterface $id_map
    *   The map table plugin.
    *
    * @internal
    */
   protected function assertRole(string $id, array $permissions, int $lookupId, MigrateIdMapInterface $id_map): void {
-    /** @var \Drupal\user\RoleInterface $role */
+    /** @var RoleInterface $role */
     $role = Role::load($id);
     $this->assertInstanceOf(RoleInterface::class, $role);
     $this->assertSame($permissions, $role->getPermissions());
@@ -91,7 +91,7 @@ class MigrateUserRoleTest extends MigrateDrupal6TestBase {
    *
    * @param array $permissions
    *   Contains the valid and invalid permissions.
-   * @param \Drupal\migrate\Plugin\MigrateIdMapInterface $id_map
+   * @param MigrateIdMapInterface $id_map
    *   The map table plugin.
    *
    * @internal

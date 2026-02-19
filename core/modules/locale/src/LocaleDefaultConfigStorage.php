@@ -24,37 +24,37 @@ class LocaleDefaultConfigStorage {
   /**
    * The storage instance for reading configuration data.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   protected $configStorage;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\language\ConfigurableLanguageManagerInterface
+   * @var ConfigurableLanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The storage instance for reading required default configuration data.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   protected $requiredInstallStorage;
 
   /**
    * The storage instance for reading optional default configuration data.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   protected $optionalInstallStorage;
 
   /**
    * Constructs a LocaleDefaultConfigStorage.
    *
-   * @param \Drupal\Core\Config\StorageInterface $config_storage
+   * @param StorageInterface $config_storage
    *   The storage object to use for reading configuration data.
-   * @param \Drupal\language\ConfigurableLanguageManagerInterface $language_manager
+   * @param ConfigurableLanguageManagerInterface $language_manager
    *   The language manager.
    * @param string $install_profile
    *   The current installation profile.

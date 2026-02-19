@@ -12,7 +12,7 @@ class FilterController {
   /**
    * Displays a page with long filter tips.
    *
-   * @param \Drupal\filter\FilterFormatInterface|null $filter_format
+   * @param FilterFormatInterface|null $filter_format
    *   (optional) A filter format, or NULL to show tips for all formats.
    *   Defaults to NULL.
    *
@@ -40,7 +40,7 @@ class FilterController {
   /**
    * Gets the label of a filter format.
    *
-   * @param \Drupal\filter\FilterFormatInterface $filter_format
+   * @param FilterFormatInterface $filter_format
    *   The filter format.
    *
    * @return string

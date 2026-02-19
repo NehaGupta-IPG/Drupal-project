@@ -21,7 +21,7 @@ interface AuthenticationProviderFilterInterface {
    * after routing, hence RouteMatch is available and can be used to inspect
    * route options.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    * @param bool $authenticated
    *   Whether or not the request is authenticated.

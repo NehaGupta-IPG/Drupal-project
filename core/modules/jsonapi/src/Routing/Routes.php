@@ -3,12 +3,12 @@
 namespace Drupal\jsonapi\Routing;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\jsonapi\Access\RelationshipRouteAccessCheck;
 use Drupal\jsonapi\Controller\EntryPoint;
 use Drupal\jsonapi\ParamConverter\ResourceTypeConverter;
 use Drupal\jsonapi\ResourceType\ResourceType;
 use Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface;
-use Drupal\Core\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -50,7 +50,7 @@ class Routes implements ContainerInjectionInterface {
   /**
    * The JSON:API resource type repository.
    *
-   * @var \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface
+   * @var ResourceTypeRepositoryInterface
    */
   protected $resourceTypeRepository;
 
@@ -71,7 +71,7 @@ class Routes implements ContainerInjectionInterface {
   /**
    * Instantiates a Routes object.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
+   * @param ResourceTypeRepositoryInterface $resource_type_repository
    *   The JSON:API resource type repository.
    * @param string[] $authentication_providers
    *   The authentication providers, keyed by ID.
@@ -140,12 +140,12 @@ class Routes implements ContainerInjectionInterface {
   /**
    * Gets applicable resource routes for a JSON:API resource type.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The JSON:API resource type for which to get the routes.
    * @param string $path_prefix
    *   The root path prefix.
    *
-   * @return \Symfony\Component\Routing\RouteCollection
+   * @return RouteCollection
    *   A collection of routes for the given resource type.
    */
   protected static function getRoutesForResourceType(ResourceType $resource_type, $path_prefix) {
@@ -197,12 +197,12 @@ class Routes implements ContainerInjectionInterface {
   /**
    * Gets the file upload route collection for the given resource type.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The resource type for which the route collection should be created.
    * @param string $path_prefix
    *   The root path prefix.
    *
-   * @return \Symfony\Component\Routing\RouteCollection
+   * @return RouteCollection
    *   The route collection.
    */
   protected static function getFileUploadRoutesForResourceType(ResourceType $resource_type, $path_prefix) {
@@ -271,10 +271,10 @@ class Routes implements ContainerInjectionInterface {
   /**
    * Gets a route collection for the given resource type.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The resource type for which the route collection should be created.
    *
-   * @return \Symfony\Component\Routing\RouteCollection
+   * @return RouteCollection
    *   The route collection.
    */
   protected static function getIndividualRoutesForResourceType(ResourceType $resource_type) {
@@ -360,7 +360,7 @@ class Routes implements ContainerInjectionInterface {
    * @param string $path_prefix
    *   The root path prefix.
    *
-   * @return \Symfony\Component\Routing\Route
+   * @return Route
    *   The entry point route.
    */
   protected function getEntryPointRoute($path_prefix) {
@@ -378,7 +378,7 @@ class Routes implements ContainerInjectionInterface {
    * overrides any previous values. Therefore, it is tedious to add a single
    * parameter while keeping those that are already set.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route to which the parameter is to be added.
    * @param string $name
    *   The name of the parameter.
@@ -394,7 +394,7 @@ class Routes implements ContainerInjectionInterface {
   /**
    * Get a unique route name for the JSON:API resource type and route type.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The resource type for which the route collection should be created.
    * @param string $route_type
    *   The route type. E.g. 'individual' or 'collection'.
@@ -409,7 +409,7 @@ class Routes implements ContainerInjectionInterface {
   /**
    * Get a unique route name for the file upload resource type and route type.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The resource type for which the route collection should be created.
    * @param string $route_type
    *   The route type. E.g. 'individual' or 'collection'.
@@ -424,7 +424,7 @@ class Routes implements ContainerInjectionInterface {
   /**
    * Determines if an array of resource types has any non-internal ones.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType[] $resource_types
+   * @param ResourceType[] $resource_types
    *   The resource types to check.
    *
    * @return bool
@@ -440,7 +440,7 @@ class Routes implements ContainerInjectionInterface {
   /**
    * Determines if an array of resource types lists non-internal "file" ones.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType[] $resource_types
+   * @param ResourceType[] $resource_types
    *   The resource types to check.
    *
    * @return bool
@@ -460,7 +460,7 @@ class Routes implements ContainerInjectionInterface {
    *   An array of parameters. These may be obtained from a route's
    *   parameter defaults or from a request object.
    *
-   * @return \Drupal\jsonapi\ResourceType\ResourceType|null
+   * @return ResourceType|null
    *   The resource type, NULL if one cannot be found from the given parameters.
    */
   public static function getResourceTypeNameFromParameters(array $parameters) {

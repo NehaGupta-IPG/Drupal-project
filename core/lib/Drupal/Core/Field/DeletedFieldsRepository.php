@@ -14,14 +14,14 @@ class DeletedFieldsRepository implements DeletedFieldsRepositoryInterface {
   /**
    * The state key/value store.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
   /**
    * Constructs a new deleted fields repository.
    *
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state key/value store.
    */
   public function __construct(StateInterface $state) {

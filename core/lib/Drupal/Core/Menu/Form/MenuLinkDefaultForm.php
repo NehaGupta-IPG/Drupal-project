@@ -4,11 +4,11 @@ namespace Drupal\Core\Menu\Form;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Menu\MenuParentFormSelectorInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -25,43 +25,43 @@ class MenuLinkDefaultForm implements MenuLinkFormInterface, ContainerInjectionIn
   /**
    * The edited menu link.
    *
-   * @var \Drupal\Core\Menu\MenuLinkInterface
+   * @var MenuLinkInterface
    */
   protected $menuLink;
 
   /**
    * The menu link manager.
    *
-   * @var \Drupal\Core\Menu\MenuLinkManagerInterface
+   * @var MenuLinkManagerInterface
    */
   protected $menuLinkManager;
 
   /**
    * The parent form selector service.
    *
-   * @var \Drupal\Core\Menu\MenuParentFormSelectorInterface
+   * @var MenuParentFormSelectorInterface
    */
   protected $menuParentSelector;
 
   /**
    * The module handler service.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * Constructs a new \Drupal\Core\Menu\Form\MenuLinkDefaultForm.
    *
-   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager
+   * @param MenuLinkManagerInterface $menu_link_manager
    *   The menu link manager.
-   * @param \Drupal\Core\Menu\MenuParentFormSelectorInterface $menu_parent_selector
+   * @param MenuParentFormSelectorInterface $menu_parent_selector
    *   The menu parent form selector service.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param TranslationInterface $string_translation
    *   The string translation.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Extension\ModuleExtensionList|null $moduleExtensionList
+   * @param ModuleExtensionList|null $moduleExtensionList
    *   The module extension list.
    */
   public function __construct(MenuLinkManagerInterface $menu_link_manager, MenuParentFormSelectorInterface $menu_parent_selector, TranslationInterface $string_translation, ModuleHandlerInterface $module_handler, protected ?ModuleExtensionList $moduleExtensionList = NULL) {

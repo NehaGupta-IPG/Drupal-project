@@ -43,7 +43,7 @@ class ResourceIdentifierNormalizerTest extends UnitTestCase {
   /**
    * The base resource type for testing.
    *
-   * @var \Drupal\jsonapi\ResourceType\ResourceType
+   * @var ResourceType
    */
   protected $resourceType;
 

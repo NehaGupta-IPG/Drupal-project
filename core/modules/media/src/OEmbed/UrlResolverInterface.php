@@ -17,12 +17,12 @@ interface UrlResolverInterface {
    * @param string $url
    *   The media asset URL.
    *
-   * @return \Drupal\media\OEmbed\Provider
+   * @return Provider
    *   The oEmbed provider for the asset.
    *
-   * @throws \Drupal\media\OEmbed\ResourceException
+   * @throws ResourceException
    *   If the provider cannot be determined.
-   * @throws \Drupal\media\OEmbed\ProviderException
+   * @throws ProviderException
    *   If tne oEmbed provider causes an error.
    */
   public function getProviderByUrl($url);

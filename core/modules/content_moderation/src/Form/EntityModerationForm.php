@@ -3,12 +3,12 @@
 namespace Drupal\content_moderation\Form;
 
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\content_moderation\ModerationInformationInterface;
+use Drupal\content_moderation\StateTransitionValidationInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\content_moderation\ModerationInformationInterface;
-use Drupal\content_moderation\StateTransitionValidationInterface;
 use Drupal\workflows\Transition;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -22,32 +22,32 @@ class EntityModerationForm extends FormBase {
   /**
    * The moderation information service.
    *
-   * @var \Drupal\content_moderation\ModerationInformationInterface
+   * @var ModerationInformationInterface
    */
   protected $moderationInfo;
 
   /**
    * The time service.
    *
-   * @var \Drupal\Component\Datetime\TimeInterface
+   * @var TimeInterface
    */
   protected $time;
 
   /**
    * The moderation state transition validation service.
    *
-   * @var \Drupal\content_moderation\StateTransitionValidationInterface
+   * @var StateTransitionValidationInterface
    */
   protected $validation;
 
   /**
    * EntityModerationForm constructor.
    *
-   * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_info
+   * @param ModerationInformationInterface $moderation_info
    *   The moderation information service.
-   * @param \Drupal\content_moderation\StateTransitionValidationInterface $validation
+   * @param StateTransitionValidationInterface $validation
    *   The moderation state transition validation service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct(ModerationInformationInterface $moderation_info, StateTransitionValidationInterface $validation, TimeInterface $time) {
@@ -81,7 +81,7 @@ class EntityModerationForm extends FormBase {
     $current_state = $entity->moderation_state->value;
     $workflow = $this->moderationInfo->getWorkflowForEntity($entity);
 
-    /** @var \Drupal\workflows\Transition[] $transitions */
+    /** @var Transition[] $transitions */
     $transitions = $this->validation->getValidTransitions($entity, $this->currentUser());
 
     // Exclude self-transitions.
@@ -140,7 +140,7 @@ class EntityModerationForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     $entity = $form_state->get('entity');
     /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
     $storage = \Drupal::entityTypeManager()->getStorage($entity->getEntityTypeId());

@@ -103,7 +103,7 @@ class ContentTranslationEntityBundleInfoTest extends KernelTestBase {
   /**
    * Tests that bundle translation settings are propagated on creation.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    */
   public function testBundleClearOnLanguageContentSettingInsert(): void {
     $node = $this->getBundledNode();
@@ -115,7 +115,7 @@ class ContentTranslationEntityBundleInfoTest extends KernelTestBase {
   /**
    * Tests that bundle translation setting changes are propagated.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    * @throws \Exception
    */
   public function testBundleClearOnLanguageContentSettingUpdate(): void {
@@ -133,10 +133,10 @@ class ContentTranslationEntityBundleInfoTest extends KernelTestBase {
   /**
    * Gets a new bundled node for testing.
    *
-   * @return \Drupal\node\Entity\Node
+   * @return Node
    *   The new node.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    */
   protected function getBundledNode() {
     $this->installEntitySchema('node');

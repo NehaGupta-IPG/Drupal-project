@@ -8,8 +8,8 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\field\FieldConfigInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -36,34 +36,34 @@ class FieldConfigListBuilder extends ConfigEntityListBuilder {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The field type plugin manager.
    *
-   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface
+   * @var FieldTypePluginManagerInterface
    */
   protected $fieldTypeManager;
 
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 
   /**
    * Constructs a new class instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager
+   * @param FieldTypePluginManagerInterface $field_type_manager
    *   The field type manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface|null $entity_field_manager
+   * @param EntityFieldManagerInterface|null $entity_field_manager
    *   The entity field manager.
    */
   public function __construct(EntityTypeInterface $entity_type, EntityTypeManagerInterface $entity_type_manager, FieldTypePluginManagerInterface $field_type_manager, EntityFieldManagerInterface $entity_field_manager) {
@@ -130,7 +130,7 @@ class FieldConfigListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $field_config) {
-    /** @var \Drupal\field\FieldConfigInterface $field_config */
+    /** @var FieldConfigInterface $field_config */
     $field_storage = $field_config->getFieldStorageDefinition();
 
     $storage_summary = $this->fieldTypeManager->getStorageSettingsSummary($field_storage);
@@ -254,7 +254,7 @@ class FieldConfigListBuilder extends ConfigEntityListBuilder {
   protected function getDefaultOperations(EntityInterface $entity/* , ?CacheableMetadata $cacheability = NULL */) {
     $args = func_get_args();
     $cacheability = $args[1] ?? new CacheableMetadata();
-    /** @var \Drupal\field\FieldConfigInterface $entity */
+    /** @var FieldConfigInterface $entity */
     $operations = parent::getDefaultOperations($entity, $cacheability);
 
     $update_access = $entity->access('update', return_as_object: TRUE);

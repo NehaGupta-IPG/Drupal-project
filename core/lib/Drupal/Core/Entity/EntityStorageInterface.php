@@ -41,7 +41,7 @@ interface EntityStorageInterface {
    * @param array<string|int>|null $ids
    *   An array of entity IDs, or NULL to load all entities.
    *
-   * @return \Drupal\Core\Entity\EntityInterface[]
+   * @return EntityInterface[]
    *   An array of successfully loaded objects indexed by their IDs.
    *   Returns an empty array if no matching entities are found.
    */
@@ -53,7 +53,7 @@ interface EntityStorageInterface {
    * @param string|int $id
    *   The ID of the entity to load.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|null
+   * @return EntityInterface|null
    *   An entity object. NULL if no matching entity is found.
    */
   public function load($id);
@@ -64,7 +64,7 @@ interface EntityStorageInterface {
    * @param string|int $id
    *   The ID of the entity to load.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|null
+   * @return EntityInterface|null
    *   The unchanged entity, or NULL if the entity cannot be loaded.
    *
    * @todo Remove this method once we have a reliable way to retrieve the
@@ -80,7 +80,7 @@ interface EntityStorageInterface {
    *   values are the values those properties must have. If a property takes
    *   multiple values, passing an array of values will produce an IN condition.
    *
-   * @return \Drupal\Core\Entity\EntityInterface[]
+   * @return EntityInterface[]
    *   An array of entity objects indexed by their ids.
    */
   public function loadByProperties(array $values = []);
@@ -92,7 +92,7 @@ interface EntityStorageInterface {
    *   (optional) An array of values to set, keyed by property name. If the
    *   entity type has bundles, the bundle key has to be specified.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   A new entity object.
    */
   public function create(array $values = []);
@@ -103,7 +103,7 @@ interface EntityStorageInterface {
    * @param array $entities
    *   An array of entity objects to delete.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   In case of failures, an exception is thrown.
    */
   public function delete(array $entities);
@@ -111,14 +111,14 @@ interface EntityStorageInterface {
   /**
    * Saves the entity permanently.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to save.
    *
    * @return int|null
    *   SAVED_NEW or SAVED_UPDATED is returned depending on the operation
    *   performed.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   In case of failures, an exception is thrown.
    */
   public function save(EntityInterface $entity);
@@ -130,10 +130,10 @@ interface EntityStorageInterface {
    * the restore process does not invoke any hooks, nor does it perform any pre
    * or post-save operations.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to restore.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   In case of failures, an exception is thrown.
    *
    * @internal
@@ -194,7 +194,7 @@ interface EntityStorageInterface {
   /**
    * Gets the entity type definition.
    *
-   * @return \Drupal\Core\Entity\EntityTypeInterface
+   * @return EntityTypeInterface
    *   Entity type definition.
    */
   public function getEntityType();
@@ -206,7 +206,7 @@ interface EntityStorageInterface {
    *   (optional) A specific entity type bundle identifier. Can be omitted in
    *   the case of entity types without bundles, like User.
    *
-   * @return class-string<\Drupal\Core\Entity\EntityInterface>
+   * @return class-string<EntityInterface>
    *   The entity class name.
    */
   public function getEntityClass(?string $bundle = NULL): string;

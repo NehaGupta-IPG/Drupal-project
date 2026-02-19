@@ -39,7 +39,7 @@ class FormBuilderTest extends FormTestBase {
   /**
    * The dependency injection container.
    *
-   * @var \Symfony\Component\DependencyInjection\ContainerBuilder
+   * @var ContainerBuilder
    */
   protected $container;
 

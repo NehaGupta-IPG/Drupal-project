@@ -23,16 +23,16 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
   /**
    * The current account.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $account;
 
   /**
    * Constructs a new MaintenanceModeSubscriber.
    *
-   * @param \Drupal\Core\Site\MaintenanceModeInterface $maintenance_mode
+   * @param MaintenanceModeInterface $maintenance_mode
    *   The maintenance mode.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The current user.
    */
   public function __construct(MaintenanceModeInterface $maintenance_mode, AccountInterface $account) {
@@ -43,7 +43,7 @@ class MaintenanceModeSubscriber implements EventSubscriberInterface {
   /**
    * Logout users if site is in maintenance mode and user is not exempt.
    *
-   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
+   * @param RequestEvent $event
    *   The event to process.
    */
   public function onMaintenanceModeRequest(RequestEvent $event) {

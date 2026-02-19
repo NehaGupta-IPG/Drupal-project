@@ -36,7 +36,7 @@ abstract class FieldTestBase extends BrowserTestBase {
    *
    * This function only checks a single column in the field values.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to test.
    * @param string $field_name
    *   The name of the field to test.

@@ -90,7 +90,7 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
   /**
    * Gets the label of the entity.
    *
-   * @return string|\Drupal\Core\StringTranslation\TranslatableMarkup|null
+   * @return string|TranslatableMarkup|null
    *   The label of the entity, or NULL if there is no label defined.
    */
   public function label();
@@ -130,15 +130,15 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
    * @return \Drupal\Core\Url
    *   The URL object.
    *
-   * @throws \Drupal\Core\Entity\EntityMalformedException
-   * @throws \Drupal\Core\Entity\Exception\UndefinedLinkTemplateException
+   * @throws EntityMalformedException
+   * @throws UndefinedLinkTemplateException
    */
   public function toUrl($rel = NULL, array $options = []);
 
   /**
    * Generates the HTML for a link to this entity.
    *
-   * @param string|null|array|\Drupal\Component\Render\MarkupInterface $text
+   * @param string|null|array|MarkupInterface $text
    *   (optional) The link text for the anchor tag as a translated string or
    *   render array. If NULL, it will use the entity's label. Defaults to NULL.
    * @param string $rel
@@ -150,8 +150,8 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
    * @return \Drupal\Core\Link
    *   A Link to the entity.
    *
-   * @throws \Drupal\Core\Entity\EntityMalformedException
-   * @throws \Drupal\Core\Entity\Exception\UndefinedLinkTemplateException
+   * @throws EntityMalformedException
+   * @throws UndefinedLinkTemplateException
    */
   public function toLink($text = NULL, $rel = 'canonical', array $options = []);
 
@@ -217,7 +217,7 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
    * @return int
    *   Either SAVED_NEW or SAVED_UPDATED, depending on the operation performed.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   In case of failures an exception is thrown.
    */
   public function save();
@@ -225,7 +225,7 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
   /**
    * Deletes an entity permanently.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   In case of failures an exception is thrown.
    */
   public function delete();
@@ -243,7 +243,7 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
    * @todo Adjust existing implementations and the documentation according to
    *   https://www.drupal.org/node/2577609 to have a consistent API.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The entity storage object.
    *
    * @see \Drupal\Core\Field\FieldItemListInterface::preSave()
@@ -261,7 +261,7 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
    * only fired on their current translation. It is up to the developer to
    * iterate over all translations if needed.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The entity storage object.
    * @param bool $update
    *   TRUE if the entity has been updated, or FALSE if it has been inserted.
@@ -273,7 +273,7 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
    *
    * Load defaults for example.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The entity storage object.
    * @param mixed[] $values
    *   An array of values to set, keyed by property name. If the entity type has
@@ -289,7 +289,7 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
    *
    * See the @link entity_crud Entity CRUD topic @endlink for more information.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The entity storage object.
    *
    * @see \Drupal\Core\Entity\EntityInterface::create()
@@ -301,9 +301,9 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
    *
    * Used before the entities are deleted and before invoking the delete hook.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The entity storage object.
-   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   * @param EntityInterface[] $entities
    *   An array of entities.
    */
   public static function preDelete(EntityStorageInterface $storage, array $entities);
@@ -313,9 +313,9 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
    *
    * Used after the entities are deleted but before invoking the delete hook.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The entity storage object.
-   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   * @param EntityInterface[] $entities
    *   An array of entities.
    */
   public static function postDelete(EntityStorageInterface $storage, array $entities);
@@ -323,9 +323,9 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
   /**
    * Acts on loaded entities.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The entity storage object.
-   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   * @param EntityInterface[] $entities
    *   An array of entities.
    */
   public static function postLoad(EntityStorageInterface $storage, array &$entities);
@@ -342,7 +342,7 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
   /**
    * Gets the entity type definition.
    *
-   * @return \Drupal\Core\Entity\EntityTypeInterface
+   * @return EntityTypeInterface
    *   The entity type definition.
    */
   public function getEntityType();
@@ -350,7 +350,7 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
   /**
    * Gets a list of entities referenced by this entity.
    *
-   * @return \Drupal\Core\Entity\EntityInterface[]
+   * @return EntityInterface[]
    *   An array of entities.
    */
   public function referencedEntities();
@@ -464,7 +464,7 @@ interface EntityInterface extends AccessibleInterface, CacheableDependencyInterf
    * This method may be used as a performance optimization when unchanged entity
    * is already available.
    *
-   * @param \Drupal\Core\Entity\EntityInterface|null $original
+   * @param EntityInterface|null $original
    *   The unchanged entity.
    *
    * @return $this

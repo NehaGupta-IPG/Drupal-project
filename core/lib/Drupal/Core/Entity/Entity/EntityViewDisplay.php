@@ -2,16 +2,16 @@
 
 namespace Drupal\Core\Entity\Entity;
 
-use Drupal\Core\Entity\Attribute\ConfigEntityType;
-use Drupal\Core\Entity\Entity\Access\EntityViewDisplayAccessControlHandler;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Component\Utility\NestedArray;
+use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\Entity\Access\EntityViewDisplayAccessControlHandler;
+use Drupal\Core\Entity\EntityDisplayBase;
 use Drupal\Core\Entity\EntityDisplayPluginCollection;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
-use Drupal\Core\Entity\EntityDisplayBase;
 use Drupal\Core\Render\Element;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\TranslatableInterface as TranslatableDataInterface;
 
 /**
@@ -74,12 +74,12 @@ class EntityViewDisplay extends EntityDisplayBase implements EntityViewDisplayIn
    * party code to alter the display options held in the display before they are
    * used to generate render arrays.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface[] $entities
+   * @param FieldableEntityInterface[] $entities
    *   The entities being rendered. They should all be of the same entity type.
    * @param string $view_mode
    *   The view mode being rendered.
    *
-   * @return \Drupal\Core\Entity\Display\EntityViewDisplayInterface[]
+   * @return EntityViewDisplayInterface[]
    *   The display objects to use to render the entities, keyed by entity
    *   bundle.
    *
@@ -166,12 +166,12 @@ class EntityViewDisplay extends EntityDisplayBase implements EntityViewDisplayIn
    *
    * See the collectRenderDisplays() method for details.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The entity being rendered.
    * @param string $view_mode
    *   The view mode.
    *
-   * @return \Drupal\Core\Entity\Display\EntityViewDisplayInterface
+   * @return EntityViewDisplayInterface
    *   The display object that should be used to render the entity.
    *
    * @see \Drupal\Core\Entity\Entity\EntityViewDisplay::collectRenderDisplays()

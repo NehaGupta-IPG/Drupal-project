@@ -2,8 +2,8 @@
 
 namespace Drupal\layout_builder\Event;
 
-use Drupal\layout_builder\SectionStorageInterface;
 use Drupal\Component\EventDispatcher\Event;
+use Drupal\layout_builder\SectionStorageInterface;
 
 /**
  * Event fired in #pre_render of \Drupal\layout_builder\Element\LayoutBuilder.
@@ -18,14 +18,14 @@ class PrepareLayoutEvent extends Event {
   /**
    * The section storage plugin.
    *
-   * @var \Drupal\layout_builder\SectionStorageInterface
+   * @var SectionStorageInterface
    */
   protected $sectionStorage;
 
   /**
    * Constructs a new PrepareLayoutEvent.
    *
-   * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
+   * @param SectionStorageInterface $section_storage
    *   The section storage preparing the Layout.
    */
   public function __construct(SectionStorageInterface $section_storage) {
@@ -35,7 +35,7 @@ class PrepareLayoutEvent extends Event {
   /**
    * Gets the section storage.
    *
-   * @return \Drupal\layout_builder\SectionStorageInterface
+   * @return SectionStorageInterface
    *   The section storage.
    */
   public function getSectionStorage(): SectionStorageInterface {

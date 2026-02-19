@@ -87,7 +87,7 @@ class UninstallDefaultContentTest extends BrowserTestBase {
   /**
    * Assert recipes are imported.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $node_storage
+   * @param EntityStorageInterface $node_storage
    *   Node storage.
    */
   protected function assertRecipesImported(EntityStorageInterface $node_storage): void {
@@ -106,7 +106,7 @@ class UninstallDefaultContentTest extends BrowserTestBase {
   /**
    * Assert articles are imported.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $node_storage
+   * @param EntityStorageInterface $node_storage
    *   Node storage.
    */
   protected function assertArticlesImported(EntityStorageInterface $node_storage): void {
@@ -125,7 +125,7 @@ class UninstallDefaultContentTest extends BrowserTestBase {
   /**
    * Assert block content are imported.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $block_storage
+   * @param EntityStorageInterface $block_storage
    *   Block storage.
    */
   protected function assertImportedCustomBlock(EntityStorageInterface $block_storage): void {

@@ -461,7 +461,7 @@ class ThemeInstallerTest extends KernelTestBase {
   /**
    * Returns the theme handler service.
    *
-   * @return \Drupal\Core\Extension\ThemeHandlerInterface
+   * @return ThemeHandlerInterface
    *   The theme handler service.
    */
   protected function themeHandler(): ThemeHandlerInterface {
@@ -471,7 +471,7 @@ class ThemeInstallerTest extends KernelTestBase {
   /**
    * Returns the theme installer service.
    *
-   * @return \Drupal\Core\Extension\ThemeInstallerInterface
+   * @return ThemeInstallerInterface
    *   The theme installer service.
    */
   protected function themeInstaller(): ThemeInstallerInterface {
@@ -481,7 +481,7 @@ class ThemeInstallerTest extends KernelTestBase {
   /**
    * Returns the system.theme config object.
    *
-   * @return \Drupal\Core\Config\Config
+   * @return Config
    *   The system.theme config object.
    */
   protected function extensionConfig(): Config {
@@ -491,7 +491,7 @@ class ThemeInstallerTest extends KernelTestBase {
   /**
    * Returns the ModuleHandler.
    *
-   * @return \Drupal\Core\Extension\ModuleHandlerInterface
+   * @return ModuleHandlerInterface
    *   The ModuleHandler.
    */
   protected function moduleHandler(): ModuleHandlerInterface {
@@ -501,7 +501,7 @@ class ThemeInstallerTest extends KernelTestBase {
   /**
    * Returns the ModuleInstaller.
    *
-   * @return \Drupal\Core\Extension\ModuleInstallerInterface
+   * @return ModuleInstallerInterface
    *   The ModuleInstaller.
    */
   protected function moduleInstaller(): ModuleInstallerInterface {
@@ -511,7 +511,7 @@ class ThemeInstallerTest extends KernelTestBase {
   /**
    * Returns the ThemeExtensionList.
    *
-   * @return \Drupal\Core\Extension\ThemeExtensionList
+   * @return ThemeExtensionList
    *   The ThemeExtensionList.
    */
   protected function extensionListTheme(): ThemeExtensionList {

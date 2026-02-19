@@ -29,28 +29,28 @@ class EntityTestDefinitionSubscriber implements EventSubscriberInterface, Entity
   /**
    * The state service.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
   /**
    * The last installed schema repository.
    *
-   * @var \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface
+   * @var EntityLastInstalledSchemaRepositoryInterface
    */
   protected $entityLastInstalledSchemaRepository;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 

@@ -16,14 +16,14 @@ class CsrfTokenController implements ContainerInjectionInterface {
   /**
    * The CSRF token generator.
    *
-   * @var \Drupal\Core\Access\CsrfTokenGenerator
+   * @var CsrfTokenGenerator
    */
   protected $tokenGenerator;
 
   /**
    * Constructs a new CsrfTokenController object.
    *
-   * @param \Drupal\Core\Access\CsrfTokenGenerator $token_generator
+   * @param CsrfTokenGenerator $token_generator
    *   The CSRF token generator.
    */
   public function __construct(CsrfTokenGenerator $token_generator) {
@@ -42,7 +42,7 @@ class CsrfTokenController implements ContainerInjectionInterface {
   /**
    * Returns a CSRF protecting session token.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   The response object.
    */
   public function csrfToken() {

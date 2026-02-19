@@ -51,7 +51,7 @@ class Views {
   /**
    * Returns the views data service.
    *
-   * @return \Drupal\views\ViewsData
+   * @return \Drupal\views\Entity\ViewsData
    *   Returns a views data cache object.
    */
   public static function viewsData() {
@@ -61,7 +61,7 @@ class Views {
   /**
    * Returns the views data helper service.
    *
-   * @return \Drupal\views\ViewsDataHelper
+   * @return \Drupal\views\Entity\ViewsDataHelper
    *   Returns a views data helper object.
    */
   public static function viewsDataHelper() {
@@ -71,7 +71,7 @@ class Views {
   /**
    * Returns the view executable factory service.
    *
-   * @return \Drupal\views\ViewExecutableFactory
+   * @return \Drupal\views\Entity\ViewExecutableFactory
    *   Returns a views executable factory.
    */
   public static function executableFactory() {
@@ -81,7 +81,7 @@ class Views {
   /**
    * Returns the view analyzer.
    *
-   * @return \Drupal\views\Analyzer
+   * @return Analyzer
    *   Returns a view analyzer object.
    */
   public static function analyzer() {
@@ -94,7 +94,7 @@ class Views {
    * @param string $type
    *   The plugin type, for example filter.
    *
-   * @return \Drupal\views\Plugin\ViewsPluginManager
+   * @return \Drupal\views\Entity\ViewsPluginManager
    *   The Views plugin manager service.
    *
    * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
@@ -114,7 +114,7 @@ class Views {
    * @param string $type
    *   The handler type, for example relationship, field, or filter.
    *
-   * @return \Drupal\views\Plugin\ViewsHandlerManager
+   * @return \Drupal\views\Entity\ViewsHandlerManager
    *   The Views plugin manager service.
    *
    * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
@@ -134,7 +134,7 @@ class Views {
    * @param string $id
    *   The view ID to load.
    *
-   * @return \Drupal\views\ViewExecutable|null
+   * @return \Drupal\views\Entity\ViewExecutable|null
    *   A view executable instance or NULL if the view does not exist.
    */
   public static function getView($id) {
@@ -309,7 +309,7 @@ class Views {
    * @param string $filter
    *   Filters the views on status. Can either be 'all' (default), 'enabled' or
    *   'disabled'.
-   * @param \Drupal\views\ViewExecutable|string $exclude_view
+   * @param ViewExecutable|string $exclude_view
    *   View or current display to exclude.
    *   Either a:
    *   - Views executable object.

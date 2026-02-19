@@ -48,7 +48,7 @@ class EntityTestTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    *
-   * @var \Drupal\entity_test\Entity\EntityTest
+   * @var EntityTest
    */
   protected $entity;
 

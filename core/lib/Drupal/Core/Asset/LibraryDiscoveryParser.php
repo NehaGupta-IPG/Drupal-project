@@ -12,12 +12,12 @@ use Drupal\Core\Asset\Exception\InvalidLibraryFileException;
 use Drupal\Core\Asset\Exception\LibraryDefinitionMissingLicenseException;
 use Drupal\Core\Extension\ExtensionPathResolver;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Plugin\Component;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
-use Drupal\Core\Theme\ComponentPluginManager;
 use Drupal\Core\Theme\ActiveTheme;
+use Drupal\Core\Theme\ComponentPluginManager;
 use Drupal\Core\Theme\ThemeManagerInterface;
-use Drupal\Core\Plugin\Component;
 
 /**
  * Parses library files to get extension data.
@@ -27,14 +27,14 @@ class LibraryDiscoveryParser {
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The theme manager.
    *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   * @var ThemeManagerInterface
    */
   protected $themeManager;
 
@@ -48,35 +48,35 @@ class LibraryDiscoveryParser {
   /**
    * The stream wrapper manager.
    *
-   * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface
+   * @var StreamWrapperManagerInterface
    */
   protected $streamWrapperManager;
 
   /**
    * The libraries directory file finder.
    *
-   * @var \Drupal\Core\Asset\LibrariesDirectoryFileFinder
+   * @var LibrariesDirectoryFileFinder
    */
   protected $librariesDirectoryFileFinder;
 
   /**
    * The component plugin manager.
    *
-   * @var \Drupal\Core\Theme\ComponentPluginManager
+   * @var ComponentPluginManager
    */
   protected $componentPluginManager;
 
   /**
    * The extension path resolver.
    *
-   * @var \Drupal\Core\Extension\ExtensionPathResolver
+   * @var ExtensionPathResolver
    */
   protected $extensionPathResolver;
 
   /**
    * The file cache.
    *
-   * @var \Drupal\Component\FileCache\FileCacheInterface
+   * @var FileCacheInterface
    */
   protected FileCacheInterface $fileCache;
 
@@ -85,17 +85,17 @@ class LibraryDiscoveryParser {
    *
    * @param string $root
    *   The app root.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
+   * @param ThemeManagerInterface $theme_manager
    *   The theme manager.
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager
+   * @param StreamWrapperManagerInterface $stream_wrapper_manager
    *   The stream wrapper manager.
-   * @param \Drupal\Core\Asset\LibrariesDirectoryFileFinder $libraries_directory_file_finder
+   * @param LibrariesDirectoryFileFinder $libraries_directory_file_finder
    *   The libraries directory file finder.
-   * @param \Drupal\Core\Extension\ExtensionPathResolver $extension_path_resolver
+   * @param ExtensionPathResolver $extension_path_resolver
    *   The extension path resolver.
-   * @param \Drupal\Core\Theme\ComponentPluginManager $component_plugin_manager
+   * @param ComponentPluginManager $component_plugin_manager
    *   The component plugin manager.
    */
   public function __construct($root, ModuleHandlerInterface $module_handler, ThemeManagerInterface $theme_manager, StreamWrapperManagerInterface $stream_wrapper_manager, LibrariesDirectoryFileFinder $libraries_directory_file_finder, ExtensionPathResolver $extension_path_resolver, ComponentPluginManager $component_plugin_manager) {
@@ -118,7 +118,7 @@ class LibraryDiscoveryParser {
    * @return array
    *   All library definitions of the passed extension.
    *
-   * @throws \Drupal\Core\Asset\Exception\IncompleteLibraryDefinitionException
+   * @throws IncompleteLibraryDefinitionException
    *   Thrown when a library has no js/css/setting.
    * @throws \UnexpectedValueException
    *   Thrown when a js file defines a positive weight.
@@ -130,7 +130,7 @@ class LibraryDiscoveryParser {
    *   Thrown when the library file is invalid.
    * @throws \InvalidLibrariesOverrideSpecificationException
    *   Thrown when a definition refers to a non-existent library.
-   * @throws \Drupal\Core\Asset\Exception\LibraryDefinitionMissingLicenseException
+   * @throws LibraryDefinitionMissingLicenseException
    *   Thrown when a library definition has no license information.
    * @throws \LogicException
    *   Thrown when a header key in a library definition is invalid.
@@ -379,7 +379,7 @@ class LibraryDiscoveryParser {
    * @return array
    *   An array of parsed library data.
    *
-   * @throws \Drupal\Core\Asset\Exception\InvalidLibraryFileException
+   * @throws InvalidLibraryFileException
    *   Thrown when a parser exception got thrown.
    */
   protected function parseLibraryInfo($extension, $path) {
@@ -433,7 +433,7 @@ class LibraryDiscoveryParser {
    *   The extension name.
    * @param array $overrides
    *   The library overrides.
-   * @param \Drupal\Core\Theme\ActiveTheme $active_theme
+   * @param ActiveTheme $active_theme
    *   The active theme.
    *
    * @return array

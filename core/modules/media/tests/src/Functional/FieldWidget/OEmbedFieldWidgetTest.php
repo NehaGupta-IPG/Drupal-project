@@ -36,7 +36,7 @@ class OEmbedFieldWidgetTest extends MediaFunctionalTestBase {
       ->getSourceFieldDefinition($media_type)
       ->getName();
 
-    /** @var \Drupal\field\Entity\FieldConfig $field */
+    /** @var FieldConfig $field */
     $field = FieldConfig::loadByName('media', $media_type->id(), $source_field);
     $field->setDescription('This is help text for oEmbed field.')
       ->save();

@@ -22,7 +22,7 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
   /**
    * The exposed form cache.
    *
-   * @var \Drupal\views\ExposedFormCache
+   * @var ExposedFormCache
    */
   protected $exposedFormCache;
 
@@ -30,16 +30,16 @@ class ViewsExposedForm extends FormBase implements WorkspaceSafeFormInterface {
   /**
    * The current path stack.
    *
-   * @var \Drupal\Core\Path\CurrentPathStack
+   * @var CurrentPathStack
    */
   protected $currentPathStack;
 
   /**
    * Constructs a new ViewsExposedForm.
    *
-   * @param \Drupal\views\ExposedFormCache $exposed_form_cache
+   * @param ExposedFormCache $exposed_form_cache
    *   The exposed form cache.
-   * @param \Drupal\Core\Path\CurrentPathStack $current_path_stack
+   * @param CurrentPathStack $current_path_stack
    *   The current path stack.
    */
   public function __construct(ExposedFormCache $exposed_form_cache, CurrentPathStack $current_path_stack) {

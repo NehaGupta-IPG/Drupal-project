@@ -22,7 +22,7 @@ class DynamicPageCacheTestController {
   /**
    * A route returning a Response object.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   A Response object.
    */
   public function response() {
@@ -59,7 +59,7 @@ class DynamicPageCacheTestController {
   /**
    * A route returning a render array (with cache contexts, so cacheable).
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    *
    * @return array
@@ -144,7 +144,7 @@ class DynamicPageCacheTestController {
   /**
    * Returns an uncacheable access result.
    *
-   * @return \Drupal\Core\Access\AccessResultInterface
+   * @return AccessResultInterface
    *   The access result.
    */
   public function uncacheableAccessCheck(): AccessResultInterface {

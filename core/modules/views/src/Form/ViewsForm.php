@@ -28,21 +28,21 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
   /**
    * The class resolver to get the subform form objects.
    *
-   * @var \Drupal\Core\DependencyInjection\ClassResolverInterface
+   * @var ClassResolverInterface
    */
   protected $classResolver;
 
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * The URL generator to generate the form action.
    *
-   * @var \Drupal\Core\Routing\UrlGeneratorInterface
+   * @var UrlGeneratorInterface
    */
   protected $urlGenerator;
 
@@ -70,11 +70,11 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
   /**
    * Constructs a ViewsForm object.
    *
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $class_resolver
+   * @param ClassResolverInterface $class_resolver
    *   The class resolver to get the subform form objects.
-   * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
+   * @param UrlGeneratorInterface $url_generator
    *   The URL generator to generate the form action.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   * @param RequestStack $requestStack
    *   The request stack.
    * @param string $view_id
    *   The ID of the view.
@@ -193,10 +193,10 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
   /**
    * Returns the object used to build the step form.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form_state of the current form.
    *
-   * @return \Drupal\Core\Form\FormInterface
+   * @return FormInterface
    *   The form object to use.
    */
   protected function getFormObject(FormStateInterface $form_state) {

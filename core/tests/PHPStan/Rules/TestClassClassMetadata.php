@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Rules class-level PHPUnit test metadata in test classes.
  *
- * @implements Rule<\PHPStan\Node\InClassNode>
+ * @implements Rule<InClassNode>
  *
  * @internal
  */

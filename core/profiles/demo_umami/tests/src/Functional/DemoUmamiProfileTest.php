@@ -116,9 +116,9 @@ class DemoUmamiProfileTest extends BrowserTestBase {
   /**
    * Asserts that the default configuration matches active configuration.
    *
-   * @param \Drupal\Core\Config\StorageInterface $default_config_storage
+   * @param StorageInterface $default_config_storage
    *   The default configuration storage to check.
-   * @param \Drupal\Core\Config\StorageInterface $active_config_storage
+   * @param StorageInterface $active_config_storage
    *   The active configuration storage.
    */
   protected function assertDefaultConfig(StorageInterface $default_config_storage, StorageInterface $active_config_storage): void {
@@ -240,7 +240,7 @@ class DemoUmamiProfileTest extends BrowserTestBase {
    *   $account->passRaw = $pass_raw;
    * @endcode
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   User object representing the user to log in.
    * @param string $password
    *   The password to authenticate the user with.

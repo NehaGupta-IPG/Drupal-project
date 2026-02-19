@@ -24,7 +24,7 @@ class Image implements ImageInterface {
   /**
    * An image toolkit object.
    *
-   * @var \Drupal\Core\ImageToolkit\ImageToolkitInterface
+   * @var ImageToolkitInterface
    */
   protected $toolkit;
 
@@ -38,7 +38,7 @@ class Image implements ImageInterface {
   /**
    * Constructs a new Image object.
    *
-   * @param \Drupal\Core\ImageToolkit\ImageToolkitInterface $toolkit
+   * @param ImageToolkitInterface $toolkit
    *   The image toolkit.
    * @param string|null $source
    *   (optional) The path to an image file, or NULL to construct the object

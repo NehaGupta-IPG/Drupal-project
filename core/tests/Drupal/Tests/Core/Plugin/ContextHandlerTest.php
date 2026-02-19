@@ -36,7 +36,7 @@ class ContextHandlerTest extends UnitTestCase {
   /**
    * The context handler.
    *
-   * @var \Drupal\Core\Plugin\Context\ContextHandler
+   * @var ContextHandler
    */
   protected $contextHandler;
 

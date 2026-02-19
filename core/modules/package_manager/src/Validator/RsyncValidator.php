@@ -34,7 +34,7 @@ final class RsyncValidator implements EventSubscriberInterface {
   /**
    * Checks that rsync is available.
    *
-   * @param \Drupal\package_manager\Event\SandboxValidationEvent $event
+   * @param SandboxValidationEvent $event
    *   The event being handled.
    */
   public function validate(SandboxValidationEvent $event): void {

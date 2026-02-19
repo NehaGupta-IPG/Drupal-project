@@ -57,34 +57,34 @@ class PermissionHandler implements PermissionHandlerInterface {
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The YAML discovery class to find all .permissions.yml files.
    *
-   * @var \Drupal\Core\Discovery\YamlDiscovery
+   * @var YamlDiscovery
    */
   protected $yamlDiscovery;
 
   /**
    * The callable resolver.
    *
-   * @var \Drupal\Core\Utility\CallableResolver
+   * @var CallableResolver
    */
   protected CallableResolver $callableResolver;
 
   /**
    * Constructs a new PermissionHandler.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param TranslationInterface $string_translation
    *   The string translation.
-   * @param \Drupal\Core\Utility\CallableResolver $callable_resolver
+   * @param CallableResolver $callable_resolver
    *   The callable resolver.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
+   * @param ModuleExtensionList $moduleExtensionList
    *   The module extension list.
    */
   public function __construct(ModuleHandlerInterface $module_handler, TranslationInterface $string_translation, CallableResolver $callable_resolver, protected ModuleExtensionList $moduleExtensionList) {
@@ -99,7 +99,7 @@ class PermissionHandler implements PermissionHandlerInterface {
   /**
    * Gets the YAML discovery.
    *
-   * @return \Drupal\Core\Discovery\YamlDiscovery
+   * @return YamlDiscovery
    *   The YAML discovery.
    */
   protected function getYamlDiscovery() {

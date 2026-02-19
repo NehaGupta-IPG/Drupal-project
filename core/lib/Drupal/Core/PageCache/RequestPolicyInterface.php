@@ -36,7 +36,7 @@ interface RequestPolicyInterface {
    * When matching against the request path, special attention is needed to
    * support path prefixes which are often used on multilingual sites.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The incoming request object.
    *
    * @return string|null

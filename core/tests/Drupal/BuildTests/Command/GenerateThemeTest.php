@@ -48,7 +48,7 @@ class GenerateThemeTest extends QuickStartTestBase {
   /**
    * Generates PHP process to generate a theme from core's starterkit theme.
    *
-   * @return \Symfony\Component\Process\Process
+   * @return Process
    *   The PHP process
    */
   private function generateThemeFromStarterkit($env = NULL) : Process {

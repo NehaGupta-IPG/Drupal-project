@@ -30,7 +30,7 @@ class FieldNormalizer extends ListNormalizer implements DenormalizerInterface {
       throw new InvalidArgumentException('The field passed in via $context[\'target_instance\'] must have a parent set.');
     }
 
-    /** @var \Drupal\Core\Field\FieldItemListInterface $items */
+    /** @var FieldItemListInterface $items */
     $items = $context['target_instance'];
     $item_class = $items->getItemDefinition()->getClass();
 

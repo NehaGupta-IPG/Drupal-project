@@ -14,7 +14,7 @@ trait EnableLayoutBuilderTrait {
   /**
    * Enables Layout Builder on an entity view display.
    *
-   * @param \Drupal\layout_builder\Entity\LayoutEntityDisplayInterface $display
+   * @param LayoutEntityDisplayInterface $display
    *   The entity view display.
    */
   protected function enableLayoutBuilder(LayoutEntityDisplayInterface $display): void {

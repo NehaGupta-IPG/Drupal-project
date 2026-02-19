@@ -37,21 +37,21 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
   /**
    * The entity under test.
    *
-   * @var \Drupal\Core\Config\Entity\ConfigEntityBase|\PHPUnit\Framework\MockObject\MockObject
+   * @var ConfigEntityBase|MockObject
    */
   protected $entity;
 
   /**
    * The entity type used for testing.
    *
-   * @var \Drupal\Core\Config\Entity\ConfigEntityTypeInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Config\Entity\ConfigEntityTypeInterface|MockObject
    */
   protected $entityType;
 
   /**
    * The entity type manager used for testing.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityTypeManagerInterface|MockObject
    */
   protected $entityTypeManager;
 
@@ -65,7 +65,7 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
   /**
    * The UUID generator used for testing.
    *
-   * @var \Drupal\Component\Uuid\UuidInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Component\Uuid\UuidInterface|MockObject
    */
   protected $uuid;
 
@@ -77,7 +77,7 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Language\LanguageManagerInterface|MockObject
    */
   protected $languageManager;
 
@@ -91,28 +91,28 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
   /**
    * The mocked cache backend.
    *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface|MockObject
    */
   protected $cacheTagsInvalidator;
 
   /**
    * The mocked typed config manager.
    *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Config\TypedConfigManagerInterface|MockObject
    */
   protected $typedConfigManager;
 
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var ModuleHandlerInterface|ProphecyInterface
    */
   protected $moduleHandler;
 
   /**
    * The theme handler.
    *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var ThemeHandlerInterface|ProphecyInterface
    */
   protected $themeHandler;
 
@@ -453,10 +453,10 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
   /**
    * Get a mock entity with a plugin collection.
    *
-   * @param \Drupal\Component\Plugin\PluginBase $plugin
+   * @param PluginBase $plugin
    *   A plugin the entity will have a collection containing.
    *
-   * @return \Drupal\Core\Config\Entity\ConfigEntityBase|\PHPUnit\Framework\MockObject\MockObject
+   * @return ConfigEntityBase|MockObject
    *   A mock entity with a plugin collection containing the given plugin.
    */
   protected function getMockEntityWithPluginCollection(PluginBase $plugin): ConfigEntityBase|MockObject {
@@ -919,14 +919,14 @@ class TestConfigEntityWithPluginCollections extends ConfigEntityBaseWithPluginCo
   /**
    * The plugin collection.
    *
-   * @var \Drupal\Core\Plugin\DefaultLazyPluginCollection
+   * @var DefaultLazyPluginCollection
    */
   protected $pluginCollection;
 
   /**
    * The plugin manager.
    *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var PluginManagerInterface|MockObject
    */
   protected $pluginManager;
 

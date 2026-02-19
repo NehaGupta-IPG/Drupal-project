@@ -5,8 +5,8 @@ namespace Drupal\jsonapi\Normalizer;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\jsonapi\JsonApiResource\LinkCollection;
 use Drupal\jsonapi\JsonApiResource\Link;
+use Drupal\jsonapi\JsonApiResource\LinkCollection;
 use Drupal\jsonapi\Normalizer\Value\CacheableNormalization;
 use Drupal\jsonapi\Normalizer\Value\CacheableOmission;
 
@@ -64,14 +64,14 @@ class LinkCollectionNormalizer extends NormalizerBase {
   /**
    * The current user making the request.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
   /**
    * LinkCollectionNormalizer constructor.
    *
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
    */
   public function __construct(AccountInterface $current_user) {
@@ -84,7 +84,7 @@ class LinkCollectionNormalizer extends NormalizerBase {
   public function normalize($object, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
     assert($object instanceof LinkCollection);
     $normalized = [];
-    /** @var \Drupal\jsonapi\JsonApiResource\Link $link */
+    /** @var Link $link */
     foreach ($object as $key => $links) {
       $is_multiple = count($links) > 1;
       foreach ($links as $link) {
@@ -119,7 +119,7 @@ class LinkCollectionNormalizer extends NormalizerBase {
    * with the same href and target attributes (i.o.w. duplicates) will generate
    * equivalent hash values.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\Link $link
+   * @param Link $link
    *   A link to be hashed.
    *
    * @return string

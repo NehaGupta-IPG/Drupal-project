@@ -12,7 +12,7 @@ namespace Drupal\Core\TypedData;
  * IteratorAggregate or Iterator before this interface in the implements clause.
  *
  * @template T of \Drupal\Core\TypedData\TypedDataInterface
- * @extends \Drupal\Core\TypedData\TraversableTypedDataInterface<int, T>
+ * @extends TraversableTypedDataInterface<int, T>
  * @extends \ArrayAccess<int, T>
  *
  * @see \Drupal\Core\TypedData\ListDataDefinitionInterface
@@ -24,7 +24,7 @@ interface ListInterface extends TraversableTypedDataInterface, \ArrayAccess, \Co
   /**
    * Gets the data definition.
    *
-   * @return \Drupal\Core\TypedData\ListDataDefinitionInterface
+   * @return ListDataDefinitionInterface
    *   The data definition object describing the list.
    */
   public function getDataDefinition();
@@ -40,7 +40,7 @@ interface ListInterface extends TraversableTypedDataInterface, \ArrayAccess, \Co
   /**
    * Gets the definition of a contained item.
    *
-   * @return \Drupal\Core\TypedData\DataDefinitionInterface
+   * @return DataDefinitionInterface
    *   The data definition of contained items.
    */
   public function getItemDefinition();
@@ -51,13 +51,13 @@ interface ListInterface extends TraversableTypedDataInterface, \ArrayAccess, \Co
    * @param int $index
    *   Index of the item to return.
    *
-   * @return \Drupal\Core\TypedData\TypedDataInterface|null
+   * @return TypedDataInterface|null
    *   The item at the specified position in this list, or NULL if no item
    *   exists at that position.
    *
    * @phpstan-return ?T
    *
-   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+   * @throws MissingDataException
    *   If the complex data structure is unset and no item can be created.
    */
   public function get($index);
@@ -81,7 +81,7 @@ interface ListInterface extends TraversableTypedDataInterface, \ArrayAccess, \Co
    * @throws \InvalidArgumentException
    *   If the $index is invalid (non-numeric, or pointing to an invalid
    *   position in the list).
-   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+   * @throws MissingDataException
    *   If the complex data structure is unset and no item can be set.
    */
   public function set($index, $value);
@@ -89,12 +89,12 @@ interface ListInterface extends TraversableTypedDataInterface, \ArrayAccess, \Co
   /**
    * Returns the first item in this list.
    *
-   * @return \Drupal\Core\TypedData\TypedDataInterface|null
+   * @return TypedDataInterface|null
    *   The first item in this list, or NULL if there are no items.
    *
    * @phpstan-return ?T
    *
-   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
+   * @throws MissingDataException
    *   If the complex data structure is unset and no item can be created.
    */
   public function first();
@@ -102,7 +102,7 @@ interface ListInterface extends TraversableTypedDataInterface, \ArrayAccess, \Co
   /**
    * Returns the last item in this list.
    *
-   * @return \Drupal\Core\TypedData\TypedDataInterface|null
+   * @return TypedDataInterface|null
    *   The last item in this list, or NULL if there are no items.
    *
    * @phpstan-return ?T
@@ -115,7 +115,7 @@ interface ListInterface extends TraversableTypedDataInterface, \ArrayAccess, \Co
    * @param mixed $value
    *   The value of the new item.
    *
-   * @return \Drupal\Core\TypedData\TypedDataInterface
+   * @return TypedDataInterface
    *   The item that was appended.
    *
    * @phpstan-return T

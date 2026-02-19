@@ -1,14 +1,13 @@
 <?php
 
+use Drupal\block\Entity\Block;
+use Drupal\Core\Access\AccessResult;
 /**
  * @file
  * Hooks provided by the Block module.
  */
-
 use Drupal\Core\Block\BlockPluginInterface;
-use Drupal\block\Entity\Block;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Access\AccessResult;
 
 /**
  * @defgroup block_api Block API
@@ -83,7 +82,6 @@ use Drupal\Core\Access\AccessResult;
  *   https://www.drupal.org/project/examples.
  * @}
  */
-
 /**
  * @addtogroup hooks
  * @{
@@ -111,7 +109,7 @@ use Drupal\Core\Access\AccessResult;
  *   A renderable array of data, as returned from the build() implementation of
  *   the plugin that defined the block:
  *   - #title: The default localized title of the block.
- * @param \Drupal\Core\Block\BlockPluginInterface $block
+ * @param BlockPluginInterface $block
  *   The block plugin instance.
  *
  * @see hook_block_view_BASE_BLOCK_ID_alter()
@@ -141,7 +139,7 @@ function hook_block_view_alter(array &$build, BlockPluginInterface $block) {
  *   A renderable array of data, as returned from the build() implementation of
  *   the plugin that defined the block:
  *   - #title: The default localized title of the block.
- * @param \Drupal\Core\Block\BlockPluginInterface $block
+ * @param BlockPluginInterface $block
  *   The block plugin instance.
  *
  * @see hook_block_view_alter()
@@ -168,7 +166,7 @@ function hook_block_view_BASE_BLOCK_ID_alter(array &$build, BlockPluginInterface
  *
  * @param array &$build
  *   A renderable array of data, only containing #cache.
- * @param \Drupal\Core\Block\BlockPluginInterface $block
+ * @param BlockPluginInterface $block
  *   The block plugin instance.
  *
  * @see hook_block_build_BASE_BLOCK_ID_alter()
@@ -196,7 +194,7 @@ function hook_block_build_alter(array &$build, BlockPluginInterface $block) {
  *
  * @param array $build
  *   A renderable array of data, only containing #cache.
- * @param \Drupal\Core\Block\BlockPluginInterface $block
+ * @param BlockPluginInterface $block
  *   The block plugin instance.
  *
  * @see hook_block_build_alter()
@@ -215,12 +213,12 @@ function hook_block_build_BASE_BLOCK_ID_alter(array &$build, BlockPluginInterfac
  * Modules may implement this hook if they want to have a say in whether or not
  * a given user has access to perform a given operation on a block instance.
  *
- * @param \Drupal\block\Entity\Block $block
+ * @param Block $block
  *   The block instance.
  * @param string $operation
  *   The operation to be performed; for instance, 'view', 'create', 'delete', or
  *   'update'.
- * @param \Drupal\Core\Session\AccountInterface $account
+ * @param AccountInterface $account
  *   The user object to perform the access check operation on.
  *
  * @return \Drupal\Core\Access\AccessResultInterface

@@ -266,7 +266,7 @@ class ContextDefinition implements ContextDefinitionInterface {
   /**
    * Checks if this definition's data type matches that of the given context.
    *
-   * @param \Drupal\Core\Plugin\Context\ContextInterface $context
+   * @param ContextInterface $context
    *   The context to test against.
    *
    * @return bool

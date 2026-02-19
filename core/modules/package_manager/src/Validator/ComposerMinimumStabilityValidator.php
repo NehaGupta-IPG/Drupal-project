@@ -32,7 +32,7 @@ final class ComposerMinimumStabilityValidator implements EventSubscriberInterfac
   /**
    * Validates composer minimum stability.
    *
-   * @param \Drupal\package_manager\Event\PreRequireEvent $event
+   * @param PreRequireEvent $event
    *   The stage event.
    */
   public function validate(PreRequireEvent $event): void {

@@ -45,14 +45,14 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   /**
    * The entity type's field storage definitions.
    *
-   * @var \Drupal\Core\Field\FieldStorageDefinitionInterface[]
+   * @var FieldStorageDefinitionInterface[]
    */
   protected $fieldStorageDefinitions;
 
   /**
    * The mapping of field columns to SQL tables.
    *
-   * @var \Drupal\Core\Entity\Sql\TableMappingInterface
+   * @var TableMappingInterface
    */
   protected $tableMapping;
 
@@ -110,7 +110,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   /**
    * Active database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $database;
 
@@ -124,14 +124,14 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
@@ -161,21 +161,21 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   /**
    * Constructs a SqlContentEntityStorage object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Database\Connection $database
+   * @param Connection $database
    *   The database connection to be used.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @param EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The cache backend to be used.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache
+   * @param MemoryCacheInterface $memory_cache
    *   The memory cache backend to be used.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle info.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(EntityTypeInterface $entity_type, Connection $database, EntityFieldManagerInterface $entity_field_manager, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, MemoryCacheInterface $memory_cache, EntityTypeBundleInfoInterface $entity_type_bundle_info, EntityTypeManagerInterface $entity_type_manager) {
@@ -262,7 +262,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   /**
    * Gets the entity type's storage schema object.
    *
-   * @return \Drupal\Core\Entity\Sql\SqlContentEntityStorageSchema
+   * @return SqlContentEntityStorageSchema
    *   The schema object.
    */
   protected function getStorageSchema() {
@@ -276,7 +276,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   /**
    * Updates the wrapped entity type definition.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The update entity type.
    *
    * @internal Only to be used internally by Entity API. Expected to be
@@ -295,7 +295,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   /**
    * Updates the internal list of field storage definitions.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface[] $field_storage_definitions
+   * @param FieldStorageDefinitionInterface[] $field_storage_definitions
    *   An array of field storage definitions.
    *
    * @internal Only to be used internally by Entity API.
@@ -313,7 +313,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   /**
    * Sets the wrapped table mapping definition.
    *
-   * @param \Drupal\Core\Entity\Sql\TableMappingInterface $table_mapping
+   * @param TableMappingInterface $table_mapping
    *   The table mapping.
    *
    * @internal Only to be used internally by Entity API. Expected to be removed
@@ -363,16 +363,16 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   /**
    * Gets a table mapping for the specified entity type and storage definitions.
    *
-   * @param \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type
+   * @param ContentEntityTypeInterface $entity_type
    *   An entity type definition.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface[] $storage_definitions
+   * @param FieldStorageDefinitionInterface[] $storage_definitions
    *   An array of field storage definitions to be used to compute the table
    *   mapping.
    * @param string $prefix
    *   (optional) A prefix to be used by all the tables of this mapping.
    *   Defaults to an empty string.
    *
-   * @return \Drupal\Core\Entity\Sql\TableMappingInterface
+   * @return TableMappingInterface
    *   A table mapping object for the entity's tables.
    *
    * @internal
@@ -406,7 +406,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    *   If not empty, return entities that match these IDs. Return all entities
    *   when NULL.
    *
-   * @return \Drupal\Core\Entity\ContentEntityInterface[]
+   * @return ContentEntityInterface[]
    *   Array of entities from the storage.
    */
   protected function getFromStorage(?array $ids = NULL) {
@@ -824,7 +824,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       $transaction = $this->database->startTransaction();
       // Insert the entity data in the base and data tables only for default
       // revisions.
-      /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+      /** @var ContentEntityInterface $entity */
       if ($entity->isDefaultRevision()) {
         $record = $this->mapToStorageRecord($entity->getUntranslated(), $this->baseTable);
         $this->database
@@ -979,7 +979,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   /**
    * Saves fields that use the shared tables.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity object.
    * @param string $table_name
    *   (optional) The table name to save to. Defaults to the data table.
@@ -1022,7 +1022,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   /**
    * Maps from an entity object to the storage record.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity object.
    * @param string $table_name
    *   (optional) The table name to map records to. Defaults to the base table.
@@ -1111,7 +1111,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   /**
    * Maps from an entity object to the storage record of the field data.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity object.
    * @param string $table_name
    *   (optional) The table name to map records to. Defaults to the data table.
@@ -1130,7 +1130,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   /**
    * Saves an entity revision.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity object.
    *
    * @return int
@@ -1396,7 +1396,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   /**
    * Saves values of fields that use dedicated tables.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity.
    * @param bool $update
    *   TRUE if the entity is being updated, FALSE if it is being inserted.
@@ -1565,7 +1565,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
   /**
    * Deletes values of fields in dedicated tables for all revisions.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity. It must have a revision ID.
    */
   protected function deleteRevisionFromDedicatedTables(ContentEntityInterface $entity) {
@@ -1719,7 +1719,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
    * @param callable $callback
    *   The callback to be executed.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   When a database schema exception is thrown.
    */
   protected function wrapSchemaException(callable $callback) {

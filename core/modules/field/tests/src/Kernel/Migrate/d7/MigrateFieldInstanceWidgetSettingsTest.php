@@ -55,7 +55,7 @@ class MigrateFieldInstanceWidgetSettingsTest extends MigrateDrupal7TestBase {
    * @internal
    */
   protected function assertEntity(string $id, string $expected_entity_type, string $expected_bundle): void {
-    /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity */
+    /** @var EntityFormDisplayInterface $entity */
     $entity = EntityFormDisplay::load($id);
     $this->assertInstanceOf(EntityFormDisplayInterface::class, $entity);
     $this->assertSame($expected_entity_type, $entity->getTargetEntityTypeId());

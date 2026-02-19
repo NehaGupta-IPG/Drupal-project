@@ -11,8 +11,8 @@ use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext as SymfonyRequestContext;
+use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -23,32 +23,32 @@ class AccessAwareRouter implements AccessAwareRouterInterface {
   /**
    * The router doing the actual routing.
    *
-   * @var \Symfony\Component\Routing\RouterInterface
+   * @var RouterInterface
    */
   protected $router;
 
   /**
    * The access manager.
    *
-   * @var \Drupal\Core\Access\AccessManagerInterface
+   * @var AccessManagerInterface
    */
   protected $accessManager;
 
   /**
    * The account to use in access checks.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $account;
 
   /**
    * Constructs a router for Drupal with access check and upcasting.
    *
-   * @param \Symfony\Component\Routing\RouterInterface $router
+   * @param RouterInterface $router
    *   The router doing the actual routing.
-   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
+   * @param AccessManagerInterface $access_manager
    *   The access manager.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The account to use in access checks.
    */
   public function __construct(RouterInterface $router, AccessManagerInterface $access_manager, AccountInterface $account) {
@@ -82,7 +82,7 @@ class AccessAwareRouter implements AccessAwareRouterInterface {
   /**
    * {@inheritdoc}
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   * @throws AccessDeniedHttpException
    *   Thrown when access checking failed.
    */
   public function matchRequest(Request $request): array {
@@ -97,7 +97,7 @@ class AccessAwareRouter implements AccessAwareRouterInterface {
   /**
    * Apply access check service to the route and parameters in the request.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request to access check.
    */
   protected function checkAccess(Request $request) {
@@ -136,7 +136,7 @@ class AccessAwareRouter implements AccessAwareRouterInterface {
   /**
    * {@inheritdoc}
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   * @throws AccessDeniedHttpException
    *   Thrown when access checking failed.
    */
   public function match($pathinfo): array {

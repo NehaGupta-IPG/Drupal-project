@@ -14,14 +14,14 @@ class CronController extends ControllerBase {
   /**
    * The cron service.
    *
-   * @var \Drupal\Core\CronInterface
+   * @var CronInterface
    */
   protected $cron;
 
   /**
    * Constructs a CronController object.
    *
-   * @param \Drupal\Core\CronInterface $cron
+   * @param CronInterface $cron
    *   The cron service.
    */
   public function __construct(CronInterface $cron) {
@@ -31,7 +31,7 @@ class CronController extends ControllerBase {
   /**
    * Run Cron once.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   A Symfony response object.
    */
   public function run() {

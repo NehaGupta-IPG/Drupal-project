@@ -8,14 +8,14 @@ use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\Core\Utility\LinkGeneratorInterface;
 use Drupal\file\FileInterface;
 use Drupal\image\Plugin\Field\FieldFormatter\ImageFormatterBase;
 use Drupal\responsive_image\Entity\ResponsiveImageStyle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Utility\LinkGeneratorInterface;
 
 /**
  * Plugin for responsive image formatter.
@@ -30,28 +30,28 @@ use Drupal\Core\Utility\LinkGeneratorInterface;
 class ResponsiveImageFormatter extends ImageFormatterBase {
 
   /**
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var EntityStorageInterface
    */
   protected $responsiveImageStyleStorage;
 
   /**
    * The image style entity storage.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var EntityStorageInterface
    */
   protected $imageStyleStorage;
 
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
   /**
    * The link generator.
    *
-   * @var \Drupal\Core\Utility\LinkGeneratorInterface
+   * @var LinkGeneratorInterface
    */
   protected $linkGenerator;
 
@@ -62,7 +62,7 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
    *   The plugin ID for the formatter.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The definition of the field to which the formatter is associated.
    * @param array $settings
    *   The formatter settings.
@@ -72,13 +72,13 @@ class ResponsiveImageFormatter extends ImageFormatterBase {
    *   The view mode.
    * @param array $third_party_settings
    *   Any third party settings.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $responsive_image_style_storage
+   * @param EntityStorageInterface $responsive_image_style_storage
    *   The responsive image style storage.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $image_style_storage
+   * @param EntityStorageInterface $image_style_storage
    *   The image style storage.
-   * @param \Drupal\Core\Utility\LinkGeneratorInterface $link_generator
+   * @param LinkGeneratorInterface $link_generator
    *   The link generator service.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
    */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, EntityStorageInterface $responsive_image_style_storage, EntityStorageInterface $image_style_storage, LinkGeneratorInterface $link_generator, AccountInterface $current_user) {

@@ -21,14 +21,14 @@ class TaxonomyPermissions implements ContainerInjectionInterface {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * Constructs a TaxonomyPermissions instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
@@ -55,7 +55,7 @@ class TaxonomyPermissions implements ContainerInjectionInterface {
   /**
    * Builds a standard list of taxonomy term permissions for a given vocabulary.
    *
-   * @param \Drupal\taxonomy\VocabularyInterface $vocabulary
+   * @param VocabularyInterface $vocabulary
    *   The vocabulary.
    *
    * @return array

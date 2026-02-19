@@ -3,10 +3,10 @@
 namespace Drupal\Core\Render\MainContent;
 
 use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\OpenOffCanvasDialogCommand;
 use Drupal\Core\Controller\TitleResolverInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Ajax\OpenOffCanvasDialogCommand;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -19,7 +19,7 @@ class OffCanvasRenderer extends DialogRenderer {
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
@@ -33,9 +33,9 @@ class OffCanvasRenderer extends DialogRenderer {
   /**
    * Constructs a new OffCanvasRenderer.
    *
-   * @param \Drupal\Core\Controller\TitleResolverInterface $title_resolver
+   * @param TitleResolverInterface $title_resolver
    *   The title resolver.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
    * @param string $position
    *   (optional) The position to render the off-canvas dialog.

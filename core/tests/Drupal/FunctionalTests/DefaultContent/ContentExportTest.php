@@ -331,7 +331,7 @@ class ContentExportTest extends BrowserTestBase {
     $entity_storage->resetCache([$page->id(), $article->id()]);
     $article = $entity_storage->load($article->id());
 
-    /** @var \Drupal\Core\DefaultContent\Exporter $exporter */
+    /** @var Exporter $exporter */
     $exporter = $this->container->get(Exporter::class);
     $logger = new TestLogger();
     $exporter->setLogger($logger);
@@ -368,7 +368,7 @@ class ContentExportTest extends BrowserTestBase {
     $logger = new TestLogger();
     $this->container->get('logger.factory')->addLogger($logger);
 
-    /** @var \Drupal\Core\DefaultContent\Exporter $exporter */
+    /** @var Exporter $exporter */
     $exporter = $this->container->get(Exporter::class);
     $attachments = $exporter->export($file)->metadata->getAttachments();
     // The export succeeded without throwing an exception, but the physical file

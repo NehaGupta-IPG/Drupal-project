@@ -2,13 +2,13 @@
 
 namespace Drupal\search\Entity;
 
-use Drupal\Core\Entity\Attribute\ConfigEntityType;
-use Drupal\Core\Entity\EntityDeleteForm;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
+use Drupal\Core\Entity\Attribute\ConfigEntityType;
+use Drupal\Core\Entity\EntityDeleteForm;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\search\Form\SearchPageAddForm;
 use Drupal\search\Form\SearchPageEditForm;
 use Drupal\search\Plugin\SearchIndexingInterface;
@@ -113,7 +113,7 @@ class SearchPage extends ConfigEntityBase implements SearchPageInterface, Entity
   /**
    * The plugin collection that stores search plugins.
    *
-   * @var \Drupal\search\Plugin\SearchPluginCollection
+   * @var SearchPluginCollection
    */
   protected $pluginCollection;
 
@@ -220,7 +220,7 @@ class SearchPage extends ConfigEntityBase implements SearchPageInterface, Entity
    */
   public static function sort(ConfigEntityInterface $a, ConfigEntityInterface $b) {
     /** @var \Drupal\search\SearchPageInterface $a */
-    /** @var \Drupal\search\SearchPageInterface $b */
+    /** @var SearchPageInterface $b */
     $a_status = (int) $a->status();
     $b_status = (int) $b->status();
     if ($a_status != $b_status) {

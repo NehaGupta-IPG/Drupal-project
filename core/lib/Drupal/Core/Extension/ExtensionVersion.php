@@ -48,7 +48,7 @@ final class ExtensionVersion {
    * @param string $version_string
    *   The version string.
    *
-   * @return \Drupal\Core\Extension\ExtensionVersion
+   * @return ExtensionVersion
    *   The extension version instance.
    */
   public static function createFromVersionString(string $version_string): ExtensionVersion {
@@ -115,7 +115,7 @@ final class ExtensionVersion {
    * @param string $branch
    *   The support branch.
    *
-   * @return \Drupal\Core\Extension\ExtensionVersion
+   * @return ExtensionVersion
    *   The ExtensionVersion instance.
    */
   public static function createFromSupportBranch(string $branch): ExtensionVersion {

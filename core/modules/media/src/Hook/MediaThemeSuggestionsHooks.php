@@ -2,8 +2,8 @@
 
 namespace Drupal\media\Hook;
 
-use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\media\Plugin\media\Source\OEmbedInterface;
 
 /**

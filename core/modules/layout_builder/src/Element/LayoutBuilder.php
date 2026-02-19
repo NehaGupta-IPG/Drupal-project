@@ -36,7 +36,7 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
   /**
    * The event dispatcher.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+   * @var EventDispatcherInterface
    */
   protected $eventDispatcher;
 
@@ -49,7 +49,7 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param EventDispatcherInterface $event_dispatcher
    *   The event dispatcher service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher) {
@@ -81,7 +81,7 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
    *
    * @param array $element
    *   The render array for the layout builder element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   Form state object.
    * @param array $form
    *   The render array for the complete form.
@@ -163,7 +163,7 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
   /**
    * Renders the Layout UI.
    *
-   * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
+   * @param SectionStorageInterface $section_storage
    *   The section storage.
    *
    * @return array
@@ -203,7 +203,7 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
   /**
    * Prepares a layout for use in the UI.
    *
-   * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
+   * @param SectionStorageInterface $section_storage
    *   The section storage.
    */
   protected function prepareLayout(SectionStorageInterface $section_storage) {
@@ -214,7 +214,7 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
   /**
    * Builds a link to add a new section at a given delta.
    *
-   * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
+   * @param SectionStorageInterface $section_storage
    *   The section storage.
    * @param int $delta
    *   The delta of the section to splice.
@@ -281,7 +281,7 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
   /**
    * Builds the render array for the layout section while editing.
    *
-   * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
+   * @param SectionStorageInterface $section_storage
    *   The section storage.
    * @param int $delta
    *   The delta of the section.

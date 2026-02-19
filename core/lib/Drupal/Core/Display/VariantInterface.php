@@ -64,7 +64,7 @@ interface VariantInterface extends PluginInspectionInterface, ConfigurableInterf
   /**
    * Determines if this display variant is accessible.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   (optional) The user for which to check access, or NULL to check access
    *   for the current user. Defaults to NULL.
    *

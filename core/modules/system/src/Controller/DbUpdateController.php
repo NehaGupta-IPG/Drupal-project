@@ -27,42 +27,42 @@ class DbUpdateController extends ControllerBase {
   /**
    * The keyvalue expirable factory.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface
+   * @var KeyValueExpirableFactoryInterface
    */
   protected $keyValueExpirableFactory;
 
   /**
    * A cache backend interface.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $cache;
 
   /**
    * The state service.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $account;
 
   /**
    * The bare HTML page renderer.
    *
-   * @var \Drupal\Core\Render\BareHtmlPageRendererInterface
+   * @var BareHtmlPageRendererInterface
    */
   protected $bareHtmlPageRenderer;
 
@@ -76,7 +76,7 @@ class DbUpdateController extends ControllerBase {
   /**
    * The post update registry.
    *
-   * @var \Drupal\Core\Update\UpdateRegistry
+   * @var UpdateRegistry
    */
   protected $postUpdateRegistry;
 
@@ -85,21 +85,21 @@ class DbUpdateController extends ControllerBase {
    *
    * @param string $root
    *   The app root.
-   * @param \Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface $key_value_expirable_factory
+   * @param KeyValueExpirableFactoryInterface $key_value_expirable_factory
    *   The keyvalue expirable factory.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   A cache backend interface.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state service.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The current user.
-   * @param \Drupal\Core\Render\BareHtmlPageRendererInterface $bare_html_page_renderer
+   * @param BareHtmlPageRendererInterface $bare_html_page_renderer
    *   The bare HTML page renderer.
-   * @param \Drupal\Core\Update\UpdateRegistry $post_update_registry
+   * @param UpdateRegistry $post_update_registry
    *   The post update registry.
-   * @param \Drupal\Core\Asset\AssetQueryStringInterface $assetQueryString
+   * @param AssetQueryStringInterface $assetQueryString
    *   The asset query string.
    */
   public function __construct(
@@ -149,10 +149,10 @@ class DbUpdateController extends ControllerBase {
    *    - "selection".
    *    - "run".
    *    - "results".
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request object.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   A response object.
    */
   public function handle($op, Request $request) {
@@ -214,7 +214,7 @@ class DbUpdateController extends ControllerBase {
   /**
    * Returns the info database update page.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    *
    * @return array
@@ -261,7 +261,7 @@ class DbUpdateController extends ControllerBase {
   /**
    * Renders a list of available database updates.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    *
    * @return array
@@ -402,7 +402,7 @@ class DbUpdateController extends ControllerBase {
   /**
    * Displays results of the update script with any accompanying errors.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    *
    * @return array
@@ -537,7 +537,7 @@ class DbUpdateController extends ControllerBase {
    *   The severity of the message, as per RFC 3164.
    * @param array $requirements
    *   The array of requirement values.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    *
    * @return array
@@ -591,7 +591,7 @@ class DbUpdateController extends ControllerBase {
   /**
    * Starts the database update batch process.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request object.
    */
   protected function triggerBatch(Request $request) {
@@ -605,7 +605,7 @@ class DbUpdateController extends ControllerBase {
       $this->state->set('system.maintenance_mode', TRUE);
     }
 
-    /** @var \Drupal\Core\Batch\BatchBuilder $batch_builder */
+    /** @var BatchBuilder $batch_builder */
     $batch_builder = (new BatchBuilder())
       ->setTitle($this->t('Updating'))
       ->setInitMessage($this->t('Starting updates'))
@@ -692,7 +692,7 @@ class DbUpdateController extends ControllerBase {
   /**
    * Provides links to the homepage and administration pages.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    *
    * @return array

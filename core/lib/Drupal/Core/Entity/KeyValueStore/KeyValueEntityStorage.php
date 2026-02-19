@@ -5,11 +5,11 @@ namespace Drupal\Core\Entity\KeyValueStore;
 use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
 use Drupal\Core\Config\Entity\Exception\ConfigEntityIdLengthException;
-use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageBase;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\KeyValueStore\KeyValueStoreInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -32,36 +32,36 @@ class KeyValueEntityStorage extends EntityStorageBase {
   /**
    * The key value store.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface
+   * @var KeyValueStoreInterface
    */
   protected $keyValueStore;
 
   /**
    * The UUID service.
    *
-   * @var \Drupal\Component\Uuid\UuidInterface
+   * @var UuidInterface
    */
   protected $uuidService;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * Constructs a new KeyValueEntityStorage.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type.
-   * @param \Drupal\Core\KeyValueStore\KeyValueStoreInterface $key_value_store
+   * @param KeyValueStoreInterface $key_value_store
    *   The key value store.
-   * @param \Drupal\Component\Uuid\UuidInterface $uuid_service
+   * @param UuidInterface $uuid_service
    *   The UUID service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache
+   * @param MemoryCacheInterface $memory_cache
    *   The memory cache.
    */
   public function __construct(EntityTypeInterface $entity_type, KeyValueStoreInterface $key_value_store, UuidInterface $uuid_service, LanguageManagerInterface $language_manager, MemoryCacheInterface $memory_cache) {
@@ -134,7 +134,7 @@ class KeyValueEntityStorage extends EntityStorageBase {
   protected function mapFromStorageRecords(array $records) {
     $entities = [];
     foreach ($records as $record) {
-      /** @var \Drupal\Core\Entity\EntityInterface $entity */
+      /** @var EntityInterface $entity */
       $entity = $this->doCreate($record);
       $entities[$entity->id()] = $entity;
     }

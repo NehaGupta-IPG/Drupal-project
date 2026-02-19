@@ -40,13 +40,13 @@ class BatchController implements ContainerInjectionInterface {
   /**
    * Returns a system batch page.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request object.
    *
-   * @return \Symfony\Component\HttpFoundation\Response|array
+   * @return Response|array
    *   A \Symfony\Component\HttpFoundation\Response object or render array.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   * @throws AccessDeniedHttpException
    */
   public function batchPage(Request $request) {
     $output = _batch_page($request);

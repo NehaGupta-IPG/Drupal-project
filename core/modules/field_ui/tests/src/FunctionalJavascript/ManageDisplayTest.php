@@ -444,7 +444,7 @@ class ManageDisplayTest extends WebDriverTestBase {
   /**
    * Checks if a select element contains the specified options.
    *
-   * @param \Behat\Mink\Element\NodeElement $field
+   * @param NodeElement $field
    *   The select field to validate.
    * @param array $expected_options
    *   An array of expected options.
@@ -454,7 +454,7 @@ class ManageDisplayTest extends WebDriverTestBase {
    * @internal
    */
   protected function assertFieldSelectOptions(NodeElement $field, array $expected_options, ?string $selected = NULL): void {
-    /** @var \Behat\Mink\Element\NodeElement[] $select_options */
+    /** @var NodeElement[] $select_options */
     $select_options = $field->findAll('xpath', 'option');
 
     // Validate the number of options.

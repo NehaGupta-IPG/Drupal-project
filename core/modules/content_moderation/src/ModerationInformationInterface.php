@@ -14,7 +14,7 @@ interface ModerationInformationInterface {
   /**
    * Determines if an entity is moderated.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity we may be moderating.
    *
    * @return bool
@@ -25,7 +25,7 @@ interface ModerationInformationInterface {
   /**
    * Determines if an entity type can have moderated entities.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   An entity type object.
    *
    * @return bool
@@ -36,7 +36,7 @@ interface ModerationInformationInterface {
   /**
    * Determines if an entity type/bundle entities should be moderated.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition to check.
    * @param string $bundle
    *   The bundle to check.
@@ -50,7 +50,7 @@ interface ModerationInformationInterface {
   /**
    * Determines if an entity type has at least one moderated bundle.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition to check.
    *
    * @return bool
@@ -75,10 +75,10 @@ interface ModerationInformationInterface {
   /**
    * Returns the revision translation affected translation of a revision.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The content entity.
    *
-   * @return \Drupal\Core\Entity\ContentEntityInterface
+   * @return ContentEntityInterface
    *   The revision translation affected translation.
    */
   public function getAffectedRevisionTranslation(ContentEntityInterface $entity);
@@ -86,7 +86,7 @@ interface ModerationInformationInterface {
   /**
    * Determines if a pending revision exists for the specified entity.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity which may or may not have a pending revision.
    *
    * @return bool
@@ -100,7 +100,7 @@ interface ModerationInformationInterface {
    * A "live" entity revision is one whose latest revision is also the default,
    * and whose moderation state, if any, is a published state.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity to check.
    *
    * @return bool
@@ -115,7 +115,7 @@ interface ModerationInformationInterface {
    * the storage handler. If the entity is translated, check if any of the
    * translations are published.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity being saved.
    *
    * @return bool
@@ -126,7 +126,7 @@ interface ModerationInformationInterface {
   /**
    * Gets the workflow for the given content entity.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The content entity to get the workflow for.
    *
    * @return \Drupal\workflows\WorkflowInterface|null
@@ -150,7 +150,7 @@ interface ModerationInformationInterface {
   /**
    * Gets unsupported features for a given entity type.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type to get the unsupported features for.
    *
    * @return array
@@ -172,10 +172,10 @@ interface ModerationInformationInterface {
    * state is used to compute an appropriate transition for the purposes of
    * validation.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The content entity to get the workflow for.
    *
-   * @return \Drupal\content_moderation\ContentModerationState
+   * @return ContentModerationState
    *   The original or default moderation state.
    */
   public function getOriginalState(ContentEntityInterface $entity);

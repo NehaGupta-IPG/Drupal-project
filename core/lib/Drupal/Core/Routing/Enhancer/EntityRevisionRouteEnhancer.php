@@ -15,7 +15,7 @@ class EntityRevisionRouteEnhancer implements EnhancerInterface {
   /**
    * Returns whether the enhancer runs on the current route.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The current route.
    *
    * @return bool
@@ -36,7 +36,7 @@ class EntityRevisionRouteEnhancer implements EnhancerInterface {
    * {@inheritdoc}
    */
   public function enhance(array $defaults, Request $request) {
-    /** @var \Symfony\Component\Routing\Route $route */
+    /** @var Route $route */
     $route = $defaults[RouteObjectInterface::ROUTE_OBJECT];
     if (!$this->applies($route)) {
       return $defaults;

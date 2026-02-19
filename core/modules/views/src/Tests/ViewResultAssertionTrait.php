@@ -18,7 +18,7 @@ trait ViewResultAssertionTrait {
    * column map, taking the order of the rows into account, but not the order
    * of the columns.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   An executed View.
    * @param array $expected_result
    *   An expected result set.
@@ -38,7 +38,7 @@ trait ViewResultAssertionTrait {
    *
    * Inverse of ViewsTestCase::assertIdenticalResultset().
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   An executed View.
    * @param array $expected_result
    *   An expected result set.
@@ -59,7 +59,7 @@ trait ViewResultAssertionTrait {
    * This is a helper method for ViewTestBase::assertIdenticalResultset() and
    * ViewTestBase::assertNotIdenticalResultset().
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   An executed View.
    * @param array $expected_result
    *   An expected result set.

@@ -21,7 +21,7 @@ class LayoutBuilderEntityViewDisplayForm extends EntityViewDisplayEditForm {
   /**
    * The entity being used by this form.
    *
-   * @var \Drupal\layout_builder\Entity\LayoutEntityDisplayInterface
+   * @var LayoutEntityDisplayInterface
    */
   protected $entity;
 
@@ -159,7 +159,7 @@ class LayoutBuilderEntityViewDisplayForm extends EntityViewDisplayEditForm {
   /**
    * Determines if the defaults have any overrides.
    *
-   * @param \Drupal\layout_builder\Entity\LayoutEntityDisplayInterface $display
+   * @param LayoutEntityDisplayInterface $display
    *   The entity display.
    *
    * @return bool
@@ -186,7 +186,7 @@ class LayoutBuilderEntityViewDisplayForm extends EntityViewDisplayEditForm {
   protected function copyFormValuesToEntity(EntityInterface $entity, array $form, FormStateInterface $form_state) {
     // Do not process field values if Layout Builder is or will be enabled.
     $set_enabled = (bool) $form_state->getValue(['layout', 'enabled'], FALSE);
-    /** @var \Drupal\layout_builder\Entity\LayoutEntityDisplayInterface $entity */
+    /** @var LayoutEntityDisplayInterface $entity */
     $already_enabled = $entity->isLayoutBuilderEnabled();
     if ($already_enabled || $set_enabled) {
       $form['#fields'] = [];

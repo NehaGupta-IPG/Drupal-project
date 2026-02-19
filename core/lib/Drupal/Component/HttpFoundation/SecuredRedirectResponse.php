@@ -21,7 +21,7 @@ abstract class SecuredRedirectResponse extends RedirectResponse {
    * The safe one cannot accidentally redirect to an external URL, unless
    * actively wanted (see TrustedRedirectResponse).
    *
-   * @param \Symfony\Component\HttpFoundation\RedirectResponse $response
+   * @param RedirectResponse $response
    *   The original redirect.
    *
    * @return static
@@ -35,7 +35,7 @@ abstract class SecuredRedirectResponse extends RedirectResponse {
   /**
    * Copies over the values from the given response.
    *
-   * @param \Symfony\Component\HttpFoundation\RedirectResponse $response
+   * @param RedirectResponse $response
    *   The redirect response object.
    */
   protected function fromResponse(RedirectResponse $response) {

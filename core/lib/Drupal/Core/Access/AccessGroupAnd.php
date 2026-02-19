@@ -14,14 +14,14 @@ class AccessGroupAnd implements AccessibleInterface {
   /**
    * The access dependencies.
    *
-   * @var \Drupal\Core\Access\AccessibleInterface[]
+   * @var AccessibleInterface[]
    */
   protected $dependencies = [];
 
   /**
    * Adds an access dependency.
    *
-   * @param \Drupal\Core\Access\AccessibleInterface $dependency
+   * @param AccessibleInterface $dependency
    *   The access dependency to be added.
    *
    * @return $this
@@ -45,7 +45,7 @@ class AccessGroupAnd implements AccessibleInterface {
   /**
    * Gets all the access dependencies.
    *
-   * @return list<\Drupal\Core\Access\AccessibleInterface>
+   * @return list<AccessibleInterface>
    *   The list of access dependencies.
    */
   public function getDependencies() {

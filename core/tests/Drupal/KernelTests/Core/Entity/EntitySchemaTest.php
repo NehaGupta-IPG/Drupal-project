@@ -38,14 +38,14 @@ class EntitySchemaTest extends EntityKernelTestBase {
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected EntityFieldManagerInterface $entityFieldManager;
 
   /**
    * The entity definition update manager.
    *
-   * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
+   * @var EntityDefinitionUpdateManagerInterface
    */
   protected EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager;
 
@@ -159,7 +159,7 @@ class EntitySchemaTest extends EntityKernelTestBase {
       $this->installEntitySchema($entity_type_id);
     }
 
-    /** @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface $update_manager */
+    /** @var EntityDefinitionUpdateManagerInterface $update_manager */
     $update_manager = $this->container->get('entity.definition_update_manager');
     $entity_type = $update_manager->getEntityType($entity_type_id);
 
@@ -237,7 +237,7 @@ class EntitySchemaTest extends EntityKernelTestBase {
   /**
    * Finds the primary keys for a given entity type.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type whose primary keys are being fetched.
    *
    * @return array[]

@@ -22,14 +22,14 @@ abstract class DateTimeFormatterBase extends FormatterBase {
   /**
    * The date formatter service.
    *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
+   * @var DateFormatterInterface
    */
   protected $dateFormatter;
 
   /**
    * The date format entity storage.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var EntityStorageInterface
    */
   protected $dateFormatStorage;
 
@@ -40,7 +40,7 @@ abstract class DateTimeFormatterBase extends FormatterBase {
    *   The plugin ID for the formatter.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The definition of the field to which the formatter is associated.
    * @param array $settings
    *   The formatter settings.
@@ -50,9 +50,9 @@ abstract class DateTimeFormatterBase extends FormatterBase {
    *   The view mode.
    * @param array $third_party_settings
    *   Third party settings.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   * @param DateFormatterInterface $date_formatter
    *   The date formatter service.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $date_format_storage
+   * @param EntityStorageInterface $date_format_storage
    *   The date format entity storage.
    */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, $label, $view_mode, array $third_party_settings, DateFormatterInterface $date_formatter, EntityStorageInterface $date_format_storage) {
@@ -126,7 +126,7 @@ abstract class DateTimeFormatterBase extends FormatterBase {
 
     foreach ($items as $delta => $item) {
       if ($item->date) {
-        /** @var \Drupal\Core\Datetime\DrupalDateTime $date */
+        /** @var DrupalDateTime $date */
         $date = $item->date;
         $elements[$delta] = $this->buildDateWithIsoAttribute($date);
 
@@ -160,7 +160,7 @@ abstract class DateTimeFormatterBase extends FormatterBase {
    * zone applied to it.  This method will apply the time zone for the current
    * user, based on system and user settings.
    *
-   * @param \Drupal\Core\Datetime\DrupalDateTime $date
+   * @param DrupalDateTime $date
    *   A DrupalDateTime object.
    */
   protected function setTimeZone(DrupalDateTime $date) {
@@ -193,7 +193,7 @@ abstract class DateTimeFormatterBase extends FormatterBase {
   /**
    * Creates a render array from a date object.
    *
-   * @param \Drupal\Core\Datetime\DrupalDateTime $date
+   * @param DrupalDateTime $date
    *   A date object.
    *
    * @return array
@@ -217,7 +217,7 @@ abstract class DateTimeFormatterBase extends FormatterBase {
   /**
    * Creates a render array from a date object with ISO date attribute.
    *
-   * @param \Drupal\Core\Datetime\DrupalDateTime $date
+   * @param DrupalDateTime $date
    *   A date object.
    *
    * @return array

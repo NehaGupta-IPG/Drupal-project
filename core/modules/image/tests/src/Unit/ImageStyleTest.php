@@ -21,14 +21,14 @@ class ImageStyleTest extends UnitTestCase {
   /**
    * The entity type used for testing.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityTypeInterface|MockObject
    */
   protected $entityType;
 
   /**
    * The entity type manager used for testing.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|MockObject
    */
   protected $entityTypeManager;
 
@@ -44,7 +44,7 @@ class ImageStyleTest extends UnitTestCase {
    *
    * @param string $image_effect_id
    *   The image effect ID.
-   * @param \Drupal\image\ImageEffectInterface|\PHPUnit\Framework\MockObject\MockObject $image_effect
+   * @param ImageEffectInterface|MockObject $image_effect
    *   The image effect used for testing.
    * @param array $stubs
    *   An array of additional method names to mock.

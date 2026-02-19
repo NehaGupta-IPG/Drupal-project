@@ -244,9 +244,9 @@ class EntityRevisionsTest extends EntityKernelTestBase {
     // English and Italian revision translations are the latest affected
     // revisions for their respective languages, while the English revision is
     // not the latest revision.
-    /** @var \Drupal\entity_test\Entity\EntityTestMulRev $en_revision */
+    /** @var EntityTestMulRev $en_revision */
     $en_revision = clone $pending_revision;
-    /** @var \Drupal\entity_test\Entity\EntityTestMulRev $it_revision */
+    /** @var EntityTestMulRev $it_revision */
     $it_revision = $pending_revision->addTranslation('it');
     $it_revision->setName($this->randomString());
     $it_revision->setNewRevision(TRUE);

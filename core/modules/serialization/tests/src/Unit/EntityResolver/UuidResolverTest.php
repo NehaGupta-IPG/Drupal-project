@@ -20,14 +20,14 @@ class UuidResolverTest extends UnitTestCase {
   /**
    * The UuidResolver instance.
    *
-   * @var \Drupal\serialization\EntityResolver\UuidResolver
+   * @var UuidResolver
    */
   protected $resolver;
 
   /**
    * The mock entity repository service.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityRepositoryInterface|MockObject
    */
   protected $entityRepository;
 

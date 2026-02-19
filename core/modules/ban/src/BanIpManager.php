@@ -12,14 +12,14 @@ class BanIpManager implements BanIpManagerInterface {
   /**
    * The database connection used to check the IP against.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
   /**
    * Constructs a BanIpManager object.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection which will be used to check the IP against.
    */
   public function __construct(Connection $connection) {

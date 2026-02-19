@@ -10,7 +10,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 /**
  * Defines a HelpSection attribute object for plugin discovery.
  *
- * Plugin Namespace: Plugin\HelpSection
+ * Plugin Namespace: Plugin\HelpSection.
  *
  * For a working example, see \Drupal\help\Plugin\HelpSection\HookHelpSection.
  *
@@ -28,9 +28,9 @@ class HelpSection extends Plugin {
    *
    * @param string $id
    *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $title
+   * @param TranslatableMarkup $title
    *   The text to use as the title of the help page section.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $description
+   * @param TranslatableMarkup|null $description
    *   (optional) The description of the help page section.
    * @param string|null $permission
    *   (optional) The permission required to access the help page section.

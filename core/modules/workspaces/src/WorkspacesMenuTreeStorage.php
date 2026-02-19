@@ -19,17 +19,17 @@ class WorkspacesMenuTreeStorage extends CoreMenuTreeStorage {
   /**
    * WorkspacesMenuTreeStorage constructor.
    *
-   * @param \Drupal\workspaces\WorkspaceManagerInterface $workspaceManager
+   * @param WorkspaceManagerInterface $workspaceManager
    *   The workspace manager service.
-   * @param \Drupal\workspaces\WorkspaceTrackerInterface $workspaceTracker
+   * @param WorkspaceTrackerInterface $workspaceTracker
    *   The workspace tracker service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   A Database connection to use for reading and writing configuration data.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $menu_cache_backend
+   * @param CacheBackendInterface $menu_cache_backend
    *   Cache backend instance for the extracted tree data.
-   * @param \Drupal\Core\Cache\CacheTagsInvalidatorInterface $cache_tags_invalidator
+   * @param CacheTagsInvalidatorInterface $cache_tags_invalidator
    *   The cache tags invalidator.
    * @param string $table
    *   A database table name to store configuration data in.

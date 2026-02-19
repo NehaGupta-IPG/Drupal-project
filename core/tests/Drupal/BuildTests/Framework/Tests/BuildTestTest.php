@@ -90,7 +90,7 @@ class BuildTestTest extends BuildTestBase {
 
     // Mock BuildTestBase so that it thinks our VFS is the Composer and Drupal
     // roots.
-    /** @var \PHPUnit\Framework\MockObject\MockBuilder|\Drupal\BuildTests\Framework\BuildTestBase $base */
+    /** @var \PHPUnit\Framework\MockObject\MockBuilder|BuildTestBase $base */
     $base = $this->getMockBuilder(BuildTestBase::class)
       ->onlyMethods(['getDrupalRoot', 'getComposerRoot'])
       ->setConstructorArgs(['test'])
@@ -167,7 +167,7 @@ class BuildTestTest extends BuildTestBase {
 
     // Mock BuildTestBase so that it thinks our VFS is the Composer and Drupal
     // roots.
-    /** @var \PHPUnit\Framework\MockObject\MockBuilder|\Drupal\BuildTests\Framework\BuildTestBase $base */
+    /** @var \PHPUnit\Framework\MockObject\MockBuilder|BuildTestBase $base */
     $base = $this->getMockBuilder(BuildTestBase::class)
       ->onlyMethods(['getDrupalRoot', 'getComposerRoot'])
       ->setConstructorArgs(['test'])

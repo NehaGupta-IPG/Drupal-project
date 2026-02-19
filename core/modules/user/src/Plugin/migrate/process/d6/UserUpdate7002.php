@@ -2,13 +2,13 @@
 
 namespace Drupal\user\Plugin\migrate\process\d6;
 
+use Drupal\Core\Config\Config;
 use Drupal\Core\Datetime\TimeZoneFormHelper;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
-use Drupal\Core\Config\Config;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -32,7 +32,7 @@ class UserUpdate7002 extends ProcessPluginBase implements ContainerFactoryPlugin
   /**
    * Contains the system.theme configuration object.
    *
-   * @var \Drupal\Core\Config\Config
+   * @var Config
    */
   protected $dateConfig;
 

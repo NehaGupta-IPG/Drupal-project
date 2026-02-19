@@ -14,13 +14,13 @@ trait EntityPublishedTrait {
   /**
    * Returns an array of base field definitions for publishing status.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type to add the publishing status field to.
    *
-   * @return \Drupal\Core\Field\BaseFieldDefinition[]
+   * @return BaseFieldDefinition[]
    *   An array of base field definitions.
    *
-   * @throws \Drupal\Core\Entity\Exception\UnsupportedEntityTypeDefinitionException
+   * @throws UnsupportedEntityTypeDefinitionException
    *   Thrown when the entity type does not implement EntityPublishedInterface
    *   or if it does not have a "published" entity key.
    */

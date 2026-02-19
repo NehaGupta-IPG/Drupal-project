@@ -16,7 +16,7 @@ trait ContentModerationTestTrait {
   /**
    * Creates the editorial workflow.
    *
-   * @return \Drupal\workflows\Entity\Workflow
+   * @return Workflow
    *   The editorial workflow entity.
    */
   protected function createEditorialWorkflow() {
@@ -96,7 +96,7 @@ trait ContentModerationTestTrait {
   /**
    * Adds an entity type ID / bundle ID to the given workflow.
    *
-   * @param \Drupal\workflows\WorkflowInterface $workflow
+   * @param WorkflowInterface $workflow
    *   A workflow object.
    * @param string $entity_type_id
    *   The entity type ID to add.

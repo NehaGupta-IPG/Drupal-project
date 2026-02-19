@@ -26,21 +26,21 @@ class IconFinderTest extends UnitTestCase {
   /**
    * The file url generator instance.
    *
-   * @var \Drupal\Core\File\FileUrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var FileUrlGeneratorInterface|MockObject
    */
   private FileUrlGeneratorInterface $fileUrlGenerator;
 
   /**
    * The logger service instance.
    *
-   * @var \Psr\Log\LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var LoggerInterface|MockObject
    */
   private LoggerInterface $logger;
 
   /**
    * The IconFinder instance.
    *
-   * @var \Drupal\Core\Theme\Icon\IconFinder
+   * @var IconFinder
    */
   private IconFinder $iconFinder;
 

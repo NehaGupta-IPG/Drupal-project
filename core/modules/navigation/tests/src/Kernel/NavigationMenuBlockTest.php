@@ -53,7 +53,7 @@ class NavigationMenuBlockTest extends KernelTestBase {
   /**
    * The navigation block under test.
    *
-   * @var \Drupal\navigation\Plugin\Block\NavigationMenuBlock
+   * @var NavigationMenuBlock
    */
   protected $navigationBlock;
 

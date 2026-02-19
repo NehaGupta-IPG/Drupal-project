@@ -62,7 +62,7 @@ abstract class EntityDisplayModeBase extends ConfigEntityBase implements EntityD
    */
   public static function sort(ConfigEntityInterface $a, ConfigEntityInterface $b) {
     /** @var \Drupal\Core\Entity\EntityDisplayModeInterface $a */
-    /** @var \Drupal\Core\Entity\EntityDisplayModeInterface $b */
+    /** @var EntityDisplayModeInterface $b */
     // Sort by the type of entity the view mode is used for.
     $a_type = $a->getTargetType();
     $b_type = $b->getTargetType();

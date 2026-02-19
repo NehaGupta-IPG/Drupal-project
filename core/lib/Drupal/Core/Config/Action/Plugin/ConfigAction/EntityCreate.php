@@ -26,9 +26,9 @@ final class EntityCreate implements ConfigActionPluginInterface, ContainerFactor
   /**
    * Constructs a EntityCreate object.
    *
-   * @param \Drupal\Core\Config\ConfigManagerInterface $configManager
+   * @param ConfigManagerInterface $configManager
    *   The config manager.
-   * @param \Drupal\Core\Config\Action\Exists $exists
+   * @param Exists $exists
    *   Determines behavior of action depending on entity existence.
    */
   public function __construct(

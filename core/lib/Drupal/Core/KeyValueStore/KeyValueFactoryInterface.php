@@ -13,7 +13,7 @@ interface KeyValueFactoryInterface {
    * @param string $collection
    *   The name of the collection holding key and value pairs.
    *
-   * @return \Drupal\Core\KeyValueStore\KeyValueStoreInterface
+   * @return KeyValueStoreInterface
    *   A key/value store implementation for the given $collection.
    */
   public function get($collection);

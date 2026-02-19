@@ -3,8 +3,8 @@
 namespace Drupal\basic_auth\Authentication\Provider;
 
 use Drupal\Component\Render\FormattableMarkup;
-use Drupal\Core\Authentication\AuthenticationProviderInterface;
 use Drupal\Core\Authentication\AuthenticationProviderChallengeInterface;
+use Drupal\Core\Authentication\AuthenticationProviderInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -23,41 +23,41 @@ class BasicAuth implements AuthenticationProviderInterface, AuthenticationProvid
   /**
    * The config factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * The user auth service.
    *
-   * @var \Drupal\user\UserAuthInterface|\Drupal\user\UserAuthenticationInterface
+   * @var UserAuthInterface|UserAuthenticationInterface
    */
   protected $userAuth;
 
   /**
    * The flood service.
    *
-   * @var \Drupal\Core\Flood\FloodInterface
+   * @var FloodInterface
    */
   protected $flood;
 
   /**
    * The entity type manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * Constructs a HTTP basic authentication provider object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\user\UserAuthInterface|\Drupal\user\UserAuthenticationInterface $user_auth
+   * @param UserAuthInterface|UserAuthenticationInterface $user_auth
    *   The user authentication service.
-   * @param \Drupal\Core\Flood\FloodInterface $flood
+   * @param FloodInterface $flood
    *   The flood service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
    */
   public function __construct(ConfigFactoryInterface $config_factory, UserAuthInterface|UserAuthenticationInterface $user_auth, FloodInterface $flood, EntityTypeManagerInterface $entity_type_manager) {

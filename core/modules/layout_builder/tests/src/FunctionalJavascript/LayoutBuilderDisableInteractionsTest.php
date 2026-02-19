@@ -180,7 +180,7 @@ class LayoutBuilderDisableInteractionsTest extends WebDriverTestBase {
   /**
    * Checks if element is not clickable.
    *
-   * @param \Behat\Mink\Element\NodeElement $element
+   * @param NodeElement $element
    *   Element being checked for.
    *
    * @internal

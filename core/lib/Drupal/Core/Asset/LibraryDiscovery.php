@@ -16,14 +16,14 @@ class LibraryDiscovery implements LibraryDiscoveryInterface {
   /**
    * The library discovery cache collector.
    *
-   * @var \Drupal\Core\Cache\CacheCollectorInterface
+   * @var CacheCollectorInterface
    */
   protected $collector;
 
   /**
    * Constructs a new LibraryDiscovery instance.
    *
-   * @param \Drupal\Core\Cache\CacheCollectorInterface $library_discovery_collector
+   * @param CacheCollectorInterface $library_discovery_collector
    *   The library discovery cache collector.
    */
   public function __construct(CacheCollectorInterface $library_discovery_collector) {

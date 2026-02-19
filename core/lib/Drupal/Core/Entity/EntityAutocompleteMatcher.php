@@ -14,14 +14,14 @@ class EntityAutocompleteMatcher implements EntityAutocompleteMatcherInterface {
   /**
    * The entity reference selection handler plugin manager.
    *
-   * @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface
+   * @var SelectionPluginManagerInterface
    */
   protected $selectionManager;
 
   /**
    * Constructs an EntityAutocompleteMatcher object.
    *
-   * @param \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface $selection_manager
+   * @param SelectionPluginManagerInterface $selection_manager
    *   The entity reference selection handler plugin manager.
    */
   public function __construct(SelectionPluginManagerInterface $selection_manager) {

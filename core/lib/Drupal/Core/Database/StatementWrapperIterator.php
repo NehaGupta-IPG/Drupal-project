@@ -17,7 +17,7 @@ class StatementWrapperIterator extends StatementBase {
   /**
    * Constructs a StatementWrapperIterator object.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   Drupal database connection object.
    * @param object $clientConnection
    *   Client database connection object, for example \PDO.

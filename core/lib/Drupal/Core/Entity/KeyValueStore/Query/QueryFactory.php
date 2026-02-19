@@ -15,7 +15,7 @@ class QueryFactory implements QueryFactoryInterface {
   /**
    * The key value factory.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueFactoryInterface
+   * @var KeyValueFactoryInterface
    */
   protected $keyValueFactory;
 

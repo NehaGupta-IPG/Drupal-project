@@ -58,7 +58,7 @@ class MigrateUrlAliasTest extends MigrateDrupal6TestBase {
    *   The path alias ID.
    * @param array $conditions
    *   The path conditions.
-   * @param \Drupal\path_alias\PathAliasInterface $path_alias
+   * @param PathAliasInterface $path_alias
    *   The path alias.
    *
    * @internal

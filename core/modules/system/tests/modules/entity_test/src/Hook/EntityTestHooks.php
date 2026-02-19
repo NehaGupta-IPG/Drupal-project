@@ -4,29 +4,29 @@ declare(strict_types=1);
 
 namespace Drupal\entity_test\Hook;
 
+use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Database\Query\AlterableInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
-use Drupal\Component\Render\FormattableMarkup;
-use Drupal\Core\Entity\Entity\EntityFormDisplay;
-use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\Core\Field\FieldStorageDefinitionInterface;
-use Drupal\Core\Field\BaseFieldDefinition;
-use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\entity_test\EntityTestHelper;
 use Drupal\entity_test\Callbacks;
 use Drupal\entity_test\Entity\EntityTest;
+use Drupal\entity_test\EntityTestHelper;
 
 /**
  * Hook implementations for entity_test.
@@ -48,7 +48,7 @@ class EntityTestHooks {
   #[Hook('entity_type_alter')]
   public function entityTypeAlter(array &$entity_types) : void {
     $state = \Drupal::state();
-    /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
+    /** @var EntityTypeInterface[] $entity_types */
     foreach (EntityTestHelper::getEntityTypes() as $entity_type) {
       // Optionally specify a translation handler for testing translations.
       if ($state->get('entity_test.translation')) {
@@ -617,7 +617,7 @@ class EntityTestHooks {
   public function entityPrepareView($entity_type, array $entities, array $displays): void {
     if ($entity_type == 'entity_test') {
       foreach ($entities as $entity) {
-        /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+        /** @var ContentEntityInterface $entity */
         // Add field item attributes on field_test_text if it exists.
         // See \Drupal\Tests\system\Functional\Entity\EntityViewControllerTest::testFieldItemAttributes().
         if ($entity->hasField('field_test_text') && $displays[$entity->bundle()]->getComponent('field_test_text')) {
@@ -642,7 +642,7 @@ class EntityTestHooks {
    */
   #[Hook('entity_display_build_alter')]
   public function entityDisplayBuildAlter(&$build, $context): void {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     $entity = $context['entity'];
     if ($entity->getEntityTypeId() == 'entity_test' && $entity->bundle() == 'display_build_alter_bundle') {
       $build['entity_display_build_alter']['#markup'] = 'Content added in hook_entity_display_build_alter for entity id ' . $entity->id();
@@ -724,7 +724,7 @@ class EntityTestHooks {
     if (!\Drupal::state()->get('entity_test_query_access')) {
       return;
     }
-    /** @var \Drupal\Core\Database\Query\Select|\Drupal\Core\Database\Query\AlterableInterface $query */
+    /** @var \Drupal\Core\Database\Query\Select|AlterableInterface $query */
     if (!\Drupal::currentUser()->hasPermission('view all entity_test_query_access entities')) {
       $query->condition('entity_test_query_access.name', 'published entity');
     }

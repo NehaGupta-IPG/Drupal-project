@@ -24,7 +24,7 @@ class Composer {
   /**
    * Update metapackages whenever composer.lock is updated.
    *
-   * @param \Composer\Script\Event $event
+   * @param Event $event
    *   The Composer event.
    */
   public static function generateMetapackages(Event $event): void {
@@ -35,7 +35,7 @@ class Composer {
   /**
    * Update component packages whenever composer.lock is updated.
    *
-   * @param \Composer\Script\Event $event
+   * @param Event $event
    *   The Composer event.
    */
   public static function generateComponentPackages(Event $event): void {
@@ -121,7 +121,7 @@ class Composer {
    * @param string $subprojectType
    *   Type of subproject - one of Metapackage, Plugin, or Template.
    *
-   * @return \Symfony\Component\Finder\Finder
+   * @return Finder
    *   A Finder object.
    */
   public static function composerSubprojectPaths(string $root, string $subprojectType): Finder {

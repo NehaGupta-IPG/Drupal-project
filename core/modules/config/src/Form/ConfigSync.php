@@ -7,10 +7,10 @@ use Drupal\Core\Config\ConfigImporterException;
 use Drupal\Core\Config\ConfigImporterFactory;
 use Drupal\Core\Config\Importer\ConfigImporterBatch;
 use Drupal\Core\Config\ImportStorageTransformer;
-use Drupal\Core\Form\FormBase;
-use Drupal\Core\Config\StorageInterface;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Config\StorageComparer;
+use Drupal\Core\Config\StorageInterface;
+use Drupal\Core\Form\FormBase;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -25,17 +25,17 @@ class ConfigSync extends FormBase {
   /**
    * Constructs the object.
    *
-   * @param \Drupal\Core\Config\StorageInterface $syncStorage
+   * @param StorageInterface $syncStorage
    *   The source storage.
-   * @param \Drupal\Core\Config\StorageInterface $activeStorage
+   * @param StorageInterface $activeStorage
    *   The target storage.
-   * @param \Drupal\Core\Config\StorageInterface $snapshotStorage
+   * @param StorageInterface $snapshotStorage
    *   The snapshot storage.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\Core\Config\ImportStorageTransformer $importTransformer
+   * @param ImportStorageTransformer $importTransformer
    *   The import transformer service.
-   * @param \Drupal\Core\Config\ConfigImporterFactory $configImporterFactory
+   * @param ConfigImporterFactory $configImporterFactory
    *   The config importer factory.
    */
   public function __construct(

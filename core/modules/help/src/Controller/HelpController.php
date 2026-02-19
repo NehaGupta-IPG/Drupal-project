@@ -21,15 +21,15 @@ class HelpController extends ControllerBase {
   /**
    * Creates a new HelpController.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $routeMatch
+   * @param RouteMatchInterface $routeMatch
    *   The current route match.
-   * @param \Drupal\help\HelpSectionManager $helpManager
+   * @param HelpSectionManager $helpManager
    *   The help section manager.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
+   * @param ModuleExtensionList $moduleExtensionList
    *   The module extension list.
-   * @param \Drupal\system\ModuleAdminLinksHelper $moduleAdminLinks
+   * @param ModuleAdminLinksHelper $moduleAdminLinks
    *   The module admin links.
-   * @param \Drupal\user\ModulePermissionsLinkHelper $modulePermissionsLinks
+   * @param ModulePermissionsLinkHelper $modulePermissionsLinks
    *   The module permissions link.
    */
   public function __construct(
@@ -102,7 +102,7 @@ class HelpController extends ControllerBase {
    *   A render array as expected by
    *   \Drupal\Core\Render\RendererInterface::render().
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   * @throws NotFoundHttpException
    */
   public function helpPage($name) {
     $build = [];

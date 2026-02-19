@@ -15,7 +15,7 @@ class NullGenerator extends UrlGenerator {
   /**
    * Override the parent constructor.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   The request stack.
    */
   public function __construct(RequestStack $request_stack) {

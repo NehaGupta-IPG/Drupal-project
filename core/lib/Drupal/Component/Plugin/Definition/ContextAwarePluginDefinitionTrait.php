@@ -13,7 +13,7 @@ trait ContextAwarePluginDefinitionTrait {
   /**
    * The context definitions for this plugin definition.
    *
-   * @var \Drupal\Component\Plugin\Context\ContextDefinitionInterface[]
+   * @var ContextDefinitionInterface[]
    */
   protected $contextDefinitions = [];
 

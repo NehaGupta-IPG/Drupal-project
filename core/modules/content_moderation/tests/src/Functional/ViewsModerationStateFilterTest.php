@@ -160,7 +160,7 @@ class ViewsModerationStateFilterTest extends ViewTestBase {
    * @param string $view_id
    *   The view ID.
    *
-   * @return \Drupal\views\ViewEntityInterface
+   * @return ViewEntityInterface
    *   A loaded view, bypassing static caches.
    */
   public function loadViewUnchanged($view_id) {
@@ -250,7 +250,7 @@ class ViewsModerationStateFilterTest extends ViewTestBase {
   /**
    * Execute a view and assert the expected results.
    *
-   * @param \Drupal\views\ViewEntityInterface $view_entity
+   * @param ViewEntityInterface $view_entity
    *   A view configuration entity.
    * @param array $expected
    *   An expected result set.
@@ -383,7 +383,7 @@ class ViewsModerationStateFilterTest extends ViewTestBase {
    *
    * @param string[] $workflow_ids
    *   An array of workflow IDs to check.
-   * @param \Drupal\views\ViewEntityInterface $view
+   * @param ViewEntityInterface $view
    *   A view configuration object.
    *
    * @internal

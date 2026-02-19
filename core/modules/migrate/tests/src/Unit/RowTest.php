@@ -477,7 +477,7 @@ class RowTest extends UnitTestCase {
    * @param bool $is_stub
    *   Whether this row is a stub row, defaults to FALSE.
    *
-   * @return \Drupal\migrate\Row
+   * @return Row
    *   The row, populated with destination properties.
    */
   protected function createRowWithDestinationProperties(array $source_properties, array $source_ids, array $destination_properties, $is_stub = FALSE) {

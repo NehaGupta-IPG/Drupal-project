@@ -101,7 +101,7 @@ interface MenuTreeStorageInterface {
    *
    * @throws \Exception
    *   Thrown if the storage back-end does not exist and could not be created.
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws PluginException
    *   Thrown if the definition is invalid - for example, if the specified
    *   parent would cause the links children to be moved to greater than the
    *   maximum depth.
@@ -130,7 +130,7 @@ interface MenuTreeStorageInterface {
    *
    * @param string $menu_name
    *   The name of the menu.
-   * @param \Drupal\Core\Menu\MenuTreeParameters $parameters
+   * @param MenuTreeParameters $parameters
    *   The parameters to determine which menu links to be loaded into a tree.
    *
    * @return array

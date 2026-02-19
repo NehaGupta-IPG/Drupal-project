@@ -34,11 +34,11 @@ class VariationCache implements VariationCacheInterface {
   /**
    * Constructs a new VariationCache object.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   * @param RequestStack $requestStack
    *   The request stack.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
+   * @param CacheBackendInterface $cacheBackend
    *   The cache backend to wrap.
-   * @param \Drupal\Core\Cache\Context\CacheContextsManager $cacheContextsManager
+   * @param CacheContextsManager $cacheContextsManager
    *   The cache contexts manager.
    */
   public function __construct(
@@ -320,7 +320,7 @@ class VariationCache implements VariationCacheInterface {
    *
    * @param string[] $keys
    *   The cache keys to retrieve the cache entry for.
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $initial_cacheability
+   * @param CacheableDependencyInterface $initial_cacheability
    *   The cache metadata of the data to store before other systems had a chance
    *   to adjust it. This is also commonly known as "pre-bubbling" cacheability.
    *
@@ -366,7 +366,7 @@ class VariationCache implements VariationCacheInterface {
    *
    * @param string[] $keys
    *   The cache keys to retrieve the redirect chain for.
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $initial_cacheability
+   * @param CacheableDependencyInterface $initial_cacheability
    *   The initial cacheability for the redirect chain.
    *
    * @return array
@@ -432,7 +432,7 @@ class VariationCache implements VariationCacheInterface {
    *
    * @param string[] $keys
    *   The cache keys of the data to store.
-   * @param \Drupal\Core\Cache\CacheableMetadata $cacheable_metadata
+   * @param CacheableMetadata $cacheable_metadata
    *   The cacheable metadata of the data to store.
    *
    * @return string
@@ -455,7 +455,7 @@ class VariationCache implements VariationCacheInterface {
    *
    * @param string[] $keys
    *   The cache keys of the data to store.
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $cacheability
+   * @param CacheableDependencyInterface $cacheability
    *   The cache metadata of the data to store.
    *
    * @return string

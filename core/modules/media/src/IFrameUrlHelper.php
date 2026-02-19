@@ -19,23 +19,23 @@ class IFrameUrlHelper {
   /**
    * The request context service.
    *
-   * @var \Drupal\Core\Routing\RequestContext
+   * @var RequestContext
    */
   protected $requestContext;
 
   /**
    * The private key service.
    *
-   * @var \Drupal\Core\PrivateKey
+   * @var PrivateKey
    */
   protected $privateKey;
 
   /**
    * IFrameUrlHelper constructor.
    *
-   * @param \Drupal\Core\Routing\RequestContext $request_context
+   * @param RequestContext $request_context
    *   The request context service.
-   * @param \Drupal\Core\PrivateKey $private_key
+   * @param PrivateKey $private_key
    *   The private key service.
    */
   public function __construct(RequestContext $request_context, PrivateKey $private_key) {

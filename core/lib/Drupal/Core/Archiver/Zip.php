@@ -34,7 +34,7 @@ class Zip implements ArchiverInterface {
    *   (Optional) settings to open the archive with the following keys:
    *   - 'flags': The mode to open the archive with \ZipArchive::open().
    *
-   * @throws \Drupal\Core\Archiver\ArchiverException
+   * @throws ArchiverException
    */
   public function __construct($file_path, array $configuration = []) {
     $this->zip = new \ZipArchive();

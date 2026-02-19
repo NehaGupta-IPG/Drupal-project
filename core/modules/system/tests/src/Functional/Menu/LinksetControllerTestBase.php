@@ -56,15 +56,15 @@ abstract class LinksetControllerTestBase extends BrowserTestBase {
    *
    * @param string $method
    *   HTTP method.
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   URL to request.
    * @param int $expected_status
    *   The expected status code.
-   * @param \Drupal\user\UserInterface $account
+   * @param UserInterface $account
    *   A user account whose credentials should be used to authenticate the
    *   request.
    *
-   * @return \GuzzleHttp\Psr7\Response
+   * @return Response
    *   The response object.
    */
   protected function doRequest(string $method, Url $url, $expected_status = 200, ?UserInterface $account = NULL): Response {
@@ -86,9 +86,9 @@ abstract class LinksetControllerTestBase extends BrowserTestBase {
    * @param string|false $expect_cache
    *   'HIT', 'MISS', or FALSE. Asserts the value of the X-Drupal-Cache header.
    *   FALSE if the page cache is not applicable.
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface $expected_metadata
+   * @param CacheableDependencyInterface $expected_metadata
    *   The expected cacheability metadata.
-   * @param \GuzzleHttp\Psr7\Response $response
+   * @param Response $response
    *   The response on which to assert cacheability.
    */
   protected function assertDrupalResponseCacheability($expect_cache, CacheableDependencyInterface $expected_metadata, Response $response) {
@@ -116,10 +116,10 @@ abstract class LinksetControllerTestBase extends BrowserTestBase {
    * @param array $options
    *   Menu options.
    *
-   * @return \Drupal\menu_link_content\MenuLinkContentInterface
+   * @return MenuLinkContentInterface
    *   The newly created menu link content entity.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *
    * @see \Drupal\menu_link_content\MenuLinkContentInterface::create()
    */

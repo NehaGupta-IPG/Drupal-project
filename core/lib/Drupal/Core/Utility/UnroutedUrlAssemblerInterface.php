@@ -44,7 +44,7 @@ interface UnroutedUrlAssemblerInterface {
    *   (optional) Defaults to FALSE. When TRUE, both the generated URL and its
    *   associated bubbleable metadata are returned.
    *
-   * @return string|\Drupal\Core\GeneratedUrl
+   * @return string|GeneratedUrl
    *   A string containing a relative or absolute URL.
    *   When $collect_bubbleable_metadata is TRUE, a GeneratedUrl object is
    *   returned, containing the generated URL plus bubbleable metadata.

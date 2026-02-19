@@ -14,14 +14,14 @@ class PluginFormFactory implements PluginFormFactoryInterface {
   /**
    * The class resolver.
    *
-   * @var \Drupal\Core\DependencyInjection\ClassResolverInterface
+   * @var ClassResolverInterface
    */
   protected $classResolver;
 
   /**
    * PluginFormFactory constructor.
    *
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $class_resolver
+   * @param ClassResolverInterface $class_resolver
    *   The class resolver.
    */
   public function __construct(ClassResolverInterface $class_resolver) {

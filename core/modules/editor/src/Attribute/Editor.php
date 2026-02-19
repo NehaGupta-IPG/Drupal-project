@@ -8,7 +8,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 /**
  * Defines an Editor attribute object.
  *
- * Plugin Namespace: Plugin\Editor
+ * Plugin Namespace: Plugin\Editor.
  *
  * For a working example, see \Drupal\ckeditor5\Plugin\Editor\CKEditor5
  *
@@ -26,7 +26,7 @@ class Editor extends Plugin {
    *
    * @param string $id
    *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $label
+   * @param TranslatableMarkup $label
    *   The human-readable name of the text editor, translated.
    * @param bool $supports_content_filtering
    *   Whether the editor supports "allowed content only" filtering.

@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\entity_test_bundle_class\Hook;
 
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\entity_test\Entity\EntityTest;
-use Drupal\entity_test_bundle_class\Entity\EntityTestVariant;
-use Drupal\entity_test_bundle_class\Entity\SharedEntityTestBundleClassB;
-use Drupal\entity_test_bundle_class\Entity\SharedEntityTestBundleClassA;
-use Drupal\entity_test_bundle_class\Entity\EntityTestUserClass;
-use Drupal\entity_test_bundle_class\Entity\NonInheritingBundleClass;
 use Drupal\entity_test_bundle_class\Entity\EntityTestAmbiguousBundleClass;
 use Drupal\entity_test_bundle_class\Entity\EntityTestBundleClass;
-use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\entity_test_bundle_class\Entity\EntityTestUserClass;
+use Drupal\entity_test_bundle_class\Entity\EntityTestVariant;
+use Drupal\entity_test_bundle_class\Entity\NonInheritingBundleClass;
+use Drupal\entity_test_bundle_class\Entity\SharedEntityTestBundleClassA;
+use Drupal\entity_test_bundle_class\Entity\SharedEntityTestBundleClassB;
 
 /**
  * Hook implementations for entity_test_bundle_class.

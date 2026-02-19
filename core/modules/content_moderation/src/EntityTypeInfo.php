@@ -2,10 +2,15 @@
 
 namespace Drupal\content_moderation;
 
+use Drupal\content_moderation\Entity\Handler\BlockContentModerationHandler;
+use Drupal\content_moderation\Entity\Handler\ModerationHandler;
+use Drupal\content_moderation\Entity\Handler\NodeModerationHandler;
+use Drupal\content_moderation\Entity\Handler\TaxonomyTermModerationHandler;
+use Drupal\content_moderation\Entity\Routing\EntityModerationRouteProvider;
 use Drupal\content_moderation\Plugin\Field\ModerationStateFieldItemList;
+use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\BundleEntityFormBase;
 use Drupal\Core\Entity\ContentEntityFormInterface;
-use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
@@ -17,11 +22,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
-use Drupal\content_moderation\Entity\Handler\BlockContentModerationHandler;
-use Drupal\content_moderation\Entity\Handler\ModerationHandler;
-use Drupal\content_moderation\Entity\Handler\NodeModerationHandler;
-use Drupal\content_moderation\Entity\Handler\TaxonomyTermModerationHandler;
-use Drupal\content_moderation\Entity\Routing\EntityModerationRouteProvider;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -39,35 +39,35 @@ class EntityTypeInfo implements ContainerInjectionInterface {
   /**
    * The moderation information service.
    *
-   * @var \Drupal\content_moderation\ModerationInformationInterface
+   * @var ModerationInformationInterface
    */
   protected $moderationInfo;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The bundle information service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @var EntityTypeBundleInfoInterface
    */
   protected $bundleInfo;
 
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
   /**
    * The state transition validation service.
    *
-   * @var \Drupal\content_moderation\StateTransitionValidationInterface
+   * @var StateTransitionValidationInterface
    */
   protected $validator;
 
@@ -87,17 +87,17 @@ class EntityTypeInfo implements ContainerInjectionInterface {
   /**
    * EntityTypeInfo constructor.
    *
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
+   * @param TranslationInterface $translation
    *   The translation service. for form alters.
-   * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_information
+   * @param ModerationInformationInterface $moderation_information
    *   The moderation information service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   Entity type manager.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info
+   * @param EntityTypeBundleInfoInterface $bundle_info
    *   Bundle information service.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   Current user.
-   * @param \Drupal\content_moderation\StateTransitionValidationInterface $validator
+   * @param StateTransitionValidationInterface $validator
    *   State transition validator.
    */
   public function __construct(TranslationInterface $translation, ModerationInformationInterface $moderation_information, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $bundle_info, AccountInterface $current_user, StateTransitionValidationInterface $validator) {
@@ -126,7 +126,7 @@ class EntityTypeInfo implements ContainerInjectionInterface {
   /**
    * Adds Moderation configuration to appropriate entity types.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface[] $entity_types
+   * @param EntityTypeInterface[] $entity_types
    *   The master entity type list to alter.
    *
    * @see hook_entity_type_alter()
@@ -159,10 +159,10 @@ class EntityTypeInfo implements ContainerInjectionInterface {
    * This primarily just means an extra handler. A Generic one is provided,
    * but individual entity types can provide their own as appropriate.
    *
-   * @param \Drupal\Core\Entity\ContentEntityTypeInterface $type
+   * @param ContentEntityTypeInterface $type
    *   The content entity definition to modify.
    *
-   * @return \Drupal\Core\Entity\ContentEntityTypeInterface
+   * @return ContentEntityTypeInterface
    *   The modified content entity definition.
    */
   protected function addModerationToEntityType(ContentEntityTypeInterface $type) {
@@ -248,10 +248,10 @@ class EntityTypeInfo implements ContainerInjectionInterface {
   /**
    * Adds base field info to an entity type.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   Entity type for adding base fields to.
    *
-   * @return \Drupal\Core\Field\BaseFieldDefinition[]
+   * @return BaseFieldDefinition[]
    *   New fields added by moderation state.
    *
    * @see hook_entity_base_field_info()
@@ -289,11 +289,11 @@ class EntityTypeInfo implements ContainerInjectionInterface {
   /**
    * Replaces the entity form entity object with a proper revision object.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity being edited.
    * @param string $operation
    *   The entity form operation.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    *
    * @see hook_entity_prepare_form()
@@ -325,7 +325,7 @@ class EntityTypeInfo implements ContainerInjectionInterface {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param string $form_id
    *   The form id.
@@ -372,7 +372,7 @@ class EntityTypeInfo implements ContainerInjectionInterface {
   /**
    * Checks whether the specified form allows to edit a moderated entity.
    *
-   * @param \Drupal\Core\Form\FormInterface $form_object
+   * @param FormInterface $form_object
    *   The form object.
    *
    * @return bool
@@ -392,7 +392,7 @@ class EntityTypeInfo implements ContainerInjectionInterface {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public static function bundleFormRedirect(array &$form, FormStateInterface $form_state) {

@@ -10,7 +10,7 @@ interface FieldStorageDefinitionListenerInterface {
   /**
    * Reacts to the creation of a field storage definition.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The definition being created.
    */
   public function onFieldStorageDefinitionCreate(FieldStorageDefinitionInterface $storage_definition);
@@ -18,12 +18,12 @@ interface FieldStorageDefinitionListenerInterface {
   /**
    * Reacts to the update of a field storage definition.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field being updated.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $original
+   * @param FieldStorageDefinitionInterface $original
    *   The original storage definition; i.e., the definition before the update.
    *
-   * @throws \Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException
+   * @throws FieldStorageDefinitionUpdateForbiddenException
    *   Thrown when the update to the field is forbidden.
    */
   public function onFieldStorageDefinitionUpdate(FieldStorageDefinitionInterface $storage_definition, FieldStorageDefinitionInterface $original);
@@ -31,7 +31,7 @@ interface FieldStorageDefinitionListenerInterface {
   /**
    * Reacts to the deletion of a field storage definition.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field being deleted.
    */
   public function onFieldStorageDefinitionDelete(FieldStorageDefinitionInterface $storage_definition);

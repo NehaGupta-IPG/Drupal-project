@@ -32,11 +32,11 @@ class Condition extends Plugin {
    *
    * @param string $id
    *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $label
+   * @param TranslatableMarkup|null $label
    *   (optional) The human-readable name of the condition.
    * @param string|null $module
    *   (optional) The name of the module providing the type.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $category
+   * @param TranslatableMarkup|null $category
    *   (optional) The category under which the condition should be listed in the
    *   UI.
    * @param array $context_definitions

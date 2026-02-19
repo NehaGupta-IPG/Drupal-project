@@ -16,9 +16,9 @@ trait FieldDiscoveryTestTrait {
   /**
    * Asserts the field discovery returns the expected processes.
    *
-   * @param \Drupal\migrate_drupal\FieldDiscoveryInterface $field_discovery
+   * @param FieldDiscoveryInterface $field_discovery
    *   The Field Discovery service.
-   * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
+   * @param MigrationPluginManagerInterface $migration_plugin_manager
    *   The migration plugin manager service.
    * @param string $core
    *   The Drupal core version, either '6', or '7'.
@@ -53,9 +53,9 @@ trait FieldDiscoveryTestTrait {
   /**
    * Asserts the field discovery returns the expected processes.
    *
-   * @param \Drupal\migrate_drupal\FieldDiscoveryInterface $field_discovery
+   * @param FieldDiscoveryInterface $field_discovery
    *   The Field Discovery service.
-   * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
+   * @param MigrationPluginManagerInterface $migration_plugin_manager
    *   The migration plugin manager service.
    * @param string $core
    *   The Drupal core version, either '6', or '7'.

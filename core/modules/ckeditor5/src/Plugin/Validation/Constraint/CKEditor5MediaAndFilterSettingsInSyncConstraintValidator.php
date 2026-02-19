@@ -4,14 +4,14 @@ declare(strict_types = 1);
 
 namespace Drupal\ckeditor5\Plugin\Validation\Constraint;
 
+use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\filter\FilterPluginManager;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Drupal\filter\FilterPluginManager;
-use Drupal\Core\Config\TypedConfigManagerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * CKEditor 5 Media plugin in sync with the filter settings validator.
@@ -27,23 +27,23 @@ class CKEditor5MediaAndFilterSettingsInSyncConstraintValidator extends Constrain
   /**
    * The filter plugin manager service.
    *
-   * @var \Drupal\filter\FilterPluginManager
+   * @var FilterPluginManager
    */
   protected $filterPluginManager;
 
   /**
    * The typed config manager service.
    *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface
+   * @var TypedConfigManagerInterface
    */
   protected $typedConfigManager;
 
   /**
    * Constructs a new CKEditor5MediaAndFilterSettingsInSyncConstraintValidator.
    *
-   * @param \Drupal\filter\FilterPluginManager $filter_plugin_manager
+   * @param FilterPluginManager $filter_plugin_manager
    *   The filter plugin manager service.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config_manager
+   * @param TypedConfigManagerInterface $typed_config_manager
    *   The typed config manager service.
    */
   public function __construct(FilterPluginManager $filter_plugin_manager, TypedConfigManagerInterface $typed_config_manager) {
@@ -64,7 +64,7 @@ class CKEditor5MediaAndFilterSettingsInSyncConstraintValidator extends Constrain
   /**
    * {@inheritdoc}
    *
-   * @throws \Symfony\Component\Validator\Exception\UnexpectedTypeException
+   * @throws UnexpectedTypeException
    *   Thrown when the given constraint is not supported by this validator.
    */
   public function validate($toolbar_item, Constraint $constraint): void {

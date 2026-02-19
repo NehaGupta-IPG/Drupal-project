@@ -13,14 +13,14 @@ class LanguagesCacheContext implements CalculatedCacheContextInterface {
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * Constructs a new LanguagesCacheContext service.
    *
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
    */
   public function __construct(LanguageManagerInterface $language_manager) {
@@ -41,7 +41,7 @@ class LanguagesCacheContext implements CalculatedCacheContextInterface {
    * manager, typically:
    * - LanguageInterface::TYPE_INTERFACE
    * - LanguageInterface::TYPE_CONTENT
-   * - LanguageInterface::TYPE_URL
+   * - LanguageInterface::TYPE_URL.
    *
    * @see \Drupal\Core\Language\LanguageManagerInterface::getLanguageTypes()
    *

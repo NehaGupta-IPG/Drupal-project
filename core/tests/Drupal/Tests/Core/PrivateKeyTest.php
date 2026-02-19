@@ -18,14 +18,14 @@ class PrivateKeyTest extends UnitTestCase {
   /**
    * The state mock class.
    *
-   * @var \Drupal\Core\State\StateInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\State\StateInterface|MockObject
    */
   protected $state;
 
   /**
    * The private key service mock.
    *
-   * @var \Drupal\Core\PrivateKey
+   * @var PrivateKey
    */
   protected $privateKey;
 

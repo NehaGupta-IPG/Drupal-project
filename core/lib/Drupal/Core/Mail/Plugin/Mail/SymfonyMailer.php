@@ -88,9 +88,9 @@ class SymfonyMailer implements MailInterface, ContainerFactoryPluginInterface {
   /**
    * Symfony mailer constructor.
    *
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   The logger service.
-   * @param \Symfony\Component\Mailer\MailerInterface $mailer
+   * @param MailerInterface $mailer
    *   The mailer service. Only specify an instance in unit tests, pass NULL in
    *   production.
    */

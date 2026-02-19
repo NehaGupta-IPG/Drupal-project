@@ -1056,7 +1056,7 @@ class ConfigImporterTest extends KernelTestBase {
    *
    * @param array $context
    *   Batch context.
-   * @param \Drupal\Core\Config\ConfigImporter $importer
+   * @param ConfigImporter $importer
    *   The config importer.
    */
   public static function customStep(array &$context, ConfigImporter $importer): void {

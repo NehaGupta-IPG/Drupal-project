@@ -127,7 +127,7 @@ class SqlTest extends UnitTestCase {
   /**
    * Sets up the views data in the container.
    *
-   * @param \Drupal\views\ViewsData $views_data
+   * @param ViewsData $views_data
    *   The views data.
    */
   protected function setupViewsData(ViewsData $views_data): void {
@@ -139,7 +139,7 @@ class SqlTest extends UnitTestCase {
   /**
    * Sets up the entity type manager in the container.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   protected function setupEntityTypeManager(EntityTypeManagerInterface $entity_type_manager): void {
@@ -151,12 +151,12 @@ class SqlTest extends UnitTestCase {
   /**
    * Sets up some test entity types and corresponding views data.
    *
-   * @param \Drupal\Core\Entity\EntityInterface[][] $entities_by_type
+   * @param EntityInterface[][] $entities_by_type
    *   Test entities keyed by entity type and entity ID.
-   * @param \Drupal\Core\Entity\EntityInterface[][] $entity_revisions_by_type
+   * @param EntityInterface[][] $entity_revisions_by_type
    *   Test entities keyed by entity type and revision ID.
    *
-   * @return \Prophecy\Prophecy\ObjectProphecy<\Drupal\Core\Entity\EntityTypeManagerInterface>
+   * @return ObjectProphecy<EntityTypeManagerInterface>
    *   The mocked entity type manager.
    */
   protected function setupEntityTypes($entities_by_type = [], $entity_revisions_by_type = []): ObjectProphecy {

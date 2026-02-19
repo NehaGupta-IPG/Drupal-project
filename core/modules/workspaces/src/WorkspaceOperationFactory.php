@@ -33,10 +33,10 @@ class WorkspaceOperationFactory {
   /**
    * Gets the workspace publisher.
    *
-   * @param \Drupal\workspaces\WorkspaceInterface $source
+   * @param WorkspaceInterface $source
    *   A workspace entity.
    *
-   * @return \Drupal\workspaces\WorkspacePublisherInterface
+   * @return WorkspacePublisherInterface
    *   A workspace publisher object.
    */
   public function getPublisher(WorkspaceInterface $source) {
@@ -46,12 +46,12 @@ class WorkspaceOperationFactory {
   /**
    * Gets the workspace merger.
    *
-   * @param \Drupal\workspaces\WorkspaceInterface $source
+   * @param WorkspaceInterface $source
    *   The source workspace entity.
-   * @param \Drupal\workspaces\WorkspaceInterface $target
+   * @param WorkspaceInterface $target
    *   The target workspace entity.
    *
-   * @return \Drupal\workspaces\WorkspaceMergerInterface
+   * @return WorkspaceMergerInterface
    *   A workspace merger object.
    */
   public function getMerger(WorkspaceInterface $source, WorkspaceInterface $target) {

@@ -12,7 +12,7 @@ class ContentModerationState implements StateInterface {
   /**
    * The vanilla state object from the Workflow module.
    *
-   * @var \Drupal\workflows\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
@@ -36,7 +36,7 @@ class ContentModerationState implements StateInterface {
    * Decorates state objects to add methods to determine if an entity should be
    * published or made the default revision.
    *
-   * @param \Drupal\workflows\StateInterface $state
+   * @param StateInterface $state
    *   The vanilla state object from the Workflow module.
    * @param bool $published
    *   (optional) TRUE if entities should be published if in this state, FALSE

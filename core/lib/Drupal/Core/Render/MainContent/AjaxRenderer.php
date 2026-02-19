@@ -18,23 +18,23 @@ class AjaxRenderer implements MainContentRendererInterface {
   /**
    * The element info manager.
    *
-   * @var \Drupal\Core\Render\ElementInfoManagerInterface
+   * @var ElementInfoManagerInterface
    */
   protected $elementInfoManager;
 
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * Constructs a new AjaxRenderer instance.
    *
-   * @param \Drupal\Core\Render\ElementInfoManagerInterface $element_info_manager
+   * @param ElementInfoManagerInterface $element_info_manager
    *   The element info manager.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
    */
   public function __construct(ElementInfoManagerInterface $element_info_manager, RendererInterface $renderer) {

@@ -13,14 +13,14 @@ interface FileValidatorInterface {
   /**
    * Validates a File with a list of validators.
    *
-   * @param \Drupal\file\FileInterface $file
+   * @param FileInterface $file
    *   The file to validate.
    * @param array $validators
    *   An associative array of validators with:
    *   - key: the plugin ID of the file validation constraint.
    *   - value: an associative array of options to pass to the constraint.
    *
-   * @return \Symfony\Component\Validator\ConstraintViolationListInterface
+   * @return ConstraintViolationListInterface
    *   The violations list.
    */
   public function validate(FileInterface $file, array $validators): ConstraintViolationListInterface;

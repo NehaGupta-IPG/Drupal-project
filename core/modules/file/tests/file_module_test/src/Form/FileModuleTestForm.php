@@ -26,7 +26,7 @@ class FileModuleTestForm extends FormBase {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param bool $tree
    *   (optional) If the form should use #tree. Defaults to TRUE.

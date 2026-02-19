@@ -13,7 +13,7 @@ class AuditResult implements MarkupInterface, \Countable {
   /**
    * The audited migration.
    *
-   * @var \Drupal\migrate\Plugin\MigrationInterface
+   * @var MigrationInterface
    */
   protected $migration;
 
@@ -34,7 +34,7 @@ class AuditResult implements MarkupInterface, \Countable {
   /**
    * AuditResult constructor.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The audited migration.
    * @param bool $status
    *   The result of the audit (TRUE if passed, FALSE otherwise).
@@ -53,7 +53,7 @@ class AuditResult implements MarkupInterface, \Countable {
   /**
    * Returns the audited migration.
    *
-   * @return \Drupal\migrate\Plugin\MigrationInterface
+   * @return MigrationInterface
    *   The audited migration.
    */
   public function getMigration() {
@@ -87,7 +87,7 @@ class AuditResult implements MarkupInterface, \Countable {
   /**
    * Creates a passing audit result for a migration.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The audited migration.
    * @param string[] $reasons
    *   (optional) The reasons why the migration passed the audit.
@@ -101,7 +101,7 @@ class AuditResult implements MarkupInterface, \Countable {
   /**
    * Creates a failing audit result for a migration.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The audited migration.
    * @param array $reasons
    *   (optional) The reasons why the migration failed the audit.

@@ -82,7 +82,7 @@ abstract class HttpExceptionSubscriberBase implements EventSubscriberInterface {
   /**
    * Handles errors for this subscriber.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   * @param ExceptionEvent $event
    *   The event to process.
    */
   public function onException(ExceptionEvent $event) {

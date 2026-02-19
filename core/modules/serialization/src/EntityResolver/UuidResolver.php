@@ -13,14 +13,14 @@ class UuidResolver implements EntityResolverInterface {
   /**
    * The entity repository.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   * @var EntityRepositoryInterface
    */
   protected $entityRepository;
 
   /**
    * Constructs a UuidResolver object.
    *
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository.
    */
   public function __construct(EntityRepositoryInterface $entity_repository) {

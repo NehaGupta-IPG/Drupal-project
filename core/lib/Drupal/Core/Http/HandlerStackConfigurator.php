@@ -38,14 +38,14 @@ class HandlerStackConfigurator {
   /**
    * The service container.
    *
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface
+   * @var ContainerInterface
    */
   protected $container;
 
   /**
    * Constructs a new HandlerStackConfigurator object.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @param ContainerInterface $container
    *   The service container.
    * @param string[] $middleware_ids
    *   The middleware IDs.
@@ -76,7 +76,7 @@ class HandlerStackConfigurator {
   /**
    * Configures the stack using services tagged as http_client_middleware.
    *
-   * @param \GuzzleHttp\HandlerStack $handler_stack
+   * @param HandlerStack $handler_stack
    *   The handler stack.
    */
   public function configure(HandlerStack $handler_stack) {

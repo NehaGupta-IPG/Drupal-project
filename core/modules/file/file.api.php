@@ -10,7 +10,6 @@ use Drupal\file\FileInterface;
  * @file
  * Hooks for file module.
  */
-
 /**
  * @defgroup file File interface
  * @{
@@ -59,7 +58,6 @@ use Drupal\file\FileInterface;
  *
  * @}
  */
-
 /**
  * @addtogroup hooks
  * @{
@@ -68,9 +66,9 @@ use Drupal\file\FileInterface;
 /**
  * Respond to a file that has been copied.
  *
- * @param \Drupal\file\FileInterface $file
+ * @param FileInterface $file
  *   The newly copied file entity.
- * @param \Drupal\file\FileInterface $source
+ * @param FileInterface $source
  *   The original file before the copy.
  *
  * @see \Drupal\file\FileRepositoryInterface::copy()
@@ -88,9 +86,9 @@ function hook_file_copy(FileInterface $file, FileInterface $source): void {
 /**
  * Respond to a file that has been moved.
  *
- * @param \Drupal\file\FileInterface $file
+ * @param FileInterface $file
  *   The updated file entity after the move.
- * @param \Drupal\file\FileInterface $source
+ * @param FileInterface $source
  *   The original file entity before the move.
  *
  * @see \Drupal\file\FileRepositoryInterface::move()

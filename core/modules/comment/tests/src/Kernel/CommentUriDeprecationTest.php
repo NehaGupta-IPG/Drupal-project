@@ -28,7 +28,7 @@ class CommentUriDeprecationTest extends EntityKernelTestBase {
   /**
    * A user to add comments.
    *
-   * @var \Drupal\user\UserInterface
+   * @var UserInterface
    */
   protected UserInterface $commentUser;
 

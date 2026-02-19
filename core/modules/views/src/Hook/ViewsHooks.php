@@ -3,19 +3,19 @@
 namespace Drupal\views\Hook;
 
 use Drupal\block\BlockInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\views\ViewsConfigUpdater;
-use Drupal\views\ViewEntityInterface;
-use Drupal\views\Plugin\Derivative\ViewsLocalTask;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Database\Query\AlterableInterface;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
+use Drupal\views\Plugin\Derivative\ViewsLocalTask;
+use Drupal\views\ViewEntityInterface;
 use Drupal\views\ViewExecutable;
 use Drupal\views\Views;
-use Drupal\Component\Utility\Html;
-use Drupal\Core\Url;
-use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\views\ViewsConfigUpdater;
 
 /**
  * Hook implementations for views.
@@ -239,7 +239,7 @@ class ViewsHooks {
    */
   #[Hook('view_presave')]
   public function viewPresave(ViewEntityInterface $view): void {
-    /** @var \Drupal\views\ViewsConfigUpdater $config_updater */
+    /** @var ViewsConfigUpdater $config_updater */
     $config_updater = \Drupal::service(ViewsConfigUpdater::class);
     $config_updater->updateAll($view);
   }

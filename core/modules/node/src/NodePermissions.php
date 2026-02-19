@@ -4,8 +4,8 @@ namespace Drupal\node;
 
 use Drupal\Core\DependencyInjection\AutowireTrait;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\BundlePermissionHandlerTrait;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\node\Entity\NodeType;
 
@@ -45,7 +45,7 @@ class NodePermissions implements ContainerInjectionInterface {
   /**
    * Returns a list of node permissions for a given node type.
    *
-   * @param \Drupal\node\Entity\NodeType $type
+   * @param NodeType $type
    *   The node type.
    *
    * @return array

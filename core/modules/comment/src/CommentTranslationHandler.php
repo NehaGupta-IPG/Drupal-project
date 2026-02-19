@@ -2,8 +2,8 @@
 
 namespace Drupal\comment;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\content_translation\ContentTranslationHandler;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -39,7 +39,7 @@ class CommentTranslationHandler extends ContentTranslationHandler {
   public function entityFormEntityBuild($entity_type, EntityInterface $entity, array $form, FormStateInterface $form_state) {
     if ($form_state->hasValue('content_translation')) {
       $translation = &$form_state->getValue('content_translation');
-      /** @var \Drupal\comment\CommentInterface $entity */
+      /** @var CommentInterface $entity */
       $translation['status'] = $entity->isPublished();
       $translation['name'] = $entity->getAuthorName();
     }

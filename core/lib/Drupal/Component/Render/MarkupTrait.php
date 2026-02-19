@@ -26,7 +26,7 @@ trait MarkupTrait {
    * @param mixed $string
    *   The string to mark as safe. This value will be cast to a string.
    *
-   * @return string|\Drupal\Component\Render\MarkupInterface
+   * @return string|MarkupInterface
    *   A safe string.
    */
   public static function create($string) {

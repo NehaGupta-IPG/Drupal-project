@@ -26,7 +26,7 @@ class QueryBatchTest extends KernelTestBase {
   /**
    * The mocked migration.
    *
-   * @var \Drupal\migrate\Plugin\MigrationInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var MigrationInterface|ObjectProphecy
    */
   protected $migration;
 
@@ -227,7 +227,7 @@ class QueryBatchTest extends KernelTestBase {
    *   The source data, keyed by table name. Each table is an array containing
    *   the rows in that table.
    *
-   * @return \Drupal\sqlite\Driver\Database\sqlite\Connection
+   * @return Connection
    *   The SQLite database connection.
    */
   protected function getDatabase(array $source_data) {

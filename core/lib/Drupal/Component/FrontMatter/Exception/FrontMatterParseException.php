@@ -24,7 +24,7 @@ class FrontMatterParseException extends InvalidDataTypeException {
   /**
    * Constructs a new FrontMatterParseException instance.
    *
-   * @param \Drupal\Component\Serialization\Exception\InvalidDataTypeException $exception
+   * @param InvalidDataTypeException $exception
    *   The exception thrown when attempting to parse front matter data.
    */
   public function __construct(InvalidDataTypeException $exception) {

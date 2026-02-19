@@ -6,8 +6,8 @@ namespace Drupal\Tests\announcements_feed\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use GuzzleHttp\Client;
-use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 
@@ -64,7 +64,7 @@ abstract class AnnounceTestBase extends KernelTestBase {
   /**
    * Sets test feed responses.
    *
-   * @param \GuzzleHttp\Psr7\Response[] $responses
+   * @param Response[] $responses
    *   The responses for the http_client service to return.
    */
   protected function setTestFeedResponses(array $responses): void {

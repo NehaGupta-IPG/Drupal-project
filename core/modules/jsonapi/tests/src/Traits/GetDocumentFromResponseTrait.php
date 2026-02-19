@@ -16,7 +16,7 @@ trait GetDocumentFromResponseTrait {
   /**
    * Retrieve document from response, with basic validation.
    *
-   * @param \Psr\Http\Message\ResponseInterface $response
+   * @param ResponseInterface $response
    *   Response to extract JSON:API document from.
    * @param bool $validate
    *   Determines whether the data is validated or not. Defaults to TRUE.
@@ -24,7 +24,7 @@ trait GetDocumentFromResponseTrait {
    * @return ?array
    *   JSON:API document extracted from the response, or NULL.
    *
-   * @throws \PHPUnit\Framework\AssertionFailedError
+   * @throws AssertionFailedError
    *   Thrown when the document does not pass basic validation against the spec.
    */
   protected function getDocumentFromResponse(ResponseInterface $response, bool $validate = TRUE): ?array {

@@ -28,7 +28,7 @@ class TranslatableStringTest extends PackageManagerKernelTestBase {
     $factory = $this->container->get(TranslatableFactoryInterface::class);
     $this->assertInstanceOf(TranslatableStringFactory::class, $factory);
 
-    /** @var \Drupal\package_manager\TranslatableStringAdapter $string */
+    /** @var TranslatableStringAdapter $string */
     $string = $factory->createTranslatableMessage('This string has no parameters.');
     $this->assertInstanceOf(TranslatableStringAdapter::class, $string);
     $this->assertEmpty($string->getArguments());

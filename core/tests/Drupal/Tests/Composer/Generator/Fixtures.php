@@ -14,7 +14,7 @@ class Fixtures {
   /**
    * Generate a suitable DrupalCoreComposer fixture for testing.
    *
-   * @return \Drupal\Composer\Generator\Util\DrupalCoreComposer
+   * @return DrupalCoreComposer
    *   DrupalCoreComposer fixture.
    */
   public function drupalCoreComposerFixture(): DrupalCoreComposer {

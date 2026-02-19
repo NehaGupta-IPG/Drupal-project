@@ -20,28 +20,28 @@ class FormCacheTest extends UnitTestCase {
   /**
    * The form cache object under test.
    *
-   * @var \Drupal\Core\Form\FormCache
+   * @var FormCache
    */
   protected $formCache;
 
   /**
    * The expirable key value factory.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface|MockObject
    */
   protected $keyValueExpirableFactory;
 
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Session\AccountInterface|MockObject
    */
   protected $account;
 
   /**
    * The CSRF token generator.
    *
-   * @var \Drupal\Core\Access\CsrfTokenGenerator|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Access\CsrfTokenGenerator|MockObject
    */
   protected $csrfToken;
 
@@ -55,35 +55,35 @@ class FormCacheTest extends UnitTestCase {
   /**
    * The expirable key value store used by form cache.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface|MockObject
    */
   protected $formCacheStore;
 
   /**
    * The expirable key value store used by form state cache.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface|MockObject
    */
   protected $formStateCacheStore;
 
   /**
    * The logger channel.
    *
-   * @var \Psr\Log\LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Psr\Log\LoggerInterface|MockObject
    */
   protected $logger;
 
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Symfony\Component\HttpFoundation\RequestStack|MockObject
    */
   protected $requestStack;
 
   /**
    * A policy rule determining the cacheability of a request.
    *
-   * @var \Drupal\Core\PageCache\RequestPolicyInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\PageCache\RequestPolicyInterface|MockObject
    */
   protected $requestPolicy;
 

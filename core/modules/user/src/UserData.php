@@ -12,14 +12,14 @@ class UserData implements UserDataInterface {
   /**
    * The database connection to use.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
   /**
    * Constructs a new user data service.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection to use.
    */
   public function __construct(Connection $connection) {

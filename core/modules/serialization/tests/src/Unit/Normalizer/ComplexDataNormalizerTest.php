@@ -30,7 +30,7 @@ class ComplexDataNormalizerTest extends UnitTestCase {
   /**
    * The Complex data normalizer under test.
    *
-   * @var \Drupal\serialization\Normalizer\ComplexDataNormalizer
+   * @var ComplexDataNormalizer
    */
   protected $normalizer;
 

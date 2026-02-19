@@ -27,42 +27,42 @@ class DateTest extends UnitTestCase {
   /**
    * The mocked entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|MockObject
    */
   protected $entityTypeManager;
 
   /**
    * The mocked language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Language\LanguageManagerInterface|MockObject
    */
   protected $languageManager;
 
   /**
    * The mocked string translation.
    *
-   * @var \Drupal\Core\StringTranslation\TranslationInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\StringTranslation\TranslationInterface|MockObject
    */
   protected $stringTranslation;
 
   /**
    * The mocked string translation.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Symfony\Component\HttpFoundation\RequestStack|MockObject
    */
   protected $requestStack;
 
   /**
    * The mocked date formatter class.
    *
-   * @var \Drupal\Core\Datetime\DateFormatter
+   * @var DateFormatter
    */
   protected $dateFormatter;
 
   /**
    * The date formatter class where methods can be stubbed.
    *
-   * @var \Drupal\Core\Datetime\DateFormatter|\PHPUnit\Framework\MockObject\MockObject
+   * @var DateFormatter|MockObject
    */
   protected $dateFormatterStub;
 

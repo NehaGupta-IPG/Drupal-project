@@ -24,7 +24,7 @@ class BackendCompilerPassTest extends UnitTestCase {
   /**
    * The tested backend compiler pass.
    *
-   * @var \Drupal\Core\DependencyInjection\Compiler\BackendCompilerPass
+   * @var BackendCompilerPass
    */
   protected $backendPass;
 
@@ -113,10 +113,10 @@ class BackendCompilerPassTest extends UnitTestCase {
    * This is necessary because the container clone does not clone the parameter
    * bag so the setParameter() call effects the parent container as well.
    *
-   * @param \Symfony\Component\DependencyInjection\Definition $service
+   * @param Definition $service
    *   The service definition.
    *
-   * @return \Symfony\Component\DependencyInjection\ContainerBuilder
+   * @return ContainerBuilder
    *   The container with a sqlite database service in it.
    */
   protected function getSqliteContainer($service): ContainerBuilder {
@@ -134,10 +134,10 @@ class BackendCompilerPassTest extends UnitTestCase {
    * This is necessary because the container clone does not clone the parameter
    * bag so the setParameter() call effects the parent container as well.
    *
-   * @param \Symfony\Component\DependencyInjection\Definition $service
+   * @param Definition $service
    *   The service definition.
    *
-   * @return \Symfony\Component\DependencyInjection\ContainerBuilder
+   * @return ContainerBuilder
    *   The container with a mysql database service in it.
    */
   protected function getMysqlContainer($service): ContainerBuilder {
@@ -153,10 +153,10 @@ class BackendCompilerPassTest extends UnitTestCase {
    * This is necessary because the container clone does not clone the parameter
    * bag so the setParameter() call effects the parent container as well.
    *
-   * @param \Symfony\Component\DependencyInjection\Definition $service
+   * @param Definition $service
    *   The service definition.
    *
-   * @return \Symfony\Component\DependencyInjection\ContainerBuilder
+   * @return ContainerBuilder
    *   The container with a DriverTestMysql database service in it.
    */
   protected function getDriverTestMysqlContainer($service): ContainerBuilder {
@@ -173,7 +173,7 @@ class BackendCompilerPassTest extends UnitTestCase {
    * This mock won't declare a driver nor databaseType to ensure no invalid
    * aliases are set.
    *
-   * @return \Symfony\Component\DependencyInjection\ContainerBuilder
+   * @return ContainerBuilder
    *   The container with a mock database service in it.
    */
   protected function getMockDriverContainerWithNullDriverBackend(): ContainerBuilder&MockObject {
@@ -207,7 +207,7 @@ class BackendCompilerPassTest extends UnitTestCase {
    * This mock container has a default_backend parameter and a dot-prefixed
    * service to verify the right aliases are set.
    *
-   * @return \Symfony\Component\DependencyInjection\ContainerBuilder
+   * @return ContainerBuilder
    *   The container with a mock database service in it.
    */
   protected function getMockDriverContainerWithDefaultBackendParameterArgumentAndDotPrefixedService(): ContainerBuilder&MockObject {

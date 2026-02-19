@@ -23,13 +23,13 @@ final class ContentDispositionFilenameParser {
   /**
    * Parse the content disposition header and return the filename.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
    * @return string
    *   The filename.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws BadRequestHttpException
    *   Thrown when the 'Content-Disposition' request header is invalid.
    */
   public static function parseFilename(Request $request): string {

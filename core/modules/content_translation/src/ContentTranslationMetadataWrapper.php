@@ -13,21 +13,21 @@ class ContentTranslationMetadataWrapper implements ContentTranslationMetadataWra
   /**
    * The wrapped entity translation.
    *
-   * @var \Drupal\Core\Entity\FieldableEntityInterface|\Drupal\Core\TypedData\TranslatableInterface
+   * @var \Drupal\Core\Entity\FieldableEntityInterface|TranslatableInterface
    */
   protected $translation;
 
   /**
    * The content translation handler.
    *
-   * @var \Drupal\content_translation\ContentTranslationHandlerInterface
+   * @var ContentTranslationHandlerInterface
    */
   protected $handler;
 
   /**
    * Initializes an instance of the content translation metadata handler.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $translation
+   * @param EntityInterface $translation
    *   The entity translation to be wrapped.
    * @param ContentTranslationHandlerInterface $handler
    *   The content translation handler.

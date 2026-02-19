@@ -13,7 +13,7 @@ interface UserStorageInterface extends ContentEntityStorageInterface {
   /**
    * Update the last login timestamp of the user.
    *
-   * @param \Drupal\user\UserInterface $account
+   * @param UserInterface $account
    *   The user account.
    */
   public function updateLastLoginTimestamp(UserInterface $account);
@@ -21,7 +21,7 @@ interface UserStorageInterface extends ContentEntityStorageInterface {
   /**
    * Update the last access timestamp of the user.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user object.
    * @param int $timestamp
    *   The last access timestamp.

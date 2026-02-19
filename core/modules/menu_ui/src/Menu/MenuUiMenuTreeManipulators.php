@@ -22,7 +22,7 @@ class MenuUiMenuTreeManipulators {
    *   been created. In this case, there is no access to the route because it
    *   does not exist.
    *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
+   * @param MenuLinkTreeElement[] $tree
    *   The menu link tree to manipulate.
    *
    * @return \Drupal\Core\Menu\MenuLinkTreeElement[]

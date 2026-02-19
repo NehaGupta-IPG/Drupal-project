@@ -15,7 +15,7 @@ class ConditionAggregate extends ConditionAggregateBase {
   /**
    * The current SQL query, set by parent condition compile() method calls.
    *
-   * @var \Drupal\Core\Database\Query\SelectInterface
+   * @var SelectInterface
    */
   protected SelectInterface $sqlQuery;
 

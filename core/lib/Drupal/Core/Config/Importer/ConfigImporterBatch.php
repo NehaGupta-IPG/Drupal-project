@@ -15,7 +15,7 @@ class ConfigImporterBatch {
   /**
    * Processes the config import batch and persists the importer.
    *
-   * @param \Drupal\Core\Config\ConfigImporter $config_importer
+   * @param ConfigImporter $config_importer
    *   The batch config importer object to persist.
    * @param string $sync_step
    *   The synchronization step to do.

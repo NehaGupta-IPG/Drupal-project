@@ -36,7 +36,7 @@ class DefaultLanguageItem extends LanguageItem {
   /**
    * Provides default language code of given entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity whose language code to be loaded.
    *
    * @return string

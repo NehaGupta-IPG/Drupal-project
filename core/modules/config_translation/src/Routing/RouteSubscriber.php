@@ -2,8 +2,8 @@
 
 namespace Drupal\config_translation\Routing;
 
-use Drupal\Core\Routing\RouteSubscriberBase;
 use Drupal\config_translation\ConfigMapperManagerInterface;
+use Drupal\Core\Routing\RouteSubscriberBase;
 use Drupal\Core\Routing\RoutingEvents;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -15,14 +15,14 @@ class RouteSubscriber extends RouteSubscriberBase {
   /**
    * The mapper plugin discovery service.
    *
-   * @var \Drupal\config_translation\ConfigMapperManagerInterface
+   * @var ConfigMapperManagerInterface
    */
   protected $mapperManager;
 
   /**
    * Constructs a new RouteSubscriber.
    *
-   * @param \Drupal\config_translation\ConfigMapperManagerInterface $mapper_manager
+   * @param ConfigMapperManagerInterface $mapper_manager
    *   The mapper plugin discovery service.
    */
   public function __construct(ConfigMapperManagerInterface $mapper_manager) {

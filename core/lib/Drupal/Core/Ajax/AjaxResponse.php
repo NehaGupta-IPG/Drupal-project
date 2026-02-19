@@ -2,9 +2,9 @@
 
 namespace Drupal\Core\Ajax;
 
-use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\AttachmentsInterface;
 use Drupal\Core\Render\AttachmentsTrait;
+use Drupal\Core\Render\BubbleableMetadata;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 /**
@@ -26,7 +26,7 @@ class AjaxResponse extends JsonResponse implements AttachmentsInterface {
   /**
    * Add an AJAX command to the response.
    *
-   * @param \Drupal\Core\Ajax\CommandInterface $command
+   * @param CommandInterface $command
    *   An AJAX command object implementing CommandInterface.
    * @param bool $prepend
    *   A boolean which determines whether the new command should be executed
@@ -60,7 +60,7 @@ class AjaxResponse extends JsonResponse implements AttachmentsInterface {
    *
    * Adds commands and merges attachments from the other ajax response.
    *
-   * @param \Drupal\Core\Ajax\AjaxResponse $other
+   * @param AjaxResponse $other
    *   An AJAX response to merge.
    *
    * @return $this

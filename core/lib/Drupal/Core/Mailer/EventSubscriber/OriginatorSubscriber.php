@@ -25,7 +25,7 @@ class OriginatorSubscriber implements EventSubscriberInterface {
   /**
    * Sets the default from header and a sender header if necessary.
    *
-   * @param \Symfony\Component\Mailer\Event\MessageEvent $event
+   * @param MessageEvent $event
    *   The message event.
    */
   public function onMessage(MessageEvent $event): void {
@@ -40,7 +40,7 @@ class OriginatorSubscriber implements EventSubscriberInterface {
   /**
    * Sets the default from address.
    *
-   * @param \Symfony\Component\Mime\Email $message
+   * @param Email $message
    *   The email message.
    */
   protected function setDefaultFrom(Email $message): void {
@@ -55,7 +55,7 @@ class OriginatorSubscriber implements EventSubscriberInterface {
   /**
    * Sets the default sender address.
    *
-   * @param \Symfony\Component\Mime\Email $message
+   * @param Email $message
    *   The email message.
    */
   protected function setDefaultSender(Email $message): void {
@@ -80,7 +80,7 @@ class OriginatorSubscriber implements EventSubscriberInterface {
    *   and the author and transmitter are identical, the "Sender:" field
    *   SHOULD NOT be used.
    *
-   * @param \Symfony\Component\Mime\Email $message
+   * @param Email $message
    *   The email message.
    *
    * @see https://www.rfc-editor.org/rfc/rfc5322.html#section-3.6.2

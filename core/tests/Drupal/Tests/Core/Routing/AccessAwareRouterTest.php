@@ -25,32 +25,32 @@ use Symfony\Component\Routing\RouterInterface;
 class AccessAwareRouterTest extends UnitTestCase {
 
   /**
-   * @var \Symfony\Component\Routing\RouterInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Routing\RouterInterface|MockObject
    */
   protected RouterInterface|MockObject $router;
 
   /**
-   * @var \Symfony\Component\Routing\Route
+   * @var Route
    */
   protected $route;
 
   /**
-   * @var \Drupal\Core\Routing\Router|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Routing\Router|MockObject
    */
   protected $coreRouter;
 
   /**
-   * @var \Drupal\Core\Access\AccessManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Access\AccessManagerInterface|MockObject
    */
   protected $accessManager;
 
   /**
-   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Session\AccountInterface|MockObject
    */
   protected $currentUser;
 
   /**
-   * @var \Drupal\Core\Routing\AccessAwareRouter
+   * @var AccessAwareRouter
    */
   protected $accessAwareRouter;
 
@@ -160,7 +160,7 @@ interface MockRouterInterface extends RouterInterface {
   /**
    * Function used in the mocking process of this test.
    *
-   * @param \Symfony\Component\Routing\RouterInterface $router
+   * @param RouterInterface $router
    *   The mocked router.
    */
   public function add(RouterInterface $router);

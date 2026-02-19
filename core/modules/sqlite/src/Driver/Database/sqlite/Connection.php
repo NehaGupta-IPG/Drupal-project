@@ -7,9 +7,9 @@ use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\Connection as DatabaseConnection;
 use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\ExceptionHandler;
+use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Database\SupportsTemporaryTablesInterface;
-use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Transaction\TransactionManagerInterface;
 
 /**
@@ -400,7 +400,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * @param string $database
    *   The name of the database to create.
    *
-   * @throws \Drupal\Core\Database\DatabaseNotFoundException
+   * @throws DatabaseNotFoundException
    */
   public function createDatabase($database) {
     // Verify the database is writable.

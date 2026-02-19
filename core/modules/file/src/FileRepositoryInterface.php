@@ -20,20 +20,20 @@ interface FileRepositoryInterface {
    * @param string $destination
    *   A string containing the destination URI. This must be a stream
    *   wrapper URI.
-   * @param \Drupal\Core\File\FileExists|int $fileExists
+   * @param FileExists|int $fileExists
    *   (optional) The replace behavior when the destination file already exists.
    *
-   * @return \Drupal\file\FileInterface
+   * @return FileInterface
    *   The file entity.
    *
-   * @throws \Drupal\Core\File\Exception\FileException
+   * @throws FileException
    *   Thrown when there is an error writing to the file system.
-   * @throws \Drupal\Core\File\Exception\FileExistsException
+   * @throws FileExistsException
    *   Thrown when the destination exists and $replace is set to
    *   FileExists::Error.
-   * @throws \Drupal\Core\File\Exception\InvalidStreamWrapperException
+   * @throws InvalidStreamWrapperException
    *   Thrown when the destination is an invalid stream wrapper.
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   Thrown when there is an error saving the file.
    *
    * @see \Drupal\Core\File\FileSystemInterface::saveData()
@@ -57,25 +57,25 @@ interface FileRepositoryInterface {
    *   temporary file, the resulting file will also be a temporary file. See
    *   file_save_upload() for details on temporary files.
    *
-   * @param \Drupal\file\FileInterface $source
+   * @param FileInterface $source
    *   A file entity.
    * @param string $destination
    *   A string containing the destination that $source should be
    *   copied to. This must be a stream wrapper URI.
-   * @param \Drupal\Core\File\FileExists|int $fileExists
+   * @param FileExists|int $fileExists
    *   (optional) Replace behavior when the destination file already exists.
    *
-   * @return \Drupal\file\FileInterface
+   * @return FileInterface
    *   The file entity.
    *
-   * @throws \Drupal\Core\File\Exception\FileException
+   * @throws FileException
    *   Thrown when there is an error writing to the file system.
-   * @throws \Drupal\Core\File\Exception\FileExistsException
+   * @throws FileExistsException
    *   Thrown when the destination exists and $replace is set to
    *   FileExists::Error.
-   * @throws \Drupal\Core\File\Exception\InvalidStreamWrapperException
+   * @throws InvalidStreamWrapperException
    *   Thrown when the destination is an invalid stream wrapper.
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   Thrown when there is an error saving the file.
    *
    * @see \Drupal\Core\File\FileSystemInterface::copy()
@@ -92,25 +92,25 @@ interface FileRepositoryInterface {
    *   replace the file or rename the file based on the $replace parameter.
    * - Adds the new file to the files database.
    *
-   * @param \Drupal\file\FileInterface $source
+   * @param FileInterface $source
    *   A file entity.
    * @param string $destination
    *   A string containing the destination that $source should be moved
    *   to. This must be a stream wrapper URI.
-   * @param \Drupal\Core\File\FileExists|int $fileExists
+   * @param FileExists|int $fileExists
    *   (optional) The replace behavior when the destination file already exists.
    *
-   * @return \Drupal\file\FileInterface
+   * @return FileInterface
    *   The file entity.
    *
-   * @throws \Drupal\Core\File\Exception\FileException
+   * @throws FileException
    *   Thrown when there is an error writing to the file system.
-   * @throws \Drupal\Core\File\Exception\FileExistsException
+   * @throws FileExistsException
    *   Thrown when the destination exists and $replace is set to
    *   FileExists::Error.
-   * @throws \Drupal\Core\File\Exception\InvalidStreamWrapperException
+   * @throws InvalidStreamWrapperException
    *   Thrown when the destination is an invalid stream wrapper.
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   Thrown when there is an error saving the file.
    *
    * @see \Drupal\Core\File\FileSystemInterface::move()
@@ -124,7 +124,7 @@ interface FileRepositoryInterface {
    * @param string $uri
    *   The file URI.
    *
-   * @return \Drupal\file\FileInterface|null
+   * @return FileInterface|null
    *   The first file with the matched URI if found, NULL otherwise.
    */
   public function loadByUri(string $uri): ?FileInterface;

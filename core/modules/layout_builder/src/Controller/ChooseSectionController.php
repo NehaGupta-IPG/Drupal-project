@@ -29,14 +29,14 @@ class ChooseSectionController implements ContainerInjectionInterface {
   /**
    * The layout manager.
    *
-   * @var \Drupal\Core\Layout\LayoutPluginManagerInterface
+   * @var LayoutPluginManagerInterface
    */
   protected $layoutManager;
 
   /**
    * ChooseSectionController constructor.
    *
-   * @param \Drupal\Core\Layout\LayoutPluginManagerInterface $layout_manager
+   * @param LayoutPluginManagerInterface $layout_manager
    *   The layout manager.
    */
   public function __construct(LayoutPluginManagerInterface $layout_manager) {
@@ -55,7 +55,7 @@ class ChooseSectionController implements ContainerInjectionInterface {
   /**
    * Choose a layout plugin to add as a section.
    *
-   * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
+   * @param SectionStorageInterface $section_storage
    *   The section storage.
    * @param int $delta
    *   The delta of the section to splice.

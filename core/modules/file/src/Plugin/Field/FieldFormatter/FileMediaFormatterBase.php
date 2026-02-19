@@ -76,7 +76,7 @@ abstract class FileMediaFormatterBase extends FileFormatterBase implements FileM
     if (!parent::isApplicable($field_definition)) {
       return FALSE;
     }
-    /** @var \Drupal\Core\File\MimeType\MimeTypeMapInterface $mime_type_map */
+    /** @var MimeTypeMapInterface $mime_type_map */
     $mime_type_map = \Drupal::service(MimeTypeMapInterface::class);
     $extension_list = array_filter(preg_split('/\s+/', $field_definition->getSetting('file_extensions')));
 
@@ -146,7 +146,7 @@ abstract class FileMediaFormatterBase extends FileFormatterBase implements FileM
    *   Additional attributes to be applied to the HTML element. Attribute names
    *   will be used as key and value in the HTML element.
    *
-   * @return \Drupal\Core\Template\Attribute
+   * @return Attribute
    *   Container with all the attributes for the HTML tag.
    */
   protected function prepareAttributes(array $additional_attributes = []) {
@@ -176,7 +176,7 @@ abstract class FileMediaFormatterBase extends FileFormatterBase implements FileM
   /**
    * Gets source files with attributes.
    *
-   * @param \Drupal\Core\Field\EntityReferenceFieldItemListInterface $items
+   * @param EntityReferenceFieldItemListInterface $items
    *   The item list.
    * @param string $langcode
    *   The language code of the referenced entities to display.

@@ -47,7 +47,7 @@ class EntityDeleteForm extends EntityConfirmFormBase {
   /**
    * Returns config names to delete for the deletion confirmation form.
    *
-   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface $entity
+   * @param ConfigEntityInterface $entity
    *   The entity being deleted.
    *
    * @return string[]

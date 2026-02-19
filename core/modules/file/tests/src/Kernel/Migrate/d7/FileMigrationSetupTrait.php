@@ -65,7 +65,7 @@ trait FileMigrationSetupTrait {
    *   The expected owner ID.
    */
   protected function assertEntity($id, $name, $uri, $mime, $size, $created, $changed, $uid) {
-    /** @var \Drupal\file\FileInterface $file */
+    /** @var FileInterface $file */
     $file = File::load($id);
     $this->assertInstanceOf(FileInterface::class, $file);
     $this->assertSame($name, $file->getFilename());

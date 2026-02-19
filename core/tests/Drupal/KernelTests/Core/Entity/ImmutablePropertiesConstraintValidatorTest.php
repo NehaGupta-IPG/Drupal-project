@@ -99,7 +99,7 @@ class ImmutablePropertiesConstraintValidatorTest extends KernelTestBase {
     $definition = DataDefinition::createFromDataType('entity:block_content_type')
       ->addConstraint('ImmutableProperties', ['properties' => ['id', 'description']]);
 
-    /** @var \Drupal\Core\TypedData\TypedDataManagerInterface $typed_data_manager */
+    /** @var TypedDataManagerInterface $typed_data_manager */
     $typed_data_manager = $this->container->get(TypedDataManagerInterface::class);
 
     // Try changing one immutable property, and one mutable property.

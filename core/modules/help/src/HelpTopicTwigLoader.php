@@ -36,9 +36,9 @@ class HelpTopicTwigLoader extends FilesystemLoader {
    *
    * @param string $root_path
    *   The root path.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler service.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param ThemeHandlerInterface $theme_handler
    *   The theme handler service.
    */
   public function __construct($root_path, ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler) {

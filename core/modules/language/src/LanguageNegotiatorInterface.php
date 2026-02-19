@@ -111,7 +111,7 @@ interface LanguageNegotiatorInterface {
   /**
    * Sets the current active user and resets all language types.
    *
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current active user.
    */
   public function setCurrentUser(AccountInterface $current_user);
@@ -147,7 +147,7 @@ interface LanguageNegotiatorInterface {
    * @param string $method_id
    *   The method identifier.
    *
-   * @return \Drupal\language\LanguageNegotiationMethodInterface
+   * @return LanguageNegotiationMethodInterface
    *   An instance of the specified language negotiation method.
    */
   public function getNegotiationMethodInstance($method_id);

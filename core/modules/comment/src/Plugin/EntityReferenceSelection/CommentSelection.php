@@ -2,11 +2,11 @@
 
 namespace Drupal\comment\Plugin\EntityReferenceSelection;
 
+use Drupal\comment\CommentInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\Attribute\EntityReferenceSelection;
 use Drupal\Core\Entity\Plugin\EntityReferenceSelection\DefaultSelection;
-use Drupal\comment\CommentInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
@@ -43,7 +43,7 @@ class CommentSelection extends DefaultSelection {
     $comment = parent::createNewEntity($entity_type_id, $bundle, $label, $uid);
 
     // In order to create a referenceable comment, it needs to published.
-    /** @var \Drupal\comment\CommentInterface $comment */
+    /** @var CommentInterface $comment */
     $comment->setPublished();
 
     return $comment;
@@ -57,7 +57,7 @@ class CommentSelection extends DefaultSelection {
     // Mirror the conditions checked in buildEntityQuery().
     if (!$this->currentUser->hasPermission('administer comments')) {
       $entities = array_filter($entities, function ($comment) {
-        /** @var \Drupal\comment\CommentInterface $comment */
+        /** @var CommentInterface $comment */
         return $comment->isPublished();
       });
     }

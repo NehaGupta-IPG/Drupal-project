@@ -53,10 +53,10 @@ abstract class ExtensionStreamBase extends LocalReadOnlyStream {
    * @param string $extension_name
    *   The extension name.
    *
-   * @return \Drupal\Core\Extension\Extension
+   * @return Extension
    *   The extension object.
    *
-   * @throws \Drupal\Core\Extension\Exception\UnknownExtensionException
+   * @throws UnknownExtensionException
    *   Thrown when the extension is missing.
    */
   abstract protected function getExtension(string $extension_name): Extension;

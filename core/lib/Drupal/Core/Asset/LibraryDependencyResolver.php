@@ -10,7 +10,7 @@ class LibraryDependencyResolver implements LibraryDependencyResolverInterface {
   /**
    * The library discovery service.
    *
-   * @var \Drupal\Core\Asset\LibraryDiscoveryInterface
+   * @var LibraryDiscoveryInterface
    */
   protected $libraryDiscovery;
 
@@ -24,7 +24,7 @@ class LibraryDependencyResolver implements LibraryDependencyResolverInterface {
   /**
    * Constructs a new LibraryDependencyResolver instance.
    *
-   * @param \Drupal\Core\Asset\LibraryDiscoveryInterface $library_discovery
+   * @param LibraryDiscoveryInterface $library_discovery
    *   The library discovery service.
    */
   public function __construct(LibraryDiscoveryInterface $library_discovery) {

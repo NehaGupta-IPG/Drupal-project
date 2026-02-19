@@ -3,16 +3,16 @@
 namespace Drupal\taxonomy\Entity;
 
 use Drupal\Core\Entity\Attribute\ContentEntityType;
-use Drupal\Core\Entity\EntityListBuilder;
-use Drupal\Core\Entity\EntityViewBuilder;
-use Drupal\Core\Entity\Routing\RevisionHtmlRouteProvider;
-use Drupal\Core\Entity\Form\RevisionRevertForm;
-use Drupal\Core\Entity\Form\RevisionDeleteForm;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\EditorialContentEntityBase;
+use Drupal\Core\Entity\EntityListBuilder;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityViewBuilder;
+use Drupal\Core\Entity\Form\RevisionDeleteForm;
+use Drupal\Core\Entity\Form\RevisionRevertForm;
+use Drupal\Core\Entity\Routing\RevisionHtmlRouteProvider;
 use Drupal\Core\Field\BaseFieldDefinition;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\taxonomy\Form\TermDeleteForm;
 use Drupal\taxonomy\TermAccessControlHandler;
 use Drupal\taxonomy\TermForm;
@@ -104,10 +104,10 @@ class Term extends EditorialContentEntityBase implements TermInterface {
 
     // See if any of the term's children are about to be become orphans.
     $orphans = [];
-    /** @var \Drupal\taxonomy\TermInterface $term */
+    /** @var TermInterface $term */
     foreach ($entities as $tid => $term) {
       if ($children = $storage->getChildren($term)) {
-        /** @var \Drupal\taxonomy\TermInterface $child */
+        /** @var TermInterface $child */
         foreach ($children as $child) {
           $parent = $child->get('parent');
           // Update child parents item list.
@@ -146,7 +146,7 @@ class Term extends EditorialContentEntityBase implements TermInterface {
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    /** @var \Drupal\Core\Field\BaseFieldDefinition[] $fields */
+    /** @var BaseFieldDefinition[] $fields */
     $fields = parent::baseFieldDefinitions($entity_type);
 
     // @todo Remove the usage of StatusItem in

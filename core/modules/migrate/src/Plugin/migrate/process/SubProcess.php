@@ -4,9 +4,9 @@ namespace Drupal\migrate\Plugin\migrate\process;
 
 use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\migrate\MigrateException;
+use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\MigrateSkipRowException;
 use Drupal\migrate\ProcessPluginBase;
-use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\Row;
 
 /**
@@ -235,9 +235,9 @@ class SubProcess extends ProcessPluginBase {
    *
    * @param string|int $key
    *   The current key.
-   * @param \Drupal\migrate\MigrateExecutableInterface $migrate_executable
+   * @param MigrateExecutableInterface $migrate_executable
    *   The migrate executable helper class.
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The current row after processing.
    *
    * @return mixed

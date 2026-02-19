@@ -12,7 +12,7 @@ interface DataReferenceInterface {
   /**
    * Gets the referenced data.
    *
-   * @return \Drupal\Core\TypedData\TypedDataInterface|null
+   * @return TypedDataInterface|null
    *   The referenced typed data object, or NULL if the reference is unset.
    */
   public function getTarget();

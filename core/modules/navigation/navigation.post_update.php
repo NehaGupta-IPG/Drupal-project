@@ -78,9 +78,9 @@ function navigation_post_update_uninstall_navigation_top_bar(): void {
  * Flushes tempstore repository for navigation to reflect definition changes.
  */
 function navigation_post_update_refresh_tempstore_repository(array &$sandbox): void {
-  /** @var \Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface $section_storage_manager */
+  /** @var SectionStorageManagerInterface $section_storage_manager */
   $section_storage_manager = \Drupal::service(SectionStorageManagerInterface::class);
-  /** @var \Drupal\layout_builder\LayoutTempstoreRepositoryInterface $layout_tempstore_repository */
+  /** @var LayoutTempstoreRepositoryInterface $layout_tempstore_repository */
   $layout_tempstore_repository = \Drupal::service(LayoutTempstoreRepositoryInterface::class);
 
   $section_storage = $section_storage_manager->loadEmpty('navigation');

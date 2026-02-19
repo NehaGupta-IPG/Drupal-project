@@ -327,7 +327,7 @@ class LayoutBuilderEntityViewDisplay extends BaseEntityViewDisplay implements La
   /**
    * Builds the render array for the sections of a given entity.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The entity.
    *
    * @return array
@@ -359,7 +359,7 @@ class LayoutBuilderEntityViewDisplay extends BaseEntityViewDisplay implements La
   /**
    * Gets the available contexts for a given entity.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The entity.
    *
    * @return \Drupal\Core\Plugin\Context\ContextInterface[]
@@ -478,7 +478,7 @@ class LayoutBuilderEntityViewDisplay extends BaseEntityViewDisplay implements La
   /**
    * Gets a default section.
    *
-   * @return \Drupal\layout_builder\Section
+   * @return Section
    *   The default section.
    */
   protected function getDefaultSection() {
@@ -523,7 +523,7 @@ class LayoutBuilderEntityViewDisplay extends BaseEntityViewDisplay implements La
    * @param string $field_name
    *   The field name.
    *
-   * @return \Drupal\layout_builder\SectionComponent|null
+   * @return SectionComponent|null
    *   The section component if it is available.
    */
   private function getSectionComponentForFieldName($field_name) {

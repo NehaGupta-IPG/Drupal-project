@@ -7,7 +7,7 @@ use Drupal\Component\Annotation\Plugin;
 /**
  * Defines an image effect annotation object.
  *
- * Plugin Namespace: Plugin\ImageEffect
+ * Plugin Namespace: Plugin\ImageEffect.
  *
  * For a working example, see
  * \Drupal\image\Plugin\ImageEffect\ResizeImageEffect

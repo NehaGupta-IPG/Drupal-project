@@ -73,10 +73,10 @@ abstract class ConfigEntityBundleBase extends ConfigEntityBase {
    * Ensure that config entities which are bundles of other entities cannot have
    * their ID changed.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The entity storage object.
    *
-   * @throws \Drupal\Core\Config\ConfigNameException
+   * @throws ConfigNameException
    *   Thrown when attempting to rename a bundle entity.
    */
   public function preSave(EntityStorageInterface $storage) {
@@ -102,7 +102,7 @@ abstract class ConfigEntityBundleBase extends ConfigEntityBase {
    *   A list of matching displays.
    */
   protected function loadDisplays($entity_type_id) {
-    /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $storage */
+    /** @var ConfigEntityStorageInterface $storage */
     $storage = $this->entityTypeManager()->getStorage($entity_type_id);
     $ids = $storage->getQuery()
       ->condition('id', $this->getEntityType()->getBundleOf() . '.' . $this->getOriginalId() . '.', 'STARTS_WITH')

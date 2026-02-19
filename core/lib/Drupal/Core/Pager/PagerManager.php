@@ -16,7 +16,7 @@ class PagerManager implements PagerManagerInterface {
   /**
    * The pager parameters.
    *
-   * @var \Drupal\Core\Pager\PagerParametersInterface
+   * @var PagerParametersInterface
    */
   protected $pagerParams;
 
@@ -41,7 +41,7 @@ class PagerManager implements PagerManagerInterface {
   /**
    * Construct a PagerManager object.
    *
-   * @param \Drupal\Core\Pager\PagerParametersInterface $pager_params
+   * @param PagerParametersInterface $pager_params
    *   The pager parameters.
    */
   public function __construct(PagerParametersInterface $pager_params) {
@@ -113,7 +113,7 @@ class PagerManager implements PagerManagerInterface {
   /**
    * Saves a pager to the static cache.
    *
-   * @param \Drupal\Core\Pager\Pager $pager
+   * @param Pager $pager
    *   The pager.
    * @param int $element
    *   The pager index.

@@ -29,7 +29,7 @@ class FieldNormalizer extends NormalizerBase implements DenormalizerInterface {
    * {@inheritdoc}
    */
   public function doNormalize($field, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
-    /** @var \Drupal\Core\Field\FieldItemListInterface $field */
+    /** @var FieldItemListInterface $field */
     $normalized_items = $this->normalizeFieldItems($field, $format, $context);
     assert($context['resource_object'] instanceof ResourceObject);
     return $context['resource_object']->getResourceType()->getFieldByInternalName($field->getName())->hasOne()
@@ -74,14 +74,14 @@ class FieldNormalizer extends NormalizerBase implements DenormalizerInterface {
   /**
    * Helper function to normalize field items.
    *
-   * @param \Drupal\Core\Field\FieldItemListInterface $field
+   * @param FieldItemListInterface $field
    *   The field object.
    * @param string $format
    *   The format.
    * @param array $context
    *   The context array.
    *
-   * @return \Drupal\jsonapi\Normalizer\Value\CacheableNormalization[]
+   * @return CacheableNormalization[]
    *   The array of normalized field items.
    */
   protected function normalizeFieldItems(FieldItemListInterface $field, $format, array $context) {

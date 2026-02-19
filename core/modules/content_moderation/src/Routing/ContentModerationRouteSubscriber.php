@@ -24,7 +24,7 @@ class ContentModerationRouteSubscriber extends RouteSubscriberBase {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
@@ -38,7 +38,7 @@ class ContentModerationRouteSubscriber extends RouteSubscriberBase {
   /**
    * ContentModerationRouteSubscriber constructor.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
@@ -57,7 +57,7 @@ class ContentModerationRouteSubscriber extends RouteSubscriberBase {
   /**
    * Ensure revisionable entities load the latest revision on entity forms.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route object.
    */
   protected function setLatestRevisionFlag(Route $route) {

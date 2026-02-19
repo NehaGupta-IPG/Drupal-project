@@ -21,14 +21,14 @@ class CollectRoutesTest extends UnitTestCase {
   /**
    * The REST export instance.
    *
-   * @var \Drupal\rest\Plugin\views\display\RestExport
+   * @var RestExport
    */
   protected $restExport;
 
   /**
    * The RouteCollection.
    *
-   * @var \Symfony\Component\Routing\RouteCollection
+   * @var RouteCollection
    */
   protected $routes;
 

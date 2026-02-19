@@ -27,7 +27,7 @@ class SimplePageVariantTest extends UnitTestCase {
    * @param array $definition
    *   The plugin definition array.
    *
-   * @return \Drupal\Core\Render\Plugin\DisplayVariant\SimplePageVariant
+   * @return SimplePageVariant
    *   A test display variant plugin.
    */
   public function setUpDisplayVariant($configuration = [], $definition = []) {

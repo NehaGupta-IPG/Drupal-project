@@ -145,7 +145,7 @@ interface ImageStyleInterface extends ConfigEntityInterface {
    * @param string $effect
    *   The image effect ID.
    *
-   * @return \Drupal\image\ImageEffectInterface
+   * @return ImageEffectInterface
    *   The image effect object.
    */
   public function getEffect($effect);
@@ -153,7 +153,7 @@ interface ImageStyleInterface extends ConfigEntityInterface {
   /**
    * Returns the image effects for this style.
    *
-   * @return \Drupal\image\ImageEffectPluginCollection|\Drupal\image\ImageEffectInterface[]
+   * @return ImageEffectPluginCollection|ImageEffectInterface[]
    *   The image effect plugin collection.
    */
   public function getEffects();
@@ -172,7 +172,7 @@ interface ImageStyleInterface extends ConfigEntityInterface {
   /**
    * Deletes an image effect from this style.
    *
-   * @param \Drupal\image\ImageEffectInterface $effect
+   * @param ImageEffectInterface $effect
    *   The image effect object.
    *
    * @return $this

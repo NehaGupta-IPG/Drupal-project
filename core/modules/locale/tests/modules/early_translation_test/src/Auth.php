@@ -23,7 +23,7 @@ class Auth implements AuthenticationProviderInterface {
   /**
    * Constructs an authentication provider object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {

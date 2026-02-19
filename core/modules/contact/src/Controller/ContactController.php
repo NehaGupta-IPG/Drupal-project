@@ -2,8 +2,8 @@
 
 namespace Drupal\contact\Controller;
 
-use Drupal\Core\Controller\ControllerBase;
 use Drupal\contact\ContactFormInterface;
+use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
 use Drupal\user\UserInterface;
@@ -17,14 +17,14 @@ class ContactController extends ControllerBase {
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * Constructs a ContactController object.
    *
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
    */
   public function __construct(RendererInterface $renderer) {
@@ -34,14 +34,14 @@ class ContactController extends ControllerBase {
   /**
    * Presents the site-wide contact form.
    *
-   * @param \Drupal\contact\ContactFormInterface $contact_form
+   * @param ContactFormInterface $contact_form
    *   The contact form to use.
    *
    * @return array
    *   The form as render array as expected by
    *   \Drupal\Core\Render\RendererInterface::render().
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   * @throws NotFoundHttpException
    *   Exception is thrown when user tries to access non existing default
    *   contact form.
    */
@@ -93,14 +93,14 @@ class ContactController extends ControllerBase {
   /**
    * Form constructor for the personal contact form.
    *
-   * @param \Drupal\user\UserInterface $user
+   * @param UserInterface $user
    *   The account for which a personal contact form should be generated.
    *
    * @return array
    *   The personal contact form as render array as expected by
    *   \Drupal\Core\Render\RendererInterface::render().
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   * @throws NotFoundHttpException
    *   Exception is thrown when user tries to access a contact form for a
    *   user who does not have an email address configured.
    */

@@ -25,23 +25,23 @@ class LayoutBuilderLocalTaskDeriver extends DeriverBase implements ContainerDeri
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The section storage manager.
    *
-   * @var \Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface
+   * @var SectionStorageManagerInterface
    */
   protected $sectionStorageManager;
 
   /**
    * Constructs a new LayoutBuilderLocalTaskDeriver.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface $section_storage_manager
+   * @param SectionStorageManagerInterface $section_storage_manager
    *   The section storage manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, SectionStorageManagerInterface $section_storage_manager) {

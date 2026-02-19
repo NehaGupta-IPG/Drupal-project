@@ -15,14 +15,14 @@ class MigrateLookup implements MigrateLookupInterface {
   /**
    * The migration plugin manager.
    *
-   * @var \Drupal\migrate\Plugin\MigrationPluginManagerInterface
+   * @var MigrationPluginManagerInterface
    */
   protected $migrationPluginManager;
 
   /**
    * Constructs a MigrateLookup object.
    *
-   * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
+   * @param MigrationPluginManagerInterface $migration_plugin_manager
    *   The migration plugin manager.
    */
   public function __construct(MigrationPluginManagerInterface $migration_plugin_manager) {
@@ -55,7 +55,7 @@ class MigrateLookup implements MigrateLookupInterface {
   /**
    * Performs a lookup.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration upon which to perform the lookup.
    * @param array $source_id_values
    *   The source ID values to look up.
@@ -63,7 +63,7 @@ class MigrateLookup implements MigrateLookupInterface {
    * @return array
    *   An array of arrays of destination identifier values.
    *
-   * @throws \Drupal\migrate\MigrateException
+   * @throws MigrateException
    *   Thrown when $source_id_values contains unknown keys, or the wrong number
    *   of keys.
    */

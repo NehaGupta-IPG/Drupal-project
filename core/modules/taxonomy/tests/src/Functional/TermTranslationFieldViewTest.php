@@ -80,7 +80,7 @@ class TermTranslationFieldViewTest extends TaxonomyTestBase {
    * Creates a test subject node, with translation.
    */
   protected function setUpNode(): void {
-    /** @var \Drupal\node\Entity\Node $node */
+    /** @var Node $node */
     $node = Node::create([
       'title' => $this->randomMachineName(),
       'type' => 'article',

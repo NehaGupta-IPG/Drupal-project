@@ -31,7 +31,7 @@ class EntityComputedFieldTest extends BrowserTestBase {
   /**
    * The state service.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected StateInterface $state;
 

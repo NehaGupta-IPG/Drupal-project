@@ -53,14 +53,14 @@ class SqlContentEntityStorageSchemaColumnTest extends KernelTestBase {
   /**
    * The entity definition update manager.
    *
-   * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
+   * @var EntityDefinitionUpdateManagerInterface
    */
   protected EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager;
 
   /**
    * The state object.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected StateInterface $state;
 

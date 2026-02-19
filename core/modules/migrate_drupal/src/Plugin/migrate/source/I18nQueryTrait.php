@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\migrate_drupal\Plugin\migrate\source;
 
-use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\MigrateException;
+use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Row;
 
 // cspell:ignore objectid
@@ -34,7 +34,7 @@ trait I18nQueryTrait {
    * MenuLinkTranslation they are 'title' and 'description'. This will save both
    * translations to the row.
    *
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The current migration row which must include both a 'language' property
    *   and an 'objectid' property. The 'objectid' is the value for the
    *   'objectid' field in the i18n_string table.
@@ -42,13 +42,13 @@ trait I18nQueryTrait {
    *   The name of the property to get the translation for.
    * @param string $object_id_name
    *   The value of the objectid in the i18n table.
-   * @param \Drupal\migrate\Plugin\MigrateIdMapInterface $id_map
+   * @param MigrateIdMapInterface $id_map
    *   The ID map.
    *
    * @return bool
    *   FALSE if the property has already been migrated.
    *
-   * @throws \Drupal\migrate\MigrateException
+   * @throws MigrateException
    */
   protected function getPropertyNotInRowTranslation(Row $row, string $property_not_in_row, string $object_id_name, MigrateIdMapInterface $id_map): bool {
     @trigger_error('Trait "' . __TRAIT__ . '" used by "' . static::class . '" is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3533564', E_USER_DEPRECATED);

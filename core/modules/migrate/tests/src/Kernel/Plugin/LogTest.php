@@ -34,7 +34,7 @@ class LogTest extends KernelTestBase {
   /**
    * Migrate executable.
    *
-   * @var \Drupal\Tests\migrate\Kernel\Plugin\TestMigrateExecutable
+   * @var TestMigrateExecutable
    */
   protected $executable;
 

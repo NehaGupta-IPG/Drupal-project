@@ -18,14 +18,14 @@ class SystemConfigSubscriber implements EventSubscriberInterface {
   /**
    * The router builder.
    *
-   * @var \Drupal\Core\Routing\RouteBuilderInterface
+   * @var RouteBuilderInterface
    */
   protected $routerBuilder;
 
   /**
    * Constructs the SystemConfigSubscriber.
    *
-   * @param \Drupal\Core\Routing\RouteBuilderInterface $router_builder
+   * @param RouteBuilderInterface $router_builder
    *   The router builder service.
    */
   public function __construct(RouteBuilderInterface $router_builder) {
@@ -35,7 +35,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface {
   /**
    * Rebuilds the router when the default or admin theme is changed.
    *
-   * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   * @param ConfigCrudEvent $event
    *   The configuration event.
    */
   public function onConfigSave(ConfigCrudEvent $event) {
@@ -52,7 +52,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface {
    * nothing to import then event propagation is stopped because there is no
    * config import to validate.
    *
-   * @param \Drupal\Core\Config\ConfigImporterEvent $event
+   * @param ConfigImporterEvent $event
    *   The config import event.
    */
   public function onConfigImporterValidateNotEmpty(ConfigImporterEvent $event) {
@@ -69,7 +69,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface {
    * This event listener checks that the system.site:uuid's in the source and
    * target match.
    *
-   * @param \Drupal\Core\Config\ConfigImporterEvent $event
+   * @param ConfigImporterEvent $event
    *   The config import event.
    */
   public function onConfigImporterValidateSiteUUID(ConfigImporterEvent $event) {

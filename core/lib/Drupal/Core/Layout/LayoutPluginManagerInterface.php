@@ -23,7 +23,7 @@ interface LayoutPluginManagerInterface extends CategorizingPluginManagerInterfac
   /**
    * {@inheritdoc}
    *
-   * @return \Drupal\Core\Layout\LayoutInterface
+   * @return LayoutInterface
    *   The created layout plugin instance.
    */
   public function createInstance($plugin_id, array $configuration = []);
@@ -31,7 +31,7 @@ interface LayoutPluginManagerInterface extends CategorizingPluginManagerInterfac
   /**
    * {@inheritdoc}
    *
-   * @return \Drupal\Core\Layout\LayoutDefinition|null
+   * @return LayoutDefinition|null
    *   The plugin definition for the given plugin ID, or NULL if it does not
    *   exist.
    */
@@ -40,7 +40,7 @@ interface LayoutPluginManagerInterface extends CategorizingPluginManagerInterfac
   /**
    * {@inheritdoc}
    *
-   * @return \Drupal\Core\Layout\LayoutDefinition[]
+   * @return LayoutDefinition[]
    *   An array of plugin definitions (empty array if no definitions were
    *   found). Keys are plugin IDs.
    */
@@ -49,7 +49,7 @@ interface LayoutPluginManagerInterface extends CategorizingPluginManagerInterfac
   /**
    * {@inheritdoc}
    *
-   * @return \Drupal\Core\Layout\LayoutDefinition[]
+   * @return LayoutDefinition[]
    *   An array of plugin definitions, sorted by category and label.
    */
   public function getSortedDefinitions(?array $definitions = NULL, string $label_key = 'label');
@@ -57,7 +57,7 @@ interface LayoutPluginManagerInterface extends CategorizingPluginManagerInterfac
   /**
    * {@inheritdoc}
    *
-   * @return \Drupal\Core\Layout\LayoutDefinition[][]
+   * @return LayoutDefinition[][]
    *   Keys are category names, and values are arrays of which the keys are
    *   plugin IDs and the values are plugin definitions.
    */

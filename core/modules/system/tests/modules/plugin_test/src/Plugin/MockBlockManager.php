@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\plugin_test\Plugin;
 
-use Drupal\Component\Plugin\PluginManagerBase;
-use Drupal\Component\Plugin\Discovery\StaticDiscovery;
 use Drupal\Component\Plugin\Discovery\DerivativeDiscoveryDecorator;
+use Drupal\Component\Plugin\Discovery\StaticDiscovery;
 use Drupal\Component\Plugin\Factory\ReflectionFactory;
+use Drupal\Component\Plugin\PluginManagerBase;
 use Drupal\Core\Plugin\Context\ContextDefinition;
 use Drupal\Core\Plugin\Context\EntityContextDefinition;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -139,7 +139,7 @@ class MockBlockManager extends PluginManagerBase {
    * @param bool $required
    *   Whether the context definition is required.
    *
-   * @return \Drupal\Core\Plugin\Context\ContextDefinition
+   * @return ContextDefinition
    *   The context definition object.
    */
   protected function createContextDefinition($data_type, $label, $required = TRUE) {

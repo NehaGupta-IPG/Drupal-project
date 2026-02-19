@@ -17,7 +17,7 @@ class Tar implements ArchiverInterface {
   /**
    * The underlying ArchiveTar instance that does the heavy lifting.
    *
-   * @var \Drupal\Core\Archiver\ArchiveTar
+   * @var ArchiveTar
    */
   protected $tar;
 
@@ -34,7 +34,7 @@ class Tar implements ArchiverInterface {
    *     required.
    *   - 'buffer_length': Length of the read buffer in bytes.
    *
-   * @throws \Drupal\Core\Archiver\ArchiverException
+   * @throws ArchiverException
    */
   public function __construct($file_path, array $configuration = []) {
     $compress = $configuration['compress'] ?? NULL;

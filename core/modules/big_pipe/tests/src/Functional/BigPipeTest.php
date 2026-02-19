@@ -445,7 +445,6 @@ class BigPipeTest extends BrowserTestBase {
     // Ensure that the session is started before accessing a session bag.
     // Otherwise the value stored in the bag is lost when subsequent session
     // access triggers a session start automatically.
-
     /** @var \Symfony\Component\HttpFoundation\RequestStack $request_stack */
     $request_stack = $this->container->get('request_stack');
     $session = $request_stack->getSession();

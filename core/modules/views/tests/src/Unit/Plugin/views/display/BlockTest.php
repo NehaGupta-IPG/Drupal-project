@@ -20,21 +20,21 @@ class BlockTest extends UnitTestCase {
   /**
    * The view executable.
    *
-   * @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\ViewExecutable|MockObject
    */
   protected $executable;
 
   /**
    * The views block plugin.
    *
-   * @var \Drupal\views\Plugin\Block\ViewsBlock|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\Plugin\Block\ViewsBlock|MockObject
    */
   protected $blockPlugin;
 
   /**
    * The tested block display plugin.
    *
-   * @var \Drupal\views\Plugin\views\display\Block|\PHPUnit\Framework\MockObject\MockObject
+   * @var Block|MockObject
    */
   protected $blockDisplay;
 

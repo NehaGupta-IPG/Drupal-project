@@ -16,14 +16,14 @@ class LayoutTempstoreRouteEnhancer implements EnhancerInterface {
   /**
    * The layout tempstore repository.
    *
-   * @var \Drupal\layout_builder\LayoutTempstoreRepositoryInterface
+   * @var LayoutTempstoreRepositoryInterface
    */
   protected $layoutTempstoreRepository;
 
   /**
    * Constructs a new LayoutTempstoreRouteEnhancer.
    *
-   * @param \Drupal\layout_builder\LayoutTempstoreRepositoryInterface $layout_tempstore_repository
+   * @param LayoutTempstoreRepositoryInterface $layout_tempstore_repository
    *   The layout tempstore repository.
    */
   public function __construct(LayoutTempstoreRepositoryInterface $layout_tempstore_repository) {

@@ -9,10 +9,10 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\RevisionableInterface;
+use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -35,31 +35,31 @@ class RevisionDeleteForm extends ConfirmFormBase implements EntityFormInterface 
   /**
    * The entity revision.
    *
-   * @var \Drupal\Core\Entity\RevisionableInterface
+   * @var RevisionableInterface
    */
   protected RevisionableInterface $revision;
 
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected ModuleHandlerInterface $moduleHandler;
 
   /**
    * Creates a new RevisionDeleteForm instance.
    *
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
+   * @param DateFormatterInterface $dateFormatter
    *   The date formatter.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManagerInterface $entityTypeManager
    *   Entity type manager.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundleInformation
+   * @param EntityTypeBundleInfoInterface $bundleInformation
    *   The bundle information.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
+   * @param AccountInterface $currentUser
    *   The current user.
    */
   public function __construct(
@@ -190,7 +190,7 @@ class RevisionDeleteForm extends ConfirmFormBase implements EntityFormInterface 
   /**
    * Returns the bundle label of an entity.
    *
-   * @param \Drupal\Core\Entity\RevisionableInterface $entity
+   * @param RevisionableInterface $entity
    *   The entity.
    *
    * @return string|null

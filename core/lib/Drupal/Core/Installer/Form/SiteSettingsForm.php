@@ -25,9 +25,9 @@ class SiteSettingsForm extends FormBase {
    *
    * @param string $sitePath
    *   The site path.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\Core\Extension\DatabaseDriverList $databaseDriverList
+   * @param DatabaseDriverList $databaseDriverList
    *   The list provider of database drivers.
    */
   public function __construct(
@@ -206,7 +206,7 @@ class SiteSettingsForm extends FormBase {
   /**
    * Gets the inline template render array to display the database errors.
    *
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup[] $errors
+   * @param TranslatableMarkup[] $errors
    *   The database errors to list.
    *
    * @return mixed[]

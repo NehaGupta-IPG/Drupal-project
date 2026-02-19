@@ -10,7 +10,6 @@ use Drupal\views_ui\ViewUI;
  * @file
  * Describes hooks provided by the Views UI module.
  */
-
 /**
  * @addtogroup hooks
  * @{
@@ -23,7 +22,7 @@ use Drupal\views_ui\ViewUI;
  *
  * @param array[] $build
  *   Render array for the display top.
- * @param \Drupal\views_ui\ViewUI $view
+ * @param ViewUI $view
  *   The view being edited.
  * @param string $display_id
  *   The display ID.
@@ -45,7 +44,7 @@ function hook_views_ui_display_top_alter(&$build, ViewUI $view, $display_id) {
  *
  * @param array[] $build
  *   Render array for the tab contents.
- * @param \Drupal\views_ui\ViewUI $view
+ * @param ViewUI $view
  *   The view being edited.
  * @param string $display_id
  *   The display ID.

@@ -24,9 +24,9 @@ interface MediaLibraryOpenerInterface {
   /**
    * Checks media library access.
    *
-   * @param \Drupal\media_library\MediaLibraryState $state
+   * @param MediaLibraryState $state
    *   The media library.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user for which to check access.
    *
    * @return \Drupal\Core\Access\AccessResultInterface
@@ -39,7 +39,7 @@ interface MediaLibraryOpenerInterface {
   /**
    * Generates a response after selecting media items in the media library.
    *
-   * @param \Drupal\media_library\MediaLibraryState $state
+   * @param MediaLibraryState $state
    *   The state the media library was in at the time of selection, allowing the
    *   response to be customized based on that state.
    * @param int[] $selected_ids

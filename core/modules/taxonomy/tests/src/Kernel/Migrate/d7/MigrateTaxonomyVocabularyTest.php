@@ -45,7 +45,7 @@ class MigrateTaxonomyVocabularyTest extends MigrateDrupal7TestBase {
    * @internal
    */
   protected function assertEntity(string $id, string $expected_label, string $expected_description, int $expected_weight): void {
-    /** @var \Drupal\taxonomy\VocabularyInterface $entity */
+    /** @var VocabularyInterface $entity */
     $entity = Vocabulary::load($id);
     $this->assertInstanceOf(VocabularyInterface::class, $entity);
     $this->assertSame($expected_label, $entity->label());

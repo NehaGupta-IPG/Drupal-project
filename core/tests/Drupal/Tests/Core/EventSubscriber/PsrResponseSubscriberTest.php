@@ -23,14 +23,14 @@ class PsrResponseSubscriberTest extends UnitTestCase {
   /**
    * The tested path root subscriber.
    *
-   * @var \Drupal\Core\EventSubscriber\PsrResponseSubscriber
+   * @var PsrResponseSubscriber
    */
   protected $psrResponseSubscriber;
 
   /**
    * The tested path root subscriber.
    *
-   * @var \Symfony\Bridge\PsrHttpMessage\HttpFoundationFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Symfony\Bridge\PsrHttpMessage\HttpFoundationFactoryInterface|MockObject
    */
   protected $httpFoundationFactoryMock;
 
@@ -85,7 +85,7 @@ class PsrResponseSubscriberTest extends UnitTestCase {
    * @param mixed $controller_result
    *   The return Object.
    *
-   * @return \Symfony\Component\HttpKernel\Event\ViewEvent
+   * @return ViewEvent
    *   A ViewEvent object to test.
    */
   protected function createEvent($controller_result): ViewEvent {

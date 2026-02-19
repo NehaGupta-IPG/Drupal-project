@@ -5,9 +5,9 @@ namespace Drupal\Core\EventSubscriber;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Session\AccountInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Response subscriber to handle finished responses for the anonymous user.
@@ -17,14 +17,14 @@ class AnonymousUserResponseSubscriber implements EventSubscriberInterface {
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
   /**
    * Constructs an AnonymousUserResponseSubscriber object.
    *
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
    */
   public function __construct(AccountInterface $current_user) {
@@ -34,7 +34,7 @@ class AnonymousUserResponseSubscriber implements EventSubscriberInterface {
   /**
    * Adds a cache tag if the 'user.permissions' cache context is present.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
+   * @param ResponseEvent $event
    *   The event to process.
    */
   public function onRespond(ResponseEvent $event) {

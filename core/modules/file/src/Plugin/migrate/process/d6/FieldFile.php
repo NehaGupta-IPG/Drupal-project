@@ -3,10 +3,10 @@
 namespace Drupal\file\Plugin\migrate\process\d6;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\migrate\MigrateLookupInterface;
-use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\migrate\MigrateExecutableInterface;
+use Drupal\migrate\MigrateLookupInterface;
+use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -30,7 +30,7 @@ class FieldFile extends ProcessPluginBase implements ContainerFactoryPluginInter
   /**
    * The migrate lookup service.
    *
-   * @var \Drupal\migrate\MigrateLookupInterface
+   * @var MigrateLookupInterface
    */
   protected $migrateLookup;
 
@@ -43,9 +43,9 @@ class FieldFile extends ProcessPluginBase implements ContainerFactoryPluginInter
    *   The plugin ID.
    * @param mixed $plugin_definition
    *   The plugin definition.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The current migration.
-   * @param \Drupal\migrate\MigrateLookupInterface $migrate_lookup
+   * @param MigrateLookupInterface $migrate_lookup
    *   The migrate lookup service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, MigrateLookupInterface $migrate_lookup) {

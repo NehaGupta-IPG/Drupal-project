@@ -369,7 +369,7 @@ class EntityViewBuilderTest extends EntityKernelTestBase {
    * @param string $entity_type
    *   The entity type.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The created entity.
    */
   protected function createTestEntity($entity_type): EntityInterface {

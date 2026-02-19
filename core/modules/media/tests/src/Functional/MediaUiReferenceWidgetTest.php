@@ -327,7 +327,7 @@ class MediaUiReferenceWidgetTest extends MediaFunctionalTestBase {
   /**
    * Asserts whether a given link is present.
    *
-   * @param \Behat\Mink\Element\NodeElement $element
+   * @param NodeElement $element
    *   The element to search.
    * @param string $text
    *   The link text.
@@ -350,7 +350,7 @@ class MediaUiReferenceWidgetTest extends MediaFunctionalTestBase {
   /**
    * Asserts that a given link is not present.
    *
-   * @param \Behat\Mink\Element\NodeElement $element
+   * @param NodeElement $element
    *   The element to search.
    * @param string $text
    *   The link text.

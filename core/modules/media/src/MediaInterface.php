@@ -2,8 +2,8 @@
 
 namespace Drupal\media;
 
-use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\user\EntityOwnerInterface;
@@ -59,7 +59,7 @@ interface MediaInterface extends ContentEntityInterface, EntityChangedInterface,
   /**
    * Returns the media source.
    *
-   * @return \Drupal\media\MediaSourceInterface
+   * @return MediaSourceInterface
    *   The media source.
    */
   public function getSource();

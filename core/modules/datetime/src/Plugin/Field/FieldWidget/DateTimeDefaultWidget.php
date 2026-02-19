@@ -4,8 +4,8 @@ namespace Drupal\datetime\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Field\Attribute\FieldWidget;
-use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\datetime\Plugin\Field\FieldType\DateTimeItem;
@@ -24,7 +24,7 @@ class DateTimeDefaultWidget extends DateTimeWidgetBase {
   /**
    * The date format storage.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var EntityStorageInterface
    */
   protected $dateStorage;
 

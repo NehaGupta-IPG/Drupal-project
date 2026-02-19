@@ -2,10 +2,10 @@
 
 namespace Drupal\Core\StackMiddleware;
 
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
+use Symfony\Component\HttpKernel\TerminableInterface;
 
 /**
  * Provides a stacked HTTP kernel.
@@ -20,23 +20,23 @@ class StackedHttpKernel implements HttpKernelInterface, TerminableInterface {
   /**
    * The decorated kernel.
    *
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface
+   * @var HttpKernelInterface
    */
   private $httpKernel;
 
   /**
    * A set of middlewares that are wrapped around this kernel.
    *
-   * @var iterable<\Symfony\Component\HttpKernel\HttpKernelInterface>
+   * @var iterable<HttpKernelInterface>
    */
   private $middlewares = [];
 
   /**
    * Constructs a stacked HTTP kernel.
    *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel
+   * @param HttpKernelInterface $http_kernel
    *   The decorated kernel.
-   * @param iterable<\Symfony\Component\HttpKernel\HttpKernelInterface> $middlewares
+   * @param iterable<HttpKernelInterface> $middlewares
    *   An array of previous middleware services.
    */
   public function __construct(HttpKernelInterface $http_kernel, iterable $middlewares) {

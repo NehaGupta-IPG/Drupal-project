@@ -18,7 +18,7 @@ trait InternalTypedDataTestTrait {
    * @param bool $internal
    *   Whether the typed data property is internal.
    *
-   * @return \Drupal\Core\TypedData\TypedDataInterface
+   * @return TypedDataInterface
    *   The typed data property.
    */
   protected function getTypedDataProperty($internal = TRUE) {

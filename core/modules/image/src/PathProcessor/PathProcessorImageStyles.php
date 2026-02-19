@@ -26,14 +26,14 @@ class PathProcessorImageStyles implements InboundPathProcessorInterface {
   /**
    * The stream wrapper manager service.
    *
-   * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface
+   * @var StreamWrapperManagerInterface
    */
   protected $streamWrapperManager;
 
   /**
    * Constructs a new PathProcessorImageStyles object.
    *
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager
+   * @param StreamWrapperManagerInterface $stream_wrapper_manager
    *   The stream wrapper manager service.
    */
   public function __construct(StreamWrapperManagerInterface $stream_wrapper_manager) {

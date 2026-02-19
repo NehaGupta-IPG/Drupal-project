@@ -24,63 +24,63 @@ class EntityTest extends UnitTestCase {
   /**
    * The tested entity area handler.
    *
-   * @var \Drupal\views\Plugin\views\area\Entity
+   * @var Entity
    */
   protected $entityHandler;
 
   /**
    * The mocked entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityTypeManagerInterface|MockObject
    */
   protected $entityTypeManager;
 
   /**
    * The entity repository.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityRepositoryInterface|MockObject
    */
   protected $entityRepository;
 
   /**
    * The entity display repository.
    *
-   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityDisplayRepositoryInterface|MockObject
    */
   protected $entityDisplayRepository;
 
   /**
    * The mocked entity storage.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityStorageInterface|MockObject
    */
   protected $entityStorage;
 
   /**
    * The mocked entity view builder.
    *
-   * @var \Drupal\Core\Entity\EntityViewBuilderInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityViewBuilderInterface|MockObject
    */
   protected $entityViewBuilder;
 
   /**
    * The mocked view executable.
    *
-   * @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\ViewExecutable|MockObject
    */
   protected $executable;
 
   /**
    * The mocked display.
    *
-   * @var \Drupal\views\Plugin\views\display\DisplayPluginBase|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\Plugin\views\display\DisplayPluginBase|MockObject
    */
   protected $display;
 
   /**
    * The mocked style plugin.
    *
-   * @var \Drupal\views\Plugin\views\style\StylePluginBase|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\Plugin\views\style\StylePluginBase|MockObject
    */
   protected $stylePlugin;
 

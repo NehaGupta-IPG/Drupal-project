@@ -18,14 +18,14 @@ class ThemeInitialization implements ThemeInitializationInterface {
   /**
    * The theme handler.
    *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
+   * @var ThemeHandlerInterface
    */
   protected $themeHandler;
 
   /**
    * The cache backend to use for the active theme.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $cache;
 
@@ -46,7 +46,7 @@ class ThemeInitialization implements ThemeInitializationInterface {
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
@@ -55,13 +55,13 @@ class ThemeInitialization implements ThemeInitializationInterface {
    *
    * @param string $root
    *   The app root.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param ThemeHandlerInterface $theme_handler
    *   The theme handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The cache backend.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler to use to load modules.
-   * @param \Psr\Container\ContainerInterface $themeEngines
+   * @param ContainerInterface $themeEngines
    *   The theme engines.
    */
   public function __construct(

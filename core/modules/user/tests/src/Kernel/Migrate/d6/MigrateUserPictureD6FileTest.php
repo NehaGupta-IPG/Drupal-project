@@ -39,7 +39,7 @@ class MigrateUserPictureD6FileTest extends MigrateDrupal6TestBase {
       $file_ids[] = reset($destination_ids);
     }
     $files = File::loadMultiple($file_ids);
-    /** @var \Drupal\file\FileInterface $file */
+    /** @var FileInterface $file */
     $file = array_shift($files);
     $this->assertSame('image-test.jpg', $file->getFilename());
     $this->assertSame('public://image-test.jpg', $file->getFileUri());
@@ -82,7 +82,7 @@ class MigrateUserPictureD6FileTest extends MigrateDrupal6TestBase {
    * @internal
    */
   protected function assertEntity(int $fid, string $name, int $size, string $uri, string $type, int $uid): void {
-    /** @var \Drupal\file\FileInterface $file */
+    /** @var FileInterface $file */
     $file = File::load($fid);
     $this->assertInstanceOf(FileInterface::class, $file);
     $this->assertSame($name, $file->getFilename());

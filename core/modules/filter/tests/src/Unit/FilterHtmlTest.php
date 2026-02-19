@@ -20,7 +20,7 @@ class FilterHtmlTest extends UnitTestCase {
   /**
    * The filter to test.
    *
-   * @var \Drupal\filter\Plugin\Filter\FilterHtml
+   * @var FilterHtml
    */
   protected $filter;
 

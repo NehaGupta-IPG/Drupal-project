@@ -31,7 +31,7 @@ class PackageGenerator {
   /**
    * Generate Drupal's metapackages whenever composer.lock is updated.
    *
-   * @param \Composer\IO\IOInterface $io
+   * @param IOInterface $io
    *   Composer IO object for interacting with the user.
    * @param string $base_dir
    *   Directory where drupal/drupal repository is located.
@@ -77,7 +77,7 @@ class PackageGenerator {
   /**
    * Generate one metapackage.
    *
-   * @param \Composer\IO\IOInterface $io
+   * @param IOInterface $io
    *   Composer IO object for interacting with the user.
    * @param BuilderInterface $builder
    *   An object that can build a metapackage.

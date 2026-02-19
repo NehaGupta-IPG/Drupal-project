@@ -18,14 +18,14 @@ class MediaListBuilder extends EntityListBuilder {
   /**
    * The date formatter service.
    *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
+   * @var DateFormatterInterface
    */
   protected $dateFormatter;
 
   /**
    * The language manager service.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
@@ -39,15 +39,15 @@ class MediaListBuilder extends EntityListBuilder {
   /**
    * Constructs a new MediaListBuilder object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The entity storage class.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   * @param DateFormatterInterface $date_formatter
    *   The date formatter service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager service.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $image_style_storage
+   * @param EntityStorageInterface $image_style_storage
    *   The entity storage class for image styles.
    */
   public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, DateFormatterInterface $date_formatter, LanguageManagerInterface $language_manager, EntityStorageInterface $image_style_storage) {
@@ -113,7 +113,7 @@ class MediaListBuilder extends EntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    /** @var \Drupal\media\MediaInterface $entity */
+    /** @var MediaInterface $entity */
     if ($this->thumbnailStyleExists) {
       $row['thumbnail'] = [];
       if ($thumbnail_uri = $entity->getSource()->getMetadata($entity, 'thumbnail_uri')) {

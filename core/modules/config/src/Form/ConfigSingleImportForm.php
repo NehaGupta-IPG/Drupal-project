@@ -29,7 +29,7 @@ class ConfigSingleImportForm extends ConfirmFormBase {
   /**
    * If the config exists, this is that object. Otherwise, FALSE.
    *
-   * @var \Drupal\Core\Config\Config|\Drupal\Core\Config\Entity\ConfigEntityInterface|bool
+   * @var \Drupal\Core\Config\Config|ConfigEntityInterface|bool
    */
   protected $configExists = FALSE;
 
@@ -43,13 +43,13 @@ class ConfigSingleImportForm extends ConfirmFormBase {
   /**
    * Constructs a new ConfigSingleImportForm.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
-   * @param \Drupal\Core\Config\StorageInterface $configStorage
+   * @param StorageInterface $configStorage
    *   The config storage.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer service.
-   * @param \Drupal\Core\Config\ConfigImporterFactory $configImporterFactory
+   * @param ConfigImporterFactory $configImporterFactory
    *   The config importer factory.
    */
   public function __construct(

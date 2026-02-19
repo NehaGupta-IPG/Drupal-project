@@ -19,7 +19,7 @@ abstract class BaseFieldDefinitionTestBase extends UnitTestCase {
   /**
    * The field definition used in this test.
    *
-   * @var \Drupal\Core\Field\BaseFieldDefinition
+   * @var BaseFieldDefinition
    */
   protected $definition;
 

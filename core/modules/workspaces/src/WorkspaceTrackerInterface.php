@@ -23,7 +23,7 @@ interface WorkspaceTrackerInterface {
    *
    * @param string $workspace_id
    *   The workspace in which the entity will be tracked.
-   * @param \Drupal\Core\Entity\RevisionableInterface $entity
+   * @param RevisionableInterface $entity
    *   The entity to update or create from.
    */
   public function trackEntity(string $workspace_id, RevisionableInterface $entity): void;
@@ -104,7 +104,7 @@ interface WorkspaceTrackerInterface {
   /**
    * Gets a list of workspace IDs in which an entity is tracked.
    *
-   * @param \Drupal\Core\Entity\RevisionableInterface $entity
+   * @param RevisionableInterface $entity
    *   An entity object.
    * @param bool $latest_revision
    *   (optional) Whether to return only the workspaces in which the latest
@@ -162,7 +162,7 @@ interface WorkspaceTrackerInterface {
   /**
    * Initializes a workspace with all the associations of its parent.
    *
-   * @param \Drupal\workspaces\WorkspaceInterface $workspace
+   * @param WorkspaceInterface $workspace
    *   The workspace to be initialized.
    */
   public function initializeWorkspace(WorkspaceInterface $workspace): void;

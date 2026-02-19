@@ -38,23 +38,23 @@ class PathChangedHelper {
   /**
    * The URL object for the route whose path has changed.
    *
-   * @var \Drupal\Core\Url
+   * @var Url
    */
   protected Url $newUrl;
 
   /**
    * The URL object for the BC route.
    *
-   * @var \Drupal\Core\Url
+   * @var Url
    */
   protected Url $oldUrl;
 
   /**
    * Constructs a PathChangedHelper object.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   A route match object, used for the route name and the parameters.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   A request object, used for the query parameters.
    *
    * @throws \InvalidArgumentException
@@ -100,7 +100,7 @@ class PathChangedHelper {
   /**
    * Returns a redirect to the new path.
    *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   * @return RedirectResponse
    *   A redirect response.
    */
   public function redirect(): RedirectResponse {

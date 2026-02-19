@@ -24,21 +24,21 @@ class BanMiddlewareTest extends UnitTestCase {
   /**
    * The mocked wrapped kernel.
    *
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var HttpKernelInterface|MockObject
    */
   protected $kernel;
 
   /**
    * The mocked ban IP manager.
    *
-   * @var \Drupal\ban\BanIpManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\ban\BanIpManagerInterface|MockObject
    */
   protected $banManager;
 
   /**
    * The tested ban middleware.
    *
-   * @var \Drupal\ban\BanMiddleware
+   * @var BanMiddleware
    */
   protected $banMiddleware;
 

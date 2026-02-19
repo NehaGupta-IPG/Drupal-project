@@ -27,7 +27,7 @@ class FormTestRecipeInputForm extends FormBase {
   /**
    * Returns the recipe object under test.
    *
-   * @return \Drupal\Core\Recipe\Recipe
+   * @return Recipe
    *   A Recipe object for the input_test recipe.
    */
   private function getRecipe(): Recipe {

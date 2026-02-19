@@ -5,11 +5,12 @@ namespace Drupal\Component\Diff;
 use Drupal\Component\Diff\Engine\DiffOpCopy;
 
 /**
- * A class to format Diffs
+ * A class to format Diffs.
  *
  * This class formats the diff in classic diff format.
  * It is intended that this class be customized via inheritance,
  * to obtain fancier outputs.
+ *
  * @todo document
  * @private
  * @subpackage DifferenceEngine
@@ -49,7 +50,7 @@ class DiffFormatter {
   /**
    * Format a diff.
    *
-   * @param \Drupal\Component\Diff\Diff $diff
+   * @param Diff $diff
    *   A Diff object.
    *
    * @return string

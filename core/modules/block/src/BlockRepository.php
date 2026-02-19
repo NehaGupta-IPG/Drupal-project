@@ -22,25 +22,25 @@ class BlockRepository implements BlockRepositoryInterface {
   /**
    * The theme manager.
    *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   * @var ThemeManagerInterface
    */
   protected $themeManager;
 
   /**
    * The context handler.
    *
-   * @var \Drupal\Core\Plugin\Context\ContextHandlerInterface
+   * @var ContextHandlerInterface
    */
   protected $contextHandler;
 
   /**
    * Constructs a new BlockRepository.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
+   * @param ThemeManagerInterface $theme_manager
    *   The theme manager.
-   * @param \Drupal\Core\Plugin\Context\ContextHandlerInterface $context_handler
+   * @param ContextHandlerInterface $context_handler
    *   The plugin context handler.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, ThemeManagerInterface $theme_manager, ContextHandlerInterface $context_handler) {
@@ -59,7 +59,7 @@ class BlockRepository implements BlockRepositoryInterface {
 
     $full = [];
     foreach ($this->blockStorage->loadByProperties(['theme' => $active_theme->getName()]) as $block_id => $block) {
-      /** @var \Drupal\block\BlockInterface $block */
+      /** @var BlockInterface $block */
       $access = $block->access('view', NULL, TRUE);
       $region = $block->getRegion();
       if (!isset($cacheable_metadata[$region])) {

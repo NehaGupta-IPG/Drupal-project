@@ -28,7 +28,7 @@ abstract class ContactFormResourceTestBase extends ConfigEntityResourceTestBase 
   protected static $patchProtectedFieldNames = [];
 
   /**
-   * @var \Drupal\contact\Entity\ContactForm
+   * @var ContactForm
    */
   protected $entity;
 

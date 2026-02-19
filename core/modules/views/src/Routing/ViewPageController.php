@@ -20,10 +20,10 @@ class ViewPageController {
    *   The ID of the view.
    * @param string $display_id
    *   The ID of the display.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
    *
-   * @return array|\Symfony\Component\HttpFoundation\Response
+   * @return array|Response
    *   A render array or a Response object.
    */
   public function handle($view_id, $display_id, RouteMatchInterface $route_match) {
@@ -56,7 +56,7 @@ class ViewPageController {
       return $class::buildResponse($view_id, $display_id, $args);
     }
     else {
-      /** @var \Drupal\views\Plugin\views\display\Page $class */
+      /** @var Page $class */
       $build = $class::buildBasicRenderable($view_id, $display_id, $args, $route);
       Page::setPageRenderArray($build);
 
@@ -74,7 +74,7 @@ class ViewPageController {
    * @param string $display_id
    *   The id of the display from the view.
    *
-   * @return string|\Drupal\Component\Render\MarkupInterface
+   * @return string|MarkupInterface
    *   The title of the display of the view.
    */
   public function getTitle($view_id, $display_id = 'default') {

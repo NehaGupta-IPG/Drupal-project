@@ -127,8 +127,8 @@ class MigrateLookupTest extends MigrateTestBase {
   /**
    * Tests looking up against multiple migrations at once.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
-   * @throws \Drupal\migrate\MigrateException
+   * @throws PluginException
+   * @throws MigrateException
    */
   public function testMultipleMigrationLookup(): void {
     $migrations = [

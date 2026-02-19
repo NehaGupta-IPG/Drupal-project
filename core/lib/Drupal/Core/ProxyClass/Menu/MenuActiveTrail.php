@@ -7,15 +7,21 @@
 
 namespace Drupal\Core\ProxyClass\Menu {
 
+    use Drupal\Core\Cache\CacheCollectorInterface;
+    use Drupal\Core\DestructableInterface;
+    use Drupal\Core\Menu\MenuActiveTrailInterface;
+    use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+    use Symfony\Component\DependencyInjection\ContainerInterface;
+
     /**
      * Provides a proxy class for \Drupal\Core\Menu\MenuActiveTrail.
      *
      * @see \Drupal\Component\ProxyBuilder
      */
-    class MenuActiveTrail implements \Drupal\Core\Cache\CacheCollectorInterface, \Drupal\Core\DestructableInterface, \Drupal\Core\Menu\MenuActiveTrailInterface
+    class MenuActiveTrail implements CacheCollectorInterface, DestructableInterface, MenuActiveTrailInterface
     {
 
-        use \Drupal\Core\DependencyInjection\DependencySerializationTrait;
+        use DependencySerializationTrait;
 
         /**
          * The id of the original proxied service.
@@ -34,19 +40,19 @@ namespace Drupal\Core\ProxyClass\Menu {
         /**
          * The service container.
          *
-         * @var \Symfony\Component\DependencyInjection\ContainerInterface
+         * @var ContainerInterface
          */
         protected $container;
 
         /**
          * Constructs a ProxyClass Drupal proxy object.
          *
-         * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+         * @param ContainerInterface $container
          *   The container.
          * @param string $drupal_proxy_original_service_id
          *   The service ID of the original service.
          */
-        public function __construct(\Symfony\Component\DependencyInjection\ContainerInterface $container, $drupal_proxy_original_service_id)
+        public function __construct(ContainerInterface $container, $drupal_proxy_original_service_id)
         {
             $this->container = $container;
             $this->drupalProxyOriginalServiceId = $drupal_proxy_original_service_id;

@@ -49,35 +49,35 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
   /**
    * The user storage.
    *
-   * @var \Drupal\user\UserStorageInterface
+   * @var UserStorageInterface
    */
   protected $userStorage;
 
   /**
    * The CSRF token generator.
    *
-   * @var \Drupal\Core\Access\CsrfTokenGenerator
+   * @var CsrfTokenGenerator
    */
   protected $csrfToken;
 
   /**
    * The user authentication.
    *
-   * @var \Drupal\user\UserAuthInterface|\Drupal\user\UserAuthenticationInterface
+   * @var UserAuthInterface|UserAuthenticationInterface
    */
   protected $userAuth;
 
   /**
    * The route provider.
    *
-   * @var \Drupal\Core\Routing\RouteProviderInterface
+   * @var RouteProviderInterface
    */
   protected $routeProvider;
 
   /**
    * The serializer.
    *
-   * @var \Symfony\Component\Serializer\Serializer
+   * @var Serializer
    */
   protected $serializer;
 
@@ -91,28 +91,28 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
   /**
    * A logger instance.
    *
-   * @var \Psr\Log\LoggerInterface
+   * @var LoggerInterface
    */
   protected $logger;
 
   /**
    * Constructs a new UserAuthenticationController object.
    *
-   * @param \Drupal\user\UserFloodControlInterface $user_flood_control
+   * @param UserFloodControlInterface $user_flood_control
    *   The user flood control service.
-   * @param \Drupal\user\UserStorageInterface $user_storage
+   * @param UserStorageInterface $user_storage
    *   The user storage.
-   * @param \Drupal\Core\Access\CsrfTokenGenerator $csrf_token
+   * @param CsrfTokenGenerator $csrf_token
    *   The CSRF token generator.
-   * @param \Drupal\user\UserAuthenticationInterface|\Drupal\user\UserAuthInterface $user_auth
+   * @param UserAuthenticationInterface|UserAuthInterface $user_auth
    *   The user authentication.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
+   * @param RouteProviderInterface $route_provider
    *   The route provider.
-   * @param \Symfony\Component\Serializer\Serializer $serializer
+   * @param Serializer $serializer
    *   The serializer.
    * @param array $serializer_formats
    *   The available serialization formats.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   A logger instance.
    */
   public function __construct(UserFloodControlInterface $user_flood_control, UserStorageInterface $user_storage, CsrfTokenGenerator $csrf_token, UserAuthenticationInterface|UserAuthInterface $user_auth, RouteProviderInterface $route_provider, Serializer $serializer, array $serializer_formats, LoggerInterface $logger) {
@@ -158,10 +158,10 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
   /**
    * Logs in a user.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   A response which contains the ID and CSRF token.
    */
   public function login(Request $request) {
@@ -243,10 +243,10 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
   /**
    * Resets a user password.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   The response object.
    */
   public function resetPassword(Request $request) {
@@ -271,7 +271,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
       $users = $this->userStorage->loadByProperties(['mail' => trim($identifier)]);
     }
 
-    /** @var \Drupal\user\UserInterface $account */
+    /** @var UserInterface $account */
     $account = reset($users);
     if ($account && $account->id()) {
       if ($account->isBlocked()) {
@@ -323,7 +323,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
   /**
    * Finalizes the user login.
    *
-   * @param \Drupal\user\UserInterface $user
+   * @param UserInterface $user
    *   The user.
    */
   protected function userLoginFinalize(UserInterface $user) {
@@ -333,7 +333,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
   /**
    * Logs out a user.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   The response object.
    */
   public function logout() {
@@ -351,7 +351,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
   /**
    * Checks whether a user is logged in or not.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   The response.
    */
   public function loginStatus() {
@@ -368,7 +368,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
   /**
    * Gets the format of the current request.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    *
    * @return string
@@ -385,7 +385,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
   /**
    * Enforces flood control for the current login request.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    * @param string $username
    *   The user name sent for login credentials.
@@ -414,7 +414,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
   /**
    * Gets the login identifier for user login flood control.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    * @param string $username
    *   The username supplied in login credentials.

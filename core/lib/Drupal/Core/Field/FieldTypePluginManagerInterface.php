@@ -20,7 +20,7 @@ interface FieldTypePluginManagerInterface extends PluginManagerInterface, Catego
    * However, it is the responsibility of the caller (usually the parent entity
    * itself) to make the parent aware of the field as a new child.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The entity this field item list will be part of.
    * @param string $field_name
    *   The name of the field.
@@ -28,7 +28,7 @@ interface FieldTypePluginManagerInterface extends PluginManagerInterface, Catego
    *   (optional) The data value. If set, it has to match one of the supported
    *   data type format as documented for the data type classes.
    *
-   * @return \Drupal\Core\Field\FieldItemListInterface<\Drupal\Core\Field\FieldItemInterface>
+   * @return FieldItemListInterface<FieldItemInterface>
    *   The instantiated object.
    */
   public function createFieldItemList(FieldableEntityInterface $entity, $field_name, $values = NULL);
@@ -40,14 +40,14 @@ interface FieldTypePluginManagerInterface extends PluginManagerInterface, Catego
    * However, it is the responsibility of the caller (usually the parent list
    * itself) to have the parent aware of the item as a new child.
    *
-   * @param \Drupal\Core\Field\FieldItemListInterface $items
+   * @param FieldItemListInterface $items
    *   The field item list, for which to create a new item.
    * @param int $index
    *   The list index at which the item is created.
    * @param array|null $values
    *   (optional) The values to assign to the field item properties.
    *
-   * @return \Drupal\Core\Field\FieldItemInterface
+   * @return FieldItemInterface
    *   The instantiated object.
    */
   public function createFieldItem(FieldItemListInterface $items, $index, $values = NULL);
@@ -79,7 +79,7 @@ interface FieldTypePluginManagerInterface extends PluginManagerInterface, Catego
   /**
    * Returns the summary of storage-level settings for a field type.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field storage definition.
    *
    * @return array
@@ -91,7 +91,7 @@ interface FieldTypePluginManagerInterface extends PluginManagerInterface, Catego
   /**
    * Returns the summary of field-level settings for a field type.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field entity.
    *
    * @return array
@@ -156,7 +156,7 @@ interface FieldTypePluginManagerInterface extends PluginManagerInterface, Catego
    * @return string
    *   Field type plugin class name.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws PluginNotFoundException
    *   Thrown if the field type plugin name is invalid.
    */
   public function getPluginClass($type);

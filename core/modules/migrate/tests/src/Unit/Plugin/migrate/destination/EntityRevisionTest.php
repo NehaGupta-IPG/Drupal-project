@@ -107,7 +107,7 @@ class EntityRevisionTestDestination extends EntityRevision {
   /**
    * The test entity.
    *
-   * @var \Drupal\migrate\Plugin\migrate\destination\EntityRevision|null
+   * @var EntityRevision|null
    */
   private $entity = NULL;
 

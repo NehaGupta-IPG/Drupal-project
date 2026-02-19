@@ -5,8 +5,8 @@ namespace Drupal\image\Plugin\Field\FieldWidget;
 use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\file\Element\ManagedFile;
@@ -28,7 +28,7 @@ class ImageWidget extends FileWidget {
   /**
    * The image factory service.
    *
-   * @var \Drupal\Core\Image\ImageFactory
+   * @var ImageFactory
    */
   protected $imageFactory;
 
@@ -39,15 +39,15 @@ class ImageWidget extends FileWidget {
    *   The plugin ID for the widget.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The definition of the field to which the widget is associated.
    * @param array $settings
    *   The widget settings.
    * @param array $third_party_settings
    *   Any third party settings.
-   * @param \Drupal\Core\Render\ElementInfoManagerInterface $element_info
+   * @param ElementInfoManagerInterface $element_info
    *   The element info manager service.
-   * @param \Drupal\Core\Image\ImageFactory $image_factory
+   * @param ImageFactory $image_factory
    *   The image factory service.
    */
   public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ElementInfoManagerInterface $element_info, ?ImageFactory $image_factory = NULL) {

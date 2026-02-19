@@ -17,9 +17,9 @@ interface EntityViewBuilderInterface {
    *
    * @param array &$build
    *   The renderable array representing the entity content.
-   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   * @param EntityInterface[] $entities
    *   The entities whose content is being built.
-   * @param \Drupal\Core\Entity\Display\EntityViewDisplayInterface[] $displays
+   * @param EntityViewDisplayInterface[] $displays
    *   The array of entity view displays holding the display options
    *   configured for the entity components, keyed by bundle name.
    * @param string $view_mode
@@ -30,7 +30,7 @@ interface EntityViewBuilderInterface {
   /**
    * Builds the render array for the provided entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to render.
    * @param string $view_mode
    *   (optional) The view mode that should be used to render the entity.
@@ -75,7 +75,7 @@ interface EntityViewBuilderInterface {
   /**
    * Resets the entity render cache.
    *
-   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   * @param EntityInterface[] $entities
    *   (optional) If specified, the cache is reset for the given entities only.
    */
   public function resetCache(?array $entities = NULL);
@@ -96,7 +96,7 @@ interface EntityViewBuilderInterface {
    * The function takes care of invoking the prepare_view steps. It also
    * respects field access permissions.
    *
-   * @param \Drupal\Core\Field\FieldItemListInterface $items
+   * @param FieldItemListInterface $items
    *   FieldItemList containing the values to be displayed.
    * @param string|array $display_options
    *   Can be either:
@@ -127,7 +127,7 @@ interface EntityViewBuilderInterface {
   /**
    * Builds a renderable array for a single field item.
    *
-   * @param \Drupal\Core\Field\FieldItemInterface $item
+   * @param FieldItemInterface $item
    *   FieldItem to be displayed.
    * @param string|array $display_options
    *   Can be either the name of a view mode, or an array of display settings.

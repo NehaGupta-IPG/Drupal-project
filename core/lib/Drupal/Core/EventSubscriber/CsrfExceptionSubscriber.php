@@ -26,7 +26,7 @@ class CsrfExceptionSubscriber extends HttpExceptionSubscriberBase {
   /**
    * Handles a 403 error for HTML.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   * @param ExceptionEvent $event
    *   The event to process.
    */
   public function on403(ExceptionEvent $event): void {

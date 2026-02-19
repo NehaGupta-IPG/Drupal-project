@@ -15,14 +15,14 @@ class TestLazyPluginCollection extends LazyPluginCollection {
   /**
    * Stores the plugin manager used by this collection.
    *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   * @var PluginManagerInterface
    */
   protected $manager;
 
   /**
    * Constructs a TestLazyPluginCollection object.
    *
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $manager
+   * @param PluginManagerInterface $manager
    *   The plugin manager that handles test plugins.
    */
   public function __construct(PluginManagerInterface $manager) {

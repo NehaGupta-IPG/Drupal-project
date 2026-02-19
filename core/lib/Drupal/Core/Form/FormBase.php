@@ -7,13 +7,13 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Htmx\HtmxRequestInfoTrait;
 use Drupal\Core\Logger\LoggerChannelTrait;
+use Drupal\Core\Messenger\MessengerTrait;
 use Drupal\Core\Routing\RedirectDestinationTrait;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Drupal\Core\Messenger\MessengerTrait;
 
 /**
  * Provides a base class for forms.
@@ -66,7 +66,7 @@ abstract class FormBase implements FormInterface, ContainerInjectionInterface {
    * directly. See \Drupal\Core\Form\ConfigFormBase::config() for an example of
    * this.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
@@ -117,7 +117,7 @@ abstract class FormBase implements FormInterface, ContainerInjectionInterface {
    * When accessing configuration values, use $this->config(). Only use this
    * when the config factory needs to be manipulated directly.
    *
-   * @return \Drupal\Core\Config\ConfigFactoryInterface
+   * @return ConfigFactoryInterface
    *   The configuration factory for this form.
    */
   protected function configFactory() {
@@ -130,7 +130,7 @@ abstract class FormBase implements FormInterface, ContainerInjectionInterface {
   /**
    * Sets the config factory for this form.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
    *
    * @return $this
@@ -176,7 +176,7 @@ abstract class FormBase implements FormInterface, ContainerInjectionInterface {
   /**
    * Sets the request stack object to use.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   The request stack object.
    *
    * @return $this
@@ -209,7 +209,7 @@ abstract class FormBase implements FormInterface, ContainerInjectionInterface {
    *   (optional) The HTTP redirect status code for the redirect. The default is
    *   302 Found.
    *
-   * @return \Symfony\Component\HttpFoundation\RedirectResponse
+   * @return RedirectResponse
    *   A redirect response object that may be returned by the controller.
    */
   protected function redirect($route_name, array $route_parameters = [], array $options = [], $status = 302) {
@@ -225,7 +225,7 @@ abstract class FormBase implements FormInterface, ContainerInjectionInterface {
    * \Drupal\Core\DependencyInjection\ContainerInjectionInterface should be used
    * for injecting services.
    *
-   * @return \Symfony\Component\DependencyInjection\ContainerInterface
+   * @return ContainerInterface
    *   The service container.
    */
   private function container() {

@@ -15,14 +15,14 @@ class AssetDumper implements AssetDumperUriInterface {
   /**
    * The file system service.
    *
-   * @var \Drupal\Core\File\FileSystemInterface
+   * @var FileSystemInterface
    */
   protected $fileSystem;
 
   /**
    * AssetDumper constructor.
    *
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
+   * @param FileSystemInterface $file_system
    *   The file handler.
    */
   public function __construct(FileSystemInterface $file_system) {

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\comment\Tests;
 
-use Drupal\Component\Utility\Unicode;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
+use Drupal\Component\Utility\Unicode;
 
 /**
  * Provides common functionality for the Comment test classes.

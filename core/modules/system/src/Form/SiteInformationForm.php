@@ -23,27 +23,27 @@ class SiteInformationForm extends ConfigFormBase {
   /**
    * The path validator.
    *
-   * @var \Drupal\Core\Path\PathValidatorInterface
+   * @var PathValidatorInterface
    */
   protected $pathValidator;
 
   /**
    * The request context.
    *
-   * @var \Drupal\Core\Routing\RequestContext
+   * @var RequestContext
    */
   protected $requestContext;
 
   /**
    * Constructs a SiteInformationForm object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
+   * @param TypedConfigManagerInterface $typedConfigManager
    *   The typed config manager.
-   * @param \Drupal\Core\Path\PathValidatorInterface $path_validator
+   * @param PathValidatorInterface $path_validator
    *   The path validator.
-   * @param \Drupal\Core\Routing\RequestContext $request_context
+   * @param RequestContext $request_context
    *   The request context.
    */
   public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, PathValidatorInterface $path_validator, RequestContext $request_context) {

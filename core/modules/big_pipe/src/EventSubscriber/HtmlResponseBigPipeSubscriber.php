@@ -2,12 +2,12 @@
 
 namespace Drupal\big_pipe\EventSubscriber;
 
-use Drupal\Core\Render\HtmlResponse;
 use Drupal\big_pipe\Render\BigPipe;
 use Drupal\big_pipe\Render\BigPipeResponse;
+use Drupal\Core\Render\HtmlResponse;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Response subscriber to replace the HtmlResponse with a BigPipeResponse.
@@ -21,14 +21,14 @@ class HtmlResponseBigPipeSubscriber implements EventSubscriberInterface {
   /**
    * The BigPipe service.
    *
-   * @var \Drupal\big_pipe\Render\BigPipe
+   * @var BigPipe
    */
   protected $bigPipe;
 
   /**
    * Constructs a HtmlResponseBigPipeSubscriber object.
    *
-   * @param \Drupal\big_pipe\Render\BigPipe $big_pipe
+   * @param BigPipe $big_pipe
    *   The BigPipe service.
    */
   public function __construct(BigPipe $big_pipe) {
@@ -38,7 +38,7 @@ class HtmlResponseBigPipeSubscriber implements EventSubscriberInterface {
   /**
    * Adds markers to the response necessary for the BigPipe render strategy.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
+   * @param ResponseEvent $event
    *   The event to process.
    */
   public function onRespondEarly(ResponseEvent $event) {
@@ -63,7 +63,7 @@ class HtmlResponseBigPipeSubscriber implements EventSubscriberInterface {
   /**
    * Transforms a HtmlResponse to a BigPipeResponse.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
+   * @param ResponseEvent $event
    *   The event to process.
    */
   public function onRespond(ResponseEvent $event) {
@@ -100,10 +100,10 @@ class HtmlResponseBigPipeSubscriber implements EventSubscriberInterface {
   /**
    * Returns the BigPipe service to use to send the current response.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
+   * @param ResponseEvent $event
    *   A response event.
    *
-   * @return \Drupal\big_pipe\Render\BigPipe
+   * @return BigPipe
    *   The BigPipe service.
    */
   protected function getBigPipeService(ResponseEvent $event) {

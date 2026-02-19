@@ -37,7 +37,7 @@ class LinkFieldUITest extends BrowserTestBase {
   /**
    * A user that can edit content types.
    *
-   * @var \Drupal\user\UserInterface
+   * @var \Drupal\user\Entity\UserInterface
    */
   protected $adminUser;
 

@@ -58,7 +58,7 @@ abstract class AccessPluginBase extends PluginBase {
   /**
    * Determine if the current user has access or not.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user who wants to access this view.
    *
    * @return bool
@@ -72,7 +72,7 @@ abstract class AccessPluginBase extends PluginBase {
    * Likely the access plugin will add new requirements, so its custom access
    * checker can be applied.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route to change.
    */
   abstract public function alterRouteDefinition(Route $route);

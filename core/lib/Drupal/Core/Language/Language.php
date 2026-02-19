@@ -140,7 +140,7 @@ class Language implements LanguageInterface {
   /**
    * Sort language objects.
    *
-   * @param \Drupal\Core\Language\LanguageInterface[] $languages
+   * @param LanguageInterface[] $languages
    *   The array of language objects keyed by langcode.
    */
   public static function sort(&$languages) {

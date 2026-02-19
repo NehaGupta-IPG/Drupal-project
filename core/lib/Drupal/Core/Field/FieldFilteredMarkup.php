@@ -2,9 +2,9 @@
 
 namespace Drupal\Core\Field;
 
-use Drupal\Component\Utility\Html;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Render\MarkupTrait;
+use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Xss;
 
 /**
@@ -25,7 +25,7 @@ final class FieldFilteredMarkup implements MarkupInterface, \Countable {
   /**
    * Overrides \Drupal\Component\Render\MarkupTrait::create().
    *
-   * @return string|\Drupal\Component\Render\MarkupInterface
+   * @return string|MarkupInterface
    *   A safe string filtered with the allowed tag list and normalized.
    *
    * @see \Drupal\Core\Field\FieldFilteredMarkup::allowedTags()

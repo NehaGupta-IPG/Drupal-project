@@ -20,7 +20,7 @@ class WorkspaceSwitcherForm extends FormBase implements WorkspaceSafeFormInterfa
   /**
    * The workspace manager.
    *
-   * @var \Drupal\workspaces\WorkspaceManagerInterface
+   * @var WorkspaceManagerInterface
    */
   protected $workspaceManager;
 
@@ -34,27 +34,27 @@ class WorkspaceSwitcherForm extends FormBase implements WorkspaceSafeFormInterfa
   /**
    * The messenger service.
    *
-   * @var \Drupal\Core\Messenger\MessengerInterface
+   * @var MessengerInterface
    */
   protected $messenger;
 
   /**
    * The entity reference selection plugin manager.
    *
-   * @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface
+   * @var SelectionPluginManagerInterface
    */
   protected $selectionManager;
 
   /**
    * Constructs a new WorkspaceSwitcherForm.
    *
-   * @param \Drupal\workspaces\WorkspaceManagerInterface $workspace_manager
+   * @param WorkspaceManagerInterface $workspace_manager
    *   The workspace manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger service.
-   * @param \Drupal\Core\Entity\EntityReferenceSelection\SelectionPluginManagerInterface $selection_manager
+   * @param SelectionPluginManagerInterface $selection_manager
    *   The entity reference selection plugin manager.
    */
   public function __construct(WorkspaceManagerInterface $workspace_manager, EntityTypeManagerInterface $entity_type_manager, MessengerInterface $messenger, SelectionPluginManagerInterface $selection_manager) {

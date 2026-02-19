@@ -2,8 +2,8 @@
 
 namespace Drupal\link\Plugin\Validation\Constraint;
 
-use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\link\LinkItemInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
@@ -18,7 +18,7 @@ class LinkAccessConstraintValidator extends ConstraintValidator implements Conta
   /**
    * Proxy for the current user account.
    *
-   * @var \Drupal\Core\Session\AccountProxyInterface
+   * @var AccountProxyInterface
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $current_user;
@@ -26,7 +26,7 @@ class LinkAccessConstraintValidator extends ConstraintValidator implements Conta
   /**
    * Constructs an instance of the LinkAccessConstraintValidator class.
    *
-   * @param \Drupal\Core\Session\AccountProxyInterface $current_user
+   * @param AccountProxyInterface $current_user
    *   The current user account.
    */
   public function __construct(AccountProxyInterface $current_user) {

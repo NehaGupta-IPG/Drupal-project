@@ -31,14 +31,14 @@ class CustomPageExceptionHtmlSubscriberTest extends UnitTestCase {
   /**
    * The mocked HTTP kernel.
    *
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var HttpKernelInterface|MockObject
    */
   protected $kernel;
 
   /**
    * The mocked config factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Config\ConfigFactoryInterface|MockObject
    */
   protected $configFactory;
 
@@ -59,21 +59,21 @@ class CustomPageExceptionHtmlSubscriberTest extends UnitTestCase {
   /**
    * The tested custom page exception subscriber.
    *
-   * @var \Drupal\Core\EventSubscriber\CustomPageExceptionHtmlSubscriber|\Drupal\Tests\Core\EventSubscriber\CustomPageExceptionHtmlSubscriberTest
+   * @var CustomPageExceptionHtmlSubscriber|CustomPageExceptionHtmlSubscriberTest
    */
   protected $customPageSubscriber;
 
   /**
    * The mocked redirect.destination service.
    *
-   * @var \Drupal\Core\Routing\RedirectDestinationInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Routing\RedirectDestinationInterface|MockObject
    */
   protected $redirectDestination;
 
   /**
    * The mocked access unaware router.
    *
-   * @var \Symfony\Component\Routing\Matcher\UrlMatcherInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Symfony\Component\Routing\Matcher\UrlMatcherInterface|MockObject
    */
   protected $accessUnawareRouter;
 

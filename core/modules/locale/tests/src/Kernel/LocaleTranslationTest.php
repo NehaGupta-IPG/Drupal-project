@@ -42,7 +42,7 @@ class LocaleTranslationTest extends KernelTestBase {
    * Tests that \Drupal\locale\LocaleTranslation is serializable.
    */
   public function testSerializable(): void {
-    /** @var \Drupal\locale\LocaleTranslation $translation */
+    /** @var LocaleTranslation $translation */
     $translation = $this->container->get('string_translator.locale.lookup');
     $this->assertInstanceOf(LocaleTranslation::class, $translation);
     // Ensure that the \Drupal\locale\LocaleTranslation::$translations property

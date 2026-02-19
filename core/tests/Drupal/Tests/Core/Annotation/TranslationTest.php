@@ -22,7 +22,7 @@ class TranslationTest extends UnitTestCase {
   /**
    * The translation manager used for testing.
    *
-   * @var \Drupal\Core\StringTranslation\TranslationInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\StringTranslation\TranslationInterface|MockObject
    */
   protected $translationManager;
 

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\package_manager;
 
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\package_manager\Event\CollectPathsToExcludeEvent;
+use Drupal\package_manager\Exception\FailureMarkerExistsException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\package_manager\Exception\FailureMarkerExistsException;
 
 /**
  * Handles failure marker file operation.
@@ -50,9 +50,9 @@ final class FailureMarker implements EventSubscriberInterface {
   /**
    * Writes data to marker file.
    *
-   * @param \Drupal\package_manager\SandboxManagerBase $sandbox_manager
+   * @param SandboxManagerBase $sandbox_manager
    *   The stage.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $message
+   * @param TranslatableMarkup $message
    *   Failure message to be added.
    * @param \Throwable|null $throwable
    *   (optional) The throwable that caused the failure.
@@ -76,7 +76,7 @@ final class FailureMarker implements EventSubscriberInterface {
    * @return array|null
    *   The data from the file if it exists.
    *
-   * @throws \Drupal\package_manager\Exception\FailureMarkerExistsException
+   * @throws FailureMarkerExistsException
    *   Thrown if failure marker exists but cannot be decoded.
    */
   private function getData(): ?array {
@@ -105,7 +105,7 @@ final class FailureMarker implements EventSubscriberInterface {
    * @return string|null
    *   The message from the file if it exists, otherwise NULL.
    *
-   * @throws \Drupal\package_manager\Exception\FailureMarkerExistsException
+   * @throws FailureMarkerExistsException
    *   Thrown if failure marker exists but cannot be decoded.
    */
   public function getMessage(bool $include_backtrace = TRUE): ?string {
@@ -130,7 +130,7 @@ final class FailureMarker implements EventSubscriberInterface {
   /**
    * Asserts the failure file doesn't exist.
    *
-   * @throws \Drupal\package_manager\Exception\FailureMarkerExistsException
+   * @throws FailureMarkerExistsException
    *   Thrown if the marker file exists.
    */
   public function assertNotExists(): void {
@@ -151,7 +151,7 @@ final class FailureMarker implements EventSubscriberInterface {
   /**
    * Excludes the failure marker file from stage operations.
    *
-   * @param \Drupal\package_manager\Event\CollectPathsToExcludeEvent $event
+   * @param CollectPathsToExcludeEvent $event
    *   The event being handled.
    */
   public function excludeMarkerFile(CollectPathsToExcludeEvent $event): void {

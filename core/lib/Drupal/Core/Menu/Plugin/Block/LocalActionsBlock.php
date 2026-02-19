@@ -6,8 +6,8 @@ use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Menu\LocalActionManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
  * Provides a block to display the local actions.
@@ -21,14 +21,14 @@ class LocalActionsBlock extends BlockBase implements ContainerFactoryPluginInter
   /**
    * The local action manager.
    *
-   * @var \Drupal\Core\Menu\LocalActionManagerInterface
+   * @var LocalActionManagerInterface
    */
   protected $localActionManager;
 
   /**
    * The route match.
    *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
+   * @var RouteMatchInterface
    */
   protected $routeMatch;
 
@@ -41,9 +41,9 @@ class LocalActionsBlock extends BlockBase implements ContainerFactoryPluginInter
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Menu\LocalActionManagerInterface $local_action_manager
+   * @param LocalActionManagerInterface $local_action_manager
    *   A local action manager.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, LocalActionManagerInterface $local_action_manager, RouteMatchInterface $route_match) {

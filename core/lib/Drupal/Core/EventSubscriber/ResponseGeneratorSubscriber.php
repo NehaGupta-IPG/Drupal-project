@@ -2,9 +2,9 @@
 
 namespace Drupal\Core\EventSubscriber;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Response subscriber to add X-Generator header tag.
@@ -14,7 +14,7 @@ class ResponseGeneratorSubscriber implements EventSubscriberInterface {
   /**
    * Sets extra X-Generator header on successful responses.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
+   * @param ResponseEvent $event
    *   The event to process.
    */
   public function onRespond(ResponseEvent $event) {

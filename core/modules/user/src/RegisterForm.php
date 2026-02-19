@@ -15,7 +15,7 @@ class RegisterForm extends AccountForm {
    * {@inheritdoc}
    */
   public function form(array $form, FormStateInterface $form_state) {
-    /** @var \Drupal\user\UserInterface $account */
+    /** @var UserInterface $account */
     $account = $this->entity;
 
     // This form is used for two cases:

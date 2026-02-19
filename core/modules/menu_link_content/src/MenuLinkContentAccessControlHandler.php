@@ -2,8 +2,8 @@
 
 namespace Drupal\menu_link_content;
 
-use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessManagerInterface;
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityHandlerInterface;
 use Drupal\Core\Entity\EntityInterface;
@@ -19,16 +19,16 @@ class MenuLinkContentAccessControlHandler extends EntityAccessControlHandler imp
   /**
    * The access manager to check routes by name.
    *
-   * @var \Drupal\Core\Access\AccessManagerInterface
+   * @var AccessManagerInterface
    */
   protected $accessManager;
 
   /**
    * Creates a new MenuLinkContentAccessControlHandler.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
+   * @param AccessManagerInterface $access_manager
    *   The access manager to check routes by name.
    */
   public function __construct(EntityTypeInterface $entity_type, AccessManagerInterface $access_manager) {
@@ -61,7 +61,7 @@ class MenuLinkContentAccessControlHandler extends EntityAccessControlHandler imp
         else {
           // Assume that access is allowed.
           $access = AccessResult::allowed()->cachePerPermissions()->addCacheableDependency($entity);
-          /** @var \Drupal\menu_link_content\MenuLinkContentInterface $entity */
+          /** @var MenuLinkContentInterface $entity */
           // If the link is routed determine whether the user has access unless
           // they have the 'link to any page' permission.
           if (!$account->hasPermission('link to any page') && ($url_object = $entity->getUrlObject()) && $url_object->isRouted()) {

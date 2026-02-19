@@ -23,14 +23,14 @@ class ThemeNegotiatorTest extends UnitTestCase {
   /**
    * The mocked theme access checker.
    *
-   * @var \Drupal\Core\Theme\ThemeAccessCheck|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Theme\ThemeAccessCheck|MockObject
    */
   protected $themeAccessCheck;
 
   /**
    * The container builder.
    *
-   * @var \Drupal\Core\DependencyInjection\ContainerBuilder
+   * @var ContainerBuilder
    */
   protected $container;
 
@@ -44,7 +44,7 @@ class ThemeNegotiatorTest extends UnitTestCase {
   /**
    * The actual tested theme negotiator.
    *
-   * @var \Drupal\Core\Theme\ThemeNegotiator
+   * @var ThemeNegotiator
    */
   protected $themeNegotiator;
 
@@ -220,7 +220,7 @@ class ThemeNegotiatorTest extends UnitTestCase {
    * @param array $negotiators
    *   An array of negotiator IDs.
    *
-   * @return \Drupal\Core\Theme\ThemeNegotiator
+   * @return ThemeNegotiator
    *   The theme negotiator.
    */
   protected function createThemeNegotiator(array $negotiators): ThemeNegotiator {

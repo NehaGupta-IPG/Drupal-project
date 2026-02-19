@@ -39,34 +39,34 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $database;
 
   /**
    * The inline block usage service.
    *
-   * @var \Drupal\layout_builder\InlineBlockUsageInterface
+   * @var InlineBlockUsageInterface
    */
   protected $usage;
 
   /**
    * Constructs SetInlineBlockDependency object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Database\Connection $database
+   * @param Connection $database
    *   The database connection.
-   * @param \Drupal\layout_builder\InlineBlockUsageInterface $usage
+   * @param InlineBlockUsageInterface $usage
    *   The inline block usage service.
-   * @param \Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface $section_storage_manager
+   * @param SectionStorageManagerInterface $section_storage_manager
    *   The section storage manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, Connection $database, InlineBlockUsageInterface $usage, SectionStorageManagerInterface $section_storage_manager) {
@@ -88,7 +88,7 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
   /**
    * Handles the BlockContentEvents::INLINE_BLOCK_GET_DEPENDENCY event.
    *
-   * @param \Drupal\block_content\Event\BlockContentGetDependencyEvent $event
+   * @param BlockContentGetDependencyEvent $event
    *   The event.
    */
   public function onGetDependency(BlockContentGetDependencyEvent $event) {
@@ -113,10 +113,10 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
    * regardless of whether the user has access to the revision in which the
    * inline block was used.
    *
-   * @param \Drupal\block_content\BlockContentInterface $block_content
+   * @param BlockContentInterface $block_content
    *   The block content entity.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|null
+   * @return EntityInterface|null
    *   Returns the layout dependency.
    *
    * @see \Drupal\block_content\BlockContentAccessControlHandler::checkAccess()
@@ -143,9 +143,9 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
   /**
    * Determines if a block content revision is used in an entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $layout_entity
+   * @param EntityInterface $layout_entity
    *   The layout entity.
-   * @param \Drupal\block_content\BlockContentInterface $block_content
+   * @param BlockContentInterface $block_content
    *   The block content revision.
    *
    * @return bool

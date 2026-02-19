@@ -21,23 +21,23 @@ class ThemeExperimentalConfirmForm extends ConfirmFormBase {
   /**
    * An extension discovery instance.
    *
-   * @var \Drupal\Core\Extension\ThemeExtensionList
+   * @var ThemeExtensionList
    */
   protected $themeList;
 
   /**
    * The theme installer service.
    *
-   * @var \Drupal\Core\Extension\ThemeInstallerInterface
+   * @var ThemeInstallerInterface
    */
   protected $themeInstaller;
 
   /**
    * Constructs a ThemeExperimentalConfirmForm object.
    *
-   * @param \Drupal\Core\Extension\ThemeExtensionList $theme_list
+   * @param ThemeExtensionList $theme_list
    *   The theme extension list.
-   * @param \Drupal\Core\Extension\ThemeInstallerInterface $theme_installer
+   * @param ThemeInstallerInterface $theme_installer
    *   The theme installer.
    */
   public function __construct(ThemeExtensionList $theme_list, ThemeInstallerInterface $theme_installer) {

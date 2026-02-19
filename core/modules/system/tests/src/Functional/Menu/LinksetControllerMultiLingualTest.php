@@ -63,7 +63,7 @@ final class LinksetControllerMultiLingualTest extends LinksetControllerTestBase 
    * Installs necessary database schemas, then creates test content and menu
    * items. The concept of this set up is to replicate a typical site's menus.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    */
   public function setUp(): void {
     parent::setUp();

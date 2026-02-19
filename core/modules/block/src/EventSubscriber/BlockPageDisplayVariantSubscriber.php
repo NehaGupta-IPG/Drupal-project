@@ -16,7 +16,7 @@ class BlockPageDisplayVariantSubscriber implements EventSubscriberInterface {
   /**
    * Selects the block page display variant.
    *
-   * @param \Drupal\Core\Render\PageDisplayVariantSelectionEvent $event
+   * @param PageDisplayVariantSelectionEvent $event
    *   The event to process.
    */
   public function onSelectPageDisplayVariant(PageDisplayVariantSelectionEvent $event) {

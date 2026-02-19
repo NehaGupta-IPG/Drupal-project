@@ -25,14 +25,14 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
   /**
    * The validator used for validating typed data.
    *
-   * @var \Symfony\Component\Validator\Validator\ValidatorInterface
+   * @var ValidatorInterface
    */
   protected $validator;
 
   /**
    * The validation constraint manager to use for instantiating constraints.
    *
-   * @var \Drupal\Core\Validation\ConstraintManager
+   * @var ConstraintManager
    */
   protected $constraintManager;
 
@@ -46,7 +46,7 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
   /**
    * The class resolver.
    *
-   * @var \Drupal\Core\DependencyInjection\ClassResolverInterface
+   * @var ClassResolverInterface
    */
   protected $classResolver;
 
@@ -56,11 +56,11 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param CacheBackendInterface $cache_backend
    *   Cache backend instance to use.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $class_resolver
+   * @param ClassResolverInterface $class_resolver
    *   The class resolver.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, ClassResolverInterface $class_resolver) {
@@ -221,7 +221,7 @@ class TypedDataManager extends DefaultPluginManager implements TypedDataManagerI
   /**
    * Sets the validator for validating typed data.
    *
-   * @param \Symfony\Component\Validator\Validator\ValidatorInterface $validator
+   * @param ValidatorInterface $validator
    *   The validator object to set.
    */
   public function setValidator(ValidatorInterface $validator) {

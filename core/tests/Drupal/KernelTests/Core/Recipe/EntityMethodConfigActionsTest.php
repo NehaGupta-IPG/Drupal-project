@@ -178,7 +178,7 @@ class EntityMethodConfigActionsTest extends KernelTestBase {
   public function testRemoveComponentFromDisplay(string $action_name): void {
     $this->assertStringStartsWith('hideComponent', $action_name);
 
-    /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $repository */
+    /** @var EntityDisplayRepositoryInterface $repository */
     $repository = $this->container->get(EntityDisplayRepositoryInterface::class);
 
     $view_display = $repository->getViewDisplay('entity_test_with_bundle', 'test');

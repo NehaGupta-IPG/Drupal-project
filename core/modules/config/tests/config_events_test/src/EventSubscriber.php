@@ -18,14 +18,14 @@ class EventSubscriber implements EventSubscriberInterface {
   /**
    * The state key value store.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
   /**
    * Constructs the Event Subscriber object.
    *
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state key value store.
    */
   public function __construct(StateInterface $state) {
@@ -35,7 +35,7 @@ class EventSubscriber implements EventSubscriberInterface {
   /**
    * Reacts to config event.
    *
-   * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   * @param ConfigCrudEvent $event
    *   The configuration event.
    * @param string $event_name
    *   The event name.

@@ -21,42 +21,42 @@ class ViewExecutableFactoryTest extends UnitTestCase {
   /**
    * The mock user object.
    *
-   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Session\AccountInterface|MockObject
    */
   protected $user;
 
   /**
    * The mock request stack object.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * The mock view entity.
    *
-   * @var \Drupal\Core\Config\Entity\ConfigEntityInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Config\Entity\ConfigEntityInterface|MockObject
    */
   protected $view;
 
   /**
    * The ViewExecutableFactory class under test.
    *
-   * @var \Drupal\views\ViewExecutableFactory
+   * @var ViewExecutableFactory
    */
   protected $viewExecutableFactory;
 
   /**
    * The mocked views data.
    *
-   * @var \Drupal\views\ViewsData|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\ViewsData|MockObject
    */
   protected $viewsData;
 
   /**
    * The mocked route provider.
    *
-   * @var \Drupal\Core\Routing\RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Routing\RouteProviderInterface|MockObject
    */
   protected $routeProvider;
 

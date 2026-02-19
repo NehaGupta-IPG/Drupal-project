@@ -8,8 +8,8 @@ use Drupal\Core\Ajax\InvokeCommand;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Field\EntityReferenceFieldItemList;
+use Drupal\Core\Session\AccountInterface;
 
 /**
  * The media library opener for field widgets.
@@ -22,14 +22,14 @@ class MediaLibraryFieldWidgetOpener implements MediaLibraryOpenerInterface {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * MediaLibraryFieldWidgetOpener constructor.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
@@ -90,7 +90,7 @@ class MediaLibraryFieldWidgetOpener implements MediaLibraryOpenerInterface {
       if ($bundle_key = $entity_type->getKey('bundle')) {
         $values[$bundle_key] = $bundle;
       }
-      /** @var \Drupal\Core\Entity\FieldableEntityInterface $entity */
+      /** @var FieldableEntityInterface $entity */
       $entity = $storage->create($values);
     }
 

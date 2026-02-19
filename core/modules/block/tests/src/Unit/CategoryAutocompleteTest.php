@@ -22,7 +22,7 @@ class CategoryAutocompleteTest extends UnitTestCase {
   /**
    * The autocomplete controller.
    *
-   * @var \Drupal\block\Controller\CategoryAutocompleteController
+   * @var CategoryAutocompleteController
    */
   protected $autocompleteController;
 

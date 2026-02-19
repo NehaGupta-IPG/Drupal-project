@@ -110,7 +110,7 @@ class EntityReference extends ManyToOne {
    * @param string|null $sub_handler
    *   The sub handler to get an instance of or NULL for the current selection.
    *
-   * @return \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface
+   * @return SelectionInterface
    *   The selection handler plugin instance.
    */
   protected function getSelectionHandler(?string $sub_handler = NULL): SelectionInterface {
@@ -118,7 +118,7 @@ class EntityReference extends ManyToOne {
     $handler_settings = $this->options['sub_handler_settings'] ?? [];
     $handler_settings['handler'] = $sub_handler;
     $handler_settings['target_type'] = $this->getReferencedEntityType()->id();
-    /** @var \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface */
+    /** @var SelectionInterface */
     return $this->selectionPluginManager->getInstance($handler_settings);
   }
 
@@ -293,7 +293,7 @@ class EntityReference extends ManyToOne {
    *
    * @param array $element
    *   The cardinality form render array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    */
   public static function validateRequired(array &$element, FormStateInterface $form_state): void {
@@ -366,7 +366,7 @@ class EntityReference extends ManyToOne {
    * @param array $form
    *   Associative array containing the structure of the form, passed by
    *   reference.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   protected function alternateWidgetsDefaultNormalize(array &$form, FormStateInterface $form_state): void {
@@ -444,7 +444,7 @@ class EntityReference extends ManyToOne {
    * @param array $form
    *   Associative array containing the structure of the form, passed by
    *   reference.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   protected function valueFormAddAutocomplete(array &$form, FormStateInterface $form_state): void {
@@ -469,7 +469,7 @@ class EntityReference extends ManyToOne {
    * @param array $form
    *   Associative array containing the structure of the form, passed by
    *   reference.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   protected function valueFormAddSelect(array &$form, FormStateInterface $form_state): void {
@@ -538,7 +538,7 @@ class EntityReference extends ManyToOne {
   /**
    * Returns the value options for a select widget.
    *
-   * @param \Drupal\Core\Entity\EntityReferenceSelection\SelectionInterface $selection_handler
+   * @param SelectionInterface $selection_handler
    *   The selection handler.
    *
    * @return string[]
@@ -659,7 +659,7 @@ class EntityReference extends ManyToOne {
   /**
    * Gets the target entity type referenced by this field.
    *
-   * @return \Drupal\Core\Entity\EntityTypeInterface
+   * @return EntityTypeInterface
    *   The entity type definition.
    */
   protected function getReferencedEntityType(): EntityTypeInterface {

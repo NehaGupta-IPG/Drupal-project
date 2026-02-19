@@ -20,7 +20,7 @@ interface TopBarItemPluginInterface {
   /**
    * Returns the plugin region.
    *
-   * @return \Drupal\navigation\TopBarRegion
+   * @return TopBarRegion
    *   The plugin region.
    */
   public function region(): TopBarRegion;

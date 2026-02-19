@@ -7,8 +7,8 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Http\Exception\CacheableBadRequestHttpException;
 use Drupal\Core\Http\Exception\CacheableHttpException;
 use Drupal\Core\Routing\EnhancerInterface;
-use Drupal\jsonapi\Routing\Routes;
 use Drupal\Core\Routing\RouteObjectInterface;
+use Drupal\jsonapi\Routing\Routes;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -65,14 +65,14 @@ final class ResourceVersionRouteEnhancer implements EnhancerInterface {
   /**
    * The revision ID negotiator.
    *
-   * @var \Drupal\jsonapi\Revisions\VersionNegotiator
+   * @var VersionNegotiator
    */
   protected $versionNegotiator;
 
   /**
    * ResourceVersionRouteEnhancer constructor.
    *
-   * @param \Drupal\jsonapi\Revisions\VersionNegotiator $version_negotiator_manager
+   * @param VersionNegotiator $version_negotiator_manager
    *   The version negotiator.
    */
   public function __construct(VersionNegotiator $version_negotiator_manager) {
@@ -159,10 +159,10 @@ final class ResourceVersionRouteEnhancer implements EnhancerInterface {
       return $defaults;
     }
 
-    /** @var \Drupal\Core\Entity\EntityInterface $entity */
+    /** @var EntityInterface $entity */
     $entity = $defaults['entity'];
 
-    /** @var \Drupal\jsonapi\Revisions\VersionNegotiatorInterface $negotiator */
+    /** @var VersionNegotiatorInterface $negotiator */
     $resolved_revision = $this->versionNegotiator->getRevision($entity, $resource_version_identifier);
     // Ensure none of the original entity cacheability is lost, especially the
     // query argument's cache context.

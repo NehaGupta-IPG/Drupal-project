@@ -12,7 +12,7 @@ class ActionPluginCollection extends DefaultSingleLazyPluginCollection {
   /**
    * {@inheritdoc}
    *
-   * @return \Drupal\Core\Action\ActionInterface
+   * @return ActionInterface
    *   The action plugin instance.
    */
   public function &get($instance_id) {

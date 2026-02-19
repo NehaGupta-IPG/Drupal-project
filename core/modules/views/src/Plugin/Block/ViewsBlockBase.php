@@ -2,16 +2,16 @@
 
 namespace Drupal\views\Plugin\Block;
 
-use Drupal\Core\Cache\Cache;
-use Drupal\Core\Url;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\views\ViewExecutableFactory;
-use Drupal\Core\Entity\EntityStorageInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Url;
+use Drupal\views\ViewExecutableFactory;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Base class for Views block plugins.
@@ -42,7 +42,7 @@ abstract class ViewsBlockBase extends BlockBase implements ContainerFactoryPlugi
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $user;
 
@@ -55,11 +55,11 @@ abstract class ViewsBlockBase extends BlockBase implements ContainerFactoryPlugi
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\views\ViewExecutableFactory $executable_factory
+   * @param ViewExecutableFactory $executable_factory
    *   The view executable factory.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The views storage.
-   * @param \Drupal\Core\Session\AccountInterface $user
+   * @param AccountInterface $user
    *   The current user.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, ViewExecutableFactory $executable_factory, EntityStorageInterface $storage, AccountInterface $user) {

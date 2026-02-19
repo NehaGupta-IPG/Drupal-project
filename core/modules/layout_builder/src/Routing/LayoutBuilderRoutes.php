@@ -18,14 +18,14 @@ class LayoutBuilderRoutes implements EventSubscriberInterface {
   /**
    * The section storage manager.
    *
-   * @var \Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface
+   * @var SectionStorageManagerInterface
    */
   protected $sectionStorageManager;
 
   /**
    * Constructs a new LayoutBuilderRoutes.
    *
-   * @param \Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface $section_storage_manager
+   * @param SectionStorageManagerInterface $section_storage_manager
    *   The section storage manager.
    */
   public function __construct(SectionStorageManagerInterface $section_storage_manager) {
@@ -35,7 +35,7 @@ class LayoutBuilderRoutes implements EventSubscriberInterface {
   /**
    * Alters existing routes for a specific collection.
    *
-   * @param \Drupal\Core\Routing\RouteBuildEvent $event
+   * @param RouteBuildEvent $event
    *   The route build event.
    */
   public function onAlterRoutes(RouteBuildEvent $event) {

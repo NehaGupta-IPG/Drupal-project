@@ -4,9 +4,9 @@ namespace Drupal\workspaces\EntityQuery;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\workspaces\WorkspaceTracker;
 use Drupal\workspaces\WorkspaceInformationInterface;
 use Drupal\workspaces\WorkspaceManagerInterface;
+use Drupal\workspaces\WorkspaceTracker;
 
 /**
  * Provides workspaces-specific helpers for altering entity queries.
@@ -18,32 +18,32 @@ trait QueryTrait {
   /**
    * The workspace manager.
    *
-   * @var \Drupal\workspaces\WorkspaceManagerInterface
+   * @var WorkspaceManagerInterface
    */
   protected $workspaceManager;
 
   /**
    * The workspace information service.
    *
-   * @var \Drupal\workspaces\WorkspaceInformationInterface
+   * @var WorkspaceInformationInterface
    */
   protected $workspaceInfo;
 
   /**
    * Constructs a Query object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
    * @param string $conjunction
    *   - AND: all of the conditions on the query need to match.
    *   - OR: at least one of the conditions on the query need to match.
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection to run the query against.
    * @param array $namespaces
    *   List of potential namespaces of the classes belonging to this query.
-   * @param \Drupal\workspaces\WorkspaceManagerInterface $workspace_manager
+   * @param WorkspaceManagerInterface $workspace_manager
    *   The workspace manager.
-   * @param \Drupal\workspaces\WorkspaceInformationInterface $workspace_information
+   * @param WorkspaceInformationInterface $workspace_information
    *   The workspace information service.
    */
   public function __construct(EntityTypeInterface $entity_type, $conjunction, Connection $connection, array $namespaces, WorkspaceManagerInterface $workspace_manager, WorkspaceInformationInterface $workspace_information) {

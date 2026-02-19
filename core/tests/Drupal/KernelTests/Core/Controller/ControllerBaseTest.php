@@ -32,7 +32,7 @@ class ControllerBaseTest extends KernelTestBase {
    * Tests create.
    */
   public function testCreate(): void {
-    /** @var \Drupal\system_test\Controller\SystemTestController $controller */
+    /** @var SystemTestController $controller */
     $controller = $this->container->get('class_resolver')->getInstanceFromDefinition(SystemTestController::class);
 
     $property = new \ReflectionProperty(SystemTestController::class, 'lock');

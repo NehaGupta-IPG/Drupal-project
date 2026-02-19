@@ -3,10 +3,10 @@
 namespace Drupal\help;
 
 use Drupal\Component\Plugin\PluginManagerInterface;
-use Drupal\help\Attribute\HelpSection;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
+use Drupal\help\Attribute\HelpSection;
 
 /**
  * Manages help page section plugins.
@@ -21,7 +21,7 @@ class HelpSectionManager extends DefaultPluginManager {
   /**
    * The search manager.
    *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   * @var PluginManagerInterface
    */
   protected ?PluginManagerInterface $searchManager = NULL;
 
@@ -31,9 +31,9 @@ class HelpSectionManager extends DefaultPluginManager {
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param CacheBackendInterface $cache_backend
    *   Cache backend instance to use.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler for the alter hook.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
@@ -46,7 +46,7 @@ class HelpSectionManager extends DefaultPluginManager {
   /**
    * Sets the search manager.
    *
-   * @param \Drupal\Component\Plugin\PluginManagerInterface|null $search_manager
+   * @param PluginManagerInterface|null $search_manager
    *   The search manager if the Search module is installed.
    */
   public function setSearchManager(?PluginManagerInterface $search_manager = NULL) {

@@ -12,10 +12,10 @@ use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsDisplay;
+use Drupal\views\Plugin\views\display\PathPluginBase;
 use Drupal\views\Plugin\views\display\ResponseDisplayPluginInterface;
 use Drupal\views\Render\ViewsRenderPipelineMarkup;
 use Drupal\views\ViewExecutable;
-use Drupal\views\Plugin\views\display\PathPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
@@ -77,7 +77,7 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
@@ -111,11 +111,11 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
+   * @param RouteProviderInterface $route_provider
    *   The route provider.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state key value store.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
    * @param string[] $authentication_providers
    *   The authentication providers, keyed by ID.
@@ -377,9 +377,9 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
    *
    * @param string $view_path
    *   The path of the view.
-   * @param \Symfony\Component\Routing\Route $view_route
+   * @param Route $view_route
    *   The route of the view.
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route itself.
    *
    * @return bool
@@ -404,7 +404,7 @@ class RestExport extends PathPluginBase implements ResponseDisplayPluginInterfac
     $response = new CacheableResponse('', 200);
     $build['#response'] = $response;
 
-    /** @var \Drupal\Core\Render\RendererInterface $renderer */
+    /** @var RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
     $output = (string) $renderer->renderRoot($build);

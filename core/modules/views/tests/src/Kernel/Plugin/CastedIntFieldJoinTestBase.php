@@ -46,7 +46,7 @@ abstract class CastedIntFieldJoinTestBase extends DriverSpecificKernelTestBase {
   protected $manager;
 
   /**
-   * @var \Drupal\user\Entity\User
+   * @var User
    */
   protected $rootUser;
 
@@ -177,7 +177,7 @@ abstract class CastedIntFieldJoinTestBase extends DriverSpecificKernelTestBase {
   /**
    * Builds a join using the given configuration.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view used in this test.
    * @param array $configuration
    *   The join plugin configuration.

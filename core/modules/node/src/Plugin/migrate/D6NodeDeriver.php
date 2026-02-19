@@ -35,7 +35,7 @@ class D6NodeDeriver extends DeriverBase implements ContainerDeriverInterface {
   /**
    * The migration field discovery service.
    *
-   * @var \Drupal\migrate_drupal\FieldDiscoveryInterface
+   * @var FieldDiscoveryInterface
    */
   protected $fieldDiscovery;
 
@@ -46,7 +46,7 @@ class D6NodeDeriver extends DeriverBase implements ContainerDeriverInterface {
    *   The base plugin ID for the plugin ID.
    * @param bool $translations
    *   Whether or not to include translations.
-   * @param \Drupal\migrate_drupal\FieldDiscoveryInterface $field_discovery
+   * @param FieldDiscoveryInterface $field_discovery
    *   The migration field discovery service.
    */
   public function __construct($base_plugin_id, $translations, FieldDiscoveryInterface $field_discovery) {

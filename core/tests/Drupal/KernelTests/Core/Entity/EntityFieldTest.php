@@ -86,7 +86,7 @@ class EntityFieldTest extends EntityKernelTestBase {
   /**
    * Creates a test entity.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The created entity.
    */
   protected function createTestEntity($entity_type): EntityInterface {
@@ -959,7 +959,7 @@ class EntityFieldTest extends EntityKernelTestBase {
 
     /** @var \Drupal\entity_test\Plugin\Field\ComputedReferenceTestFieldItemList $field */
     $field = $entity->get('computed_reference_field');
-    /** @var \Drupal\Core\Entity\EntityInterface[] $referenced_entities */
+    /** @var EntityInterface[] $referenced_entities */
     $referenced_entities = $field->referencedEntities();
 
     // Check that ::referencedEntities() is working with computed fields.
@@ -998,7 +998,7 @@ class EntityFieldTest extends EntityKernelTestBase {
     $storage = $this->container->get('entity_type.manager')->getStorage($entity_type);
 
     // Check that an ID can be explicitly assigned on creation.
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     $entity = $this->createTestEntity($entity_type);
     $entity_id = 3;
     $entity->set('id', $entity_id);

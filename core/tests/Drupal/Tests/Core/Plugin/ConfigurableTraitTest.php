@@ -23,7 +23,7 @@ class ConfigurableTraitTest extends TestCase {
    * Tests ConfigurableTrait::defaultConfiguration.
    */
   public function testDefaultConfiguration(): void {
-    /** @var \Drupal\Component\Plugin\ConfigurableInterface $configurable_plugin */
+    /** @var ConfigurableInterface $configurable_plugin */
     $configurable_plugin = new ConfigurableTestClass();
     $this->assertSame([], $configurable_plugin->defaultConfiguration());
   }

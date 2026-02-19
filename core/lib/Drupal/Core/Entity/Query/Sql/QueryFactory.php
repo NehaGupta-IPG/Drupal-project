@@ -18,7 +18,7 @@ class QueryFactory implements QueryFactoryInterface {
   /**
    * The database connection to use.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
@@ -35,7 +35,7 @@ class QueryFactory implements QueryFactoryInterface {
    * Initializes the list of namespaces used to locate query
    * classes for different entity types.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection used by the entity query.
    */
   public function __construct(Connection $connection) {

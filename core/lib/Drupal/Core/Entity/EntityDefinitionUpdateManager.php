@@ -18,50 +18,50 @@ class EntityDefinitionUpdateManager implements EntityDefinitionUpdateManagerInte
   /**
    * The entity field manager service.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 
   /**
    * The entity type listener service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeListenerInterface
+   * @var EntityTypeListenerInterface
    */
   protected $entityTypeListener;
 
   /**
    * The entity type manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The field storage definition listener service.
    *
-   * @var \Drupal\Core\Field\FieldStorageDefinitionListenerInterface
+   * @var FieldStorageDefinitionListenerInterface
    */
   protected $fieldStorageDefinitionListener;
 
   /**
    * The last installed schema repository.
    *
-   * @var \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface
+   * @var EntityLastInstalledSchemaRepositoryInterface
    */
   protected $entityLastInstalledSchemaRepository;
 
   /**
    * Constructs a new EntityDefinitionUpdateManager.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
-   * @param \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository
+   * @param EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository
    *   The last installed schema repository service.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @param EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager service.
-   * @param \Drupal\Core\Entity\EntityTypeListenerInterface $entity_type_listener
+   * @param EntityTypeListenerInterface $entity_type_listener
    *   The entity type listener interface.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionListenerInterface $field_storage_definition_listener
+   * @param FieldStorageDefinitionListenerInterface $field_storage_definition_listener
    *   The field storage definition listener service.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository, EntityFieldManagerInterface $entity_field_manager, EntityTypeListenerInterface $entity_type_listener, FieldStorageDefinitionListenerInterface $field_storage_definition_listener) {
@@ -311,9 +311,9 @@ class EntityDefinitionUpdateManager implements EntityDefinitionUpdateManagerInte
   /**
    * Checks if the changes to the entity type requires storage schema changes.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The updated entity type definition.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $original
+   * @param EntityTypeInterface $original
    *   The original entity type definition.
    *
    * @return bool
@@ -327,9 +327,9 @@ class EntityDefinitionUpdateManager implements EntityDefinitionUpdateManagerInte
   /**
    * Checks if the changes to the storage definition requires schema changes.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The updated field storage definition.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $original
+   * @param FieldStorageDefinitionInterface $original
    *   The original field storage definition.
    *
    * @return bool
@@ -343,9 +343,9 @@ class EntityDefinitionUpdateManager implements EntityDefinitionUpdateManagerInte
   /**
    * Checks if existing data would be lost if the schema changes were applied.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The updated entity type definition.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $original
+   * @param EntityTypeInterface $original
    *   The original entity type definition.
    *
    * @return bool

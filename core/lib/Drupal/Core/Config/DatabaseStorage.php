@@ -15,7 +15,7 @@ class DatabaseStorage implements StorageInterface {
   /**
    * The database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
@@ -43,7 +43,7 @@ class DatabaseStorage implements StorageInterface {
   /**
    * Constructs a new DatabaseStorage.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   A Database connection to use for reading and writing configuration data.
    * @param string $table
    *   A database table name to store configuration data in.
@@ -176,7 +176,7 @@ class DatabaseStorage implements StorageInterface {
    * @return bool
    *   TRUE if the table was created, FALSE otherwise.
    *
-   * @throws \Drupal\Core\Config\StorageException
+   * @throws StorageException
    *   If a database error occurs.
    */
   protected function ensureTableExists() {

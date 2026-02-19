@@ -17,13 +17,13 @@ interface AuditorInterface {
   /**
    * Audits a migration.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration to audit.
    *
-   * @throws \Drupal\migrate\Audit\AuditException
+   * @throws AuditException
    *   If the audit fails.
    *
-   * @return \Drupal\migrate\Audit\AuditResult
+   * @return AuditResult
    *   The result of the audit.
    */
   public function audit(MigrationInterface $migration);
@@ -31,10 +31,10 @@ interface AuditorInterface {
   /**
    * Audits a set of migrations.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface[] $migrations
+   * @param MigrationInterface[] $migrations
    *   The migrations to audit.
    *
-   * @return \Drupal\migrate\Audit\AuditResult[]
+   * @return AuditResult[]
    *   The audit results, keyed by migration ID.
    */
   public function auditMultiple(array $migrations);

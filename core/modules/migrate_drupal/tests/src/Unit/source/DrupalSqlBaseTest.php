@@ -34,7 +34,7 @@ class DrupalSqlBaseTest extends MigrateTestCase {
   /**
    * The DrupalSqlBase object.
    *
-   * @var \Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase
+   * @var DrupalSqlBase
    */
   protected $base;
 
@@ -207,7 +207,7 @@ class TestDrupalSqlBase extends DrupalSqlBase {
   /**
    * Tweaks DrupalSqlBase to set a new database connection for tests.
    *
-   * @param \Drupal\Core\Database\Connection $database
+   * @param Connection $database
    *   The new connection to use.
    *
    * @see \Drupal\Tests\migrate\Unit\MigrateSourceSqlTestCase

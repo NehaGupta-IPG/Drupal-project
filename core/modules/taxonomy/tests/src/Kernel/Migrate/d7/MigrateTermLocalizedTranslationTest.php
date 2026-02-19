@@ -76,7 +76,7 @@ class MigrateTermLocalizedTranslationTest extends MigrateDrupal7TestBase {
    * @internal
    */
   protected function assertEntity(int $id, string $expected_language, string $expected_label, string $expected_vid, string $expected_description = '', ?string $expected_format = NULL, int $expected_weight = 0, array $expected_parents = [], ?int $expected_field_integer_value = NULL, ?int $expected_term_reference_tid = NULL): void {
-    /** @var \Drupal\taxonomy\TermInterface $entity */
+    /** @var TermInterface $entity */
     $entity = Term::load($id);
     $this->assertInstanceOf(TermInterface::class, $entity);
     $this->assertSame($expected_language, $entity->language()->getId());
@@ -122,7 +122,7 @@ class MigrateTermLocalizedTranslationTest extends MigrateDrupal7TestBase {
     $this->assertEntity(20, 'en', 'DS9', 'vocablocalized', 'Terok Nor', 'filtered_html', 0, []);
     $this->assertEntity(25, 'en', 'Emissary', 'vocablocalized2', 'Pilot episode', 'filtered_html', 0, []);
 
-    /** @var \Drupal\taxonomy\TermInterface $entity */
+    /** @var TermInterface $entity */
     $entity = Term::load(19);
     $this->assertFalse($entity->hasTranslation('fr'));
     $this->assertTrue($entity->hasTranslation('is'));

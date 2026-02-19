@@ -25,7 +25,7 @@ interface InputCollectorInterface {
    * @param string $name
    *   The machine name of the input to collect, in the form
    *   RECIPE_NAME.INPUT_NAME.
-   * @param \Drupal\Core\TypedData\DataDefinitionInterface $definition
+   * @param DataDefinitionInterface $definition
    *   The data definition that describes the expected type, constraints, and
    *   metadata for the input value.
    * @param mixed $default_value

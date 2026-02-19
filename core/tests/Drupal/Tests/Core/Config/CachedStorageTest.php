@@ -16,7 +16,7 @@ use PHPUnit\Framework\Attributes\Group;
 class CachedStorageTest extends UnitTestCase {
 
   /**
-   * @var \Drupal\Core\Cache\CacheFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Cache\CacheFactoryInterface|MockObject
    */
   protected $cacheFactory;
 

@@ -36,37 +36,37 @@ class SystemMenuOffCanvasForm extends PluginFormBase implements ContainerInjecti
   /**
    * The menu entity that the block uses and that will be edited in this form.
    *
-   * @var \Drupal\system\MenuInterface
+   * @var MenuInterface
    */
   protected $menu;
 
   /**
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var EntityStorageInterface
    */
   protected $menuStorage;
 
   /**
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The config factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * SystemMenuOffCanvasForm constructor.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $menu_storage
+   * @param EntityStorageInterface $menu_storage
    *   The menu storage handler.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param TranslationInterface $string_translation
    *   The string translation handler.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
    */
   public function __construct(EntityStorageInterface $menu_storage, EntityTypeManagerInterface $entity_type_manager, TranslationInterface $string_translation, ConfigFactoryInterface $config_factory) {
@@ -148,7 +148,7 @@ class SystemMenuOffCanvasForm extends PluginFormBase implements ContainerInjecti
   /**
    * Gets the entity form for this menu.
    *
-   * @param \Drupal\system\MenuInterface $menu
+   * @param MenuInterface $menu
    *   The menu entity.
    *
    * @return \Drupal\Core\Entity\EntityFormInterface

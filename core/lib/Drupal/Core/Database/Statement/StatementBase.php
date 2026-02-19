@@ -67,7 +67,7 @@ abstract class StatementBase implements \Iterator, StatementInterface {
   /**
    * Constructor.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   Drupal database connection object.
    * @param object $clientConnection
    *   Client database connection object, for example \PDO.
@@ -133,7 +133,7 @@ abstract class StatementBase implements \Iterator, StatementInterface {
    *   An array of values with as many elements as there are bound parameters in
    *   the SQL statement being executed. This can be empty.
    *
-   * @return \Drupal\Core\Database\Event\StatementExecutionStartEvent|null
+   * @return StatementExecutionStartEvent|null
    *   The dispatched event or NULL if event dispatching is not enabled.
    */
   protected function dispatchStatementExecutionStartEvent(array $args): ?StatementExecutionStartEvent {
@@ -155,7 +155,7 @@ abstract class StatementBase implements \Iterator, StatementInterface {
   /**
    * Dispatches an event informing that the statement execution succeeded.
    *
-   * @param \Drupal\Core\Database\Event\StatementExecutionStartEvent|null $startEvent
+   * @param StatementExecutionStartEvent|null $startEvent
    *   The start event or NULL if event dispatching is not enabled.
    */
   protected function dispatchStatementExecutionEndEvent(?StatementExecutionStartEvent $startEvent): void {
@@ -175,7 +175,7 @@ abstract class StatementBase implements \Iterator, StatementInterface {
   /**
    * Dispatches an event informing of the statement execution failure.
    *
-   * @param \Drupal\Core\Database\Event\StatementExecutionStartEvent|null $startEvent
+   * @param StatementExecutionStartEvent|null $startEvent
    *   The start event or NULL if event dispatching is not enabled.
    * @param \Exception $e
    *   The statement exception thrown.

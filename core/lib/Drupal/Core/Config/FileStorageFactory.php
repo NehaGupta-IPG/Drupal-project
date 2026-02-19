@@ -12,10 +12,10 @@ class FileStorageFactory {
   /**
    * Returns a FileStorage object working with the sync config directory.
    *
-   * @return \Drupal\Core\Config\FileStorage
+   * @return FileStorage
    *   The file storage object for the configuration sync directory.
    *
-   * @throws \Drupal\Core\Config\ConfigDirectoryNotDefinedException
+   * @throws ConfigDirectoryNotDefinedException
    *   In case the sync directory does not exist or is not defined in
    *   $settings['config_sync_directory'].
    */

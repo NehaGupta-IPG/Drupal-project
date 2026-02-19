@@ -32,7 +32,7 @@ trait FieldStorageDefinitionEventSubscriberTrait {
   /**
    * Listener method for any field storage definition event.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionEvent $event
+   * @param FieldStorageDefinitionEvent $event
    *   The field storage definition event object.
    * @param string $event_name
    *   The event name.

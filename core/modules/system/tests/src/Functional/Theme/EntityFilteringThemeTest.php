@@ -61,7 +61,7 @@ class EntityFilteringThemeTest extends BrowserTestBase {
   /**
    * A test taxonomy term.
    *
-   * @var \Drupal\taxonomy\Entity\Term
+   * @var Term
    */
   protected $term;
 
@@ -69,7 +69,7 @@ class EntityFilteringThemeTest extends BrowserTestBase {
   /**
    * A test comment.
    *
-   * @var \Drupal\comment\Entity\Comment
+   * @var Comment
    */
   protected $comment;
 

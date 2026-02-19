@@ -325,7 +325,7 @@ class TableDragTest extends WebDriverTestBase {
    * @param string[] $items
    *   An ordered list of strings.
    *
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ExpectationException
    *   When any of the given string is not found.
    *
    * @todo Remove this and use the WebAssert method when #2817657 is done.
@@ -509,7 +509,7 @@ class TableDragTest extends WebDriverTestBase {
   /**
    * Asserts the values of a draggable row.
    *
-   * @param \Behat\Mink\Element\NodeElement $row
+   * @param NodeElement $row
    *   The row element to assert.
    * @param string $id
    *   The expected value for the ID hidden input of the row.
@@ -555,7 +555,7 @@ class TableDragTest extends WebDriverTestBase {
    * @param string $table_id
    *   The ID of the parent table. Defaults to 'tabledrag-test-table'.
    *
-   * @return \Behat\Mink\Element\NodeElement
+   * @return NodeElement
    *   The row element.
    */
   protected function findRowById($id, $table_id = 'tabledrag-test-table'): NodeElement {
@@ -571,7 +571,7 @@ class TableDragTest extends WebDriverTestBase {
    * @param string $expected_text
    *   The expected text on the element.
    *
-   * @return \Behat\Mink\Element\NodeElement
+   * @return NodeElement
    *   The toggle element.
    */
   protected function findWeightsToggle($expected_text): NodeElement {
@@ -583,7 +583,7 @@ class TableDragTest extends WebDriverTestBase {
   /**
    * Moves a row through the keyboard.
    *
-   * @param \Behat\Mink\Element\NodeElement $row
+   * @param NodeElement $row
    *   The row to move.
    * @param string $arrow
    *   The arrow button to use to move the row. Either one of 'left', 'right',
@@ -623,7 +623,7 @@ class TableDragTest extends WebDriverTestBase {
    * The handle is marked by adding a css class that is removed by an helper
    * js library once the dragging is over.
    *
-   * @param \Behat\Mink\Element\NodeElement $handle
+   * @param NodeElement $handle
    *   The draggable row handle element.
    *
    * @throws \Exception
@@ -649,7 +649,7 @@ JS;
   /**
    * Waits until the dragging operations are finished on a row handle.
    *
-   * @param \Behat\Mink\Element\NodeElement $handle
+   * @param NodeElement $handle
    *   The draggable row handle element.
    *
    * @throws \Exception

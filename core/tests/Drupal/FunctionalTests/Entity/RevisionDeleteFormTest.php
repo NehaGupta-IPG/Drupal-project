@@ -112,7 +112,7 @@ class RevisionDeleteFormTest extends BrowserTestBase {
    * @legacy-covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
    */
   public function testAccessDeleteLatestDefault(): void {
-    /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
+    /** @var EntityTestRev $entity */
     $entity = EntityTestRev::create();
     $entity->setName('delete revision');
     $entity->save();
@@ -139,7 +139,7 @@ class RevisionDeleteFormTest extends BrowserTestBase {
    * @legacy-covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
    */
   protected function testAccessDeleteLatestForwardRevision(): void {
-    /** @var \Drupal\entity_test\Entity\EntityTestRevPub $entity */
+    /** @var EntityTestRevPub $entity */
     $entity = EntityTestRevPub::create();
     $entity->setName('delete revision');
     $entity->save();
@@ -165,7 +165,7 @@ class RevisionDeleteFormTest extends BrowserTestBase {
    * @legacy-covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
    */
   protected function testAccessDeleteDefault(): void {
-    /** @var \Drupal\entity_test\Entity\EntityTestRevPub $entity */
+    /** @var EntityTestRevPub $entity */
     $entity = EntityTestRevPub::create();
     $entity->setName('delete revision');
     $entity->save();
@@ -184,7 +184,7 @@ class RevisionDeleteFormTest extends BrowserTestBase {
     // Reload the entity.
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = \Drupal::entityTypeManager()->getStorage('entity_test_revpub');
-    /** @var \Drupal\entity_test\Entity\EntityTestRevPub $revision */
+    /** @var EntityTestRevPub $revision */
     $revision = $storage->loadRevision($revisionId);
     // Check default but not latest.
     $this->assertTrue($revision->isDefaultRevision());
@@ -200,7 +200,7 @@ class RevisionDeleteFormTest extends BrowserTestBase {
    * @legacy-covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
    */
   protected function testAccessDeleteNonLatest(): void {
-    /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
+    /** @var EntityTestRev $entity */
     $entity = EntityTestRev::create();
     $entity->setName('delete revision');
     $entity->save();

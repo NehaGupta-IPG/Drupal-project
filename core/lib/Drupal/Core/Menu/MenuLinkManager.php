@@ -36,32 +36,32 @@ class MenuLinkManager implements MenuLinkManagerInterface {
   /**
    * The menu link tree storage.
    *
-   * @var \Drupal\Core\Menu\MenuTreeStorageInterface
+   * @var MenuTreeStorageInterface
    */
   protected $treeStorage;
 
   /**
    * Service providing overrides for static links.
    *
-   * @var \Drupal\Core\Menu\StaticMenuLinkOverridesInterface
+   * @var StaticMenuLinkOverridesInterface
    */
   protected $overrides;
 
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * Constructs a \Drupal\Core\Menu\MenuLinkManager object.
    *
-   * @param \Drupal\Core\Menu\MenuTreeStorageInterface $tree_storage
+   * @param MenuTreeStorageInterface $tree_storage
    *   The menu link tree storage.
-   * @param \Drupal\Core\Menu\StaticMenuLinkOverridesInterface $overrides
+   * @param StaticMenuLinkOverridesInterface $overrides
    *   The service providing overrides for static links.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
    */
   public function __construct(MenuTreeStorageInterface $tree_storage, StaticMenuLinkOverridesInterface $overrides, ModuleHandlerInterface $module_handler) {
@@ -186,10 +186,10 @@ class MenuLinkManager implements MenuLinkManagerInterface {
    * @param array $configuration
    *   An array of configuration relevant to the plugin instance.
    *
-   * @return \Drupal\Core\Menu\MenuLinkInterface
+   * @return MenuLinkInterface
    *   A menu link instance.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws PluginException
    *   If the instance cannot be created, such as if the ID is invalid.
    */
   public function createInstance($plugin_id, array $configuration = []) {
@@ -224,12 +224,12 @@ class MenuLinkManager implements MenuLinkManagerInterface {
   /**
    * Deletes a specific instance.
    *
-   * @param \Drupal\Core\Menu\MenuLinkInterface $instance
+   * @param MenuLinkInterface $instance
    *   The plugin instance to be deleted.
    * @param bool $persist
    *   If TRUE, calls MenuLinkInterface::deleteLink() on the instance.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws PluginException
    *   If the plugin instance does not support deletion.
    */
   protected function deleteInstance(MenuLinkInterface $instance, $persist) {
@@ -345,13 +345,13 @@ class MenuLinkManager implements MenuLinkManagerInterface {
   /**
    * Resets the menu link to its default settings.
    *
-   * @param \Drupal\Core\Menu\MenuLinkInterface $instance
+   * @param MenuLinkInterface $instance
    *   The menu link which should be reset.
    *
-   * @return \Drupal\Core\Menu\MenuLinkInterface
+   * @return MenuLinkInterface
    *   The reset menu link.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws PluginException
    *   Thrown when the menu link is not resettable.
    */
   protected function resetInstance(MenuLinkInterface $instance) {

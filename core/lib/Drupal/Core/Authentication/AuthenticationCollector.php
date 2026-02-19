@@ -10,7 +10,7 @@ class AuthenticationCollector implements AuthenticationCollectorInterface {
   /**
    * Array of all registered authentication providers, keyed by ID.
    *
-   * @var \Drupal\Core\Authentication\AuthenticationProviderInterface[]
+   * @var AuthenticationProviderInterface[]
    */
   protected $providers;
 
@@ -24,7 +24,7 @@ class AuthenticationCollector implements AuthenticationCollectorInterface {
   /**
    * Sorted list of registered providers.
    *
-   * @var \Drupal\Core\Authentication\AuthenticationProviderInterface[]
+   * @var AuthenticationProviderInterface[]
    */
   protected $sortedProviders;
 

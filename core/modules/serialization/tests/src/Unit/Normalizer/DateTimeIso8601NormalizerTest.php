@@ -39,14 +39,14 @@ class DateTimeIso8601NormalizerTest extends UnitTestCase {
   /**
    * The tested data type's normalizer.
    *
-   * @var \Drupal\serialization\Normalizer\DateTimeIso8601Normalizer
+   * @var DateTimeIso8601Normalizer
    */
   protected $normalizer;
 
   /**
    * The tested data type.
    *
-   * @var \Drupal\Core\TypedData\Plugin\DataType\DateTimeIso8601
+   * @var DateTimeIso8601
    */
   protected $data;
 

@@ -47,7 +47,7 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
    *
    * Case 1. Try to create another entity with existing value for unique field.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *
    * @legacy-covers ::validate
    */
@@ -115,7 +115,7 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
    * Case 2. Try to create another entity with existing reference for unique
    * field.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *
    * @legacy-covers ::validate
    */
@@ -191,7 +191,7 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
    *
    * Case 3. Try to add existing value for unique field in the same entity.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *
    * @legacy-covers ::validate
    */
@@ -240,7 +240,7 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
    * Case 4. Try to add multiple existing values for unique field in the same
    * entity.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *
    * @legacy-covers ::validate
    */
@@ -303,7 +303,7 @@ class UniqueValuesConstraintValidatorTest extends KernelTestBase {
    * Case 5. Try to create another entity with existing value for unique field
    * with different capitalization.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *
    * @legacy-covers ::validate
    */

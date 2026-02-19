@@ -23,63 +23,63 @@ class BlockFormTest extends UnitTestCase {
   /**
    * The condition plugin manager.
    *
-   * @var \Drupal\Core\Executable\ExecutableManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Executable\ExecutableManagerInterface|MockObject
    */
   protected $conditionManager;
 
   /**
    * The block storage.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityStorageInterface|MockObject
    */
   protected $storage;
 
   /**
    * The language manager service.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Language\LanguageManagerInterface|MockObject
    */
   protected $language;
 
   /**
    * The theme handler.
    *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Extension\ThemeHandlerInterface|MockObject
    */
   protected $themeHandler;
 
   /**
    * The theme manager service.
    *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Theme\ThemeManagerInterface|MockObject
    */
   protected $themeManager;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|MockObject
    */
   protected $entityTypeManager;
 
   /**
    * The mocked context handler.
    *
-   * @var \Drupal\Core\Plugin\Context\ContextHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Plugin\Context\ContextHandlerInterface|MockObject
    */
   protected $contextHandler;
 
   /**
    * The mocked context repository.
    *
-   * @var \Drupal\Core\Plugin\Context\ContextRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Plugin\Context\ContextRepositoryInterface|MockObject
    */
   protected $contextRepository;
 
   /**
    * The plugin form manager.
    *
-   * @var \Drupal\Core\Plugin\PluginFormFactoryInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var PluginFormFactoryInterface|ProphecyInterface
    */
   protected $pluginFormFactory;
 
@@ -120,7 +120,7 @@ class BlockFormTest extends UnitTestCase {
    * @param string $machine_name
    *   The machine name of the block plugin.
    *
-   * @return \Drupal\block\BlockInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @return \Drupal\block\BlockInterface|MockObject
    *   The mocked block.
    */
   protected function getBlockMockWithMachineName($machine_name) {

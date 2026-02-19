@@ -23,23 +23,23 @@ class MetadataBubblingUrlGenerator implements UrlGeneratorInterface {
   /**
    * The non-bubbling URL generator.
    *
-   * @var \Drupal\Core\Routing\UrlGeneratorInterface
+   * @var UrlGeneratorInterface
    */
   protected $urlGenerator;
 
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * Constructs a new bubbling URL generator service.
    *
-   * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
+   * @param UrlGeneratorInterface $url_generator
    *   The non-bubbling URL generator.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
    */
   public function __construct(UrlGeneratorInterface $url_generator, RendererInterface $renderer) {
@@ -71,7 +71,7 @@ class MetadataBubblingUrlGenerator implements UrlGeneratorInterface {
   /**
    * Bubbles the bubbleable metadata to the current render context.
    *
-   * @param \Drupal\Core\GeneratedUrl $generated_url
+   * @param GeneratedUrl $generated_url
    *   The generated URL whose bubbleable metadata to bubble.
    * @param array $options
    *   (optional) The URL options. Defaults to none.

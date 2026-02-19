@@ -70,7 +70,7 @@ abstract class QueryPluginBase extends PluginBase implements CacheableDependency
   /**
    * Let modules modify the query just prior to finalizing it.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view which is executed.
    */
   public function alter(ViewExecutable $view) {}
@@ -78,7 +78,7 @@ abstract class QueryPluginBase extends PluginBase implements CacheableDependency
   /**
    * Builds the necessary info to execute the query.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view which is executed.
    */
   public function build(ViewExecutable $view) {}
@@ -92,7 +92,7 @@ abstract class QueryPluginBase extends PluginBase implements CacheableDependency
    * $view->result should contain an array of objects. The array must use a
    * numeric index starting at 0.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view which is executed.
    */
   public function execute(ViewExecutable $view) {}
@@ -103,7 +103,7 @@ abstract class QueryPluginBase extends PluginBase implements CacheableDependency
    * This signature is something that can be used when perusing query logs to
    * discern where particular queries might be coming from.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view which is executed.
    */
   public function addSignature(ViewExecutable $view) {}

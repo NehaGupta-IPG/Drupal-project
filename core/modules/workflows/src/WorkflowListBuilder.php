@@ -18,7 +18,7 @@ class WorkflowListBuilder extends ConfigEntityListBuilder {
   /**
    * The workflow type plugin manager.
    *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   * @var PluginManagerInterface
    */
   protected $workflowTypeManager;
 
@@ -36,11 +36,11 @@ class WorkflowListBuilder extends ConfigEntityListBuilder {
   /**
    * Constructs a new WorkflowListBuilder object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The entity storage class.
-   * @param \Drupal\Component\Plugin\PluginManagerInterface $workflow_type_manager
+   * @param PluginManagerInterface $workflow_type_manager
    *   The workflow type plugin manager.
    */
   public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, PluginManagerInterface $workflow_type_manager) {
@@ -70,7 +70,7 @@ class WorkflowListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-    /** @var \Drupal\workflows\WorkflowInterface $entity */
+    /** @var WorkflowInterface $entity */
     $row['label'] = $entity->label();
 
     $row['type']['data'] = [

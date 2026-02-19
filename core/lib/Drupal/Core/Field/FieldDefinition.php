@@ -40,14 +40,14 @@ class FieldDefinition extends ListDataDefinition implements FieldDefinitionInter
   /**
    * The associated field storage definition.
    *
-   * @var \Drupal\Core\Field\FieldStorageDefinitionInterface
+   * @var FieldStorageDefinitionInterface
    */
   protected $fieldStorageDefinition;
 
   /**
    * Creates a new field definition.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storageDefinition
+   * @param FieldStorageDefinitionInterface $storageDefinition
    *   The associated field storage definition.
    *
    * @return static
@@ -243,7 +243,7 @@ class FieldDefinition extends ListDataDefinition implements FieldDefinitionInter
   /**
    * Set the field storage definition.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storageDefinition
+   * @param FieldStorageDefinitionInterface $storageDefinition
    *   The field storage definition associated with this field definition.
    *
    * @return $this

@@ -23,9 +23,9 @@ class AssetQueryString implements AssetQueryStringInterface {
   /**
    * Creates a new AssetQueryString instance.
    *
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   State service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   System time service.
    */
   public function __construct(

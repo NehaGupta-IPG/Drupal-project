@@ -16,14 +16,14 @@ class AliasPathProcessor implements InboundPathProcessorInterface, OutboundPathP
   /**
    * An alias manager for looking up the system path.
    *
-   * @var \Drupal\path_alias\AliasManagerInterface
+   * @var AliasManagerInterface
    */
   protected $aliasManager;
 
   /**
    * Constructs a AliasPathProcessor object.
    *
-   * @param \Drupal\path_alias\AliasManagerInterface $alias_manager
+   * @param AliasManagerInterface $alias_manager
    *   An alias manager for looking up the system path.
    */
   public function __construct(AliasManagerInterface $alias_manager) {

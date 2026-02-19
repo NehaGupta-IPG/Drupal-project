@@ -7,7 +7,7 @@ use Drupal\Component\Annotation\Plugin;
 /**
  * Defines a Mail annotation object.
  *
- * Plugin Namespace: Plugin\Mail
+ * Plugin Namespace: Plugin\Mail.
  *
  * For a working example, see \Drupal\Core\Mail\Plugin\Mail\PhpMail
  *
@@ -29,7 +29,7 @@ class Mail extends Plugin {
   /**
    * The human-readable name of the mail plugin.
    *
-   * @var \Drupal\Core\Annotation\Translation
+   * @var Translation
    *
    * @ingroup plugin_translatable
    */
@@ -38,7 +38,7 @@ class Mail extends Plugin {
   /**
    * A short description of the mail plugin.
    *
-   * @var \Drupal\Core\Annotation\Translation
+   * @var Translation
    *
    * @ingroup plugin_translatable
    */

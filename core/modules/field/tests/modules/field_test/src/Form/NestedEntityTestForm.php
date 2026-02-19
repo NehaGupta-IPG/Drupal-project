@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\field_test\Form;
 
+use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\EntityChangedInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Entity\Entity\EntityFormDisplay;
 
 /**
  * Provides a form for field_test routes.
@@ -97,11 +97,11 @@ class NestedEntityTestForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    /** @var \Drupal\Core\Entity\EntityInterface $entity_1 */
+    /** @var EntityInterface $entity_1 */
     $entity_1 = $form_state->get('entity_1');
     $entity_1->save();
 
-    /** @var \Drupal\Core\Entity\EntityInterface $entity_2 */
+    /** @var EntityInterface $entity_2 */
     $entity_2 = $form_state->get('entity_2');
     $entity_2->save();
 

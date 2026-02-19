@@ -33,7 +33,7 @@ class NavigationTopBarContentModerationTest extends ModerationStateTestBase {
   /**
    * Node used to check top bar options.
    *
-   * @var \Drupal\node\NodeInterface
+   * @var NodeInterface
    */
   protected NodeInterface $node;
 

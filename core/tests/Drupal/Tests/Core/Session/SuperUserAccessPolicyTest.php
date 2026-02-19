@@ -28,7 +28,7 @@ class SuperUserAccessPolicyTest extends UnitTestCase {
   /**
    * The access policy to test.
    *
-   * @var \Drupal\Core\Session\SuperUserAccessPolicy
+   * @var SuperUserAccessPolicy
    */
   protected $accessPolicy;
 

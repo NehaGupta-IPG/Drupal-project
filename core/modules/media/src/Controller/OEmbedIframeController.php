@@ -39,50 +39,50 @@ class OEmbedIframeController implements ContainerInjectionInterface {
   /**
    * The oEmbed resource fetcher service.
    *
-   * @var \Drupal\media\OEmbed\ResourceFetcherInterface
+   * @var ResourceFetcherInterface
    */
   protected $resourceFetcher;
 
   /**
    * The oEmbed URL resolver service.
    *
-   * @var \Drupal\media\OEmbed\UrlResolverInterface
+   * @var UrlResolverInterface
    */
   protected $urlResolver;
 
   /**
    * The renderer service.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * The logger channel.
    *
-   * @var \Psr\Log\LoggerInterface
+   * @var LoggerInterface
    */
   protected $logger;
 
   /**
    * The iFrame URL helper service.
    *
-   * @var \Drupal\media\IFrameUrlHelper
+   * @var IFrameUrlHelper
    */
   protected $iFrameUrlHelper;
 
   /**
    * Constructs an OEmbedIframeController instance.
    *
-   * @param \Drupal\media\OEmbed\ResourceFetcherInterface $resource_fetcher
+   * @param ResourceFetcherInterface $resource_fetcher
    *   The oEmbed resource fetcher service.
-   * @param \Drupal\media\OEmbed\UrlResolverInterface $url_resolver
+   * @param UrlResolverInterface $url_resolver
    *   The oEmbed URL resolver service.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer service.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   The logger channel.
-   * @param \Drupal\media\IFrameUrlHelper $iframe_url_helper
+   * @param IFrameUrlHelper $iframe_url_helper
    *   The iFrame URL helper service.
    */
   public function __construct(ResourceFetcherInterface $resource_fetcher, UrlResolverInterface $url_resolver, RendererInterface $renderer, LoggerInterface $logger, IFrameUrlHelper $iframe_url_helper) {
@@ -109,13 +109,13 @@ class OEmbedIframeController implements ContainerInjectionInterface {
   /**
    * Renders an oEmbed resource.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    *
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response object.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws BadRequestHttpException
    *   Will be thrown if either
    *   - the 'hash' parameter does not match the expected hash of the 'url'
    *     parameter;

@@ -3,10 +3,10 @@
 namespace Drupal\Core\Update;
 
 use Drupal\Core\DrupalKernel;
+use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StackMiddleware\ReverseProxyMiddleware;
-use Drupal\Core\Routing\RouteObjectInterface;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -88,10 +88,10 @@ class UpdateKernel extends DrupalKernel {
    *
    * The actual logic of the update is done in the db update controller.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The incoming request.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   A response object.
    *
    * @see \Drupal\system\Controller\DbUpdateController
@@ -121,7 +121,7 @@ class UpdateKernel extends DrupalKernel {
    * This method + shutdownSession() basically simulates what
    * \Drupal\Core\StackMiddleware\Session does.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The incoming request.
    */
   protected function bootSession(Request $request) {
@@ -135,7 +135,7 @@ class UpdateKernel extends DrupalKernel {
   /**
    * Ensures that the session is saved.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The incoming request.
    */
   protected function shutdownSession(Request $request) {
@@ -147,7 +147,7 @@ class UpdateKernel extends DrupalKernel {
    *
    * This fake routing data is needed in order to make batch API work properly.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The incoming request.
    */
   protected function setupRequestMatch(Request $request) {
@@ -166,10 +166,10 @@ class UpdateKernel extends DrupalKernel {
    *
    * If the current user does not have the rights, an exception is thrown.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The incoming request.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
+   * @throws AccessDeniedHttpException
    *   Thrown when update.php should not be accessible.
    */
   protected function handleAccess(Request $request) {

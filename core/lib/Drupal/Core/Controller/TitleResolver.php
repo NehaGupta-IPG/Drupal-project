@@ -3,8 +3,8 @@
 namespace Drupal\Core\Controller;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 use Symfony\Component\Routing\Route;
@@ -18,25 +18,25 @@ class TitleResolver implements TitleResolverInterface {
   /**
    * The controller resolver.
    *
-   * @var \Drupal\Core\Controller\ControllerResolverInterface
+   * @var ControllerResolverInterface
    */
   protected $controllerResolver;
 
   /**
    * The argument resolver.
    *
-   * @var \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface
+   * @var ArgumentResolverInterface
    */
   protected $argumentResolver;
 
   /**
    * Constructs a TitleResolver instance.
    *
-   * @param \Drupal\Core\Controller\ControllerResolverInterface $controller_resolver
+   * @param ControllerResolverInterface $controller_resolver
    *   The controller resolver.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param TranslationInterface $string_translation
    *   The translation manager.
-   * @param \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface $argument_resolver
+   * @param ArgumentResolverInterface $argument_resolver
    *   The argument resolver.
    */
   public function __construct(ControllerResolverInterface $controller_resolver, TranslationInterface $string_translation, ArgumentResolverInterface $argument_resolver) {

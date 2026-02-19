@@ -7,7 +7,7 @@ use Drupal\Component\Annotation\Plugin;
 /**
  * Defines a language negotiation annotation object.
  *
- * Plugin Namespace: Plugin\LanguageNegotiation
+ * Plugin Namespace: Plugin\LanguageNegotiation.
  *
  * For a working example, see
  * \Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationBrowser.

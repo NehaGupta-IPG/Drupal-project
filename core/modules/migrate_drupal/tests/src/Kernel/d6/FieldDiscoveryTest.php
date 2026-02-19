@@ -37,7 +37,7 @@ class FieldDiscoveryTest extends MigrateDrupal6TestBase {
   /**
    * The Field discovery service.
    *
-   * @var \Drupal\migrate_drupal\FieldDiscoveryInterface
+   * @var FieldDiscoveryInterface
    */
   protected $fieldDiscovery;
 

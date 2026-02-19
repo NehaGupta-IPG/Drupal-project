@@ -394,7 +394,7 @@ class ResourceResponseSubscriberTest extends UnitTestCase {
   /**
    * Gets the resource response subscriber.
    *
-   * @return \Drupal\rest\EventSubscriber\ResourceResponseSubscriber
+   * @return ResourceResponseSubscriber
    *   A functioning ResourceResponseSubscriber.
    */
   protected function getFunctioningResourceResponseSubscriber(RouteMatchInterface $route_match) {

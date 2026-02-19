@@ -16,7 +16,7 @@ class RssResponseRelativeUrlFilter implements EventSubscriberInterface {
   /**
    * Converts relative URLs to absolute URLs.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
+   * @param ResponseEvent $event
    *   The response event.
    */
   public function onResponse(ResponseEvent $event) {
@@ -36,7 +36,7 @@ class RssResponseRelativeUrlFilter implements EventSubscriberInterface {
    *
    * @param string $rss_markup
    *   The RSS markup to update.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    *
    * @return string

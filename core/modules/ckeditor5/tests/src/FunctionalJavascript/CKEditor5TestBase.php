@@ -143,10 +143,10 @@ JS;
    *   Field id|name|label|value.
    * @param string $value
    *   Field value.
-   * @param \Behat\Mink\Element\TraversableElement $container
+   * @param TraversableElement $container
    *   Document to check against.
    *
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ExpectationException
    *
    * @see \Behat\Mink\WebAssert::fieldValueEquals()
    */
@@ -165,7 +165,7 @@ JS;
   /**
    * Checks that no real-time validation errors are present.
    *
-   * @throws \Behat\Mink\Exception\ElementNotFoundException
+   * @throws ElementNotFoundException
    */
   protected function assertNoRealtimeValidationErrors(): void {
     $assert_session = $this->assertSession();

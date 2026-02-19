@@ -21,7 +21,7 @@ class ClientFactoryTest extends UnitTestCase {
   /**
    * The client factory under test.
    *
-   * @var \Drupal\Core\Http\ClientFactory
+   * @var ClientFactory
    */
   protected $factory;
 

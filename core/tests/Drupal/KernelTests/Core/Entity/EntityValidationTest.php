@@ -85,7 +85,7 @@ class EntityValidationTest extends EntityKernelTestBase {
    * @param string $entity_type
    *   An entity type.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The created test entity.
    */
   protected function createTestEntity($entity_type): EntityInterface {
@@ -266,7 +266,7 @@ class EntityValidationTest extends EntityKernelTestBase {
     $this->assertInstanceOf(CompositeConstraintBase::class, $constraint);
     $this->assertEquals('type', $violations[0]->getPropertyPath());
 
-    /** @var \Drupal\Core\Entity\Plugin\Validation\Constraint\CompositeConstraintBase $constraint */
+    /** @var CompositeConstraintBase $constraint */
     $this->assertEquals(['name', 'type'], $constraint->coversFields(), 'Information about covered fields can be retrieved.');
   }
 

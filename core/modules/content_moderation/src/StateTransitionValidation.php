@@ -16,7 +16,7 @@ class StateTransitionValidation implements StateTransitionValidationInterface {
   /**
    * The moderation information service.
    *
-   * @var \Drupal\content_moderation\ModerationInformationInterface
+   * @var ModerationInformationInterface
    */
   protected $moderationInfo;
 
@@ -30,7 +30,7 @@ class StateTransitionValidation implements StateTransitionValidationInterface {
   /**
    * Constructs a new StateTransitionValidation.
    *
-   * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_info
+   * @param ModerationInformationInterface $moderation_info
    *   The moderation information service.
    */
   public function __construct(ModerationInformationInterface $moderation_info) {

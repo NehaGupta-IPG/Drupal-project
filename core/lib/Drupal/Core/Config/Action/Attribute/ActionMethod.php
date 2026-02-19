@@ -18,9 +18,9 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 final class ActionMethod {
 
   /**
-   * @param \Drupal\Core\Config\Action\Exists $exists
+   * @param Exists $exists
    *   Determines behavior of action depending on entity existence.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|string $adminLabel
+   * @param TranslatableMarkup|string $adminLabel
    *   The admin label for the user interface.
    * @param bool|string $pluralize
    *   Determines whether to create a pluralized version of the method to enable

@@ -32,32 +32,32 @@ class CKEditor5MediaController extends ControllerBase {
   /**
    * The currently authenticated user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
   /**
    * The entity repository.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   * @var EntityRepositoryInterface
    */
   protected $entityRepository;
 
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * Constructs a new CKEditor5MediaController.
    *
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The currently authenticated user.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   The request stack.
    */
   public function __construct(AccountInterface $current_user, EntityRepositoryInterface $entity_repository, RequestStack $request_stack) {
@@ -69,15 +69,15 @@ class CKEditor5MediaController extends ControllerBase {
   /**
    * Returns JSON response containing metadata about media entity.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request object.
    *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   * @return JsonResponse
    *   A JSON object including the response.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws BadRequestHttpException
    *   Thrown when no media UUID is provided.
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   * @throws NotFoundHttpException
    *   Thrown when no media with the provided UUID exists.
    */
   public function mediaEntityMetadata(Request $request) {
@@ -127,15 +127,15 @@ class CKEditor5MediaController extends ControllerBase {
    * Note that access to the filter format is not checked here because the route
    * is configured to check entity access to the filter format.
    *
-   * @param \Drupal\editor\Entity\Editor $editor
+   * @param Editor $editor
    *   The text editor.
    *
-   * @return \Drupal\Core\Access\AccessResultInterface
+   * @return AccessResultInterface
    *   The access result.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws BadRequestHttpException
    *   Thrown when no media UUID is provided.
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   * @throws NotFoundHttpException
    *   Thrown when no media with the provided UUID exists.
    */
   public function access(Editor $editor): AccessResultInterface {
@@ -163,7 +163,7 @@ class CKEditor5MediaController extends ControllerBase {
   /**
    * Gets the name of an image media item's source field.
    *
-   * @param \Drupal\media\MediaInterface $media
+   * @param MediaInterface $media
    *   The media item being embedded.
    *
    * @return string|null

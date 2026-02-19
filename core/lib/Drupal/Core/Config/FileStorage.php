@@ -98,7 +98,7 @@ class FileStorage implements StorageInterface {
   /**
    * Implements Drupal\Core\Config\StorageInterface::read().
    *
-   * @throws \Drupal\Core\Config\UnsupportedDataTypeConfigException
+   * @throws UnsupportedDataTypeConfigException
    */
   public function read($name) {
     if (!$this->exists($name)) {
@@ -359,7 +359,7 @@ class FileStorage implements StorageInterface {
   /**
    * Returns file system service.
    *
-   * @return \Drupal\Core\File\FileSystemInterface
+   * @return FileSystemInterface
    *   The file system service.
    */
   private function getFileSystem() {

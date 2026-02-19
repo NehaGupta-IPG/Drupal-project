@@ -65,14 +65,14 @@ class ContentModerationStateTest extends KernelTestBase {
   /**
    * The state object.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected StateInterface $state;
 
   /**
    * The entity definition update manager.
    *
-   * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
+   * @var EntityDefinitionUpdateManagerInterface
    */
   protected EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager;
 
@@ -827,13 +827,13 @@ class ContentModerationStateTest extends KernelTestBase {
   /**
    * Reloads the entity after clearing the static cache.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to reload.
    * @param int|bool $revision_id
    *   The specific revision ID to load. Defaults FALSE and just loads the
    *   default revision.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The reloaded entity.
    */
   protected function reloadEntity(EntityInterface $entity, $revision_id = FALSE): EntityInterface {
@@ -849,7 +849,7 @@ class ContentModerationStateTest extends KernelTestBase {
   /**
    * Checks the default revision ID and publishing status for an entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   An entity object.
    * @param int $revision_id
    *   The expected revision ID.

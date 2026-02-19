@@ -81,7 +81,7 @@ trait ToolkitTestTrait {
   /**
    * Sets up an image with the custom toolkit.
    *
-   * @return \Drupal\Core\Image\ImageInterface
+   * @return ImageInterface
    *   The image object.
    */
   protected function getImage(): ImageInterface {

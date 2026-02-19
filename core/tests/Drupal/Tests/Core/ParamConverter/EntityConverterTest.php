@@ -33,21 +33,21 @@ class EntityConverterTest extends UnitTestCase {
   /**
    * The mocked entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityTypeManagerInterface|MockObject
    */
   protected $entityTypeManager;
 
   /**
    * The mocked entities repository.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityRepositoryInterface|MockObject
    */
   protected $entityRepository;
 
   /**
    * The tested entity converter.
    *
-   * @var \Drupal\Core\ParamConverter\EntityConverter
+   * @var EntityConverter
    */
   protected $entityConverter;
 
@@ -131,7 +131,7 @@ class EntityConverterTest extends UnitTestCase {
       'typed_data_manager' => $typed_data_manager,
     ];
 
-    /** @var \Symfony\Component\DependencyInjection\ContainerInterface|\PHPUnit\Framework\MockObject\MockObject $container */
+    /** @var ContainerInterface|MockObject $container */
     $container = $this->createMock(ContainerInterface::class);
     $return_map = [];
     foreach ($service_map as $name => $service) {

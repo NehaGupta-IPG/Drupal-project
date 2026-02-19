@@ -13,7 +13,7 @@ class Link implements RenderableInterface {
   /**
    * The link generator.
    *
-   * @var \Drupal\Core\Utility\LinkGeneratorInterface
+   * @var LinkGeneratorInterface
    */
   protected $linkGenerator;
 
@@ -25,27 +25,27 @@ class Link implements RenderableInterface {
    * the output of \Drupal\Component\Utility\Xss::filter() or
    * \Drupal\Component\Render\FormattableMarkup.
    *
-   * @var string|array|\Drupal\Component\Render\MarkupInterface
+   * @var string|array|MarkupInterface
    */
   protected $text;
 
   /**
    * The URL of the link.
    *
-   * @var \Drupal\Core\Url
+   * @var Url
    */
   protected $url;
 
   /**
    * Constructs a new Link object.
    *
-   * @param string|array|\Drupal\Component\Render\MarkupInterface $text
+   * @param string|array|MarkupInterface $text
    *   The link text for the anchor tag as a translated string or render array.
    *   Strings will be sanitized automatically. If you need to output HTML in
    *   the link text, use a render array or an already sanitized string such as
    *   the output of \Drupal\Component\Utility\Xss::filter() or
    *   \Drupal\Component\Render\FormattableMarkup.
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   The \Drupal\Core\Url object.
    */
   public function __construct($text, Url $url) {
@@ -56,7 +56,7 @@ class Link implements RenderableInterface {
   /**
    * Creates a Link object from a given route name and parameters.
    *
-   * @param string|array|\Drupal\Component\Render\MarkupInterface $text
+   * @param string|array|MarkupInterface $text
    *   The link text for the anchor tag as a translated string or render array.
    *   Strings will be sanitized automatically. If you need to output HTML in
    *   the link text, use a render array or an already sanitized string such as
@@ -79,13 +79,13 @@ class Link implements RenderableInterface {
   /**
    * Creates a Link object from a given Url object.
    *
-   * @param string|array|\Drupal\Component\Render\MarkupInterface $text
+   * @param string|array|MarkupInterface $text
    *   The link text for the anchor tag as a translated string or render array.
    *   Strings will be sanitized automatically. If you need to output HTML in
    *   the link text, use a render array or an already sanitized string such as
    *   the output of \Drupal\Component\Utility\Xss::filter() or
    *   \Drupal\Component\Render\FormattableMarkup.
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   The Url to create the link for.
    *
    * @return static
@@ -97,7 +97,7 @@ class Link implements RenderableInterface {
   /**
    * Returns the text of the link.
    *
-   * @return string|array|\Drupal\Component\Render\MarkupInterface
+   * @return string|array|MarkupInterface
    *   The link text for the anchor tag as a translated string or render array.
    *   Strings will be sanitized automatically. If you need to output HTML in
    *   the link text, use a render array or an already sanitized string such as
@@ -111,7 +111,7 @@ class Link implements RenderableInterface {
   /**
    * Sets the new text of the link.
    *
-   * @param string|array|\Drupal\Component\Render\MarkupInterface $text
+   * @param string|array|MarkupInterface $text
    *   The link text for the anchor tag as a translated string or render array.
    *   Strings will be sanitized automatically. If you need to output HTML in
    *   the link text, use a render array or an already sanitized string such as
@@ -128,7 +128,7 @@ class Link implements RenderableInterface {
   /**
    * Returns the URL of the link.
    *
-   * @return \Drupal\Core\Url
+   * @return Url
    *   The URL object.
    */
   public function getUrl() {
@@ -156,7 +156,7 @@ class Link implements RenderableInterface {
    * information is maintained. However, there might be use cases such as tests
    * and non-HTML contexts where calling this method directly makes sense.
    *
-   * @return \Drupal\Core\GeneratedLink
+   * @return GeneratedLink
    *   The link HTML markup.
    *
    * @see \Drupal\Core\Link::toRenderable()
@@ -179,7 +179,7 @@ class Link implements RenderableInterface {
   /**
    * Returns the link generator.
    *
-   * @return \Drupal\Core\Utility\LinkGeneratorInterface
+   * @return LinkGeneratorInterface
    *   The link generator
    */
   protected function getLinkGenerator() {
@@ -192,7 +192,7 @@ class Link implements RenderableInterface {
   /**
    * Sets the link generator service.
    *
-   * @param \Drupal\Core\Utility\LinkGeneratorInterface $generator
+   * @param LinkGeneratorInterface $generator
    *   The link generator service.
    *
    * @return $this

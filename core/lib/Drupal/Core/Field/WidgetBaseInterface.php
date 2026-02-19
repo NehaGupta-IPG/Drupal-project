@@ -22,13 +22,13 @@ interface WidgetBaseInterface extends PluginSettingsInterface {
    * TRUE), the 'default value', if any, is pre-populated. Also allows other
    * modules to alter the form element by implementing their own hooks.
    *
-   * @param \Drupal\Core\Field\FieldItemListInterface $items
+   * @param FieldItemListInterface $items
    *   An array of the field values. When creating a new entity this may be NULL
    *   or an empty array to use default values.
    * @param array $form
    *   An array representing the form that the editing element will be attached
    *   to.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param int $get_delta
    *   Used to get only a specific delta value of a multiple value field.
@@ -41,13 +41,13 @@ interface WidgetBaseInterface extends PluginSettingsInterface {
   /**
    * Extracts field values from submitted form values.
    *
-   * @param \Drupal\Core\Field\FieldItemListInterface $items
+   * @param FieldItemListInterface $items
    *   The field values. This parameter is altered by reference to receive the
    *   incoming form values.
    * @param array $form
    *   The form structure where field elements are attached to. This might be a
    *   full form structure, or a sub-element of a larger form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    */
   public function extractFormValues(FieldItemListInterface $items, array $form, FormStateInterface $form_state);
@@ -55,14 +55,14 @@ interface WidgetBaseInterface extends PluginSettingsInterface {
   /**
    * Reports field-level validation errors against actual form elements.
    *
-   * @param \Drupal\Core\Field\FieldItemListInterface $items
+   * @param FieldItemListInterface $items
    *   The field values.
-   * @param \Symfony\Component\Validator\ConstraintViolationListInterface $violations
+   * @param ConstraintViolationListInterface $violations
    *   A list of constraint violations to flag.
    * @param array $form
    *   The form structure where field elements are attached to. This might be a
    *   full form structure, or a sub-element of a larger form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    */
   public function flagErrors(FieldItemListInterface $items, ConstraintViolationListInterface $violations, array $form, FormStateInterface $form_state);
@@ -76,7 +76,7 @@ interface WidgetBaseInterface extends PluginSettingsInterface {
    *   The array of #parents where the field lives in the form.
    * @param string $field_name
    *   The field name.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    *
    * @return array
@@ -96,7 +96,7 @@ interface WidgetBaseInterface extends PluginSettingsInterface {
    *   The array of #parents where the widget lives in the form.
    * @param string $field_name
    *   The field name.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    * @param array $field_state
    *   The array of data to store. See getWidgetState() for the structure and

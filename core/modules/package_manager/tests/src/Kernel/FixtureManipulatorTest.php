@@ -41,14 +41,14 @@ class FixtureManipulatorTest extends PackageManagerKernelTestBase {
   /**
    * The Composer inspector service.
    *
-   * @var \Drupal\package_manager\ComposerInspector
+   * @var ComposerInspector
    */
   private ComposerInspector $inspector;
 
   /**
    * The original fixture package list at the start of the test.
    *
-   * @var \Drupal\package_manager\InstalledPackagesList
+   * @var InstalledPackagesList
    */
   private InstalledPackagesList $originalFixturePackages;
 

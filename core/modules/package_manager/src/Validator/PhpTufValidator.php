@@ -13,8 +13,8 @@ use Drupal\Core\Url;
 use Drupal\package_manager\ComposerInspector;
 use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\Event\PreCreateEvent;
-use Drupal\package_manager\Event\SandboxValidationEvent;
 use Drupal\package_manager\Event\PreRequireEvent;
+use Drupal\package_manager\Event\SandboxValidationEvent;
 use Drupal\package_manager\Event\StatusCheckEvent;
 use Drupal\package_manager\PathLocator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -74,7 +74,7 @@ final class PhpTufValidator implements EventSubscriberInterface {
   /**
    * Reacts to a stage event by validating PHP-TUF configuration as needed.
    *
-   * @param \Drupal\package_manager\Event\SandboxValidationEvent $event
+   * @param SandboxValidationEvent $event
    *   The event object.
    */
   public function validate(SandboxValidationEvent $event): void {

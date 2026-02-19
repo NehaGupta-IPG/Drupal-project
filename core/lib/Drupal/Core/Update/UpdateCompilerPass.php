@@ -75,7 +75,7 @@ class UpdateCompilerPass implements CompilerPassInterface {
    *
    * @param mixed $argument
    *   The argument to check.
-   * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+   * @param ContainerBuilder $container
    *   The container.
    *
    * @return bool

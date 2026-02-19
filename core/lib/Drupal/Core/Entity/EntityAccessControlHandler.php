@@ -3,8 +3,8 @@
 namespace Drupal\Core\Entity;
 
 use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Session\AccountInterface;
 
@@ -30,7 +30,7 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
   /**
    * Information about the entity type.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface
+   * @var EntityTypeInterface
    */
   protected $entityType;
 
@@ -47,7 +47,7 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
   /**
    * Constructs an access control handler instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
    */
   public function __construct(EntityTypeInterface $entity_type) {
@@ -74,7 +74,7 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
     // individual revisions to have specific access control and be cached
     // separately.
     if ($entity instanceof RevisionableInterface) {
-      /** @var \Drupal\Core\Entity\RevisionableInterface $entity */
+      /** @var RevisionableInterface $entity */
       $cid .= ':' . $entity->getRevisionId();
       // It is not possible to delete or revert the default revision.
       if ($entity->isDefaultRevision() && ($operation === 'revert' || $operation === 'delete revision')) {
@@ -119,7 +119,7 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
    * - No modules say to deny access.
    * - At least one module says to grant access.
    *
-   * @param \Drupal\Core\Access\AccessResultInterface[] $access
+   * @param AccessResultInterface[] $access
    *   An array of access results of the fired access hook.
    *
    * @return \Drupal\Core\Access\AccessResultInterface
@@ -148,12 +148,12 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
    * This method is supposed to be overwritten by extending classes that
    * do their own custom access checking.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity for which to check access.
    * @param string $operation
    *   The entity operation. Usually one of 'view', 'view label', 'update' or
    *   'delete'.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user for which to check access.
    *
    * @return \Drupal\Core\Access\AccessResultInterface
@@ -183,7 +183,7 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
    *   'delete'.
    * @param string $langcode
    *   The language code for which to check access.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user for which to check access.
    *
    * @return \Drupal\Core\Access\AccessResultInterface|null
@@ -200,7 +200,7 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
   /**
    * Statically caches whether the given user has access.
    *
-   * @param \Drupal\Core\Access\AccessResultInterface $access
+   * @param AccessResultInterface $access
    *   The access result.
    * @param string $cid
    *   Unique string identifier for the entity/operation, for example the
@@ -210,7 +210,7 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
    *   'delete'.
    * @param string $langcode
    *   The language code for which to check access.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user for which to check access.
    *
    * @return \Drupal\Core\Access\AccessResultInterface
@@ -275,7 +275,7 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
    * This method is supposed to be overwritten by extending classes that
    * do their own custom access checking.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user for which to check access.
    * @param array $context
    *   An array of key-value pairs to pass additional context when needed.
@@ -299,10 +299,10 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
   /**
    * Loads the current account object, if it does not exist yet.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The account interface instance.
    *
-   * @return \Drupal\Core\Session\AccountInterface
+   * @return AccountInterface
    *   Returns the current account object.
    */
   protected function prepareUser(?AccountInterface $account = NULL) {
@@ -379,11 +379,11 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
    * @param string $operation
    *   The operation access should be checked for.
    *   Usually one of "view" or "edit".
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user session for which to check access.
-   * @param \Drupal\Core\Field\FieldItemListInterface $items
+   * @param FieldItemListInterface $items
    *   (optional) The field values for which to check access, or NULL if access
    *   is checked for the field definition, without any specific value
    *   available. Defaults to NULL.

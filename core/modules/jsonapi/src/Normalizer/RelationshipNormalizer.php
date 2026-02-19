@@ -21,7 +21,7 @@ class RelationshipNormalizer extends NormalizerBase {
   /**
    * Constructor.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resourceTypeRepository
+   * @param ResourceTypeRepositoryInterface $resourceTypeRepository
    *   Resource type repository.
    */
   public function __construct(

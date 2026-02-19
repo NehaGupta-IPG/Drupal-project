@@ -19,7 +19,7 @@ final class RecipeAppliedEvent extends Event {
   /**
    * Constructs a RecipeAppliedEvent object.
    *
-   * @param \Drupal\Core\Recipe\Recipe $recipe
+   * @param Recipe $recipe
    *   The recipe that was applied.
    */
   public function __construct(public readonly Recipe $recipe) {

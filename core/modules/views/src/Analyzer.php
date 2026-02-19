@@ -22,14 +22,14 @@ class Analyzer {
   /**
    * A module handler that invokes the 'views_analyze' hook.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * Constructs an Analyzer object.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler that invokes the 'views_analyze' hook.
    */
   public function __construct(ModuleHandlerInterface $module_handler) {
@@ -39,7 +39,7 @@ class Analyzer {
   /**
    * Analyzes a review and return the results.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view to analyze.
    *
    * @return array

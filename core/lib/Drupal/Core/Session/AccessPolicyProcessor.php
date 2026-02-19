@@ -2,9 +2,9 @@
 
 namespace Drupal\Core\Session;
 
-use Drupal\Core\Cache\CacheOptionalInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\CacheOptionalInterface;
 use Drupal\Core\Cache\VariationCacheInterface;
 
 /**
@@ -15,7 +15,7 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
   /**
    * The access policies.
    *
-   * @var \Drupal\Core\Session\AccessPolicyInterface[]
+   * @var AccessPolicyInterface[]
    */
   protected array $accessPolicies = [];
 
@@ -192,7 +192,7 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
    *
    * @param string $scope
    *   The scope to match.
-   * @param \Drupal\Core\Session\CalculatedPermissionsInterface $calculated_permissions
+   * @param CalculatedPermissionsInterface $calculated_permissions
    *   The calculated permissions that should match the scope.
    *
    * @return bool

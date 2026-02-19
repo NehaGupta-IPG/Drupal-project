@@ -25,7 +25,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
   /**
    * The field definition.
    *
-   * @var \Drupal\Core\Field\FieldDefinitionInterface
+   * @var FieldDefinitionInterface
    */
   protected $fieldDefinition;
 
@@ -43,7 +43,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
    *   The plugin ID for the widget.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The definition of the field to which the widget is associated.
    * @param array $settings
    *   The widget settings.
@@ -174,7 +174,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
    * Handles generic features for multiple fields:
    * - number of widgets
    * - AHAH-'add more' button
-   * - table display and drag-n-drop value reordering
+   * - table display and drag-n-drop value reordering.
    */
   protected function formMultipleElements(FieldItemListInterface $items, array &$form, FormStateInterface $form_state) {
     $field_name = $this->fieldDefinition->getName();
@@ -385,7 +385,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
    *
    * @param array $form
    *   The form array to remove elements from.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public static function deleteSubmit(&$form, FormStateInterface $form_state) {
@@ -448,7 +448,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
    *
    * @param array $form
    *   The form array to remove elements from.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public static function deleteAjax(array &$form, FormStateInterface $form_state) {
@@ -576,7 +576,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
           }
         }
 
-        /** @var \Symfony\Component\Validator\ConstraintViolationInterface[] $delta_violations */
+        /** @var ConstraintViolationInterface[] $delta_violations */
         foreach ($violations_by_delta as $delta => $delta_violations) {
           // Pass violations to the main element if this is a multiple-value
           // widget.
@@ -596,7 +596,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
           }
         }
 
-        /** @var \Symfony\Component\Validator\ConstraintViolationInterface[] $item_list_violations */
+        /** @var ConstraintViolationInterface[] $item_list_violations */
         // Pass violations to the main element without going through
         // errorElement() if the violations are at the ItemList level.
         foreach ($item_list_violations as $violation) {
@@ -714,7 +714,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
   /**
    * Returns whether the widget used for default value form.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return bool
@@ -727,7 +727,7 @@ abstract class WidgetBase extends PluginSettingsBase implements WidgetInterface,
   /**
    * Returns the filtered field description.
    *
-   * @return \Drupal\Core\Field\FieldFilteredMarkup
+   * @return FieldFilteredMarkup
    *   The filtered field description, with tokens replaced.
    */
   protected function getFilteredDescription() {

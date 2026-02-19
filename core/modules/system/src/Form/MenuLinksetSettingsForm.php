@@ -17,11 +17,11 @@ class MenuLinksetSettingsForm extends ConfigFormBase {
   /**
    * Constructs a MenuLinksetSettingsForm object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
+   * @param TypedConfigManagerInterface $typedConfigManager
    *   The typed config manager.
-   * @param \Drupal\Core\Routing\RouteBuilderInterface $routerBuilder
+   * @param RouteBuilderInterface $routerBuilder
    *   The router builder service.
    */
   public function __construct(

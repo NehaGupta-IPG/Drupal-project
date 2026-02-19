@@ -35,7 +35,7 @@ final class EntityMethodDeriver extends DeriverBase implements ContainerDeriverI
   /**
    * Constructs new EntityMethodDeriver.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
   public function __construct(protected readonly EntityTypeManagerInterface $entityTypeManager) {
@@ -85,9 +85,9 @@ final class EntityMethodDeriver extends DeriverBase implements ContainerDeriverI
    *
    * @param \ReflectionMethod $method
    *   The entity method.
-   * @param \Drupal\Core\Config\Action\Attribute\ActionMethod $action_attribute
+   * @param ActionMethod $action_attribute
    *   The entity method attribute.
-   * @param \Drupal\Core\Config\Entity\ConfigEntityTypeInterface $entity_type
+   * @param ConfigEntityTypeInterface $entity_type
    *   The entity type.
    * @param array $derivative
    *   The base plugin definition that will used to create the derivative.
@@ -129,7 +129,7 @@ final class EntityMethodDeriver extends DeriverBase implements ContainerDeriverI
    *
    * @param string $action_id
    *   The action ID.
-   * @param \Drupal\Core\Config\Entity\ConfigEntityTypeInterface $entity_type
+   * @param ConfigEntityTypeInterface $entity_type
    *   The entity type.
    * @param array $derivative
    *   The derivative definition.

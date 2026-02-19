@@ -73,7 +73,7 @@ class MigrateMenuLinkTest extends MigrateNodeTestBase {
    * @internal
    */
   protected function assertEntity(string $id, string $title, string $menu, ?string $description, bool $enabled, bool $expanded, array $attributes, string $uri, int $weight): void {
-    /** @var \Drupal\menu_link_content\MenuLinkContentInterface $menu_link */
+    /** @var MenuLinkContentInterface $menu_link */
     $menu_link = MenuLinkContent::load($id);
     $this->assertInstanceOf(MenuLinkContentInterface::class, $menu_link);
     $this->assertSame($title, $menu_link->getTitle());

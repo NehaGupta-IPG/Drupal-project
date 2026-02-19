@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\field_discovery_test;
 
+use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\MigrationPluginManagerInterface;
 use Drupal\migrate_drupal\FieldDiscovery;
-use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate_drupal\Plugin\MigrateFieldPluginManagerInterface;
 use Psr\Log\LoggerInterface;
 
@@ -25,11 +25,11 @@ class FieldDiscoveryTestClass extends FieldDiscovery {
   /**
    * Constructs a FieldDiscoveryTestClass object.
    *
-   * @param \Drupal\migrate_drupal\Plugin\MigrateFieldPluginManagerInterface $field_plugin_manager
+   * @param MigrateFieldPluginManagerInterface $field_plugin_manager
    *   The field plugin manager.
-   * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
+   * @param MigrationPluginManagerInterface $migration_plugin_manager
    *   The migration plugin manager.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   The logger.
    * @param array $test_data
    *   An array of test data, keyed by method name, for overridden methods to

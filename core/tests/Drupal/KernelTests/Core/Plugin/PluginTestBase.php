@@ -28,7 +28,7 @@ abstract class PluginTestBase extends KernelTestBase {
   /**
    * The test plugin manager used by Plugin API unit tests.
    *
-   * @var \Drupal\plugin_test\Plugin\TestPluginManager
+   * @var TestPluginManager
    */
   protected $testPluginManager;
 
@@ -42,7 +42,7 @@ abstract class PluginTestBase extends KernelTestBase {
   /**
    * The mock plugin manager used by Plugin API derivative unit tests.
    *
-   * @var \Drupal\plugin_test\Plugin\MockBlockManager
+   * @var MockBlockManager
    */
   protected $mockBlockManager;
 
@@ -56,7 +56,7 @@ abstract class PluginTestBase extends KernelTestBase {
   /**
    * The default plugin manager used by Plugin API unit tests.
    *
-   * @var \Drupal\plugin_test\Plugin\DefaultsTestPluginManager
+   * @var DefaultsTestPluginManager
    */
   protected $defaultsTestPluginManager;
 

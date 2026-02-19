@@ -16,15 +16,15 @@ class EditorController extends ControllerBase {
   /**
    * Apply the necessary XSS filtering for using a certain text format's editor.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request object.
-   * @param \Drupal\filter\FilterFormatInterface $filter_format
+   * @param FilterFormatInterface $filter_format
    *   The text format whose text editor (if any) will be used.
    *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   * @return JsonResponse
    *   A JSON response containing the XSS-filtered value.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   * @throws NotFoundHttpException
    *   Thrown if no value to filter is specified.
    *
    * @see editor_filter_xss()

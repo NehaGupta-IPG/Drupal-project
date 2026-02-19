@@ -26,7 +26,7 @@ final class GenerateAutoloadReferenceFile {
    * Composer generated. Drupal does this so that it can guarantee that there
    * will always be an `autoload.php` file in a well-known location.
    *
-   * @param \Composer\IO\IOInterface $io
+   * @param IOInterface $io
    *   IOInterface to write to.
    * @param string $package_name
    *   The name of the package defining the autoload file (the root package).
@@ -35,7 +35,7 @@ final class GenerateAutoloadReferenceFile {
    * @param string $vendor
    *   The path to the vendor directory.
    *
-   * @return \Drupal\Composer\Plugin\Scaffold\Operations\ScaffoldResult
+   * @return ScaffoldResult
    *   The result of the autoload file generation.
    */
   public static function generateAutoload(IOInterface $io, $package_name, $web_root, $vendor) {
@@ -51,7 +51,7 @@ final class GenerateAutoloadReferenceFile {
   /**
    * Determines whether or not the autoload file has been committed.
    *
-   * @param \Composer\IO\IOInterface $io
+   * @param IOInterface $io
    *   IOInterface to write to.
    * @param string $package_name
    *   The name of the package defining the autoload file (the root package).
@@ -79,7 +79,7 @@ final class GenerateAutoloadReferenceFile {
    * @param string $web_root
    *   The path to the web root.
    *
-   * @return \Drupal\Composer\Plugin\Scaffold\ScaffoldFilePath
+   * @return ScaffoldFilePath
    *   Object wrapping the relative and absolute path to the destination file.
    */
   protected static function autoloadPath($package_name, $web_root) {

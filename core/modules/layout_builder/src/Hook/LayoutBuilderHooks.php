@@ -2,32 +2,32 @@
 
 namespace Drupal\layout_builder\Hook;
 
-use Drupal\Core\Access\AccessResultInterface;
-use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\Link;
-use Drupal\Core\Breadcrumb\Breadcrumb;
 use Drupal\Core\Access\AccessResult;
-use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\layout_builder\InlineBlockEntityOperations;
-use Drupal\layout_builder\Plugin\Block\ExtraFieldBlock;
-use Drupal\Core\Render\Element;
+use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Breadcrumb\Breadcrumb;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\field\FieldConfigInterface;
-use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\layout_builder\Form\OverridesEntityForm;
 use Drupal\Core\Entity\FieldableEntityInterface;
-use Drupal\layout_builder\Form\LayoutBuilderEntityViewDisplayForm;
-use Drupal\layout_builder\Form\DefaultsEntityForm;
-use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplayStorage;
-use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
-use Drupal\layout_builder\LayoutOverrideFieldHelper;
-use Drupal\Core\Url;
-use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Order\Order;
+use Drupal\Core\Link;
+use Drupal\Core\Render\Element;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
+use Drupal\field\FieldConfigInterface;
+use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
+use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplayStorage;
+use Drupal\layout_builder\Form\DefaultsEntityForm;
+use Drupal\layout_builder\Form\LayoutBuilderEntityViewDisplayForm;
+use Drupal\layout_builder\Form\OverridesEntityForm;
+use Drupal\layout_builder\InlineBlockEntityOperations;
+use Drupal\layout_builder\LayoutOverrideFieldHelper;
+use Drupal\layout_builder\Plugin\Block\ExtraFieldBlock;
+use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
 
 /**
  * Hook implementations for layout_builder.
@@ -202,7 +202,7 @@ class LayoutBuilderHooks {
   #[Hook('entity_presave')]
   public function entityPresave(EntityInterface $entity): void {
     if (\Drupal::moduleHandler()->moduleExists('block_content')) {
-      /** @var \Drupal\layout_builder\InlineBlockEntityOperations $entity_operations */
+      /** @var InlineBlockEntityOperations $entity_operations */
       $entity_operations = \Drupal::classResolver(InlineBlockEntityOperations::class);
       $entity_operations->handlePreSave($entity);
     }
@@ -214,7 +214,7 @@ class LayoutBuilderHooks {
   #[Hook('entity_delete')]
   public function entityDelete(EntityInterface $entity): void {
     if (\Drupal::moduleHandler()->moduleExists('block_content')) {
-      /** @var \Drupal\layout_builder\InlineBlockEntityOperations $entity_operations */
+      /** @var InlineBlockEntityOperations $entity_operations */
       $entity_operations = \Drupal::classResolver(InlineBlockEntityOperations::class);
       $entity_operations->handleEntityDelete($entity);
     }
@@ -234,7 +234,7 @@ class LayoutBuilderHooks {
       // If an entity's field values change, and it also has a layout override
       // in the tempstore, the tempstore must be updated to reflect those new
       // values.
-      /** @var \Drupal\layout_builder\LayoutOverrideFieldHelper $override_field_helper */
+      /** @var LayoutOverrideFieldHelper $override_field_helper */
       $override_field_helper = \Drupal::classResolver(LayoutOverrideFieldHelper::class);
       $override_field_helper->updateTempstoreEntityContext($entity);
     }
@@ -246,7 +246,7 @@ class LayoutBuilderHooks {
   #[Hook('cron')]
   public function cron(): void {
     if (\Drupal::moduleHandler()->moduleExists('block_content')) {
-      /** @var \Drupal\layout_builder\InlineBlockEntityOperations $entity_operations */
+      /** @var InlineBlockEntityOperations $entity_operations */
       $entity_operations = \Drupal::classResolver(InlineBlockEntityOperations::class);
       $entity_operations->removeUnused();
     }
@@ -388,7 +388,7 @@ class LayoutBuilderHooks {
    */
   #[Hook('entity_translation_create')]
   public function entityTranslationCreate(EntityInterface $translation): void {
-    /** @var \Drupal\Core\Entity\FieldableEntityInterface $translation */
+    /** @var FieldableEntityInterface $translation */
     if ($translation->hasField(OverridesSectionStorage::FIELD_NAME) && $translation->getFieldDefinition(OverridesSectionStorage::FIELD_NAME)->isTranslatable()) {
       // When creating a new translation do not copy untranslated sections
       // because per-language layouts are not supported.

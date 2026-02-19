@@ -26,7 +26,7 @@ class WorkspaceProviderCollector {
    * @param string $id
    *   A workspace provider ID.
    *
-   * @return \Drupal\workspaces\Provider\WorkspaceProviderInterface
+   * @return WorkspaceProviderInterface
    *   The workspace provider.
    */
   public function getProvider($id): WorkspaceProviderInterface {

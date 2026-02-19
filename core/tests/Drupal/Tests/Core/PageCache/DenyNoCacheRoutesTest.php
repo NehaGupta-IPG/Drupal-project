@@ -26,28 +26,28 @@ class DenyNoCacheRoutesTest extends UnitTestCase {
   /**
    * The response policy under test.
    *
-   * @var \Drupal\Core\PageCache\ResponsePolicy\DenyNoCacheRoutes
+   * @var DenyNoCacheRoutes
    */
   protected $policy;
 
   /**
    * A request object.
    *
-   * @var \Symfony\Component\HttpFoundation\Request
+   * @var Request
    */
   protected $request;
 
   /**
    * A response object.
    *
-   * @var \Symfony\Component\HttpFoundation\Response
+   * @var Response
    */
   protected $response;
 
   /**
    * The current route match.
    *
-   * @var \Drupal\Core\Routing\RouteMatch|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Routing\RouteMatch|MockObject
    */
   protected $routeMatch;
 

@@ -15,28 +15,28 @@ class PrivateTempStoreFactory {
   /**
    * The storage factory creating the backend to store the data.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface
+   * @var KeyValueExpirableFactoryInterface
    */
   protected $storageFactory;
 
   /**
    * The lock object used for this data.
    *
-   * @var \Drupal\Core\Lock\LockBackendInterface
+   * @var LockBackendInterface
    */
   protected $lockBackend;
 
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountProxyInterface
+   * @var AccountProxyInterface
    */
   protected $currentUser;
 
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
@@ -50,13 +50,13 @@ class PrivateTempStoreFactory {
   /**
    * Constructs a Drupal\Core\TempStore\PrivateTempStoreFactory object.
    *
-   * @param \Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface $storage_factory
+   * @param KeyValueExpirableFactoryInterface $storage_factory
    *   The key/value store factory.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock_backend
+   * @param LockBackendInterface $lock_backend
    *   The lock object used for this data.
-   * @param \Drupal\Core\Session\AccountProxyInterface $current_user
+   * @param AccountProxyInterface $current_user
    *   The current account.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   The request stack.
    * @param int $expire
    *   The time to live for items, in seconds.
@@ -76,7 +76,7 @@ class PrivateTempStoreFactory {
    *   The collection name to use for this key/value store. This is typically
    *   a shared namespace or module name, e.g. 'views', 'entity', etc.
    *
-   * @return \Drupal\Core\TempStore\PrivateTempStore
+   * @return PrivateTempStore
    *   An instance of the key/value store.
    */
   public function get($collection) {

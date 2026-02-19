@@ -43,7 +43,7 @@ class CommentDisplayConfigurableTest extends CommentTestBase {
   public function testDisplayConfigurable(): void {
     // Add a comment.
     $nid = $this->node->id();
-    /** @var \Drupal\comment\CommentInterface $comment */
+    /** @var CommentInterface $comment */
     $comment = Comment::create([
       'entity_id' => $nid,
       'entity_type' => 'node',

@@ -71,7 +71,7 @@ class NodePreviewController extends EntityViewController {
   /**
    * The _title_callback for the page that renders a single node in preview.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $node_preview
+   * @param EntityInterface $node_preview
    *   The current node.
    *
    * @return string

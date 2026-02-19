@@ -17,7 +17,7 @@ class ViewDuplicateForm extends ViewFormBase {
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected LanguageManagerInterface $languageManager;
 
@@ -34,9 +34,9 @@ class ViewDuplicateForm extends ViewFormBase {
   /**
    * Constructs a ViewDuplicateForm.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   * @param ModuleHandlerInterface $moduleHandler
    *   Drupal's module handler.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
    */
   public function __construct(ModuleHandlerInterface $moduleHandler, LanguageManagerInterface $language_manager) {
@@ -97,7 +97,7 @@ class ViewDuplicateForm extends ViewFormBase {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   A reference to a keyed array containing the current state of the form.
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {

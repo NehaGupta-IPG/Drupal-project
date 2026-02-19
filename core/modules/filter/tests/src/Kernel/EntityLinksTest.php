@@ -40,14 +40,14 @@ class EntityLinksTest extends KernelTestBase {
   /**
    * The entity_links filter.
    *
-   * @var \Drupal\filter\Plugin\Filter\EntityLinks
+   * @var EntityLinks
    */
   protected EntityLinks $filter;
 
   /**
    * The test logger.
    *
-   * @var \ColinODell\PsrTestLogger\TestLogger
+   * @var TestLogger
    */
   protected TestLogger $logger;
 
@@ -153,7 +153,7 @@ class EntityLinksTest extends KernelTestBase {
     ];
 
     // Create an entity and add translations to that.
-    /** @var \Drupal\entity_test\Entity\EntityTestMul $entity */
+    /** @var EntityTestMul $entity */
     $entity = EntityTestMul::create(['name' => $this->randomMachineName()]);
     $entity->addTranslation('sv', ['name' => $this->randomMachineName(), 'langcode' => 'sv']);
     $entity->addTranslation('da', ['name' => $this->randomMachineName(), 'langcode' => 'da']);
@@ -375,7 +375,7 @@ class EntityLinksTest extends KernelTestBase {
    *   The text string to be filtered.
    * @param string $langcode
    *   The language code of the text to be filtered.
-   * @param \Drupal\filter\FilterProcessResult $expected_result
+   * @param FilterProcessResult $expected_result
    *   The expected filtered result.
    */
   private function assertFilterProcessResult(string $input, string $langcode, FilterProcessResult $expected_result): void {

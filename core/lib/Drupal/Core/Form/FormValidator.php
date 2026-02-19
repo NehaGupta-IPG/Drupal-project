@@ -21,28 +21,28 @@ class FormValidator implements FormValidatorInterface {
   /**
    * The CSRF token generator to validate the form token.
    *
-   * @var \Drupal\Core\Access\CsrfTokenGenerator
+   * @var CsrfTokenGenerator
    */
   protected $csrfToken;
 
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * A logger instance.
    *
-   * @var \Psr\Log\LoggerInterface
+   * @var LoggerInterface
    */
   protected $logger;
 
   /**
    * The form error handler.
    *
-   * @var \Drupal\Core\Form\FormErrorHandlerInterface
+   * @var FormErrorHandlerInterface
    */
   protected $formErrorHandler;
 
@@ -141,7 +141,7 @@ class FormValidator implements FormValidatorInterface {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param string $form_id
    *   The unique string identifying the form.
@@ -195,7 +195,7 @@ class FormValidator implements FormValidatorInterface {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param string $form_id
    *   The unique string identifying the form.
@@ -217,7 +217,7 @@ class FormValidator implements FormValidatorInterface {
    *
    * @param array $elements
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form. The current user-submitted data is stored
    *   in $form_state->getValues(), though form validation functions are passed
    *   an explicit copy of the values for the sake of simplicity. Validation
@@ -323,7 +323,7 @@ class FormValidator implements FormValidatorInterface {
    *
    * @param array $elements
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form. The current user-submitted data is stored
    *   in $form_state->getValues(), though form validation functions are passed
    *   an explicit copy of the values for the sake of simplicity. Validation
@@ -393,7 +393,7 @@ class FormValidator implements FormValidatorInterface {
   /**
    * Determines if validation errors should be limited.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return array|null

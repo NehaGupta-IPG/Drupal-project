@@ -37,21 +37,21 @@ class DefaultsSectionStorageTest extends UnitTestCase {
   /**
    * The plugin.
    *
-   * @var \Drupal\layout_builder\Plugin\SectionStorage\DefaultsSectionStorage
+   * @var DefaultsSectionStorage
    */
   protected $plugin;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The sample entity generator.
    *
-   * @var \Drupal\layout_builder\Entity\SampleEntityGeneratorInterface
+   * @var SampleEntityGeneratorInterface
    */
   protected $sampleEntityGenerator;
 

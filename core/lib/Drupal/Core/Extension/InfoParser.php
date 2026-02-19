@@ -14,7 +14,7 @@ class InfoParser extends InfoParserDynamic {
   /**
    * The file cache.
    *
-   * @var \Drupal\Component\FileCache\FileCacheInterface
+   * @var FileCacheInterface
    */
   protected FileCacheInterface $fileCache;
 

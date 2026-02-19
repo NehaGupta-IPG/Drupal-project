@@ -26,7 +26,7 @@ final class SemVer {
    * intersection is returned. For example, if called with ">=10.3" and
    * "^10.4 || ^11" the function will return ">=10.4.0.0-dev, <12.0.0.0-dev".
    *
-   * @param \Composer\Semver\VersionParser $version_parser
+   * @param VersionParser $version_parser
    *   A version parser.
    * @param string $constraint_a
    *   A constraint to compact.

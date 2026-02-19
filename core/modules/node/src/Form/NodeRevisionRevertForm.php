@@ -21,7 +21,7 @@ class NodeRevisionRevertForm extends ConfirmFormBase {
   /**
    * The node revision.
    *
-   * @var \Drupal\node\NodeInterface
+   * @var NodeInterface
    */
   protected $revision;
 
@@ -35,25 +35,25 @@ class NodeRevisionRevertForm extends ConfirmFormBase {
   /**
    * The date formatter service.
    *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
+   * @var DateFormatterInterface
    */
   protected $dateFormatter;
 
   /**
    * The time service.
    *
-   * @var \Drupal\Component\Datetime\TimeInterface
+   * @var TimeInterface
    */
   protected $time;
 
   /**
    * Constructs a new NodeRevisionRevertForm.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $node_storage
+   * @param EntityStorageInterface $node_storage
    *   The node storage.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   * @param DateFormatterInterface $date_formatter
    *   The date formatter service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct(EntityStorageInterface $node_storage, DateFormatterInterface $date_formatter, TimeInterface $time) {
@@ -154,12 +154,12 @@ class NodeRevisionRevertForm extends ConfirmFormBase {
   /**
    * Prepares a revision to be reverted.
    *
-   * @param \Drupal\node\NodeInterface $revision
+   * @param NodeInterface $revision
    *   The revision to be reverted.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
-   * @return \Drupal\node\NodeInterface
+   * @return NodeInterface
    *   The prepared revision ready to be stored.
    */
   protected function prepareRevertedRevision(NodeInterface $revision, FormStateInterface $form_state) {

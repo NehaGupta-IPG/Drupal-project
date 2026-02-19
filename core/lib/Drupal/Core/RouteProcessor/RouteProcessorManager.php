@@ -33,7 +33,7 @@ class RouteProcessorManager implements OutboundRouteProcessorInterface {
   /**
    * Adds an outbound processor object to the $outboundProcessors property.
    *
-   * @param \Drupal\Core\RouteProcessor\OutboundRouteProcessorInterface $processor
+   * @param OutboundRouteProcessorInterface $processor
    *   The processor object to add.
    * @param int $priority
    *   The priority of the processor being added.

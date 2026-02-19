@@ -14,7 +14,7 @@ trait AssertConfigTrait {
   /**
    * Ensures that a specific config diff does not contain unwanted changes.
    *
-   * @param \Drupal\Component\Diff\Diff $result
+   * @param Diff $result
    *   The diff result for the passed in config name.
    * @param string $config_name
    *   The config name to check.

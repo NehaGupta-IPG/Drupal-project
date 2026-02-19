@@ -7,15 +7,22 @@
 
 namespace Drupal\Core\ProxyClass\PageCache {
 
+    use Drupal\Core\PageCache\ChainResponsePolicyInterface;
+    use Drupal\Core\DependencyInjection\DependencySerializationTrait;
+    use Symfony\Component\DependencyInjection\ContainerInterface;
+    use Symfony\Component\HttpFoundation\Response;
+    use Symfony\Component\HttpFoundation\Request;
+    use Drupal\Core\PageCache\ResponsePolicyInterface;
+
     /**
      * Provides a proxy class for \Drupal\Core\PageCache\ChainResponsePolicy.
      *
      * @see \Drupal\Component\ProxyBuilder
      */
-    class ChainResponsePolicy implements \Drupal\Core\PageCache\ChainResponsePolicyInterface
+    class ChainResponsePolicy implements ChainResponsePolicyInterface
     {
 
-        use \Drupal\Core\DependencyInjection\DependencySerializationTrait;
+        use DependencySerializationTrait;
 
         /**
          * The id of the original proxied service.
@@ -34,19 +41,19 @@ namespace Drupal\Core\ProxyClass\PageCache {
         /**
          * The service container.
          *
-         * @var \Symfony\Component\DependencyInjection\ContainerInterface
+         * @var ContainerInterface
          */
         protected $container;
 
         /**
          * Constructs a ProxyClass Drupal proxy object.
          *
-         * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+         * @param ContainerInterface $container
          *   The container.
          * @param string $drupal_proxy_original_service_id
          *   The service ID of the original service.
          */
-        public function __construct(\Symfony\Component\DependencyInjection\ContainerInterface $container, $drupal_proxy_original_service_id)
+        public function __construct(ContainerInterface $container, $drupal_proxy_original_service_id)
         {
             $this->container = $container;
             $this->drupalProxyOriginalServiceId = $drupal_proxy_original_service_id;
@@ -70,7 +77,7 @@ namespace Drupal\Core\ProxyClass\PageCache {
         /**
          * {@inheritdoc}
          */
-        public function check(\Symfony\Component\HttpFoundation\Response $response, \Symfony\Component\HttpFoundation\Request $request)
+        public function check(Response $response, Request $request)
         {
             return $this->lazyLoadItself()->check($response, $request);
         }
@@ -78,7 +85,7 @@ namespace Drupal\Core\ProxyClass\PageCache {
         /**
          * {@inheritdoc}
          */
-        public function addPolicy(\Drupal\Core\PageCache\ResponsePolicyInterface $policy)
+        public function addPolicy(ResponsePolicyInterface $policy)
         {
             return $this->lazyLoadItself()->addPolicy($policy);
         }

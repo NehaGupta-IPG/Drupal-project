@@ -24,28 +24,28 @@ class TitleResolverTest extends UnitTestCase {
   /**
    * The mocked controller resolver.
    *
-   * @var \Drupal\Core\Controller\ControllerResolverInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Controller\ControllerResolverInterface|MockObject
    */
   protected $controllerResolver;
 
   /**
    * The mocked translation manager.
    *
-   * @var \Drupal\Core\StringTranslation\TranslationInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\StringTranslation\TranslationInterface|MockObject
    */
   protected $translationManager;
 
   /**
    * The mocked argument resolver.
    *
-   * @var \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface|MockObject
    */
   protected $argumentResolver;
 
   /**
    * The actual tested title resolver.
    *
-   * @var \Drupal\Core\Controller\TitleResolver
+   * @var TitleResolver
    */
   protected $titleResolver;
 

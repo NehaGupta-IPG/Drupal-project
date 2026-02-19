@@ -50,7 +50,7 @@ class NavigationBlockUiTest extends WebDriverTestBase {
   /**
    * An administrative user to configure the test environment.
    *
-   * @var \Drupal\user\UserInterface
+   * @var UserInterface
    */
   protected UserInterface $adminUser;
 

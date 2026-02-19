@@ -9,15 +9,15 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\views\Plugin\ViewsHandlerManager;
 use Drupal\views\Plugin\views\join\JoinPluginInterface;
 use Drupal\views\Plugin\views\query\QueryPluginBase;
 use Drupal\views\Plugin\views\query\Sql;
+use Drupal\views\Plugin\ViewsHandlerManager;
 use Drupal\views\ViewExecutable;
 use Drupal\views\ViewsData;
-use Drupal\workspaces\WorkspaceTracker;
 use Drupal\workspaces\WorkspaceInformationInterface;
 use Drupal\workspaces\WorkspaceManagerInterface;
+use Drupal\workspaces\WorkspaceTracker;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -86,9 +86,9 @@ class ViewsOperations {
    * This should only be called after determining that this entity type is
    * involved in the query, and that a non-default workspace is in use.
    *
-   * @param \Drupal\views\Plugin\views\query\Sql $query
+   * @param Sql $query
    *   The query plugin object for the query.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
    */
   protected function alterQueryForEntityType(Sql $query, EntityTypeInterface $entity_type): void {
@@ -216,7 +216,7 @@ class ViewsOperations {
    *
    * @param string $entity_type_id
    *   The ID of the entity type to join.
-   * @param \Drupal\views\Plugin\views\query\Sql $query
+   * @param Sql $query
    *   The query plugin object for the query.
    * @param string $relationship
    *   The primary table alias this table is related to.
@@ -259,9 +259,9 @@ class ViewsOperations {
   /**
    * Adds the revision table of an entity type to a query object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\views\Plugin\views\query\Sql $query
+   * @param Sql $query
    *   The query plugin object for the query.
    * @param string $relationship
    *   The name of the relationship.
@@ -315,13 +315,13 @@ class ViewsOperations {
    * @param string $workspace_association_table
    *   The alias of the 'workspace_association' table joined to the main entity
    *   table.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type that is being queried.
    *
-   * @return \Drupal\views\Plugin\views\join\JoinPluginInterface
+   * @return JoinPluginInterface
    *   An adjusted views join object to add to the query.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws PluginException
    */
   protected function getRevisionTableJoin(string $relationship, string $table, string $field, string $workspace_association_table, EntityTypeInterface $entity_type): JoinPluginInterface {
     $definition = [
@@ -338,7 +338,7 @@ class ViewsOperations {
       ];
     }
 
-    /** @var \Drupal\views\Plugin\views\join\JoinPluginInterface $join */
+    /** @var JoinPluginInterface $join */
     $join = $this->viewsJoinPluginManager->createInstance('standard', $definition);
     $join->adjusted = TRUE;
     $this->adjustedTables[$join] = TRUE;
@@ -354,7 +354,7 @@ class ViewsOperations {
    * 'workspace_association' table appears in the query before the alias it's
    * chained on or the SQL is invalid.
    *
-   * @param \Drupal\views\Plugin\views\query\Sql $query
+   * @param Sql $query
    *   The SQL query object.
    * @param string $workspace_association_table
    *   The alias of the 'workspace_association' table.

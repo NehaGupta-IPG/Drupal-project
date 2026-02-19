@@ -369,7 +369,7 @@ interface RendererInterface {
    * Any and all rendering must therefore happen within a render context, and it
    * is this method that provides that.
    *
-   * @param \Drupal\Core\Render\RenderContext $context
+   * @param RenderContext $context
    *   The render context to execute the callable within.
    * @param callable $callable
    *   The callable to execute.
@@ -410,7 +410,7 @@ interface RendererInterface {
    *
    * @param array &$elements
    *   The render array to update.
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface|mixed $dependency
+   * @param CacheableDependencyInterface|mixed $dependency
    *   The dependency. If the object implements CacheableDependencyInterface,
    *   then its cacheability metadata will be used. Otherwise, the passed in
    *   object must be assumed to be uncacheable, so max-age 0 is set.

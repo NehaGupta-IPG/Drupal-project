@@ -20,7 +20,7 @@ class WorkspacesLayoutTempstoreRepository extends LayoutTempstoreRepository {
   /**
    * Sets the workspace manager.
    *
-   * @param \Drupal\workspaces\WorkspaceManagerInterface $workspace_manager
+   * @param WorkspaceManagerInterface $workspace_manager
    *   The workspace manager service.
    */
   public function setWorkspacesManager(WorkspaceManagerInterface $workspace_manager): static {

@@ -28,14 +28,14 @@ class EntityListBuilderTest extends UnitTestCase {
   /**
    * The entity type used for testing.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityTypeInterface|MockObject
    */
   protected $entityType;
 
   /**
    * The module handler used for testing.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface|MockObject
    */
   protected $moduleHandler;
 
@@ -49,35 +49,35 @@ class EntityListBuilderTest extends UnitTestCase {
   /**
    * The role storage used for testing.
    *
-   * @var \Drupal\user\RoleStorageInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\user\RoleStorageInterface|MockObject
    */
   protected $roleStorage;
 
   /**
    * The service container used for testing.
    *
-   * @var \Drupal\Core\DependencyInjection\ContainerBuilder
+   * @var ContainerBuilder
    */
   protected $container;
 
   /**
    * The entity used to construct the EntityListBuilder.
    *
-   * @var \Drupal\user\RoleInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\user\RoleInterface|MockObject
    */
   protected $role;
 
   /**
    * The redirect destination service.
    *
-   * @var \Drupal\Core\Routing\RedirectDestinationInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var RedirectDestinationInterface|MockObject
    */
   protected $redirectDestination;
 
   /**
    * The EntityListBuilder object to test.
    *
-   * @var \Drupal\Core\Entity\EntityListBuilder
+   * @var EntityListBuilder
    */
   protected $entityListBuilder;
 

@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Plugin\views\filter;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Form\FormHelper;
@@ -10,9 +11,8 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Element\Checkboxes;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
-use Drupal\views\Plugin\views\HandlerBase;
-use Drupal\Component\Utility\Html;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
+use Drupal\views\Plugin\views\HandlerBase;
 use Drupal\views\ViewExecutable;
 
 /**
@@ -249,7 +249,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    * @param array $form
    *   An alterable, associative array containing the structure of the form,
    *   passed by reference.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
@@ -296,7 +296,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    * @param array $form
    *   An alterable, associative array containing the structure of the form,
    *   passed by reference.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function validateOptionsForm(&$form, FormStateInterface $form_state) {
@@ -316,7 +316,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    * @param array $form
    *   An alterable, associative array containing the structure of the form,
    *   passed by reference.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function submitOptionsForm(&$form, FormStateInterface $form_state) {
@@ -354,7 +354,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    * @param array $form
    *   An alterable, associative array containing the structure of the form,
    *   passed by reference.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @see buildOptionsForm()
@@ -385,7 +385,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    *
    * @param array $form
    *   Associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   protected function operatorValidate($form, FormStateInterface $form_state) {}
@@ -397,7 +397,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    *
    * @param array $form
    *   Associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function operatorSubmit($form, FormStateInterface $form_state) {}
@@ -408,7 +408,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    * @param array $form
    *   An alterable, associative array containing the structure of the form,
    *   passed by reference.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   protected function showValueForm(&$form, FormStateInterface $form_state) {
@@ -428,7 +428,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    * @param array $form
    *   An alterable, associative array containing the structure of the form,
    *   passed by reference.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @see buildOptionsForm()
@@ -442,7 +442,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    *
    * @param array $form
    *   Associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   protected function valueValidate($form, FormStateInterface $form_state) {}
@@ -454,7 +454,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    *
    * @param array $form
    *   Associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   protected function valueSubmit($form, FormStateInterface $form_state) {}
@@ -465,7 +465,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    * @param array $form
    *   An alterable, associative array containing the structure of the form,
    *   passed by reference.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function showBuildGroupForm(&$form, FormStateInterface $form_state) {
@@ -494,7 +494,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    * @param array $form
    *   An alterable, associative array containing the structure of the form,
    *   passed by reference.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   protected function showBuildGroupButton(&$form, FormStateInterface $form_state) {
@@ -577,7 +577,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    * @param array $form
    *   An alterable, associative array containing the structure of the form,
    *   passed by reference.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function showExposeButton(&$form, FormStateInterface $form_state) {
@@ -632,7 +632,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    * @param array $form
    *   An alterable, associative array containing the structure of the form,
    *   passed by reference.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @see buildOptionsForm()
@@ -883,7 +883,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    *
    * @param string $identifier
    *   The identifier to check.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   (optional) The current state of the form.
    * @param array $form_group
    *   (optional) The form element to set any errors on.
@@ -1038,7 +1038,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    * @param array $form
    *   An alterable, associative array containing the structure of the form,
    *   passed by reference.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function buildExposedForm(&$form, FormStateInterface $form_state) {
@@ -1140,7 +1140,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
    * @param array $form
    *   An alterable, associative array containing the structure of the form,
    *   passed by reference.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   protected function buildExposedFiltersGroupForm(&$form, FormStateInterface $form_state) {

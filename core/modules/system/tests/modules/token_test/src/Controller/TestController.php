@@ -17,14 +17,14 @@ class TestController extends ControllerBase {
   /**
    * The token replacement system.
    *
-   * @var \Drupal\Core\Utility\Token
+   * @var Token
    */
   protected $token;
 
   /**
    * Constructs a new TestController instance.
    *
-   * @param \Drupal\Core\Utility\Token $token
+   * @param Token $token
    *   The token replacement system.
    */
   public function __construct(Token $token) {
@@ -38,7 +38,7 @@ class TestController extends ControllerBase {
    * $this->token->replace(), and applies the collected metadata to the render
    * array being built.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   The node.
    *
    * @return array
@@ -59,7 +59,7 @@ class TestController extends ControllerBase {
    * applying collected metadata to the currently active render context when an
    * explicit bubbleable metadata object isn't passed in.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   The node.
    *
    * @return array

@@ -37,14 +37,14 @@ class FieldItemNormalizer extends NormalizerBase implements DenormalizerInterfac
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * FieldItemNormalizer constructor.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
@@ -214,13 +214,13 @@ class FieldItemNormalizer extends NormalizerBase implements DenormalizerInterfac
   /**
    * Gets a field item instance for use with SerializedColumnNormalizerTrait.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The JSON:API resource type of the entity being denormalized.
-   * @param \Drupal\Core\Field\TypedData\FieldItemDataDefinitionInterface $item_definition
+   * @param FieldItemDataDefinitionInterface $item_definition
    *   The field item definition of the instance to get.
    *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws InvalidPluginDefinitionException
+   * @throws PluginNotFoundException
    */
   protected function getFieldItemInstance(ResourceType $resource_type, FieldItemDataDefinitionInterface $item_definition) {
     if ($bundle_key = $this->entityTypeManager->getDefinition($resource_type->getEntityTypeId())

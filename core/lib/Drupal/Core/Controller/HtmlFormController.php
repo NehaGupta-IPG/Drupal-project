@@ -2,9 +2,9 @@
 
 namespace Drupal\Core\Controller;
 
+use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface;
 
 /**
@@ -15,18 +15,18 @@ class HtmlFormController extends FormController {
   /**
    * The class resolver.
    *
-   * @var \Drupal\Core\DependencyInjection\ClassResolverInterface
+   * @var ClassResolverInterface
    */
   protected $classResolver;
 
   /**
    * Constructs a new \Drupal\Core\Controller\HtmlFormController object.
    *
-   * @param \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface $argument_resolver
+   * @param ArgumentResolverInterface $argument_resolver
    *   The argument resolver.
-   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
+   * @param FormBuilderInterface $form_builder
    *   The form builder.
-   * @param \Drupal\Core\DependencyInjection\ClassResolverInterface $class_resolver
+   * @param ClassResolverInterface $class_resolver
    *   The class resolver.
    */
   public function __construct(ArgumentResolverInterface $argument_resolver, FormBuilderInterface $form_builder, ClassResolverInterface $class_resolver) {

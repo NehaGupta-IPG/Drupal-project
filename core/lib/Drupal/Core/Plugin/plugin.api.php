@@ -1,10 +1,10 @@
 <?php
 
+
 /**
  * @file
  * Hooks provided by the Plugin system.
  */
-
 /**
  * @addtogroup hooks
  * @{
@@ -18,7 +18,7 @@
  * by a hook listener which specifies the 'block' plugin list,
  * e.g., BlockLibraryController or ChooseBlockController.
  *
- * @param \Drupal\Component\Plugin\Definition\PluginDefinitionInterface[]|array[] $definitions
+ * @param PluginDefinitionInterface[]|array[] $definitions
  *   The array of plugin definitions.
  * @param mixed[] $extra
  *   An associative array containing additional information provided by the code
@@ -52,7 +52,7 @@ function hook_plugin_filter_TYPE_alter(array &$definitions, array $extra, $consu
  * ChooseSectionController), while HOOK_plugin_filter_block__block_ui_alter()
  * would affect the Block UI's listeners for the 'block' plugin type.
  *
- * @param \Drupal\Component\Plugin\Definition\PluginDefinitionInterface[]|array[] $definitions
+ * @param PluginDefinitionInterface[]|array[] $definitions
  *   The array of plugin definitions.
  * @param mixed[] $extra
  *   An associative array containing additional information provided by the code

@@ -21,7 +21,7 @@ class UserLocalTaskTest extends UnitTestCase {
   /**
    * The local tasks deriver.
    *
-   * @var \Drupal\user\Plugin\Derivative\UserLocalTask
+   * @var UserLocalTask
    */
   protected $deriver;
 

@@ -25,21 +25,21 @@ class CustomAccessCheckTest extends UnitTestCase {
   /**
    * The access checker to test.
    *
-   * @var \Drupal\Core\Access\CustomAccessCheck
+   * @var CustomAccessCheck
    */
   protected $accessChecker;
 
   /**
    * The mocked callable resolver.
    *
-   * @var \Drupal\Core\Utility\CallableResolver|\PHPUnit\Framework\MockObject\MockObject
+   * @var CallableResolver|MockObject
    */
   protected $callableResolver;
 
   /**
    * The mocked arguments resolver.
    *
-   * @var \Drupal\Core\Access\AccessArgumentsResolverFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Access\AccessArgumentsResolverFactoryInterface|MockObject
    */
   protected $argumentsResolverFactory;
 

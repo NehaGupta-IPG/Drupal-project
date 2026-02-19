@@ -69,7 +69,7 @@ class Container extends RenderElementBase {
    * @param array $element
    *   An associative array containing the properties and children of the
    *   container.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array $complete_form
    *   The complete form structure.

@@ -41,10 +41,10 @@ interface TransactionManagerInterface {
    * @param string $name
    *   (optional) The name of the savepoint.
    *
-   * @return \Drupal\Core\Database\Transaction
+   * @return Transaction
    *   A Transaction object.
    *
-   * @throws \Drupal\Core\Database\TransactionNameNonUniqueException
+   * @throws TransactionNameNonUniqueException
    *   If a Drupal Transaction with the specified name exists already.
    */
   public function push(string $name = ''): Transaction;
@@ -60,9 +60,9 @@ interface TransactionManagerInterface {
    * @param string $id
    *   The id of the transaction.
    *
-   * @throws \Drupal\Core\Database\TransactionOutOfOrderException
+   * @throws TransactionOutOfOrderException
    *   If a Drupal Transaction with the specified name does not exist.
-   * @throws \Drupal\Core\Database\TransactionCommitFailedException
+   * @throws TransactionCommitFailedException
    *   If the commit of the root transaction failed.
    *
    * @internal
@@ -83,9 +83,9 @@ interface TransactionManagerInterface {
    * @param string $id
    *   The id of the transaction.
    *
-   * @throws \Drupal\Core\Database\TransactionOutOfOrderException
+   * @throws TransactionOutOfOrderException
    *   If a Drupal Transaction with the specified name does not exist.
-   * @throws \Drupal\Core\Database\TransactionCommitFailedException
+   * @throws TransactionCommitFailedException
    *   If the commit of the root transaction failed.
    *
    * @see \Drupal\Core\Database\Transaction::__destruct()
@@ -107,12 +107,12 @@ interface TransactionManagerInterface {
    * @param string $id
    *   The id of the transaction.
    *
-   * @throws \Drupal\Core\Database\TransactionNoActiveException
+   * @throws TransactionNoActiveException
    *   If there is no active client connection.
-   * @throws \Drupal\Core\Database\TransactionOutOfOrderException
+   * @throws TransactionOutOfOrderException
    *   If the order of rollback is not in reverse sequence against the pushes
    *   to the stack.
-   * @throws \Drupal\Core\Database\TransactionCommitFailedException
+   * @throws TransactionCommitFailedException
    *   If the commit of the root transaction failed.
    *
    * @see \Drupal\Core\Database\Transaction::rollback()

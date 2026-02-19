@@ -18,39 +18,39 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
   /**
    * The entity being used by this form.
    *
-   * @var \Drupal\Core\Entity\ContentEntityInterface|\Drupal\Core\Entity\RevisionLogInterface
+   * @var ContentEntityInterface|RevisionLogInterface
    */
   protected $entity;
 
   /**
    * The entity type bundle info service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @var EntityTypeBundleInfoInterface
    */
   protected $entityTypeBundleInfo;
 
   /**
    * The time service.
    *
-   * @var \Drupal\Component\Datetime\TimeInterface
+   * @var TimeInterface
    */
   protected $time;
 
   /**
    * The entity repository service.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   * @var EntityRepositoryInterface
    */
   protected $entityRepository;
 
   /**
    * Constructs a ContentEntityForm object.
    *
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository service.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param EntityTypeBundleInfoInterface $entity_type_bundle_info
    *   The entity type bundle service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct(EntityRepositoryInterface $entity_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info, TimeInterface $time) {
@@ -85,7 +85,7 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
   /**
    * Returns the bundle entity of the entity, or NULL if there is none.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|null
+   * @return EntityInterface|null
    *   The bundle entity.
    */
   protected function getBundleEntity() {
@@ -151,7 +151,7 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
    * {@inheritdoc}
    */
   public function buildEntity(array $form, FormStateInterface $form_state) {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     $entity = parent::buildEntity($form, $form_state);
 
     // Mark the entity as requiring validation.
@@ -182,7 +182,7 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     $entity = $this->buildEntity($form, $form_state);
 
     $violations = $entity->validate();
@@ -227,7 +227,7 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
    * the form display), it needs to add its fields here and override
    * flagViolations() for displaying the violations.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return string[]
@@ -251,11 +251,11 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
    * parent::flagViolations($violations, $form, $form_state);
    * @endcode
    *
-   * @param \Drupal\Core\Entity\EntityConstraintViolationListInterface $violations
+   * @param EntityConstraintViolationListInterface $violations
    *   The violations to flag.
    * @param array $form
    *   A nested array of form elements comprising the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   protected function flagViolations(EntityConstraintViolationListInterface $violations, array $form, FormStateInterface $form_state) {
@@ -271,7 +271,7 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
   /**
    * Initializes the form state and the entity before the first form build.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   protected function init(FormStateInterface $form_state) {
@@ -290,7 +290,7 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
   /**
    * Initializes form language code values.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   protected function initFormLangcodes(FormStateInterface $form_state) {
@@ -367,11 +367,11 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
    *
    * @param string $entity_type_id
    *   The entity type identifier.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity updated with the submitted values.
    * @param array $form
    *   The complete form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @see \Drupal\Core\Entity\ContentEntityForm::form()
@@ -392,7 +392,7 @@ class ContentEntityForm extends EntityForm implements ContentEntityFormInterface
    *
    * Applies only if the entity implements the EntityChangedInterface.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity updated with the submitted values.
    */
   public function updateChangedTime(EntityInterface $entity) {

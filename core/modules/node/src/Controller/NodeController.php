@@ -10,9 +10,9 @@ use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
+use Drupal\node\NodeInterface;
 use Drupal\node\NodeStorageInterface;
 use Drupal\node\NodeTypeInterface;
-use Drupal\node\NodeInterface;
 
 /**
  * Returns responses for Node routes.
@@ -22,32 +22,32 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
   /**
    * The date formatter service.
    *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
+   * @var DateFormatterInterface
    */
   protected $dateFormatter;
 
   /**
    * The renderer service.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * The entity repository service.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   * @var EntityRepositoryInterface
    */
   protected $entityRepository;
 
   /**
    * Constructs a NodeController object.
    *
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+   * @param DateFormatterInterface $date_formatter
    *   The date formatter service.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer service.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository.
    */
   public function __construct(DateFormatterInterface $date_formatter, RendererInterface $renderer, EntityRepositoryInterface $entity_repository) {
@@ -61,7 +61,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
    *
    * Redirects to node/add/[type] if only one content type is available.
    *
-   * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
+   * @return array|RedirectResponse
    *   A render array for a list of the node types that can be added; however,
    *   if there is only one node type defined for the site, the function
    *   will return a RedirectResponse to the node add page for that one node
@@ -103,7 +103,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
   /**
    * Displays a node revision.
    *
-   * @param \Drupal\node\NodeInterface $node_revision
+   * @param NodeInterface $node_revision
    *   The node revision.
    *
    * @return array
@@ -119,7 +119,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
   /**
    * Generates an overview table of older revisions of a node.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   A node object.
    *
    * @return array
@@ -146,7 +146,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
     $current_revision_displayed = FALSE;
 
     foreach ($this->getRevisionIds($node, $node_storage) as $vid) {
-      /** @var \Drupal\node\NodeInterface $revision */
+      /** @var NodeInterface $revision */
       $revision = $node_storage->loadRevision($vid);
       $username = [
         '#theme' => 'username',
@@ -258,7 +258,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
   /**
    * The _title_callback for the node.add route.
    *
-   * @param \Drupal\node\NodeTypeInterface $node_type
+   * @param NodeTypeInterface $node_type
    *   The current node.
    *
    * @return string
@@ -273,9 +273,9 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
    *
    * Only returns revisions that are affected by the $node language.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   The node entity.
-   * @param \Drupal\node\NodeStorageInterface $node_storage
+   * @param NodeStorageInterface $node_storage
    *   The node storage handler.
    *
    * @return int[]

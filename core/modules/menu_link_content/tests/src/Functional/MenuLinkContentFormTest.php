@@ -33,7 +33,6 @@ class MenuLinkContentFormTest extends BrowserTestBase {
    *
    * @var \Drupal\user\Entity\User
    */
-
   protected $adminUser;
 
   /**
@@ -41,7 +40,6 @@ class MenuLinkContentFormTest extends BrowserTestBase {
    *
    * @var \Drupal\user\Entity\User
    */
-
   protected $basicUser;
 
   /**

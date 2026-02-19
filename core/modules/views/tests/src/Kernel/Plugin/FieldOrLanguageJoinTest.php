@@ -188,7 +188,7 @@ class FieldOrLanguageJoinTest extends RelationshipJoinTestBase {
   /**
    * Builds a join using the given configuration.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The view used in this test.
    * @param array $configuration
    *   The join plugin configuration.

@@ -22,13 +22,13 @@ class DemoUmamiHooks {
   /**
    * DemoUmamiHooks constructor.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   * @param ModuleHandlerInterface $moduleHandler
    *   The module handler.
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
+   * @param AccountInterface $currentUser
    *   The current user.
-   * @param \Drupal\Core\Routing\AdminContext $adminContext
+   * @param AdminContext $adminContext
    *   The admin context.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
   public function __construct(
@@ -77,7 +77,7 @@ class DemoUmamiHooks {
    *
    * @param array $form
    *   Form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    */
   public function installConfigureSubmit(array $form, FormStateInterface $form_state): void {

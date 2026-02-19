@@ -4,8 +4,8 @@ namespace Drupal\config\Form;
 
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Config\StorageInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Htmx\Htmx;
@@ -24,30 +24,30 @@ class ConfigSingleExportForm extends FormBase {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The config storage.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   protected $configStorage;
 
   /**
    * Tracks the valid config entity type definitions.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface[]
+   * @var EntityTypeInterface[]
    */
   protected $definitions = [];
 
   /**
    * Constructs a new ConfigSingleImportForm.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Config\StorageInterface $config_storage
+   * @param StorageInterface $config_storage
    *   The config storage.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, StorageInterface $config_storage) {

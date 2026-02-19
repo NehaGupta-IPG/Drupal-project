@@ -2,10 +2,10 @@
 
 namespace Drupal\responsive_image;
 
-use Drupal\Core\Url;
 use Drupal\breakpoint\BreakpointManagerInterface;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -18,7 +18,7 @@ class ResponsiveImageStyleForm extends EntityForm {
   /**
    * The breakpoint manager.
    *
-   * @var \Drupal\breakpoint\BreakpointManagerInterface
+   * @var BreakpointManagerInterface
    */
   protected $breakpointManager;
 
@@ -34,7 +34,7 @@ class ResponsiveImageStyleForm extends EntityForm {
   /**
    * Constructs the responsive image style form.
    *
-   * @param \Drupal\breakpoint\BreakpointManagerInterface $breakpoint_manager
+   * @param BreakpointManagerInterface $breakpoint_manager
    *   The breakpoint manager.
    */
   public function __construct(BreakpointManagerInterface $breakpoint_manager) {
@@ -46,7 +46,7 @@ class ResponsiveImageStyleForm extends EntityForm {
    *
    * @param array $form
    *   A nested array form elements comprising the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return array
@@ -61,7 +61,7 @@ class ResponsiveImageStyleForm extends EntityForm {
       $form['#title'] = $this->t('<em>Edit responsive image style</em> @label', ['@label' => $this->entity->label()]);
     }
 
-    /** @var \Drupal\responsive_image\ResponsiveImageStyleInterface $responsive_image_style */
+    /** @var ResponsiveImageStyleInterface $responsive_image_style */
     $responsive_image_style = $this->entity;
     $form['label'] = [
       '#type' => 'textfield',
@@ -248,7 +248,7 @@ class ResponsiveImageStyleForm extends EntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    /** @var \Drupal\responsive_image\ResponsiveImageStyleInterface $responsive_image_style */
+    /** @var ResponsiveImageStyleInterface $responsive_image_style */
     $responsive_image_style = $this->entity;
     // Remove all the existing mappings and replace with submitted values.
     $responsive_image_style->removeImageStyleMappings();

@@ -4,9 +4,9 @@ namespace Drupal\content_translation;
 
 use Drupal\Core\Config\Entity\ThirdPartySettingsInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldTypePluginManagerInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
  * Provides field translation synchronization capabilities.
@@ -16,23 +16,23 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The field type plugin manager.
    *
-   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface
+   * @var FieldTypePluginManagerInterface
    */
   protected $fieldTypeManager;
 
   /**
    * Constructs a FieldTranslationSynchronizer object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager
+   * @param FieldTypePluginManagerInterface $field_type_manager
    *   The field type plugin manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, FieldTypePluginManagerInterface $field_type_manager) {
@@ -60,7 +60,7 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
   /**
    * Returns the synchronization settings for the specified field.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   A field definition.
    *
    * @return string[]
@@ -114,7 +114,7 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
         // default revision. In this case the actual language does not matter as
         // synchronized properties are the same for all the translations in the
         // default revision.
-        /** @var \Drupal\Core\Entity\ContentEntityInterface $default_revision */
+        /** @var ContentEntityInterface $default_revision */
         $default_revision = $this->entityTypeManager
           ->getStorage($entity->getEntityTypeId())
           ->load($entity->id());
@@ -182,10 +182,10 @@ class FieldTranslationSynchronizer implements FieldTranslationSynchronizerInterf
   /**
    * Returns the original unchanged entity to be used to detect changes.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity being changed.
    *
-   * @return \Drupal\Core\Entity\ContentEntityInterface
+   * @return ContentEntityInterface
    *   The unchanged entity.
    */
   protected function getOriginalEntity(ContentEntityInterface $entity) {

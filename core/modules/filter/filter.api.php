@@ -1,5 +1,6 @@
 <?php
 
+
 /**
  * @file
  * Hooks provided by the Filter module.
@@ -50,7 +51,7 @@ function hook_filter_secure_image_alter(&$image) {
 /**
  * Perform actions when a text format has been disabled.
  *
- * @param \Drupal\filter\FilterFormatInterface $format
+ * @param FilterFormatInterface $format
  *   The format object of the format being disabled.
  */
 function hook_filter_format_disable($format): void {

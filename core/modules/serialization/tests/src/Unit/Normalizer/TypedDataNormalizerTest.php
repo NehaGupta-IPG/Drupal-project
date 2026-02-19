@@ -19,14 +19,14 @@ class TypedDataNormalizerTest extends UnitTestCase {
   /**
    * The TypedDataNormalizer instance.
    *
-   * @var \Drupal\serialization\Normalizer\TypedDataNormalizer
+   * @var TypedDataNormalizer
    */
   protected $normalizer;
 
   /**
    * The mock typed data instance.
    *
-   * @var \Drupal\Core\TypedData\TypedDataInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\TypedData\TypedDataInterface|MockObject
    */
   protected $typedData;
 

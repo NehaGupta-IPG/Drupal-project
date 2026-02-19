@@ -13,7 +13,7 @@ class MenuActiveTrailsCacheContext implements CalculatedCacheContextInterface {
   /**
    * Constructs a MenuActiveTrailsCacheContext object.
    *
-   * @param \Drupal\Core\Menu\MenuActiveTrailInterface $menuActiveTrailService
+   * @param MenuActiveTrailInterface $menuActiveTrailService
    *   The menu active trail service.
    */
   public function __construct(protected MenuActiveTrailInterface $menuActiveTrailService) {

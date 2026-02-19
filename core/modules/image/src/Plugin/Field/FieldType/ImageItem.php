@@ -368,7 +368,7 @@ class ImageItem extends FileItem {
 
     // Generate a max of 5 different images.
     if (!isset($images[$extension][$min_resolution][$max_resolution]) || count($images[$extension][$min_resolution][$max_resolution]) <= 5) {
-      /** @var \Drupal\Core\File\FileSystemInterface $file_system */
+      /** @var FileSystemInterface $file_system */
       $file_system = \Drupal::service('file_system');
       $tmp_file = $file_system->tempnam('temporary://', 'generateImage_');
       $destination = $tmp_file . '.' . $extension;
@@ -500,7 +500,7 @@ class ImageItem extends FileItem {
    *
    * @param array $element
    *   The form element to process.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    */
   public static function validateDefaultImageForm(array &$element, FormStateInterface $form_state) {

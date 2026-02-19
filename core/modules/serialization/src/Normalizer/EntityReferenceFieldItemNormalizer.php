@@ -18,14 +18,14 @@ class EntityReferenceFieldItemNormalizer extends FieldItemNormalizer {
   /**
    * The entity repository.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   * @var EntityRepositoryInterface
    */
   protected $entityRepository;
 
   /**
    * Constructs an EntityReferenceFieldItemNormalizer object.
    *
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository.
    */
   public function __construct(EntityRepositoryInterface $entity_repository) {
@@ -67,7 +67,7 @@ class EntityReferenceFieldItemNormalizer extends FieldItemNormalizer {
    */
   protected function constructValue($data, $context) {
     if (isset($data['target_uuid'])) {
-      /** @var \Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem $field_item */
+      /** @var EntityReferenceItem $field_item */
       $field_item = $context['target_instance'];
       if (empty($data['target_uuid'])) {
         throw new InvalidArgumentException(sprintf('If provided "target_uuid" cannot be empty for field "%s".', $field_item->getName()));

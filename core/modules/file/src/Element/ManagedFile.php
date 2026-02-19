@@ -168,12 +168,12 @@ class ManagedFile extends FormElementBase {
    *
    * @param array $form
    *   The build form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   The ajax response of the ajax upload.
    */
   public static function uploadAjaxCallback(&$form, FormStateInterface &$form_state, Request $request) {
@@ -476,7 +476,7 @@ class ManagedFile extends FormElementBase {
    *
    * @param array<string,mixed> $form
    *   The form structure.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    *
    * @see \Drupal\file\Element\ManagedFile::processManagedFile()

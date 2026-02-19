@@ -19,9 +19,9 @@ class TransportInfoController implements ContainerInjectionInterface {
   /**
    * Constructs a new transport info controller.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   * @param ConfigFactoryInterface $configFactory
    *   The config factory.
-   * @param \Symfony\Component\Mailer\Transport\TransportInterface $transport
+   * @param TransportInterface $transport
    *   The mailer transport.
    */
   public function __construct(

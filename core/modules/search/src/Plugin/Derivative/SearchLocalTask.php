@@ -15,14 +15,14 @@ class SearchLocalTask extends DeriverBase implements ContainerDeriverInterface {
   /**
    * The search page repository.
    *
-   * @var \Drupal\search\SearchPageRepositoryInterface
+   * @var SearchPageRepositoryInterface
    */
   protected $searchPageRepository;
 
   /**
    * Constructs a new SearchLocalTask.
    *
-   * @param \Drupal\search\SearchPageRepositoryInterface $search_page_repository
+   * @param SearchPageRepositoryInterface $search_page_repository
    *   The search page repository.
    */
   public function __construct(SearchPageRepositoryInterface $search_page_repository) {

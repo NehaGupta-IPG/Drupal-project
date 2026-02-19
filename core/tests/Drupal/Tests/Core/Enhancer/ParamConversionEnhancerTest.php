@@ -21,12 +21,12 @@ use Symfony\Component\Routing\Route;
 class ParamConversionEnhancerTest extends UnitTestCase {
 
   /**
-   * @var \Drupal\Core\Routing\Enhancer\ParamConversionEnhancer
+   * @var ParamConversionEnhancer
    */
   protected $paramConversionEnhancer;
 
   /**
-   * @var \Drupal\Core\ParamConverter\ParamConverterManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\ParamConverter\ParamConverterManagerInterface|MockObject
    */
   protected $paramConverterManager;
 

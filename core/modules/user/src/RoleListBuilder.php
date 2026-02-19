@@ -21,18 +21,18 @@ class RoleListBuilder extends DraggableListBuilder {
   /**
    * The messenger.
    *
-   * @var \Drupal\Core\Messenger\MessengerInterface
+   * @var MessengerInterface
    */
   protected $messenger;
 
   /**
    * RoleListBuilder constructor.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entityType
+   * @param EntityTypeInterface $entityType
    *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The entity storage class.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger.
    */
   public function __construct(

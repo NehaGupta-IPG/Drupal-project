@@ -57,14 +57,14 @@ class SerializerTest extends JsonapiKernelTestBase {
   /**
    * The subject under test.
    *
-   * @var \Drupal\jsonapi\Serializer\Serializer
+   * @var Serializer
    */
   protected $sut;
 
   /**
    * A user.
    *
-   * @var \Drupal\user\Entity\User
+   * @var User
    */
   protected User $user;
 

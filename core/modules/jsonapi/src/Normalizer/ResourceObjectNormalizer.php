@@ -38,35 +38,35 @@ class ResourceObjectNormalizer extends NormalizerBase {
   /**
    * The entity normalization cacher.
    *
-   * @var \Drupal\jsonapi\EventSubscriber\ResourceObjectNormalizationCacher
+   * @var ResourceObjectNormalizationCacher
    */
   protected $cacher;
 
   /**
-   * @var mixed|\Symfony\Component\EventDispatcher\EventDispatcherInterface|null
+   * @var mixed|EventDispatcherInterface|null
    */
   private EventDispatcherInterface $eventDispatcher;
 
   /**
-   * @var mixed|\Drupal\Core\Entity\EntityFieldManagerInterface|null
+   * @var mixed|EntityFieldManagerInterface|null
    */
   private EntityFieldManagerInterface $entityFieldManager;
 
   /**
-   * @var mixed|\Drupal\Core\Entity\EntityTypeManagerInterface|null
+   * @var mixed|EntityTypeManagerInterface|null
    */
   private EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * Constructs a ResourceObjectNormalizer object.
    *
-   * @param \Drupal\jsonapi\EventSubscriber\ResourceObjectNormalizationCacher $cacher
+   * @param ResourceObjectNormalizationCacher $cacher
    *   The entity normalization cacher.
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @param EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(ResourceObjectNormalizationCacher $cacher, ?EventDispatcherInterface $event_dispatcher = NULL, ?EntityFieldManagerInterface $entity_field_manager = NULL, ?EntityTypeManagerInterface $entity_type_manager = NULL) {
@@ -146,7 +146,7 @@ class ResourceObjectNormalizer extends NormalizerBase {
    *
    * @param string[] $field_names
    *   The field names to normalize (the sparse fieldset, if any).
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceObject $object
+   * @param ResourceObject $object
    *   The resource object to partially normalize.
    * @param string $format
    *   The format in which the normalization will be encoded.
@@ -186,7 +186,7 @@ class ResourceObjectNormalizer extends NormalizerBase {
   /**
    * Builds the empty normalization structure for cache misses.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceObject $object
+   * @param ResourceObject $object
    *   The resource object being normalized.
    *
    * @return array
@@ -214,7 +214,7 @@ class ResourceObjectNormalizer extends NormalizerBase {
    * @param string $format
    *   The serialization format.
    *
-   * @return \Drupal\jsonapi\Normalizer\Value\CacheableNormalization
+   * @return CacheableNormalization
    *   The normalized value.
    */
   protected function serializeField($field, array $context, $format) {

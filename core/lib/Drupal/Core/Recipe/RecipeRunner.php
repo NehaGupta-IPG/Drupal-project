@@ -10,8 +10,8 @@ use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\DefaultContent\Existing;
-use Drupal\Core\DefaultContent\Importer;
 use Drupal\Core\DefaultContent\Finder;
+use Drupal\Core\DefaultContent\Importer;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -30,7 +30,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 final class RecipeRunner {
 
   /**
-   * @param \Drupal\Core\Recipe\Recipe $recipe
+   * @param Recipe $recipe
    *   The recipe to apply.
    */
   public static function processRecipe(Recipe $recipe): void {
@@ -44,7 +44,7 @@ final class RecipeRunner {
   /**
    * Triggers the RecipeAppliedEvent.
    *
-   * @param \Drupal\Core\Recipe\Recipe $recipe
+   * @param Recipe $recipe
    *   The recipe to apply.
    * @param array<mixed>|null $context
    *   The batch context if called by a batch.
@@ -59,7 +59,7 @@ final class RecipeRunner {
   /**
    * Applies any recipes listed by the recipe.
    *
-   * @param \Drupal\Core\Recipe\RecipeConfigurator $recipes
+   * @param RecipeConfigurator $recipes
    *   The list of recipes to apply.
    */
   protected static function processRecipes(RecipeConfigurator $recipes): void {
@@ -71,9 +71,9 @@ final class RecipeRunner {
   /**
    * Installs the extensions.
    *
-   * @param \Drupal\Core\Recipe\InstallConfigurator $install
+   * @param InstallConfigurator $install
    *   The list of extensions to install.
-   * @param \Drupal\Core\Config\StorageInterface $recipeConfigStorage
+   * @param StorageInterface $recipeConfigStorage
    *   The recipe's configuration storage. Used to override extension provided
    *   configuration.
    */
@@ -91,11 +91,11 @@ final class RecipeRunner {
   /**
    * Creates configuration and applies configuration actions.
    *
-   * @param \Drupal\Core\Recipe\Recipe $recipe
+   * @param Recipe $recipe
    *   The recipe being applied.
    */
   protected static function processConfiguration(Recipe $recipe): void {
-    /** @var \Drupal\Core\Config\ConfigManagerInterface $config_manager */
+    /** @var ConfigManagerInterface $config_manager */
     $config_manager = \Drupal::service(ConfigManagerInterface::class);
 
     $config_installer = new RecipeConfigInstaller(
@@ -140,11 +140,11 @@ final class RecipeRunner {
   /**
    * Creates content contained in a recipe.
    *
-   * @param \Drupal\Core\DefaultContent\Finder $content
+   * @param Finder $content
    *   The content finder object for the recipe.
    */
   protected static function processContent(Finder $content): void {
-    /** @var \Drupal\Core\DefaultContent\Importer $importer */
+    /** @var Importer $importer */
     $importer = \Drupal::service(Importer::class);
     $importer->setLogger(\Drupal::logger('recipe'));
     $importer->importContent($content, Existing::Skip);
@@ -153,7 +153,7 @@ final class RecipeRunner {
   /**
    * Converts a recipe into a series of batch operations.
    *
-   * @param \Drupal\Core\Recipe\Recipe $recipe
+   * @param Recipe $recipe
    *   The recipe to convert to batch operations.
    *
    * @return array<int, array{0: callable, 1: array{mixed}}>
@@ -173,7 +173,7 @@ final class RecipeRunner {
   /**
    * Helper method to convert a recipe to batch operations.
    *
-   * @param \Drupal\Core\Recipe\Recipe $recipe
+   * @param Recipe $recipe
    *   The recipe to convert to batch operations.
    * @param string[] $recipes
    *   The paths of the recipes that have already been converted to batch
@@ -215,7 +215,7 @@ final class RecipeRunner {
   /**
    * Converts a recipe's install tasks to batch operations.
    *
-   * @param \Drupal\Core\Recipe\Recipe $recipe
+   * @param Recipe $recipe
    *   The recipe to convert install tasks to batch operations.
    * @param string[] $modules
    *   The modules that will already be installed due to previous recipes in the
@@ -252,7 +252,7 @@ final class RecipeRunner {
    *
    * @param string $module
    *   The name of the module to install.
-   * @param \Drupal\Core\Config\StorageInterface|\Drupal\Core\Recipe\Recipe $recipeConfigStorage
+   * @param StorageInterface|Recipe $recipeConfigStorage
    *   The recipe or recipe's config storage.
    * @param array<mixed>|null $context
    *   The batch context if called by a batch.
@@ -283,7 +283,7 @@ final class RecipeRunner {
    *
    * @param string $theme
    *   The name of the theme to install.
-   * @param \Drupal\Core\Config\StorageInterface|\Drupal\Core\Recipe\Recipe $recipeConfigStorage
+   * @param StorageInterface|Recipe $recipeConfigStorage
    *   The recipe or recipe's config storage.
    * @param array<mixed>|null $context
    *   The batch context if called by a batch.
@@ -311,7 +311,7 @@ final class RecipeRunner {
   /**
    * Installs a config for a recipe.
    *
-   * @param \Drupal\Core\Recipe\Recipe $recipe
+   * @param Recipe $recipe
    *   The recipe to install config for.
    * @param array<mixed>|null $context
    *   The batch context if called by a batch.
@@ -325,7 +325,7 @@ final class RecipeRunner {
   /**
    * Installs a content for a recipe.
    *
-   * @param \Drupal\Core\Recipe\Recipe $recipe
+   * @param Recipe $recipe
    *   The recipe to install content for.
    * @param array<mixed>|null $context
    *   The batch context if called by a batch.

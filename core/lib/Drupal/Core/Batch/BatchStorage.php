@@ -21,13 +21,13 @@ class BatchStorage implements BatchStorageInterface {
   /**
    * Constructs the database batch storage service.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection.
-   * @param \Symfony\Component\HttpFoundation\Session\SessionInterface $session
+   * @param SessionInterface $session
    *   The session.
-   * @param \Drupal\Core\Access\CsrfTokenGenerator $csrfToken
+   * @param CsrfTokenGenerator $csrfToken
    *   The CSRF token generator.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct(

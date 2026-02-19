@@ -28,7 +28,7 @@ class ProjectInfo {
    *
    * @param array $projects
    *   Reference to the array of project data of what's installed on this site.
-   * @param \Drupal\Core\Extension\Extension[] $list
+   * @param Extension[] $list
    *   Array of data to process to add the relevant info to the $projects array.
    * @param string $project_type
    *   The kind of data in the list. Can be 'module' or 'theme'.
@@ -142,7 +142,7 @@ class ProjectInfo {
   /**
    * Determines what project a given file object belongs to.
    *
-   * @param \Drupal\Core\Extension\Extension $file
+   * @param Extension $file
    *   An extension object.
    *
    * @return string

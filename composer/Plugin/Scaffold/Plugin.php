@@ -42,7 +42,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
   /**
    * The Composer Scaffold handler.
    *
-   * @var \Drupal\Composer\Plugin\Scaffold\Handler
+   * @var Handler
    */
   protected $handler;
 

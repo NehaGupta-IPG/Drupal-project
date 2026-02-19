@@ -8,8 +8,8 @@ use Drupal\Component\Assertion\Inspector;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Cache\CacheRedirect;
 use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\ContentEntityNullStorage;
@@ -134,14 +134,14 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
   /**
    * The main entity used for testing.
    *
-   * @var \Drupal\Core\Entity\EntityInterface
+   * @var EntityInterface
    */
   protected $entity;
 
   /**
    * Another entity of the same type used for testing.
    *
-   * @var \Drupal\Core\Entity\EntityInterface
+   * @var EntityInterface
    */
   protected $anotherEntity;
 
@@ -247,7 +247,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
   /**
    * Creates the entity to be tested.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The entity to be tested.
    */
   abstract protected function createEntity();
@@ -255,7 +255,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
   /**
    * Creates another entity to be tested.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   Another entity based on $this->entity.
    */
   protected function createAnotherEntity() {
@@ -369,7 +369,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
    *   Whether the current request is authenticated or not. This matters for
    *   some entity access control handlers, but not for most.
    *
-   * @return \Drupal\Core\Cache\CacheableMetadata
+   * @return CacheableMetadata
    *   The expected cacheability.
    */
   protected function getExpectedUnauthorizedEntityAccessCacheability($is_authenticated) {
@@ -1248,7 +1248,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
   /**
    * Gets an entity resource's GET/PATCH/DELETE URL.
    *
-   * @return \Drupal\Core\Url
+   * @return Url
    *   The URL to GET/PATCH/DELETE.
    */
   protected function getEntityResourceUrl() {
@@ -1263,7 +1263,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
   /**
    * Gets an entity resource's POST URL.
    *
-   * @return \Drupal\Core\Url
+   * @return Url
    *   The URL to POST to.
    */
   protected function getEntityResourcePostUrl() {
@@ -1274,7 +1274,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
   /**
    * Clones the given entity and modifies all PATCH-protected fields.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity being tested and to modify.
    *
    * @return array
@@ -1371,7 +1371,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
    *
    * @todo Remove this in https://www.drupal.org/node/2805279.
    *
-   * @param \Psr\Http\Message\ResponseInterface $response
+   * @param ResponseInterface $response
    *   The response to assert.
    */
   protected function assert406Response(ResponseInterface $response) {
@@ -1394,7 +1394,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
   /**
    * Asserts that a resource is unavailable: 404, 406 if it has canonical route.
    *
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   URL to request.
    * @param array $request_options
    *   Request options to apply.
@@ -1415,7 +1415,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
    *
    * @param array $sent_normalization
    *   An entity normalization.
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $modified_entity
+   * @param FieldableEntityInterface $modified_entity
    *   The entity object of the modified (PATCHed or POSTed) entity.
    */
   protected function assertStoredEntityMatchesSentNormalization(array $sent_normalization, FieldableEntityInterface $modified_entity) {

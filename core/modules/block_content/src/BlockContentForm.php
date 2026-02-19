@@ -16,7 +16,7 @@ class BlockContentForm extends ContentEntityForm {
   /**
    * The block content entity.
    *
-   * @var \Drupal\block_content\BlockContentInterface
+   * @var BlockContentInterface
    */
   protected $entity;
 
@@ -65,7 +65,7 @@ class BlockContentForm extends ContentEntityForm {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   public function configureBlock(array $form, FormStateInterface $form_state): void {

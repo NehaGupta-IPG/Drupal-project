@@ -24,7 +24,7 @@ class SearchPageForm extends FormBase implements WorkspaceSafeFormInterface {
   /**
    * The search page entity.
    *
-   * @var \Drupal\search\SearchPageInterface
+   * @var SearchPageInterface
    */
   protected $entity;
 

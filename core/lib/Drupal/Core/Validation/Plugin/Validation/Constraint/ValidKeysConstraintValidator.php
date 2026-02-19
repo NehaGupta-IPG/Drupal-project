@@ -174,7 +174,7 @@ class ValidKeysConstraintValidator extends ConstraintValidator {
   /**
    * Computes message parameters for dynamic type violations.
    *
-   * @param \Drupal\Core\Config\Schema\Mapping $mapping
+   * @param Mapping $mapping
    *   A `type: mapping` instance, with values.
    *
    * @return array

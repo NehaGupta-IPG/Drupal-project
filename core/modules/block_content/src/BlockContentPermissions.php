@@ -20,7 +20,7 @@ class BlockContentPermissions implements ContainerInjectionInterface {
   /**
    * Constructs a BlockContentPermissions instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManagerInterface $entityTypeManager
    *   Entity type manager.
    */
   public function __construct(
@@ -50,7 +50,7 @@ class BlockContentPermissions implements ContainerInjectionInterface {
   /**
    * Return all the permissions available for a block type.
    *
-   * @param \Drupal\block_content\Entity\BlockContentType $type
+   * @param BlockContentType $type
    *   The block type.
    *
    * @return array

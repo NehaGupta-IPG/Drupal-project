@@ -31,7 +31,7 @@ class RequestFormatRouteFilter implements FilterInterface {
     $routes_with_requirement = [];
     $routes_without_requirement = [];
     $result_collection = new RouteCollection();
-    /** @var \Symfony\Component\Routing\Route $route */
+    /** @var Route $route */
     foreach ($collection as $name => $route) {
       if (!$route->hasRequirement('_format')) {
         $routes_without_requirement[$name] = $route;
@@ -84,7 +84,7 @@ class RequestFormatRouteFilter implements FilterInterface {
    * there are multiple routes which all require the same single format then
    * use it.
    *
-   * @param \Symfony\Component\Routing\RouteCollection $collection
+   * @param RouteCollection $collection
    *   The route collection to filter.
    *
    * @return string
@@ -102,7 +102,7 @@ class RequestFormatRouteFilter implements FilterInterface {
   /**
    * Gets the set of formats across all routes in the collection.
    *
-   * @param \Symfony\Component\Routing\RouteCollection $collection
+   * @param RouteCollection $collection
    *   The route collection to filter.
    *
    * @return string[]

@@ -21,14 +21,14 @@ class TermRouteContext implements ContextProviderInterface {
   /**
    * The route match object.
    *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
+   * @var RouteMatchInterface
    */
   protected $routeMatch;
 
   /**
    * Constructs a new TermRouteContext.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match object.
    */
   public function __construct(RouteMatchInterface $route_match) {

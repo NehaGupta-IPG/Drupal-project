@@ -32,7 +32,7 @@ class RegionalSettingsFormTest extends BrowserTestBase {
   /**
    * A user with permission to administer site configuration.
    *
-   * @var \Drupal\user\UserInterface
+   * @var UserInterface
    */
   protected UserInterface $adminAccount;
 

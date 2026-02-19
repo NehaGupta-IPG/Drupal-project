@@ -20,7 +20,7 @@ class OrderByTest extends UnitTestCase {
   /**
    * The select query object to test.
    *
-   * @var \Drupal\Core\Database\Query\Select
+   * @var Select
    */
   protected $query;
 

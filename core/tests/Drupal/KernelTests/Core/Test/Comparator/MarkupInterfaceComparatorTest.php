@@ -30,14 +30,14 @@ class MarkupInterfaceComparatorTest extends KernelTestBase {
   /**
    * The markup comparator.
    *
-   * @var \Drupal\TestTools\Comparator\MarkupInterfaceComparator
+   * @var MarkupInterfaceComparator
    */
   protected $comparator;
 
   /**
    * The comparator factory.
    *
-   * @var \SebastianBergmann\Comparator\Factory
+   * @var Factory
    */
   protected $factory;
 

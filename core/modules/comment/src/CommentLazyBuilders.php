@@ -8,8 +8,8 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Render\Element\Link;
-use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
@@ -24,59 +24,59 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
   /**
    * The entity type manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity form builder service.
    *
-   * @var \Drupal\Core\Entity\EntityFormBuilderInterface
+   * @var EntityFormBuilderInterface
    */
   protected $entityFormBuilder;
 
   /**
    * Comment manager service.
    *
-   * @var \Drupal\comment\CommentManagerInterface
+   * @var CommentManagerInterface
    */
   protected $commentManager;
 
   /**
    * Current logged in user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
   /**
    * The module handler service.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The renderer service.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * Constructs a new CommentLazyBuilders object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
-   * @param \Drupal\Core\Entity\EntityFormBuilderInterface $entity_form_builder
+   * @param EntityFormBuilderInterface $entity_form_builder
    *   The entity form builder service.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current logged in user.
-   * @param \Drupal\comment\CommentManagerInterface $comment_manager
+   * @param CommentManagerInterface $comment_manager
    *   The comment manager service.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler service.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer service.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFormBuilderInterface $entity_form_builder, AccountInterface $current_user, CommentManagerInterface $comment_manager, ModuleHandlerInterface $module_handler, RendererInterface $renderer) {
@@ -142,7 +142,7 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
     ];
 
     if (!$is_in_preview) {
-      /** @var \Drupal\comment\CommentInterface $entity */
+      /** @var CommentInterface $entity */
       $entity = $this->entityTypeManager->getStorage('comment')->load($comment_entity_id);
       if ($commented_entity = $entity->getCommentedEntity()) {
         $links['comment'] = $this->buildLinks($entity, $commented_entity);
@@ -162,9 +162,9 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
   /**
    * Build the default links (reply, edit, delete …) for a comment.
    *
-   * @param \Drupal\comment\CommentInterface $entity
+   * @param CommentInterface $entity
    *   The comment object.
-   * @param \Drupal\Core\Entity\EntityInterface $commented_entity
+   * @param EntityInterface $commented_entity
    *   The entity to which the comment is attached.
    *
    * @return array

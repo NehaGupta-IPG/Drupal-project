@@ -35,28 +35,28 @@ class EntityAccessChecker {
   /**
    * The JSON:API resource type repository.
    *
-   * @var \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface
+   * @var ResourceTypeRepositoryInterface
    */
   protected $resourceTypeRepository;
 
   /**
    * The router.
    *
-   * @var \Symfony\Component\Routing\RouterInterface
+   * @var RouterInterface
    */
   protected $router;
 
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
   /**
    * The entity repository.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   * @var EntityRepositoryInterface
    */
   protected $entityRepository;
 
@@ -67,20 +67,20 @@ class EntityAccessChecker {
    * is a temporary measure. JSON:API should not need to be aware of the
    * Content Moderation module.
    *
-   * @var \Drupal\content_moderation\Access\LatestRevisionCheck
+   * @var LatestRevisionCheck
    */
   protected $latestRevisionCheck = NULL;
 
   /**
    * EntityAccessChecker constructor.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceTypeRepositoryInterface $resource_type_repository
+   * @param ResourceTypeRepositoryInterface $resource_type_repository
    *   The JSON:API resource type repository.
-   * @param \Symfony\Component\Routing\RouterInterface $router
+   * @param RouterInterface $router
    *   The router.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The current user.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository.
    */
   public function __construct(ResourceTypeRepositoryInterface $resource_type_repository, RouterInterface $router, AccountInterface $account, EntityRepositoryInterface $entity_repository) {
@@ -95,7 +95,7 @@ class EntityAccessChecker {
    *
    * This is only called when content_moderation module is installed.
    *
-   * @param \Drupal\content_moderation\Access\LatestRevisionCheck $latest_revision_check
+   * @param LatestRevisionCheck $latest_revision_check
    *   The latest revision access check service provided by the
    *   content_moderation module.
    *
@@ -108,13 +108,13 @@ class EntityAccessChecker {
   /**
    * Get the object to normalize and the access based on the provided entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to test access for.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   (optional) The account with which access should be checked. Defaults to
    *   the current user.
    *
-   * @return \Drupal\jsonapi\JsonApiResource\ResourceObject|\Drupal\jsonapi\JsonApiResource\LabelOnlyResourceObject|\Drupal\jsonapi\Exception\EntityAccessDeniedHttpException
+   * @return ResourceObject|LabelOnlyResourceObject|EntityAccessDeniedHttpException
    *   The ResourceObject, a LabelOnlyResourceObject or an
    *   EntityAccessDeniedHttpException object if neither is accessible. All
    *   three possible return values carry the access result cacheability.
@@ -144,15 +144,15 @@ class EntityAccessChecker {
   /**
    * Checks access to the given entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity for which access should be evaluated.
    * @param string $operation
    *   The entity operation for which access should be evaluated.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   (optional) The account with which access should be checked. Defaults to
    *   the current user.
    *
-   * @return \Drupal\Core\Access\AccessResultInterface|\Drupal\Core\Access\AccessResultReasonInterface
+   * @return \Drupal\Core\Access\AccessResultInterface|AccessResultReasonInterface
    *   The access check result.
    */
   public function checkEntityAccess(EntityInterface $entity, $operation, AccountInterface $account) {
@@ -181,13 +181,13 @@ class EntityAccessChecker {
    * There is no standardized API for revision access checking in Drupal core
    * and this method shims that missing API.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The revised entity for which to check access.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   (optional) The account with which access should be checked. Defaults to
    *   the current user.
    *
-   * @return \Drupal\Core\Access\AccessResultInterface|\Drupal\Core\Access\AccessResultReasonInterface
+   * @return \Drupal\Core\Access\AccessResultInterface|AccessResultReasonInterface
    *   The access check result.
    */
   protected function checkRevisionViewAccess(EntityInterface $entity, AccountInterface $account) {

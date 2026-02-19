@@ -3,8 +3,8 @@
 namespace Drupal\shortcut\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\shortcut\ShortcutSetInterface;
 use Drupal\shortcut\ShortcutInterface;
+use Drupal\shortcut\ShortcutSetInterface;
 
 /**
  * Provides route responses for taxonomy.module.
@@ -14,7 +14,7 @@ class ShortcutController extends ControllerBase {
   /**
    * Returns a form to add a new shortcut to a given set.
    *
-   * @param \Drupal\shortcut\ShortcutSetInterface $shortcut_set
+   * @param ShortcutSetInterface $shortcut_set
    *   The shortcut set this shortcut will be added to.
    *
    * @return array
@@ -28,7 +28,7 @@ class ShortcutController extends ControllerBase {
   /**
    * Deletes the selected shortcut.
    *
-   * @param \Drupal\shortcut\ShortcutInterface $shortcut
+   * @param ShortcutInterface $shortcut
    *   The shortcut to delete.
    *
    * @return \Symfony\Component\HttpFoundation\RedirectResponse

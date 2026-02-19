@@ -29,7 +29,7 @@ interface MenuActiveTrailInterface {
    *   (optional) The menu within which to find the active link. If omitted, all
    *   menus will be searched.
    *
-   * @return \Drupal\Core\Menu\MenuLinkInterface|null
+   * @return MenuLinkInterface|null
    *   The menu link for the currently active route, or NULL if there is no
    *   matching menu link or the current user cannot access the current page
    *   (i.e. we have a 403 response).

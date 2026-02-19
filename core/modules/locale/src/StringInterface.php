@@ -85,7 +85,7 @@ interface StringInterface {
   /**
    * Gets the string storage.
    *
-   * @return \Drupal\locale\StringStorageInterface
+   * @return StringStorageInterface
    *   The storage used for this string.
    */
   public function getStorage();
@@ -93,7 +93,7 @@ interface StringInterface {
   /**
    * Sets the string storage.
    *
-   * @param \Drupal\locale\StringStorageInterface $storage
+   * @param StringStorageInterface $storage
    *   The storage to use for this string.
    *
    * @return $this
@@ -199,7 +199,7 @@ interface StringInterface {
    *
    * @return $this
    *
-   * @throws \Drupal\locale\StringStorageException
+   * @throws StringStorageException
    *   In case of failures, an exception is thrown.
    */
   public function save();
@@ -209,7 +209,7 @@ interface StringInterface {
    *
    * @return $this
    *
-   * @throws \Drupal\locale\StringStorageException
+   * @throws StringStorageException
    *   In case of failures, an exception is thrown.
    */
   public function delete();

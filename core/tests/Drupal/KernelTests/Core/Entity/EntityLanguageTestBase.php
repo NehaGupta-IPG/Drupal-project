@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\entity_test\EntityTestHelper;
-use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\language\Entity\ConfigurableLanguage;
 
 /**
  * Base class for language-aware entity tests.

@@ -67,7 +67,7 @@ class DestinationCategoryTest extends MigrateDrupalTestBase {
   /**
    * Asserts that all migrations are tagged as either Configuration or Content.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface[] $migrations
+   * @param MigrationInterface[] $migrations
    *   The migrations.
    *
    * @internal

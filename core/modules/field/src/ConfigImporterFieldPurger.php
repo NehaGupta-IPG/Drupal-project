@@ -19,7 +19,7 @@ class ConfigImporterFieldPurger {
    *
    * @param array $context
    *   The batch context.
-   * @param \Drupal\Core\Config\ConfigImporter $config_importer
+   * @param ConfigImporter $config_importer
    *   The config importer.
    */
   public static function process(array &$context, ConfigImporter $config_importer) {
@@ -59,7 +59,7 @@ class ConfigImporterFieldPurger {
    *
    * @param array $context
    *   The batch context.
-   * @param \Drupal\Core\Config\ConfigImporter $config_importer
+   * @param ConfigImporter $config_importer
    *   The config importer.
    */
   protected static function initializeSandbox(array &$context, ConfigImporter $config_importer) {
@@ -104,7 +104,7 @@ class ConfigImporterFieldPurger {
    *   The configuration that will be deleted by the configuration
    *   synchronization.
    *
-   * @return \Drupal\field\Entity\FieldStorageConfig[]
+   * @return FieldStorageConfig[]
    *   An array of field storages that need purging before configuration can be
    *   synchronized.
    */
@@ -133,7 +133,7 @@ class ConfigImporterFieldPurger {
     }
 
     // Gather deleted fields from modules that are being uninstalled.
-    /** @var \Drupal\field\FieldStorageConfigInterface[] $deleted_storage_definitions */
+    /** @var FieldStorageConfigInterface[] $deleted_storage_definitions */
     $deleted_storage_definitions = \Drupal::service('entity_field.deleted_fields_repository')->getFieldStorageDefinitions();
     foreach ($deleted_storage_definitions as $field_storage_definition) {
       if ($field_storage_definition instanceof FieldStorageConfigInterface && !in_array($field_storage_definition->getTypeProvider(), $providers)) {

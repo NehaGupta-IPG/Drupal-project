@@ -15,7 +15,7 @@ class ExtensionInstallStorage extends InstallStorage {
   /**
    * The active configuration store.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   protected $configStorage;
 
@@ -38,7 +38,7 @@ class ExtensionInstallStorage extends InstallStorage {
   /**
    * Overrides \Drupal\Core\Config\InstallStorage::__construct().
    *
-   * @param \Drupal\Core\Config\StorageInterface $config_storage
+   * @param StorageInterface $config_storage
    *   The active configuration store where the list of enabled modules and
    *   themes is stored.
    * @param string $directory

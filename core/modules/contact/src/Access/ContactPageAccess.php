@@ -17,23 +17,23 @@ class ContactPageAccess implements AccessInterface {
   /**
    * The contact settings config object.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * The user data service.
    *
-   * @var \Drupal\user\UserDataInterface
+   * @var UserDataInterface
    */
   protected $userData;
 
   /**
    * Constructs a ContactPageAccess instance.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\user\UserDataInterface $user_data
+   * @param UserDataInterface $user_data
    *   The user data service.
    */
   public function __construct(ConfigFactoryInterface $config_factory, UserDataInterface $user_data) {
@@ -44,9 +44,9 @@ class ContactPageAccess implements AccessInterface {
   /**
    * Checks access to the given user's contact page.
    *
-   * @param \Drupal\user\UserInterface $user
+   * @param UserInterface $user
    *   The user being contacted.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The currently logged in account.
    *
    * @return \Drupal\Core\Access\AccessResultInterface

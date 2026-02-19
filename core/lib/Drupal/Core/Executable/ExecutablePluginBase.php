@@ -80,7 +80,7 @@ abstract class ExecutablePluginBase extends PluginBase implements ExecutableInte
    * @return $this
    *   The executable object for chaining.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws PluginException
    *   If the provided configuration value does not pass validation.
    */
   public function setConfig($key, $value) {

@@ -30,42 +30,42 @@ class FinishResponseSubscriberTest extends UnitTestCase {
   /**
    * The mock Kernel.
    *
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var HttpKernelInterface|MockObject
    */
   protected $kernel;
 
   /**
    * The mock language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var LanguageManagerInterface|MockObject
    */
   protected $languageManager;
 
   /**
    * The mock request policy.
    *
-   * @var \Drupal\Core\PageCache\RequestPolicyInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var RequestPolicyInterface|MockObject
    */
   protected $requestPolicy;
 
   /**
    * The mock response policy.
    *
-   * @var \Drupal\Core\PageCache\ResponsePolicyInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var ResponsePolicyInterface|MockObject
    */
   protected $responsePolicy;
 
   /**
    * The mock cache contexts manager.
    *
-   * @var \Drupal\Core\Cache\Context\CacheContextsManager|\PHPUnit\Framework\MockObject\MockObject
+   * @var CacheContextsManager|MockObject
    */
   protected $cacheContextsManager;
 
   /**
    * The mock time service.
    *
-   * @var \Drupal\Component\Datetime\TimeInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var TimeInterface|MockObject
    */
   protected $time;
 

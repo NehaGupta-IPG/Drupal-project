@@ -46,7 +46,7 @@ abstract class MigrateSourceTestBase extends KernelTestBase {
   /**
    * The mocked migration.
    *
-   * @var \Drupal\migrate\Plugin\MigrationInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var MigrationInterface|ObjectProphecy
    */
   protected $migration;
 
@@ -180,7 +180,7 @@ abstract class MigrateSourceTestBase extends KernelTestBase {
     }
 
     $i = 0;
-    /** @var \Drupal\migrate\Row $row */
+    /** @var Row $row */
     foreach ($plugin as $row) {
       $this->assertInstanceOf(Row::class, $row);
 

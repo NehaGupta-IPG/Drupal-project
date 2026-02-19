@@ -13,7 +13,7 @@ use PhpTuf\ComposerStager\API\Translation\Value\TranslationParametersInterface;
  *
  * @internal
  *
- * @property \Symfony\Component\DependencyInjection\ContainerInterface $container
+ * @property ContainerInterface $container
  */
 trait ComposerStagerTestTrait {
 
@@ -25,13 +25,13 @@ trait ComposerStagerTestTrait {
    *   ```php
    *   $message = 'Hello, %first_name %last_name.';
    *   ```.
-   * @param \PhpTuf\ComposerStager\API\Translation\Value\TranslationParametersInterface|null $parameters
+   * @param TranslationParametersInterface|null $parameters
    *   Translation parameters.
    * @param string|null $domain
    *   An arbitrary domain for grouping translations or null to use the default. See
    *   {@see \PhpTuf\ComposerStager\API\Translation\Service\DomainOptionsInterface}.
    *
-   * @return \PhpTuf\ComposerStager\API\Translation\Value\TranslatableInterface
+   * @return TranslatableInterface
    *   A message that can be translated by Composer Stager.
    */
   protected function createComposeStagerMessage(
@@ -39,7 +39,7 @@ trait ComposerStagerTestTrait {
     ?TranslationParametersInterface $parameters = NULL,
     ?string $domain = NULL,
   ): TranslatableInterface {
-    /** @var \PhpTuf\ComposerStager\API\Translation\Factory\TranslatableFactoryInterface $translatable_factory */
+    /** @var TranslatableFactoryInterface $translatable_factory */
     $translatable_factory = $this->container->get(TranslatableFactoryInterface::class);
 
     return $translatable_factory->createTranslatableMessage($message, $parameters, $domain);

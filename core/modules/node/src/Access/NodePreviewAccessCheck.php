@@ -17,14 +17,14 @@ class NodePreviewAccessCheck implements AccessInterface {
   /**
    * The entity type manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * Constructs an EntityCreateAccessCheck object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
@@ -34,9 +34,9 @@ class NodePreviewAccessCheck implements AccessInterface {
   /**
    * Checks access to the node preview page.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The currently logged in account.
-   * @param \Drupal\node\NodeInterface $node_preview
+   * @param NodeInterface $node_preview
    *   The node that is being previewed.
    *
    * @return \Drupal\Core\Access\AccessResultInterface

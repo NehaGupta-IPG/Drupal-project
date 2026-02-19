@@ -20,7 +20,7 @@ class NodeModulesExcluder implements EventSubscriberInterface {
   /**
    * Excludes node_modules directories from stage operations.
    *
-   * @param \Drupal\package_manager\Event\CollectPathsToExcludeEvent $event
+   * @param CollectPathsToExcludeEvent $event
    *   The event object.
    */
   public function excludeNodeModulesFiles(CollectPathsToExcludeEvent $event): void {

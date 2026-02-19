@@ -24,7 +24,7 @@ class PhpUnitTestDiscovery {
   /**
    * The singleton.
    *
-   * @var \Drupal\Core\Test\PhpUnitTestDiscovery|null
+   * @var PhpUnitTestDiscovery|null
    */
   private static ?self $instance = NULL;
 
@@ -213,7 +213,7 @@ class PhpUnitTestDiscovery {
   /**
    * Returns a list of tests from a TestSuite object.
    *
-   * @param \PHPUnit\Framework\TestSuite $phpUnitTestSuite
+   * @param TestSuite $phpUnitTestSuite
    *   The TestSuite object returned by PHPUnit test discovery.
    * @param string|null $extension
    *   The name of an extension to limit discovery to; e.g., 'node'.
@@ -252,7 +252,7 @@ class PhpUnitTestDiscovery {
   /**
    * Returns a list of tests from a TestSuite object limited to a directory.
    *
-   * @param \PHPUnit\Framework\TestSuite $phpUnitTestSuite
+   * @param TestSuite $phpUnitTestSuite
    *   The TestSuite object returned by PHPUnit test discovery.
    * @param string|null $extension
    *   The name of an extension to limit discovery to; e.g., 'node'.
@@ -322,7 +322,7 @@ class PhpUnitTestDiscovery {
   /**
    * Returns the test class information.
    *
-   * @param \PHPUnit\Framework\Test $testClass
+   * @param Test $testClass
    *   The test class.
    * @param string $testSuite
    *   The test suite of this test class.

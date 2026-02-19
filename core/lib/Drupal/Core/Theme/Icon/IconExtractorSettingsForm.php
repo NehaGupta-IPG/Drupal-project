@@ -17,7 +17,7 @@ use Drupal\Core\Form\FormStateInterface;
  * - boolean => #type = checkbox
  * - number => #type = number
  * - integer => #type = number
- * - string => #type = textfield
+ * - string => #type = textfield.
  *
  * For all types, basic values from YAML to Drupal Form API:
  * - title => #title
@@ -50,7 +50,7 @@ class IconExtractorSettingsForm {
    *
    * @param array $settings
    *   The settings from the icon pack definition.
-   * @param \Drupal\Core\Form\FormStateInterface|null $form_state
+   * @param FormStateInterface|null $form_state
    *   The from state used to get values if no form context.
    *
    * @return array

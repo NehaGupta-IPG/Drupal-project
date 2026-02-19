@@ -135,7 +135,7 @@ function system_post_update_delete_rss_config(array &$sandbox): void {
   }
 
   if (\Drupal::moduleHandler()->moduleExists('views')) {
-    /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+    /** @var ViewsConfigUpdater $view_config_updater */
     $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
     $view_config_updater->setDeprecationsEnabled(FALSE);
     \Drupal::classResolver(ConfigEntityUpdater::class)

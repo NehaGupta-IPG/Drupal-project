@@ -48,7 +48,7 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
   /**
    * The translations of the test entity.
    *
-   * @var \Drupal\Core\Entity\ContentEntityInterface[]
+   * @var ContentEntityInterface[]
    */
   protected $translations;
 
@@ -315,7 +315,7 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
    * @return int
    *   The new revision identifier.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    */
   protected function doEditStep($active_langcode, $default_revision, $untranslatable_update = FALSE, $valid = TRUE) {
     $this->stepInfo = [$active_langcode, $default_revision, $untranslatable_update, $valid];
@@ -372,7 +372,7 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
         $latest_affected_revision_id = 1;
       }
       $previous_revision_id = (int) $entity->getLoadedRevisionId();
-      /** @var \Drupal\Core\Entity\ContentEntityInterface $latest_affected_revision */
+      /** @var ContentEntityInterface $latest_affected_revision */
       $latest_affected_revision = $this->storage->loadRevision($latest_affected_revision_id);
       $translation = $latest_affected_revision->hasTranslation($active_langcode) ?
         $latest_affected_revision->getTranslation($active_langcode) : $latest_affected_revision->addTranslation($active_langcode);
@@ -392,7 +392,7 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
       $this->assertEquals($previous_untranslatable_field_value, $value, $this->formatMessage('Loaded untranslatable field value does not match the previous one.'));
     }
     elseif (!$entity->isDefaultTranslation()) {
-      /** @var \Drupal\Core\Entity\ContentEntityInterface $default_revision */
+      /** @var ContentEntityInterface $default_revision */
       $default_revision = $this->storage->loadUnchanged($entity->id());
       $expected_value = $default_revision->get('non_mul_field')->value;
       $this->assertEquals($expected_value, $value, $this->formatMessage('Loaded untranslatable field value does not match the previous one.'));
@@ -428,10 +428,10 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
 
       // Reload the current revision translation and the default revision to
       // make sure data was stored correctly.
-      /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+      /** @var ContentEntityInterface $entity */
       $entity = $this->storage->loadRevision($entity->getRevisionId());
       $entity = $entity->getTranslation($active_langcode);
-      /** @var \Drupal\Core\Entity\ContentEntityInterface $default_entity */
+      /** @var ContentEntityInterface $default_entity */
       $default_entity = $this->storage->loadUnchanged($entity->id());
 
       // Verify that the values for the current revision translation match the
@@ -457,7 +457,7 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
   /**
    * Generates a new label for the specified revision.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $revision
+   * @param ContentEntityInterface $revision
    *   An entity object.
    * @param int $previous_revision_id
    *   The previous revision identifier for this revision translation.
@@ -509,7 +509,7 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
     $entity->get('non_mul_field')->value = 'Test 1.1';
     $this->storage->save($entity);
 
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $revision */
+    /** @var ContentEntityInterface $revision */
     $revision = $this->storage->createRevision($entity->addTranslation('it'));
     $revision->get('name')->value = 'Test 1.2 IT';
     $this->storage->save($revision);
@@ -533,7 +533,7 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
     $entity->save();
     $this->doTestInternalProperties($entity);
 
-    /** @var \Drupal\entity_test\Entity\EntityTestMulRev $translation */
+    /** @var EntityTestMulRev $translation */
     $translation = EntityTestMulRev::create()->addTranslation('it');
     $translation->save();
     $this->doTestInternalProperties($translation);
@@ -542,7 +542,7 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
   /**
    * Checks that internal properties are preserved for the specified entity.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   An entity object.
    */
   protected function doTestInternalProperties(ContentEntityInterface $entity): void {
@@ -559,21 +559,21 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
    * @legacy-covers ::createRevision
    */
   public function testRemovedTranslations(): void {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     $entity = EntityTestMulRev::create(['name' => 'Test 1.1 EN']);
     $this->storage->save($entity);
 
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $it_revision */
+    /** @var ContentEntityInterface $it_revision */
     $it_revision = $this->storage->createRevision($entity->addTranslation('it'));
     $it_revision->set('name', 'Test 1.2 IT');
     $this->storage->save($it_revision);
 
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $en_revision */
+    /** @var ContentEntityInterface $en_revision */
     $en_revision = $this->storage->createRevision($it_revision->getUntranslated(), FALSE);
     $en_revision->set('name', 'Test 1.3 EN');
     $this->storage->save($en_revision);
 
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $en_revision */
+    /** @var ContentEntityInterface $en_revision */
     $it_revision = $this->storage->createRevision($it_revision);
     $en_revision = $it_revision->getUntranslated();
     $en_revision->removeTranslation('it');
@@ -596,10 +596,10 @@ class EntityDecoupledTranslationRevisionsTest extends EntityKernelTestBase {
     $entity->get('name')->value = 'revision_create_test_en';
     $this->storage->save($entity);
 
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $translation */
+    /** @var ContentEntityInterface $translation */
     $translation = $entity->addTranslation('it');
     $translation->set('name', 'revision_create_test_it');
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $revision */
+    /** @var ContentEntityInterface $revision */
     $revision = $this->storage->createRevision($translation, FALSE, TRUE);
 
     // Assert that the alter hook can alter the new revision.

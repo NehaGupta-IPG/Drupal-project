@@ -15,7 +15,7 @@ interface RefinableDependentAccessInterface extends DependentAccessInterface {
    * If an access dependency is already set this will replace the existing
    * dependency.
    *
-   * @param \Drupal\Core\Access\AccessibleInterface $access_dependency
+   * @param AccessibleInterface $access_dependency
    *   The object upon which access depends.
    *
    * @return $this
@@ -36,7 +36,7 @@ interface RefinableDependentAccessInterface extends DependentAccessInterface {
    * If there is an existing dependency and it is an instance of AccessGroupAnd
    * the dependency will be added to the existing access group.
    *
-   * @param \Drupal\Core\Access\AccessibleInterface $access_dependency
+   * @param AccessibleInterface $access_dependency
    *   The access dependency to merge.
    *
    * @return $this

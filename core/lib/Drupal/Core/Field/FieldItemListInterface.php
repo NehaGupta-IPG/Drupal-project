@@ -2,10 +2,10 @@
 
 namespace Drupal\Core\Field;
 
+use Drupal\Core\Access\AccessibleInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Access\AccessibleInterface;
 use Drupal\Core\TypedData\ListInterface;
 
 /**
@@ -24,7 +24,7 @@ use Drupal\Core\TypedData\ListInterface;
  * IteratorAggregate or Iterator before this interface in the implements clause.
  *
  * @template T of \Drupal\Core\Field\FieldItemInterface
- * @extends \Drupal\Core\TypedData\ListInterface<T>
+ * @extends ListInterface<T>
  * @property mixed $value
  *
  * @see \Drupal\Core\Field\FieldItemInterface
@@ -34,7 +34,7 @@ interface FieldItemListInterface extends ListInterface, AccessibleInterface {
   /**
    * Gets the entity that field belongs to.
    *
-   * @return \Drupal\Core\Entity\FieldableEntityInterface
+   * @return FieldableEntityInterface
    *   The entity object. If the entity is translatable and a specific
    *   translation is required, always request it by calling ::getTranslation()
    *   or ::getUntranslated() as the language of the returned object is not
@@ -61,7 +61,7 @@ interface FieldItemListInterface extends ListInterface, AccessibleInterface {
   /**
    * Gets the field definition.
    *
-   * @return \Drupal\Core\Field\FieldDefinitionInterface
+   * @return FieldDefinitionInterface
    *   The field definition.
    */
   public function getFieldDefinition();
@@ -206,7 +206,7 @@ interface FieldItemListInterface extends ListInterface, AccessibleInterface {
    *
    * @param array $form
    *   The form where the settings form is being included in.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state of the (entire) configuration form.
    *
    * @return array
@@ -224,7 +224,7 @@ interface FieldItemListInterface extends ListInterface, AccessibleInterface {
    *   The default value form element.
    * @param array $form
    *   The form where the settings form is being included in.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state of the (entire) configuration form.
    */
   public function defaultValuesFormValidate(array $element, array &$form, FormStateInterface $form_state);
@@ -239,7 +239,7 @@ interface FieldItemListInterface extends ListInterface, AccessibleInterface {
    *   The default value form element.
    * @param array $form
    *   The form where the settings form is being included in.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state of the (entire) configuration form.
    *
    * @return array
@@ -257,9 +257,9 @@ interface FieldItemListInterface extends ListInterface, AccessibleInterface {
    * @param array $default_value
    *   The unprocessed default value defined for the field, as a numerically
    *   indexed array of items, each item being an array of property/value pairs.
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The entity for which the default value is generated.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $definition
+   * @param FieldDefinitionInterface $definition
    *   The definition of the field.
    *
    * @return array
@@ -273,7 +273,7 @@ interface FieldItemListInterface extends ListInterface, AccessibleInterface {
    * This method is usually used by the storage to check for not computed
    * value changes, which will be saved into the storage.
    *
-   * @param \Drupal\Core\Field\FieldItemListInterface $list_to_compare
+   * @param FieldItemListInterface $list_to_compare
    *   The field item list to compare to.
    *
    * @return bool
@@ -291,7 +291,7 @@ interface FieldItemListInterface extends ListInterface, AccessibleInterface {
    * therefore technically affecting all translations, is only internal metadata
    * or only affects a single translation.
    *
-   * @param \Drupal\Core\Field\FieldItemListInterface $original_items
+   * @param FieldItemListInterface $original_items
    *   The original field items to compare against.
    * @param string $langcode
    *   The language that should be checked.

@@ -41,35 +41,35 @@ abstract class ConfigureBlockFormBase extends FormBase implements BaseFormIdInte
   /**
    * The plugin being configured.
    *
-   * @var \Drupal\Core\Block\BlockPluginInterface
+   * @var BlockPluginInterface
    */
   protected $block;
 
   /**
    * The layout tempstore repository.
    *
-   * @var \Drupal\layout_builder\LayoutTempstoreRepositoryInterface
+   * @var LayoutTempstoreRepositoryInterface
    */
   protected $layoutTempstoreRepository;
 
   /**
    * The block manager.
    *
-   * @var \Drupal\Core\Block\BlockManagerInterface
+   * @var BlockManagerInterface
    */
   protected $blockManager;
 
   /**
    * The UUID generator.
    *
-   * @var \Drupal\Component\Uuid\UuidInterface
+   * @var UuidInterface
    */
   protected $uuidGenerator;
 
   /**
    * The plugin form manager.
    *
-   * @var \Drupal\Core\Plugin\PluginFormFactoryInterface
+   * @var PluginFormFactoryInterface
    */
   protected $pluginFormFactory;
 
@@ -104,15 +104,15 @@ abstract class ConfigureBlockFormBase extends FormBase implements BaseFormIdInte
   /**
    * Constructs a new block form.
    *
-   * @param \Drupal\layout_builder\LayoutTempstoreRepositoryInterface $layout_tempstore_repository
+   * @param LayoutTempstoreRepositoryInterface $layout_tempstore_repository
    *   The layout tempstore repository.
-   * @param \Drupal\Core\Plugin\Context\ContextRepositoryInterface $context_repository
+   * @param ContextRepositoryInterface $context_repository
    *   The context repository.
-   * @param \Drupal\Core\Block\BlockManagerInterface $block_manager
+   * @param BlockManagerInterface $block_manager
    *   The block manager.
-   * @param \Drupal\Component\Uuid\UuidInterface $uuid
+   * @param UuidInterface $uuid
    *   The UUID generator.
-   * @param \Drupal\Core\Plugin\PluginFormFactoryInterface $plugin_form_manager
+   * @param PluginFormFactoryInterface $plugin_form_manager
    *   The plugin form manager.
    */
   public function __construct(LayoutTempstoreRepositoryInterface $layout_tempstore_repository, ContextRepositoryInterface $context_repository, BlockManagerInterface $block_manager, UuidInterface $uuid, PluginFormFactoryInterface $plugin_form_manager) {
@@ -148,13 +148,13 @@ abstract class ConfigureBlockFormBase extends FormBase implements BaseFormIdInte
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
-   * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
+   * @param SectionStorageInterface $section_storage
    *   The section storage being configured.
    * @param int $delta
    *   The delta of the section.
-   * @param \Drupal\layout_builder\SectionComponent $component
+   * @param SectionComponent $component
    *   The section component containing the block.
    *
    * @return array
@@ -244,7 +244,7 @@ abstract class ConfigureBlockFormBase extends FormBase implements BaseFormIdInte
   /**
    * Retrieves the plugin form for a given block.
    *
-   * @param \Drupal\Core\Block\BlockPluginInterface $block
+   * @param BlockPluginInterface $block
    *   The block plugin.
    *
    * @return \Drupal\Core\Plugin\PluginFormInterface

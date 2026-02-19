@@ -41,7 +41,7 @@ class EntityTestMapFieldTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    *
-   * @var \Drupal\entity_test\Entity\EntityTestMapField
+   * @var EntityTestMapField
    */
   protected $entity;
 

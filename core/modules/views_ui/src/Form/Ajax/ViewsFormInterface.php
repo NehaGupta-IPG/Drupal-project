@@ -22,7 +22,7 @@ interface ViewsFormInterface extends FormInterface {
   /**
    * Gets the form state for this form.
    *
-   * @param \Drupal\views\ViewEntityInterface $view
+   * @param ViewEntityInterface $view
    *   The view being edited.
    * @param string|null $display_id
    *   The display ID being edited, or NULL to load the first available display.
@@ -38,7 +38,7 @@ interface ViewsFormInterface extends FormInterface {
   /**
    * Creates a new instance of this form.
    *
-   * @param \Drupal\views\ViewEntityInterface $view
+   * @param ViewEntityInterface $view
    *   The view being edited.
    * @param string|null $display_id
    *   The display ID being edited, or NULL to load the first available display.

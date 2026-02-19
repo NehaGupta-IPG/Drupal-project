@@ -74,7 +74,7 @@ interface MigrateIdMapInterface extends \Iterator, PluginInspectionInterface {
    * the destination ID. Also may be called, setting the third parameter to
    * NEEDS_UPDATE, to signal an existing record should be re-migrated.
    *
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The raw source data. We use the ID map derived from the source object
    *   to get the source identifier values.
    * @param array $destination_id_values
@@ -256,7 +256,7 @@ interface MigrateIdMapInterface extends \Iterator, PluginInspectionInterface {
    * @return array
    *   An array of arrays of destination identifier values.
    *
-   * @throws \Drupal\migrate\MigrateException
+   * @throws MigrateException
    *   Thrown when $source_id_values contains unknown keys, or is the wrong
    *   length.
    */
@@ -295,7 +295,7 @@ interface MigrateIdMapInterface extends \Iterator, PluginInspectionInterface {
   /**
    * Sets the migrate message service.
    *
-   * @param \Drupal\migrate\MigrateMessageInterface $message
+   * @param MigrateMessageInterface $message
    *   The migrate message service.
    */
   public function setMessage(MigrateMessageInterface $message);

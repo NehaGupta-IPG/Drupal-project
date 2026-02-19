@@ -24,7 +24,7 @@ class AvifImageEffect extends ConvertImageEffect {
   /**
    * The image toolkit manager.
    *
-   * @var \Drupal\Core\ImageToolkit\ImageToolkitManager
+   * @var ImageToolkitManager
    */
   protected ImageToolkitManager $imageToolkitManager;
 

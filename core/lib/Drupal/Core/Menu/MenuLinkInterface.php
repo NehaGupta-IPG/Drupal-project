@@ -2,8 +2,8 @@
 
 namespace Drupal\Core\Menu;
 
-use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
+use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Url;
 
@@ -126,7 +126,7 @@ interface MenuLinkInterface extends PluginInspectionInterface, DerivativeInspect
    *   (optional) If TRUE, add the link description as the title attribute if
    *   the description is not empty.
    *
-   * @return \Drupal\Core\Url
+   * @return Url
    *   A URL object containing either the external path or route.
    */
   public function getUrlObject($title_attribute = TRUE);
@@ -178,7 +178,7 @@ interface MenuLinkInterface extends PluginInspectionInterface, DerivativeInspect
    * This method will only delete the link from any additional storage, but not
    * from the plugin.manager.menu.link service.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws PluginException
    *   If the link is not deletable.
    */
   public function deleteLink();
@@ -201,7 +201,7 @@ interface MenuLinkInterface extends PluginInspectionInterface, DerivativeInspect
   /**
    * Returns route information for a route to delete the menu link.
    *
-   * @return \Drupal\Core\Url|null
+   * @return Url|null
    *   A Url object, or NULL if there is no route (e.g. when the link is not
    *   deletable).
    */
@@ -214,7 +214,7 @@ interface MenuLinkInterface extends PluginInspectionInterface, DerivativeInspect
    * they need to define additional local tasks, local actions, etc. that are
    * visible from the edit form.
    *
-   * @return \Drupal\Core\Url|null
+   * @return Url|null
    *   A Url object, or NULL if there is no route because there is no custom
    *   edit route for this instance.
    */
@@ -223,7 +223,7 @@ interface MenuLinkInterface extends PluginInspectionInterface, DerivativeInspect
   /**
    * Returns route information for a route to reset the menu link.
    *
-   * @return \Drupal\Core\Url|null
+   * @return Url|null
    *   A Url object, or NULL if there is no route (e.g. when the link is not
    *   resettable).
    */
@@ -232,7 +232,7 @@ interface MenuLinkInterface extends PluginInspectionInterface, DerivativeInspect
   /**
    * Returns route information for a route to translate the menu link.
    *
-   * @return \Drupal\Core\Url|null
+   * @return Url|null
    *   A Url object, or NULL if there is no route (e.g. when the link is not
    *   translatable).
    */

@@ -29,7 +29,7 @@ class FilterCaption extends FilterBase implements ContainerFactoryPluginInterfac
   /**
    * Filter manager.
    *
-   * @var \Drupal\filter\FilterPluginManager
+   * @var FilterPluginManager
    */
   protected $filterManager;
 
@@ -42,7 +42,7 @@ class FilterCaption extends FilterBase implements ContainerFactoryPluginInterfac
    *   Plugin ID.
    * @param mixed $plugin_definition
    *   Definition.
-   * @param \Drupal\filter\FilterPluginManager $filter_manager
+   * @param FilterPluginManager $filter_manager
    *   Filter plugin manager.
    */
   public function __construct(

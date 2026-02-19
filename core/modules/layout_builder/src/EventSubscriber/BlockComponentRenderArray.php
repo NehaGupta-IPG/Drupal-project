@@ -12,8 +12,8 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\layout_builder\Access\LayoutPreviewAccessAllowed;
 use Drupal\layout_builder\Event\SectionComponentBuildRenderArrayEvent;
-use Drupal\layout_builder\Plugin\Block\InlineBlock;
 use Drupal\layout_builder\LayoutBuilderEvents;
+use Drupal\layout_builder\Plugin\Block\InlineBlock;
 use Drupal\views\Plugin\Block\ViewsBlock;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -30,14 +30,14 @@ class BlockComponentRenderArray implements EventSubscriberInterface {
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
   /**
    * Creates a BlockComponentRenderArray object.
    *
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
    */
   public function __construct(AccountInterface $current_user) {
@@ -55,7 +55,7 @@ class BlockComponentRenderArray implements EventSubscriberInterface {
   /**
    * Builds render arrays for block plugins and sets it on the event.
    *
-   * @param \Drupal\layout_builder\Event\SectionComponentBuildRenderArrayEvent $event
+   * @param SectionComponentBuildRenderArrayEvent $event
    *   The section component render event.
    */
   public function onBuildRender(SectionComponentBuildRenderArrayEvent $event) {

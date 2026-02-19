@@ -20,14 +20,14 @@ class CKEditor5CacheTag implements EventSubscriberInterface {
   /**
    * The cache tags invalidator.
    *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface
+   * @var CacheTagsInvalidatorInterface
    */
   protected $cacheTagsInvalidator;
 
   /**
    * Constructs a CKEditor5CacheTag object.
    *
-   * @param \Drupal\Core\Cache\CacheTagsInvalidatorInterface $cache_tags_invalidator
+   * @param CacheTagsInvalidatorInterface $cache_tags_invalidator
    *   The cache tags invalidator.
    */
   public function __construct(CacheTagsInvalidatorInterface $cache_tags_invalidator) {
@@ -37,7 +37,7 @@ class CKEditor5CacheTag implements EventSubscriberInterface {
   /**
    * Invalidates cache tags when particular system config objects are saved.
    *
-   * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   * @param ConfigCrudEvent $event
    *   The Event to process.
    */
   public function onSave(ConfigCrudEvent $event) {

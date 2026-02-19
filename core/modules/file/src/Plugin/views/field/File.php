@@ -5,10 +5,10 @@ namespace Drupal\file\Plugin\views\field;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Attribute\ViewsField;
-use Drupal\views\ResultRow;
-use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\field\FieldPluginBase;
+use Drupal\views\ResultRow;
+use Drupal\views\ViewExecutable;
 
 /**
  * Field handler to provide simple renderer that allows linking to a file.
@@ -21,7 +21,7 @@ class File extends FieldPluginBase {
   /**
    * The file URL generator.
    *
-   * @var \Drupal\Core\File\FileUrlGeneratorInterface
+   * @var FileUrlGeneratorInterface
    */
   protected $fileUrlGenerator;
 
@@ -34,7 +34,7 @@ class File extends FieldPluginBase {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator
+   * @param FileUrlGeneratorInterface $file_url_generator
    *   The file URL generator.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, FileUrlGeneratorInterface $file_url_generator) {
@@ -80,7 +80,7 @@ class File extends FieldPluginBase {
    *
    * @param string $data
    *   The XSS safe string for the link text.
-   * @param \Drupal\views\ResultRow $values
+   * @param ResultRow $values
    *   The values retrieved from a single row of a view's query result.
    *
    * @return string

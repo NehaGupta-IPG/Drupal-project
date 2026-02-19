@@ -22,21 +22,21 @@ class CsrfTokenGeneratorTest extends UnitTestCase {
   /**
    * The CSRF token generator.
    *
-   * @var \Drupal\Core\Access\CsrfTokenGenerator
+   * @var CsrfTokenGenerator
    */
   protected $generator;
 
   /**
    * The mock private key instance.
    *
-   * @var \Drupal\Core\PrivateKey|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\PrivateKey|MockObject
    */
   protected $privateKey;
 
   /**
    * The mock session metadata bag.
    *
-   * @var \Drupal\Core\Session\MetadataBag|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Session\MetadataBag|MockObject
    */
   protected $sessionMetadata;
 

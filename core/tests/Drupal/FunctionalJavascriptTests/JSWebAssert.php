@@ -137,7 +137,7 @@ JS);
    * @param int $timeout
    *   (Optional) Timeout in milliseconds, defaults to 10000.
    *
-   * @return \Behat\Mink\Element\NodeElement|null
+   * @return NodeElement|null
    *   The page element node if found, NULL if not.
    *
    * @see \Behat\Mink\Element\ElementInterface::findAll()
@@ -181,7 +181,7 @@ JS);
    * @param int $timeout
    *   (Optional) Timeout in milliseconds, defaults to 10000.
    *
-   * @return \Behat\Mink\Element\NodeElement|null
+   * @return NodeElement|null
    *   The page element node if found and visible, NULL if not.
    *
    * @see \Behat\Mink\Element\ElementInterface::findAll()
@@ -238,7 +238,7 @@ JS);
    * @param int $timeout
    *   (Optional) Timeout in milliseconds, defaults to 10000.
    *
-   * @return \Behat\Mink\Element\NodeElement|null
+   * @return NodeElement|null
    *   The page element node if found, NULL if not.
    */
   public function waitForButton($locator, $timeout = 10000) {
@@ -253,7 +253,7 @@ JS);
    * @param int $timeout
    *   (Optional) Timeout in milliseconds, defaults to 10000.
    *
-   * @return \Behat\Mink\Element\NodeElement|null
+   * @return NodeElement|null
    *   The page element node if found, NULL if not.
    */
   public function waitForLink($locator, $timeout = 10000) {
@@ -268,7 +268,7 @@ JS);
    * @param int $timeout
    *   (Optional) Timeout in milliseconds, defaults to 10000.
    *
-   * @return \Behat\Mink\Element\NodeElement|null
+   * @return NodeElement|null
    *   The page element node if found, NULL if not.
    */
   public function waitForField($locator, $timeout = 10000) {
@@ -283,7 +283,7 @@ JS);
    * @param int $timeout
    *   (Optional) Timeout in milliseconds, defaults to 10000.
    *
-   * @return \Behat\Mink\Element\NodeElement|null
+   * @return NodeElement|null
    *   The page element node if found, NULL if not.
    */
   public function waitForId($id, $timeout = 10000) {
@@ -318,9 +318,9 @@ JS);
    * @param string $message
    *   (optional) A message for the exception.
    *
-   * @throws \Behat\Mink\Exception\ElementHtmlException
+   * @throws ElementHtmlException
    *   When the element doesn't exist.
-   * @throws \Behat\Mink\Exception\ElementNotFoundException
+   * @throws ElementNotFoundException
    *   When the element is not visible in the viewport.
    */
   public function assertVisibleInViewport($selector_type, $selector, $corner = FALSE, $message = 'Element is not visible in the viewport.'): void {
@@ -360,9 +360,9 @@ JS);
    * @param string $message
    *   (optional) A message for the exception.
    *
-   * @throws \Behat\Mink\Exception\ElementHtmlException
+   * @throws ElementHtmlException
    *   When the element doesn't exist.
-   * @throws \Behat\Mink\Exception\ElementNotFoundException
+   * @throws ElementNotFoundException
    *   When the element is not visible in the viewport.
    *
    * @see \Drupal\FunctionalJavascriptTests\JSWebAssert::assertVisibleInViewport()
@@ -386,7 +386,7 @@ JS);
   /**
    * Check the visibility of a node, or its specific corner.
    *
-   * @param \Behat\Mink\Element\NodeElement $node
+   * @param NodeElement $node
    *   A valid node.
    * @param bool|string $corner
    *   (Optional) Corner to test: topLeft, topRight, bottomRight, bottomLeft.
@@ -395,7 +395,7 @@ JS);
    * @return bool
    *   Returns TRUE if the node is visible in the viewport, FALSE otherwise.
    *
-   * @throws \Behat\Mink\Exception\UnsupportedDriverActionException
+   * @throws UnsupportedDriverActionException
    *   When an invalid corner specification is given.
    */
   private function checkNodeVisibilityInViewport(NodeElement $node, $corner = FALSE): bool {
@@ -552,7 +552,7 @@ JS;
    * @param string $message
    *   (optional) The exception message.
    *
-   * @throws \Behat\Mink\Exception\ElementHtmlException
+   * @throws ElementHtmlException
    *   When an element still exists on the page.
    */
   public function assertNoElementAfterWait($selector_type, $selector, $timeout = 10000, $message = 'Element exists on the page.'): void {
@@ -574,7 +574,7 @@ JS;
   /**
    * Determines if an exception is due to an element not being clickable.
    *
-   * @param \WebDriver\Exception $exception
+   * @param Exception $exception
    *   The exception to check.
    *
    * @return bool

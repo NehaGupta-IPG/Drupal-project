@@ -41,7 +41,7 @@ class DateTimeCustomFormatter extends DateTimeFormatterBase {
 
     foreach ($items as $delta => $item) {
       if (!empty($item->date)) {
-        /** @var \Drupal\Core\Datetime\DrupalDateTime $date */
+        /** @var DrupalDateTime $date */
         $date = $item->date;
 
         $elements[$delta] = $this->buildDate($date);

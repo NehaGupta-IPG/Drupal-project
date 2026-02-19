@@ -2,8 +2,8 @@
 
 namespace Drupal\migrate\Event;
 
-use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\Component\EventDispatcher\Event;
+use Drupal\migrate\Plugin\MigrationInterface;
 
 /**
  * Wraps a pre- or post-rollback event for event listeners.
@@ -13,14 +13,14 @@ class MigrateRollbackEvent extends Event {
   /**
    * Migration entity.
    *
-   * @var \Drupal\migrate\Plugin\MigrationInterface
+   * @var MigrationInterface
    */
   protected $migration;
 
   /**
    * Constructs a rollback event object.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   Migration entity.
    */
   public function __construct(MigrationInterface $migration) {
@@ -30,7 +30,7 @@ class MigrateRollbackEvent extends Event {
   /**
    * Gets the migration entity.
    *
-   * @return \Drupal\migrate\Plugin\MigrationInterface
+   * @return MigrationInterface
    *   The migration entity involved.
    */
   public function getMigration() {

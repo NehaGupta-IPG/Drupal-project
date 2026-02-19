@@ -17,7 +17,7 @@ trait SerializedColumnNormalizerTrait {
    *   The field item data to denormalize.
    * @param string $class
    *   The expected class to instantiate.
-   * @param \Drupal\Core\Field\FieldItemInterface $field_item
+   * @param FieldItemInterface $field_item
    *   The field item.
    */
   protected function checkForSerializedStrings($data, $class, FieldItemInterface $field_item) {
@@ -40,7 +40,7 @@ trait SerializedColumnNormalizerTrait {
   /**
    * Checks if the data contains string value for serialize column.
    *
-   * @param \Drupal\Core\Field\FieldItemInterface $field_item
+   * @param FieldItemInterface $field_item
    *   The field item.
    * @param array $data
    *   The data being denormalized.
@@ -60,7 +60,7 @@ trait SerializedColumnNormalizerTrait {
   /**
    * Gets the names of all serialized properties.
    *
-   * @param \Drupal\Core\Field\FieldItemInterface $field_item
+   * @param FieldItemInterface $field_item
    *   The field item.
    *
    * @return string[]
@@ -92,7 +92,7 @@ trait SerializedColumnNormalizerTrait {
    * handle serialized data themselves and do not rely on the serialized schema
    * flag.
    *
-   * @param \Drupal\Core\Field\FieldItemInterface $field_item
+   * @param FieldItemInterface $field_item
    *   The field item.
    *
    * @return string[]

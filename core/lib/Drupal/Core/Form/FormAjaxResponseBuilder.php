@@ -21,14 +21,14 @@ class FormAjaxResponseBuilder implements FormAjaxResponseBuilderInterface {
   /**
    * The main content to AJAX Response renderer.
    *
-   * @var \Drupal\Core\Render\MainContent\MainContentRendererInterface
+   * @var MainContentRendererInterface
    */
   protected $ajaxRenderer;
 
   /**
    * The current route match.
    *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
+   * @var RouteMatchInterface
    */
   protected $routeMatch;
 
@@ -98,7 +98,7 @@ class FormAjaxResponseBuilder implements FormAjaxResponseBuilderInterface {
         unset($result['#group']);
       }
 
-      /** @var \Drupal\Core\Ajax\AjaxResponse $response */
+      /** @var AjaxResponse $response */
       $response = $this->ajaxRenderer->renderResponse($result, $request, $this->routeMatch);
     }
 

@@ -27,7 +27,7 @@ trait LayoutEntityHelperTrait {
   /**
    * Determines if an entity can have a layout.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to check.
    *
    * @return bool
@@ -40,7 +40,7 @@ trait LayoutEntityHelperTrait {
   /**
    * Gets revision IDs for layout sections.
    *
-   * @param \Drupal\layout_builder\Section[] $sections
+   * @param Section[] $sections
    *   The layout sections.
    *
    * @return int[]
@@ -60,10 +60,10 @@ trait LayoutEntityHelperTrait {
   /**
    * Gets the sections for an entity if any.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity.
    *
-   * @return \Drupal\layout_builder\Section[]
+   * @return Section[]
    *   The entity layout sections if available.
    */
   protected function getEntitySections(EntityInterface $entity) {
@@ -74,10 +74,10 @@ trait LayoutEntityHelperTrait {
   /**
    * Gets components that have Inline Block plugins.
    *
-   * @param \Drupal\layout_builder\Section[] $sections
+   * @param Section[] $sections
    *   The layout sections.
    *
-   * @return \Drupal\layout_builder\SectionComponent[]
+   * @return SectionComponent[]
    *   The components that contain Inline Block plugins.
    */
   protected function getInlineBlockComponents(array $sections) {
@@ -96,10 +96,10 @@ trait LayoutEntityHelperTrait {
   /**
    * Gets the section storage for an entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity.
    *
-   * @return \Drupal\layout_builder\SectionStorageInterface|null
+   * @return SectionStorageInterface|null
    *   The section storage if found otherwise NULL.
    */
   protected function getSectionStorageForEntity(EntityInterface $entity) {
@@ -130,7 +130,7 @@ trait LayoutEntityHelperTrait {
    * the original entity is set and used the default section storage plugin as
    * determined by ::getSectionStorageForEntity().
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity.
    *
    * @return bool
@@ -148,7 +148,7 @@ trait LayoutEntityHelperTrait {
   /**
    * Gets the section storage manager.
    *
-   * @return \Drupal\layout_builder\SectionStorage\SectionStorageManagerInterface
+   * @return SectionStorageManagerInterface
    *   The section storage manager.
    */
   private function sectionStorageManager() {
@@ -158,10 +158,10 @@ trait LayoutEntityHelperTrait {
   /**
    * Gets the overrides section storage for an entity.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The entity with the overridden layout.
    *
-   * @return \Drupal\layout_builder\OverridesSectionStorageInterface|null
+   * @return OverridesSectionStorageInterface|null
    *   The overrides section storage if found otherwise NULL.
    */
   public function getOverridesSectionStorageForEntity(FieldableEntityInterface $entity): ?OverridesSectionStorageInterface {
@@ -172,7 +172,7 @@ trait LayoutEntityHelperTrait {
   /**
    * Gets the section storage contexts for an entity.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The entity with the overridden layout.
    *
    * @return \Drupal\Core\Plugin\Context\ContextInterface[]

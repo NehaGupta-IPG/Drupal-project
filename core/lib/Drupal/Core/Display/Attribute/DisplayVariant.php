@@ -36,7 +36,7 @@ class DisplayVariant extends Plugin {
    *
    * @param string $id
    *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $admin_label
+   * @param TranslatableMarkup $admin_label
    *   The administrative label.
    * @param class-string|null $deriver
    *   (optional) The deriver class.

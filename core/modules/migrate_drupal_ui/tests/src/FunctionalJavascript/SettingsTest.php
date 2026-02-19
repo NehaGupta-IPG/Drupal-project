@@ -57,8 +57,8 @@ class SettingsTest extends WebDriverTestBase {
    * @param string $expected_source_connection
    *   The expected source database connection key.
    *
-   * @throws \Behat\Mink\Exception\ElementNotFoundException
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ElementNotFoundException
+   * @throws ExpectationException
    */
   #[DataProvider('providerTestCredentialForm')]
   public function testCredentialForm($source_connection, $version, array $manual, array $databases, $expected_source_connection): void {

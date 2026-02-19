@@ -28,7 +28,7 @@ class TaxonomyTermReferenceFieldTest extends UnitTestCase {
   /**
    * The migration.
    *
-   * @var \Drupal\migrate\Plugin\MigrationInterface
+   * @var MigrationInterface
    */
   protected $migration;
 

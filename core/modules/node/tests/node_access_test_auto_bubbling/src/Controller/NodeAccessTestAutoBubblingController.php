@@ -33,7 +33,7 @@ class NodeAccessTestAutoBubblingController extends ControllerBase implements Con
   /**
    * Exposes the node label when a user has access to view a node.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   A node entity.
    *
    * @return array

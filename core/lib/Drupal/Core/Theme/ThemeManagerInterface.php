@@ -24,7 +24,7 @@ interface ThemeManagerInterface {
    * @param array $variables
    *   An associative array of theme variables.
    *
-   * @return string|\Drupal\Component\Render\MarkupInterface
+   * @return string|MarkupInterface
    *   The rendered output, or a Markup object.
    */
   public function render($hook, array $variables);
@@ -32,10 +32,10 @@ interface ThemeManagerInterface {
   /**
    * Returns the active theme object.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface|null $route_match
+   * @param RouteMatchInterface|null $route_match
    *   The route match.
    *
-   * @return \Drupal\Core\Theme\ActiveTheme
+   * @return ActiveTheme
    *   The active theme object.
    */
   public function getActiveTheme(?RouteMatchInterface $route_match = NULL);
@@ -64,7 +64,7 @@ interface ThemeManagerInterface {
    * Note: This method should not be used in common cases, just in special cases
    * like tests.
    *
-   * @param \Drupal\Core\Theme\ActiveTheme $active_theme
+   * @param ActiveTheme $active_theme
    *   The new active theme.
    *
    * @return $this
@@ -170,7 +170,7 @@ interface ThemeManagerInterface {
    *
    * Similar to ::alter, it also invokes the alter hooks for the base themes.
    *
-   * @param \Drupal\Core\Theme\ActiveTheme $theme
+   * @param ActiveTheme $theme
    *   A manually specified theme.
    * @param string|array $type
    *   A string describing the type of the alterable $data.
@@ -191,7 +191,7 @@ interface ThemeManagerInterface {
    * @param string $name
    *   The name of the theme engine.
    *
-   * @return \Drupal\Core\Theme\ThemeEngineInterface|null
+   * @return ThemeEngineInterface|null
    *   The theme engine or NULL.
    */
   public function getThemeEngine(string $name): ?ThemeEngineInterface;

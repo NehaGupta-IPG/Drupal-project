@@ -28,38 +28,38 @@ class EntityPermissionsForm extends UserPermissionsForm {
   /**
    * The configuration entity manager.
    *
-   * @var \Drupal\Core\Config\ConfigManagerInterface
+   * @var ConfigManagerInterface
    */
   protected $configManager;
 
   /**
    * The entity type manager service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The bundle object.
    *
-   * @var \Drupal\Core\Entity\EntityInterface
+   * @var EntityInterface
    */
   protected $bundle;
 
   /**
    * Constructs a new EntityPermissionsForm.
    *
-   * @param \Drupal\user\PermissionHandlerInterface $permission_handler
+   * @param PermissionHandlerInterface $permission_handler
    *   The permission handler.
-   * @param \Drupal\user\RoleStorageInterface $role_storage
+   * @param RoleStorageInterface $role_storage
    *   The role storage.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
+   * @param ConfigManagerInterface $config_manager
    *   The configuration entity manager.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
-   * @param \Drupal\Core\Extension\ModuleExtensionList|null $module_extension_list
+   * @param ModuleExtensionList|null $module_extension_list
    *   The module extension list.
    */
   public function __construct(PermissionHandlerInterface $permission_handler, RoleStorageInterface $role_storage, ModuleHandlerInterface $module_handler, ConfigManagerInterface $config_manager, EntityTypeManagerInterface $entity_type_manager, ?ModuleExtensionList $module_extension_list = NULL) {
@@ -119,11 +119,11 @@ class EntityPermissionsForm extends UserPermissionsForm {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param string $bundle_entity_type
    *   (optional) The entity type ID.
-   * @param string|\Drupal\Core\Entity\EntityInterface $bundle
+   * @param string|EntityInterface $bundle
    *   (optional) Either the bundle name or the bundle object.
    */
   public function buildForm(array $form, FormStateInterface $form_state, ?string $bundle_entity_type = NULL, $bundle = NULL): array {
@@ -143,9 +143,9 @@ class EntityPermissionsForm extends UserPermissionsForm {
   /**
    * Checks that there are permissions to be managed.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route to check against.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The parametrized route.
    * @param string|EntityInterface $bundle
    *   (optional) The bundle. Different entity types can have different names
@@ -156,7 +156,7 @@ class EntityPermissionsForm extends UserPermissionsForm {
    *   available via the {node_type} parameter rather than a {bundle}
    *   parameter.
    *
-   * @return \Drupal\Core\Access\AccessResultInterface
+   * @return AccessResultInterface
    *   The access result.
    *
    * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\node\Hook;
 
-use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Database\Query\AlterableInterface;
+use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 
 /**

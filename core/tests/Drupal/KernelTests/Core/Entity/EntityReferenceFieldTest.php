@@ -385,7 +385,7 @@ class EntityReferenceFieldTest extends EntityKernelTestBase {
   /**
    * Asserts that the setter callback performs autocreation for users.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The referencing entity.
    * @param callable $setter_callback
    *   A callback setting the target entity on the referencing entity.
@@ -406,7 +406,7 @@ class EntityReferenceFieldTest extends EntityKernelTestBase {
   /**
    * Asserts that the setter callback performs autocreation for user roles.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The referencing entity.
    * @param callable $setter_callback
    *   A callback setting the target entity on the referencing entity.

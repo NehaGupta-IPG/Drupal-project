@@ -18,22 +18,21 @@ class DerivativeDiscoveryDecorator implements CachedDiscoveryInterface {
   /**
    * Plugin derivers.
    *
-   * @var \Drupal\Component\Plugin\Derivative\DeriverInterface[]
-   *   Keys are base plugin IDs.
+   * @var \Drupal\Component\Plugin\Derivative\DeriverInterface[] *   Keys are base plugin IDs.
    */
   protected $derivers = [];
 
   /**
    * The decorated plugin discovery.
    *
-   * @var \Drupal\Component\Plugin\Discovery\DiscoveryInterface
+   * @var DiscoveryInterface
    */
   protected $decorated;
 
   /**
    * Creates a new instance.
    *
-   * @param \Drupal\Component\Plugin\Discovery\DiscoveryInterface $decorated
+   * @param DiscoveryInterface $decorated
    *   The parent object implementing DiscoveryInterface that is being
    *   decorated.
    */
@@ -44,7 +43,7 @@ class DerivativeDiscoveryDecorator implements CachedDiscoveryInterface {
   /**
    * {@inheritdoc}
    *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidDeriverException
+   * @throws InvalidDeriverException
    *   Thrown if the 'deriver' class specified in the plugin definition
    *   does not implement \Drupal\Component\Plugin\Derivative\DeriverInterface.
    */
@@ -78,7 +77,7 @@ class DerivativeDiscoveryDecorator implements CachedDiscoveryInterface {
   /**
    * {@inheritdoc}
    *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidDeriverException
+   * @throws InvalidDeriverException
    *   Thrown if the 'deriver' class specified in the plugin definition
    *   does not implement \Drupal\Component\Plugin\Derivative\DeriverInterface.
    */
@@ -172,7 +171,7 @@ class DerivativeDiscoveryDecorator implements CachedDiscoveryInterface {
    * @return \Drupal\Component\Plugin\Derivative\DeriverInterface|null
    *   A DerivativeInterface or NULL if none exists for the plugin.
    *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidDeriverException
+   * @throws InvalidDeriverException
    *   Thrown if the 'deriver' class specified in the plugin definition
    *   does not implement \Drupal\Component\Plugin\Derivative\DeriverInterface.
    */
@@ -197,7 +196,7 @@ class DerivativeDiscoveryDecorator implements CachedDiscoveryInterface {
    *   The name of a class implementing
    *   \Drupal\Component\Plugin\Derivative\DeriverInterface.
    *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidDeriverException
+   * @throws InvalidDeriverException
    *   Thrown if the 'deriver' class specified in the plugin definition
    *   does not implement
    *   \Drupal\Component\Plugin\Derivative\DerivativeInterface.

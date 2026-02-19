@@ -42,10 +42,10 @@ class RevisionHtmlRouteProvider implements EntityRouteProviderInterface {
   /**
    * Gets the entity revision history route.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entityType
+   * @param EntityTypeInterface $entityType
    *   The entity type.
    *
-   * @return \Symfony\Component\Routing\Route|null
+   * @return Route|null
    *   The entity revision revert route, or NULL if the entity type does not
    *   support viewing version history.
    */
@@ -73,10 +73,10 @@ class RevisionHtmlRouteProvider implements EntityRouteProviderInterface {
   /**
    * Gets the entity revision view route.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entityType
+   * @param EntityTypeInterface $entityType
    *   The entity type.
    *
-   * @return \Symfony\Component\Routing\Route|null
+   * @return Route|null
    *   The entity revision view route, or NULL if the entity type does not
    *   support viewing revisions.
    */
@@ -106,10 +106,10 @@ class RevisionHtmlRouteProvider implements EntityRouteProviderInterface {
   /**
    * Gets the entity revision revert route.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entityType
+   * @param EntityTypeInterface $entityType
    *   The entity type.
    *
-   * @return \Symfony\Component\Routing\Route|null
+   * @return Route|null
    *   The entity revision revert route, or NULL if the entity type does not
    *   support reverting revisions.
    */
@@ -140,10 +140,10 @@ class RevisionHtmlRouteProvider implements EntityRouteProviderInterface {
   /**
    * Gets the entity revision delete route.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entityType
+   * @param EntityTypeInterface $entityType
    *   The entity type.
    *
-   * @return \Symfony\Component\Routing\Route|null
+   * @return Route|null
    *   The entity revision delete route, or NULL if the entity type does not
    *   support deleting revisions.
    */

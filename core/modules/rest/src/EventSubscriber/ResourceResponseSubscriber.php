@@ -9,11 +9,11 @@ use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\rest\ResourceResponseInterface;
 use Drupal\serialization\Normalizer\CacheableNormalizerInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
@@ -24,32 +24,32 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
   /**
    * The serializer.
    *
-   * @var \Symfony\Component\Serializer\SerializerInterface
+   * @var SerializerInterface
    */
   protected $serializer;
 
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * The current route match.
    *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
+   * @var RouteMatchInterface
    */
   protected $routeMatch;
 
   /**
    * Constructs a ResourceResponseSubscriber object.
    *
-   * @param \Symfony\Component\Serializer\SerializerInterface $serializer
+   * @param SerializerInterface $serializer
    *   The serializer.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The current route match.
    */
   public function __construct(SerializerInterface $serializer, RendererInterface $renderer, RouteMatchInterface $route_match) {
@@ -61,7 +61,7 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
   /**
    * Serializes ResourceResponse responses' data, and removes that data.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
+   * @param ResponseEvent $event
    *   The event to process.
    */
   public function onResponse(ResponseEvent $event) {
@@ -85,9 +85,9 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
    * or PATCHing using a certain format, you probably expect a response in that
    * same format.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The current route match.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    *
    * @return string
@@ -134,11 +134,11 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
    * received context. This bubbled cacheability metadata will be applied to the
    * the response.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
-   * @param \Drupal\rest\ResourceResponseInterface $response
+   * @param ResourceResponseInterface $response
    *   The response from the REST resource.
-   * @param \Symfony\Component\Serializer\SerializerInterface $serializer
+   * @param SerializerInterface $serializer
    *   The serializer to use.
    * @param string|null $format
    *   The response format, or NULL in case the response does not need a format.
@@ -175,10 +175,10 @@ class ResourceResponseSubscriber implements EventSubscriberInterface {
    * requires unserializing the PHP data when reading this response object from
    * cache, which can be very costly, and is unnecessary.
    *
-   * @param \Drupal\rest\ResourceResponseInterface $response
+   * @param ResourceResponseInterface $response
    *   A fully rendered resource response.
    *
-   * @return \Drupal\Core\Cache\CacheableResponse|\Symfony\Component\HttpFoundation\Response
+   * @return CacheableResponse|Response
    *   The flattened response.
    */
   protected function flattenResponse(ResourceResponseInterface $response) {

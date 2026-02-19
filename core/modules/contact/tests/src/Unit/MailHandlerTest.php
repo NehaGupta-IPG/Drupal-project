@@ -24,49 +24,49 @@ class MailHandlerTest extends UnitTestCase {
   /**
    * Language manager service.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Language\LanguageManagerInterface|MockObject
    */
   protected $languageManager;
 
   /**
    * Logger service.
    *
-   * @var \Psr\Log\LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Psr\Log\LoggerInterface|MockObject
    */
   protected $logger;
 
   /**
    * Mail manager service.
    *
-   * @var \Drupal\Core\Mail\MailManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Mail\MailManagerInterface|MockObject
    */
   protected $mailManager;
 
   /**
    * Contact mail messages service.
    *
-   * @var \Drupal\contact\MailHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\contact\MailHandlerInterface|MockObject
    */
   protected $contactMailHandler;
 
   /**
    * The contact form entity.
    *
-   * @var \Drupal\contact\ContactFormInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\contact\ContactFormInterface|MockObject
    */
   protected $contactForm;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var EntityTypeManagerInterface|MockObject
    */
   protected $entityTypeManager;
 
   /**
    * The user storage handler.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityStorageInterface|MockObject
    */
   protected $userStorage;
 
@@ -228,7 +228,7 @@ class MailHandlerTest extends UnitTestCase {
    * @param string $mail_address
    *   The mail address of the user.
    *
-   * @return \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @return \Drupal\Core\Session\AccountInterface|MockObject
    *   Mock sender for testing.
    */
   protected function getMockSender($anonymous = TRUE, $mail_address = 'anonymous@drupal.org') {
@@ -265,7 +265,7 @@ class MailHandlerTest extends UnitTestCase {
    * @param bool $copy_sender
    *   TRUE if a copy should be sent, FALSE if not.
    *
-   * @return \Drupal\contact\MessageInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @return \Drupal\contact\MessageInterface|MockObject
    *   Mock message for testing.
    */
   protected function getAnonymousMockMessage($recipients, $auto_reply, $copy_sender = FALSE) {
@@ -294,7 +294,7 @@ class MailHandlerTest extends UnitTestCase {
    * @param bool $copy_sender
    *   TRUE if a copy should be sent, FALSE if not.
    *
-   * @return \Drupal\contact\MessageInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @return \Drupal\contact\MessageInterface|MockObject
    *   Mock message for testing.
    */
   protected function getAuthenticatedMockMessage($copy_sender = FALSE) {
@@ -329,7 +329,7 @@ class MailHandlerTest extends UnitTestCase {
    * @param string $auto_reply
    *   An auto-reply message to send to the message author.
    *
-   * @return \Drupal\contact\ContactFormInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @return \Drupal\contact\ContactFormInterface|MockObject
    *   Mock message for testing.
    */
   protected function getMockContactForm($recipients, $auto_reply) {

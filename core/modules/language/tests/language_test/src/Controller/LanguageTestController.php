@@ -23,23 +23,23 @@ class LanguageTestController implements ContainerInjectionInterface {
   /**
    * The HTTP kernel service.
    *
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface
+   * @var HttpKernelInterface
    */
   protected $httpKernel;
 
   /**
    * The language manager service.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * Constructs a new LanguageTestController object.
    *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
+   * @param HttpKernelInterface $httpKernel
    *   An HTTP kernel.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
    */
   public function __construct(HttpKernelInterface $httpKernel, LanguageManagerInterface $language_manager) {
@@ -57,7 +57,7 @@ class LanguageTestController implements ContainerInjectionInterface {
   /**
    * Route entity upcasting test helper.
    *
-   * @param \Drupal\language\ConfigurableLanguageInterface $configurable_language
+   * @param ConfigurableLanguageInterface $configurable_language
    *   The ConfigurableLanguage object from the route.
    *
    * @return string

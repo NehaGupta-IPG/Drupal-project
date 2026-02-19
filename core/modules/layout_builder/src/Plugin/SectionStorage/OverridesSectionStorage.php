@@ -69,28 +69,28 @@ class OverridesSectionStorage extends SectionStorageBase implements ContainerFac
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 
   /**
    * The entity repository.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   * @var EntityRepositoryInterface
    */
   protected $entityRepository;
 
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
@@ -117,7 +117,7 @@ class OverridesSectionStorage extends SectionStorageBase implements ContainerFac
   /**
    * Gets the entity storing the overrides.
    *
-   * @return \Drupal\Core\Entity\FieldableEntityInterface
+   * @return FieldableEntityInterface
    *   The entity storing the overrides.
    */
   protected function getEntity() {
@@ -240,7 +240,7 @@ class OverridesSectionStorage extends SectionStorageBase implements ContainerFac
   /**
    * Determines if this entity type's ID is stored as an integer.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   An entity type.
    *
    * @return bool
@@ -259,7 +259,7 @@ class OverridesSectionStorage extends SectionStorageBase implements ContainerFac
   /**
    * Returns an array of relevant entity types.
    *
-   * @return \Drupal\Core\Entity\EntityTypeInterface[]
+   * @return EntityTypeInterface[]
    *   An array of entity types.
    */
   protected function getEntityTypes() {
@@ -355,11 +355,11 @@ class OverridesSectionStorage extends SectionStorageBase implements ContainerFac
   /**
    * Handles access checks related to translations.
    *
-   * @param \Drupal\Core\Access\AccessResult $result
+   * @param AccessResult $result
    *   The access result.
    * @param string $operation
    *   The operation to be performed.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user for which to check access.
    *
    * @return \Drupal\Core\Access\AccessResultInterface

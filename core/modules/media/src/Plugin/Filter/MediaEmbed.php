@@ -47,42 +47,42 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
   /**
    * The entity repository.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   * @var EntityRepositoryInterface
    */
   protected $entityRepository;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity display repository.
    *
-   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
+   * @var EntityDisplayRepositoryInterface
    */
   protected $entityDisplayRepository;
 
   /**
    * The entity type bundle info service.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @var EntityTypeBundleInfoInterface
    */
   protected $entityTypeBundleInfo;
 
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * The logger factory.
    *
-   * @var \Drupal\Core\Logger\LoggerChannelFactoryInterface
+   * @var LoggerChannelFactoryInterface
    */
   protected $loggerFactory;
 
@@ -95,17 +95,17 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository
+   * @param EntityDisplayRepositoryInterface $entity_display_repository
    *   The entity display repository.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info
+   * @param EntityTypeBundleInfoInterface $bundle_info
    *   The entity type bundle info service.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
+   * @param LoggerChannelFactoryInterface $logger_factory
    *   The logger factory.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityRepositoryInterface $entity_repository, EntityTypeManagerInterface $entity_type_manager, EntityDisplayRepositoryInterface $entity_display_repository, EntityTypeBundleInfoInterface $bundle_info, RendererInterface $renderer, LoggerChannelFactoryInterface $logger_factory) {
@@ -158,7 +158,7 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
    *
    * @param array $element
    *   The allowed_view_modes form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    */
   public static function validateOptions(array &$element, FormStateInterface $form_state) {
@@ -170,7 +170,7 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
   /**
    * Builds the render array for the given media entity in the given langcode.
    *
-   * @param \Drupal\media\MediaInterface $media
+   * @param MediaInterface $media
    *   A media entity to render.
    * @param string $view_mode
    *   The view mode to render it in.
@@ -321,7 +321,7 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
    *   The render array to render in isolation.
    * @param \DOMNode $node
    *   The DOM node to render into.
-   * @param \Drupal\filter\FilterProcessResult $result
+   * @param FilterProcessResult $result
    *   The accumulated result of filter processing, updated with the metadata
    *   bubbled during rendering.
    */
@@ -396,7 +396,7 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
    *   The HTML tag whose attributes may contain overrides, and if such
    *   attributes are applied, they will be considered consumed and will
    *   therefore be removed from the HTML.
-   * @param \Drupal\media\MediaInterface $media
+   * @param MediaInterface $media
    *   The media entity to apply attribute-based overrides to, if any.
    *
    * @see \Drupal\media\Plugin\media\Source\Image
@@ -440,7 +440,7 @@ class MediaEmbed extends FilterBase implements ContainerFactoryPluginInterface, 
   /**
    * Get image field from source config.
    *
-   * @param \Drupal\media\MediaInterface $media
+   * @param MediaInterface $media
    *   A media entity.
    *
    * @return string|null

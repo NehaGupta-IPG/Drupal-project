@@ -16,7 +16,7 @@ class Composer {
   /**
    * Add vendor classes to Composer's static classmap.
    *
-   * @param \Composer\Script\Event $event
+   * @param Event $event
    *   The event.
    *
    * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use
@@ -32,7 +32,7 @@ class Composer {
   /**
    * Fires the drupal-phpunit-upgrade script event if necessary.
    *
-   * @param \Composer\Script\Event $event
+   * @param Event $event
    *   The event.
    *
    * @internal

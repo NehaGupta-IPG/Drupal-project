@@ -26,14 +26,14 @@ class Dependency {
   /**
    * The constraint string.
    *
-   * @var \Drupal\Component\Version\Constraint
+   * @var Constraint
    */
   protected $constraintString;
 
   /**
    * The Constraint object from the constraint string.
    *
-   * @var \Drupal\Component\Version\Constraint
+   * @var Constraint
    */
   protected $constraint;
 
@@ -86,7 +86,7 @@ class Dependency {
   /**
    * Gets the Constraint object.
    *
-   * @return \Drupal\Component\Version\Constraint
+   * @return Constraint
    *   The Constraint object.
    */
   protected function getConstraint() {

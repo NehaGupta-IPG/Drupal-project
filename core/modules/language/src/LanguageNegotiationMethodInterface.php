@@ -15,7 +15,7 @@ interface LanguageNegotiationMethodInterface {
   /**
    * Injects the language manager.
    *
-   * @param \Drupal\language\ConfigurableLanguageManagerInterface $language_manager
+   * @param ConfigurableLanguageManagerInterface $language_manager
    *   The language manager to be used to retrieve the language list and the
    *   already negotiated languages.
    */
@@ -24,7 +24,7 @@ interface LanguageNegotiationMethodInterface {
   /**
    * Injects the configuration factory.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config
+   * @param ConfigFactoryInterface $config
    *   The configuration factory.
    */
   public function setConfig(ConfigFactoryInterface $config);
@@ -32,7 +32,7 @@ interface LanguageNegotiationMethodInterface {
   /**
    * Injects the current user.
    *
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current active user.
    */
   public function setCurrentUser(AccountInterface $current_user);
@@ -40,7 +40,7 @@ interface LanguageNegotiationMethodInterface {
   /**
    * Performs language negotiation.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   (optional) The current request. Defaults to NULL if it has not been
    *   initialized yet.
    *
@@ -59,7 +59,7 @@ interface LanguageNegotiationMethodInterface {
   /**
    * Notifies the plugin that the language code it returned has been accepted.
    *
-   * @param \Drupal\Core\Language\LanguageInterface $language
+   * @param LanguageInterface $language
    *   The accepted language.
    */
   public function persist(LanguageInterface $language);

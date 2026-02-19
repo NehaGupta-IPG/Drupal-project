@@ -150,7 +150,7 @@ class AjaxTestFocusFirstForm implements FormInterface {
   /**
    * Callback for testing FocusFirstCommand on a container.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   The AJAX response.
    */
   public function selectorDoesNotExist() {
@@ -161,7 +161,7 @@ class AjaxTestFocusFirstForm implements FormInterface {
   /**
    * Callback for testing FocusFirstCommand on a container.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   The AJAX response.
    */
   public function selectorHasNothingTabbable() {
@@ -172,7 +172,7 @@ class AjaxTestFocusFirstForm implements FormInterface {
   /**
    * Callback for testing FocusFirstCommand on a container.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   The AJAX response.
    */
   public function focusableContainerNotTabbableChildren() {
@@ -183,7 +183,7 @@ class AjaxTestFocusFirstForm implements FormInterface {
   /**
    * Callback for testing FocusFirstCommand on a container.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   The AJAX response.
    */
   public function focusFirstSelectorMultipleMatch() {
@@ -194,7 +194,7 @@ class AjaxTestFocusFirstForm implements FormInterface {
   /**
    * Callback for testing FocusFirstCommand on a container.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   The AJAX response.
    */
   public function focusFirstInContainer() {
@@ -205,7 +205,7 @@ class AjaxTestFocusFirstForm implements FormInterface {
   /**
    * Callback for testing FocusFirstCommand on a form.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   The AJAX response.
    */
   public function focusFirstInForm() {

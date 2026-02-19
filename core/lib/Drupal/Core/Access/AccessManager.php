@@ -2,16 +2,16 @@
 
 namespace Drupal\Core\Access;
 
+use Drupal\Component\Utility\ArgumentsResolverInterface;
 use Drupal\Core\ParamConverter\ParamConverterManagerInterface;
 use Drupal\Core\ParamConverter\ParamNotConvertedException;
 use Drupal\Core\Routing\RouteMatch;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Component\Utility\ArgumentsResolverInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
-use Drupal\Core\Routing\RouteObjectInterface;
 
 /**
  * Attaches access check services to routes and runs them on request.
@@ -22,48 +22,48 @@ class AccessManager implements AccessManagerInterface {
   /**
    * The route provider.
    *
-   * @var \Drupal\Core\Routing\RouteProviderInterface
+   * @var RouteProviderInterface
    */
   protected $routeProvider;
 
   /**
    * The paramconverter manager.
    *
-   * @var \Drupal\Core\ParamConverter\ParamConverterManagerInterface
+   * @var ParamConverterManagerInterface
    */
   protected $paramConverterManager;
 
   /**
    * The access arguments resolver.
    *
-   * @var \Drupal\Core\Access\AccessArgumentsResolverFactoryInterface
+   * @var AccessArgumentsResolverFactoryInterface
    */
   protected $argumentsResolverFactory;
 
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
   /**
    * The check provider.
    *
-   * @var \Drupal\Core\Access\CheckProviderInterface
+   * @var CheckProviderInterface
    */
   protected $checkProvider;
 
   /**
    * Constructs an AccessManager instance.
    *
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
+   * @param RouteProviderInterface $route_provider
    *   The route provider.
-   * @param \Drupal\Core\ParamConverter\ParamConverterManagerInterface $paramconverter_manager
+   * @param ParamConverterManagerInterface $paramconverter_manager
    *   The param converter manager.
-   * @param \Drupal\Core\Access\AccessArgumentsResolverFactoryInterface $arguments_resolver_factory
+   * @param AccessArgumentsResolverFactoryInterface $arguments_resolver_factory
    *   The access arguments resolver.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
    * @param CheckProviderInterface $check_provider
    *   The check access provider.
@@ -144,19 +144,19 @@ class AccessManager implements AccessManagerInterface {
    *
    * @param string $service_id
    *   The access check service ID to use.
-   * @param \Drupal\Component\Utility\ArgumentsResolverInterface $arguments_resolver
+   * @param ArgumentsResolverInterface $arguments_resolver
    *   The parametrized arguments resolver instance.
    *
-   * @return \Drupal\Core\Access\AccessResultInterface
+   * @return AccessResultInterface
    *   The access result.
    *
-   * @throws \Drupal\Core\Access\AccessException
+   * @throws AccessException
    *   Thrown when the access check returns an invalid value.
    */
   protected function performCheck($service_id, ArgumentsResolverInterface $arguments_resolver) {
     $callable = $this->checkProvider->loadCheck($service_id);
     $arguments = $arguments_resolver->getArguments($callable);
-    /** @var \Drupal\Core\Access\AccessResultInterface $service_access **/
+    /** @var AccessResultInterface $service_access **/
     $service_access = call_user_func_array($callable, $arguments);
 
     if (!$service_access instanceof AccessResultInterface) {

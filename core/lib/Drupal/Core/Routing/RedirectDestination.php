@@ -13,14 +13,14 @@ class RedirectDestination implements RedirectDestinationInterface {
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * The URL generator.
    *
-   * @var \Drupal\Core\Routing\UrlGeneratorInterface
+   * @var UrlGeneratorInterface
    */
   protected $urlGenerator;
 
@@ -34,9 +34,9 @@ class RedirectDestination implements RedirectDestinationInterface {
   /**
    * Constructs a new RedirectDestination instance.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   The request stack.
-   * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
+   * @param UrlGeneratorInterface $url_generator
    *   The URL generator.
    */
   public function __construct(RequestStack $request_stack, UrlGeneratorInterface $url_generator) {

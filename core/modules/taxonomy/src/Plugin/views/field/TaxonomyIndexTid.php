@@ -3,12 +3,12 @@
 namespace Drupal\taxonomy\Plugin\views\field;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\taxonomy\VocabularyStorageInterface;
 use Drupal\views\Attribute\ViewsField;
-use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\field\PrerenderList;
+use Drupal\views\ViewExecutable;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\taxonomy\VocabularyStorageInterface;
 
 /**
  * Field handler to display all taxonomy terms of a node.
@@ -21,7 +21,7 @@ class TaxonomyIndexTid extends PrerenderList {
   /**
    * The vocabulary storage.
    *
-   * @var \Drupal\taxonomy\VocabularyStorageInterface
+   * @var VocabularyStorageInterface
    */
   protected $vocabularyStorage;
 
@@ -34,7 +34,7 @@ class TaxonomyIndexTid extends PrerenderList {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\taxonomy\VocabularyStorageInterface $vocabulary_storage
+   * @param VocabularyStorageInterface $vocabulary_storage
    *   The vocabulary storage.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, VocabularyStorageInterface $vocabulary_storage) {

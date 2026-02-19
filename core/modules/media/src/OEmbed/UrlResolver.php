@@ -26,21 +26,21 @@ class UrlResolver implements UrlResolverInterface {
   /**
    * The OEmbed provider repository service.
    *
-   * @var \Drupal\media\OEmbed\ProviderRepositoryInterface
+   * @var ProviderRepositoryInterface
    */
   protected $providers;
 
   /**
    * The OEmbed resource fetcher service.
    *
-   * @var \Drupal\media\OEmbed\ResourceFetcherInterface
+   * @var ResourceFetcherInterface
    */
   protected $resourceFetcher;
 
   /**
    * The module handler service.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
@@ -57,22 +57,22 @@ class UrlResolver implements UrlResolverInterface {
   /**
    * The cache backend.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $cacheBackend;
 
   /**
    * Constructs a UrlResolver object.
    *
-   * @param \Drupal\media\OEmbed\ProviderRepositoryInterface $providers
+   * @param ProviderRepositoryInterface $providers
    *   The oEmbed provider repository service.
-   * @param \Drupal\media\OEmbed\ResourceFetcherInterface $resource_fetcher
+   * @param ResourceFetcherInterface $resource_fetcher
    *   The OEmbed resource fetcher service.
-   * @param \GuzzleHttp\ClientInterface $http_client
+   * @param ClientInterface $http_client
    *   The HTTP client.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler service.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param CacheBackendInterface $cache_backend
    *   The cache backend.
    */
   public function __construct(ProviderRepositoryInterface $providers, ResourceFetcherInterface $resource_fetcher, ClientInterface $http_client, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend) {
@@ -195,7 +195,7 @@ class UrlResolver implements UrlResolverInterface {
    *
    * @param string $url
    *   The media URL used to lookup the matching endpoint.
-   * @param \Drupal\media\OEmbed\Provider $provider
+   * @param Provider $provider
    *   The oEmbed provider for the asset.
    *
    * @return string

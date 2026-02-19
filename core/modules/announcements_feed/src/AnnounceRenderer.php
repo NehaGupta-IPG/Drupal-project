@@ -18,7 +18,7 @@ final class AnnounceRenderer {
   /**
    * Constructs an AnnouncementRenderer object.
    *
-   * @param \Drupal\announcements_feed\AnnounceFetcher $announceFetcher
+   * @param AnnounceFetcher $announceFetcher
    *   The AnnounceFetcher service.
    * @param string $feedLink
    *   The feed url path.

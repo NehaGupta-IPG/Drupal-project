@@ -39,7 +39,7 @@ class UserRouteAlterSubscriber implements EventSubscriberInterface {
   /**
    * Adds supported formats to the user authentication HTTP routes.
    *
-   * @param \Drupal\Core\Routing\RouteBuildEvent $event
+   * @param RouteBuildEvent $event
    *   The event to process.
    */
   public function onRoutingAlterAddFormats(RouteBuildEvent $event) {

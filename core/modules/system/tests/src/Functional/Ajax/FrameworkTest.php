@@ -139,7 +139,7 @@ class FrameworkTest extends BrowserTestBase {
   /**
    * Requests a path or URL in drupal_ajax format and JSON-decodes the response.
    *
-   * @param \Drupal\Core\Url|string $path
+   * @param Url|string $path
    *   Drupal path or URL to request from.
    * @param array $options
    *   Array of URL options.

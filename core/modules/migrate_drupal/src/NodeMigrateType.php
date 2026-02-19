@@ -28,7 +28,7 @@ final class NodeMigrateType {
    * The node complete migration is the default. It is not used when there
    * are existing tables for dN_node.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The connection to the target database.
    * @param string|false $version
    *   The Drupal version of the source database, FALSE if it cannot be

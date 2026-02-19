@@ -72,7 +72,7 @@ JS;
    * @param string $name
    *   The name of the button, such as `drupallink`, `source`, etc.
    *
-   * @return \Behat\Mink\Element\NodeElement|null
+   * @return NodeElement|null
    *   The page element node if found, NULL if not.
    */
   protected function getEditorButton($name) {
@@ -111,7 +111,7 @@ JS;
    * @param string $balloon_content_selector
    *   A CSS selector.
    *
-   * @return \Behat\Mink\Element\NodeElement
+   * @return NodeElement
    *   The asserted balloon.
    */
   protected function assertVisibleBalloon(string $balloon_content_selector): NodeElement {
@@ -134,7 +134,7 @@ JS;
    * @param string $name
    *   The label of the button to find.
    *
-   * @return \Behat\Mink\Element\NodeElement
+   * @return NodeElement
    *   The requested button.
    */
   protected function getBalloonButton(string $name): NodeElement {

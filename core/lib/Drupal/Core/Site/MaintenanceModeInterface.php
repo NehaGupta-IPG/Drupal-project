@@ -13,7 +13,7 @@ interface MaintenanceModeInterface {
   /**
    * Returns whether the site is in maintenance mode.
    *
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The current route match.
    *
    * @return bool
@@ -24,7 +24,7 @@ interface MaintenanceModeInterface {
   /**
    * Determines whether a user has access to the site in maintenance mode.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The logged in user.
    *
    * @return bool

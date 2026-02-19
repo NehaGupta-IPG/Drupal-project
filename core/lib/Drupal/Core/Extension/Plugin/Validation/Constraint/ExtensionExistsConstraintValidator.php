@@ -19,23 +19,23 @@ class ExtensionExistsConstraintValidator extends ConstraintValidator implements 
   /**
    * The module handler service.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected ModuleHandlerInterface $moduleHandler;
 
   /**
    * The theme handler service.
    *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
+   * @var ThemeHandlerInterface
    */
   protected ThemeHandlerInterface $themeHandler;
 
   /**
    * Constructs a ExtensionExistsConstraintValidator object.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler service.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param ThemeHandlerInterface $theme_handler
    *   The theme handler service.
    */
   public function __construct(ModuleHandlerInterface $module_handler, ThemeHandlerInterface $theme_handler) {

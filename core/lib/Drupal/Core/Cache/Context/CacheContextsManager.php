@@ -25,7 +25,7 @@ class CacheContextsManager {
   /**
    * The service container.
    *
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface
+   * @var ContainerInterface
    */
   protected $container;
 
@@ -44,7 +44,7 @@ class CacheContextsManager {
   /**
    * Constructs a CacheContextsManager object.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @param ContainerInterface $container
    *   The current service container.
    * @param string[] $contexts
    *   An array of the available cache context IDs.
@@ -100,7 +100,7 @@ class CacheContextsManager {
    * @param string[] $context_tokens
    *   An array of cache context tokens.
    *
-   * @return \Drupal\Core\Cache\Context\ContextCacheKeys
+   * @return ContextCacheKeys
    *   The ContextCacheKeys object containing the converted cache keys and
    *   cacheability metadata.
    */
@@ -215,7 +215,7 @@ class CacheContextsManager {
    *   The context ID, which together with the service ID prefix allows the
    *   corresponding cache context service to be retrieved.
    *
-   * @return \Drupal\Core\Cache\Context\CacheContextInterface
+   * @return CacheContextInterface
    *   The requested cache context service.
    */
   protected function getService($context_id) {

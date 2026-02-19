@@ -17,7 +17,7 @@ final class CallsDestructableServiceController extends ControllerBase {
   /**
    * Destructable service.
    *
-   * @var \Drupal\destructable_test\Destructable
+   * @var Destructable
    */
   protected $destructable;
 
@@ -28,7 +28,7 @@ final class CallsDestructableServiceController extends ControllerBase {
   /**
    * Render callback.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   Response.
    */
   public function render(Request $request): Response {

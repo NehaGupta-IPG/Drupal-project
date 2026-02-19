@@ -18,7 +18,7 @@ final class ShortcutLazyBuilder {
   /**
    * Constructs a ShortcutLazyBuilders object.
    *
-   * @param \Drupal\shortcut\ShortcutLazyBuilders $shortcutLazyBuilder
+   * @param ShortcutLazyBuilders $shortcutLazyBuilder
    *   The original shortcuts lazy builder service.
    */
   public function __construct(

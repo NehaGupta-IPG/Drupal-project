@@ -70,7 +70,7 @@ interface ConditionInterface extends ExecutableInterface, PluginFormInterface, C
   /**
    * Sets the executable manager class.
    *
-   * @param \Drupal\Core\Executable\ExecutableManagerInterface $executableManager
+   * @param ExecutableManagerInterface $executableManager
    *   The executable manager.
    */
   public function setExecutableManager(ExecutableManagerInterface $executableManager);

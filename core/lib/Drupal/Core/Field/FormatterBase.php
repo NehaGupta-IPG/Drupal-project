@@ -20,7 +20,7 @@ abstract class FormatterBase extends PluginSettingsBase implements FormatterInte
   /**
    * The field definition.
    *
-   * @var \Drupal\Core\Field\FieldDefinitionInterface
+   * @var FieldDefinitionInterface
    */
   protected $fieldDefinition;
 
@@ -52,7 +52,7 @@ abstract class FormatterBase extends PluginSettingsBase implements FormatterInte
    *   The plugin ID for the formatter.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The definition of the field to which the formatter is associated.
    * @param array $settings
    *   The formatter settings.

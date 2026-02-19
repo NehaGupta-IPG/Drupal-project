@@ -22,35 +22,35 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
   /**
    * The mock cache backend.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Cache\CacheBackendInterface|MockObject
    */
   protected $cache;
 
   /**
    * The mock lock backend.
    *
-   * @var \Drupal\Core\Lock\LockBackendInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Lock\LockBackendInterface|MockObject
    */
   protected $lock;
 
   /**
    * The mock library discovery parser.
    *
-   * @var \Drupal\Core\Asset\LibraryDiscoveryParser|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Asset\LibraryDiscoveryParser|MockObject
    */
   protected $libraryDiscoveryParser;
 
   /**
    * The library discovery collector under test.
    *
-   * @var \Drupal\Core\Asset\LibraryDiscoveryCollector
+   * @var LibraryDiscoveryCollector
    */
   protected $libraryDiscoveryCollector;
 
   /**
    * The mocked theme manager.
    *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Theme\ThemeManagerInterface|MockObject
    */
   protected $themeManager;
 
@@ -90,7 +90,7 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
   /**
    * The active theme.
    *
-   * @var \Drupal\Core\Theme\ActiveTheme|\PHPUnit\Framework\MockObject\MockObject
+   * @var ActiveTheme|MockObject
    */
   protected $activeTheme;
 

@@ -18,14 +18,14 @@ class CachedStorage implements StorageInterface, StorageCacheInterface {
   /**
    * The configuration storage to be cached.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   protected $storage;
 
   /**
    * The instantiated Cache backend.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $cache;
 
@@ -39,9 +39,9 @@ class CachedStorage implements StorageInterface, StorageCacheInterface {
   /**
    * Constructs a new CachedStorage.
    *
-   * @param \Drupal\Core\Config\StorageInterface $storage
+   * @param StorageInterface $storage
    *   A configuration storage to be cached.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   A cache backend used to store configuration.
    */
   public function __construct(StorageInterface $storage, CacheBackendInterface $cache) {
@@ -190,7 +190,7 @@ class CachedStorage implements StorageInterface, StorageCacheInterface {
    *
    * Given the following configuration objects:
    * - node.type.article
-   * - node.type.page
+   * - node.type.page.
    *
    * Passing the prefix 'node.type.' will return an array containing the above
    * names.

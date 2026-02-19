@@ -14,14 +14,14 @@ class ConfigTranslationListController extends ControllerBase {
   /**
    * The mapper manager.
    *
-   * @var \Drupal\config_translation\ConfigMapperManagerInterface
+   * @var ConfigMapperManagerInterface
    */
   protected $mapperManager;
 
   /**
    * Constructs a new ConfigTranslationListController object.
    *
-   * @param \Drupal\config_translation\ConfigMapperManagerInterface $mapper_manager
+   * @param ConfigMapperManagerInterface $mapper_manager
    *   The config mapper manager.
    */
   public function __construct(ConfigMapperManagerInterface $mapper_manager) {
@@ -38,7 +38,7 @@ class ConfigTranslationListController extends ControllerBase {
    *   A render array as expected by
    *   \Drupal\Core\Render\RendererInterface::render().
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   * @throws NotFoundHttpException
    *   Throws an exception if a mapper plugin could not be instantiated from the
    *   mapper definition in the constructor.
    */

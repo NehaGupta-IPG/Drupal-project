@@ -3,9 +3,9 @@
 namespace Drupal\Core\EventSubscriber;
 
 use Drupal\Core\Entity\EntityResolverManager;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Drupal\Core\Routing\RoutingEvents;
 use Drupal\Core\Routing\RouteBuildEvent;
+use Drupal\Core\Routing\RoutingEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Registers the 'type' of route parameter names that match an entity type.
@@ -23,14 +23,14 @@ class EntityRouteAlterSubscriber implements EventSubscriberInterface {
   /**
    * The entity resolver manager.
    *
-   * @var \Drupal\Core\Entity\EntityResolverManager
+   * @var EntityResolverManager
    */
   protected $resolverManager;
 
   /**
    * Constructs an EntityRouteAlterSubscriber instance.
    *
-   * @param \Drupal\Core\Entity\EntityResolverManager $entity_resolver_manager
+   * @param EntityResolverManager $entity_resolver_manager
    *   The entity resolver manager.
    */
   public function __construct(EntityResolverManager $entity_resolver_manager) {
@@ -40,7 +40,7 @@ class EntityRouteAlterSubscriber implements EventSubscriberInterface {
   /**
    * Applies parameter converters to route parameters.
    *
-   * @param \Drupal\Core\Routing\RouteBuildEvent $event
+   * @param RouteBuildEvent $event
    *   The event to process.
    */
   public function onRoutingRouteAlterSetType(RouteBuildEvent $event) {

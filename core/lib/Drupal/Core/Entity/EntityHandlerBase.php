@@ -18,14 +18,14 @@ abstract class EntityHandlerBase {
   /**
    * The module handler to invoke hooks on.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * Gets the module handler.
    *
-   * @return \Drupal\Core\Extension\ModuleHandlerInterface
+   * @return ModuleHandlerInterface
    *   The module handler.
    */
   protected function moduleHandler() {
@@ -38,7 +38,7 @@ abstract class EntityHandlerBase {
   /**
    * Sets the module handler for this handler.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
    *
    * @return $this

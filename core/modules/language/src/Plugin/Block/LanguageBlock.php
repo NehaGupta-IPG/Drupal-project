@@ -6,11 +6,11 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Cache\CacheOptionalInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Path\PathMatcherInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\language\Plugin\Derivative\LanguageBlock as LanguageBlockDeriver;
@@ -29,14 +29,14 @@ class LanguageBlock extends BlockBase implements ContainerFactoryPluginInterface
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The path matcher.
    *
-   * @var \Drupal\Core\Path\PathMatcherInterface
+   * @var PathMatcherInterface
    */
   protected $pathMatcher;
 
@@ -49,9 +49,9 @@ class LanguageBlock extends BlockBase implements ContainerFactoryPluginInterface
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Path\PathMatcherInterface $path_matcher
+   * @param PathMatcherInterface $path_matcher
    *   The path matcher.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, LanguageManagerInterface $language_manager, PathMatcherInterface $path_matcher) {

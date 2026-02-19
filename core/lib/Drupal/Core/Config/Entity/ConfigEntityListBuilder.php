@@ -16,7 +16,7 @@ class ConfigEntityListBuilder extends EntityListBuilder {
   /**
    * The config entity storage class.
    *
-   * @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface
+   * @var ConfigEntityStorageInterface
    */
   protected $storage;
 
@@ -39,7 +39,7 @@ class ConfigEntityListBuilder extends EntityListBuilder {
   protected function getDefaultOperations(EntityInterface $entity/* , ?CacheableMetadata $cacheability = NULL */) {
     $args = func_get_args();
     $cacheability = $args[1] ?? new CacheableMetadata();
-    /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
+    /** @var ConfigEntityInterface $entity */
     $operations = parent::getDefaultOperations($entity, $cacheability);
 
     if ($this->entityType->hasKey('status')) {
@@ -65,7 +65,7 @@ class ConfigEntityListBuilder extends EntityListBuilder {
   /**
    * Gets the config entity storage.
    *
-   * @return \Drupal\Core\Config\Entity\ConfigEntityStorageInterface
+   * @return ConfigEntityStorageInterface
    *   The config storage used by this list builder.
    */
   public function getStorage(): ConfigEntityStorageInterface {

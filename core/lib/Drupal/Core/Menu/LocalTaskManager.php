@@ -53,21 +53,21 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
   /**
    * An argument resolver object.
    *
-   * @var \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface
+   * @var ArgumentResolverInterface
    */
   protected $argumentResolver;
 
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * The current route match.
    *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
+   * @var RouteMatchInterface
    */
   protected $routeMatch;
 
@@ -88,21 +88,21 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
   /**
    * The route provider to load routes by name.
    *
-   * @var \Drupal\Core\Routing\RouteProviderInterface
+   * @var RouteProviderInterface
    */
   protected $routeProvider;
 
   /**
    * The access manager.
    *
-   * @var \Drupal\Core\Access\AccessManagerInterface
+   * @var AccessManagerInterface
    */
   protected $accessManager;
 
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $account;
 
@@ -114,24 +114,24 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
   /**
    * Constructs a \Drupal\Core\Menu\LocalTaskManager object.
    *
-   * @param \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface $argument_resolver
+   * @param ArgumentResolverInterface $argument_resolver
    *   An object to use in resolving route arguments.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   The request object to use for building titles and paths for plugin
    *   instances.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The current route match.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
+   * @param RouteProviderInterface $route_provider
    *   The route provider to load routes by name.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The cache backend.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
+   * @param AccessManagerInterface $access_manager
    *   The access manager.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The current user.
    */
   public function __construct(ArgumentResolverInterface $argument_resolver, RequestStack $request_stack, RouteMatchInterface $route_match, RouteProviderInterface $route_provider, ModuleHandlerInterface $module_handler, CacheBackendInterface $cache, LanguageManagerInterface $language_manager, AccessManagerInterface $access_manager, AccountInterface $account) {
@@ -310,7 +310,7 @@ class LocalTaskManager extends DefaultPluginManager implements LocalTaskManagerI
     }
 
     foreach ($tree as $level => $instances) {
-      /** @var \Drupal\Core\Menu\LocalTaskInterface[] $instances */
+      /** @var LocalTaskInterface[] $instances */
       foreach ($instances as $plugin_id => $child) {
         $route_name = $child->getRouteName();
         $route_parameters = $child->getRouteParameters($this->routeMatch);

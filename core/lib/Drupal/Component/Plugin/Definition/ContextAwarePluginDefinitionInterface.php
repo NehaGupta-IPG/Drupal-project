@@ -25,7 +25,7 @@ interface ContextAwarePluginDefinitionInterface extends PluginDefinitionInterfac
   /**
    * Returns all context definitions for this plugin.
    *
-   * @return \Drupal\Component\Plugin\Context\ContextDefinitionInterface[]
+   * @return ContextDefinitionInterface[]
    *   The context definitions.
    */
   public function getContextDefinitions();
@@ -36,10 +36,10 @@ interface ContextAwarePluginDefinitionInterface extends PluginDefinitionInterfac
    * @param string $name
    *   The context name.
    *
-   * @return \Drupal\Component\Plugin\Context\ContextDefinitionInterface
+   * @return ContextDefinitionInterface
    *   The context definition.
    *
-   * @throws \Drupal\Component\Plugin\Exception\ContextException
+   * @throws ContextException
    *   Thrown if the plugin does not define the given context.
    */
   public function getContextDefinition($name);
@@ -49,7 +49,7 @@ interface ContextAwarePluginDefinitionInterface extends PluginDefinitionInterfac
    *
    * @param string $name
    *   The context name.
-   * @param \Drupal\Component\Plugin\Context\ContextDefinitionInterface $definition
+   * @param ContextDefinitionInterface $definition
    *   The context definition.
    *
    * @return $this

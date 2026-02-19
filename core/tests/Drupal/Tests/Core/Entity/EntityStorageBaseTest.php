@@ -25,7 +25,7 @@ class EntityStorageBaseTest extends UnitTestCase {
    * @param string $id
    *   ID value for this entity.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @return EntityInterface|MockObject
    *   The mocked entity.
    */
   public function generateEntityInterface(string $id): EntityInterface&MockObject {

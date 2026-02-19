@@ -30,7 +30,7 @@ class EntityConditionGroup {
   /**
    * The members of the condition group.
    *
-   * @var \Drupal\jsonapi\Query\EntityCondition[]
+   * @var EntityCondition[]
    */
   protected $members;
 
@@ -63,7 +63,7 @@ class EntityConditionGroup {
   /**
    * The members which belong to the condition group.
    *
-   * @return \Drupal\jsonapi\Query\EntityCondition[]
+   * @return EntityCondition[]
    *   The member conditions of this condition group.
    */
   public function members() {

@@ -21,14 +21,14 @@ class ParamConversionEnhancer implements EnhancerInterface, EventSubscriberInter
   /**
    * The parameter conversion manager.
    *
-   * @var \Drupal\Core\ParamConverter\ParamConverterManagerInterface
+   * @var ParamConverterManagerInterface
    */
   protected $paramConverterManager;
 
   /**
    * Constructs a new ParamConversionEnhancer.
    *
-   * @param \Drupal\Core\ParamConverter\ParamConverterManagerInterface $param_converter_manager
+   * @param ParamConverterManagerInterface $param_converter_manager
    *   The parameter conversion manager.
    */
   public function __construct(ParamConverterManagerInterface $param_converter_manager) {
@@ -53,7 +53,7 @@ class ParamConversionEnhancer implements EnhancerInterface, EventSubscriberInter
    * @param array $defaults
    *   The route defaults array.
    *
-   * @return \Symfony\Component\HttpFoundation\InputBag
+   * @return InputBag
    *   The input bag container with the raw variables.
    */
   protected function copyRawVariables(array $defaults) {
@@ -80,7 +80,7 @@ class ParamConversionEnhancer implements EnhancerInterface, EventSubscriberInter
   /**
    * Catches failed parameter conversions and throw a 404 instead.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   * @param ExceptionEvent $event
    *   The event.
    */
   public function onException(ExceptionEvent $event) {

@@ -222,7 +222,7 @@ class CommentPagerTest extends CommentTestBase {
   /**
    * Asserts that the comments are displayed in the correct order.
    *
-   * @param \Drupal\comment\CommentInterface[] $comments
+   * @param CommentInterface[] $comments
    *   An array of comments, must be of the type CommentInterface.
    * @param array $expected_order
    *   An array of keys from $comments describing the expected order.

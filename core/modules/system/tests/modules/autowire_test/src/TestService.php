@@ -13,26 +13,26 @@ use Drupal\Core\DrupalKernelInterface;
 class TestService {
 
   /**
-   * @var \Drupal\autowire_test\TestInjectionInterface
+   * @var TestInjectionInterface
    */
   protected $testInjection;
 
   /**
-   * @var \Drupal\autowire_test\TestInjection2
+   * @var TestInjection2
    */
   protected $testInjection2;
 
   /**
    * The database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $database;
 
   /**
    * The Drupal kernel.
    *
-   * @var \Drupal\Core\DrupalKernelInterface
+   * @var DrupalKernelInterface
    */
   protected $kernel;
 

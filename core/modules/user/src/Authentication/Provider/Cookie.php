@@ -8,8 +8,8 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Session\UserSession;
 use Drupal\Core\Session\SessionConfigurationInterface;
+use Drupal\Core\Session\UserSession;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -28,32 +28,32 @@ class Cookie implements AuthenticationProviderInterface, EventSubscriberInterfac
   /**
    * The session configuration.
    *
-   * @var \Drupal\Core\Session\SessionConfigurationInterface
+   * @var SessionConfigurationInterface
    */
   protected $sessionConfiguration;
 
   /**
    * The database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
   /**
    * The messenger.
    *
-   * @var \Drupal\Core\Messenger\MessengerInterface
+   * @var MessengerInterface
    */
   protected $messenger;
 
   /**
    * Constructs a new cookie authentication provider.
    *
-   * @param \Drupal\Core\Session\SessionConfigurationInterface $session_configuration
+   * @param SessionConfigurationInterface $session_configuration
    *   The session configuration.
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection.
-   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   * @param MessengerInterface $messenger
    *   The messenger.
    */
   public function __construct(SessionConfigurationInterface $session_configuration, Connection $connection, MessengerInterface $messenger) {
@@ -84,10 +84,10 @@ class Cookie implements AuthenticationProviderInterface, EventSubscriberInterfac
   /**
    * Returns the UserSession object for the given session.
    *
-   * @param \Symfony\Component\HttpFoundation\Session\SessionInterface $session
+   * @param SessionInterface $session
    *   The session.
    *
-   * @return \Drupal\Core\Session\AccountInterface|null
+   * @return AccountInterface|null
    *   The UserSession object for the current user, or NULL if this is an
    *   anonymous session.
    */
@@ -118,7 +118,7 @@ class Cookie implements AuthenticationProviderInterface, EventSubscriberInterfac
   /**
    * Adds a query parameter to check successful log in redirect URL.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
+   * @param ResponseEvent $event
    *   The Event to process.
    */
   public function addCheckToUrl(ResponseEvent $event) {

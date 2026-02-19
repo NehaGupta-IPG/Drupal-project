@@ -15,7 +15,7 @@ trait RoutePathGenerationTrait {
    * Placeholders without corresponding values in the parameters array
    * are removed from the resulting path.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route object containing the path with placeholders.
    * @param array $parameters
    *   An associative array of parameters to replace in the route path,

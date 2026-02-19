@@ -23,7 +23,7 @@ class MemoryBackendTest extends UnitTestCase {
   /**
    * The tested memory flood backend.
    *
-   * @var \Drupal\Core\Flood\MemoryBackend
+   * @var MemoryBackend
    */
   protected $flood;
 

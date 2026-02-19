@@ -27,7 +27,7 @@ class MetaEventSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * @param \Drupal\jsonapi\Events\CollectResourceObjectMetaEvent $event
+   * @param CollectResourceObjectMetaEvent $event
    *   Event to be processed.
    */
   public function addResourceObjectMeta(CollectResourceObjectMetaEvent $event): void {
@@ -68,7 +68,7 @@ class MetaEventSubscriber implements EventSubscriberInterface {
   }
 
   /**
-   * @param \Drupal\jsonapi\Events\CollectRelationshipMetaEvent $event
+   * @param CollectRelationshipMetaEvent $event
    *   Event to be processed.
    */
   public function addRelationshipMeta(CollectRelationshipMetaEvent $event): void {
@@ -136,8 +136,8 @@ class MetaEventSubscriber implements EventSubscriberInterface {
    * @return string
    *   The value 'yes' if the current user has an admin role, 'no' otherwise.
    *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws InvalidPluginDefinitionException
+   * @throws PluginNotFoundException
    */
   protected function currentUserHasAdminRole(): string {
     $admin_roles = \Drupal::entityTypeManager()

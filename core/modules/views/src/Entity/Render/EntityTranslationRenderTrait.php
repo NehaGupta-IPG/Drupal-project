@@ -15,14 +15,14 @@ trait EntityTranslationRenderTrait {
   /**
    * The renderer to be used to render the entity row.
    *
-   * @var \Drupal\views\Entity\Render\EntityTranslationRendererBase
+   * @var EntityTranslationRendererBase
    */
   protected $entityTranslationRenderer;
 
   /**
    * Returns the current renderer.
    *
-   * @return \Drupal\views\Entity\Render\EntityTranslationRendererBase
+   * @return EntityTranslationRendererBase
    *   The configured renderer.
    */
   protected function getEntityTranslationRenderer() {
@@ -57,14 +57,14 @@ trait EntityTranslationRenderTrait {
   /**
    * Returns the entity translation matching the configured row language.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity object the field value being processed is attached to.
-   * @param \Drupal\views\ResultRow $row
+   * @param ResultRow $row
    *   The result row the field value being processed belongs to.
    * @param string $relationship
    *   The relationship to be used, or 'none' by default.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The entity translation object for the specified row.
    */
   public function getEntityTranslationByRelationship(EntityInterface $entity, ResultRow $row, string $relationship = 'none'): EntityInterface {

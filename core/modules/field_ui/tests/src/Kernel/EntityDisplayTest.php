@@ -672,7 +672,7 @@ class EntityDisplayTest extends KernelTestBase {
    *   The dependency type: 'config', 'content', 'module' or 'theme'.
    * @param string $key
    *   The string to be checked.
-   * @param \Drupal\Core\Entity\Display\EntityDisplayInterface $display
+   * @param EntityDisplayInterface $display
    *   The entity display object to get dependencies from.
    *
    * @internal
@@ -688,7 +688,7 @@ class EntityDisplayTest extends KernelTestBase {
    *   The dependency type: 'config', 'content', 'module' or 'theme'.
    * @param string $key
    *   The string to be checked.
-   * @param \Drupal\Core\Entity\Display\EntityDisplayInterface $display
+   * @param EntityDisplayInterface $display
    *   The entity display object to get dependencies from.
    *
    * @internal
@@ -706,7 +706,7 @@ class EntityDisplayTest extends KernelTestBase {
    *   The dependency type: 'config', 'content', 'module' or 'theme'.
    * @param string $key
    *   The string to be checked.
-   * @param \Drupal\Core\Entity\Display\EntityDisplayInterface $display
+   * @param EntityDisplayInterface $display
    *   The entity display object to get dependencies from.
    *
    * @internal

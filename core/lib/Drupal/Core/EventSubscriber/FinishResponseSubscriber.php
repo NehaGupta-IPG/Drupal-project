@@ -11,11 +11,11 @@ use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\PageCache\RequestPolicyInterface;
 use Drupal\Core\PageCache\ResponsePolicyInterface;
 use Drupal\Core\Site\Settings;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Response subscriber to handle finished responses.
@@ -32,17 +32,17 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
   /**
    * Constructs a FinishResponseSubscriber object.
    *
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   * @param LanguageManagerInterface $languageManager
    *   The language manager object for retrieving the correct language code.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   A config factory for retrieving required config objects.
-   * @param \Drupal\Core\PageCache\RequestPolicyInterface $requestPolicy
+   * @param RequestPolicyInterface $requestPolicy
    *   A policy rule determining the cacheability of a request.
-   * @param \Drupal\Core\PageCache\ResponsePolicyInterface $responsePolicy
+   * @param ResponsePolicyInterface $responsePolicy
    *   A policy rule determining the cacheability of a response.
-   * @param \Drupal\Core\Cache\Context\CacheContextsManager $cacheContextsManager
+   * @param CacheContextsManager $cacheContextsManager
    *   The cache contexts manager service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    * @param bool $debugCacheabilityHeaders
    *   (optional) Whether to send cacheability headers for debugging purposes.
@@ -62,7 +62,7 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
   /**
    * Sets extra headers on any responses, also subrequest ones.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
+   * @param ResponseEvent $event
    *   The event to process.
    */
   public function onAllResponds(ResponseEvent $event) {
@@ -77,7 +77,7 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
   /**
    * Sets extra headers on successful responses.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
+   * @param ResponseEvent $event
    *   The event to process.
    */
   public function onRespond(ResponseEvent $event) {
@@ -174,7 +174,7 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
    * not Cache-Control, then 'private, must-revalidate' (in exactly this order)
    * is returned.
    *
-   * @param \Symfony\Component\HttpFoundation\Response $response
+   * @param Response $response
    *   The response object.
    *
    * @return bool
@@ -198,9 +198,9 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
   /**
    * Add Cache-Control and Expires headers to a response which is not cacheable.
    *
-   * @param \Symfony\Component\HttpFoundation\Response $response
+   * @param Response $response
    *   A response object.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   A request object.
    */
   protected function setResponseNotCacheable(Response $response, Request $request) {
@@ -218,9 +218,9 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
   /**
    * Add Cache-Control and Expires headers to a cacheable response.
    *
-   * @param \Symfony\Component\HttpFoundation\Response $response
+   * @param Response $response
    *   A response object.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   A request object.
    */
   protected function setResponseCacheable(Response $response, Request $request) {
@@ -259,7 +259,7 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
   /**
    * Disable caching in the browser and for HTTP/1.1 proxies and clients.
    *
-   * @param \Symfony\Component\HttpFoundation\Response $response
+   * @param Response $response
    *   A response object.
    */
   protected function setCacheControlNoCache(Response $response) {
@@ -274,7 +274,7 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
    * header if a Cache-Control: max-age= directive is specified (see RFC 2616,
    * section 14.9.3).
    *
-   * @param \Symfony\Component\HttpFoundation\Response $response
+   * @param Response $response
    *   A response object.
    */
   protected function setExpiresNoCache(Response $response) {

@@ -14,7 +14,7 @@ class TestController {
   /**
    * Just a test method for the test routes.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   The response object.
    */
   public function testMethod() {

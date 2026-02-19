@@ -123,7 +123,7 @@ interface MediaSourceInterface extends PluginInspectionInterface, ConfigurableIn
   /**
    * Gets the value for a metadata attribute for a given media item.
    *
-   * @param \Drupal\media\MediaInterface $media
+   * @param MediaInterface $media
    *   A media item.
    * @param string $attribute_name
    *   Name of the attribute to fetch.
@@ -136,7 +136,7 @@ interface MediaSourceInterface extends PluginInspectionInterface, ConfigurableIn
   /**
    * Get the source field definition for a media type.
    *
-   * @param \Drupal\media\MediaTypeInterface $type
+   * @param MediaTypeInterface $type
    *   A media type.
    *
    * @return \Drupal\Core\Field\FieldDefinitionInterface|null
@@ -148,7 +148,7 @@ interface MediaSourceInterface extends PluginInspectionInterface, ConfigurableIn
   /**
    * Creates the source field definition for a type.
    *
-   * @param \Drupal\media\MediaTypeInterface $type
+   * @param MediaTypeInterface $type
    *   The media type.
    *
    * @return \Drupal\field\FieldConfigInterface
@@ -165,9 +165,9 @@ interface MediaSourceInterface extends PluginInspectionInterface, ConfigurableIn
    * \Drupal\Core\Entity\Display\EntityDisplayInterface::removeComponent() to
    * configure the media type fields in the view display.
    *
-   * @param \Drupal\media\MediaTypeInterface $type
+   * @param MediaTypeInterface $type
    *   The media type which is using this source.
-   * @param \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display
+   * @param EntityViewDisplayInterface $display
    *   The display which should be prepared.
    *
    * @see \Drupal\Core\Entity\Display\EntityDisplayInterface::setComponent()
@@ -183,9 +183,9 @@ interface MediaSourceInterface extends PluginInspectionInterface, ConfigurableIn
    * \Drupal\Core\Entity\Display\EntityDisplayInterface::removeComponent() to
    * configure the media type fields in the form display.
    *
-   * @param \Drupal\media\MediaTypeInterface $type
+   * @param MediaTypeInterface $type
    *   The media type which is using this source.
-   * @param \Drupal\Core\Entity\Display\EntityFormDisplayInterface $display
+   * @param EntityFormDisplayInterface $display
    *   The display which should be prepared.
    *
    * @see \Drupal\Core\Entity\Display\EntityDisplayInterface::setComponent()

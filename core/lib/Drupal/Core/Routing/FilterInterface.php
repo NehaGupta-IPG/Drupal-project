@@ -13,15 +13,15 @@ interface FilterInterface {
   /**
    * Filters the route collection against a request.
    *
-   * @param \Symfony\Component\Routing\RouteCollection $collection
+   * @param RouteCollection $collection
    *   The collection against which to match.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   A Request object against which to match.
    *
-   * @return \Symfony\Component\Routing\RouteCollection
+   * @return RouteCollection
    *   A non-empty RouteCollection of matched routes
    *
-   * @throws \Symfony\Component\Routing\Exception\ResourceNotFoundException
+   * @throws ResourceNotFoundException
    *   If none of the routes in $collection matches $request. This is a
    *   performance optimization to not continue the match process when a match
    *   will no longer be possible.

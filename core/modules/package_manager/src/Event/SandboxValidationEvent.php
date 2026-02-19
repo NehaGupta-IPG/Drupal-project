@@ -16,7 +16,7 @@ abstract class SandboxValidationEvent extends SandboxEvent {
   /**
    * The validation results.
    *
-   * @var \Drupal\package_manager\ValidationResult[]
+   * @var ValidationResult[]
    */
   protected $results = [];
 
@@ -27,7 +27,7 @@ abstract class SandboxValidationEvent extends SandboxEvent {
    *   (optional) The severity for the results to return. Should be one of the
    *   SystemManager::REQUIREMENT_* constants.
    *
-   * @return \Drupal\package_manager\ValidationResult[]
+   * @return ValidationResult[]
    *   The validation results.
    */
   public function getResults(?int $severity = NULL): array {
@@ -42,9 +42,9 @@ abstract class SandboxValidationEvent extends SandboxEvent {
   /**
    * Convenience method to flag a validation error.
    *
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup[] $messages
+   * @param TranslatableMarkup[] $messages
    *   The error messages.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $summary
+   * @param TranslatableMarkup|null $summary
    *   The summary of error messages. Must be passed if there is more than one
    *   message.
    */
@@ -57,7 +57,7 @@ abstract class SandboxValidationEvent extends SandboxEvent {
    *
    * @param \Throwable $throwable
    *   The throwable.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $summary
+   * @param TranslatableMarkup|null $summary
    *   (optional) The summary of error messages.
    */
   public function addErrorFromThrowable(\Throwable $throwable, ?TranslatableMarkup $summary = NULL): void {
@@ -67,7 +67,7 @@ abstract class SandboxValidationEvent extends SandboxEvent {
   /**
    * Adds a validation result to the event.
    *
-   * @param \Drupal\package_manager\ValidationResult $result
+   * @param ValidationResult $result
    *   The validation result to add.
    *
    * @throws \InvalidArgumentException

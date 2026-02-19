@@ -23,13 +23,13 @@ class EntityRevisionViewController implements ContainerInjectionInterface {
   /**
    * Creates a new EntityRevisionViewController.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
+   * @param EntityRepositoryInterface $entityRepository
    *   The entity repository.
-   * @param \Drupal\Core\Datetime\DateFormatterInterface $dateFormatter
+   * @param DateFormatterInterface $dateFormatter
    *   The date formatter.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation
+   * @param TranslationInterface $translation
    *   The string translation manager.
    */
   public function __construct(
@@ -56,7 +56,7 @@ class EntityRevisionViewController implements ContainerInjectionInterface {
   /**
    * Provides a page to render a single entity revision.
    *
-   * @param \Drupal\Core\Entity\RevisionableInterface $_entity_revision
+   * @param RevisionableInterface $_entity_revision
    *   The Entity to be rendered. Note this variable is named $_entity_revision
    *   rather than $entity to prevent collisions with other named placeholders
    *   in the route.
@@ -82,10 +82,10 @@ class EntityRevisionViewController implements ContainerInjectionInterface {
   /**
    * Provides a title callback for a revision of an entity.
    *
-   * @param \Drupal\Core\Entity\RevisionableInterface $_entity_revision
+   * @param RevisionableInterface $_entity_revision
    *   The revisionable entity, passed in directly from request attributes.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   * @return TranslatableMarkup
    *   The title for the entity revision view page.
    */
   public function title(RevisionableInterface $_entity_revision): TranslatableMarkup {

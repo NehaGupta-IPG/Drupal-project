@@ -105,7 +105,7 @@ class ThemeTestController extends ControllerBase {
   /**
    * Controller to ensure that no theme is initialized.
    *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   * @return JsonResponse
    *   The json response with the theme initialized information.
    */
   public function nonHtml() {

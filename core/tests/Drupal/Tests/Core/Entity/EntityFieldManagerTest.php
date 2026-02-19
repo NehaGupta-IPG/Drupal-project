@@ -48,105 +48,105 @@ class EntityFieldManagerTest extends UnitTestCase {
   /**
    * The typed data manager.
    *
-   * @var \Drupal\Core\TypedData\TypedDataManagerInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var TypedDataManagerInterface|ProphecyInterface
    */
   protected $typedDataManager;
 
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var ModuleHandlerInterface|ProphecyInterface
    */
   protected $moduleHandler;
 
   /**
    * The cache backend to use.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var CacheBackendInterface|ProphecyInterface
    */
   protected $cacheBackend;
 
   /**
    * The cache tags invalidator.
    *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var CacheTagsInvalidatorInterface|ProphecyInterface
    */
   protected $cacheTagsInvalidator;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var LanguageManagerInterface|ProphecyInterface
    */
   protected $languageManager;
 
   /**
    * The keyvalue factory.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueFactoryInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var KeyValueFactoryInterface|ProphecyInterface
    */
   protected $keyValueFactory;
 
   /**
    * The event dispatcher.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|ProphecyInterface
    */
   protected $eventDispatcher;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var EntityTypeManagerInterface|ProphecyInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity type repository.
    *
-   * @var \Drupal\Core\Entity\EntityTypeRepositoryInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var EntityTypeRepositoryInterface|ProphecyInterface
    */
   protected $entityTypeRepository;
 
   /**
    * The entity type bundle info.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var EntityTypeBundleInfoInterface|ProphecyInterface
    */
   protected $entityTypeBundleInfo;
 
   /**
    * The entity display repository.
    *
-   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var EntityDisplayRepositoryInterface|ProphecyInterface
    */
   protected $entityDisplayRepository;
 
   /**
    * The entity field manager under test.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManager
+   * @var EntityFieldManager
    */
   protected $entityFieldManager;
 
   /**
    * The dependency injection container.
    *
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var ContainerInterface|ProphecyInterface
    */
   protected $container;
 
   /**
    * The entity type definition.
    *
-   * @var \Drupal\Core\Entity\EntityTypeInterface|\Prophecy\Prophecy\ProphecyInterface
+   * @var EntityTypeInterface|ProphecyInterface
    */
   protected $entityType;
 
   /**
    * The entity last installed schema repository.
    *
-   * @var \Prophecy\Prophecy\ObjectProphecy|\Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface
+   * @var \Prophecy\Prophecy\ObjectProphecy|EntityLastInstalledSchemaRepositoryInterface
    */
   protected $entityLastInstalledSchemaRepository;
 
@@ -191,7 +191,7 @@ class EntityFieldManagerTest extends UnitTestCase {
   /**
    * Sets up the entity type manager to be tested.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface[]|\Prophecy\Prophecy\ProphecyInterface[] $definitions
+   * @param EntityTypeInterface[]|ProphecyInterface[] $definitions
    *   (optional) An array of entity type definitions.
    */
   protected function setUpEntityTypeDefinitions($definitions = []): void {
@@ -602,7 +602,7 @@ class EntityFieldManagerTest extends UnitTestCase {
    *   (optional) An array of entity keys for the mocked entity type. Defaults
    *   to an empty array.
    *
-   * @return \Drupal\Core\Field\BaseFieldDefinition|\Prophecy\Prophecy\ProphecyInterface
+   * @return BaseFieldDefinition|ProphecyInterface
    *   A field definition object.
    */
   protected function setUpEntityWithFieldDefinition($custom_invoke_all = FALSE, $field_definition_id = 'id', $entity_keys = []) {
@@ -907,7 +907,7 @@ abstract class EntityTypeManagerTestEntity implements \Iterator, ContentEntityIn
   /**
    * The base field definitions.
    *
-   * @var \Drupal\Core\Field\FieldDefinitionInterface[]
+   * @var FieldDefinitionInterface[]
    */
   public static $baseFieldDefinitions = [];
 

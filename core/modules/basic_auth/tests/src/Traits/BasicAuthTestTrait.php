@@ -12,7 +12,7 @@ trait BasicAuthTestTrait {
   /**
    * Retrieves a Drupal path or an absolute path using basic authentication.
    *
-   * @param \Drupal\Core\Url|string $path
+   * @param Url|string $path
    *   Drupal path or URL to load into the internal browser.
    * @param string $username
    *   The username to use for basic authentication.

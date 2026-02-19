@@ -19,7 +19,7 @@ interface WizardInterface {
    *
    * @param array $form
    *   The full wizard form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the wizard form.
    *
    * @return array
@@ -32,7 +32,7 @@ interface WizardInterface {
    *
    * @param array $form
    *   The full wizard form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the wizard form.
    *
    * @return array
@@ -46,13 +46,13 @@ interface WizardInterface {
    *
    * @param array $form
    *   The full wizard form array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the wizard form.
    *
    * @return \Drupal\views\ViewEntityInterface
    *   The created view object.
    *
-   * @throws \Drupal\views\Plugin\views\wizard\WizardException
+   * @throws WizardException
    */
   public function createView(array $form, FormStateInterface $form_state);
 

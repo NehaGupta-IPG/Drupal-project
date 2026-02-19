@@ -16,7 +16,7 @@ trait AutowiredInstanceTrait {
   /**
    * Instantiates a new instance of the implementing class using autowiring.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @param ContainerInterface $container
    *   The service container this instance should use.
    * @param mixed ...$args
    *   Any predefined arguments to pass to the constructor.

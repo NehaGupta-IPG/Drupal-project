@@ -6,11 +6,11 @@ use Drupal\Component\Serialization\Json;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\migrate\Event\MigrateRollbackEvent;
 use Drupal\migrate\Event\RollbackAwareInterface;
-use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateSkipRowException;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate\Plugin\MigrateSourceInterface;
+use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
 
 /**
@@ -126,14 +126,14 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
   /**
    * The entity migration object.
    *
-   * @var \Drupal\migrate\Plugin\MigrationInterface
+   * @var MigrationInterface
    */
   protected $migration;
 
   /**
    * The current row from the query.
    *
-   * @var \Drupal\migrate\Row|null
+   * @var Row|null
    */
   protected $currentRow;
 
@@ -224,7 +224,7 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
   /**
    * The migration ID map.
    *
-   * @var \Drupal\migrate\Plugin\MigrateIdMapInterface
+   * @var MigrateIdMapInterface
    */
   protected $idMap;
 
@@ -445,7 +445,7 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
   /**
    * Check if the incoming data is newer than what we've previously imported.
    *
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The row we're importing.
    *
    * @return bool
@@ -459,7 +459,7 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
   /**
    * Checks if the incoming row has changed since our last import.
    *
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   The row we're importing.
    *
    * @return bool

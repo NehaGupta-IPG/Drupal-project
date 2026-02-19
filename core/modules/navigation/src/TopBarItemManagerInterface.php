@@ -12,7 +12,7 @@ interface TopBarItemManagerInterface {
   /**
    * Gets the top bar item plugins by region.
    *
-   * @param \Drupal\navigation\TopBarRegion $region
+   * @param TopBarRegion $region
    *   The region.
    *
    * @return array
@@ -23,7 +23,7 @@ interface TopBarItemManagerInterface {
   /**
    * Gets the top bar items prepared as render array.
    *
-   * @param \Drupal\navigation\TopBarRegion $region
+   * @param TopBarRegion $region
    *   The region.
    *
    * @return array

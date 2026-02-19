@@ -16,7 +16,7 @@ class TestController extends ControllerBase {
   /**
    * Token generator service.
    *
-   * @var \Drupal\Core\Access\CsrfTokenGenerator
+   * @var CsrfTokenGenerator
    */
   protected $tokenGenerator;
 

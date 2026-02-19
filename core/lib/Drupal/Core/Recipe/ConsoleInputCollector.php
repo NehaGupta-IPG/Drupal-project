@@ -36,7 +36,7 @@ final class ConsoleInputCollector implements InputCollectorInterface {
    *
    * This should be called by a command's configure() method.
    *
-   * @param \Symfony\Component\Console\Command\Command $command
+   * @param Command $command
    *   The command being configured.
    */
   public static function configureCommand(Command $command): void {

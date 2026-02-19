@@ -24,84 +24,84 @@ class ConfigManager implements ConfigManagerInterface {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity repository.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface
+   * @var EntityRepositoryInterface
    */
   protected $entityRepository;
 
   /**
    * The configuration factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * The typed config manager.
    *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface
+   * @var TypedConfigManagerInterface
    */
   protected $typedConfigManager;
 
   /**
    * The active configuration storage.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   protected $activeStorage;
 
   /**
    * The event dispatcher.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+   * @var EventDispatcherInterface
    */
   protected $eventDispatcher;
 
   /**
    * The configuration collection info.
    *
-   * @var \Drupal\Core\Config\ConfigCollectionInfo
+   * @var ConfigCollectionInfo
    */
   protected $configCollectionInfo;
 
   /**
    * The configuration storages keyed by collection name.
    *
-   * @var \Drupal\Core\Config\StorageInterface[]
+   * @var StorageInterface[]
    */
   protected $storages;
 
   /**
    * The extension path resolver.
    *
-   * @var \Drupal\Core\Extension\ExtensionPathResolver
+   * @var ExtensionPathResolver
    */
   protected $extensionPathResolver;
 
   /**
    * Creates ConfigManager objects.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The configuration factory.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config_manager
+   * @param TypedConfigManagerInterface $typed_config_manager
    *   The typed config manager.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param TranslationInterface $string_translation
    *   The string translation service.
-   * @param \Drupal\Core\Config\StorageInterface $active_storage
+   * @param StorageInterface $active_storage
    *   The active configuration storage.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository.
-   * @param \Drupal\Core\Extension\ExtensionPathResolver $extension_path_resolver
+   * @param ExtensionPathResolver $extension_path_resolver
    *   The extension path resolver.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typed_config_manager, TranslationInterface $string_translation, StorageInterface $active_storage, EventDispatcherInterface $event_dispatcher, EntityRepositoryInterface $entity_repository, ExtensionPathResolver $extension_path_resolver) {
@@ -203,7 +203,7 @@ class ConfigManager implements ConfigManagerInterface {
   public function uninstall($type, $name) {
     $entities = $this->getConfigEntitiesToChangeOnDependencyRemoval($type, [$name], FALSE);
     // Fix all dependent configuration entities.
-    /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
+    /** @var ConfigEntityInterface $entity */
     foreach ($entities['update'] as $entity) {
       $entity->save();
     }
@@ -348,7 +348,7 @@ class ConfigManager implements ConfigManagerInterface {
     // example, this ensures that Menu UI third party dependencies on node types
     // are fixed before processing the node type's other dependents.
     while ($dependent = array_pop($dependents_to_process)) {
-      /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $dependent */
+      /** @var ConfigEntityInterface $dependent */
       if ($dry_run) {
         // Clone the entity so any changes do not change any static caches.
         $dependent = clone $dependent;
@@ -419,9 +419,9 @@ class ConfigManager implements ConfigManagerInterface {
    * entity. Configuration and content entity dependencies will be converted
    * into entity objects.
    *
-   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface $entity
+   * @param ConfigEntityInterface $entity
    *   The entity to call onDependencyRemoval() on.
-   * @param \Drupal\Core\Config\Entity\ConfigEntityInterface[] $dependent_entities
+   * @param ConfigEntityInterface[] $dependent_entities
    *   The list of dependent configuration entities.
    * @param string $type
    *   The type of dependency being checked. Either 'module', 'theme', 'config'

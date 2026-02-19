@@ -12,7 +12,7 @@ interface ContainerFactoryPluginInterface {
   /**
    * Creates an instance of the plugin.
    *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @param ContainerInterface $container
    *   The container to pull out services used in the plugin.
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.

@@ -26,7 +26,7 @@ class BlockSettings extends ProcessPluginBase implements ContainerFactoryPluginI
   /**
    * The block manager service.
    *
-   * @var \Drupal\Core\Block\BlockManagerInterface
+   * @var BlockManagerInterface
    */
   protected readonly BlockManagerInterface $blockManager;
 

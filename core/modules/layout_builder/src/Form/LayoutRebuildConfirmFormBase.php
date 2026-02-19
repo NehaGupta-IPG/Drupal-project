@@ -28,14 +28,14 @@ abstract class LayoutRebuildConfirmFormBase extends ConfirmFormBase implements W
   /**
    * The layout tempstore repository.
    *
-   * @var \Drupal\layout_builder\LayoutTempstoreRepositoryInterface
+   * @var LayoutTempstoreRepositoryInterface
    */
   protected $layoutTempstoreRepository;
 
   /**
    * The section storage.
    *
-   * @var \Drupal\layout_builder\SectionStorageInterface
+   * @var SectionStorageInterface
    */
   protected $sectionStorage;
 
@@ -49,7 +49,7 @@ abstract class LayoutRebuildConfirmFormBase extends ConfirmFormBase implements W
   /**
    * Constructs a new RemoveSectionForm.
    *
-   * @param \Drupal\layout_builder\LayoutTempstoreRepositoryInterface $layout_tempstore_repository
+   * @param LayoutTempstoreRepositoryInterface $layout_tempstore_repository
    *   The layout tempstore repository.
    */
   public function __construct(LayoutTempstoreRepositoryInterface $layout_tempstore_repository) {
@@ -118,9 +118,9 @@ abstract class LayoutRebuildConfirmFormBase extends ConfirmFormBase implements W
   /**
    * Performs any actions on the section storage before saving.
    *
-   * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
+   * @param SectionStorageInterface $section_storage
    *   The section storage.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    */
   abstract protected function handleSectionStorage(SectionStorageInterface $section_storage, FormStateInterface $form_state);

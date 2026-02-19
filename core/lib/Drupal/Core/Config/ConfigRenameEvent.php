@@ -17,7 +17,7 @@ class ConfigRenameEvent extends ConfigCrudEvent {
   /**
    * Constructs the config rename event.
    *
-   * @param \Drupal\Core\Config\StorableConfigBase $config
+   * @param StorableConfigBase $config
    *   The configuration that has been renamed.
    * @param string $old_name
    *   The old configuration object name.

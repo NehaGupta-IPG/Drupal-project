@@ -7,12 +7,12 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\node\NodeInterface;
 use Drupal\taxonomy\TermInterface;
+use Drupal\taxonomy\VocabularyStorageInterface;
 use Drupal\views\Attribute\ViewsArgumentDefault;
 use Drupal\views\Plugin\views\argument_default\ArgumentDefaultPluginBase;
-use Drupal\node\NodeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\taxonomy\VocabularyStorageInterface;
 
 /**
  * Taxonomy tid default argument.
@@ -26,14 +26,14 @@ class Tid extends ArgumentDefaultPluginBase implements CacheableDependencyInterf
   /**
    * The route match.
    *
-   * @var \Drupal\Core\Routing\RouteMatchInterface
+   * @var RouteMatchInterface
    */
   protected $routeMatch;
 
   /**
    * The vocabulary storage.
    *
-   * @var \Drupal\taxonomy\VocabularyStorageInterface
+   * @var VocabularyStorageInterface
    */
   protected $vocabularyStorage;
 
@@ -46,9 +46,9 @@ class Tid extends ArgumentDefaultPluginBase implements CacheableDependencyInterf
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match.
-   * @param \Drupal\taxonomy\VocabularyStorageInterface $vocabulary_storage
+   * @param VocabularyStorageInterface $vocabulary_storage
    *   The vocabulary storage.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteMatchInterface $route_match, VocabularyStorageInterface $vocabulary_storage) {
@@ -173,7 +173,7 @@ class Tid extends ArgumentDefaultPluginBase implements CacheableDependencyInterf
         foreach ($node->getFieldDefinitions() as $field) {
           if ($field->getType() == 'entity_reference' && $field->getSetting('target_type') == 'taxonomy_term') {
             $taxonomy_terms = $node->{$field->getName()}->referencedEntities();
-            /** @var \Drupal\taxonomy\TermInterface $taxonomy_term */
+            /** @var TermInterface $taxonomy_term */
             foreach ($taxonomy_terms as $taxonomy_term) {
               $taxonomy[$taxonomy_term->id()] = $taxonomy_term->bundle();
             }

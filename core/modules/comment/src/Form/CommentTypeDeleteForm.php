@@ -19,14 +19,14 @@ class CommentTypeDeleteForm extends EntityDeleteForm {
   /**
    * The comment manager service.
    *
-   * @var \Drupal\comment\CommentManagerInterface
+   * @var CommentManagerInterface
    */
   protected $commentManager;
 
   /**
    * A logger instance.
    *
-   * @var \Psr\Log\LoggerInterface
+   * @var LoggerInterface
    */
   protected $logger;
 
@@ -40,9 +40,9 @@ class CommentTypeDeleteForm extends EntityDeleteForm {
   /**
    * Constructs a query factory object.
    *
-   * @param \Drupal\comment\CommentManagerInterface $comment_manager
+   * @param CommentManagerInterface $comment_manager
    *   The comment manager service.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   A logger instance.
    */
   public function __construct(CommentManagerInterface $comment_manager, LoggerInterface $logger) {

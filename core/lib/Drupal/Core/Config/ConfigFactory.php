@@ -4,8 +4,8 @@ namespace Drupal\Core\Config;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Defines the configuration object factory.
@@ -27,46 +27,46 @@ class ConfigFactory implements ConfigFactoryInterface, EventSubscriberInterface 
   /**
    * A storage instance for reading and writing configuration data.
    *
-   * @var \Drupal\Core\Config\StorageInterface
+   * @var StorageInterface
    */
   protected $storage;
 
   /**
    * An event dispatcher instance to use for configuration events.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+   * @var EventDispatcherInterface
    */
   protected $eventDispatcher;
 
   /**
    * Cached configuration objects.
    *
-   * @var \Drupal\Core\Config\Config[]
+   * @var Config[]
    */
   protected $cache = [];
 
   /**
    * The typed config manager.
    *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface
+   * @var TypedConfigManagerInterface
    */
   protected $typedConfigManager;
 
   /**
    * An array of config factory override objects ordered by priority.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryOverrideInterface[]
+   * @var ConfigFactoryOverrideInterface[]
    */
   protected $configFactoryOverrides = [];
 
   /**
    * Constructs the Config factory.
    *
-   * @param \Drupal\Core\Config\StorageInterface $storage
+   * @param StorageInterface $storage
    *   The configuration storage engine.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param EventDispatcherInterface $event_dispatcher
    *   An event dispatcher instance to use for configuration events.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
+   * @param TypedConfigManagerInterface $typed_config
    *   The typed configuration manager.
    */
   public function __construct(StorageInterface $storage, EventDispatcherInterface $event_dispatcher, TypedConfigManagerInterface $typed_config) {
@@ -97,7 +97,7 @@ class ConfigFactory implements ConfigFactoryInterface, EventSubscriberInterface 
    * @param bool $immutable
    *   (optional) Create an immutable configuration object. Defaults to TRUE.
    *
-   * @return \Drupal\Core\Config\Config|\Drupal\Core\Config\ImmutableConfig
+   * @return Config|ImmutableConfig
    *   A configuration object.
    */
   protected function doGet($name, $immutable = TRUE) {
@@ -144,7 +144,7 @@ class ConfigFactory implements ConfigFactoryInterface, EventSubscriberInterface 
    * @param bool $immutable
    *   (optional) Create an immutable configuration objects. Defaults to TRUE.
    *
-   * @return \Drupal\Core\Config\Config[]|\Drupal\Core\Config\ImmutableConfig[]
+   * @return Config[]|ImmutableConfig[]
    *   List of successfully loaded configuration objects, keyed by name.
    */
   protected function doLoadMultiple(array $names, $immutable = TRUE) {
@@ -361,7 +361,7 @@ class ConfigFactory implements ConfigFactoryInterface, EventSubscriberInterface 
   /**
    * Removes stale static cache entries when configuration is deleted.
    *
-   * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   * @param ConfigCrudEvent $event
    *   The configuration event.
    */
   public function onConfigDelete(ConfigCrudEvent $event) {
@@ -404,7 +404,7 @@ class ConfigFactory implements ConfigFactoryInterface, EventSubscriberInterface 
    * @param bool $immutable
    *   Determines whether a mutable or immutable config object is returned.
    *
-   * @return \Drupal\Core\Config\Config|\Drupal\Core\Config\ImmutableConfig
+   * @return Config|ImmutableConfig
    *   The configuration object.
    */
   protected function createConfigObject($name, $immutable) {

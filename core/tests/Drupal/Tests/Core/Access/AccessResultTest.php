@@ -26,7 +26,7 @@ class AccessResultTest extends UnitTestCase {
   /**
    * The cache contexts manager.
    *
-   * @var \Drupal\Core\Cache\Context\CacheContextsManager|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Cache\Context\CacheContextsManager|MockObject
    */
   protected $cacheContextsManager;
 
@@ -929,7 +929,7 @@ class AccessResultTest extends UnitTestCase {
    *   The permissions to check for.
    * @param string $conjunction
    *   The conjunction to use when checking for permission. 'AND' or 'OR'.
-   * @param \Drupal\Core\Access\AccessResult $expected_access
+   * @param AccessResult $expected_access
    *   The expected access check result.
    */
   #[DataProvider('providerTestAllowedIfHasPermissions')]

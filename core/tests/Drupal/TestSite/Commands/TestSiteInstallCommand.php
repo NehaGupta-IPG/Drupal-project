@@ -246,7 +246,7 @@ class TestSiteInstallCommand extends Command {
    */
   protected function executeSetupClass($class) {
     if (is_subclass_of($class, TestSetupInterface::class)) {
-      /** @var \Drupal\TestSite\TestSetupInterface $instance */
+      /** @var TestSetupInterface $instance */
       $instance = new $class();
       $instance->setup();
     }
@@ -264,7 +264,7 @@ class TestSiteInstallCommand extends Command {
    */
   protected function executePreinstallClass($class) {
     if (is_subclass_of($class, TestPreinstallInterface::class)) {
-      /** @var \Drupal\TestSite\TestPreinstallInterface $instance */
+      /** @var TestPreinstallInterface $instance */
       $instance = new $class();
       $instance->preinstall($this->databasePrefix, $this->siteDirectory);
     }

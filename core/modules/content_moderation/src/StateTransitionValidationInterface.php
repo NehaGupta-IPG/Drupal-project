@@ -15,9 +15,9 @@ interface StateTransitionValidationInterface {
   /**
    * Gets a list of transitions that are legal for this user on this entity.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity to be transitioned.
-   * @param \Drupal\Core\Session\AccountInterface $user
+   * @param AccountInterface $user
    *   The account that wants to perform a transition.
    *
    * @return \Drupal\workflows\Transition[]
@@ -28,15 +28,15 @@ interface StateTransitionValidationInterface {
   /**
    * Checks if a transition between two states if valid for the given user.
    *
-   * @param \Drupal\workflows\WorkflowInterface $workflow
+   * @param WorkflowInterface $workflow
    *   The workflow entity.
-   * @param \Drupal\workflows\StateInterface $original_state
+   * @param StateInterface $original_state
    *   The original workflow state.
-   * @param \Drupal\workflows\StateInterface $new_state
+   * @param StateInterface $new_state
    *   The new workflow state.
-   * @param \Drupal\Core\Session\AccountInterface $user
+   * @param AccountInterface $user
    *   The user to validate.
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity to be transitioned.
    *
    * @return bool

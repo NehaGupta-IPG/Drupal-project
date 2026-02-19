@@ -85,7 +85,7 @@ class Config {
   /**
    * The root package.
    *
-   * @var \Composer\Package\RootPackageInterface
+   * @var RootPackageInterface
    */
   protected $rootPackage;
 
@@ -99,7 +99,7 @@ class Config {
   /**
    * Construct a Config object.
    *
-   * @param \Composer\Package\RootPackageInterface $root_package
+   * @param RootPackageInterface $root_package
    *   Composer package object for the root package.
    */
   public function __construct(RootPackageInterface $root_package) {

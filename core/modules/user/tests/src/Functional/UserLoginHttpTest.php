@@ -42,14 +42,14 @@ class UserLoginHttpTest extends BrowserTestBase {
   /**
    * The cookie jar.
    *
-   * @var \GuzzleHttp\Cookie\CookieJar
+   * @var CookieJar
    */
   protected $cookies;
 
   /**
    * The serializer.
    *
-   * @var \Symfony\Component\Serializer\Serializer
+   * @var Serializer
    */
   protected $serializer;
 
@@ -73,7 +73,7 @@ class UserLoginHttpTest extends BrowserTestBase {
    * @param string $format
    *   The format to use to make the request.
    *
-   * @return \Psr\Http\Message\ResponseInterface
+   * @return ResponseInterface
    *   The HTTP response.
    */
   protected function loginRequest($name, $pass, $format = 'json'): ResponseInterface {
@@ -216,7 +216,7 @@ class UserLoginHttpTest extends BrowserTestBase {
    * @param string $format
    *   The format to use to make the request.
    *
-   * @return \Psr\Http\Message\ResponseInterface
+   * @return ResponseInterface
    *   The HTTP response.
    */
   protected function passwordRequest(array $request_body, $format = 'json'): ResponseInterface {
@@ -261,7 +261,7 @@ class UserLoginHttpTest extends BrowserTestBase {
   /**
    * Gets a value for a given key from the response.
    *
-   * @param \Psr\Http\Message\ResponseInterface $response
+   * @param ResponseInterface $response
    *   The response object.
    * @param string $key
    *   The key for the value.
@@ -331,7 +331,7 @@ class UserLoginHttpTest extends BrowserTestBase {
   /**
    * Checks a response for status code and body.
    *
-   * @param \Psr\Http\Message\ResponseInterface $response
+   * @param ResponseInterface $response
    *   The response object.
    * @param int $expected_code
    *   The expected status code.
@@ -348,7 +348,7 @@ class UserLoginHttpTest extends BrowserTestBase {
   /**
    * Checks a response for status code and message.
    *
-   * @param \Psr\Http\Message\ResponseInterface $response
+   * @param ResponseInterface $response
    *   The response object.
    * @param int $expected_code
    *   The expected status code.
@@ -441,7 +441,7 @@ class UserLoginHttpTest extends BrowserTestBase {
    * @param string $logout_token
    *   The csrf token for user logout.
    *
-   * @return \Psr\Http\Message\ResponseInterface
+   * @return ResponseInterface
    *   The HTTP response.
    */
   protected function logoutRequest($format = 'json', $logout_token = ''): ResponseInterface {
@@ -529,7 +529,7 @@ class UserLoginHttpTest extends BrowserTestBase {
    *
    * @param string $format
    *   Serialization format.
-   * @param \Drupal\user\UserInterface $account
+   * @param UserInterface $account
    *   Test account.
    */
   protected function doTestPasswordReset($format, $account): void {

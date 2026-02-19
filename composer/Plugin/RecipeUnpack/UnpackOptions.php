@@ -52,7 +52,7 @@ final readonly class UnpackOptions {
   /**
    * Checks if a package should be ignored.
    *
-   * @param \Composer\Package\PackageInterface $package
+   * @param PackageInterface $package
    *   The package.
    *
    * @return bool

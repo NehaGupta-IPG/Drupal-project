@@ -76,7 +76,7 @@ class BigPipeResponseAttachmentsProcessorTest extends UnitTestCase {
         && empty(array_intersect(['big_pipe_placeholders', 'big_pipe_nojs_placeholders'], array_keys($response->getAttachments())));
     }))
       ->will(function ($args) {
-        /** @var \Symfony\Component\HttpFoundation\Response|\Drupal\Core\Render\AttachmentsInterface $response */
+        /** @var \Symfony\Component\HttpFoundation\Response|AttachmentsInterface $response */
         $response = $args[0];
         // Simulate its actual behavior.
         $attachments = array_diff_key($response->getAttachments(), ['html_response_attachment_placeholders' => TRUE]);
@@ -147,10 +147,10 @@ class BigPipeResponseAttachmentsProcessorTest extends UnitTestCase {
   /**
    * Creates a BigPipeResponseAttachmentsProcessor with mostly dummies.
    *
-   * @param \Prophecy\Prophecy\ObjectProphecy $decorated_html_response_attachments_processor
+   * @param ObjectProphecy $decorated_html_response_attachments_processor
    *   An object prophecy implementing AttachmentsResponseProcessorInterface.
    *
-   * @return \Drupal\big_pipe\Render\BigPipeResponseAttachmentsProcessor
+   * @return BigPipeResponseAttachmentsProcessor
    *   The BigPipeResponseAttachmentsProcessor to test.
    */
   protected function createBigPipeResponseAttachmentsProcessor(ObjectProphecy $decorated_html_response_attachments_processor) {

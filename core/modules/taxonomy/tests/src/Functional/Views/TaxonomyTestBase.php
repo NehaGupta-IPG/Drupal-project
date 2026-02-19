@@ -6,10 +6,10 @@ namespace Drupal\Tests\taxonomy\Functional\Views;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
-use Drupal\taxonomy\Entity\Vocabulary;
-use Drupal\taxonomy\Entity\Term;
 use Drupal\views\Tests\ViewTestData;
 
 /**
@@ -142,7 +142,7 @@ abstract class TaxonomyTestBase extends ViewTestBase {
    *   - langcode: LANGCODE_NOT_SPECIFIED.
    *   Defaults to an empty array.
    *
-   * @return \Drupal\taxonomy\Entity\Term
+   * @return Term
    *   The created taxonomy term.
    */
   protected function createTerm(array $settings = []) {

@@ -320,7 +320,7 @@ class PagerTest extends BrowserTestBase {
   /**
    * Asserts that an element has a given class.
    *
-   * @param \Behat\Mink\Element\NodeElement $element
+   * @param NodeElement $element
    *   The element to test.
    * @param string $class
    *   The class to assert.
@@ -339,7 +339,7 @@ class PagerTest extends BrowserTestBase {
   /**
    * Asserts that an element does not have a given class.
    *
-   * @param \Behat\Mink\Element\NodeElement $element
+   * @param NodeElement $element
    *   The element to test.
    * @param string $class
    *   The class to assert.

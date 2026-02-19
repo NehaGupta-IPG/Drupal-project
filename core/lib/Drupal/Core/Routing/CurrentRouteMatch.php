@@ -13,7 +13,7 @@ class CurrentRouteMatch implements ResettableStackedRouteMatchInterface {
   /**
    * The related request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
@@ -27,7 +27,7 @@ class CurrentRouteMatch implements ResettableStackedRouteMatchInterface {
   /**
    * Constructs a CurrentRouteMatch object.
    *
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   The request stack.
    */
   public function __construct(RequestStack $request_stack) {
@@ -80,7 +80,7 @@ class CurrentRouteMatch implements ResettableStackedRouteMatchInterface {
   /**
    * Returns the route match for the current request.
    *
-   * @return \Drupal\Core\Routing\RouteMatchInterface
+   * @return RouteMatchInterface
    *   The current route match object.
    */
   public function getCurrentRouteMatch() {
@@ -94,10 +94,10 @@ class CurrentRouteMatch implements ResettableStackedRouteMatchInterface {
   /**
    * Returns the route match for a passed in request.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   A request object.
    *
-   * @return \Drupal\Core\Routing\RouteMatchInterface
+   * @return RouteMatchInterface
    *   A route match object created from the request.
    */
   protected function getRouteMatch(Request $request) {

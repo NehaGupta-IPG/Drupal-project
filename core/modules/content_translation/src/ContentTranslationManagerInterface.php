@@ -34,7 +34,7 @@ interface ContentTranslationManagerInterface {
    * @param string $entity_type_id
    *   The type of the entity being translated.
    *
-   * @return \Drupal\content_translation\ContentTranslationHandlerInterface
+   * @return ContentTranslationHandlerInterface
    *   An instance of the content translation handler.
    */
   public function getTranslationHandler($entity_type_id);
@@ -42,10 +42,10 @@ interface ContentTranslationManagerInterface {
   /**
    * Returns an instance of the Content translation metadata.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $translation
+   * @param EntityInterface $translation
    *   The entity translation whose metadata needs to be retrieved.
    *
-   * @return \Drupal\content_translation\ContentTranslationMetadataWrapperInterface
+   * @return ContentTranslationMetadataWrapperInterface
    *   An instance of the content translation metadata.
    */
   public function getTranslationMetadata(EntityInterface $translation);

@@ -17,14 +17,14 @@ class MockRouteProvider implements RouteProviderInterface {
   /**
    * A collection of routes for this route provider.
    *
-   * @var \Symfony\Component\Routing\RouteCollection
+   * @var RouteCollection
    */
   protected $routes;
 
   /**
    * Constructs a new MockRouteProvider.
    *
-   * @param \Symfony\Component\Routing\RouteCollection $routes
+   * @param RouteCollection $routes
    *   The route collection to use for this provider.
    */
   public function __construct(RouteCollection $routes) {

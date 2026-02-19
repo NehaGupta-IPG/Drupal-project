@@ -3,7 +3,6 @@
 namespace Drupal\user\Entity;
 
 use Drupal\Core\Entity\Attribute\ContentEntityType;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -11,6 +10,7 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Flood\PrefixFloodInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\user\Form\UserCancelForm;
 use Drupal\user\ProfileForm;
 use Drupal\user\ProfileTranslationHandler;
@@ -82,7 +82,7 @@ class User extends ContentEntityBase implements UserInterface {
   /**
    * Stores a reference for a reusable anonymous user entity.
    *
-   * @var \Drupal\user\UserInterface
+   * @var UserInterface
    */
   protected static $anonymousUser;
 
@@ -446,7 +446,7 @@ class User extends ContentEntityBase implements UserInterface {
   /**
    * Returns an anonymous user entity.
    *
-   * @return \Drupal\user\UserInterface
+   * @return UserInterface
    *   An anonymous user entity.
    */
   public static function getAnonymousUser() {
@@ -473,7 +473,7 @@ class User extends ContentEntityBase implements UserInterface {
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
-    /** @var \Drupal\Core\Field\BaseFieldDefinition[] $fields */
+    /** @var BaseFieldDefinition[] $fields */
     $fields = parent::baseFieldDefinitions($entity_type);
 
     $fields['uid']->setLabel(t('User ID'))

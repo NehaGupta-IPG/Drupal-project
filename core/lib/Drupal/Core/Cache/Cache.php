@@ -113,7 +113,7 @@ class Cache {
   /**
    * Gets all cache bin services.
    *
-   * @return \Drupal\Core\Cache\CacheBackendInterface[]
+   * @return CacheBackendInterface[]
    *   An array of cache backend objects keyed by cache bins.
    */
   public static function getBins() {
@@ -128,7 +128,7 @@ class Cache {
   /**
    * Gets all memory cache bin services.
    *
-   * @return \Drupal\Core\Cache\CacheBackendInterface[]
+   * @return CacheBackendInterface[]
    *   An array of cache backend objects keyed by memory cache bins.
    */
   public static function getMemoryBins(): array {

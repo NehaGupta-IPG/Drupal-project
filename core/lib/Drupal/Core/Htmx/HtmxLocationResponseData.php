@@ -18,7 +18,7 @@ class HtmxLocationResponseData implements \Stringable {
   /**
    * Data for HX-Location headers.
    *
-   * @param \Drupal\Core\Url $path
+   * @param Url $path
    *   The path for the GET request.
    * @param string $source
    *   The source element of the request.
@@ -82,7 +82,7 @@ class HtmxLocationResponseData implements \Stringable {
   /**
    * Retrieves the cacheable metadata associated with the URL.
    *
-   * @return \Drupal\Core\Cache\CacheableMetadata
+   * @return CacheableMetadata
    *   The cacheable metadata instance.
    */
   public function getCacheableMetadata(): CacheableMetadata {

@@ -23,32 +23,32 @@ class EntitySchemaSubscriber implements EntityTypeListenerInterface, EventSubscr
   /**
    * The definition update manager.
    *
-   * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
+   * @var EntityDefinitionUpdateManagerInterface
    */
   protected $entityDefinitionUpdateManager;
 
   /**
    * The last installed schema definitions.
    *
-   * @var \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface
+   * @var EntityLastInstalledSchemaRepositoryInterface
    */
   protected $entityLastInstalledSchemaRepository;
 
   /**
    * The workspace information service.
    *
-   * @var \Drupal\workspaces\WorkspaceInformationInterface
+   * @var WorkspaceInformationInterface
    */
   protected $workspaceInfo;
 
   /**
    * Constructs a new EntitySchemaSubscriber.
    *
-   * @param \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager
+   * @param EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager
    *   Definition update manager.
-   * @param \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entityLastInstalledSchemaRepository
+   * @param EntityLastInstalledSchemaRepositoryInterface $entityLastInstalledSchemaRepository
    *   Last definitions.
-   * @param \Drupal\workspaces\WorkspaceInformationInterface $workspace_information
+   * @param WorkspaceInformationInterface $workspace_information
    *   The workspace information service.
    */
   public function __construct(EntityDefinitionUpdateManagerInterface $entityDefinitionUpdateManager, EntityLastInstalledSchemaRepositoryInterface $entityLastInstalledSchemaRepository, WorkspaceInformationInterface $workspace_information) {
@@ -123,7 +123,7 @@ class EntitySchemaSubscriber implements EntityTypeListenerInterface, EventSubscr
   /**
    * Adds the 'workspace' revision metadata field to an entity type.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type that has been installed or updated.
    */
   protected function addRevisionMetadataField(EntityTypeInterface $entity_type) {
@@ -145,7 +145,7 @@ class EntitySchemaSubscriber implements EntityTypeListenerInterface, EventSubscr
   /**
    * Gets the base field definition for the 'workspace' revision metadata field.
    *
-   * @return \Drupal\Core\Field\BaseFieldDefinition
+   * @return BaseFieldDefinition
    *   The base field definition.
    */
   protected function getWorkspaceFieldDefinition() {

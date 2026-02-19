@@ -27,7 +27,7 @@ class MenuLinkTreeElement {
   /**
    * The menu link for this element in a menu link tree.
    *
-   * @var \Drupal\Core\Menu\MenuLinkInterface
+   * @var MenuLinkInterface
    */
   public $link;
 
@@ -37,7 +37,7 @@ class MenuLinkTreeElement {
    * (Children of a link are only loaded if a link is marked as "expanded" by
    * the query.)
    *
-   * @var \Drupal\Core\Menu\MenuLinkTreeElement[]
+   * @var MenuLinkTreeElement[]
    */
   public $subtree;
 
@@ -86,7 +86,7 @@ class MenuLinkTreeElement {
   /**
    * Constructs a new \Drupal\Core\Menu\MenuLinkTreeElement.
    *
-   * @param \Drupal\Core\Menu\MenuLinkInterface $link
+   * @param MenuLinkInterface $link
    *   The menu link for this element in the menu link tree.
    * @param bool $has_children
    *   A flag as to whether this element has children even if they are not
@@ -96,7 +96,7 @@ class MenuLinkTreeElement {
    * @param bool $in_active_trail
    *   A flag as to whether this link was included in the list of active trail
    *   IDs used to build the tree.
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $subtree
+   * @param MenuLinkTreeElement[] $subtree
    *   The children of this element in the menu link tree.
    */
   public function __construct(MenuLinkInterface $link, $has_children, $depth, $in_active_trail, array $subtree) {

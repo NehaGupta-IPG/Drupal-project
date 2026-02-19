@@ -61,7 +61,7 @@ class TestDiscovery {
    *
    * @param string $root
    *   The app root.
-   * @param \Composer\Autoload\ClassLoader $class_loader
+   * @param ClassLoader $class_loader
    *   The class loader. Normally Composer's ClassLoader, as included by the
    *   front controller, but may also be decorated.
    */
@@ -343,7 +343,7 @@ class TestDiscovery {
    *   - groups: All of the test's @group annotations, as an array (parsed from
    *     PHPDoc annotations).
    *
-   * @throws \Drupal\Core\Test\Exception\MissingGroupException
+   * @throws MissingGroupException
    *   If the class does not have a @group annotation.
    *
    * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is

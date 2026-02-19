@@ -31,7 +31,7 @@ class TextFieldTest extends UnitTestCase {
   /**
    * The migration object.
    *
-   * @var \Drupal\migrate\Plugin\MigrationInterface
+   * @var MigrationInterface
    */
   protected $migration;
 

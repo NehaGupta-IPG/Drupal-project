@@ -37,14 +37,14 @@ class AddedStylesheetsTest extends BrowserTestBase {
   /**
    * The editor user.
    *
-   * @var \Drupal\editor\Entity\Editor
+   * @var Editor
    */
   protected Editor $editor;
 
   /**
    * The admin user.
    *
-   * @var \Drupal\user\Entity\User
+   * @var User
    */
   protected User $adminUser;
 

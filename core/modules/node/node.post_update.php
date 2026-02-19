@@ -28,7 +28,7 @@ function node_removed_post_updates(): array {
  * Creates base field override config for the promote base field on node types.
  */
 function node_post_update_create_promote_base_field_overrides(&$sandbox = []): void {
-  /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager */
+  /** @var EntityFieldManagerInterface $entityFieldManager */
   $entityFieldManager = \Drupal::service(EntityFieldManagerInterface::class);
   $promoteFieldDefinition = $entityFieldManager->getBaseFieldDefinitions('node')['promote'];
   \Drupal::classResolver(ConfigEntityUpdater::class)

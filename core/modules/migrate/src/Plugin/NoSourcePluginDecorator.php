@@ -15,14 +15,14 @@ class NoSourcePluginDecorator implements DiscoveryInterface {
   /**
    * The Discovery object being decorated.
    *
-   * @var \Drupal\Component\Plugin\Discovery\DiscoveryInterface
+   * @var DiscoveryInterface
    */
   protected $decorated;
 
   /**
    * Constructs a NoSourcePluginDecorator object.
    *
-   * @param \Drupal\Component\Plugin\Discovery\DiscoveryInterface $decorated
+   * @param DiscoveryInterface $decorated
    *   The object implementing DiscoveryInterface that is being decorated.
    */
   public function __construct(DiscoveryInterface $decorated) {

@@ -7,9 +7,9 @@ namespace Drupal\Tests\content_translation\Functional;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\Sql\SqlContentEntityStorage;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\field\Entity\FieldStorageConfig;
 
 /**
  * Base class for content translation tests.
@@ -248,7 +248,7 @@ abstract class ContentTranslationTestBase extends BrowserTestBase {
   /**
    * Returns the edit URL for the specified entity.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   * @param ContentEntityInterface $entity
    *   The entity being edited.
    *
    * @return \Drupal\Core\Url

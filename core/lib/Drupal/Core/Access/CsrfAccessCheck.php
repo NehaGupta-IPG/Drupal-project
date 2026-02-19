@@ -4,8 +4,8 @@ namespace Drupal\Core\Access;
 
 use Drupal\Core\Routing\Access\AccessInterface as RoutingAccessInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Symfony\Component\Routing\Route;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Route;
 
 /**
  * Access protection against CSRF attacks.
@@ -34,7 +34,7 @@ class CsrfAccessCheck implements RoutingAccessInterface {
   /**
    * Constructs a CsrfAccessCheck object.
    *
-   * @param \Drupal\Core\Access\CsrfTokenGenerator $csrf_token
+   * @param CsrfTokenGenerator $csrf_token
    *   The CSRF token generator.
    */
   public function __construct(CsrfTokenGenerator $csrf_token) {
@@ -44,14 +44,14 @@ class CsrfAccessCheck implements RoutingAccessInterface {
   /**
    * Checks access based on a CSRF token for the request.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route to check against.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The route match object.
    *
-   * @return \Drupal\Core\Access\AccessResultInterface
+   * @return AccessResultInterface
    *   The access result.
    */
   public function access(Route $route, Request $request, RouteMatchInterface $route_match) {

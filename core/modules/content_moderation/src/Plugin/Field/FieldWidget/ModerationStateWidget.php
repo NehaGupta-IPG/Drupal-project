@@ -2,7 +2,9 @@
 
 namespace Drupal\content_moderation\Plugin\Field\FieldWidget;
 
+use Drupal\content_moderation\ModerationInformation;
 use Drupal\content_moderation\Plugin\Field\ModerationStateFieldItemList;
+use Drupal\content_moderation\StateTransitionValidationInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\Attribute\FieldWidget;
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -10,8 +12,6 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\Plugin\Field\FieldWidget\OptionsSelectWidget;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\content_moderation\ModerationInformation;
-use Drupal\content_moderation\StateTransitionValidationInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -28,28 +28,28 @@ class ModerationStateWidget extends OptionsSelectWidget {
   /**
    * Current user service.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
   /**
    * Moderation information service.
    *
-   * @var \Drupal\content_moderation\ModerationInformation
+   * @var ModerationInformation
    */
   protected $moderationInformation;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * Moderation state transition validation service.
    *
-   * @var \Drupal\content_moderation\StateTransitionValidationInterface
+   * @var StateTransitionValidationInterface
    */
   protected $validator;
 
@@ -60,19 +60,19 @@ class ModerationStateWidget extends OptionsSelectWidget {
    *   Plugin id.
    * @param mixed $plugin_definition
    *   Plugin definition.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   Field definition.
    * @param array $settings
    *   Field settings.
    * @param array $third_party_settings
    *   Third party settings.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   Current user service.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   Entity type manager.
-   * @param \Drupal\content_moderation\ModerationInformation $moderation_information
+   * @param ModerationInformation $moderation_information
    *   Moderation information service.
-   * @param \Drupal\content_moderation\StateTransitionValidationInterface $validator
+   * @param StateTransitionValidationInterface $validator
    *   Moderation state transition validation service.
    */
   public function __construct(

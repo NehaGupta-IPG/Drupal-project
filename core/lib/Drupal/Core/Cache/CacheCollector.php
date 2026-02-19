@@ -40,14 +40,14 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
   /**
    * The cache backend that should be used.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $cache;
 
   /**
    * The lock backend that should be used.
    *
-   * @var \Drupal\Core\Lock\LockBackendInterface
+   * @var LockBackendInterface
    */
   protected $lock;
 
@@ -103,9 +103,9 @@ abstract class CacheCollector implements CacheCollectorInterface, DestructableIn
    *
    * @param string $cid
    *   The cid for the array being cached.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The cache backend.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
+   * @param LockBackendInterface $lock
    *   The lock backend.
    * @param array $tags
    *   (optional) The tags to specify for the cache item.

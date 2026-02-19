@@ -30,7 +30,7 @@ class EntityDisplayRepositoryTest extends KernelTestBase {
   /**
    * The entity display repository under test.
    *
-   * @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface
+   * @var EntityDisplayRepositoryInterface
    */
   protected $displayRepository;
 

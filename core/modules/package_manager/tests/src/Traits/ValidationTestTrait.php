@@ -24,11 +24,11 @@ trait ValidationTestTrait {
    * This assertion is sensitive to the order of results. For example,
    * ['a', 'b'] is not equal to ['b', 'a'].
    *
-   * @param \Drupal\package_manager\ValidationResult[] $expected_results
+   * @param ValidationResult[] $expected_results
    *   The expected validation results.
-   * @param \Drupal\package_manager\ValidationResult[] $actual_results
+   * @param ValidationResult[] $actual_results
    *   The actual validation results.
-   * @param \Drupal\package_manager\PathLocator|null $path_locator
+   * @param PathLocator|null $path_locator
    *   (optional) The path locator (when this trait is used in unit tests).
    * @param string|null $stage_dir
    *   (optional) The stage directory.
@@ -57,7 +57,7 @@ trait ValidationTestTrait {
    *   placeholders <PROJECT_ROOT>, <VENDOR_DIR>, <STAGE_ROOT>, or
    *   <STAGE_ROOT_PARENT>. <STAGE_DIR> is the placeholder for $stage_dir, if
    *   passed.
-   * @param \Drupal\package_manager\PathLocator|null $path_locator
+   * @param PathLocator|null $path_locator
    *   (optional) The path locator (when this trait is used in unit tests).
    * @param string|null $stage_dir
    *   (optional) The stage directory.
@@ -90,7 +90,7 @@ trait ValidationTestTrait {
   /**
    * Gets an array representation of validation results for easy comparison.
    *
-   * @param \Drupal\package_manager\ValidationResult[] $results
+   * @param ValidationResult[] $results
    *   An array of validation results.
    *
    * @return array

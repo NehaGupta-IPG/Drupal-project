@@ -4,16 +4,16 @@ namespace Drupal\block_content\Hook;
 
 use Drupal\block\BlockConfigUpdater;
 use Drupal\block\BlockInterface;
-use Drupal\block_content\Plugin\EntityReferenceSelection\BlockContentSelection;
-use Drupal\Core\Database\Query\ConditionInterface;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\block_content\BlockContentInterface;
-use Drupal\Core\Database\Query\SelectInterface;
+use Drupal\block_content\Plugin\EntityReferenceSelection\BlockContentSelection;
 use Drupal\Core\Database\Query\AlterableInterface;
+use Drupal\Core\Database\Query\ConditionInterface;
+use Drupal\Core\Database\Query\SelectInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
-use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Hook\Attribute\Hook;
 
 /**
  * Hook implementations for block_content.

@@ -18,7 +18,7 @@ class SchemaInspector {
    * hook_schema(), so it allows you to derive your tables from existing
    * specifications.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $handler
+   * @param ModuleHandlerInterface $handler
    *   The module handler to use for calling schema hook.
    * @param string $module
    *   The module to which the table belongs.

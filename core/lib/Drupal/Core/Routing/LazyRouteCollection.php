@@ -13,7 +13,7 @@ class LazyRouteCollection extends RouteCollection {
   /**
    * The route provider for this generator.
    *
-   * @var \Drupal\Core\Routing\RouteProviderInterface
+   * @var RouteProviderInterface
    */
   protected $provider;
 
@@ -44,7 +44,7 @@ class LazyRouteCollection extends RouteCollection {
   /**
    * Returns all routes in this collection.
    *
-   * @return \Symfony\Component\Routing\Route[]
+   * @return Route[]
    *   An array of routes
    */
   public function all(): array {
@@ -57,7 +57,7 @@ class LazyRouteCollection extends RouteCollection {
    * @param string $name
    *   The route name.
    *
-   * @return \Symfony\Component\Routing\Route|null
+   * @return Route|null
    *   A Route instance or null when not found
    */
   public function get($name): ?Route {

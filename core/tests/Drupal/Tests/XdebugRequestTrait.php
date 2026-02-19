@@ -22,7 +22,7 @@ trait XdebugRequestTrait {
    * this bit of information is forwarded. Make sure that the debugger listens
    * to at least three external connections.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
    * @return array

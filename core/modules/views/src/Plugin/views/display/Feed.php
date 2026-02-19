@@ -46,7 +46,7 @@ class Feed extends PathPluginBase implements ResponseDisplayPluginInterface {
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
@@ -59,11 +59,11 @@ class Feed extends PathPluginBase implements ResponseDisplayPluginInterface {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
+   * @param RouteProviderInterface $route_provider
    *   The route provider.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state key value store.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, RouteProviderInterface $route_provider, StateInterface $state, RendererInterface $renderer) {
@@ -89,7 +89,7 @@ class Feed extends PathPluginBase implements ResponseDisplayPluginInterface {
     $response = new CacheableResponse('', 200);
     $build['#response'] = $response;
 
-    /** @var \Drupal\Core\Render\RendererInterface $renderer */
+    /** @var RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
     $output = (string) $renderer->renderRoot($build);
@@ -113,7 +113,7 @@ class Feed extends PathPluginBase implements ResponseDisplayPluginInterface {
   /**
    * Sets headers on a response object.
    *
-   * @param \Drupal\Core\Cache\CacheableResponse $response
+   * @param CacheableResponse $response
    *   The HTML response to update.
    * @param array $headers
    *   The headers to set, as an array. The items in this array should be as

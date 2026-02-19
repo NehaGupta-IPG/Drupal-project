@@ -20,23 +20,23 @@ class JsonRenderer implements MainContentRendererInterface {
   /**
    * The title resolver.
    *
-   * @var \Drupal\Core\Controller\TitleResolverInterface
+   * @var TitleResolverInterface
    */
   protected $titleResolver;
 
   /**
    * The renderer service.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * Constructs a new JsonRenderer.
    *
-   * @param \Drupal\Core\Controller\TitleResolverInterface $title_resolver
+   * @param TitleResolverInterface $title_resolver
    *   The title resolver.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer service.
    */
   public function __construct(TitleResolverInterface $title_resolver, RendererInterface $renderer) {

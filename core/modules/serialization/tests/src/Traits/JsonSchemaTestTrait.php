@@ -6,8 +6,8 @@ namespace Drupal\Tests\serialization\Traits;
 
 use Drupal\serialization\Normalizer\PrimitiveDataNormalizer;
 use JsonSchema\Validator;
-use Prophecy\Prophecy\ObjectProphecy;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -36,7 +36,7 @@ trait JsonSchemaTestTrait {
   /**
    * Method to make prophecy public for use in data provider closures.
    *
-   * @return \Prophecy\Prophecy\ObjectProphecy<object>
+   * @return ObjectProphecy<object>
    *   A new prophecy object.
    */
   public function doProphesize(?string $classOrInterface = NULL): ObjectProphecy {
@@ -135,7 +135,7 @@ trait JsonSchemaTestTrait {
    * Override this method if the normalizer has a custom getter or is not
    * already present at $this->normalizer.
    *
-   * @return \Symfony\Component\Serializer\Normalizer\NormalizerInterface
+   * @return NormalizerInterface
    *   The normalizer under test.
    */
   protected function getNormalizer(): NormalizerInterface {
@@ -163,7 +163,7 @@ trait JsonSchemaTestTrait {
    *
    * Override this method to add additional schema translations to the loader.
    *
-   * @return \JsonSchema\Validator
+   * @return Validator
    *   Schema validator.
    */
   protected function getValidator(): Validator {

@@ -18,7 +18,7 @@ trait MailerCaptureTrait {
   /**
    * Gets an array containing all emails sent during this test case.
    *
-   * @return \Symfony\Component\Mime\Email[]
+   * @return Email[]
    *   An array containing email messages captured during the current test.
    */
   protected function getEmails(): array {
@@ -29,7 +29,7 @@ trait MailerCaptureTrait {
   /**
    * Gets an array containing all messages sent during this test case.
    *
-   * @return \Symfony\Component\Mailer\SentMessage[]
+   * @return SentMessage[]
    *   An array containing messages captured during the current test.
    */
   protected function getCapturedMessages(): array {

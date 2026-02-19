@@ -95,28 +95,28 @@ class MenuLinkParent extends ProcessPluginBase implements ContainerFactoryPlugin
   /**
    * The menu link plugin manager.
    *
-   * @var \Drupal\Core\Menu\MenuLinkManagerInterface
+   * @var MenuLinkManagerInterface
    */
   protected $menuLinkManager;
 
   /**
    * The currently running migration.
    *
-   * @var \Drupal\migrate\Plugin\MigrationInterface
+   * @var MigrationInterface
    */
   protected $migration;
 
   /**
    * The migrate lookup service.
    *
-   * @var \Drupal\migrate\MigrateLookupInterface
+   * @var MigrateLookupInterface
    */
   protected $migrateLookup;
 
   /**
    * The menu link entity storage handler.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var EntityStorageInterface
    */
   protected $menuLinkStorage;
 
@@ -136,13 +136,13 @@ class MenuLinkParent extends ProcessPluginBase implements ContainerFactoryPlugin
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\migrate\MigrateLookupInterface $migrate_lookup
+   * @param MigrateLookupInterface $migrate_lookup
    *   The migrate lookup service.
-   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menu_link_manager
+   * @param MenuLinkManagerInterface $menu_link_manager
    *   The menu link manager.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $menu_link_storage
+   * @param EntityStorageInterface $menu_link_storage
    *   The menu link storage object.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The currently running migration.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrateLookupInterface $migrate_lookup, MenuLinkManagerInterface $menu_link_manager, EntityStorageInterface $menu_link_storage, MigrationInterface $migration) {

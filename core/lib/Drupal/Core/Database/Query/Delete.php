@@ -23,7 +23,7 @@ class Delete extends Query implements ConditionInterface {
   /**
    * Constructs a Delete object.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   A Connection object.
    * @param string $table
    *   Name of the table to associate with this query.

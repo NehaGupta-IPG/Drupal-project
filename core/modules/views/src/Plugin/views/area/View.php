@@ -26,7 +26,7 @@ class View extends AreaPluginBase {
   /**
    * The view storage.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var EntityStorageInterface
    */
   protected $viewStorage;
 
@@ -39,7 +39,7 @@ class View extends AreaPluginBase {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $view_storage
+   * @param EntityStorageInterface $view_storage
    *   The view storage.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityStorageInterface $view_storage) {

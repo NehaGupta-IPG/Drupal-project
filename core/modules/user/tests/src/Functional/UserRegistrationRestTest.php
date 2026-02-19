@@ -203,7 +203,7 @@ class UserRegistrationRestTest extends ResourceTestBase {
    * @param bool $include_email
    *   Include the email?
    *
-   * @return bool|\Drupal\user\Entity\User
+   * @return bool|User
    *   Return bool or the user.
    */
   protected function registerUser($name, $include_password = TRUE, $include_email = TRUE) {
@@ -225,7 +225,7 @@ class UserRegistrationRestTest extends ResourceTestBase {
    * @param bool $include_email
    *   Include the email?
    *
-   * @return \Psr\Http\Message\ResponseInterface
+   * @return ResponseInterface
    *   Return the Response.
    */
   protected function registerRequest($name, $include_password = TRUE, $include_email = TRUE): ResponseInterface {

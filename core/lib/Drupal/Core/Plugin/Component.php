@@ -2,8 +2,8 @@
 
 namespace Drupal\Core\Plugin;
 
-use Drupal\Core\Theme\Component\ComponentMetadata;
 use Drupal\Core\Render\Component\Exception\InvalidComponentException;
+use Drupal\Core\Theme\Component\ComponentMetadata;
 
 /**
  * Simple value object that contains information about the component.
@@ -13,7 +13,7 @@ class Component extends PluginBase {
   /**
    * The component's metadata.
    *
-   * @var \Drupal\Core\Theme\Component\ComponentMetadata
+   * @var ComponentMetadata
    */
   public readonly ComponentMetadata $metadata;
 
@@ -41,7 +41,7 @@ class Component extends PluginBase {
   /**
    * Component constructor.
    *
-   * @throws \Drupal\Core\Render\Component\Exception\InvalidComponentException
+   * @throws InvalidComponentException
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);

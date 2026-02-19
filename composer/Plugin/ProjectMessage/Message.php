@@ -14,7 +14,7 @@ class Message {
   /**
    * The root package.
    *
-   * @var \Composer\Package\RootPackageInterface
+   * @var RootPackageInterface
    */
   protected $rootPackage;
 
@@ -35,7 +35,7 @@ class Message {
   /**
    * Construct a Config object.
    *
-   * @param \Composer\Package\RootPackageInterface $root_package
+   * @param RootPackageInterface $root_package
    *   Composer package object for the root package.
    * @param string $event_name
    *   The event name.

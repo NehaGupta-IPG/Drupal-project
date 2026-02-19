@@ -161,7 +161,7 @@ final class ConfigTarget {
   /**
    * Retrieves the mapped value from config.
    *
-   * @param \Drupal\Core\Config\Config $config
+   * @param Config $config
    *   The config object we're reading from.
    *
    * @return mixed
@@ -193,12 +193,12 @@ final class ConfigTarget {
   /**
    * Sets the submitted value from config.
    *
-   * @param \Drupal\Core\Config\Config $config
+   * @param Config $config
    *   The config object we're changing.
    * @param mixed $value
    *   The value(s) to set. If this object is targeting multiple property paths,
    *   this must be an array with the values to set, keyed by property path.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    *
    * @throws \InvalidArgumentException

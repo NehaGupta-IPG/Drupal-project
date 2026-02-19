@@ -105,7 +105,7 @@ class MigrateImageStylesTest extends MigrateDrupal7TestBase {
   protected function assertEntity(string $id, string $label, array $expected_effect_plugins, array $expected_effect_config): void {
     $style = ImageStyle::load($id);
     $this->assertInstanceOf(ImageStyleInterface::class, $style);
-    /** @var \Drupal\image\ImageStyleInterface $style */
+    /** @var ImageStyleInterface $style */
     $this->assertSame($id, $style->id());
     $this->assertSame($label, $style->label());
 

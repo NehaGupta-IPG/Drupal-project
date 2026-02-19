@@ -103,7 +103,7 @@ class RenderCacheIntegrationTest extends ViewsKernelTestBase {
     $this->assertViewsCacheTagsFromStaticRenderArray($view, $base_tags, $do_assert_views_caches);
 
     // Non-empty result (1 entity).
-    /** @var \Drupal\Core\Entity\EntityInterface[] $entities */
+    /** @var EntityInterface[] $entities */
     $entities[] = $entity = EntityTest::create();
     $entity->save();
 

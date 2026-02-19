@@ -29,9 +29,9 @@ class DrupalSelenium2Driver extends Selenium2Driver {
    * @return string
    *   The remote path.
    *
-   * @throws \Behat\Mink\Exception\DriverException
+   * @throws DriverException
    *   When PHP is compiled without zip support, or the file doesn't exist.
-   * @throws \WebDriver\Exception\UnknownError
+   * @throws UnknownError
    *   When an unknown error occurred during file upload.
    * @throws \Exception
    *   When a known error occurred during file upload.
@@ -211,7 +211,7 @@ JS);
   /**
    * Executes JS on a given element.
    *
-   * @param \WebDriver\Element $element
+   * @param Element $element
    *   The webdriver element.
    * @param string $script
    *   The script to execute.

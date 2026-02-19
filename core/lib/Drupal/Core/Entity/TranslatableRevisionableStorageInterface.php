@@ -13,7 +13,7 @@ interface TranslatableRevisionableStorageInterface extends RevisionableStorageIn
    * When dealing with a translatable entity, this will merge the default
    * revision with the active translation of the passed entity.
    *
-   * @param \Drupal\Core\Entity\RevisionableInterface $entity
+   * @param RevisionableInterface $entity
    *   The revisionable entity object being modified.
    * @param bool $default
    *   (optional) Whether the new revision should be marked as default. Defaults
@@ -24,7 +24,7 @@ interface TranslatableRevisionableStorageInterface extends RevisionableStorageIn
    *   TRUE if the provided entity is the default translation and untranslatable
    *   fields should only affect the default translation, FALSE otherwise.
    *
-   * @return \Drupal\Core\Entity\TranslatableRevisionableInterface
+   * @return TranslatableRevisionableInterface
    *   A new translatable entity revision object.
    */
   public function createRevision(RevisionableInterface $entity, $default = TRUE, $keep_untranslatable_fields = NULL);

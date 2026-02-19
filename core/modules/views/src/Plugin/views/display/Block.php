@@ -2,13 +2,13 @@
 
 namespace Drupal\views\Plugin\views\display;
 
-use Drupal\Component\Utility\Unicode;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\Url;
 use Drupal\Component\Plugin\Discovery\CachedDiscoveryInterface;
+use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
 use Drupal\views\Attribute\ViewsDisplay;
 use Drupal\views\Plugin\Block\ViewsBlock;
 
@@ -42,14 +42,14 @@ class Block extends DisplayPluginBase {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The block manager.
    *
-   * @var \Drupal\Core\Block\BlockManagerInterface
+   * @var BlockManagerInterface
    */
   protected $blockManager;
 
@@ -62,9 +62,9 @@ class Block extends DisplayPluginBase {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Block\BlockManagerInterface $block_manager
+   * @param BlockManagerInterface $block_manager
    *   The block manager.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, BlockManagerInterface $block_manager) {
@@ -260,11 +260,11 @@ class Block extends DisplayPluginBase {
    *
    * This method allows block instances to override the views items_per_page.
    *
-   * @param \Drupal\views\Plugin\Block\ViewsBlock $block
+   * @param ViewsBlock $block
    *   The ViewsBlock plugin.
    * @param array $form
    *   The form definition array for the block configuration form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return array
@@ -316,11 +316,11 @@ class Block extends DisplayPluginBase {
   /**
    * Handles form validation for the views block configuration form.
    *
-   * @param \Drupal\views\Plugin\Block\ViewsBlock $block
+   * @param ViewsBlock $block
    *   The ViewsBlock plugin.
    * @param array $form
    *   The form definition array for the block configuration form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @see \Drupal\views\Plugin\Block\ViewsBlock::blockValidate()
@@ -331,11 +331,11 @@ class Block extends DisplayPluginBase {
   /**
    * Handles form submission for the views block configuration form.
    *
-   * @param \Drupal\views\Plugin\Block\ViewsBlock $block
+   * @param ViewsBlock $block
    *   The ViewsBlock plugin.
    * @param array $form
    *   The form definition array for the full block configuration form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @see \Drupal\views\Plugin\Block\ViewsBlock::blockSubmit()
@@ -350,7 +350,7 @@ class Block extends DisplayPluginBase {
   /**
    * Allows to change the display settings right before executing the block.
    *
-   * @param \Drupal\views\Plugin\Block\ViewsBlock $block
+   * @param ViewsBlock $block
    *   The block plugin for views displays.
    */
   public function preBlockBuild(ViewsBlock $block) {

@@ -24,35 +24,35 @@ class ModulesUninstallForm extends FormBase {
   /**
    * The module handler service.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The module installer service.
    *
-   * @var \Drupal\Core\Extension\ModuleInstallerInterface
+   * @var ModuleInstallerInterface
    */
   protected $moduleInstaller;
 
   /**
    * The expirable key value store.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface
+   * @var KeyValueStoreExpirableInterface
    */
   protected $keyValueExpirable;
 
   /**
    * The module extension list.
    *
-   * @var \Drupal\Core\Extension\ModuleExtensionList
+   * @var ModuleExtensionList
    */
   protected $moduleExtensionList;
 
   /**
    * The update registry service.
    *
-   * @var \Drupal\Core\Update\UpdateHookRegistry
+   * @var UpdateHookRegistry
    */
   protected $updateRegistry;
 
@@ -72,15 +72,15 @@ class ModulesUninstallForm extends FormBase {
   /**
    * Constructs a ModulesUninstallForm object.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Extension\ModuleInstallerInterface $module_installer
+   * @param ModuleInstallerInterface $module_installer
    *   The module installer.
-   * @param \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface $key_value_expirable
+   * @param KeyValueStoreExpirableInterface $key_value_expirable
    *   The key value expirable factory.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $extension_list_module
+   * @param ModuleExtensionList $extension_list_module
    *   The module extension list.
-   * @param \Drupal\Core\Update\UpdateHookRegistry|null $versioning_update_registry
+   * @param UpdateHookRegistry|null $versioning_update_registry
    *   Versioning update registry service.
    */
   public function __construct(ModuleHandlerInterface $module_handler, ModuleInstallerInterface $module_installer, KeyValueStoreExpirableInterface $key_value_expirable, ModuleExtensionList $extension_list_module, UpdateHookRegistry $versioning_update_registry) {

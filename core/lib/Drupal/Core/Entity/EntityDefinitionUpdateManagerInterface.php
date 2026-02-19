@@ -107,7 +107,7 @@ interface EntityDefinitionUpdateManagerInterface {
    * @param string $entity_type_id
    *   The entity type identifier.
    *
-   * @return \Drupal\Core\Entity\EntityTypeInterface|null
+   * @return EntityTypeInterface|null
    *   The entity type definition. Or NULL if not found.
    */
   public function getEntityType($entity_type_id);
@@ -119,7 +119,7 @@ interface EntityDefinitionUpdateManagerInterface {
    * method should always be used to retrieve all the definitions ready to be
    * manipulated.
    *
-   * @return \Drupal\Core\Entity\EntityTypeInterface[]
+   * @return EntityTypeInterface[]
    *   The last installed entity type definitions, keyed by the entity type ID.
    */
   public function getEntityTypes();
@@ -127,7 +127,7 @@ interface EntityDefinitionUpdateManagerInterface {
   /**
    * Installs a new entity type definition.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
    */
   public function installEntityType(EntityTypeInterface $entity_type);
@@ -135,9 +135,9 @@ interface EntityDefinitionUpdateManagerInterface {
   /**
    * Installs a new fieldable entity type definition.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface[] $field_storage_definitions
+   * @param FieldStorageDefinitionInterface[] $field_storage_definitions
    *   The entity type's field storage definitions.
    */
   public function installFieldableEntityType(EntityTypeInterface $entity_type, array $field_storage_definitions);
@@ -145,7 +145,7 @@ interface EntityDefinitionUpdateManagerInterface {
   /**
    * Applies any change performed to the passed entity type definition.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
    */
   public function updateEntityType(EntityTypeInterface $entity_type);
@@ -153,7 +153,7 @@ interface EntityDefinitionUpdateManagerInterface {
   /**
    * Uninstalls an entity type definition.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
    */
   public function uninstallEntityType(EntityTypeInterface $entity_type);
@@ -161,9 +161,9 @@ interface EntityDefinitionUpdateManagerInterface {
   /**
    * Applies any change performed to a fieldable entity type definition.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The updated entity type definition.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface[] $field_storage_definitions
+   * @param FieldStorageDefinitionInterface[] $field_storage_definitions
    *   The updated field storage definitions, including possibly new ones.
    * @param array &$sandbox
    *   (optional) A sandbox array provided by a hook_update_N() implementation
@@ -184,7 +184,7 @@ interface EntityDefinitionUpdateManagerInterface {
    * @param string $entity_type_id
    *   The entity type identifier.
    *
-   * @return \Drupal\Core\Field\FieldStorageDefinitionInterface|null
+   * @return FieldStorageDefinitionInterface|null
    *   The field storage definition or NULL if there is none for the given field
    *   name and entity type.
    *
@@ -202,7 +202,7 @@ interface EntityDefinitionUpdateManagerInterface {
    *   The target entity type identifier.
    * @param string $provider
    *   The name of the definition provider.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field storage definition.
    */
   public function installFieldStorageDefinition($name, $entity_type_id, $provider, FieldStorageDefinitionInterface $storage_definition);
@@ -210,7 +210,7 @@ interface EntityDefinitionUpdateManagerInterface {
   /**
    * Applies any change performed to the passed field storage definition.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field storage definition.
    */
   public function updateFieldStorageDefinition(FieldStorageDefinitionInterface $storage_definition);
@@ -218,7 +218,7 @@ interface EntityDefinitionUpdateManagerInterface {
   /**
    * Uninstalls a field storage definition.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field storage definition.
    */
   public function uninstallFieldStorageDefinition(FieldStorageDefinitionInterface $storage_definition);

@@ -12,14 +12,14 @@ namespace Drupal\Core\Config\Checkpoint;
  *
  * @see \Drupal\Core\Config\Checkpoint\Checkpoint
  *
- * @phpstan-extends \IteratorAggregate<string, \Drupal\Core\Config\Checkpoint\Checkpoint>
+ * @phpstan-extends \IteratorAggregate<string, Checkpoint>
  */
 interface CheckpointListInterface extends \IteratorAggregate, \Countable {
 
   /**
    * Gets the active checkpoint.
    *
-   * @return \Drupal\Core\Config\Checkpoint\Checkpoint|null
+   * @return Checkpoint|null
    *   The active checkpoint or NULL if there are no checkpoints.
    */
   public function getActiveCheckpoint(): ?Checkpoint;
@@ -30,10 +30,10 @@ interface CheckpointListInterface extends \IteratorAggregate, \Countable {
    * @param string $id
    *   The checkpoint ID.
    *
-   * @return \Drupal\Core\Config\Checkpoint\Checkpoint
+   * @return Checkpoint
    *   The checkpoint.
    *
-   * @throws \Drupal\Core\Config\Checkpoint\UnknownCheckpointException
+   * @throws UnknownCheckpointException
    *   Thrown when the provided checkpoint does not exist.
    */
   public function get(string $id): Checkpoint;
@@ -44,7 +44,7 @@ interface CheckpointListInterface extends \IteratorAggregate, \Countable {
    * @param string $id
    *   The checkpoint ID.
    *
-   * @return iterable<string, \Drupal\Core\Config\Checkpoint\Checkpoint>
+   * @return iterable<string, Checkpoint>
    *   The parents for the given checkpoint.
    */
   public function getParents(string $id): iterable;
@@ -57,10 +57,10 @@ interface CheckpointListInterface extends \IteratorAggregate, \Countable {
    * @param string|\Stringable $label
    *   The checkpoint label.
    *
-   * @return \Drupal\Core\Config\Checkpoint\Checkpoint
+   * @return Checkpoint
    *   The new checkpoint, which is now at the end of the checkpoint sequence.
    *
-   * @throws \Drupal\Core\Config\Checkpoint\CheckpointExistsException
+   * @throws CheckpointExistsException
    *   Thrown when the ID already exists.
    */
   public function add(string $id, string|\Stringable $label): Checkpoint;
@@ -74,7 +74,7 @@ interface CheckpointListInterface extends \IteratorAggregate, \Countable {
    *
    * @return $this
    *
-   * @throws \Drupal\Core\Config\Checkpoint\UnknownCheckpointException
+   * @throws UnknownCheckpointException
    *   Thrown when provided checkpoint ID does not exist.
    */
   public function delete(string $id): static;

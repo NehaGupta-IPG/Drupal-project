@@ -5,11 +5,11 @@ namespace Drupal\update;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface;
-use Drupal\Core\State\StateInterface;
+use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\PrivateKey;
 use Drupal\Core\Queue\QueueFactory;
+use Drupal\Core\State\StateInterface;
 
 /**
  * Process project update information.
@@ -26,7 +26,7 @@ class UpdateProcessor implements UpdateProcessorInterface {
   /**
    * The UpdateFetcher service.
    *
-   * @var \Drupal\update\UpdateFetcherInterface
+   * @var UpdateFetcherInterface
    */
   protected $updateFetcher;
 
@@ -68,14 +68,14 @@ class UpdateProcessor implements UpdateProcessorInterface {
   /**
    * The state service.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $stateStore;
 
   /**
    * The private key.
    *
-   * @var \Drupal\Core\PrivateKey
+   * @var PrivateKey
    */
   protected $privateKey;
 
@@ -87,21 +87,21 @@ class UpdateProcessor implements UpdateProcessorInterface {
   /**
    * Constructs an UpdateProcessor.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\Core\Queue\QueueFactory $queue_factory
+   * @param QueueFactory $queue_factory
    *   The queue factory.
-   * @param \Drupal\update\UpdateFetcherInterface $update_fetcher
+   * @param UpdateFetcherInterface $update_fetcher
    *   The update fetcher service.
-   * @param \Drupal\Core\State\StateInterface $state_store
+   * @param StateInterface $state_store
    *   The state service.
-   * @param \Drupal\Core\PrivateKey $private_key
+   * @param PrivateKey $private_key
    *   The private key factory service.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_factory
+   * @param KeyValueFactoryInterface $key_value_factory
    *   The key/value factory.
-   * @param \Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface $key_value_expirable_factory
+   * @param KeyValueExpirableFactoryInterface $key_value_expirable_factory
    *   The expirable key/value factory.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct(

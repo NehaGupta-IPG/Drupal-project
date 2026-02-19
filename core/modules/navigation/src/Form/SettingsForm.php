@@ -30,17 +30,17 @@ final class SettingsForm extends ConfigFormBase {
   /**
    * Constructs a Navigation SettingsForm object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config_manager
+   * @param TypedConfigManagerInterface $typed_config_manager
    *   The typed config manager.
-   * @param \Drupal\Core\File\FileSystemInterface $fileSystem
+   * @param FileSystemInterface $fileSystem
    *   The file system.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer service.
-   * @param \Drupal\Core\Image\ImageFactory $imageFactory
+   * @param ImageFactory $imageFactory
    *   The image factory.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $themeManager
+   * @param ThemeManagerInterface $themeManager
    *   The theme manager.
    */
   public function __construct(
@@ -259,7 +259,7 @@ final class SettingsForm extends ConfigFormBase {
   /**
    * Adjusts the custom logo dimensions according to navigation settings.
    *
-   * @param \Drupal\file\Entity\File $file
+   * @param File $file
    *   The file entity that contains the image.
    *
    * @return array|null

@@ -5,6 +5,7 @@
 
 namespace Drupal\Core\DependencyInjection;
 
+use Drupal\Component\FileCache\FileCacheInterface;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Core\Serialization\Yaml;
@@ -44,14 +45,14 @@ class YamlFileLoader
     ];
 
     /**
-     * @var \Drupal\Core\DependencyInjection\ContainerBuilder $container
+     * @var ContainerBuilder $container
      */
     protected $container;
 
     /**
      * File cache object.
      *
-     * @var \Drupal\Component\FileCache\FileCacheInterface
+     * @var FileCacheInterface
      */
     protected $fileCache;
 

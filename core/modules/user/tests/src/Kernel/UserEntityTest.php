@@ -100,7 +100,7 @@ class UserEntityTest extends KernelTestBase {
    * Tests that ::existingPassword can be used for chaining.
    */
   public function testChainExistingPasswordMethod(): void {
-    /** @var \Drupal\user\Entity\User $user */
+    /** @var User $user */
     $user = User::create([
       'name' => $this->randomMachineName(),
     ]);

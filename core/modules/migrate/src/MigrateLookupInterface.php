@@ -21,10 +21,10 @@ interface MigrateLookupInterface {
    *   An array of arrays of destination ids, or an empty array if none were
    *   found.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws PluginException
    *   Thrown by the migration plugin manager on error, or if the migration(s)
    *   cannot be found.
-   * @throws \Drupal\migrate\MigrateException
+   * @throws MigrateException
    *   Thrown when $source_id_values contains unknown keys, or is the wrong
    *   length.
    */

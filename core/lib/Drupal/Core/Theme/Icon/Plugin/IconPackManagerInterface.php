@@ -33,7 +33,7 @@ interface IconPackManagerInterface extends PluginManagerInterface {
    * @param string $icon_full_id
    *   The ID of the icon to retrieve, include pack id.
    *
-   * @return \Drupal\Core\Theme\Icon\IconDefinitionInterface|null
+   * @return IconDefinitionInterface|null
    *   Icon definition.
    */
   public function getIcon(string $icon_full_id): ?IconDefinitionInterface;
@@ -55,7 +55,7 @@ interface IconPackManagerInterface extends PluginManagerInterface {
    * @param array $form
    *   The form structure where widgets are being attached to. This might be a
    *   full form structure, or a sub-element of a larger form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    * @param array $default_settings
    *   The settings for the forms (optional).

@@ -4,9 +4,8 @@ declare(strict_types = 1);
 
 namespace Drupal\ckeditor5\Plugin\Validation\Constraint;
 
-// cspell:ignore enableable
-
 use Drupal\ckeditor5\HTMLRestrictions;
+// cspell:ignore enableable
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\Validator\Constraint;
@@ -27,7 +26,7 @@ class SourceEditingRedundantTagsConstraintValidator extends ConstraintValidator 
   /**
    * {@inheritdoc}
    *
-   * @throws \Symfony\Component\Validator\Exception\UnexpectedTypeException
+   * @throws UnexpectedTypeException
    *   Thrown when the given constraint is not supported by this validator.
    */
   public function validate($value, Constraint $constraint): void {
@@ -155,7 +154,7 @@ class SourceEditingRedundantTagsConstraintValidator extends ConstraintValidator 
   /**
    * Inspects whether the given tag has attribute restrictions.
    *
-   * @param \Drupal\ckeditor5\HTMLRestrictions $r
+   * @param HTMLRestrictions $r
    *   A set of HTML restrictions to inspect.
    * @param string $tag_name
    *   The tag to check for attribute restrictions in $r.
@@ -172,11 +171,11 @@ class SourceEditingRedundantTagsConstraintValidator extends ConstraintValidator 
   /**
    * Creates a message listing plugins and the overlapping tags they provide.
    *
-   * @param \Drupal\ckeditor5\HTMLRestrictions $overlap
+   * @param HTMLRestrictions $overlap
    *   An array of overlapping tags.
-   * @param \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition[] $plugin_definitions
+   * @param CKEditor5PluginDefinition[] $plugin_definitions
    *   An array of plugin definitions where overlap was found.
-   * @param \Drupal\ckeditor5\HTMLRestrictions $enabled_plugin_restrictions
+   * @param HTMLRestrictions $enabled_plugin_restrictions
    *   The set of HTML restrictions for all already enabled CKEditor 5 plugins.
    *
    * @return string

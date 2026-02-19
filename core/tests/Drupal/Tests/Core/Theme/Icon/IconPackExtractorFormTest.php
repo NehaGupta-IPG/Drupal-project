@@ -21,21 +21,21 @@ class IconPackExtractorFormTest extends UnitTestCase {
   /**
    * The icon pack form.
    *
-   * @var \Drupal\Core\Theme\Icon\IconPackExtractorForm
+   * @var IconPackExtractorForm
    */
   private IconPackExtractorForm $iconPackForm;
 
   /**
    * The plugin form.
    *
-   * @var \Drupal\Core\Plugin\PluginWithFormsInterface
+   * @var PluginWithFormsInterface
    */
   private PluginWithFormsInterface $plugin;
 
   /**
    * The form state.
    *
-   * @var \Drupal\Core\Form\FormStateInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var FormStateInterface|ObjectProphecy
    */
   private $formState;
 
@@ -59,7 +59,7 @@ class IconPackExtractorFormTest extends UnitTestCase {
     $form = [
       'test_form' => 'test_form',
     ];
-    /** @var \Drupal\Core\Form\FormStateInterface $formState */
+    /** @var FormStateInterface $formState */
     $formState = $this->formState->reveal();
 
     $result = $this->iconPackForm->buildConfigurationForm($form, $formState);
@@ -73,7 +73,7 @@ class IconPackExtractorFormTest extends UnitTestCase {
    */
   public function testValidateConfigurationForm(): void {
     $form = [];
-    /** @var \Drupal\Core\Form\FormStateInterface $formState */
+    /** @var FormStateInterface $formState */
     $formState = $this->formState->reveal();
 
     $this->iconPackForm->validateConfigurationForm($form, $formState);
@@ -85,7 +85,7 @@ class IconPackExtractorFormTest extends UnitTestCase {
    */
   public function testSubmitConfigurationForm(): void {
     $form = [];
-    /** @var \Drupal\Core\Form\FormStateInterface $formState */
+    /** @var FormStateInterface $formState */
     $formState = $this->formState->reveal();
 
     $this->iconPackForm->submitConfigurationForm($form, $formState);

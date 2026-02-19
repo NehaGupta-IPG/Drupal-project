@@ -25,7 +25,7 @@ final class LinksetController extends ControllerBase {
   /**
    * Linkset constructor.
    *
-   * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menuTree
+   * @param MenuLinkTreeInterface $menuTree
    *   The menu tree loader service. This is used to load a menu's link
    *   elements so that they can be serialized into a linkset response.
    */
@@ -35,12 +35,12 @@ final class LinksetController extends ControllerBase {
   /**
    * Serve linkset requests.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   An HTTP request.
-   * @param \Drupal\system\MenuInterface $menu
+   * @param MenuInterface $menu
    *   A menu for which to produce a linkset.
    *
-   * @return \Drupal\Core\Cache\CacheableJsonResponse
+   * @return CacheableJsonResponse
    *   A linkset response.
    */
   public function process(Request $request, MenuInterface $menu) {
@@ -125,9 +125,9 @@ final class LinksetController extends ControllerBase {
    * must be a string. See
    * https://tools.ietf.org/html/draft-ietf-httpapi-linkset-08#section-4.2.4.3
    *
-   * @param \Drupal\Core\Menu\MenuLinkTreeElement[] $tree
+   * @param MenuLinkTreeElement[] $tree
    *   A tree of menu elements.
-   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $cacheability
+   * @param RefinableCacheableDependencyInterface $cacheability
    *   An object to capture any cacheability metadata.
    * @param array $hierarchy_ancestors
    *   (Internal use only) The hierarchy value of the parent element
@@ -253,7 +253,7 @@ final class LinksetController extends ControllerBase {
   /**
    * Loads a menu tree.
    *
-   * @param \Drupal\system\MenuInterface $menu
+   * @param MenuInterface $menu
    *   A menu for which a tree should be loaded.
    *
    * @return \Drupal\Core\Menu\MenuLinkTreeElement[]

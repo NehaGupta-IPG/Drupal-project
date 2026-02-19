@@ -24,7 +24,7 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface {
    *
    * If this is NULL a rebuild will be triggered.
    *
-   * @var \Symfony\Component\Mime\MimeTypeGuesserInterface[]
+   * @var MimeTypeGuesserInterface[]
    *
    * @see \Drupal\Core\File\MimeType\MimeTypeGuesser::addGuesser()
    * @see \Drupal\Core\File\MimeType\MimeTypeGuesser::sortGuessers()
@@ -34,14 +34,14 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface {
   /**
    * The stream wrapper manager.
    *
-   * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface
+   * @var StreamWrapperManagerInterface
    */
   protected $streamWrapperManager;
 
   /**
    * Constructs a MimeTypeGuesser object.
    *
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager
+   * @param StreamWrapperManagerInterface $stream_wrapper_manager
    *   The stream wrapper manager.
    */
   public function __construct(StreamWrapperManagerInterface $stream_wrapper_manager) {
@@ -79,7 +79,7 @@ class MimeTypeGuesser implements MimeTypeGuesserInterface {
   /**
    * Appends a MIME type guesser to the guessers chain.
    *
-   * @param \Symfony\Component\Mime\MimeTypeGuesserInterface $guesser
+   * @param MimeTypeGuesserInterface $guesser
    *   The guesser to be appended.
    * @param int $priority
    *   The priority of the guesser being added.

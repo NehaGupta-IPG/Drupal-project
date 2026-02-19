@@ -14,14 +14,14 @@ class ServiceWithDependency {
   /**
    * The injected service.
    *
-   * @var \Drupal\new_dependency_test\InjectedService
+   * @var InjectedService
    */
   protected $service;
 
   /**
    * ServiceWithDependency constructor.
    *
-   * @param \Drupal\new_dependency_test\InjectedService|null $service
+   * @param InjectedService|null $service
    *   The service of the same module which has the new dependency.
    */
   public function __construct(?InjectedService $service = NULL) {

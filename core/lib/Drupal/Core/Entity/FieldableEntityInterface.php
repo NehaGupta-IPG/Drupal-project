@@ -41,7 +41,7 @@ interface FieldableEntityInterface extends EntityInterface {
    * bundles by hook_entity_base_field_info_alter() or overridden on a
    * per-bundle basis via 'base_field_override' configuration entities.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition. Useful when a single class is used for
    *   multiple, possibly dynamic entity types.
    *
@@ -74,12 +74,12 @@ interface FieldableEntityInterface extends EntityInterface {
    * 'base_field_override' configuration entity exists, the latter takes
    * precedence.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition. Useful when a single class is used for
    *   multiple, possibly dynamic entity types.
    * @param string $bundle
    *   The bundle.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface[] $base_field_definitions
+   * @param FieldDefinitionInterface[] $base_field_definitions
    *   The list of base field definitions.
    *
    * @return \Drupal\Core\Field\FieldDefinitionInterface[]
@@ -212,7 +212,7 @@ interface FieldableEntityInterface extends EntityInterface {
   /**
    * Validates the currently set values.
    *
-   * @return \Drupal\Core\Entity\EntityConstraintViolationListInterface
+   * @return EntityConstraintViolationListInterface
    *   A list of constraint violations. If the list is empty, validation
    *   succeeded.
    */

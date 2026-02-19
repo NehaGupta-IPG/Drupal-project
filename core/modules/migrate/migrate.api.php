@@ -5,8 +5,8 @@
  * Hooks provided by the Migrate module.
  */
 
-use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Plugin\MigrateSourceInterface;
+use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
 
 /**
@@ -128,7 +128,6 @@ use Drupal\migrate\Row;
  * @link https://www.drupal.org/docs/8/upgrade Upgrading to Drupal 8 handbook. @endlink
  * @}
  */
-
 /**
  * @addtogroup hooks
  * @{
@@ -143,11 +142,11 @@ use Drupal\migrate\Row;
  *
  * hook_migrate_MIGRATION_ID_prepare_row() is also available.
  *
- * @param \Drupal\migrate\Row $row
+ * @param Row $row
  *   The row being imported.
- * @param \Drupal\migrate\Plugin\MigrateSourceInterface $source
+ * @param MigrateSourceInterface $source
  *   The source migration.
- * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+ * @param MigrationInterface $migration
  *   The current migration.
  *
  * @ingroup migration
@@ -167,11 +166,11 @@ function hook_migrate_prepare_row(Row $row, MigrateSourceInterface $source, Migr
  * This provides the same functionality as hook_migrate_prepare_row() but
  * removes the need to check the value of $migration->id().
  *
- * @param \Drupal\migrate\Row $row
+ * @param Row $row
  *   The row being imported.
- * @param \Drupal\migrate\Plugin\MigrateSourceInterface $source
+ * @param MigrateSourceInterface $source
  *   The source migration.
- * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+ * @param MigrationInterface $migration
  *   The current migration.
  *
  * @ingroup migration

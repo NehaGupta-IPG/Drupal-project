@@ -10,7 +10,7 @@ trait BundlePermissionHandlerTrait {
   /**
    * Builds a permissions array for the supplied bundles.
    *
-   * @param \Drupal\Core\Entity\EntityInterface[] $bundles
+   * @param EntityInterface[] $bundles
    *   An array of bundles to generate permissions for.
    * @param callable $permission_builder
    *   A callable to generate the permissions for a particular bundle. Returns

@@ -19,7 +19,7 @@ class Result extends ResultBase {
   /**
    * Constructor.
    *
-   * @param \Drupal\Core\Database\Statement\FetchAs $fetchMode
+   * @param FetchAs $fetchMode
    *   The fetch mode.
    * @param array{class: class-string, constructor_args: list<mixed>, column: int, cursor_orientation?: int, cursor_offset?: int} $fetchOptions
    *   The fetch options.

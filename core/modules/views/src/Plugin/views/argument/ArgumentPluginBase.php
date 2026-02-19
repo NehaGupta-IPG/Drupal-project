@@ -10,8 +10,8 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
-use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\HandlerBase;
+use Drupal\views\ViewExecutable;
 
 /**
  * @defgroup views_argument_handlers Views argument handlers
@@ -33,7 +33,7 @@ use Drupal\views\Plugin\views\HandlerBase;
 /**
  * Base class for argument (contextual filter) handler plugins.
  *
- * The basic argument works for very simple arguments such as nid and uid
+ * The basic argument works for very simple arguments such as nid and uid.
  *
  * Definition terms for this handler:
  * - name field: The field to use for the name to use in the summary, which is
@@ -466,7 +466,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
     $output = [];
 
     foreach ($this->view->display_handler->getHandlers('argument') as $arg => $handler) {
-      /** @var \Drupal\views\Plugin\views\argument\ArgumentPluginBase $handler */
+      /** @var ArgumentPluginBase $handler */
       $options[(string) $this->t('Arguments')]["{{ arguments.$arg }}"] = $this->t('@argument title', ['@argument' => $handler->adminLabel()]);
       $options[(string) $this->t('Arguments')]["{{ raw_arguments.$arg }}"] = $this->t('@argument input', ['@argument' => $handler->adminLabel()]);
     }
@@ -860,7 +860,7 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
    * Default action: empty.
    *
    * If an argument was expected and was not given, in this case, display
-   * the view's empty text
+   * the view's empty text.
    */
   public function defaultEmpty() {
     // We return with no query; this will force the empty text.

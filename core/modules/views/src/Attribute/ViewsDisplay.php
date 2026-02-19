@@ -22,15 +22,15 @@ class ViewsDisplay extends Plugin {
    *
    * @param string $id
    *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup $title
+   * @param TranslatableMarkup $title
    *   The plugin title used in the views UI.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $short_title
+   * @param TranslatableMarkup|null $short_title
    *   (optional) The short title used in the views UI.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $admin
+   * @param TranslatableMarkup|null $admin
    *   (optional) The administrative name of the display.
    *   The name is displayed on the Views overview and also used as default name
    *   for new displays.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $help
+   * @param TranslatableMarkup|null $help
    *   (optional) A short help string; this is displayed in the views UI.
    * @param bool $uses_menu_links
    *   (optional) Whether or not to use hook_menu() to register a route.

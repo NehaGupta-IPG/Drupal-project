@@ -200,7 +200,7 @@ class ThemePreprocess {
               $li_attributes['data-drupal-link-query'] = Json::encode($query);
             }
 
-            /** @var \Drupal\Core\Url $url */
+            /** @var Url $url */
             $url = $link['url'];
             if ($url->isRouted()) {
               // Add a "data-drupal-link-system-path" attribute to let the

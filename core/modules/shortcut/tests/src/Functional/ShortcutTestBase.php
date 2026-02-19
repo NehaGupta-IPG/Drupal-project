@@ -43,7 +43,7 @@ abstract class ShortcutTestBase extends BrowserTestBase {
   /**
    * Site-wide default shortcut set.
    *
-   * @var \Drupal\shortcut\ShortcutSetInterface
+   * @var ShortcutSetInterface
    */
   protected $set;
 
@@ -123,7 +123,7 @@ abstract class ShortcutTestBase extends BrowserTestBase {
   /**
    * Extracts information from shortcut set links.
    *
-   * @param \Drupal\shortcut\ShortcutSetInterface $set
+   * @param ShortcutSetInterface $set
    *   The shortcut set object to extract information from.
    * @param string $key
    *   The array key indicating what information to extract from each link:

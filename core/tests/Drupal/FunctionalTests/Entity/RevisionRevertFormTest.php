@@ -115,7 +115,7 @@ class RevisionRevertFormTest extends BrowserTestBase {
    * @legacy-covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
    */
   protected function testAccessRevertLatestDefault(): void {
-    /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
+    /** @var EntityTestRev $entity */
     $entity = EntityTestRev::create();
     $entity->setName('revert');
     $entity->save();
@@ -134,7 +134,7 @@ class RevisionRevertFormTest extends BrowserTestBase {
    * @legacy-covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
    */
   protected function testAccessRevertLatestForwardRevision(): void {
-    /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
+    /** @var EntityTestRev $entity */
     $entity = EntityTestRevPub::create();
     $entity->setName('revert');
     $entity->isDefaultRevision(TRUE);
@@ -158,7 +158,7 @@ class RevisionRevertFormTest extends BrowserTestBase {
    * @legacy-covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
    */
   protected function testAccessRevertNonLatest(): void {
-    /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
+    /** @var EntityTestRev $entity */
     $entity = EntityTestRev::create();
     $entity->setName('revert');
     $entity->save();
@@ -309,7 +309,7 @@ class RevisionRevertFormTest extends BrowserTestBase {
     $user = $this->createUser();
     $this->drupalLogin($user);
 
-    /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $entity */
+    /** @var EntityTestWithRevisionLog $entity */
     $entity = EntityTestWithRevisionLog::create([
       'type' => 'entity_test_revlog',
       'name' => 'revert',
@@ -340,14 +340,14 @@ class RevisionRevertFormTest extends BrowserTestBase {
     // Load the revision to be copied.
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = \Drupal::entityTypeManager()->getStorage($entity->getEntityTypeId());
-    /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $targetRevision */
+    /** @var EntityTestWithRevisionLog $targetRevision */
     $targetRevision = $storage->loadRevision($targetRevertRevisionId);
 
     $this->drupalGet($targetRevision->toUrl('revision-revert-form'));
     $this->submitForm([], 'Revert');
 
     // Load the new latest revision.
-    /** @var \Drupal\entity_test_revlog\Entity\EntityTestWithRevisionLog $latestRevision */
+    /** @var EntityTestWithRevisionLog $latestRevision */
     $latestRevision = $storage->loadUnchanged($entity->id());
     $this->assertEquals($count + 1, $this->countRevisions($entity->getEntityTypeId()));
     $this->assertEquals('Copy of the revision from <em class="placeholder">Sun, 11 Jan 2009 - 17:00</em>.', $latestRevision->getRevisionLogMessage());

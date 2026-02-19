@@ -21,7 +21,7 @@ class BlockContentTypeForm extends BundleEntityFormBase {
   public function form(array $form, FormStateInterface $form_state) {
     $form = parent::form($form, $form_state);
 
-    /** @var \Drupal\block_content\BlockContentTypeInterface $block_type */
+    /** @var BlockContentTypeInterface $block_type */
     $block_type = $this->entity;
 
     if ($this->operation == 'add') {

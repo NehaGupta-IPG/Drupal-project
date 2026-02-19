@@ -40,7 +40,7 @@ class FieldDefinitionTest extends UnitTestCase {
   /**
    * The test field storage definition.
    *
-   * @var \Drupal\Core\Field\FieldStorageDefinitionInterface
+   * @var FieldStorageDefinitionInterface
    */
   protected $storageDefinition;
 
@@ -347,9 +347,9 @@ class FieldDefinitionTest extends UnitTestCase {
   /**
    * Provides a Mock base field default value callback.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   Entity interface.
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $definition
+   * @param FieldDefinitionInterface $definition
    *   Field definition.
    *
    * @return string
@@ -385,7 +385,7 @@ class FieldDefinitionTest extends UnitTestCase {
    * @param string $factory_name
    *   The factory name to use.
    *
-   * @return \Drupal\Core\Field\FieldDefinition
+   * @return FieldDefinition
    *   A field definition instance created using the specified factory.
    */
   protected function initializeFieldUsingFactory($factory_name) {

@@ -10,8 +10,8 @@ use Drupal\Core\Cache\VariationCacheInterface;
 use Drupal\Core\PageCache\RequestPolicyInterface;
 use Drupal\Core\PageCache\ResponsePolicyInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -43,21 +43,21 @@ class DynamicPageCacheSubscriber implements EventSubscriberInterface {
   /**
    * A request policy rule determining the cacheability of a response.
    *
-   * @var \Drupal\Core\PageCache\RequestPolicyInterface
+   * @var RequestPolicyInterface
    */
   protected $requestPolicy;
 
   /**
    * A response policy rule determining the cacheability of the response.
    *
-   * @var \Drupal\Core\PageCache\ResponsePolicyInterface
+   * @var ResponsePolicyInterface
    */
   protected $responsePolicy;
 
   /**
    * The variation cache.
    *
-   * @var \Drupal\Core\Cache\VariationCacheInterface
+   * @var VariationCacheInterface
    */
   protected $cache;
 
@@ -80,7 +80,7 @@ class DynamicPageCacheSubscriber implements EventSubscriberInterface {
   /**
    * The cache contexts manager service.
    *
-   * @var \Drupal\Core\Cache\Context\CacheContextsManager
+   * @var CacheContextsManager
    */
   protected $cacheContextsManager;
 
@@ -101,13 +101,13 @@ class DynamicPageCacheSubscriber implements EventSubscriberInterface {
   /**
    * Constructs a new DynamicPageCacheSubscriber object.
    *
-   * @param \Drupal\Core\PageCache\RequestPolicyInterface $request_policy
+   * @param RequestPolicyInterface $request_policy
    *   A policy rule determining the cacheability of a request.
-   * @param \Drupal\Core\PageCache\ResponsePolicyInterface $response_policy
+   * @param ResponsePolicyInterface $response_policy
    *   A policy rule determining the cacheability of the response.
-   * @param \Drupal\Core\Cache\VariationCacheInterface $cache
+   * @param VariationCacheInterface $cache
    *   The variation cache.
-   * @param \Drupal\Core\Cache\Context\CacheContextsManager $cache_contexts_manager
+   * @param CacheContextsManager $cache_contexts_manager
    *   The cache contexts manager service.
    * @param array $renderer_config
    *   The renderer configuration array.
@@ -124,7 +124,7 @@ class DynamicPageCacheSubscriber implements EventSubscriberInterface {
   /**
    * Sets a response in case of a Dynamic Page Cache hit.
    *
-   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
+   * @param RequestEvent $event
    *   The event to process.
    */
   public function onRequest(RequestEvent $event) {
@@ -150,7 +150,7 @@ class DynamicPageCacheSubscriber implements EventSubscriberInterface {
   /**
    * Stores a response in case of a Dynamic Page Cache miss, if cacheable.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
+   * @param ResponseEvent $event
    *   The event to process.
    */
   public function onResponse(ResponseEvent $event) {
@@ -238,7 +238,7 @@ class DynamicPageCacheSubscriber implements EventSubscriberInterface {
    * is automatically placeholdered, and consequently the cacheability metadata
    * of the placeholdered content does not bubble up to the response level.
    *
-   * @param \Drupal\Core\Cache\CacheableResponseInterface $response
+   * @param CacheableResponseInterface $response
    *   The response whose cacheability to analyze.
    *
    * @return bool

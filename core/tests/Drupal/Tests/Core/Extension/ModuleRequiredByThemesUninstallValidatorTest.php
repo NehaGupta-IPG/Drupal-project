@@ -21,21 +21,21 @@ class ModuleRequiredByThemesUninstallValidatorTest extends UnitTestCase {
   /**
    * Instance of ModuleRequiredByThemesUninstallValidator.
    *
-   * @var \Drupal\Core\Extension\ModuleRequiredByThemesUninstallValidator
+   * @var ModuleRequiredByThemesUninstallValidator
    */
   protected $moduleRequiredByThemeUninstallValidator;
 
   /**
    * Mock of ModuleExtensionList.
    *
-   * @var \Drupal\Core\Extension\ModuleExtensionList
+   * @var ModuleExtensionList
    */
   protected $moduleExtensionList;
 
   /**
    * Mock of ThemeExtensionList.
    *
-   * @var \Drupal\Core\Extension\ThemeExtensionList
+   * @var ThemeExtensionList
    */
   protected $themeExtensionList;
 

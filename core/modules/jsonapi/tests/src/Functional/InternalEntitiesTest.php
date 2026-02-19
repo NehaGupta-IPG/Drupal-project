@@ -49,14 +49,14 @@ class InternalEntitiesTest extends BrowserTestBase {
   /**
    * An entity of an internal entity type.
    *
-   * @var \Drupal\Core\Entity\EntityInterface
+   * @var EntityInterface
    */
   protected $internalEntity;
 
   /**
    * An entity referencing an internal entity.
    *
-   * @var \Drupal\Core\Entity\EntityInterface
+   * @var EntityInterface
    */
   protected $referencingEntity;
 
@@ -149,7 +149,7 @@ class InternalEntitiesTest extends BrowserTestBase {
   /**
    * Returns the decoded JSON:API document for the for the given entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to request.
    * @param array $options
    *   URL options.
@@ -167,7 +167,7 @@ class InternalEntitiesTest extends BrowserTestBase {
   /**
    * Performs an authenticated request and returns the decoded document.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to request.
    * @param string $relationship
    *   The field name of the relationship to request.

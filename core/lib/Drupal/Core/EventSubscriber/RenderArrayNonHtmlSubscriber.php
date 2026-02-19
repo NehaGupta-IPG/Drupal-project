@@ -15,7 +15,7 @@ class RenderArrayNonHtmlSubscriber implements EventSubscriberInterface {
   /**
    * Throws an HTTP 406 error if client requested a non-HTML format.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ViewEvent $event
+   * @param ViewEvent $event
    *   The event to process.
    */
   public function onRespond(ViewEvent $event) {

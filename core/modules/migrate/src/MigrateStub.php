@@ -15,14 +15,14 @@ class MigrateStub implements MigrateStubInterface {
   /**
    * The migration plugin manager.
    *
-   * @var \Drupal\migrate\Plugin\MigrationPluginManagerInterface
+   * @var MigrationPluginManagerInterface
    */
   protected $migrationPluginManager;
 
   /**
    * Constructs a MigrationStub object.
    *
-   * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
+   * @param MigrationPluginManagerInterface $migration_plugin_manager
    *   The migration plugin manager.
    */
   public function __construct(MigrationPluginManagerInterface $migration_plugin_manager) {
@@ -57,9 +57,9 @@ class MigrateStub implements MigrateStubInterface {
    *   An array of destination ids for the new stub, keyed by destination id
    *   key, or false if the stub failed.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
-   * @throws \Drupal\migrate\MigrateException
+   * @throws PluginException
+   * @throws PluginNotFoundException
+   * @throws MigrateException
    */
   public function createStub($migration_id, array $source_ids, array $default_values = [], $key_by_destination_ids = NULL) {
     $migrations = $this->migrationPluginManager->createInstances([$migration_id]);
@@ -91,7 +91,7 @@ class MigrateStub implements MigrateStubInterface {
   /**
    * Creates a stub.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration to use to create the stub.
    * @param array $source_ids
    *   The source ids to map to the stub.
@@ -101,7 +101,7 @@ class MigrateStub implements MigrateStubInterface {
    * @return array|false
    *   An array of destination ids for the stub.
    *
-   * @throws \Drupal\migrate\MigrateException
+   * @throws MigrateException
    */
   protected function doCreateStub(MigrationInterface $migration, array $source_ids, array $default_values = []) {
     $destination = $migration->getDestinationPlugin(TRUE);

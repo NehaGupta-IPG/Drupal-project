@@ -136,7 +136,7 @@ class InstallerKernel extends DrupalKernel {
   /**
    * Gets the base themes for a given theme.
    *
-   * @param \Drupal\Core\Extension\Extension $profile
+   * @param Extension $profile
    *   The profile being installed.
    * @param string $theme
    *   The theme for installation.
@@ -168,7 +168,7 @@ class InstallerKernel extends DrupalKernel {
   /**
    * Gets the profile to be installed.
    *
-   * @return string|null|\Drupal\Core\Extension\Extension
+   * @return string|null|Extension
    *   Returns NULL if no profile was selected or FALSE if the site has no
    *   profile, or the profile extension object with the profile info added.
    *

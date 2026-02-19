@@ -17,7 +17,7 @@ interface LocalTaskManagerInterface extends PluginManagerInterface {
   /**
    * Gets the title for a local task.
    *
-   * @param \Drupal\Core\Menu\LocalTaskInterface $local_task
+   * @param LocalTaskInterface $local_task
    *   A local task plugin instance to get the title for.
    *
    * @return string
@@ -44,7 +44,7 @@ interface LocalTaskManagerInterface extends PluginManagerInterface {
    *
    * @param string $current_route_name
    *   The route for which to make renderable local tasks.
-   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $cacheability
+   * @param RefinableCacheableDependencyInterface $cacheability
    *   The cacheability metadata for the local tasks.
    *
    * @return array

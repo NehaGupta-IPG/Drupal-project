@@ -67,17 +67,17 @@ function under_test_update_1234_failed(): void {
 class UpdateHookRegistryTest extends UnitTestCase {
 
   /**
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var KeyValueStoreInterface|MockObject
    */
   protected $keyValueStore;
 
   /**
-   * @var \Drupal\Core\KeyValueStore\KeyValueFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var KeyValueFactoryInterface|MockObject
    */
   protected $keyValueFactory;
 
   /**
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var KeyValueStoreInterface|MockObject
    */
   protected KeyValueStoreInterface $equivalentUpdatesStore;
 

@@ -40,7 +40,7 @@ interface ConfigManagerInterface {
   /**
    * Gets the config factory.
    *
-   * @return \Drupal\Core\Config\ConfigFactoryInterface
+   * @return ConfigFactoryInterface
    *   The config factory.
    */
   public function getConfigFactory();
@@ -48,9 +48,9 @@ interface ConfigManagerInterface {
   /**
    * Creates a Diff object using the config data from the two storages.
    *
-   * @param \Drupal\Core\Config\StorageInterface $source_storage
+   * @param StorageInterface $source_storage
    *   The storage to diff configuration from.
-   * @param \Drupal\Core\Config\StorageInterface $target_storage
+   * @param StorageInterface $target_storage
    *   The storage to diff configuration to.
    * @param string $source_name
    *   The name of the configuration object in the source storage to diff.
@@ -73,9 +73,9 @@ interface ConfigManagerInterface {
   /**
    * Creates a configuration snapshot following a successful import.
    *
-   * @param \Drupal\Core\Config\StorageInterface $source_storage
+   * @param StorageInterface $source_storage
    *   The storage to synchronize configuration from.
-   * @param \Drupal\Core\Config\StorageInterface $snapshot_storage
+   * @param StorageInterface $snapshot_storage
    *   The storage to synchronize configuration to.
    */
   public function createSnapshot(StorageInterface $source_storage, StorageInterface $snapshot_storage);
@@ -160,7 +160,7 @@ interface ConfigManagerInterface {
   /**
    * Gets available collection information using the event system.
    *
-   * @return \Drupal\Core\Config\ConfigCollectionInfo
+   * @return ConfigCollectionInfo
    *   The object which contains information about the available collections.
    */
   public function getConfigCollectionInfo();

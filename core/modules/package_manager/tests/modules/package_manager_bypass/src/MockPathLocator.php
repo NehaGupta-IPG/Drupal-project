@@ -18,14 +18,14 @@ final class MockPathLocator extends BasePathLocator {
   /**
    * The state service.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   private $state;
 
   /**
    * Constructs a PathLocator object.
    *
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state service.
    * @param mixed ...$arguments
    *   Additional arguments to pass to the parent constructor.

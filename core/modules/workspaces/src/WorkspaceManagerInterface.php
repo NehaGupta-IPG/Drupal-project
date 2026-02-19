@@ -18,7 +18,7 @@ interface WorkspaceManagerInterface {
   /**
    * Gets the active workspace.
    *
-   * @return \Drupal\workspaces\WorkspaceInterface|null
+   * @return WorkspaceInterface|null
    *   The active workspace entity, or NULL if there's no active workspace.
    */
   public function getActiveWorkspace();
@@ -26,7 +26,7 @@ interface WorkspaceManagerInterface {
   /**
    * Sets the active workspace.
    *
-   * @param \Drupal\workspaces\WorkspaceInterface $workspace
+   * @param WorkspaceInterface $workspace
    *   The workspace to set as active.
    * @param bool $persist
    *   (optional) Whether to persist this workspace in the first applicable
@@ -34,7 +34,7 @@ interface WorkspaceManagerInterface {
    *
    * @return $this
    *
-   * @throws \Drupal\workspaces\WorkspaceAccessException
+   * @throws WorkspaceAccessException
    *   Thrown when the current user doesn't have access to view the workspace.
    */
   public function setActiveWorkspace(WorkspaceInterface $workspace, bool $persist = TRUE);

@@ -30,7 +30,7 @@ class StackedKernelPassTest extends UnitTestCase {
   /**
    * The stacked kernel pass.
    *
-   * @var \Drupal\Core\DependencyInjection\Compiler\StackedKernelPass
+   * @var StackedKernelPass
    */
   protected $stackedKernelPass;
 
@@ -213,7 +213,7 @@ class StackedKernelPassTest extends UnitTestCase {
    * @param int $priority
    *   The priority to be used for the tag.
    *
-   * @return \Symfony\Component\DependencyInjection\Definition
+   * @return Definition
    *   The middleware definition.
    */
   protected function createMiddlewareServiceDefinition($tag = TRUE, $priority = 0): Definition {

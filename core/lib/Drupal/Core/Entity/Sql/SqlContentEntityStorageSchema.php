@@ -6,10 +6,10 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityPublishedInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException;
 use Drupal\Core\Entity\Schema\DynamicallyFieldableEntityStorageSchemaInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -36,35 +36,35 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity field manager service.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 
   /**
    * The entity type this schema builder is responsible for.
    *
-   * @var \Drupal\Core\Entity\ContentEntityTypeInterface
+   * @var ContentEntityTypeInterface
    */
   protected $entityType;
 
   /**
    * The storage field definitions for this entity type.
    *
-   * @var \Drupal\Core\Field\FieldStorageDefinitionInterface[]
+   * @var FieldStorageDefinitionInterface[]
    */
   protected $fieldStorageDefinitions;
 
   /**
    * The storage object for the given entity type.
    *
-   * @var \Drupal\Core\Entity\Sql\SqlContentEntityStorage
+   * @var SqlContentEntityStorage
    */
   protected $storage;
 
@@ -78,7 +78,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * The database connection to be used.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $database;
 
@@ -106,15 +106,15 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Constructs a SqlContentEntityStorageSchema.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type
+   * @param ContentEntityTypeInterface $entity_type
    *   The entity type.
-   * @param \Drupal\Core\Entity\Sql\SqlContentEntityStorage $storage
+   * @param SqlContentEntityStorage $storage
    *   The storage of the entity type. This must be an SQL-based storage.
-   * @param \Drupal\Core\Database\Connection $database
+   * @param Connection $database
    *   The database connection to be used.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @param EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, ContentEntityTypeInterface $entity_type, SqlContentEntityStorage $storage, Connection $database, EntityFieldManagerInterface $entity_field_manager) {
@@ -181,13 +181,13 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Refreshes the table mapping with updated definitions.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   An entity type definition.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface[]|null $storage_definitions
+   * @param FieldStorageDefinitionInterface[]|null $storage_definitions
    *   (optional) An array of field storage definitions. Defaults to the last
    *   installed field storage definition.
    *
-   * @return \Drupal\Core\Entity\Sql\DefaultTableMapping
+   * @return DefaultTableMapping
    *   A table mapping object.
    */
   protected function getTableMapping(EntityTypeInterface $entity_type, ?array $storage_definitions = NULL) {
@@ -215,9 +215,9 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Detects whether there is a change in the shared table structure.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The new entity type.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $original
+   * @param EntityTypeInterface $original
    *   The origin entity type.
    *
    * @return bool
@@ -233,9 +233,9 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Detects whether any table name got renamed in an entity type update.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The new entity type.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $original
+   * @param EntityTypeInterface $original
    *   The origin entity type.
    *
    * @return bool
@@ -291,7 +291,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Gets the schema data for the given field storage definition.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field storage definition. The field that must not have custom
    *   storage, i.e. the storage must take care of storing the field.
    *
@@ -515,11 +515,11 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    * {@inheritdoc}
    */
   protected function postUpdateEntityTypeSchema(EntityTypeInterface $entity_type, EntityTypeInterface $original, array $field_storage_definitions, array $original_field_storage_definitions, ?array &$sandbox = NULL) {
-    /** @var \Drupal\Core\Entity\Sql\TableMappingInterface $original_table_mapping */
+    /** @var TableMappingInterface $original_table_mapping */
     $original_table_mapping = $sandbox['original_table_mapping'];
-    /** @var \Drupal\Core\Entity\Sql\TableMappingInterface $new_table_mapping */
+    /** @var TableMappingInterface $new_table_mapping */
     $new_table_mapping = $sandbox['new_table_mapping'];
-    /** @var \Drupal\Core\Entity\Sql\TableMappingInterface $backup_table_mapping */
+    /** @var TableMappingInterface $backup_table_mapping */
     $backup_table_mapping = $sandbox['backup_table_mapping'];
 
     // Rename the original tables so we can put them back in place in case
@@ -620,11 +620,11 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    * both the storage and the storage handlers expect them to be existing, the
    * missing table names need to be manually restored.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   An entity type definition.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface[] $field_storage_definitions
+   * @param FieldStorageDefinitionInterface[] $field_storage_definitions
    *   An array of field storage definitions.
-   * @param \Drupal\Core\Entity\Sql\TableMappingInterface $table_mapping
+   * @param TableMappingInterface $table_mapping
    *   A table mapping.
    *
    * @return string[]
@@ -663,9 +663,9 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Gets a string to be used as a prefix for a temporary table mapping object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   An entity type definition.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface[] $field_storage_definitions
+   * @param FieldStorageDefinitionInterface[] $field_storage_definitions
    *   An array of field storage definitions.
    * @param string $first_prefix_part
    *   (optional) The first part of the prefix. Defaults to 'tmp_'.
@@ -906,13 +906,13 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Checks that we are dealing with the correct entity type.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type to be checked.
    *
    * @return bool
    *   TRUE if the entity type matches the current one.
    *
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    */
   protected function checkEntityType(EntityTypeInterface $entity_type) {
     if ($entity_type->id() != $this->entityType->id()) {
@@ -930,7 +930,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    * apply to a single field have to be added via
    * SqlContentEntityStorageSchema::getSharedTableFieldSchema() instead.
    *
-   * @param \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type
+   * @param ContentEntityTypeInterface $entity_type
    *   The entity type definition.
    * @param bool $reset
    *   (optional) If set to TRUE static cache will be ignored and a new schema
@@ -946,7 +946,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
 
     if (!isset($this->schema[$entity_type_id]) || $reset) {
       // Prepare basic information about the entity type.
-      /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
+      /** @var DefaultTableMapping $table_mapping */
       $table_mapping = $this->getTableMapping($entity_type, $this->fieldStorageDefinitions);
       $tables = $this->getEntitySchemaTables($table_mapping);
 
@@ -1018,14 +1018,14 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Gets a list of entity type tables.
    *
-   * @param \Drupal\Core\Entity\Sql\TableMappingInterface $table_mapping
+   * @param TableMappingInterface $table_mapping
    *   A table mapping object.
    *
    * @return array
    *   A list of entity type tables, keyed by table key.
    */
   protected function getEntitySchemaTables(TableMappingInterface $table_mapping) {
-    /** @var \Drupal\Core\Entity\Sql\DefaultTableMapping $table_mapping */
+    /** @var DefaultTableMapping $table_mapping */
     return array_filter([
       'base_table' => $table_mapping->getBaseTable(),
       'revision_table' => $table_mapping->getRevisionTable(),
@@ -1037,7 +1037,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Gets entity schema definitions for index and key definitions.
    *
-   * @param \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type
+   * @param ContentEntityTypeInterface $entity_type
    *   The entity type definition.
    * @param array $schema
    *   The entity schema array.
@@ -1225,7 +1225,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Loads stored schema data for the given entity type definition.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
    *
    * @return array
@@ -1238,7 +1238,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Stores schema data for the given entity type definition.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
    * @param array $schema
    *   The entity schema data array.
@@ -1251,7 +1251,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Deletes schema data for the given entity type definition.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
    */
   protected function deleteEntitySchemaData(EntityTypeInterface $entity_type) {
@@ -1261,7 +1261,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Loads stored schema data for the given field storage definition.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field storage definition.
    *
    * @return array
@@ -1274,7 +1274,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Stores schema data for the given field storage definition.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field storage definition.
    * @param array $schema
    *   The field schema data array.
@@ -1287,7 +1287,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Deletes schema data for the given field storage definition.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field storage definition.
    */
   protected function deleteFieldSchemaData(FieldStorageDefinitionInterface $storage_definition) {
@@ -1297,7 +1297,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Initializes common information for a base table.
    *
-   * @param \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type
+   * @param ContentEntityTypeInterface $entity_type
    *   The entity type.
    *
    * @return array
@@ -1331,7 +1331,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Initializes common information for a revision table.
    *
-   * @param \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type
+   * @param ContentEntityTypeInterface $entity_type
    *   The entity type.
    *
    * @return array
@@ -1364,7 +1364,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Initializes common information for a data table.
    *
-   * @param \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type
+   * @param ContentEntityTypeInterface $entity_type
    *   The entity type.
    *
    * @return array
@@ -1405,7 +1405,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Initializes common information for a revision data table.
    *
-   * @param \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type
+   * @param ContentEntityTypeInterface $entity_type
    *   The entity type.
    *
    * @return array
@@ -1461,7 +1461,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Processes the gathered schema for a base table.
    *
-   * @param \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type
+   * @param ContentEntityTypeInterface $entity_type
    *   The entity type.
    * @param array $schema
    *   The table schema, passed by reference.
@@ -1475,7 +1475,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Processes the gathered schema for a base table.
    *
-   * @param \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type
+   * @param ContentEntityTypeInterface $entity_type
    *   The entity type.
    * @param array &$schema
    *   The table schema, passed by reference.
@@ -1527,9 +1527,9 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    *
    * @param string $operation
    *   The name of the operation to be performed.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field storage definition.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $original
+   * @param FieldStorageDefinitionInterface $original
    *   (optional) The original field storage definition. This is relevant (and
    *   required) only for updates. Defaults to NULL.
    */
@@ -1546,7 +1546,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Creates the schema for a field stored in a dedicated table.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The storage definition of the field being created.
    * @param bool $only_save
    *   (optional) Whether to skip modification of database tables and only save
@@ -1572,7 +1572,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Creates the schema for a field stored in a shared table.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The storage definition of the field being created.
    * @param bool $only_save
    *   (optional) Whether to skip modification of database tables and only save
@@ -1650,7 +1650,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Deletes the schema for a field stored in a dedicated table.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The storage definition of the field being deleted.
    */
   protected function deleteDedicatedTableSchema(FieldStorageDefinitionInterface $storage_definition) {
@@ -1671,7 +1671,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Deletes the schema for a field stored in a shared table.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The storage definition of the field being deleted.
    */
   protected function deleteSharedTableSchema(FieldStorageDefinitionInterface $storage_definition) {
@@ -1718,12 +1718,12 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Updates the schema for a field stored in a shared table.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The storage definition of the field being updated.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $original
+   * @param FieldStorageDefinitionInterface $original
    *   The original storage definition; i.e., the definition before the update.
    *
-   * @throws \Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException
+   * @throws FieldStorageDefinitionUpdateForbiddenException
    *   Thrown when the update to the field is forbidden.
    * @throws \Exception
    *   Rethrown exception if the table recreation fails.
@@ -1813,12 +1813,12 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Updates the schema for a field stored in a shared table.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The storage definition of the field being updated.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $original
+   * @param FieldStorageDefinitionInterface $original
    *   The original storage definition; i.e., the definition before the update.
    *
-   * @throws \Drupal\Core\Entity\Exception\FieldStorageDefinitionUpdateForbiddenException
+   * @throws FieldStorageDefinitionUpdateForbiddenException
    *   Thrown when the update to the field is forbidden.
    * @throws \Exception
    *   Rethrown exception if the table recreation fails.
@@ -1922,7 +1922,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    *
    * @param array $entity_schema
    *   The entity schema definition.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface|null $storage_definition
+   * @param FieldStorageDefinitionInterface|null $storage_definition
    *   (optional) If a field storage definition is specified, only indexes and
    *   keys involving its columns will be processed. Otherwise all defined
    *   entity indexes and keys will be processed.
@@ -1979,7 +1979,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    *
    * @param array $entity_schema_data
    *   The entity schema data definition.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface|null $storage_definition
+   * @param FieldStorageDefinitionInterface|null $storage_definition
    *   (optional) If a field storage definition is specified, only indexes and
    *   keys involving its columns will be processed. Otherwise all defined
    *   entity indexes and keys will be processed.
@@ -2042,7 +2042,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    * SqlContentEntityStorageSchema::getEntitySchema() instead; e.g.,
    * an index spanning multiple fields.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The storage definition of the field whose schema has to be returned.
    * @param string $table_name
    *   The name of the table columns will be added to.
@@ -2056,7 +2056,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    *   - unique keys: The schema definition for the unique keys.
    *   - foreign keys: The schema definition for the foreign keys.
    *
-   * @throws \Drupal\Core\Field\FieldException
+   * @throws FieldException
    *   Exception thrown if the schema contains reserved column names or if the
    *   initial values definition is invalid.
    */
@@ -2164,7 +2164,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Adds an index for the specified field to the given schema definition.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The storage definition of the field for which an index should be added.
    * @param array $schema
    *   A reference to the schema array to be updated.
@@ -2190,7 +2190,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    * Also adds a 'not null' constraint, because many databases do not reliably
    * support unique keys on null columns.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The storage definition of the field to which to add a unique key.
    * @param array $schema
    *   A reference to the schema array to be updated.
@@ -2205,7 +2205,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Adds a foreign key for the specified field to the given schema definition.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The storage definition of the field to which to add a foreign key.
    * @param array $schema
    *   A reference to the schema array to be updated.
@@ -2226,9 +2226,9 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Gets the SQL schema for a dedicated table.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field storage definition.
-   * @param \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type
+   * @param ContentEntityTypeInterface $entity_type
    *   (optional) The entity type definition. Defaults to the one provided by
    *   the entity storage.
    *
@@ -2239,7 +2239,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    *   - unique keys: The schema definition for the unique keys.
    *   - foreign keys: The schema definition for the foreign keys.
    *
-   * @throws \Drupal\Core\Field\FieldException
+   * @throws FieldException
    *   Exception thrown if the schema contains reserved column names.
    *
    * @see hook_schema()
@@ -2415,7 +2415,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Gets the name to be used for the given entity index.
    *
-   * @param \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type
+   * @param ContentEntityTypeInterface $entity_type
    *   The entity type.
    * @param string $index
    *   The index column name.
@@ -2430,7 +2430,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Generates an index name for a field data table.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   The field storage definition.
    * @param string $index
    *   The name of the index.
@@ -2466,9 +2466,9 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   /**
    * Compares schemas to check for changes in the column definitions.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $storage_definition
+   * @param FieldStorageDefinitionInterface $storage_definition
    *   Current field storage definition.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $original
+   * @param FieldStorageDefinitionInterface $original
    *   The original field storage definition.
    *
    * @return bool

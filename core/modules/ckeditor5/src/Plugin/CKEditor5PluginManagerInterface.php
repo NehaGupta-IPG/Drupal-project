@@ -21,10 +21,10 @@ interface CKEditor5PluginManagerInterface extends DiscoveryInterface {
    *
    * @param string $plugin_id
    *   The plugin ID.
-   * @param \Drupal\editor\EditorInterface|null $editor
+   * @param EditorInterface|null $editor
    *   The editor to load configuration from.
    *
-   * @return \Drupal\ckeditor5\Plugin\CKEditor5PluginInterface
+   * @return CKEditor5PluginInterface
    *   The CKEditor 5 plugin instance.
    */
   public function getPlugin(string $plugin_id, ?EditorInterface $editor): CKEditor5PluginInterface;
@@ -50,7 +50,7 @@ interface CKEditor5PluginManagerInterface extends DiscoveryInterface {
    *
    * This list is filtered by enabled plugins because it is needed at runtime.
    *
-   * @param \Drupal\editor\EditorInterface $editor
+   * @param EditorInterface $editor
    *   A configured text editor object.
    *
    * @return string[]
@@ -61,7 +61,7 @@ interface CKEditor5PluginManagerInterface extends DiscoveryInterface {
   /**
    * Filter list of definitions by enabled plugins only.
    *
-   * @param \Drupal\editor\EditorInterface $editor
+   * @param EditorInterface $editor
    *   A configured text editor object.
    *
    * @return array
@@ -83,7 +83,7 @@ interface CKEditor5PluginManagerInterface extends DiscoveryInterface {
   /**
    * Gets the configuration for the CKEditor 5 plugins enabled in this editor.
    *
-   * @param \Drupal\editor\EditorInterface $editor
+   * @param EditorInterface $editor
    *   A configured text editor object.
    *
    * @return array[]
@@ -103,7 +103,7 @@ interface CKEditor5PluginManagerInterface extends DiscoveryInterface {
    * @param string[] $plugin_ids
    *   (optional) An array of CKEditor 5 plugin IDs. When not set, gets elements
    *   for all plugins.
-   * @param \Drupal\editor\EditorInterface|null $editor
+   * @param EditorInterface|null $editor
    *   (optional) A configured text editor object using CKEditor 5. When not
    *   set, plugins depending on the text editor cannot provide elements.
    * @param bool $resolve_wildcards

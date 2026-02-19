@@ -2,9 +2,8 @@
 
 namespace Drupal\field\Entity;
 
-use Drupal\Core\Entity\Attribute\ConfigEntityType;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\FieldableEntityStorageInterface;
@@ -12,6 +11,7 @@ use Drupal\Core\Entity\Plugin\DataType\EntityAdapter;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\FieldException;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\OptionsProviderInterface;
 use Drupal\field\FieldStorageConfigAccessControlHandler;
 use Drupal\field\FieldStorageConfigInterface;
@@ -314,9 +314,9 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
   /**
    * Overrides \Drupal\Core\Entity\EntityBase::preSave().
    *
-   * @throws \Drupal\Core\Field\FieldException
+   * @throws FieldException
    *   If the field definition is invalid.
-   * @throws \Drupal\Core\Entity\EntityStorageException
+   * @throws EntityStorageException
    *   In case of failures at the configuration storage level.
    */
   public function preSave(EntityStorageInterface $storage) {
@@ -343,10 +343,10 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
   /**
    * Prepares saving a new field definition.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The entity storage.
    *
-   * @throws \Drupal\Core\Field\FieldException
+   * @throws FieldException
    *   If the field definition is invalid.
    */
   protected function preSaveNew(EntityStorageInterface $storage) {
@@ -393,7 +393,7 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
   /**
    * Prepares saving an updated field definition.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The entity storage.
    */
   protected function preSaveUpdated(EntityStorageInterface $storage) {
@@ -447,7 +447,7 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
 
     // Keep the field storage definitions in the deleted fields repository so we
     // can use them later during field_purge_batch().
-    /** @var \Drupal\field\FieldStorageConfigInterface $field_storage */
+    /** @var FieldStorageConfigInterface $field_storage */
     foreach ($field_storages as $field_storage) {
       // Only mark a field for purging if there is data. Otherwise, just remove
       // it.
@@ -841,7 +841,7 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
    * @param string $field_name
    *   Name of the field.
    *
-   * @return \Drupal\field\FieldStorageConfigInterface|null
+   * @return FieldStorageConfigInterface|null
    *   The field config entity if one exists for the provided field name,
    *   otherwise NULL.
    */

@@ -25,21 +25,21 @@ class CommentLinkBuilderTest extends UnitTestCase {
   /**
    * Comment manager mock.
    *
-   * @var \Drupal\comment\CommentManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\comment\CommentManagerInterface|MockObject
    */
   protected $commentManager;
 
   /**
    * String translation mock.
    *
-   * @var \Drupal\Core\StringTranslation\TranslationInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\StringTranslation\TranslationInterface|MockObject
    */
   protected $stringTranslation;
 
   /**
    * Current user proxy mock.
    *
-   * @var \Drupal\Core\Session\AccountProxyInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Session\AccountProxyInterface|MockObject
    */
   protected $currentUser;
 
@@ -249,7 +249,7 @@ class CommentLinkBuilderTest extends UnitTestCase {
    * @param int $comment_count
    *   Number of comments against the field.
    *
-   * @return \Drupal\node\NodeInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @return \Drupal\node\NodeInterface|MockObject
    *   Mock node for testing.
    */
   protected function getMockNode($has_field, $comment_status, $form_location, $comment_count) {

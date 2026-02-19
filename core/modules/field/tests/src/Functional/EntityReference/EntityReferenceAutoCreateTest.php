@@ -166,7 +166,7 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
    * storing the auto-created entity in the right destination.
    */
   public function testMultipleTargetBundles(): void {
-    /** @var \Drupal\taxonomy\Entity\Vocabulary[] $vocabularies */
+    /** @var Vocabulary[] $vocabularies */
     $vocabularies = [];
     for ($i = 0; $i < 2; $i++) {
       $vid = $this->randomMachineName();
@@ -212,7 +212,7 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
     // The new term is expected to be stored in the second vocabulary.
     $this->assertEquals($vocabularies[1]->id(), $term->bundle());
 
-    /** @var \Drupal\field\Entity\FieldConfig $field_config */
+    /** @var FieldConfig $field_config */
     $field_config = FieldConfig::loadByName('node', $this->referencingType, $field_name);
     $handler_settings = $field_config->getSetting('handler_settings');
 

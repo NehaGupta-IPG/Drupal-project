@@ -30,14 +30,14 @@ class BlockAccessControlHandler extends EntityAccessControlHandler implements En
   /**
    * The plugin context handler.
    *
-   * @var \Drupal\Core\Plugin\Context\ContextHandlerInterface
+   * @var ContextHandlerInterface
    */
   protected $contextHandler;
 
   /**
    * The context manager service.
    *
-   * @var \Drupal\Core\Plugin\Context\ContextRepositoryInterface
+   * @var ContextRepositoryInterface
    */
   protected $contextRepository;
 
@@ -55,11 +55,11 @@ class BlockAccessControlHandler extends EntityAccessControlHandler implements En
   /**
    * Constructs the block access control handler instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Plugin\Context\ContextHandlerInterface $context_handler
+   * @param ContextHandlerInterface $context_handler
    *   The ContextHandler for applying contexts to conditions properly.
-   * @param \Drupal\Core\Plugin\Context\ContextRepositoryInterface $context_repository
+   * @param ContextRepositoryInterface $context_repository
    *   The lazy context repository service.
    */
   public function __construct(EntityTypeInterface $entity_type, ContextHandlerInterface $context_handler, ContextRepositoryInterface $context_repository) {
@@ -72,7 +72,7 @@ class BlockAccessControlHandler extends EntityAccessControlHandler implements En
    * {@inheritdoc}
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
-    /** @var \Drupal\block\BlockInterface $entity */
+    /** @var BlockInterface $entity */
     if ($operation != 'view') {
       return parent::checkAccess($entity, $operation, $account);
     }
@@ -152,9 +152,9 @@ class BlockAccessControlHandler extends EntityAccessControlHandler implements En
   /**
    * Merges cacheable metadata from conditions onto the access result object.
    *
-   * @param \Drupal\Core\Access\AccessResult $access
+   * @param AccessResult $access
    *   The access result object.
-   * @param \Drupal\Core\Condition\ConditionInterface[] $conditions
+   * @param ConditionInterface[] $conditions
    *   List of visibility conditions.
    */
   protected function mergeCacheabilityFromConditions(AccessResult $access, array $conditions) {

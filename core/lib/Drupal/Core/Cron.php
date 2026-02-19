@@ -37,21 +37,21 @@ class Cron implements CronInterface {
   /**
    * Constructs a cron object.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   * @param ModuleHandlerInterface $moduleHandler
    *   The module handler.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
+   * @param LockBackendInterface $lock
    *   The lock service.
-   * @param \Drupal\Core\Queue\QueueFactory $queueFactory
+   * @param QueueFactory $queueFactory
    *   The queue service.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state service.
-   * @param \Drupal\Core\Session\AccountSwitcherInterface $accountSwitcher
+   * @param AccountSwitcherInterface $accountSwitcher
    *   The account switching service.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   A logger instance.
-   * @param \Drupal\Core\Queue\QueueWorkerManagerInterface $queueManager
+   * @param QueueWorkerManagerInterface $queueManager
    *   The queue plugin manager.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    * @param array $queue_config
    *   Queue configuration from the service container.
@@ -133,7 +133,7 @@ class Cron implements CronInterface {
     $max_wait = (float) $this->queueConfig['suspendMaximumWait'];
 
     // Build a stack of queues to work on.
-    /** @var array<array{process_from: int<0, max>, queue: \Drupal\Core\Queue\QueueInterface, worker: \Drupal\Core\Queue\QueueWorkerInterface}> $queues */
+    /** @var array<array{process_from: int<0, max>, queue: QueueInterface, worker: QueueWorkerInterface}> $queues */
     $queues = [];
     foreach ($this->queueManager->getDefinitions() as $queue_name => $queue_info) {
       if (!isset($queue_info['cron'])) {
@@ -192,12 +192,12 @@ class Cron implements CronInterface {
   /**
    * Processes a cron queue.
    *
-   * @param \Drupal\Core\Queue\QueueInterface $queue
+   * @param QueueInterface $queue
    *   The queue.
-   * @param \Drupal\Core\Queue\QueueWorkerInterface $worker
+   * @param QueueWorkerInterface $worker
    *   The queue worker.
    *
-   * @throws \Drupal\Core\Queue\SuspendQueueException
+   * @throws SuspendQueueException
    *   If the queue was suspended.
    */
   protected function processQueue(QueueInterface $queue, QueueWorkerInterface $worker) {

@@ -36,7 +36,7 @@ final readonly class UnpackManager {
   /**
    * Unpacks the packages in the provided collection.
    *
-   * @param \Drupal\Composer\Plugin\RecipeUnpack\UnpackCollection $unpackCollection
+   * @param UnpackCollection $unpackCollection
    *   The collection of recipe packages to unpack.
    */
   public function unpack(UnpackCollection $unpackCollection): void {

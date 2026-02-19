@@ -16,28 +16,28 @@ class SharedTempStoreFactory {
   /**
    * The storage factory creating the backend to store the data.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface
+   * @var KeyValueExpirableFactoryInterface
    */
   protected $storageFactory;
 
   /**
    * The lock object used for this data.
    *
-   * @var \Drupal\Core\Lock\LockBackendInterface
+   * @var LockBackendInterface
    */
   protected $lockBackend;
 
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountProxyInterface
+   * @var AccountProxyInterface
    */
   protected $currentUser;
 
@@ -51,13 +51,13 @@ class SharedTempStoreFactory {
   /**
    * Constructs a Drupal\Core\TempStore\SharedTempStoreFactory object.
    *
-   * @param \Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface $storage_factory
+   * @param KeyValueExpirableFactoryInterface $storage_factory
    *   The key/value store factory.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock_backend
+   * @param LockBackendInterface $lock_backend
    *   The lock object used for this data.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+   * @param RequestStack $request_stack
    *   The request stack.
-   * @param \Drupal\Core\Session\AccountProxyInterface $current_user
+   * @param AccountProxyInterface $current_user
    *   The current user.
    * @param int $expire
    *   The time to live for items, in seconds.
@@ -81,7 +81,7 @@ class SharedTempStoreFactory {
    *   SharedTempStore is owned by the currently authenticated user, or by the
    *   active anonymous session if no user is logged in.
    *
-   * @return \Drupal\Core\TempStore\SharedTempStore
+   * @return SharedTempStore
    *   An instance of the key/value store.
    */
   public function get($collection, $owner = NULL) {

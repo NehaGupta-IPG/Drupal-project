@@ -39,35 +39,35 @@ class EntityReferenceFieldItemNormalizerTest extends UnitTestCase {
   /**
    * The mock serializer.
    *
-   * @var \Symfony\Component\Serializer\SerializerInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var \Symfony\Component\Serializer\SerializerInterface|ObjectProphecy
    */
   protected $serializer;
 
   /**
    * The normalizer under test.
    *
-   * @var \Drupal\serialization\Normalizer\EntityReferenceFieldItemNormalizer
+   * @var EntityReferenceFieldItemNormalizer
    */
   protected $normalizer;
 
   /**
    * The mock field item.
    *
-   * @var \Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem|\Prophecy\Prophecy\ObjectProphecy
+   * @var EntityReferenceItem|ObjectProphecy
    */
   protected $fieldItem;
 
   /**
    * The mock entity repository.
    *
-   * @var \Drupal\Core\Entity\EntityRepositoryInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var EntityRepositoryInterface|ObjectProphecy
    */
   protected $entityRepository;
 
   /**
    * The mock field definition.
    *
-   * @var \Drupal\Core\Field\FieldDefinitionInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var FieldDefinitionInterface|ObjectProphecy
    */
   protected $fieldDefinition;
 

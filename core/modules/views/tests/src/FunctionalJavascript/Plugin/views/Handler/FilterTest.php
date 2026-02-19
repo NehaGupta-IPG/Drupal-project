@@ -99,7 +99,7 @@ class FilterTest extends WebDriverTestBase {
   /**
    * Removes any non-visible elements from the passed array.
    *
-   * @param \Behat\Mink\Element\NodeElement[] $elements
+   * @param NodeElement[] $elements
    *   The elements to filter.
    *
    * @return \Behat\Mink\Element\NodeElement[]

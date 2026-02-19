@@ -6,8 +6,8 @@ use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Config\Action\Attribute\ActionMethod;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
-use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityWithPluginCollectionInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\filter\FilterFormatAccessControlHandler;
 use Drupal\filter\FilterFormatAddForm;
@@ -135,7 +135,7 @@ class FilterFormat extends ConfigEntityBase implements FilterFormatInterface, En
   /**
    * Holds the collection of filters that are attached to this format.
    *
-   * @var \Drupal\filter\FilterPluginCollection
+   * @var FilterPluginCollection
    */
   protected $filterCollection;
 

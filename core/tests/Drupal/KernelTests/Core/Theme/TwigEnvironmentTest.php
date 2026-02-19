@@ -36,7 +36,7 @@ class TwigEnvironmentTest extends KernelTestBase {
   public function testInlineTemplate(): void {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = $this->container->get('renderer');
-    /** @var \Drupal\Core\Template\TwigEnvironment $environment */
+    /** @var TwigEnvironment $environment */
     $environment = \Drupal::service('twig');
     $this->assertEquals('test-no-context', $environment->renderInline('test-no-context'));
     $this->assertEquals('test-with-context social', $environment->renderInline('test-with-context {{ llama }}', ['llama' => 'social']));
@@ -104,7 +104,7 @@ class TwigEnvironmentTest extends KernelTestBase {
    * Tests that exceptions are thrown when a template is not found.
    */
   public function testTemplateNotFoundException(): void {
-    /** @var \Drupal\Core\Template\TwigEnvironment $environment */
+    /** @var TwigEnvironment $environment */
     $environment = \Drupal::service('twig');
 
     try {
@@ -120,7 +120,7 @@ class TwigEnvironmentTest extends KernelTestBase {
    * Ensures that templates resolve to the same class name and cache file.
    */
   public function testTemplateClassname(): void {
-    /** @var \Drupal\Core\Template\TwigEnvironment $environment */
+    /** @var TwigEnvironment $environment */
     $environment = \Drupal::service('twig');
 
     // Test using an include template path.
@@ -149,7 +149,7 @@ class TwigEnvironmentTest extends KernelTestBase {
    * Ensures that cacheFilename() varies by extensions + deployment identifier.
    */
   public function testCacheFilename(): void {
-    /** @var \Drupal\Core\Template\TwigEnvironment $environment */
+    /** @var TwigEnvironment $environment */
     // Note: Later we refetch the twig service in order to bypass its internal
     // static cache.
     $environment = \Drupal::service('twig');
@@ -209,7 +209,7 @@ TWIG;
     $template_file = tempnam(sys_get_temp_dir(), '__METHOD__') . '.html.twig';
     file_put_contents($template_file, $template_before);
 
-    /** @var \Drupal\Core\Template\TwigEnvironment $environment */
+    /** @var TwigEnvironment $environment */
     $environment = \Drupal::service('twig');
 
     $output = $environment->load(basename($template_file))->render();
@@ -224,7 +224,7 @@ TWIG;
    * Test twig file prefix change.
    */
   public function testTwigFilePrefixChange(): void {
-    /** @var \Drupal\Core\Template\TwigEnvironment $environment */
+    /** @var TwigEnvironment $environment */
     $environment = \Drupal::service('twig');
     $cache_prefixes = [];
     $cache_filenames = [];

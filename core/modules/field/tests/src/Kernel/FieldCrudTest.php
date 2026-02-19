@@ -26,7 +26,7 @@ class FieldCrudTest extends FieldKernelTestBase {
   /**
    * The field storage entity.
    *
-   * @var \Drupal\field\Entity\FieldStorageConfig
+   * @var FieldStorageConfig
    */
   protected $fieldStorage;
 

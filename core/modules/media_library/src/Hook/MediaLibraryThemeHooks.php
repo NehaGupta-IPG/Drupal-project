@@ -2,9 +2,9 @@
 
 namespace Drupal\media_library\Hook;
 
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Template\Attribute;
-use Drupal\Core\Hook\Attribute\Hook;
 
 /**
  * Hook implementations for media_library.

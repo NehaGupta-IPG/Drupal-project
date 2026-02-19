@@ -39,7 +39,7 @@ abstract class PhpassHashedPasswordBase implements PasswordInterface {
   /**
    * Constructs a new password hashing instance.
    *
-   * @param \Drupal\Core\Password\PasswordInterface $corePassword
+   * @param PasswordInterface $corePassword
    *   The core PHP password interface.
    */
   public function __construct(protected PasswordInterface $corePassword) {

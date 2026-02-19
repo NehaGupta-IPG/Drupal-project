@@ -25,7 +25,7 @@ class UpdateCalculateProjectDataTest extends KernelTestBase {
   /**
    * The Guzzle HTTP client.
    *
-   * @var \GuzzleHttp\Client
+   * @var Client
    */
   protected $client;
 

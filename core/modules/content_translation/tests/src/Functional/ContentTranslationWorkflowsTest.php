@@ -45,14 +45,14 @@ class ContentTranslationWorkflowsTest extends ContentTranslationTestBase {
   /**
    * The entity owner account to be used to test multilingual entity editing.
    *
-   * @var \Drupal\user\UserInterface
+   * @var UserInterface
    */
   protected $entityOwner;
 
   /**
    * The user that has entity owner permission but is not the owner.
    *
-   * @var \Drupal\user\UserInterface
+   * @var UserInterface
    */
   protected $notEntityOwner;
 
@@ -159,7 +159,7 @@ class ContentTranslationWorkflowsTest extends ContentTranslationTestBase {
   /**
    * Creates a test entity and translate it.
    *
-   * @param \Drupal\user\UserInterface|null $user
+   * @param UserInterface|null $user
    *   (optional) The entity owner.
    */
   protected function setupEntity(?UserInterface $user = NULL): void {
@@ -315,7 +315,7 @@ class ContentTranslationWorkflowsTest extends ContentTranslationTestBase {
   /**
    * Checks that workflows have the expected behaviors for the given user.
    *
-   * @param \Drupal\user\UserInterface $user
+   * @param UserInterface $user
    *   The user to test the workflow behavior against.
    * @param array $expected_status
    *   The an associative array with the operation name as key and the expected

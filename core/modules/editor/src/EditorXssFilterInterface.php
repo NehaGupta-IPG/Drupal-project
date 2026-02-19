@@ -26,10 +26,10 @@ interface EditorXssFilterInterface {
    *
    * @param string $html
    *   The HTML to be filtered.
-   * @param \Drupal\filter\FilterFormatInterface $format
+   * @param FilterFormatInterface $format
    *   The text format configuration entity. Provides context based upon which
    *   one may want to adjust the filtering.
-   * @param \Drupal\filter\FilterFormatInterface|null $original_format
+   * @param FilterFormatInterface|null $original_format
    *   (optional) The original text format configuration entity (when switching
    *   text formats/editors). Also provides context based upon which one may
    *   want to adjust the filtering.

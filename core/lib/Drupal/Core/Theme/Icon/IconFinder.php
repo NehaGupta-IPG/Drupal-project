@@ -95,9 +95,9 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
   /**
    * Constructs a new IconFinder object.
    *
-   * @param \Drupal\Core\File\FileUrlGeneratorInterface $fileUrlGenerator
+   * @param FileUrlGeneratorInterface $fileUrlGenerator
    *   The file URL generator service.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   A logger instance.
    * @param string $appRoot
    *   The application root.
@@ -250,7 +250,7 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
    * @param string $names
    *   The file names for Finder::names().
    *
-   * @return \Symfony\Component\Finder\Finder|null
+   * @return Finder|null
    *   The configured Finder instance.
    */
   private function findFiles(string $path, string $names): ?Finder {
@@ -280,7 +280,7 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
   /**
    * Process files and format icon information.
    *
-   * @param \Symfony\Component\Finder\Finder $finder
+   * @param Finder $finder
    *   The Finder instance with found files.
    * @param string $source
    *   The source.

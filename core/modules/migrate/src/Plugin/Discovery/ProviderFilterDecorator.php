@@ -21,7 +21,7 @@ class ProviderFilterDecorator implements DiscoveryInterface {
   /**
    * The Discovery object being decorated.
    *
-   * @var \Drupal\Component\Plugin\Discovery\DiscoveryInterface
+   * @var DiscoveryInterface
    */
   protected $decorated;
 
@@ -35,7 +35,7 @@ class ProviderFilterDecorator implements DiscoveryInterface {
   /**
    * Constructs an InheritProviderDecorator object.
    *
-   * @param \Drupal\Component\Plugin\Discovery\DiscoveryInterface $decorated
+   * @param DiscoveryInterface $decorated
    *   The object implementing DiscoveryInterface that is being decorated.
    * @param callable $provider_exists
    *   A callable, gets passed a provider name, should return TRUE if the

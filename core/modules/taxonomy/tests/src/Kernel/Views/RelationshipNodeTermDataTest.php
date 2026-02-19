@@ -92,7 +92,7 @@ class RelationshipNodeTermDataTest extends TaxonomyTestBase {
   /**
    * Assert views queries have taxonomy_term_access tag.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The View to check for the term access tag.
    * @param bool $hasTag
    *   The expected existence of taxonomy_term_access tag.

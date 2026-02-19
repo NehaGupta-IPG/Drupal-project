@@ -20,7 +20,7 @@ class ToolbarController extends ControllerBase implements TrustedCallbackInterfa
   /**
    * Constructs a ToolbarController object.
    *
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct(
@@ -31,7 +31,7 @@ class ToolbarController extends ControllerBase implements TrustedCallbackInterfa
   /**
    * Returns an AJAX response to render the toolbar subtrees.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   The AJAX response containing the rendered toolbar subtrees.
    */
   public function subtreesAjax() {

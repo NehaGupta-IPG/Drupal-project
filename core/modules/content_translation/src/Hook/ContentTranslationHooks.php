@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\content_translation\Hook;
 
+use Drupal\content_translation\BundleTranslationSettingsInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\ContentEntityInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\content_translation\BundleTranslationSettingsInterface;
-use Drupal\language\ContentLanguageSettingsInterface;
-use Drupal\Core\Language\LanguageInterface;
-use Drupal\Core\Url;
-use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Order\Order;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Url;
+use Drupal\language\ContentLanguageSettingsInterface;
 use Drupal\workflows\Entity\Workflow;
 
 /**
@@ -143,7 +143,7 @@ class ContentTranslationHooks {
   #[Hook('entity_type_alter', order: Order::Last)]
   public function entityTypeAlter(array &$entity_types) : void {
     // Provide defaults for translation info.
-    /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
+    /** @var EntityTypeInterface[] $entity_types */
     foreach ($entity_types as $entity_type) {
       if ($entity_type->isTranslatable()) {
         if (!$entity_type->hasHandlerClass('translation')) {
@@ -392,7 +392,7 @@ class ContentTranslationHooks {
    */
   #[Hook('language_fallback_candidates_entity_view_alter')]
   public function languageFallbackCandidatesEntityViewAlter(&$candidates, $context): void {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     $entity = $context['data'];
     $entity_type_id = $entity->getEntityTypeId();
     /** @var \Drupal\content_translation\ContentTranslationManagerInterface $manager */

@@ -24,7 +24,7 @@ final class AnnounceFetcher {
   /**
    * The configuration settings of this module.
    *
-   * @var \Drupal\Core\Config\ImmutableConfig
+   * @var ImmutableConfig
    */
   protected ImmutableConfig $config;
 
@@ -38,13 +38,13 @@ final class AnnounceFetcher {
   /**
    * Construct an AnnounceFetcher service.
    *
-   * @param \GuzzleHttp\ClientInterface $httpClient
+   * @param ClientInterface $httpClient
    *   The http client.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config
+   * @param ConfigFactoryInterface $config
    *   The config factory service.
-   * @param \Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface $temp_store
+   * @param KeyValueExpirableFactoryInterface $temp_store
    *   The tempstore factory service.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   The logger service.
    * @param string $feedUrl
    *   The feed url path.
@@ -122,7 +122,7 @@ final class AnnounceFetcher {
    * @param bool $force
    *   (optional) Whether to always fetch new items or not. Defaults to FALSE.
    *
-   * @return \Drupal\announcements_feed\Announcement[]
+   * @return Announcement[]
    *   An array of announcements from the feed relevant to the Drupal version.
    *   The array is empty if there were no matching announcements. If an error
    *   occurred while fetching/decoding the feed, it is thrown as an exception.

@@ -187,7 +187,7 @@ class FieldStorageAddForm extends FormBase {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return array
@@ -319,10 +319,10 @@ class FieldStorageAddForm extends FormBase {
    * @param string $field_name
    *   The field name.
    *
-   * @return \Drupal\Core\Url
+   * @return Url
    *   The URL to redirect to.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws PluginNotFoundException
    */
   private function getRedirectUrl(string $field_name): Url {
     $route_parameters = [
@@ -337,10 +337,10 @@ class FieldStorageAddForm extends FormBase {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   An AJAX response that display validation error messages or represents a
    *   successful submission.
    *
@@ -367,10 +367,10 @@ class FieldStorageAddForm extends FormBase {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   An AJAX response.
    */
   protected function successfulAjaxSubmit(array $form, FormStateInterface $form_state): AjaxResponse {
@@ -391,7 +391,7 @@ class FieldStorageAddForm extends FormBase {
    *   An array of settings with keys 'field_storage_config', 'field_config',
    *   'entity_form_display', and 'entity_view_display'.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws PluginNotFoundException
    *
    * @see \Drupal\Core\Field\PreconfiguredFieldUiOptionsInterface::getPreconfiguredOptions()
    */
@@ -502,7 +502,7 @@ class FieldStorageAddForm extends FormBase {
    *   The machine name, not prefixed.
    * @param array $element
    *   An array containing the structure of the 'field_name' element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return bool

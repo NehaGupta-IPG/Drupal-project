@@ -12,7 +12,7 @@ class ImageEffectPluginCollection extends DefaultLazyPluginCollection {
   /**
    * {@inheritdoc}
    *
-   * @return \Drupal\image\ImageEffectInterface
+   * @return ImageEffectInterface
    *   The image effect plugin.
    */
   public function &get($instance_id) {

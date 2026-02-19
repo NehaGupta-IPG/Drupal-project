@@ -33,7 +33,7 @@ class AnnounceBlock extends BlockBase implements ContainerFactoryPluginInterface
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\announcements_feed\AnnounceRenderer $announceRenderer
+   * @param AnnounceRenderer $announceRenderer
    *   The AnnounceRenderer service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, protected AnnounceRenderer $announceRenderer) {

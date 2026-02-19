@@ -20,10 +20,10 @@ interface MigrationPluginManagerInterface extends PluginManagerInterface {
    *   An array of configuration relevant to the plugin instances. Keyed by the
    *   plugin ID.
    *
-   * @return \Drupal\migrate\Plugin\MigrationInterface[]
+   * @return MigrationInterface[]
    *   Fully configured plugin instances.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws PluginException
    *   If an instance cannot be created, such as if the ID is invalid.
    */
   public function createInstances($id, array $configuration = []);
@@ -46,7 +46,7 @@ interface MigrationPluginManagerInterface extends PluginManagerInterface {
    *   The migration definition. If an 'id' key is set then this will be used as
    *   the migration ID, if not a random ID will be assigned.
    *
-   * @return \Drupal\migrate\Plugin\Migration
+   * @return Migration
    *   The stub migration.
    */
   public function createStubMigration(array $definition);
@@ -57,7 +57,7 @@ interface MigrationPluginManagerInterface extends PluginManagerInterface {
    * @param string $tag
    *   A migration tag we want to filter by.
    *
-   * @return array|\Drupal\migrate\Plugin\MigrationInterface[]
+   * @return array|MigrationInterface[]
    *   An array of migration objects with the given tag, or an empty array if no
    *   migrations with that tag exist.
    */

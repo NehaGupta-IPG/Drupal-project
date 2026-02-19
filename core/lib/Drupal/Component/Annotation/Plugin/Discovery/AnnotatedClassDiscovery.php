@@ -4,11 +4,11 @@ namespace Drupal\Component\Annotation\Plugin\Discovery;
 
 use Drupal\Component\Annotation\AnnotationInterface;
 use Drupal\Component\Annotation\Doctrine\AnnotationRegistry;
-use Drupal\Component\FileCache\FileCacheFactory;
-use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
 use Drupal\Component\Annotation\Doctrine\SimpleAnnotationReader;
 use Drupal\Component\Annotation\Doctrine\StaticReflectionParser;
 use Drupal\Component\Annotation\Reflection\MockFileFinder;
+use Drupal\Component\FileCache\FileCacheFactory;
+use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
 use Drupal\Component\Plugin\Discovery\DiscoveryTrait;
 use Drupal\Component\Utility\Crypt;
 
@@ -140,7 +140,7 @@ class AnnotatedClassDiscovery implements DiscoveryInterface {
               $finder = MockFileFinder::create($fileinfo->getPathName());
               $parser = new StaticReflectionParser($class, $finder, TRUE);
 
-              /** @var \Drupal\Component\Annotation\AnnotationInterface $annotation */
+              /** @var AnnotationInterface $annotation */
               if ($annotation = $reader->getClassAnnotation($parser->getReflectionClass(), $this->pluginDefinitionAnnotationName)) {
                 $this->prepareAnnotationDefinition($annotation, $class);
 
@@ -169,7 +169,7 @@ class AnnotatedClassDiscovery implements DiscoveryInterface {
   /**
    * Prepares the annotation definition.
    *
-   * @param \Drupal\Component\Annotation\AnnotationInterface $annotation
+   * @param AnnotationInterface $annotation
    *   The annotation derived from the plugin.
    * @param string $class
    *   The class used for the plugin.

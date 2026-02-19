@@ -64,7 +64,7 @@ class StyleSensibleElementConstraintValidator extends ConstraintValidator implem
   /**
    * {@inheritdoc}
    *
-   * @throws \Symfony\Component\Validator\Exception\UnexpectedTypeException
+   * @throws UnexpectedTypeException
    *   Thrown when the given constraint is not supported by this validator.
    */
   public function validate($element, Constraint $constraint): void {
@@ -133,9 +133,9 @@ class StyleSensibleElementConstraintValidator extends ConstraintValidator implem
   /**
    * Checks if there is an intersection on allowed 'class' attribute values.
    *
-   * @param \Drupal\ckeditor5\HTMLRestrictions $a
+   * @param HTMLRestrictions $a
    *   One set of HTML restrictions.
-   * @param \Drupal\ckeditor5\HTMLRestrictions $b
+   * @param HTMLRestrictions $b
    *   Another set of HTML restrictions.
    *
    * @return bool
@@ -181,11 +181,11 @@ class StyleSensibleElementConstraintValidator extends ConstraintValidator implem
   /**
    * Finds the plugin with elements that conflict with the style element.
    *
-   * @param \Drupal\ckeditor5\HTMLRestrictions $needle
+   * @param HTMLRestrictions $needle
    *   A style definition element: a single tag, plus the 'class' attribute,
    *   plus >=1 allowed 'class' attribute values.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
+   * @return TranslatableMarkup
    *   The label of the plugin that is conflicting with this style.
    *
    * @throws \OutOfBoundsException

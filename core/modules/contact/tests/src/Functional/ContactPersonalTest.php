@@ -329,7 +329,7 @@ class ContactPersonalTest extends BrowserTestBase {
   /**
    * Fills out a user's personal contact form and submits it.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   A user object of the user being contacted.
    * @param array $message
    *   (optional) An array with the form fields being used. Defaults to an empty

@@ -26,7 +26,7 @@ use Symfony\Component\Filesystem\Path;
  * 2. The web root
  * 3. composer.json
  * 4. composer.lock
- * 5. Scaffold files as determined by the drupal/core-composer-scaffold plugin
+ * 5. Scaffold files as determined by the drupal/core-composer-scaffold plugin.
  *
  * If the web root and the project root are the same, nothing is excluded.
  *
@@ -155,7 +155,7 @@ final class UnknownPathExcluder implements EventSubscriberInterface, LoggerAware
   /**
    * Excludes unknown paths from stage operations.
    *
-   * @param \Drupal\package_manager\Event\CollectPathsToExcludeEvent $event
+   * @param CollectPathsToExcludeEvent $event
    *   The event object.
    */
   public function excludeUnknownPaths(CollectPathsToExcludeEvent $event): void {

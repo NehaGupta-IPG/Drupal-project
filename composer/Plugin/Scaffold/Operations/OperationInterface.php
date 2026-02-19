@@ -24,14 +24,14 @@ interface OperationInterface {
   /**
    * Process this scaffold operation.
    *
-   * @param \Drupal\Composer\Plugin\Scaffold\ScaffoldFilePath $destination
+   * @param ScaffoldFilePath $destination
    *   Scaffold file's destination path.
-   * @param \Composer\IO\IOInterface $io
+   * @param IOInterface $io
    *   IOInterface to write to.
-   * @param \Drupal\Composer\Plugin\Scaffold\ScaffoldOptions $options
+   * @param ScaffoldOptions $options
    *   Various options that may alter the behavior of the operation.
    *
-   * @return \Drupal\Composer\Plugin\Scaffold\Operations\ScaffoldResult
+   * @return ScaffoldResult
    *   Result of the scaffolding operation.
    */
   public function process(ScaffoldFilePath $destination, IOInterface $io, ScaffoldOptions $options);
@@ -58,7 +58,7 @@ interface OperationInterface {
    * and therefore do not need to do anything special when there is no existing
    * file.
    *
-   * @param \Drupal\Composer\Plugin\Scaffold\ScaffoldFilePath $destination
+   * @param ScaffoldFilePath $destination
    *   Scaffold file's destination path.
    *
    * @return OperationInterface

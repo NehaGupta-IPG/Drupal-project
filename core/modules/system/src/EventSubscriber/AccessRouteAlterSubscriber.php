@@ -25,7 +25,7 @@ class AccessRouteAlterSubscriber implements EventSubscriberInterface {
   /**
    * Adds requirements to some System Controller routes.
    *
-   * @param \Drupal\Core\Routing\RouteBuildEvent $event
+   * @param RouteBuildEvent $event
    *   The event to process.
    */
   public function accessAdminMenuBlockPage(RouteBuildEvent $event) {

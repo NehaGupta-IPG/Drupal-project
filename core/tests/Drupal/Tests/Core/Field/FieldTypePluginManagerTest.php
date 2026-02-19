@@ -27,28 +27,28 @@ class FieldTypePluginManagerTest extends UnitTestCase {
   /**
    * The field type plugin manager.
    *
-   * @var \Drupal\Core\Field\FieldTypePluginManager
+   * @var FieldTypePluginManager
    */
   protected FieldTypePluginManager $fieldTypeManager;
 
   /**
    * A mocked module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var ModuleHandlerInterface|ObjectProphecy
    */
   protected $moduleHandler;
 
   /**
    * A mocked module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var ModuleHandlerInterface|ObjectProphecy
    */
   protected $fieldTypeCategoryManager;
 
   /**
    * A mocked plugin discovery.
    *
-   * @var \Drupal\Component\Plugin\Discovery\DiscoveryInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var DiscoveryInterface|ObjectProphecy
    */
   protected $discovery;
 

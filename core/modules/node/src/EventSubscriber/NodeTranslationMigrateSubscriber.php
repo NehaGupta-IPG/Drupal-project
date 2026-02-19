@@ -30,23 +30,23 @@ class NodeTranslationMigrateSubscriber implements EventSubscriberInterface {
   /**
    * The key value factory.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueFactoryInterface
+   * @var KeyValueFactoryInterface
    */
   protected $keyValue;
 
   /**
    * The state service.
    *
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
   /**
    * Constructs the NodeTranslationMigrateSubscriber.
    *
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value
+   * @param KeyValueFactoryInterface $key_value
    *   The key value factory.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state service.
    */
   public function __construct(KeyValueFactoryInterface $key_value, StateInterface $state) {
@@ -57,7 +57,7 @@ class NodeTranslationMigrateSubscriber implements EventSubscriberInterface {
   /**
    * Helper method to check if we are migrating translated nodes.
    *
-   * @param \Drupal\migrate\Event\EventBase $event
+   * @param EventBase $event
    *   The migrate event.
    *
    * @return bool
@@ -73,7 +73,7 @@ class NodeTranslationMigrateSubscriber implements EventSubscriberInterface {
   /**
    * Maps the old nid to the new one in the key value collection.
    *
-   * @param \Drupal\migrate\Event\MigratePostRowSaveEvent $event
+   * @param MigratePostRowSaveEvent $event
    *   The migrate post row save event.
    */
   public function onPostRowSave(MigratePostRowSaveEvent $event) {
@@ -89,7 +89,7 @@ class NodeTranslationMigrateSubscriber implements EventSubscriberInterface {
   /**
    * Set the node_translation_redirect state to enable the redirects.
    *
-   * @param \Drupal\migrate\Event\MigrateImportEvent $event
+   * @param MigrateImportEvent $event
    *   The migrate import event.
    */
   public function onPostImport(MigrateImportEvent $event) {

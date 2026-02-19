@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Recipe;
 
+use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\DefaultContent\Finder;
 use Drupal\Core\Extension\Dependency;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ThemeExtensionList;
-use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\Render\Element;
 use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\RegexConstraint;
@@ -45,19 +45,19 @@ final class Recipe {
    *   A short description of the recipe.
    * @param string $type
    *   The recipe type.
-   * @param \Drupal\Core\Recipe\RecipeConfigurator $recipes
+   * @param RecipeConfigurator $recipes
    *   The recipe configurator, which lists the recipes that will be applied
    *   before this one.
-   * @param \Drupal\Core\Recipe\InstallConfigurator $install
+   * @param InstallConfigurator $install
    *   The install configurator, which lists the extensions this recipe will
    *   install.
-   * @param \Drupal\Core\Recipe\ConfigConfigurator $config
+   * @param ConfigConfigurator $config
    *   The config configurator, which lists the config that this recipe will
    *   install, and what config actions will be taken.
-   * @param \Drupal\Core\Recipe\InputConfigurator $input
+   * @param InputConfigurator $input
    *   The input configurator, which collects any input values used by the
    *   recipe.
-   * @param \Drupal\Core\DefaultContent\Finder $content
+   * @param Finder $content
    *   The default content finder.
    * @param string $path
    *   The recipe's path.
@@ -106,7 +106,7 @@ final class Recipe {
    * @return mixed[]
    *   The parsed and validated data from the file.
    *
-   * @throws \Drupal\Core\Recipe\RecipeFileException
+   * @throws RecipeFileException
    *   Thrown if the recipe.yml file is unreadable, invalid, or cannot be
    *   validated.
    */
@@ -337,7 +337,7 @@ final class Recipe {
    *
    * @param array $definition
    *   The array to validate (part of a single input definition).
-   * @param \Symfony\Component\Validator\Context\ExecutionContextInterface $context
+   * @param ExecutionContextInterface $context
    *   The validator execution context.
    *
    * @see ::parse()
@@ -355,7 +355,7 @@ final class Recipe {
    *
    * @param string $value
    *   The value to validate.
-   * @param \Symfony\Component\Validator\Context\ExecutionContextInterface $context
+   * @param ExecutionContextInterface $context
    *   The validator execution context.
    *
    * @see \Drupal\Core\Extension\ExtensionList::getAllAvailableInfo()
@@ -375,7 +375,7 @@ final class Recipe {
    *
    * @param string $name
    *   The machine name of the recipe to look for.
-   * @param \Symfony\Component\Validator\Context\ExecutionContextInterface $context
+   * @param ExecutionContextInterface $context
    *   The validator execution context.
    * @param string $include_path
    *   The recipe's include path.
@@ -397,7 +397,7 @@ final class Recipe {
    *
    * @param mixed $value
    *   The config action; not used.
-   * @param \Symfony\Component\Validator\Context\ExecutionContextInterface $context
+   * @param ExecutionContextInterface $context
    *   The validator execution context.
    * @param string $include_path
    *   The recipe's include path.
@@ -421,7 +421,7 @@ final class Recipe {
 
     $configurator = new RecipeConfigurator($recipe_being_validated['recipes'] ?? [], $include_path);
 
-    /** @var \Drupal\Core\Extension\ModuleExtensionList $module_list */
+    /** @var ModuleExtensionList $module_list */
     $module_list = \Drupal::service('extension.list.module');
     // The config provider must either be an already-installed module or theme,
     // or an extension being installed by this recipe or a recipe it depends on.
@@ -456,7 +456,7 @@ final class Recipe {
    *
    * @param array $value
    *   The array being validated.
-   * @param \Symfony\Component\Validator\Context\ExecutionContextInterface $context
+   * @param ExecutionContextInterface $context
    *   The validator execution context.
    */
   private static function validateKeysAreValidExtensionNames(array $value, ExecutionContextInterface $context): void {

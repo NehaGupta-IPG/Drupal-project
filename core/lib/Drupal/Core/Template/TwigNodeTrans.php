@@ -103,7 +103,7 @@ class TwigNodeTrans extends Node {
   /**
    * Extracts the text and tokens for the "trans" tag.
    *
-   * @param \Twig\Node\Node $body
+   * @param Node $body
    *   The node to compile.
    *
    * @return array

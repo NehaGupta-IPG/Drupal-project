@@ -28,10 +28,10 @@ final class AdminAccountSwitcher implements AccountSwitcherInterface {
    * `is_admin` flag. If there are no such roles, or no such users, this will
    * try to switch to user 1 if superuser access is enabled.
    *
-   * @return \Drupal\Core\Session\AccountInterface
+   * @return AccountInterface
    *   The account that was switched to.
    *
-   * @throws \Drupal\Core\Access\AccessException
+   * @throws AccessException
    *   Thrown if there are no users with administrative roles.
    */
   public function switchToAdministrator(): AccountInterface {

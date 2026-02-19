@@ -100,7 +100,7 @@ class ContentImportTest extends BrowserTestBase {
   public function testDirectContentImport(): void {
     $logger = new TestLogger();
 
-    /** @var \Drupal\Core\DefaultContent\Importer $importer */
+    /** @var Importer $importer */
     $importer = $this->container->get(Importer::class);
     $importer->setLogger($logger);
     $importer->importContent(new Finder($this->contentDir));
@@ -173,11 +173,11 @@ class ContentImportTest extends BrowserTestBase {
   /**
    * Asserts that the default content was imported as expected.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The account that should own the imported content.
    */
   private function assertContentWasImported(AccountInterface $account): void {
-    /** @var \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository */
+    /** @var EntityRepositoryInterface $entity_repository */
     $entity_repository = $this->container->get(EntityRepositoryInterface::class);
 
     $node = $entity_repository->loadEntityByUuid('node', 'e1714f23-70c0-4493-8e92-af1901771921');
@@ -307,7 +307,7 @@ class ContentImportTest extends BrowserTestBase {
     $finder = new Finder($this->contentDir);
     $this->assertSame('menu_link_content', $finder->data['3434bd5a-d2cd-4f26-bf79-a7f6b951a21b']['_meta']['entity_type']);
 
-    /** @var \Drupal\Core\DefaultContent\Importer $importer */
+    /** @var Importer $importer */
     $importer = \Drupal::service(Importer::class);
     $logger = new TestLogger();
     $importer->setLogger($logger);

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\condition_test;
 
-use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Condition\ConditionManager;
+use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\SubformState;
 use Drupal\Core\StringTranslation\StringTranslationTrait;

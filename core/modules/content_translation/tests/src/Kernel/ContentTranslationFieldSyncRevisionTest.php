@@ -48,7 +48,7 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
   /**
    * The content translation manager.
    *
-   * @var \Drupal\content_translation\ContentTranslationManagerInterface|\Drupal\content_translation\BundleTranslationSettingsInterface
+   * @var \Drupal\content_translation\ContentTranslationManagerInterface|BundleTranslationSettingsInterface
    */
   protected $contentTranslationManager;
 
@@ -75,7 +75,7 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
     ConfigurableLanguage::createFromLangcode('it')->save();
     ConfigurableLanguage::createFromLangcode('fr')->save();
 
-    /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
+    /** @var FieldStorageConfig $field_storage */
     $field_storage_config = FieldStorageConfig::create([
       'field_name' => $this->fieldName,
       'type' => 'image',
@@ -139,14 +139,14 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
     $entity_id = $entity->id();
     $this->assertLatestRevisionFieldValues($entity_id, [1, 1, 1, 'Alt 1 EN']);
 
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $en_revision */
+    /** @var ContentEntityInterface $en_revision */
     $en_revision = $this->createRevision($entity, FALSE);
     $en_revision->get($this->fieldName)->target_id = 2;
     $violations = $en_revision->validate();
     $this->assertViolations($violations);
 
     $it_translation = $entity->addTranslation('it', $entity->toArray());
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $it_revision */
+    /** @var ContentEntityInterface $it_revision */
     $it_revision = $this->createRevision($it_translation, FALSE);
     $metadata = $this->contentTranslationManager->getTranslationMetadata($it_revision);
     $metadata->setSource('en');
@@ -206,7 +206,7 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
     $entity_id = $entity->id();
     $this->assertLatestRevisionFieldValues($entity_id, [8, 1, 1, 'Alt 1 EN']);
 
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $en_revision */
+    /** @var ContentEntityInterface $en_revision */
     $en_revision = $this->createRevision($entity, FALSE);
     $en_revision->get($this->fieldName)->target_id = 2;
     $en_revision->get($this->fieldName)->alt = 'Alt 2 EN';
@@ -216,7 +216,7 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
     $this->assertLatestRevisionFieldValues($entity_id, [9, 2, 2, 'Alt 2 EN']);
 
     $it_translation = $entity->addTranslation('it', $entity->toArray());
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $it_revision */
+    /** @var ContentEntityInterface $it_revision */
     $it_revision = $this->createRevision($it_translation, FALSE);
     $metadata = $this->contentTranslationManager->getTranslationMetadata($it_revision);
     $metadata->setSource('en');
@@ -279,7 +279,7 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
     $this->assertLatestRevisionFieldValues($entity_id, [15, 1, 1, 'Alt 1 EN']);
 
     $it_translation = $entity->addTranslation('it', $entity->toArray());
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $it_revision */
+    /** @var ContentEntityInterface $it_revision */
     $it_revision = $this->createRevision($it_translation);
     $metadata = $this->contentTranslationManager->getTranslationMetadata($it_revision);
     $metadata->setSource('en');
@@ -289,7 +289,7 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
     $this->storage->save($it_revision);
     $this->assertLatestRevisionFieldValues($entity_id, [16, 1, 1, 'Alt 1 EN', 'Alt 2 IT']);
 
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $en_revision */
+    /** @var ContentEntityInterface $en_revision */
     $en_revision = $this->createRevision($entity);
     $en_revision->get($this->fieldName)->target_id = 3;
     $en_revision->get($this->fieldName)->alt = 'Alt 3 EN';
@@ -327,7 +327,7 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
     $this->assertLatestRevisionFieldValues($entity_id, [21, 1, 1, 'Alt 1 EN']);
 
     $it_translation = $entity->addTranslation('it', $entity->toArray());
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $it_revision */
+    /** @var ContentEntityInterface $it_revision */
     $it_revision = $this->createRevision($it_translation);
     $metadata = $this->contentTranslationManager->getTranslationMetadata($it_revision);
     $metadata->setSource('en');
@@ -352,7 +352,7 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
     $this->assertLatestRevisionFieldValues($entity_id, [23, 1, 1, 'Alt 1 EN']);
 
     $it_translation = $entity->addTranslation('it', $entity->toArray());
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $it_revision */
+    /** @var ContentEntityInterface $it_revision */
     $it_revision = $this->createRevision($it_translation, FALSE);
     $metadata = $this->contentTranslationManager->getTranslationMetadata($it_revision);
     $metadata->setSource('en');
@@ -362,7 +362,7 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
     $this->storage->save($it_revision);
     $this->assertLatestRevisionFieldValues($entity_id, [24, 1, 1, 'Alt 1 EN', 'Alt 2 IT']);
 
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $en_revision */
+    /** @var ContentEntityInterface $en_revision */
     $en_revision = $this->createRevision($entity);
     $en_revision->get($this->fieldName)->target_id = 3;
     $en_revision->get($this->fieldName)->alt = 'Alt 3 EN';
@@ -391,7 +391,7 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
       $entity->save();
     }
 
-    /** @var \Drupal\field\Entity\FieldStorageConfig $field_storage */
+    /** @var FieldStorageConfig $field_storage */
     $field_storage_config = FieldStorageConfig::create([
       'field_name' => $file_field_name,
       'type' => 'file',
@@ -418,7 +418,7 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
     $field_config->setThirdPartySetting('content_translation', 'translation_sync', $property_settings);
     $field_config->save();
 
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     $entity = EntityTestMulRev::create([
       'uid' => 1,
       'langcode' => 'en',
@@ -483,11 +483,11 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
   }
 
   /**
-   * @return \Drupal\Core\Entity\ContentEntityInterface
+   * @return ContentEntityInterface
    *   The saved entity.
    */
   protected function saveNewEntity() {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     $entity = EntityTestMulRev::create([
       'uid' => 1,
       'langcode' => 'en',
@@ -507,24 +507,24 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
   /**
    * Creates a new revision starting from the latest translation-affecting one.
    *
-   * @param \Drupal\Core\Entity\ContentEntityInterface $translation
+   * @param ContentEntityInterface $translation
    *   The translation to be revisioned.
    * @param bool $default
    *   (optional) Whether the new revision should be marked as default. Defaults
    *   to TRUE.
    *
-   * @return \Drupal\Core\Entity\ContentEntityInterface
+   * @return ContentEntityInterface
    *   An entity revision object.
    */
   protected function createRevision(ContentEntityInterface $translation, $default = TRUE) {
     if (!$translation->isNewTranslation()) {
       $langcode = $translation->language()->getId();
       $revision_id = $this->storage->getLatestTranslationAffectedRevisionId($translation->id(), $langcode);
-      /** @var \Drupal\Core\Entity\ContentEntityInterface $revision */
+      /** @var ContentEntityInterface $revision */
       $revision = $this->storage->loadRevision($revision_id);
       $translation = $revision->getTranslation($langcode);
     }
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $revision */
+    /** @var ContentEntityInterface $revision */
     $revision = $this->storage->createRevision($translation, $default);
     return $revision;
   }
@@ -532,7 +532,7 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
   /**
    * Asserts that the expected violations were found.
    *
-   * @param \Drupal\Core\Entity\EntityConstraintViolationListInterface $violations
+   * @param EntityConstraintViolationListInterface $violations
    *   A list of violations.
    *
    * @internal
@@ -569,7 +569,7 @@ class ContentTranslationFieldSyncRevisionTest extends EntityKernelTestBase {
    * @internal
    */
   protected function assertLatestRevisionFieldValues(string $entity_id, array $expected_values): void {
-    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    /** @var ContentEntityInterface $entity */
     $entity = $this->storage->loadRevision($this->storage->getLatestRevisionId($entity_id));
     @[$revision_id, $target_id_en, $target_id_it, $alt_en, $alt_it] = $expected_values;
     $this->assertEquals($revision_id, $entity->getRevisionId());

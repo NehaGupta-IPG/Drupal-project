@@ -15,7 +15,7 @@ class TestMigrateExecutable extends MigrateExecutable {
   /**
    * Sets the string translation service.
    *
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+   * @param TranslationInterface $string_translation
    *   The translation manager.
    */
   public function setStringTranslation(TranslationInterface $string_translation) {
@@ -26,7 +26,7 @@ class TestMigrateExecutable extends MigrateExecutable {
   /**
    * Allows access to set protected source property.
    *
-   * @param \Drupal\migrate\Plugin\MigrateSourceInterface $source
+   * @param MigrateSourceInterface $source
    *   The value to set.
    */
   public function setSource($source) {

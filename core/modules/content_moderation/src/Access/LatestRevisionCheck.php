@@ -2,12 +2,12 @@
 
 namespace Drupal\content_moderation\Access;
 
+use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\Core\Access\AccessException;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Routing\Access\AccessInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\user\EntityOwnerInterface;
 use Symfony\Component\Routing\Route;
@@ -20,14 +20,14 @@ class LatestRevisionCheck implements AccessInterface {
   /**
    * The moderation information service.
    *
-   * @var \Drupal\content_moderation\ModerationInformationInterface
+   * @var ModerationInformationInterface
    */
   protected $moderationInfo;
 
   /**
    * Constructs a new LatestRevisionCheck.
    *
-   * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_information
+   * @param ModerationInformationInterface $moderation_information
    *   The moderation information service.
    */
   public function __construct(ModerationInformationInterface $moderation_information) {
@@ -40,11 +40,11 @@ class LatestRevisionCheck implements AccessInterface {
    * This checker assumes the presence of an '_entity_access' requirement key
    * in the same form as used by EntityAccessCheck.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route to check against.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The parametrized route.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The current user account.
    *
    * @return \Drupal\Core\Access\AccessResultInterface
@@ -74,15 +74,15 @@ class LatestRevisionCheck implements AccessInterface {
   /**
    * Returns the default revision of the entity this route is for.
    *
-   * @param \Symfony\Component\Routing\Route $route
+   * @param Route $route
    *   The route to check against.
-   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   * @param RouteMatchInterface $route_match
    *   The parametrized route.
    *
    * @return \Drupal\Core\Entity\ContentEntityInterface
    *   returns the Entity in question.
    *
-   * @throws \Drupal\Core\Access\AccessException
+   * @throws AccessException
    *   An AccessException is thrown if the entity couldn't be loaded.
    */
   protected function loadEntity(Route $route, RouteMatchInterface $route_match) {

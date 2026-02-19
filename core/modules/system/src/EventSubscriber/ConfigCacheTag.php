@@ -27,7 +27,7 @@ class ConfigCacheTag implements EventSubscriberInterface {
   /**
    * Invalidate cache tags when particular system config objects are saved.
    *
-   * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   * @param ConfigCrudEvent $event
    *   The Event to process.
    */
   public function onSave(ConfigCrudEvent $event) {

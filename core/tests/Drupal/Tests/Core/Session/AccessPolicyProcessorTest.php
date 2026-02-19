@@ -581,7 +581,7 @@ class CacheItem {
   /**
    * The cache data.
    *
-   * @var \Drupal\Core\Session\CalculatedPermissions
+   * @var CalculatedPermissions
    */
   public $data;
 

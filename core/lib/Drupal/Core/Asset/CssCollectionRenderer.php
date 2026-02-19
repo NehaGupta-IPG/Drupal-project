@@ -12,9 +12,9 @@ class CssCollectionRenderer implements AssetCollectionRendererInterface {
   /**
    * Constructs a CssCollectionRenderer.
    *
-   * @param \Drupal\Core\Asset\AssetQueryStringInterface $assetQueryString
+   * @param AssetQueryStringInterface $assetQueryString
    *   The asset query string.
-   * @param \Drupal\Core\File\FileUrlGeneratorInterface $fileUrlGenerator
+   * @param FileUrlGeneratorInterface $fileUrlGenerator
    *   The file URL generator.
    */
   public function __construct(

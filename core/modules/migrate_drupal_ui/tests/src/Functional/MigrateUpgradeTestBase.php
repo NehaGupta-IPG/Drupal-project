@@ -7,8 +7,8 @@ namespace Drupal\Tests\migrate_drupal_ui\Functional;
 use Drupal\Core\Database\Database;
 use Drupal\migrate\Plugin\MigrateIdMapInterface;
 use Drupal\migrate_drupal\MigrationConfigurationTrait;
-use Drupal\user\Entity\User;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\user\Entity\User;
 
 /**
  * Provides a base class for testing migration upgrades in the UI.
@@ -174,8 +174,8 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
    * @param array $entity_types
    *   An array of entity types.
    *
-   * @throws \Behat\Mink\Exception\ResponseTextException
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws ResponseTextException
+   * @throws PluginNotFoundException
    */
   protected function assertIdConflictForm(array $entity_types) {
     $session = $this->assertSession();
@@ -203,7 +203,7 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
    *   An array of modules that will not be upgraded. Defaults to
    *   $this->getMissingPaths().
    *
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ExpectationException
    */
   protected function assertReviewForm(?array $available_paths = NULL, ?array $missing_paths = NULL) {
     $session = $this->assertSession();
@@ -235,7 +235,7 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
    *   An array of entity count, where the key is the entity type and the value
    *   is the number of the entities that should exist post migration.
    *
-   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws ExpectationException
    */
   protected function assertUpgrade(array $entity_counts) {
     $session = $this->assertSession();

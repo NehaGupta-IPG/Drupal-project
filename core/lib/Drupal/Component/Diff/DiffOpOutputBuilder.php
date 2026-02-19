@@ -33,7 +33,7 @@ final class DiffOpOutputBuilder implements DiffOutputBuilderInterface {
    * @param array $diff
    *   The array output of Differ::diffToArray().
    *
-   * @return \Drupal\Component\Diff\Engine\DiffOp[]
+   * @return DiffOp[]
    *   An array of DiffOp* value objects.
    */
   public function toOpsArray(array $diff): array {
@@ -103,7 +103,7 @@ final class DiffOpOutputBuilder implements DiffOutputBuilderInterface {
    * @param string[] $source
    *   The array of strings to be changed to when self::CHANGED is specified.
    *
-   * @return \Drupal\Component\Diff\Engine\DiffOp
+   * @return DiffOp
    *   A DiffOp* value object.
    *
    * @throw \InvalidArgumentException

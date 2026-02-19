@@ -136,7 +136,6 @@ class ImageOnTranslatedEntityTest extends ImageFieldTestBase {
     \Drupal::entityTypeManager()->getStorage('file')->resetCache();
 
     /** @var \Drupal\file\FileInterface $file */
-
     // Ensure the file status of the first file permanent.
     $file = File::load($first_fid);
     $this->assertTrue($file->isPermanent());

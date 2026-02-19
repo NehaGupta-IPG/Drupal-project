@@ -88,7 +88,7 @@ class CacheTagsChecksumDecorator implements CacheTagsChecksumInterface, CacheTag
    *   The start microtime.
    * @param float $stop
    *   The stop microtime.
-   * @param \Drupal\performance_test\Cache\CacheTagOperation $operation
+   * @param CacheTagOperation $operation
    *   The type of operation being logged.
    */
   protected function logCacheTagOperation(array $tags, float $start, float $stop, CacheTagOperation $operation): void {

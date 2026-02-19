@@ -23,21 +23,21 @@ class ChainResponsePolicyTest extends UnitTestCase {
   /**
    * The chain response policy under test.
    *
-   * @var \Drupal\Core\PageCache\ChainResponsePolicy
+   * @var ChainResponsePolicy
    */
   protected $policy;
 
   /**
    * A request object.
    *
-   * @var \Symfony\Component\HttpFoundation\Request
+   * @var Request
    */
   protected $request;
 
   /**
    * A response object.
    *
-   * @var \Symfony\Component\HttpFoundation\Response
+   * @var Response
    */
   protected $response;
 

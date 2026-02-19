@@ -66,21 +66,21 @@ abstract class AssetControllerBase extends FileDownloadController {
   /**
    * Constructs an object derived from AssetControllerBase.
    *
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $streamWrapperManager
+   * @param StreamWrapperManagerInterface $streamWrapperManager
    *   The stream wrapper manager.
-   * @param \Drupal\Core\Asset\LibraryDependencyResolverInterface $libraryDependencyResolver
+   * @param LibraryDependencyResolverInterface $libraryDependencyResolver
    *   The library dependency resolver.
-   * @param \Drupal\Core\Asset\AssetResolverInterface $assetResolver
+   * @param AssetResolverInterface $assetResolver
    *   The asset resolver.
-   * @param \Drupal\Core\Theme\ThemeInitializationInterface $themeInitialization
+   * @param ThemeInitializationInterface $themeInitialization
    *   The theme initializer.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $themeManager
+   * @param ThemeManagerInterface $themeManager
    *   The theme manager.
-   * @param \Drupal\Core\Asset\AssetCollectionGrouperInterface $grouper
+   * @param AssetCollectionGrouperInterface $grouper
    *   The asset grouper.
-   * @param \Drupal\Core\Asset\AssetCollectionOptimizerInterface $optimizer
+   * @param AssetCollectionOptimizerInterface $optimizer
    *   The asset collection optimizer.
-   * @param \Drupal\Core\Asset\AssetDumperUriInterface $dumper
+   * @param AssetDumperUriInterface $dumper
    *   The asset dumper.
    */
   public function __construct(
@@ -100,15 +100,15 @@ abstract class AssetControllerBase extends FileDownloadController {
   /**
    * Generates an aggregate, given a filename.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request object.
    * @param string $file_name
    *   The file to deliver.
    *
-   * @return \Symfony\Component\HttpFoundation\BinaryFileResponse|\Symfony\Component\HttpFoundation\Response
+   * @return BinaryFileResponse|Response
    *   The transferred file as response.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws BadRequestHttpException
    *   Thrown when the filename is invalid or an invalid query argument is
    *   supplied.
    */
@@ -225,7 +225,7 @@ abstract class AssetControllerBase extends FileDownloadController {
    * @return array
    *   The correct asset group matching $group_delta.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws BadRequestHttpException
    *   Thrown when the filename is invalid.
    */
   protected function getGroup(array $groups, int $group_delta): array {
@@ -238,15 +238,15 @@ abstract class AssetControllerBase extends FileDownloadController {
   /**
    * Get grouped assets.
    *
-   * @param \Drupal\Core\Asset\AttachedAssetsInterface $attached_assets
+   * @param AttachedAssetsInterface $attached_assets
    *   The attached assets.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    *
    * @return array
    *   The grouped assets.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+   * @throws BadRequestHttpException
    *   Thrown when the query argument is omitted.
    */
   abstract protected function getGroups(AttachedAssetsInterface $attached_assets, Request $request): array;

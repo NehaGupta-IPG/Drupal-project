@@ -32,45 +32,45 @@ class FieldBlockDeriver extends DeriverBase implements ContainerDeriverInterface
   /**
    * The entity type repository.
    *
-   * @var \Drupal\Core\Entity\EntityTypeRepositoryInterface
+   * @var EntityTypeRepositoryInterface
    */
   protected $entityTypeRepository;
 
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 
   /**
    * The field type manager.
    *
-   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface
+   * @var FieldTypePluginManagerInterface
    */
   protected $fieldTypeManager;
 
   /**
    * The formatter manager.
    *
-   * @var \Drupal\Core\Field\FormatterPluginManager
+   * @var FormatterPluginManager
    */
   protected $formatterManager;
 
   /**
    * Constructs new FieldBlockDeriver.
    *
-   * @param \Drupal\Core\Entity\EntityTypeRepositoryInterface $entity_type_repository
+   * @param EntityTypeRepositoryInterface $entity_type_repository
    *   The entity type repository.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @param EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager
+   * @param FieldTypePluginManagerInterface $field_type_manager
    *   The field type manager.
-   * @param \Drupal\Core\Field\FormatterPluginManager $formatter_manager
+   * @param FormatterPluginManager $formatter_manager
    *   The formatter manager.
-   * @param \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $entityViewDisplayStorage
+   * @param ConfigEntityStorageInterface $entityViewDisplayStorage
    *   The entity view display storage.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   * @param ModuleHandlerInterface $moduleHandler
    *   The module handler.
    */
   public function __construct(

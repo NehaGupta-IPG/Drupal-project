@@ -53,10 +53,10 @@ class EntityLinkSuggestionsController extends ControllerBase {
    * Note that access to the filter format is not checked here because the route
    * is configured to check entity access to the filter format.
    *
-   * @param \Drupal\editor\Entity\Editor $editor
+   * @param Editor $editor
    *   The text editor for which to check access.
    *
-   * @return \Drupal\Core\Access\AccessResultInterface
+   * @return AccessResultInterface
    *   The access result.
    */
   public static function formatUsesEntityLinksFilter(EditorInterface $editor): AccessResultInterface {
@@ -71,12 +71,12 @@ class EntityLinkSuggestionsController extends ControllerBase {
    * Like other autocomplete functions, this function inspects the 'q' query
    * parameter for the string to use to search for suggestions.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
-   * @param \Drupal\editor\EditorInterface $editor
+   * @param EditorInterface $editor
    *   The text editor whose drupalEntityLinkSuggestions configuration to use.
    *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   * @return JsonResponse
    *   A JSON response containing the autocomplete suggestions.
    */
   public function suggestions(Request $request, EditorInterface $editor): JsonResponse {
@@ -221,7 +221,7 @@ class EntityLinkSuggestionsController extends ControllerBase {
   /**
    * Creates a suggestion.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The matched entity.
    *
    * @return array
@@ -243,10 +243,10 @@ class EntityLinkSuggestionsController extends ControllerBase {
   /**
    * Computes a suggestion description.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The suggested entity for which to compute a description.
    *
-   * @return \Drupal\Core\StringTranslation\TranslatableMarkup|null
+   * @return TranslatableMarkup|null
    *   A suggestion description.
    */
   protected function computeDescription(EntityInterface $entity): ?TranslatableMarkup {
@@ -278,7 +278,7 @@ class EntityLinkSuggestionsController extends ControllerBase {
   /**
    * Computers a suggestion group.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The suggested entity for which to compute the group.
    *
    * @return string

@@ -40,9 +40,9 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param CacheBackendInterface $cache_backend
    *   Cache backend instance to use.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler to invoke the alter hook with.
    */
   public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
@@ -132,7 +132,7 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
   /**
    * Gets the plugin configuration (if any) from a text editor config entity.
    *
-   * @param \Drupal\editor\EditorInterface $editor
+   * @param EditorInterface $editor
    *   A text editor config entity that is using CKEditor 5.
    * @param string $plugin_id
    *   A CKEditor 5 plugin ID.
@@ -441,7 +441,7 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
    *
    * @param string $get_method
    *   Which CKEditor5PluginDefinition getter to call to get values to merge.
-   * @param \Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition[] $definitions
+   * @param CKEditor5PluginDefinition[] $definitions
    *   The plugin definitions whose values to merge.
    *
    * @return array
@@ -468,9 +468,9 @@ class CKEditor5PluginManager extends DefaultPluginManager implements CKEditor5Pl
   /**
    * Checks whether a plugin must be disabled due to unmet conditions.
    *
-   * @param \Drupal\ckeditor5\Plugin\CKEditor5PluginInterface $plugin
+   * @param CKEditor5PluginInterface $plugin
    *   A CKEditor 5 plugin instance.
-   * @param \Drupal\editor\EditorInterface $editor
+   * @param EditorInterface $editor
    *   A configured text editor object.
    *
    * @return bool

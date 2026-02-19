@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\taxonomy\Traits;
 
 use Drupal\Core\Language\LanguageInterface;
-use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\taxonomy\TermInterface;
 use Drupal\taxonomy\VocabularyInterface;
 
@@ -21,7 +21,7 @@ trait TaxonomyTestTrait {
    * @param array $values
    *   (optional) Default values for the Vocabulary::create() method.
    *
-   * @return \Drupal\taxonomy\VocabularyInterface
+   * @return VocabularyInterface
    *   A vocabulary used for testing.
    */
   protected function createVocabulary(array $values = []) {
@@ -41,12 +41,12 @@ trait TaxonomyTestTrait {
   /**
    * Returns a new term with random properties given a vocabulary.
    *
-   * @param \Drupal\taxonomy\VocabularyInterface $vocabulary
+   * @param VocabularyInterface $vocabulary
    *   The vocabulary object.
    * @param array $values
    *   (optional) An array of values to set, keyed by property name.
    *
-   * @return \Drupal\taxonomy\TermInterface
+   * @return TermInterface
    *   The new taxonomy term object.
    */
   protected function createTerm(VocabularyInterface $vocabulary, $values = []) {
@@ -67,10 +67,10 @@ trait TaxonomyTestTrait {
   /**
    * Creates a new revision for a given taxonomy term.
    *
-   * @param \Drupal\taxonomy\TermInterface $term
+   * @param TermInterface $term
    *   A taxonomy term object.
    *
-   * @return \Drupal\taxonomy\TermInterface
+   * @return TermInterface
    *   The new taxonomy term object.
    */
   protected function createTaxonomyTermRevision(TermInterface $term) {

@@ -10,7 +10,7 @@ interface SearchPageRepositoryInterface {
   /**
    * Returns all active search page entities.
    *
-   * @return \Drupal\search\SearchPageInterface[]
+   * @return SearchPageInterface[]
    *   An array of active search page entities.
    */
   public function getActiveSearchPages();
@@ -26,7 +26,7 @@ interface SearchPageRepositoryInterface {
   /**
    * Returns all active, indexable search page entities.
    *
-   * @return \Drupal\search\SearchPageInterface[]
+   * @return SearchPageInterface[]
    *   An array of indexable search page entities.
    */
   public function getIndexableSearchPages();
@@ -42,7 +42,7 @@ interface SearchPageRepositoryInterface {
   /**
    * Sets a given search page as the default.
    *
-   * @param \Drupal\search\SearchPageInterface $search_page
+   * @param SearchPageInterface $search_page
    *   The search page entity.
    *
    * @return static
@@ -57,10 +57,10 @@ interface SearchPageRepositoryInterface {
   /**
    * Sorts a list of search pages.
    *
-   * @param \Drupal\search\SearchPageInterface[] $search_pages
+   * @param SearchPageInterface[] $search_pages
    *   The unsorted list of search pages.
    *
-   * @return \Drupal\search\SearchPageInterface[]
+   * @return SearchPageInterface[]
    *   The sorted list of search pages.
    */
   public function sortSearchPages($search_pages);

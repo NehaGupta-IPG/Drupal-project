@@ -11,7 +11,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 /**
  * Defines a ConfigAction attribute object.
  *
- * Plugin Namespace: Plugin\ConfigAction
+ * Plugin Namespace: Plugin\ConfigAction.
  *
  * @ingroup config_action_api
  *
@@ -30,7 +30,7 @@ final class ConfigAction extends Plugin {
    *
    * @param string $id
    *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $admin_label
+   * @param TranslatableMarkup|null $admin_label
    *   The administrative label of the config action. This is optional when
    *   using a deriver, but in that case the deriver should add an admin label.
    * @param string[] $entity_types

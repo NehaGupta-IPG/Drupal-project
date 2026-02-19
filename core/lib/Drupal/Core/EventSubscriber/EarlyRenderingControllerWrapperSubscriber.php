@@ -57,23 +57,23 @@ class EarlyRenderingControllerWrapperSubscriber implements EventSubscriberInterf
   /**
    * The argument resolver.
    *
-   * @var \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface
+   * @var ArgumentResolverInterface
    */
   protected $argumentResolver;
 
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface
+   * @var RendererInterface
    */
   protected $renderer;
 
   /**
    * Constructs a new EarlyRenderingControllerWrapperSubscriber instance.
    *
-   * @param \Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface $argument_resolver
+   * @param ArgumentResolverInterface $argument_resolver
    *   The argument resolver.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
    */
   public function __construct(ArgumentResolverInterface $argument_resolver, RendererInterface $renderer) {
@@ -84,7 +84,7 @@ class EarlyRenderingControllerWrapperSubscriber implements EventSubscriberInterf
   /**
    * Ensures bubbleable metadata from early rendering is not lost.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ControllerEvent $event
+   * @param ControllerEvent $event
    *   The controller event.
    */
   public function onController(ControllerEvent $event) {
@@ -127,7 +127,7 @@ class EarlyRenderingControllerWrapperSubscriber implements EventSubscriberInterf
     // RendererInterface::render() outside of a render context, then the
     // bubbleable metadata for that is stored in the current render context.
     if (!$context->isEmpty()) {
-      /** @var \Drupal\Core\Render\BubbleableMetadata $early_rendering_bubbleable_metadata */
+      /** @var BubbleableMetadata $early_rendering_bubbleable_metadata */
       $early_rendering_bubbleable_metadata = $context->pop();
 
       // If a render array or AjaxResponse is returned by the controller, merge

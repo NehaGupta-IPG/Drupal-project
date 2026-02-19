@@ -28,7 +28,7 @@ interface SessionManagerInterface extends SessionStorageInterface {
    * @todo This should be removed once all database queries are removed from
    *   the session manager class.
    *
-   * @var \Drupal\Core\Session\WriteSafeSessionHandlerInterface
+   * @var WriteSafeSessionHandlerInterface
    */
   public function setWriteSafeHandler(WriteSafeSessionHandlerInterface $handler);
 

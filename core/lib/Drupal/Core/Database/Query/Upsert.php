@@ -26,7 +26,7 @@ abstract class Upsert extends Query implements \Countable {
   /**
    * Constructs an Upsert object.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   A Connection object.
    * @param string $table
    *   Name of the table to associate with this query.
@@ -58,9 +58,9 @@ abstract class Upsert extends Query implements \Countable {
    * @return bool
    *   TRUE if the validation was successful, FALSE otherwise.
    *
-   * @throws \Drupal\Core\Database\Query\NoUniqueFieldException
-   * @throws \Drupal\Core\Database\Query\FieldsOverlapException
-   * @throws \Drupal\Core\Database\Query\NoFieldsException
+   * @throws NoUniqueFieldException
+   * @throws FieldsOverlapException
+   * @throws NoFieldsException
    */
   protected function preExecute() {
     // Confirm that the user set the unique/primary key of the table.

@@ -12,14 +12,14 @@ class EnforcedResponseException extends \Exception {
   /**
    * The response to be enforced.
    *
-   * @var \Symfony\Component\HttpFoundation\Response
+   * @var Response
    */
   protected $response;
 
   /**
    * Constructs a new enforced response exception.
    *
-   * @param \Symfony\Component\HttpFoundation\Response $response
+   * @param Response $response
    *   The response to be enforced.
    * @param string $message
    *   (optional) The exception message.
@@ -37,7 +37,7 @@ class EnforcedResponseException extends \Exception {
   /**
    * Return the response to be enforced.
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   The response to be enforced.
    */
   public function getResponse() {

@@ -3,11 +3,11 @@
 namespace Drupal\user\Plugin\views\field;
 
 use Drupal\Core\Database\Connection;
+use Drupal\user\Entity\Role;
 use Drupal\views\Attribute\ViewsField;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
-use Drupal\views\ViewExecutable;
 use Drupal\views\Plugin\views\field\PrerenderList;
-use Drupal\user\Entity\Role;
+use Drupal\views\ViewExecutable;
 
 /**
  * Field handler to provide a list of roles.
@@ -20,7 +20,7 @@ class Roles extends PrerenderList {
   /**
    * Database Service Object.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $database;
 
@@ -33,7 +33,7 @@ class Roles extends PrerenderList {
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\Core\Database\Connection $database
+   * @param Connection $database
    *   Database Service Object.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, Connection $database) {

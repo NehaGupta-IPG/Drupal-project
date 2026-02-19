@@ -134,9 +134,9 @@ class MenuLinkParentTest extends MigrateProcessTestCase {
    * @param string[] $source_value
    *   The source value(s) for the migration process plugin.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
-   * @throws \Drupal\migrate\MigrateException
-   * @throws \Drupal\migrate\MigrateSkipRowException
+   * @throws PluginException
+   * @throws MigrateException
+   * @throws MigrateSkipRowException
    */
   #[DataProvider('providerTransformException')]
   public function testTransformException(array $source_value): void {
@@ -180,9 +180,9 @@ class MenuLinkParentTest extends MigrateProcessTestCase {
    * @param string $expected_result
    *   The expected value(s) of the migration process plugin.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
-   * @throws \Drupal\migrate\MigrateException
-   * @throws \Drupal\migrate\MigrateSkipRowException
+   * @throws PluginException
+   * @throws MigrateException
+   * @throws MigrateSkipRowException
    */
   #[DataProvider('providerMenuLinkParent')]
   public function testMenuLinkParent(array $source_value, $lookup_result, $plugin_id, $route_name, $expected_result): void {
@@ -252,7 +252,7 @@ class MenuLinkParentTest extends MigrateProcessTestCase {
    * @return string
    *   The transformed menu link.
    *
-   * @throws \Drupal\migrate\MigrateSkipRowException
+   * @throws MigrateSkipRowException
    */
   public function doTransform(array $source_value, $plugin_id) {
     [$parent_id, $menu_name, $parent_link_path] = $source_value;

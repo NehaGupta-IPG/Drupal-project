@@ -18,7 +18,7 @@ interface FilteredPluginManagerInterface extends PluginManagerInterface {
    *
    * @param string $consumer
    *   A string identifying the consumer of these plugin definitions.
-   * @param \Drupal\Component\Plugin\Context\ContextInterface[]|null $contexts
+   * @param ContextInterface[]|null $contexts
    *   (optional) Either an array of contexts to use for filtering, or NULL to
    *   not filter by contexts.
    * @param mixed[] $extra

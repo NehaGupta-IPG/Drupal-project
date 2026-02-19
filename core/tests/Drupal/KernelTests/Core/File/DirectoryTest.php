@@ -41,7 +41,7 @@ class DirectoryTest extends FileTestBase {
     // Create the directories.
     $parent_path = $directory . DIRECTORY_SEPARATOR . $parent;
     $child_path = $parent_path . DIRECTORY_SEPARATOR . $child;
-    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
+    /** @var FileSystemInterface $file_system */
     $file_system = \Drupal::service('file_system');
     $this->assertTrue($file_system->mkdir($child_path, 0775, TRUE), 'No error reported when creating new local directories.');
 
@@ -72,7 +72,7 @@ class DirectoryTest extends FileTestBase {
     $this->assertDirectoryDoesNotExist($directory);
 
     // Non-existent directory.
-    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
+    /** @var FileSystemInterface $file_system */
     $file_system = \Drupal::service('file_system');
     $this->assertFalse($file_system->prepareDirectory($directory, 0), 'Error reported for non-existing directory.');
 
@@ -127,7 +127,7 @@ class DirectoryTest extends FileTestBase {
     $basename = 'xyz.txt';
     $directory = 'core/misc';
     $original = $directory . '/' . $basename;
-    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
+    /** @var FileSystemInterface $file_system */
     $file_system = \Drupal::service('file_system');
     $path = $file_system->createFilename($basename, $directory);
     $this->assertEquals($original, $path, "New filepath $path equals $original.");
@@ -159,7 +159,7 @@ class DirectoryTest extends FileTestBase {
   public function testFileDestination(): void {
     // First test for non-existent file.
     $destination = 'core/misc/xyz.txt';
-    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
+    /** @var FileSystemInterface $file_system */
     $file_system = \Drupal::service('file_system');
     $path = $file_system->getDestinationFilename($destination, FileExists::Replace);
     $this->assertEquals($destination, $path, 'Non-existing filepath destination is correct with FileExists::Replace.');
@@ -195,7 +195,7 @@ class DirectoryTest extends FileTestBase {
    * Tests directory creation.
    */
   public function testDirectoryCreation(): void {
-    /** @var \Drupal\Core\File\FileSystemInterface $file_system */
+    /** @var FileSystemInterface $file_system */
     $file_system = $this->container->get('file_system');
 
     // mkdir() recursion should work with or without a trailing slash.

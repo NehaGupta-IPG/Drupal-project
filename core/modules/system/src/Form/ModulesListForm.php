@@ -2,9 +2,10 @@
 
 namespace Drupal\system\Form;
 
+use Drupal\Component\Utility\Xss;
+use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Config\PreExistingConfigException;
 use Drupal\Core\Config\UnmetDependenciesException;
-use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\Extension\InfoParserException;
@@ -19,10 +20,9 @@ use Drupal\Core\Link;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Markup;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\user\PermissionHandlerInterface;
 use Drupal\Core\Url;
+use Drupal\user\PermissionHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Component\Utility\Xss;
 
 /**
  * Provides module installation interface.
@@ -43,49 +43,49 @@ class ModulesListForm extends FormBase {
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
   /**
    * The module handler service.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The expirable key value store.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface
+   * @var KeyValueStoreExpirableInterface
    */
   protected $keyValueExpirable;
 
   /**
    * The module installer.
    *
-   * @var \Drupal\Core\Extension\ModuleInstallerInterface
+   * @var ModuleInstallerInterface
    */
   protected $moduleInstaller;
 
   /**
    * The permission handler.
    *
-   * @var \Drupal\user\PermissionHandlerInterface
+   * @var PermissionHandlerInterface
    */
   protected $permissionHandler;
 
   /**
    * The module extension list.
    *
-   * @var \Drupal\Core\Extension\ModuleExtensionList
+   * @var ModuleExtensionList
    */
   protected $moduleExtensionList;
 
   /**
    * The access manager.
    *
-   * @var \Drupal\Core\Access\AccessManagerInterface
+   * @var AccessManagerInterface
    */
   protected $accessManager;
 
@@ -107,19 +107,19 @@ class ModulesListForm extends FormBase {
   /**
    * Constructs a ModulesListForm object.
    *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Extension\ModuleInstallerInterface $module_installer
+   * @param ModuleInstallerInterface $module_installer
    *   The module installer.
-   * @param \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface $key_value_expirable
+   * @param KeyValueStoreExpirableInterface $key_value_expirable
    *   The key value expirable factory.
-   * @param \Drupal\Core\Access\AccessManagerInterface $access_manager
+   * @param AccessManagerInterface $access_manager
    *   Access manager.
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
-   * @param \Drupal\user\PermissionHandlerInterface $permission_handler
+   * @param PermissionHandlerInterface $permission_handler
    *   The permission handler.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $extension_list_module
+   * @param ModuleExtensionList $extension_list_module
    *   The module extension list.
    */
   public function __construct(ModuleHandlerInterface $module_handler, ModuleInstallerInterface $module_installer, KeyValueStoreExpirableInterface $key_value_expirable, AccessManagerInterface $access_manager, AccountInterface $current_user, PermissionHandlerInterface $permission_handler, ModuleExtensionList $extension_list_module) {
@@ -242,7 +242,7 @@ class ModulesListForm extends FormBase {
    *
    * @param array $modules
    *   The list existing modules.
-   * @param \Drupal\Core\Extension\Extension $module
+   * @param Extension $module
    *   The module for which to build the form row.
    * @param string $distribution
    *   The distribution.
@@ -402,7 +402,7 @@ class ModulesListForm extends FormBase {
   /**
    * Helper function for building a list of modules to install.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return array

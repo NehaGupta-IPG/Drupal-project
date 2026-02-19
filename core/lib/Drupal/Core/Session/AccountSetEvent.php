@@ -12,14 +12,14 @@ final class AccountSetEvent extends Event {
   /**
    * The set account.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $account;
 
   /**
    * AccountSetEvent constructor.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The set account.
    */
   public function __construct(AccountInterface $account) {
@@ -29,7 +29,7 @@ final class AccountSetEvent extends Event {
   /**
    * Gets the account.
    *
-   * @return \Drupal\Core\Session\AccountInterface
+   * @return AccountInterface
    *   The account.
    */
   public function getAccount() {

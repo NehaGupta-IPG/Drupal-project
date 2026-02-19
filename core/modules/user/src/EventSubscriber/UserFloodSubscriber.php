@@ -2,11 +2,11 @@
 
 namespace Drupal\user\EventSubscriber;
 
+use Drupal\Core\Site\Settings;
 use Drupal\user\Event\UserEvents;
 use Drupal\user\Event\UserFloodEvent;
-use Drupal\Core\Site\Settings;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Logs details of User Flood Control events.
@@ -16,14 +16,14 @@ class UserFloodSubscriber implements EventSubscriberInterface {
   /**
    * The default logger service.
    *
-   * @var \Psr\Log\LoggerInterface
+   * @var LoggerInterface
    */
   protected $logger;
 
   /**
    * Constructs a UserFloodSubscriber.
    *
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   A logger instance.
    */
   public function __construct(?LoggerInterface $logger = NULL) {
@@ -42,7 +42,7 @@ class UserFloodSubscriber implements EventSubscriberInterface {
   /**
    * An attempt to login has been blocked based on user name.
    *
-   * @param \Drupal\user\Event\UserFloodEvent $floodEvent
+   * @param UserFloodEvent $floodEvent
    *   The flood event.
    */
   public function blockedUser(UserFloodEvent $floodEvent) {
@@ -60,7 +60,7 @@ class UserFloodSubscriber implements EventSubscriberInterface {
   /**
    * An attempt to login has been blocked based on IP.
    *
-   * @param \Drupal\user\Event\UserFloodEvent $floodEvent
+   * @param UserFloodEvent $floodEvent
    *   The flood event.
    */
   public function blockedIp(UserFloodEvent $floodEvent) {

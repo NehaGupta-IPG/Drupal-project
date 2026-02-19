@@ -50,70 +50,70 @@ class ViewExecutableTest extends UnitTestCase {
   /**
    * A mocked display collection.
    *
-   * @var \Drupal\views\DisplayPluginCollection|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\DisplayPluginCollection|MockObject
    */
   protected $displayHandlers;
 
   /**
    * The mocked view executable.
    *
-   * @var \Drupal\views\ViewExecutableFactory|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\ViewExecutableFactory|MockObject
    */
   protected $viewExecutableFactory;
 
   /**
    * The tested view executable.
    *
-   * @var \Drupal\views\ViewExecutable
+   * @var ViewExecutable
    */
   protected $executable;
 
   /**
    * The mocked view entity.
    *
-   * @var \Drupal\views\ViewEntityInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\ViewEntityInterface|MockObject
    */
   protected $view;
 
   /**
    * The mocked user.
    *
-   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Session\AccountInterface|MockObject
    */
   protected $user;
 
   /**
    * The mocked views data.
    *
-   * @var \Drupal\views\ViewsData|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\ViewsData|MockObject
    */
   protected $viewsData;
 
   /**
    * The mocked display router handler.
    *
-   * @var \Drupal\views\Plugin\views\display\DisplayRouterInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\Plugin\views\display\DisplayRouterInterface|MockObject
    */
   protected $displayHandler;
 
   /**
    * The mocked route provider.
    *
-   * @var \Drupal\Core\Routing\RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Routing\RouteProviderInterface|MockObject
    */
   protected $routeProvider;
 
   /**
    * The mocked none cache plugin.
    *
-   * @var \Drupal\views\Plugin\views\cache\None|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\Plugin\views\cache\None|MockObject
    */
   protected $noneCache;
 
   /**
    * The mocked cache plugin that returns a successful result.
    *
-   * @var \Drupal\views\Plugin\views\cache\None|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\views\Plugin\views\cache\None|MockObject
    */
   protected $successCache;
 
@@ -323,7 +323,7 @@ class ViewExecutableTest extends UnitTestCase {
    */
   public function testBuildThemeFunctions(): void {
     /** @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject $view */
-    /** @var \Drupal\views\Plugin\views\display\DisplayPluginBase|\PHPUnit\Framework\MockObject\MockObject $display */
+    /** @var \Drupal\views\Plugin\views\display\DisplayPluginBase|MockObject $display */
     [$view, $display] = $this->setupBaseViewAndDisplay();
 
     unset($view->display_handler);
@@ -383,7 +383,7 @@ class ViewExecutableTest extends UnitTestCase {
   #[DataProvider('addHandlerProvider')]
   public function testAddHandler($option, $handler_type): void {
     /** @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject $view */
-    /** @var \Drupal\views\Plugin\views\display\DisplayPluginBase|\PHPUnit\Framework\MockObject\MockObject $display */
+    /** @var \Drupal\views\Plugin\views\display\DisplayPluginBase|MockObject $display */
     [$view, $display] = $this->setupBaseViewAndDisplay();
 
     $views_data = [];
@@ -424,7 +424,7 @@ class ViewExecutableTest extends UnitTestCase {
   #[DataProvider('addHandlerProvider')]
   public function testAddHandlerWithEntityField($option, $handler_type): void {
     /** @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject $view */
-    /** @var \Drupal\views\Plugin\views\display\DisplayPluginBase|\PHPUnit\Framework\MockObject\MockObject $display */
+    /** @var \Drupal\views\Plugin\views\display\DisplayPluginBase|MockObject $display */
     [$view, $display] = $this->setupBaseViewAndDisplay();
 
     $views_data = [];
@@ -486,7 +486,7 @@ class ViewExecutableTest extends UnitTestCase {
   #[DataProvider('providerAttachDisplays')]
   public function testAttachDisplays($display_enabled, $access_granted, $expected_to_be_attached): void {
     /** @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject $view */
-    /** @var \Drupal\views\Plugin\views\display\DisplayPluginBase|\PHPUnit\Framework\MockObject\MockObject $display */
+    /** @var \Drupal\views\Plugin\views\display\DisplayPluginBase|MockObject $display */
     [$view, $display] = $this->setupBaseViewAndDisplay();
 
     $display->expects($this->atLeastOnce())
@@ -603,7 +603,7 @@ class ViewExecutableTest extends UnitTestCase {
    * @legacy-covers ::getItemsPerPage
    */
   public function testSetItemsPerPageBeforePreRender(): void {
-    /** @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject $view */
+    /** @var ViewExecutable|MockObject $view */
     $view = current($this->setupBaseViewAndDisplay());
 
     $view->setItemsPerPage(12);
@@ -618,7 +618,7 @@ class ViewExecutableTest extends UnitTestCase {
    * @legacy-covers ::getItemsPerPage
    */
   public function testSetItemsPerPageDuringPreRender(): void {
-    /** @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject $view */
+    /** @var ViewExecutable|MockObject $view */
     $view = current($this->setupBaseViewAndDisplay());
 
     $elements = &$view->element;
@@ -637,7 +637,7 @@ class ViewExecutableTest extends UnitTestCase {
    * @legacy-covers ::getOffset
    */
   public function testSetOffsetBeforePreRender(): void {
-    /** @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject $view */
+    /** @var ViewExecutable|MockObject $view */
     $view = current($this->setupBaseViewAndDisplay());
 
     $view->setOffset(12);
@@ -652,7 +652,7 @@ class ViewExecutableTest extends UnitTestCase {
    * @legacy-covers ::getOffset
    */
   public function testSetOffsetDuringPreRender(): void {
-    /** @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject $view */
+    /** @var ViewExecutable|MockObject $view */
     $view = current($this->setupBaseViewAndDisplay());
 
     $elements = &$view->element;
@@ -671,7 +671,7 @@ class ViewExecutableTest extends UnitTestCase {
    * @legacy-covers ::getCurrentPage
    */
   public function testSetCurrentPageBeforePreRender(): void {
-    /** @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject $view */
+    /** @var ViewExecutable|MockObject $view */
     $view = current($this->setupBaseViewAndDisplay());
 
     $view->setCurrentPage(12);
@@ -686,7 +686,7 @@ class ViewExecutableTest extends UnitTestCase {
    * @legacy-covers ::getCurrentPage
    */
   public function testSetCurrentPageDuringPreRender(): void {
-    /** @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject $view */
+    /** @var ViewExecutable|MockObject $view */
     $view = current($this->setupBaseViewAndDisplay());
 
     $elements = &$view->element;
@@ -704,7 +704,7 @@ class ViewExecutableTest extends UnitTestCase {
    * @legacy-covers ::execute
    */
   public function testCacheIsIgnoredDuringPreview(): void {
-    /** @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject $view */
+    /** @var ViewExecutable|MockObject $view */
     $view = current($this->setupBaseViewAndDisplay());
 
     // Pager needs to be set to avoid false test failures.
@@ -737,7 +737,7 @@ class ViewExecutableTest extends UnitTestCase {
   #[DataProvider('providerExecuteReturn')]
   public function testExecuteReturn($display_enabled, $expected_result): void {
     /** @var \Drupal\views\ViewExecutable|\PHPUnit\Framework\MockObject\MockObject $view */
-    /** @var \Drupal\views\Plugin\views\display\DisplayPluginBase|\PHPUnit\Framework\MockObject\MockObject $display */
+    /** @var \Drupal\views\Plugin\views\display\DisplayPluginBase|MockObject $display */
     [$view, $display] = $this->setupBaseViewAndDisplay();
 
     $display->expects($this->any())

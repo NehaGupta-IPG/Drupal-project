@@ -24,7 +24,7 @@ interface BlockRepositoryInterface {
   /**
    * Returns an array of regions and their block entities.
    *
-   * @param \Drupal\Core\Cache\CacheableMetadata[] $cacheable_metadata
+   * @param CacheableMetadata[] $cacheable_metadata
    *   (optional) List of CacheableMetadata objects, keyed by region. This is
    *   by reference and is used to pass this information back to the caller.
    *

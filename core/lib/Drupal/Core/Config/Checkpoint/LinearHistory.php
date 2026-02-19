@@ -25,23 +25,23 @@ final class LinearHistory implements CheckpointListInterface {
    *
    * In our implementation this is always the last in the list.
    *
-   * @var \Drupal\Core\Config\Checkpoint\Checkpoint|null
+   * @var Checkpoint|null
    */
   private ?Checkpoint $activeCheckpoint;
 
   /**
    * The list of checkpoints, keyed by ID.
    *
-   * @var \Drupal\Core\Config\Checkpoint\Checkpoint[]
+   * @var Checkpoint[]
    */
   private array $checkpoints;
 
   /**
    * Constructs a checkpoints object.
    *
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct(

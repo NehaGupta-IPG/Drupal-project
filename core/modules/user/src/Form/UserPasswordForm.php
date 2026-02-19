@@ -11,8 +11,8 @@ use Drupal\Core\Form\WorkspaceSafeFormInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\Element\Email;
 use Drupal\user\UserInterface;
-use Drupal\user\UserStorageInterface;
 use Drupal\user\UserNameValidator;
+use Drupal\user\UserStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -27,45 +27,45 @@ class UserPasswordForm extends FormBase implements WorkspaceSafeFormInterface {
   /**
    * The user storage.
    *
-   * @var \Drupal\user\UserStorageInterface
+   * @var UserStorageInterface
    */
   protected $userStorage;
 
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * The flood service.
    *
-   * @var \Drupal\Core\Flood\FloodInterface
+   * @var FloodInterface
    */
   protected $flood;
 
   /**
    * The email validator service.
    *
-   * @var \Drupal\Component\Utility\EmailValidatorInterface
+   * @var EmailValidatorInterface
    */
   protected $emailValidator;
 
   /**
    * Constructs a UserPasswordForm object.
    *
-   * @param \Drupal\user\UserStorageInterface $user_storage
+   * @param UserStorageInterface $user_storage
    *   The user storage.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Config\ConfigFactory $config_factory
+   * @param ConfigFactory $config_factory
    *   The config factory.
-   * @param \Drupal\Core\Flood\FloodInterface $flood
+   * @param FloodInterface $flood
    *   The flood service.
-   * @param \Drupal\user\UserNameValidator $userNameValidator
+   * @param UserNameValidator $userNameValidator
    *   The user validator service.
-   * @param \Drupal\Component\Utility\EmailValidatorInterface $email_validator
+   * @param EmailValidatorInterface $email_validator
    *   The email validator service.
    */
   public function __construct(

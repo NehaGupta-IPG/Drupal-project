@@ -20,12 +20,12 @@ use PHPUnit\Framework\MockObject\MockObject;
 class CachePreWarmerTest extends UnitTestCase {
 
   /**
-   * @var \Drupal\Core\DependencyInjection\ClassResolverInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var ClassResolverInterface|MockObject
    */
   protected MockObject|ClassResolverInterface $classResolver;
 
   /**
-   * @var \SplObjectStorage<\Drupal\Core\PreWarm\PreWarmableInterface|\PHPUnit\Framework\MockObject\MockObject>
+   * @var \SplObjectStorage<PreWarmableInterface|MockObject>
    */
   protected \SplObjectStorage $warmedMap;
 

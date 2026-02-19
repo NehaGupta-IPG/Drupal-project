@@ -230,7 +230,7 @@ class MenuUiNodeTest extends BrowserTestBase {
 
     // Disable the menu link, then edit the node--the link should stay disabled.
     $link_id = menu_ui_get_menu_link_defaults($node)['entity_id'];
-    /** @var \Drupal\menu_link_content\Entity\MenuLinkContent $link */
+    /** @var MenuLinkContent $link */
     $link = MenuLinkContent::load($link_id);
     $link->set('enabled', FALSE);
     $link->save();
@@ -418,7 +418,7 @@ class MenuUiNodeTest extends BrowserTestBase {
     $this->assertTrue($node->access('view', $admin_user));
     $this->drupalGet('node/add/page');
     $link_id = menu_ui_get_menu_link_defaults($node)['entity_id'];
-    /** @var \Drupal\menu_link_content\Entity\MenuLinkContent $link */
+    /** @var MenuLinkContent $link */
     $link = MenuLinkContent::load($link_id);
     $this->assertSession()->optionExists('edit-menu-menu-parent', 'main:' . $link->getPluginId());
 

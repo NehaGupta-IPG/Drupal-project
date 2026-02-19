@@ -7,7 +7,7 @@ use Drupal\Component\Annotation\Plugin;
 /**
  * Defines a Workflow type annotation object.
  *
- * Plugin Namespace: Plugin\WorkflowType
+ * Plugin Namespace: Plugin\WorkflowType.
  *
  * For a working example, see
  * \Drupal\content_moderation\Plugin\Workflow\ContentModerate

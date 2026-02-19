@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\file\Functional;
 
-use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\file\Entity\File;
 use Drupal\file\FileInterface;
 use Drupal\Tests\BrowserTestBase;
-use Drupal\file\Entity\File;
 use Drupal\Tests\TestFileCreationTrait;
 
 /**
@@ -57,7 +57,7 @@ abstract class FileFieldTestBase extends BrowserTestBase {
   /**
    * Retrieves a sample file of the specified type.
    *
-   * @return \Drupal\file\FileInterface
+   * @return FileInterface
    *   The new unsaved file entity.
    */
   public function getTestFile($type_name, $size = NULL) {
@@ -99,7 +99,7 @@ abstract class FileFieldTestBase extends BrowserTestBase {
   /**
    * Uploads a file to a node.
    *
-   * @param \Drupal\file\FileInterface $file
+   * @param FileInterface $file
    *   The File to be uploaded.
    * @param string $field_name
    *   The name of the field on which the files should be saved.
@@ -121,7 +121,7 @@ abstract class FileFieldTestBase extends BrowserTestBase {
   /**
    * Uploads multiple files to a node.
    *
-   * @param \Drupal\file\FileInterface[] $files
+   * @param FileInterface[] $files
    *   The files to be uploaded.
    * @param string $field_name
    *   The name of the field on which the files should be saved.
@@ -228,7 +228,7 @@ abstract class FileFieldTestBase extends BrowserTestBase {
   /**
    * Asserts that a file does not exist in the database.
    *
-   * @param \Drupal\file\FileInterface $file
+   * @param FileInterface $file
    *   The file to be validated.
    * @param string|null $message
    *   (optional) A message to display with the assertion.

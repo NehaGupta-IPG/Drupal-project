@@ -2,12 +2,12 @@
 
 namespace Drupal\system\Controller;
 
+use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Site\Settings;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\system\SystemManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Drupal\system\SystemManager;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
  * Returns responses for System Info routes.
@@ -19,7 +19,7 @@ class SystemInfoController implements ContainerInjectionInterface {
   /**
    * System Manager Service.
    *
-   * @var \Drupal\system\SystemManager
+   * @var SystemManager
    */
   protected $systemManager;
 
@@ -35,7 +35,7 @@ class SystemInfoController implements ContainerInjectionInterface {
   /**
    * Constructs a SystemInfoController object.
    *
-   * @param \Drupal\system\SystemManager $systemManager
+   * @param SystemManager $systemManager
    *   System manager service.
    */
   public function __construct(SystemManager $systemManager) {
@@ -57,7 +57,7 @@ class SystemInfoController implements ContainerInjectionInterface {
   /**
    * Returns the contents of phpinfo().
    *
-   * @return \Symfony\Component\HttpFoundation\Response
+   * @return Response
    *   A response object to be sent to the client.
    */
   public function php() {

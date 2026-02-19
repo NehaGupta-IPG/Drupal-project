@@ -37,42 +37,42 @@ class TwigExtensionTest extends UnitTestCase {
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Render\RendererInterface|MockObject
    */
   protected $renderer;
 
   /**
    * The URL generator.
    *
-   * @var \Drupal\Core\Routing\UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Routing\UrlGeneratorInterface|MockObject
    */
   protected $urlGenerator;
 
   /**
    * The theme manager.
    *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Theme\ThemeManagerInterface|MockObject
    */
   protected $themeManager;
 
   /**
    * The date formatter.
    *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Datetime\DateFormatterInterface|MockObject
    */
   protected $dateFormatter;
 
   /**
    * The system under test.
    *
-   * @var \Drupal\Core\Template\TwigExtension
+   * @var TwigExtension
    */
   protected $systemUnderTest;
 
   /**
    * The file URL generator mock.
    *
-   * @var \Drupal\Core\File\FileUrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var FileUrlGeneratorInterface|MockObject
    */
   protected $fileUrlGenerator;
 

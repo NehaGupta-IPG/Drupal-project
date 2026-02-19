@@ -18,7 +18,7 @@ class KernelTestCompilerPass implements CompilerPassInterface {
   /**
    * Constructs a KernelTestCompilerPass object.
    *
-   * @param \Symfony\Component\DependencyInjection\Definition $definition
+   * @param Definition $definition
    *   The kernel test service definition that will be used to register hooks.
    */
   public function __construct(private Definition $definition) {}

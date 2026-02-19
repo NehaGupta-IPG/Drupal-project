@@ -22,7 +22,7 @@ class ReplaceOp extends AbstractOperation {
   /**
    * The relative path to the source file.
    *
-   * @var \Drupal\Composer\Plugin\Scaffold\ScaffoldFilePath
+   * @var ScaffoldFilePath
    */
   protected $source;
 
@@ -36,7 +36,7 @@ class ReplaceOp extends AbstractOperation {
   /**
    * Constructs a ReplaceOp.
    *
-   * @param \Drupal\Composer\Plugin\Scaffold\ScaffoldFilePath $sourcePath
+   * @param ScaffoldFilePath $sourcePath
    *   The relative path to the source file.
    * @param bool $overwrite
    *   Whether to allow this scaffold file to overwrite files already at
@@ -81,12 +81,12 @@ class ReplaceOp extends AbstractOperation {
   /**
    * Copies the scaffold file.
    *
-   * @param \Drupal\Composer\Plugin\Scaffold\ScaffoldFilePath $destination
+   * @param ScaffoldFilePath $destination
    *   Scaffold file to process.
-   * @param \Composer\IO\IOInterface $io
+   * @param IOInterface $io
    *   IOInterface to writing to.
    *
-   * @return \Drupal\Composer\Plugin\Scaffold\Operations\ScaffoldResult
+   * @return ScaffoldResult
    *   The scaffold result.
    */
   protected function copyScaffold(ScaffoldFilePath $destination, IOInterface $io) {
@@ -102,12 +102,12 @@ class ReplaceOp extends AbstractOperation {
   /**
    * Symlinks the scaffold file.
    *
-   * @param \Drupal\Composer\Plugin\Scaffold\ScaffoldFilePath $destination
+   * @param ScaffoldFilePath $destination
    *   Scaffold file to process.
-   * @param \Composer\IO\IOInterface $io
+   * @param IOInterface $io
    *   IOInterface to writing to.
    *
-   * @return \Drupal\Composer\Plugin\Scaffold\Operations\ScaffoldResult
+   * @return ScaffoldResult
    *   The scaffold result.
    */
   protected function symlinkScaffold(ScaffoldFilePath $destination, IOInterface $io) {

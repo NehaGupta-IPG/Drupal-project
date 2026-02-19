@@ -12,7 +12,7 @@ interface LoggerChannelFactoryInterface {
   /**
    * Retrieves the registered logger for the requested channel.
    *
-   * @return \Drupal\Core\Logger\LoggerChannelInterface
+   * @return LoggerChannelInterface
    *   The registered logger for this channel.
    */
   public function get($channel);
@@ -20,7 +20,7 @@ interface LoggerChannelFactoryInterface {
   /**
    * Adds a logger to all the channels.
    *
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   The PSR-3 logger to add.
    * @param int $priority
    *   The priority of the logger being added.

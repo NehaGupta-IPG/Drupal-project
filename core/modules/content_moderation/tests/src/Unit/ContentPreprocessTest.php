@@ -48,7 +48,7 @@ class ContentPreprocessTest extends UnitTestCase {
    * @param int $nid
    *   The node ID for mocking.
    *
-   * @return \Drupal\Core\Routing\CurrentRouteMatch
+   * @return CurrentRouteMatch
    *   The mocked current route match object.
    */
   protected function setupCurrentRouteMatch($route_name, $nid) {
@@ -65,7 +65,7 @@ class ContentPreprocessTest extends UnitTestCase {
    * @param int $nid
    *   The node ID to mock.
    *
-   * @return \Drupal\node\Entity\Node
+   * @return Node
    *   The mocked node.
    */
   protected function setupNode($nid) {

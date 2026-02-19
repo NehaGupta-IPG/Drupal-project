@@ -15,7 +15,7 @@ use Drupal\Core\Config\StorageInterface;
 final class AllowListConfigStorage implements StorageInterface {
 
   /**
-   * @param \Drupal\Core\Config\StorageInterface $decorated
+   * @param StorageInterface $decorated
    *   A config storage backend to wrap around.
    * @param string[] $allowList
    *   A list of config names. Only these names will be visible, or readable,

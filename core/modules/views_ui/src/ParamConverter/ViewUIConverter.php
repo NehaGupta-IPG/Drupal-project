@@ -33,22 +33,22 @@ class ViewUIConverter extends AdminPathConfigEntityConverter implements ParamCon
   /**
    * Stores the tempstore factory.
    *
-   * @var \Drupal\Core\TempStore\SharedTempStoreFactory
+   * @var SharedTempStoreFactory
    */
   protected $tempStoreFactory;
 
   /**
    * Constructs a new ViewUIConverter.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\TempStore\SharedTempStoreFactory $temp_store_factory
+   * @param SharedTempStoreFactory $temp_store_factory
    *   The factory for the temp store object.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\Core\Routing\AdminContext $admin_context
+   * @param AdminContext $admin_context
    *   The route admin context service.
-   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entity_repository
+   * @param EntityRepositoryInterface $entity_repository
    *   The entity repository.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, SharedTempStoreFactory $temp_store_factory, ConfigFactoryInterface $config_factory, AdminContext $admin_context, EntityRepositoryInterface $entity_repository) {

@@ -2,7 +2,6 @@
 
 namespace Drupal\migrate\Plugin\migrate\process;
 
-use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\File\FileSystemInterface;
@@ -10,6 +9,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StreamWrapper\LocalStream;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
+use Drupal\migrate\Attribute\MigrateProcess;
 use Drupal\migrate\MigrateException;
 use Drupal\migrate\MigrateExecutableInterface;
 use Drupal\migrate\Plugin\MigrateProcessInterface;
@@ -55,21 +55,21 @@ class FileCopy extends FileProcessBase implements ContainerFactoryPluginInterfac
   /**
    * The stream wrapper manager service.
    *
-   * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface
+   * @var StreamWrapperManagerInterface
    */
   protected $streamWrapperManager;
 
   /**
    * The file system service.
    *
-   * @var \Drupal\Core\File\FileSystemInterface
+   * @var FileSystemInterface
    */
   protected $fileSystem;
 
   /**
    * An instance of the download process plugin.
    *
-   * @var \Drupal\migrate\Plugin\MigrateProcessInterface
+   * @var MigrateProcessInterface
    */
   protected $downloadPlugin;
 
@@ -82,11 +82,11 @@ class FileCopy extends FileProcessBase implements ContainerFactoryPluginInterfac
    *   The plugin ID.
    * @param array $plugin_definition
    *   The plugin definition.
-   * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrappers
+   * @param StreamWrapperManagerInterface $stream_wrappers
    *   The stream wrapper manager service.
-   * @param \Drupal\Core\File\FileSystemInterface $file_system
+   * @param FileSystemInterface $file_system
    *   The file system service.
-   * @param \Drupal\migrate\Plugin\MigrateProcessInterface $download_plugin
+   * @param MigrateProcessInterface $download_plugin
    *   An instance of the download plugin for handling remote URIs.
    */
   public function __construct(array $configuration, $plugin_id, array $plugin_definition, StreamWrapperManagerInterface $stream_wrappers, FileSystemInterface $file_system, MigrateProcessInterface $download_plugin) {
@@ -165,7 +165,7 @@ class FileCopy extends FileProcessBase implements ContainerFactoryPluginInterfac
    *   The source path or URI.
    * @param string $destination
    *   The destination path or URI.
-   * @param \Drupal\Core\File\FileExists|int $fileExists
+   * @param FileExists|int $fileExists
    *   (optional) FileExists::Replace (default) or
    *   FileExists::Rename.
    *

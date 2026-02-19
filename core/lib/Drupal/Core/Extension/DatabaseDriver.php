@@ -25,11 +25,11 @@ class DatabaseDriver extends Extension {
    *
    * @param string $root
    *   The app root.
-   * @param \Drupal\Core\Extension\Extension $module
+   * @param Extension $module
    *   The module containing the database driver.
    * @param string $driverName
    *   The database driver name.
-   * @param \Drupal\Core\Extension\Extension[] $discoveredModules
+   * @param Extension[] $discoveredModules
    *   The modules discovered in the installation.
    */
   public function __construct(
@@ -45,7 +45,7 @@ class DatabaseDriver extends Extension {
   /**
    * Returns the Extension object of the module containing the database driver.
    *
-   * @return \Drupal\Core\Extension\Extension
+   * @return Extension
    *   The Extension object of the module containing the database driver.
    */
   public function getModule(): Extension {
@@ -108,7 +108,7 @@ class DatabaseDriver extends Extension {
   /**
    * Returns the install tasks object instance of this database driver.
    *
-   * @return \Drupal\Core\Database\Install\Tasks
+   * @return Tasks
    *   The install tasks object instance.
    */
   public function getInstallTasks(): Tasks {
@@ -207,7 +207,7 @@ class DatabaseDriver extends Extension {
    *
    * The info array is saved in the $info property.
    *
-   * @throws \Drupal\Core\Extension\InfoParserException
+   * @throws InfoParserException
    *   Exception thrown if there is a parsing error or the .info.yml file does
    *   not contain a required key.
    */

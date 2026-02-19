@@ -21,8 +21,7 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
    * {@inheritdoc}
    */
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
-    /** @var \Drupal\comment\CommentInterface|\Drupal\user\EntityOwnerInterface $entity */
-
+    /** @var CommentInterface|EntityOwnerInterface $entity */
     $comment_admin = $account->hasPermission('administer comments');
     if ($operation == 'approve') {
       return AccessResult::allowedIf($comment_admin && !$entity->isPublished())
@@ -99,7 +98,7 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
         'field_name',
         'pid',
       ];
-      /** @var \Drupal\comment\CommentInterface|null $entity */
+      /** @var CommentInterface|null $entity */
       $entity = $items ? $items->getEntity() : NULL;
       $commented_entity = $entity ? $entity->getCommentedEntity() : NULL;
       if ($entity && $entity->isNew() && in_array($field_definition->getName(), $create_only_fields, TRUE)) {

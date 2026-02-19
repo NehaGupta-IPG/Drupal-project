@@ -60,7 +60,7 @@ class TypedConfigTest extends KernelTestBase {
       $this->assertEquals('Missing required data for typed configuration: config_test.non_existent', $e->getMessage());
     }
 
-    /** @var \Drupal\Core\Config\Schema\TypedConfigInterface $typed_config */
+    /** @var TypedConfigInterface $typed_config */
     $typed_config = $typed_config_manager->get('config_test.validation');
 
     // Test a primitive.
@@ -70,7 +70,7 @@ class TypedConfigTest extends KernelTestBase {
 
     // Test complex data.
     $mapping = $typed_config->get('cat');
-    /** @var \Drupal\Core\TypedData\ComplexDataInterface $mapping */
+    /** @var ComplexDataInterface $mapping */
     $this->assertInstanceOf(ComplexDataInterface::class, $mapping);
     $this->assertInstanceOf(StringInterface::class, $mapping->get('type'));
     $this->assertEquals('kitten', $mapping->get('type')->getValue());
@@ -180,7 +180,7 @@ class TypedConfigTest extends KernelTestBase {
     $config = \Drupal::configFactory()->getEditable('config_test.validation');
     /** @var \Drupal\Core\Config\TypedConfigManagerInterface $typed_config_manager */
     $typed_config_manager = \Drupal::service('config.typed');
-    /** @var \Drupal\Core\Config\Schema\TypedConfigInterface $typed_config */
+    /** @var TypedConfigInterface $typed_config */
     $typed_config = $typed_config_manager->get('config_test.validation');
 
     $result = $typed_config->validate();

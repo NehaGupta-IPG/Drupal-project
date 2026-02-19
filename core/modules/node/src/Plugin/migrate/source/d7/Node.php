@@ -2,13 +2,13 @@
 
 namespace Drupal\node\Plugin\migrate\source\d7;
 
-use Drupal\Core\Extension\ModuleHandlerInterface;
-use Drupal\migrate\Row;
-use Drupal\migrate_drupal\Plugin\migrate\source\d7\FieldableEntity;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\State\StateInterface;
 use Drupal\migrate\Plugin\MigrationInterface;
+use Drupal\migrate\Row;
+use Drupal\migrate_drupal\Plugin\migrate\source\d7\FieldableEntity;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 // cspell:ignore tnid
@@ -53,7 +53,7 @@ class Node extends FieldableEntity {
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
@@ -212,7 +212,7 @@ class Node extends FieldableEntity {
   /**
    * Adapt our query for translations.
    *
-   * @param \Drupal\Core\Database\Query\SelectInterface $query
+   * @param SelectInterface $query
    *   The generated query.
    */
   protected function handleTranslations(SelectInterface $query) {

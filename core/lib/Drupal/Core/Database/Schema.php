@@ -12,7 +12,7 @@ abstract class Schema implements PlaceholderInterface {
   /**
    * The database connection.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $connection;
 
@@ -305,9 +305,9 @@ abstract class Schema implements PlaceholderInterface {
    * @param string $new_name
    *   The new name for the table.
    *
-   * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
+   * @throws SchemaObjectDoesNotExistException
    *   If the specified table doesn't exist.
-   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   * @throws SchemaObjectExistsException
    *   If a table with the specified new name already exists.
    */
   abstract public function renameTable($table, $new_name);
@@ -347,9 +347,9 @@ abstract class Schema implements PlaceholderInterface {
    *   or index including it in this array. See ::changeField() for more
    *   explanation why.
    *
-   * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
+   * @throws SchemaObjectDoesNotExistException
    *   If the specified table doesn't exist.
-   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   * @throws SchemaObjectExistsException
    *   If the specified table already has a field by that name.
    */
   abstract public function addField($table, $field, $spec, $keys_new = []);
@@ -389,9 +389,9 @@ abstract class Schema implements PlaceholderInterface {
    * @param array $fields
    *   Fields for the primary key.
    *
-   * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
+   * @throws SchemaObjectDoesNotExistException
    *   If the specified table doesn't exist.
-   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   * @throws SchemaObjectExistsException
    *   If the specified table already has a primary key.
    */
   abstract public function addPrimaryKey($table, $fields);
@@ -438,9 +438,9 @@ abstract class Schema implements PlaceholderInterface {
    * @param array $fields
    *   An array of field names.
    *
-   * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
+   * @throws SchemaObjectDoesNotExistException
    *   If the specified table doesn't exist.
-   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   * @throws SchemaObjectExistsException
    *   If the specified table already has a key by that name.
    */
   abstract public function addUniqueKey($table, $name, $fields);
@@ -512,9 +512,9 @@ abstract class Schema implements PlaceholderInterface {
    * @see schemaapi
    * @see hook_schema()
    *
-   * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
+   * @throws SchemaObjectDoesNotExistException
    *   If the specified table doesn't exist.
-   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   * @throws SchemaObjectExistsException
    *   If the specified table already has an index by that name.
    *
    * @todo remove the $spec argument whenever schema introspection is added.
@@ -546,7 +546,7 @@ abstract class Schema implements PlaceholderInterface {
    *   A schema array with the following keys: 'primary key', 'unique keys' and
    *   'indexes', and values as arrays of database columns.
    *
-   * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
+   * @throws SchemaObjectDoesNotExistException
    *   If the specified table doesn't exist.
    * @throws \RuntimeException
    *   If the driver does not implement this method.
@@ -620,9 +620,9 @@ abstract class Schema implements PlaceholderInterface {
    *   table along with changing the field. The format is the same as a
    *   table specification but without the 'fields' element.
    *
-   * @throws \Drupal\Core\Database\SchemaObjectDoesNotExistException
+   * @throws SchemaObjectDoesNotExistException
    *   If the specified table or source field doesn't exist.
-   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   * @throws SchemaObjectExistsException
    *   If the specified destination field already exists.
    */
   abstract public function changeField($table, $field, $field_new, $spec, $keys_new = []);
@@ -635,7 +635,7 @@ abstract class Schema implements PlaceholderInterface {
    * @param array $table
    *   A Schema API table definition array.
    *
-   * @throws \Drupal\Core\Database\SchemaObjectExistsException
+   * @throws SchemaObjectExistsException
    *   If the specified table already exists.
    * @throws \BadMethodCallException
    *   When ::createTableSql() is not implemented in the concrete driver class.
@@ -744,7 +744,7 @@ abstract class Schema implements PlaceholderInterface {
    *   An array containing the field specifications of the table, as per the
    *   schema data structure format.
    *
-   * @throws \Drupal\Core\Database\SchemaException
+   * @throws SchemaException
    *   Thrown if any primary key field specification does not exist or if they
    *   do not define 'not null' as TRUE.
    */

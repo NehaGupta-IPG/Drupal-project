@@ -35,14 +35,14 @@ abstract class MediaKernelTestBase extends KernelTestBase {
   /**
    * The test media type.
    *
-   * @var \Drupal\media\MediaTypeInterface
+   * @var MediaTypeInterface
    */
   protected $testMediaType;
 
   /**
    * The test media type with constraints.
    *
-   * @var \Drupal\media\MediaTypeInterface
+   * @var MediaTypeInterface
    */
   protected $testConstraintsMediaType;
 
@@ -83,10 +83,10 @@ abstract class MediaKernelTestBase extends KernelTestBase {
    *
    * @param string $filename
    *   String filename with extension.
-   * @param \Drupal\media\MediaTypeInterface $media_type
+   * @param MediaTypeInterface $media_type
    *   The media type.
    *
-   * @return \Drupal\media\Entity\Media
+   * @return Media
    *   A media item.
    */
   protected function generateMedia($filename, MediaTypeInterface $media_type) {

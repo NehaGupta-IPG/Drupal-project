@@ -45,15 +45,15 @@ class EntityAccessCheckTest extends UnitTestCase {
    */
   public function testAccess(): void {
     $route = new Route('/foo/{var_name}', [], ['_entity_access' => 'var_name.update'], ['parameters' => ['var_name' => ['type' => 'entity:node']]]);
-    /** @var \Drupal\Core\Session\AccountInterface $account */
+    /** @var AccountInterface $account */
     $account = $this->prophesize(AccountInterface::class)->reveal();
 
-    /** @var \Drupal\node\NodeInterface|\Prophecy\Prophecy\ObjectProphecy $route_match */
+    /** @var NodeInterface|ObjectProphecy $route_match */
     $node = $this->prophesize(NodeInterface::class);
     $node->access('update', $account, TRUE)->willReturn(AccessResult::allowed());
     $node = $node->reveal();
 
-    /** @var \Drupal\Core\Routing\RouteMatchInterface|\Prophecy\Prophecy\ObjectProphecy $route_match */
+    /** @var RouteMatchInterface|ObjectProphecy $route_match */
     $route_match = $this->prophesize(RouteMatchInterface::class);
     $route_match->getRawParameters()->willReturn(new InputBag(['var_name' => 1]));
     $route_match->getParameters()->willReturn(new ParameterBag(['var_name' => $node]));
@@ -68,15 +68,15 @@ class EntityAccessCheckTest extends UnitTestCase {
    */
   public function testAccessWithTypePlaceholder(): void {
     $route = new Route('/foo/{entity_type}/{var_name}', [], ['_entity_access' => 'var_name.update'], ['parameters' => ['var_name' => ['type' => 'entity:{entity_type}']]]);
-    /** @var \Drupal\Core\Session\AccountInterface $account */
+    /** @var AccountInterface $account */
     $account = $this->prophesize(AccountInterface::class)->reveal();
 
-    /** @var \Drupal\node\NodeInterface|\Prophecy\Prophecy\ObjectProphecy $node */
+    /** @var NodeInterface|ObjectProphecy $node */
     $node = $this->prophesize(NodeInterface::class);
     $node->access('update', $account, TRUE)->willReturn(AccessResult::allowed());
     $node = $node->reveal();
 
-    /** @var \Drupal\Core\Routing\RouteMatchInterface|\Prophecy\Prophecy\ObjectProphecy $route_match */
+    /** @var RouteMatchInterface|ObjectProphecy $route_match */
     $route_match = $this->createRouteMatchForObject($node);
 
     $access_check = new EntityAccessCheck();
@@ -93,19 +93,19 @@ class EntityAccessCheckTest extends UnitTestCase {
       ['_entity_access' => 'var_name.update'],
       ['parameters' => ['var_name' => ['type' => 'entity:node']]]
     );
-    /** @var \Drupal\Core\Session\AccountInterface $account */
+    /** @var AccountInterface $account */
     $account = $this->prophesize(AccountInterface::class)->reveal();
     $access_check = new EntityAccessCheck();
 
     // Confirm an EntityInterface route parameter's ::access() is called.
-    /** @var \Drupal\Core\Entity\EntityInterface|\Prophecy\Prophecy\ObjectProphecy $node */
+    /** @var EntityInterface|ObjectProphecy $node */
     $node = $this->prophesize(EntityInterface::class);
     $node->access('update', $account, TRUE)->willReturn(AccessResult::allowed());
     $route_match = $this->createRouteMatchForObject($node->reveal());
     $this->assertEquals(AccessResult::allowed(), $access_check->access($route, $route_match, $account));
 
     // AccessibleInterface is not entity-like: ::access() should not be called.
-    /** @var \Drupal\Core\Access\AccessibleInterface|\Prophecy\Prophecy\ObjectProphecy $node */
+    /** @var AccessibleInterface|ObjectProphecy $node */
     $node = $this->prophesize(AccessibleInterface::class);
     $node->access('update', $account, TRUE)->willReturn(AccessResult::allowed());
     $route_match = $this->createRouteMatchForObject($node->reveal());
@@ -118,7 +118,7 @@ class EntityAccessCheckTest extends UnitTestCase {
    * @param object $object
    *   Any object, including mocks based on interfaces.
    *
-   * @return \Drupal\Core\Routing\RouteMatchInterface
+   * @return RouteMatchInterface
    *   A mock RouteMatchInterface.
    */
   private function createRouteMatchForObject(\stdClass $object) {

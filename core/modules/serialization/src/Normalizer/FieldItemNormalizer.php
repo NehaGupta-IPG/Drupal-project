@@ -26,7 +26,7 @@ class FieldItemNormalizer extends ComplexDataNormalizer implements DenormalizerI
       throw new InvalidArgumentException('The field item passed in via $context[\'target_instance\'] must have a parent set.');
     }
 
-    /** @var \Drupal\Core\Field\FieldItemInterface $field_item */
+    /** @var FieldItemInterface $field_item */
     $field_item = $context['target_instance'];
     $this->checkForSerializedStrings($data, $class, $field_item);
 

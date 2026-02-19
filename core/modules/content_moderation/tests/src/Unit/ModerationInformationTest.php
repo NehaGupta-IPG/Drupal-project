@@ -30,7 +30,7 @@ class ModerationInformationTest extends UnitTestCase {
   /**
    * Builds a mock user.
    *
-   * @return \Drupal\Core\Session\AccountInterface
+   * @return AccountInterface
    *   The mocked user.
    */
   protected function getUser() {
@@ -40,7 +40,7 @@ class ModerationInformationTest extends UnitTestCase {
   /**
    * Returns a mock Entity Type Manager.
    *
-   * @return \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @return EntityTypeManagerInterface
    *   The mocked entity type manager.
    */
   protected function getEntityTypeManager() {
@@ -57,7 +57,7 @@ class ModerationInformationTest extends UnitTestCase {
    * @param string|null $workflow
    *   The workflow ID. If nul no workflow information is added to the bundle.
    *
-   * @return \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @return EntityTypeManagerInterface
    *   The mocked entity type manager.
    */
   public function setupModerationBundleInfo($bundle, $workflow = NULL) {

@@ -18,7 +18,7 @@ class MessageEventTestSubscriber implements EventSubscriberInterface {
   /**
    * Constructs a new message event test subscriber.
    *
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state service.
    */
   public function __construct(
@@ -29,7 +29,7 @@ class MessageEventTestSubscriber implements EventSubscriberInterface {
   /**
    * Sets a custom from header.
    *
-   * @param \Symfony\Component\Mailer\Event\MessageEvent $event
+   * @param MessageEvent $event
    *   The message event.
    */
   public function setCustomFrom(MessageEvent $event): void {
@@ -43,7 +43,7 @@ class MessageEventTestSubscriber implements EventSubscriberInterface {
   /**
    * Sets a custom message sender header.
    *
-   * @param \Symfony\Component\Mailer\Event\MessageEvent $event
+   * @param MessageEvent $event
    *   The message event.
    */
   public function setCustomMessageSender(MessageEvent $event): void {
@@ -57,7 +57,7 @@ class MessageEventTestSubscriber implements EventSubscriberInterface {
   /**
    * Sets a custom envelope sender.
    *
-   * @param \Symfony\Component\Mailer\Event\MessageEvent $event
+   * @param MessageEvent $event
    *   The message event.
    */
   public function setCustomEnvelopeSender(MessageEvent $event): void {

@@ -20,13 +20,13 @@ trait EntityResourceValidationTrait {
    * current user does not have access and if $fields_to_validate is provided
    * will only include fields in that array.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity to validate.
    * @param string[] $fields_to_validate
    *   (optional) An array of field names. If specified, filters the violations
    *   list to include only this set of fields.
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException
+   * @throws UnprocessableEntityHttpException
    *   If validation errors are found.
    */
   protected function validate(EntityInterface $entity, array $fields_to_validate = []) {

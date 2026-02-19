@@ -18,7 +18,7 @@ interface PermissionCheckerInterface {
    *
    * @param string $permission
    *   The name of the permission to check for.
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user account for which to check the permissions.
    *
    * @return bool

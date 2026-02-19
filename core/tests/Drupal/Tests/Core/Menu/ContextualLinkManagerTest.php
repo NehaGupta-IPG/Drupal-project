@@ -28,42 +28,42 @@ class ContextualLinkManagerTest extends UnitTestCase {
   /**
    * The tested contextual link manager.
    *
-   * @var \Drupal\Core\Menu\ContextualLinkManager
+   * @var ContextualLinkManager
    */
   protected $contextualLinkManager;
 
   /**
    * The mocked plugin discovery.
    *
-   * @var \Drupal\Component\Plugin\Discovery\DiscoveryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Component\Plugin\Discovery\DiscoveryInterface|MockObject
    */
   protected $pluginDiscovery;
 
   /**
    * The cache backend used in the test.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Cache\CacheBackendInterface|MockObject
    */
   protected $cacheBackend;
 
   /**
    * The mocked module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\Prophecy\Prophecy\ObjectProphecy
+   * @var ModuleHandlerInterface|ObjectProphecy
    */
   protected $moduleHandler;
 
   /**
    * The mocked access manager.
    *
-   * @var \Drupal\Core\Access\AccessManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Access\AccessManagerInterface|MockObject
    */
   protected $accessManager;
 
   /**
    * The mocked account.
    *
-   * @var \Drupal\Core\Session\AccountInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Session\AccountInterface|MockObject
    */
   protected $account;
 

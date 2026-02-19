@@ -41,7 +41,7 @@ interface EditorPluginInterface extends PluginInspectionInterface, PluginFormInt
    * of the text editor into JavaScript variables that will be accessible when
    * the text editor is loaded.
    *
-   * @param \Drupal\editor\Entity\Editor $editor
+   * @param Editor $editor
    *   A configured text editor object.
    *
    * @return array
@@ -60,7 +60,7 @@ interface EditorPluginInterface extends PluginInspectionInterface, PluginFormInt
    * different library for different configurations, instead of being forced to
    * always use the same method.
    *
-   * @param \Drupal\editor\Entity\Editor $editor
+   * @param Editor $editor
    *   A configured text editor object.
    *
    * @return array

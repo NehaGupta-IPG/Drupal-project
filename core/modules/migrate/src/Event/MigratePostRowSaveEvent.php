@@ -2,8 +2,8 @@
 
 namespace Drupal\migrate\Event;
 
-use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\MigrateMessageInterface;
+use Drupal\migrate\Plugin\MigrationInterface;
 use Drupal\migrate\Row;
 
 /**
@@ -21,11 +21,11 @@ class MigratePostRowSaveEvent extends MigratePreRowSaveEvent {
   /**
    * Constructs a post-save event object.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   Migration entity.
-   * @param \Drupal\migrate\MigrateMessageInterface $message
+   * @param MigrateMessageInterface $message
    *   The message interface.
-   * @param \Drupal\migrate\Row $row
+   * @param Row $row
    *   Row object.
    * @param array|bool $destination_id_values
    *   Values represent the destination ID.

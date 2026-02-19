@@ -44,7 +44,7 @@ class RouteProviderTest extends KernelTestBase {
     $this->installEntitySchema('entity_test_mul');
     $this->installEntitySchema('entity_test_admin_routes');
 
-    /** @var \Drupal\user\RoleInterface $role */
+    /** @var RoleInterface $role */
     $role = Role::create([
       'id' => RoleInterface::ANONYMOUS_ID,
       'label' => 'Anonymous',
@@ -60,7 +60,7 @@ class RouteProviderTest extends KernelTestBase {
    */
   protected function httpKernelHandle($url): string|false {
     $request = Request::create($url);
-    /** @var \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel */
+    /** @var HttpKernelInterface $http_kernel */
     $http_kernel = \Drupal::service('http_kernel');
     return $http_kernel->handle($request, HttpKernelInterface::SUB_REQUEST)->getContent();
   }

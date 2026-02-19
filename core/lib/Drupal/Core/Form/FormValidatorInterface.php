@@ -15,7 +15,7 @@ interface FormValidatorInterface {
    *
    * @param array $form
    *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form. If the user submitted the form by clicking
    *   a button with custom handler functions defined, those handlers will be
    *   stored here.
@@ -36,7 +36,7 @@ interface FormValidatorInterface {
    *   structure, it is responsible for validating the values of changed form
    *   elements in $form_state->getValues() to prevent form submit handlers from
    *   receiving non validated values.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form. The current user-submitted data is stored
    *   in $form_state->getValues(), though form validation functions are passed
    *   an explicit copy of the values for the sake of simplicity. Validation
@@ -52,7 +52,7 @@ interface FormValidatorInterface {
   /**
    * Sets a form_token error on the given form state.
    *
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return $this

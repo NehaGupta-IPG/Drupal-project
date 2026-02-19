@@ -17,7 +17,7 @@ class InstallProfileUninstallValidator implements ModuleUninstallValidatorInterf
   /**
    * Extension discovery that scans all folders except profiles.
    *
-   * @var \Drupal\Core\Extension\ExtensionDiscovery
+   * @var ExtensionDiscovery
    */
   protected ExtensionDiscovery $noProfileExtensionDiscovery;
 
@@ -74,7 +74,7 @@ class InstallProfileUninstallValidator implements ModuleUninstallValidatorInterf
   /**
    * Gets an extension discovery object that ignores the install profile.
    *
-   * @return \Drupal\Core\Extension\ExtensionDiscovery
+   * @return ExtensionDiscovery
    *   An extension discovery object to look for extensions not in a profile
    *   directory.
    */

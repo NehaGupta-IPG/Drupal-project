@@ -15,7 +15,7 @@ interface EntityReferenceItemInterface {
   /**
    * Returns the referenceable entity types and bundles.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition for which to retrieve the referenceable entity
    *   types and bundles.
    *

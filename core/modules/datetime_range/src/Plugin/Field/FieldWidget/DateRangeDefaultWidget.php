@@ -24,7 +24,7 @@ class DateRangeDefaultWidget extends DateRangeWidgetBase {
   /**
    * The date format storage.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var EntityStorageInterface
    */
   protected $dateStorage;
 

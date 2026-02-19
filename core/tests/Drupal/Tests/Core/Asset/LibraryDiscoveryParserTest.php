@@ -32,70 +32,70 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
   /**
    * The tested library discovery parser service.
    *
-   * @var \Drupal\Core\Asset\LibraryDiscoveryParser|\Drupal\Tests\Core\Asset\TestLibraryDiscoveryParser
+   * @var LibraryDiscoveryParser|TestLibraryDiscoveryParser
    */
   protected $libraryDiscoveryParser;
 
   /**
    * The mocked cache backend.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Cache\CacheBackendInterface|MockObject
    */
   protected $cache;
 
   /**
    * The mocked module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface|MockObject
    */
   protected $moduleHandler;
 
   /**
    * The mocked theme manager.
    *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var ThemeManagerInterface|MockObject
    */
   protected $themeManager;
 
   /**
    * The mocked active theme.
    *
-   * @var \Drupal\Core\Theme\ActiveTheme|\PHPUnit\Framework\MockObject\MockObject
+   * @var ActiveTheme|MockObject
    */
   protected $activeTheme;
 
   /**
    * The mocked lock backend.
    *
-   * @var \Drupal\Core\Lock\LockBackendInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Lock\LockBackendInterface|MockObject
    */
   protected $lock;
 
   /**
    * The mocked stream wrapper manager.
    *
-   * @var \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var StreamWrapperManagerInterface|MockObject
    */
   protected $streamWrapperManager;
 
   /**
    * The mocked libraries directory file finder.
    *
-   * @var \Drupal\Core\Asset\LibrariesDirectoryFileFinder|\PHPUnit\Framework\MockObject\MockObject
+   * @var LibrariesDirectoryFileFinder|MockObject
    */
   protected $librariesDirectoryFileFinder;
 
   /**
    * The mocked extension path resolver.
    *
-   * @var \Drupal\Core\Extension\ExtensionPathResolver|\PHPUnit\Framework\MockObject\MockObject
+   * @var ExtensionPathResolver|MockObject
    */
   protected $extensionPathResolver;
 
   /**
    * The mocked extension path resolver.
    *
-   * @var \Drupal\Core\Theme\ComponentPluginManager|\PHPUnit\Framework\MockObject\MockObject
+   * @var ComponentPluginManager|MockObject
    */
   protected $componentPluginManager;
 

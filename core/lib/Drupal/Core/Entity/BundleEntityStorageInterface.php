@@ -17,7 +17,7 @@ interface BundleEntityStorageInterface {
    *   The bundle name of the class provided or NULL if unable to determine the
    *   bundle from the provided class.
    *
-   * @throws \Drupal\Core\Entity\Exception\AmbiguousBundleClassException
+   * @throws AmbiguousBundleClassException
    *   Thrown when multiple bundles are using the provided class.
    */
   public function getBundleFromClass(string $class_name): ?string;

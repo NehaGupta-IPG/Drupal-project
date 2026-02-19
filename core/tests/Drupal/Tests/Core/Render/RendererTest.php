@@ -796,7 +796,7 @@ class RendererTest extends RendererTestBase {
    *
    * @param array $build
    *   A render array with either #access or #access_callback.
-   * @param \Drupal\Core\Access\AccessResultInterface|bool $access
+   * @param AccessResultInterface|bool $access
    *   Whether the render array is accessible or not.
    *
    * @internal

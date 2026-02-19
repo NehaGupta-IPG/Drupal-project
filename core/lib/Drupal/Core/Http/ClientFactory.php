@@ -16,14 +16,14 @@ class ClientFactory {
   /**
    * The handler stack.
    *
-   * @var \GuzzleHttp\HandlerStack
+   * @var HandlerStack
    */
   protected $stack;
 
   /**
    * Constructs a new ClientFactory instance.
    *
-   * @param \GuzzleHttp\HandlerStack $stack
+   * @param HandlerStack $stack
    *   The handler stack.
    */
   public function __construct(HandlerStack $stack) {
@@ -36,7 +36,7 @@ class ClientFactory {
    * @param array $config
    *   The config for the client.
    *
-   * @return \GuzzleHttp\Client
+   * @return Client
    *   The HTTP client.
    */
   public function fromOptions(array $config = []) {

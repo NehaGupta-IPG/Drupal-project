@@ -43,14 +43,14 @@ class BlockContentAccessHandlerTest extends KernelTestBase {
   /**
    * The BlockContent access controller to test.
    *
-   * @var \Drupal\block_content\BlockContentAccessControlHandler
+   * @var BlockContentAccessControlHandler
    */
   protected $accessControlHandler;
 
   /**
    * The BlockContent entity used for testing.
    *
-   * @var \Drupal\block_content\Entity\BlockContent
+   * @var BlockContent
    */
   protected $blockEntity;
 
@@ -131,8 +131,8 @@ class BlockContentAccessHandlerTest extends KernelTestBase {
    * @param string|null $expected_access_message
    *   The expected access message.
    *
-   * @phpstan-param class-string<\Drupal\Core\Access\AccessResultInterface>|null $parent_access
-   * @phpstan-param class-string<\Drupal\Core\Access\AccessResultInterface> $expected_access
+   * @phpstan-param class-string<AccessResultInterface>|null $parent_access
+   * @phpstan-param class-string<AccessResultInterface> $expected_access
    * @legacy-covers ::checkAccess
    */
   #[DataProvider('providerTestAccess')]

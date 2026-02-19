@@ -4,8 +4,8 @@ namespace Drupal\Core\Validation\Plugin\Validation\Constraint;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\TypedData\OptionsProviderInterface;
 use Drupal\Core\TypedData\ComplexDataInterface;
+use Drupal\Core\TypedData\OptionsProviderInterface;
 use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\Core\TypedData\Validation\TypedDataAwareValidatorTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -23,7 +23,7 @@ class AllowedValuesConstraintValidator extends ChoiceValidator implements Contai
   /**
    * The current user.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $currentUser;
 
@@ -37,7 +37,7 @@ class AllowedValuesConstraintValidator extends ChoiceValidator implements Contai
   /**
    * Constructs a new AllowedValuesConstraintValidator.
    *
-   * @param \Drupal\Core\Session\AccountInterface $current_user
+   * @param AccountInterface $current_user
    *   The current user.
    */
   public function __construct(AccountInterface $current_user) {

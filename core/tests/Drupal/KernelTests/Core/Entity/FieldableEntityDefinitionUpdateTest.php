@@ -137,7 +137,7 @@ class FieldableEntityDefinitionUpdateTest extends EntityKernelTestBase {
   protected function insertData($revisionable, $translatable): void {
     // Add three test entities in order to make the "data copy" step run at
     // least three times.
-    /** @var \Drupal\Core\Entity\TranslatableRevisionableStorageInterface|\Drupal\Core\Entity\EntityStorageInterface $storage */
+    /** @var \Drupal\Core\Entity\TranslatableRevisionableStorageInterface|EntityStorageInterface $storage */
     $storage = $this->entityTypeManager->getStorage($this->entityTypeId);
     $next_id = $storage->getQuery()->accessCheck(FALSE)->count()->execute() + 1;
 

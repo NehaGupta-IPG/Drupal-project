@@ -150,7 +150,7 @@ abstract class MediaLibraryTestBase extends WebDriverTestBase {
    * @param int $timeout
    *   Timeout in milliseconds, defaults to 10000.
    *
-   * @return \Behat\Mink\Element\NodeElement
+   * @return NodeElement
    *   The page element node if found. If not found, the test fails.
    *
    * @todo replace with whatever gets added in
@@ -165,7 +165,7 @@ abstract class MediaLibraryTestBase extends WebDriverTestBase {
   /**
    * Gets the menu of available media types.
    *
-   * @return \Behat\Mink\Element\NodeElement
+   * @return NodeElement
    *   The menu of available media types.
    */
   protected function getTypesMenu(): NodeElement {
@@ -187,7 +187,7 @@ abstract class MediaLibraryTestBase extends WebDriverTestBase {
 
     $link->click();
     $result = $link->waitFor(10, function ($link) {
-      /** @var \Behat\Mink\Element\NodeElement $link */
+      /** @var NodeElement $link */
       return $link->hasClass('active');
     });
     $this->assertNotEmpty($result);
@@ -205,7 +205,7 @@ abstract class MediaLibraryTestBase extends WebDriverTestBase {
    * @param int $timeout
    *   Timeout in milliseconds, defaults to 10000.
    *
-   * @return \Behat\Mink\Element\NodeElement|null
+   * @return NodeElement|null
    *   The element if found, otherwise null.
    *
    * @todo replace with whatever gets added in
@@ -255,7 +255,7 @@ abstract class MediaLibraryTestBase extends WebDriverTestBase {
     // button to return.
     if (!$expect_errors) {
       $result = $buttons->waitFor(10, function ($buttons) {
-        /** @var \Behat\Mink\Element\NodeElement $buttons */
+        /** @var NodeElement $buttons */
         return $buttons->findButton('Insert selected');
       });
       $this->assertNotEmpty($result);
@@ -274,7 +274,7 @@ abstract class MediaLibraryTestBase extends WebDriverTestBase {
    * @param string $after_open_selector
    *   The selector to look for after the button is clicked.
    *
-   * @return \Behat\Mink\Element\NodeElement
+   * @return NodeElement
    *   The NodeElement found via $after_open_selector.
    */
   protected function openMediaLibraryForField($field_name, $after_open_selector = '.js-media-library-menu'): NodeElement {
@@ -301,7 +301,7 @@ abstract class MediaLibraryTestBase extends WebDriverTestBase {
    * @param bool $open
    *   Whether or not to open the area before returning it. Defaults to TRUE.
    *
-   * @return \Behat\Mink\Element\NodeElement
+   * @return NodeElement
    *   The "additional selected media" area.
    */
   protected function getSelectionArea($open = TRUE): NodeElement {
@@ -381,7 +381,7 @@ abstract class MediaLibraryTestBase extends WebDriverTestBase {
   /**
    * Gets all available media item checkboxes.
    *
-   * @return \Behat\Mink\Element\NodeElement[]
+   * @return NodeElement[]
    *   The available checkboxes.
    */
   protected function getCheckboxes() {

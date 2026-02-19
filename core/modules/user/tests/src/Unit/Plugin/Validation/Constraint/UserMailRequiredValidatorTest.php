@@ -33,7 +33,7 @@ class UserMailRequiredValidatorTest extends UnitTestCase {
    * @param bool $is_admin
    *   Whether or not the current user is an administrator.
    *
-   * @return \Drupal\user\Plugin\Validation\Constraint\UserMailRequiredValidator
+   * @return UserMailRequiredValidator
    *   The validator instance.
    */
   protected function createValidator($is_admin) {

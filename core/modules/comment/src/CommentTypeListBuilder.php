@@ -20,11 +20,11 @@ class CommentTypeListBuilder extends ConfigEntityListBuilder {
   /**
    * Constructs a new CommentTypeListBuilder object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+   * @param EntityStorageInterface $storage
    *   The entity storage class.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   * @param EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
   public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, protected EntityTypeManagerInterface $entityTypeManager) {

@@ -40,7 +40,7 @@ class QueueWorker extends Plugin {
   /**
    * @param string $id
    *   The plugin ID.
-   * @param \Drupal\Core\StringTranslation\TranslatableMarkup|null $title
+   * @param TranslatableMarkup|null $title
    *   The human-readable title of the plugin.
    * @param array|null $cron
    *   (optional) An associative array of settings for cron. The array has one

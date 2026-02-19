@@ -16,9 +16,9 @@ use Drupal\Core\Config\StorageInterface;
 final class RecipeConfigStorageWrapper implements StorageInterface {
 
   /**
-   * @param \Drupal\Core\Config\StorageInterface $storageA
+   * @param StorageInterface $storageA
    *   First config storage to wrap.
-   * @param \Drupal\Core\Config\StorageInterface $storageB
+   * @param StorageInterface $storageB
    *   Second config storage to wrap.
    * @param string $collection
    *   (optional) The collection to store configuration in. Defaults to the
@@ -37,10 +37,10 @@ final class RecipeConfigStorageWrapper implements StorageInterface {
    * If the same configuration is contained in multiple storages then the
    * version returned is from the first storage supplied in the $storages array.
    *
-   * @param \Drupal\Core\Config\StorageInterface[] $storages
+   * @param StorageInterface[] $storages
    *   An array of storages to merge into a single storage.
    *
-   * @return \Drupal\Core\Config\StorageInterface
+   * @return StorageInterface
    *   A config storage that represents a merge of all the provided storages.
    */
   public static function createStorageFromArray(array $storages): StorageInterface {

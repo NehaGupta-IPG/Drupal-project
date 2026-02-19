@@ -44,7 +44,7 @@ class UserPermissionsAdminTest extends BrowserTestBase {
 
     // Check that permissions are sorted alphabetically.
     $storage = \Drupal::entityTypeManager()->getStorage('user_role');
-    /** @var \Drupal\user\Entity\Role $role */
+    /** @var Role $role */
     $role = $storage->loadUnchanged($role->id());
     $this->assertEquals([
       'change own username',
@@ -56,7 +56,7 @@ class UserPermissionsAdminTest extends BrowserTestBase {
     $this->submitForm([
       'test_role[change own username]' => 0,
     ], 'Save permissions');
-    /** @var \Drupal\user\Entity\Role $role */
+    /** @var Role $role */
     $role = $storage->loadUnchanged($role->id());
     $this->assertEquals([
       'view user email addresses',

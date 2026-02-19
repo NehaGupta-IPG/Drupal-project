@@ -22,7 +22,7 @@ class SessionConfigurationTest extends UnitTestCase {
   /**
    * Constructs a partially mocked SUT.
    *
-   * @return \Drupal\Core\Session\SessionConfiguration|\PHPUnit\Framework\MockObject\MockObject
+   * @return SessionConfiguration|MockObject
    *   A mock object of SessionConfiguration with specific methods overridden.
    */
   protected function createSessionConfiguration($options = []): SessionConfiguration&MockObject {

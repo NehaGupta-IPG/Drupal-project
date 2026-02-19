@@ -21,7 +21,7 @@ class NodeRevisionDeleteForm extends ConfirmFormBase {
   /**
    * The node revision.
    *
-   * @var \Drupal\node\NodeInterface
+   * @var NodeInterface
    */
   protected $revision;
 

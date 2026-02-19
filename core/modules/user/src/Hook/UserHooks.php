@@ -2,24 +2,24 @@
 
 namespace Drupal\user\Hook;
 
+use Drupal\Component\Assertion\Inspector;
+use Drupal\Component\Render\PlainTextOutput;
+use Drupal\Core\Asset\AttachedAssetsInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\ConfigTarget;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\filter\FilterFormatInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\system\Entity\Action;
-use Drupal\Component\Assertion\Inspector;
-use Drupal\user\RoleInterface;
-use Drupal\Component\Render\PlainTextOutput;
-use Drupal\Core\Session\AccountInterface;
-use Drupal\image\Plugin\Field\FieldType\ImageItem;
-use Drupal\Core\Render\Element;
-use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
-use Drupal\user\UserInterface;
-use Drupal\Core\Asset\AttachedAssetsInterface;
-use Drupal\Core\Url;
-use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Render\Element;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
+use Drupal\filter\FilterFormatInterface;
+use Drupal\image\Plugin\Field\FieldType\ImageItem;
+use Drupal\system\Entity\Action;
+use Drupal\user\RoleInterface;
+use Drupal\user\UserInterface;
 
 /**
  * Hook implementations for user.
@@ -164,7 +164,7 @@ class UserHooks {
           // render key may not exist, or may not be an image field.
           continue;
         }
-        /** @var \Drupal\image\Plugin\Field\FieldType\ImageItem $item */
+        /** @var ImageItem $item */
         $item = $build['user_picture'][$key]['#item'];
         if (!$item->get('alt')->getValue()) {
           $item->get('alt')->setValue(\Drupal::translation()->translate('Profile picture for user @username', ['@username' => $account->getAccountName()]));

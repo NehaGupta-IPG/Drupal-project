@@ -12,8 +12,8 @@ use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Form\FormHelper;
 use Drupal\Core\Render\Element\RenderCallbackInterface;
-use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Security\DoTrustedCallbackTrait;
+use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Core\Utility\FiberResumeType;
@@ -52,24 +52,24 @@ class Renderer implements RendererInterface {
    * fail to render correctly. As soon as it is guaranteed that during a request
    * the same container is used, it no longer needs to be static.
    *
-   * @var \Drupal\Core\Render\RenderContext[]
+   * @var RenderContext[]
    */
   protected static $contextCollection;
 
   /**
    * Constructs a new Renderer.
    *
-   * @param \Drupal\Core\Utility\CallableResolver $callableResolver
+   * @param CallableResolver $callableResolver
    *   The callable resolver.
-   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme
+   * @param ThemeManagerInterface $theme
    *   The theme manager.
-   * @param \Drupal\Core\Render\ElementInfoManagerInterface $elementInfo
+   * @param ElementInfoManagerInterface $elementInfo
    *   The element info.
-   * @param \Drupal\Core\Render\PlaceholderGeneratorInterface $placeholderGenerator
+   * @param PlaceholderGeneratorInterface $placeholderGenerator
    *   The placeholder generator.
-   * @param \Drupal\Core\Render\RenderCacheInterface $renderCache
+   * @param RenderCacheInterface $renderCache
    *   The render cache service.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   * @param RequestStack $requestStack
    *   The request stack.
    * @param array $renderer_config
    *   The renderer configuration array.
@@ -158,7 +158,7 @@ class Renderer implements RendererInterface {
    * @param array $placeholder_element
    *   The placeholder element by reference.
    *
-   * @return \Drupal\Component\Render\MarkupInterface|string
+   * @return MarkupInterface|string
    *   The rendered HTML.
    */
   protected function doRenderPlaceholder(array &$placeholder_element): MarkupInterface|string {
@@ -175,14 +175,14 @@ class Renderer implements RendererInterface {
    *
    * @param string $placeholder
    *   The placeholder HTML.
-   * @param \Drupal\Component\Render\MarkupInterface|string $markup
+   * @param MarkupInterface|string $markup
    *   The markup to replace the placeholder with.
    * @param array $elements
    *   The render array that the placeholder is from.
    * @param array $placeholder_element
    *   The placeholder element render array.
    *
-   * @return \Drupal\Component\Render\MarkupInterface|string
+   * @return MarkupInterface|string
    *   The rendered HTML.
    */
   protected function doReplacePlaceholder(string $placeholder, string|MarkupInterface $markup, array $elements, array $placeholder_element): array {
@@ -683,7 +683,7 @@ class Renderer implements RendererInterface {
   /**
    * Returns the current render context.
    *
-   * @return \Drupal\Core\Render\RenderContext|null
+   * @return RenderContext|null
    *   The current render context.
    */
   protected function getCurrentRenderContext() {
@@ -699,7 +699,7 @@ class Renderer implements RendererInterface {
   /**
    * Sets the current render context.
    *
-   * @param \Drupal\Core\Render\RenderContext|null $context
+   * @param RenderContext|null $context
    *   The render context. This can be NULL for instance when restoring the
    *   original render context, which is in fact NULL.
    *
@@ -717,7 +717,7 @@ class Renderer implements RendererInterface {
    * Placeholders may have:
    * - #lazy_builder callback, to build a render array to be rendered into
    *   markup that can replace the placeholder
-   * - #cache: to cache the result of the placeholder
+   * - #cache: to cache the result of the placeholder.
    *
    * Also merges the bubbleable metadata resulting from the rendering of the
    * contents of the placeholders. Hence $elements will be contain the entirety
@@ -832,10 +832,10 @@ class Renderer implements RendererInterface {
    * Note: This method only filters if $string is not marked safe already. This
    * ensures that HTML intended for display is not filtered.
    *
-   * @param string|\Drupal\Core\Render\Markup $string
+   * @param string|Markup $string
    *   A string.
    *
-   * @return \Drupal\Core\Render\Markup
+   * @return Markup
    *   The escaped string wrapped in a Markup object. If the string is an
    *   instance of \Drupal\Component\Render\MarkupInterface, it won't be escaped
    *   again.

@@ -13,14 +13,14 @@ class ConditionPluginCollection extends DefaultLazyPluginCollection {
   /**
    * An array of collected contexts for conditions.
    *
-   * @var \Drupal\Component\Plugin\Context\ContextInterface[]
+   * @var ContextInterface[]
    */
   protected $conditionContexts = [];
 
   /**
    * {@inheritdoc}
    *
-   * @return \Drupal\Core\Condition\ConditionInterface
+   * @return ConditionInterface
    *   The condition plugin instance for the given instance ID.
    */
   public function &get($instance_id) {
@@ -62,7 +62,7 @@ class ConditionPluginCollection extends DefaultLazyPluginCollection {
    *
    * @param string $name
    *   The name of the context.
-   * @param \Drupal\Component\Plugin\Context\ContextInterface $context
+   * @param ContextInterface $context
    *   The context to add.
    *
    * @return $this
@@ -75,7 +75,7 @@ class ConditionPluginCollection extends DefaultLazyPluginCollection {
   /**
    * Gets the values for all defined contexts.
    *
-   * @return \Drupal\Component\Plugin\Context\ContextInterface[]
+   * @return ContextInterface[]
    *   An array of set contexts, keyed by context name.
    */
   public function getConditionContexts() {

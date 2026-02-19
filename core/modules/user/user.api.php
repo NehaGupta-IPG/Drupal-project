@@ -4,7 +4,6 @@
  * @file
  * Hooks provided by the User module.
  */
-
 use Drupal\Core\Session\AccountInterface;
 use Drupal\node\NodeBulkUpdate;
 use Drupal\user\UserInterface;
@@ -32,7 +31,7 @@ use Drupal\user\UserInterface;
  *
  * @param array $edit
  *   The array of form values submitted by the user.
- * @param \Drupal\user\UserInterface $account
+ * @param UserInterface $account
  *   The user object on which the operation is being performed.
  * @param string $method
  *   The account cancellation method.
@@ -116,12 +115,12 @@ function hook_user_cancel_methods_alter(&$methods) {
  * $account->getDisplayName() is too revealing. This hook is invoked both for
  * user entities and the anonymous user session object.
  *
- * @param string|Drupal\Component\Render\MarkupInterface $name
+ * @param string|MarkupInterface $name
  *   The username that is displayed for a user. If a hook implementation changes
  *   this to an object implementing MarkupInterface it is the responsibility of
  *   the implementation to ensure the user's name is escaped properly. String
  *   values will be autoescaped.
- * @param \Drupal\Core\Session\AccountInterface $account
+ * @param AccountInterface $account
  *   The object on which the operation is being performed. This object may be a
  *   user entity. If the object is an implementation of UserInterface you can
  *   use instanceof operator before accessing user entity methods. For example:
@@ -144,7 +143,7 @@ function hook_user_format_name_alter(&$name, AccountInterface $account) {
 /**
  * The user just logged in.
  *
- * @param \Drupal\user\UserInterface $account
+ * @param UserInterface $account
  *   The user object on which the operation was just performed.
  */
 function hook_user_login(UserInterface $account): void {
@@ -165,7 +164,7 @@ function hook_user_login(UserInterface $account): void {
 /**
  * The user just logged out.
  *
- * @param \Drupal\Core\Session\AccountInterface $account
+ * @param AccountInterface $account
  *   The user object on which the operation was just performed.
  */
 function hook_user_logout(AccountInterface $account): void {

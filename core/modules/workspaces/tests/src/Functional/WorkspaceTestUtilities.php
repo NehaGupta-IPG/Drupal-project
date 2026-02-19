@@ -37,7 +37,7 @@ trait WorkspaceTestUtilities {
    * @param string $label
    *   The label of the entity to load.
    *
-   * @return \Drupal\Core\Entity\EntityInterface
+   * @return EntityInterface
    *   The entity.
    */
   protected function getOneEntityByLabel($type, $label): EntityInterface {
@@ -63,7 +63,7 @@ trait WorkspaceTestUtilities {
    * @param string $parent
    *   (optional) The ID of the parent workspace. Defaults to '_none'.
    *
-   * @return \Drupal\workspaces\WorkspaceInterface
+   * @return WorkspaceInterface
    *   The workspace that was just created.
    */
   protected function createAndActivateWorkspaceThroughUi(?string $label = NULL, ?string $id = NULL, string $parent = '_none'): WorkspaceInterface {
@@ -96,7 +96,7 @@ trait WorkspaceTestUtilities {
    * @param string $parent
    *   (optional) The ID of the parent workspace. Defaults to '_none'.
    *
-   * @return \Drupal\workspaces\WorkspaceInterface
+   * @return WorkspaceInterface
    *   The workspace that was just created.
    */
   protected function createWorkspaceThroughUi(?string $label = NULL, ?string $id = NULL, string $parent = '_none') {
@@ -138,7 +138,7 @@ trait WorkspaceTestUtilities {
    * This assumes that the switcher block has already been setup by calling
    * setupWorkspaceSwitcherBlock().
    *
-   * @param \Drupal\workspaces\WorkspaceInterface $workspace
+   * @param WorkspaceInterface $workspace
    *   The workspace to set active.
    */
   protected function switchToWorkspace(WorkspaceInterface $workspace) {
@@ -180,7 +180,7 @@ trait WorkspaceTestUtilities {
    * @return \Drupal\node\NodeInterface
    *   The Node that was just created.
    *
-   * @throws \Behat\Mink\Exception\ElementNotFoundException
+   * @throws ElementNotFoundException
    */
   protected function createNodeThroughUi($label, $bundle, $publish = TRUE) {
     $this->drupalGet('/node/add/' . $bundle);

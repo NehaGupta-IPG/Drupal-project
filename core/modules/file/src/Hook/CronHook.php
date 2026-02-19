@@ -40,7 +40,7 @@ class CronHook {
     // cleanup is disabled if $age set to 0.
     if ($age) {
       $fids = $fileStorage->getQuery()->accessCheck(FALSE)->condition('status', FileInterface::STATUS_PERMANENT, '<>')->condition('changed', $this->time->getRequestTime() - $age, '<')->range(0, 100)->execute();
-      /** @var \Drupal\file\FileInterface[] $files */
+      /** @var FileInterface[] $files */
       $files = $fileStorage->loadMultiple($fids);
       foreach ($files as $file) {
         $references = $this->fileUsage->listUsage($file);

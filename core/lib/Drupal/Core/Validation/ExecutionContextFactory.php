@@ -16,7 +16,7 @@ class ExecutionContextFactory implements ExecutionContextFactoryInterface {
   /**
    * Constructs a new ExecutionContextFactory instance.
    *
-   * @param \Drupal\Core\Validation\TranslatorInterface $translator
+   * @param TranslatorInterface $translator
    *   The translator instance.
    * @param string|null $translationDomain
    *   (optional) The translation domain.

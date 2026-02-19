@@ -46,7 +46,7 @@ abstract class ComposerBuildTestBase extends BuildTestBase {
    * @param string $drupal_root
    *   The Drupal root directory.
    *
-   * @return \Symfony\Component\Finder\Finder
+   * @return Finder
    *   A Finder object with all the composer.json files for components.
    */
   protected static function getComponentPathsFinder(string $drupal_root): Finder {

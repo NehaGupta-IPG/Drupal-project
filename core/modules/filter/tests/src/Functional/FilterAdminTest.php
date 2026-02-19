@@ -269,7 +269,7 @@ class FilterAdminTest extends BrowserTestBase {
     $this->assertSession()->checkboxChecked('roles[' . RoleInterface::AUTHENTICATED_ID . ']');
     $this->assertSession()->checkboxChecked('filters[' . $second_filter . '][status]');
     $this->assertSession()->checkboxChecked('filters[' . $first_filter . '][status]');
-    /** @var \Drupal\user\Entity\Role $role */
+    /** @var Role $role */
     $role = Role::load(RoleInterface::AUTHENTICATED_ID);
     $this->assertTrue($role->hasPermission($format->getPermissionName()), 'The authenticated role has permission to use the filter.');
 

@@ -25,7 +25,7 @@ class ViewsHandlerManager extends DefaultPluginManager implements FallbackPlugin
   /**
    * The views data cache.
    *
-   * @var \Drupal\views\ViewsData
+   * @var ViewsData
    */
   protected $viewsData;
 
@@ -46,11 +46,11 @@ class ViewsHandlerManager extends DefaultPluginManager implements FallbackPlugin
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths
    *   keyed by the corresponding namespace to look for plugin implementations.
-   * @param \Drupal\views\ViewsData $views_data
+   * @param ViewsData $views_data
    *   The views data cache.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
+   * @param CacheBackendInterface $cache_backend
    *   Cache backend instance to use.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler to invoke the alter hook with.
    */
   public function __construct($handler_type, \Traversable $namespaces, ViewsData $views_data, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
@@ -86,7 +86,7 @@ class ViewsHandlerManager extends DefaultPluginManager implements FallbackPlugin
    *   for aggregation when the handler is redirected to the aggregation
    *   handler.
    *
-   * @return \Drupal\views\Plugin\views\ViewsHandlerInterface
+   * @return ViewsHandlerInterface
    *   An instance of a handler object. May be a broken handler instance.
    */
   public function getHandler(array $item, ?string $override_plugin_id = NULL): ViewsHandlerInterface {

@@ -12,23 +12,23 @@ class FieldStorageDefinitionEvent extends Event {
   /**
    * The field storage definition.
    *
-   * @var \Drupal\Core\Field\FieldStorageDefinitionInterface
+   * @var FieldStorageDefinitionInterface
    */
   protected $fieldStorageDefinition;
 
   /**
    * The original field storage definition.
    *
-   * @var \Drupal\Core\Field\FieldStorageDefinitionInterface
+   * @var FieldStorageDefinitionInterface
    */
   protected $original;
 
   /**
    * Constructs a new FieldStorageDefinitionEvent.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $field_storage_definition
+   * @param FieldStorageDefinitionInterface $field_storage_definition
    *   The field storage definition.
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $original
+   * @param FieldStorageDefinitionInterface $original
    *   (optional) The original field storage definition. This should be passed
    *   only when updating the storage definition.
    */
@@ -40,7 +40,7 @@ class FieldStorageDefinitionEvent extends Event {
   /**
    * The field storage definition.
    *
-   * @return \Drupal\Core\Field\FieldStorageDefinitionInterface
+   * @return FieldStorageDefinitionInterface
    *   The field storage definition for the entity.
    */
   public function getFieldStorageDefinition() {
@@ -50,7 +50,7 @@ class FieldStorageDefinitionEvent extends Event {
   /**
    * The original field storage definition.
    *
-   * @return \Drupal\Core\Field\FieldStorageDefinitionInterface
+   * @return FieldStorageDefinitionInterface
    *   The field storage definition for the original entity.
    */
   public function getOriginal() {

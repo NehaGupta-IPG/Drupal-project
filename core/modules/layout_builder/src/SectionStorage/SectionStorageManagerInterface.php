@@ -15,7 +15,7 @@ interface SectionStorageManagerInterface extends DiscoveryInterface {
    *
    * @param string $type
    *   The section storage type.
-   * @param \Drupal\Component\Plugin\Context\ContextInterface[] $contexts
+   * @param ContextInterface[] $contexts
    *   (optional) The contexts available for this storage to use.
    *
    * @return \Drupal\layout_builder\SectionStorageInterface|null
@@ -26,9 +26,9 @@ interface SectionStorageManagerInterface extends DiscoveryInterface {
   /**
    * Finds the section storage to load based on available contexts.
    *
-   * @param \Drupal\Component\Plugin\Context\ContextInterface[] $contexts
+   * @param ContextInterface[] $contexts
    *   The contexts which should be used to determine which storage to return.
-   * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $cacheability
+   * @param RefinableCacheableDependencyInterface $cacheability
    *   Refinable cacheability object, which will be populated based on the
    *   cacheability of each section storage candidate. After calling this method
    *   this parameter will reflect the cacheability information used to

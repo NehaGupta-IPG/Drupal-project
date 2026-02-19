@@ -30,7 +30,7 @@ interface FormElementInterface extends ElementInterface {
    * @param mixed $input
    *   The incoming input to populate the form element. If this is FALSE,
    *   the element's default value should be returned.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return mixed

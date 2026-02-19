@@ -70,11 +70,11 @@ class ExecutionContext implements ExecutionContextInterface {
   /**
    * Creates a new ExecutionContext.
    *
-   * @param \Symfony\Component\Validator\Validator\ValidatorInterface $validator
+   * @param ValidatorInterface $validator
    *   The validator.
    * @param mixed $root
    *   The root.
-   * @param \Drupal\Core\Validation\TranslatorInterface $translator
+   * @param TranslatorInterface $translator
    *   The translator.
    * @param string|null $translationDomain
    *   (optional) The translation domain.
@@ -251,7 +251,7 @@ class ExecutionContext implements ExecutionContextInterface {
   /**
    * Gets the current constraint.
    *
-   * @return \Symfony\Component\Validator\Constraint|null
+   * @return Constraint|null
    *   The constraint.
    *
    * @internal

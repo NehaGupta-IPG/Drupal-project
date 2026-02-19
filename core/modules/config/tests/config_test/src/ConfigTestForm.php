@@ -158,7 +158,7 @@ class ConfigTestForm extends EntityForm {
    *   The entity ID.
    * @param array $element
    *   The form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current state of the form.
    *
    * @return bool

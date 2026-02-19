@@ -35,21 +35,21 @@ final class CronSuspendQueueDelayTest extends UnitTestCase {
   /**
    * Constructor arguments for \Drupal\Core\Cron.
    *
-   * @var object[]|\PHPUnit\Framework\MockObject\MockObject[]
+   * @var object[]|MockObject[]
    */
   protected $cronConstructorArguments;
 
   /**
    * A worker for testing.
    *
-   * @var \Drupal\Core\Queue\QueueWorkerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var QueueWorkerInterface|MockObject
    */
   protected $workerA;
 
   /**
    * A worker for testing.
    *
-   * @var \Drupal\Core\Queue\QueueWorkerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var QueueWorkerInterface|MockObject
    */
   protected $workerB;
 

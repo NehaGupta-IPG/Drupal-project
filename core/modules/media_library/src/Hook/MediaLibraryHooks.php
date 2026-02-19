@@ -2,24 +2,24 @@
 
 namespace Drupal\media_library\Hook;
 
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\media\MediaTypeForm;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Render\Element;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
+use Drupal\media\MediaTypeForm;
+use Drupal\media_library\Form\FileUploadForm;
+use Drupal\media_library\Form\OEmbedForm;
 use Drupal\media_library\MediaLibraryState;
 use Drupal\views\Plugin\views\cache\CachePluginBase;
 use Drupal\views\ViewExecutable;
-use Drupal\media_library\Form\OEmbedForm;
-use Drupal\media_library\Form\FileUploadForm;
-use Drupal\Core\Url;
-use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\Core\Render\Element;
 
 /**
  * Hook implementations for media_library.
@@ -205,7 +205,7 @@ class MediaLibraryHooks {
   #[Hook('form_views_form_media_library_page_alter')]
   public function formViewsFormMediaLibraryPageAlter(array &$form, FormStateInterface $form_state, $form_id) : void {
     if (isset($form['media_bulk_form']) && isset($form['output'])) {
-      /** @var \Drupal\views\ViewExecutable $view */
+      /** @var ViewExecutable $view */
       $view = $form['output'][0]['#view'];
       foreach (Element::getVisibleChildren($form['media_bulk_form']) as $key) {
         if (isset($view->result[$key])) {

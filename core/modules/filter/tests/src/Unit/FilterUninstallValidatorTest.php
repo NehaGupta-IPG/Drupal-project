@@ -21,7 +21,7 @@ class FilterUninstallValidatorTest extends UnitTestCase {
   /**
    * The filter uninstall validator.
    *
-   * @var \Drupal\filter\FilterUninstallValidator|\PHPUnit\Framework\MockObject\MockObject
+   * @var FilterUninstallValidator|MockObject
    */
   protected $filterUninstallValidator;
 

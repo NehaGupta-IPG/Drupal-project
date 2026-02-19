@@ -29,14 +29,14 @@ class UpdateRemovedPostUpdateTest extends BrowserTestBase {
   /**
    * An user that can execute updates.
    *
-   * @var \Drupal\Core\Url
+   * @var Url
    */
   protected Url $updateUrl;
 
   /**
    * An user that can execute updates.
    *
-   * @var \Drupal\user\Entity\User
+   * @var User
    */
   protected User $updateUser;
 

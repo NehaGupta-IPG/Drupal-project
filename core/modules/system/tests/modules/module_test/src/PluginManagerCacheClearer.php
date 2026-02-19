@@ -13,7 +13,7 @@ use Drupal\Core\State\StateInterface;
 class PluginManagerCacheClearer extends DefaultPluginManager {
 
   /**
-   * @var \Drupal\Core\State\StateInterface
+   * @var StateInterface
    */
   protected $state;
 
@@ -27,7 +27,7 @@ class PluginManagerCacheClearer extends DefaultPluginManager {
   /**
    * PluginManagerCacheClearer constructor.
    *
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state service for recording what happens.
    * @param null $optional_service
    *   An optional service for testing.

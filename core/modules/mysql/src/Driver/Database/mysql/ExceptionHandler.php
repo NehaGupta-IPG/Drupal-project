@@ -4,10 +4,10 @@ namespace Drupal\mysql\Driver\Database\mysql;
 
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
-use Drupal\Core\Database\ExceptionHandler as BaseExceptionHandler;
 use Drupal\Core\Database\Exception\SchemaPrimaryKeyMustBeDroppedException;
 use Drupal\Core\Database\Exception\SchemaTableColumnSizeTooLargeException;
 use Drupal\Core\Database\Exception\SchemaTableKeyTooLargeException;
+use Drupal\Core\Database\ExceptionHandler as BaseExceptionHandler;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Database\StatementInterface;
 
@@ -44,11 +44,11 @@ class ExceptionHandler extends BaseExceptionHandler {
    * @param array $arguments
    *   An array of arguments for the prepared statement.
    *
-   * @throws \Drupal\Core\Database\DatabaseExceptionWrapper
-   * @throws \Drupal\Core\Database\IntegrityConstraintViolationException
-   * @throws \Drupal\Core\Database\Exception\SchemaPrimaryKeyMustBeDroppedException
-   * @throws \Drupal\Core\Database\Exception\SchemaTableColumnSizeTooLargeException
-   * @throws \Drupal\Core\Database\Exception\SchemaTableKeyTooLargeException
+   * @throws DatabaseExceptionWrapper
+   * @throws IntegrityConstraintViolationException
+   * @throws SchemaPrimaryKeyMustBeDroppedException
+   * @throws SchemaTableColumnSizeTooLargeException
+   * @throws SchemaTableKeyTooLargeException
    */
   protected function rethrowNormalizedException(
     \Exception $exception,

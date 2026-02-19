@@ -2,19 +2,19 @@
 
 namespace Drupal\media\Hook;
 
+use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Field\FieldTypeCategoryManagerInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\views\ViewExecutable;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Field\FieldTypeCategoryManagerInterface;
-use Drupal\Core\Access\AccessResult;
-use Drupal\field\FieldConfigInterface;
-use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Url;
-use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\field\FieldConfigInterface;
+use Drupal\views\ViewExecutable;
 
 /**
  * Hook implementations for media.
@@ -113,7 +113,7 @@ class MediaHooks {
   /**
    * Provides help text to choose between File and Media reference fields.
    *
-   * @return string|\Drupal\Core\StringTranslation\TranslatableMarkup
+   * @return string|TranslatableMarkup
    *   A suggestion of when to use Media fields instead of File or Image fields.
    */
   protected function fileMediaHelpText(): string|TranslatableMarkup {

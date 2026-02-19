@@ -14,14 +14,14 @@ class InaccessibleMenuLink extends MenuLinkBase {
   /**
    * The wrapped menu link.
    *
-   * @var \Drupal\Core\Menu\MenuLinkInterface
+   * @var MenuLinkInterface
    */
   protected $wrappedLink;
 
   /**
    * Constructs a new InaccessibleMenuLink.
    *
-   * @param \Drupal\Core\Menu\MenuLinkInterface $wrapped_link
+   * @param MenuLinkInterface $wrapped_link
    *   The menu link to wrap.
    */
   public function __construct(MenuLinkInterface $wrapped_link) {

@@ -17,7 +17,7 @@ class ExtraFieldBlockCacheTagInvalidator implements CacheTagsInvalidatorInterfac
   /**
    * Constructs a new ExtraFieldBlockCacheTagInvalidator.
    *
-   * @param \Drupal\Core\Block\BlockManagerInterface $blockManager
+   * @param BlockManagerInterface $blockManager
    *   The block manager.
    */
   public function __construct(protected BlockManagerInterface $blockManager) {

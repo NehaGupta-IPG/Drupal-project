@@ -148,7 +148,7 @@ class StyleTableUnitTest extends PluginKernelTestBase {
   /**
    * Prepares a view executable by initializing everything which is needed.
    *
-   * @param \Drupal\views\ViewExecutable $view
+   * @param ViewExecutable $view
    *   The executable to prepare.
    */
   protected function prepareView(ViewExecutable $view): void {

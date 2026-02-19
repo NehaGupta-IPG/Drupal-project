@@ -40,7 +40,7 @@ class EntityArgumentTest extends TaxonomyTestBase {
   /**
    * A user with permission to administer taxonomy.
    *
-   * @var \Drupal\user\UserInterface
+   * @var UserInterface
    */
   protected UserInterface $adminUser;
 

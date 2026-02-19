@@ -16,7 +16,7 @@ trait RevisionLogEntityTrait {
   /**
    * Provides revision-related base field definitions for an entity type.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
    *
    * @return \Drupal\Core\Field\FieldDefinitionInterface[]
@@ -126,7 +126,7 @@ trait RevisionLogEntityTrait {
   /**
    * Gets the entity type definition.
    *
-   * @return \Drupal\Core\Entity\ContentEntityTypeInterface
+   * @return ContentEntityTypeInterface
    *   The content entity type definition.
    */
   abstract public function getEntityType();

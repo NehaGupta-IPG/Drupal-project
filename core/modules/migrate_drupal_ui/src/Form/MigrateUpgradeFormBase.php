@@ -35,13 +35,13 @@ abstract class MigrateUpgradeFormBase extends FormBase {
   /**
    * Constructs the Migrate Upgrade Form Base.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory service.
-   * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
+   * @param MigrationPluginManagerInterface $migration_plugin_manager
    *   The migration plugin manager service.
-   * @param \Drupal\Core\State\StateInterface $state
+   * @param StateInterface $state
    *   The state service.
-   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $tempstore_private
+   * @param PrivateTempStoreFactory $tempstore_private
    *   The private tempstore factory service.
    */
   public function __construct(ConfigFactoryInterface $config_factory, MigrationPluginManagerInterface $migration_plugin_manager, StateInterface $state, PrivateTempStoreFactory $tempstore_private) {
@@ -86,7 +86,7 @@ abstract class MigrateUpgradeFormBase extends FormBase {
    * @return \Symfony\Component\HttpFoundation\RedirectResponse
    *   A redirect response object that may be returned by the controller.
    *
-   * @throws \Drupal\Core\TempStore\TempStoreException
+   * @throws TempStoreException
    *   Thrown when a lock for the backend storage could not be acquired.
    */
   protected function restartUpgradeForm() {

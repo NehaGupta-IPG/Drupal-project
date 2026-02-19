@@ -2,22 +2,22 @@
 
 namespace Drupal\comment\Hook;
 
-use Drupal\Core\Field\FieldTypeCategoryManagerInterface;
-use Drupal\Core\Entity\Entity\EntityViewMode;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\user\UserInterface;
-use Drupal\user\RoleInterface;
-use Drupal\Core\Entity\FieldableEntityInterface;
-use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
-use Drupal\Core\Entity\EntityInterface;
-use Drupal\node\NodeInterface;
-use Drupal\field\FieldStorageConfigInterface;
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
-use Drupal\field\FieldConfigInterface;
 use Drupal\comment\Entity\CommentType;
-use Drupal\Core\Url;
-use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\Entity\EntityViewMode;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\FieldTypeCategoryManagerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
+use Drupal\field\FieldConfigInterface;
+use Drupal\field\FieldStorageConfigInterface;
+use Drupal\node\NodeInterface;
+use Drupal\user\RoleInterface;
+use Drupal\user\UserInterface;
 
 /**
  * Hook implementations for comment.
@@ -442,7 +442,7 @@ class CommentHooks {
     // disabled.
     foreach ($storage->loadMultiple() as $view_display) {
       $changed = FALSE;
-      /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface $view_display */
+      /** @var EntityViewDisplayInterface $view_display */
       foreach ($view_display->getComponents() as $field => $component) {
         if (isset($component['type']) && $component['type'] === 'comment_default') {
           if ($component['settings']['view_mode'] === $display->getMode()) {

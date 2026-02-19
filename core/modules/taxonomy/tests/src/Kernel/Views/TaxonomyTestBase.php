@@ -6,14 +6,14 @@ namespace Drupal\Tests\taxonomy\Kernel\Views;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Tests\ViewTestData;
-use Drupal\taxonomy\Entity\Vocabulary;
-use Drupal\taxonomy\Entity\Term;
 
 /**
  * Base class for views kernel taxonomy tests.
@@ -165,7 +165,7 @@ abstract class TaxonomyTestBase extends ViewsKernelTestBase {
    *   - langcode: LANGCODE_NOT_SPECIFIED.
    *   Defaults to an empty array.
    *
-   * @return \Drupal\taxonomy\Entity\Term
+   * @return Term
    *   The created taxonomy term.
    */
   protected function createTerm(array $settings = []) {

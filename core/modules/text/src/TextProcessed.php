@@ -5,8 +5,8 @@ namespace Drupal\text;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Serialization\Attribute\JsonSchema;
 use Drupal\Core\TypedData\DataDefinitionInterface;
-use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\Core\TypedData\TypedData;
+use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\filter\FilterProcessResult;
 use Drupal\filter\Render\FilteredMarkup;
 
@@ -21,7 +21,7 @@ class TextProcessed extends TypedData implements CacheableDependencyInterface {
   /**
    * Cached processed text.
    *
-   * @var \Drupal\filter\FilterProcessResult|null
+   * @var FilterProcessResult|null
    */
   protected $processed = NULL;
 

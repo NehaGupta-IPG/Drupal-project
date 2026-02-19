@@ -95,7 +95,7 @@ interface FormStateInterface {
    * If a response is set, it will be used during processing and returned
    * directly. The form will not be rebuilt or redirected.
    *
-   * @param \Symfony\Component\HttpFoundation\Response $response
+   * @param Response $response
    *   The response to return.
    *
    * @return $this
@@ -108,7 +108,7 @@ interface FormStateInterface {
    * If a response is set, it will be used during processing and returned
    * directly. The form will not be rebuilt or redirected.
    *
-   * @return \Symfony\Component\HttpFoundation\Response|null
+   * @return Response|null
    *   The response to return, or NULL.
    */
   public function getResponse();
@@ -134,7 +134,7 @@ interface FormStateInterface {
   /**
    * Sets the redirect URL for the form.
    *
-   * @param \Drupal\Core\Url $url
+   * @param Url $url
    *   The URL to redirect to.
    *
    * @return $this
@@ -635,7 +635,7 @@ interface FormStateInterface {
   /**
    * Returns the form object that is responsible for building this form.
    *
-   * @return \Drupal\Core\Form\FormInterface
+   * @return FormInterface
    *   The form object.
    */
   public function getFormObject();
@@ -643,7 +643,7 @@ interface FormStateInterface {
   /**
    * Sets the form object that is responsible for building this form.
    *
-   * @param \Drupal\Core\Form\FormInterface $form_object
+   * @param FormInterface $form_object
    *   The form object.
    *
    * @return $this
@@ -1151,7 +1151,7 @@ interface FormStateInterface {
    * - form_id
    * - form_token
    * - form_build_id
-   * - op
+   * - op.
    *
    * @return $this
    */

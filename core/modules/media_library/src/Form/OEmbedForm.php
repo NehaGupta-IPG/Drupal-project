@@ -25,29 +25,29 @@ class OEmbedForm extends AddFormBase {
   /**
    * The oEmbed URL resolver service.
    *
-   * @var \Drupal\media\OEmbed\UrlResolverInterface
+   * @var UrlResolverInterface
    */
   protected $urlResolver;
 
   /**
    * The oEmbed resource fetcher service.
    *
-   * @var \Drupal\media\OEmbed\ResourceFetcherInterface
+   * @var ResourceFetcherInterface
    */
   protected $resourceFetcher;
 
   /**
    * Constructs a new OEmbedForm.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\media_library\MediaLibraryUiBuilder $library_ui_builder
+   * @param MediaLibraryUiBuilder $library_ui_builder
    *   The media library UI builder.
-   * @param \Drupal\media\OEmbed\UrlResolverInterface $url_resolver
+   * @param UrlResolverInterface $url_resolver
    *   The oEmbed URL resolver service.
-   * @param \Drupal\media\OEmbed\ResourceFetcherInterface $resource_fetcher
+   * @param ResourceFetcherInterface $resource_fetcher
    *   The oEmbed resource fetcher service.
-   * @param \Drupal\media_library\OpenerResolverInterface $opener_resolver
+   * @param OpenerResolverInterface $opener_resolver
    *   The opener resolver.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, MediaLibraryUiBuilder $library_ui_builder, UrlResolverInterface $url_resolver, ResourceFetcherInterface $resource_fetcher, ?OpenerResolverInterface $opener_resolver = NULL) {
@@ -147,7 +147,7 @@ class OEmbedForm extends AddFormBase {
    *
    * @param array $form
    *   The complete form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The current form state.
    */
   public function validateUrl(array &$form, FormStateInterface $form_state) {
@@ -168,7 +168,7 @@ class OEmbedForm extends AddFormBase {
    *
    * @param array $form
    *   The form render array.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   * @param FormStateInterface $form_state
    *   The form state.
    */
   public function addButtonSubmit(array $form, FormStateInterface $form_state) {

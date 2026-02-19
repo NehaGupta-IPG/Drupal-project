@@ -2,17 +2,17 @@
 
 namespace Drupal\Core\Config\Entity;
 
+use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
+use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\ConfigImporterException;
+use Drupal\Core\Config\Entity\Exception\ConfigEntityIdLengthException;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityMalformedException;
 use Drupal\Core\Entity\EntityStorageBase;
-use Drupal\Core\Config\Config;
-use Drupal\Core\Config\Entity\Exception\ConfigEntityIdLengthException;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Component\Uuid\UuidInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -58,7 +58,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
   /**
    * The config factory service.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
@@ -72,7 +72,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
   /**
    * The language manager.
    *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
+   * @var LanguageManagerInterface
    */
   protected $languageManager;
 
@@ -86,15 +86,15 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
   /**
    * Constructs a ConfigEntityStorage object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type definition.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The config factory service.
-   * @param \Drupal\Component\Uuid\UuidInterface $uuid_service
+   * @param UuidInterface $uuid_service
    *   The UUID service.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
+   * @param LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param \Drupal\Core\Cache\MemoryCache\MemoryCacheInterface $memory_cache
+   * @param MemoryCacheInterface $memory_cache
    *   The memory cache backend.
    */
   public function __construct(EntityTypeInterface $entity_type, ConfigFactoryInterface $config_factory, UuidInterface $uuid_service, LanguageManagerInterface $language_manager, MemoryCacheInterface $memory_cache) {
@@ -157,7 +157,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
     }
 
     // Load all of the configuration entities.
-    /** @var \Drupal\Core\Config\Config[] $configs */
+    /** @var Config[] $configs */
     $configs = [];
     $records = [];
     foreach ($this->configFactory->loadMultiple($names) as $config) {
@@ -218,7 +218,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
   /**
    * Implements Drupal\Core\Entity\EntityStorageInterface::save().
    *
-   * @throws \Drupal\Core\Entity\EntityMalformedException
+   * @throws EntityMalformedException
    *   When attempting to save a configuration entity that has no ID.
    */
   public function save(EntityInterface $entity) {
@@ -277,7 +277,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
   /**
    * Maps from an entity object to the storage record.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity object.
    *
    * @return array
@@ -326,7 +326,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
    *
    * @param string $hook
    *   One of 'presave', 'insert', 'update', 'predelete', or 'delete'.
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity object.
    */
   protected function invokeHook($hook, EntityInterface $entity) {
@@ -403,7 +403,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
    * @param bool $is_syncing
    *   Is the configuration entity being created as part of a config sync.
    *
-   * @return \Drupal\Core\Config\Entity\ConfigEntityInterface
+   * @return ConfigEntityInterface
    *   The configuration entity.
    *
    * @see \Drupal\Core\Config\Entity\ConfigEntityStorageInterface::createFromStorageRecord()
@@ -415,7 +415,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
       $values[$this->uuidKey] = $this->uuidService->generate();
     }
     $data = $this->mapFromStorageRecords([$values]);
-    /** @var \Drupal\Core\Config\Entity\ConfigEntityInterface $entity */
+    /** @var ConfigEntityInterface $entity */
     $entity = current($data);
     $entity->setOriginal(clone $entity);
     $entity->setSyncing($is_syncing);
@@ -438,7 +438,7 @@ class ConfigEntityStorage extends EntityStorageBase implements ConfigEntityStora
     $data = $this->mapFromStorageRecords([$values]);
     $updated_entity = current($data);
 
-    /** @var \Drupal\Core\Config\Entity\ConfigEntityTypeInterface $entity_type */
+    /** @var ConfigEntityTypeInterface $entity_type */
     $entity_type = $this->getEntityType();
     $id_key = $entity_type->getKey('id');
     $properties = $entity_type->getPropertiesToExport($updated_entity->get($id_key));

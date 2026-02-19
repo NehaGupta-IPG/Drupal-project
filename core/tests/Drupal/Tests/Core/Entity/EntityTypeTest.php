@@ -27,7 +27,7 @@ class EntityTypeTest extends UnitTestCase {
    * @param array $definition
    *   An array of values to use for the EntityType.
    *
-   * @return \Drupal\Core\Entity\EntityTypeInterface
+   * @return EntityTypeInterface
    *   The EntityType object.
    */
   protected function setUpEntityType($definition): EntityType {
@@ -541,7 +541,7 @@ class EntityTypeTest extends UnitTestCase {
   /**
    * Asserts there on no public properties on the object instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type.
    *
    * @internal

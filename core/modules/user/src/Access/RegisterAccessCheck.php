@@ -15,7 +15,7 @@ class RegisterAccessCheck implements AccessInterface {
   /**
    * Checks access.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The currently logged in account.
    *
    * @return \Drupal\Core\Access\AccessResultInterface

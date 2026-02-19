@@ -57,9 +57,9 @@ function hook_options_list_alter(array &$options, array $context) {
  * For consistency, the set of values returned when an $entity is provided
  * should be a subset of the values returned when no $entity is provided.
  *
- * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $definition
+ * @param FieldStorageDefinitionInterface $definition
  *   The field storage definition.
- * @param \Drupal\Core\Entity\FieldableEntityInterface|null $entity
+ * @param FieldableEntityInterface|null $entity
  *   (optional) The entity context if known, or NULL if the allowed values are
  *   being collected without the context of a specific entity.
  * @param bool &$cacheable

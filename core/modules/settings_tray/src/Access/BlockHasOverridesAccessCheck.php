@@ -16,7 +16,7 @@ class BlockHasOverridesAccessCheck implements AccessInterface {
   /**
    * Checks access for accessing a block's 'settings_tray' form.
    *
-   * @param \Drupal\block\BlockInterface $block
+   * @param BlockInterface $block
    *   The block whose 'settings_tray' form is being accessed.
    *
    * @return \Drupal\Core\Access\AccessResultInterface

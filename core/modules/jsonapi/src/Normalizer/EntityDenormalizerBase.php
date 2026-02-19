@@ -30,32 +30,32 @@ abstract class EntityDenormalizerBase extends NormalizerBase implements Denormal
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $fieldManager;
 
   /**
    * The field plugin manager.
    *
-   * @var \Drupal\Core\Field\FieldTypePluginManagerInterface
+   * @var FieldTypePluginManagerInterface
    */
   protected $pluginManager;
 
   /**
    * Constructs an EntityDenormalizerBase object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager
+   * @param EntityFieldManagerInterface $field_manager
    *   The entity field manager.
-   * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $plugin_manager
+   * @param FieldTypePluginManagerInterface $plugin_manager
    *   The plugin manager for fields.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $field_manager, FieldTypePluginManagerInterface $plugin_manager) {
@@ -85,7 +85,7 @@ abstract class EntityDenormalizerBase extends NormalizerBase implements Denormal
     if (empty($context['resource_type']) || !$context['resource_type'] instanceof ResourceType) {
       throw new PreconditionFailedHttpException('Missing context during denormalization.');
     }
-    /** @var \Drupal\jsonapi\ResourceType\ResourceType $resource_type */
+    /** @var ResourceType $resource_type */
     $resource_type = $context['resource_type'];
     $entity_type_id = $resource_type->getEntityTypeId();
     $bundle = $resource_type->getBundle();
@@ -104,7 +104,7 @@ abstract class EntityDenormalizerBase extends NormalizerBase implements Denormal
    *
    * @param array $data
    *   The input data to modify.
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   Contains the info about the resource type.
    * @param string $format
    *   Format the given data was extracted from.

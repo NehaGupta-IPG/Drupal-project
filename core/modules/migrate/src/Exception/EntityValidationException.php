@@ -27,14 +27,14 @@ class EntityValidationException extends MigrateException {
   /**
    * The list of violations generated during the entity validation.
    *
-   * @var \Drupal\Core\Entity\EntityConstraintViolationListInterface
+   * @var EntityConstraintViolationListInterface
    */
   protected $violations;
 
   /**
    * EntityValidationException constructor.
    *
-   * @param \Drupal\Core\Entity\EntityConstraintViolationListInterface $violations
+   * @param EntityConstraintViolationListInterface $violations
    *   The list of violations generated during the entity validation.
    */
   public function __construct(EntityConstraintViolationListInterface $violations) {
@@ -77,7 +77,7 @@ class EntityValidationException extends MigrateException {
   /**
    * Returns the list of violations generated during the entity validation.
    *
-   * @return \Drupal\Core\Entity\EntityConstraintViolationListInterface
+   * @return EntityConstraintViolationListInterface
    *   The list of violations generated during the entity validation.
    */
   public function getViolations() {

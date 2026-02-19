@@ -8,10 +8,10 @@ use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\language\ConfigurableLanguageInterface;
 use Drupal\language\ConfigurableLanguageManager;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\language\Exception\DeleteDefaultLanguageException;
-use Drupal\language\ConfigurableLanguageInterface;
 use Drupal\language\Form\LanguageAddForm;
 use Drupal\language\Form\LanguageDeleteForm;
 use Drupal\language\Form\LanguageEditForm;
@@ -173,7 +173,7 @@ class ConfigurableLanguage extends ConfigEntityBase implements ConfigurableLangu
   /**
    * {@inheritdoc}
    *
-   * @throws \Drupal\language\Exception\DeleteDefaultLanguageException
+   * @throws DeleteDefaultLanguageException
    *   Exception thrown if we're trying to delete the default language entity.
    *   This is not allowed as a site must have a default language.
    */

@@ -16,7 +16,7 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
    * An associative array. The keys are integers that indicate priority. Values
    * are arrays of TranslatorInterface objects.
    *
-   * @var \Drupal\Core\StringTranslation\Translator\TranslatorInterface[][]
+   * @var TranslatorInterface[][]
    *
    * @see \Drupal\Core\StringTranslation\TranslationManager::addTranslator()
    * @see \Drupal\Core\StringTranslation\TranslationManager::sortTranslators()
@@ -28,7 +28,7 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
    *
    * If this is NULL a rebuild will be triggered.
    *
-   * @var null|\Drupal\Core\StringTranslation\Translator\TranslatorInterface[]
+   * @var null|TranslatorInterface[]
    *
    * @see \Drupal\Core\StringTranslation\TranslationManager::addTranslator()
    * @see \Drupal\Core\StringTranslation\TranslationManager::sortTranslators()
@@ -46,7 +46,7 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
   /**
    * Constructs a TranslationManager object.
    *
-   * @param \Drupal\Core\Language\LanguageDefault $default_language
+   * @param LanguageDefault $default_language
    *   The default language.
    */
   public function __construct(LanguageDefault $default_language) {
@@ -56,7 +56,7 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
   /**
    * Appends a translation system to the translation chain.
    *
-   * @param \Drupal\Core\StringTranslation\Translator\TranslatorInterface $translator
+   * @param TranslatorInterface $translator
    *   The translation interface to be appended to the translation chain.
    * @param int $priority
    *   The priority of the logger being added.
@@ -73,7 +73,7 @@ class TranslationManager implements TranslationInterface, TranslatorInterface {
   /**
    * Sorts translators according to priority.
    *
-   * @return \Drupal\Core\StringTranslation\Translator\TranslatorInterface[]
+   * @return TranslatorInterface[]
    *   A sorted array of translator objects.
    */
   protected function sortTranslators() {

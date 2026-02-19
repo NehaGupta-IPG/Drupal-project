@@ -17,32 +17,32 @@ class MediaConfigSubscriber implements EventSubscriberInterface {
   /**
    * The route builder.
    *
-   * @var \Drupal\Core\Routing\RouteBuilderInterface
+   * @var RouteBuilderInterface
    */
   protected $routeBuilder;
 
   /**
    * The cache tags invalidator.
    *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface
+   * @var CacheTagsInvalidatorInterface
    */
   protected $cacheTagsInvalidator;
 
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * Constructs the MediaConfigSubscriber.
    *
-   * @param \Drupal\Core\Routing\RouteBuilderInterface $router_builder
+   * @param RouteBuilderInterface $router_builder
    *   The route builder.
-   * @param \Drupal\Core\Cache\CacheTagsInvalidatorInterface $cache_tags_invalidator
+   * @param CacheTagsInvalidatorInterface $cache_tags_invalidator
    *   The cache tags invalidator.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(RouteBuilderInterface $router_builder, CacheTagsInvalidatorInterface $cache_tags_invalidator, EntityTypeManagerInterface $entity_type_manager) {
@@ -54,7 +54,7 @@ class MediaConfigSubscriber implements EventSubscriberInterface {
   /**
    * Updates entity type definitions and ensures routes are rebuilt when needed.
    *
-   * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   * @param ConfigCrudEvent $event
    *   The ConfigCrudEvent to process.
    */
   public function onSave(ConfigCrudEvent $event) {

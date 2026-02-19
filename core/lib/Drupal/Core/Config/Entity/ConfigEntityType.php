@@ -2,9 +2,9 @@
 
 namespace Drupal\Core\Config\Entity;
 
+use Drupal\Core\Config\ConfigPrefixLengthException;
 use Drupal\Core\Config\Entity\Exception\ConfigEntityStorageClassException;
 use Drupal\Core\Entity\EntityType;
-use Drupal\Core\Config\ConfigPrefixLengthException;
 
 /**
  * Provides an implementation of a configuration entity type and its metadata.
@@ -55,7 +55,7 @@ class ConfigEntityType extends EntityType implements ConfigEntityTypeInterface {
   /**
    * {@inheritdoc}
    *
-   * @throws \Drupal\Core\Config\Entity\Exception\ConfigEntityStorageClassException
+   * @throws ConfigEntityStorageClassException
    *   Exception thrown when the provided class is not an instance of
    *   \Drupal\Core\Config\Entity\ConfigEntityStorage.
    */
@@ -133,7 +133,7 @@ class ConfigEntityType extends EntityType implements ConfigEntityTypeInterface {
   /**
    * {@inheritdoc}
    *
-   * @throws \Drupal\Core\Config\Entity\Exception\ConfigEntityStorageClassException
+   * @throws ConfigEntityStorageClassException
    *   Exception thrown when the provided class is not an instance of
    *   \Drupal\Core\Config\Entity\ConfigEntityStorage.
    *

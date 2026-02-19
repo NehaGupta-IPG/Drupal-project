@@ -21,21 +21,21 @@ class ViewsLocalTaskTest extends UnitTestCase {
   /**
    * The mocked route provider.
    *
-   * @var \Drupal\Core\Routing\RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Routing\RouteProviderInterface|MockObject
    */
   protected $routeProvider;
 
   /**
    * The mocked key value storage.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface|MockObject
    */
   protected $state;
 
   /**
    * The views storage.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityStorageInterface|MockObject
    */
   protected $viewStorage;
 
@@ -52,7 +52,7 @@ class ViewsLocalTaskTest extends UnitTestCase {
   /**
    * The tested local task derivative class.
    *
-   * @var \Drupal\views\Plugin\Derivative\ViewsLocalTask
+   * @var ViewsLocalTask
    */
   protected $localTaskDerivative;
 

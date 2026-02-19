@@ -4,9 +4,9 @@ namespace Drupal\help\Controller;
 
 use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
 use Drupal\help\HelpTopicPluginManagerInterface;
-use Drupal\Core\Render\RendererInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -20,9 +20,9 @@ class HelpTopicPluginController extends ControllerBase {
   /**
    * Constructs a HelpTopicPluginController object.
    *
-   * @param \Drupal\help\HelpTopicPluginManagerInterface $helpTopicPluginManager
+   * @param HelpTopicPluginManagerInterface $helpTopicPluginManager
    *   The help topic plugin manager service.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer service.
    */
   public function __construct(protected HelpTopicPluginManagerInterface $helpTopicPluginManager, protected RendererInterface $renderer) {

@@ -8,7 +8,7 @@ use Drupal\Core\Database\Database;
 /**
  * Provides a trait for shared test setup functionality.
  *
- * @property \Drupal\Component\DependencyInjection\ContainerInterface $container
+ * @property ContainerInterface $container
  */
 trait TestSetupTrait {
 

@@ -1,5 +1,11 @@
 <?php
 
+use Drupal\Core\Breadcrumb\Breadcrumb;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+
 /**
  * @file
  * Hooks and documentation related to the menu system and links.
@@ -270,13 +276,13 @@
 function hook_menu_links_discovered_alter(&$links) {
   // Change the weight and title of the user.logout link.
   $links['user.logout']['weight'] = -10;
-  $links['user.logout']['title'] = new \Drupal\Core\StringTranslation\TranslatableMarkup('Logout');
+  $links['user.logout']['title'] = new TranslatableMarkup('Logout');
   // Conditionally add an additional link with a title that's not translated.
   if (\Drupal::moduleHandler()->moduleExists('search')) {
     $links['menu.api.search'] = [
       'title' => \Drupal::config('system.site')->get('name'),
       'route_name' => 'menu.api.search',
-      'description' => new \Drupal\Core\StringTranslation\TranslatableMarkup('View popular search phrases for this site.'),
+      'description' => new TranslatableMarkup('View popular search phrases for this site.'),
       'parent' => 'system.admin_reports',
     ];
   }
@@ -307,14 +313,14 @@ function hook_menu_links_discovered_alter(&$links) {
  *   as described above.
  * @param string $route_name
  *   The route name of the page.
- * @param \Drupal\Core\Cache\RefinableCacheableDependencyInterface $cacheability
+ * @param RefinableCacheableDependencyInterface $cacheability
  *   The cacheability metadata for the current route's local tasks.
  *
  * @see hook_local_tasks_alter()
  *
  * @ingroup menu
  */
-function hook_menu_local_tasks_alter(&$data, $route_name, \Drupal\Core\Cache\RefinableCacheableDependencyInterface &$cacheability) {
+function hook_menu_local_tasks_alter(&$data, $route_name, RefinableCacheableDependencyInterface &$cacheability) {
 
   // Add a tab linking to node/add to all pages.
   $data['tabs'][0]['entity.node.add_page'] = [
@@ -428,9 +434,9 @@ function hook_contextual_links_plugins_alter(array &$contextual_links) {
 /**
  * Perform alterations to the breadcrumb built by the BreadcrumbManager.
  *
- * @param \Drupal\Core\Breadcrumb\Breadcrumb $breadcrumb
+ * @param Breadcrumb $breadcrumb
  *   A breadcrumb object returned by BreadcrumbBuilderInterface::build().
- * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+ * @param RouteMatchInterface $route_match
  *   The current route match.
  * @param array $context
  *   May include the following key:
@@ -440,9 +446,9 @@ function hook_contextual_links_plugins_alter(array &$contextual_links) {
  *
  * @ingroup menu
  */
-function hook_system_breadcrumb_alter(\Drupal\Core\Breadcrumb\Breadcrumb &$breadcrumb, \Drupal\Core\Routing\RouteMatchInterface $route_match, array $context) {
+function hook_system_breadcrumb_alter(Breadcrumb &$breadcrumb, RouteMatchInterface $route_match, array $context) {
   // Add an item to the end of the breadcrumb.
-  $breadcrumb->addLink(\Drupal\Core\Link::createFromRoute(t('Text'), 'example_route_name'));
+  $breadcrumb->addLink(Link::createFromRoute(t('Text'), 'example_route_name'));
 }
 
 /**

@@ -25,21 +25,21 @@ class FieldDiscovery implements FieldDiscoveryInterface {
   /**
    * The field plugin manager.
    *
-   * @var \Drupal\migrate_drupal\Plugin\MigrateFieldPluginManagerInterface
+   * @var MigrateFieldPluginManagerInterface
    */
   protected $fieldPluginManager;
 
   /**
    * The migration plugin manager.
    *
-   * @var \Drupal\migrate\Plugin\MigrationPluginManagerInterface
+   * @var MigrationPluginManagerInterface
    */
   protected $migrationPluginManager;
 
   /**
    * The logger channel service.
    *
-   * @var \Psr\Log\LoggerInterface
+   * @var LoggerInterface
    */
   protected $logger;
 
@@ -92,11 +92,11 @@ class FieldDiscovery implements FieldDiscoveryInterface {
   /**
    * Constructs a FieldDiscovery object.
    *
-   * @param \Drupal\migrate_drupal\Plugin\MigrateFieldPluginManagerInterface $field_plugin_manager
+   * @param MigrateFieldPluginManagerInterface $field_plugin_manager
    *   The field plugin manager.
-   * @param \Drupal\migrate\Plugin\MigrationPluginManagerInterface $migration_plugin_manager
+   * @param MigrationPluginManagerInterface $migration_plugin_manager
    *   The migration plugin manager.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   The logger channel service.
    */
   public function __construct(MigrateFieldPluginManagerInterface $field_plugin_manager, MigrationPluginManagerInterface $migration_plugin_manager, LoggerInterface $logger) {
@@ -168,13 +168,13 @@ class FieldDiscovery implements FieldDiscoveryInterface {
    *
    * @param string $field_type
    *   The field type.
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration to retrieve the plugin for.
    *
    * @return \Drupal\migrate_drupal\Plugin\MigrateFieldInterface|bool
    *   The appropriate field plugin to process this field type.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws PluginException
    * @throws \InvalidArgumentException
    */
   protected function getFieldPlugin($field_type, MigrationInterface $migration) {
@@ -271,7 +271,7 @@ class FieldDiscovery implements FieldDiscoveryInterface {
    * @param string $core
    *   The Drupal core version.
    *
-   * @return array|\Drupal\migrate\Plugin\MigrateSourceInterface
+   * @return array|MigrateSourceInterface
    *   The source plugin, or an empty array if none can be found that meets
    *   requirements.
    */
@@ -322,7 +322,7 @@ class FieldDiscovery implements FieldDiscoveryInterface {
   /**
    * Finds the core version of a Drupal migration.
    *
-   * @param \Drupal\migrate\Plugin\MigrationInterface $migration
+   * @param MigrationInterface $migration
    *   The migration.
    *
    * @return string|false

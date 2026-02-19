@@ -19,7 +19,7 @@ class MonkeysInTheControlRoom implements HttpKernelInterface {
   /**
    * The app kernel.
    *
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface
+   * @var HttpKernelInterface
    */
   protected $app;
 
@@ -31,9 +31,9 @@ class MonkeysInTheControlRoom implements HttpKernelInterface {
   /**
    * MonkeysInTheControlRoom constructor.
    *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $app
+   * @param HttpKernelInterface $app
    *   The wrapper HTTP kernel.
-   * @param \Drupal\Core\Site\Settings $settings
+   * @param Settings $settings
    *   The settings object.
    */
   public function __construct(HttpKernelInterface $app, Settings $settings) {

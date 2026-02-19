@@ -21,14 +21,14 @@ class Context implements ContextInterface {
   /**
    * The definition to which a context must conform.
    *
-   * @var \Drupal\Component\Plugin\Context\ContextDefinitionInterface
+   * @var ContextDefinitionInterface
    */
   protected $contextDefinition;
 
   /**
    * Create a context object.
    *
-   * @param \Drupal\Component\Plugin\Context\ContextDefinitionInterface $context_definition
+   * @param ContextDefinitionInterface $context_definition
    *   The context definition.
    * @param mixed|null $context_value
    *   The value of the context.

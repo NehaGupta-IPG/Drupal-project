@@ -36,14 +36,14 @@ class ComposerInspector implements LoggerAwareInterface {
   /**
    * The process output callback.
    *
-   * @var \Drupal\package_manager\ProcessOutputCallback
+   * @var ProcessOutputCallback
    */
   private ProcessOutputCallback $processCallback;
 
   /**
    * Statically cached installed package lists, keyed by directory.
    *
-   * @var \Drupal\package_manager\InstalledPackagesList[]
+   * @var InstalledPackagesList[]
    */
   private array $packageLists = [];
 
@@ -93,7 +93,7 @@ class ComposerInspector implements LoggerAwareInterface {
    * @param string $working_dir
    *   The directory to check.
    *
-   * @throws \Drupal\package_manager\Exception\ComposerNotReadyException
+   * @throws ComposerNotReadyException
    *   Thrown if:
    *   - `composer.json` doesn't exist in the given directory or is invalid
    *     according to `composer validate`.
@@ -280,7 +280,7 @@ class ComposerInspector implements LoggerAwareInterface {
    *   The working directory in which to run Composer. Should contain a
    *   `composer.lock` file.
    *
-   * @return \Drupal\package_manager\InstalledPackagesList
+   * @return InstalledPackagesList
    *   The installed packages list for the directory.
    *
    * @throws \UnexpectedValueException

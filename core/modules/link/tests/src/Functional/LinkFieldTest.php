@@ -44,14 +44,14 @@ class LinkFieldTest extends BrowserTestBase {
   /**
    * A field to use in this test class.
    *
-   * @var \Drupal\field\Entity\FieldStorageConfig
+   * @var FieldStorageConfig
    */
   protected $fieldStorage;
 
   /**
    * The instance used in this test class.
    *
-   * @var \Drupal\field\Entity\FieldConfig
+   * @var FieldConfig
    */
   protected $field;
 

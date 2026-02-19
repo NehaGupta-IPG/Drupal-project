@@ -168,7 +168,7 @@ class InlineBlockPrivateFilesTest extends InlineBlockTestBase {
   /**
    * Replaces the file in the block with another one.
    *
-   * @param \Drupal\file\FileInterface $file
+   * @param FileInterface $file
    *   The file entity.
    */
   protected function replaceFileInBlock(FileInterface $file): void {
@@ -188,7 +188,7 @@ class InlineBlockPrivateFilesTest extends InlineBlockTestBase {
    *
    * @param string $title
    *   The title field value.
-   * @param \Drupal\file\Entity\File $file
+   * @param File $file
    *   The file entity.
    */
   protected function addInlineFileBlockToLayout($title, File $file): void {
@@ -212,7 +212,7 @@ class InlineBlockPrivateFilesTest extends InlineBlockTestBase {
    * @param string $file_name
    *   The file name.
    *
-   * @return \Drupal\file\Entity\File
+   * @return File
    *   The file entity.
    */
   protected function createPrivateFile($file_name) {
@@ -232,7 +232,7 @@ class InlineBlockPrivateFilesTest extends InlineBlockTestBase {
   /**
    * Returns the href of a file, asserting it is accessible on the page.
    *
-   * @param \Drupal\file\FileInterface $file
+   * @param FileInterface $file
    *   The file entity.
    *
    * @return string
@@ -254,7 +254,7 @@ class InlineBlockPrivateFilesTest extends InlineBlockTestBase {
   /**
    * Gets the text secret for a file.
    *
-   * @param \Drupal\file\FileInterface $file
+   * @param FileInterface $file
    *   The file entity.
    *
    * @return string
@@ -267,7 +267,7 @@ class InlineBlockPrivateFilesTest extends InlineBlockTestBase {
   /**
    * Attaches a file to the block edit form.
    *
-   * @param \Drupal\file\FileInterface $file
+   * @param FileInterface $file
    *   The file to be attached.
    */
   protected function attachFileToBlockForm(FileInterface $file): void {

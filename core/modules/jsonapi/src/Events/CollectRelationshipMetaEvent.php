@@ -4,11 +4,11 @@ declare(strict_types = 1);
 
 namespace Drupal\jsonapi\Events;
 
+use Drupal\Component\EventDispatcher\Event;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\jsonapi\JsonApiResource\ResourceObject;
-use Drupal\Component\EventDispatcher\Event;
 
 /**
  * Event for collecting the relationship metadata of a JSON:API resource object.
@@ -33,7 +33,7 @@ final class CollectRelationshipMetaEvent extends Event implements RefinableCache
   /**
    * Constructs a new CollectRelationshipMetaEvent object.
    *
-   * @param \Drupal\jsonapi\JsonApiResource\ResourceObject $resourceObject
+   * @param ResourceObject $resourceObject
    *   The resource object.
    * @param string $relationshipFieldName
    *   The relationship field name.
@@ -46,7 +46,7 @@ final class CollectRelationshipMetaEvent extends Event implements RefinableCache
   /**
    * Gets the resource object.
    *
-   * @return \Drupal\jsonapi\JsonApiResource\ResourceObject
+   * @return ResourceObject
    *   The resource object.
    */
   public function getResourceObject(): ResourceObject {

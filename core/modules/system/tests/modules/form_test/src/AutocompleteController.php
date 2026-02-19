@@ -17,7 +17,7 @@ class AutocompleteController {
    * The delay is present so tests can make assertions on the "processing"
    * layout of autocompletion.
    *
-   * @return \Symfony\Component\HttpFoundation\JsonResponse
+   * @return JsonResponse
    *   A JSON response.
    */
   public function delayed_autocomplete() {

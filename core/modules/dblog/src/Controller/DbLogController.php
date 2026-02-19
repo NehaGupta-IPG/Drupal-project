@@ -5,8 +5,8 @@ namespace Drupal\dblog\Controller;
 use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
-use Drupal\Component\Utility\Xss;
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Component\Utility\Xss;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\PagerSelectExtender;
@@ -14,12 +14,12 @@ use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Database\Query\TableSortExtender;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Form\FormBuilderInterface;
+use Drupal\Core\Link;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Url;
+use Drupal\dblog\DbLogFilters;
 use Drupal\user\Entity\User;
 use Symfony\Component\HttpFoundation\Request;
-use Drupal\Core\Link;
-use Drupal\dblog\DbLogFilters;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -30,14 +30,14 @@ class DbLogController extends ControllerBase {
   /**
    * The database service.
    *
-   * @var \Drupal\Core\Database\Connection
+   * @var Connection
    */
   protected $database;
 
   /**
    * The date formatter service.
    *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
+   * @var DateFormatterInterface
    */
   protected $dateFormatter;
 
@@ -85,7 +85,7 @@ class DbLogController extends ControllerBase {
    * Messages are truncated at 56 chars.
    * Full-length messages can be viewed on the message details page.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
    * @return array
@@ -213,7 +213,7 @@ class DbLogController extends ControllerBase {
    *   If the ID is located in the Database Logging table, a build array in the
    *   format expected by \Drupal\Core\Render\RendererInterface::render().
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   * @throws NotFoundHttpException
    *   If no event found for the given ID.
    */
   public function eventDetails($event_id) {
@@ -299,9 +299,9 @@ class DbLogController extends ControllerBase {
    * applies them to the provided query object. If no filters are present, the
    * query is left unchanged.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
-   * @param \Drupal\Core\Database\Query\SelectInterface $query
+   * @param SelectInterface $query
    *   The database query.
    */
   protected function addFilterToQuery(Request $request, SelectInterface &$query): void {
@@ -348,7 +348,7 @@ class DbLogController extends ControllerBase {
    *   used in the message, the formatted backtrace will be assigned to a new
    *   backtrace property on the row object which can be displayed separately.
    *
-   * @return string|\Drupal\Core\StringTranslation\TranslatableMarkup|false
+   * @return string|TranslatableMarkup|false
    *   The formatted log message or FALSE if the message or variables properties
    *   are not set.
    */
@@ -391,7 +391,7 @@ class DbLogController extends ControllerBase {
    * @param string|null $uri
    *   The uri string to convert into link if valid.
    *
-   * @return \Drupal\Core\Link|string|null
+   * @return Link|string|null
    *   Return a Link object if the uri can be converted as a link. In case of
    *   empty uri or invalid, fallback to the provided $uri.
    */

@@ -20,17 +20,17 @@ interface ThemeInstallerInterface {
    * @return bool
    *   Whether any of the given themes have been installed.
    *
-   * @throws \Drupal\Core\Extension\ExtensionNameLengthException
+   * @throws ExtensionNameLengthException
    *   Thrown when a theme's name is longer than
    *   DRUPAL_EXTENSION_NAME_MAX_LENGTH.
    *
-   * @throws \Drupal\Core\Extension\ExtensionNameReservedException
+   * @throws ExtensionNameReservedException
    *   Thrown when a theme's name is already used by an installed module.
    *
-   * @throws \Drupal\Core\Extension\Exception\UnknownExtensionException
+   * @throws UnknownExtensionException
    *   Thrown when the theme does not exist.
    *
-   * @throws \Drupal\Core\Extension\MissingDependencyException
+   * @throws MissingDependencyException
    *   Thrown when a requested dependency can't be found.
    */
   public function install(array $theme_list, $install_dependencies = TRUE);

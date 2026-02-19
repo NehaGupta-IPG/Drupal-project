@@ -20,7 +20,7 @@ class LockTest extends KernelTestBase {
   /**
    * Database lock backend to test.
    *
-   * @var \Drupal\Core\Lock\DatabaseLockBackend
+   * @var DatabaseLockBackend
    */
   protected $lock;
 

@@ -6,9 +6,9 @@ namespace Drupal\display_variant_test\Plugin\DisplayVariant;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Display\Attribute\DisplayVariant;
-use Drupal\Core\Display\VariantBase;
-use Drupal\Core\Display\PageVariantInterface;
 use Drupal\Core\Display\ContextAwareVariantInterface;
+use Drupal\Core\Display\PageVariantInterface;
+use Drupal\Core\Display\VariantBase;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 /**
@@ -56,7 +56,7 @@ class TestDisplayVariant extends VariantBase implements PageVariantInterface, Co
   /**
    * Sets the contexts.
    *
-   * @param \Drupal\Component\Plugin\Context\ContextInterface[] $contexts
+   * @param ContextInterface[] $contexts
    *   An array of contexts, keyed by context name.
    *
    * @return $this

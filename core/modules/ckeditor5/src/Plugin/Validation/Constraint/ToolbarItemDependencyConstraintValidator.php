@@ -21,7 +21,7 @@ class ToolbarItemDependencyConstraintValidator extends ConstraintValidator imple
   /**
    * {@inheritdoc}
    *
-   * @throws \Symfony\Component\Validator\Exception\UnexpectedTypeException
+   * @throws UnexpectedTypeException
    *   Thrown when the given constraint is not supported by this validator.
    */
   public function validate($toolbar_item, Constraint $constraint): void {

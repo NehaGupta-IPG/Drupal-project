@@ -27,59 +27,59 @@ class SystemController extends ControllerBase {
   /**
    * System Manager Service.
    *
-   * @var \Drupal\system\SystemManager
+   * @var SystemManager
    */
   protected $systemManager;
 
   /**
    * The theme access checker service.
    *
-   * @var \Drupal\Core\Theme\ThemeAccessCheck
+   * @var ThemeAccessCheck
    */
   protected $themeAccess;
 
   /**
    * The form builder service.
    *
-   * @var \Drupal\Core\Form\FormBuilderInterface
+   * @var FormBuilderInterface
    */
   protected $formBuilder;
 
   /**
    * The menu link tree service.
    *
-   * @var \Drupal\Core\Menu\MenuLinkTreeInterface
+   * @var MenuLinkTreeInterface
    */
   protected $menuLinkTree;
 
   /**
    * The module extension list.
    *
-   * @var \Drupal\Core\Extension\ModuleExtensionList
+   * @var ModuleExtensionList
    */
   protected $moduleExtensionList;
 
   /**
    * The theme extension list.
    *
-   * @var \Drupal\Core\Extension\ThemeExtensionList
+   * @var ThemeExtensionList
    */
   protected ThemeExtensionList $themeExtensionList;
 
   /**
    * Constructs a new SystemController.
    *
-   * @param \Drupal\system\SystemManager $systemManager
+   * @param SystemManager $systemManager
    *   System manager service.
-   * @param \Drupal\Core\Theme\ThemeAccessCheck $theme_access
+   * @param ThemeAccessCheck $theme_access
    *   The theme access checker service.
-   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
+   * @param FormBuilderInterface $form_builder
    *   The form builder.
-   * @param \Drupal\Core\Menu\MenuLinkTreeInterface $menu_link_tree
+   * @param MenuLinkTreeInterface $menu_link_tree
    *   The menu link tree service.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $module_extension_list
+   * @param ModuleExtensionList $module_extension_list
    *   The module extension list.
-   * @param \Drupal\Core\Extension\ThemeExtensionList $theme_extension_list
+   * @param ThemeExtensionList $theme_extension_list
    *   The theme extension list.
    */
   public function __construct(

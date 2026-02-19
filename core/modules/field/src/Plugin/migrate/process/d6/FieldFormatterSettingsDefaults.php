@@ -3,8 +3,8 @@
 namespace Drupal\field\Plugin\migrate\process\d6;
 
 use Drupal\migrate\Attribute\MigrateProcess;
-use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\MigrateExecutableInterface;
+use Drupal\migrate\ProcessPluginBase;
 use Drupal\migrate\Row;
 
 /**
@@ -58,7 +58,7 @@ class FieldFormatterSettingsDefaults extends ProcessPluginBase {
    * @return array
    *   The correct default settings.
    *
-   * @throws \Drupal\migrate\MigrateException
+   * @throws MigrateException
    */
   protected function numberSettings($type, $format) {
     $map = [

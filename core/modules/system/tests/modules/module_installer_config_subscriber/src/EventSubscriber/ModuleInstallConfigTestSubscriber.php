@@ -27,7 +27,7 @@ class ModuleInstallConfigTestSubscriber implements EventSubscriberInterface {
   /**
    * Reacts to a test simple configuration object being installed.
    *
-   * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   * @param ConfigCrudEvent $event
    *   The ConfigCrudEvent to process.
    */
   public function onSave(ConfigCrudEvent $event): void {

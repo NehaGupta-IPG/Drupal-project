@@ -36,23 +36,23 @@ class Fast404ExceptionHtmlSubscriber extends HttpExceptionSubscriberBase {
   /**
    * The config factory.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
    * The cache tags invalidator.
    *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface
+   * @var CacheTagsInvalidatorInterface
    */
   protected $cacheTagsInvalidator;
 
   /**
    * Constructs a new Fast404ExceptionHtmlSubscriber.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param ConfigFactoryInterface $config_factory
    *   The configuration factory.
-   * @param \Drupal\Core\Cache\CacheTagsInvalidatorInterface $cache_tags_invalidator
+   * @param CacheTagsInvalidatorInterface $cache_tags_invalidator
    *   The cache tags invalidator.
    */
   public function __construct(ConfigFactoryInterface $config_factory, CacheTagsInvalidatorInterface $cache_tags_invalidator) {
@@ -79,7 +79,7 @@ class Fast404ExceptionHtmlSubscriber extends HttpExceptionSubscriberBase {
   /**
    * Handles a 404 error for HTML.
    *
-   * @param \Symfony\Component\HttpKernel\Event\ExceptionEvent $event
+   * @param ExceptionEvent $event
    *   The event to process.
    */
   public function on404(ExceptionEvent $event) {
@@ -108,7 +108,7 @@ class Fast404ExceptionHtmlSubscriber extends HttpExceptionSubscriberBase {
   /**
    * Invalidates 4xx-response cache tag if fast 404 config is changed.
    *
-   * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   * @param ConfigCrudEvent $event
    *   The configuration event.
    */
   public function onConfigSave(ConfigCrudEvent $event): void {

@@ -14,7 +14,7 @@ interface NodeStorageInterface extends ContentEntityStorageInterface {
   /**
    * Gets a list of node revision IDs for a specific node.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   The node entity.
    *
    * @return int[]
@@ -30,7 +30,7 @@ interface NodeStorageInterface extends ContentEntityStorageInterface {
   /**
    * Gets a list of revision IDs having a given user as node author.
    *
-   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param AccountInterface $account
    *   The user entity.
    *
    * @return int[]
@@ -46,7 +46,7 @@ interface NodeStorageInterface extends ContentEntityStorageInterface {
   /**
    * Counts the number of revisions in the default language.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param NodeInterface $node
    *   The node entity.
    *
    * @return int
@@ -80,7 +80,7 @@ interface NodeStorageInterface extends ContentEntityStorageInterface {
   /**
    * Unsets the language for all nodes with the given language.
    *
-   * @param \Drupal\Core\Language\LanguageInterface $language
+   * @param LanguageInterface $language
    *   The language object.
    */
   public function clearRevisionsLanguage(LanguageInterface $language);

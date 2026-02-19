@@ -23,7 +23,7 @@ class Endpoint {
   /**
    * The provider this endpoint belongs to.
    *
-   * @var \Drupal\media\OEmbed\Provider
+   * @var Provider
    */
   protected $provider;
 
@@ -55,7 +55,7 @@ class Endpoint {
    *
    * @param string $url
    *   The endpoint URL. May contain a "{format}" placeholder.
-   * @param \Drupal\media\OEmbed\Provider $provider
+   * @param Provider $provider
    *   The provider this endpoint belongs to.
    * @param string[] $schemes
    *   List of URL schemes supported by the provider.
@@ -102,7 +102,7 @@ class Endpoint {
   /**
    * Returns the provider this endpoint belongs to.
    *
-   * @return \Drupal\media\OEmbed\Provider
+   * @return Provider
    *   The provider object.
    */
   public function getProvider() {

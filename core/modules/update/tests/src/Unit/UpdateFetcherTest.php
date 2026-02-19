@@ -28,7 +28,7 @@ class UpdateFetcherTest extends UnitTestCase {
   /**
    * The update fetcher to use.
    *
-   * @var \Drupal\update\UpdateFetcher
+   * @var UpdateFetcher
    */
   protected $updateFetcher;
 
@@ -63,7 +63,7 @@ class UpdateFetcherTest extends UnitTestCase {
   /**
    * The logger.
    *
-   * @var \Psr\Log\LoggerInterface
+   * @var LoggerInterface
    */
   protected LoggerInterface $logger;
 
@@ -160,7 +160,7 @@ class UpdateFetcherTest extends UnitTestCase {
   /**
    * Mocks the HTTP client.
    *
-   * @param \GuzzleHttp\Psr7\Response ...$responses
+   * @param Response ...$responses
    *   Variable number of Response objects that the mocked client should return.
    */
   protected function mockClient(Response ...$responses): void {

@@ -257,7 +257,7 @@ class CommentValidationTest extends EntityKernelTestBase {
     $this->assertInstanceOf(Comment::class, $comment1);
 
     // Create a second published node.
-    /** @var \Drupal\node\Entity\Node $node2 */
+    /** @var Node $node2 */
     $node2 = $this->entityTypeManager->getStorage('node')->create([
       'type' => 'page',
       'title' => 'test 2',
@@ -286,7 +286,7 @@ class CommentValidationTest extends EntityKernelTestBase {
   /**
    * Verifies that a length violation exists for the given field.
    *
-   * @param \Drupal\comment\CommentInterface $comment
+   * @param CommentInterface $comment
    *   The comment object to validate.
    * @param string $field_name
    *   The field that violates the maximum length.

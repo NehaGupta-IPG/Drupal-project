@@ -19,7 +19,7 @@ interface WorkspaceHandlerInterface {
    * entity type can make to evaluate if a given entity is appropriate to be
    * tracked in a workspace.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity we may be tracking.
    *
    * @return bool

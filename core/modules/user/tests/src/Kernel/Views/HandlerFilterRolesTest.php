@@ -113,7 +113,7 @@ class HandlerFilterRolesTest extends UserKernelTestBase {
 
     $role = Role::create(['id' => 'test_user_role', 'label' => 'Test user role']);
     $role->save();
-    /** @var \Drupal\views\Entity\View $view */
+    /** @var View $view */
     $view = View::load('test_user_name');
     $display = &$view->getDisplay('default');
     $display['display_options']['filters']['roles_target_id'] = [

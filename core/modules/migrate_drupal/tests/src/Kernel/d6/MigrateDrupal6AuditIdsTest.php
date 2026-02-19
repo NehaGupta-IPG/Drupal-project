@@ -92,7 +92,7 @@ class MigrateDrupal6AuditIdsTest extends MigrateDrupal6TestBase {
     ];
 
     $results = (new IdAuditor())->auditMultiple($migrations);
-    /** @var \Drupal\migrate\Audit\AuditResult $result */
+    /** @var AuditResult $result */
     foreach ($results as $result) {
       $this->assertInstanceOf(AuditResult::class, $result);
       $this->assertTrue($result->passed());
@@ -110,7 +110,7 @@ class MigrateDrupal6AuditIdsTest extends MigrateDrupal6TestBase {
     // Audit all Drupal 6 migrations that support it. There should be no
     // conflicts since no content has been created.
     $results = (new IdAuditor())->auditMultiple($migrations);
-    /** @var \Drupal\migrate\Audit\AuditResult $result */
+    /** @var AuditResult $result */
     foreach ($results as $result) {
       $this->assertInstanceOf(AuditResult::class, $result);
       $this->assertTrue($result->passed());
@@ -182,7 +182,7 @@ class MigrateDrupal6AuditIdsTest extends MigrateDrupal6TestBase {
 
     // Audit the IDs of the d6_node_revision migration. There should be
     // conflicts since a draft revision has been created.
-    /** @var \Drupal\migrate\Audit\AuditResult $result */
+    /** @var AuditResult $result */
     $result = (new IdAuditor())->audit($this->getMigration('d6_node_revision:page'));
     $this->assertInstanceOf(AuditResult::class, $result);
     $this->assertFalse($result->passed());
@@ -202,7 +202,7 @@ class MigrateDrupal6AuditIdsTest extends MigrateDrupal6TestBase {
 
     // Audit the IDs of the d6_node migration. There should be conflicts
     // even though the new node is not accessible.
-    /** @var \Drupal\migrate\Audit\AuditResult $result */
+    /** @var AuditResult $result */
     $result = (new IdAuditor())->audit($this->getMigration('d6_node:page'));
     $this->assertInstanceOf(AuditResult::class, $result);
     $this->assertFalse($result->passed());

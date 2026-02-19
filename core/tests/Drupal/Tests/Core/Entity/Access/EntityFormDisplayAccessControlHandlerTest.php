@@ -41,28 +41,28 @@ class EntityFormDisplayAccessControlHandlerTest extends UnitTestCase {
   /**
    * The mock module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The mock account without field storage config access.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $anon;
 
   /**
    * The mock account with EntityFormDisplay access.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $member;
 
   /**
    * The mock account with EntityFormDisplay access via parent access check.
    *
-   * @var \Drupal\Core\Session\AccountInterface
+   * @var AccountInterface
    */
   protected $parentMember;
 
@@ -76,7 +76,7 @@ class EntityFormDisplayAccessControlHandlerTest extends UnitTestCase {
   /**
    * Returns a mock Entity Type Manager.
    *
-   * @return \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @return EntityTypeManagerInterface
    *   The mocked entity type manager.
    */
   protected function getEntityTypeManager() {
@@ -201,7 +201,7 @@ class EntityFormDisplayAccessControlHandlerTest extends UnitTestCase {
    *
    * @param array $allow_operations
    *   A list of allowed operations.
-   * @param \Drupal\Core\Session\AccountInterface $user
+   * @param AccountInterface $user
    *   The account to use for get access.
    *
    * @internal

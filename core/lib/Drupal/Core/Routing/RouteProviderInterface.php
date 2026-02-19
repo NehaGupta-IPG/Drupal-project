@@ -26,7 +26,7 @@ interface RouteProviderInterface {
    * very large route sets to be filtered down to likely candidates, which
    * may then be filtered in memory more completely.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   A request against which to match.
    *
    * @return \Symfony\Component\Routing\RouteCollection
@@ -44,7 +44,7 @@ interface RouteProviderInterface {
    * @return \Symfony\Component\Routing\Route
    *   The Symfony route object.
    *
-   * @throws \Symfony\Component\Routing\Exception\RouteNotFoundException
+   * @throws RouteNotFoundException
    *   If a matching route cannot be found.
    */
   public function getRouteByName($name);
@@ -69,7 +69,7 @@ interface RouteProviderInterface {
    *   The list of names to retrieve, In case of null, the provider will
    *   determine what routes to return.
    *
-   * @return \Symfony\Component\Routing\Route|\Symfony\Component\Routing\Alias[]
+   * @return \Symfony\Component\Routing\Route|Alias[]
    *   Iterable list with the keys being the names from the $names array
    */
   public function getRoutesByNames($names);
@@ -113,7 +113,7 @@ interface RouteProviderInterface {
    * @param string $route_name
    *   The route name.
    *
-   * @return iterable<\Symfony\Component\Routing\Alias>
+   * @return iterable<Alias>
    *   Iterable list of aliases for the given route name.
    */
   public function getRouteAliases(string $route_name): iterable;

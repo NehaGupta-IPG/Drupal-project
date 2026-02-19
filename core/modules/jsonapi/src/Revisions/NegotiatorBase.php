@@ -19,14 +19,14 @@ abstract class NegotiatorBase implements VersionNegotiatorInterface {
   /**
    * The entity type manager to load the revision.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * Constructs a version negotiator instance.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager) {
@@ -36,7 +36,7 @@ abstract class NegotiatorBase implements VersionNegotiatorInterface {
   /**
    * Gets the revision ID.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity.
    * @param string $version_argument
    *   A value used to derive a revision ID for the given entity.
@@ -44,9 +44,9 @@ abstract class NegotiatorBase implements VersionNegotiatorInterface {
    * @return int
    *   The revision ID.
    *
-   * @throws \Drupal\jsonapi\Revisions\VersionNotFoundException
+   * @throws VersionNotFoundException
    *   When the revision does not exist.
-   * @throws \Drupal\jsonapi\Revisions\InvalidVersionIdentifierException
+   * @throws InvalidVersionIdentifierException
    *   When the revision ID is not valid.
    */
   abstract protected function getRevisionId(EntityInterface $entity, $version_argument);
@@ -61,17 +61,17 @@ abstract class NegotiatorBase implements VersionNegotiatorInterface {
   /**
    * Loads an entity revision.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity for which to load a revision.
    * @param int $revision_id
    *   The revision ID to be loaded.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|null
+   * @return EntityInterface|null
    *   The revision or NULL if the revision does not exists.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws PluginNotFoundException
    *   Thrown if the entity type doesn't exist.
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws InvalidPluginDefinitionException
    *   Thrown if the storage handler couldn't be loaded.
    */
   protected function loadRevision(EntityInterface $entity, $revision_id) {
@@ -87,13 +87,13 @@ abstract class NegotiatorBase implements VersionNegotiatorInterface {
   /**
    * Helper method that ensures that a version exists.
    *
-   * @param int|\Drupal\Core\Entity\EntityInterface $revision
+   * @param int|EntityInterface $revision
    *   A revision ID, or NULL if one was not found.
    *
-   * @return int|\Drupal\Core\Entity\EntityInterface
+   * @return int|EntityInterface
    *   A revision or revision ID, if one was found.
    *
-   * @throws \Drupal\jsonapi\Revisions\VersionNotFoundException
+   * @throws VersionNotFoundException
    *   Thrown if the given value is NULL, meaning the requested version was not
    *   found.
    */

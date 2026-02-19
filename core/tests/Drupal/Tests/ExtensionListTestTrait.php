@@ -18,7 +18,7 @@ trait ExtensionListTestTrait {
    * @return string
    *   The Drupal-root relative path to the module directory.
    *
-   * @throws \Drupal\Core\Extension\Exception\UnknownExtensionException
+   * @throws UnknownExtensionException
    *   If the module does not exist.
    */
   protected function getModulePath(string $module_name): string {
@@ -34,7 +34,7 @@ trait ExtensionListTestTrait {
    * @return string
    *   The Drupal-root relative path to the theme directory.
    *
-   * @throws \Drupal\Core\Extension\Exception\UnknownExtensionException
+   * @throws UnknownExtensionException
    *   If the theme does not exist.
    */
   protected function getThemePath(string $theme_name): string {

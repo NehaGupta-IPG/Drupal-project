@@ -23,21 +23,21 @@ class RedirectDestinationTest extends UnitTestCase {
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * The mocked URL generator.
    *
-   * @var \Drupal\Core\Routing\UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Routing\UrlGeneratorInterface|MockObject
    */
   protected $urlGenerator;
 
   /**
    * The tested redirect destination.
    *
-   * @var \Drupal\Core\Routing\RedirectDestination
+   * @var RedirectDestination
    */
   protected $redirectDestination;
 
@@ -68,7 +68,7 @@ class RedirectDestinationTest extends UnitTestCase {
   /**
    * Tests destination passed via $_GET.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request to test.
    * @param string $expected_destination
    *   The expected destination.

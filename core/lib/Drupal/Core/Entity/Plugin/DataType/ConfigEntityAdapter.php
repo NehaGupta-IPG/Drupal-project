@@ -21,7 +21,7 @@ class ConfigEntityAdapter extends EntityAdapter {
   /**
    * The typed config manager.
    *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface
+   * @var TypedConfigManagerInterface
    */
   protected $typedConfigManager;
 
@@ -82,7 +82,7 @@ class ConfigEntityAdapter extends EntityAdapter {
   /**
    * Gets the typed config manager.
    *
-   * @return \Drupal\Core\Config\TypedConfigManagerInterface
+   * @return TypedConfigManagerInterface
    *   The typed config manager.
    */
   protected function getTypedConfigManager() {

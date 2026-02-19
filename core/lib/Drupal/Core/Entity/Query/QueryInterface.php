@@ -37,7 +37,7 @@ interface QueryInterface extends AlterableInterface {
    *     ->execute();
    * @endcode
    *
-   * @param string|\Drupal\Core\Entity\Query\ConditionInterface $field
+   * @param string|ConditionInterface $field
    *   Name of the field being queried or an instance of ConditionInterface.
    *   In the case of the name, it must contain a field name, optionally
    *   followed by a column name. The column can be the reference property,
@@ -84,6 +84,33 @@ interface QueryInterface extends AlterableInterface {
    *   The meaning of each element in the array is dependent on $operator.
    *   Defaults to NULL, for most operators (except: 'IS NULL', 'IS NOT NULL')
    *   it always makes the condition false.
+   * @param string|null $operator
+   *   (optional) The comparison operator. Possible values:
+   *   - '=', '<>', '>', '>=', '<', '<=', 'STARTS_WITH', 'CONTAINS',
+   *     'ENDS_WITH': These operators expect $value to be a literal of the
+   *     same type as the column.
+   *   - 'IN', 'NOT IN': These operators expect $value to be an array of
+   *     literals of the same type as the column.
+   *   - 'IS NULL', 'IS NOT NULL': These operators ignore $value, for that
+   *     reason it is recommended to use a $value of NULL for clarity.
+   *   - 'BETWEEN', 'NOT BETWEEN': These operators expect $value to be an array
+   *     of two literals of the same type as the column.
+   *   If NULL, defaults to the '=' operator.
+   * @param string|null $langcode
+   *   (optional) The language code allows filtering results by specific
+   *   language. If two or more conditions omit the langcode within
+   *   one condition group then they are presumed to apply to the same
+   *   translation. If within one condition group one condition has a langcode
+   *   and another does not they are not presumed to apply to the same
+   *   translation. If omitted (NULL), any translation satisfies the condition.
+   *
+   * @return $this
+   *
+   * @see \Drupal\Core\Entity\Query\QueryInterface::andConditionGroup()
+   * @see \Drupal\Core\Entity\Query\QueryInterface::orConditionGroup()
+   * @see \Drupal\Core\Entity\Query\ConditionInterface
+   * @see \Drupal\Core\Entity\Query\QueryInterface::exists()
+   * @see \Drupal\Core\Entity\Query\QueryInterface::notExists()
    * @param string|null $operator
    *   (optional) The comparison operator. Possible values:
    *   - '=', '<>', '>', '>=', '<', '<=', 'STARTS_WITH', 'CONTAINS',
@@ -251,7 +278,7 @@ interface QueryInterface extends AlterableInterface {
    *   $entity_ids = $query->execute();
    * @endcode
    *
-   * @return \Drupal\Core\Entity\Query\ConditionInterface
+   * @return ConditionInterface
    *   A condition object whose conditions will be combined with AND.
    */
   public function andConditionGroup();
@@ -280,7 +307,7 @@ interface QueryInterface extends AlterableInterface {
    *     ->execute();
    * @endcode
    *
-   * @return \Drupal\Core\Entity\Query\ConditionInterface
+   * @return ConditionInterface
    *   A condition object whose conditions will be combined with OR.
    */
   public function orConditionGroup();

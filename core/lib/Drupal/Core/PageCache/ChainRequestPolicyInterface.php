@@ -10,7 +10,7 @@ interface ChainRequestPolicyInterface extends RequestPolicyInterface {
   /**
    * Add a policy to the list of policy rules.
    *
-   * @param \Drupal\Core\PageCache\RequestPolicyInterface $policy
+   * @param RequestPolicyInterface $policy
    *   The request policy rule to add.
    *
    * @return $this

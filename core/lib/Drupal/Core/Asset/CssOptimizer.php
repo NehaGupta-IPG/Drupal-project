@@ -3,8 +3,8 @@
 namespace Drupal\Core\Asset;
 
 use Drupal\Component\Utility\Unicode;
-use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\File\FileUrlGeneratorInterface;
+use Drupal\Core\StreamWrapper\StreamWrapperManager;
 
 /**
  * Optimizes a CSS asset.
@@ -21,14 +21,14 @@ class CssOptimizer implements AssetOptimizerInterface {
   /**
    * The file URL generator.
    *
-   * @var \Drupal\Core\File\FileUrlGeneratorInterface
+   * @var FileUrlGeneratorInterface
    */
   protected $fileUrlGenerator;
 
   /**
    * Constructs a CssOptimizer.
    *
-   * @param \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator
+   * @param FileUrlGeneratorInterface $file_url_generator
    *   The file URL generator.
    */
   public function __construct(FileUrlGeneratorInterface $file_url_generator) {

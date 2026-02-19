@@ -272,7 +272,7 @@ class PreviewTest extends WebDriverTestBase {
   /**
    * Click on a preview link.
    *
-   * @param \Behat\Mink\Element\NodeElement $element
+   * @param NodeElement $element
    *   The element to click.
    * @param int $row_count
    *   The expected number of rows in the preview.
@@ -299,7 +299,7 @@ class PreviewTest extends WebDriverTestBase {
   /**
    * Asserts that an element has a given class.
    *
-   * @param \Behat\Mink\Element\NodeElement $element
+   * @param NodeElement $element
    *   The element to test.
    * @param string $class
    *   The class to assert.

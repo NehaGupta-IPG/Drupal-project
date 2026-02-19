@@ -60,7 +60,7 @@ class Resource implements CacheableDependencyInterface {
   /**
    * The resource provider.
    *
-   * @var \Drupal\media\OEmbed\Provider
+   * @var Provider
    */
   protected $provider;
 
@@ -152,7 +152,7 @@ class Resource implements CacheableDependencyInterface {
   /**
    * Resource constructor.
    *
-   * @param \Drupal\media\OEmbed\Provider $provider
+   * @param Provider $provider
    *   (optional) The resource provider.
    * @param string $title
    *   (optional) A text title, describing the resource.
@@ -197,7 +197,7 @@ class Resource implements CacheableDependencyInterface {
    *
    * @param string $url
    *   (optional) The URL of the resource.
-   * @param \Drupal\media\OEmbed\Provider $provider
+   * @param Provider $provider
    *   (optional) The resource provider.
    * @param string $title
    *   (optional) A text title, describing the resource.
@@ -237,7 +237,7 @@ class Resource implements CacheableDependencyInterface {
    *   The width of the photo, in pixels.
    * @param int $height
    *   (optional) The height of the photo, in pixels.
-   * @param \Drupal\media\OEmbed\Provider $provider
+   * @param Provider $provider
    *   (optional) The resource provider.
    * @param string $title
    *   (optional) A text title, describing the resource.
@@ -281,7 +281,7 @@ class Resource implements CacheableDependencyInterface {
    *   The width of the resource, in pixels.
    * @param int $height
    *   (optional) The height of the resource, in pixels.
-   * @param \Drupal\media\OEmbed\Provider $provider
+   * @param Provider $provider
    *   (optional) The resource provider.
    * @param string $title
    *   (optional) A text title, describing the resource.
@@ -326,7 +326,7 @@ class Resource implements CacheableDependencyInterface {
    *   The width of the video, in pixels.
    * @param int $height
    *   (optional) The height of the video, in pixels.
-   * @param \Drupal\media\OEmbed\Provider $provider
+   * @param Provider $provider
    *   (optional) The resource provider.
    * @param string $title
    *   (optional) A text title, describing the resource.
@@ -389,7 +389,7 @@ class Resource implements CacheableDependencyInterface {
   /**
    * Returns the URL of the resource author.
    *
-   * @return \Drupal\Core\Url|null
+   * @return Url|null
    *   The absolute URL of the resource author, or NULL if none is provided.
    */
   public function getAuthorUrl() {
@@ -399,7 +399,7 @@ class Resource implements CacheableDependencyInterface {
   /**
    * Returns the resource provider, if known.
    *
-   * @return \Drupal\media\OEmbed\Provider|null
+   * @return Provider|null
    *   The resource provider, or NULL if the provider is not known.
    */
   public function getProvider() {
@@ -409,7 +409,7 @@ class Resource implements CacheableDependencyInterface {
   /**
    * Returns the URL of the resource's thumbnail image.
    *
-   * @return \Drupal\Core\Url|null
+   * @return Url|null
    *   The absolute URL of the thumbnail image, or NULL if there isn't one.
    */
   public function getThumbnailUrl() {
@@ -461,7 +461,7 @@ class Resource implements CacheableDependencyInterface {
   /**
    * Returns the URL of the resource. Only applies to 'photo' resources.
    *
-   * @return \Drupal\Core\Url|null
+   * @return Url|null
    *   The resource URL, if it has one.
    */
   public function getUrl() {

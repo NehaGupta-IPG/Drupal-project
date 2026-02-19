@@ -14,9 +14,9 @@ class ConfirmFormHelper {
   /**
    * Builds the cancel link for a confirmation form.
    *
-   * @param \Drupal\Core\Form\ConfirmFormInterface $form
+   * @param ConfirmFormInterface $form
    *   The confirmation form.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request.
    *
    * @return array

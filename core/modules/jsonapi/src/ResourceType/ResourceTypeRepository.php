@@ -17,8 +17,8 @@ use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Logger\LoggerChannelTrait;
 use Drupal\Core\TypedData\DataReferenceTargetDefinition;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Provides a repository of all JSON:API resource types.
@@ -47,35 +47,35 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
   /**
    * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   * @var EntityTypeManagerInterface
    */
   protected $entityTypeManager;
 
   /**
    * The bundle manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   * @var EntityTypeBundleInfoInterface
    */
   protected $entityTypeBundleInfo;
 
   /**
    * The entity field manager.
    *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   * @var EntityFieldManagerInterface
    */
   protected $entityFieldManager;
 
   /**
    * The cache backend.
    *
-   * @var \Drupal\Core\Cache\CacheBackendInterface
+   * @var CacheBackendInterface
    */
   protected $cache;
 
   /**
    * The event dispatcher.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+   * @var EventDispatcherInterface
    */
   protected $eventDispatcher;
 
@@ -97,15 +97,15 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
   /**
    * Instantiates a ResourceTypeRepository object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_bundle_info
+   * @param EntityTypeBundleInfoInterface $entity_bundle_info
    *   The entity type bundle info service.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @param EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The cache backend.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher
+   * @param EventDispatcherInterface $dispatcher
    *   The event dispatcher.
    */
   public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $entity_bundle_info, EntityFieldManagerInterface $entity_field_manager, CacheBackendInterface $cache, EventDispatcherInterface $dispatcher) {
@@ -147,12 +147,12 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
   /**
    * Creates a ResourceType value object for the given entity type + bundle.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type to create a JSON:API resource type for.
    * @param string $bundle
    *   The entity type bundle to create a JSON:API resource type for.
    *
-   * @return \Drupal\jsonapi\ResourceType\ResourceType
+   * @return ResourceType
    *   A JSON:API resource type.
    */
   protected function createResourceType(EntityTypeInterface $entity_type, $bundle) {
@@ -215,12 +215,12 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
    *
    * @param string[] $field_names
    *   All field names on a bundle of the given entity type.
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type for which to get the field mapping.
    * @param string $bundle
    *   The bundle to assess.
    *
-   * @return \Drupal\jsonapi\ResourceType\ResourceTypeField[]
+   * @return ResourceTypeField[]
    *   An array of JSON:API resource type fields keyed by internal field names.
    */
   protected function getFields(array $field_names, EntityTypeInterface $entity_type, $bundle) {
@@ -287,9 +287,9 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
     // With all fields now aliased, detect any conflicts caused by the
     // automatically generated aliases above.
     foreach (array_intersect($reserved_field_names, array_keys($fields)) as $reserved_field_name) {
-      /** @var \Drupal\jsonapi\ResourceType\ResourceTypeField $aliased_reserved_field */
+      /** @var ResourceTypeField $aliased_reserved_field */
       $aliased_reserved_field = $fields[$reserved_field_name];
-      /** @var \Drupal\jsonapi\ResourceType\ResourceTypeField $field */
+      /** @var ResourceTypeField $field */
       foreach (array_diff_key($fields, array_flip([$reserved_field_name])) as $field) {
         if ($aliased_reserved_field->getPublicName() === $field->getPublicName()) {
           throw new \LogicException("The generated alias '{$aliased_reserved_field->getPublicName()}' for field name '{$aliased_reserved_field->getInternalName()}' conflicts with an existing field. Report this in the JSON:API issue queue!");
@@ -312,7 +312,7 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
   /**
    * Gets all field names for a given entity type and bundle.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type for which to get all field names.
    * @param string $bundle
    *   The bundle for which to get all field names.
@@ -347,7 +347,7 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
   /**
    * Whether an entity type + bundle maps to a mutable resource type.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type to assess.
    * @param string $bundle
    *   The bundle to assess.
@@ -363,7 +363,7 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
   /**
    * Whether an entity type + bundle maps to a locatable resource type.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type to assess.
    * @param string $bundle
    *   The bundle to assess.
@@ -379,7 +379,7 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
   /**
    * Whether an entity type is a versionable resource type.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type to assess.
    *
    * @return bool
@@ -394,9 +394,9 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
    *
    * This method has no affect after being called once.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType $resource_type
+   * @param ResourceType $resource_type
    *   The resource type repository.
-   * @param \Drupal\jsonapi\ResourceType\ResourceType[] $resource_types
+   * @param ResourceType[] $resource_types
    *   A list of JSON:API resource types.
    *
    * @return array
@@ -429,13 +429,13 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
   /**
    * Get relatable resource types from a field definition.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition from which to calculate relatable JSON:API resource
    *   types.
-   * @param \Drupal\jsonapi\ResourceType\ResourceType[] $resource_types
+   * @param ResourceType[] $resource_types
    *   A list of JSON:API resource types.
    *
-   * @return \Drupal\jsonapi\ResourceType\ResourceType[]
+   * @return ResourceType[]
    *   The JSON:API resource types with which the given field may have a
    *   relationship.
    */
@@ -475,7 +475,7 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
   /**
    * Determines if a given field definition is a reference field.
    *
-   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   * @param FieldDefinitionInterface $field_definition
    *   The field definition to inspect.
    *
    * @return bool
@@ -517,14 +517,14 @@ class ResourceTypeRepository implements ResourceTypeRepositoryInterface {
   /**
    * Lookup a resource type by entity type ID and bundle name.
    *
-   * @param \Drupal\jsonapi\ResourceType\ResourceType[] $resource_types
+   * @param ResourceType[] $resource_types
    *   The list of resource types to do a lookup.
    * @param string $entity_type_id
    *   The entity type of a seekable resource type.
    * @param string $bundle
    *   The entity bundle of a seekable resource type.
    *
-   * @return \Drupal\jsonapi\ResourceType\ResourceType|null
+   * @return ResourceType|null
    *   The resource type or NULL if one cannot be found.
    */
   protected static function lookupResourceType(array $resource_types, $entity_type_id, $bundle) {

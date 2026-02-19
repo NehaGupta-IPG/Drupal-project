@@ -17,14 +17,14 @@ abstract class LanguageFormBase extends EntityForm {
   /**
    * The configurable language manager.
    *
-   * @var \Drupal\language\ConfigurableLanguageManagerInterface
+   * @var ConfigurableLanguageManagerInterface
    */
   protected $languageManager;
 
   /**
    * Constructs a ContentEntityForm object.
    *
-   * @param \Drupal\language\ConfigurableLanguageManagerInterface $language_manager
+   * @param ConfigurableLanguageManagerInterface $language_manager
    *   The configurable language manager.
    */
   public function __construct(ConfigurableLanguageManagerInterface $language_manager) {

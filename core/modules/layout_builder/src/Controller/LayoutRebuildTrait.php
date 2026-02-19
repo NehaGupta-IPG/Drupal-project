@@ -15,10 +15,10 @@ trait LayoutRebuildTrait {
   /**
    * Rebuilds the layout.
    *
-   * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
+   * @param SectionStorageInterface $section_storage
    *   The section storage.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   An AJAX response to either rebuild the layout and close the dialog, or
    *   reload the page.
    */
@@ -31,10 +31,10 @@ trait LayoutRebuildTrait {
   /**
    * Rebuilds the layout.
    *
-   * @param \Drupal\layout_builder\SectionStorageInterface $section_storage
+   * @param SectionStorageInterface $section_storage
    *   The section storage.
    *
-   * @return \Drupal\Core\Ajax\AjaxResponse
+   * @return AjaxResponse
    *   An AJAX response to either rebuild the layout and close the dialog, or
    *   reload the page.
    */

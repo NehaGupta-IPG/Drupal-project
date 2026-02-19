@@ -30,7 +30,7 @@ class UpdateHookRegistry {
   /**
    * The system.schema key value storage.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface
+   * @var KeyValueStoreInterface
    */
   protected $keyValue;
 
@@ -45,7 +45,7 @@ class UpdateHookRegistry {
    *     equivalent.
    *   - 'future_version_string': The version that provides the future update.
    *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface
+   * @var KeyValueStoreInterface
    * @see module.api.php
    */
   protected KeyValueStoreInterface $equivalentUpdates;
@@ -76,7 +76,7 @@ class UpdateHookRegistry {
    *
    * @param array $module_list
    *   An associative array whose keys are the names of installed modules.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $key_value_factory
+   * @param KeyValueFactoryInterface $key_value_factory
    *   The key value factory.
    */
   public function __construct(
@@ -194,7 +194,7 @@ class UpdateHookRegistry {
    * - A 2.x hook_update_N() would be added as normal, for example:
    *   MODULE_update_2005().
    * - When that same update is backported to 1.x, it is given its own update
-   *   number, for example: MODULE_update_1040(). In this update, a call to
+   *   number, for example: MODULE_update_1040(). In this update, a call to.
    *   @code
    *   \Drupal::service('update.update_hook_registry')->markFutureUpdateEquivalent(2005, '2.10')
    *   @endcode
@@ -237,7 +237,7 @@ class UpdateHookRegistry {
    *   The update to check. If this is NULL the update to check will
    *   be determined from the backtrace.
    *
-   * @return \Drupal\Core\Update\EquivalentUpdate|null
+   * @return EquivalentUpdate|null
    *   A value object with the equivalent update information or NULL if the
    *   update does not have an equivalent update.
    */

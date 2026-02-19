@@ -30,7 +30,7 @@ class ModuleHandler implements ModuleHandlerInterface {
   /**
    * Installed modules, as extension objects keyed by module name.
    *
-   * @var array<string, \Drupal\Core\Extension\Extension>
+   * @var array<string, Extension>
    */
   protected $moduleList;
 
@@ -63,7 +63,7 @@ class ModuleHandler implements ModuleHandlerInterface {
   /**
    * Implementation lists by hook name.
    *
-   * @var array<string, \Drupal\Core\Hook\ImplementationList>
+   * @var array<string, ImplementationList>
    */
   protected array $hookImplementationLists = [];
 
@@ -84,7 +84,7 @@ class ModuleHandler implements ModuleHandlerInterface {
   /**
    * Ordering rules by hook name.
    *
-   * @var array<string, list<\Drupal\Core\Hook\OrderOperation\OrderOperation>>
+   * @var array<string, list<OrderOperation>>
    */
   protected array $orderingRules = [];
 
@@ -97,11 +97,11 @@ class ModuleHandler implements ModuleHandlerInterface {
    *   An associative array whose keys are the names of installed modules and
    *   whose values are Extension class parameters. This is normally the
    *   %container.modules% parameter being set up by DrupalKernel.
-   * @param \Drupal\Core\KeyValueStore\KeyValueFactoryInterface $keyValueFactory
+   * @param KeyValueFactoryInterface $keyValueFactory
    *   The key value factory.
-   * @param \Drupal\Core\Utility\CallableResolver $callableResolver
+   * @param CallableResolver $callableResolver
    *   The callable resolver.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   * @param CacheBackendInterface $cache
    *   The bootstrap cache.
    *
    * @see \Drupal\Core\DrupalKernel
@@ -419,10 +419,10 @@ class ModuleHandler implements ModuleHandlerInterface {
    */
   protected function getCombinedListeners(array $hooks): array {
     // Get implementation lists for each hook.
-    /** @var list<\Drupal\Core\Hook\ImplementationList> $lists */
+    /** @var list<ImplementationList> $lists */
     $lists = array_map($this->getHookImplementationList(...), $hooks);
     // Remove empty lists.
-    /** @var array<int, \Drupal\Core\Hook\ImplementationList> $lists */
+    /** @var array<int, ImplementationList> $lists */
     $lists = array_filter($lists, fn (ImplementationList $list) => $list->hasImplementations());
     if (!$lists) {
       // No implementations exist.
@@ -544,7 +544,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    * @param string $hook
    *   Hook name.
    *
-   * @return list<\Drupal\Core\Hook\OrderOperation\OrderOperation>
+   * @return list<OrderOperation>
    *   List of order operations for the hook.
    */
   protected function getHookOrderingRules(string $hook): array {
@@ -628,7 +628,7 @@ class ModuleHandler implements ModuleHandlerInterface {
    * @param string $hook
    *   The hook name.
    *
-   * @return \Drupal\Core\Hook\ImplementationList
+   * @return ImplementationList
    *   Object with hook implementation callbacks and their modules.
    */
   protected function getHookImplementationList(string $hook): ImplementationList {

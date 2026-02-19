@@ -2,8 +2,8 @@
 
 namespace Drupal\comment;
 
-use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 
 /**
  * Provides an interface for storing and retrieving comment statistics.
@@ -24,7 +24,7 @@ interface CommentStatisticsInterface {
   /**
    * Read comment statistics records for an array of entities.
    *
-   * @param \Drupal\Core\Entity\EntityInterface[] $entities
+   * @param EntityInterface[] $entities
    *   Array of entities on which commenting is enabled, keyed by id.
    * @param string $entity_type
    *   The entity type of the passed entities.
@@ -40,7 +40,7 @@ interface CommentStatisticsInterface {
   /**
    * Delete comment statistics records for an entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
+   * @param EntityInterface $entity
    *   The entity for which comment statistics should be deleted.
    */
   public function delete(EntityInterface $entity);
@@ -48,7 +48,7 @@ interface CommentStatisticsInterface {
   /**
    * Update or insert comment statistics records after a comment is added.
    *
-   * @param \Drupal\comment\CommentInterface $comment
+   * @param CommentInterface $comment
    *   The comment added or updated.
    */
   public function update(CommentInterface $comment);
@@ -71,7 +71,7 @@ interface CommentStatisticsInterface {
   /**
    * Insert an empty record for the given entity.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The created entity for which a statistics record is to be initialized.
    * @param array $fields
    *   Array of comment field definitions for the given entity.

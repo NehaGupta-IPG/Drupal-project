@@ -17,21 +17,21 @@ class BlockContentController extends ControllerBase {
   /**
    * The content block storage.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var EntityStorageInterface
    */
   protected $blockContentStorage;
 
   /**
    * The content block type storage.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var EntityStorageInterface
    */
   protected $blockContentTypeStorage;
 
   /**
    * The theme handler.
    *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
+   * @var ThemeHandlerInterface
    */
   protected $themeHandler;
 
@@ -50,11 +50,11 @@ class BlockContentController extends ControllerBase {
   /**
    * Constructs a BlockContent object.
    *
-   * @param \Drupal\Core\Entity\EntityStorageInterface $block_content_storage
+   * @param EntityStorageInterface $block_content_storage
    *   The content block storage.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $block_content_type_storage
+   * @param EntityStorageInterface $block_content_type_storage
    *   The block type storage.
-   * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
+   * @param ThemeHandlerInterface $theme_handler
    *   The theme handler.
    */
   public function __construct(EntityStorageInterface $block_content_storage, EntityStorageInterface $block_content_type_storage, ThemeHandlerInterface $theme_handler) {
@@ -66,9 +66,9 @@ class BlockContentController extends ControllerBase {
   /**
    * Presents the content block creation form.
    *
-   * @param \Drupal\block_content\BlockContentTypeInterface $block_content_type
+   * @param BlockContentTypeInterface $block_content_type
    *   The block type to add.
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The current request object.
    *
    * @return array
@@ -91,7 +91,7 @@ class BlockContentController extends ControllerBase {
   /**
    * Provides the page title for this controller.
    *
-   * @param \Drupal\block_content\BlockContentTypeInterface $block_content_type
+   * @param BlockContentTypeInterface $block_content_type
    *   The block type being added.
    *
    * @return string

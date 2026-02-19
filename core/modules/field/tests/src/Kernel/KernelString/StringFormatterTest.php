@@ -58,7 +58,7 @@ class StringFormatterTest extends KernelTestBase {
   protected $fieldName;
 
   /**
-   * @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface
+   * @var EntityViewDisplayInterface
    */
   protected $display;
 
@@ -108,9 +108,9 @@ class StringFormatterTest extends KernelTestBase {
   /**
    * Renders fields of a given entity with a given display.
    *
-   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   * @param FieldableEntityInterface $entity
    *   The entity object with attached fields to render.
-   * @param \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display
+   * @param EntityViewDisplayInterface $display
    *   The display to render the fields in.
    *
    * @return string

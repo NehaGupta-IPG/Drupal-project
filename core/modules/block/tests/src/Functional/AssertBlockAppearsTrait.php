@@ -16,7 +16,7 @@ trait AssertBlockAppearsTrait {
   /**
    * Checks to see whether a block appears on the page.
    *
-   * @param \Drupal\block\Entity\Block $block
+   * @param Block $block
    *   The block entity to find on the page.
    */
   protected function assertBlockAppears(Block $block) {
@@ -26,7 +26,7 @@ trait AssertBlockAppearsTrait {
   /**
    * Checks to see whether a block does not appears on the page.
    *
-   * @param \Drupal\block\Entity\Block $block
+   * @param Block $block
    *   The block entity to find on the page.
    */
   protected function assertNoBlockAppears(Block $block) {

@@ -2,16 +2,16 @@
 
 namespace Drupal\Core\Routing;
 
+use Drupal\Component\EventDispatcher\Event;
 use Drupal\Core\Access\CheckProviderInterface;
 use Drupal\Core\Controller\ControllerResolverInterface;
+use Drupal\Core\DestructableInterface;
 use Drupal\Core\Discovery\YamlDiscovery;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Lock\LockBackendInterface;
-use Drupal\Core\DestructableInterface;
-use Drupal\Component\EventDispatcher\Event;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Managing class for rebuilding the router table.
@@ -21,42 +21,42 @@ class RouteBuilder implements RouteBuilderInterface, DestructableInterface {
   /**
    * The dumper to which we should send collected routes.
    *
-   * @var \Drupal\Core\Routing\MatcherDumperInterface
+   * @var MatcherDumperInterface
    */
   protected $dumper;
 
   /**
    * The used lock backend instance.
    *
-   * @var \Drupal\Core\Lock\LockBackendInterface
+   * @var LockBackendInterface
    */
   protected $lock;
 
   /**
    * The event dispatcher to notify of routes.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+   * @var EventDispatcherInterface
    */
   protected $dispatcher;
 
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The controller resolver.
    *
-   * @var \Drupal\Core\Controller\ControllerResolverInterface
+   * @var ControllerResolverInterface
    */
   protected $controllerResolver;
 
   /**
    * The route collection during the rebuild.
    *
-   * @var \Symfony\Component\Routing\RouteCollection
+   * @var RouteCollection
    */
   protected $routeCollection;
 
@@ -77,24 +77,24 @@ class RouteBuilder implements RouteBuilderInterface, DestructableInterface {
   /**
    * The check provider.
    *
-   * @var \Drupal\Core\Access\CheckProviderInterface
+   * @var CheckProviderInterface
    */
   protected $checkProvider;
 
   /**
    * Constructs the RouteBuilder using the passed MatcherDumperInterface.
    *
-   * @param \Drupal\Core\Routing\MatcherDumperInterface $dumper
+   * @param MatcherDumperInterface $dumper
    *   The matcher dumper used to store the route information.
-   * @param \Drupal\Core\Lock\LockBackendInterface $lock
+   * @param LockBackendInterface $lock
    *   The lock backend.
-   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher
+   * @param EventDispatcherInterface $dispatcher
    *   The event dispatcher to notify of routes.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Controller\ControllerResolverInterface $controller_resolver
+   * @param ControllerResolverInterface $controller_resolver
    *   The controller resolver.
-   * @param \Drupal\Core\Access\CheckProviderInterface $check_provider
+   * @param CheckProviderInterface $check_provider
    *   The check provider.
    */
   public function __construct(MatcherDumperInterface $dumper, LockBackendInterface $lock, EventDispatcherInterface $dispatcher, ModuleHandlerInterface $module_handler, ControllerResolverInterface $controller_resolver, CheckProviderInterface $check_provider) {

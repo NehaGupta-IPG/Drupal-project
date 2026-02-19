@@ -31,14 +31,14 @@ class TimestampItemNormalizerTest extends UnitTestCase {
   /**
    * The time stamp normalizer.
    *
-   * @var \Drupal\serialization\Normalizer\TimestampItemNormalizer
+   * @var TimestampItemNormalizer
    */
   protected $normalizer;
 
   /**
    * The test TimestampItem.
    *
-   * @var \Drupal\Core\Field\Plugin\Field\FieldType\TimestampItem
+   * @var TimestampItem
    */
   protected $item;
 
@@ -177,7 +177,7 @@ class TimestampItemNormalizerTest extends UnitTestCase {
   /**
    * Creates a TimestampItem prophecy.
    *
-   * @return \Prophecy\Prophecy\ObjectProphecy<\Drupal\Core\Field\Plugin\Field\FieldType\TimestampItem>
+   * @return ObjectProphecy<TimestampItem>
    *   The TimestampItem prophecy.
    */
   protected function createTimestampItemProphecy(): ObjectProphecy {

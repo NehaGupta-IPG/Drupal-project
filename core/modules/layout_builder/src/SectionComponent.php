@@ -77,7 +77,7 @@ class SectionComponent {
   /**
    * Returns the renderable array for this component.
    *
-   * @param \Drupal\Core\Plugin\Context\ContextInterface[] $contexts
+   * @param ContextInterface[] $contexts
    *   An array of available contexts.
    * @param bool $in_preview
    *   TRUE if the component is being previewed, FALSE otherwise.
@@ -210,7 +210,7 @@ class SectionComponent {
    * @return string
    *   The plugin ID.
    *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   * @throws PluginException
    *   Thrown if the plugin ID cannot be found.
    */
   public function getPluginId() {
@@ -233,7 +233,7 @@ class SectionComponent {
   /**
    * Gets the plugin for this component.
    *
-   * @param \Drupal\Core\Plugin\Context\ContextInterface[] $contexts
+   * @param ContextInterface[] $contexts
    *   An array of contexts to set on the plugin.
    *
    * @return \Drupal\Component\Plugin\PluginInspectionInterface

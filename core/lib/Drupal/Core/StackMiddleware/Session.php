@@ -19,14 +19,14 @@ class Session implements HttpKernelInterface {
   /**
    * The wrapped HTTP kernel.
    *
-   * @var \Symfony\Component\HttpKernel\HttpKernelInterface
+   * @var HttpKernelInterface
    */
   protected $httpKernel;
 
   /**
    * Constructs a Session stack middleware object.
    *
-   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $http_kernel
+   * @param HttpKernelInterface $http_kernel
    *   The decorated kernel.
    * @param \Closure $sessionClosure
    *   A closure that wraps the session service.
@@ -70,7 +70,7 @@ class Session implements HttpKernelInterface {
    * must continue to use the ephemeral session initialized in
    * DrupalKernel::preHandle().
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
+   * @param Request $request
    *   The request.
    *
    * @see \Drupal\Core\DrupalKernel::preHandle()

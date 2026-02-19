@@ -20,12 +20,12 @@ class DatabaseBackend implements FloodInterface, PrefixFloodInterface {
   /**
    * Construct the DatabaseBackend.
    *
-   * @param \Drupal\Core\Database\Connection $connection
+   * @param Connection $connection
    *   The database connection which will be used to store the flood event
    *   information.
-   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   * @param RequestStack $requestStack
    *   The request stack used to retrieve the current request.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
+   * @param TimeInterface $time
    *   The time service.
    */
   public function __construct(

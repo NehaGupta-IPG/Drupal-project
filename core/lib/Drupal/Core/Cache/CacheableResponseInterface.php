@@ -16,7 +16,7 @@ interface CacheableResponseInterface {
    * an access result, we must make sure their cacheability metadata is present
    * on the response. This method makes doing that simple.
    *
-   * @param \Drupal\Core\Cache\CacheableDependencyInterface|mixed $dependency
+   * @param CacheableDependencyInterface|mixed $dependency
    *   The dependency. If the object implements CacheableDependencyInterface,
    *   then its cacheability metadata will be used. Otherwise, the passed in
    *   object must be assumed to be uncacheable, so max-age 0 is set.
@@ -30,7 +30,7 @@ interface CacheableResponseInterface {
   /**
    * Returns the cacheability metadata for this response.
    *
-   * @return \Drupal\Core\Cache\CacheableMetadata
+   * @return CacheableMetadata
    *   The cacheable metadata.
    */
   public function getCacheableMetadata();

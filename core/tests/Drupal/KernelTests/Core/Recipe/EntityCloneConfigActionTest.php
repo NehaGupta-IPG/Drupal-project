@@ -106,7 +106,7 @@ class EntityCloneConfigActionTest extends KernelTestBase {
     $this->createContentType(['type' => 'alpha']);
     $this->createContentType(['type' => 'beta']);
 
-    /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
+    /** @var EntityDisplayRepositoryInterface $display_repository */
     $display_repository = $this->container->get(EntityDisplayRepositoryInterface::class);
     // Create the default view displays for each node type.
     $display_repository->getViewDisplay('node', 'alpha')->save();

@@ -21,14 +21,14 @@ class AjaxRendererTest extends UnitTestCase {
   /**
    * The tested ajax controller.
    *
-   * @var \Drupal\Core\Render\MainContent\AjaxRenderer
+   * @var AjaxRenderer
    */
   protected $ajaxRenderer;
 
   /**
    * The renderer.
    *
-   * @var \Drupal\Core\Render\RendererInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var RendererInterface|MockObject
    */
   protected $renderer;
 

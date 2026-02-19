@@ -3,18 +3,18 @@
 namespace Drupal\help\Plugin\HelpSection;
 
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\help\Attribute\HelpSection;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\help\SearchableHelpInterface;
-use Drupal\help\HelpTopicPluginInterface;
-use Drupal\help\HelpTopicPluginManagerInterface;
 use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Render\RenderContext;
+use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslationManager;
+use Drupal\help\Attribute\HelpSection;
+use Drupal\help\HelpTopicPluginInterface;
+use Drupal\help\HelpTopicPluginManagerInterface;
+use Drupal\help\SearchableHelpInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -34,14 +34,14 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
   /**
    * The top level help topic plugins.
    *
-   * @var \Drupal\help\HelpTopicPluginInterface[]
+   * @var HelpTopicPluginInterface[]
    */
   protected $topLevelPlugins;
 
   /**
    * The merged top level help topic plugins cache metadata.
    *
-   * @var \Drupal\Core\Cache\CacheableMetadata
+   * @var CacheableMetadata
    */
   protected $cacheableMetadata;
 
@@ -54,15 +54,15 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Drupal\help\HelpTopicPluginManagerInterface $pluginManager
+   * @param HelpTopicPluginManagerInterface $pluginManager
    *   The help topic plugin manager service.
-   * @param \Drupal\Core\Render\RendererInterface $renderer
+   * @param RendererInterface $renderer
    *   The renderer.
-   * @param \Drupal\Core\Language\LanguageDefault $defaultLanguage
+   * @param LanguageDefault $defaultLanguage
    *   The default language object.
-   * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+   * @param LanguageManagerInterface $languageManager
    *   The language manager.
-   * @param \Drupal\Core\StringTranslation\TranslationManager $translationManager
+   * @param TranslationManager $translationManager
    *   The translation manager. We are using a method that doesn't exist on an
    *   interface, so require this class.
    */
@@ -114,7 +114,7 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
   /**
    * Gets the top level help topic plugins.
    *
-   * @return \Drupal\help\HelpTopicPluginInterface[]
+   * @return HelpTopicPluginInterface[]
    *   The top level help topic plugins.
    */
   protected function getPlugins() {
@@ -219,7 +219,7 @@ class HelpTopicSection extends HelpSectionPluginBase implements ContainerFactory
   /**
    * Gets the merged CacheableMetadata for all the top level help topic plugins.
    *
-   * @return \Drupal\Core\Cache\CacheableMetadata
+   * @return CacheableMetadata
    *   The merged CacheableMetadata for all the top level help topic plugins.
    */
   protected function getCacheMetadata() {

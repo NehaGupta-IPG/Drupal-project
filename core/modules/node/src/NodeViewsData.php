@@ -2,11 +2,11 @@
 
 namespace Drupal\node;
 
-use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
+use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslationInterface;
@@ -21,19 +21,19 @@ class NodeViewsData extends EntityViewsData {
   /**
    * Constructs an NodeViewsData object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
+   * @param EntityTypeInterface $entity_type
    *   The entity type to provide views integration for.
-   * @param \Drupal\Core\Entity\Sql\SqlEntityStorageInterface $storage_controller
+   * @param SqlEntityStorageInterface $storage_controller
    *   The storage handler used for this entity type.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\StringTranslation\TranslationInterface $translation_manager
+   * @param TranslationInterface $translation_manager
    *   The translation manager.
-   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+   * @param EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
-   * @param \Drupal\Core\Extension\ModuleExtensionList|null $moduleExtensionList
+   * @param ModuleExtensionList|null $moduleExtensionList
    *   The module extension list.
    */
   public function __construct(

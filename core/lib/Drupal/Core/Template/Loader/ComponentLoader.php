@@ -19,9 +19,9 @@ class ComponentLoader implements LoaderInterface {
   /**
    * Constructs a new ComponentLoader object.
    *
-   * @param \Drupal\Core\Theme\ComponentPluginManager $pluginManager
+   * @param ComponentPluginManager $pluginManager
    *   The plugin manager.
-   * @param \Psr\Log\LoggerInterface $logger
+   * @param LoggerInterface $logger
    *   The logger.
    */
   public function __construct(
@@ -41,7 +41,7 @@ class ComponentLoader implements LoaderInterface {
    * @return string|null
    *   The path to the component.
    *
-   * @throws \Twig\Error\LoaderError
+   * @throws LoaderError
    *   Thrown if a template matching $name cannot be found and $throw is TRUE.
    */
   protected function findTemplate(string $name, bool $throw = TRUE): ?string {

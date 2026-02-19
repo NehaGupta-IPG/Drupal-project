@@ -35,42 +35,42 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
   /**
    * The module handler.
    *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   * @var ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The event dispatcher.
    *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+   * @var EventDispatcherInterface
    */
   protected $eventDispatcher;
 
   /**
    * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\RequestStack
+   * @var RequestStack
    */
   protected $requestStack;
 
   /**
    * The element info manager.
    *
-   * @var \Drupal\Core\Render\ElementInfoManagerInterface
+   * @var ElementInfoManagerInterface
    */
   protected $elementInfo;
 
   /**
    * The CSRF token generator to validate the form token.
    *
-   * @var \Drupal\Core\Access\CsrfTokenGenerator
+   * @var CsrfTokenGenerator
    */
   protected $csrfToken;
 
   /**
    * The class resolver.
    *
-   * @var \Drupal\Core\DependencyInjection\ClassResolverInterface
+   * @var ClassResolverInterface
    */
   protected $classResolver;
 
@@ -84,28 +84,28 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
   /**
    * The theme manager.
    *
-   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   * @var ThemeManagerInterface
    */
   protected $themeManager;
 
   /**
    * The form validator.
    *
-   * @var \Drupal\Core\Form\FormValidatorInterface
+   * @var FormValidatorInterface
    */
   protected $formValidator;
 
   /**
    * The form submitter.
    *
-   * @var \Drupal\Core\Form\FormSubmitterInterface
+   * @var FormSubmitterInterface
    */
   protected $formSubmitter;
 
   /**
    * The form cache.
    *
-   * @var \Drupal\Core\Form\FormCacheInterface
+   * @var FormCacheInterface
    */
   protected $formCache;
 

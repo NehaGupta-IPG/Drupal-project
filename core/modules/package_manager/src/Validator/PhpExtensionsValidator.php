@@ -50,7 +50,7 @@ class PhpExtensionsValidator implements EventSubscriberInterface {
   /**
    * Flags a warning if Xdebug is enabled.
    *
-   * @param \Drupal\package_manager\Event\StatusCheckEvent $event
+   * @param StatusCheckEvent $event
    *   The event object.
    */
   public function validateXdebug(StatusCheckEvent $event): void {
@@ -64,7 +64,7 @@ class PhpExtensionsValidator implements EventSubscriberInterface {
   /**
    * Flags an error if the OpenSSL extension is not installed.
    *
-   * @param \Drupal\package_manager\Event\SandboxValidationEvent $event
+   * @param SandboxValidationEvent $event
    *   The event object.
    */
   public function validateOpenSsl(SandboxValidationEvent $event): void {
