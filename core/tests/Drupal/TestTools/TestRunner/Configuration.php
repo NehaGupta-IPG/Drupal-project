@@ -162,7 +162,7 @@ final class Configuration {
       'sqlite',
       NULL,
       InputOption::VALUE_REQUIRED,
-      'A pathname to use for the SQLite database of the test runner. Required unless this script is executed with a working Drupal installation. A relative pathname is interpreted relative to the Drupal root directory.',
+      "A pathname to use for the SQLite database of the test runner. Required unless this script is executed with a working Drupal installation.\nA relative pathname is interpreted relative to the Drupal root directory.",
     ));
     $inputDefinition->addOption(new InputOption(
       'dburl',
@@ -260,7 +260,7 @@ final class Configuration {
       'suppress-deprecations',
       NULL,
       InputOption::VALUE_NONE,
-      "Stops tests from failing if deprecation errors are triggered.\nIf this is not set the value specified in the SYMFONY_DEPRECATIONS_HELPER environment variable, or the value specified in core/phpunit.xml (if it exists), or the default value will be used.\nThe default is that any unexpected silenced deprecation error will fail tests.",
+      "Stops tests from failing if deprecation errors are triggered.\nIf this is not set the value specified in the SYMFONY_DEPRECATIONS_HELPER environment variable, or the value specified in core/phpunit.xml (if it exists) will be used.\nThe default is that any unexpected silenced deprecation error will fail tests.",
     ));
     $inputDefinition->addOption(new InputOption(
       'xml',
@@ -296,7 +296,7 @@ final class Configuration {
     $inputDefinition->addArgument(new InputArgument(
       'tests',
       InputArgument::OPTIONAL,
-      "One or more tests to be run.\nBy default, these are interpreted as the names of test groups which are derived from test class @group annotations. These group names typically correspond to module names like \"User\" or \"Profile\" or \"System\", but there is also a group \"Database\".\nIf --class is specified then these are interpreted as the names of specific test classes whose test methods will be run.\nTests must be separated by commas.\nIgnored if --all is specified.",
+      "One or more tests to be run.\nBy default, these are interpreted as the names of test groups which are derived from test class @group annotations.\nThese group names typically correspond to module names like \"User\" or \"Profile\" or \"System\", but there is also a group \"Database\".\nFor Contrib projects the @group can be anything but usually it will start with the project machine name.\nIf --class is specified then these are interpreted as the names of specific test classes whose test methods will be run.\nTests must be separated by commas.\nIgnored if --all is specified.",
     ));
 
     return $inputDefinition;
