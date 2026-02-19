@@ -52,7 +52,7 @@ class DriverModuleMissingDependenciesTest extends UnitTestCase {
     $container->expects($this->any())
       ->method('get')
       ->with('extension.list.database_driver')
-      ->willReturn(new DatabaseDriverList($root, 'database_driver', new NullBackend('database_driver')));
+      ->willReturn(new DatabaseDriverList($root, 'database_driver', new NullBackend()));
     \Drupal::setContainer($container);
 
     $this->expectException(UnknownExtensionException::class);

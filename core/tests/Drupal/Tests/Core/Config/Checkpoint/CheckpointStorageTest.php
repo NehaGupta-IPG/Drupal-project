@@ -55,7 +55,7 @@ class CheckpointStorageTest extends UnitTestCase {
     // Set up a memory storage we can manipulate to set fixtures.
     $this->memory = new MemoryStorage();
     $keyValueMemoryFactory = new KeyValueMemoryFactory();
-    $state = new State($keyValueMemoryFactory, new NullBackend('test'), new NullLockBackend());
+    $state = new State($keyValueMemoryFactory, new NullBackend(), new NullLockBackend());
     $time = new Time();
     $checkpoints = new LinearHistory($state, $time);
     $this->storage = new CheckpointStorage($this->memory, $checkpoints, $keyValueMemoryFactory);

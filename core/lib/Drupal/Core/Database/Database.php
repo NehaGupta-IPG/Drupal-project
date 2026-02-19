@@ -582,7 +582,7 @@ abstract class Database {
       return \Drupal::service('extension.list.database_driver');
     }
     else {
-      return new DatabaseDriverList(DRUPAL_ROOT, 'database_driver', new NullBackend('database_driver'));
+      return new DatabaseDriverList(DRUPAL_ROOT, 'database_driver', new NullBackend());
     }
   }
 

@@ -119,7 +119,7 @@ class StorageComparer implements StorageComparerInterface {
     if ($source_storage instanceof FileStorage) {
       // FileStorage has its own static cache so that multiple reads of the
       // same raw configuration object are not costly.
-      $this->sourceCacheStorage = new NullBackend('storage_comparer');
+      $this->sourceCacheStorage = new NullBackend();
       $this->sourceStorage = $source_storage;
     }
     else {
@@ -180,7 +180,7 @@ class StorageComparer implements StorageComparerInterface {
   public function writeMode(): static {
     if (!$this->writeMode) {
       $this->writeMode = TRUE;
-      $this->targetCacheStorage = new NullBackend('storage_comparer');
+      $this->targetCacheStorage = new NullBackend();
       $this->targetStorages = [];
     }
     return $this;

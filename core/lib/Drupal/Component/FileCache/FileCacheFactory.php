@@ -42,7 +42,7 @@ class FileCacheFactory {
     // If there is a special key in the configuration, disable FileCache
     // completely.
     if (!empty(static::$configuration[static::DISABLE_CACHE])) {
-      return new NullFileCache('', '');
+      return new NullFileCache();
     }
 
     $configuration = [];

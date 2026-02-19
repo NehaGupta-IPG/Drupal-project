@@ -371,7 +371,7 @@ function install_begin_request($class_loader, &$install_state): void {
     ->register('extension.list.database_driver', 'Drupal\Core\Extension\DatabaseDriverList')
     ->addArgument(dirname(__DIR__, 2))
     ->addArgument('database_driver')
-    ->addArgument(new NullBackend('database_driver'));
+    ->addArgument(new NullBackend());
 
   // Register the class loader so contrib and custom database drivers can be
   // autoloaded.

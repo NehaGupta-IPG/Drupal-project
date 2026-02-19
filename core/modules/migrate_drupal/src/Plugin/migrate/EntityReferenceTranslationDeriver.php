@@ -64,14 +64,12 @@ class EntityReferenceTranslationDeriver extends DeriverBase implements Container
   /**
    * EntityReferenceTranslationDeriver constructor.
    *
-   * @param string $base_plugin_id
-   *   The base plugin ID.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
    */
-  public function __construct($base_plugin_id, EntityFieldManagerInterface $entity_field_manager, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(EntityFieldManagerInterface $entity_field_manager, EntityTypeManagerInterface $entity_type_manager) {
     $this->entityFieldManager = $entity_field_manager;
     $this->entityTypeManager = $entity_type_manager;
   }
@@ -81,7 +79,6 @@ class EntityReferenceTranslationDeriver extends DeriverBase implements Container
    */
   public static function create(ContainerInterface $container, $base_plugin_id) {
     return new static(
-      $base_plugin_id,
       $container->get('entity_field.manager'),
       $container->get('entity_type.manager')
     );

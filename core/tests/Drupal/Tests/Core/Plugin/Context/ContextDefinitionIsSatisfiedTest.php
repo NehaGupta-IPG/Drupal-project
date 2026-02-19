@@ -39,7 +39,7 @@ class ContextDefinitionIsSatisfiedTest extends UnitTestCase {
       'Drupal\\Core\\Validation' => $this->root . '/core/lib/Drupal/Core/Validation',
       'Drupal\\Tests\\Core\\Plugin\\Fixtures' => $this->root . '/core/tests/Drupal/Tests/Core/Plugin/Fixtures',
     ]);
-    $cache_backend = new NullBackend('cache');
+    $cache_backend = new NullBackend();
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
 
     $class_resolver = $this->prophesize(ClassResolverInterface::class);

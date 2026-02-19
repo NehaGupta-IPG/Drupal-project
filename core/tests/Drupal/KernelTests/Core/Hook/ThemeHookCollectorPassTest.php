@@ -35,7 +35,7 @@ class ThemeHookCollectorPassTest extends KernelTestBase {
     $container->setParameter('container.themes', $theme_filenames);
     $keyvalue = new KeyValueMemoryFactory();
     $container->set('keyvalue', $keyvalue);
-    $container->set('cache.bootstrap', new NullBackend('bootstrap'));
+    $container->set('cache.bootstrap', new NullBackend());
     (new ThemeHookCollectorPass())->process($container);
 
     $themeHookData = $container->getParameter('.theme_hook_data');

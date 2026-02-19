@@ -33,7 +33,7 @@ class PluginManager extends DefaultPluginManager {
    * @param \Drupal\Core\Routing\UrlGeneratorInterface $url_generator
    *   The URL generator.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, UrlGeneratorInterface $url_generator) {
+  public function __construct(\Traversable $namespaces, protected CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, protected UrlGeneratorInterface $url_generator) {
     // Generate a URL during construction to prove that URL generation works. If
     // the route was missing an exception would be thrown. This also forces the
     // route provider to be initialized very early during a module install.

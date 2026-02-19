@@ -126,7 +126,7 @@ class LinearHistoryTest extends UnitTestCase {
    */
   public function testDelete(): void {
     // Create a real State object so that we can manipulate it.
-    $state = new State(new KeyValueMemoryFactory(), new NullBackend(''), new NullLockBackend());
+    $state = new State(new KeyValueMemoryFactory(), new NullBackend(), new NullLockBackend());
     $test_data = [
       'hash1' => new Checkpoint('hash1', 'One', 1701539510, NULL),
       'hash2' => new Checkpoint('hash2', 'Two', 1701539520, 'hash1'),
