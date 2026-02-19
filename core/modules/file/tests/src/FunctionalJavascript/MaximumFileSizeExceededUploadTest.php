@@ -124,11 +124,10 @@ class MaximumFileSizeExceededUploadTest extends WebDriverTestBase {
     // Drupal may show:
     // - a global error message (.messages--error),
     // - an inline file.js error (.file-upload-js-error),
-    // - or an error message inside the widget (.js-form-managed-file .messages--error).
+    // - or an error message inside the widget
+    // (.js-form-managed-file .messages--error).
     $this->assertSession()->waitForElementVisible('css', '.messages--error, .file-upload-js-error');
 
-    // Assert the error is related to a failed upload/size constraint, but do not
-    // depend on an exact sentence which can vary across environments.
     $this->assertSession()->pageTextMatches('/(maximum file size|exceed|could not be uploaded|unrecoverable error|upload)/i');
 
     // Ensure the upload did not succeed: the remove button should not appear.
@@ -141,8 +140,8 @@ class MaximumFileSizeExceededUploadTest extends WebDriverTestBase {
     // The remove button should appear when the upload succeeds.
     $this->assertSession()->waitForElement('named', ['id_or_name', 'field_file_0_remove_button']);
 
-    // Any prior error UI from the failed attempt should be gone (or at least the
-    // inline file.js error should be gone).
+    // Any prior error UI from the failed attempt should be gone
+    // (or at least the inline file.js error should be gone).
     $this->assertSession()->elementNotExists('css', '.file-upload-js-error');
   }
 
