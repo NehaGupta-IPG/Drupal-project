@@ -1,51 +1,54 @@
 <?php
 
-namespace Drupal\Core\Template;
+declare(strict_types=1);
+
+namespace Drupal\Component\HtmlAttribute;
 
 use Drupal\Component\Utility\Html;
+use ReturnTypeWillChange;
 
 /**
- * A class that defines a type of Attribute that can be added to as an array.
+ * A class defining a type of HtmlAttribute that can be added to as an array.
  *
- * To use with Attribute, the array must be specified.
+ * To use with HtmlAttributeCollection, the array must be specified.
  * Correct:
  * @code
- *  $attributes = new Attribute();
+ *  $attributes = new HtmlAttributeCollection();
  *  $attributes['class'] = [];
  *  $attributes['class'][] = 'cat';
  * @endcode
  * Incorrect:
  * @code
- *  $attributes = new Attribute();
+ *  $attributes = new HtmlAttributeCollection();
  *  $attributes['class'][] = 'cat';
  * @endcode
  *
- * @implements \ArrayAccess<int|string, mixed>
- * @implements \IteratorAggregate<int|string, mixed>
+ * @see \Drupal\Component\HtmlAttribute\HtmlAttributeCollection
  *
- * @see \Drupal\Core\Template\Attribute
+ * @implements \ArrayAccess<string, scalar>
+ * @implements \IteratorAggregate<string, scalar>
  */
-class AttributeArray extends AttributeValueBase implements \ArrayAccess, \IteratorAggregate {
+class HtmlAttributeArray extends HtmlAttributeValueBase implements \ArrayAccess, \IteratorAggregate {
 
   /**
    * Ensures empty array as a result of array_filter will not print '$name=""'.
    *
-   * @see \Drupal\Core\Template\AttributeArray::__toString()
-   * @see \Drupal\Core\Template\AttributeValueBase::render()
+   * @see \Drupal\Component\HtmlAttribute\HtmlAttributeArray::__toString()
+   * @see \Drupal\Component\HtmlAttribute\HtmlAttributeValueBase::render()
    */
-  const RENDER_EMPTY_ATTRIBUTE = FALSE;
+  const bool RENDER_EMPTY_ATTRIBUTE = FALSE;
 
   /**
    * {@inheritdoc}
    */
-  public function offsetGet($offset): mixed {
+  public function offsetGet(mixed $offset): mixed {
     return $this->value[$offset];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function offsetSet($offset, $value): void {
+  public function offsetSet(mixed $offset, mixed $value): void {
     if (isset($offset)) {
       $this->value[$offset] = $value;
     }
@@ -57,31 +60,28 @@ class AttributeArray extends AttributeValueBase implements \ArrayAccess, \Iterat
   /**
    * {@inheritdoc}
    */
-  public function offsetUnset($offset): void {
+  public function offsetUnset(mixed $offset): void {
     unset($this->value[$offset]);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function offsetExists($offset): bool {
+  public function offsetExists(mixed $offset): bool {
     return isset($this->value[$offset]);
   }
 
   /**
-   * Implements the magic __toString() method.
+   * {@inheritdoc}
    */
-  public function __toString() {
+  public function __toString(): string {
     // Filter out any empty values before printing.
     $this->value = array_unique(array_filter($this->value));
     return Html::escape(implode(' ', $this->value));
   }
 
   /**
-   * Retrieves the iterator for the object.
-   *
-   * @return \ArrayIterator<int|string, mixed>
-   *   The iterator.
+   * {@inheritdoc}
    */
   public function getIterator(): \ArrayIterator {
     return new \ArrayIterator($this->value);
@@ -90,15 +90,15 @@ class AttributeArray extends AttributeValueBase implements \ArrayAccess, \Iterat
   /**
    * Exchange the array for another one.
    *
-   * @param array $input
+   * @param array<scalar> $input
    *   The array input to replace the internal value.
    *
-   * @return array
+   * @return array<scalar>
    *   The old array value.
    *
    * @see ArrayObject::exchangeArray
    */
-  public function exchangeArray($input) {
+  public function exchangeArray(/*array */$input) {
     $old = $this->value;
     $this->value = $input;
     return $old;

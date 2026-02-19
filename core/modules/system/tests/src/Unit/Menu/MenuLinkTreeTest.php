@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Unit\Menu;
 
+use Drupal\Component\HtmlAttribute\HtmlAttributeCollection;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Menu\MenuLinkTree;
 use Drupal\Core\Menu\MenuLinkTreeElement;
-use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\Core\Menu\MenuLinkMock;
@@ -144,7 +144,7 @@ class MenuLinkTreeTest extends UnitTestCase {
 
     $get_built_element = function (MenuLinkTreeElement $element) {
       $return = [
-        'attributes' => new Attribute(),
+        'attributes' => new HtmlAttributeCollection(),
         'title' => $element->link->getTitle(),
         'url' => new Url($element->link->getRouteName(), $element->link->getRouteParameters(), ['set_active_class' => TRUE]),
         'below' => [],

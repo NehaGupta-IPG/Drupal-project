@@ -55,6 +55,9 @@ parameters:
     - "#Drupal calls should be avoided in classes, use dependency injection instead#"
     - "#^Class .* extends @internal class#"
     - identifier: missingType.iterableValue
+    # Ignore Attribute deprecation errors while conversion happening.
+    - "#Instantiation of deprecated class Drupal.Core.Template.Attribute#"
+    - "#Return type of (method|function) .* has typehint with deprecated class Drupal.Core.Template.Attribute#"
 
 rules:
   - Drupal\PHPStan\Rules\ComponentTestDoesNotExtendCoreTest

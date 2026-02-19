@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\EventSubscriber;
 
+use Drupal\Component\HtmlAttribute\HtmlAttributeCollection;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\EventSubscriber\ActiveLinkResponseFilter;
 use Drupal\Core\Language\LanguageDefault;
@@ -11,7 +12,6 @@ use Drupal\Core\Language\LanguageManager;
 use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Path\PathMatcherInterface;
 use Drupal\Core\Session\AnonymousUserSession;
-use Drupal\Core\Template\Attribute;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -696,7 +696,7 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
         for ($c = 0; $c < count($contents); $c++) {
           $tag_content = $contents[$c];
 
-          $create_markup = function (Attribute $attributes) use ($html_prefix, $html_suffix, $tag, $tag_content) {
+          $create_markup = function (HtmlAttributeCollection $attributes) use ($html_prefix, $html_suffix, $tag, $tag_content) {
             return $html_prefix . '<' . $tag . $attributes . '>' . $tag_content . '</' . $tag . '>' . $html_suffix;
           };
 
@@ -711,7 +711,7 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
             }
 
             // Build the source markup.
-            $source_markup = $create_markup(new Attribute($situation['attributes']));
+            $source_markup = $create_markup(new HtmlAttributeCollection($situation['attributes']));
 
             // Build the target markup. If no "is-active" class should be set,
             // the resulting HTML should be identical. Otherwise, it should get
@@ -727,7 +727,7 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
                 $active_attributes['class'] = [];
               }
               $active_attributes['class'][] = 'is-active';
-              $target_markup = $create_markup(new Attribute($active_attributes));
+              $target_markup = $create_markup(new HtmlAttributeCollection($active_attributes));
             }
 
             $data[] = [

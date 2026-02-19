@@ -1,6 +1,8 @@
 <?php
 
-namespace Drupal\Core\Template;
+declare(strict_types=1);
+
+namespace Drupal\Component\HtmlAttribute;
 
 use Drupal\Component\Utility\Html;
 
@@ -11,9 +13,10 @@ use Drupal\Component\Utility\Html;
  * They are attributes that if they exist in the tag, they are TRUE.
  * Examples include selected, disabled, checked, readonly.
  *
- * To set a boolean attribute on the Attribute class, set it to TRUE.
+ * To set a boolean attribute on the HtmlAttributeCollection class, set it to
+ * TRUE.
  * @code
- *  $attributes = new Attribute();
+ *  $attributes = new HtmlAttributeCollection();
  *  $attributes['disabled'] = TRUE;
  *  echo '<select' . $attributes . '/>';
  *  // produces <select disabled>;
@@ -22,21 +25,21 @@ use Drupal\Component\Utility\Html;
  *  // produces <select>;
  * @endcode
  *
- * @see \Drupal\Core\Template\Attribute
+ * @see \Drupal\Component\HtmlAttribute\HtmlAttributeCollection
  */
-class AttributeBoolean extends AttributeValueBase {
+class HtmlAttributeBoolean extends HtmlAttributeValueBase {
 
   /**
    * {@inheritdoc}
    */
-  public function render() {
+  public function render(): string {
     return $this->__toString();
   }
 
   /**
-   * Implements the magic __toString() method.
+   * {@inheritdoc}
    */
-  public function __toString() {
+  public function __toString(): string {
     return $this->value === FALSE ? '' : Html::escape($this->name);
   }
 

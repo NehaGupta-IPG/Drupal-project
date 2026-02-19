@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Template;
 
+use Drupal\Component\HtmlAttribute\HtmlAttributeCollection;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Cache\CacheableDependencyInterface;
@@ -254,15 +255,15 @@ class TwigExtension extends AbstractExtension {
    *   The link text for the anchor tag as a translated string.
    * @param \Drupal\Core\Url|string $url
    *   The URL object or string used for the link.
-   * @param array|\Drupal\Core\Template\Attribute $attributes
-   *   An optional array or Attribute object of link attributes.
+   * @param array|\Drupal\Component\HtmlAttribute\HtmlAttributeCollection $attributes
+   *   An optional array or HtmlAttributeCollection object of link attributes.
    *
    * @return array
    *   A render array representing a link to the given URL.
    */
   public function getLink($text, $url, $attributes = []) {
     assert(is_string($url) || $url instanceof Url, '$url must be a string or object of type \Drupal\Core\Url');
-    assert(is_array($attributes) || $attributes instanceof Attribute, '$attributes, if set, must be an array or object of type \Drupal\Core\Template\Attribute');
+    assert(is_array($attributes) || $attributes instanceof HtmlAttributeCollection, '$attributes, if set, must be an array or object of type \Drupal\Component\HtmlAttribute\HtmlAttributeCollection');
 
     if (!$url instanceof Url) {
       $url = Url::fromUri($url);
@@ -272,7 +273,7 @@ class TwigExtension extends AbstractExtension {
     // @see https://www.drupal.org/node/2842399
     $url = clone $url;
     if ($attributes) {
-      if ($attributes instanceof Attribute) {
+      if ($attributes instanceof HtmlAttributeCollection) {
         $attributes = $attributes->toArray();
       }
       $url->mergeOptions(['attributes' => $attributes]);
@@ -632,18 +633,18 @@ class TwigExtension extends AbstractExtension {
   }
 
   /**
-   * Creates an Attribute object.
+   * Creates an HtmlAttributeCollection object.
    *
-   * @param Attribute|array $attributes
+   * @param \Drupal\Component\HtmlAttribute\HtmlAttributeCollection|array $attributes
    *   (optional) An existing attribute object or an associative array of
    *   key-value pairs to be converted to HTML attributes.
    *
-   * @return \Drupal\Core\Template\Attribute
+   * @return \Drupal\Component\HtmlAttribute\HtmlAttributeCollection
    *   An attributes object that has the given attributes.
    */
-  public function createAttribute(Attribute|array $attributes = []) {
+  public function createAttribute(HtmlAttributeCollection|array $attributes = []) {
     if (\is_array($attributes)) {
-      return new Attribute($attributes);
+      return new HtmlAttributeCollection($attributes);
     }
     return $attributes;
   }
@@ -776,7 +777,7 @@ class TwigExtension extends AbstractExtension {
    *   The element with the given class(es) in attributes.
    */
   public function addClass(array $element, ...$classes): array {
-    $attributes = new Attribute($element['#attributes'] ?? []);
+    $attributes = new HtmlAttributeCollection($element['#attributes'] ?? []);
     $attributes->addClass(...$classes);
     $element['#attributes'] = $attributes->toArray();
 
@@ -804,7 +805,7 @@ class TwigExtension extends AbstractExtension {
   public function setAttribute(array $element, string $name, mixed $value = NULL): array {
     $element['#attributes'] = AttributeHelper::mergeCollections(
       $element['#attributes'] ?? [],
-      new Attribute([$name => $value])
+      new HtmlAttributeCollection([$name => $value])
     );
 
     // Make sure element gets rendered again.

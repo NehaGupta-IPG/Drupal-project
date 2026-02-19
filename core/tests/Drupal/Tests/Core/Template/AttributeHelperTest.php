@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Template;
 
-use Drupal\Core\Template\Attribute;
+use Drupal\Component\HtmlAttribute\HtmlAttributeCollection;
 use Drupal\Core\Template\AttributeHelper;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[CoversClass(AttributeHelper::class)]
 #[Group('Template')]
+#[Group('legacy')]
 class AttributeHelperTest extends UnitTestCase {
 
   /**
@@ -41,7 +42,7 @@ class AttributeHelperTest extends UnitTestCase {
   #[DataProvider('providerTestAttributeExists')]
   public function testAttributeExists(array $test_data, $test_attribute, $expected): void {
     $this->assertSame($expected, AttributeHelper::attributeExists($test_attribute, $test_data));
-    $attributes = new Attribute($test_data);
+    $attributes = new HtmlAttributeCollection($test_data);
     $this->assertSame($expected, AttributeHelper::attributeExists($test_attribute, $attributes));
   }
 
@@ -54,8 +55,14 @@ class AttributeHelperTest extends UnitTestCase {
    */
   public static function providerTestMergeCollections(): array {
     return [
-      [[], ['class' => ['class1']], ['class' => ['class1']]],
-      [[], new Attribute(['class' => ['class1']]), ['class' => ['class1']]],
+      [
+        [],
+        ['class' => ['class1']], ['class' => ['class1']],
+      ],
+      [
+        [],
+        new HtmlAttributeCollection(['class' => ['class1']]), ['class' => ['class1']],
+      ],
       [
         ['class' => ['example-class']],
         ['class' => ['class1']],
@@ -63,7 +70,7 @@ class AttributeHelperTest extends UnitTestCase {
       ],
       [
         ['class' => ['example-class']],
-        new Attribute(['class' => ['class1']]),
+        new HtmlAttributeCollection(['class' => ['class1']]),
         ['class' => ['example-class', 'class1']],
       ],
       [
@@ -73,7 +80,7 @@ class AttributeHelperTest extends UnitTestCase {
       ],
       [
         ['class' => ['example-class']],
-        new Attribute(['id' => 'foo', 'href' => 'bar']),
+        new HtmlAttributeCollection(['id' => 'foo', 'href' => 'bar']),
         ['class' => ['example-class'], 'id' => 'foo', 'href' => 'bar'],
       ],
     ];
@@ -85,14 +92,14 @@ class AttributeHelperTest extends UnitTestCase {
   #[DataProvider('providerTestMergeCollections')]
   public function testMergeCollections($original, $merge, $expected): void {
     $this->assertEquals($expected, AttributeHelper::mergeCollections($original, $merge));
-    $this->assertEquals(new Attribute($expected), AttributeHelper::mergeCollections(new Attribute($original), $merge));
+    $this->assertEquals(new HtmlAttributeCollection($expected), AttributeHelper::mergeCollections(new HtmlAttributeCollection($original), $merge));
   }
 
   /**
    * Tests merge collections argument exception.
    */
   public function testMergeCollectionsArgumentException(): void {
-    $attributes = new Attribute(['class' => ['example-class']]);
+    $attributes = new HtmlAttributeCollection(['class' => ['example-class']]);
     $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage('Invalid collection argument');
     AttributeHelper::mergeCollections($attributes, 'not an array');

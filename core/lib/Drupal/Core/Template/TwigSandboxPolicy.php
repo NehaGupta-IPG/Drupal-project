@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Template;
 
+use Drupal\Component\HtmlAttribute\HtmlAttributeCollection;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Template\Attribute\TwigAllowed;
 use Twig\Sandbox\SecurityError;
@@ -48,13 +49,17 @@ class TwigSandboxPolicy implements SecurityPolicyInterface {
    * Constructs a new TwigSandboxPolicy object.
    */
   public function __construct() {
-    // Allow settings.php to override our default allowed classes, methods, and
-    // prefixes.
     $allowed_classes = Settings::get('twig_sandbox_allowed_classes', [
-      // Allow any operations on the Attribute object as it is intended to be
-      // changed from a Twig template, for example calling addClass().
-      'Drupal\Core\Template\Attribute',
+      // Allow any operations on the HtmlAttributeCollection object as it is
+      // intended to be changed from a Twig template, for example calling
+      // addClass().
+      HtmlAttributeCollection::class,
     ]);
+    // BC layer to support earlier Attribute class.
+    if (in_array('Drupal\Core\Template\Attribute', $allowed_classes) && !in_array(HtmlAttributeCollection::class, $allowed_classes)) {
+      @trigger_error('\Drupal\Core\Template\Attribute as an allowed class in $settings[\'twig_sandbox_allowed_classes\'] is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Component\HtmlAttribute\HtmlAttributeCollection instead. See https://www.drupal.org/node/3070485', E_USER_DEPRECATED);
+      $allowed_classes[] = HtmlAttributeCollection::class;
+    }
     // Flip the array so we can check using isset().
     $this->allowed_classes = array_flip($allowed_classes);
 

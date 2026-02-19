@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\serialization\Unit\Normalizer;
 
+use Drupal\Component\HtmlAttribute\HtmlAttributeCollection;
 use Drupal\Core\Render\Markup;
-use Drupal\Core\Template\Attribute;
 use Drupal\serialization\Normalizer\MarkupNormalizer;
 use Drupal\Tests\serialization\Traits\JsonSchemaTestTrait;
 use Drupal\Tests\UnitTestCase;
@@ -41,7 +41,7 @@ final class MarkupNormalizerTest extends UnitTestCase {
    * Test the normalizer properly delegates schema discovery to its subject.
    */
   public function testDelegatedSchemaDiscovery(): void {
-    $schema = $this->normalizer->getNormalizationSchema(new Attribute(['data-test' => 'testing']));
+    $schema = $this->normalizer->getNormalizationSchema(new HtmlAttributeCollection(['data-test' => 'testing']));
     $this->assertEquals('Rendered HTML element attributes', $schema['description']);
   }
 
@@ -51,7 +51,7 @@ final class MarkupNormalizerTest extends UnitTestCase {
   public static function jsonSchemaDataProvider(): array {
     return [
       'markup' => [Markup::create('Generic Markup')],
-      'attribute' => [new Attribute(['data-test' => 'testing'])],
+      'attribute' => [new HtmlAttributeCollection(['data-test' => 'testing'])],
     ];
   }
 
