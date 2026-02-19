@@ -2,12 +2,14 @@
 
 namespace Drupal\syslog\Hook;
 
+use Drupal\Core\Hook\Attribute\FormAlter;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\Core\Link;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\system\Form\LoggingForm;
 
 /**
  * Hook implementations for syslog.
@@ -41,7 +43,7 @@ class SyslogHooks {
   /**
    * Implements hook_form_FORM_ID_alter().
    */
-  #[Hook('form_system_logging_settings_alter')]
+  #[FormAlter(LoggingForm::class)]
   public function formSystemLoggingSettingsAlter(&$form, FormStateInterface $form_state) : void {
     $config = \Drupal::configFactory()->getEditable('syslog.settings');
     $help = \Drupal::moduleHandler()->moduleExists('help') ? ' ' . Link::fromTextAndUrl($this->t('More information'), Url::fromRoute('help.page', ['name' => 'syslog']))->toString() . '.' : NULL;

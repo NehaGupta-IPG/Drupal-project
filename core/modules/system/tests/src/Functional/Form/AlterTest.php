@@ -37,6 +37,7 @@ class AlterTest extends BrowserTestBase {
       'block_form_form_test_alter_form_alter() executed.',
       'form_test_form_alter() executed.',
       'form_test_form_form_test_alter_form_alter() executed.',
+      'form_test FormAlter(FormTestAlterForm::class) executed.',
       'system_form_form_test_alter_form_alter() executed.',
     ];
     $content = preg_replace('/\s+/', ' ', Xss::filter($this->getSession()->getPage()->getContent(), []));

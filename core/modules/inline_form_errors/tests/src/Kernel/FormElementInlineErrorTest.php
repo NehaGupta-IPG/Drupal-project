@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\inline_form_errors\Kernel;
 
+use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -40,6 +41,7 @@ class FormElementInlineErrorTest extends KernelTestBase {
       '#array_parents' => ['test'],
     ];
     $form_state = new FormState();
+    $form_state->setFormObject($this->createStub(FormInterface::class));
 
     \Drupal::formBuilder()->prepareForm($form_id, $form, $form_state);
     \Drupal::formBuilder()->processForm($form_id, $form, $form_state);

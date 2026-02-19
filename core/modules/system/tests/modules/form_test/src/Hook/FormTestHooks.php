@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Drupal\form_test\Hook;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Hook\Attribute\FormAlter;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\form_test\Callbacks;
+use Drupal\form_test\Form\FormTestAlterForm;
 
 /**
  * Hook implementations for form_test.
@@ -40,6 +42,14 @@ class FormTestHooks {
   #[Hook('form_form_test_alter_form_alter')]
   public function formFormTestAlterFormAlter(&$form, FormStateInterface $form_state) : void {
     \Drupal::messenger()->addStatus('form_test_form_form_test_alter_form_alter() executed.');
+  }
+
+  /**
+   * Implements hook_form_FORM_ID_alter() via FormAlter attribute with FQCN.
+   */
+  #[FormAlter(FormTestAlterForm::class)]
+  public function formTestAlterFormFqcnAlter(&$form, FormStateInterface $form_state): void {
+    \Drupal::messenger()->addStatus('form_test FormAlter(FormTestAlterForm::class) executed.');
   }
 
   /**

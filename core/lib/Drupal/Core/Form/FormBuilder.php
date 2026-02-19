@@ -891,13 +891,14 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     // identify this render array as a form to the render cache.
     $form['#cache']['tags'][] = 'CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form';
 
-    // Invoke hook_form_alter(), hook_form_BASE_FORM_ID_alter(), and
-    // hook_form_FORM_ID_alter() implementations.
+    // Invoke hook_form_alter(), hook_form_BASE_FORM_ID_alter(),
+    // hook_form_FORM_ID_alter(), and FQCN-based FormAlter implementations.
     $hooks = ['form'];
     if (isset($build_info['base_form_id'])) {
       $hooks[] = 'form_' . $build_info['base_form_id'];
     }
     $hooks[] = 'form_' . $form_id;
+    $hooks[] = 'form_' . get_class($form_state->getFormObject());
     $this->moduleHandler->alter($hooks, $form, $form_state, $form_id);
     $this->themeManager->alter($hooks, $form, $form_state, $form_id);
   }
