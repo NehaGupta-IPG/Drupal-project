@@ -113,18 +113,6 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
               'fragment' => 'comments',
               'url' => $entity->toUrl(),
             ];
-            if ($this->moduleHandler->moduleExists('history')) {
-              $links['comment-new-comments'] = [
-                'title' => '',
-                'url' => Url::fromRoute('<current>'),
-                'attributes' => [
-                  'class' => 'hidden',
-                  'title' => $this->t('Jump to the first new comment.'),
-                  'data-history-node-last-comment-timestamp' => $field->last_comment_timestamp,
-                  'data-history-node-field-name' => $field_name,
-                ],
-              ];
-            }
           }
           // Provide a link to new comment form.
           if ($commenting_status == CommentItemInterface::OPEN) {

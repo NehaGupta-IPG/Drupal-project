@@ -13,14 +13,18 @@ use Drupal\node\Entity\NodeType;
 use Drupal\Tests\comment\Traits\CommentCreationTrait;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Tests the comment controller.
- *
- * @group comment
- * @coversDefaultClass \Drupal\comment\Controller\CommentController
  */
+#[Group('comment')]
+#[CoversClass(CommentController::class)]
+#[RunTestsInSeparateProcesses]
 class CommentControllerTest extends KernelTestBase {
 
   use CommentCreationTrait;
@@ -43,10 +47,8 @@ class CommentControllerTest extends KernelTestBase {
 
   /**
    * The tested comment controller.
-   *
-   * @var \Drupal\comment\Controller\CommentController
    */
-  protected $controller;
+  protected CommentController $controller;
 
   /**
    * {@inheritdoc}
@@ -74,10 +76,8 @@ class CommentControllerTest extends KernelTestBase {
    *   User permissions.
    * @param bool $expectation
    *   The access expectation.
-   *
-   * @covers ::replyFormAccess
-   * @dataProvider providerTestReplyFormAccess
    */
+  #[DataProvider('providerTestReplyFormAccess')]
   public function testReplyFormAccess(array $permissions, bool $expectation): void {
     // Create and set as current a non-UID1 user.
     $this->setCurrentUser($this->createUser($permissions, NULL, FALSE, ['uid' => 2]));
@@ -130,7 +130,7 @@ class CommentControllerTest extends KernelTestBase {
 
     // Check that users granted with proper permissions can reply to a comment.
     $access_result = $this->controller->replyFormAccess($node, 'comment', $comment->id());
-    $this->assertEquals($expectation, $access_result->isAllowed());
+    $this->assertSame($expectation, $access_result->isAllowed());
     // Now the parent comment cache metadata should have been merged.
     $commented_entity = $comment->getCommentedEntity();
     $field_config = $commented_entity->getFieldDefinition($comment->getFieldName())->getConfig($commented_entity->bundle());
@@ -185,8 +185,6 @@ class CommentControllerTest extends KernelTestBase {
 
   /**
    * Tests that the controller returns 404 on a nonexistent comment field.
-   *
-   * @covers ::replyFormAccess
    */
   public function testReplyFormAccessWrongField(): void {
     $node = $this->createNode(['type' => 'page']);

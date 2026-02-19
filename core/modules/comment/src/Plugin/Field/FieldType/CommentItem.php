@@ -176,11 +176,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
       '#type' => 'select',
       '#title' => $this->t('Anonymous commenting'),
       '#default_value' => $settings['anonymous'],
-      '#options' => [
-        CommentInterface::ANONYMOUS_MAYNOT_CONTACT => $this->t('Anonymous posters may not enter their contact information'),
-        CommentInterface::ANONYMOUS_MAY_CONTACT => $this->t('Anonymous posters may leave their contact information'),
-        CommentInterface::ANONYMOUS_MUST_CONTACT => $this->t('Anonymous posters must leave their contact information'),
-      ],
+      '#options' => AnonymousContact::asOptions(),
       '#access' => $anonymous_user_access,
     ];
     $element['form_location'] = [
