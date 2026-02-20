@@ -16,6 +16,7 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\user\RoleInterface;
 use Drupal\user\UserInterface;
 
 /**
@@ -150,8 +151,6 @@ class CommentManager implements CommentManagerInterface {
    * {@inheritdoc}
    */
   public function forbiddenMessage(EntityInterface $entity, $field_name) {
-    // Get comments-field.
-    $field = $entity->get($field_name);
     if (!isset($this->authenticatedCanPostComments)) {
       // We only output a link if we are certain that users will get the
       // permission to post comments by logging in.

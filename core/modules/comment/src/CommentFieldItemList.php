@@ -70,7 +70,7 @@ class CommentFieldItemList extends FieldItemList {
       // comments), the field must still be accessible so the formatter can
       // display a login-to-comment prompt. Without this the formatter is
       // skipped entirely and no prompt is ever shown.
-      if (!$result->isAllowed() && (int) $this->status === CommentItemInterface::OPEN) {
+      if (!$result->isAllowed() && (int) $this->first()->get('status')->getValue() === CommentItemInterface::OPEN) {
         $result = $result->orIf(
           AccessResult::allowedIfHasPermission($account, 'access comments')
             ->addCacheableDependency($this->getEntity())

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\comment\Kernel;
 
+use Drupal\comment\CommentAccessControlHandler;
 use Drupal\comment\CommentInterface;
 use Drupal\comment\CommentManagerInterface;
+use Drupal\comment\CommentViewBuilder;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Core\Render\Element;
@@ -14,12 +16,17 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\comment\Traits\CommentCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests threaded comments with depth limitation.
- *
- * @group comment
  */
+#[CoversClass(CommentViewBuilder::class)]
+#[CoversClass(CommentAccessControlHandler::class)]
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentThreadMaxDepthTest extends KernelTestBase {
 
   use CommentCreationTrait;
@@ -68,8 +75,6 @@ class CommentThreadMaxDepthTest extends KernelTestBase {
 
   /**
    * Tests threaded comments with no depth limitation.
-   *
-   * @covers \Drupal\comment\CommentViewBuilder::buildComponents
    */
   public function testNoMaxDepth(): void {
     // Check that we're using not limited comment threading.
@@ -109,8 +114,6 @@ class CommentThreadMaxDepthTest extends KernelTestBase {
 
   /**
    * Tests threaded comments with depth limitation when replying is allowed.
-   *
-   * @covers \Drupal\comment\CommentViewBuilder::buildComponents
    */
   public function testMaxDepthReplyAllowed(): void {
     FieldConfig::loadByName('entity_test', 'entity_test', 'comment')
@@ -180,8 +183,6 @@ class CommentThreadMaxDepthTest extends KernelTestBase {
 
   /**
    * Tests threaded comments with depth limitation when replying is denied.
-   *
-   * @covers \Drupal\comment\CommentAccessControlHandler::checkCreateAccess
    */
   public function testMaxDepthReplyDenied(): void {
     FieldConfig::loadByName('entity_test', 'entity_test', 'comment')

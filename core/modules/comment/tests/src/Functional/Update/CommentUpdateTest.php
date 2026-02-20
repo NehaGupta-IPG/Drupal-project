@@ -8,12 +8,14 @@ use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Comment module update paths.
  */
 #[Group('comment')]
 #[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class CommentUpdateTest extends UpdatePathTestBase {
 
   /**

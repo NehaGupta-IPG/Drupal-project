@@ -11,6 +11,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Url;
+use Drupal\Component\Utility\NestedArray;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
@@ -191,11 +192,12 @@ class CommentLinkBuilder implements CommentLinkBuilderInterface {
           $entity_links['comment__' . $field_name]['#attached']['library'][] = 'comment/drupal.node-new-comments-link';
           // Embed the metadata for the "X new comments" link (if any) on this
           // entity.
-          $entity_links['comment__' . $field_name]['#attached']['drupalSettings']['history']['lastReadTimestamps'][$entity->id()] = history_read($entity->id());
+          if (function_exists('history_read')) {
+            $entity_links['comment__' . $field_name]['#attached']['drupalSettings']['history']['lastReadTimestamps'][$entity->id()] = history_read($entity->id());
+          }
           $new_comments = $this->commentManager->getCountNewComments($entity);
           if ($new_comments > 0) {
-            $page_number = $this->entityTypeManager
-              ->getStorage('comment')
+            $page_number = $this->entityTypeManager->getStorage('comment')
               ->getNewCommentPageNumber($field->comment_count, $new_comments, $entity, $field_name);
             $query = $page_number ? ['page' => $page_number] : NULL;
             $value = [
