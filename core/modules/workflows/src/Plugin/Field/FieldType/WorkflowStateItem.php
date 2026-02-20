@@ -25,6 +25,8 @@ use Drupal\workflows\WorkflowStateItemInterface;
 
 /**
  * Plugin implementation of the 'workflow_state' field type.
+ *
+ * @property string|null $value
  */
 #[FieldType(
   id: "workflow_state",
