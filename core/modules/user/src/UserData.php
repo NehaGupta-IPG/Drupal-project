@@ -74,7 +74,7 @@ class UserData implements UserDataInterface {
    * {@inheritdoc}
    */
   public function set($module, $uid, $name, $value) {
-    $serialized = (int) !is_scalar($value);
+    $serialized = (int) !is_string($value);
     if ($serialized) {
       $value = serialize($value);
     }
