@@ -684,7 +684,14 @@ class FormBuilderTest extends FormTestBase {
 
     $form = $this->formBuilder->buildForm($form_id, $form_state);
     $this->assertFormElement($expected_form, $form, 'test');
-    $this->assertSame('test-form', $form['#id']);
+
+    // @see \Drupal\Tests\Component\Utility::testHtmlGetUniqueId()
+    $source = 'test-form';
+    $actual = $form['#id'];
+    $random_suffix = substr($actual, strlen($source) + 2);
+    $expected = $source . '--' . $random_suffix;
+
+    $this->assertSame($expected, $actual);
   }
 
   /**
