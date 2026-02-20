@@ -36,6 +36,7 @@ class LocaleUpdateInterfaceTest extends LocaleUpdateBase {
       'administer languages',
       'access administration pages',
       'translate interface',
+      'administer locale',
     ]);
     $this->drupalLogin($admin_user);
   }
