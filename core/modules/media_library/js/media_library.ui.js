@@ -109,14 +109,14 @@
             .html(
               Drupal.t(
                 '<span class="visually-hidden">Show </span>@title<span class="visually-hidden"> media</span><span class="active-tab visually-hidden"> (selected)</span>',
-                { '@title': $(e.currentTarget).data('title') },
+                { '@title': $(e.currentTarget)[0].getAttribute('data-title') },
               ),
             );
 
           // Announce the updated content.
           Drupal.announce(
             Drupal.t('Showing @title media.', {
-              '@title': $(e.currentTarget).data('title'),
+              '@title': $(e.currentTarget)[0].getAttribute('data-title'),
             }),
           );
         });

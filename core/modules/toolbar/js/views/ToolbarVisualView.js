@@ -162,7 +162,7 @@
             'activeTab',
             !activeTab || clickedTab !== activeTab ? clickedTab : null,
           );
-
+          this.model.trigger('change:activeTab');
           event.preventDefault();
           event.stopPropagation();
         }
@@ -352,7 +352,8 @@
         //   (3) The orientation of the tray is vertical.
         if (
           !this.model.get('areSubtreesLoaded') &&
-          typeof $activeTab.data('drupal-subtrees') !== 'undefined' &&
+          $activeTab[0] &&
+          $activeTab[0].dataset?.drupalSubtrees !== undefined &&
           orientation === 'vertical'
         ) {
           const subtreesHash = drupalSettings.toolbar.subtreesHash;

@@ -23,7 +23,7 @@
 
     const toggleOrder = (reset) => {
       const current = $active.index();
-      const original = $active.data('original-order');
+      const original = Number($active[0].getAttribute('data-original-order'));
 
       // Do not change order if already first or if already reset.
       if (original === 0 || reset === (current === original)) {

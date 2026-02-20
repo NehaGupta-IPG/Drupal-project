@@ -56,12 +56,11 @@
       settings.dialog.close = function (event, ...args) {
         originalClose.apply(settings.dialog, [event, ...args]);
         // Check if the opener element is inside an AJAX container.
-        const $element = $(event.target);
-        const ajaxContainer = $element.data('uiDialog')
-          ? $element
-              .data('uiDialog')
-              .opener.closest('[data-drupal-ajax-container]')
-          : [];
+        const uiDialog = $(event.target).dialog('instance');
+        const ajaxContainer =
+          uiDialog !== undefined
+            ? uiDialog.opener.closest('[data-drupal-ajax-container]')
+            : [];
 
         // If the opener element was in an ajax container, and focus is on the
         // body element, we can assume focus was lost. To recover, focus is
@@ -267,7 +266,7 @@
    *   Dialog settings.
    */
   window.addEventListener('dialog:aftercreate', (event) => {
-    const dialog = event.dialog;
+    const { dialog } = event;
     const cancelButton = event.target.querySelector('.dialog-cancel');
     const cancelClick = (e) => {
       dialog.close('cancel');

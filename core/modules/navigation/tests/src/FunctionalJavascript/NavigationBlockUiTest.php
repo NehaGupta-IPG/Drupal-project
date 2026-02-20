@@ -134,7 +134,6 @@ class NavigationBlockUiTest extends WebDriverTestBase {
     $page = $this->getSession()->getPage();
     $this->getSession()->getPage()->pressButton('Enable edit mode');
     $this->assertSession()->assertWaitOnAjaxRequest();
-
     // Add section should not be present.
     $this->assertSession()->linkNotExists('Add section');
     // Configure section should not be present.

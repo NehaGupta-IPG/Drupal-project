@@ -122,8 +122,7 @@
 
             // Create the row handler, make it accessible from the DOM row
             // element.
-            const rowHandler = new rowHandlers[data.rowHandler](row, data);
-            $(row).data('fieldUIRowHandler', rowHandler);
+            row.rowHandler = new rowHandlers[data.rowHandler](row, data);
           }
         });
     },
@@ -141,7 +140,7 @@
         return;
       }
 
-      const rowHandler = $row.data('fieldUIRowHandler');
+      const rowHandler = this.closest('tr').rowHandler;
       const refreshRows = {};
       refreshRows[rowHandler.name] = $trigger.get(0);
 
@@ -189,7 +188,7 @@
       const dragObject = this;
       const row = dragObject.rowObject.element;
       const $row = $(row);
-      const rowHandler = $row.data('fieldUIRowHandler');
+      const rowHandler = row.rowHandler;
       if (typeof rowHandler !== 'undefined') {
         const regionRow = $row.prevAll('tr.region-message').get(0);
         const region = regionRow.className.replace(

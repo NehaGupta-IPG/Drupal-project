@@ -204,7 +204,7 @@
             .concat(
               Drupal.t('Edit machine name'),
               '" data-drupal-selector="'.concat(
-                $target.data('drupal-selector'),
+                $target[0].getAttribute('data-drupal-selector'),
               ),
               '-machine-name-admin-link">',
             )

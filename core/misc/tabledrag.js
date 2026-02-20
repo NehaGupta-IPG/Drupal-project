@@ -135,7 +135,8 @@
      *
      * @type {boolean}
      */
-    this.striping = $(this.table).data('striping') === 1;
+    this.striping =
+      Number($(this.table)[0].getAttribute('data-striping')) === 1;
 
     /**
      * Configure the scroll settings.

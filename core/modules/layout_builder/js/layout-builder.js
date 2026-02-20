@@ -128,19 +128,33 @@
     const itemRegion = $item.closest('.js-layout-builder-region');
     if (to === itemRegion[0]) {
       // Find the destination delta.
-      const deltaTo = $item.closest('[data-layout-delta]').data('layout-delta');
+      const deltaTo = Number(
+        $item
+          .closest('[data-layout-delta]')[0]
+          .getAttribute('data-layout-delta'),
+      );
       // If the block didn't leave the original delta use the destination.
       const deltaFrom = $from
-        ? $from.closest('[data-layout-delta]').data('layout-delta')
+        ? Number(
+            $from
+              .closest('[data-layout-delta]')[0]
+              .getAttribute('data-layout-delta'),
+          )
         : deltaTo;
       ajax({
         url: [
-          $item.closest('[data-layout-update-url]').data('layout-update-url'),
+          $item
+            .closest('[data-layout-update-url]')[0]
+            .getAttribute('data-layout-update-url'),
           deltaFrom,
           deltaTo,
-          itemRegion.data('region'),
-          $item.data('layout-block-uuid'),
-          $item.prev('[data-layout-block-uuid]').data('layout-block-uuid'),
+          itemRegion[0].getAttribute('data-region'),
+          $item[0].getAttribute('data-layout-block-uuid'),
+          $item.prev('[data-layout-block-uuid]').length
+            ? $item
+                .prev('[data-layout-block-uuid]')[0]
+                .getAttribute('data-layout-block-uuid')
+            : undefined,
         ]
           .filter((element) => element !== undefined)
           .join('/'),
@@ -331,7 +345,11 @@
 
       // data-content-preview-id specifies the layout being edited.
       const contentPreviewId =
-        $layoutBuilderContentPreview.data('content-preview-id');
+        $layoutBuilderContentPreview.length > 0
+          ? $layoutBuilderContentPreview[0].getAttribute(
+              'data-content-preview-id',
+            )
+          : '';
 
       /**
        * Tracks if content preview is enabled for this layout. Defaults to true

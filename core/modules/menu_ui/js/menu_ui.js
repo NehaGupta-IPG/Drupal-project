@@ -50,32 +50,37 @@
         // alterations.
         const $checkbox = $this.find('.js-form-item-menu-enabled input');
         const $linkTitle = $context.find('.js-form-item-menu-title input');
+        const linkTitle = context.querySelector(
+          '.js-form-item-menu-title input',
+        );
         const $title = $this
           .closest('form')
           .find('.js-form-item-title-0-value input');
         // Bail out if we do not have all required fields.
-        if (!($checkbox.length && $linkTitle.length && $title.length)) {
+        if (
+          !($checkbox.length && $linkTitle.length && linkTitle && $title.length)
+        ) {
           return;
         }
         // If there is a link title already, mark it as overridden. The user
         // expects that toggling the checkbox twice will take over the node's
         // title.
         if ($checkbox[0].checked && $linkTitle[0].value.length) {
-          $linkTitle.data('menuLinkAutomaticTitleOverridden', true);
+          linkTitle.menuLinkAutomaticTitleOverridden = true;
         }
         // Whenever the value is changed manually, disable this behavior.
         $linkTitle.on('keyup', () => {
-          $linkTitle.data('menuLinkAutomaticTitleOverridden', true);
+          linkTitle.menuLinkAutomaticTitleOverridden = true;
         });
         // Global trigger on checkbox (do not fill-in a value when disabled).
         $checkbox.on('change', () => {
           if ($checkbox[0].checked) {
-            if (!$linkTitle.data('menuLinkAutomaticTitleOverridden')) {
+            if (!linkTitle.menuLinkAutomaticTitleOverridden) {
               $linkTitle[0].value = $title[0].value;
             }
           } else {
             $linkTitle[0].value = '';
-            $linkTitle.removeData('menuLinkAutomaticTitleOverridden');
+            linkTitle.menuLinkAutomaticTitleOverridden = undefined;
           }
           $checkbox.closest('.vertical-tabs-pane').trigger('summaryUpdated');
           $checkbox.trigger('formUpdated');
@@ -83,7 +88,7 @@
         // Take over any title change.
         $title.on('keyup', () => {
           if (
-            !$linkTitle.data('menuLinkAutomaticTitleOverridden') &&
+            !linkTitle.menuLinkAutomaticTitleOverridden &&
             $checkbox[0].checked
           ) {
             $linkTitle[0].value = $title[0].value;

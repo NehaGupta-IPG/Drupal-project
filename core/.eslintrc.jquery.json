@@ -12,7 +12,7 @@
     "no-jquery/no-clone": 2,
     "no-jquery/no-closest": 0,
     "no-jquery/no-css": 2,
-    "no-jquery/no-data": 0,
+    "no-jquery/no-data": 2,
     "no-jquery/no-deferred": 0,
     "no-jquery/no-delegate": 2,
     "no-jquery/no-each": 0,

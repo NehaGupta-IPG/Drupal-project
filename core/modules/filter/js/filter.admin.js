@@ -31,7 +31,9 @@
             .attr('id')
             .replace(/-status$/, '-settings')}']`,
         );
-        const filterSettingsTab = $filterSettings.data('verticalTab');
+        const filterSettingsTab = $filterSettings.length
+          ? $filterSettings[0].verticalTab
+          : undefined;
 
         // Bind click handler to this checkbox to conditionally show and hide
         // the filter's tableDrag row and vertical tab pane.
