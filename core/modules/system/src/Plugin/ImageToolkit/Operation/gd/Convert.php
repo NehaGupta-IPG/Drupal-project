@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Plugin\ImageToolkit\Operation\gd;
 
+use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\ImageToolkit\Attribute\ImageToolkitOperation;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
@@ -17,6 +18,15 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 )]
 class Convert extends GDImageToolkitOperationBase {
 
+  // phpcs:disable
+  /**
+   * {@inheritdoc}
+   */
+  public bool $needsToolkitInjection {
+    get => FALSE;
+  }
+  // phpcs:enable
+
   /**
    * {@inheritdoc}
    */
@@ -31,8 +41,18 @@ class Convert extends GDImageToolkitOperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function validateArguments(array $arguments) {
-    if (!in_array($arguments['extension'], $this->getToolkit()->getSupportedExtensions())) {
+  protected function validateArguments(ImageInterface|array $arguments, $extra = NULL) {
+    if ($arguments instanceof ImageInterface) {
+      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+      $image = $arguments;
+      $arguments = $extra;
+      assert(is_array($arguments));
+    }
+    else {
+      // @todo fix.
+    }
+
+    if (!in_array($arguments['extension'], $image->getToolkit()->getSupportedExtensions())) {
       throw new \InvalidArgumentException("Invalid extension ({$arguments['extension']}) specified for the image 'convert' operation");
     }
     return $arguments;
@@ -41,28 +61,37 @@ class Convert extends GDImageToolkitOperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function execute(array $arguments) {
+  protected function execute(ImageInterface|array $arguments, $extra = NULL) {
+    if ($arguments instanceof ImageInterface) {
+      $image = $arguments;
+      $arguments = $extra;
+      assert(is_array($arguments));
+    }
+    else {
+      // @todo fix.
+    }
+
     // Create a new image of the required dimensions and format, and copy
     // the original image on it with resampling. Restore the original image upon
     // failure.
-    $width = $this->getToolkit()->getWidth();
-    $height = $this->getToolkit()->getHeight();
-    $original_image = $this->getToolkit()->getImage();
-    $original_type = $this->getToolkit()->getType();
+    $width = $image->getWidth();
+    $height = $image->getHeight();
+    $original_gd_image = $image->getGdImageObject();
+    $original_type = $image->getType();
     $data = [
       'width' => $width,
       'height' => $height,
       'extension' => $arguments['extension'],
-      'transparent_color' => $this->getToolkit()->getTransparentColor(),
+      'transparent_color' => $image->getToolkit()->getTransparentColor($image),
       'is_temp' => TRUE,
     ];
-    if ($this->getToolkit()->apply('create_new', $data)) {
-      if (imagecopyresampled($this->getToolkit()->getImage(), $original_image, 0, 0, 0, 0, $width, $height, $width, $height)) {
+    if ($image->apply('create_new', $data)) {
+      if (imagecopyresampled($image->getGdImageObject(), $original_gd_image, 0, 0, 0, 0, $width, $height, $width, $height)) {
         return TRUE;
       }
       // In case of error, reset image and type to as it was.
-      $this->getToolkit()->setImage($original_image);
-      $this->getToolkit()->setType($original_type);
+      $image->setGdImageObject($original_gd_image);
+      $image->setType($original_type);
     }
     return FALSE;
   }

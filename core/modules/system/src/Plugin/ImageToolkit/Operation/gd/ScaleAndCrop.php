@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Plugin\ImageToolkit\Operation\gd;
 
+use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\ImageToolkit\Attribute\ImageToolkitOperation;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
@@ -16,6 +17,15 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
   description: new TranslatableMarkup("Scales an image to the exact width and height given. This plugin achieves the target aspect ratio by cropping the original image equally on both sides, or equally on the top and bottom. This function is useful to create uniform sized avatars from larger images.")
 )]
 class ScaleAndCrop extends GDImageToolkitOperationBase {
+
+  // phpcs:disable
+  /**
+   * {@inheritdoc}
+   */
+  public bool $needsToolkitInjection {
+    get => FALSE;
+  }
+  // phpcs:enable
 
   /**
    * {@inheritdoc}
@@ -44,9 +54,19 @@ class ScaleAndCrop extends GDImageToolkitOperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function validateArguments(array $arguments) {
-    $actualWidth = $this->getToolkit()->getWidth();
-    $actualHeight = $this->getToolkit()->getHeight();
+  protected function validateArguments(ImageInterface|array $arguments, $extra = NULL) {
+    if ($arguments instanceof ImageInterface) {
+      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+      $image = $arguments;
+      $arguments = $extra;
+      assert(is_array($arguments));
+    }
+    else {
+      // @todo fix.
+    }
+
+    $actualWidth = $image->getWidth();
+    $actualHeight = $image->getHeight();
 
     $scaleFactor = max($arguments['width'] / $actualWidth, $arguments['height'] / $actualHeight);
 
@@ -75,9 +95,19 @@ class ScaleAndCrop extends GDImageToolkitOperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function execute(array $arguments = []) {
-    return $this->getToolkit()->apply('resize', $arguments['resize'])
-        && $this->getToolkit()->apply('crop', $arguments);
+  protected function execute(ImageInterface|array $arguments, $extra = NULL) {
+    if ($arguments instanceof ImageInterface) {
+      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+      $image = $arguments;
+      $arguments = $extra;
+      assert(is_array($arguments));
+    }
+    else {
+      // @todo fix.
+    }
+
+    return $image->apply('resize', $arguments['resize'])
+        && $image->apply('crop', $arguments);
   }
 
 }
