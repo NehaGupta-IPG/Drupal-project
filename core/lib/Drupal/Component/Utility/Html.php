@@ -151,6 +151,9 @@ class Html {
   /**
    * Prepares a string for use as a valid HTML ID and guarantees uniqueness.
    *
+   * Sanitizes the ID and also appends a random string so that IDs loaded via
+   * AJAX or render caching can't conflict with others on the page.
+   *
    * @param string $id
    *   The ID to make unique.
    *
