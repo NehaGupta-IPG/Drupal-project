@@ -110,56 +110,11 @@ class HtmlTest extends TestCase {
    *   The expected result.
    * @param string $source
    *   The string being transformed to an ID.
-   * @param bool $reset
-   *   (optional) If TRUE, reset the list of seen IDs. Defaults to FALSE.
    *
    * @legacy-covers ::getUniqueId
    */
   #[DataProvider('providerTestHtmlGetUniqueId')]
-  public function testHtmlGetUniqueId($expected, $source, $reset = FALSE): void {
-    if ($reset) {
-      Html::resetSeenIds();
-    }
-    $this->assertSame($expected, Html::getUniqueId($source));
-  }
-
-  /**
-   * Provides test data for testHtmlGetId().
-   *
-   * @return array
-   *   Test data.
-   */
-  public static function providerTestHtmlGetUniqueId(): array {
-    // cSpell:disable
-    $id = 'abcdefghijklmnopqrstuvwxyz-0123456789';
-    return [
-      // Verify that letters, digits, and hyphens are not stripped from the ID.
-      [$id, $id],
-      // Verify that invalid characters are stripped from the ID.
-      ['invalididentifier', 'invalid,./:@\\^`{Üidentifier'],
-      // Verify Drupal coding standards are enforced.
-      ['id-name-1', 'ID NAME_[1]'],
-      // Verify that a repeated ID is made unique.
-      ['test-unique-id', 'test-unique-id', TRUE],
-      ['test-unique-id--2', 'test-unique-id'],
-      ['test-unique-id--3', 'test-unique-id'],
-    ];
-    // cSpell:enable
-  }
-
-  /**
-   * Tests the Html::getUniqueId() method.
-   *
-   * @param string $expected
-   *   The expected result.
-   * @param string $source
-   *   The string being transformed to an ID.
-   *
-   * @legacy-covers ::getUniqueId
-   */
-  #[DataProvider('providerTestHtmlGetUniqueIdWithAjaxIds')]
-  public function testHtmlGetUniqueIdWithAjaxIds($expected, $source): void {
-    Html::setIsAjax(TRUE);
+  public function testHtmlGetUniqueId($expected, $source): void {
     $id = Html::getUniqueId($source);
 
     // Note, we truncate two hyphens at the end.
@@ -180,7 +135,7 @@ class HtmlTest extends TestCase {
    * @return array
    *   Test data.
    */
-  public static function providerTestHtmlGetUniqueIdWithAjaxIds(): array {
+  public static function providerTestHtmlGetUniqueId(): array {
     return [
       ['test-unique-id1--', 'test-unique-id1'],
       // Note, we truncate two hyphens at the end.
