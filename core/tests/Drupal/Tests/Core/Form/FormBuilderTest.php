@@ -304,14 +304,7 @@ class FormBuilderTest extends FormTestBase {
 
     $form = $this->formBuilder->getForm($form_id);
     $this->assertFormElement($expected_form, $form, 'test');
-
-    // @see \Drupal\Tests\Component\Utility::testHtmlGetUniqueId()
-    $source = 'test-form';
-    $actual = $form['#id'];
-    $random_suffix = substr($actual, strlen($source) + 2);
-    $expected = $source . '--' . $random_suffix;
-
-    $this->assertSame($expected, $actual);
+    $this->assertFormIdSame('test-form', $form['#id']);
   }
 
   /**
@@ -336,7 +329,7 @@ class FormBuilderTest extends FormTestBase {
 
     $form = $this->formBuilder->buildForm($form_id, $form_state);
     $this->assertFormElement($expected_form, $form, 'test');
-    $this->assertSame('test-form', $form['#id']);
+    $this->assertFormIdSame('test-form', $form['#id']);
   }
 
   /**
@@ -539,11 +532,13 @@ class FormBuilderTest extends FormTestBase {
 
     $form_state = new FormState();
     $form = $this->simulateFormSubmission($form_id, $form_arg, $form_state);
-    $this->assertSame('test-form-id', $form['#id']);
+    $this->assertFormIdSame('test-form-id', $form['#id']);
+    $previous_id = $form['#id'];
 
     $form_state = new FormState();
     $form = $this->simulateFormSubmission($form_id, $form_arg, $form_state);
-    $this->assertSame('test-form-id--2', $form['#id']);
+    $this->assertFormIdSame('test-form-id', $form['#id']);
+    $this->assertNotSame($previous_id, $form['#id']);
   }
 
   /**
@@ -684,14 +679,7 @@ class FormBuilderTest extends FormTestBase {
 
     $form = $this->formBuilder->buildForm($form_id, $form_state);
     $this->assertFormElement($expected_form, $form, 'test');
-
-    // @see \Drupal\Tests\Component\Utility::testHtmlGetUniqueId()
-    $source = 'test-form';
-    $actual = $form['#id'];
-    $random_suffix = substr($actual, strlen($source) + 2);
-    $expected = $source . '--' . $random_suffix;
-
-    $this->assertSame($expected, $actual);
+    $this->assertFormIdSame('test-form', $form['#id']);
   }
 
   /**
@@ -718,7 +706,7 @@ class FormBuilderTest extends FormTestBase {
 
     $form = $this->formBuilder->buildForm($form_id, $form_state);
     $this->assertFormElement($expected_form, $form, 'test');
-    $this->assertSame('test-form', $form['#id']);
+    $this->assertFormIdSame('test-form', $form['#id']);
   }
 
   /**
@@ -1129,6 +1117,27 @@ class FormBuilderTest extends FormTestBase {
     $triggeringElement = $form_state->getTriggeringElement();
     $this->assertIsArray($triggeringElement);
     $this->assertSame('op', $triggeringElement['#name']);
+  }
+
+  /**
+   * Helper to account for random strings appended by Html::getUniqueId()
+   *
+   * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+   * @throws ExpectationFailedException
+   *
+   * @psalm-template ExpectedType
+   *
+   * @psalm-param ExpectedType $expectedId
+   *
+   * @psalm-assert =ExpectedType $actualId
+   *
+   * @see \Drupal\Tests\Component\Utility::testHtmlGetUniqueId()
+   */
+  private function assertFormIdSame($expectedId, $actualId): void {
+    $random_suffix = substr($actualId, strlen($expectedId) + 2);
+    $expected = $expectedId . '--' . $random_suffix;
+
+    $this->assertSame($expected, $actualId);
   }
 
 }
