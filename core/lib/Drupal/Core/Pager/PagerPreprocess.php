@@ -66,6 +66,12 @@ class PagerPreprocess {
       return;
     }
 
+    $variables['heading_id'] = Html::getUniqueId('pagination-heading');
+    $variables['pagination_heading_level'] = $variables['pager']['#pagination_heading_level'] ?? 'h4';
+    if (!preg_match('/^h[1-6]$/', $variables['pagination_heading_level'])) {
+      $variables['pagination_heading_level'] = 'h4';
+    }
+
     $pager_max = $pager->getTotalPages();
 
     // Nothing to do if there is only one page.
@@ -171,11 +177,6 @@ class PagerPreprocess {
     }
 
     $variables['items'] = $items;
-    $variables['heading_id'] = Html::getUniqueId('pagination-heading');
-    $variables['pagination_heading_level'] = $variables['pager']['#pagination_heading_level'] ?? 'h4';
-    if (!preg_match('/^h[1-6]$/', $variables['pagination_heading_level'])) {
-      $variables['pagination_heading_level'] = 'h4';
-    }
 
     // The rendered link needs to play well with any other query parameter used
     // on the page, like exposed filters, so for the cacheability all query

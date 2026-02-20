@@ -6,6 +6,7 @@ namespace Drupal\Tests\system\Unit\Pager;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
+use Drupal\Core\Pager\Pager;
 use Drupal\Core\Pager\PagerPreprocess;
 use Drupal\Core\Template\AttributeString;
 use Drupal\Tests\UnitTestCase;
@@ -22,6 +23,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class PreprocessPagerTest extends UnitTestCase {
 
   /**
+   * The mocked pager.
+   *
+   * @var \Drupal\Core\Pager\Pager|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected Pager $pager;
+
+  /**
    * Pager preprocess instance.
    */
   protected PagerPreprocess $pagerPreprocess;
@@ -35,19 +43,18 @@ class PreprocessPagerTest extends UnitTestCase {
     $pager_manager = $this->getMockBuilder('Drupal\Core\Pager\PagerManager')
       ->disableOriginalConstructor()
       ->getMock();
-    $pager = $this->getMockBuilder('Drupal\Core\Pager\Pager')
-      ->disableOriginalConstructor()
-      ->getMock();
     $url_generator = $this->getMockBuilder('Drupal\Core\Routing\UrlGenerator')
       ->disableOriginalConstructor()
       ->getMock();
 
-    $pager->method('getTotalPages')->willReturn(2);
-    $pager->method('getCurrentPage')->willReturn(1);
+    $this->pager = $this->getMockBuilder('Drupal\Core\Pager\Pager')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->pager->method('getCurrentPage')->willReturn(1);
 
     $url_generator->method('generateFromRoute')->willReturn('');
 
-    $pager_manager->method('getPager')->willReturn($pager);
+    $pager_manager->method('getPager')->willReturn($this->pager);
     $pager_manager->method('getUpdatedParameters')->willReturn('');
 
     $request_stack = $this->createMock(RequestStack::class);
@@ -72,6 +79,7 @@ class PreprocessPagerTest extends UnitTestCase {
    * @legacy-covers ::preprocessPager
    */
   public function testQuantityNotSet(): void {
+    $this->pager->method('getTotalPages')->willReturn(2);
     $variables = [
       'pager' => [
         '#element' => '',
@@ -92,6 +100,7 @@ class PreprocessPagerTest extends UnitTestCase {
    * @legacy-covers ::preprocessPager
    */
   public function testQuantitySet(): void {
+    $this->pager->method('getTotalPages')->willReturn(2);
     $variables = [
       'pager' => [
         '#element' => '2',
@@ -116,6 +125,7 @@ class PreprocessPagerTest extends UnitTestCase {
    * @legacy-covers ::preprocessPager
    */
   public function testEmptyPaginationHeadingLevelSet(): void {
+    $this->pager->method('getTotalPages')->willReturn(1);
     $variables = [
       'pager' => [
         '#element' => '2',
@@ -137,6 +147,7 @@ class PreprocessPagerTest extends UnitTestCase {
    * @legacy-covers ::preprocessPager
    */
   public function testPaginationHeadingLevelNotSet(): void {
+    $this->pager->method('getTotalPages')->willReturn(1);
     $variables = [
       'pager' => [
         '#element' => '',
@@ -157,6 +168,7 @@ class PreprocessPagerTest extends UnitTestCase {
    * @legacy-covers ::preprocessPager
    */
   public function testPaginationHeadingLevelSet(): void {
+    $this->pager->method('getTotalPages')->willReturn(1);
     $variables = [
       'pager' => [
         '#element' => '2',
@@ -178,6 +190,7 @@ class PreprocessPagerTest extends UnitTestCase {
    * @legacy-covers ::preprocessPager
    */
   public function testPaginationHeadingLevelInvalid(): void {
+    $this->pager->method('getTotalPages')->willReturn(1);
     $variables = [
       'pager' => [
         '#element' => '2',
@@ -197,6 +210,7 @@ class PreprocessPagerTest extends UnitTestCase {
    * Tests pager links get modal attributes when request is in a modal.
    */
   public function testPagerModalAttributes(): void {
+    $this->pager->method('getTotalPages')->willReturn(2);
     $variables = [
       'pager' => [
         '#element' => '',
