@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Plugin\ImageToolkit\Operation\gd;
 
+use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\ImageToolkit\Attribute\ImageToolkitOperation;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
@@ -16,6 +17,15 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
   description: new TranslatableMarkup("Crops an image to a rectangle specified by the given dimensions.")
 )]
 class Crop extends GDImageToolkitOperationBase {
+
+  // phpcs:disable
+  /**
+   * {@inheritdoc}
+   */
+  public bool $needsToolkitInjection {
+    get => FALSE;
+  }
+  // phpcs:enable
 
   /**
    * {@inheritdoc}
@@ -44,14 +54,24 @@ class Crop extends GDImageToolkitOperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function validateArguments(array $arguments) {
+  protected function validateArguments(ImageInterface|array $arguments, $extra = NULL) {
+    if ($arguments instanceof ImageInterface) {
+      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+      $image = $arguments;
+      $arguments = $extra;
+      assert(is_array($arguments));
+    }
+    else {
+      // @todo fix.
+    }
+
     // Assure at least one dimension.
     if (empty($arguments['width']) && empty($arguments['height'])) {
       throw new \InvalidArgumentException("At least one dimension ('width' or 'height') must be provided to the image 'crop' operation");
     }
 
     // Preserve aspect.
-    $aspect = $this->getToolkit()->getHeight() / $this->getToolkit()->getWidth();
+    $aspect = $image->getHeight() / $image->getWidth();
     $arguments['height'] = empty($arguments['height']) ? $arguments['width'] * $aspect : $arguments['height'];
     $arguments['width'] = empty($arguments['width']) ? $arguments['height'] / $aspect : $arguments['width'];
 
@@ -74,24 +94,33 @@ class Crop extends GDImageToolkitOperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function execute(array $arguments) {
+  protected function execute(ImageInterface|array $arguments, $extra = NULL) {
+    if ($arguments instanceof ImageInterface) {
+      $image = $arguments;
+      $arguments = $extra;
+      assert(is_array($arguments));
+    }
+    else {
+      // @todo fix.
+    }
+
     // Create a new image of the required dimensions, and copy and resize
     // the original image on it with resampling. Restore the original image upon
     // failure.
-    $original_image = $this->getToolkit()->getImage();
+    $original_gd_image = $image->getGdImageObject();
     $data = [
       'width' => $arguments['width'],
       'height' => $arguments['height'],
-      'extension' => image_type_to_extension($this->getToolkit()->getType(), FALSE),
-      'transparent_color' => $this->getToolkit()->getTransparentColor(),
+      'extension' => image_type_to_extension($image->getType(), FALSE),
+      'transparent_color' => $image->getToolkit()->getTransparentColor($image),
       'is_temp' => TRUE,
     ];
-    if ($this->getToolkit()->apply('create_new', $data)) {
-      if (imagecopyresampled($this->getToolkit()->getImage(), $original_image, 0, 0, $arguments['x'], $arguments['y'], $arguments['width'], $arguments['height'], $arguments['width'], $arguments['height'])) {
+    if ($image->apply('create_new', $data)) {
+      if (imagecopyresampled($image->getGdImageObject(), $original_gd_image, 0, 0, $arguments['x'], $arguments['y'], $arguments['width'], $arguments['height'], $arguments['width'], $arguments['height'])) {
         return TRUE;
       }
       // In case of failure, restore the original image.
-      $this->getToolkit()->setImage($original_image);
+      $image->setGdImageObject($original_gd_image);
     }
     return FALSE;
   }

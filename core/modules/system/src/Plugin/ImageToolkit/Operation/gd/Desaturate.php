@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Plugin\ImageToolkit\Operation\gd;
 
+use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\ImageToolkit\Attribute\ImageToolkitOperation;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 
@@ -17,6 +18,15 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
 )]
 class Desaturate extends GDImageToolkitOperationBase {
 
+  // phpcs:disable
+  /**
+   * {@inheritdoc}
+   */
+  public bool $needsToolkitInjection {
+    get => FALSE;
+  }
+  // phpcs:enable
+
   /**
    * {@inheritdoc}
    */
@@ -28,14 +38,36 @@ class Desaturate extends GDImageToolkitOperationBase {
   /**
    * {@inheritdoc}
    */
-  protected function execute(array $arguments) {
+  protected function validateArguments(ImageInterface|array $arguments, $extra = NULL) {
+    if ($arguments instanceof ImageInterface) {
+      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+      $image = $arguments;
+      $arguments = $extra;
+      assert(is_array($arguments));
+    }
+    return $arguments;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function execute(ImageInterface|array $arguments, $extra = NULL) {
+    if ($arguments instanceof ImageInterface) {
+      $image = $arguments;
+      $arguments = $extra;
+      assert(is_array($arguments));
+    }
+    else {
+      // @todo fix.
+    }
+
     // PHP installations using non-bundled GD do not have imagefilter.
     if (!function_exists('imagefilter')) {
-      $this->logger->notice("The image '@file' could not be desaturated because the imagefilter() function is not available in this PHP installation.", ['@file' => $this->getToolkit()->getSource()]);
+      $this->logger->notice("The image '@file' could not be desaturated because the imagefilter() function is not available in this PHP installation.", ['@file' => $image->getSource()]);
       return FALSE;
     }
 
-    return imagefilter($this->getToolkit()->getImage(), IMG_FILTER_GRAYSCALE);
+    return imagefilter($image->getGdImageObject(), IMG_FILTER_GRAYSCALE);
   }
 
 }
