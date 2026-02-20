@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Image;
 
-use Drupal\Core\ImageToolkit\ImageToolkitException;
 use Drupal\Core\ImageToolkit\ImageToolkitInterface;
 
 /**

@@ -200,16 +200,13 @@ class GdImageWrapperTest extends UnitTestCase {
    *
    * @param string $class_name
    *   The name of the GD toolkit operation class to be mocked.
-   * @param bool $needsToolkitInjection
-   *   BC layer - Whether a copy of the toolkit should be injected to the
-   *   operation.
    * @param bool $expectsBackfillImageAccess
    *   BC layer - Whether access to the BC layer image backfill is expected.
    *
    * @return \Drupal\system\Image\GdImageWrapper
    *   An image object.
    */
-  protected function getTestImageForOperationWithToolkitInjectionToOperation(string $class_name, bool $expectsBackfillImageAccess = FALSE): GdImageWrapper {
+  protected function getTestImageForOperationWithToolkitInjectionToOperation(string $class_name, bool $expectsBackfillImageAccess = TRUE): GdImageWrapper {
     $this->toolkit = $this->getToolkitMock(['getToolkitOperation']);
     $this->toolkitOperation = $this->getToolkitOperationMock($class_name, $this->toolkit, TRUE);
     $this->toolkit->expects($this->never())
@@ -560,7 +557,7 @@ class GdImageWrapperTest extends UnitTestCase {
    */
   #[IgnoreDeprecations]
   public function testStatefulCrop(): void {
-    $this->getTestImageForOperationWithToolkitInjectionToOperation(StatefulCrop::class, TRUE);
+    $this->getTestImageForOperationWithToolkitInjectionToOperation(StatefulCrop::class);
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
       ->willReturnArgument(0);
@@ -582,7 +579,7 @@ class GdImageWrapperTest extends UnitTestCase {
    */
   #[IgnoreDeprecations]
   public function testStatefulScaleAndCrop(): void {
-    $this->getTestImageForOperationWithToolkitInjectionToOperation(StatefulScaleAndCrop::class, TRUE);
+    $this->getTestImageForOperationWithToolkitInjectionToOperation(StatefulScaleAndCrop::class);
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
       ->willReturnArgument(0);

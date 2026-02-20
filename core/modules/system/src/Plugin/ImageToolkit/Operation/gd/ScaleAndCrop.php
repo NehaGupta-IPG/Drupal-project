@@ -97,6 +97,7 @@ class ScaleAndCrop extends GDImageToolkitOperationBase {
    */
   protected function execute(ImageInterface|array $arguments, $extra = NULL) {
     if ($arguments instanceof ImageInterface) {
+      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
       $image = $arguments;
       $arguments = $extra;
       assert(is_array($arguments));

@@ -1,13 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\image_test\Plugin\ImageToolkit\Operation\gd;
 
 use Drupal\Core\ImageToolkit\Attribute\ImageToolkitOperation;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\system\Plugin\ImageToolkit\Operation\gd\GDImageToolkitOperationBase;
 
+@trigger_error('Drupal\\image_test\\Plugin\\ImageToolkit\\Operation\\gd\\StatefulCrop is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+
 /**
- * Defines GD2 Crop operation.
+ * Legacy stateful GD2 Crop operation.
+ *
+ * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+ *    whack-a-mole instead.
+ *
+ * @see https://www.drupal.org/node/7654123
  */
 #[ImageToolkitOperation(
   id: "gd_stateful_crop",
