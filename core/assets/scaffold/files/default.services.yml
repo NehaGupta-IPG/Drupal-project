@@ -111,6 +111,18 @@ parameters:
       - js
       - svg
       - twig
+    # Twig debug comments for empty markup.
+    #
+    # By default, Twig will add debug information for empty markup, which
+    # will make template variables, which are otherwise expected to be empty,
+    # to be non-empty. This can interfere with empty content check in template
+    # files where a variable is expected to not hold any content. E.g. when
+    # 'sidebar_first' variable is checked for any markup.
+    #
+    # Disabling debug on empty markup will stop twig from adding comments when
+    # the markup is empty.
+    # @default true
+    debug_on_empty: true
   renderer.config:
     # Renderer required cache contexts:
     #

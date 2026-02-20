@@ -46,7 +46,10 @@ function twig_render_template($template_file, array $variables): string|MarkupIn
     }
     throw $e;
   }
-  if ($twig_service->isDebug()) {
+
+  $twig_config = \Drupal::getContainer()?->getParameter('twig.config');
+  $debug_on_empty = !isset($twig_config['debug_on_empty']) || ($twig_config['debug_on_empty'] === TRUE);
+  if (!empty($rendered_markup || $debug_on_empty) && $twig_service->isDebug()) {
     $output = [
       'debug_prefix' => '',
       'debug_info' => '',

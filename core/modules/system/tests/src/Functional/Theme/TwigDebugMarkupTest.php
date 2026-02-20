@@ -74,6 +74,25 @@ class TwigDebugMarkupTest extends BrowserTestBase {
     $this->assertStringContainsString("THEME HOOK: 'node__foo__bar'", $output, 'Theme call information found.');
     $this->assertStringContainsString('▪️ node--foo--bar.html.twig' . PHP_EOL . '   ▪️ node--foo.html.twig' . PHP_EOL . '   ▪️ node--&lt;script type=&quot;text/javascript&quot;&gt;alert(&#039;yo&#039;);&lt;/script&gt;.html.twig' . PHP_EOL . '   ▪️ node--3--full.html.twig' . PHP_EOL . '   ▪️ node--3.html.twig' . PHP_EOL . '   ▪️ node--page--full.html.twig' . PHP_EOL . '   ▪️ node--page.html.twig' . PHP_EOL . '   ▪️ node--full.html.twig' . PHP_EOL . '   ✅ node.html.twig', $output, 'Suggested template files found in order and base template shown as current template.');
 
+    // By default, empty theme output should display debug markup.
+    $empty_element = [
+      '#theme_wrappers' => ['region'],
+      '#region' => 'abc',
+    ];
+    $element = $empty_element;
+    $output = (string) $renderer->renderRoot($element);
+    $this->assertStringContainsString('<!-- THEME DEBUG -->', $output);
+
+    // Set debug_on_empty: false, ensure debug markup is not present.
+    $parameters = $this->container->getParameter('twig.config');
+    $parameters['debug_on_empty'] = FALSE;
+    $this->setContainerParameter('twig.config', $parameters);
+    $this->rebuildContainer();
+    $this->resetAll();
+
+    $element = $empty_element;
+    $this->assertEmpty($renderer->renderRoot($element));
+
     // Disable debug, rebuild the service container, and clear all caches.
     $parameters = $this->container->getParameter('twig.config');
     $parameters['debug'] = FALSE;
