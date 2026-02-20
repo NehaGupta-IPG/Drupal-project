@@ -33,7 +33,7 @@ use Drupal\workflows\WorkflowStateItemInterface;
   label: new TranslatableMarkup("Workflow state"),
   description: new TranslatableMarkup("Stores the current workflow state."),
   default_widget: "options_select",
-  default_formatter: "list_default",
+  default_formatter: "workflow_state",
   list_class: WorkflowStateFieldItemList::class,
   cardinality: 1,
 )]
