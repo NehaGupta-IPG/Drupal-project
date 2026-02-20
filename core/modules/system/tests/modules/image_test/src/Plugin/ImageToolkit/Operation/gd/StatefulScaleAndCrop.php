@@ -4,6 +4,7 @@ namespace Drupal\image_test\Plugin\ImageToolkit\Operation\gd;
 
 use Drupal\Core\ImageToolkit\Attribute\ImageToolkitOperation;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\system\Plugin\ImageToolkit\Operation\gd\GDImageToolkitOperationBase;
 
 /**
  * Defines GD2 Scale and crop operation.

@@ -10,6 +10,7 @@ use Drupal\Core\Image\ImageInterface;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\system\Image\GdImageWrapper;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 // cspell:ignore IMG_NEAREST_NEIGHBOUR
 
@@ -49,7 +50,7 @@ abstract class GdToolkitImageManipulationTestBase extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['system'];
+  protected static $modules = ['system', 'image_test'];
 
   /**
    * {@inheritdoc}
@@ -289,6 +290,102 @@ abstract class GdToolkitImageManipulationTestBase extends KernelTestBase {
    */
   #[DataProvider('providerOperationTestCases')]
   public function testManipulations(string $test_case, string $operation, array $arguments, array $expected): void {
+    // Load up a fresh image.
+    $image = $this->imageFactory->get('core/tests/fixtures/files/' . $this->sourceTestImage);
+    $gdImage = $image->getGdImageObject();
+    $this->assertTrue($image->isValid());
+    $image_original_type = $image->getType();
+    $this->assertTrue(imageistruecolor($gdImage), "Image '$this->sourceTestImage' after load should be a truecolor image, but it is not.");
+
+    // Perform our operation.
+    $image->apply($operation, $arguments);
+
+    // The \GdImage object may have been changed, load again.
+    $gdImage = $image->getGdImageObject();
+
+    // Flush Image object to disk storage.
+    $file_path = $this->directory . '/' . $test_case . image_type_to_extension($image->getType());
+    $image->save($file_path);
+
+    // Check that the both the GD object and the Image object have an accurate
+    // record of the dimensions.
+    if (isset($expected['height']) && isset($expected['width'])) {
+      $this->assertSame($expected['height'], imagesy($gdImage), "Image '$this->sourceTestImage' after '$test_case' should have a proper height.");
+      $this->assertSame($expected['width'], imagesx($gdImage), "Image '$this->sourceTestImage' after '$test_case' should have a proper width.");
+      $this->assertSame($expected['height'], $image->getHeight(), "Image '$this->sourceTestImage' after '$test_case' should have a proper height.");
+      $this->assertSame($expected['width'], $image->getWidth(), "Image '$this->sourceTestImage' after '$test_case' should have a proper width.");
+    }
+
+    // Now check each of the corners to ensure color correctness.
+    foreach ($expected['corners'] as $key => $expected_color) {
+      // Get the location of the corner.
+      [$x, $y] = match ($key) {
+        0 => [0, 0],
+        1 => [$image->getWidth() - 1, 0],
+        2 => [$image->getWidth() - 1, $image->getHeight() - 1],
+        3 => [0, $image->getHeight() - 1],
+      };
+
+      $actual_color = $this->getPixelColor($image, $x, $y);
+
+      // If image cannot handle transparent colors, skip the pixel color test.
+      if ($actual_color[3] === 0 && $expected_color[3] === 127) {
+        continue;
+      }
+
+      // JPEG and AVIF have small differences in color after processing.
+      $tolerance = match($image_original_type) {
+        IMAGETYPE_JPEG, IMAGETYPE_AVIF => 3,
+        default => 1,
+      };
+
+      $this->assertColorsAreEqual($expected_color, $actual_color, $tolerance, "Image '$this->sourceTestImage' object after '$test_case' action has the correct color placement at corner '$key'");
+    }
+
+    // Check that saved image reloads without raising PHP errors.
+    $image_reloaded = $this->imageFactory->get($file_path);
+    $this->assertInstanceOf(\GdImage::class, $image_reloaded->getGdImageObject());
+  }
+
+  /**
+   * Data provider for ::testLegacyManipulations().
+   */
+  public static function providerLegacyOperationTestCases(): array {
+    // Setup a list of tests to perform on each type.
+    $test_cases = [
+      'stateful_crop' => [
+        'operation' => 'stateful_crop',
+        'arguments' => ['x' => 12, 'y' => 4, 'width' => 16, 'height' => 12],
+        'width' => 16,
+        'height' => 12,
+        'corners' => array_fill(0, 4, static::WHITE),
+      ],
+      'stateful_scale_and_crop' => [
+        'operation' => 'stateful_scale_and_crop',
+        'arguments' => ['width' => 10, 'height' => 8],
+        'width' => 10,
+        'height' => 8,
+        'corners' => array_fill(0, 4, static::BLACK),
+      ],
+    ];
+
+    $ret = [];
+    foreach ($test_cases as $test_case => $values) {
+      $operation = $values['operation'];
+      $arguments = $values['arguments'];
+      unset($values['operation'], $values['arguments']);
+      $ret[$test_case] = [$test_case, $operation, $arguments, $values];
+    }
+
+    return $ret;
+  }
+
+  /**
+   * Tests legacy stateful operation plugins.
+   */
+  #[DataProvider('providerLegacyOperationTestCases')]
+  #[IgnoreDeprecations]
+  public function testLegacyManipulations(string $test_case, string $operation, array $arguments, array $expected): void {
     // Load up a fresh image.
     $image = $this->imageFactory->get('core/tests/fixtures/files/' . $this->sourceTestImage);
     $gdImage = $image->getGdImageObject();

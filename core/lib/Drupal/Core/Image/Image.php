@@ -185,31 +185,6 @@ class Image implements ImageInterface {
   }
 
   /**
-   * BC layer - ensure a toolkit clone is present when needed.
-   *
-   * @var \Drupal\Core\ImageToolkit\ImageToolkitInterface
-   *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
-   *    whack-a-mole instead.
-   *
-   * @see https://www.drupal.org/node/7654123
-   */
-  public function ensureToolkitClone(): void {
-    if (isset($this->toolkit)) {
-      return;
-    }
-    if (!isset($this->imageFactory)) {
-      throw new ImageToolkitException('ImageFactory service is missing from ' . get_class($this));
-    }
-    $toolkit = $this->imageFactory->getToolkit($this->getToolkitId());
-    if ($toolkit->isStateful) {
-      throw new ImageToolkitException('$toolkit must be set in the constructor for stateful toolkits');
-    }
-    $this->toolkit = clone $toolkit;
-    $this->toolkit->backfillImage = $this;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function apply($operation, array $arguments = []) {
