@@ -100,17 +100,17 @@ class WorkflowStateItem extends FieldItemBase implements WorkflowStateItemInterf
   /**
    * {@inheritdoc}
    */
-  public static function defaultStorageSettings() {
+  public static function defaultFieldSettings() {
     return [
       'workflow' => '',
       'workflow_callback' => '',
-    ] + parent::defaultStorageSettings();
+    ] + parent::defaultFieldSettings();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function storageSettingsForm(array &$form, FormStateInterface $form_state, $has_data) {
+  public function fieldSettingsForm(array $form, FormStateInterface $form_state) {
     $element = [];
     // Allow the workflow to be changed if it's not determined by a callback.
     if (!$this->getSetting('workflow_callback')) {
@@ -127,7 +127,6 @@ class WorkflowStateItem extends FieldItemBase implements WorkflowStateItemInterf
         '#title' => $this->t('Workflow'),
         '#options' => $options,
         '#default_value' => $this->getSetting('workflow'),
-        '#disabled' => $has_data,
         '#required' => TRUE,
       ];
     }
@@ -270,12 +269,11 @@ class WorkflowStateItem extends FieldItemBase implements WorkflowStateItemInterf
    *   The workflow ID, or NULL if it could not be determined.
    */
   public static function resolveWorkflowId(FieldDefinitionInterface $field_definition, ?FieldableEntityInterface $entity = NULL): ?string {
-    $storage_definition = $field_definition->getFieldStorageDefinition();
-    if ($callback = $storage_definition->getSetting('workflow_callback')) {
+    if ($callback = $field_definition->getSetting('workflow_callback')) {
       $workflow_id = call_user_func($callback, $field_definition, $entity);
     }
     else {
-      $workflow_id = $storage_definition->getSetting('workflow');
+      $workflow_id = $field_definition->getSetting('workflow');
     }
 
     return !empty($workflow_id) ? $workflow_id : NULL;

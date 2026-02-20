@@ -18,9 +18,9 @@ workflows.workflow.*:
     type_settings:
       type: workflow.type_settings.[%parent.type]
 
-field.storage_settings.workflow_state:
+field.field_settings.workflow_state:
   type: mapping
-  label: 'Workflow state field storage settings'
+  label: 'Workflow state field settings'
   mapping:
     workflow:
       type: string

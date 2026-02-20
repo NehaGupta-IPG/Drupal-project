@@ -66,7 +66,6 @@ class WorkflowStateItemTest extends KernelTestBase {
       'field_name' => 'field_state',
       'entity_type' => 'entity_test',
       'type' => 'workflow_state',
-      'settings' => ['workflow' => 'test_workflow'],
     ])->save();
 
     FieldConfig::create([
@@ -74,6 +73,7 @@ class WorkflowStateItemTest extends KernelTestBase {
       'entity_type' => 'entity_test',
       'bundle' => 'entity_test',
       'label' => 'State',
+      'settings' => ['workflow' => 'test_workflow'],
     ])->save();
   }
 
@@ -241,7 +241,7 @@ class WorkflowStateItemTest extends KernelTestBase {
     $incompatible->getTypePlugin()->addState('start', 'Start');
     $incompatible->save();
 
-    FieldStorageConfig::loadByName('entity_test', 'field_state')
+    FieldConfig::loadByName('entity_test', 'entity_test', 'field_state')
       ->setSetting('workflow', 'incompatible')
       ->save();
 
@@ -257,7 +257,8 @@ class WorkflowStateItemTest extends KernelTestBase {
    * Tests workflow_callback setting.
    */
   public function testWorkflowCallback(): void {
-    FieldStorageConfig::loadByName('entity_test', 'field_state')
+    // Remove the explicit workflow setting and use a callback instead.
+    FieldConfig::loadByName('entity_test', 'entity_test', 'field_state')
       ->setSetting('workflow_callback', static::class . '::workflowCallback')
       ->setSetting('workflow', '')
       ->save();
