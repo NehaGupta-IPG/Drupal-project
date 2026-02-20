@@ -216,15 +216,27 @@ class CommentAccessControlHandler extends EntityAccessControlHandler {
   /**
    * {@inheritdoc}
    */
-  protected function buildCreateAccessCid(array $context, ?string $entity_bundle): string {
-    $commented_entity_id = isset($context['commented_entity']) ? $context['commented_entity']->id() : '0';
+  protected function buildCreateAccessCid(array $context, ?string $entity_bundle): ?string {
+    $commented_entity = $context['commented_entity'] ?? NULL;
+    $commented_entity_id = $commented_entity?->id() ?? NULL;
     unset($context['commented_entity']);
 
-    $cid = parent::buildCreateAccessCid($context, $entity_bundle);
-    $cid ??= "create:$entity_bundle:";
+    // If no specific commented entity ID, skip caching entirely.
+    // The CID "create:comment:0" (or empty) would be ambiguous across entities
+    // and could cause stale cache hits for the wrong entity context.
+    if ($commented_entity_id === NULL) {
+      return NULL;
+    }
 
-    // Vary the static access cache depending on the commented/host entity.
-    return $cid . $commented_entity_id;
+    $cid = parent::buildCreateAccessCid($context, $entity_bundle);
+    if ($cid === NULL) {
+      return NULL;
+    }
+
+    // Vary the static access cache by commented/host entity ID.
+    // Use a colon separator to avoid CID ambiguity (e.g. bundle 'foo' with
+    // entity 1 vs bundle 'foo1' with no entity).
+    return $cid . ':' . $commented_entity_id;
   }
 
 }

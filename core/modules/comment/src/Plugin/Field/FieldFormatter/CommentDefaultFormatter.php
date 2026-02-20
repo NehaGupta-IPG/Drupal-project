@@ -173,20 +173,26 @@ class CommentDefaultFormatter extends FormatterBase {
       // Append comment form if the comments are open and the form is set to
       // display below the entity. Do not show the form for the print view mode.
       if ($status == CommentItemInterface::OPEN && $comment_settings['form_location'] == CommentItemInterface::FORM_BELOW && $this->viewMode != 'print') {
-        // Inject a lazy builder which will show the add comment form if the
-        // user has access.
-        $output['comment_form'] = [
-          '#lazy_builder' => [
-            'comment.lazy_builders:renderForm',
-            [
-              $entity->getEntityTypeId(),
-              $entity->id(),
-              $field_name,
-              $this->getFieldSetting('comment_type'),
+        // Only add the comment form if the user has create access. This
+        // prevents the template's {% if comment_form %} from evaluating to
+        // TRUE (due to a non-empty lazy builder render array) and rendering
+        // the "Add new comment" heading for users who cannot post.
+        $create_access = $items->access('create', $this->currentUser, TRUE);
+        $cacheability->addCacheableDependency($create_access);
+        if ($create_access->isAllowed()) {
+          $output['comment_form'] = [
+            '#lazy_builder' => [
+              'comment.lazy_builders:renderForm',
+              [
+                $entity->getEntityTypeId(),
+                $entity->id(),
+                $field_name,
+                $this->getFieldSetting('comment_type'),
+              ],
             ],
-          ],
-          '#create_placeholder' => TRUE,
-        ];
+            '#create_placeholder' => TRUE,
+          ];
+        }
       }
 
       $elements[] = $output + [
