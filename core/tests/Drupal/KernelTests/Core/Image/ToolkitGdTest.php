@@ -58,9 +58,6 @@ class ToolkitGdTest extends KernelTestBase {
 
   /**
    * Tests supported extensions.
-   *
-   * @legacy-covers ::getSupportedExtensions
-   * @legacy-covers ::extensionToImageType
    */
   public function testSupportedExtensions(): void {
     // Test the list of supported extensions.
@@ -78,9 +75,8 @@ class ToolkitGdTest extends KernelTestBase {
       'webp' => IMAGETYPE_WEBP,
       'avif' => IMAGETYPE_AVIF,
     ];
-    $image = $this->imageFactory->get();
     foreach ($expected_image_types as $extension => $expected_image_type) {
-      $this->assertSame($expected_image_type, $image->getToolkit()->extensionToImageType($extension));
+      $this->assertSame($expected_image_type, $this->imageFactory->getToolkit()->extensionToImageType($extension));
     }
   }
 
@@ -128,11 +124,11 @@ class ToolkitGdTest extends KernelTestBase {
     $this->assertSame(50, $image_reloaded->getWidth());
     $this->assertSame(20, $image_reloaded->getHeight());
     $this->assertSame(image_type_to_mime_type($type), $image_reloaded->getMimeType());
-    if ($image_reloaded->getToolkit()->getType() == IMAGETYPE_GIF) {
-      $this->assertSame('#ffff00', $image_reloaded->getToolkit()->getTransparentColor(), "Image '$file' after reload should have color channel set to #ffff00, but it has not.");
+    if ($image_reloaded->getType() == IMAGETYPE_GIF) {
+      $this->assertSame('#ffff00', $image_reloaded->getToolkit()->getTransparentColor($image_reloaded), "Image '$file' after reload should have color channel set to #ffff00, but it has not.");
     }
     else {
-      $this->assertNull($image_reloaded->getToolkit()->getTransparentColor(), "Image '$file' after reload should have no color channel set, but it has.");
+      $this->assertNull($image_reloaded->getToolkit()->getTransparentColor($image_reloaded), "Image '$file' after reload should have no color channel set, but it has.");
     }
   }
 
@@ -176,7 +172,7 @@ class ToolkitGdTest extends KernelTestBase {
           implode(', ', ['GIF', 'JPEG', 'PNG', 'WEBP', 'AVIF']),
         ),
       ],
-    ], $this->imageFactory->get()->getToolkit()->getRequirements());
+    ], $this->imageFactory->getToolkit()->getRequirements());
   }
 
 }

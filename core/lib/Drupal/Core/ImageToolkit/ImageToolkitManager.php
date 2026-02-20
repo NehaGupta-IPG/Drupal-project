@@ -19,11 +19,11 @@ use Drupal\Core\Plugin\DefaultPluginManager;
 class ImageToolkitManager extends DefaultPluginManager {
 
   /**
-   * The config factory.
+   * The map of active toolkit singleton instances, keyed by plugin ID.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var array<string, ImageToolkitInterface>
    */
-  protected $configFactory;
+  protected array $activeToolkits = [];
 
   /**
    * Constructs the ImageToolkitManager object.
@@ -35,14 +35,14 @@ class ImageToolkitManager extends DefaultPluginManager {
    *   Cache backend instance to use.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The config factory.
    */
   public function __construct(
     \Traversable $namespaces,
     CacheBackendInterface $cache_backend,
     ModuleHandlerInterface $module_handler,
-    ConfigFactoryInterface $config_factory,
+    protected readonly ConfigFactoryInterface $configFactory,
   ) {
     parent::__construct(
       'Plugin/ImageToolkit',
@@ -54,7 +54,30 @@ class ImageToolkitManager extends DefaultPluginManager {
     );
 
     $this->setCacheBackend($cache_backend, 'image_toolkit_plugins');
-    $this->configFactory = $config_factory;
+  }
+
+  /**
+   * Returns an image toolkit active instance.
+   *
+   * It would be the singleton of stateless toolkit, or a new instance of the
+   * toolkit for stateful ones. In drupal:43.0.0 only stateless toolkits will
+   * be accepted.
+   *
+   * @param string $id
+   *   The ID of the image toolkit.
+   *
+   * @return \Drupal\Core\ImageToolkit\ImageToolkitInterface
+   *   The toolkit.
+   */
+  public function getToolkit(string $id): ImageToolkitInterface {
+    if (isset($this->activeToolkits[$id])) {
+      return $this->activeToolkits[$id];
+    }
+    $toolkit = $this->createInstance($id);
+    if (!$toolkit->isStateful) {
+      $this->activeToolkits[$id] = $toolkit;
+    }
+    return $toolkit;
   }
 
   /**
@@ -84,7 +107,7 @@ class ImageToolkitManager extends DefaultPluginManager {
    */
   public function getDefaultToolkit() {
     if ($toolkit_id = $this->getDefaultToolkitId()) {
-      return $this->createInstance($toolkit_id);
+      return $this->getToolkit($toolkit_id);
     }
     return FALSE;
   }

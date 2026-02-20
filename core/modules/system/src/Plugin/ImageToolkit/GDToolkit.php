@@ -16,6 +16,7 @@ use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\system\Image\GdImageWrapper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -27,20 +28,51 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 #[ImageToolkit(
   id: "gd",
   title: new TranslatableMarkup("GD2 image manipulation toolkit"),
+  imageClass: GdImageWrapper::class,
 )]
 class GDToolkit extends ImageToolkitBase {
 
+  // phpcs:ignoreFile
+
   /**
    * A GD image.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
-  protected ?\GdImage $image = NULL;
+  protected ?\GdImage $image {
+    get {
+      @trigger_error('Getting ' . __CLASS__ . '::$image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+      return $this->backfillImage->getGdImageObject();
+    }
+    set(?\GdImage $image) {
+      @trigger_error('Setting ' . __CLASS__ . '::$image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+      $this->backfillImage->setGdImageObject($image);
+    }
+  }
 
   /**
    * Image type represented by a PHP IMAGETYPE_* constant (e.g. IMAGETYPE_JPEG).
    *
    * @var int
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
-  protected $type;
+  protected $type {
+    get {
+      @trigger_error('Getting ' . __CLASS__ . '::$type is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+      return $this->backfillImage->getType();
+    }
+    set($type) {
+      @trigger_error('Setting ' . __CLASS__ . '::$type is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+      $this->backfillImage->setType($type);
+    }
+  }
 
   /**
    * Image information from a file, available prior to loading the GD object.
@@ -54,8 +86,22 @@ class GDToolkit extends ImageToolkitBase {
    * @see \Drupal\system\Plugin\ImageToolkit\GDToolkit::parseFile()
    * @see \Drupal\system\Plugin\ImageToolkit\GDToolkit::setImage()
    * @see http://php.net/manual/function.getimagesize.php
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   protected $preLoadInfo = NULL;
+
+  // phpcs:disable
+  /**
+   * {@inheritdoc}
+   */
+  public bool $isStateful {
+    get => FALSE;
+  }
+  // phpcs:enable
 
   /**
    * Constructs a GDToolkit object.
@@ -99,9 +145,14 @@ class GDToolkit extends ImageToolkitBase {
    *
    * @return $this
    *   An instance of the current toolkit object.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   public function setImage(?\GdImage $image): static {
-    $this->preLoadInfo = NULL;
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     $this->image = $image;
     return $this;
   }
@@ -111,11 +162,14 @@ class GDToolkit extends ImageToolkitBase {
    *
    * @return \GdImage|null
    *   The GD image object, or NULL if not available.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   public function getImage(): ?\GdImage {
-    if (!$this->image) {
-      $this->load();
-    }
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     return $this->image;
   }
 
@@ -150,21 +204,23 @@ class GDToolkit extends ImageToolkitBase {
    * @return bool
    *   TRUE or FALSE, based on success.
    */
-  protected function load() {
+  public function load($image = NULL) {
+    assert($image instanceof GdImageWrapper);
+
     // Return immediately if the image file is not valid.
-    if (!$this->isValid()) {
+    if (!$image->isValid()) {
       return FALSE;
     }
 
     // Invalidate the image object and return if there's no function to load the
     // image file.
-    $function = 'imagecreatefrom' . image_type_to_extension($this->getType(), FALSE);
+    $function = 'imagecreatefrom' . image_type_to_extension($image->getType(), FALSE);
     if (!function_exists($function)) {
       $this->logger->error("The image toolkit '@toolkit' can not process image '@image'.", [
         '@toolkit' => $this->getPluginId(),
-        '@image' => $this->getSource(),
+        '@image' => $image->getSource(),
       ]);
-      $this->preLoadInfo = NULL;
+      $image->setPreLoadInfo(NULL);
       return FALSE;
     }
 
@@ -174,21 +230,21 @@ class GDToolkit extends ImageToolkitBase {
       // warnings that are not actionable like loading a PNG content with
       // certain color profiles. Actual issues with image processing will
       // trigger exceptions that are logged later on.
-      $image = @$function($this->getSource());
+      $gdImage = @$function($image->getSource());
     }
     catch (\Throwable $t) {
       $this->logger->error("The image toolkit '@toolkit' failed loading image '@image'. Reported error: @class - @message", [
         '@toolkit' => $this->getPluginId(),
-        '@image' => $this->getSource(),
+        '@image' => $image->getSource(),
         '@class' => get_class($t),
         '@message' => $t->getMessage(),
       ]);
-      $this->preLoadInfo = NULL;
+      $image->setPreLoadInfo(NULL);
       return FALSE;
     }
 
-    $this->setImage($image);
-    if (imageistruecolor($image)) {
+    $image->setGdImageObject($gdImage);
+    if (imageistruecolor($gdImage)) {
       return TRUE;
     }
     else {
@@ -196,30 +252,35 @@ class GDToolkit extends ImageToolkitBase {
       // truecolor image, so that filters work correctly and don't result
       // in unnecessary dither.
       $data = [
-        'width' => imagesx($image),
-        'height' => imagesy($image),
-        'extension' => image_type_to_extension($this->getType(), FALSE),
-        'transparent_color' => $this->getTransparentColor(),
+        'width' => imagesx($gdImage),
+        'height' => imagesy($gdImage),
+        'extension' => image_type_to_extension($image->getType(), FALSE),
+        'transparent_color' => $this->doGetTransparentColor($gdImage),
         'is_temp' => TRUE,
       ];
-      if ($this->apply('create_new', $data)) {
-        imagecopy($this->getImage(), $image, 0, 0, 0, 0, imagesx($image), imagesy($image));
+      if ($this->apply('create_new', $data, $image)) {
+        imagecopy($image->getGdImageObject(), $gdImage, 0, 0, 0, 0, imagesx($gdImage), imagesy($gdImage));
       }
     }
-    return (bool) $this->getImage();
+    return (bool) $image->getGdImageObject();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function isValid() {
-    return ((bool) $this->preLoadInfo || isset($this->image));
+  public function isValid($image = NULL) {
+    assert($image instanceof GdImageWrapper);
+
+    return ($image->hasPreLoadInfo() || $image->hasGdImageObject());
   }
 
   /**
    * {@inheritdoc}
    */
-  public function save($destination) {
+  public function save($destination = NULL, $image = NULL) {
+    assert($image instanceof GdImageWrapper);
+    assert(is_string($destination));
+
     $scheme = StreamWrapperManager::getScheme($destination);
     // Work around lack of stream wrapper support in imagejpeg() and imagepng().
     if ($scheme && $this->streamWrapperManager->isValidScheme($scheme)) {
@@ -233,13 +294,13 @@ class GDToolkit extends ImageToolkitBase {
       $destination = $this->fileSystem->realpath($destination);
     }
 
-    $function = 'image' . image_type_to_extension($this->getType(), FALSE);
+    $function = 'image' . image_type_to_extension($image->getType(), FALSE);
     if (!function_exists($function)) {
       return FALSE;
     }
-    if ($this->getType() == IMAGETYPE_JPEG) {
+    if ($image->getType() == IMAGETYPE_JPEG) {
       try {
-        $success = $function($this->getImage(), $destination, $this->configFactory->get('system.image.gd')->get('jpeg_quality'));
+        $success = $function($image->getGdImageObject(), $destination, $this->configFactory->get('system.image.gd')->get('jpeg_quality'));
       }
       catch (\Throwable $t) {
         $this->logger->error("The image toolkit '@toolkit' failed saving image '@image'. Reported error: @class - @message", [
@@ -253,16 +314,16 @@ class GDToolkit extends ImageToolkitBase {
     }
     else {
       // Image types that support alpha need to be saved accordingly.
-      if (in_array($this->getType(), [
+      if (in_array($image->getType(), [
         IMAGETYPE_PNG,
         IMAGETYPE_WEBP,
         IMAGETYPE_AVIF,
       ], TRUE)) {
-        imagealphablending($this->getImage(), FALSE);
-        imagesavealpha($this->getImage(), TRUE);
+        imagealphablending($image->getGdImageObject(), FALSE);
+        imagesavealpha($image->getGdImageObject(), TRUE);
       }
       try {
-        $success = $function($this->getImage(), $destination);
+        $success = $function($image->getGdImageObject(), $destination);
       }
       catch (\Throwable $t) {
         $this->logger->error("The image toolkit '@toolkit' failed saving image '@image'. Reported error: @class - @message", [
@@ -290,11 +351,13 @@ class GDToolkit extends ImageToolkitBase {
   /**
    * {@inheritdoc}
    */
-  public function parseFile() {
-    $data = @getimagesize($this->getSource());
+  public function parseFile($image = NULL) {
+    assert($image instanceof GdImageWrapper);
+
+    $data = @getimagesize($image->getSource());
     if ($data && in_array($data[2], static::supportedTypes())) {
-      $this->setType($data[2]);
-      $this->preLoadInfo = $data;
+      $image->setType($data[2]);
+      $image->setPreLoadInfo($data);
       return TRUE;
     }
     return FALSE;
@@ -306,17 +369,38 @@ class GDToolkit extends ImageToolkitBase {
    * @return string|null
    *   A color string like '#rrggbb', or NULL if not set or not relevant.
    */
-  public function getTransparentColor() {
-    if (!$this->getImage() || $this->getType() != IMAGETYPE_GIF) {
+  public function getTransparentColor($image = NULL) {
+    // @phpstan-ignore property.deprecated
+    if (!$image && $this->backfillImage) {
+      @trigger_error(__METHOD__ . '() not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+      // @phpstan-ignore property.deprecated
+      $image = $this->backfillImage;
+    }
+    assert($image instanceof GdImageWrapper);
+
+    if ($image->getGdImageObject() === NULL || $image->getType() != IMAGETYPE_GIF) {
       return NULL;
     }
+    return $this->doGetTransparentColor($image->getGdImageObject());
+  }
+
+  /**
+   * Gets the color set for alpha channel from a \GdImage object.
+   *
+   * @var \GdImage $gdImage
+   *   A GdImage object.
+   *
+   * @return string|null
+   *   A color string like '#rrggbb', or NULL if not set or not relevant.
+   */
+  protected function doGetTransparentColor(\GdImage $gdImage): ?string {
     // Find out if a transparent color is set, will return -1 if no
     // transparent color has been defined in the image.
-    $transparent = imagecolortransparent($this->getImage());
+    $transparent = imagecolortransparent($gdImage);
     if ($transparent >= 0) {
       // Find out the number of colors in the image palette. It will be 0 for
       // truecolor images.
-      $palette_size = imagecolorstotal($this->getImage());
+      $palette_size = imagecolorstotal($gdImage);
       if ($palette_size == 0 || $transparent < $palette_size) {
         // Return the transparent color, either if it is a truecolor image
         // or if the transparent color is part of the palette.
@@ -324,7 +408,7 @@ class GDToolkit extends ImageToolkitBase {
         // image rather than of the palette, it is possible that an image
         // could be created with this index set outside the palette size.
         // (see http://stackoverflow.com/a/3898007).
-        $rgb = imagecolorsforindex($this->getImage(), $transparent);
+        $rgb = imagecolorsforindex($gdImage, $transparent);
         unset($rgb['alpha']);
         return Color::rgbToHex($rgb);
       }
@@ -335,11 +419,16 @@ class GDToolkit extends ImageToolkitBase {
   /**
    * {@inheritdoc}
    */
-  public function getWidth() {
-    if ($this->preLoadInfo) {
-      return $this->preLoadInfo[0];
+  public function getWidth($image = NULL) {
+    if (!$image instanceof GdImageWrapper) {
+      // @phpstan-ignore property.deprecated
+      $image = $this->backfillImage;
     }
-    elseif ($res = $this->getImage()) {
+
+    if ($image->hasPreLoadInfo()) {
+      return $image->getPreLoadInfo()[0];
+    }
+    elseif ($res = $image->getGdImageObject()) {
       return imagesx($res);
     }
     else {
@@ -350,11 +439,16 @@ class GDToolkit extends ImageToolkitBase {
   /**
    * {@inheritdoc}
    */
-  public function getHeight() {
-    if ($this->preLoadInfo) {
-      return $this->preLoadInfo[1];
+  public function getHeight($image = NULL) {
+    if (!$image instanceof GdImageWrapper) {
+      // @phpstan-ignore property.deprecated
+      $image = $this->backfillImage;
     }
-    elseif ($res = $this->getImage()) {
+
+    if ($image->hasPreLoadInfo()) {
+      return $image->getPreLoadInfo()[1];
+    }
+    elseif ($res = $image->getGdImageObject()) {
       return imagesy($res);
     }
     else {
@@ -368,8 +462,14 @@ class GDToolkit extends ImageToolkitBase {
    * @return int
    *   The image type represented by a PHP IMAGETYPE_* constant (e.g.
    *   IMAGETYPE_JPEG).
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   public function getType() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     return $this->type;
   }
 
@@ -381,19 +481,25 @@ class GDToolkit extends ImageToolkitBase {
    *   IMAGETYPE_JPEG).
    *
    * @return $this
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   public function setType($type) {
-    if (in_array($type, static::supportedTypes())) {
-      $this->type = $type;
-    }
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+    $this->type = $type;
     return $this;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getMimeType() {
-    return $this->getType() ? image_type_to_mime_type($this->getType()) : '';
+  public function getMimeType($image = NULL) {
+    assert($image instanceof GdImageWrapper);
+
+    return $image->getType() ? image_type_to_mime_type($image->getType()) : '';
   }
 
   /**
@@ -555,7 +661,7 @@ class GDToolkit extends ImageToolkitBase {
    *   An array of available image types. An image type is represented by a PHP
    *   IMAGETYPE_* constant (e.g. IMAGETYPE_JPEG, IMAGETYPE_PNG, etc.).
    */
-  protected static function supportedTypes() {
+  public static function supportedTypes() {
     $types = [
       IMAGETYPE_PNG,
       IMAGETYPE_JPEG,

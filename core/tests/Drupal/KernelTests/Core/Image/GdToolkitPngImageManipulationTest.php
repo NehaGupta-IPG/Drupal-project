@@ -9,6 +9,7 @@ use Drupal\system\Plugin\ImageToolkit\GDToolkit;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -19,6 +20,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[CoversClass(GDToolkit::class)]
 #[Group('Image')]
+#[IgnoreDeprecations]
 #[RequiresPhpExtension('gd')]
 #[RunTestsInSeparateProcesses]
 class GdToolkitPngImageManipulationTest extends GdToolkitImageManipulationTestBase {

@@ -8,6 +8,7 @@ use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\Image\ImageInterface;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\system\Image\GdImageWrapper;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 // cspell:ignore IMG_NEAREST_NEIGHBOUR
@@ -92,15 +93,17 @@ abstract class GdToolkitImageManipulationTestBase extends KernelTestBase {
    * Function for finding a pixel's RGBa values.
    */
   public function getPixelColor(ImageInterface $image, int $x, int $y): array {
-    $toolkit = $image->getToolkit();
-    $color_index = imagecolorat($toolkit->getImage(), $x, $y);
+    $this->assertInstanceOf(GdImageWrapper::class, $image);
 
-    $transparent_index = imagecolortransparent($toolkit->getImage());
+    $gdImage = $image->getGdImageObject();
+    $color_index = imagecolorat($gdImage, $x, $y);
+
+    $transparent_index = imagecolortransparent($gdImage);
     if ($color_index == $transparent_index) {
       return [0, 0, 0, 127];
     }
 
-    return array_values(imagecolorsforindex($toolkit->getImage(), $color_index));
+    return array_values(imagecolorsforindex($gdImage, $color_index));
   }
 
   /**
@@ -288,24 +291,26 @@ abstract class GdToolkitImageManipulationTestBase extends KernelTestBase {
   public function testManipulations(string $test_case, string $operation, array $arguments, array $expected): void {
     // Load up a fresh image.
     $image = $this->imageFactory->get('core/tests/fixtures/files/' . $this->sourceTestImage);
-    $toolkit = $image->getToolkit();
+    $gdImage = $image->getGdImageObject();
     $this->assertTrue($image->isValid());
-    $image_original_type = $image->getToolkit()->getType();
-
-    $this->assertTrue(imageistruecolor($toolkit->getImage()), "Image '$this->sourceTestImage' after load should be a truecolor image, but it is not.");
+    $image_original_type = $image->getType();
+    $this->assertTrue(imageistruecolor($gdImage), "Image '$this->sourceTestImage' after load should be a truecolor image, but it is not.");
 
     // Perform our operation.
     $image->apply($operation, $arguments);
 
+    // The \GdImage object may have been changed, load again.
+    $gdImage = $image->getGdImageObject();
+
     // Flush Image object to disk storage.
-    $file_path = $this->directory . '/' . $test_case . image_type_to_extension($image->getToolkit()->getType());
+    $file_path = $this->directory . '/' . $test_case . image_type_to_extension($image->getType());
     $image->save($file_path);
 
     // Check that the both the GD object and the Image object have an accurate
     // record of the dimensions.
     if (isset($expected['height']) && isset($expected['width'])) {
-      $this->assertSame($expected['height'], imagesy($toolkit->getImage()), "Image '$this->sourceTestImage' after '$test_case' should have a proper height.");
-      $this->assertSame($expected['width'], imagesx($toolkit->getImage()), "Image '$this->sourceTestImage' after '$test_case' should have a proper width.");
+      $this->assertSame($expected['height'], imagesy($gdImage), "Image '$this->sourceTestImage' after '$test_case' should have a proper height.");
+      $this->assertSame($expected['width'], imagesx($gdImage), "Image '$this->sourceTestImage' after '$test_case' should have a proper width.");
       $this->assertSame($expected['height'], $image->getHeight(), "Image '$this->sourceTestImage' after '$test_case' should have a proper height.");
       $this->assertSame($expected['width'], $image->getWidth(), "Image '$this->sourceTestImage' after '$test_case' should have a proper width.");
     }
@@ -338,7 +343,7 @@ abstract class GdToolkitImageManipulationTestBase extends KernelTestBase {
 
     // Check that saved image reloads without raising PHP errors.
     $image_reloaded = $this->imageFactory->get($file_path);
-    $this->assertInstanceOf(\GdImage::class, $image_reloaded->getToolkit()->getImage());
+    $this->assertInstanceOf(\GdImage::class, $image_reloaded->getGdImageObject());
   }
 
 }

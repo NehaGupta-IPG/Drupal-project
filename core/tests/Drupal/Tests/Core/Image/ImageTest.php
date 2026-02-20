@@ -6,20 +6,25 @@ namespace Drupal\Tests\Core\Image;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\File\FileSystemInterface;
-use Drupal\Core\Image\Image;
+use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\ImageToolkit\ImageToolkitOperationManagerInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
+use Drupal\system\Image\GdImageWrapper;
 use Drupal\system\Plugin\ImageToolkit\GDToolkit;
 use Drupal\system\Plugin\ImageToolkit\Operation\gd\GDImageToolkitOperationBase;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Runtime\PropertyHook;
 use Psr\Log\LoggerInterface;
 
 /**
- * Tests the image class.
+ * Tests the GdImageWrapper class.
  */
+#[CoversClass(GdImageWrapper::class)]
 #[Group('Image')]
 #[RequiresPhpExtension('gd')]
 class ImageTest extends UnitTestCase {
@@ -32,7 +37,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Image object.
    */
-  protected Image $image;
+  protected GdImageWrapper $image;
 
   /**
    * Mocked image toolkit.
@@ -66,7 +71,7 @@ class ImageTest extends UnitTestCase {
   protected function getToolkitMock(array $stubs = []): GDToolkit&MockObject {
     $mock_builder = $this->getMockBuilder(GDToolkit::class);
     $stubs = array_merge(['getPluginId', 'save'], $stubs);
-    return $mock_builder
+    $toolkit = $mock_builder
       ->setConstructorArgs([
         [],
         '',
@@ -79,6 +84,18 @@ class ImageTest extends UnitTestCase {
       ])
       ->onlyMethods($stubs)
       ->getMock();
+    return $toolkit;
+  }
+
+  /**
+   * Mocks the ImageFactory.
+   */
+  protected function getImageFactoryMock(?GDToolkit $toolkit = NULL): ImageFactory&MockObject {
+    $mock = $this->createMock(ImageFactory::class);
+    $mock->expects($this->atLeastOnce())
+      ->method('getToolkit')
+      ->willReturn($toolkit ?? $this->getToolkitMock());
+    return $mock;
   }
 
   /**
@@ -88,17 +105,27 @@ class ImageTest extends UnitTestCase {
    *   The short name of the GD toolkit operation class to be mocked.
    * @param \Drupal\system\Plugin\ImageToolkit\GDToolkit $toolkit
    *   The image toolkit object.
+   * @param bool $needsToolkitInjection
+   *   BC layer - Whether a copy of the toolkit should be injected to the
+   *   operation.
    *
    * @return \Drupal\system\Plugin\ImageToolkit\Operation\gd\GDImageToolkitOperationBase&\PHPUnit\Framework\MockObject\MockObject
    *   Mocked GDToolkit operation instance.
    */
-  protected function getToolkitOperationMock(string $class_name, GDToolkit $toolkit): GDImageToolkitOperationBase&MockObject {
+  protected function getToolkitOperationMock(string $class_name, GDToolkit $toolkit, bool $needsToolkitInjection): GDImageToolkitOperationBase&MockObject {
     $mock_builder = $this->getMockBuilder('Drupal\system\Plugin\ImageToolkit\Operation\gd\\' . $class_name);
     $operation = $mock_builder
       ->onlyMethods(['execute'])
       ->setConstructorArgs([[], '', [], $this->createStub(LoggerInterface::class)])
       ->getMock();
-    $operation->setToolkit($toolkit);
+    $operation
+      ->method(PropertyHook::get('needsToolkitInjection'))
+      ->willReturn($needsToolkitInjection);
+
+    if ($operation->needsToolkitInjection) {
+      $operation->setToolkit($toolkit);
+    }
+
     return $operation;
   }
 
@@ -111,26 +138,28 @@ class ImageTest extends UnitTestCase {
    * @param list<string> $stubs
    *   (optional) Array containing toolkit methods to be replaced with stubs.
    *
-   * @return \Drupal\Core\Image\Image
+   * @return \Drupal\system\Image\GdImageWrapper
    *   An image object.
    */
-  protected function getTestImage(bool $load_expected = TRUE, array $stubs = []): Image {
+  protected function getTestImage(bool $load_expected = TRUE, array $stubs = []): GdImageWrapper {
     if (!$load_expected && !in_array('load', $stubs)) {
       $stubs = array_merge(['load'], $stubs);
     }
 
     $this->toolkit = $this->getToolkitMock($stubs);
 
-    $this->toolkit->expects($this->any())
-      ->method('getPluginId')
-      ->willReturn('gd');
+    $this->toolkit->expects($this->never())
+      ->method('getPluginId');
 
     if (!$load_expected) {
       $this->toolkit->expects($this->never())
         ->method('load');
     }
 
-    $this->image = new Image($this->toolkit, $this->source);
+    $this->image = new GdImageWrapper($this->getImageFactoryMock($this->toolkit), 'gd', $this->source);
+
+    $this->toolkit->expects($this->never())
+      ->method(PropertyHook::get('backfillImage'));
 
     return $this->image;
   }
@@ -140,23 +169,37 @@ class ImageTest extends UnitTestCase {
    *
    * @param string $class_name
    *   The name of the GD toolkit operation class to be mocked.
+   * @param bool $needsToolkitInjection
+   *   BC layer - Whether a copy of the toolkit should be injected to the
+   *   operation.
+   * @param bool $expectsBackfillImageAccess
+   *   BC layer - Whether access to the BC layer image backfill is expected.
    *
-   * @return \Drupal\Core\Image\Image
+   * @return \Drupal\system\Image\GdImageWrapper
    *   An image object.
    */
-  protected function getTestImageForOperation(string $class_name): Image {
+  protected function getTestImageForOperation(string $class_name, bool $needsToolkitInjection = TRUE, bool $expectsBackfillImageAccess = TRUE): GdImageWrapper {
     $this->toolkit = $this->getToolkitMock(['getToolkitOperation']);
-    $this->toolkitOperation = $this->getToolkitOperationMock($class_name, $this->toolkit);
+    $this->toolkitOperation = $this->getToolkitOperationMock($class_name, $this->toolkit, $needsToolkitInjection);
 
-    $this->toolkit->expects($this->any())
+    $this->toolkit->expects($this->never())
       ->method('getPluginId')
       ->willReturn('gd');
 
-    $this->toolkit->expects($this->any())
+    $this->toolkit->expects($this->atLeastOnce())
       ->method('getToolkitOperation')
       ->willReturn($this->toolkitOperation);
 
-    $this->image = new Image($this->toolkit, $this->source);
+    $this->image = new GdImageWrapper($this->getImageFactoryMock($this->toolkit), 'gd', $this->source);
+
+    if ($needsToolkitInjection) {
+      $this->toolkit->expects($expectsBackfillImageAccess ? $this->atLeastOnce() : $this->never())
+        ->method(PropertyHook::get('backfillImage'))
+        ->willReturn($this->image);
+
+      // @phpstan-ignore method.deprecated
+      $this->image->ensureToolkitClone();
+    }
 
     return $this->image;
   }
@@ -190,7 +233,7 @@ class ImageTest extends UnitTestCase {
    */
   public function testGetType(): void {
     $this->getTestImage(FALSE);
-    $this->assertEquals(IMAGETYPE_PNG, $this->image->getToolkit()->getType());
+    $this->assertEquals(IMAGETYPE_PNG, $this->image->getType());
   }
 
   /**
@@ -229,7 +272,7 @@ class ImageTest extends UnitTestCase {
       ->method('save')
       ->willReturn(TRUE);
 
-    $image = new Image($toolkit, $this->image->getSource());
+    $image = new GdImageWrapper($this->getImageFactoryMock($toolkit), 'gd', $this->image->getSource());
 
     $file_system = $this->prophesize(FileSystemInterface::class);
     $file_system->chmod($this->image->getSource())
@@ -271,7 +314,7 @@ class ImageTest extends UnitTestCase {
       ->method('save')
       ->willReturn(TRUE);
 
-    $image = new Image($toolkit, $this->image->getSource());
+    $image = new GdImageWrapper($this->getImageFactoryMock($toolkit), 'gd', $this->image->getSource());
 
     $file_system = $this->prophesize(FileSystemInterface::class);
     $file_system->chmod($this->image->getSource())
@@ -293,9 +336,7 @@ class ImageTest extends UnitTestCase {
    * Tests \Drupal\Core\Image\Image::parseFile().
    */
   public function testParseFileFails(): void {
-    $toolkit = $this->getToolkitMock();
-    $image = new Image($toolkit, 'magic-foobar.png');
-
+    $image = new GdImageWrapper($this->getImageFactoryMock(), 'gd', 'magic-foobar.png');
     $this->assertFalse($image->isValid());
     $this->assertFalse($image->save());
   }
@@ -304,10 +345,10 @@ class ImageTest extends UnitTestCase {
    * Tests \Drupal\Core\Image\Image::scale().
    */
   public function testScaleWidth(): void {
-    $this->getTestImageForOperation('Scale');
+    $this->getTestImageForOperation('Scale', FALSE);
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
-      ->willReturnArgument(0);
+      ->willReturnArgument(1);
 
     $ret = $this->image->scale(44, NULL, FALSE);
     $this->assertEquals(50, $ret['height']);
@@ -317,10 +358,10 @@ class ImageTest extends UnitTestCase {
    * Tests \Drupal\Core\Image\Image::scale().
    */
   public function testScaleHeight(): void {
-    $this->getTestImageForOperation('Scale');
+    $this->getTestImageForOperation('Scale', FALSE);
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
-      ->willReturnArgument(0);
+      ->willReturnArgument(1);
 
     $ret = $this->image->scale(NULL, 50, FALSE);
     $this->assertEquals(44, $ret['width']);
@@ -330,11 +371,11 @@ class ImageTest extends UnitTestCase {
    * Tests \Drupal\Core\Image\Image::scale().
    */
   public function testScaleSame(): void {
-    $this->getTestImageForOperation('Scale');
+    $this->getTestImageForOperation('Scale', FALSE);
     // Dimensions are the same, resize should not be called.
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
-      ->willReturnArgument(0);
+      ->willReturnArgument(1);
 
     $ret = $this->image->scale(88, 100, FALSE);
     $this->assertEquals(88, $ret['width']);
@@ -344,6 +385,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::scaleAndCrop().
    */
+  #[IgnoreDeprecations]
   public function testScaleAndCropWidth(): void {
     $this->getTestImageForOperation('ScaleAndCrop');
     $this->toolkitOperation->expects($this->once())
@@ -357,6 +399,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::scaleAndCrop().
    */
+  #[IgnoreDeprecations]
   public function testScaleAndCropHeight(): void {
     $this->getTestImageForOperation('ScaleAndCrop');
     $this->toolkitOperation->expects($this->once())
@@ -370,6 +413,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::scaleAndCrop().
    */
+  #[IgnoreDeprecations]
   public function testScaleAndCropFails(): void {
     $this->getTestImageForOperation('ScaleAndCrop');
     $this->toolkitOperation->expects($this->once())
@@ -386,6 +430,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::crop().
    */
+  #[IgnoreDeprecations]
   public function testCropWidth(): void {
     $this->getTestImageForOperation('Crop');
     $this->toolkitOperation->expects($this->once())
@@ -400,6 +445,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::crop().
    */
+  #[IgnoreDeprecations]
   public function testCropHeight(): void {
     $this->getTestImageForOperation('Crop');
     $this->toolkitOperation->expects($this->once())
@@ -414,6 +460,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::crop().
    */
+  #[IgnoreDeprecations]
   public function testCrop(): void {
     $this->getTestImageForOperation('Crop');
     $this->toolkitOperation->expects($this->once())
@@ -427,8 +474,9 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::convert().
    */
+  #[IgnoreDeprecations]
   public function testConvert(): void {
-    $this->getTestImageForOperation('Convert');
+    $this->getTestImageForOperation('Convert', TRUE, FALSE);
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
       ->willReturnArgument(0);
@@ -441,10 +489,10 @@ class ImageTest extends UnitTestCase {
    * Tests \Drupal\Core\Image\Image::resize().
    */
   public function testResize(): void {
-    $this->getTestImageForOperation('Resize');
+    $this->getTestImageForOperation('Resize', FALSE);
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
-      ->willReturnArgument(0);
+      ->willReturnArgument(1);
 
     // Resize with integer for width and height.
     $ret = $this->image->resize(30, 40);
@@ -456,10 +504,10 @@ class ImageTest extends UnitTestCase {
    * Tests \Drupal\Core\Image\Image::resize().
    */
   public function testFloatResize(): void {
-    $this->getTestImageForOperation('Resize');
+    $this->getTestImageForOperation('Resize', FALSE);
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
-      ->willReturnArgument(0);
+      ->willReturnArgument(1);
 
     // Pass a float for width.
     $ret = $this->image->resize(30.4, 40);
@@ -470,8 +518,9 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::desaturate().
    */
+  #[IgnoreDeprecations]
   public function testDesaturate(): void {
-    $this->getTestImageForOperation('Desaturate');
+    $this->getTestImageForOperation('Desaturate', TRUE, FALSE);
     $this->toolkitOperation->expects($this->once())
       ->method('execute')
       ->willReturnArgument(0);
@@ -482,6 +531,7 @@ class ImageTest extends UnitTestCase {
   /**
    * Tests \Drupal\Core\Image\Image::rotate().
    */
+  #[IgnoreDeprecations]
   public function testRotate(): void {
     $this->getTestImageForOperation('Rotate');
     $this->toolkitOperation->expects($this->once())

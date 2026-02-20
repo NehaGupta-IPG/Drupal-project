@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Image;
 
+use Drupal\Core\ImageToolkit\ImageToolkitException;
 use Drupal\Core\ImageToolkit\ImageToolkitInterface;
 
 /**
@@ -25,6 +26,11 @@ class Image implements ImageInterface {
    * An image toolkit object.
    *
    * @var \Drupal\Core\ImageToolkit\ImageToolkitInterface
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   protected $toolkit;
 
@@ -36,6 +42,32 @@ class Image implements ImageInterface {
   protected $fileSize;
 
   /**
+   * The image factory.
+   *
+   * @todo make the prop non-nullable.
+   */
+  protected readonly ?ImageFactory $imageFactory;
+
+  /**
+   * The image toolkit id.
+   */
+  protected readonly string $toolkitId;
+
+  /**
+   * BC layer.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
+   */
+  public function __sleep(): array {
+    $ret = get_object_vars($this);
+    unset($ret['imageFactory'], $ret['toolkit']);
+    return array_keys($ret);
+  }
+
+  /**
    * Constructs a new Image object.
    *
    * @param \Drupal\Core\ImageToolkit\ImageToolkitInterface $toolkit
@@ -43,14 +75,22 @@ class Image implements ImageInterface {
    * @param string|null $source
    *   (optional) The path to an image file, or NULL to construct the object
    *   with no image source.
+   * @param \Drupal\Core\Image\ImageFactory|null $imageFactory
+   *   The image factory.
    */
-  public function __construct(ImageToolkitInterface $toolkit, $source = NULL) {
+  public function __construct(ImageToolkitInterface $toolkit, $source = NULL, ?ImageFactory $imageFactory = NULL) {
+    // @phpstan-ignore property.deprecated
     $this->toolkit = $toolkit;
+    // @phpstan-ignore-next-line
+    $this->toolkit->backfillImage = $this;
+    $this->toolkitId = $toolkit->getPluginId();
+    $this->imageFactory = $imageFactory;
     if ($source) {
       $this->source = $source;
+      // @phpstan-ignore-next-line
       $this->getToolkit()->setSource($this->source);
       // Defer image file validity check to the toolkit.
-      if ($this->getToolkit()->parseFile()) {
+      if ($this->getToolkit()->parseFile($this)) {
         $this->fileSize = filesize($this->source);
       }
     }
@@ -60,21 +100,21 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function isValid() {
-    return $this->getToolkit()->isValid();
+    return $this->getToolkit()->isValid($this);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getHeight() {
-    return $this->getToolkit()->getHeight();
+    return $this->getToolkit()->getHeight($this);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getWidth() {
-    return $this->getToolkit()->getWidth();
+    return $this->getToolkit()->getWidth($this);
   }
 
   /**
@@ -88,7 +128,15 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function getMimeType() {
-    return $this->getToolkit()->getMimeType();
+    return $this->getToolkit()->getMimeType($this);
+  }
+
+  /**
+   * @todo add to interface.
+   */
+  public function setSource(string $source): static {
+    $this->source = $source;
+    return $this;
   }
 
   /**
@@ -102,14 +150,15 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function getToolkitId() {
-    return $this->getToolkit()->getPluginId();
+    return $this->toolkitId;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getToolkit() {
-    return $this->toolkit;
+    // @phpstan-ignore property.deprecated
+    return $this->toolkit ?? $this->imageFactory->getToolkit($this->getToolkitId());
   }
 
   /**
@@ -122,7 +171,7 @@ class Image implements ImageInterface {
     }
 
     $destination = $destination ?: $this->getSource();
-    if ($return = $this->getToolkit()->save($destination)) {
+    if ($return = $this->getToolkit()->save($destination, $this)) {
       // Clear the cached file size and refresh the image information.
       clearstatcache(TRUE, $destination);
       $this->fileSize = filesize($destination);
@@ -136,10 +185,35 @@ class Image implements ImageInterface {
   }
 
   /**
+   * BC layer - ensure a toolkit clone is present when needed.
+   *
+   * @var \Drupal\Core\ImageToolkit\ImageToolkitInterface
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
+   */
+  public function ensureToolkitClone(): void {
+    if (isset($this->toolkit)) {
+      return;
+    }
+    if (!isset($this->imageFactory)) {
+      throw new ImageToolkitException('ImageFactory service is missing from ' . get_class($this));
+    }
+    $toolkit = $this->imageFactory->getToolkit($this->getToolkitId());
+    if ($toolkit->isStateful) {
+      throw new ImageToolkitException('$toolkit must be set in the constructor for stateful toolkits');
+    }
+    $this->toolkit = clone $toolkit;
+    $this->toolkit->backfillImage = $this;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function apply($operation, array $arguments = []) {
-    return $this->getToolkit()->apply($operation, $arguments);
+    return $this->getToolkit()->apply($operation, $arguments, $this);
   }
 
   /**

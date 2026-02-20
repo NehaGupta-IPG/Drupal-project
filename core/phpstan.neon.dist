@@ -46,6 +46,11 @@ parameters:
     - modules/system/tests/modules/plugin_test/src/Plugin/plugin_test/fruit/ExtendingNonInstalledClass.php
     - modules/system/tests/modules/plugin_test/src/Plugin/plugin_test/custom_annotation/UsingNonInstalledTraitClass.php
     - modules/system/tests/modules/plugin_test/src/Plugin/plugin_test/custom_annotation/ExtendingNonInstalledClass.php
+    # Property hooks don't work.
+    - lib/Drupal/Core/ImageToolkit/ImageToolkitBase.php
+    - lib/Drupal/Core/ImageToolkit/ImageToolkitOperationBase.php
+    - modules/system/src/Plugin/ImageToolkit/*
+    - modules/system/src/Plugin/ImageToolkit/Operation/gd/*
 
   ignoreErrors:
     # new static() is a best practice in Drupal, so we cannot fix that.

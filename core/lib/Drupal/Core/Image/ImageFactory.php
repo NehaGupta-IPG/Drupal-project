@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Image;
 
+use Drupal\Core\ImageToolkit\ImageToolkitInterface;
 use Drupal\Core\ImageToolkit\ImageToolkitManager;
 
 /**
@@ -10,34 +11,26 @@ use Drupal\Core\ImageToolkit\ImageToolkitManager;
 class ImageFactory {
 
   /**
-   * The image toolkit plugin manager.
-   *
-   * @var \Drupal\Core\ImageToolkit\ImageToolkitManager
+   * The default image toolkit ID.
    */
-  protected $toolkitManager;
-
-  /**
-   * The image toolkit ID to use for this factory.
-   *
-   * @var string
-   */
-  protected $toolkitId;
+  protected string $toolkitId;
 
   /**
    * Constructs a new ImageFactory object.
    *
-   * @param \Drupal\Core\ImageToolkit\ImageToolkitManager $toolkit_manager
+   * @param \Drupal\Core\ImageToolkit\ImageToolkitManager $toolkitManager
    *   The image toolkit plugin manager.
    */
-  public function __construct(ImageToolkitManager $toolkit_manager) {
-    $this->toolkitManager = $toolkit_manager;
+  public function __construct(
+    protected readonly ImageToolkitManager $toolkitManager,
+  ) {
   }
 
   /**
-   * Sets the ID of the image toolkit.
+   * Sets the ID of the default image toolkit.
    *
    * @param string $toolkit_id
-   *   The ID of the image toolkit to use for this image factory.
+   *   The toolkit ID.
    *
    * @return $this
    */
@@ -47,14 +40,14 @@ class ImageFactory {
   }
 
   /**
-   * Gets the ID of the image toolkit currently in use.
+   * Gets the default image toolkit ID.
    *
    * @return string
-   *   The ID of the image toolkit in use by the image factory.
+   *   The toolkit ID.
    */
   public function getToolkitId() {
-    if ($this->toolkitId === NULL) {
-      $this->toolkitId = $this->toolkitManager->getDefaultToolkitId();
+    if (!isset($this->toolkitId)) {
+      $this->setToolkitId($this->toolkitManager->getDefaultToolkitId());
     }
     return $this->toolkitId;
   }
@@ -83,8 +76,12 @@ class ImageFactory {
    * @see ImageFactory::setToolkitId()
    */
   public function get($source = NULL, $toolkit_id = NULL) {
-    $toolkit_id = $toolkit_id ?: $this->getToolkitId();
-    return new Image($this->toolkitManager->createInstance($toolkit_id), $source);
+    $toolkit = $this->getToolkit($toolkit_id);
+    // @todo in drupal:43.0.0, only allow toolkits defining their image class.
+    if ($image_class = $toolkit->getPluginDefinition()['imageClass'] ?? NULL) {
+      return new $image_class($this, $toolkit->getPluginId(), $source);
+    }
+    return new Image($toolkit, $source, $this);
   }
 
   /**
@@ -100,9 +97,25 @@ class ImageFactory {
    * @see \Drupal\Core\ImageToolkit\ImageToolkitInterface::getSupportedExtensions()
    */
   public function getSupportedExtensions($toolkit_id = NULL) {
-    $toolkit_id = $toolkit_id ?: $this->getToolkitId();
-    $definition = $this->toolkitManager->getDefinition($toolkit_id);
-    return call_user_func($definition['class'] . '::getSupportedExtensions');
+    return $this->getToolkit($toolkit_id)->getSupportedExtensions();
+  }
+
+  /**
+   * Gets an image toolkit from the manager.
+   *
+   * It would be the singleton of stateless toolkit, or a new instance of the
+   * toolkit for stateful ones. In drupal:43.0.0 only stateless toolkits will
+   * be accepted.
+   *
+   * @param string|null $toolkit_id
+   *   The ID of the image toolkit. The default toolkit will be returned if
+   *   NULL.
+   *
+   * @return \Drupal\Core\ImageToolkit\ImageToolkitInterface
+   *   The toolkit.
+   */
+  public function getToolkit(?string $toolkit_id = NULL): ImageToolkitInterface {
+    return $this->toolkitManager->getToolkit($toolkit_id ?? $this->getToolkitId());
   }
 
 }
