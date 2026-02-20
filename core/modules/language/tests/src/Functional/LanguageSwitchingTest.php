@@ -85,6 +85,7 @@ class LanguageSwitchingTest extends BrowserTestBase {
     ]);
 
     $this->doTestLanguageBlockAuthenticated($block->label());
+    $this->doTestLanguageBlockRole($block->label());
     $this->doTestHomePageLinks($block->label());
     $this->doTestLanguageBlockAnonymous($block->label());
     $this->doTestLanguageBlock404($block->label(), 'system/404');
@@ -209,6 +210,26 @@ class LanguageSwitchingTest extends BrowserTestBase {
     $this->assertFalse($settings['path']['isFront'], 'drupalSettings.path.isFront is set correctly to allow drupal.active-link to mark the correct links as active.');
     $this->assertSame('en', $settings['path']['currentLanguage'], 'drupalSettings.path.currentLanguage is set correctly to allow drupal.active-link to mark the correct links as active.');
     $this->assertSame(['English', 'français'], $labels, 'The language links labels are in their own language on the language switcher block.');
+  }
+
+  /**
+   * Verifies that the block does not have the navigation role attribute.
+   *
+   * @param string $block_label
+   *   The label of the language switching block.
+   *
+   * @see self::testLanguageBlock()
+   */
+  protected function doTestLanguageBlockRole($block_label): void {
+    // Assert that the language switching block is displayed on the frontpage.
+    $this->drupalGet('');
+    $this->assertSession()->pageTextContains($block_label);
+
+    $block = $this->xpath('//div[@id=:id][not(@role=:role)]', [
+      ':id' => 'block-test-language-block',
+      ':role' => 'navigation',
+    ]);
+    $this->assertCount(1, $block);
   }
 
   /**
