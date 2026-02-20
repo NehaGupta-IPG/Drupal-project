@@ -174,17 +174,13 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
     // @todo BC layer - remove in drupal:43.0.0.
     $args = func_get_args();
     $image = $args[2] ?? NULL;
+    $image ??= $this->backfillImage;
+    assert($image instanceof ImageInterface);
 
     try {
-      $operation = $this->getToolkitOperation($operation);
       // Get the plugin to use for the operation and apply the operation.
-      // @todo remove the needsToolkitInjection case in drupal:43.0.0.
-      if ($operation->needsToolkitInjection) {
-        return $operation->apply($arguments);
-      }
-      else {
-        return $operation->apply($image, $arguments);
-      }
+      $operation = $this->getToolkitOperation($operation);
+      return $operation->apply($image, $arguments);
     }
     catch (PluginNotFoundException) {
       $this->logger->error("The selected image handling toolkit '@toolkit' can not process operation '@operation'.", [
