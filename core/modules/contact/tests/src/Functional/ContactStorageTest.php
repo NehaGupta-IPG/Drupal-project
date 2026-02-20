@@ -82,4 +82,19 @@ class ContactStorageTest extends ContactSitewideTest {
     $this->assertEquals($id, $config->get('id'));
   }
 
+  /**
+   * Deletes all forms.
+   */
+  public function deleteContactForms() {
+    // This test uses the contact_storage_test module, which overrides the
+    // default NULL entity storage handler for contact messages, so we need to
+    // manually delete all contact messages before deleting the contact forms.
+    $messages = Message::loadMultiple();
+    \Drupal::entityTypeManager()
+      ->getStorage('contact_message')
+      ->delete($messages);
+
+    parent::deleteContactForms();
+  }
+
 }

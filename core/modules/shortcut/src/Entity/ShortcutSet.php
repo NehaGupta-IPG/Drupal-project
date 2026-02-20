@@ -96,7 +96,6 @@ class ShortcutSet extends ConfigEntityBundleBase implements ShortcutSetInterface
    * {@inheritdoc}
    */
   public static function preDelete(EntityStorageInterface $storage, array $entities) {
-    parent::preDelete($storage, $entities);
 
     foreach ($entities as $entity) {
       $storage->deleteAssignedShortcutSets($entity);
@@ -111,6 +110,7 @@ class ShortcutSet extends ConfigEntityBundleBase implements ShortcutSetInterface
       $entities = $controller->loadMultiple($shortcut_ids);
       $controller->delete($entities);
     }
+    parent::preDelete($storage, $entities);
   }
 
   /**

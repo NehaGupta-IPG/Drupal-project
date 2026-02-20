@@ -3,6 +3,7 @@
 namespace Drupal\Core\Config\Entity;
 
 use Drupal\Core\Config\ConfigNameException;
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
@@ -51,6 +52,36 @@ abstract class ConfigEntityBundleBase extends ConfigEntityBase {
       \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
       $this->entityTypeBundleInfo()->clearCachedBundles();
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function preDelete(EntityStorageInterface $storage, array $entities) {
+    // Prevent the deletion of bundle entities if there are existing content
+    // entities of this bundle.
+    $entity_type_manager = \Drupal::entityTypeManager();
+    foreach ($entities as $entity) {
+      if ($bundle_of = $entity->getEntityType()->getBundleOf()) {
+        $bundle_of_entity_type = $entity_type_manager->getDefinition($bundle_of);
+        $storage = $entity_type_manager->getStorage($bundle_of);
+
+        $has_data = (bool) $storage->getQuery()
+          ->condition($bundle_of_entity_type->getKey('bundle'), $entity->id(), '=')
+          ->accessCheck(FALSE)
+          ->range(0, 1)
+          ->execute();
+
+        if ($has_data) {
+          // Use the 409 (Conflict) status code to indicate that the deletion
+          // could not be completed due to a conflict with the current state of
+          // the target resource.
+          throw new EntityStorageException("The '{$entity->label()}' bundle contains data and can not be deleted.", 409);
+        }
+      }
+    }
+
+    parent::preDelete($storage, $entities);
   }
 
   /**

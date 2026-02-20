@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Entity\Form;
 
+use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\BaseFormIdInterface;
 use Drupal\Core\Form\ConfirmFormBase;
@@ -259,14 +260,30 @@ class DeleteMultipleForm extends ConfirmFormBase implements BaseFormIdInterface,
     }
 
     if ($delete_entities) {
-      $storage->delete($delete_entities);
-      foreach ($delete_entities as $entity) {
-        $this->logger($entity->getEntityType()->getProvider())->info('The @entity-type %label has been deleted.', [
-          '@entity-type' => $entity->getEntityType()->getSingularLabel(),
-          '%label' => $entity->label(),
-        ]);
+      try {
+        $storage->delete($delete_entities);
+        foreach ($delete_entities as $entity) {
+          $this->logger($entity->getEntityType()->getProvider())
+            ->notice('The @entity-type %label has been deleted.', [
+              '@entity-type' => $entity->getEntityType()->getSingularLabel(),
+              '%label' => $entity->label(),
+            ]);
+        }
       }
-    }
+      catch (EntityStorageException $e) {
+        // The 409 (Conflict) status code indicates that the deletion could not be
+        // completed due to a conflict with the current state of the entity.
+        if ($e->getCode() == 409) {
+          $this->messenger()->addError($this->t('Failed deletion of entity %entity_label of exception: %exception', [
+            '%entity_label' => $entity->label(),
+            '%exception' => $e->getMessage(),
+          ]));
+        }
+        else {
+          throw $e;
+        }
+      }
+   }
 
     if ($delete_translations) {
       /** @var \Drupal\Core\Entity\TranslatableInterface[][] $delete_translations */

@@ -68,12 +68,23 @@ class ContentEntityDeleteForm extends ContentEntityConfirmFormBase {
       $form_state->setRedirectUrl($untranslated_entity->toUrl('canonical'));
     }
     else {
-      $entity->delete();
+      try {
+        $entity->delete();
+        $this->messenger()->addStatus($message);
+        $this->logDeletionMessage();
+      }
+      catch (EntityStorageException $e) {
+        // The 409 (Conflict) status code indicates that the deletion could not be
+        // completed due to a conflict with the current state of the entity.
+        if ($e->getCode() == 409) {
+          $this->messenger()->addError($e->getMessage());
+        }
+        else {
+          throw $e;
+        }
+      }
       $form_state->setRedirectUrl($this->getRedirectUrl());
     }
-
-    $this->messenger()->addStatus($message);
-    $this->logDeletionMessage();
   }
 
   /**

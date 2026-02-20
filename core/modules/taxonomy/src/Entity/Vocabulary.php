@@ -126,12 +126,11 @@ class Vocabulary extends ConfigEntityBundleBase implements VocabularyInterface {
    * {@inheritdoc}
    */
   public static function preDelete(EntityStorageInterface $storage, array $entities) {
-    parent::preDelete($storage, $entities);
-
     // Only load terms without a parent, child terms will get deleted too.
     $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
     $terms = $term_storage->loadMultiple($storage->getToplevelTids(array_keys($entities)));
     $term_storage->delete($terms);
+    parent::preDelete($storage, $entities);
   }
 
   /**
