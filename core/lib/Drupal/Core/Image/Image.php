@@ -156,8 +156,25 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function getToolkit() {
-    // @phpstan-ignore property.deprecated
-    return $this->toolkit ?? $this->imageFactory->getToolkit($this->getToolkitId());
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+    if (!isset($this->toolkit)) {
+      $toolkit = $this->toolkit();
+      if ($toolkit->isStateful) {
+        $this->toolkit = $toolkit;
+      }
+      else {
+        $this->toolkit = clone $toolkit;
+        $this->toolkit->backfillImage = $this;
+      }
+    }
+    return $this->toolkit;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function toolkit(): ImageToolkitInterface {
+    return $this->imageFactory->getToolkit($this->getToolkitId());
   }
 
   /**

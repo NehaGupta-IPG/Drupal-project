@@ -85,7 +85,7 @@ class Resize extends GDImageToolkitOperationBase {
       'width' => $arguments['width'],
       'height' => $arguments['height'],
       'extension' => image_type_to_extension($image->getType(), FALSE),
-      'transparent_color' => $image->getToolkit()->getTransparentColor($image),
+      'transparent_color' => $image->toolkit()->getTransparentColor($image),
       'is_temp' => TRUE,
     ];
     if ($image->apply('create_new', $data)) {

@@ -52,7 +52,7 @@ class Convert extends GDImageToolkitOperationBase {
       // @todo fix.
     }
 
-    if (!in_array($arguments['extension'], $image->getToolkit()->getSupportedExtensions())) {
+    if (!in_array($arguments['extension'], $image->toolkit()->getSupportedExtensions())) {
       throw new \InvalidArgumentException("Invalid extension ({$arguments['extension']}) specified for the image 'convert' operation");
     }
     return $arguments;
@@ -82,7 +82,7 @@ class Convert extends GDImageToolkitOperationBase {
       'width' => $width,
       'height' => $height,
       'extension' => $arguments['extension'],
-      'transparent_color' => $image->getToolkit()->getTransparentColor($image),
+      'transparent_color' => $image->toolkit()->getTransparentColor($image),
       'is_temp' => TRUE,
     ];
     if ($image->apply('create_new', $data)) {

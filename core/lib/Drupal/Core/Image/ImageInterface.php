@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Image;
 
+use Drupal\Core\ImageToolkit\ImageToolkitInterface;
+
 /**
  * Provides an interface for image objects.
  */
@@ -62,8 +64,21 @@ interface ImageInterface {
    *
    * @return \Drupal\Core\ImageToolkit\ImageToolkitInterface
    *   The image toolkit.
+   *
+   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
+   *    whack-a-mole instead.
+   *
+   * @see https://www.drupal.org/node/7654123
    */
   public function getToolkit();
+
+  /**
+   * Returns the image toolkit singleton to be used for this image file.
+   *
+   * @return \Drupal\Core\ImageToolkit\ImageToolkitInterface
+   *   The image toolkit.
+   */
+  public function toolkit(): ImageToolkitInterface;
 
   /**
    * Returns the ID of the image toolkit used for this image file.
