@@ -3,5 +3,5 @@ description: 'Mocks PathLocator service, decorates Beginner & Committer services
 type: module
 package: Testing
 dependencies:
-  - auto_updates:package_manager
-  - auto_updates:fixture_manipulator
+  - drupal:package_manager
+  - drupal:fixture_manipulator

@@ -4,4 +4,4 @@ description: "Provides test CKEditor5 plugin with deprecated Drupal element styl
 package: Testing
 version: VERSION
 dependencies:
-  - ckeditor5:ckeditor5
+  - drupal:ckeditor5

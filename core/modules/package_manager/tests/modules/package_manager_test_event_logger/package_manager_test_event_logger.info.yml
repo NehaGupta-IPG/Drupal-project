@@ -3,4 +3,4 @@ description: 'Provides an event subscriber to test logging during events in Pack
 type: module
 package: Testing
 dependencies:
-  - auto_updates:package_manager
+  - drupal:package_manager
