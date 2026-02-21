@@ -87,9 +87,9 @@ class Image implements ImageInterface {
     if ($source) {
       $this->source = $source;
       // @phpstan-ignore-next-line
-      $this->getToolkit()->setSource($this->source);
+      $this->toolkit->setSource($this->source);
       // Defer image file validity check to the toolkit.
-      if ($this->getToolkit()->parseFile($this)) {
+      if ($this->toolkit->parseFile($this)) {
         $this->fileSize = filesize($this->source);
       }
     }
@@ -99,21 +99,21 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function isValid() {
-    return $this->getToolkit()->isValid($this);
+    return isset($this->toolkit) ? $this->toolkit->isValid($this) : $this->toolkit()->isValid($this);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getHeight() {
-    return $this->getToolkit()->getHeight($this);
+    return isset($this->toolkit) ? $this->toolkit->getHeight($this) : $this->toolkit()->getHeight($this);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getWidth() {
-    return $this->getToolkit()->getWidth($this);
+    return isset($this->toolkit) ? $this->toolkit->getWidth($this) : $this->toolkit()->getWidth($this);
   }
 
   /**
@@ -127,7 +127,7 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function getMimeType() {
-    return $this->getToolkit()->getMimeType($this);
+    return isset($this->toolkit) ? $this->toolkit->getMimeType($this) : $this->toolkit()->getMimeType($this);
   }
 
   /**
@@ -187,7 +187,7 @@ class Image implements ImageInterface {
     }
 
     $destination = $destination ?: $this->getSource();
-    if ($return = $this->getToolkit()->save($destination, $this)) {
+    if ($return = isset($this->toolkit) ? $this->toolkit->save($destination, $this) : $this->toolkit()->save($destination, $this)) {
       // Clear the cached file size and refresh the image information.
       clearstatcache(TRUE, $destination);
       $this->fileSize = filesize($destination);
@@ -204,7 +204,7 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function apply($operation, array $arguments = []) {
-    return $this->getToolkit()->apply($operation, $arguments, $this);
+    return isset($this->toolkit) ? $this->toolkit->apply($operation, $arguments, $this) : $this->toolkit()->apply($operation, $arguments, $this);
   }
 
   /**

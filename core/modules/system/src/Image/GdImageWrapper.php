@@ -44,7 +44,7 @@ class GdImageWrapper extends ImageBase {
     $this->imageFactory = $imageFactory;
     if ($source) {
       $this->source = $source;
-      if ($this->getToolkit()->parseFile($this)) {
+      if ($this->toolkit()->parseFile($this)) {
         $this->fileSize = filesize($this->source);
       }
     }
@@ -90,7 +90,7 @@ class GdImageWrapper extends ImageBase {
    */
   public function getGdImageObject(): ?\GdImage {
     if (!$this->gdImage) {
-      $this->getToolkit()->load($this);
+      $this->toolkit()->load($this);
     }
     return $this->gdImage;
   }
