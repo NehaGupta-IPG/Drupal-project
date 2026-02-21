@@ -89,6 +89,7 @@ class Image implements ImageInterface {
       // @phpstan-ignore-next-line
       $this->toolkit->setSource($this->source);
       // Defer image file validity check to the toolkit.
+      // @phpstan-ignore property.deprecated
       if ($this->toolkit->parseFile($this)) {
         $this->fileSize = filesize($this->source);
       }
@@ -99,6 +100,7 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function isValid() {
+    // @phpstan-ignore property.deprecated,property.deprecated
     return isset($this->toolkit) ? $this->toolkit->isValid($this) : $this->toolkit()->isValid($this);
   }
 
@@ -106,6 +108,7 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function getHeight() {
+    // @phpstan-ignore property.deprecated,property.deprecated
     return isset($this->toolkit) ? $this->toolkit->getHeight($this) : $this->toolkit()->getHeight($this);
   }
 
@@ -113,6 +116,7 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function getWidth() {
+    // @phpstan-ignore property.deprecated,property.deprecated
     return isset($this->toolkit) ? $this->toolkit->getWidth($this) : $this->toolkit()->getWidth($this);
   }
 
@@ -127,6 +131,7 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function getMimeType() {
+    // @phpstan-ignore property.deprecated,property.deprecated
     return isset($this->toolkit) ? $this->toolkit->getMimeType($this) : $this->toolkit()->getMimeType($this);
   }
 
@@ -187,6 +192,7 @@ class Image implements ImageInterface {
     }
 
     $destination = $destination ?: $this->getSource();
+    // @phpstan-ignore property.deprecated,property.deprecated
     if ($return = isset($this->toolkit) ? $this->toolkit->save($destination, $this) : $this->toolkit()->save($destination, $this)) {
       // Clear the cached file size and refresh the image information.
       clearstatcache(TRUE, $destination);
@@ -204,6 +210,7 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function apply($operation, array $arguments = []) {
+    // @phpstan-ignore property.deprecated,property.deprecated
     return isset($this->toolkit) ? $this->toolkit->apply($operation, $arguments, $this) : $this->toolkit()->apply($operation, $arguments, $this);
   }
 
