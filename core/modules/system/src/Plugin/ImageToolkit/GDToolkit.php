@@ -205,6 +205,12 @@ class GDToolkit extends ImageToolkitBase {
    *   TRUE or FALSE, based on success.
    */
   public function load($image = NULL) {
+    // @phpstan-ignore property.deprecated
+    if (!$image && $this->backfillImage) {
+      @trigger_error(__METHOD__ . '() not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+      // @phpstan-ignore property.deprecated
+      $image = $this->backfillImage;
+    }
     assert($image instanceof GdImageWrapper);
 
     // Return immediately if the image file is not valid.
@@ -269,6 +275,12 @@ class GDToolkit extends ImageToolkitBase {
    * {@inheritdoc}
    */
   public function isValid($image = NULL) {
+    // @phpstan-ignore property.deprecated
+    if (!$image && $this->backfillImage) {
+      @trigger_error(__METHOD__ . '() not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+      // @phpstan-ignore property.deprecated
+      $image = $this->backfillImage;
+    }
     assert($image instanceof GdImageWrapper);
 
     return ($image->hasPreLoadInfo() || $image->hasGdImageObject());
@@ -278,6 +290,12 @@ class GDToolkit extends ImageToolkitBase {
    * {@inheritdoc}
    */
   public function save($destination = NULL, $image = NULL) {
+    // @phpstan-ignore property.deprecated
+    if (!$image && $this->backfillImage) {
+      @trigger_error(__METHOD__ . '() not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+      // @phpstan-ignore property.deprecated
+      $image = $this->backfillImage;
+    }
     assert($image instanceof GdImageWrapper);
     assert(is_string($destination));
 
@@ -352,6 +370,12 @@ class GDToolkit extends ImageToolkitBase {
    * {@inheritdoc}
    */
   public function parseFile($image = NULL) {
+    // @phpstan-ignore property.deprecated
+    if (!$image && $this->backfillImage) {
+      @trigger_error(__METHOD__ . '() not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+      // @phpstan-ignore property.deprecated
+      $image = $this->backfillImage;
+    }
     assert($image instanceof GdImageWrapper);
 
     $data = @getimagesize($image->getSource());
@@ -420,10 +444,13 @@ class GDToolkit extends ImageToolkitBase {
    * {@inheritdoc}
    */
   public function getWidth($image = NULL) {
-    if (!$image instanceof GdImageWrapper) {
+    // @phpstan-ignore property.deprecated
+    if (!$image && $this->backfillImage) {
+      @trigger_error(__METHOD__ . '() not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
       // @phpstan-ignore property.deprecated
       $image = $this->backfillImage;
     }
+    assert($image instanceof GdImageWrapper);
 
     if ($image->hasPreLoadInfo()) {
       return $image->getPreLoadInfo()[0];
@@ -440,10 +467,13 @@ class GDToolkit extends ImageToolkitBase {
    * {@inheritdoc}
    */
   public function getHeight($image = NULL) {
-    if (!$image instanceof GdImageWrapper) {
+    // @phpstan-ignore property.deprecated
+    if (!$image && $this->backfillImage) {
+      @trigger_error(__METHOD__ . '() not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
       // @phpstan-ignore property.deprecated
       $image = $this->backfillImage;
     }
+    assert($image instanceof GdImageWrapper);
 
     if ($image->hasPreLoadInfo()) {
       return $image->getPreLoadInfo()[1];
@@ -497,6 +527,12 @@ class GDToolkit extends ImageToolkitBase {
    * {@inheritdoc}
    */
   public function getMimeType($image = NULL) {
+    // @phpstan-ignore property.deprecated
+    if (!$image && $this->backfillImage) {
+      @trigger_error(__METHOD__ . '() not receiving the Image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+      // @phpstan-ignore property.deprecated
+      $image = $this->backfillImage;
+    }
     assert($image instanceof GdImageWrapper);
 
     return $image->getType() ? image_type_to_mime_type($image->getType()) : '';
