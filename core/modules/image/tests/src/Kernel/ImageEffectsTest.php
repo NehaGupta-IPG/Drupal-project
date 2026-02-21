@@ -15,6 +15,9 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests image effects.
+ *
+ * @todo in drupal:43.0.0, do not remove this test when removing the
+ *   #[IgnoreDeprecations] attribute. Rather, make the test toolkit stateless.
  */
 #[Group('image')]
 #[IgnoreDeprecations]
