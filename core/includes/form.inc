@@ -282,6 +282,21 @@ function template_preprocess_vertical_tabs(&$variables): void {
 }
 
 /**
+ * Prepares variables for button templates.
+ *
+ * Default template: button.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - element: An associative array containing the properties of the element.
+ *     Properties used: #attributes.
+ */
+function template_preprocess_button(&$variables): void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
+  \Drupal::service(FormPreprocess::class)->preprocessButton($variables);
+}
+
+/**
  * Prepares variables for input templates.
  *
  * Default template: input.html.twig.
