@@ -14,6 +14,5 @@ services:
     arguments: ['@plugin.manager.mail', '@language_manager', '@logger.channel.contact', '@string_translation', '@entity_type.manager']
   Drupal\contact\MailHandlerInterface: '@contact.mail_handler'
   logger.channel.contact:
-    class: Drupal\Core\Logger\LoggerChannel
-    factory: ['@logger.factory', 'get']
+    parent: logger.channel_base
     arguments: ['contact']
