@@ -98,18 +98,30 @@ class PermissionsRepository implements PermissionsRepositoryInterface {
             $sectionWeight = 1000 * $sections[$sectionKey]['weight'];
           }
         }
+
         $this->data[$provider]['permissions'][$key]['overall_weight'] = $sectionWeight + ($permission['weight'] ?? 0);
       }
 
+      // For both permissions and sections, sort by name, then by weight.
       if (!empty($this->data[$provider]['permissions'])) {
         uasort($this->data[$provider]['permissions'], function ($a, $b) {
-          return $a['overall_weight'] <=> $b['overall_weight'];
+          if ($a['overall_weight'] != $b['overall_weight']) {
+            return $a['overall_weight'] <=> $b['overall_weight'];
+          }
+          else {
+            return (string) $a['title'] <=> (string) $b['title'];
+          }
         });
       }
 
       if (!empty($this->data[$provider]['sections'])) {
         uasort($this->data[$provider]['sections'], function ($a, $b) {
-          return $a['weight'] <=> $b['weight'];
+          if ($a['weight'] != $b['weight']) {
+            return $a['weight'] <=> $b['weight'];
+          }
+          else {
+            return (string) $a['title'] <=> (string) $b['title'];
+          }
         });
       }
     }
