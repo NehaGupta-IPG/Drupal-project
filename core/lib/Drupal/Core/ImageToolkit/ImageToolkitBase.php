@@ -122,6 +122,9 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    * @see https://www.drupal.org/node/7654123
    */
   public function __clone(): void {
+    if ($this->isStateful) {
+      throw new ImageToolkitException('Cannot clone a stateful toolkit');
+    }
     $this->isClone = TRUE;
   }
 
