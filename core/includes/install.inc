@@ -694,10 +694,6 @@ function drupal_requirements_severity(&$requirements) {
  *   TRUE or FALSE, depending on whether the requirements are met.
  */
 function drupal_check_module($module) {
-  // Load .install files for all installed modules.
-  foreach (\Drupal::moduleHandler()->getModuleList() as $already_installed_module => $extension) {
-    \Drupal::moduleHandler()->loadInclude($already_installed_module, 'install');
-  }
   /** @var \Drupal\Core\Extension\ModuleExtensionList $module_list */
   $module_list = \Drupal::service('extension.list.module');
   $extension = $module_list->get($module);
