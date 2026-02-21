@@ -10,6 +10,7 @@ namespace Drupal\user\Permissions;
  * @see \Drupal\user\Permissions\PermissionsRepositoryInterface
  */
 class PermissionsRepository implements PermissionsRepositoryInterface {
+
   /**
    * Contains the list of permissions.
    *
@@ -102,25 +103,37 @@ class PermissionsRepository implements PermissionsRepositoryInterface {
         $this->data[$provider]['permissions'][$key]['overall_weight'] = $sectionWeight + ($permission['weight'] ?? 0);
       }
 
-      // For both permissions and sections, sort by name, then by weight.
+      // For both permissions and sections, sort by weight, then by name.
       if (!empty($this->data[$provider]['permissions'])) {
         uasort($this->data[$provider]['permissions'], function ($a, $b) {
-          if ($a['overall_weight'] != $b['overall_weight']) {
-            return $a['overall_weight'] <=> $b['overall_weight'];
+          $weightA = (int) ($a['overall_weight'] ?? 0);
+          $titleA = (string) ($a['title'] ?? '');
+
+          $weightB = (int) ($b['overall_weight'] ?? 0);
+          $titleB = (string) ($b['title'] ?? '');
+
+          if ($weightA != $weightB) {
+            return $weightA <=> $weightB;
           }
           else {
-            return (string) $a['title'] <=> (string) $b['title'];
+            return $titleA <=> $titleB;
           }
         });
       }
 
       if (!empty($this->data[$provider]['sections'])) {
         uasort($this->data[$provider]['sections'], function ($a, $b) {
-          if ($a['weight'] != $b['weight']) {
-            return $a['weight'] <=> $b['weight'];
+          $weightA = (int) ($a['weight'] ?? 0);
+          $titleA = (string) ($a['title'] ?? '');
+
+          $weightB = (int) ($b['weight'] ?? 0);
+          $titleB = (string) ($b['title'] ?? '');
+
+          if ($weightA != $weightB) {
+            return $weightA <=> $weightB;
           }
           else {
-            return (string) $a['title'] <=> (string) $b['title'];
+            return $titleA <=> $titleB;
           }
         });
       }
