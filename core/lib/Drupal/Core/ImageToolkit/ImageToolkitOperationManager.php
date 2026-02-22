@@ -38,6 +38,15 @@ class ImageToolkitOperationManager extends DefaultPluginManager implements Image
   protected readonly ImageToolkitManager $toolkitManager;
 
   /**
+   * The map of active toolkit operation singleton instances.
+   *
+   * Keyed by image toolkit ID and by operation.
+   *
+   * @var array<string, array<string, ImageToolkitOperationInterface>>
+   */
+  protected array $activeToolkitOperations = [];
+
+  /**
    * Constructs the ImageToolkitOperationManager object.
    *
    * @param \Traversable $namespaces
@@ -126,8 +135,6 @@ class ImageToolkitOperationManager extends DefaultPluginManager implements Image
     }
     else {
       // Pickup the first plugin found.
-      // @todo In https://www.drupal.org/node/2110591 we'll return here the UI
-      //   selected plugin or the first found if missed.
       $definition = reset($definitions);
       return $definition['id'];
     }
@@ -138,7 +145,7 @@ class ImageToolkitOperationManager extends DefaultPluginManager implements Image
    */
   public function getToolkitOperation(ImageToolkitInterface $toolkit, $operation) {
     $plugin_id = $this->getToolkitOperationPluginId($toolkit, $operation);
-    $instance = $this->createInstance($plugin_id, $configuration);
+    $instance = $this->createInstance($plugin_id, []);
     if ($instance->needsToolkitInjection) {
       $instance->setToolkit($toolkit->isStateful ? $toolkit : clone $toolkit);
     }
