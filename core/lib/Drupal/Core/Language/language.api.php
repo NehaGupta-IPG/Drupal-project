@@ -77,7 +77,7 @@ use Drupal\Core\Language\LanguageInterface;
  * The Interface Translation module deserves special mention, because besides
  * providing a UI for translating UI text, it also imports community
  * translations from the
- * @link https://localize.drupal.org Drupal translation server. @endlink If
+ * @link https://localize.drupal.org Drupal translations website. @endlink If
  * UI text and provided configuration in Drupal Core and contributed modules,
  * themes, and installation profiles is properly internationalized (as described
  * above), the text is automatically added to the translation server for
