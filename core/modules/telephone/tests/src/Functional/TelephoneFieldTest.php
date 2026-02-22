@@ -72,6 +72,7 @@ class TelephoneFieldTest extends BrowserTestBase {
         'type' => 'telephone_default',
         'settings' => [
           'placeholder' => '123-456-7890',
+          'size' => 12,
         ],
       ])
       ->save();
@@ -124,6 +125,9 @@ class TelephoneFieldTest extends BrowserTestBase {
       ];
 
       $this->drupalGet('node/add/article');
+      // Test size of telephone field.
+      $element = $this->assertSession()->elementExists('css', '[name="field_telephone[0][value]"]');
+      $this->assertEquals(12, $element->getAttribute('size'));
       $this->submitForm($edit, 'Save');
       $this->assertSession()->responseContains('<a href="tel:' . $expected . '">');
     }

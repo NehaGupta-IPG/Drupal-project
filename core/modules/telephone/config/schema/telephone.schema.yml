@@ -12,6 +12,9 @@ field.widget.settings.telephone_default:
   type: mapping
   label: 'Telephone default format settings'
   mapping:
+    size:
+      type: integer
+      label: 'Size of textfield'
     placeholder:
       type: label
       label: 'Placeholder'

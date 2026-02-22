@@ -96,7 +96,7 @@ class MigrateFieldWidgetSettingsTest extends MigrateDrupal6TestBase {
     $component = $form_display->getComponent('field_test_phone');
     $expected['type'] = 'telephone_default';
     $expected['weight'] = 13;
-    $expected['settings'] = ['placeholder' => ''];
+    $expected['settings'] = ['size' => 60, 'placeholder' => ''];
     $this->assertSame($expected, $component);
 
     // Date fields.
