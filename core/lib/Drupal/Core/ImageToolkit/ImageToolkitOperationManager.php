@@ -139,8 +139,7 @@ class ImageToolkitOperationManager extends DefaultPluginManager implements Image
   public function createInstance($plugin_id, array $configuration = [], ?ImageToolkitInterface $toolkit = NULL) {
     $instance = parent::createInstance($plugin_id, $configuration);
     if ($instance->needsToolkitInjection) {
-      $toolkitClone = clone $toolkit;
-      $instance->setToolkit($toolkitClone);
+      $instance->setToolkit($toolkit->isStateful ? $toolkit : clone $toolkit);
     }
     return $instance;
   }
