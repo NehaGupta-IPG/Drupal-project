@@ -197,6 +197,7 @@ fourcol
 francais
 français
 fraîche
+frankenphp
 frontpage
 fudgy
 gabilondo
