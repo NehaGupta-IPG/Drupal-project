@@ -144,10 +144,16 @@ class ImageToolkitOperationManager extends DefaultPluginManager implements Image
    * {@inheritdoc}
    */
   public function getToolkitOperation(ImageToolkitInterface $toolkit, $operation) {
+    if (isset($this->activeToolkitOperations[$toolkit->getPluginId()][$operation])) {
+      return $this->activeToolkitOperations[$toolkit->getPluginId()][$operation];
+    }
     $plugin_id = $this->getToolkitOperationPluginId($toolkit, $operation);
     $instance = $this->createInstance($plugin_id, []);
     if ($instance->needsToolkitInjection) {
       $instance->setToolkit($toolkit->isStateful ? $toolkit : clone $toolkit);
+    }
+    else {
+      $this->activeToolkitOperations[$toolkit->getPluginId()][$operation] = $instance;
     }
     return $instance;
   }
