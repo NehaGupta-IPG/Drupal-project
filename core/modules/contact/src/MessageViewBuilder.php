@@ -25,6 +25,19 @@ class MessageViewBuilder extends EntityViewBuilder {
   /**
    * {@inheritdoc}
    */
+  public function buildMultiple(array $build_list) {
+    foreach ($build_list as &$build) {
+      // If pre_render exists, unset #sorted to allow re-sorting.
+      if (isset($build['#pre_render'])) {
+        unset($build['#sorted']);
+      }
+    }
+    return parent::buildMultiple($build_list);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function view(EntityInterface $entity, $view_mode = 'full', $langcode = NULL) {
     $build = parent::view($entity, $view_mode, $langcode);
 
