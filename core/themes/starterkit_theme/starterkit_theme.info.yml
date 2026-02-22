@@ -7,6 +7,14 @@ libraries:
   - starterkit_theme/base
   - starterkit_theme/messages
   - core/normalize
+regions:
+  header: Header
+  primary_navigation: 'Primary navigation'
+  highlighted: Highlighted
+  content: Content
+  sidebar_left: 'Left sidebar'
+  sidebar_right: 'Right sidebar'
+  footer: 'Footer'
 libraries-extend:
   user/drupal.user:
     - starterkit_theme/user

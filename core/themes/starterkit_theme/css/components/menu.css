@@ -3,17 +3,13 @@
  * Visual styles for menu.
  */
 
-ul.menu {
-  margin-left: 1em; /* LTR */
+.menu {
+  margin-inline-start: 1em;
   padding: 0;
   list-style: none outside;
-  text-align: left; /* LTR */
+  text-align: start;
 }
-[dir="rtl"] ul.menu {
-  margin-right: 1em;
-  margin-left: 0;
-  text-align: right;
-}
+
 .menu-item--expanded {
   list-style-type: circle;
   list-style-image: url(../../images/icons/menu-expanded.png);
@@ -29,6 +25,6 @@ ul.menu {
   margin: 0;
   padding-top: 0.2em;
 }
-ul.menu a.is-active {
+.menu a.is-active {
   color: #000;
 }
