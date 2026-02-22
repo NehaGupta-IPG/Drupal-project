@@ -136,20 +136,13 @@ class ImageToolkitOperationManager extends DefaultPluginManager implements Image
   /**
    * {@inheritdoc}
    */
-  public function createInstance($plugin_id, array $configuration = [], ?ImageToolkitInterface $toolkit = NULL) {
-    $instance = parent::createInstance($plugin_id, $configuration);
+  public function getToolkitOperation(ImageToolkitInterface $toolkit, $operation) {
+    $plugin_id = $this->getToolkitOperationPluginId($toolkit, $operation);
+    $instance = $this->createInstance($plugin_id, $configuration);
     if ($instance->needsToolkitInjection) {
       $instance->setToolkit($toolkit->isStateful ? $toolkit : clone $toolkit);
     }
     return $instance;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getToolkitOperation(ImageToolkitInterface $toolkit, $operation) {
-    $plugin_id = $this->getToolkitOperationPluginId($toolkit, $operation);
-    return $this->createInstance($plugin_id, [], $toolkit);
   }
 
 }
