@@ -14,3 +14,11 @@ ban.delete:
     _title: 'Delete IP address'
   requirements:
     _permission: 'ban IP addresses'
+
+ban.delete.multiple:
+  path: '/admin/config/people/ban/delete/multiple'
+  defaults:
+    _form: '\Drupal\ban\Form\BanDeleteMultiple'
+    _title: 'Delete multiple IP addresses'
+  requirements:
+    _permission: 'ban IP addresses'

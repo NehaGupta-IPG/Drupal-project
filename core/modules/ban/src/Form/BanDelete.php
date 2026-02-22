@@ -67,7 +67,7 @@ class BanDelete extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function getConfirmText() {
-    return $this->t('Delete');
+    return $this->t('Unblock');
   }
 
   /**
@@ -99,8 +99,8 @@ class BanDelete extends ConfirmFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->ipManager->unbanIp($this->banIp);
-    $this->logger('user')->notice('Deleted %ip', ['%ip' => $this->banIp]);
-    $this->messenger()->addStatus($this->t('The IP address %ip was deleted.', ['%ip' => $this->banIp]));
+    $this->logger('user')->notice('Unblocked %ip', ['%ip' => $this->banIp]);
+    $this->messenger()->addStatus($this->t('The IP address %ip was unblocked.', ['%ip' => $this->banIp]));
     $form_state->setRedirectUrl($this->getCancelUrl());
   }
 

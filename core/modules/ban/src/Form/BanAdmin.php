@@ -7,6 +7,7 @@ use Drupal\ban\BanIpManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\TempStore\PrivateTempStoreFactory;
 
 /**
  * Displays banned IP addresses.
@@ -16,26 +17,25 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class BanAdmin extends FormBase {
 
   /**
-   * @var \Drupal\ban\BanIpManagerInterface
-   */
-  protected $ipManager;
-
-  /**
    * Constructs a new BanAdmin object.
    *
-   * @param \Drupal\ban\BanIpManagerInterface $ip_manager
+   * @param \Drupal\ban\BanIpManagerInterface $ipManager
    *   The ban IP manager.
+   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $tempStoreFactory
+   *   The tempstore factory.
    */
-  public function __construct(BanIpManagerInterface $ip_manager) {
-    $this->ipManager = $ip_manager;
-  }
+  public function __construct(
+    protected BanIpManagerInterface $ipManager,
+    protected PrivateTempStoreFactory $tempStoreFactory,
+  ) {}
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('ban.ip_manager')
+      $container->get('ban.ip_manager'),
+      $container->get('tempstore.private'),
     );
   }
 
@@ -59,24 +59,27 @@ class BanAdmin extends FormBase {
    *   address form field.
    */
   public function buildForm(array $form, FormStateInterface $form_state, $default_ip = '') {
-    $rows = [];
-    $header = [$this->t('banned IP addresses'), $this->t('Operations')];
+    $options = [];
+    $header = [
+      'address' => $this->t('Banned IP addresses'),
+      'operations' => $this->t('Operations'),
+    ];
     $result = $this->ipManager->findAll();
     foreach ($result as $ip) {
       $row = [];
-      $row[] = $ip->ip;
+      $row['address'] = $ip->ip;
       $links = [];
       $links['delete'] = [
-        'title' => $this->t('Delete'),
+        'title' => $this->t('Unblock'),
         'url' => Url::fromRoute('ban.delete', ['ban_id' => $ip->iid]),
       ];
-      $row[] = [
+      $row['operations'] = [
         'data' => [
           '#type' => 'operations',
           '#links' => $links,
         ],
       ];
-      $rows[] = $row;
+      $options[] = $row;
     }
 
     $form['ip'] = [
@@ -91,15 +94,22 @@ class BanAdmin extends FormBase {
     $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Add'),
+      '#name' => 'submit_add',
     ];
-
     $form['ban_ip_banning_table'] = [
-      '#type' => 'table',
+      '#type' => 'tableselect',
       '#header' => $header,
-      '#rows' => $rows,
+      '#options' => $options,
       '#empty' => $this->t('No blocked IP addresses available.'),
       '#weight' => 120,
     ];
+    $form['delete'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Unblock selected'),
+      '#name' => 'submit_delete',
+      '#weight' => 130,
+    ];
+
     return $form;
   }
 
@@ -107,15 +117,23 @@ class BanAdmin extends FormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    $ip = trim($form_state->getValue('ip'));
-    if ($this->ipManager->isBanned($ip)) {
-      $form_state->setErrorByName('ip', $this->t('This IP address is already banned.'));
+    if ($form_state->getTriggeringElement()['#name'] === 'submit_add') {
+      $ip = trim($form_state->getValue('ip'));
+      if ($this->ipManager->isBanned($ip)) {
+        $form_state->setErrorByName('ip', $this->t('This IP address is already banned.'));
+      }
+      elseif ($ip == $this->getRequest()->getClientIP()) {
+        $form_state->setErrorByName('ip', $this->t('You may not ban your own IP address.'));
+      }
+      elseif (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_RES_RANGE) == FALSE) {
+        $form_state->setErrorByName('ip', $this->t('Enter a valid IP address.'));
+      }
     }
-    elseif ($ip == $this->getRequest()->getClientIP()) {
-      $form_state->setErrorByName('ip', $this->t('You may not ban your own IP address.'));
-    }
-    elseif (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_RES_RANGE) == FALSE) {
-      $form_state->setErrorByName('ip', $this->t('Enter a valid IP address.'));
+    elseif ($form_state->getTriggeringElement()['#name'] === 'submit_delete') {
+      $tableSelectArray = $form_state->getValue('ban_ip_banning_table');
+      if (reset($tableSelectArray) === 0) {
+        $form_state->setErrorByName('delete', $this->t('There were no selected IP addresses to unblock.'));
+      }
     }
   }
 
@@ -123,10 +141,25 @@ class BanAdmin extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $ip = trim($form_state->getValue('ip'));
-    $this->ipManager->banIp($ip);
-    $this->messenger()->addStatus($this->t('The IP address %ip has been banned.', ['%ip' => $ip]));
-    $form_state->setRedirect('ban.admin_page');
+    if ($form_state->getTriggeringElement()['#name'] === 'submit_add') {
+      $ip = trim($form_state->getValue('ip'));
+      $this->ipManager->banIp($ip);
+      $this->messenger()->addStatus($this->t('The IP address %ip has been banned.', ['%ip' => $ip]));
+      $form_state->setRedirect('ban.admin_page');
+    }
+    elseif ($form_state->getTriggeringElement()['#name'] === 'submit_delete') {
+      $tableSelectArray = $form_state->getValue('ban_ip_banning_table');
+      $tableSelectOptions = $form['ban_ip_banning_table']['#options'];
+      $selectedIps = [];
+      foreach ($tableSelectArray as $key => $value) {
+        // Make sure that unchecked checkboxes (0) aren't written to the array.
+        if ($value !== 0) {
+          $selectedIps[] = $tableSelectOptions[$key]['address'];
+        }
+      }
+      $this->tempStoreFactory->get('ban_ip_delete_multiple')->set('selected_ips', $selectedIps);
+      $form_state->setRedirect('ban.delete.multiple');
+    }
   }
 
 }
