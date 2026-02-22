@@ -105,7 +105,11 @@ class PermissionsRepository implements PermissionsRepositoryInterface {
 
       // For both permissions and sections, sort by weight, then by name.
       if (!empty($this->data[$provider]['permissions'])) {
-        uasort($this->data[$provider]['permissions'], function ($a, $b) {
+        $subarray = $this->data[$provider]['permissions'];
+        uasort($this->data[$provider]['permissions'], function ($a, $b) use ($provider, $subarray) {
+          if (empty($a['title'])) {
+            throw new \Exception('title is empty ' . $provider . json_encode($subarray));
+          }
           $weightA = (int) ($a['overall_weight'] ?? 0);
           $titleA = (string) ($a['title'] ?? '');
 
