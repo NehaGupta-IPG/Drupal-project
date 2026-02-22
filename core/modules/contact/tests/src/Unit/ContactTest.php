@@ -15,13 +15,13 @@ use PHPUnit\Framework\Attributes\Group;
 class ContactTest extends UnitTestCase {
 
   /**
-   * Test contact_menu_local_tasks_alter doesn't throw warnings.
+   * Test contact_local_tasks_render_alter doesn't throw warnings.
    */
-  public function testLocalTasksAlter(): void {
+  public function testLocalTasksRenderAlter(): void {
     require_once $this->root . '/core/modules/contact/contact.module';
     $data = [];
-    $contactMenuLocalTasksAlter = new ContactHooks();
-    $contactMenuLocalTasksAlter->menuLocalTasksAlter($data, 'entity.user.canonical');
+    $contactLocalTasksRenderAlter = new ContactHooks();
+    $contactLocalTasksRenderAlter->localTasksRenderAlter($data, 'entity.user.canonical');
     $this->assertTrue(TRUE, 'No warning thrown');
   }
 

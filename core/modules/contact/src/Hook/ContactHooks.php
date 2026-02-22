@@ -101,13 +101,13 @@ class ContactHooks {
   }
 
   /**
-   * Implements hook_menu_local_tasks_alter().
+   * Implements hook_local_tasks_render_alter().
    *
    * Hides the 'Contact' tab on the user profile if the user does not have an
    * email address configured.
    */
-  #[Hook('menu_local_tasks_alter')]
-  public function menuLocalTasksAlter(&$data, $route_name): void {
+  #[Hook('local_tasks_render_alter')]
+  public function localTasksRenderAlter(&$data, $route_name): void {
     if ($route_name == 'entity.user.canonical' && isset($data['tabs'][0])) {
       foreach ($data['tabs'][0] as $href => $tab_data) {
         if ($href == 'entity.user.contact_form') {

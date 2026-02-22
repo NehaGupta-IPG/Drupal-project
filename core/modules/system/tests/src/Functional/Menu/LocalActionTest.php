@@ -59,6 +59,7 @@ class LocalActionTest extends BrowserTestBase {
     // Test a local action title that changes based on a config value.
     $this->drupalGet(Url::fromRoute('menu_test.local_action6'));
     $this->assertLocalAction([
+      [Url::fromRoute('menu_test.local_action2'), 'Dynamic title override'],
       [Url::fromRoute('menu_test.local_action5'), 'Original title'],
     ]);
     // Verify the expected cache tag in the response headers.
@@ -69,6 +70,7 @@ class LocalActionTest extends BrowserTestBase {
     $config->save();
     $this->drupalGet(Url::fromRoute('menu_test.local_action6'));
     $this->assertLocalAction([
+      [Url::fromRoute('menu_test.local_action2'), 'Dynamic title override'],
       [Url::fromRoute('menu_test.local_action5'), 'New title'],
     ]);
   }

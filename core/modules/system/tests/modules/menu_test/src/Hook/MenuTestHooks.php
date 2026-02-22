@@ -34,10 +34,10 @@ class MenuTestHooks {
   }
 
   /**
-   * Implements hook_menu_local_tasks_alter().
+   * Implements hook_local_tasks_render_alter().
    */
-  #[Hook('menu_local_tasks_alter')]
-  public function menuLocalTasksAlter(&$data, $route_name, RefinableCacheableDependencyInterface &$cacheability): void {
+  #[Hook('local_tasks_render_alter')]
+  public function localTasksRenderAlter(&$data, $route_name, RefinableCacheableDependencyInterface &$cacheability): void {
     if (in_array($route_name, ['menu_test.tasks_default'])) {
       $data['tabs'][0]['foo'] = [
         '#theme' => 'menu_local_task',
@@ -61,6 +61,17 @@ class MenuTestHooks {
       ];
     }
     $cacheability->addCacheTags(['kittens:dwarf-cat']);
+  }
+
+  /**
+   * Implements hook_local_actions_render_alter().
+   */
+  #[Hook('local_actions_render_alter')]
+  public function localActionsRenderAlter(&$data, $route_appears): void {
+    // Change the link title for local_action2 if on test route 6.
+    if ($route_appears === 'menu_test.local_action6') {
+      $data['menu_test.local_action2']['#link']['title'] = 'Dynamic title override';
+    }
   }
 
 }
