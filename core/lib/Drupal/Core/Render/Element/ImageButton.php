@@ -61,6 +61,8 @@ class ImageButton extends Submit {
         return $element['#return_value'];
       }
     }
+
+    return NULL;
   }
 
   /**

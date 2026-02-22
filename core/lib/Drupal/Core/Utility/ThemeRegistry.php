@@ -116,6 +116,8 @@ class ThemeRegistry extends CacheCollector implements DestructableInterface {
     elseif (array_key_exists($key, $this->storage)) {
       return $this->resolveCacheMiss($key);
     }
+
+    return NULL;
   }
 
   /**

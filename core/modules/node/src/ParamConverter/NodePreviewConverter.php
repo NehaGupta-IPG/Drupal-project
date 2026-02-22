@@ -36,6 +36,8 @@ class NodePreviewConverter implements ParamConverterInterface {
     if ($form_state = $store->get($value)) {
       return $form_state->getFormObject()->getEntity();
     }
+
+    return NULL;
   }
 
   /**

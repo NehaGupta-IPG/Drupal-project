@@ -471,6 +471,8 @@ abstract class FieldPluginBase extends HandlerBase implements FieldHandlerInterf
     if (isset($values->{$alias})) {
       return $values->{$alias};
     }
+
+    return NULL;
   }
 
   /**

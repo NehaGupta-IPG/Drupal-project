@@ -37,6 +37,8 @@ abstract class DataReferenceBase extends TypedData implements DataReferenceInter
     if ($target = $this->getTarget()) {
       return $target->getValue();
     }
+
+    return NULL;
   }
 
   /**

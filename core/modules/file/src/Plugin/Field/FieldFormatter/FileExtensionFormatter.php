@@ -63,6 +63,8 @@ class FileExtensionFormatter extends BaseFieldFileFormatterBase {
         return $extension;
       }
     }
+
+    return NULL;
   }
 
   /**

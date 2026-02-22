@@ -106,6 +106,8 @@ class PrivateTempStore {
     if (($object = $this->storage->get($key)) && ($object->owner == $this->getOwner())) {
       return $object->data;
     }
+
+    return NULL;
   }
 
   /**

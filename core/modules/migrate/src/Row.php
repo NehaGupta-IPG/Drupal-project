@@ -154,6 +154,7 @@ class Row {
     if ($key_exists) {
       return $return;
     }
+    return NULL;
   }
 
   /**

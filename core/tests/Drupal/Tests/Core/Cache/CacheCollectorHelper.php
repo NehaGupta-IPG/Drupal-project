@@ -43,6 +43,8 @@ class CacheCollectorHelper extends CacheCollector {
       $this->persist($key);
       return $this->cacheMissData[$key];
     }
+
+    return NULL;
   }
 
   /**

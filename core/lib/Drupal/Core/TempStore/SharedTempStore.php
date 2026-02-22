@@ -125,6 +125,8 @@ class SharedTempStore {
     if ($object = $this->storage->get($key)) {
       return $object->data;
     }
+
+    return NULL;
   }
 
   /**
@@ -142,6 +144,8 @@ class SharedTempStore {
     if (($object = $this->storage->get($key)) && ($object->owner == $this->owner)) {
       return $object->data;
     }
+
+    return NULL;
   }
 
   /**

@@ -99,6 +99,8 @@ class Tableselect extends Table {
         return is_array($input) ? array_combine($input, $input) : [];
       }
     }
+
+    return NULL;
   }
 
   /**

@@ -156,6 +156,8 @@ abstract class FieldItemBase extends Map implements FieldItemInterface {
     elseif (isset($this->values[$name])) {
       return $this->values[$name];
     }
+
+    return NULL;
   }
 
   /**

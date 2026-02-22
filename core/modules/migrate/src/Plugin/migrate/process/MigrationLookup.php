@@ -292,6 +292,8 @@ class MigrationLookup extends ProcessPluginBase implements ContainerFactoryPlugi
         return $destination_ids;
       }
     }
+
+    return NULL;
   }
 
   /**

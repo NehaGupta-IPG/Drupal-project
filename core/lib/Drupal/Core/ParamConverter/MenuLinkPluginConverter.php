@@ -40,6 +40,8 @@ class MenuLinkPluginConverter implements ParamConverterInterface {
         // Suppress the error.
       }
     }
+
+    return NULL;
   }
 
   /**
