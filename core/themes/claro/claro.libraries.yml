@@ -404,3 +404,15 @@ classy.search-results:
   css:
     component:
       css/classy/components/search-results.css: {}
+
+react-test:
+  version: 1.x
+  js:
+    js/react-test.js: {
+      attributes: { type: module }
+    }
+    js/redux-test.js: {
+        attributes: { type: module }
+    }
+  dependencies:
+    - core/drupal.react
