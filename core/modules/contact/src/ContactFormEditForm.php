@@ -21,6 +21,11 @@ class ContactFormEditForm extends EntityForm implements ContainerInjectionInterf
   use ConfigFormBaseTrait;
 
   /**
+   * Config settings.
+   */
+  const CONFIG_NAME = 'contact.settings';
+
+  /**
    * The email validator.
    *
    * @var \Drupal\Component\Utility\EmailValidatorInterface
@@ -61,7 +66,7 @@ class ContactFormEditForm extends EntityForm implements ContainerInjectionInterf
    * {@inheritdoc}
    */
   protected function getEditableConfigNames() {
-    return ['contact.settings'];
+    return [static::CONFIG_NAME];
   }
 
   /**
@@ -71,7 +76,7 @@ class ContactFormEditForm extends EntityForm implements ContainerInjectionInterf
     $form = parent::form($form, $form_state);
 
     $contact_form = $this->entity;
-    $default_form = $this->config('contact.settings')->get('default_form');
+    $default_form = $this->config(static::CONFIG_NAME)->get('default_form');
 
     $form['label'] = [
       '#type' => 'textfield',
@@ -161,7 +166,7 @@ class ContactFormEditForm extends EntityForm implements ContainerInjectionInterf
   public function save(array $form, FormStateInterface $form_state) {
     $contact_form = $this->entity;
     $status = $contact_form->save();
-    $contact_settings = $this->config('contact.settings');
+    $contact_settings = $this->config(static::CONFIG_NAME);
 
     $edit_link = $this->entity->toLink($this->t('Edit'))->toString();
     $view_link = $contact_form->toLink($contact_form->label(), 'canonical')->toString();
