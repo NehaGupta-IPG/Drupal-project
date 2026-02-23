@@ -369,6 +369,56 @@ class CommentFieldAccessTest extends EntityKernelTestBase {
   }
 
   /**
+   * Tests that the comment field view access allows login-to-comment prompt.
+   *
+   * When comments are open and neither 'view comment list' nor 'create' grants
+   * access (e.g. an anonymous user without 'post comments' on a node with no
+   * existing comments), the field must still be accessible so the formatter can
+   * display a login-to-comment prompt. Without this the formatter is skipped
+   * entirely and no prompt is ever shown.
+   */
+  public function testFieldViewAccessForLoginPrompt(): void {
+    $this->createCommentType('entity_test');
+    $this->addDefaultCommentField('entity_test', 'entity_test', 'comment');
+
+    $host = EntityTest::create();
+    $host->save();
+
+    $role = Role::load(RoleInterface::ANONYMOUS_ID);
+    $role->revokePermission('post comments');
+    $role->save();
+
+    $anonymous = new AnonymousUserSession();
+
+    $host = EntityTest::load($host->id());
+    /** @var \Drupal\comment\CommentFieldItemList $comment_field */
+    $comment_field = $host->get('comment');
+
+    // Preconditions: no published comments exist and anonymous cannot create.
+    $this->assertFalse($comment_field->access('view comment list', $anonymous));
+    $this->assertFalse($comment_field->access('create', $anonymous));
+
+    // Despite both checks being denied, 'view' must still grant access
+    // because comments are open, so the formatter can show a login prompt.
+    $this->assertTrue($comment_field->access('view', $anonymous));
+    $this->assertTrue($comment_field->access('view', $anonymous, TRUE)->isAllowed());
+
+    // Closed: nothing to show (no comments, no form, no prompt).
+    $host->comment->status = CommentItemInterface::CLOSED;
+    $host->save();
+    $host = EntityTest::load($host->id());
+    $comment_field = $host->get('comment');
+    $this->assertFalse($comment_field->access('view', $anonymous));
+
+    // Hidden: field is completely suppressed.
+    $host->comment->status = CommentItemInterface::HIDDEN;
+    $host->save();
+    $host = EntityTest::load($host->id());
+    $comment_field = $host->get('comment');
+    $this->assertFalse($comment_field->access('view', $anonymous));
+  }
+
+  /**
    * Tests the comment field item list 'view comment list' access.
    */
   public function testFieldViewOnlyOperationAccess(): void {
