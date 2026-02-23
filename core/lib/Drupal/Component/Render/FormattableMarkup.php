@@ -188,6 +188,9 @@ class FormattableMarkup implements MarkupInterface, \Countable {
           break;
 
         case ':':
+          if (method_exists($value, '__toString')) {
+            $value = (string) $value;
+          }
           // Strip URL protocols that can be XSS vectors.
           $value = UrlHelper::stripDangerousProtocols($value);
           // Escape unconditionally, without checking whether the value is an
