@@ -56,7 +56,9 @@ class IdConflictForm extends MigrateUpgradeFormBase {
       }
     }
 
-    if ($content_conflicts || $translated_content_conflicts) {
+    $moduleHandler = \Drupal::service('module_handler');
+    $translation_possible = $moduleHandler->moduleExists('language');
+    if ($content_conflicts || ($translated_content_conflicts && $translation_possible)) {
       $this->messenger()->addWarning($this->t('WARNING: Content may be overwritten on your new site.'));
 
       $form = parent::buildForm($form, $form_state);
