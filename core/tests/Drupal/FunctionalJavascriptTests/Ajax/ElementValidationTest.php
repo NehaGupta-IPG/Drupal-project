@@ -59,4 +59,34 @@ class ElementValidationTest extends WebDriverTestBase {
     $this->assertNotNull($placeholder_number, 'A callback successfully echoed back a number.');
   }
 
+  /**
+   * Tests that suppress_required_fields_validation skips required errors.
+   *
+   * When an AJAX element has suppress_required_fields_validation set to TRUE,
+   * the required field validation should be suppressed during the AJAX request,
+   * but full validation should still apply on normal form submission.
+   */
+  public function testAjaxSuppressRequiredFieldsValidation(): void {
+    $this->drupalGet('ajax_validation_test');
+    $page = $this->getSession()->getPage();
+    $assert = $this->assertSession();
+
+    // Click the AJAX button that has suppress_required_fields_validation.
+    // The required field is empty, but required validation should be
+    // suppressed.
+    $page->pressButton('Suppress validation');
+    $this->assertSession()->assertWaitOnAjaxRequest();
+
+    // Verify the AJAX callback was invoked despite the empty required field.
+    $assert->pageTextContains('suppress_validation_callback invoked');
+
+    // Verify no required field validation error appeared.
+    $assert->pageTextNotContains('Spare Required Field field is required.');
+
+    // Now submit the full form with the required field still empty.
+    // Required validation should apply on normal form submission.
+    $this->submitForm([], 'Submit');
+    $assert->pageTextContains('Spare Required Field field is required.');
+  }
+
 }

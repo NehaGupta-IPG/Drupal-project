@@ -52,6 +52,17 @@ class AjaxFormsTestValidationForm extends FormBase {
       '#suffix' => '<div id="message_area_number"></div>',
     ];
 
+    $form['suppress_validation_button'] = [
+      '#type' => 'button',
+      '#value' => $this->t('Suppress validation'),
+      '#ajax' => [
+        'callback' => [Callbacks::class, 'suppressValidationCallback'],
+        'wrapper' => 'suppress_validation_area',
+        'suppress_required_fields_validation' => TRUE,
+      ],
+      '#suffix' => '<div id="suppress_validation_area"></div>',
+    ];
+
     $form['spare_required_field'] = [
       '#title' => $this->t("Spare Required Field"),
       '#type' => 'textfield',
