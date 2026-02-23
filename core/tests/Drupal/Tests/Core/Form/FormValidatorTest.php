@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Form;
 
+use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormValidator;
 use Drupal\Core\Utility\CallableResolver;
@@ -402,6 +403,89 @@ class FormValidatorTest extends UnitTestCase {
         '',
       ],
     ];
+  }
+
+  /**
+   * Tests that required error is suppressed during AJAX with suppression flag.
+   *
+   * @legacy-covers ::doValidateForm
+   */
+  public function testRequiredErrorMessageSuppressedForAjax(): void {
+    $request_stack = new RequestStack();
+    $request = Request::create('/test?' . FormBuilderInterface::AJAX_FORM_REQUEST . '=1&' . FormBuilderInterface::AJAX_SKIP_REQUIRED_VALIDATION . '=1');
+    $request_stack->push($request);
+
+    $form_validator = $this->getMockBuilder('Drupal\Core\Form\FormValidator')
+      ->setConstructorArgs([
+        $request_stack,
+        $this->getStringTranslationStub(),
+        $this->csrfToken,
+        $this->logger,
+        $this->formErrorHandler,
+        $this->callableResolver,
+      ])
+      ->onlyMethods(['executeValidateHandlers'])
+      ->getMock();
+    $form_validator->expects($this->once())
+      ->method('executeValidateHandlers');
+
+    $form = [];
+    $form['test'] = [
+      '#type' => 'textfield',
+      '#title' => 'Test',
+      '#value' => '',
+      '#needs_validation' => TRUE,
+      '#required' => TRUE,
+      '#parents' => ['test'],
+    ];
+    $form_state = $this->getMockBuilder('Drupal\Core\Form\FormState')
+      ->onlyMethods(['setError'])
+      ->getMock();
+    $form_state->expects($this->never())
+      ->method('setError');
+    $form_validator->validateForm('test_form_id', $form, $form_state);
+  }
+
+  /**
+   * Tests that required error is still set for AJAX without suppression flag.
+   *
+   * @legacy-covers ::doValidateForm
+   */
+  public function testRequiredErrorMessageNotSuppressedForAjaxWithoutFlag(): void {
+    $request_stack = new RequestStack();
+    $request = Request::create('/test?' . FormBuilderInterface::AJAX_FORM_REQUEST . '=1');
+    $request_stack->push($request);
+
+    $form_validator = $this->getMockBuilder('Drupal\Core\Form\FormValidator')
+      ->setConstructorArgs([
+        $request_stack,
+        $this->getStringTranslationStub(),
+        $this->csrfToken,
+        $this->logger,
+        $this->formErrorHandler,
+        $this->callableResolver,
+      ])
+      ->onlyMethods(['executeValidateHandlers'])
+      ->getMock();
+    $form_validator->expects($this->once())
+      ->method('executeValidateHandlers');
+
+    $form = [];
+    $form['test'] = [
+      '#type' => 'textfield',
+      '#title' => 'Test',
+      '#value' => '',
+      '#needs_validation' => TRUE,
+      '#required' => TRUE,
+      '#parents' => ['test'],
+    ];
+    $form_state = $this->getMockBuilder('Drupal\Core\Form\FormState')
+      ->onlyMethods(['setError'])
+      ->getMock();
+    $form_state->expects($this->once())
+      ->method('setError')
+      ->with($this->isArray(), 'Test field is required.');
+    $form_validator->validateForm('test_form_id', $form, $form_state);
   }
 
   /**
