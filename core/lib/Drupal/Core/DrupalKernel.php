@@ -1202,27 +1202,16 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     global $base_secure_url, $base_insecure_url;
 
     // Create base URL.
+    $base_path = $request->getBasePath();
+    // Requests to 'core/foo.php' bypass the front controller, causing
+    // $request->getBasePath() to return a string ending with '/core'. In these
+    // cases, remove '/core' to obtain the correct $base_path.
+    if (str_ends_with($base_path, '/core')) {
+      $base_path = substr($base_path, 0, -5);
+    }
+    $base_path .= '/';
     $base_root = $request->getSchemeAndHttpHost();
-    $base_url = $base_root;
-
-    // For a request URI of '/index.php/foo', $_SERVER['SCRIPT_NAME'] is
-    // '/index.php', whereas $_SERVER['PHP_SELF'] is '/index.php/foo'.
-    if ($dir = rtrim(dirname($request->server->get('SCRIPT_NAME')), '\/')) {
-      // Remove "core" directory if present, allowing install.php,
-      // authorize.php, and others to auto-detect a base path.
-      $core_position = strrpos($dir, '/core');
-      if ($core_position !== FALSE && strlen($dir) - 5 == $core_position) {
-        $base_path = substr($dir, 0, $core_position);
-      }
-      else {
-        $base_path = $dir;
-      }
-      $base_url .= $base_path;
-      $base_path .= '/';
-    }
-    else {
-      $base_path = '/';
-    }
+    $base_url = rtrim($base_root . $base_path, '\/');
     $base_secure_url = str_replace('http://', 'https://', $base_url);
     $base_insecure_url = str_replace('https://', 'http://', $base_url);
   }

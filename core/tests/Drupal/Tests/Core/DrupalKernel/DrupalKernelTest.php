@@ -23,6 +23,13 @@ use Symfony\Component\HttpFoundation\Response;
 class DrupalKernelTest extends UnitTestCase {
 
   /**
+   * Back up and restore any global variables that may be changed by tests.
+   *
+   * @var bool
+   */
+  protected bool $backupGlobals = FALSE;
+
+  /**
    * Tests hostname validation with settings.
    *
    * @legacy-covers ::setupTrustedHosts
@@ -152,6 +159,49 @@ EOD;
     $kernel = new DrupalKernel('test', new ClassLoader());
     $kernel->terminate(new Request(), new Response());
     $this->assertTrue(TRUE, "\Drupal\Core\DrupalKernel::terminate() called without error on kernel which has not booted");
+  }
+
+  /**
+   * Test processing request by initializeRequestGlobals of Drupal kernel.
+   *
+   * @covers ::initializeRequestGlobals
+   * @dataProvider initializeRequestGlobalsProvider
+   */
+  public function testInitializeRequestGlobals(string $path, string $url, string $expected_base_url, string $expected_base_path, string $expected_base_root): void {
+    global $base_url, $base_path, $base_root;
+
+    $request = $this->prophesize(Request::class);
+    $request->getBasePath()->willReturn($path);
+    $request->getSchemeAndHttpHost()->willReturn($url);
+    $drupalKernel = new DrupalKernel('test', NULL);
+    $method = new \ReflectionMethod(DrupalKernel::class, 'initializeRequestGlobals');
+    $method->setAccessible(TRUE);
+    $method->invoke($drupalKernel, $request->reveal());
+    $this->assertSame($expected_base_path, $base_path);
+    $this->assertSame($expected_base_url, $base_url);
+    $this->assertSame($expected_base_root, $base_root);
+  }
+
+  /**
+   * Provides data for testInitializeRequestGlobals().
+   */
+  public static function initializeRequestGlobalsProvider(): array {
+    return [
+      ['', 'http://localhost', 'http://localhost', '/', 'http://localhost'],
+      ['/drupal',
+        'http://localhost',
+        'http://localhost/drupal',
+        '/drupal/',
+        'http://localhost',
+      ],
+      ['/core', 'http://localhost', 'http://localhost', '/', 'http://localhost'],
+      ['/drupal/core',
+        'http://localhost',
+        'http://localhost/drupal',
+        '/drupal/',
+        'http://localhost',
+      ],
+    ];
   }
 
 }
