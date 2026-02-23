@@ -192,6 +192,10 @@ action.configuration.user_remove_role_action:
       constraints:
         RoleExists: ~
 
+action.configuration.user_welcome_message_action:
+  type: action_configuration_default
+  label: 'Send the welcome message to selected users configuration'
+
 action.configuration.user_unblock_user_action:
   type: action_configuration_default
   label: 'Unblock the selected users configuration'

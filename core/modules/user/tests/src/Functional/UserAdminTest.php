@@ -49,7 +49,7 @@ class UserAdminTest extends BrowserTestBase {
    * Registers a user and deletes it.
    */
   public function testUserAdmin(): void {
-    $config = $this->config('user.settings');
+
     $user_a = $this->drupalCreateUser();
     $user_a->name = 'User A';
     $user_a->mail = $this->randomMachineName() . '@example.com';
@@ -126,7 +126,7 @@ class UserAdminTest extends BrowserTestBase {
     $edit = [];
     $edit['action'] = 'user_block_user_action';
     $edit['user_bulk_form[4]'] = TRUE;
-    $config
+    $this->config('user.settings')
       ->set('notify.status_blocked', TRUE)
       ->save();
     $this->drupalGet('admin/people', [
@@ -190,10 +190,8 @@ class UserAdminTest extends BrowserTestBase {
     $this->assertSession()->responseContains('id="edit-mail-notification-address"');
     $this->drupalLogout();
 
-    // Test custom user registration approval email address(es).
-    $config = $this->config('user.settings');
     // Allow users to register with admin approval.
-    $config
+    $this->config('user.settings')
       ->set('verify_mail', TRUE)
       ->set('register', UserInterface::REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL)
       ->save();
@@ -229,6 +227,193 @@ class UserAdminTest extends BrowserTestBase {
       'subject' => $subject,
     ]);
     $this->assertCount(1, $user_mail, 'New user mail to user is sent from configured Notification Email address');
+  }
+
+  /**
+   * Tests the sending of a welcome email notification.
+   *
+   * @dataProvider welcomeNotifications
+   */
+  public function testSendWelcomeEmailNotification($register_mode, $mail_id): void {
+    $admin_user = $this->drupalCreateUser(['administer users']);
+    $this->drupalLogin($admin_user);
+
+    $this->config('user.settings')
+      ->set('register', $register_mode)
+      ->save();
+
+    // Create an active user.
+    $test_user = $this->drupalCreateUser();
+    $test_user->save();
+
+    // Send the welcome message.
+    $this->drupalGet('user/' . $test_user->id() . '/edit');
+    $this->submitForm(['status' => 0], 'Send welcome message');
+    $mails = $this->getMails();
+
+    // Assert that only one mail was sent to test_user.
+    $this->assertCount(1, $mails);
+
+    $this->assertEquals($mails[0]['to'], $test_user->getEmail(), 'Activation mail send to user');
+    $this->assertEquals($mails[0]['id'], $mail_id);
+  }
+
+  /**
+   * Collection of alternatives registrations configurations.
+   *
+   * @return array
+   *   List of registration config & expected user mail.
+   */
+  public static function welcomeNotifications(): array {
+    return [
+      [
+        UserInterface::REGISTER_VISITORS,
+        'user_register_no_approval_required',
+      ],
+      [
+        UserInterface::REGISTER_ADMINISTRATORS_ONLY,
+        'user_register_admin_created',
+      ],
+      [
+        UserInterface::REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL,
+        'user_register_no_approval_required',
+      ],
+    ];
+  }
+
+  /**
+   * Tests the sending of a waiting approval email notification.
+   *
+   * @dataProvider awaitingApprovalNotifications
+   */
+  protected function testSendAwaitingApprovalEmailNotification($register_mode, $mail_id): void {
+    $admin_user = $this->drupalCreateUser(['administer users']);
+    $this->drupalLogin($admin_user);
+
+    $this->config('user.settings')
+      ->set('register', $register_mode)
+      ->save();
+
+    // Create a blocked user.
+    $blocked_user = $this->drupalCreateUser()->block();
+    $blocked_user->save();
+
+    $this->drupalGet('user/' . $blocked_user->id() . '/edit');
+    $this->submitForm(['status' => 0], 'Send awaiting approval message');
+    $mails = $this->getMails();
+
+    // Assert that an email was sent to a blocked user and admin.
+    $this->assertCount(2, $mails);
+    $this->assertEquals($mails[0]['to'], $blocked_user->getEmail(), 'Awaiting approval mail send to user');
+    $this->assertEquals($mails[0]['id'], $mail_id);
+    $this->assertEquals($mails[1]['to'], 'simpletest@example.com', 'Pending admin approval mail send to admin');
+    $this->assertEquals($mails[1]['id'], 'user_register_pending_approval_admin');
+  }
+
+  /**
+   * Returns a collection of alternative registration configurations.
+   *
+   * @return array
+   *   List of registration config & expected user mail.
+   */
+  public static function awaitingApprovalNotifications(): array {
+    return [
+      [
+        UserInterface::REGISTER_VISITORS,
+        'user_register_pending_approval',
+      ],
+      [
+        UserInterface::REGISTER_ADMINISTRATORS_ONLY,
+        'user_register_pending_approval',
+      ],
+      [
+        UserInterface::REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL,
+        'user_register_pending_approval',
+      ],
+    ];
+  }
+
+  /**
+   * Tests the bulk action sending of welcome emails notifications.
+   */
+  public function testBulkSendWelcomeEmailsNotifications(): void {
+    $admin_user = $this->drupalCreateUser(['administer users']);
+    $this->drupalLogin($admin_user);
+
+    // Create users at a certain timestamp to fix order of "Member for".
+    $user_a = $this->drupalCreateUser();
+    $user_a->created = 1363219200;
+    $user_a->save();
+    $user_b = $this->drupalCreateUser();
+    $user_b->created = 1394755200;
+    $user_b->save();
+    $user_c = $this->drupalCreateUser();
+    $user_c->created = 1426291200;
+    $user_c->save();
+
+    // Send welcome message to user_b and user_c.
+    $edit = [
+      'action'            => 'user_welcome_message_action',
+      'user_bulk_form[3]' => TRUE,
+      'user_bulk_form[2]' => TRUE,
+    ];
+    $this->drupalGet('admin/people');
+    $this->submitForm($edit, 'Apply to selected items');
+    $mails = $this->getMails();
+
+    // Assert that welcome emails were sent to user_b and user_c.
+    $this->assertCount(2, $mails);
+    $this->assertEquals($mails[0]['to'], $user_c->getEmail(), 'Activation mail send to user C');
+    $this->assertEquals($mails[0]['id'], 'user_register_no_approval_required');
+    $this->assertEquals($mails[1]['to'], $user_b->getEmail(), 'Activation mail send to user B');
+    $this->assertEquals($mails[1]['id'], 'user_register_no_approval_required');
+  }
+
+  /**
+   * Tests the bulk action sending of waiting approval email notification.
+   */
+  public function testBulkSendAwaitingApprovalEmailNotification(): void {
+    $admin_user = $this->drupalCreateUser(['administer users']);
+    $this->drupalLogin($admin_user);
+
+    // Create users at a certain timestamp to fix order of "Member for".
+    $user_a = $this->drupalCreateUser()->block();
+    $user_a->created = 1363219200;
+    $user_a->save();
+    $user_b = $this->drupalCreateUser()->block();
+    $user_b->created = 1394755200;
+    $user_b->save();
+    $user_c = $this->drupalCreateUser()->block();
+    $user_c->created = 1426291200;
+    $user_c->save();
+
+    // Send waiting approval mail to user_b & user_c.
+    $edit = [
+      'action'            => 'user_welcome_message_action',
+      'user_bulk_form[3]' => TRUE,
+      'user_bulk_form[2]' => TRUE,
+    ];
+    $this->drupalGet('admin/people');
+    $this->submitForm($edit, ('Apply to selected items'));
+    $mails = $this->getMails();
+
+    // Assert that welcome emails were sent to user_b and user_c.
+    // The admin should be notified twice.
+    $this->assertCount(4, $mails);
+
+    // Assert that awaiting approval and notification emails have been sent to
+    // user_b and user_c.
+    $this->assertEquals($mails[0]['id'], 'user_register_pending_approval');
+    $this->assertEquals($mails[0]['to'], $user_c->getEmail(), 'Awaiting approval mail send to user C');
+    // Admin notification about user C notification send.
+    $this->assertEquals($mails[1]['id'], 'user_register_pending_approval_admin');
+    $this->assertEquals($mails[1]['to'], 'simpletest@example.com', 'Pending admin approval mail send to admin');
+    // Awaiting approval mail send to user B.
+    $this->assertEquals($mails[2]['id'], 'user_register_pending_approval');
+    $this->assertEquals($mails[2]['to'], $user_b->getEmail(), 'Awaiting approval mail send to user B');
+    // Admin notification about user B notification send.
+    $this->assertEquals($mails[3]['id'], 'user_register_pending_approval_admin');
+    $this->assertEquals($mails[3]['to'], 'simpletest@example.com', 'Pending admin approval mail send to admin');
   }
 
 }

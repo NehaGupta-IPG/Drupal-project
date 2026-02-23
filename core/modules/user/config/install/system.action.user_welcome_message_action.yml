@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - user
+id: user_welcome_message_action
+label: 'Send the welcome message to the selected user(s)'
+type: user
+plugin: user_welcome_message_action
+configuration: {  }
