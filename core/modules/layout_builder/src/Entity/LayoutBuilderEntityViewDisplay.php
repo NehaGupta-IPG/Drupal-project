@@ -3,8 +3,6 @@
 namespace Drupal\layout_builder\Entity;
 
 use Drupal\Component\Plugin\ConfigurableInterface;
-use Drupal\Component\Plugin\DerivativeInspectionInterface;
-use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Action\Attribute\ActionMethod;
 use Drupal\Core\Entity\Entity\EntityViewDisplay as BaseEntityViewDisplay;
@@ -515,33 +513,6 @@ class LayoutBuilderEntityViewDisplay extends BaseEntityViewDisplay implements La
       }
     }
     return parent::getComponent($name);
-  }
-
-  /**
-   * Gets the component for a given field name if any.
-   *
-   * @param string $field_name
-   *   The field name.
-   *
-   * @return \Drupal\layout_builder\SectionComponent|null
-   *   The section component if it is available.
-   */
-  private function getSectionComponentForFieldName($field_name) {
-    // Loop through every component until the first match is found.
-    foreach ($this->getSections() as $section) {
-      foreach ($section->getComponents() as $component) {
-        $plugin = $component->getPlugin();
-        if ($plugin instanceof DerivativeInspectionInterface && in_array($plugin->getBaseId(), ['field_block', 'extra_field_block'], TRUE)) {
-          // FieldBlock derivative IDs are in the format
-          // [entity_type]:[bundle]:[field].
-          [, , $field_block_field_name] = explode(PluginBase::DERIVATIVE_SEPARATOR, $plugin->getDerivativeId());
-          if ($field_block_field_name === $field_name) {
-            return $component;
-          }
-        }
-      }
-    }
-    return NULL;
   }
 
 }
