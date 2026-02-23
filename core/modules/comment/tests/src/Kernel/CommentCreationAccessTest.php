@@ -173,11 +173,9 @@ class CommentCreationAccessTest extends KernelTestBase {
 
     $account = $this->container->get('current_user');
 
-    // First call without context: checkCreateAccess() must be invoked.
     $access_handler->createAccess('comment', $account, [], TRUE);
     $this->assertNotNull($state->get('comment_test.create_access.account'));
 
-    // Clear captured state.
     $state->delete('comment_test.create_access.account');
 
     // Second call, same account, still no context. Without the fix this would
@@ -200,7 +198,6 @@ class CommentCreationAccessTest extends KernelTestBase {
   public function testCreateAccessCacheVariesByEntityType(): void {
     $state = $this->container->get('state');
 
-    // Set up a second entity type with its own comment type and field.
     $this->installEntitySchema('entity_test_rev');
     $this->createCommentType('entity_test_rev', ['id' => 'comment_rev']);
     $this->addDefaultCommentField('entity_test_rev', 'entity_test_rev', 'comment', comment_type_id: 'comment_rev');
@@ -218,12 +215,10 @@ class CommentCreationAccessTest extends KernelTestBase {
       ->getAccessControlHandler('comment');
     $account = $this->container->get('current_user');
 
-    // First call: createAccess for comment on entity_test:1.
     $access_handler->createAccess('comment', $account, ['commented_entity' => $entity_test], TRUE);
     $context = $state->get('comment_test.create_access.context');
     $this->assertSame($entity_test->getEntityTypeId(), $context['commented_entity']->getEntityTypeId());
 
-    // Clear captured state.
     $state->delete('comment_test.create_access.context');
 
     // Second call: createAccess for comment on entity_test_rev:1 (same ID,
