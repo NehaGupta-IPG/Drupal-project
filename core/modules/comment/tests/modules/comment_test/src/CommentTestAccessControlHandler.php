@@ -23,6 +23,7 @@ class CommentTestAccessControlHandler extends CommentAccessControlHandler {
    */
   public function checkCreateAccess(AccountInterface $account, array $context, $entity_bundle = NULL): AccessResultInterface {
     \Drupal::state()->set('comment_test.create_access.context', $context);
+    \Drupal::state()->set('comment_test.create_access.account', $account);
     return parent::checkCreateAccess($account, $context, $entity_bundle);
   }
 
