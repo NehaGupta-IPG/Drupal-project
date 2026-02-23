@@ -117,14 +117,11 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
     $comment = $this->entityTypeManager->getStorage('comment')->create($values);
 
     // Use createAccess() with the commented entity in context so that access
-    // handlers (and caching via buildCreateAccessCid()) have the full picture.
-    // $comment->access('create') delegates to createAccess() but with an empty
-    // context, losing the commented_entity that CommentFieldItemList passes.
+    // handlers and buildCreateAccessCid() have the full picture.
     $commented_entity = $comment->getCommentedEntity();
     $context = ['commented_entity' => $commented_entity];
     /** @var \Drupal\Core\Access\AccessResultInterface $access */
-    $access = $this->entityTypeManager
-      ->getAccessControlHandler('comment')
+    $access = $this->entityTypeManager->getAccessControlHandler('comment')
       ->createAccess($comment_type_id, $this->currentUser, $context, TRUE);
     if ($commented_entity) {
       $access->addCacheableDependency($commented_entity);
