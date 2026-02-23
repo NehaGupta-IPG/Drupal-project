@@ -173,7 +173,7 @@ class FieldViewsDataProvider {
       ];
     }
 
-    if ($translation_join_type === 'language_bundle') {
+    if ($translation_join_type === 'language_bundle' && $data_table) {
       $data[$table_alias]['table']['join'][$data_table]['join_id'] = 'field_or_language_join';
       $data[$table_alias]['table']['join'][$data_table]['extra'][] = [
         'left_field' => 'langcode',
@@ -215,7 +215,7 @@ class FieldViewsDataProvider {
           ],
         ];
       }
-      if ($translation_join_type === 'language_bundle') {
+      if ($translation_join_type === 'language_bundle' && $entity_revision_data_table) {
         $data[$table_alias]['table']['join'][$entity_revision_data_table]['join_id'] = 'field_or_language_join';
         $data[$table_alias]['table']['join'][$entity_revision_data_table]['extra'][] = [
           'left_field' => 'langcode',
