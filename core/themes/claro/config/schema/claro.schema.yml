@@ -3,3 +3,17 @@
 claro.settings:
   type: theme_settings
   label: 'Claro settings'
+  constraints:
+    FullyValidatable: ~
+  mapping:
+    third_party_settings:
+      type: mapping
+      label: 'Third party settings'
+      mapping:
+        shortcut:
+          type: mapping
+          label: 'Shortcut'
+          mapping:
+            module_link:
+              type: boolean
+              label: 'Module Link'
