@@ -25,6 +25,9 @@ use Drupal\content_moderation\Entity\Routing\EntityModerationRouteProvider;
 use Drupal\Core\TempStore\PrivateTempStoreFactory;
 use Drupal\node\Form\NodePreviewForm;
 use Drupal\workspaces\Negotiator\QueryParameterWorkspaceNegotiator;
+use Drupal\workspaces\Provider\WorkspaceProviderInterface;
+use Drupal\workspaces\WorkspaceInformationInterface;
+use Drupal\workspaces\WorkspaceManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -95,6 +98,9 @@ class EntityTypeInfo implements ContainerInjectionInterface {
     AccountInterface $current_user,
     StateTransitionValidationInterface $validator,
     protected PrivateTempStoreFactory $tempStoreFactory,
+    protected WorkspaceManagerInterface $workspaceManager,
+    protected WorkspaceInformationInterface $workspaceInfo,
+    protected WorkspaceProviderInterface $workspaceProvider,
   ) {
     $this->stringTranslation = $translation;
     $this->moderationInfo = $moderation_information;
@@ -116,6 +122,9 @@ class EntityTypeInfo implements ContainerInjectionInterface {
       $container->get('current_user'),
       $container->get('content_moderation.state_transition_validation'),
       $container->get('tempstore.private'),
+      $container->get('workspaces.manager'),
+      $container->get('workspaces.information'),
+      $container->get(ContentModerationWorkspaceProvider::class),
     );
   }
 
@@ -301,8 +310,7 @@ class EntityTypeInfo implements ContainerInjectionInterface {
     /** @var \Drupal\Core\Entity\EntityFormInterface $form_object */
     $form_object = $form_state->getFormObject();
 
-    $is_moderated_entity_form = $this->isModeratedEntityEditForm($form_object);
-    if ($is_moderated_entity_form && !$entity->isNew()) {
+    if ($this->isModeratedEntityEditForm($form_object) && !$entity->isNew()) {
       // Generate a proper revision object for the current entity. This allows
       // to correctly handle translatable entities having pending revisions.
       /** @var \Drupal\Core\Entity\ContentEntityStorageInterface $storage */
@@ -319,10 +327,23 @@ class EntityTypeInfo implements ContainerInjectionInterface {
       $form_object->setEntity($new_revision);
     }
 
-    if ($is_moderated_entity_form && $entity->isNew()) {
-      $temporary_moderation_workspace_id = $form_state->getUserInput()['temporary_moderation_workspace_id'] ?? NULL;
-      if ($temporary_moderation_workspace_id) {
-        $form_object->getEntity()->_temporaryModerationWorkspace = $temporary_moderation_workspace_id;
+    if ($entity->isNew()
+      && $form_object instanceof ContentEntityFormInterface
+      && $this->moderationInfo->isModeratedEntity($entity)
+      && $this->workspaceInfo->isEntitySupported($entity)
+    ) {
+      // If the entity form is built for the first time, create a temporary
+      // moderation workspace so it can track dependencies created before the
+      // initial form is submitted.
+      if (!$this->workspaceManager->hasActiveWorkspace()) {
+        $workspace = $this->workspaceProvider->createModerationWorkspace($entity, TRUE);
+        $this->workspaceManager->setActiveWorkspace($workspace, FALSE);
+        $form_state->set('temporary_moderation_workspace', $workspace->id());
+      }
+      elseif ($this->workspaceManager->getActiveWorkspace()->id() === $form_state->getUserInput()['temporary_moderation_workspace_id'] ?? NULL) {
+        // If the entity form has been submitted, and the temporary moderation
+        // workspace set in ::formAlter() matches the active workspace.
+        $form_object->getEntity()->_temporaryModerationWorkspace = $this->workspaceManager->getActiveWorkspace()->id();
       }
     }
   }
@@ -374,7 +395,7 @@ class EntityTypeInfo implements ContainerInjectionInterface {
         $form['meta']['published']['#markup'] = $this->moderationInfo->getWorkflowForEntity($entity)->getTypePlugin()->getState($entity->moderation_state->value)->label();
       }
 
-      if ($temporary_moderation_workspace_id = $entity->_temporaryModerationWorkspace) {
+      if ($temporary_moderation_workspace_id = $form_state->get('temporary_moderation_workspace')) {
         $form['temporary_moderation_workspace_id'] = [
           '#type' => 'hidden',
           '#value' => $temporary_moderation_workspace_id,

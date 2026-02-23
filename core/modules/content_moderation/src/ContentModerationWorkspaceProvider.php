@@ -101,7 +101,6 @@ class ContentModerationWorkspaceProvider extends WorkspaceProviderBase {
     if ($entity->isNew()
       && $this->moderationInfo->isModeratedEntity($entity)
       && $this->getModerationState($entity)?->isPublishedState()
-      && isset($entity->_temporaryModerationWorkspace)
       && isset($this->initialPublished[$entity->uuid()])
     ) {
       unset($this->initialPublished[$entity->uuid()]);

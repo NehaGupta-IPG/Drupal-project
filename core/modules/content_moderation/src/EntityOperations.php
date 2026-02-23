@@ -15,9 +15,6 @@ use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\content_moderation\Form\EntityModerationForm;
 use Drupal\Core\Routing\RouteBuilderInterface;
 use Drupal\workflows\Entity\Workflow;
-use Drupal\workspaces\Provider\WorkspaceProviderInterface;
-use Drupal\workspaces\WorkspaceInformationInterface;
-use Drupal\workspaces\WorkspaceManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -62,16 +59,21 @@ class EntityOperations implements ContainerInjectionInterface {
    */
   protected $routerBuilder;
 
-  public function __construct(
-    ModerationInformationInterface $moderation_info,
-    EntityTypeManagerInterface $entity_type_manager,
-    FormBuilderInterface $form_builder,
-    EntityTypeBundleInfoInterface $bundle_info,
-    RouteBuilderInterface $router_builder,
-    protected WorkspaceManagerInterface $workspaceManager,
-    protected WorkspaceInformationInterface $workspaceInfo,
-    protected WorkspaceProviderInterface $workspaceProvider,
-  ) {
+  /**
+   * Constructs a new EntityOperations object.
+   *
+   * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_info
+   *   Moderation information service.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   Entity type manager service.
+   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
+   *   The form builder.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info
+   *   The entity bundle information service.
+   * @param \Drupal\Core\Routing\RouteBuilderInterface $router_builder
+   *   The router builder service.
+   */
+  public function __construct(ModerationInformationInterface $moderation_info, EntityTypeManagerInterface $entity_type_manager, FormBuilderInterface $form_builder, EntityTypeBundleInfoInterface $bundle_info, RouteBuilderInterface $router_builder) {
     $this->moderationInfo = $moderation_info;
     $this->entityTypeManager = $entity_type_manager;
     $this->formBuilder = $form_builder;
@@ -88,30 +90,8 @@ class EntityOperations implements ContainerInjectionInterface {
       $container->get('entity_type.manager'),
       $container->get('form_builder'),
       $container->get('entity_type.bundle.info'),
-      $container->get('router.builder'),
-      $container->get('workspaces.manager'),
-      $container->get('workspaces.information'),
-      $container->get(ContentModerationWorkspaceProvider::class),
+      $container->get('router.builder')
     );
-  }
-
-  /**
-   * Creates a temporary moderation workspace if needed.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity being created.
-   *
-   * @see hook_entity_create()
-   */
-  public function entityCreate(EntityInterface $entity): void {
-    if ($this->moderationInfo->isModeratedEntity($entity)
-      && $this->workspaceInfo->isEntitySupported($entity)
-      && !$this->workspaceManager->hasActiveWorkspace()
-    ) {
-      $workspace = $this->workspaceProvider->createModerationWorkspace($entity, TRUE);
-      $this->workspaceManager->setActiveWorkspace($workspace, FALSE);
-      $entity->_temporaryModerationWorkspace = $workspace->id();
-    }
   }
 
   /**

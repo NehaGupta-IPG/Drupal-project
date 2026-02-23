@@ -116,14 +116,6 @@ class ContentModerationHooks {
   }
 
   /**
-   * Implements hook_entity_create().
-   */
-  #[Hook('entity_create')]
-  public function entityCreate(EntityInterface $entity): void {
-    \Drupal::service('class_resolver')->getInstanceFromDefinition(EntityOperations::class)->entityCreate($entity);
-  }
-
-  /**
    * Implements hook_entity_presave().
    */
   #[Hook('entity_presave')]
