@@ -105,6 +105,11 @@ class ThemeSettingsProvider {
         }
       }
 
+      // If the theme is a subtheme, get the name of its base theme.
+      if (isset($themeObject->info['base_theme'])) {
+        $base_theme = strtolower($themeObject->info['base_theme']);
+      }
+
       // Generate the path to the logo image.
       if ($themeSettings->get('logo.use_default')) {
         $logo = $this->themeInitialization->getActiveThemeByName($theme)->getLogo();
@@ -114,11 +119,15 @@ class ThemeSettingsProvider {
         $themeSettings->set('logo.url', $this->fileUrlGenerator->generateString($logo_path));
       }
 
-      // Generate the path to the favicon.
+      // Generate the path to the favicon. If it is a subtheme without its own
+      // favicon, attempt to use the favicon from the base theme.
       if ($themeSettings->get('features.favicon')) {
         $faviconPath = $themeSettings->get('favicon.path');
         if ($themeSettings->get('favicon.use_default')) {
           if (file_exists($favicon = $themeObject->getPath() . '/favicon.ico')) {
+            $themeSettings->set('favicon.url', $this->fileUrlGenerator->generateString($favicon));
+          }
+          elseif (isset($base_theme) && file_exists($favicon = dirname($themes[$base_theme]->filename) . '/favicon.ico')) {
             $themeSettings->set('favicon.url', $this->fileUrlGenerator->generateString($favicon));
           }
           else {
