@@ -72,4 +72,80 @@ class UserSubAdminTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('Cancellation method');
   }
 
+  /**
+   * Cover user cancel configuration.
+   *
+   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws \Drupal\Core\Entity\EntityStorageException
+   */
+  public function testCancelAccount(): void {
+    $admin_user = $this->drupalCreateUser(['administer users']);
+
+    $config = $this->config('user.settings');
+    $config->set('cancel_method_options.user_cancel_block', TRUE);
+    $config->set('cancel_method_options.user_cancel_block_unpublish', TRUE);
+    $config->set('cancel_method_options.user_cancel_reassign', FALSE);
+    $config->set('cancel_method_options.user_cancel_delete', FALSE);
+    $config->save();
+    $this->drupalLogin($admin_user);
+
+    // Test that the cancel user page do not show the disabled fields.
+    $cancel_user = $this->createUser();
+    $this->drupalGet('user/' . $cancel_user->id() . '/cancel');
+    $this->assertSession()->responseContains('Are you sure you want to cancel the account ' . $cancel_user->getAccountName() . '?');
+    $this->assertSession()->fieldExists('edit-user-cancel-method-user-cancel-block');
+    $this->assertSession()->fieldExists('edit-user-cancel-method-user-cancel-block-unpublish');
+    $this->assertSession()->fieldNotExists('edit-user-cancel-method-user-cancel-reassign');
+    $this->assertSession()->fieldNotExists('edit-user-cancel-method-user-cancel-delete');
+  }
+
+  /**
+   * Cover user cancellation validations.
+   *
+   * @throws \Behat\Mink\Exception\ExpectationException
+   * @throws \Drupal\Core\Entity\EntityStorageException
+   */
+  public function testCancelAccountValidations(): void {
+    $admin_user = $this->drupalCreateUser([
+      'administer users',
+      'administer account settings',
+    ]);
+
+    // Check validation user cancellation method cannot be a disabled option.
+    $config = $this->config('user.settings');
+    $config->set('cancel_method_options.user_cancel_block', TRUE);
+    $config->set('cancel_method_options.user_cancel_block_unpublish', TRUE);
+    $config->set('cancel_method_options.user_cancel_reassign', FALSE);
+    $config->set('cancel_method_options.user_cancel_delete', FALSE);
+    $config->set('cancel_method', 'user_cancel_block');
+    $config->save();
+    $this->drupalLogin($admin_user);
+
+    $this->drupalGet('admin/config/people/accounts');
+    $container = $this->assertSession()->elementExists('css', '#edit-user-cancel-method-options--wrapper');
+    $this->assertSession()->fieldExists('user_cancel_method_options[user_cancel_block]')->uncheck();
+    $this->assertSession()->checkboxNotChecked('Disable the account and keep its content.', $container);
+    $this->assertSession()->checkboxChecked('Disable the account and unpublish its content.', $container);
+    $this->assertSession()->checkboxNotChecked('Delete the account and make its content belong to the', $container);
+    $this->assertSession()->checkboxNotChecked('Delete the account and its content. This action cannot be undone.', $container);
+    $this->submitForm([], 'Save configuration');
+    $this->assertSession()->responseContains('The default user cancellation method cannot be a disabled option.');
+
+    // Check validation:
+    // At least one user cancellation option should be enabled.
+    $this->getSession()->getDriver()->uncheck('.//input[@name="user_cancel_method_options[user_cancel_block_unpublish]"]');
+    $this->assertSession()->checkboxNotChecked('Disable the account and keep its content.', $container);
+    $this->assertSession()->checkboxNotChecked('Disable the account and unpublish its content.', $container);
+    $this->assertSession()->checkboxNotChecked('Delete the account and make its content belong to the', $container);
+    $this->assertSession()->checkboxNotChecked('Delete the account and its content. This action cannot be undone.', $container);
+    $this->submitForm([], 'Save configuration');
+    $this->assertSession()->responseContains('At least one user cancellation option should be enabled.');
+
+    $this->submitForm([
+      'user_cancel_method_options[user_cancel_block]' => TRUE,
+      'user_cancel_method_options[user_cancel_block_unpublish]' => TRUE,
+    ], 'Save configuration');
+    $this->assertSession()->responseContains('The configuration options have been saved.');
+  }
+
 }

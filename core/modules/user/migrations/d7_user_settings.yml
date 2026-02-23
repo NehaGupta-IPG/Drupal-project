@@ -54,6 +54,18 @@ process:
       1: visitors
       0: admin_only
   anonymous: anonymous
+  'cancel_method_options/user_cancel_block':
+    plugin: default_value
+    default_value: true
+  'cancel_method_options/user_cancel_block_unpublish':
+    plugin: default_value
+    default_value: true
+  'cancel_method_options/user_cancel_reassign':
+    plugin: default_value
+    default_value: true
+  'cancel_method_options/user_cancel_delete':
+    plugin: default_value
+    default_value: true
 destination:
   plugin: config
   config_name: user.settings

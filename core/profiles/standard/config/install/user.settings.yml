@@ -12,5 +12,10 @@ notify:
   register_pending_approval: true
 register: admin_only
 cancel_method: user_cancel_block
+cancel_method_options:
+  user_cancel_block: true
+  user_cancel_block_unpublish: true
+  user_cancel_reassign: true
+  user_cancel_delete: true
 password_reset_timeout: 86400
 password_strength: true

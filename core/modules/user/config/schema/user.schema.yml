@@ -57,6 +57,12 @@ user.settings:
       label: 'When cancelling a user account'
       constraints:
         UserCancelMethod: []
+    cancel_method_options:
+      type: sequence
+      label: 'Cancellation method options'
+      sequence:
+        type: boolean
+        label: 'Option status'
     password_reset_timeout:
       type: integer
       label: 'Password reset timeout'

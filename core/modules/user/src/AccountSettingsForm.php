@@ -150,6 +150,24 @@ class AccountSettingsForm extends ConfigFormBase {
       '#description' => $this->t('Users with the %select-cancel-method or %administer-users <a href=":permissions-url">permissions</a> can override this default method.', ['%select-cancel-method' => $this->t('Select method for cancelling account'), '%administer-users' => $this->t('Administer users'), ':permissions-url' => Url::fromRoute('user.admin_permissions')->toString()]),
     ];
     $form['registration_cancellation']['user_cancel_method'] += user_cancel_methods();
+
+    $cancel_methods_options = $config->get('cancel_method_options') ?? [];
+    $default_value_methods = \array_keys(\array_filter($cancel_methods_options));
+    $form['registration_cancellation']['user_cancel_method_options'] = [
+      '#type' => 'checkboxes',
+      '#title' => $this->t('Available user cancellation options'),
+      '#default_value' => $default_value_methods,
+      '#config_target' => 'user.settings:cancel_method_options',
+      '#description' => $this->t('Choose the methods that will be available for the user when cancelling the account'),
+    ];
+    $form['registration_cancellation']['user_cancel_method_options'] += user_cancel_methods();
+
+    // We need to display all methods regardless of the method access
+    // to allow selecting the user cancellation options available.
+    foreach (array_keys($form['registration_cancellation']['user_cancel_method_options']['#options']) as $method_name) {
+      unset($form['registration_cancellation']['user_cancel_method_options'][$method_name]['#access']);
+    }
+
     foreach (Element::children($form['registration_cancellation']['user_cancel_method']) as $key) {
       // All account cancellation methods that specify #access cannot be
       // configured as default method.
@@ -416,6 +434,29 @@ class AccountSettingsForm extends ConfigFormBase {
     ];
 
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state): void {
+    $default_cancel_method = $form_state->getValue('user_cancel_method');
+    $cancel_methods_options = $form_state->getValue('user_cancel_method_options');
+    $boolean_values = [];
+    foreach ($cancel_methods_options as $key => $value) {
+      $boolean_values[$key] = (bool) $value;
+    }
+    $form_state->setValue('user_cancel_method_options', $boolean_values);
+    // Remove disabled cancel options.
+    parent::validateForm($form, $form_state);
+    $cancel_methods_options = array_filter($cancel_methods_options);
+    if (empty($cancel_methods_options)) {
+      $form_state->setErrorByName('user_cancel_method_options', $this->t('At least one user cancellation option should be enabled.'));
+      return;
+    }
+    if (!(in_array($default_cancel_method, $cancel_methods_options, TRUE))) {
+      $form_state->setErrorByName('user_cancel_method', $this->t('The default user cancellation method cannot be a disabled option.'));
+    }
   }
 
 }
