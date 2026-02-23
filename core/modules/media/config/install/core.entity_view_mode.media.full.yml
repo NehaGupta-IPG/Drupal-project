@@ -5,6 +5,6 @@ dependencies:
     - media
 id: media.full
 label: 'Full content'
-description: ''
+description: 'Displays media in its full context.'
 targetEntityType: media
 cache: true
