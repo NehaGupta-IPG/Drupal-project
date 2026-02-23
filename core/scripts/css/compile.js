@@ -52,6 +52,9 @@ module.exports = (filePath, callback) => {
             '!outline*',
           ],
           mediaQuery: true,
+          selectorBlackList: [
+            'toolbar-toggle-orientation',
+          ],
           minPixelValue: 3,
           // Prevent converting PX to REM for icon styles. These files have been
           // added to use the `postcssUrl` plugin, but aren't compatible with

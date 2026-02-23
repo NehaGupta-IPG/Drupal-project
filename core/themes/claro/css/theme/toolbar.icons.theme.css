@@ -321,8 +321,8 @@
  */
 
 .toolbar .toolbar-toggle-orientation button {
-  width: 2.4375rem;
-  height: 2.4375rem;
+  width: 39px;
+  height: 39px;
   padding: 0;
   text-indent: -999em;
 }
