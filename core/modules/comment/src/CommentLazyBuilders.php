@@ -116,8 +116,13 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
     ];
     $comment = $this->entityTypeManager->getStorage('comment')->create($values);
 
+    // Use createAccess() with the commented entity in context so that access
+    // handlers and buildCreateAccessCid() have the full picture.
+    $commented_entity = $this->entityTypeManager->getStorage($commented_entity_type_id)->load($commented_entity_id);
+    $context = ['commented_entity' => $commented_entity];
     /** @var \Drupal\Core\Access\AccessResultInterface $access */
-    $access = $comment->access('create', $this->currentUser, TRUE);
+    $access = $this->entityTypeManager->getAccessControlHandler('comment')
+      ->createAccess($comment_type_id, $this->currentUser, $context, TRUE);
     $form = $access->isAllowed() ? $this->entityFormBuilder->getForm($comment) : [];
 
     // Merge access cacheable metadata into the form render array.
