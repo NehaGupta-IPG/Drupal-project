@@ -28,6 +28,6 @@ class EntityUntranslatableFieldsConstraint extends SymfonyConstraint {
    *
    * @var string
    */
-  public $defaultTranslationMessage = 'Non-translatable fields can only be changed when updating the original language. Non-translatable field: %field',
+  public $defaultTranslationMessage = 'Non-translatable fields can only be changed when updating the original language. Non-translatable field: %field';
 
 }
