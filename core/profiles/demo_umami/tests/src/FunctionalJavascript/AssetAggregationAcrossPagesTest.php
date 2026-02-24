@@ -6,11 +6,13 @@ namespace Drupal\Tests\demo_umami\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\PerformanceTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests demo_umami profile performance.
  */
 #[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
 
   /**
@@ -30,7 +32,7 @@ class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
       'ScriptCount' => 1,
       'ScriptBytes' => 11700,
       'StylesheetCount' => 6,
-      'StylesheetBytes' => 118700,
+      'StylesheetBytes' => 117400,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
@@ -48,9 +50,9 @@ class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
 
     $expected = [
       'ScriptCount' => 3,
-      'ScriptBytes' => 253948,
+      'ScriptBytes' => 73750,
       'StylesheetCount' => 5,
-      'StylesheetBytes' => 82672,
+      'StylesheetBytes' => 79400,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
@@ -69,9 +71,37 @@ class AssetAggregationAcrossPagesTest extends PerformanceTestBase {
     }, 'umamiFrontAndRecipePagesEditor');
     $expected = [
       'ScriptCount' => 5,
-      'ScriptBytes' => 446101,
+      'ScriptBytes' => 206500,
       'StylesheetCount' => 5,
-      'StylesheetBytes' => 205100,
+      'StylesheetBytes' => 165250,
+    ];
+    $this->assertMetrics($expected, $performance_data);
+  }
+
+  /**
+   * Checks the node/add page asset requests as an author.
+   */
+  public function testNodeAddPagesAuthor(): void {
+    $user = $this->createUser();
+    $user->addRole('author');
+    $user->save();
+    $this->drupalLogin($user);
+    $this->drupalGet('<front>');
+    // Give additional time for the request and all assets to be returned
+    // before making the next request.
+    sleep(2);
+    $performance_data = $this->collectPerformanceData(function () {
+      $this->drupalGet('node/add/article');
+      sleep(2);
+      $this->drupalGet('node/add/recipe');
+      sleep(2);
+      $this->drupalGet('node/add/page');
+    }, 'umamiNodeAddEditor');
+    $expected = [
+      'ScriptCount' => 15,
+      'ScriptBytes' => 3769883,
+      'StylesheetCount' => 8,
+      'StylesheetBytes' => 619086,
     ];
     $this->assertMetrics($expected, $performance_data);
   }

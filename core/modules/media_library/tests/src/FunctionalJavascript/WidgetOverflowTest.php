@@ -7,6 +7,7 @@ namespace Drupal\Tests\media_library\FunctionalJavascript;
 use Drupal\Tests\TestFileCreationTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that uploads in the 'media_library_widget' works as expected.
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[Group('media_library')]
 #[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class WidgetOverflowTest extends MediaLibraryTestBase {
 
   use TestFileCreationTrait;
@@ -74,7 +76,7 @@ class WidgetOverflowTest extends MediaLibraryTestBase {
       $this->assertNotEmpty($path);
       $this->assertFileExists($path);
 
-      $filenames[] = $file_system->basename($path);
+      $filenames[] = basename($path);
       $remote_paths[] = $this->getSession()
         ->getDriver()
         ->uploadFileAndGetRemoteFilePath($path);
@@ -124,10 +126,12 @@ class WidgetOverflowTest extends MediaLibraryTestBase {
     $this->pressInsertSelected(NULL, FALSE);
     $this->waitForElementTextContains('.messages--error', 'There are currently 5 items selected. The maximum number of items for the field is 2. Remove 3 items from the selection.');
     $assert_session->elementNotExists('css', '.messages--warning');
-    // Once the extra items are deselected, all should be well.
+    // Once the extra items are deselected, the error message should be
+    // automatically cleared.
     $this->deselectMediaItem(2);
     $this->deselectMediaItem(3);
     $this->deselectMediaItem(4);
+    $assert_session->elementNotExists('css', '.messages--error');
     $this->pressInsertSelected('Added 2 media items.');
   }
 

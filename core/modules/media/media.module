@@ -5,31 +5,7 @@
  */
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element;
 use Drupal\Core\Url;
-
-/**
- * Prepares variables for media templates.
- *
- * Default template: media.html.twig.
- *
- * @param array $variables
- *   An associative array containing:
- *   - elements: An array of elements to display in view mode.
- *   - media: The media item.
- *   - name: The label for the media item.
- *   - view_mode: View mode; e.g., 'full', 'teaser', etc.
- */
-function template_preprocess_media(array &$variables): void {
-  $variables['media'] = $variables['elements']['#media'];
-  $variables['view_mode'] = $variables['elements']['#view_mode'];
-  $variables['name'] = $variables['media']->label();
-
-  // Helpful $content variable for templates.
-  foreach (Element::children($variables['elements']) as $key) {
-    $variables['content'][$key] = $variables['elements'][$key];
-  }
-}
 
 /**
  * Returns the appropriate URL to add media for the current user.

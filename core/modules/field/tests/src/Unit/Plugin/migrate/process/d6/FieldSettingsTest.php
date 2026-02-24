@@ -11,18 +11,18 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests Drupal\field\Plugin\migrate\process\d6\FieldSettings.
  */
 #[CoversClass(FieldSettings::class)]
 #[Group('field')]
+#[IgnoreDeprecations]
 class FieldSettingsTest extends UnitTestCase {
 
   /**
    * Tests get settings.
-   *
-   * @legacy-covers ::getSettings
    */
   #[DataProvider('getSettingsProvider')]
   public function testGetSettings($field_type, $field_settings, $allowed_values): void {

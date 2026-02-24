@@ -7,18 +7,15 @@ namespace Drupal\KernelTests\Core\Extension;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests hook_module_implements_alter().
  */
 #[Group('Module')]
 #[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class ModuleImplementsAlterTest extends KernelTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
 
   /**
    * Tests hook_module_implements_alter() adding an implementation.
@@ -46,10 +43,6 @@ class ModuleImplementsAlterTest extends KernelTestBase {
 
     $this->assertTrue(\Drupal::moduleHandler()->hasImplementations('module_implements_alter', 'module_implements_alter_test'),
       'module_implements_alter_test implements hook_module_implements_alter().');
-
-    // Assert that module_implements_alter_test.implementations.inc is not included yet.
-    $this->assertFalse(function_exists('module_implements_alter_test_altered_test_hook'),
-      'The file module_implements_alter_test.implementations.inc is not included yet.');
 
     // Trigger hook discovery for hook_altered_test_hook().
     // Assert that module_implements_alter_test_module_implements_alter(*, 'altered_test_hook')

@@ -8,12 +8,14 @@ use Drupal\block\Entity\Block;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Block Items Per Page Update.
  */
 #[Group('Update')]
 #[CoversFunction('views_post_update_block_items_per_page')]
+#[RunTestsInSeparateProcesses]
 final class BlockItemsPerPageUpdateTest extends UpdatePathTestBase {
 
   /**
@@ -22,6 +24,8 @@ final class BlockItemsPerPageUpdateTest extends UpdatePathTestBase {
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-history.php',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-ban.php',
       __DIR__ . '/../../../fixtures/update/views-block-items-per-page.php',
     ];
   }

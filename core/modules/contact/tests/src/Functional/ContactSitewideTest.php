@@ -13,6 +13,8 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests site-wide contact form functionality.
@@ -20,6 +22,8 @@ use PHPUnit\Framework\Attributes\Group;
  * @see \Drupal\Tests\contact\Functional\ContactStorageTest
  */
 #[Group('contact')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class ContactSitewideTest extends BrowserTestBase {
 
   use FieldUiTestTrait;
@@ -213,10 +217,31 @@ class ContactSitewideTest extends BrowserTestBase {
     $this->drupalLogin($admin_user);
 
     // Add more forms.
-    $this->addContactForm($this->randomMachineName(16), $label = $this->randomMachineName(16), implode(',', [$recipients[0], $recipients[1]]), '', FALSE);
+    $this->addContactForm(
+      $this->randomMachineName(16),
+      $label = $this->randomMachineName(16),
+      implode(',',
+        [
+          $recipients[0],
+          $recipients[1],
+        ]),
+      '',
+      FALSE,
+    );
     $this->assertSession()->pageTextContains('Contact form ' . $label . ' has been added.');
 
-    $this->addContactForm($name = $this->randomMachineName(16), $label = $this->randomMachineName(16), implode(',', [$recipients[0], $recipients[1], $recipients[2]]), '', FALSE);
+    $this->addContactForm(
+      $name = $this->randomMachineName(16),
+      $label = $this->randomMachineName(16),
+      implode(',',
+        [
+          $recipients[0],
+          $recipients[1],
+          $recipients[2],
+        ]),
+      '',
+      FALSE,
+    );
     $this->assertSession()->pageTextContains('Contact form ' . $label . ' has been added.');
 
     // Try adding a form that already exists.
@@ -560,7 +585,7 @@ class ContactSitewideTest extends BrowserTestBase {
    *   The message that will be displayed to a user upon completing the contact
    *   form.
    * @param string $redirect
-   *   The path where user will be redirect after this form has been submitted..
+   *   The path where user will be redirect after this form has been submitted.
    */
   public function updateContactForm($id, $label, $recipients, $reply, $selected, $message = 'Your message has been sent.', $redirect = '/'): void {
     $edit = [];

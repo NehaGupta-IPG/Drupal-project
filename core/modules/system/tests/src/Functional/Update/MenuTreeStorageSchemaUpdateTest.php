@@ -7,11 +7,13 @@ namespace Drupal\Tests\system\Functional\Update;
 use Drupal\Core\Database\Connection;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests update of menu tree storage fields.
  */
 #[Group('system')]
+#[RunTestsInSeparateProcesses]
 class MenuTreeStorageSchemaUpdateTest extends UpdatePathTestBase {
 
   /**
@@ -37,6 +39,7 @@ class MenuTreeStorageSchemaUpdateTest extends UpdatePathTestBase {
     $this->databaseDumpFiles = [
       // Start with a bare installation of Drupal 10.3.0.
       DRUPAL_ROOT . '/core/modules/system/tests/fixtures/update/drupal-10.3.0.bare.standard.php.gz',
+      DRUPAL_ROOT . '/core/modules/system/tests/fixtures/update/uninstall-history.php',
     ];
   }
 

@@ -69,6 +69,17 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
   public function getOriginalClass();
 
   /**
+   * Gets the list of all the classes for this entity type.
+   *
+   * In case the class name was changed with setClass(), this will return
+   * the list of all the changes.
+   *
+   * @return class-string[]
+   *   The list of classes.
+   */
+  public function getDecoratedClasses(): array;
+
+  /**
    * Gets an array of entity keys.
    *
    * @return array
@@ -385,7 +396,7 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    * with more complex permissions can extend this class to do their own access
    * checks.
    *
-   * @return string|bool
+   * @return string|false
    *   The name of the administrative permission. Defaults to FALSE, if the
    *   permission does not exist.
    */
@@ -447,7 +458,7 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    * @param string $key
    *   The link type.
    *
-   * @return string|bool
+   * @return string|false
    *   The path for this link, or FALSE if it doesn't exist.
    */
   public function getLinkTemplate($key);
@@ -803,12 +814,16 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    *
    * @param string $constraint_name
    *   The name of the constraint to add, i.e. its plugin id.
+   * phpcs:disable Drupal.Commenting
+   * @todo Uncomment new method parameter signature before drupal:12.0.0.
+   * @see https://www.drupal.org/node/3554746
    * @param array|null $options
    *   The constraint options as required by the constraint plugin, or NULL.
+   * phpcs:enable
    *
    * @return $this
    */
-  public function addConstraint($constraint_name, $options = NULL);
+  public function addConstraint($constraint_name, /* ?array */$options = NULL);
 
   /**
    * Gets the config dependency info for this entity, if any exists.
@@ -822,5 +837,16 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    *   - 'name': The name of the config dependency.
    */
   public function getBundleConfigDependency($bundle);
+
+  /**
+   * Checks if this entity type has an integer ID.
+   *
+   * @return bool|null
+   *   Returns:
+   *     - TRUE if the entity type ID is defined as integer;
+   *     - FALSE if the entity type ID is defined as string;
+   *     - NULL if the entity type lacks an ID key.
+   */
+  public function hasIntegerId(): ?bool;
 
 }

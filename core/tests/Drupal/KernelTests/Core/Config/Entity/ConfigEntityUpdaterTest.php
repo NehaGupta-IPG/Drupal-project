@@ -9,12 +9,14 @@ use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests \Drupal\Core\Config\Entity\ConfigEntityUpdater.
  */
 #[CoversClass(ConfigEntityUpdater::class)]
 #[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ConfigEntityUpdaterTest extends KernelTestBase {
 
   /**
@@ -24,8 +26,6 @@ class ConfigEntityUpdaterTest extends KernelTestBase {
 
   /**
    * Tests update.
-   *
-   * @legacy-covers ::update
    */
   public function testUpdate(): void {
     // Create some entities to update.
@@ -79,8 +79,6 @@ class ConfigEntityUpdaterTest extends KernelTestBase {
 
   /**
    * Tests update default callback.
-   *
-   * @legacy-covers ::update
    */
   public function testUpdateDefaultCallback(): void {
     // Create some entities to update.
@@ -121,8 +119,6 @@ class ConfigEntityUpdaterTest extends KernelTestBase {
 
   /**
    * Tests update exception.
-   *
-   * @legacy-covers ::update
    */
   public function testUpdateException(): void {
     $this->enableModules(['user', 'entity_test']);
@@ -135,8 +131,6 @@ class ConfigEntityUpdaterTest extends KernelTestBase {
 
   /**
    * Tests update once per update exception.
-   *
-   * @legacy-covers ::update
    */
   public function testUpdateOncePerUpdateException(): void {
     $this->expectException(\RuntimeException::class);

@@ -13,7 +13,6 @@ use Drupal\views\Views;
 use Drupal\views_ui\ViewUI;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\PluginBase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @defgroup views_wizard_plugins Views wizard plugins
@@ -42,7 +41,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    *
    * @var string
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $base_table;
 
   /**
@@ -67,7 +66,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    *
    * @var array
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $validated_views = [];
 
   /**
@@ -106,7 +105,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    *
    * @var array
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $filter_defaults = [
     'id' => NULL,
     'expose' => ['operator' => FALSE],
@@ -128,19 +127,6 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
   protected $parentFormSelector;
 
   /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('entity_type.bundle.info'),
-      $container->get('menu.parent_form_selector')
-    );
-  }
-
-  /**
    * Constructs a WizardPluginBase object.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeBundleInfoInterface $bundle_info_service, MenuParentFormSelectorInterface $parent_form_selector) {
@@ -153,7 +139,12 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
 
     $entity_types = \Drupal::entityTypeManager()->getDefinitions();
     foreach ($entity_types as $entity_type_id => $entity_type) {
-      if (in_array($this->base_table, [$entity_type->getBaseTable(), $entity_type->getDataTable(), $entity_type->getRevisionTable(), $entity_type->getRevisionDataTable()], TRUE)) {
+      if (in_array($this->base_table, [
+        $entity_type->getBaseTable(),
+        $entity_type->getDataTable(),
+        $entity_type->getRevisionTable(),
+        $entity_type->getRevisionDataTable(),
+      ], TRUE)) {
         $this->entityType = $entity_type;
         $this->entityTypeId = $entity_type_id;
       }
@@ -421,7 +412,11 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
         '#options' => $style_options,
       ];
       $style_form = &$form['displays']['block']['options']['style'];
-      $style_form['style_plugin']['#default_value'] = static::getSelected($form_state, ['block', 'style', 'style_plugin'], 'default', $style_form['style_plugin']);
+      $style_form['style_plugin']['#default_value'] = static::getSelected($form_state, [
+        'block',
+        'style',
+        'style_plugin',
+      ], 'default', $style_form['style_plugin']);
       // Changing this dropdown updates $form['displays']['block']['options']
       // via AJAX.
       views_ui_add_ajax_trigger($style_form, 'style_plugin', ['displays', 'block', 'options']);
@@ -579,7 +574,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
   protected function buildFormStyle(array &$form, FormStateInterface $form_state, $type) {
     $style_form = &$form['displays'][$type]['options']['style'];
     $style = $style_form['style_plugin']['#default_value'];
-    $style_plugin = Views::pluginManager('style')->createInstance($style);
+    $style_plugin = \Drupal::service('plugin.manager.views.style')->createInstance($style);
     if (isset($style_plugin) && $style_plugin->usesRowPlugin()) {
       $options = $this->rowStyleOptions();
       $style_form['row_plugin'] = [
@@ -628,7 +623,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
   protected function buildFilters(&$form, FormStateInterface $form_state) {
     \Drupal::moduleHandler()->loadInclude('views_ui', 'inc', 'admin');
 
-    $bundles = $this->bundleInfoService->getBundleInfo($this->entityTypeId);
+    $bundles = isset($this->entityTypeId) ? $this->bundleInfoService->getBundleInfo($this->entityTypeId) : [];
     // If the current base table support bundles and has more than one (like
     // user).
     if (!empty($bundles) && $this->entityType && $this->entityType->hasKey('bundle')) {
@@ -760,7 +755,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
   protected function alterDisplayOptions(&$display_options, $form, FormStateInterface $form_state) {
     foreach ($display_options as $display_type => $options) {
       // Allow style plugins to hook in and provide some settings.
-      $style_plugin = Views::pluginManager('style')->createInstance($options['style']['type']);
+      $style_plugin = \Drupal::service('plugin.manager.views.style')->createInstance($options['style']['type']);
       $style_plugin->wizardSubmit($form, $form_state, $this, $display_options, $display_type);
     }
   }
@@ -954,7 +949,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
         $table_data = Views::viewsData()->get($table);
         // If the 'in' operator is being used, map the values to an array.
         $handler = $table_data[$bundle_key]['filter']['id'];
-        $handler_definition = Views::pluginManager('filter')
+        $handler_definition = \Drupal::service('plugin.manager.views.filter')
           ->getDefinition($handler);
         if ($handler == 'in_operator' || is_subclass_of($handler_definition['class'], 'Drupal\\views\\Plugin\\views\\filter\\InOperator')) {
           $value = [$type => $type];

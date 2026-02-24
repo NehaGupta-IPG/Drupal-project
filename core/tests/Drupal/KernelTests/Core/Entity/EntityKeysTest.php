@@ -8,11 +8,13 @@ use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\entity_test\Entity\EntityTest;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test the behavior of entity keys.
  */
 #[Group('entity')]
+#[RunTestsInSeparateProcesses]
 class EntityKeysTest extends EntityKernelTestBase {
 
   /**
@@ -44,7 +46,7 @@ class EntityKeysTest extends EntityKernelTestBase {
   /**
    * Data provider for ::testMultipleKeysCache.
    */
-  public static function multipleKeysCacheTestCases() {
+  public static function multipleKeysCacheTestCases(): array {
     return [
       'translatable Entity Key' => [
         TRUE,

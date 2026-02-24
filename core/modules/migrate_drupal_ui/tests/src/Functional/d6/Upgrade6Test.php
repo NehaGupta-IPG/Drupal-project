@@ -7,6 +7,8 @@ namespace Drupal\Tests\migrate_drupal_ui\Functional\d6;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\migrate_drupal_ui\Functional\MigrateUpgradeExecuteTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal 6 upgrade using the migrate UI.
@@ -15,6 +17,8 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[Group('migrate_drupal_ui')]
 #[Group('#slow')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
 
   /**
@@ -22,12 +26,14 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
    */
   protected static $modules = [
     'config_translation',
+    'contact',
     'content_translation',
     'datetime_range',
     'language',
     'migrate_drupal_ui',
     'telephone',
     'update',
+    'shortcut',
   ];
 
   /**
@@ -80,7 +86,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
       // The 'standard' profile provides the 'comment' comment type, and the
       // migration creates 12 comment types, one per node type.
       'comment_type' => 14,
-      'contact_form' => 5,
+      'contact_form' => 4,
       'contact_message' => 0,
       'configurable_language' => 5,
       'editor' => 2,
@@ -95,7 +101,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
       // creates 12 node types.
       'node_type' => 13,
       'search_page' => 3,
-      'shortcut' => 2,
+      'shortcut' => 0,
       'shortcut_set' => 1,
       'action' => 30,
       'menu' => 8,

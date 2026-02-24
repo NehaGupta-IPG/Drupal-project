@@ -7,11 +7,13 @@ namespace Drupal\Tests\search\Functional\Update;
 use Drupal\block\Entity\Block;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests update path for the search block's `page_id` setting from '' to NULL.
  */
 #[Group('search')]
+#[RunTestsInSeparateProcesses]
 class SearchBlockPageIdUpdatePathTest extends UpdatePathTestBase {
 
   /**
@@ -20,6 +22,8 @@ class SearchBlockPageIdUpdatePathTest extends UpdatePathTestBase {
   protected function setDatabaseDumpFiles() {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-history.php',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-ban.php',
     ];
   }
 

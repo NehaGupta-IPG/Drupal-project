@@ -9,6 +9,7 @@ use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore garply tarz
 /**
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 #[CoversClass(ExtensionMimeTypeGuesser::class)]
 #[Group('File')]
 #[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class ExtensionMimeTypeGuesserLegacyTest extends KernelTestBase {
 
   /**
@@ -30,8 +32,6 @@ class ExtensionMimeTypeGuesserLegacyTest extends KernelTestBase {
 
   /**
    * Tests mapping of mimetypes from filenames.
-   *
-   * @legacy-covers ::guessMimeType
    */
   public function testGuessMimeType(): void {
     $prefixes = ['public://', 'private://', 'temporary://', 'dummy-remote://'];

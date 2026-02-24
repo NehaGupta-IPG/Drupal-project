@@ -7,42 +7,9 @@
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\image\Plugin\Field\FieldType\ImageItem;
 use Drupal\media\MediaTypeInterface;
-
-/**
- * Prepares variables for the media library modal dialog.
- *
- * Default template: media-library-wrapper.html.twig.
- *
- * @param array $variables
- *   An associative array containing:
- *   - element: An associative array containing the properties of the element.
- *     Properties used: #menu, #content.
- */
-function template_preprocess_media_library_wrapper(array &$variables): void {
-  $variables['menu'] = &$variables['element']['menu'];
-  $variables['content'] = &$variables['element']['content'];
-}
-
-/**
- * Prepares variables for a selected media item.
- *
- * Default template: media-library-item.html.twig.
- *
- * @param array $variables
- *   An associative array containing:
- *   - element: An associative array containing the properties and children of
- *     the element.
- */
-function template_preprocess_media_library_item(array &$variables): void {
-  $element = &$variables['element'];
-  foreach (Element::children($element) as $key) {
-    $variables['content'][$key] = $element[$key];
-  }
-}
 
 /**
  * Form #after_build callback for media_library view's exposed filters form.

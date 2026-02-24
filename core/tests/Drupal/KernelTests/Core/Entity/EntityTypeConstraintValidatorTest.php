@@ -6,11 +6,13 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\TypedData\DataDefinition;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests validation constraints for EntityTypeConstraintValidator.
  */
 #[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityTypeConstraintValidatorTest extends EntityKernelTestBase {
 
   /**
@@ -41,7 +43,7 @@ class EntityTypeConstraintValidatorTest extends EntityKernelTestBase {
     $entity_type = 'node';
     $definition = DataDefinition::create('entity_reference')
       ->setConstraints([
-        'EntityType' => $entity_type,
+        'EntityType' => ['type' => $entity_type],
       ]
     );
 

@@ -6,6 +6,7 @@ namespace Drupal\Tests\mysql\Unit;
 
 use Drupal\mysql\Driver\Database\mysql\Connection;
 use Drupal\Tests\UnitTestCase;
+use Pdo\Mysql;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -31,7 +32,7 @@ class ConnectionTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $this->connection = $this->getMockBuilder(Connection::class)
-      ->setConstructorArgs([$this->createMock(\PDO::class), []])
+      ->setConstructorArgs([$this->createMock(Mysql::class), []])
       ->onlyMethods(['getServerVersion'])
       ->getMock();
   }

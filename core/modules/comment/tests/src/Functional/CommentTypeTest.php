@@ -12,11 +12,13 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Ensures that comment type functions work correctly.
  */
 #[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentTypeTest extends CommentTestBase {
 
   /**
@@ -93,7 +95,7 @@ class CommentTypeTest extends CommentTestBase {
     $this->assertSession()->addressEquals('admin/structure/comment/manage/' . $edit['id'] . '/fields');
 
     // Asserts that the comment type is visible in breadcrumb.
-    $this->assertTrue($this->assertSession()->elementExists('css', 'nav[role="navigation"]')->hasLink('title for foo'));
+    $this->assertTrue($this->assertSession()->elementExists('css', 'nav')->hasLink('title for foo'));
 
     $comment_type = CommentType::load('foo');
     $this->assertInstanceOf(CommentType::class, $comment_type);

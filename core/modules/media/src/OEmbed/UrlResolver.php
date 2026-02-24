@@ -89,7 +89,7 @@ class UrlResolver implements UrlResolverInterface {
    * @param string $url
    *   The resource's URL.
    *
-   * @return string|bool
+   * @return string|false
    *   URL of the oEmbed endpoint, or FALSE if the discovery was unsuccessful.
    */
   protected function discoverResourceUrl($url) {
@@ -97,6 +97,12 @@ class UrlResolver implements UrlResolverInterface {
       $response = $this->httpClient->get($url);
     }
     catch (ClientExceptionInterface) {
+      return FALSE;
+    }
+
+    // Only care about HTML responses.
+    $response_type = strtolower($response->getHeaderLine('Content-Type'));
+    if (!str_contains($response_type, 'text/html')) {
       return FALSE;
     }
 

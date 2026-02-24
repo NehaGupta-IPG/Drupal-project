@@ -372,7 +372,7 @@ function hook_node_update_index(NodeInterface $node): string|\Stringable {
  *
  * @ingroup entity_crud
  */
-function hook_ranking(): array {
+function hook_node_search_ranking(): array {
   $data = [];
   // If voting is disabled, we can avoid returning the array, no hard feelings.
   if (\Drupal::config('vote.settings')->get('node_enabled')) {
