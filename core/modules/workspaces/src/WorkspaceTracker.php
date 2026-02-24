@@ -115,13 +115,18 @@ class WorkspaceTracker implements WorkspaceTrackerInterface, EventSubscriberInte
       }
 
       // Individual revisions are tracked in a separate table only for the
-      // workspace in which they were created or updated.
-      $this->database->insert(static::REVISION_TABLE)
-        ->fields([
+      // workspace in which they were created or updated. A merge query is
+      // used to allow re-tracking a revision that already exists, e.g. when
+      // re-indexing after a revision deletion.
+      // @todo Use an Upsert query after https://www.drupal.org/i/2547493.
+      $this->database->merge(static::REVISION_TABLE)
+        ->keys([
           'workspace' => $workspace_id,
           'target_entity_type_id' => $entity->getEntityTypeId(),
           $id_field => $entity->id(),
           'target_entity_revision_id' => $entity->getRevisionId(),
+        ])
+        ->fields([
           'initial_revision' => (int) $entity->isDefaultRevision(),
         ])
         ->execute();
@@ -424,6 +429,31 @@ class WorkspaceTracker implements WorkspaceTrackerInterface, EventSubscriberInte
       $transaction = $this->database->startTransaction();
       $this->doDeleteAssociations(static::TABLE, $workspace_id, $entity_type_id, $entity_ids, $revision_ids);
       $this->doDeleteAssociations(static::REVISION_TABLE, $workspace_id, $entity_type_id, $entity_ids, $revision_ids);
+
+      // When deleting specific revisions, check if we're still tracking other
+      // revisions for those entity IDs, and update the association table if
+      // needed.
+      if ($entity_ids && $revision_ids) {
+        $id_field = static::getIdField($entity_type_id);
+
+        $select = $this->database->select(static::REVISION_TABLE);
+        $select->fields(static::REVISION_TABLE, ['workspace']);
+        $select->addExpression("MAX(target_entity_revision_id)", 'target_entity_revision_id');
+        $select->condition('target_entity_type_id', $entity_type_id);
+        $select->condition($id_field, $entity_ids, 'IN');
+        if ($workspace_id) {
+          $select->condition('workspace', $workspace_id);
+        }
+        $select->groupBy('workspace');
+        $select->groupBy($id_field);
+
+        $storage = $this->entityTypeManager->getStorage($entity_type_id);
+        foreach ($select->execute() as $record) {
+          if ($entity = $storage->loadRevision($record->target_entity_revision_id)) {
+            $this->trackEntity($record->workspace, $entity);
+          }
+        }
+      }
     }
     catch (\Exception $e) {
       if (isset($transaction)) {
