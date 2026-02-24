@@ -3,6 +3,8 @@
 namespace Drupal\user;
 
 use Drupal\Core\Database\Connection;
+use Drupal\user\Entity\User;
+use Drupal\Core\Cache\Cache;
 
 /**
  * Defines the user data service.
@@ -89,12 +91,15 @@ class UserData implements UserDataInterface {
         'serialized' => $serialized,
       ])
       ->execute();
+    $this->invalidateUserCacheTags($uid);
   }
 
   /**
    * {@inheritdoc}
    */
   public function delete($module = NULL, $uid = NULL, $name = NULL) {
+    // We do not need to invalidate cache tags here as this is invoked in
+    // User::postDelete().
     $query = $this->connection->delete('users_data');
     // Cast scalars to array so we can consistently use an IN condition.
     if (isset($module)) {
@@ -108,5 +113,25 @@ class UserData implements UserDataInterface {
     }
     $query->execute();
   }
-
+  
+  /**
+   * Invalidate cache tags for the specified user.
+   *
+   * @param int $uids
+   *   The user account ID the data is associated with.
+   */
+  protected function invalidateUserCacheTags($uids) {
+    if (is_scalar($uids)) {
+      $uids = [$uids];
+    }
+    /** @var \Drupal\user\UserInterface[] $accounts */
+    $accounts = User::loadMultiple($uids);
+    if ($accounts) {
+      $tags = [];
+      foreach ($accounts as $account) {
+        $tags = Cache::mergeTags($tags, $account->getCacheTags());
+      }
+      Cache::invalidateTags($tags);
+    }
+  }
 }
