@@ -75,7 +75,7 @@ class DbLog implements LoggerInterface {
           'severity' => $level,
           'link' => $context['link'],
           'location' => $context['request_uri'],
-          'referer' => $context['referer'],
+          'referer' => mb_convert_encoding($context['referer'], 'UTF-8', 'UTF-8'),
           'hostname' => mb_substr($context['ip'], 0, 128),
           'timestamp' => $context['timestamp'],
         ])
