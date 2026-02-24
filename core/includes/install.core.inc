@@ -2034,7 +2034,8 @@ function install_check_translations($langcode, $server_pattern, string $project 
     }
   }
 
-  if ($translations_directory_exists && $readable && $writable && $translation_available) {
+  $locale_use_remote = \Drupal::moduleHandler()->moduleExists('locale') && locale_translation_use_remote_source();
+  if ($locale_use_remote && $translations_directory_exists && $readable && $writable && $translation_available) {
     $translation_downloaded = install_retrieve_file($translation_url, $translations_directory);
 
     if (!$translation_downloaded) {
