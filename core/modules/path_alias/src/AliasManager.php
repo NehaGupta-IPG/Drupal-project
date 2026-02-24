@@ -14,28 +14,39 @@ use Drupal\Core\Utility\FiberResumeType;
 class AliasManager implements AliasManagerInterface {
 
   /**
-   * Holds the map of path lookups per language.
+   * Holds the map of path aliases, keyed by language code and system path.
    *
-   * @var array
+   * @var array<string, array<string, string>>
+   * An associative array where the primary key is the language code, the
+   * secondary key is the system path, and the value is the path alias.
    */
   protected $lookupMap = [];
 
   /**
    * Holds an array of aliases for which no path was found.
    *
-   * @var array
+   * @var array<string, array<string, bool>>
+   * An associative array where the primary key is the language code, the
+   * secondary key is the path alias, and the value is TRUE.
    */
   protected $noPath = [];
 
   /**
    * Holds an array of paths that have no alias.
    *
-   * @var array
+   * @var array<string, array<string, string>>
+   * An associative array where the primary key is the language code, the
+   * secondary key is the system path, and the value is the system path.
    */
   protected $noAlias = [];
 
   /**
    * Holds an array of paths that have been requested but not loaded yet.
+   *
+   * @var array<string, array<string, string>>
+   * An associative array where the primary key is the language code, the
+   * secondary key is the requested system path, and the value is the system
+   * path.
    */
   protected array $requestedPaths = [];
 
@@ -180,7 +191,6 @@ class AliasManager implements AliasManagerInterface {
     // Note this method does not flush the preloaded path lookup cache. This is
     // because if a path is missing from this cache, it still results in the
     // alias being loaded correctly, only less efficiently.
-
     if ($source) {
       foreach (array_keys($this->lookupMap) as $lang) {
         unset($this->lookupMap[$lang][$source]);
