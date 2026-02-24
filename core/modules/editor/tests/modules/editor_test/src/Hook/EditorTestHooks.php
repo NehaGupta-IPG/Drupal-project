@@ -21,7 +21,7 @@ class EditorTestHooks {
    * @see \Drupal\Tests\editor\Kernel\EntityUpdateTest
    */
   #[Hook('entity_update')]
-  public function entityUpdate(EntityInterface $entity) {
+  public function entityUpdate(EntityInterface $entity): void {
     // Only act on nodes.
     if (!$entity instanceof NodeInterface) {
       return;
@@ -66,7 +66,7 @@ class EditorTestHooks {
   #[Hook('editor_xss_filter_alter')]
   public function editorXssFilterAlter(&$editor_xss_filter_class, FilterFormatInterface $format, ?FilterFormatInterface $original_format = NULL): void {
     // Allow tests to enable or disable this alter hook.
-    if (!\Drupal::state()->get('editor_test_editor_xss_filter_alter_enabled', FALSE)) {
+    if (!\Drupal::keyValue('editor_test')->get('editor_xss_filter_alter_enabled', FALSE)) {
       return;
     }
     $filters = $format->filters()->getAll();
@@ -89,7 +89,7 @@ class EditorTestHooks {
    * Implements hook_ENTITY_TYPE_presave() for file entities.
    */
   #[Hook('file_presave')]
-  public function filePresave(FileInterface $file) {
+  public function filePresave(FileInterface $file): void {
     // Use state to keep track of how many times a file is saved.
     $file_save_count = \Drupal::state()->get('editor_test.file_save_count', []);
     $file_save_count[$file->getFilename()] = isset($file_save_count[$file->getFilename()]) ? $file_save_count[$file->getFilename()] + 1 : 1;

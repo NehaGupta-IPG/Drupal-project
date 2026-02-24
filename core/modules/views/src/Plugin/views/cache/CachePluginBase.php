@@ -75,21 +75,24 @@ abstract class CachePluginBase extends PluginBase {
    *
    * Plugins must override this to implement expiration.
    *
-   * @param $type
+   * @param string $type
    *   The cache type, either 'query', 'result'.
    */
   protected function cacheExpire($type) {
   }
 
   /**
-   * Determine cache expiration time.
+   * Determines cache expiration time based on its type.
    *
-   * Plugins must override this to implement expiration in the cache table. The
-   * default is CACHE_PERMANENT, indicating that the item will not be removed
-   * automatically from cache.
+   * Plugins must override this to implement expiration in the cache table.
    *
    * @param string $type
    *   The cache type.
+   *
+   * @return int
+   *   Either an offset from the request time to indicate when the cache
+   *   expires, or \Drupal\Core\Cache\Cache::PERMANENT to indicate that the
+   *   cache does not expire. Defaults to \Drupal\Core\Cache\Cache::PERMANENT.
    */
   protected function cacheSetMaxAge($type) {
     return Cache::PERMANENT;
@@ -100,7 +103,7 @@ abstract class CachePluginBase extends PluginBase {
    *
    * A plugin should override this to provide specialized caching behavior.
    *
-   * @param $type
+   * @param string $type
    *   The cache type, either 'query', 'result'.
    */
   public function cacheSet($type) {
@@ -126,7 +129,7 @@ abstract class CachePluginBase extends PluginBase {
    *
    * A plugin should override this to provide specialized caching behavior.
    *
-   * @param $type
+   * @param string $type
    *   The cache type, either 'query', 'result'.
    *
    * @return bool
@@ -258,6 +261,7 @@ abstract class CachePluginBase extends PluginBase {
    * Gets the max age for the current view.
    *
    * @return int
+   *   The maximum age for the current view's cache.
    */
   public function getCacheMaxAge() {
     $max_age = $this->getDefaultCacheMaxAge();
@@ -334,8 +338,13 @@ abstract class CachePluginBase extends PluginBase {
    *
    * @return string[]
    *   The row cache keys.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There
+   * is no replacement.
+   * @see https://www.drupal.org/node/3564958
    */
   public function getRowCacheKeys(ResultRow $row) {
+    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3564958', E_USER_DEPRECATED);
     return [
       'views',
       'fields',
@@ -353,8 +362,13 @@ abstract class CachePluginBase extends PluginBase {
    *
    * @return string
    *   The row identifier.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There
+   * is no replacement.
+   * @see https://www.drupal.org/node/3564958
    */
   public function getRowId(ResultRow $row) {
+    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3564958', E_USER_DEPRECATED);
     // Here we compute a unique identifier for the row by computing the hash of
     // its data. We exclude the current index, since the same row could have a
     // different result index depending on the user permissions. We exclude also

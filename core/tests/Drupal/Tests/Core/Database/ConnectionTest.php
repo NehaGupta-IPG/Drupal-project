@@ -5,18 +5,22 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Database;
 
 use Composer\Autoload\ClassLoader;
+use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
+use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\StatementPrefetchIterator;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
 use Drupal\Tests\Core\Database\Stub\StubPDO;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Tests the Connection class.
- *
- * @coversDefaultClass \Drupal\Core\Database\Connection
- * @group Database
  */
+#[CoversClass(Connection::class)]
+#[Group('Database')]
 class ConnectionTest extends UnitTestCase {
 
   /**
@@ -27,7 +31,7 @@ class ConnectionTest extends UnitTestCase {
    *   - Arguments to pass to Connection::setPrefix().
    *   - Expected result from Connection::getPrefix().
    */
-  public static function providerPrefixRoundTrip() {
+  public static function providerPrefixRoundTrip(): array {
     return [
       [
         [
@@ -47,9 +51,8 @@ class ConnectionTest extends UnitTestCase {
 
   /**
    * Exercise setPrefix() and getPrefix().
-   *
-   * @dataProvider providerPrefixRoundTrip
    */
+  #[DataProvider('providerPrefixRoundTrip')]
   public function testPrefixRoundTrip($expected, $prefix_info): void {
     $mock_pdo = $this->createMock('Drupal\Tests\Core\Database\Stub\StubPDO');
     $connection = new StubConnection($mock_pdo, []);
@@ -61,7 +64,7 @@ class ConnectionTest extends UnitTestCase {
     // Set the prefix data.
     $set_prefix->invokeArgs($connection, [$prefix_info]);
     // Check the round-trip.
-    foreach ($expected as $table => $prefix) {
+    foreach ($expected as $prefix) {
       $this->assertEquals($prefix, $connection->getPrefix());
     }
   }
@@ -76,7 +79,7 @@ class ConnectionTest extends UnitTestCase {
    *   - Query to be prefixed.
    *   - Quote identifier.
    */
-  public static function providerTestPrefixTables() {
+  public static function providerTestPrefixTables(): array {
     return [
       [
         'SELECT * FROM test_table',
@@ -107,9 +110,8 @@ class ConnectionTest extends UnitTestCase {
 
   /**
    * Exercise the prefixTables() method.
-   *
-   * @dataProvider providerTestPrefixTables
    */
+  #[DataProvider('providerTestPrefixTables')]
   public function testPrefixTables($expected, $prefix_info, $query, array $quote_identifier = ['"', '"']): void {
     $mock_pdo = $this->createMock('Drupal\Tests\Core\Database\Stub\StubPDO');
     $connection = new StubConnection($mock_pdo, ['prefix' => $prefix_info], $quote_identifier);
@@ -125,7 +127,7 @@ class ConnectionTest extends UnitTestCase {
    *   - Namespace.
    *   - Class name without namespace.
    */
-  public static function providerGetDriverClass() {
+  public static function providerGetDriverClass(): array {
     return [
       [
         'nonexistent_class',
@@ -315,10 +317,9 @@ class ConnectionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getDriverClass
-   * @dataProvider providerGetDriverClass
-   * @group legacy
+   * Tests get driver class.
    */
+  #[DataProvider('providerGetDriverClass')]
   public function testGetDriverClass($expected, $namespace, $class): void {
     $additional_class_loader = new ClassLoader();
     $additional_class_loader->addPsr4("Drupal\\core_fake\\Driver\\Database\\CoreFake\\", __DIR__ . "/../../../../../tests/fixtures/database_drivers/module/core_fake/src/Driver/Database/CoreFake");
@@ -354,7 +355,7 @@ class ConnectionTest extends UnitTestCase {
    *   - Driver for PDO connection.
    *   - Namespace for connection.
    */
-  public static function providerSchema() {
+  public static function providerSchema(): array {
     return [
       [
         'Drupal\\Tests\\Core\\Database\\Stub\\Driver\\Schema',
@@ -366,9 +367,8 @@ class ConnectionTest extends UnitTestCase {
 
   /**
    * Tests Connection::schema().
-   *
-   * @dataProvider providerSchema
    */
+  #[DataProvider('providerSchema')]
   public function testSchema($expected, $driver, $namespace): void {
     $mock_pdo = $this->createMock('Drupal\Tests\Core\Database\Stub\StubPDO');
     $connection = new StubConnection($mock_pdo, ['namespace' => $namespace]);
@@ -384,7 +384,7 @@ class ConnectionTest extends UnitTestCase {
    *   - Expected filtered comment.
    *   - Arguments for Connection::makeComment().
    */
-  public static function providerMakeComments() {
+  public static function providerMakeComments(): array {
     return [
       [
         '/*  */ ',
@@ -403,9 +403,8 @@ class ConnectionTest extends UnitTestCase {
 
   /**
    * Tests Connection::makeComments().
-   *
-   * @dataProvider providerMakeComments
    */
+  #[DataProvider('providerMakeComments')]
   public function testMakeComments($expected, $comment_array): void {
     $mock_pdo = $this->createMock('Drupal\Tests\Core\Database\Stub\StubPDO');
     $connection = new StubConnection($mock_pdo, []);
@@ -420,7 +419,7 @@ class ConnectionTest extends UnitTestCase {
    *   - Expected filtered comment.
    *   - Comment to filter.
    */
-  public static function providerFilterComments() {
+  public static function providerFilterComments(): array {
     return [
       ['', ''],
       ['Exploit  *  / DROP TABLE node. --', 'Exploit * / DROP TABLE node; --'],
@@ -430,9 +429,8 @@ class ConnectionTest extends UnitTestCase {
 
   /**
    * Tests Connection::filterComments().
-   *
-   * @dataProvider providerFilterComments
    */
+  #[DataProvider('providerFilterComments')]
   public function testFilterComments($expected, $comment): void {
     $mock_pdo = $this->createMock('Drupal\Tests\Core\Database\Stub\StubPDO');
     $connection = new StubConnection($mock_pdo, []);
@@ -455,7 +453,7 @@ class ConnectionTest extends UnitTestCase {
    *   testEscapeField. The first value is the expected value, and the second
    *   value is the value to test.
    */
-  public static function providerEscapeTables() {
+  public static function providerEscapeTables(): array {
     return [
       ['nocase', 'nocase'],
       ['camelCase', 'camelCase'],
@@ -472,9 +470,9 @@ class ConnectionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::escapeTable
-   * @dataProvider providerEscapeTables
+   * Tests escape table.
    */
+  #[DataProvider('providerEscapeTables')]
   public function testEscapeTable($expected, $name, array $identifier_quote = ['"', '"']): void {
     $mock_pdo = $this->createMock(StubPDO::class);
     $connection = new StubConnection($mock_pdo, [], $identifier_quote);
@@ -490,7 +488,7 @@ class ConnectionTest extends UnitTestCase {
    *   - Expected escaped string.
    *   - String to escape.
    */
-  public static function providerEscapeAlias() {
+  public static function providerEscapeAlias(): array {
     return [
       ['!nocase!', 'nocase', ['!', '!']],
       ['`backtick`', 'backtick', ['`', '`']],
@@ -503,9 +501,9 @@ class ConnectionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::escapeAlias
-   * @dataProvider providerEscapeAlias
+   * Tests escape alias.
    */
+  #[DataProvider('providerEscapeAlias')]
   public function testEscapeAlias($expected, $name, array $identifier_quote = ['"', '"']): void {
     $mock_pdo = $this->createMock(StubPDO::class);
     $connection = new StubConnection($mock_pdo, [], $identifier_quote);
@@ -521,7 +519,7 @@ class ConnectionTest extends UnitTestCase {
    *   - Expected escaped string.
    *   - String to escape.
    */
-  public static function providerEscapeFields() {
+  public static function providerEscapeFields(): array {
     return [
       ['/title/', 'title', ['/', '/']],
       ['`backtick`', 'backtick', ['`', '`']],
@@ -537,9 +535,9 @@ class ConnectionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::escapeField
-   * @dataProvider providerEscapeFields
+   * Tests escape field.
    */
+  #[DataProvider('providerEscapeFields')]
   public function testEscapeField($expected, $name, array $identifier_quote = ['"', '"']): void {
     $mock_pdo = $this->createMock(StubPDO::class);
     $connection = new StubConnection($mock_pdo, [], $identifier_quote);
@@ -555,7 +553,7 @@ class ConnectionTest extends UnitTestCase {
    *   testEscapeField. The first value is the expected value, and the second
    *   value is the value to test.
    */
-  public static function providerEscapeDatabase() {
+  public static function providerEscapeDatabase(): array {
     return [
       ['/name/', 'name', ['/', '/']],
       ['`backtick`', 'backtick', ['`', '`']],
@@ -566,9 +564,9 @@ class ConnectionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::escapeDatabase
-   * @dataProvider providerEscapeDatabase
+   * Tests escape database.
    */
+  #[DataProvider('providerEscapeDatabase')]
   public function testEscapeDatabase($expected, $name, array $identifier_quote = ['"', '"']): void {
     $mock_pdo = $this->createMock(StubPDO::class);
     $connection = new StubConnection($mock_pdo, [], $identifier_quote);
@@ -577,7 +575,9 @@ class ConnectionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::__construct
+   * Tests identifier quotes assert count.
+   *
+   * @legacy-covers ::__construct
    */
   public function testIdentifierQuotesAssertCount(): void {
     $this->expectException(\AssertionError::class);
@@ -587,7 +587,9 @@ class ConnectionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::__construct
+   * Tests identifier quotes assert string.
+   *
+   * @legacy-covers ::__construct
    */
   public function testIdentifierQuotesAssertString(): void {
     $this->expectException(\AssertionError::class);
@@ -597,7 +599,9 @@ class ConnectionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::__construct
+   * Tests namespace default.
+   *
+   * @legacy-covers ::__construct
    */
   public function testNamespaceDefault(): void {
     $mock_pdo = $this->createMock(StubPDO::class);
@@ -607,9 +611,8 @@ class ConnectionTest extends UnitTestCase {
 
   /**
    * Test rtrim() of query strings.
-   *
-   * @dataProvider provideQueriesToTrim
    */
+  #[DataProvider('provideQueriesToTrim')]
   public function testQueryTrim($expected, $query, $options): void {
     $mock_pdo = $this->getMockBuilder(StubPdo::class)->getMock();
     $connection = new StubConnection($mock_pdo, []);
@@ -627,7 +630,7 @@ class ConnectionTest extends UnitTestCase {
    *   - Padded query.
    *   - Query options.
    */
-  public static function provideQueriesToTrim() {
+  public static function provideQueriesToTrim(): array {
     return [
       'remove_non_breaking_space' => [
         'SELECT * FROM test',
@@ -665,9 +668,9 @@ class ConnectionTest extends UnitTestCase {
   /**
    * Tests that the proper caller is retrieved from the backtrace.
    *
-   * @covers ::findCallerFromDebugBacktrace
-   * @covers ::removeDatabaseEntriesFromDebugBacktrace
-   * @covers ::getDebugBacktrace
+   * @legacy-covers ::findCallerFromDebugBacktrace
+   * @legacy-covers ::removeDatabaseEntriesFromDebugBacktrace
+   * @legacy-covers ::getDebugBacktrace
    */
   public function testFindCallerFromDebugBacktrace(): void {
     Database::addConnectionInfo('default', 'default', [
@@ -696,13 +699,10 @@ class ConnectionTest extends UnitTestCase {
    * @param array $expected_entry
    *   The expected stack entry.
    *
-   * @covers ::findCallerFromDebugBacktrace
-   * @covers ::removeDatabaseEntriesFromDebugBacktrace
-   *
-   * @dataProvider providerMockedBacktrace
-   *
-   * @group legacy
+   * @legacy-covers ::findCallerFromDebugBacktrace
+   * @legacy-covers ::removeDatabaseEntriesFromDebugBacktrace
    */
+  #[DataProvider('providerMockedBacktrace')]
   public function testFindCallerFromDebugBacktraceWithMockedBacktrace(string $driver_namespace, array $stack, array $expected_entry): void {
     $mock_builder = $this->getMockBuilder(StubConnection::class);
     $connection = $mock_builder
@@ -885,65 +885,24 @@ class ConnectionTest extends UnitTestCase {
   /**
    * Provides data for testSupportedFetchModes.
    *
-   * @return array
-   *   An associative array of simple arrays, each having the following
-   *   elements:
-   *   - a PDO fetch mode.
+   * @return array<string,array<\Drupal\Core\Database\Statement\FetchAs>>
+   *   The FetchAs cases.
    */
   public static function providerSupportedFetchModes(): array {
     return [
-      'FETCH_ASSOC' => [\PDO::FETCH_ASSOC],
-      'FETCH_CLASS' => [\PDO::FETCH_CLASS],
-      'FETCH_CLASS | FETCH_PROPS_LATE' => [\PDO::FETCH_CLASS | \PDO::FETCH_PROPS_LATE],
-      'FETCH_COLUMN' => [\PDO::FETCH_COLUMN],
-      'FETCH_NUM' => [\PDO::FETCH_NUM],
-      'FETCH_OBJ' => [\PDO::FETCH_OBJ],
+      'Associative array' => [FetchAs::Associative],
+      'Classed object' => [FetchAs::ClassObject],
+      'Single column' => [FetchAs::Column],
+      'Simple array' => [FetchAs::List],
+      'Standard object' => [FetchAs::Object],
     ];
   }
 
   /**
    * Tests supported fetch modes.
-   *
-   * @dataProvider providerSupportedFetchModes
    */
-  public function testSupportedFetchModes(int $mode): void {
-    $mockPdo = $this->createMock(StubPDO::class);
-    $mockConnection = new StubConnection($mockPdo, []);
-    $statement = new StatementPrefetchIterator($mockPdo, $mockConnection, '');
-    $this->assertInstanceOf(StatementPrefetchIterator::class, $statement);
-    $statement->setFetchMode($mode);
-  }
-
-  /**
-   * Provides data for testUnsupportedFetchModes.
-   *
-   * @return array
-   *   An associative array of simple arrays, each having the following
-   *   elements:
-   *   - a PDO fetch mode.
-   */
-  public static function providerUnsupportedFetchModes(): array {
-    return [
-      'FETCH_DEFAULT' => [\PDO::FETCH_DEFAULT],
-      'FETCH_LAZY' => [\PDO::FETCH_LAZY],
-      'FETCH_BOTH' => [\PDO::FETCH_BOTH],
-      'FETCH_BOUND' => [\PDO::FETCH_BOUND],
-      'FETCH_INTO' => [\PDO::FETCH_INTO],
-      'FETCH_FUNC' => [\PDO::FETCH_FUNC],
-      'FETCH_NAMED' => [\PDO::FETCH_NAMED],
-      'FETCH_KEY_PAIR' => [\PDO::FETCH_KEY_PAIR],
-      'FETCH_CLASS | FETCH_CLASSTYPE' => [\PDO::FETCH_CLASS | \PDO::FETCH_CLASSTYPE],
-    ];
-  }
-
-  /**
-   * Tests unsupported fetch modes.
-   *
-   * @dataProvider providerUnsupportedFetchModes
-   */
-  public function testUnsupportedFetchModes(int $mode): void {
-    $this->expectException(\AssertionError::class);
-    $this->expectExceptionMessageMatches("/^Fetch mode FETCH_.* is not supported\\. Use supported modes only/");
+  #[DataProvider('providerSupportedFetchModes')]
+  public function testSupportedFetchModes(FetchAs $mode): void {
     $mockPdo = $this->createMock(StubPDO::class);
     $mockConnection = new StubConnection($mockPdo, []);
     $statement = new StatementPrefetchIterator($mockPdo, $mockConnection, '');

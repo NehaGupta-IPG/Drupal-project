@@ -35,12 +35,6 @@ class RegisterForm extends AccountForm {
 
     $form['#attached']['library'][] = 'core/drupal.form';
 
-    // For non-admin users, populate the form fields using data from the
-    // browser.
-    if (!$admin) {
-      $form['#attributes']['data-user-info-from-browser'] = TRUE;
-    }
-
     // Because the user status has security implications, users are blocked by
     // default when created programmatically and need to be actively activated
     // if needed. When administrators create users from the user interface,
@@ -91,7 +85,6 @@ class RegisterForm extends AccountForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $account = $this->entity;
-    $pass = $account->getPassword();
     $admin = $form_state->getValue('administer_users');
     $notify = !$form_state->isValueEmpty('notify');
 
@@ -103,9 +96,6 @@ class RegisterForm extends AccountForm {
     $form_state->setValue('uid', $account->id());
 
     $this->logger('user')->info('New user: %name %email.', ['%name' => $form_state->getValue('name'), '%email' => '<' . $form_state->getValue('mail') . '>', 'type' => $account->toLink($this->t('Edit'), 'edit-form')->toString()]);
-
-    // Add plain text password into user account to generate mail tokens.
-    $account->password = $pass;
 
     // New administrative account without notification.
     if ($admin && !$notify) {

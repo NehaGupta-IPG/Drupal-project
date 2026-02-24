@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\locale\Functional;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Locale update functions.
- *
- * @group locale
  */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocalesLocationAddIndexUpdateTest extends UpdatePathTestBase {
 
   /**
@@ -23,6 +25,8 @@ class LocalesLocationAddIndexUpdateTest extends UpdatePathTestBase {
    */
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles[] = $this->root . '/core/modules/system/tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz';
+    $this->databaseDumpFiles[] = $this->root . '/core/modules/system/tests/fixtures/update/uninstall-history.php';
+    $this->databaseDumpFiles[] = $this->root . '/core/modules/system/tests/fixtures/update/uninstall-ban.php';
   }
 
   /**
