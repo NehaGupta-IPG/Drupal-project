@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\media\Unit;
 
 use Drupal\Core\Cache\NullBackend;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\media\OEmbed\ProviderRepositoryInterface;
 use Drupal\media\OEmbed\ResourceFetcherInterface;
@@ -40,6 +41,7 @@ class UrlResolverTest extends UnitTestCase {
       $client,
       $this->createMock(ModuleHandlerInterface::class),
       new NullBackend('default'),
+      $this->createMock(ConfigFactoryInterface::class),
     ) extends UrlResolver {
 
       /**
