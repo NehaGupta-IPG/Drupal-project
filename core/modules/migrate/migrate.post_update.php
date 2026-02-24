@@ -5,6 +5,8 @@
  * Post update functions for migrate.
  */
 
+use Drupal\migrate\Plugin\migrate\id_map\Sql;
+
 /**
  * Implements hook_removed_post_updates().
  */
@@ -24,7 +26,7 @@ function migrate_post_update_ensure_destination_id_map_indexes(): string {
 
   foreach ($migration_plugin_manager->createInstances([]) as $migration) {
     $id_map = $migration->getIdMap();
-    if ($id_map instanceof \Drupal\migrate\Plugin\migrate\id_map\Sql && $schema->tableExists($id_map->mapTableName())) {
+    if ($id_map instanceof Sql && $schema->tableExists($id_map->mapTableName())) {
       $id_map->getDatabase();
     }
   }
