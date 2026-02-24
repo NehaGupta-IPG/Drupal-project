@@ -2,11 +2,14 @@
 
 namespace Drupal\Core\EventSubscriber;
 
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
+use Drupal\Core\Routing\LocalRedirectResponse;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -99,10 +102,53 @@ class MainContentViewSubscriber implements EventSubscriberInterface {
   }
 
   /**
+   * Ensures that requests with wrapper formats also have functioning redirects.
+   *
+   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
+   *   The Event to process.
+   */
+  public function onRedirectResponse(ResponseEvent $event): void {
+    $response = $event->getResponse();
+    $url = '';
+    // Only local redirects need to be updated to have the wrapper format.
+    if ($response instanceof LocalRedirectResponse) {
+      $request = $event->getRequest();
+      if ($request->getRequestFormat() === 'html' && $request->query->has(static::WRAPPER_FORMAT)) {
+        $old_redirect_url = $response->getTargetUrl();
+        $wrapper_format_query = [static::WRAPPER_FORMAT => $request->query->get(static::WRAPPER_FORMAT)];
+        $parts = parse_url($old_redirect_url, PHP_URL_QUERY | PHP_URL_FRAGMENT);
+        // Append the query to the URL.
+        if ($parts === NULL || (!isset($parts['query']) && !isset($parts['fragment']))) {
+          $url = $old_redirect_url . '?' . UrlHelper::buildQuery($wrapper_format_query);
+        }
+        // Update the existing query in the URL.
+        elseif (isset($parts['query'])) {
+          $query = [];
+          parse_str($parts['query'], $query);
+          $query = $wrapper_format_query;
+          $url = str_replace($parts['query'], UrlHelper::buildQuery($query), $old_redirect_url);
+        }
+        // Handle when there is a URL fragment and no query.
+        elseif (isset($parts['fragment'])) {
+          $url = str_replace('#' . $parts['fragment'], '', $old_redirect_url);
+          $url .= '?' . UrlHelper::buildQuery($wrapper_format_query);
+          $url .= '#' . $parts['fragment'];
+        }
+        if ($url) {
+          $response->setTargetUrl($url);
+        }
+        $main_content_view_subscriber_cacheability = (new CacheableMetadata())->setCacheContexts(['url' . static::WRAPPER_FORMAT]);
+        $response->addCacheableDependency($main_content_view_subscriber_cacheability);
+      }
+    }
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function getSubscribedEvents(): array {
     $events[KernelEvents::VIEW][] = ['onViewRenderArray'];
+    $events[KernelEvents::RESPONSE][] = ['onRedirectResponse'];
 
     return $events;
   }
