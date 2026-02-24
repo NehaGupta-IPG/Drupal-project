@@ -6,7 +6,6 @@ namespace Drupal\Tests\media\Functional;
 
 use Drupal\media\OEmbed\ResourceException;
 use Drupal\media\OEmbed\UrlResolver;
-use Drupal\media\OEmbed\ResourceException;
 use Drupal\Tests\media\Traits\OEmbedTestTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;

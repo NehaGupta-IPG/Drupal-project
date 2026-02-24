@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\media\Functional\Update;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Testing the media settings update.
