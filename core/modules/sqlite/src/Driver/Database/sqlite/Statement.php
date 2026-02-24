@@ -2,12 +2,14 @@
 
 namespace Drupal\sqlite\Driver\Database\sqlite;
 
-use Drupal\Core\Database\StatementInterface;
-use Drupal\Core\Database\StatementPrefetchIterator;
 use Drupal\Core\Database\Statement\FetchAs;
+use Drupal\Core\Database\Statement\PdoTrait;
+use Drupal\Core\Database\Statement\PrefetchedResult;
+use Drupal\Core\Database\Statement\StatementBase;
+use Drupal\Core\Database\StatementInterface;
 
 /**
- * SQLite implementation of \Drupal\Core\Database\Statement.
+ * SQLite implementation of \Drupal\Core\Database\StatementInterface.
  *
  * The PDO SQLite driver only closes SELECT statements when the PDOStatement
  * destructor is called and SQLite does not allow data change (INSERT,
@@ -15,7 +17,52 @@ use Drupal\Core\Database\Statement\FetchAs;
  * user-space mock of PDOStatement that buffers all the data and doesn't
  * have those limitations.
  */
-class Statement extends StatementPrefetchIterator implements StatementInterface {
+class Statement extends StatementBase {
+
+  use PdoTrait;
+
+  /**
+   * Constructor.
+   *
+   * @param object $clientConnection
+   *   Client database connection object, for example \PDO.
+   * @param \Drupal\Core\Database\Connection $connection
+   *   The database connection.
+   * @param string $queryString
+   *   The query string.
+   * @param array $driverOptions
+   *   Driver-specific options.
+   * @param bool $rowCountEnabled
+   *   (optional) Enables counting the rows matched. Defaults to FALSE.
+   */
+  public function __construct(
+    object $clientConnection,
+    Connection $connection,
+    string $queryString,
+    protected array $driverOptions = [],
+    bool $rowCountEnabled = FALSE,
+  ) {
+    parent::__construct($connection, $clientConnection, $queryString, $rowCountEnabled);
+  }
+
+  /**
+   * Returns the client-level database PDO statement object.
+   *
+   * This method should normally be used only within database driver code.
+   *
+   * @return \PDOStatement
+   *   The client-level database PDO statement.
+   *
+   * @throws \RuntimeException
+   *   If the client-level statement is not set.
+   */
+  public function getClientStatement(): \PDOStatement {
+    if (isset($this->clientStatement)) {
+      assert($this->clientStatement instanceof \PDOStatement);
+      return $this->clientStatement;
+    }
+    throw new \LogicException('\\PDOStatement not initialized');
+  }
 
   /**
    * {@inheritdoc}
@@ -90,7 +137,7 @@ class Statement extends StatementPrefetchIterator implements StatementInterface 
     assert(!isset($options['fetch']) || $options['fetch'] instanceof FetchAs || is_string($options['fetch']), 'The "fetch" option passed to execute() must contain a FetchAs enum case or a string. See https://www.drupal.org/node/3488338');
 
     try {
-      $return = parent::execute($args, $options);
+      $return = $this->doExecute($args, $options);
     }
     catch (\PDOException $e) {
       // The database schema might be changed by another process in between the
@@ -109,6 +156,56 @@ class Statement extends StatementPrefetchIterator implements StatementInterface 
         throw $e;
       }
     }
+
+    return $return;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function doExecute(array $args = [], array $options = []) {
+    assert(!isset($options['fetch']) || $options['fetch'] instanceof FetchAs || is_string($options['fetch']), 'The "fetch" option passed to execute() must contain a FetchAs enum case or a string. See https://www.drupal.org/node/3488338');
+
+    $startEvent = $this->dispatchStatementExecutionStartEvent($args ?? []);
+
+    // Prepare and execute the statement.
+    try {
+      $this->clientStatement = $this->getStatement($this->queryString, $args);
+      $return = $this->clientExecute($args, $options);
+    }
+    catch (\Exception $e) {
+      $this->dispatchStatementExecutionFailureEvent($startEvent, $e);
+      // @phpstan-ignore unset.possiblyHookedProperty
+      unset($this->clientStatement);
+      throw $e;
+    }
+
+    // Fetch all the data from the reply, in order to release any lock as soon
+    // as possible. Then, destroy the client statement. See the documentation
+    // of \Drupal\sqlite\Driver\Database\sqlite\Statement for an explanation.
+    $this->result = new PrefetchedResult(
+      $this->fetchMode,
+      $this->fetchOptions,
+      $this->clientFetchAll(FetchAs::Associative),
+      $this->rowCountEnabled ? $this->clientRowCount() : NULL,
+    );
+    // @phpstan-ignore unset.possiblyHookedProperty
+    unset($this->clientStatement);
+    $this->markResultsetIterable($return);
+
+    if (isset($options['fetch'])) {
+      if (is_string($options['fetch'])) {
+        // Default to an object. Note: db fields will be added to the object
+        // before the constructor is run. If you need to assign fields after
+        // the constructor is run. See https://www.drupal.org/node/315092.
+        $this->setFetchMode(FetchAs::ClassObject, $options['fetch']);
+      }
+      else {
+        $this->setFetchMode($options['fetch']);
+      }
+    }
+
+    $this->dispatchStatementExecutionEndEvent($startEvent);
 
     return $return;
   }
