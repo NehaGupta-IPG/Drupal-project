@@ -45,6 +45,10 @@ class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
       'length' => 255,
       'not null' => FALSE,
     ];
+    $fields['destid2'] = [
+      'type' => 'int',
+      'not null' => FALSE,
+    ];
     $fields['source_row_status'] = [
       'type' => 'int',
       'size' => 'tiny',
@@ -81,7 +85,7 @@ class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
       'primary key' => ['source_ids_hash'],
       'indexes' => [
         'source' => ['sourceid1', 'sourceid2'],
-        'destid1' => ['destid1'],
+        'destination' => ['destid1', 'destid2'],
       ],
     ];
 
@@ -135,8 +139,7 @@ class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
     $schema->fieldExists('migrate_map_sql_idmap_test', 'rollback_action')->willReturn(FALSE);
     $schema->fieldExists('migrate_map_sql_idmap_test', 'hash')->willReturn(FALSE);
     $schema->fieldExists('migrate_map_sql_idmap_test', 'source_ids_hash')->willReturn(FALSE);
-    $schema->fieldExists('migrate_map_sql_idmap_test', 'destid1')->willReturn(TRUE);
-    $schema->indexExists('migrate_map_sql_idmap_test', 'destid1')->willReturn(FALSE);
+    $schema->indexExists('migrate_map_sql_idmap_test', 'destination')->willReturn(FALSE);
     $schema->addField('migrate_map_sql_idmap_test', 'rollback_action', [
       'type' => 'int',
       'size' => 'tiny',
@@ -157,11 +160,15 @@ class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
       'not null' => TRUE,
       'description' => 'Hash of source ids. Used as primary key',
     ])->shouldBeCalled();
-    $schema->addIndex('migrate_map_sql_idmap_test', 'destid1', ['destid1'], [
+    $schema->addIndex('migrate_map_sql_idmap_test', 'destination', ['destid1', 'destid2'], [
       'fields' => [
         'destid1' => [
           'type' => 'varchar',
           'length' => 255,
+          'not null' => FALSE,
+        ],
+        'destid2' => [
+          'type' => 'int',
           'not null' => FALSE,
         ],
       ],
@@ -207,8 +214,11 @@ class MigrateSqlIdMapEnsureTablesTest extends MigrateTestCase {
     $plugin->expects($this->any())
       ->method('getIds')
       ->willReturn([
-        'destination_id_property' => [
+        'destination_langcode' => [
           'type' => 'string',
+        ],
+        'destination_entity_id' => [
+          'type' => 'integer',
         ],
       ]);
     $migration->expects($this->any())
