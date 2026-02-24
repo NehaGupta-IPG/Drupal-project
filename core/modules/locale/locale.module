@@ -436,10 +436,6 @@ function locale_system_file_system_settings_submit(&$form, FormStateInterface $f
   if ($form['translation_path']['#default_value'] != $form_state->getValue('translation_path')) {
     locale_translation_clear_status();
   }
-
-  \Drupal::configFactory()->getEditable('locale.settings')
-    ->set('translation.path', $form_state->getValue('translation_path'))
-    ->save();
 }
 
 /**

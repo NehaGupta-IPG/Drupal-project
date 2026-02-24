@@ -362,7 +362,7 @@ class LocaleHooks {
     $form['translation_path'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Interface translations directory'),
-      '#default_value' => \Drupal::configFactory()->getEditable('locale.settings')->get('translation.path'),
+      '#config_target' => 'locale.settings:translation.path',
       '#maxlength' => 255,
       '#description' => $this->t('A local file system path where interface translation files will be stored.'),
       '#required' => TRUE,

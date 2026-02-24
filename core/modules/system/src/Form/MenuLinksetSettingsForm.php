@@ -67,19 +67,9 @@ class MenuLinksetSettingsForm extends ConfigFormBase {
       '#description' => $this->t('See the <a href="@docs-link">decoupled menus documentation</a> for more information.', [
         '@docs-link' => 'https://www.drupal.org/docs/develop/decoupled-drupal/decoupled-menus',
       ]),
-      '#default_value' => $this->config('system.feature_flags')->get('linkset_endpoint'),
+      '#config_target' => 'system.feature_flags:linkset_endpoint',
     ];
     return parent::buildForm($form, $form_state);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
-    $this->config('system.feature_flags')
-      ->set('linkset_endpoint', $form_state->getValue('enable_endpoint'))
-      ->save();
-    parent::submitForm($form, $form_state);
   }
 
 }
