@@ -7,9 +7,10 @@ namespace Drupal\Tests\media\Functional\Update;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 
 /**
- * @covers \media_post_update_set_oembed_discovery
- * @group media
+ * Testing the media settings update.
  */
+#[Group('media')]
+#[RunTestsInSeparateProcesses]
 class MediaSettingsUpdateTest extends UpdatePathTestBase {
 
   /**

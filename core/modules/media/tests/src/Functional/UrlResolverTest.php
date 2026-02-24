@@ -143,7 +143,6 @@ class UrlResolverTest extends MediaFunctionalTestBase {
    * @legacy-covers ::getProviderByUrl
    * @legacy-covers ::getResourceUrl
    */
-
   #[DataProvider('providerUrlDiscovery')]
   public function testUrlDiscovery($url, $resource_url, bool $discovery_enabled = TRUE): void {
     \Drupal::configFactory()->getEditable('media.settings')->set('oembed_discovery', $discovery_enabled)->save();
