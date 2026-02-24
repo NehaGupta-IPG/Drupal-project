@@ -86,7 +86,11 @@ class AliasPathProcessorTest extends UnitTestCase {
     $this->assertEquals($expected_path, $this->pathProcessor->processOutbound($path, $options, NULL, $bubbleable_metadata));
     // Cacheability of paths replaced with path aliases is permanent.
     // @todo https://www.drupal.org/node/2480077
-    $this->assertEquals((new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT), $bubbleable_metadata);
+    $expected_metadata = (new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT);
+    if (empty($options['alias'])) {
+      $expected_metadata->setCacheTags(['route_match']);
+    }
+    $this->assertEquals($expected_metadata, $bubbleable_metadata);
   }
 
   /**
