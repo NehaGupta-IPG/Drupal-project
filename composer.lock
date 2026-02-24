@@ -368,7 +368,7 @@
             "dist": {
                 "type": "path",
                 "url": "core",
-                "reference": "427dcc44caf1e2bb69247bd4948f3d78f83c19e0"
+                "reference": "03e77defebe97a6c6e23a34f1cb4493020caa2f1"
             },
             "require": {
                 "asm89/stack-cors": "^2.3",
@@ -452,9 +452,6 @@
                 "drupal/core-uuid": "self.version",
                 "drupal/core-version": "self.version"
             },
-            "suggest": {
-                "ext-zip": "Needed to extend the plugin.manager.archiver service capability with the handling of files in the ZIP format."
-            },
             "type": "drupal-core",
             "extra": {
                 "branch-alias": {
@@ -523,7 +520,7 @@
             },
             "scripts": {
                 "pre-autoload-dump": [
-                    "Drupal\\Core\\Composer\\Composer::preAutoloadDump"
+                    "Drupal\\Composer\\Plugin\\Scaffold\\Plugin::preAutoloadDump"
                 ]
             },
             "license": [
@@ -10180,5 +10177,5 @@
     "platform-overrides": {
         "php": "8.5.0"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }
