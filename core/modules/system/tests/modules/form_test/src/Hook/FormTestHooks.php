@@ -80,7 +80,7 @@ class FormTestHooks {
    * Implements hook_form_FORM_ID_alter().
    */
   #[Hook('form_form_after_build_test_alter')]
-  function formFormAfterBuildTestAlter(&$form, FormStateInterface $form_state, $form_id) {
+  public function formFormAfterBuildTestAlter(&$form, FormStateInterface $form_state, $form_id) : void {
     $form['#after_build'][] = [Callbacks::class, 'testAfterBuild'];
   }
 

@@ -106,7 +106,7 @@ class Callbacks {
    *
    * @see https://www.drupal.org/project/drupal/issues/3027240
    */
-  public static function testAfterBuild($element, FormStateInterface $form_state) {
+  public static function testAfterBuild($element, FormStateInterface $form_state): array {
     // Add a new element to the form that doesn't have #parents set.
     $element['after_build_item'] = ['#markup' => 'after_build_item'];
     return $element;
