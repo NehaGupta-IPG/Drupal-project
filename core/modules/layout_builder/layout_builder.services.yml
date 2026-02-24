@@ -63,6 +63,7 @@ services:
   Drupal\layout_builder\InlineBlockUsageInterface: '@inline_block.usage'
   layout_builder.element.prepare_layout:
     class: Drupal\layout_builder\EventSubscriber\PrepareLayout
+    public: false
     arguments: ['@layout_builder.tempstore_repository', '@messenger']
   Drupal\layout_builder\EventSubscriber\DefaultContentSubscriber:
     autowire: true
