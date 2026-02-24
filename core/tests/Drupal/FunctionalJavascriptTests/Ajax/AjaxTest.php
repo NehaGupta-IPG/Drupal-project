@@ -134,7 +134,7 @@ class AjaxTest extends WebDriverTestBase {
     // This is temporary behavior for BC reason.
     $render_multiple_root_wrapper = [];
     foreach ($render_multiple_root_unwrap as $key => $render) {
-      $render_multiple_root_wrapper["$key--effect"] = '<div>' . $render . '</div>';
+      $render_multiple_root_wrapper["$key--effect"] = $render;
     }
 
     $expected_renders = array_merge(
