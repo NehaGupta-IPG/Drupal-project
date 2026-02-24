@@ -64,7 +64,12 @@
           const bundleId = href ?? src;
           let prefix = 'css!';
           if (src) {
-            prefix = type === 'module' ? 'module!' : '';
+            if (typeof nomodule !== 'undefined' && nomodule) {
+              prefix = 'nomodule!';
+            }
+            else {
+              prefix = type === 'module' ? 'module!' : '';
+            }
           }
 
           loadjs(prefix + bundleId, bundleId, {
@@ -76,6 +81,11 @@
               // This allows all attributes to be added, like defer, async and
               // crossorigin.
               Object.entries(attributes).forEach(([name, value]) => {
+                if (['type', 'nomodule'].includes(name)) {
+                  // These attributes are handled with path modifiers passed to
+                  // loadjs.
+                  return;
+                }
                 element.setAttribute(name, value);
               });
             },
