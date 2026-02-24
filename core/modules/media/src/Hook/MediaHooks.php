@@ -4,6 +4,7 @@ namespace Drupal\media\Hook;
 
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\ViewExecutable;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Field\FieldTypeCategoryManagerInterface;
@@ -75,35 +76,6 @@ class MediaHooks {
   }
 
   /**
-   * Implements hook_theme().
-   */
-  #[Hook('theme')]
-  public function theme() : array {
-    return [
-      'media' => [
-        'render element' => 'elements',
-      ],
-      'media_reference_help' => [
-        'render element' => 'element',
-        'base hook' => 'field_multiple_value_form',
-      ],
-      'media_oembed_iframe' => [
-        'variables' => [
-          'resource' => NULL,
-          'media' => NULL,
-          'placeholder_token' => '',
-        ],
-      ],
-      'media_embed_error' => [
-        'variables' => [
-          'message' => NULL,
-          'attributes' => [],
-        ],
-      ],
-    ];
-  }
-
-  /**
    * Implements hook_entity_access().
    */
   #[Hook('entity_access')]
@@ -131,11 +103,29 @@ class MediaHooks {
     // Set the default formatter for media in entity reference fields to be the
     // "Rendered entity" formatter.
     if (!empty($options['media'])) {
-      $options['media']['description'] = $this->t('Field to reference media. Allows uploading and selecting from uploaded media.');
+      $options['media']['description'] = $this->t('Upload new media or select existing one');
       $options['media']['weight'] = -25;
       $options['media']['category'] = FieldTypeCategoryManagerInterface::FALLBACK_CATEGORY;
       $options['media']['entity_view_display']['type'] = 'entity_reference_entity_view';
     }
+  }
+
+  /**
+   * Provides help text to choose between File and Media reference fields.
+   *
+   * @return string|\Drupal\Core\StringTranslation\TranslatableMarkup
+   *   A suggestion of when to use Media fields instead of File or Image fields.
+   */
+  protected function fileMediaHelpText(): string|TranslatableMarkup {
+    $help_text = $this->t('Use <em>Media</em> reference fields for most files, images, audio, videos, and remote media. Use <em>File</em> or <em>Image</em> reference fields when creating your own media types, or for legacy files and images created before installing the Media module.');
+    if (\Drupal::moduleHandler()->moduleExists('help')) {
+      $help_text .= ' ' . $this->t('For more information, see the <a href="@help_url">Media help page</a>.', [
+        '@help_url' => Url::fromRoute('help.page', [
+          'name' => 'media',
+        ])->toString(),
+      ]);
+    }
+    return $help_text;
   }
 
   /**
@@ -145,17 +135,11 @@ class MediaHooks {
   public function formFieldUiFieldStorageAddFormAlter(&$form, FormStateInterface $form_state, $form_id) : void {
     // Provide some help text to aid users decide whether they need a Media,
     // File, or Image reference field.
-    $description_text = $this->t('Use <em>Media</em> reference fields for most files, images, audio, videos, and remote media. Use <em>File</em> or <em>Image</em> reference fields when creating your own media types, or for legacy files and images created before installing the Media module.');
-    if (\Drupal::moduleHandler()->moduleExists('help')) {
-      $description_text .= ' ' . $this->t('For more information, see the <a href="@help_url">Media help page</a>.', [
-        '@help_url' => Url::fromRoute('help.page', [
-          'name' => 'media',
-        ])->toString(),
-      ]);
-    }
-    $field_types = ['file_upload', 'field_ui:entity_reference:media'];
-    if (in_array($form_state->getValue('new_storage_type'), $field_types)) {
-      $form['group_field_options_wrapper']['description_wrapper'] = ['#type' => 'item', '#markup' => $description_text];
+    if ($form_state->getStorage()['field_type'] === 'field_ui:entity_reference:media') {
+      $form['field_options_wrapper']['description_wrapper'] = [
+        '#type' => 'item',
+        '#markup' => $this->fileMediaHelpText(),
+      ];
     }
   }
 
@@ -195,10 +179,10 @@ class MediaHooks {
       $elements['#media_help']['#media_add_help'] = $this->t('Create your media on the <a href=":add_page" target="_blank">media add page</a> (opens a new window), then add it by name to the field below.', [':add_page' => $add_url]);
     }
     $elements['#theme'] = 'media_reference_help';
-    // @todo template_preprocess_field_multiple_value_form() assumes this key
-    //   exists, but it does not exist in the case of a single widget that
-    //   accepts multiple values. This is for some reason necessary to use
-    //   our template for the entity_autocomplete_tags widget.
+    // @todo \Drupal\Core\Field\FieldPreprocess::preprocessFieldMultipleValueForm()
+    //   assumes this key exists, but it does not exist in the case of a single
+    //   widget that accepts multiple values. This is for some reason necessary
+    //   to use our template for the entity_autocomplete_tags widget.
     //   Research and resolve this in https://www.drupal.org/node/2943020.
     if (empty($elements['#cardinality_multiple'])) {
       $elements['#cardinality_multiple'] = NULL;
@@ -227,10 +211,7 @@ class MediaHooks {
       if ($overview_url->access()) {
         $elements['#media_help']['#media_list_link'] = $this->t('See the <a href=":list_url" target="_blank">media list</a> (opens a new window) to help locate media.', [':list_url' => $overview_url->toString()]);
       }
-      $all_bundles = \Drupal::service('entity_type.bundle.info')->getBundleInfo('media');
-      $bundle_labels = array_map(function ($bundle) use ($all_bundles) {
-          return $all_bundles[$bundle]['label'];
-      }, $allowed_bundles);
+      $bundle_labels = array_intersect_key(\Drupal::service('entity_type.bundle.info')->getBundleLabels('media'), $allowed_bundles);
       $elements['#media_help']['#allowed_types_help'] = $this->t('Allowed media types: %types', ['%types' => implode(", ", $bundle_labels)]);
     }
   }
@@ -253,8 +234,12 @@ class MediaHooks {
   #[Hook('form_filter_format_edit_form_alter')]
   public function formFilterFormatEditFormAlter(array &$form, FormStateInterface $form_state, $form_id) : void {
     // Add an additional validate callback so we can ensure the order of filters
-    // is correct.
-    $form['#validate'][] = 'media_filter_format_edit_form_validate';
+    // is correct, this is not necessary when using ckeditor5 since allowed tags
+    // are added automatically by CKEditor 5. The validator would conflict with
+    // the automatic addition of those allowed tags.
+    if ($form_state->getValue('editor') !== 'ckeditor5') {
+      $form['#validate'][] = 'media_filter_format_edit_form_validate';
+    }
   }
 
   /**
@@ -263,8 +248,12 @@ class MediaHooks {
   #[Hook('form_filter_format_add_form_alter')]
   public function formFilterFormatAddFormAlter(array &$form, FormStateInterface $form_state, $form_id) : void {
     // Add an additional validate callback so we can ensure the order of filters
-    // is correct.
-    $form['#validate'][] = 'media_filter_format_edit_form_validate';
+    // is correct, this is not necessary when using ckeditor5 since allowed tags
+    // are added automatically by CKEditor 5. The validator would conflict with
+    // the automatic addition of those allowed tags.
+    if ($form_state->getValue('editor') !== 'ckeditor5') {
+      $form['#validate'][] = 'media_filter_format_edit_form_validate';
+    }
   }
 
   /**
@@ -299,6 +288,15 @@ class MediaHooks {
     // The `media` field type belongs in the `general` category, so the
     // libraries need to be attached using an alter hook.
     $definitions[FieldTypeCategoryManagerInterface::FALLBACK_CATEGORY]['libraries'][] = 'media/drupal.media-icon';
+
+    // Provide some help text to aid users decide whether they need a Media,
+    // File, or Image reference field.
+    if (!empty($definitions['file_upload'])) {
+      $existing_summary = $definitions['file_upload']['summary'] ?? '';
+      $definitions['file_upload']['summary'] = empty($existing_summary)
+        ? $this->fileMediaHelpText()
+        : $existing_summary . ' ' . $this->fileMediaHelpText();
+    }
   }
 
 }

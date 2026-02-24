@@ -8,15 +8,16 @@ use Drupal\Component\Utility\Html;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore displaymessage scriptalertxsssubjectscript
 // cspell:ignore testcontextawareblock
-
 /**
  * Tests that the block configuration UI exists and stores data correctly.
- *
- * @group block
  */
+#[Group('block')]
+#[RunTestsInSeparateProcesses]
 class BlockUiTest extends BrowserTestBase {
 
   /**
@@ -97,7 +98,7 @@ class BlockUiTest extends BrowserTestBase {
     $this->drupalPlaceBlock('help_block', ['region' => 'help']);
     $this->drupalGet('admin/structure/block');
     $this->clickLink('Demonstrate block regions (Stark)');
-    $this->assertSession()->elementExists('xpath', '//header[@role = "banner"]/div/div[contains(@class, "block-region") and contains(text(), "Header")]');
+    $this->assertSession()->elementExists('xpath', '//header/div/div[contains(@class, "block-region") and contains(text(), "Header")]');
 
     // Ensure that other themes can use the block demo page.
     \Drupal::service('theme_installer')->install(['test_theme']);
@@ -345,9 +346,7 @@ class BlockUiTest extends BrowserTestBase {
     // Removing a block will remove the block placement indicator.
     $this->clickLink('Remove');
     $this->submitForm([], 'Remove');
-    // @todo https://www.drupal.org/project/drupal/issues/2980527 this should be
-    //   'admin/structure/block/list/stark' but there is a bug.
-    $this->assertSession()->addressEquals('admin/structure/block');
+    $this->assertSession()->addressEquals('admin/structure/block/list/stark');
   }
 
   /**

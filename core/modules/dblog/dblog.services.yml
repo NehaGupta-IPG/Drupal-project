@@ -1,5 +1,5 @@
 parameters:
-  dblog.hooks_converted: true
+  dblog.skip_procedural_hook_scan: true
 
 services:
   _defaults:
@@ -10,3 +10,5 @@ services:
     tags:
       - { name: logger }
       - { name: backend_overridable }
+  Drupal\dblog\DbLogFilters:
+    autowire: true

@@ -76,9 +76,16 @@ class EntityTypeBundleInfo implements EntityTypeBundleInfoInterface {
   /**
    * {@inheritdoc}
    */
-  public function getBundleInfo($entity_type_id) {
+  public function getBundleInfo(string $entity_type_id) {
     $bundle_info = $this->getAllBundleInfo();
     return $bundle_info[$entity_type_id] ?? [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getBundleLabels(string $entity_type_id): array {
+    return array_map(static fn (array $bundle_info) => $bundle_info['label'], $this->getBundleInfo($entity_type_id));
   }
 
   /**

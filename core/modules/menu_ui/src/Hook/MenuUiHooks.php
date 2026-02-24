@@ -16,6 +16,9 @@ use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\menu_link_content\Entity\MenuLinkContent;
+use Drupal\Core\Access\AccessResultInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
  * Hook implementations for menu_ui.
@@ -23,6 +26,16 @@ use Drupal\Core\Hook\Attribute\Hook;
 class MenuUiHooks {
 
   use StringTranslationTrait;
+
+  /**
+   * Constructs a new MenuUiHooks object.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager.
+   */
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+  ) {}
 
   /**
    * Implements hook_help().
@@ -87,7 +100,29 @@ class MenuUiHooks {
   }
 
   /**
-   * Implements hook_form_BASE_FORM_ID_alter() for \Drupal\node\NodeForm.
+   * Check if user is allowed to use the menu link subform.
+   *
+   * @param array $defaults
+   *   An array that contains default values for the menu link form.
+   *
+   * @see menu_ui_get_menu_link_defaults()
+   */
+  protected function getMenuLinkContentAccess(array $defaults): AccessResultInterface {
+    if (!empty($defaults['entity_id'])) {
+      $entity = MenuLinkContent::load($defaults['entity_id']);
+
+      // The form can be used to edit or delete the menu link.
+      return $entity->access('update', NULL, TRUE)->andIf($entity->access('delete', NULL, TRUE));
+    }
+    else {
+      // If the node has no corresponding menu link, users needs to permission
+      // to create one.
+      return $this->entityTypeManager->getAccessControlHandler('menu_link_content')->createAccess(NULL, NULL, [], TRUE);
+    }
+  }
+
+  /**
+   * Implements hook_form_BASE_FORM_ID_alter() for \Drupal\node\Form\NodeForm.
    *
    * Adds menu item fields to the node form.
    *
@@ -128,8 +163,7 @@ class MenuUiHooks {
     $form['menu'] = [
       '#type' => 'details',
       '#title' => $this->t('Menu settings'),
-      '#access' => \Drupal::currentUser()->hasPermission('administer menu'),
-      '#open' => (bool) $defaults['id'],
+      '#access' => $this->getMenuLinkContentAccess($defaults),
       '#group' => 'advanced',
       '#attached' => [
         'library' => [
@@ -197,7 +231,7 @@ class MenuUiHooks {
   }
 
   /**
-   * Implements hook_form_FORM_ID_alter() for \Drupal\node\NodeTypeForm.
+   * Implements hook_form_FORM_ID_alter() for \Drupal\node\Form\NodeTypeForm.
    *
    * Adds menu options to the node type form.
    *
@@ -235,7 +269,7 @@ class MenuUiHooks {
     ];
     // @todo See if we can avoid pre-loading all options by changing the form or
     //   using a #process callback. https://www.drupal.org/node/2310319 To avoid
-    //   an 'illegal option' error after saving the form we have to load all
+    //   an 'invalid option' error after saving the form we have to load all
     //   available menu parents. Otherwise, it is not possible to dynamically
     //   add options to the list using ajax.
     $options_cacheability = new CacheableMetadata();
@@ -255,6 +289,38 @@ class MenuUiHooks {
     $options_cacheability->applyTo($form['menu']['menu_parent']);
     $form['#validate'][] = 'menu_ui_form_node_type_form_validate';
     $form['#entity_builders'][] = 'menu_ui_form_node_type_form_builder';
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_delete().
+   */
+  #[Hook('menu_delete')]
+  public function menuDelete(EntityInterface $entity): void {
+    if (!$this->entityTypeManager->hasDefinition('node_type')) {
+      return;
+    }
+
+    // Remove the menu from content type third party settings.
+    $menu_id = $entity->id();
+    $parent_prefix = $menu_id . ':';
+    $storage = $this->entityTypeManager->getStorage('node_type');
+    foreach ($storage->loadMultiple() as $content_type) {
+      $third_party_settings = $original_third_party_settings = $content_type->getThirdPartySettings('menu_ui');
+      if (isset($third_party_settings['available_menus']) && in_array($menu_id, $third_party_settings['available_menus'])) {
+        $key = array_search($menu_id, $third_party_settings['available_menus']);
+        if ($key !== FALSE) {
+          unset($third_party_settings['available_menus'][$key]);
+        }
+        $content_type->setThirdPartySetting('menu_ui', 'available_menus', $third_party_settings['available_menus']);
+      }
+      if (isset($third_party_settings['parent']) && substr($third_party_settings['parent'], 0, strlen($parent_prefix)) == $parent_prefix) {
+        $third_party_settings['parent'] = '';
+        $content_type->setThirdPartySetting('menu_ui', 'parent', $third_party_settings['parent']);
+      }
+      if ($third_party_settings != $original_third_party_settings) {
+        $content_type->save();
+      }
+    }
   }
 
   /**
@@ -292,7 +358,11 @@ class MenuUiHooks {
       if ($plugin->getBaseId() === 'system_menu_block') {
         $menu = Menu::load($plugin->getDerivativeId());
         if ($menu && $menu->access('edit')) {
-          $operations['menu-edit'] = ['title' => $this->t('Edit menu'), 'url' => $menu->toUrl('edit-form'), 'weight' => 50];
+          $operations['menu-edit'] = [
+            'title' => $this->t('Edit menu'),
+            'url' => $menu->toUrl('edit-form'),
+            'weight' => 50,
+          ];
         }
       }
     }

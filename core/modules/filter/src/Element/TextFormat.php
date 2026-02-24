@@ -6,7 +6,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Render\Element;
-use Drupal\Core\Url;
 
 /**
  * Provides a text format render element.
@@ -198,24 +197,10 @@ class TextFormat extends RenderElementBase {
       '#parents' => array_merge($element['#parents'], ['format']),
     ];
 
-    $element['format']['help'] = [
-      '#type' => 'container',
-      '#theme_wrappers' => [
-        'container__text_format_filter_help',
-      ],
-      'about' => [
-        '#type' => 'link',
-        '#title' => t('About text formats'),
-        '#url' => new Url('filter.tips_all'),
-        '#attributes' => ['target' => '_blank'],
-      ],
-      '#weight' => 0,
-    ];
-
     $all_formats = filter_formats();
-    $format_exists = isset($all_formats[$element['#format']]);
+    $format_exists = isset($element['#format'], $all_formats[$element['#format']]);
     $format_allowed = !isset($element['#allowed_formats']) || in_array($element['#format'], $element['#allowed_formats']);
-    $user_has_access = isset($formats[$element['#format']]);
+    $user_has_access = isset($element['#format'], $formats[$element['#format']]);
     $user_is_admin = $user->hasPermission('administer filters');
 
     // If the stored format does not exist or if it is not among the allowed
