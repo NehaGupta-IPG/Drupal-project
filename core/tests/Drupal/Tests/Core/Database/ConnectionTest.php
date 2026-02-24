@@ -9,7 +9,6 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Statement\StatementBase;
-use Drupal\Core\Database\StatementWrapperIterator;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
 use Drupal\Tests\Core\Database\Stub\StubPDO;
 use Drupal\Tests\UnitTestCase;
