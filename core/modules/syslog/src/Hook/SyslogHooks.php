@@ -43,19 +43,18 @@ class SyslogHooks {
    */
   #[Hook('form_system_logging_settings_alter')]
   public function formSystemLoggingSettingsAlter(&$form, FormStateInterface $form_state) : void {
-    $config = \Drupal::configFactory()->getEditable('syslog.settings');
     $help = \Drupal::moduleHandler()->moduleExists('help') ? ' ' . Link::fromTextAndUrl($this->t('More information'), Url::fromRoute('help.page', ['name' => 'syslog']))->toString() . '.' : NULL;
     $form['syslog_identity'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Syslog identity'),
-      '#default_value' => $config->get('identity'),
+      '#config_target' => 'syslog.settings:identity',
       '#description' => $this->t('A string that will be prepended to every message logged to Syslog. If you have multiple sites logging to the same Syslog log file, a unique identity per site makes it easy to tell the log entries apart.') . $help,
     ];
     if (defined('LOG_LOCAL0')) {
       $form['syslog_facility'] = [
         '#type' => 'select',
         '#title' => $this->t('Syslog facility'),
-        '#default_value' => $config->get('facility'),
+        '#config_target' => 'syslog.settings:facility',
         '#options' => syslog_facility_list(),
         '#description' => $this->t('Depending on the system configuration, Syslog and other logging tools use this code to identify or filter messages from within the entire system log.') . $help,
       ];
@@ -63,11 +62,10 @@ class SyslogHooks {
     $form['syslog_format'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Syslog format'),
-      '#default_value' => $config->get('format'),
+      '#config_target' => 'syslog.settings:format',
       '#required' => TRUE,
       '#description' => $this->t('Specify the format of the syslog entry. Available variables are: <dl><dt><code>!base_url</code></dt><dd>Base URL of the site.</dd><dt><code>!timestamp</code></dt><dd>Unix timestamp of the log entry.</dd><dt><code>!type</code></dt><dd>The category to which this message belongs.</dd><dt><code>!ip</code></dt><dd>IP address of the user triggering the message.</dd><dt><code>!request_uri</code></dt><dd>The requested URI.</dd><dt><code>!referer</code></dt><dd>HTTP Referer if available.</dd><dt><code>!severity</code></dt><dd>The severity level of the event; ranges from 0 (Emergency) to 7 (Debug).</dd><dt><code>!uid</code></dt><dd>User ID.</dd><dt><code>!link</code></dt><dd>A link to associate with the message.</dd><dt><code>!message</code></dt><dd>The message to store in the log.</dd></dl>'),
     ];
-    $form['#submit'][] = 'syslog_logging_settings_submit';
   }
 
 }
