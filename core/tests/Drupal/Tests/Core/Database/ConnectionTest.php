@@ -910,6 +910,7 @@ class ConnectionTest extends UnitTestCase {
        * {@inheritdoc}
        */
       public function execute($args = [], $options = []) {
+        return TRUE;
       }
 
     };

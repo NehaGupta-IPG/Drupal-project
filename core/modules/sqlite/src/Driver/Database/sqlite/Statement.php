@@ -6,7 +6,6 @@ use Drupal\Core\Database\Statement\FetchAs;
 use Drupal\Core\Database\Statement\PdoTrait;
 use Drupal\Core\Database\Statement\PrefetchedResult;
 use Drupal\Core\Database\Statement\StatementBase;
-use Drupal\Core\Database\StatementInterface;
 
 /**
  * SQLite implementation of \Drupal\Core\Database\StatementInterface.
@@ -149,7 +148,7 @@ class Statement extends StatementBase {
       if (!empty($e->errorInfo[1]) && $e->errorInfo[1] === 17) {
         // The schema has changed. SQLite specifies that we must resend the
         // query.
-        $return = parent::execute($args, $options);
+        $return = $this->doExecute($args, $options);
       }
       else {
         // Rethrow the exception.
@@ -163,7 +162,7 @@ class Statement extends StatementBase {
   /**
    * {@inheritdoc}
    */
-  protected function doExecute(array $args = [], array $options = []) {
+  protected function doExecute($args = [], $options = []): bool {
     assert(!isset($options['fetch']) || $options['fetch'] instanceof FetchAs || is_string($options['fetch']), 'The "fetch" option passed to execute() must contain a FetchAs enum case or a string. See https://www.drupal.org/node/3488338');
 
     $startEvent = $this->dispatchStatementExecutionStartEvent($args ?? []);
