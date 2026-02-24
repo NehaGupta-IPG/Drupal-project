@@ -148,6 +148,7 @@ class LayoutPluginManagerTest extends UnitTestCase {
     $this->assertSame('2 column layout', (string) $layout_definition->getLabel());
     $this->assertSame('Columns: 2', (string) $layout_definition->getCategory());
     $this->assertSame('A theme provided layout', (string) $layout_definition->getDescription());
+    $this->assertSame(0, $layout_definition->getWeight());
     $this->assertInstanceOf(TranslatableMarkup::class, $layout_definition->getLabel());
     $this->assertInstanceOf(TranslatableMarkup::class, $layout_definition->getCategory());
     $this->assertInstanceOf(TranslatableMarkup::class, $layout_definition->getDescription());
@@ -177,6 +178,7 @@ class LayoutPluginManagerTest extends UnitTestCase {
     $this->assertSame('1 column layout', (string) $layout_definition->getLabel());
     $this->assertSame('Columns: 1', (string) $layout_definition->getCategory());
     $this->assertSame('A module provided layout', (string) $layout_definition->getDescription());
+    $this->assertSame(10, $layout_definition->getWeight());
     $this->assertInstanceOf(TranslatableMarkup::class, $layout_definition->getLabel());
     $this->assertInstanceOf(TranslatableMarkup::class, $layout_definition->getCategory());
     $this->assertInstanceOf(TranslatableMarkup::class, $layout_definition->getDescription());
@@ -209,6 +211,7 @@ class LayoutPluginManagerTest extends UnitTestCase {
     $this->assertEquals('Layout plugin', $layout_definition->getLabel());
     $this->assertEquals('Columns: 1', $layout_definition->getCategory());
     $this->assertEquals('Test layout', $layout_definition->getDescription());
+    $this->assertSame(8, $layout_definition->getWeight());
     $this->assertInstanceOf(TranslatableMarkup::class, $layout_definition->getLabel());
     $this->assertInstanceOf(TranslatableMarkup::class, $layout_definition->getCategory());
     $this->assertInstanceOf(TranslatableMarkup::class, $layout_definition->getDescription());
@@ -394,13 +397,13 @@ EOS;
    */
   public function testGetGroupedDefinitions(): void {
     $category_expected = [
-      'Columns: 1' => [
-        'module_a_provided_layout',
-        'plugin_provided_layout',
-      ],
       'Columns: 2' => [
         'theme_a_provided_layout',
         'plugin_provided_by_annotation_layout',
+      ],
+      'Columns: 1' => [
+        'module_a_provided_layout',
+        'plugin_provided_layout',
       ],
     ];
 
@@ -445,6 +448,7 @@ module_a_provided_layout:
   theme_hook: onecol
   path: layouts
   library: module_a/onecol
+  weight: 10
   regions:
     top:
       label: Top region
@@ -486,6 +490,7 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
   label: new TranslatableMarkup('Layout plugin'),
   category: new TranslatableMarkup('Columns: 1'),
   description: new TranslatableMarkup('Test layout'),
+  weight: 8,
   path: "core/lib/Drupal/Core",
   template: "templates/plugin-provided-layout",
   regions: [

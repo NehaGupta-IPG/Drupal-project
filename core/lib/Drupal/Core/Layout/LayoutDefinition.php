@@ -122,6 +122,13 @@ class LayoutDefinition extends PluginDefinition implements PluginDefinitionInter
   protected $default_region;
 
   /**
+   * An optional weight.
+   *
+   * @var int
+   */
+  protected $weight = 0;
+
+  /**
    * Any additional properties and values.
    *
    * @var array
@@ -543,6 +550,29 @@ class LayoutDefinition extends PluginDefinition implements PluginDefinitionInter
    */
   public function setDefaultRegion($default_region) {
     $this->default_region = $default_region;
+    return $this;
+  }
+
+  /**
+   * Gets the weight.
+   *
+   * @return int
+   *   The weight.
+   */
+  public function getWeight() {
+    return $this->weight;
+  }
+
+  /**
+   * Sets the weight.
+   *
+   * @param int $weight
+   *   The weight.
+   *
+   * @return $this
+   */
+  public function setWeight($weight) {
+    $this->weight = (int) $weight;
     return $this;
   }
 
