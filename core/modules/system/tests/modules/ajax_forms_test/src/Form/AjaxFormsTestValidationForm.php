@@ -26,6 +26,10 @@ class AjaxFormsTestValidationForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    // Disable client-side validation so that server-side validation can be
+    // tested, e.g. submitting with empty required fields.
+    $form['#attributes']['novalidate'] = 'novalidate';
+
     $form['driver_text'] = [
       '#title' => $this->t('AJAX-enabled textfield.'),
       '#description' => $this->t("When this one AJAX-triggers and the spare required field is empty, you should not get an error."),
