@@ -86,6 +86,7 @@ class Connection extends CoreConnection {
   /**
    * {@inheritdoc}
    */
+  #[\NoDiscard]
   public function select($table, $alias = NULL, array $options = []): Select {
     return new Select($this, $table, $alias, $options);
   }
@@ -93,6 +94,7 @@ class Connection extends CoreConnection {
   /**
    * {@inheritdoc}
    */
+  #[\NoDiscard]
   public function insert($table, array $options = []): Insert {
     return new Insert($this, $table, $options);
   }
@@ -100,6 +102,7 @@ class Connection extends CoreConnection {
   /**
    * {@inheritdoc}
    */
+  #[\NoDiscard]
   public function merge($table, array $options = []): Merge {
     return new Merge($this, $table, $options);
   }
@@ -107,6 +110,7 @@ class Connection extends CoreConnection {
   /**
    * {@inheritdoc}
    */
+  #[\NoDiscard]
   public function upsert($table, array $options = []): Upsert {
     return new Upsert($this, $table, $options);
   }
@@ -114,6 +118,7 @@ class Connection extends CoreConnection {
   /**
    * {@inheritdoc}
    */
+  #[\NoDiscard]
   public function update($table, array $options = []): Update {
     return new Update($this, $table, $options);
   }
@@ -121,6 +126,7 @@ class Connection extends CoreConnection {
   /**
    * {@inheritdoc}
    */
+  #[\NoDiscard]
   public function delete($table, array $options = []): Delete {
     return new Delete($this, $table, $options);
   }
@@ -128,6 +134,7 @@ class Connection extends CoreConnection {
   /**
    * {@inheritdoc}
    */
+  #[\NoDiscard]
   public function truncate($table, array $options = []): Truncate {
     return new Truncate($this, $table, $options);
   }
@@ -152,6 +159,7 @@ class Connection extends CoreConnection {
   /**
    * {@inheritdoc}
    */
+  #[\NoDiscard]
   public function startTransaction($name = ''): Transaction {
     return new Transaction($this, $name);
   }

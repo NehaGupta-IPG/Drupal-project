@@ -809,6 +809,7 @@ abstract class Connection {
    *
    * @see \Drupal\Core\Database\Query\Select
    */
+  #[\NoDiscard]
   public function select($table, $alias = NULL, array $options = []) {
     assert(is_string($alias) || $alias === NULL, 'The \'$alias\' argument to ' . __METHOD__ . '() must be a string or NULL');
     return new Select($this, $table, $alias, $options);
@@ -830,6 +831,7 @@ abstract class Connection {
    * @see \Drupal\Core\Database\Query\Insert
    * @see \Drupal\Core\Database\Connection::defaultOptions()
    */
+  #[\NoDiscard]
   abstract public function insert($table, array $options = []);
 
   /**
@@ -875,6 +877,7 @@ abstract class Connection {
    *
    * @see \Drupal\Core\Database\Query\Merge
    */
+  #[\NoDiscard]
   public function merge($table, array $options = []) {
     return new Merge($this, $table, $options);
   }
@@ -892,6 +895,7 @@ abstract class Connection {
    *
    * @see \Drupal\Core\Database\Query\Upsert
    */
+  #[\NoDiscard]
   abstract public function upsert($table, array $options = []);
 
   /**
@@ -910,6 +914,7 @@ abstract class Connection {
    * @see \Drupal\Core\Database\Query\Update
    * @see \Drupal\Core\Database\Connection::defaultOptions()
    */
+  #[\NoDiscard]
   public function update($table, array $options = []) {
     return new Update($this, $table, $options);
   }
@@ -930,6 +935,7 @@ abstract class Connection {
    * @see \Drupal\Core\Database\Query\Delete
    * @see \Drupal\Core\Database\Connection::defaultOptions()
    */
+  #[\NoDiscard]
   public function delete($table, array $options = []) {
     return new Delete($this, $table, $options);
   }
@@ -947,6 +953,7 @@ abstract class Connection {
    *
    * @see \Drupal\Core\Database\Query\Truncate
    */
+  #[\NoDiscard]
   public function truncate($table, array $options = []) {
     return new Truncate($this, $table, $options);
   }
@@ -1152,6 +1159,7 @@ abstract class Connection {
    *
    * @see \Drupal\Core\Database\Transaction
    */
+  #[\NoDiscard]
   public function startTransaction($name = '') {
     return $this->transactionManager()->push($name);
   }

@@ -274,6 +274,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
   /**
    * {@inheritdoc}
    */
+  #[\NoDiscard]
   public function push(string $name = ''): Transaction {
     if (!$this->inTransaction()) {
       // If there is no transaction active, name the transaction
