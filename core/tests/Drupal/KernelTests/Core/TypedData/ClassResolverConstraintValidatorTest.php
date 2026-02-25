@@ -124,7 +124,8 @@ class ClassResolverConstraintValidatorTest extends KernelTestBase {
 
     $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage('The method "missingMethod" does not exist on the service "test.service".');
-    $typed_data->validate();
+    $violations = $typed_data->validate();
+    $this->assertCount(0, $violations);
   }
 
   /**
@@ -139,7 +140,8 @@ class ClassResolverConstraintValidatorTest extends KernelTestBase {
     $typed_data = $this->typedDataManager->create($definition, 1);
 
     $this->expectExceptionMessage('Class "\Drupal\NonExisting\Class" does not exist.');
-    $typed_data->validate();
+    $violations = $typed_data->validate();
+    $this->assertCount(0, $violations);
   }
 
 }

@@ -52,9 +52,10 @@ class EntityBundleExistsConstraintValidatorTest extends KernelTestBase {
 
     $this->expectException(UnexpectedTypeException::class);
     $this->expectExceptionMessage('Expected argument of type "string", "int" given');
-    $this->container->get('typed_data_manager')
+    $violations = $this->container->get('typed_data_manager')
       ->create($definition, 39)
       ->validate();
+    $this->assertCount(0, $violations);
   }
 
   /**
