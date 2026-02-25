@@ -14,11 +14,13 @@ use Drupal\Tests\field\Kernel\FieldKernelTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests link formatter access check behavior.
  */
 #[Group('link')]
+#[RunTestsInSeparateProcesses]
 final class LinkFormatterAccessCheckTest extends FieldKernelTestBase {
 
   /**
