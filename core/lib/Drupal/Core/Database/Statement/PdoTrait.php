@@ -79,7 +79,7 @@ trait PdoTrait {
    * @return \PDOStatement
    *   The client-level database PDO statement.
    *
-   * @throws \RuntimeException
+   * @throws \LogicException
    *   If the client-level statement is not set.
    */
   public function getClientStatement(): \PDOStatement {
