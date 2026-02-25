@@ -32,26 +32,27 @@ trait AutowiredInstanceTrait {
       $args = array_merge($args, self::getAutowireArguments($container, $parameters, '__construct'));
     }
 
-    $instance = new static(...$args);
-    self::invokeRequiredMethods($instance, $container);
-    return $instance;
+    return new static(...$args)->invokeRequiredMethods($container);
   }
 
   /**
    * Invokes setter injection methods tagged with the Required attribute.
    *
-   * @param object $instance
-   *   The instance on which to invoke the methods.
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-   *   The service container this instance should use.
+   *   The service container.
+   *
+   * @return self
+   *   The instance with required methods invoked.
    */
-  public static function invokeRequiredMethods(object $instance, ContainerInterface $container): void {
-    $reflection = new \ReflectionClass($instance);
+  public function invokeRequiredMethods(ContainerInterface $container): self {
+    $reflection = new \ReflectionClass($this);
     foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
       if (!empty($method->getAttributes(Required::class))) {
-        $method->invoke($instance, ...self::getAutowireArguments($container, $method->getParameters(), $method->getName()));
+        $method->invoke($this, ...self::getAutowireArguments($container, $method->getParameters(), $method->getName()));
       }
     }
+
+    return $this;
   }
 
   /**

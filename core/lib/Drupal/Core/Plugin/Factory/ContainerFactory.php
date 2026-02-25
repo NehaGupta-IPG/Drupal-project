@@ -4,6 +4,7 @@ namespace Drupal\Core\Plugin\Factory;
 
 use Drupal\Component\Plugin\Factory\DefaultFactory;
 use Drupal\Core\DependencyInjection\AutowiredInstanceTrait;
+use Drupal\Core\Plugin\PluginBase;
 
 /**
  * Plugin factory which passes a container to a create method.
@@ -23,7 +24,14 @@ class ContainerFactory extends DefaultFactory {
     if (is_subclass_of($plugin_class, 'Drupal\Core\Plugin\ContainerFactoryPluginInterface')) {
       $container = \Drupal::getContainer();
       $plugin = $plugin_class::create($container, $configuration, $plugin_id, $plugin_definition);
-      self::invokeRequiredMethods($plugin, $container);
+
+      // PluginBase calls invokeRequiredMethods() in its create() method, so
+      // only call it here if the plugin class overrides the method.
+      $method = new \ReflectionMethod($plugin_class, 'create');
+      if ($method->getDeclaringClass()->getName() !== PluginBase::class) {
+        $plugin->invokeRequiredMethods($container);
+      }
+
       return $plugin;
     }
 
