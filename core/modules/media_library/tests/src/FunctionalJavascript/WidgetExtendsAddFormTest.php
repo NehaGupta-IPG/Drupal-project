@@ -5,21 +5,23 @@ declare(strict_types=1);
 namespace Drupal\Tests\media_library\FunctionalJavascript;
 
 use Drupal\media\Entity\Media;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that extending in the Media library's widget works as expected.
  *
  * This test exists to protect contributed modules from getting broken.
  * That is, it helps assure backwards compatibility.
- *
- * @group media_library
  */
+#[Group('media_library')]
+#[RunTestsInSeparateProcesses]
 class WidgetExtendsAddFormTest extends MediaLibraryTestBase {
 
   /**
    * Tests that extended AddFormBase works.
    */
-  public function testExtendedAddForm() {
+  public function testExtendedAddForm(): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 

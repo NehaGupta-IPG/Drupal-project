@@ -66,7 +66,7 @@ class TestConstraintsAddForm extends AddFormBase {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current form state.
    */
-  public function validateName(array &$form, FormStateInterface $form_state) {
+  public function validateName(array &$form, FormStateInterface $form_state): void {
     $name = $form_state->getValue('name');
     if (strpos($name, 'love Drupal') === FALSE) {
       $form_state->setErrorByName('name', 'Text is not appropriate.');
@@ -81,7 +81,7 @@ class TestConstraintsAddForm extends AddFormBase {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
    */
-  public function addButtonSubmit(array $form, FormStateInterface $form_state) {
+  public function addButtonSubmit(array $form, FormStateInterface $form_state): void {
     $this->processInputValues([$form_state->getValue('name')], $form, $form_state);
   }
 

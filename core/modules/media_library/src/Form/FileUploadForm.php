@@ -311,7 +311,7 @@ class FileUploadForm extends AddFormBase {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
    */
-  public function uploadButtonValidate(array $form, FormStateInterface $form_state) {
+  public function uploadButtonValidate(array $form, FormStateInterface $form_state): void {
     $source_values = $this->entityTypeManager
       ->getStorage('file')
       ->loadMultiple($form_state->getValue('upload', []));
