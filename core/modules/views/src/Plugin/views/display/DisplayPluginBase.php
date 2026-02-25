@@ -23,6 +23,7 @@ use Drupal\views\Plugin\views\PluginBase;
 use Drupal\views\Views;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * Base class for views display plugins.
@@ -136,6 +137,11 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
   public DisplayPluginInterface $default_display;
 
   /**
+   * The Views plugin managers.
+   */
+  protected ContainerInterface $pluginManagers;
+
+  /**
    * Constructs a new DisplayPluginBase object.
    *
    * Because DisplayPluginBase::initDisplay() takes the display configuration by
@@ -152,21 +158,23 @@ abstract class DisplayPluginBase extends PluginBase implements DisplayPluginInte
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Psr\Container\ContainerInterface|null $pluginManagers
-   *   The plugin manager locator.
    */
-  public function __construct(
-    array $configuration,
-    $plugin_id,
-    $plugin_definition,
-    #[Autowire(service: 'views.plugin_managers')]
-    protected ?ContainerInterface $pluginManagers = NULL,
-  ) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct([], $plugin_id, $plugin_definition);
-    if ($this->pluginManagers === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $pluginManagers argument is deprecated in drupal:11.4.0 and it will be required in drupal:13.0.0. See https://www.drupal.org/node/7654321', E_USER_DEPRECATED);
-      $this->pluginManagers = \Drupal::service('views.plugin_managers');
-    }
+  }
+
+  /**
+   * Setter injection method for the Views plugin managers.
+   *
+   * @param \Psr\Container\ContainerInterface $pluginManagers
+   *   A service locator containing the Views plugin managers.
+   */
+  #[Required]
+  public function setPluginManagers(
+    #[Autowire(service: 'views.plugin_managers')]
+    ContainerInterface $pluginManagers,
+  ): void {
+    $this->pluginManagers = $pluginManagers;
   }
 
   /**
