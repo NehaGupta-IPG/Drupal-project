@@ -17,6 +17,7 @@ class Color {
    * @return bool
    *   TRUE if $hex is valid or FALSE if it is not.
    */
+  #[\NoDiscard]
   public static function validateHex($hex) {
     if (!is_string($hex)) {
       return FALSE;
@@ -35,6 +36,7 @@ class Color {
    *
    * @throws \InvalidArgumentException
    */
+  #[\NoDiscard]
   public static function hexToRgb($hex) {
     if (!self::validateHex($hex)) {
       throw new \InvalidArgumentException("'$hex' is not a valid hex value.");
@@ -68,6 +70,7 @@ class Color {
    * @return string
    *   The lowercase simple color representation of the given color.
    */
+  #[\NoDiscard]
   public static function rgbToHex($input) {
     // Remove named array keys if input comes from Color::hex2rgb().
     if (is_array($input)) {
@@ -96,6 +99,7 @@ class Color {
    * @return string
    *   The 6 character hex color.
    */
+  #[\NoDiscard]
   public static function normalizeHexLength($hex) {
     // Ignore '#' prefixes.
     $hex = ltrim($hex, '#');

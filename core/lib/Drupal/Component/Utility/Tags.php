@@ -18,6 +18,7 @@ class Tags {
    * @return array
    *   An array of tags.
    */
+  #[\NoDiscard]
   public static function explode($tags) {
     // This regexp allows the following types of user input:
     // this, "company, llc", "and ""this"" w,o.rks", foo bar.
@@ -48,6 +49,7 @@ class Tags {
    * @return string
    *   The encoded string.
    */
+  #[\NoDiscard]
   public static function encode($tag) {
     if (str_contains($tag, ',') || str_contains($tag, '"')) {
       return '"' . str_replace('"', '""', $tag) . '"';
@@ -64,6 +66,7 @@ class Tags {
    * @return string
    *   The imploded string.
    */
+  #[\NoDiscard]
   public static function implode($tags) {
     $encoded_tags = [];
     foreach ($tags as $tag) {
