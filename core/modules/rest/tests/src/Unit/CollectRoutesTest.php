@@ -78,12 +78,14 @@ class CollectRoutesTest extends UnitTestCase {
     $container->set('plugin.manager.views.style', $style_manager);
     $container->set('renderer', $this->createMock('Drupal\Core\Render\RendererInterface'));
 
-    $locator = $this->createStub('\Symfony\Component\DependencyInjection\ServiceLocator');
-    $locator->method('get')->willReturnCallback(fn($type) => match ($type) {
-      'access' => $access_manager,
-      'display' => $display_manager,
-      'style' => $style_manager,
-    });
+    $locator = $this->createMock('\Symfony\Component\DependencyInjection\ServiceLocator');
+    $locator->expects($this->any())
+      ->method('get')
+      ->willReturnCallback(fn($type) => match ($type) {
+        'access' => $access_manager,
+        'display' => $display_manager,
+        'style' => $style_manager,
+      });
 
     $authentication_collector = $this->createMock('\Drupal\Core\Authentication\AuthenticationCollectorInterface');
     $container->set('authentication_collector', $authentication_collector);
