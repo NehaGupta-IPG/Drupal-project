@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\media_library_test\Form;
 
 use Drupal\Core\Form\FormBuilderInterface;
@@ -48,8 +50,8 @@ class TestConstraintsAddForm extends AddFormBase {
         'url' => Url::fromRoute('media_library.ui'),
         'options' => [
           'query' => $this->getMediaLibraryState($form_state)->all() + [
-              FormBuilderInterface::AJAX_FORM_REQUEST => TRUE,
-            ],
+            FormBuilderInterface::AJAX_FORM_REQUEST => TRUE,
+          ],
         ],
       ],
     ];

@@ -702,8 +702,7 @@ abstract class AddFormBase extends FormBase implements BaseFormIdInterface, Trus
       $media_storage = $this->entityTypeManager->getStorage('media');
       $source_field_name = $this->getSourceFieldName($media_type);
       $valid_media = [];
-      $all_valid = TRUE;
-      foreach ($source_values as $delta => $source_value) {
+      foreach ($source_values as $source_value) {
         $media = $this->createMediaFromValue($media_type, $media_storage, $source_field_name, $source_value);
         $violations = $media->validate()->getByField($source_field_name);
         if (count($violations) > 0) {

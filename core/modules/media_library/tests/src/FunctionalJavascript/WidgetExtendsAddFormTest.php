@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media_library\FunctionalJavascript;
 
 use Drupal\media\Entity\Media;
@@ -20,7 +22,6 @@ class WidgetExtendsAddFormTest extends MediaLibraryTestBase {
   public function testExtendedAddForm() {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
-    $driver = $this->getSession()->getDriver();
 
     // Create a user that can only add media of type four.
     $user = $this->drupalCreateUser([
