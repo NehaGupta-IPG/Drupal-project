@@ -9,12 +9,14 @@ use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use Drupal\layout_builder\Section;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\layout_builder\Traits\EnableLayoutBuilderTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests Layout Builder local tasks.
- *
- * @group layout_builder
+ * Tests Layout Builder can recover from a missing layout plugin.
  */
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class LayoutBuilderMissingLayoutTest extends LayoutBuilderTestBase {
 
   use EnableLayoutBuilderTrait;
