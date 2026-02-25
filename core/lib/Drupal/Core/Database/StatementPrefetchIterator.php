@@ -7,6 +7,8 @@ use Drupal\Core\Database\Statement\PdoTrait;
 use Drupal\Core\Database\Statement\PrefetchedResult;
 use Drupal\Core\Database\Statement\StatementBase;
 
+@trigger_error('\\Drupal\\Core\\Database\\StatementPrefetchIterator is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Extend from \\Drupal\\Core\\Database\\Statement\\StatementBase instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+
 /**
  * An implementation of StatementInterface that prefetches all data.
  *
@@ -39,7 +41,7 @@ class StatementPrefetchIterator extends StatementBase {
     protected array $driverOptions = [],
     bool $rowCountEnabled = FALSE,
   ) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Extend from \\Drupal\\Core\\Database\\Statement\\StatementBase instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
     parent::__construct($connection, $clientConnection, $queryString, $rowCountEnabled);
   }
 

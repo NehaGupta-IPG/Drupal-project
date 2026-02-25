@@ -11,10 +11,9 @@ use Drupal\Core\Database\Statement\StatementBase;
  * SQLite implementation of \Drupal\Core\Database\StatementInterface.
  *
  * The PDO SQLite driver only closes SELECT statements when the PDOStatement
- * destructor is called and SQLite does not allow data change (INSERT,
- * UPDATE etc) on a table which has open SELECT statements. This is a
- * user-space mock of PDOStatement that buffers all the data and doesn't
- * have those limitations.
+ * destructor is called and SQLite does not allow data change (INSERT, UPDATE
+ * etc) on a table which has open SELECT statements. Here we buffer all the
+ * data and don't have those limitations.
  */
 class Statement extends StatementBase {
 
@@ -133,10 +132,12 @@ class Statement extends StatementBase {
    * {@inheritdoc}
    */
   public function execute($args = [], $options = []) {
+    $args ??= [];
     assert(!isset($options['fetch']) || $options['fetch'] instanceof FetchAs || is_string($options['fetch']), 'The "fetch" option passed to execute() must contain a FetchAs enum case or a string. See https://www.drupal.org/node/3488338');
+    $fetchAs = $options['fetch'] ?? NULL;
 
     try {
-      $return = $this->doExecute($args, $options);
+      $return = $this->executeAndPrefetch($args, $fetchAs);
     }
     catch (\PDOException $e) {
       // The database schema might be changed by another process in between the
@@ -148,7 +149,7 @@ class Statement extends StatementBase {
       if (!empty($e->errorInfo[1]) && $e->errorInfo[1] === 17) {
         // The schema has changed. SQLite specifies that we must resend the
         // query.
-        $return = $this->doExecute($args, $options);
+        $return = $this->executeAndPrefetch($args, $fetchAs);
       }
       else {
         // Rethrow the exception.
@@ -160,47 +161,50 @@ class Statement extends StatementBase {
   }
 
   /**
-   * {@inheritdoc}
+   * Executes the statement and prefetches the result.
+   *
+   * @param array $args
+   *   An array of values with as many elements as there are bound parameters in
+   *   the SQL statement being executed.
+   * @param \Drupal\Core\Database\Statement\FetchAs|class-string|null $fetchAs
+   *   The fetch mode.
+   *
+   * @return bool
+   *   TRUE on success, or FALSE on failure.
    */
-  protected function doExecute($args = [], $options = []): bool {
-    assert(!isset($options['fetch']) || $options['fetch'] instanceof FetchAs || is_string($options['fetch']), 'The "fetch" option passed to execute() must contain a FetchAs enum case or a string. See https://www.drupal.org/node/3488338');
-
-    $startEvent = $this->dispatchStatementExecutionStartEvent($args ?? []);
+  protected function executeAndPrefetch(array $args, FetchAs|string|null $fetchAs): bool {
+    $startEvent = $this->dispatchStatementExecutionStartEvent($args);
 
     // Prepare and execute the statement.
     try {
       $this->clientStatement = $this->getStatement($this->queryString, $args);
-      $return = $this->clientExecute($args, $options);
+      $return = $this->clientExecute($args);
     }
     catch (\Exception $e) {
+      // In case of failure, cleanup and exit early - without preprocessing the
+      // exception.
       $this->dispatchStatementExecutionFailureEvent($startEvent, $e);
-      // @phpstan-ignore unset.possiblyHookedProperty
-      unset($this->clientStatement);
+      $this->clientStatement = NULL;
       throw $e;
     }
 
     // Fetch all the data from the reply, in order to release any lock as soon
-    // as possible. Then, destroy the client statement. See the documentation
-    // of \Drupal\sqlite\Driver\Database\sqlite\Statement for an explanation.
+    // as possible. Then, destroy the client statement.
     $this->result = new PrefetchedResult(
       $this->fetchMode,
       $this->fetchOptions,
       $this->clientFetchAll(FetchAs::Associative),
       $this->rowCountEnabled ? $this->clientRowCount() : NULL,
     );
-    // @phpstan-ignore unset.possiblyHookedProperty
-    unset($this->clientStatement);
+    $this->clientStatement = NULL;
     $this->markResultsetIterable($return);
 
-    if (isset($options['fetch'])) {
-      if (is_string($options['fetch'])) {
-        // Default to an object. Note: db fields will be added to the object
-        // before the constructor is run. If you need to assign fields after
-        // the constructor is run. See https://www.drupal.org/node/315092.
-        $this->setFetchMode(FetchAs::ClassObject, $options['fetch']);
+    if ($fetchAs) {
+      if (is_string($fetchAs)) {
+        $this->setFetchMode(FetchAs::ClassObject, $fetchAs);
       }
       else {
-        $this->setFetchMode($options['fetch']);
+        $this->setFetchMode($fetchAs);
       }
     }
 
