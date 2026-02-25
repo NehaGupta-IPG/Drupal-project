@@ -55,29 +55,33 @@ class PathPluginBaseTest extends UnitTestCase {
 
     $this->routeProvider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
     $this->state = $this->createMock('\Drupal\Core\State\StateInterface');
+    $this->accessPluginManager = $this->createMock('\Drupal\views\Plugin\ViewsPluginManager');
+    $this->setupPathPlugin();
+    $this->setupContainer();
+  }
+
+  /**
+   * Sets up the path plugin with the given options.
+   *
+   * @param array $options
+   *   The plugin options.
+   */
+  protected function setupPathPlugin(array $options = []): void {
     $this->pathPlugin = $this->getMockBuilder('Drupal\views\Plugin\views\display\PathPluginBase')
-      ->setConstructorArgs([[], 'path_base', [], $this->routeProvider, $this->state])
+      ->setConstructorArgs([[], 'path_base', $options, $this->routeProvider, $this->state])
       ->onlyMethods([])
       ->getMock();
-    $this->setupContainer();
+
+    $locator = $this->createStub('\Symfony\Component\DependencyInjection\ServiceLocator');
+    $locator->method('get')->with('access')->willReturn($this->accessPluginManager);
+    $this->pathPlugin->setPluginManagers($locator);
   }
 
   /**
    * Setup access plugin manager and config factory in the Drupal class.
    */
   public function setupContainer(): void {
-    $this->accessPluginManager = $this->getMockBuilder('\Drupal\views\Plugin\ViewsPluginManager')
-      ->disableOriginalConstructor()
-      ->getMock();
     $container = new ContainerBuilder();
-    $container->set('plugin.manager.views.access', $this->accessPluginManager);
-
-    $locator = $this->createMock('\Symfony\Component\DependencyInjection\ServiceLocator');
-    $locator->expects($this->any())
-      ->method('get')
-      ->with('access')
-      ->willReturn($this->accessPluginManager);
-    $container->set('views.plugin_managers', $locator);
 
     $config = [
       'views.settings' => [
@@ -153,10 +157,7 @@ class PathPluginBaseTest extends UnitTestCase {
     $display['display_options'] = [
       'path' => 'test_route',
     ];
-    $this->pathPlugin = $this->getMockBuilder('Drupal\views\Plugin\views\display\PathPluginBase')
-      ->setConstructorArgs([[], 'path_base', ['returns_response' => TRUE], $this->routeProvider, $this->state])
-      ->onlyMethods([])
-      ->getMock();
+    $this->setupPathPlugin(['returns_response' => TRUE]);
     $this->pathPlugin->initDisplay($view, $display);
 
     $collection = new RouteCollection();

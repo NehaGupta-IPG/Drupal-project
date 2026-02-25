@@ -78,15 +78,12 @@ class CollectRoutesTest extends UnitTestCase {
     $container->set('plugin.manager.views.style', $style_manager);
     $container->set('renderer', $this->createMock('Drupal\Core\Render\RendererInterface'));
 
-    $locator = $this->createMock('\Symfony\Component\DependencyInjection\ServiceLocator');
-    $locator->expects($this->any())
-      ->method('get')
-      ->willReturnCallback(fn($type) => match ($type) {
-        'access' => $access_manager,
-        'display' => $display_manager,
-        'style' => $style_manager,
-      });
-    $container->set('views.plugin_managers', $locator);
+    $locator = $this->createStub('\Symfony\Component\DependencyInjection\ServiceLocator');
+    $locator->method('get')->willReturnCallback(fn($type) => match ($type) {
+      'access' => $access_manager,
+      'display' => $display_manager,
+      'style' => $style_manager,
+    });
 
     $authentication_collector = $this->createMock('\Drupal\Core\Authentication\AuthenticationCollectorInterface');
     $container->set('authentication_collector', $authentication_collector);
@@ -99,6 +96,7 @@ class CollectRoutesTest extends UnitTestCase {
     \Drupal::setContainer($container);
 
     $this->restExport = RestExport::create($container, [], "test_routes", []);
+    $this->restExport->setPluginManagers($locator);
     $this->restExport->view = $view_executable;
 
     // Initialize a display.
