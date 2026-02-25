@@ -89,6 +89,7 @@ interface TypedDataInterface {
    *   A list of constraint violations. If the list is empty, validation
    *   succeeded.
    */
+  #[\NoDiscard]
   public function validate();
 
   /**

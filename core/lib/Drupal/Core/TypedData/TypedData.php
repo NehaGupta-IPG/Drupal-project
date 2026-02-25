@@ -128,6 +128,7 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
   /**
    * {@inheritdoc}
    */
+  #[\NoDiscard]
   public function validate() {
     return $this->getTypedDataManager()->getValidator()->validate($this);
   }
