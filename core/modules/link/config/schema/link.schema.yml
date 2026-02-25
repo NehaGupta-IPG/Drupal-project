@@ -21,6 +21,7 @@ field.formatter.settings.link:
       label: 'Open link in new window'
     access_check:
       type: boolean
+      nullable: true
       label: 'Run access checks'
 
 field.formatter.settings.link_separate:
