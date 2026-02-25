@@ -40,13 +40,10 @@ class StateFileExistsTest extends MigrateDrupalTestBase {
    * @var array
    */
   protected $stateFileRequired = [
-    // @todo Remove ban in https://www.drupal.org/project/drupal/issues/3488827
-    'ban',
     'block',
     'block_content',
     'comment',
     'config_translation',
-    'contact',
     'content_translation',
     'datetime',
     'dblog',

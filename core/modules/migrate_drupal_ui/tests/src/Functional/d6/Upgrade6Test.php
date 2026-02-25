@@ -26,13 +26,13 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
    */
   protected static $modules = [
     'config_translation',
-    'contact',
     'content_translation',
     'datetime_range',
     'language',
     'migrate_drupal_ui',
     'telephone',
     'update',
+    'shortcut',
   ];
 
   /**
@@ -85,8 +85,6 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
       // The 'standard' profile provides the 'comment' comment type, and the
       // migration creates 12 comment types, one per node type.
       'comment_type' => 14,
-      'contact_form' => 4,
-      'contact_message' => 0,
       'configurable_language' => 5,
       'editor' => 2,
       'field_config' => 102,
@@ -100,7 +98,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
       // creates 12 node types.
       'node_type' => 13,
       'search_page' => 3,
-      'shortcut' => 2,
+      'shortcut' => 0,
       'shortcut_set' => 1,
       'action' => 30,
       'menu' => 8,
@@ -144,7 +142,6 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
       'Block translation',
       'CCK translation',
       'Comment',
-      'Contact',
       'Content',
       'Content translation',
       'Content type translation',
@@ -195,6 +192,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
     return [
       'Aggregator',
       'Book',
+      'Contact',
       'Forum',
       'Statistics',
     ];

@@ -34,10 +34,12 @@ class SystemRequirements implements InstallRequirementsInterface {
    */
   public const DRUPAL_CORE_REMOVED_MODULE_LIST = [
     'action' => 'Action UI',
+    'ban' => 'Ban',
     'book' => 'Book',
     'aggregator' => 'Aggregator',
     'ckeditor' => 'CKEditor',
     'color' => 'Color',
+    'contact' => 'Contact',
     'field_layout' => 'Field Layout',
     'forum' => 'Forum',
     'hal' => 'HAL',
