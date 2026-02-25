@@ -44,25 +44,6 @@ class Statement extends StatementBase {
   }
 
   /**
-   * Returns the client-level database PDO statement object.
-   *
-   * This method should normally be used only within database driver code.
-   *
-   * @return \PDOStatement
-   *   The client-level database PDO statement.
-   *
-   * @throws \RuntimeException
-   *   If the client-level statement is not set.
-   */
-  public function getClientStatement(): \PDOStatement {
-    if (isset($this->clientStatement)) {
-      assert($this->clientStatement instanceof \PDOStatement);
-      return $this->clientStatement;
-    }
-    throw new \LogicException('\\PDOStatement not initialized');
-  }
-
-  /**
    * {@inheritdoc}
    *
    * The PDO SQLite layer doesn't replace numeric placeholders in queries
@@ -137,7 +118,7 @@ class Statement extends StatementBase {
     $fetchAs = $options['fetch'] ?? NULL;
 
     try {
-      $return = $this->executeAndPrefetch($args, $fetchAs);
+      $return = $this->executeAndPrefetch($args);
     }
     catch (\PDOException $e) {
       // The database schema might be changed by another process in between the
@@ -149,11 +130,20 @@ class Statement extends StatementBase {
       if (!empty($e->errorInfo[1]) && $e->errorInfo[1] === 17) {
         // The schema has changed. SQLite specifies that we must resend the
         // query.
-        $return = $this->executeAndPrefetch($args, $fetchAs);
+        $return = $this->executeAndPrefetch($args);
       }
       else {
         // Rethrow the exception.
         throw $e;
+      }
+    }
+
+    if ($fetchAs) {
+      if (is_string($fetchAs)) {
+        $this->setFetchMode(FetchAs::ClassObject, $fetchAs);
+      }
+      else {
+        $this->setFetchMode($fetchAs);
       }
     }
 
@@ -166,13 +156,11 @@ class Statement extends StatementBase {
    * @param array $args
    *   An array of values with as many elements as there are bound parameters in
    *   the SQL statement being executed.
-   * @param \Drupal\Core\Database\Statement\FetchAs|class-string|null $fetchAs
-   *   The fetch mode.
    *
    * @return bool
    *   TRUE on success, or FALSE on failure.
    */
-  protected function executeAndPrefetch(array $args, FetchAs|string|null $fetchAs): bool {
+  protected function executeAndPrefetch(array $args): bool {
     $startEvent = $this->dispatchStatementExecutionStartEvent($args);
 
     // Prepare and execute the statement.
@@ -199,17 +187,7 @@ class Statement extends StatementBase {
     $this->clientStatement = NULL;
     $this->markResultsetIterable($return);
 
-    if ($fetchAs) {
-      if (is_string($fetchAs)) {
-        $this->setFetchMode(FetchAs::ClassObject, $fetchAs);
-      }
-      else {
-        $this->setFetchMode($fetchAs);
-      }
-    }
-
     $this->dispatchStatementExecutionEndEvent($startEvent);
-
     return $return;
   }
 
