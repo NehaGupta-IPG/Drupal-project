@@ -235,27 +235,13 @@ try {
   }
 
   $outputDirectory = \Drupal::root() . \DIRECTORY_SEPARATOR . 'test-artifacts/jobs' . \DIRECTORY_SEPARATOR . getenv('CI_JOB_ID') . \DIRECTORY_SEPARATOR . 'deprecation-handler';
-  dump(\Drupal::service(FileSystemInterface::class)->prepareDirectory($outputDirectory, FileSystemInterface::CREATE_DIRECTORY));
+  // dump(\Drupal::service(FileSystemInterface::class)->prepareDirectory($outputDirectory, FileSystemInterface::CREATE_DIRECTORY));
 
   $outputFile = $outputDirectory . \DIRECTORY_SEPARATOR . "deprecation-ignore-stats.json";
   file_put_contents($outputFile, json_encode([
     'metadata' => $metadata,
     'skips' => $tmp,
   ]));
-
-  echo "\n\nDeprecation skips statistics\n";
-  echo "-----------+----------------------------------------------------------------------\n";
-  echo "    Skips# | Line\n";
-  echo "-----------+----------------------------------------------------------------------\n";
-  foreach (file(\Drupal::root() . \DIRECTORY_SEPARATOR . 'core' . \DIRECTORY_SEPARATOR . '.deprecation-ignore.txt') as $line => $pattern) {
-    if ((trim($pattern)[0] ?? '#') !== '#') {
-      echo sprintf("%10d | %s\n", $tmp[$pattern] ?? 0, trim_with_ellipsis(rtrim($pattern, "\n"), 80, \STR_PAD_RIGHT));
-    }
-    else {
-      echo sprintf("           | %s\n", trim_with_ellipsis(rtrim($pattern, "\n"), 80, \STR_PAD_RIGHT));
-    }
-  }
-  echo "-----------+----------------------------------------------------------------------\n";
 }
 catch (\Exception) {
   // Do nothing.
@@ -1613,4 +1599,23 @@ function dump_discovery_warnings(): void {
       echo "\n";
     }
   }
+}
+
+/**
+ * Outputs the deprecation ignore statistics.
+ */
+function dump_deprecation_ignore_stats(array $stats): void {
+  echo "\n\nDeprecation skips statistics\n";
+  echo "-----------+----------------------------------------------------------------------\n";
+  echo "    Skips# | Line\n";
+  echo "-----------+----------------------------------------------------------------------\n";
+  foreach (file(\Drupal::root() . \DIRECTORY_SEPARATOR . 'core' . \DIRECTORY_SEPARATOR . '.deprecation-ignore.txt') as $line => $pattern) {
+    if ((trim($pattern)[0] ?? '#') !== '#') {
+      echo sprintf("%10d | %s\n", $stats[$pattern] ?? 0, trim_with_ellipsis(rtrim($pattern, "\n"), 80, \STR_PAD_RIGHT));
+    }
+    else {
+      echo sprintf("           | %s\n", trim_with_ellipsis(rtrim($pattern, "\n"), 80, \STR_PAD_RIGHT));
+    }
+  }
+  echo "-----------+----------------------------------------------------------------------\n";
 }

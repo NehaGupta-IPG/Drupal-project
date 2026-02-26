@@ -59,10 +59,6 @@
     <env name="MINK_DRIVER_ARGS_WEBDRIVER" value=""/>
   </php>
   <extensions>
-    <!-- Artifacts handler. -->
-    <bootstrap class="Drupal\TestTools\Extension\Artifact\ArtifactHandler">
-      <parameter name="directory" value="test-artifacts"/>
-    </bootstrap>
     <!-- Deprecation handler. -->
     <bootstrap class="Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler">
     </bootstrap>
