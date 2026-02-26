@@ -181,20 +181,43 @@ export default class DrupalMediaEditing extends Plugin {
    * @private
    */
   async _fetchPreview(modelElement) {
-    const query = {
-      text: this._renderElement(modelElement),
+    // Convert the rendered model into a base64 encoded string. We can't just
+    // use only btoa() here as it's not UTF-8 safe.
+    const utf8Encoded = btoa(
+      encodeURIComponent(this._renderElement(modelElement)).replace(
+        /%([0-9A-F]{2})/g,
+        function toSolidBytes(match, p1) {
+          return String.fromCharCode(`0x${p1}`);
+        },
+      ),
+    );
+
+    const queryParams = {
       uuid: modelElement.getAttribute('drupalMediaEntityUuid'),
     };
 
-    const response = await fetch(
-      `${this.previewUrl}?${new URLSearchParams(query)}`,
-      {
-        headers: {
-          'X-Drupal-MediaPreview-CSRF-Token':
-            this.editor.config.get('drupalMedia').previewCsrfToken,
-        },
+    // Consider query parameters that might already exist, for example ones that
+    // are added by path processors.
+    const previewUrlParts = this.previewUrl.split('?');
+    if (previewUrlParts.length > 1) {
+      const existingQuery = new URLSearchParams(previewUrlParts[1]);
+      existingQuery.forEach((value, key) => {
+        queryParams[key] = value;
+      });
+    }
+
+    const query = new URLSearchParams();
+    Object.keys(queryParams).forEach((key) => {
+      query.append(key, queryParams[key]);
+    });
+
+    const response = await fetch(`${previewUrlParts[0]}?${query}`, {
+      headers: {
+        'X-Encoded-Media-Embed': utf8Encoded,
+        'X-Drupal-MediaPreview-CSRF-Token':
+          this.editor.config.get('drupalMedia').previewCsrfToken,
       },
-    );
+    });
     if (response.ok) {
       const label = response.headers.get('drupal-media-label');
       const preview = await response.text();
