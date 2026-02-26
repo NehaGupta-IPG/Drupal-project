@@ -235,7 +235,7 @@ try {
   }
 
   $outputDirectory = \Drupal::root() . \DIRECTORY_SEPARATOR . 'test-artifacts/jobs' . \DIRECTORY_SEPARATOR . getenv('CI_JOB_ID') . \DIRECTORY_SEPARATOR . 'deprecation-handler';
-  // dump(\Drupal::service(FileSystemInterface::class)->prepareDirectory($outputDirectory, FileSystemInterface::CREATE_DIRECTORY));
+  \Drupal::service(FileSystemInterface::class)->prepareDirectory($outputDirectory, FileSystemInterface::CREATE_DIRECTORY);
 
   $outputFile = $outputDirectory . \DIRECTORY_SEPARATOR . "deprecation-ignore-stats.json";
   file_put_contents($outputFile, json_encode([
