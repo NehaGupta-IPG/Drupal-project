@@ -7,12 +7,14 @@ namespace Drupal\KernelTests\Core\DependencyInjection;
 use Drupal\autowire_test\TestInjection;
 use Drupal\autowire_test\TestInjection2;
 use Drupal\autowire_test\TestInjection3;
+use Drupal\autowire_test\TestInjectionInterface;
 use Drupal\autowire_test\TestService;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Serialization\Yaml;
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\KernelTests\FileSystemModuleDiscoveryDataProviderTrait;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -184,6 +186,22 @@ class AutowireTest extends KernelTestBase {
     }
 
     $this->assertEmpty($autowire, 'The following core controllers can be autowired. Remove the create() method:' . PHP_EOL . implode(PHP_EOL, $autowire));
+  }
+
+  /**
+   * Test mocked service.
+   */
+  public function testMockedService(): void {
+    $mock = $this->createMock(TestInjectionInterface::class);
+    $this->container->set(TestInjectionInterface::class, $mock);
+    $service = $this->container->get(TestService::class);
+    $this->assertSame($mock, $service->getTestInjection());
+
+
+    $user = $this->createMock(AccountProxyInterface::class);
+    $this->container->set(AccountProxyInterface::class, $mock);
+    $service = $this->container->get(TestService::class);
+    $this->assertSame($user, $service->getCurrentUser());
   }
 
 }
