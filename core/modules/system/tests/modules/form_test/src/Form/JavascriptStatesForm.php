@@ -765,6 +765,158 @@ class JavascriptStatesForm extends FormBase {
       ],
     ];
 
+    // Ajax related testing.
+    $form['header_ajax_affected_triggers'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'h3',
+      '#value' => 'Ajax affected triggers tests',
+    ];
+    // Ajax trigger.
+    $form['ajax_reload'] = [
+      '#type' => 'checkbox',
+      '#title' => 'Check me to reload elements with the states_ajax_test_wrapper',
+      '#ajax' => [
+        'callback' => '::buildAjax',
+        'wrapper' => 'states_ajax_test_wrapper',
+      ],
+    ];
+    $form['checkbox_trigger'] = [
+      '#type' => 'checkbox',
+      '#title' => 'Checkbox Trigger',
+    ];
+
+    // Ajax wrapper.
+    $form['states_ajax_test'] = [
+      '#type' => 'details',
+      '#open' => TRUE,
+      '#prefix' => '<div id="states_ajax_test_wrapper">',
+      '#suffix' => '</div>',
+    ];
+    $form['states_ajax_test']['ajax_select_trigger'] = [
+      '#type' => 'select',
+      '#title' => 'Ajax Affected Select Trigger',
+      '#options' => [0 => 0, 1 => 1],
+      '#default_value' => 0,
+    ];
+    $form['states_ajax_test']['ajax_set_trigger'] = [
+      '#type' => 'radios',
+      '#title' => 'Ajax Set trigger',
+      '#options' => [
+        'value1' => 'Value 1',
+        'value2' => 'Value 2',
+      ],
+    ];
+    // Add element added via ajax when ajax_reload is checked.
+    if ($form_state->getValue('ajax_reload')) {
+      $form['states_ajax_test']['ajax_added_trigger'] = [
+        '#type' => 'checkbox',
+        '#title' => 'Ajax Added Trigger',
+      ];
+      $form['states_ajax_test']['ajax_added_textfield_enabled_when_checkbox_trigger_checked'] = [
+        '#type' => 'textfield',
+        '#title' => 'Ajax added Textfield enabled when Checkbox Trigger is checked',
+        '#states' => [
+          'enabled' => [
+            ':input[name="checkbox_trigger"]' => ['checked' => TRUE],
+          ],
+        ],
+      ];
+      $form['states_ajax_test']['ajax_set_trigger']['#default_value'] = 'value1';
+    }
+    $form['textfield_enabled_when_checkbox_trigger_is_checked'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield enabled when Checkbox Trigger is checked',
+      '#states' => [
+        'enabled' => [
+          ':input[name="checkbox_trigger"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+    $form['not_ajax_select_trigger'] = [
+      '#type' => 'select',
+      '#title' => 'Not Ajax Affected Select Trigger',
+      '#options' => [0 => 0, 1 => 1],
+      '#default_value' => 0,
+    ];
+    $form['textfield_visible_when_ajax_select_trigger_is_1'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield visible when Ajax Affected Select Trigger is 1',
+      '#states' => [
+        'visible' => [
+          ':input[name="ajax_select_trigger"]' => ['value' => 1],
+        ],
+      ],
+    ];
+    $form['textfield_visible_when_not_ajax_select_trigger_is_1'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield visible when Not Ajax Affected Select Trigger is 1',
+      '#states' => [
+        'visible' => [
+          ':input[name="not_ajax_select_trigger"]' => ['value' => 1],
+        ],
+      ],
+    ];
+    $form['textfield_visible_when_ajax_trigger_is_1_and_not_ajax_trigger_is_1'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield visible when Ajax Affected Select Trigger is 1 and Not Ajax Affected Select Trigger is 1',
+      '#states' => [
+        'visible' => [
+          ':input[name="ajax_select_trigger"]' => ['value' => 1],
+          ':input[name="not_ajax_select_trigger"]' => ['value' => 1],
+        ],
+      ],
+    ];
+    $form['textfield_invisible_when_ajax_added_trigger_is_checked'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield invisible when Ajax Added Trigger is checked',
+      '#states' => [
+        'invisible' => [
+          ':input[name="ajax_added_trigger"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+    $form['textfield_invisible_when_ajax_added_trigger_is_checked_and_not_ajax_trigger_is_1'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield invisible when Ajax Added Trigger is checked AND Not Ajax Affected Select Trigger is 1',
+      '#states' => [
+        'invisible' => [
+          ':input[name="ajax_added_trigger"]' => ['checked' => TRUE],
+          ':input[name="not_ajax_select_trigger"]' => ['value' => 1],
+        ],
+      ],
+    ];
+    $form['textfield_invisible_when_ajax_added_trigger_is_checked_or_not_ajax_trigger_is_1'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield invisible when Ajax Added Trigger is checked OR Not Ajax Affected Select Trigger is 1',
+      '#states' => [
+        'invisible' => [
+          [':input[name="ajax_added_trigger"]' => ['checked' => TRUE]],
+          'or',
+          [':input[name="not_ajax_select_trigger"]' => ['value' => 1]],
+        ],
+      ],
+    ];
+    // Use a selector which includes a form identifier. This is valid if there
+    // are multiple forms on a page which may have duplicate field names.
+    $form['textfield_visible_when_ajax_added_trigger_is_checked_form_selector'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield visible when Ajax Added Trigger is checked',
+      '#states' => [
+        'visible' => [
+          'form :input[name="ajax_added_trigger"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+    $form['textfield_visible_when_ajax_set_trigger_is_value1_form_selector'] = [
+      '#type' => 'textfield',
+      '#title' => 'Textfield visible when Ajax Set Trigger is Value 1',
+      '#states' => [
+        'visible' => [
+          'form :input[name="ajax_set_trigger"]' => ['value' => 'value1'],
+        ],
+      ],
+    ];
+
     return $form;
   }
 
@@ -772,6 +924,13 @@ class JavascriptStatesForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+  }
+
+  /**
+   * Return ajax.
+   */
+  public function buildAjax(array &$form, FormStateInterface $form_state): array {
+    return $form['states_ajax_test'];
   }
 
 }
