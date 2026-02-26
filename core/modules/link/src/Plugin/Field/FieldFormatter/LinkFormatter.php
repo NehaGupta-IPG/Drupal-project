@@ -39,9 +39,14 @@ class LinkFormatter extends FormatterBase {
     $view_mode,
     array $third_party_settings,
     protected PathValidatorInterface $pathValidator,
-    protected AccessManagerInterface $accessManager,
+    protected ?AccessManagerInterface $accessManager = NULL,
   ) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings);
+
+    if ($this->accessManager === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . ' without the $accessManager argument is deprecated in drupal:11.4.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3575906', E_USER_DEPRECATED);
+      $this->accessManager = \Drupal::service('access_manager');
+    }
   }
 
   /**
