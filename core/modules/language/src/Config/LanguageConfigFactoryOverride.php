@@ -12,6 +12,8 @@ use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Language\LanguageDefault;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutowireServiceClosure;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -36,7 +38,30 @@ class LanguageConfigFactoryOverride extends ConfigFactoryOverrideBase implements
    */
   protected $language;
 
-  public function __construct(protected StorageInterface $baseStorage, protected EventDispatcherInterface $eventDispatcher, protected TypedConfigManagerInterface $typedConfigManager, LanguageDefault $default_language, protected ?array $defaultLanguageValues, protected ?bool $translateEnglish = TRUE) {
+  /**
+   * Whether the language is already negotiated.
+   *
+   * @var bool
+   */
+  protected bool $isNegotiated = FALSE;
+
+  /**
+   * Whether in the process of negotiating language.
+   *
+   * @var bool
+   */
+  protected bool $isNegotiating = FALSE;
+
+  public function __construct(
+    protected StorageInterface $baseStorage,
+    protected EventDispatcherInterface $eventDispatcher,
+    protected TypedConfigManagerInterface $typedConfigManager,
+    LanguageDefault $default_language,
+    protected ?array $defaultLanguageValues,
+    protected ?bool $translateEnglish = TRUE,
+    #[AutowireServiceClosure(LanguageManagerInterface::class)]
+    protected ?\Closure $getLanguageManager = NULL,
+  ) {
     // Prior to negotiation the override language should be the default
     // language.
     $this->language = $default_language->get();
@@ -48,24 +73,30 @@ class LanguageConfigFactoryOverride extends ConfigFactoryOverrideBase implements
       @trigger_error('Not passing the language.translate_english parameter to LanguageConfigFactoryOverride::__construct() is deprecated in drupal:11.3.0 and it will be required in drupal::12.0.0. See https://www.drupal.org/project/drupal/issues/3518992');
       $this->translateEnglish = \Drupal::getContainer()->getParameter('language.translate_english');
     }
+    if ($this->getLanguageManager === NULL) {
+      // @fixme Set deprecation version.
+      @trigger_error('Not passing the getLanguageManager parameter to LanguageConfigFactoryOverride::__construct() is deprecated in drupal:XXXXXXX and it will be required in drupal::12.0.0. See https://www.drupal.org/project/drupal/issues/3518992');
+      // @fixme Defer on serializable service closures https://www.drupal.org/i/3544994
+      $this->getLanguageManager = fn() => \Drupal::service(LanguageManagerInterface::class);
+    }
   }
 
   /**
    * Checks whether overrides should be loaded.
    */
   protected function shouldSkipOverrides(): bool {
-    return $this->language
-      && $this->language->getId() === 'en'
-      && $this->defaultLanguageValues['id'] === 'en'
-      && !$this->translateEnglish;
+    return $this->defaultLanguageValues['id'] === 'en'
+      && !$this->translateEnglish
+      && $this->getLanguage()
+      && $this->getLanguage()->getId() === 'en';
   }
 
   /**
    * {@inheritdoc}
    */
   public function loadOverrides($names) {
-    if ($this->language) {
-      $storage = $this->getStorage($this->language->getId());
+    if ($this->getLanguage()) {
+      $storage = $this->getStorage($this->getLanguage()->getId());
       return $storage->readMultiple($names);
     }
     return [];
@@ -112,13 +143,26 @@ class LanguageConfigFactoryOverride extends ConfigFactoryOverrideBase implements
    * {@inheritdoc}
    */
   public function getCacheSuffix() {
-    return $this->language ? $this->language->getId() : NULL;
+    return $this->getLanguage() ? $this->getLanguage()->getId() : NULL;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getLanguage() {
+    if ($this->isNegotiating) {
+      // Recursion while negotiating, return the default language.
+      // @todo Once needed, add a proper circular dependency check like in
+      //   ServiceContainer.
+      return $this->language;
+    }
+    // Negotiate language if not already done.
+    if ($this->isNegotiated) {
+      $this->isNegotiating = TRUE;
+      $this->language = ($this->getLanguageManager)()->getCurrentLanguage();
+      $this->isNegotiating = FALSE;
+      $this->isNegotiated = TRUE;
+    }
     return $this->language;
   }
 
@@ -126,6 +170,8 @@ class LanguageConfigFactoryOverride extends ConfigFactoryOverrideBase implements
    * {@inheritdoc}
    */
   public function setLanguage(?LanguageInterface $language = NULL) {
+    // @todo Remove this brittle get / set interface for language overrides with
+    //   sth like ::executeWithConfigLanguageOverride().
     $this->language = $language;
     return $this;
   }
@@ -207,7 +253,7 @@ class LanguageConfigFactoryOverride extends ConfigFactoryOverrideBase implements
    */
   public function getCacheableMetadata($name) {
     $metadata = new CacheableMetadata();
-    if ($this->language) {
+    if ($this->getLanguage()) {
       $metadata->setCacheContexts(['languages:language_interface']);
     }
     return $metadata;
