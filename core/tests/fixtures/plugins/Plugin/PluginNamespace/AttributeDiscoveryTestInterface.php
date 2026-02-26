@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace fixtures\plugins\Plugin\PluginNamespace;
+namespace com\example\PluginNamespace;
 
 /**
  * An interface in a plugin directory that should not be parsed.
