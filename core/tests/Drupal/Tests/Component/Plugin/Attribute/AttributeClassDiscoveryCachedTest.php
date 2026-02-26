@@ -53,8 +53,8 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
     // Define file paths within the directory that should not be discovered.
     $non_discoverable_file_paths = [
       $discovery_path . '/PluginNamespace/AttributeDiscoveryTest2.php',
-      $discovery_path . '/PluginNamespace/AttributeDiscoveryTestMissingInterface.php',
-      $discovery_path . '/PluginNamespace/AttributeDiscoveryTestMissingTrait.php',
+      $discovery_path . '/PluginNamespace/AttributeDiscoveryTestMissingInterfacePlugin.php',
+      $discovery_path . '/PluginNamespace/AttributeDiscoveryTestMissingTraitPlugin.php',
     ];
 
     $discovery = new AttributeClassDiscovery(['com\example' => [$discovery_path]]);
@@ -108,8 +108,8 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
     // Define file paths within the directory that should not be discovered.
     $non_discoverable_file_paths = [
       $discovery_path . '/PluginNamespace/AttributeDiscoveryTest2.php',
-      $discovery_path . '/PluginNamespace/AttributeDiscoveryTestMissingInterface.php',
-      $discovery_path . '/PluginNamespace/AttributeDiscoveryTestMissingTrait.php',
+      $discovery_path . '/PluginNamespace/AttributeDiscoveryTestMissingInterfacePlugin.php',
+      $discovery_path . '/PluginNamespace/AttributeDiscoveryTestMissingTraitPlugin.php',
     ];
 
     $discovery = new AttributeClassDiscovery(['com\example' => [$discovery_path]]);
@@ -143,7 +143,7 @@ class AttributeClassDiscoveryCachedTest extends TestCase {
       ],
       'discovery_test_missing_trait' => [
         'id' => 'discovery_test_missing_trait',
-        'class' => 'com\example\PluginNamespace\AttributeDiscoveryTestMissingTrait',
+        'class' => 'com\example\PluginNamespace\AttributeDiscoveryTestMissingTraitPlugin',
         'title' => 'Discovery test plugin missing trait',
         'dependencies' => [
           'trait' => ['Drupal\a_module_that_does_not_exist\Plugin\CustomTrait'],

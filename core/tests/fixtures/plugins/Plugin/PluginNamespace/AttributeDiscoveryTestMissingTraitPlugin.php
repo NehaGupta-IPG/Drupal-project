@@ -13,7 +13,7 @@ use Drupal\a_module_that_does_not_exist\Plugin\CustomTrait;
   id: "discovery_test_missing_trait",
   title: "Discovery test plugin missing trait"
 )]
-class AttributeDiscoveryTestMissingTrait {
+class AttributeDiscoveryTestMissingTraitPlugin {
   use CustomTrait;
 
 }
