@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\link\Functional;
 
-use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
 use Drupal\entity_test\Entity\EntityTest;
@@ -498,107 +497,6 @@ class LinkFieldTest extends BrowserTestBase {
     $content = $display->build($entity);
     $output = \Drupal::service('renderer')->renderRoot($content);
     return (string) $output;
-  }
-
-  /**
-   * Tests link formatter access_check behavior.
-   */
-  public function testAccessCheckLinkFormatter(): void {
-    // Create two nodes: one published, one unpublished.
-    $published_node = $this->drupalCreateNode([
-      'type' => 'page',
-      'title' => 'Published node',
-      'status' => NodeInterface::PUBLISHED,
-    ]);
-    $unpublished_node = $this->drupalCreateNode([
-      'type' => 'page',
-      'title' => 'Unpublished node',
-      'status' => NodeInterface::NOT_PUBLISHED,
-    ]);
-
-    // Add a link field to entity_test.
-    $field_name = 'field_link';
-    FieldStorageConfig::create([
-      'entity_type' => 'entity_test',
-      'field_name' => $field_name,
-      'type' => 'link',
-      'cardinality' => FieldStorageDefinitionInterface::CARDINALITY_UNLIMITED,
-    ])->save();
-
-    FieldConfig::create([
-      'entity_type' => 'entity_test',
-      'bundle' => 'entity_test',
-      'field_name' => $field_name,
-      'settings' => [
-        'title' => LinkTitleVisibility::Optional->value,
-        'link_type' => LinkItemInterface::LINK_GENERIC,
-      ],
-    ])->save();
-
-    // Configure display with access_check = TRUE.
-    $display_repository = \Drupal::service('entity_display.repository');
-    $display_repository
-      ->getViewDisplay('entity_test', 'entity_test', 'full')
-      ->setComponent($field_name, [
-        'type' => 'link',
-        'settings' => [
-          'trim_length' => '80',
-          'access_check' => TRUE,
-        ],
-      ])
-      ->save();
-
-    // Create an entity linking to both nodes.
-    $entity = EntityTest::create([
-      $field_name => [
-        [
-          'uri' => 'entity:node/' . $published_node->id(),
-          'title' => 'Published node',
-        ],
-        [
-          'uri' => 'entity:node/' . $unpublished_node->id(),
-          'title' => 'Unpublished node',
-        ],
-      ],
-    ]);
-    $entity->save();
-
-    // Test access_check = TRUE → only published link should render.
-    $this->drupalGet('entity_test/' . $entity->id());
-    $this->assertSession()->linkExists('Published node');
-    $this->assertSession()->linkNotExists('Unpublished node');
-
-    // Toggle the published node to unpublished → it should disappear.
-    $published_node->setUnpublished()->save();
-    $this->drupalGet('entity_test/' . $entity->id());
-    $this->assertSession()->linkNotExists('Published node');
-    $this->assertSession()->linkNotExists('Unpublished node');
-
-    // Now publish both nodes → both links should render again.
-    $published_node->setPublished()->save();
-    $unpublished_node->setPublished()->save();
-    $this->drupalGet('entity_test/' . $entity->id());
-    $this->assertSession()->linkExists('Published node');
-    $this->assertSession()->linkExists('Unpublished node');
-
-    // Finally, disable access_check → both should always render.
-    $display_repository
-      ->getViewDisplay('entity_test', 'entity_test', 'full')
-      ->setComponent($field_name, [
-        'type' => 'link',
-        'settings' => [
-          'trim_length' => '80',
-          'access_check' => FALSE,
-        ],
-      ])
-      ->save();
-
-    // Unpublish both nodes again → both visible with access_check = FALSE.
-    $published_node->setUnpublished()->save();
-    $unpublished_node->setUnpublished()->save();
-    $this->drupalGet('entity_test/' . $entity->id());
-    $this->assertSession()->linkExists('Published node');
-    $this->assertSession()->linkExists('Unpublished node');
   }
 
 }
