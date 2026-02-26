@@ -18,6 +18,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Timer;
 use Drupal\Core\Composer\Composer;
 use Drupal\Core\Database\Database;
+use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Test\EnvironmentCleaner;
 use Drupal\Core\Test\PhpUnitTestDiscovery;
 use Drupal\Core\Test\PhpUnitTestRunner;
@@ -236,6 +237,53 @@ TestDatabase::releaseAllTestLocks();
 
 // Display results before database is cleared.
 simpletest_script_reporter_display_results($test_run_results_storage);
+
+// CONSOLIDATE. --------------------
+
+try {
+  $files = \Drupal::service(FileSystemInterface::class)->scanDirectory(
+    \Drupal::root() . \DIRECTORY_SEPARATOR . 'core/test-artifacts/jobs' . \DIRECTORY_SEPARATOR . getenv('CI_JOB_ID') . \DIRECTORY_SEPARATOR . 'deprecation-handler',
+    '/^deprecation-ignore-stats.*\.json$/',
+  );
+
+  $tmp = [];
+  $metadata = NULL;
+  foreach ($files as $file) {
+    $contents = json_decode(file_get_contents($file->uri), TRUE);
+    $metadata = $contents['metadata'];
+    foreach ($contents['skips'] as $key => $count) {
+      $tmp[$key] = isset($tmp[$key]) ? $tmp[$key] + $count : $count;
+    }
+  }
+
+  $outputDirectory = \Drupal::root() . \DIRECTORY_SEPARATOR . 'test-artifacts/jobs' . \DIRECTORY_SEPARATOR . getenv('CI_JOB_ID') . \DIRECTORY_SEPARATOR . 'deprecation-handler';
+  dump(\Drupal::service(FileSystemInterface::class)->prepareDirectory($outputDirectory, FileSystemInterface::CREATE_DIRECTORY));
+
+  $outputFile = $outputDirectory . \DIRECTORY_SEPARATOR . "deprecation-ignore-stats.json";
+  file_put_contents($outputFile, json_encode([
+    'metadata' => $metadata,
+    'skips' => $tmp,
+  ]));
+
+  echo "\n\nDeprecation skips statistics\n";
+  echo "-----------+----------------------------------------------------------------------\n";
+  echo "    Skips# | Line\n";
+  echo "-----------+----------------------------------------------------------------------\n";
+  foreach (file(\Drupal::root() . \DIRECTORY_SEPARATOR . 'core' . \DIRECTORY_SEPARATOR . '.deprecation-ignore.txt') as $line => $pattern) {
+    if ((trim($pattern)[0] ?? '#') !== '#') {
+      echo sprintf("%10d | %s\n", $tmp[$pattern] ?? 0, trim_with_ellipsis(rtrim($pattern, "\n"), 80, \STR_PAD_RIGHT));
+    }
+    else {
+      echo sprintf("           | %s\n", trim_with_ellipsis(rtrim($pattern, "\n"), 80, \STR_PAD_RIGHT));
+    }
+  }
+  echo "-----------+----------------------------------------------------------------------\n";
+}
+catch (\Exception) {
+  // Do nothing.
+}
+
+// CONSOLIDATE. --------------------
 
 if (Config::get('xml')) {
   simpletest_script_reporter_write_xml_results($test_run_results_storage);

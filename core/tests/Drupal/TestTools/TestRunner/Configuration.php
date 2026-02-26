@@ -24,6 +24,8 @@ final class Configuration {
    */
   protected static ?self $instance = NULL;
 
+  private array $items = [];
+
   protected function __construct(
     private array $options,
     private array $arguments,
@@ -39,6 +41,19 @@ final class Configuration {
     }
     if (array_key_exists($name, self::$instance->options)) {
       return self::$instance->options[$name];
+    }
+    throw new \RuntimeException("There is no '{$name}' element in config");
+  }
+
+  /**
+   * Gets a config element.
+   */
+  public static function getx(string $name): mixed {
+    if (self::$instance === NULL) {
+      return NULL;
+    }
+    if (array_key_exists($name, self::$instance->items)) {
+      return self::$instance->items[$name];
     }
     throw new \RuntimeException("There is no '{$name}' element in config");
   }
@@ -105,7 +120,40 @@ final class Configuration {
     }
 
     self::$instance = new self($input->getOptions(), $input->getArguments());
+
+    self::$instance->items['artifacts-directory'] = 'test-artifacts';
+    self::$instance->items['environment-context'] = self::environmentContext();
+
     return self::$instance;
+  }
+
+  private static function environmentContext(): array {
+    $tmp = [];
+    if ($env = getenv('CI_PIPELINE_ID')) {
+      $tmp['CI_PIPELINE_ID'] = $env;
+    }
+    if ($env = getenv('CI_PIPELINE_NAME')) {
+      $tmp['CI_PIPELINE_NAME'] = $env;
+    }
+    if ($env = getenv('CI_JOB_ID')) {
+      $tmp['CI_JOB_ID'] = $env;
+    }
+    if ($env = getenv('CI_JOB_STAGE')) {
+      $tmp['CI_JOB_STAGE'] = $env;
+    }
+    if ($env = getenv('CI_JOB_NAME')) {
+      $tmp['CI_JOB_NAME'] = $env;
+    }
+    preg_match('/^\d+\.\d+/', \PHP_VERSION, $matches);
+    $tmp['php_version'] = $matches[0];
+    // @todo complete.
+    if (FALSE) {
+      $tmp['database_driver'] = NULL;
+    }
+    if (!empty(getenv('_TARGET_DB'))) {
+      $tmp['database_version'] = getenv('_TARGET_DB');
+    }
+    return $tmp;
   }
 
   /**

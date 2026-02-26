@@ -96,6 +96,7 @@ stages:
   - 🪄 Lint
   - ⚡️ Tests
   - 🗜️ Additional tests
+  - 🚚 Consolidate
 
 #############
 # Defaults  #
@@ -214,6 +215,7 @@ default:
     reports:
       junit: ./sites/default/files/simpletest/phpunit-*.xml
     paths:
+      - test-artifacts
       - ./sites/default/files/simpletest/phpunit-*.xml
       - ./sites/simpletest/browser_output
       - '*.log'
@@ -315,6 +317,7 @@ default:
     reports:
       junit: ./sites/default/files/simpletest/phpunit-*.xml
     paths:
+      - test-artifacts
       - ./sites/default/files/simpletest/phpunit-*.xml
 
 '📋 PHPUnit Unit (Component)':
@@ -1010,3 +1013,21 @@ default:
     - if [ ! -f core/.eslintcache ]; then exit 1; fi
     - if [ ! -f core/.stylelintcache ]; then exit 1; fi
     - if [ ! -f core/.phpcscache ]; then exit 1; fi
+
+##########################
+# Consolidation stage Jobs
+##########################
+
+'Ignored deprecations stats':
+  stage: 🚚 Consolidate
+  script:
+    # - find test-artifacts
+    - php .gitlab-ci/scripts/statistics-consolidator.php test-artifacts $_TARGET_PHP
+  artifacts:
+    when: always
+    expire_in: 6 mos
+    paths:
+      - vendor/
+      - composer.lock
+      - composer/Metapackage/
+      - test-artifacts
