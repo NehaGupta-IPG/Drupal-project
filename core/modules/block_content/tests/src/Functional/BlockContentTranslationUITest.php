@@ -156,4 +156,34 @@ class BlockContentTranslationUITest extends ContentTranslationUITestBase {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  protected function doTestPublishedStatus() {
+    $storage = $this->container->get('entity_type.manager')
+      ->getStorage($this->entityTypeId);
+    $entity = $storage->loadUnchanged($this->entityId);
+    $languages = $this->container->get('language_manager')->getLanguages();
+
+    foreach ([TRUE, FALSE] as $index => $value) {
+      // (Un)publish the block content translations and check that the
+      // translation statuses are (un)published accordingly.
+      foreach ($this->langcodes as $langcode) {
+        $options = ['language' => $languages[$langcode]];
+        $url = $entity->toUrl('edit-form', $options);
+        $this->drupalGet($url);
+        $this->submitForm(['status[value]' => $value], 'Save');
+      }
+      $entity = $storage->loadUnchanged($this->entityId);
+      foreach ($this->langcodes as $langcode) {
+        // The block content is created as unpublished thus we switch to the
+        // published status first.
+        $status = !$index;
+        $translation = $entity->getTranslation($langcode);
+        $this->assertEquals($status, $this->manager->getTranslationMetadata($translation)
+          ->isPublished(), 'The translation has been correctly unpublished.');
+      }
+    }
+  }
+
 }

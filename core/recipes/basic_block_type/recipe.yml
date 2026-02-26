@@ -13,3 +13,7 @@ config:
       - field.storage.block_content.body
       - core.entity_view_mode.block_content.full
       - views.view.block_content
+      - system.action.block_content_publish_action
+      - system.action.block_content_unpublish_action
+      - system.action.block_content_publish_action
+      - system.action.block_content_unpublish_action

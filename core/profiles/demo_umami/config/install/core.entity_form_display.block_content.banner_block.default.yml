@@ -61,6 +61,13 @@ content:
     settings:
       include_locked: true
     third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    settings:
+      display_label: true
+    weight: 120
+    region: content
+    third_party_settings: { }
   translation:
     weight: 7
     region: content

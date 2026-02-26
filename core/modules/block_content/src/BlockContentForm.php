@@ -35,6 +35,10 @@ class BlockContentForm extends ContentEntityForm {
     // names.
     $form['#attributes']['class'][0] = 'block-' . Html::getClass($block->bundle()) . '-form';
 
+    if (isset($form['status'])) {
+      $form['status']['#group'] = 'footer';
+    }
+
     return $form;
   }
 

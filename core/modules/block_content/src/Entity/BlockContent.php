@@ -214,6 +214,16 @@ class BlockContent extends EditorialContentEntityBase implements BlockContentInt
 
     $fields['uuid']->setDescription(t('The content block UUID.'));
 
+    $fields['status']
+      ->setDisplayOptions('form', [
+        'type' => 'boolean_checkbox',
+        'settings' => [
+          'display_label' => TRUE,
+        ],
+        'weight' => 120,
+      ])
+      ->setDisplayConfigurable('form', TRUE);
+
     $fields['revision_id']->setDescription(t('The revision ID.'));
 
     $fields['langcode']->setDescription(t('The content block language code.'));

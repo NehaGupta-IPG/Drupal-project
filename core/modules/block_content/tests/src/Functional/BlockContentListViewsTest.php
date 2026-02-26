@@ -18,6 +18,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class BlockContentListViewsTest extends BlockContentTestBase {
 
+  use BlockContentTestBulkOperationsTrait;
+
   /**
    * A user with 'access block library' permission.
    *
@@ -94,13 +96,15 @@ class BlockContentListViewsTest extends BlockContentTestBase {
     $this->assertSession()->elementExists('xpath', '//div[@class="layout-content"]//table');
 
     // Test the table header, four cells should be present.
-    $this->assertSession()->elementsCount('xpath', '//div[@class="layout-content"]//table/thead/tr/th', 4);
+    $this->assertSession()->elementsCount('xpath', '//div[@class="layout-content"]//table/thead/tr/th', 6);
 
     // Test the contents of each th cell.
-    $this->assertSession()->elementTextEquals('xpath', '//div[@class="layout-content"]//table/thead/tr/th[1]', 'Block description');
-    $this->assertSession()->elementTextEquals('xpath', '//div[@class="layout-content"]//table/thead/tr/th[2]', 'Block type');
-    $this->assertSession()->elementTextEquals('xpath', '//div[@class="layout-content"]//table/thead/tr/th[3]', 'Updated Sort ascending');
-    $this->assertSession()->elementTextEquals('xpath', '//div[@class="layout-content"]//table/thead/tr/th[4]', 'Operations');
+    $this->assertSession()->elementTextEquals('xpath', '//div[@class="layout-content"]//table/thead/tr/th[1]', '');
+    $this->assertSession()->elementTextEquals('xpath', '//div[@class="layout-content"]//table/thead/tr/th[2]', 'Block description');
+    $this->assertSession()->elementTextEquals('xpath', '//div[@class="layout-content"]//table/thead/tr/th[3]', 'Block type');
+    $this->assertSession()->elementTextEquals('xpath', '//div[@class="layout-content"]//table/thead/tr/th[4]', 'Updated Sort ascending');
+    $this->assertSession()->elementTextEquals('xpath', '//div[@class="layout-content"]//table/thead/tr/th[5]', 'Published');
+    $this->assertSession()->elementTextEquals('xpath', '//div[@class="layout-content"]//table/thead/tr/th[6]', 'Operations');
 
     $label = 'Antelope';
     $new_label = 'Albatross';
@@ -116,11 +120,27 @@ class BlockContentListViewsTest extends BlockContentTestBase {
     // (versus elsewhere on the page).
     $this->assertSession()->elementTextContains('xpath', '//td/a', $label);
 
+    $this->unpublishUsingBulkAction();
+    $this->assertBlockStatusDisplayedAs(FALSE);
+    // Filter by unpublished to show only unpublished blocks.
+    $edit = [];
+    $edit['status'] = 0;
+    $this->drupalGet('admin/content/block');
+    $this->submitForm($edit, 'Apply');
+    $this->assertSession()->pageTextContains($label);
+
+    $this->publishUsingBulkAction();
+    $this->assertBlockStatusDisplayedAs(TRUE);
+    // Filter by published to show only published blocks.
+    $edit = [];
+    $edit['status'] = 1;
+    $this->drupalGet('admin/content/block');
+    $this->submitForm($edit, 'Apply');
+    $this->assertSession()->pageTextContains($label);
+
     // Check the number of table row cells.
-    $this->assertSession()->elementsCount('xpath', '//div[@class="layout-content"]//table/tbody/tr/td', 4);
-    // Check the contents of each row cell. The first cell contains the label,
-    // the second contains the machine name, and the third contains the
-    // operations list.
+    $this->assertSession()->elementsCount('xpath', '//div[@class="layout-content"]//table/tbody/tr/td', 6);
+    // Check the second cell contains the label.
     $this->assertSession()->elementTextEquals('xpath', '//div[@class="layout-content"]//table/tbody/tr/td/a', $label);
 
     // Edit the entity using the operations link.

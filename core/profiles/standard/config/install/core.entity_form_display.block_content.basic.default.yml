@@ -27,4 +27,11 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    settings:
+      display_label: true
+    weight: 120
+    third_party_settings: {  }
+    region: content
 hidden: {  }

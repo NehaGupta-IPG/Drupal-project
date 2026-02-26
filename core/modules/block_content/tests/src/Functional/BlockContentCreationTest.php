@@ -57,13 +57,21 @@ class BlockContentCreationTest extends BlockContentTestBase {
    * Creates a "Basic block" block and verifies its consistency in the database.
    */
   public function testBlockContentCreation(): void {
+    $assert = $this->assertSession();
     $this->drupalLogin($this->adminUser);
 
     // Create a block.
     $edit = [];
     $edit['info[0][value]'] = 'Test Block';
     $edit['body[0][value]'] = $this->randomMachineName(16);
+
     $this->drupalGet('block/add/basic');
+    $assert->statusCodeEquals(200);
+
+    // Ensure that the status field exists.
+    $assert->fieldExists('edit-status-value');
+    $assert->checkboxChecked('edit-status-value');
+
     $this->submitForm($edit, 'Save');
 
     // Check that the Basic block has been created.
@@ -104,6 +112,7 @@ class BlockContentCreationTest extends BlockContentTestBase {
     $edit = [];
     $edit['info[0][value]'] = 'Test Block';
     $edit['body[0][value]'] = $this->randomMachineName(16);
+
     $this->drupalGet('block/add/basic');
     $this->submitForm($edit, 'Save and configure');
 

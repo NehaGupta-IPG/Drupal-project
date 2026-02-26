@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - block_content
+id: block_content_publish_action
+label: 'Publish block content'
+type: block_content
+plugin: entity:publish_action:block_content
+configuration: {  }
