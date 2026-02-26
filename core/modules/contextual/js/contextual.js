@@ -99,7 +99,7 @@
     const destination = `destination=${Drupal.encodePath(
       Drupal.url(drupalSettings.path.currentPath + window.location.search),
     )}`;
-    $contextual.find('.contextual-links a').each(function () {
+    $contextual.find('a').each(function () {
       const url = this.getAttribute('href');
       const glue = url.includes('?') ? '&' : '?';
       this.setAttribute('href', url + glue + destination);
