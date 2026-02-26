@@ -170,8 +170,13 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
         $target_type
       ));
     }
-    $properties = static::propertyDefinitions($field_definition)['target_id'];
-    if ($target_type_info->entityClassImplements(FieldableEntityInterface::class) && $properties->getDataType() === 'integer') {
+    $integer_key = FALSE;
+    if ($target_type_info->entityClassImplements(FieldableEntityInterface::class)) {
+      $field_definitions = \Drupal::service('entity_field.manager')->getBaseFieldDefinitions($target_type);
+      $id_definition = $field_definitions[$target_type_info->getKeys()['id']];
+      $integer_key = $id_definition->getType() === 'integer';
+    }
+    if ($integer_key) {
       $columns = [
         'target_id' => [
           'description' => 'The ID of the target entity.',
