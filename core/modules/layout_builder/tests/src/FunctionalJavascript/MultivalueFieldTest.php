@@ -10,12 +10,15 @@ use Drupal\Tests\contextual\FunctionalJavascript\ContextualLinkClickTrait;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test display of fields with multiple values.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class MultivalueFieldTest extends WebDriverTestBase {
 
   use ContextualLinkClickTrait;
@@ -97,10 +100,9 @@ class MultivalueFieldTest extends WebDriverTestBase {
 
   /**
    * Tests display of partial contents of multivalue fields.
-   *
-   * @dataProvider testMultiValueFieldProvider
    */
-  public function testMultiValueField($params) {
+  #[DataProvider('testMultiValueFieldProvider')]
+  public function testMultiValueField($params): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
 
@@ -159,7 +161,7 @@ class MultivalueFieldTest extends WebDriverTestBase {
   /**
    * Provider for testMultiValueField().
    */
-  public static function testMultiValueFieldProvider() {
+  public static function testMultiValueFieldProvider(): array {
     return [
       'offset' => [
         'params' => [
@@ -198,7 +200,7 @@ class MultivalueFieldTest extends WebDriverTestBase {
   /**
    * Configure settings for Multiple Value fields in a Layout.
    */
-  protected function updateMultiValueFieldSettings($assert_session, $page, $params) {
+  protected function updateMultiValueFieldSettings($assert_session, $page, $params): void {
     // cSpell:disable-next-line.
     $this->clickContextualLink('.block-field-blocknodebundle-with-section-fieldmulti-textfield', 'Configure');
     $assert_session->assertWaitOnAjaxRequest();
