@@ -376,7 +376,7 @@ default:
         coverage_format: cobertura
         path: $_ARTIFACTS_DIR/component-coverage-cobertura.xml
     paths:
-      - $_ARTIFACTS_DIR
+      - test-artifacts
 
 '📋 PHPUnit Unit (PHPStan rules)':
   stage: ⚡️ Tests
