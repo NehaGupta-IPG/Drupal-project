@@ -6,6 +6,7 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\InvokeCommand;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Session\AccountInterface;
@@ -20,21 +21,17 @@ use Drupal\Core\Field\EntityReferenceFieldItemList;
 class MediaLibraryFieldWidgetOpener implements MediaLibraryOpenerInterface {
 
   /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
    * MediaLibraryFieldWidgetOpener constructor.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
+   * @param \Drupal\Core\Entity\EntityRepositoryInterface $entityRepository
+   *   The entity repository.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
-    $this->entityTypeManager = $entity_type_manager;
-  }
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected EntityRepositoryInterface $entityRepository,
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -63,14 +60,32 @@ class MediaLibraryFieldWidgetOpener implements MediaLibraryOpenerInterface {
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = $this->entityTypeManager->getStorage($entity_type_id);
     $access_handler = $this->entityTypeManager->getAccessControlHandler($entity_type_id);
+    /** @var \Drupal\content_translation\ContentTranslationHandlerInterface $handler */
+    $translation_access_handler = $this->entityTypeManager->getHandler($entity_type_id, 'translation');
+    // Route name pattern for translation add/edit operations.
+    $translation_route_name_pattern = '/entity\.\w+\.content_translation_(add|edit)/';
 
     if (!empty($parameters['revision_id'])) {
       $entity = $storage->loadRevision($parameters['revision_id']);
-      $entity_access = $access_handler->access($entity, 'update', $account, TRUE);
+      $entity = $this->entityRepository->getTranslationFromContext($entity);
+      // Check if entity route name is for adding or editing translation.
+      if (preg_match($translation_route_name_pattern, $parameters['entity_route_name'])) {
+        $entity_access = $translation_access_handler->getTranslationAccess($entity, 'update');
+      }
+      else {
+        $entity_access = $access_handler->access($entity, 'update', $account, TRUE);
+      }
     }
     elseif ($parameters['entity_id']) {
       $entity = $storage->load($parameters['entity_id']);
-      $entity_access = $access_handler->access($entity, 'update', $account, TRUE);
+      $entity = $this->entityRepository->getTranslationFromContext($entity);
+      // Check if entity route name is for adding or editing translation.
+      if (preg_match($translation_route_name_pattern, $parameters['entity_route_name'])) {
+        $entity_access = $translation_access_handler->getTranslationAccess($entity, 'update');
+      }
+      else {
+        $entity_access = $access_handler->access($entity, 'update', $account, TRUE);
+      }
     }
     else {
       $entity_access = $access_handler->createAccess($bundle, $account, [], TRUE);
