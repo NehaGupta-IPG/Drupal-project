@@ -124,7 +124,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     // So we don't have to mess around with cursors and unbuffered queries by
     // default.
     $connection_options['pdo'] += [
-      Mysql::ATTR_USE_BUFFERED_QUERY => TRUE,
+      Mysql::ATTR_USE_BUFFERED_QUERY => FALSE,
     ];
     // Make sure MySQL returns all matched rows on update queries including
     // rows that actually didn't have to be updated because the values didn't
