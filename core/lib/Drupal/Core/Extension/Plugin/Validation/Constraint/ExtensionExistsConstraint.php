@@ -27,8 +27,8 @@ class ExtensionExistsConstraint extends SymfonyConstraint {
   public function __construct(
     mixed $options = NULL,
     ?string $type = NULL,
-    public string $moduleMessage = "Module '@name' is not installed.",
-    public string $themeMessage = "Theme '@name' is not installed.",
+    public string $moduleNotInstalledMessage = "Module '@name' is not installed.",
+    public string $themeNotInstalledMessage = "Theme '@name' is not installed.",
     ?array $groups = NULL,
     mixed $payload = NULL,
   ) {
@@ -55,11 +55,11 @@ class ExtensionExistsConstraint extends SymfonyConstraint {
    */
   public function __get(string $name): mixed {
     if ($name === 'moduleMessage') {
-      @trigger_error('The moduleMessage property is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use moduleNotFoundMessage or moduleNotInstalledMessage instead. See https://www.drupal.org/node/3536194', E_USER_DEPRECATED);
+      @trigger_error('The moduleMessage property is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use moduleNotFoundMessage or moduleNotInstalledMessage instead. See https://www.drupal.org/node/3536194', E_USER_DEPRECATED);
       return $this->moduleNotInstalledMessage;
     }
     if ($name === 'themeMessage') {
-      @trigger_error('The themeMessage property is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use themeNotFoundMessage or themeNotInstalledMessage instead. See https://www.drupal.org/node/3536194', E_USER_DEPRECATED);
+      @trigger_error('The themeMessage property is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use themeNotFoundMessage or themeNotInstalledMessage instead. See https://www.drupal.org/node/3536194', E_USER_DEPRECATED);
       return $this->themeNotInstalledMessage;
     }
     return parent::__get($name);
