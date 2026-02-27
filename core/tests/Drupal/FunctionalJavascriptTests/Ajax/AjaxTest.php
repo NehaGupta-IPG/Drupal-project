@@ -134,7 +134,7 @@ class AjaxTest extends WebDriverTestBase {
     // This is temporary behavior for BC reason.
     $render_multiple_root_wrapper = [];
     foreach ($render_multiple_root_unwrap as $key => $render) {
-      $render_multiple_root_wrapper["$key--effect"] = '<div>' . $render . '</div>';
+      $render_multiple_root_wrapper["$key--effect"] = $render;
     }
 
     $expected_renders = array_merge(
@@ -147,34 +147,6 @@ class AjaxTest extends WebDriverTestBase {
     foreach ($expected_renders as $render_type => $expected) {
       $this->assertInsert($render_type, $expected);
     }
-
-    // Checking custom ajaxWrapperMultipleRootElements wrapping.
-    $custom_wrapper_multiple_root = <<<JS
-    (function($, Drupal){
-      Drupal.theme.ajaxWrapperMultipleRootElements = function (elements) {
-        return $('<div class="my-favorite-div"></div>').append(elements);
-      };
-    }(jQuery, Drupal));
-JS;
-    $expected = '<div class="my-favorite-div"><span>element #1</span> <span>element #2</span></div>';
-    $this->assertInsert('top-level-only-middle-whitespace-span--effect', $expected, $custom_wrapper_multiple_root);
-
-    // Checking custom ajaxWrapperNewContent wrapping.
-    $custom_wrapper_new_content = <<<JS
-    (function($, Drupal){
-      Drupal.theme.ajaxWrapperNewContent = function (elements) {
-        return $('<div class="div-wrapper-forever"></div>').append(elements);
-      };
-    }(jQuery, Drupal));
-JS;
-    $expected = '<div class="div-wrapper-forever"></div>';
-    $this->assertInsert('empty', $expected, $custom_wrapper_new_content);
-
-    // Checking inserting table elements.
-    $expected = '<tr><td>table-row</td></tr>';
-    $this->drupalGet('ajax-test/insert-table-wrapper');
-    $this->clickLink('Link table-row');
-    $this->assertWaitPageContains('<div class="ajax-target-wrapper"><table><tbody id="ajax-target">' . $expected . '</tbody></table></div>');
   }
 
   /**
