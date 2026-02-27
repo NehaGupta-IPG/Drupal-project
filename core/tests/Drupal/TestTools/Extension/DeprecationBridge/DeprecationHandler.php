@@ -111,7 +111,7 @@ final class DeprecationHandler implements Extension {
     // Database driver.
     if (!empty(getenv('SIMPLETEST_DB'))) {
       $currDir = getcwd();
-      chdir(dirname(__DIR__, 5));
+      chdir(dirname(__DIR__, 6));
       $dbInfo = Database::convertDbUrlToConnectionInfo(getenv('SIMPLETEST_DB'), TRUE);
       chdir($currDir);
       self::$databaseDriver = $dbInfo['driver'];
