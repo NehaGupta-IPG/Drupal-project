@@ -9,7 +9,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 
 /**
  * Tests Drupal\Component\Utility\Rectangle.
@@ -17,8 +16,6 @@ use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 #[CoversClass(Rectangle::class)]
 #[Group('Image')]
 class RectangleTest extends TestCase {
-
-  use ExpectDeprecationTrait;
 
   /**
    * Tests wrong rectangle width.
@@ -60,7 +57,6 @@ class RectangleTest extends TestCase {
    */
   #[DataProvider('providerPhp55RotateDimensions')]
   public function testRotateDimensions($width, $height, $angle, $exp_width, $exp_height): void {
-    $this->expectDeprecation('boing');
     $rect = new Rectangle($width, $height);
     $rect->rotate($angle);
     $this->assertEquals($exp_width, $rect->getBoundingWidth());

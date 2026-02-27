@@ -208,10 +208,6 @@ final class DeprecationHandler implements Extension {
    */
   public static function processStatisticsArtifact(): void {
     $content = @file_get_contents(self::$statisticsStagingFilePath);
-    if (empty($content)) {
-      return;
-    }
-
     $statisticsArtifactDirectory = self::directory() . \DIRECTORY_SEPARATOR . 'deprecation-handler';
     Filesystem::createDirectory($statisticsArtifactDirectory);
 
@@ -229,9 +225,9 @@ final class DeprecationHandler implements Extension {
       'skips' => [],
     ];
     foreach ($encodedStats as $encodedStat) {
-      $tmp = (array) json_decode(base64_decode($encodedStat));
-      if (!empty($tmp)) {
-        $stats['skips'][$tmp['pattern']] = isset($stats['skips'][$tmp['pattern']]) ? $stats['skips'][$tmp['pattern']] + 1 : 1;
+      $stat = (array) json_decode(base64_decode($encodedStat));
+      if (!empty($stat)) {
+        $stats['skips'][$stat['pattern']] = isset($stats['skips'][$stat['pattern']]) ? $stats['skips'][$stat['pattern']] + 1 : 1;
       }
     }
 
