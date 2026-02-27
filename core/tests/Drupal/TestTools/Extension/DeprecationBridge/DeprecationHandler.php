@@ -343,6 +343,9 @@ final class DeprecationHandler implements Extension {
     if ($env = getenv('DRUPAL_TEST_CONTEXT_KEYS')) {
       $contextKeys = explode(",", $env);
     }
+    else {
+      throw new \RuntimeException('No DRUPAL_TEST_CONTEXT_KEYS environment variable set');
+    }
 
     $tmp = [];
     if ($env = getenv('CI_PIPELINE_ID')) {
@@ -360,7 +363,8 @@ final class DeprecationHandler implements Extension {
     if ($env = getenv('CI_JOB_NAME')) {
       $tmp['CI_JOB_NAME'] = $env;
     }
-    if ($env = getenv('DRUPAL_PHPUNIT_TESTSUITE') && in_array('phpunit-testsuite', $contextKeys)) {
+    $env = getenv('DRUPAL_PHPUNIT_TESTSUITE');
+    if ($env !== FALSE && in_array('phpunit-testsuite', $contextKeys)) {
       $tmp['phpunit_testsuite'] = $env;
     }
     $tmp['php_version'] = self::phpVersion();
