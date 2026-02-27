@@ -27,6 +27,7 @@ const POPOVER_NO_CLICK_DELAY = 500;
         const button = popover.querySelector('[data-toolbar-popover-control]');
         // This is tooltip content. Currently child menus only.
         const tooltip = popover.querySelector('[data-toolbar-popover-wrapper]');
+        tooltip.setAttribute('inert', '');
 
         if (!button || !tooltip) return;
 

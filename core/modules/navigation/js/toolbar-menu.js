@@ -31,6 +31,10 @@
      */
     Drupal.behaviors.navigationProcessToolbarMenuTriggers = {
       attach: (context) => {
+        once('toolbar-menu', '.toolbar-menu', context).forEach((el) => {
+          el.setAttribute('inert', '');
+        });
+
         once(
           'toolbar-menu-trigger',
           '[data-toolbar-menu-trigger]',

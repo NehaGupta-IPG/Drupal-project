@@ -57,7 +57,7 @@
               'toolbar-popover__control',
             ],
           } only %}
-          <div class="toolbar-popover__wrapper" data-toolbar-popover-wrapper inert>
+          <div class="toolbar-popover__wrapper" data-toolbar-popover-wrapper>
             {% if item.url %}
               {% include 'navigation:toolbar-button' with {
                 attributes: item_link_attributes.setAttribute('href', item.url|render),
@@ -113,7 +113,7 @@
             text: item.title,
             modifiers: ['expand--down'],
           } only %}
-          <ul class="toolbar-menu toolbar-menu--level-{{ menu_level + 1 }}" inert>
+          <ul class="toolbar-menu toolbar-menu--level-{{ menu_level + 1 }}">
             {{ menus.menu_items(item.below, attributes, menu_level + 1) }}
           </ul>
         {% endif %}
@@ -139,7 +139,7 @@
             <span class="toolbar-menu__link-title">{{ item.title }}</span>
             {{ icon('navigation', 'chevron', { class: 'toolbar-menu__chevron', size: 16 }) }}
           </button>
-          <ul class="toolbar-menu toolbar-menu--level-{{ menu_level + 1 }}" inert>
+          <ul class="toolbar-menu toolbar-menu--level-{{ menu_level + 1 }}">
             {{ menus.menu_items(item.below, attributes, menu_level + 1) }}
           </ul>
         {% endif %}

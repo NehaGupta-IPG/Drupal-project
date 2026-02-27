@@ -27,6 +27,10 @@ body {
     [data-admin-toolbar="expanded"] & {
       --admin-toolbar-sidebar-width: calc(16.5 * var(--admin-toolbar-rem));
     }
+
+    @media (scripting: none) {
+      --admin-toolbar-sidebar-width: calc(4.5 * var(--admin-toolbar-rem));
+    }
   }
 }
 /* We apply transitions after page load to avoid shifts. */
