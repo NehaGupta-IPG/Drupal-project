@@ -204,6 +204,16 @@ class MigrationLookup extends ProcessPluginBase implements ContainerFactoryPlugi
       $lookup_value = (array) $lookup_value;
       $this->skipInvalid($lookup_value);
       if ($this->isPipelineStopped()) {
+        $export = print_r($value, TRUE);
+        if (is_null($value) || is_bool($value)) {
+          $export = var_export($value, TRUE);
+        }
+        $message = sprintf("%s:%s: Migration lookup skipped migration '%s' with input value '%s'",
+          $this->migration->getPluginId(),
+          $destination_property,
+          print_r($this->configuration['migration'], TRUE),
+          print_r($export, TRUE));
+        $migrate_executable->saveMessage($message, MigrationInterface::MESSAGE_INFORMATIONAL);
         return NULL;
       }
       $source_id_values[$lookup_migration_id] = $lookup_value;

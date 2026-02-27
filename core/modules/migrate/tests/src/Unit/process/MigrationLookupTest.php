@@ -114,6 +114,7 @@ class MigrationLookupTest extends MigrationLookupTestCase {
       'migration' => 'foo',
     ];
     $migration_plugin->id()->willReturn(uniqid());
+    $migration_plugin->getPluginId()->willReturn('foo');
     $migration_plugin_manager->createInstances(['foo'])
       ->willReturn(['foo' => $migration_plugin->reveal()]);
     $migration = MigrationLookup::create($this->prepareContainer(), $configuration, '', [], $migration_plugin->reveal());

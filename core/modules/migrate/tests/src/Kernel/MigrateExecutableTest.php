@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\migrate\Kernel;
 
+use Drupal\Core\Database\Database;
 use Drupal\migrate\Plugin\MigrationInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -81,6 +82,57 @@ class MigrateExecutableTest extends MigrateTestBase {
     $messages = iterator_to_array($migration->getIdMap()->getMessages());
     $this->assertCount(1, $messages);
     $expected = $migration->getPluginId() . ':foo: test message';
+    $this->assertEquals($expected, $messages[0]->message);
+  }
+
+  /**
+   * Tests logging when MigrationLookup::skipInvalid skips the process.
+   */
+  public function testSkipInvalid() {
+    \Drupal::service('module_installer')->install(['dblog', 'system']);
+
+    // Define a test migration that uses migration_lookup and does not skip.
+    $ids = ['name' => ['type' => 'string']];
+    $definition = [
+      'id' => 'foo',
+      'source' => [
+        'plugin' => 'embedded_data',
+        'data_rows' => [['name' => 'foo']],
+        'ids' => $ids,
+      ],
+      'process' => [
+        'name' => [
+          'plugin' => 'migration_lookup',
+          'migration' => 'foo',
+          'source' => 'name',
+        ],
+      ],
+      'destination' => [
+        'plugin' => 'config',
+        'config_name' => 'system.site',
+      ],
+    ];
+    $migration_plugin_manager = \Drupal::service('plugin.manager.migration');
+    $migration = $migration_plugin_manager->createStubMigration($definition);
+    $connection = Database::getConnection();
+    $connection->truncate('watchdog')->execute();
+
+    // Execute with a migration lookup that does not cause a skip.
+    $executable = new TestMigrateExecutable($migration);
+    $executable->import();
+    $messages = iterator_to_array($migration->getIdMap()->getMessages());
+    $this->assertCount(0, $messages);
+
+    // Change the definition so that the source value will be NULL.
+    $definition['id'] = 'bar';
+    $definition['process']['name']['source'] = 'foo';
+    $migration = $migration_plugin_manager->createStubMigration($definition);
+    $executable = new TestMigrateExecutable($migration);
+    $executable->import();
+    $messages = iterator_to_array($migration->getIdMap()->getMessages());
+    $this->assertCount(1, $messages);
+    $message = "Migration lookup skipped migration 'foo' with input value 'NULL'";
+    $expected = $migration->getPluginId() . ':name: ' . $message;
     $this->assertEquals($expected, $messages[0]->message);
   }
 

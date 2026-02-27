@@ -401,6 +401,10 @@ class MigrateExecutable implements MigrateExecutableInterface {
           catch (MigrateSkipProcessException $e) {
             $new_value[] = NULL;
             $break = TRUE;
+            if ($message = trim($e->getMessage())) {
+              $this->sourceIdValues = $row->getSourceIdValues();
+              $this->saveMessage(sprintf("%s:%s: %s", $this->migration->getPluginId(), $destination, $message), $e->getCode());
+            }
           }
           catch (MigrateException $e) {
             // Prepend the process plugin id to the message.
@@ -423,6 +427,10 @@ class MigrateExecutable implements MigrateExecutableInterface {
         }
         catch (MigrateSkipProcessException) {
           $value = NULL;
+          if ($message = trim($e->getMessage())) {
+            $this->sourceIdValues = $row->getSourceIdValues();
+            $this->saveMessage(sprintf("%s:%s: %s", $this->migration->getPluginId(), $destination, $message), $e->getCode());
+          }
           break;
         }
         catch (MigrateException $e) {
