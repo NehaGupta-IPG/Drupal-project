@@ -27,8 +27,11 @@ class ExtensionExistsConstraint extends SymfonyConstraint {
   public function __construct(
     mixed $options = NULL,
     ?string $type = NULL,
+    public string $moduleNotFoundMessage = "Module '@name' was not found.",
+    public string $themeNotFoundMessage = "Theme '@name' was not found.",
     public string $moduleNotInstalledMessage = "Module '@name' is not installed.",
     public string $themeNotInstalledMessage = "Theme '@name' is not installed.",
+    public bool $mustBeInstalled = TRUE,
     ?array $groups = NULL,
     mixed $payload = NULL,
   ) {
