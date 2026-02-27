@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Drupal\TestTools\Extension\DeprecationBridge;
 
 use Drupal\Core\Database\Database;
+use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
 use PHPUnit\Runner\Extension\Extension;
 use PHPUnit\Runner\Extension\Facade;
 use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Configuration;
 use PHPUnit\Util\Filesystem;
+use Symfony\Component\ErrorHandler\DebugClassLoader;
 
 // cspell:ignore depsta
 
@@ -27,7 +30,7 @@ final class DeprecationHandler implements Extension {
   /**
    * Indicates if the extension is enabled.
    */
-  private static bool $enabled = FALSE;
+  private static bool $enabled = TRUE;
 
   /**
    * A list of deprecation messages that should be ignored if detected.
@@ -82,6 +85,9 @@ final class DeprecationHandler implements Extension {
     Facade $facade,
     ParameterCollection $parameters,
   ): void {
+    // Mark the extension as enabled.
+    self::$enabled = TRUE;
+
     // Determine staging file path.
     self::$statisticsStagingFilePath = tempnam(sys_get_temp_dir(), 'depsta');
 
@@ -92,7 +98,11 @@ final class DeprecationHandler implements Extension {
     ]);
     putenv('_DRUPAL_DEPRECATION_HANDLER_CONFIG=' . $config);
 
+    $facade->registerSubscriber(new TestRunnerStartedSubscriber());
     $facade->registerSubscriber(new TestRunnerFinishedSubscriber());
+
+    $deprecationBridgeConfiguration = self::getConfiguration();
+    self::init($deprecationBridgeConfiguration['ignoreFile'] ?? NULL);
 
     // Artifacts directory.
     // $directory = $parameters->get('directory');
@@ -184,10 +194,6 @@ final class DeprecationHandler implements Extension {
    *   The path to a file containing ignore patterns for deprecations.
    */
   public static function init(?string $ignoreFile = NULL): void {
-    if (self::isEnabled()) {
-      throw new \LogicException(__CLASS__ . ' is already initialized');
-    }
-
     // Load the deprecation ignore patterns from the specified file.
     if ($ignoreFile && !self::$deprecationIgnorePatterns) {
       if (!is_file($ignoreFile)) {
@@ -208,9 +214,6 @@ final class DeprecationHandler implements Extension {
         restore_error_handler();
       }
     }
-
-    // Mark the extension as enabled.
-    self::$enabled = TRUE;
   }
 
   /**
@@ -351,6 +354,23 @@ final class DeprecationHandler implements Extension {
       $tmp['database_version'] = self::$databaseVersion;
     }
     return $tmp;
+  }
+
+  /**
+   * Remove.
+   *
+   * @todo remove.
+   */
+  public static function runnerStarted(): void {
+    // Need to have an early error handler to manage deprecations triggered by
+    // DebugClassLoader, that occur before tests' setUp() methods are called.
+    // We pass an instance of the PHPUnit error handler to redirect any error not
+    // managed by our layer back to PHPUnit.
+    set_error_handler(new BootstrapErrorHandler(PhpUnitErrorHandler::instance()));
+
+    // Enable the DebugClassLoader to get deprecations for methods' signature
+    // changes.
+    DebugClassLoader::enable();
   }
 
 }

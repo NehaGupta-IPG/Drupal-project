@@ -9,11 +9,6 @@
 
 declare(strict_types=1);
 
-use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
-use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
-use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
-use Symfony\Component\ErrorHandler\DebugClassLoader;
-
 /**
  * Finds all valid extension directories recursively within a given directory.
  *
@@ -162,19 +157,3 @@ mb_language('uni');
 // and DST). This choice is made to prevent timezone related regressions and
 // reduce the fragility of the testing system in general.
 date_default_timezone_set('Australia/Sydney');
-
-// Bootstrap the DeprecationHandler extension and the DebugClassloader to report
-// deprecations.
-if ($deprecationBridgeConfiguration = DeprecationHandler::getConfiguration()) {
-  DeprecationHandler::init($deprecationBridgeConfiguration['ignoreFile'] ?? NULL);
-
-  // Need to have an early error handler to manage deprecations triggered by
-  // DebugClassLoader, that occur before tests' setUp() methods are called.
-  // We pass an instance of the PHPUnit error handler to redirect any error not
-  // managed by our layer back to PHPUnit.
-  set_error_handler(new BootstrapErrorHandler(PhpUnitErrorHandler::instance()));
-
-  // Enable the DebugClassLoader to get deprecations for methods' signature
-  // changes.
-  DebugClassLoader::enable();
-}

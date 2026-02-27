@@ -61,6 +61,8 @@
   <extensions>
     <!-- Deprecation handler. -->
     <bootstrap class="Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler">
+      <parameter name="colors" value="true"/>
+      <parameter name="ignoreFile" value=".deprecation-ignore.txt"/>
     </bootstrap>
     <!-- Functional tests HTML output logging. -->
     <bootstrap class="Drupal\TestTools\Extension\HtmlLogging\HtmlOutputLogger">
