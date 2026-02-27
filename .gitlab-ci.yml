@@ -95,8 +95,8 @@ variables:
 stages:
   - 🪄 Lint
   - ⚡️ Tests
-  - 🗜️ Additional tests
   - 🚚 Consolidate
+  - 🗜️ Additional tests
 
 #############
 # Defaults  #
