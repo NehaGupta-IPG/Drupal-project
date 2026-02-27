@@ -300,7 +300,7 @@ default:
     CONCURRENCY: 24
     PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
     DRUPAL_PHPUNIT_TESTSUITE: "unit"
-    DRUPAL_TEST_CONTEXT_KEYS: "php,phpunit-testsuite"
+    DRUPAL_TEST_CONTEXT_KEYS: "php-version,phpunit-testsuite"
   before_script:
     - *composer-setup
     - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
@@ -344,7 +344,7 @@ default:
     _ARTIFACTS_DIR: "test-artifacts/phpunit"
     PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
     DRUPAL_PHPUNIT_TESTSUITE: "unit-component"
-    DRUPAL_TEST_CONTEXT_KEYS: "php,phpunit-testsuite"
+    DRUPAL_TEST_CONTEXT_KEYS: "php-version,phpunit-testsuite"
   before_script:
     - mkdir -p $_ARTIFACTS_DIR
     - *composer-setup
@@ -423,7 +423,7 @@ default:
     KUBERNETES_CPU_REQUEST: "16"
     MINK_DRIVER_ARGS_WEBDRIVER: '["chrome", {"browserName":"chrome", "goog:chromeOptions":{"w3c": true, "args":["--no-sandbox","--ignore-certificate-errors", "--allow-insecure-localhost", "--headless", "--dns-prefetch-disable"]}}, "http://selenium:4444"]'
     DRUPAL_PHPUNIT_TESTSUITE: "functional-javascript"
-    DRUPAL_TEST_CONTEXT_KEYS: "php,phpunit-testsuite,db-driver,db-version"
+    DRUPAL_TEST_CONTEXT_KEYS: "php-version,phpunit-testsuite,database-driver,database-version"
   services:
     - <<: *with-database
     - <<: *with-selenium-chrome
@@ -440,7 +440,7 @@ default:
     KUBERNETES_CPU_REQUEST: "8"
     CONCURRENCY: "5"
     DRUPAL_PHPUNIT_TESTSUITE: "build"
-    DRUPAL_TEST_CONTEXT_KEYS: "php,phpunit-testsuite,db-driver,db-version"
+    DRUPAL_TEST_CONTEXT_KEYS: "php-version,phpunit-testsuite,database-driver,database-version"
   services:
     - <<: *with-database
 
@@ -452,7 +452,7 @@ default:
     CONCURRENCY: "5"
     KUBERNETES_CPU_REQUEST: "16"
     DRUPAL_PHPUNIT_TESTSUITE: "functional"
-    DRUPAL_TEST_CONTEXT_KEYS: "php,phpunit-testsuite,db-driver,db-version"
+    DRUPAL_TEST_CONTEXT_KEYS: "php-version,phpunit-testsuite,database-driver,database-version"
   services:
     - <<: *with-database
 
@@ -464,7 +464,7 @@ default:
     KUBERNETES_CPU_REQUEST: "8"
     CONCURRENCY: 12
     DRUPAL_PHPUNIT_TESTSUITE: "kernel"
-    DRUPAL_TEST_CONTEXT_KEYS: "php,phpunit-testsuite,db-driver,db-version"
+    DRUPAL_TEST_CONTEXT_KEYS: "php-version,phpunit-testsuite,database-driver,database-version"
   services:
     - <<: *with-database
 

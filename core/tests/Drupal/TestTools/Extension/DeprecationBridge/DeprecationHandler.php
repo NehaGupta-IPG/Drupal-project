@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\TestTools\Extension\DeprecationBridge;
 
+use Drupal\Core\Database\Database;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Runner\Extension\Extension;
 use PHPUnit\Runner\Extension\Facade;
@@ -107,6 +108,12 @@ final class DeprecationHandler implements Extension {
     preg_match('/^\d+\.\d+/', \PHP_VERSION, $matches);
     self::$phpVersion = $matches[0];
 
+    // Database driver.
+    if (!empty(getenv('SIMPLETEST_DB'))) {
+      $dbInfo = Database::convertDbUrlToConnectionInfo(getenv('SIMPLETEST_DB'), TRUE);
+      self::$databaseDriver = $dbInfo['driver'];
+    }
+
     // Database version.
     if (!empty(getenv('_TARGET_DB'))) {
       self::$databaseVersion = getenv('_TARGET_DB');
@@ -208,7 +215,7 @@ final class DeprecationHandler implements Extension {
    */
   public static function processStatisticsArtifact(): void {
     $content = @file_get_contents(self::$statisticsStagingFilePath);
-    $statisticsArtifactDirectory = self::directory() . \DIRECTORY_SEPARATOR . 'deprecation-handler';
+    $statisticsArtifactDirectory = self::$directory . \DIRECTORY_SEPARATOR . 'deprecation-handler';
     Filesystem::createDirectory($statisticsArtifactDirectory);
 
     $test_run_id = getenv('DRUPAL_TEST_RUN_ID');
@@ -303,42 +310,6 @@ final class DeprecationHandler implements Extension {
    *
    * @todo remove.
    */
-  public static function directory(): ?string {
-    return self::$directory ?? NULL;
-  }
-
-  /**
-   * Remove.
-   *
-   * @todo remove.
-   */
-  public static function phpVersion(): ?string {
-    return self::$phpVersion ?? NULL;
-  }
-
-  /**
-   * Remove.
-   *
-   * @todo remove.
-   */
-  public static function databaseDriver(): ?string {
-    return self::$databaseDriver;
-  }
-
-  /**
-   * Remove.
-   *
-   * @todo remove.
-   */
-  public static function databaseVersion(): ?string {
-    return self::$databaseVersion;
-  }
-
-  /**
-   * Remove.
-   *
-   * @todo remove.
-   */
   public static function metadata(): array {
     if ($env = getenv('DRUPAL_TEST_CONTEXT_KEYS')) {
       $contextKeys = explode(",", $env);
@@ -367,12 +338,14 @@ final class DeprecationHandler implements Extension {
     if ($env !== FALSE && in_array('phpunit-testsuite', $contextKeys)) {
       $tmp['phpunit_testsuite'] = $env;
     }
-    $tmp['php_version'] = self::phpVersion();
-    if (self::databaseDriver() && in_array('db-driver', $contextKeys)) {
-      $tmp['database_driver'] = self::databaseDriver();
+    if (self::$phpVersion && in_array('php-version', $contextKeys)) {
+      $tmp['php_version'] = self::$phpVersion;
     }
-    if (self::databaseVersion() && in_array('db-version', $contextKeys)) {
-      $tmp['database_version'] = self::databaseVersion();
+    if (self::$databaseDriver && in_array('database-driver', $contextKeys)) {
+      $tmp['database_driver'] = self::$databaseDriver;
+    }
+    if (self::$databaseVersion && in_array('database-version', $contextKeys)) {
+      $tmp['database_version'] = self::$databaseVersion;
     }
     return $tmp;
   }
