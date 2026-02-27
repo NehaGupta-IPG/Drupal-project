@@ -299,6 +299,8 @@ default:
     KUBERNETES_CPU_REQUEST: "4"
     CONCURRENCY: 24
     PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
+    DRUPAL_PHPUNIT_TESTSUITE: "unit"
+    DRUPAL_TEST_CONTEXT_KEYS: "php,phpunit-testsuite"
   before_script:
     - *composer-setup
     - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
@@ -341,6 +343,8 @@ default:
     KUBERNETES_CPU_REQUEST: "2"
     _ARTIFACTS_DIR: "test-artifacts/phpunit"
     PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
+    DRUPAL_PHPUNIT_TESTSUITE: "unit-component"
+    DRUPAL_TEST_CONTEXT_KEYS: "php,phpunit-testsuite"
   before_script:
     - mkdir -p $_ARTIFACTS_DIR
     - *composer-setup
@@ -418,6 +422,8 @@ default:
     CONCURRENCY: 5
     KUBERNETES_CPU_REQUEST: "16"
     MINK_DRIVER_ARGS_WEBDRIVER: '["chrome", {"browserName":"chrome", "goog:chromeOptions":{"w3c": true, "args":["--no-sandbox","--ignore-certificate-errors", "--allow-insecure-localhost", "--headless", "--dns-prefetch-disable"]}}, "http://selenium:4444"]'
+    DRUPAL_PHPUNIT_TESTSUITE: "functional-javascript"
+    DRUPAL_TEST_CONTEXT_KEYS: "php,phpunit-testsuite,db-driver,db-version"
   services:
     - <<: *with-database
     - <<: *with-selenium-chrome
@@ -433,6 +439,8 @@ default:
     TESTSUITE: PHPUnit-Build
     KUBERNETES_CPU_REQUEST: "8"
     CONCURRENCY: "5"
+    DRUPAL_PHPUNIT_TESTSUITE: "build"
+    DRUPAL_TEST_CONTEXT_KEYS: "php,phpunit-testsuite,db-driver,db-version"
   services:
     - <<: *with-database
 
@@ -443,6 +451,8 @@ default:
     TESTSUITE: PHPUnit-Functional
     CONCURRENCY: "5"
     KUBERNETES_CPU_REQUEST: "16"
+    DRUPAL_PHPUNIT_TESTSUITE: "functional"
+    DRUPAL_TEST_CONTEXT_KEYS: "php,phpunit-testsuite,db-driver,db-version"
   services:
     - <<: *with-database
 
@@ -453,6 +463,8 @@ default:
     TESTSUITE: PHPUnit-Kernel
     KUBERNETES_CPU_REQUEST: "8"
     CONCURRENCY: 12
+    DRUPAL_PHPUNIT_TESTSUITE: "kernel"
+    DRUPAL_TEST_CONTEXT_KEYS: "php,phpunit-testsuite,db-driver,db-version"
   services:
     - <<: *with-database
 

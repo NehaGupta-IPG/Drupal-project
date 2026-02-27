@@ -340,6 +340,10 @@ final class DeprecationHandler implements Extension {
    * @todo remove.
    */
   public static function metadata(): array {
+    if ($env = getenv('DRUPAL_TEST_CONTEXT_KEYS')) {
+      $contextKeys = explode(",", $env);
+    }
+
     $tmp = [];
     if ($env = getenv('CI_PIPELINE_ID')) {
       $tmp['CI_PIPELINE_ID'] = $env;
@@ -356,11 +360,14 @@ final class DeprecationHandler implements Extension {
     if ($env = getenv('CI_JOB_NAME')) {
       $tmp['CI_JOB_NAME'] = $env;
     }
+    if ($env = getenv('DRUPAL_PHPUNIT_TESTSUITE') && in_array('phpunit-testsuite', $contextKeys)) {
+      $tmp['phpunit_testsuite'] = $env;
+    }
     $tmp['php_version'] = self::phpVersion();
-    if (self::databaseDriver()) {
+    if (self::databaseDriver() && in_array('db-driver', $contextKeys)) {
       $tmp['database_driver'] = self::databaseDriver();
     }
-    if (self::databaseVersion()) {
+    if (self::databaseVersion() && in_array('db-version', $contextKeys)) {
       $tmp['database_version'] = self::databaseVersion();
     }
     return $tmp;
