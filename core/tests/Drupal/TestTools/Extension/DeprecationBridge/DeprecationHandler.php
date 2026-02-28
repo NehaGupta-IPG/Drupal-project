@@ -15,7 +15,7 @@ use PHPUnit\TextUI\Configuration\Configuration;
 use PHPUnit\Util\Filesystem;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
 
-// cspell:ignore depsta
+// cspell:ignore depsta bootstrapper bootstrappers
 
 /**
  * Drupal's PHPUnit extension to manage code deprecation.
