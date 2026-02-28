@@ -109,9 +109,6 @@ final class DeprecationHandler implements Extension {
 
     $facade->registerSubscriber(new TestRunnerFinishedSubscriber($this));
 
-    $deprecationBridgeConfiguration = self::getConfiguration();
-    self::init($deprecationBridgeConfiguration['ignoreFile'] ?? NULL);
-
     // Artifacts directory.
     // $directory = $parameters->get('directory');
     $directory = 'test-artifacts/jobs/' . getenv('CI_JOB_ID');
@@ -166,6 +163,9 @@ final class DeprecationHandler implements Extension {
     // Enable the DebugClassLoader to get deprecations for methods' signature
     // changes.
     DebugClassLoader::enable();
+
+    $deprecationBridgeConfiguration = self::getConfiguration();
+    self::init($deprecationBridgeConfiguration['ignoreFile'] ?? NULL);
   }
 
   /**
