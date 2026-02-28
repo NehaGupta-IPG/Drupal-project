@@ -82,7 +82,7 @@ class DownloadFunctionalTest extends BrowserTestBase {
     // Assert critical parts of the error message, but not the exact message,
     // since it depends on Guzzle's internal implementation of PSR-7.
     $id = $migration->getPluginId();
-    $this->assertStringContainsString("$id:uri:download:", $message->message);
+    $this->assertStringContainsString("$id:uri:download(1):", $message->message);
     $this->assertStringContainsString($invalid_url, $message->message);
     $this->assertEquals(MigrationInterface::MESSAGE_ERROR, $message->level);
 

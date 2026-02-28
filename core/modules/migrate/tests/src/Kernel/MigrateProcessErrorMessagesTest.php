@@ -102,7 +102,7 @@ class MigrateProcessErrorMessagesTest extends MigrateTestBase {
   public function testProcessErrorMessage(): void {
     $this->definition['process']['error']['plugin'] = 'test_error';
 
-    $this->idMap->saveMessage(['id' => 1], "process_errors_migration:error:test_error: Process exception.", MigrationInterface::MESSAGE_ERROR)->shouldBeCalled();
+    $this->idMap->saveMessage(['id' => 1], "process_errors_migration:error:test_error(0): Process exception.", MigrationInterface::MESSAGE_ERROR)->shouldBeCalled();
     $this->setPluginManagers();
 
     /** @var \Drupal\migrate\Plugin\MigrationInterface $migration */
@@ -135,7 +135,7 @@ class MigrateProcessErrorMessagesTest extends MigrateTestBase {
 
     $this->processPluginManager->createInstance('sub_process', Argument::cetera())
       ->will(fn($x) => new SubProcess($x[1], 'sub_process', ['handle_multiples' => TRUE]));
-    $this->idMap->saveMessage(['id' => 1], "process_errors_migration:subprocess_error:sub_process: test_error: Process exception.", MigrationInterface::MESSAGE_ERROR)->shouldBeCalled();
+    $this->idMap->saveMessage(['id' => 1], "process_errors_migration:subprocess_error:sub_process(1): test_error(0): Process exception.", MigrationInterface::MESSAGE_ERROR)->shouldBeCalled();
     $this->setPluginManagers();
 
     /** @var \Drupal\migrate\Plugin\MigrationInterface $migration */
