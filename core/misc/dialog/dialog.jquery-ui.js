@@ -70,7 +70,7 @@
           const tabbableElements = tabbable(this.uiDialog[0]);
           if (tabbableElements.length) {
             const first = tabbableElements[0];
-            const last = tabbableElements[tabbableElements.length - 1];
+            const last = tabbableElements.at(-1);
 
             if (
               (event.target === last || event.target === this.uiDialog[0]) &&

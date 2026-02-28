@@ -6,7 +6,7 @@
       }
     }
     // The final "Finished" step is never "active".
-    if (steps[steps.length - 1].className === 'done') {
+    if (steps.at(-1).className === 'done') {
       return steps.length;
     }
     return 0;

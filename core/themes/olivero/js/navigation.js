@@ -74,8 +74,7 @@
         const tabbableNavElements = tabbable.tabbable(props.navWrapper);
         tabbableNavElements.unshift(props.navButton);
         const firstTabbableEl = tabbableNavElements[0];
-        const lastTabbableEl =
-          tabbableNavElements[tabbableNavElements.length - 1];
+        const lastTabbableEl = tabbableNavElements.at(-1);
 
         if (e.shiftKey) {
           if (
