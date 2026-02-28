@@ -154,6 +154,13 @@ final class DeprecationHandler implements Extension {
    * @todo remove.
    */
   public static function startHandling(): void {
+    $deprecationBridgeConfiguration = self::getConfiguration();
+
+    if (!$deprecationBridgeConfiguration) {
+      return;
+    }
+    self::init($deprecationBridgeConfiguration['ignoreFile'] ?? NULL);
+
     // Need to have an early error handler to manage deprecations triggered by
     // DebugClassLoader, that occur before tests' setUp() methods are called.
     // We pass an instance of the PHPUnit error handler to redirect any error not
@@ -163,9 +170,6 @@ final class DeprecationHandler implements Extension {
     // Enable the DebugClassLoader to get deprecations for methods' signature
     // changes.
     DebugClassLoader::enable();
-
-    $deprecationBridgeConfiguration = self::getConfiguration();
-    self::init($deprecationBridgeConfiguration['ignoreFile'] ?? NULL);
   }
 
   /**
