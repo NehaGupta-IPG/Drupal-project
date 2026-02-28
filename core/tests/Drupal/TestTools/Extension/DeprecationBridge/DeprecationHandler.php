@@ -115,7 +115,7 @@ final class DeprecationHandler implements Extension {
       if ($legacyConfiguration && isset($legacyConfiguration['ignoreFile'])) {
         $ignoreFilePath = $legacyConfiguration['ignoreFile'];
       }
-      self::init($ignoreFilePath);
+      self::loadDeprecationIgnorePatterns($ignoreFilePath);
 
       // Need to have an early error handler to manage deprecations triggered
       // by DebugClassLoader, that occur before tests' setUp() methods are
@@ -267,12 +267,12 @@ final class DeprecationHandler implements Extension {
   }
 
   /**
-   * Initializes the extension.
+   * Loads the deprecation ignore patterns from the ignore file.
    *
    * @param string|null $ignoreFile
    *   The path to a file containing ignore patterns for deprecations.
    */
-  public static function init(?string $ignoreFile = NULL): void {
+  private static function loadDeprecationIgnorePatterns(?string $ignoreFile = NULL): void {
     // Load the deprecation ignore patterns from the specified file.
     if ($ignoreFile && !self::$deprecationIgnorePatterns) {
       if (!is_file($ignoreFile)) {

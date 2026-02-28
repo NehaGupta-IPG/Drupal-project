@@ -68,7 +68,11 @@ echo "    Skips# | Line\n";
 echo "-----------+----------------------------------------------------------------------\n";
 foreach (file(__DIR__ . '/../../core' . \DIRECTORY_SEPARATOR . '.deprecation-ignore.txt') as $line => $pattern) {
   if ((trim($pattern)[0] ?? '#') !== '#') {
-    echo sprintf("%10d | %s\n", $tmp[$pattern] ?? 0, trim_with_ellipsis(rtrim($pattern, "\n"), 80, \STR_PAD_RIGHT));
+    $msg = "%10d | %s";
+    if (($tmp[$pattern] ?? 0) === 0) {
+      $msg = "\033[" . "33" . "m" . $msg . "\033[0m";
+    }
+    echo sprintf($msg . "\n", $tmp[$pattern] ?? 0, trim_with_ellipsis(rtrim($pattern, "\n"), 80, \STR_PAD_RIGHT));
   }
   else {
     echo sprintf("           | %s\n", trim_with_ellipsis(rtrim($pattern, "\n"), 80, \STR_PAD_RIGHT));
