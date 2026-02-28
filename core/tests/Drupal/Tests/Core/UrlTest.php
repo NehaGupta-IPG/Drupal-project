@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core;
 
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Access\AccessManagerInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Route;
@@ -70,6 +72,13 @@ class UrlTest extends UnitTestCase {
   protected $pathValidator;
 
   /**
+   * The request stack.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
+  protected $requestStack;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -116,12 +125,20 @@ class UrlTest extends UnitTestCase {
 
     $this->router = $this->createMock('Drupal\Tests\Core\Routing\TestRouterInterface');
     $this->pathValidator = $this->createMock('Drupal\Core\Path\PathValidatorInterface');
-
+    // Mock the redirect.destination service.
+    $destination = $this->createMock('Drupal\Core\Routing\RedirectDestinationInterface');
+    $destination->expects($this->any())
+      ->method('get')
+      ->willReturn('/test-path');
+    $this->requestStack = new RequestStack();
     $this->container = new ContainerBuilder();
     $this->container->set('router.no_access_checks', $this->router);
     $this->container->set('url_generator', $this->urlGenerator);
     $this->container->set('path_alias.manager', $this->pathAliasManager);
     $this->container->set('path.validator', $this->pathValidator);
+    $this->container->set('request_stack', $this->requestStack);
+    $this->container->set('redirect.destination', $destination);
+
     \Drupal::setContainer($this->container);
   }
 
@@ -857,6 +874,85 @@ class UrlTest extends UnitTestCase {
       [TRUE],
       [FALSE],
     ];
+  }
+
+  /**
+   * Tests the setDestination method.
+   *
+   * @covers ::setDestination
+   */
+  public function testSetDestination(): void {
+    $url = Url::fromRoute('test_route');
+
+    // Test with valid internal path.
+    $url->setDestination('node/1');
+    $this->assertEquals(['destination' => 'node/1'], $url->getOption('query'));
+
+    // Test with empty path.
+    $url->setDestination('');
+    $this->assertEquals(['destination' => ''], $url->getOption('query'));
+
+    // Test with invalid external path.
+    $this->expectException(\InvalidArgumentException::class);
+    $url->setDestination('http://example.com');
+  }
+
+  /**
+   * Tests the setDestinationToCurrent method.
+   *
+   * @covers ::setDestinationToCurrent
+   */
+  public function testSetDestinationToCurrent(): void {
+    // Mock the redirect.destination service to return a valid path.
+    $destination = $this->createMock('Drupal\Core\Routing\RedirectDestinationInterface');
+    $destination->expects($this->once())
+      ->method('get')
+      ->willReturn('/test-path');
+    $this->container->set('redirect.destination', $destination);
+
+    $url = Url::fromRoute('test_route');
+    $url->setDestinationToCurrent();
+
+    $this->assertEquals(['destination' => '/test-path'], $url->getOption('query'));
+  }
+
+  /**
+   * Tests the setDestinationToCurrent method with query parameters.
+   *
+   * @covers ::setDestinationToCurrent
+   */
+  public function testSetDestinationToCurrentWithQuery(): void {
+    // Mock the redirect.destination service to return a path with query parameters.
+    $destination = $this->createMock('Drupal\Core\Routing\RedirectDestinationInterface');
+    $destination->expects($this->once())
+      ->method('get')
+      ->willReturn('/test-path?param=value');
+    $this->container->set('redirect.destination', $destination);
+
+    $url = Url::fromRoute('test_route');
+    $url->setDestinationToCurrent();
+
+    $this->assertEquals(['destination' => '/test-path?param=value'], $url->getOption('query'));
+  }
+
+  /**
+   * Tests the setDestinationToCurrent method with no current request.
+   *
+   * @covers ::setDestinationToCurrent
+   */
+  public function testSetDestinationToCurrentWithNoRequest(): void {
+    // Create a new container without the redirect.destination service.
+    $container = new ContainerBuilder();
+    $container->set('router.no_access_checks', $this->router);
+    $container->set('url_generator', $this->urlGenerator);
+    $container->set('path_alias.manager', $this->pathAliasManager);
+    $container->set('path.validator', $this->pathValidator);
+    $container->set('request_stack', $this->requestStack);
+    \Drupal::setContainer($container);
+
+    $url = Url::fromRoute('test_route');
+    $this->expectException(ServiceNotFoundException::class);
+    $url->setDestinationToCurrent();
   }
 
 }
