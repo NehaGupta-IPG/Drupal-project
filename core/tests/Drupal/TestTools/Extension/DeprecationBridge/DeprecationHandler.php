@@ -37,7 +37,7 @@ final class DeprecationHandler implements Extension {
   /**
    * Indicates if the extension is enabled.
    */
-  private static bool $enabled = TRUE;
+  private static bool $enabled = FALSE;
 
   /**
    * A list of deprecation messages that should be ignored if detected.
@@ -85,6 +85,46 @@ final class DeprecationHandler implements Extension {
   private static ?string $databaseVersion = NULL;
 
   /**
+   * Remove.
+   *
+   * @todo remove.
+   */
+  public static function preBootstrap(Configuration $configuration): void {
+    // Find the extension parameters from current PHPUnit configuration.
+    $extensionBootstrappers = $configuration->extensionBootstrappers();
+    $parameters = [];
+    foreach ($extensionBootstrappers as $bootstrapper) {
+      if ($bootstrapper['className'] === self::class) {
+        $parameters = $bootstrapper['parameters'];
+        break;
+      }
+    }
+
+    // Determine if the extension is to be considered active.
+    $enabled = filter_var($parameters['enabled'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
+    self::$enabled = $enabled;
+
+    if (self::$enabled) {
+      $deprecationBridgeConfiguration = self::getConfiguration();
+      self::init($deprecationBridgeConfiguration['ignoreFile'] ?? NULL);
+
+      // Need to have an early error handler to manage deprecations triggered
+      // by DebugClassLoader, that occur before tests' setUp() methods are
+      // called.
+      // We pass an instance of the PHPUnit error handler to redirect any error
+      // not managed by our layer back to PHPUnit.
+      set_error_handler(new BootstrapErrorHandler(PhpUnitErrorHandler::instance()));
+    }
+
+    // Enable the DebugClassLoader to get deprecations for methods' signature
+    // changes.
+    $debugClassLoader = filter_var($parameters['debugClassLoader'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
+    if ($debugClassLoader) {
+      DebugClassLoader::enable();
+    }
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function bootstrap(
@@ -94,8 +134,10 @@ final class DeprecationHandler implements Extension {
   ): void {
     self::$instance = $this;
 
-    // Mark the extension as enabled.
-    self::$enabled = TRUE;
+    // Bail out if the extension was disabled in ::preBootstrap().
+    if (!self::isEnabled()) {
+      return;
+    }
 
     // Determine staging file path.
     $this->statisticsStagingFilePath = tempnam(sys_get_temp_dir(), 'depsta');
@@ -146,30 +188,6 @@ final class DeprecationHandler implements Extension {
       'database_version' => self::$databaseVersion,
     ]);
     putenv('_DRUPAL_TEST_ARTIFACT_CONFIG=' . $config);
-  }
-
-  /**
-   * Remove.
-   *
-   * @todo remove.
-   */
-  public static function startHandling(): void {
-    $deprecationBridgeConfiguration = self::getConfiguration();
-
-    if (!$deprecationBridgeConfiguration) {
-      return;
-    }
-    self::init($deprecationBridgeConfiguration['ignoreFile'] ?? NULL);
-
-    // Need to have an early error handler to manage deprecations triggered by
-    // DebugClassLoader, that occur before tests' setUp() methods are called.
-    // We pass an instance of the PHPUnit error handler to redirect any error not
-    // managed by our layer back to PHPUnit.
-    set_error_handler(new BootstrapErrorHandler(PhpUnitErrorHandler::instance()));
-
-    // Enable the DebugClassLoader to get deprecations for methods' signature
-    // changes.
-    DebugClassLoader::enable();
   }
 
   /**

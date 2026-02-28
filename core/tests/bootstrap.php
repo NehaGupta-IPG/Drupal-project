@@ -10,6 +10,7 @@
 declare(strict_types=1);
 
 use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
+use PHPUnit\TextUI\Configuration\Registry as PhpunitConfigurationRegistry;
 
 /**
  * Finds all valid extension directories recursively within a given directory.
@@ -163,4 +164,4 @@ date_default_timezone_set('Australia/Sydney');
 // Get deprecation override handling as early as possible. If the deprecation
 // bridge extension is not enabled, overrides will be reverted during extension
 // bootstrap.
-DeprecationHandler::startHandling();
+DeprecationHandler::preBootstrap(PhpunitConfigurationRegistry::get());
