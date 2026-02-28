@@ -100,13 +100,22 @@ final class DeprecationHandler implements Extension {
       }
     }
 
+    // Get the legacy configuration provided via Symfony env variable.
+    $legacyConfiguration = self::legacySymfonyConfiguration();
+
     // Determine if the extension is to be considered active.
     $enabled = filter_var($parameters['enabled'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
+    if ($legacyConfiguration) {
+      $enabled = $legacyConfiguration['enabled'];
+    }
     self::$enabled = $enabled;
 
     if (self::$enabled) {
-      $deprecationBridgeConfiguration = self::getConfiguration();
-      self::init($deprecationBridgeConfiguration['ignoreFile'] ?? NULL);
+      $ignoreFilePath = realpath(dirname(__DIR__, 6) . '//' . $parameters['ignoreFile']);
+      if ($legacyConfiguration && isset($legacyConfiguration['ignoreFile'])) {
+        $ignoreFilePath = $legacyConfiguration['ignoreFile'];
+      }
+      self::init($ignoreFilePath);
 
       // Need to have an early error handler to manage deprecations triggered
       // by DebugClassLoader, that occur before tests' setUp() methods are
@@ -221,6 +230,29 @@ final class DeprecationHandler implements Extension {
     $phpUnitDeprecationVariable = $environmentVariable !== FALSE ? $environmentVariable : TRUE;
     $configuration['failOnPhpunitDeprecation'] = filter_var($phpUnitDeprecationVariable, \FILTER_VALIDATE_BOOLEAN);
 
+    return $configuration;
+  }
+
+  /**
+   * Returns the legacy configuration provided via Symfony env variable.
+   *
+   * For historical reasons, the configuration is stored in the
+   * SYMFONY_DEPRECATIONS_HELPER environment variable.
+   *
+   * @return array|false
+   *   An array of configuration variables, of FALSE if the environment
+   *   variable is missing.
+   */
+  private static function legacySymfonyConfiguration(): array|false {
+    $environmentVariable = getenv('SYMFONY_DEPRECATIONS_HELPER');
+    if ($environmentVariable === FALSE) {
+      return FALSE;
+    }
+    if ($environmentVariable === 'disabled') {
+      return ['enabled' => FALSE];
+    }
+    parse_str($environmentVariable, $configuration);
+    $configuration['enabled'] = TRUE;
     return $configuration;
   }
 

@@ -164,4 +164,12 @@ date_default_timezone_set('Australia/Sydney');
 // Get deprecation override handling as early as possible. If the deprecation
 // bridge extension is not enabled, overrides will be reverted during extension
 // bootstrap.
-DeprecationHandler::preBootstrap(PhpunitConfigurationRegistry::get());
+try {
+  DeprecationHandler::preBootstrap(PhpunitConfigurationRegistry::get());
+}
+catch (\AssertionError) {
+  // In case this script is executed outside of a PHPUnit test run, the
+  // configuration is not defined, so we cannot bootstrap the deprecation
+  // handler extension. In such case, do nothing.
+  // @see core/scripts/test-site.php for an example.
+}
