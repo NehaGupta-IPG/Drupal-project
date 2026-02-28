@@ -14,11 +14,13 @@ use PHPUnit\Event\TestRunner\FinishedSubscriber;
  */
 final class TestRunnerFinishedSubscriber implements FinishedSubscriber {
 
-  public function __construct() {
+  public function __construct(
+    private DeprecationHandler $handler,
+  ) {
   }
 
   public function notify(Finished $event): void {
-    DeprecationHandler::processStatisticsArtifact();
+    $this->handler->processStatisticsArtifact();
   }
 
 }

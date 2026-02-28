@@ -9,6 +9,8 @@
 
 declare(strict_types=1);
 
+use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
+
 /**
  * Finds all valid extension directories recursively within a given directory.
  *
@@ -157,3 +159,8 @@ mb_language('uni');
 // and DST). This choice is made to prevent timezone related regressions and
 // reduce the fragility of the testing system in general.
 date_default_timezone_set('Australia/Sydney');
+
+// Get deprecation override handling as early as possible. If the deprecation
+// bridge extension is not enabled, overrides will be reverted during extension
+// bootstrap.
+DeprecationHandler::startHandling();

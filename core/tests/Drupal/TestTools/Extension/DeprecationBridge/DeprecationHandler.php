@@ -28,6 +28,11 @@ use Symfony\Component\ErrorHandler\DebugClassLoader;
 final class DeprecationHandler implements Extension {
 
   /**
+   * The instantiated handler singleton.
+   */
+  private static self $instance;
+
+  /**
    * Indicates if the extension is enabled.
    */
   private static bool $enabled = TRUE;
@@ -47,7 +52,7 @@ final class DeprecationHandler implements Extension {
   /**
    * The path to the statistics staging file.
    */
-  private static string $statisticsStagingFilePath;
+  private string $statisticsStagingFilePath;
 
   /**
    * The path to the artifacts base directory.
@@ -85,21 +90,22 @@ final class DeprecationHandler implements Extension {
     Facade $facade,
     ParameterCollection $parameters,
   ): void {
+    self::$instance = $this;
+
     // Mark the extension as enabled.
     self::$enabled = TRUE;
 
     // Determine staging file path.
-    self::$statisticsStagingFilePath = tempnam(sys_get_temp_dir(), 'depsta');
+    $this->statisticsStagingFilePath = tempnam(sys_get_temp_dir(), 'depsta');
 
     // Set an environment variable with the configuration, so that isolated
     // tests can access it.
     $config = json_encode([
-      'stagingFilePath' => self::$statisticsStagingFilePath,
+      'stagingFilePath' => $this->statisticsStagingFilePath,
     ]);
     putenv('_DRUPAL_DEPRECATION_HANDLER_CONFIG=' . $config);
 
-    $facade->registerSubscriber(new TestRunnerStartedSubscriber());
-    $facade->registerSubscriber(new TestRunnerFinishedSubscriber());
+    $facade->registerSubscriber(new TestRunnerFinishedSubscriber($this));
 
     $deprecationBridgeConfiguration = self::getConfiguration();
     self::init($deprecationBridgeConfiguration['ignoreFile'] ?? NULL);
@@ -141,6 +147,23 @@ final class DeprecationHandler implements Extension {
       'database_version' => self::$databaseVersion,
     ]);
     putenv('_DRUPAL_TEST_ARTIFACT_CONFIG=' . $config);
+  }
+
+  /**
+   * Remove.
+   *
+   * @todo remove.
+   */
+  public static function startHandling(): void {
+    // Need to have an early error handler to manage deprecations triggered by
+    // DebugClassLoader, that occur before tests' setUp() methods are called.
+    // We pass an instance of the PHPUnit error handler to redirect any error not
+    // managed by our layer back to PHPUnit.
+    set_error_handler(new BootstrapErrorHandler(PhpUnitErrorHandler::instance()));
+
+    // Enable the DebugClassLoader to get deprecations for methods' signature
+    // changes.
+    DebugClassLoader::enable();
   }
 
   /**
@@ -219,8 +242,8 @@ final class DeprecationHandler implements Extension {
   /**
    * Dump statistics after test runner end.
    */
-  public static function processStatisticsArtifact(): void {
-    $content = @file_get_contents(self::$statisticsStagingFilePath);
+  public function processStatisticsArtifact(): void {
+    $content = @file_get_contents($this->statisticsStagingFilePath);
     $statisticsArtifactDirectory = self::$directory . \DIRECTORY_SEPARATOR . 'deprecation-handler';
     Filesystem::createDirectory($statisticsArtifactDirectory);
 
@@ -354,23 +377,6 @@ final class DeprecationHandler implements Extension {
       $tmp['database_version'] = self::$databaseVersion;
     }
     return $tmp;
-  }
-
-  /**
-   * Remove.
-   *
-   * @todo remove.
-   */
-  public static function runnerStarted(): void {
-    // Need to have an early error handler to manage deprecations triggered by
-    // DebugClassLoader, that occur before tests' setUp() methods are called.
-    // We pass an instance of the PHPUnit error handler to redirect any error not
-    // managed by our layer back to PHPUnit.
-    set_error_handler(new BootstrapErrorHandler(PhpUnitErrorHandler::instance()));
-
-    // Enable the DebugClassLoader to get deprecations for methods' signature
-    // changes.
-    DebugClassLoader::enable();
   }
 
 }
