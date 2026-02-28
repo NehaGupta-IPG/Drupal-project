@@ -46,7 +46,11 @@ function twig_render_template($template_file, array $variables): string|MarkupIn
     }
     throw $e;
   }
-  if ($twig_service->isDebug()) {
+
+  // View variable exists and the display type is of feed
+  // then it returns TRUE otherwise FALSE.
+  $debug_blacklisted = isset($variables['view']) && ($variables['view']->getDisplay()->getType() === 'feed');
+  if ($twig_service->isDebug() && !$debug_blacklisted) {
     $output = [
       'debug_prefix' => '',
       'debug_info' => '',
