@@ -85,6 +85,8 @@ class UsageTest extends FileManagedUnitTestBase {
    * Tests file usage deletion when files are made temporary.
    */
   public function testRemoveUsageTemporary(): void {
+    $this->installConfig('file');
+
     $this->config('file.settings')
       ->set('make_unused_managed_files_temporary', TRUE)
       ->save();
@@ -96,6 +98,8 @@ class UsageTest extends FileManagedUnitTestBase {
    * Tests file usage deletion when files are made temporary.
    */
   public function testRemoveUsageNonTemporary(): void {
+    $this->installConfig('file');
+
     $this->config('file.settings')
       ->set('make_unused_managed_files_temporary', FALSE)
       ->save();
