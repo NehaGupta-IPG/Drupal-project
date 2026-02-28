@@ -29,6 +29,8 @@ final class DeprecationHandler implements Extension {
 
   /**
    * The instantiated handler singleton.
+   *
+   * @var \Drupal\TestTools\Extension\DeprecationBridge\Extension
    */
   private static self $instance;
 
