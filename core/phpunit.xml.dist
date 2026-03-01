@@ -6,7 +6,7 @@
  https://www.drupal.org/node/2116263 for details.
 -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         bootstrap="tests/bootstrap.php"
+         bootstrap="PATH-TO/core/tests/bootstrap.php"
          colors="true"
          beStrictAboutTestsThatDoNotTestAnything="true"
          beStrictAboutOutputDuringTests="true"
@@ -26,16 +26,16 @@
     <!-- Do not limit the amount of memory tests take to run. -->
     <ini name="memory_limit" value="-1"/>
     <!-- Example SIMPLETEST_BASE_URL value: http://localhost -->
-    <env name="SIMPLETEST_BASE_URL" value=""/>
+    <env name="SIMPLETEST_BASE_URL" value="LOCAL-SITE-URL"/>
     <!-- Example SIMPLETEST_DB value: mysql://username:password@localhost/database_name#table_prefix -->
-    <env name="SIMPLETEST_DB" value=""/>
+    <env name="SIMPLETEST_DB" value="DB-SCHEME://USERNAME:PASSWORD@HOST/DBNAME"/>
     <!-- By default, browser tests will output links that use the base URL set
      in SIMPLETEST_BASE_URL. However, if your SIMPLETEST_BASE_URL is an internal
      path (such as may be the case in a virtual or Docker-based environment),
      you can set the base URL used in the browser test output links to something
      reachable from your host machine here. This will allow you to follow them
      directly and view the output. -->
-    <env name="BROWSERTEST_OUTPUT_BASE_URL" value=""/>
+    <env name="BROWSERTEST_OUTPUT_BASE_URL" value="BROWSER-OUTPUT-BASE-URL"/>
     <!-- The environment variable SYMFONY_DEPRECATIONS_HELPER is used to configure
       the behavior of the deprecation tests.
       Drupal core's testing framework is setting this variable to its defaults.
@@ -67,7 +67,7 @@
         overridden by the value set for the "BROWSERTEST_OUTPUT_DIRECTORY"
         environment variable.
       -->
-      <parameter name="outputDirectory" value="sites/simpletest/browser_output"/>
+      <parameter name="outputDirectory" value="PATH-TO/sites/simpletest/browser_output"/>
       <!-- By default browser tests print the individual links in the test run
         report. To avoid overcrowding the output in CI environments, you can
         set the "verbose" parameter or the "BROWSERTEST_OUTPUT_VERBOSE"
@@ -84,71 +84,71 @@
   </extensions>
   <testsuites>
     <testsuite name="unit-component">
-      <directory>tests/Drupal/Tests/Component</directory>
+      <directory>PATH-TO/tests/Drupal/Tests/Component</directory>
     </testsuite>
     <testsuite name="unit">
-      <directory>tests/Drupal/Tests</directory>
-      <exclude>tests/Drupal/Tests/Component</exclude>
-      <directory>modules/**/tests/src/Unit</directory>
-      <directory>profiles/**/tests/src/Unit</directory>
-      <directory>themes/**/tests/src/Unit</directory>
-      <directory>../modules/*/**/tests/src/Unit</directory>
-      <directory>../profiles/*/**/tests/src/Unit</directory>
-      <directory>../themes/*/**/tests/src/Unit</directory>
+      <directory>PATH-TO/core/tests/Drupal/Tests</directory>
+      <exclude>PATH-TO/core/tests/Drupal/Tests/Component</exclude>
+      <directory>PATH-TO/core/modules/**/tests/src/Unit</directory>
+      <directory>PATH-TO/core/profiles/**/tests/src/Unit</directory>
+      <directory>PATH-TO/core/themes/**/tests/src/Unit</directory>
+      <directory>PATH-TO/core/../modules/*/**/tests/src/Unit</directory>
+      <directory>PATH-TO/core/../profiles/*/**/tests/src/Unit</directory>
+      <directory>PATH-TO/core/../themes/*/**/tests/src/Unit</directory>
     </testsuite>
     <testsuite name="kernel">
-      <directory>tests/Drupal/KernelTests</directory>
-      <directory>modules/**/tests/src/Kernel</directory>
-      <directory>recipes/*/tests/src/Kernel</directory>
-      <directory>profiles/**/tests/src/Kernel</directory>
-      <directory>themes/**/tests/src/Kernel</directory>
-      <directory>../modules/*/**/tests/src/Kernel</directory>
-      <directory>../profiles/*/**/tests/src/Kernel</directory>
-      <directory>../themes/*/**/tests/src/Kernel</directory>
+      <directory>PATH-TO/core/tests/Drupal/KernelTests</directory>
+      <directory>PATH-TO/core/modules/**/tests/src/Kernel</directory>
+      <directory>PATH-TO/core/recipes/*/tests/src/Kernel</directory>
+      <directory>PATH-TO/core/profiles/**/tests/src/Kernel</directory>
+      <directory>PATH-TO/core/themes/**/tests/src/Kernel</directory>
+      <directory>PATH-TO/core/../modules/*/**/tests/src/Kernel</directory>
+      <directory>PATH-TO/core/../profiles/*/**/tests/src/Kernel</directory>
+      <directory>PATH-TO/core/../themes/*/**/tests/src/Kernel</directory>
     </testsuite>
     <testsuite name="functional">
-      <directory>tests/Drupal/FunctionalTests</directory>
-      <directory>modules/**/tests/src/Functional</directory>
-      <directory>profiles/**/tests/src/Functional</directory>
-      <directory>recipes/*/tests/src/Functional</directory>
-      <directory>themes/**/tests/src/Functional</directory>
-      <directory>../modules/*/**/tests/src/Functional</directory>
-      <directory>../profiles/*/**/tests/src/Functional</directory>
-      <directory>../themes/*/**/tests/src/Functional</directory>
+      <directory>PATH-TO/core/tests/Drupal/FunctionalTests</directory>
+      <directory>PATH-TO/core/modules/**/tests/src/Functional</directory>
+      <directory>PATH-TO/core/profiles/**/tests/src/Functional</directory>
+      <directory>PATH-TO/core/recipes/*/tests/src/Functional</directory>
+      <directory>PATH-TO/core/themes/**/tests/src/Functional</directory>
+      <directory>PATH-TO/core/../modules/*/**/tests/src/Functional</directory>
+      <directory>PATH-TO/core/../profiles/*/**/tests/src/Functional</directory>
+      <directory>PATH-TO/core/../themes/*/**/tests/src/Functional</directory>
     </testsuite>
     <testsuite name="functional-javascript">
-      <directory>tests/Drupal/FunctionalJavascriptTests</directory>
-      <directory>modules/**/tests/src/FunctionalJavascript</directory>
-      <directory>recipes/*/tests/src/FunctionalJavascript</directory>
-      <directory>profiles/**/tests/src/FunctionalJavascript</directory>
-      <directory>themes/**/tests/src/FunctionalJavascript</directory>
-      <directory>../modules/*/**/tests/src/FunctionalJavascript</directory>
-      <directory>../profiles/*/**/tests/src/FunctionalJavascript</directory>
-      <directory>../themes/*/**/tests/src/FunctionalJavascript</directory>
+      <directory>PATH-TO/core/tests/Drupal/FunctionalJavascriptTests</directory>
+      <directory>PATH-TO/core/modules/**/tests/src/FunctionalJavascript</directory>
+      <directory>PATH-TO/core/recipes/*/tests/src/FunctionalJavascript</directory>
+      <directory>PATH-TO/core/profiles/**/tests/src/FunctionalJavascript</directory>
+      <directory>PATH-TO/core/themes/**/tests/src/FunctionalJavascript</directory>
+      <directory>PATH-TO/core/../modules/*/**/tests/src/FunctionalJavascript</directory>
+      <directory>PATH-TO/core/../profiles/*/**/tests/src/FunctionalJavascript</directory>
+      <directory>PATH-TO/core/../themes/*/**/tests/src/FunctionalJavascript</directory>
     </testsuite>
     <testsuite name="build">
-      <directory>tests/Drupal/BuildTests</directory>
-      <directory>modules/**/tests/src/Build</directory>
-      <directory>../modules/*/**/tests/src/Build</directory>
+      <directory>PATH-TO/core/tests/Drupal/BuildTests</directory>
+      <directory>PATH-TO/core/modules/**/tests/src/Build</directory>
+      <directory>PATH-TO/core/../modules/*/**/tests/src/Build</directory>
     </testsuite>
   </testsuites>
   <!-- Settings for coverage reports. -->
   <source ignoreSuppressionOfDeprecations="true">
     <include>
-      <directory>./includes</directory>
-      <directory>./lib</directory>
-      <directory>./modules</directory>
-      <directory>../modules</directory>
-      <directory>../sites</directory>
+      <directory>PATH-TO/core/./includes</directory>
+      <directory>PATH-TO/core/./lib</directory>
+      <directory>PATH-TO/core/./modules</directory>
+      <directory>PATH-TO/core/../modules</directory>
+      <directory>PATH-TO/core/../sites</directory>
     </include>
     <exclude>
-      <directory>./lib/Drupal/Component</directory>
-      <directory>./modules/*/src/Tests</directory>
-      <directory>./modules/*/tests</directory>
-      <directory>../modules/*/src/Tests</directory>
-      <directory>../modules/*/tests</directory>
-      <directory>../modules/*/*/src/Tests</directory>
-      <directory>../modules/*/*/tests</directory>
+      <directory>PATH-TO/core/./lib/Drupal/Component</directory>
+      <directory>PATH-TO/core/./modules/*/src/Tests</directory>
+      <directory>PATH-TO/core/./modules/*/tests</directory>
+      <directory>PATH-TO/core/../modules/*/src/Tests</directory>
+      <directory>PATH-TO/core/../modules/*/tests</directory>
+      <directory>PATH-TO/core/../modules/*/*/src/Tests</directory>
+      <directory>PATH-TO/core/../modules/*/*/tests</directory>
     </exclude>
   </source>
 </phpunit>
