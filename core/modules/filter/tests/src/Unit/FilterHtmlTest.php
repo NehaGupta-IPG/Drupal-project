@@ -52,15 +52,14 @@ class FilterHtmlTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::process
-   *
-   * @dataProvider providerProcess
+   * @legacy-covers ::process
    *
    * @param string $html
    *   Input HTML.
    * @param array $expected
    *   The expected output string.
    */
+  #[DataProvider('providerProcess')]
   public function testProcess(string $html, array $expected): void {
     $currentConfiguration = $this->filter->getConfiguration();
     $currentConfiguration['settings']['allowed_html'] = "<p>";
