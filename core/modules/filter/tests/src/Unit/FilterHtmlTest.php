@@ -60,9 +60,9 @@ class FilterHtmlTest extends UnitTestCase {
    *   The expected output string.
    */
   #[DataProvider('providerProcess')]
-  public function testProcess(string $html, array $expected): void {
+  public function testProcess(string $html, string $expected): void {
     $currentConfiguration = $this->filter->getConfiguration();
-    $currentConfiguration['settings']['allowed_html'] = ["<p>"];
+    $currentConfiguration['settings']['allowed_html'] = "<p>";
     $this->filter->setConfiguration($currentConfiguration);
     $this->assertSame($expected, $this->filter->process($html, NULL)->getProcessedText());
   }
