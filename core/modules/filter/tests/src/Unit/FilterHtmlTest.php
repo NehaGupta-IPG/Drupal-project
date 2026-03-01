@@ -59,7 +59,7 @@ class FilterHtmlTest extends UnitTestCase {
    * @param array $expected
    *   The expected output string.
    *
-   * @legacy-covers ::process
+   * @covers ::process
    */
   #[DataProvider('providerProcess')]
   public function testProcess(string $html, array $expected): void {
