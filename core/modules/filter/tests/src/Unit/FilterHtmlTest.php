@@ -52,14 +52,14 @@ class FilterHtmlTest extends UnitTestCase {
   }
 
   /**
-   * Tests filter process 
-   * 
-   * @legacy-covers ::process
+   * Tests filter process.
    *
    * @param string $html
    *   Input HTML.
    * @param array $expected
    *   The expected output string.
+   * 
+   * @legacy-covers ::process
    */
   #[DataProvider('providerProcess')]
   public function testProcess(string $html, array $expected): void {
