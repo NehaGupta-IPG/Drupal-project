@@ -33,6 +33,7 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
     \Drupal::service('module_installer')->uninstall(['toolbar']);
     \Drupal::service('module_installer')->install(['navigation']);
     $this->doTestFrontPageAuthenticatedWarmCache();
+    $this->doTestNodePageAuthenticatedWarmCache();
     $this->doTestNodePageAdministrator();
   }
 
@@ -77,10 +78,59 @@ class OpenTelemetryAuthenticatedPerformanceTest extends PerformanceTestBase {
       'ScriptCount' => 1,
       'ScriptBytes' => 13150,
       'StylesheetCount' => 2,
-      'StylesheetBytes' => 39163,
+      'StylesheetBytes' => 38500,
     ];
     $this->assertMetrics($expected, $performance_data);
   }
+
+  /**
+   * Logs front page tracing data with an authenticated user and warm cache.
+   */
+  protected function doTestNodePageAuthenticatedWarmCache(): void {
+    $this->drupalGet('node/1');
+    sleep(2);
+    $this->drupalGet('node/1');
+    sleep(2);
+
+    $performance_data = $this->collectPerformanceData(function () {
+      $this->drupalGet('node/1');
+    }, 'authenticatedNodePage');
+
+    $expected_queries = [
+      'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
+      'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = "10" AND "u"."default_langcode" = 1',
+      'SELECT "roles_target_id" FROM "user__roles" WHERE "entity_id" = "10"',
+      'SELECT "base_table"."path" AS "path", "base_table"."alias" AS "alias" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/node/1" ESCAPE ' .  "'\\\\'" . ') AND ("base_table"."langcode" IN ("en", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
+      'SELECT "base_table"."path" AS "path", "base_table"."alias" AS "alias" FROM "path_alias" "base_table" WHERE ("base_table"."status" = 1) AND ("base_table"."path" LIKE "/node/1" ESCAPE ' .  "'\\\\'" . ') AND ("base_table"."langcode" IN ("es", "und")) ORDER BY "base_table"."langcode" ASC, "base_table"."id" DESC',
+    ];
+    $recorded_queries = $performance_data->getQueries();
+    $this->assertSame($expected_queries, $recorded_queries);
+
+    $expected = [
+      'QueryCount' => 5,
+      'CacheGetCount' => 45,
+      'CacheGetCountByBin' => [
+        'config' => 13,
+        'bootstrap' => 9,
+        'discovery' => 12,
+        'data' => 4,
+        'entity' => 1,
+        'dynamic_page_cache' => 2,
+        'menu' => 1,
+        'render' => 3,
+      ],
+      'CacheSetCount' => 0,
+      'CacheDeleteCount' => 0,
+      'CacheTagInvalidationCount' => 0,
+      'CacheTagLookupQueryCount' => 5,
+      'ScriptCount' => 1,
+      'ScriptBytes' => 13150,
+      'StylesheetCount' => 2,
+      'StylesheetBytes' => 40500,
+    ];
+    $this->assertMetrics($expected, $performance_data);
+  }
+
 
   /**
    * Logs node page performance with an administrator.

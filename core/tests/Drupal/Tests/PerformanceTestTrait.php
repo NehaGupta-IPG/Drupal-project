@@ -262,6 +262,9 @@ trait PerformanceTestTrait {
       $args[':now'] = 'NOW';
       $args[':keys__0'] = 'KEY';
     }
+    elseif (str_starts_with($query, 'UPDATE "history" SET "timestamp"')) {
+      $args[':db_update_placeholder_0'] = 'TIMESTAMP';
+    }
 
     // Inline query arguments and log the query, reverse arguments to avoid
     // matches on placeholders with 2+ digits.
