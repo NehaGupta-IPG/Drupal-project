@@ -266,7 +266,7 @@ services:
       - [setContainer, ['@service_container']]
   cache.backend.database:
     class: Drupal\Core\Cache\DatabaseBackendFactory
-    arguments: ['@database', '@cache_tags.invalidator.checksum', '@settings', '@serialization.phpserialize', '@datetime.time']
+    arguments: ['@database', '@cache_tags.invalidator.checksum', '@settings', '@Drupal\Component\Serialization\ObjectAwareSerializationInterface', '@datetime.time']
     tags:
       - { name: backend_overridable }
   cache.backend.apcu:
@@ -607,9 +607,11 @@ services:
 
   serialization.json:
     class: Drupal\Component\Serialization\Json
+  serialization.igbinary:
+    class: Drupal\Component\Serialization\IgbinarySerialize
   serialization.phpserialize:
     class: Drupal\Component\Serialization\PhpSerialize
-  Drupal\Component\Serialization\ObjectAwareSerializationInterface: '@serialization.phpserialize'
+  Drupal\Component\Serialization\ObjectAwareSerializationInterface: '@serialization.igbinary'
   serialization.yaml:
     class: Drupal\Component\Serialization\Yaml
 

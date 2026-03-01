@@ -24,6 +24,7 @@ fieldable
 fulldate
 groupby
 groupwise
+igbinary
 itok
 jswebassert
 keyvalue

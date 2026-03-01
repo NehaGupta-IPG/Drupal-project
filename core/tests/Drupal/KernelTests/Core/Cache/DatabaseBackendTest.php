@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Cache;
 
+use Drupal\Component\Serialization\IgbinarySerialize;
+use Drupal\Component\Serialization\ObjectAwareSerializationInterface;
 use Drupal\Component\Datetime\TimeInterface;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\DatabaseBackend;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -34,7 +37,7 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
       $this->container->get('database'),
       $this->container->get('cache_tags.invalidator.checksum'),
       $bin,
-      $this->container->get('serialization.phpserialize'),
+      $this->container->get(ObjectAwareSerializationInterface::class),
       \Drupal::service(TimeInterface::class),
       static::$maxRows,
     );
@@ -67,6 +70,62 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
     }
     $backend->setMultiple($items);
     $this->assertSame(DatabaseBackend::MAX_ITEMS_PER_CACHE_SET + 1, $this->getNumRows());
+  }
+
+  /**
+   * Tests that legacy PHP-serialized cache rows remain readable.
+   */
+  public function testLegacyPhpSerializedDataRemainsReadable(): void {
+    $backend = $this->getCacheBackend();
+    $data = [
+      'foo' => 'bar',
+      'nested' => ['baz' => TRUE],
+    ];
+
+    $backend->set('legacy_php_serialized_setup', 'setup');
+    $backend->delete('legacy_php_serialized_setup');
+
+    $this->container->get('database')
+      ->insert('cache_' . $this->testBin)
+      ->fields([
+        'cid' => 'legacy_php_serialized',
+        'expire' => Cache::PERMANENT,
+        'created' => round(microtime(TRUE), 3),
+        'tags' => '',
+        'checksum' => $this->container->get('cache_tags.invalidator.checksum')->getCurrentChecksum([]),
+        'data' => serialize($data),
+        'serialized' => 1,
+      ])
+      ->execute();
+
+    $this->assertSame($data, $backend->get('legacy_php_serialized')->data);
+  }
+
+  /**
+   * Tests that new cache rows use the igbinary serializer when available.
+   */
+  public function testIgbinaryPayloadsAreWrittenWhenAvailable(): void {
+    if (!function_exists('igbinary_serialize')) {
+      $this->markTestSkipped('Requires the igbinary extension.');
+    }
+
+    $cid = 'igbinary_payload';
+    $data = [
+      'foo' => 'bar',
+      'nested' => ['baz' => TRUE],
+    ];
+
+    $this->getCacheBackend()->set($cid, $data);
+
+    $row = $this->container->get('database')
+      ->select('cache_' . $this->testBin, 'c')
+      ->fields('c', ['data', 'serialized'])
+      ->condition('cid', $cid)
+      ->execute()
+      ->fetchAssoc();
+
+    $this->assertSame(1, (int) $row['serialized']);
+    $this->assertSame(IgbinarySerialize::encode($data), $row['data']);
   }
 
   /**

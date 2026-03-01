@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\jsonapi\Functional;
 
 use Drupal\Component\Serialization\Json;
+use Drupal\Component\Serialization\ObjectAwareSerializationInterface;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Access\AccessResult;
@@ -1018,8 +1019,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->assertLessThanOrEqual(5, count($cache_items));
     $found_cached_200_response = FALSE;
     $other_cached_responses_are_4xx = TRUE;
+    $serializer = $this->container->get(ObjectAwareSerializationInterface::class);
     foreach ($cache_items as $cache_item) {
-      $cached_response = unserialize($cache_item->data);
+      $cached_response = $serializer::decode($cache_item->data);
       if (!$cached_response instanceof CacheRedirect) {
         if ($cached_response->getStatusCode() === 200) {
           $found_cached_200_response = TRUE;

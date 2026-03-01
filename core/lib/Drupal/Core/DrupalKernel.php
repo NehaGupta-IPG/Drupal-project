@@ -5,6 +5,7 @@ namespace Drupal\Core;
 use Composer\Autoload\ClassLoader;
 use Drupal\Component\EventDispatcher\Event;
 use Drupal\Component\FileCache\FileCacheFactory;
+use Drupal\Component\Serialization\IgbinarySerialize;
 use Drupal\Component\Serialization\PhpSerialize;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Cache\DatabaseBackend;
@@ -91,7 +92,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
           '@database',
           '@cache_tags_provider.container',
           'container',
-          '@serialization.phpserialize',
+          '@serialization.igbinary',
           '@datetime.time',
           DatabaseBackend::MAXIMUM_NONE,
         ],
@@ -99,6 +100,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       'cache_tags_provider.container' => [
         'class' => 'Drupal\Core\Cache\DatabaseCacheTagsChecksum',
         'arguments' => ['@database'],
+      ],
+      'serialization.igbinary' => [
+        'class' => IgbinarySerialize::class,
       ],
       'serialization.phpserialize' => [
         'class' => PhpSerialize::class,
