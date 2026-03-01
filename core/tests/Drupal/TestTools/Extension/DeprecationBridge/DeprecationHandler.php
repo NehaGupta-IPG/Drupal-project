@@ -6,7 +6,7 @@ namespace Drupal\TestTools\Extension\DeprecationBridge;
 
 use Drupal\Core\Database\Database;
 use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Event\Code\TestMethod;
 use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
 use PHPUnit\Runner\Extension\Extension;
 use PHPUnit\Runner\Extension\Facade;
@@ -162,6 +162,8 @@ final class DeprecationHandler implements Extension {
     ]);
     putenv('_DRUPAL_DEPRECATION_HANDLER_CONFIG=' . $config);
 
+    $facade->registerSubscriber(new TestPreparationStartedSubscriber());
+    $facade->registerSubscriber(new TestFinishedSubscriber());
     $facade->registerSubscriber(new TestRunnerFinishedSubscriber($this));
 
     // Artifacts directory.
@@ -308,8 +310,8 @@ final class DeprecationHandler implements Extension {
     ];
     foreach ($encodedStats as $encodedStat) {
       $stat = (array) json_decode(base64_decode($encodedStat));
-      if (!empty($stat)) {
-        $stats['skips'][$stat['pattern']] = isset($stats['skips'][$stat['pattern']]) ? $stats['skips'][$stat['pattern']] + 1 : 1;
+      if (!empty($stat) && $stat['status'] === 'ignored_by_project') {
+        $stats['skips'][$stat['ignore-pattern']] = isset($stats['skips'][$stat['ignore-pattern']]) ? $stats['skips'][$stat['ignore-pattern']] + 1 : 1;
       }
     }
 
@@ -322,7 +324,7 @@ final class DeprecationHandler implements Extension {
   /**
    * Write a statistic entry.
    */
-  private static function writeStatisticEntry(string $testName, string $ignorePattern, string $triggeringMessage): void {
+  public static function writeStatisticEntry(string $status, ?TestMethod $testMethod, ?string $ignorePattern, string $triggeringMessage): void {
     $artifactEnv = getenv('_DRUPAL_TEST_ARTIFACT_CONFIG');
     $configEnv = getenv('_DRUPAL_DEPRECATION_HANDLER_CONFIG');
 
@@ -334,14 +336,14 @@ final class DeprecationHandler implements Extension {
     $artifact = (array) json_decode($artifactEnv);
     $config = (array) json_decode($configEnv);
 
-    $stat = [
-      'test' => $testName,
-      'pattern' => $ignorePattern,
-      'message' => $triggeringMessage,
-      'php_version' => $artifact['php_version'],
-    ];
-    if ($artifact['database_version']) {
-      $stat['database'] = $artifact['database_version'];
+    $stat = [];
+    $stat['status'] = $status;
+    if ($testMethod !== NULL) {
+      $stat['test'] = $testMethod->id();
+    }
+    $stat['message'] = $triggeringMessage;
+    if ($ignorePattern !== NULL) {
+      $stat['ignore-pattern'] = $ignorePattern;
     }
 
     file_put_contents(
@@ -352,18 +354,18 @@ final class DeprecationHandler implements Extension {
   }
 
   /**
-   * Determines if an actual deprecation should be ignored.
+   * Determines if an actual deprecation is ignored by the project.
    *
    * Deprecations that match the patterns included in the ignore file should
    * be ignored.
    *
-   * @param \PHPUnit\Framework\TestCase|null $testCase
+   * @param \PHPUnit\Event\Code\TestMethod|null $testMethod
    *   The test case being executed.
    * @param string $deprecationMessage
    *   The actual deprecation message triggered via trigger_error().
    */
-  public static function isIgnoredDeprecation(?TestCase $testCase, string $deprecationMessage): bool {
-    if (!self::$deprecationIgnorePatterns) {
+  public static function isIgnoredByProject(?TestMethod $testMethod, string $deprecationMessage): bool {
+    if (!self::projectIgnoresEnabled()) {
       return FALSE;
     }
     foreach (self::$deprecationIgnorePatterns as $pattern) {
@@ -372,11 +374,29 @@ final class DeprecationHandler implements Extension {
         throw new \RuntimeException(preg_last_error_msg());
       }
       if ((bool) $result) {
-        $testName = $testCase ? $testCase->valueObjectForEvents()->id() : '#not-in-test';
-        self::writeStatisticEntry($testName, $pattern, $deprecationMessage);
+        self::writeStatisticEntry('ignored_by_project', $testMethod, $pattern, $deprecationMessage);
         return TRUE;
       }
     }
+    return FALSE;
+  }
+
+  /**
+   * Determines if an actual deprecation is ignored by the project.
+   *
+   * Deprecations that match the patterns included in the ignore file should
+   * be ignored.
+   *
+   * @param \PHPUnit\Framework\TestMethod|null $testMethod
+   *   The test case being executed.
+   * @param string $deprecationMessage
+   *   The actual deprecation message triggered via trigger_error().
+   */
+  public static function reported(?TestMethod $testMethod, string $deprecationMessage): bool {
+    if (!self::projectIgnoresEnabled()) {
+      return FALSE;
+    }
+    self::writeStatisticEntry('reported', $testMethod, NULL, $deprecationMessage);
     return FALSE;
   }
 
@@ -390,7 +410,7 @@ final class DeprecationHandler implements Extension {
       $contextKeys = explode(",", $env);
     }
     else {
-      throw new \RuntimeException('No DRUPAL_TEST_CONTEXT_KEYS environment variable set');
+      $contextKeys = [];
     }
 
     $tmp = [];

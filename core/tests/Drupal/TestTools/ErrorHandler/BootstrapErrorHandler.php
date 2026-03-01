@@ -6,7 +6,7 @@ namespace Drupal\TestTools\ErrorHandler;
 
 use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
 use PHPUnit\Event\Code\NoTestCaseObjectOnCallStackException;
-use PHPUnit\Framework\TestCase;
+use PHPUnit\Event\Code\TestMethod;
 use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
 
 /**
@@ -24,6 +24,14 @@ use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
 final class BootstrapErrorHandler {
 
   /**
+   * The currently executing test case.
+   *
+   * @see \Drupal\TestTools\Extension\DeprecationBridge\TestPreparationStartedSubscriber
+   * @see \Drupal\TestTools\Extension\DeprecationBridge\TestFinishedSubscriber
+   */
+  static ?TestMethod $currentTest = NULL;
+
+  /**
    * @param \PHPUnit\Runner\ErrorHandler $phpUnitErrorHandler
    *   An instance of PHPUnit's runner own error handler. Any error not
    *   managed here will fall back to it.
@@ -31,6 +39,10 @@ final class BootstrapErrorHandler {
   public function __construct(
     private readonly PhpUnitErrorHandler $phpUnitErrorHandler,
   ) {
+  }
+
+  public static function setCurrentTest(?TestMethod $test): void {
+    self::$currentTest = $test;
   }
 
   /**
@@ -44,29 +56,23 @@ final class BootstrapErrorHandler {
    *   The filename that the error was raised in.
    * @param int $errorLine
    *   The line number the error was raised at.
-   * @param \PHPUnit\Framework\TestCase|null $testCase
-   *   The test case being executed, or NULL if error occurred outside of a
-   *   test.
    *
    * @return bool
    *   TRUE to stop error handling, FALSE to let the normal error handler
    *   continue.
    */
-  public function __invoke(
-    int $errorNumber,
-    string $errorString,
-    string $errorFile,
-    int $errorLine,
-    ?TestCase $testCase = NULL,
-  ): bool {
+  public function __invoke(int $errorNumber, string $errorString, string $errorFile, int $errorLine): bool {
     if (!DeprecationHandler::projectIgnoresEnabled()) {
       throw new \RuntimeException(__METHOD__ . '() must not be called if the deprecation handler is not enabled.');
     }
 
     // If the deprecation handled is one of those in the ignore list, we keep
     // running.
-    if ((E_USER_DEPRECATED === $errorNumber || E_DEPRECATED === $errorNumber) && DeprecationHandler::isIgnoredDeprecation($testCase, $errorString)) {
-      return TRUE;
+    if (E_USER_DEPRECATED === $errorNumber || E_DEPRECATED === $errorNumber) {
+      if (DeprecationHandler::isIgnoredByProject(self::$currentTest, $errorString)) {
+        return TRUE;
+      }
+      DeprecationHandler::reported(self::$currentTest, $errorString);
     }
 
     // In all other cases (errors, warnings, deprecations to be reported), we

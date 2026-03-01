@@ -1029,7 +1029,7 @@ default:
 # Consolidate stage jobs
 ########################
 
-'Ignore deprecations report':
+'Deprecations statistics':
   stage: 🚚 Consolidate
   script:
     - find test-artifacts
