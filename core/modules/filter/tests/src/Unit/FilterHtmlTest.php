@@ -58,7 +58,6 @@ class FilterHtmlTest extends UnitTestCase {
    *   Input HTML.
    * @param array $expected
    *   The expected output string.
-   *
    */
   #[DataProvider('providerProcess')]
   public function testProcess(string $html, array $expected): void {
@@ -157,7 +156,7 @@ class FilterHtmlTest extends UnitTestCase {
 
   /**
    * Tests set configuration.
-  */
+   */
   public function testSetConfiguration(): void {
     $configuration['settings'] = [
       // New lines and spaces are replaced with a single space.
