@@ -11,7 +11,7 @@ use Drupal\Composer\Plugin\Scaffold\Operations\ScaffoldResult;
  *
  * @internal
  */
-final class GenerateAutoloadReferenceFile {
+abstract class GenerateAutoloadReferenceFileBase {
 
   /**
    * This class provides only static methods.
@@ -30,16 +30,18 @@ final class GenerateAutoloadReferenceFile {
    *   IOInterface to write to.
    * @param string $package_name
    *   The name of the package defining the autoload file (the root package).
-   * @param string $web_root
-   *   The path to the web root.
    * @param string $vendor
+   *   The path to the web root.
+   * @param string $web_root
    *   The path to the vendor directory.
+   * @param string $drupal_core
+   *   The path to drupal/core.
    *
    * @return \Drupal\Composer\Plugin\Scaffold\Operations\ScaffoldResult
    *   The result of the autoload file generation.
    */
-  public static function generateAutoload(IOInterface $io, $package_name, $web_root, $vendor) {
-    $autoload_path = static::autoloadPath($package_name, $web_root);
+  public static function generateAutoload(IOInterface $io, string $package_name, string $vendor, string $web_root = '', string $drupal_core = ''): ScaffoldResult {
+    $autoload_path = static::autoloadPath($package_name, $web_root, $drupal_core);
     // Calculate the relative path from the webroot (location of the project
     // autoload.php) to the vendor directory.
     $fs = new Filesystem();
@@ -57,12 +59,14 @@ final class GenerateAutoloadReferenceFile {
    *   The name of the package defining the autoload file (the root package).
    * @param string $web_root
    *   The path to the web root.
+   * @param string $drupal_core
+   *   The path to drupal/core.
    *
    * @return bool
    *   True if autoload.php file exists and has been committed to the repository
    */
-  public static function autoloadFileCommitted(IOInterface $io, $package_name, $web_root) {
-    $autoload_path = static::autoloadPath($package_name, $web_root);
+  public static function autoloadFileCommitted(IOInterface $io, string $package_name, string $web_root = '', string $drupal_core = ''): bool  {
+    $autoload_path = static::autoloadPath($package_name, $web_root, $drupal_core);
     $autoload_file = $autoload_path->fullPath();
     $location = dirname($autoload_file);
     if (!file_exists($autoload_file)) {
@@ -78,16 +82,13 @@ final class GenerateAutoloadReferenceFile {
    *   The name of the package defining the autoload file (the root package).
    * @param string $web_root
    *   The path to the web root.
+   * @param string $drupal_core
+   *   The path to drupal/core.
    *
    * @return \Drupal\Composer\Plugin\Scaffold\ScaffoldFilePath
    *   Object wrapping the relative and absolute path to the destination file.
    */
-  protected static function autoloadPath($package_name, $web_root) {
-    $rel_path = 'autoload.php';
-    $dest_rel_path = '[web-root]/' . $rel_path;
-    $dest_full_path = $web_root . '/' . $rel_path;
-    return new ScaffoldFilePath('autoload', $package_name, $dest_rel_path, $dest_full_path);
-  }
+  abstract protected static function autoloadPath(string $package_name, string $web_root, string $drupal_core): ScaffoldFilePath;
 
   /**
    * Builds the contents of the autoload file.
@@ -98,7 +99,7 @@ final class GenerateAutoloadReferenceFile {
    * @return string
    *   Return the contents for the autoload.php.
    */
-  protected static function autoLoadContents($relative_autoload_path) {
+  protected static function autoLoadContents(string $relative_autoload_path): string {
     $relative_autoload_path = preg_replace('#^\./#', '', $relative_autoload_path);
     return <<<EOF
 <?php
@@ -115,7 +116,7 @@ final class GenerateAutoloadReferenceFile {
  * @see core/rebuild.php
  */
 
-return require __DIR__ . '/{$relative_autoload_path}';
+return require __DIR__ . '/$relative_autoload_path';
 
 EOF;
   }

@@ -153,6 +153,19 @@
                 "[web-root]/profiles/README.txt": "assets/scaffold/files/profiles.README.txt",
                 "[web-root]/themes/README.txt": "assets/scaffold/files/themes.README.txt"
             }
+        },
+        "drupal-pre-bootstrap": {
+            "services": {
+                "ApplicationRootGuesser": {
+                    "class": "Drupal\\Core\\Boot\\ApplicationRootGuesser"
+                },
+                "InitializeEnvironment": {
+                    "class": "Drupal\\Core\\Boot\\InitializeEnvironment",
+                    "arguments": [
+                        "@ApplicationRootGuesser"
+                    ]
+                }
+            }
         }
     },
     "scripts": {

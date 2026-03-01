@@ -166,11 +166,22 @@ class Handler {
     $scaffold_results = $scaffold_files->processScaffoldFiles($this->io, $scaffold_options);
 
     // Generate an autoload file in the document root that includes the
-    // autoload.php file in the vendor directory, wherever that is. Drupal
-    // requires this in order to easily locate relocated vendor dirs.
+    // autoload.php file in the vendor directory, wherever that is. This
+    // allows scripts in the web root to easily locate other parts of Drupal.
     $web_root = $this->manageOptions->getOptions()->getLocation('web-root');
-    if (!GenerateAutoloadReferenceFile::autoloadFileCommitted($this->io, $this->rootPackageName(), $web_root)) {
-      $scaffold_results[] = GenerateAutoloadReferenceFile::generateAutoload($this->io, $this->rootPackageName(), $web_root, $this->getVendorPath());
+    if (!GenerateWebRootAutoloadReferenceFile::autoloadFileCommitted($this->io, $this->rootPackageName(), $web_root)) {
+      $scaffold_results[] = GenerateWebRootAutoloadReferenceFile::generateAutoload($this->io, $this->rootPackageName(), $this->getVendorPath(), $web_root);
+    }
+    if (!GenerateAppRootAutoloadReferenceFile::autoloadFileCommitted($this->io, $this->rootPackageName())) {
+      $scaffold_results[] = GenerateAppRootAutoloadReferenceFile::generateAutoload($this->io, $this->rootPackageName(), $this->getVendorPath());
+    }
+    // Generate an autoload file in drupal/core that includes the
+    // autoload.php file in the vendor directory, wherever that is. This
+    // allows scripts in drupal/core to easily locate other parts of Drupal.
+    if (
+      ($drupal_core = Plugin::getCorePath($this->composer, $this->io)) &&
+      !GenerateDrupalCoreAutoloadReferenceFile::autoloadFileCommitted($this->io, $this->rootPackageName(), drupal_core: $drupal_core)) {
+      $scaffold_results[] = GenerateDrupalCoreAutoloadReferenceFile::generateAutoload($this->io, $this->rootPackageName(), $this->getVendorPath(), drupal_core: $drupal_core);
     }
 
     // Add the managed scaffold files to .gitignore if applicable.
