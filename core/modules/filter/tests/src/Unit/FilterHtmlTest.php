@@ -149,7 +149,7 @@ class FilterHtmlTest extends UnitTestCase {
       ['<em>emphasis</em>', 'emphasis'],
       // Preserve summary delimiter.
       [
-        '<p>some content</p><!--break--><p>some more content</p>', 
+        '<p>some content</p><!--break--><p>some more content</p>',
         '<p>some content</p><!--break--><p>some more content</p>',
       ],
     ];
