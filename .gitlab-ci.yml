@@ -422,6 +422,8 @@ default:
     TESTSUITE: PHPUnit-FunctionalJavascript
     CONCURRENCY: 5
     KUBERNETES_CPU_REQUEST: "16"
+    DRUPAL_PHPUNIT_TESTSUITE: "functional-javascript"
+    DRUPAL_TEST_CONTEXT_KEYS: "php-version,phpunit-testsuite,database-driver,database-version"
   services:
     - <<: *with-database
     - <<: *with-selenium-chrome
