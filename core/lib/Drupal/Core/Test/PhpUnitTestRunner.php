@@ -4,7 +4,6 @@ namespace Drupal\Core\Test;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
-use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
