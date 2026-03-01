@@ -92,6 +92,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
       PackageEvents::POST_PACKAGE_INSTALL => 'postPackage',
       PluginEvents::COMMAND => 'onCommand',
       ScriptEvents::PRE_AUTOLOAD_DUMP => 'preAutoloadDump',
+      ScriptEvents::POST_AUTOLOAD_DUMP => 'postAutoloadDump',
     ];
   }
 
@@ -157,14 +158,15 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
    */
   public static function preAutoloadDump(Event $event): void {
     // Get the configured vendor directory.
-    $vendor_dir = $event->getComposer()->getConfig()->get('vendor-dir');
+    $composer = $event->getComposer();
+    $vendor_dir = $composer->getConfig()->get('vendor-dir');
 
     // We need the root_package package so we can add our classmaps to its
     // loader.
-    $package = $event->getComposer()->getPackage();
+    $package = $composer->getPackage();
     // We need the local repository so that we can query and see if it's likely
     // that our files are present there.
-    $repository = $event->getComposer()->getRepositoryManager()->getLocalRepository();
+    $repository = $composer->getRepositoryManager()->getLocalRepository();
     // This is, essentially, a null constraint. We only care whether the package
     // is present in the vendor directory yet, but findPackage() requires it.
     $constraint = new Constraint('>', '');
@@ -200,7 +202,128 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
     if ($repository->findPackage('psr/container', $constraint)) {
       $autoload['classmap'][] = $vendor_dir . '/psr/container/src/ContainerInterface.php';
     }
+    $autoload['classmap'] = array_merge(static::generatePreBootstrapContainerDefinition($composer), $autoload['classmap']);
+    $autoload['classmap'][] = static::writeDrupalClass($vendor_dir, 'DrupalInstalled.php', DrupalInstalledTemplate::getCode($package, $repository));
 
+    $package->setAutoload($autoload);
+  }
+
+  /**
+   * Generate the bootstrap map.
+   *
+   * @param \Composer\Composer $composer
+   *   The composer object.
+   *
+   * @return array
+   *   Paths to classes to be added to the classmap.
+   */
+  protected static function generatePreBootstrapContainerDefinition(Composer $composer): array {
+    $return = [];
+    $root_extra = $composer->getPackage()->getExtra();
+    $container_definition = [
+      'parameters' => $root_extra['drupal-pre-bootstrap']['parameters'] ?? [],
+      'services' => $root_extra['drupal-pre-bootstrap']['services'] ?? [],
+    ];
+    $paths = [];
+    $packages = $composer
+      ->getRepositoryManager()
+      ->getLocalRepository()
+      ->getPackages();
+    foreach ($packages as $package) {
+      $name = $package->getName();
+      foreach (['services', 'parameters'] as $key) {
+        $container_definition[$key] += ($package->getExtra()['drupal-pre-bootstrap'][$key] ?? []);
+      }
+      $paths[$name] = $composer->getInstallationManager()->getInstallPath($package);
+    }
+    if (!isset($paths['drupal/core'])) {
+      return $return;
+    }
+    // Add classes in Drupal contrib to the autoloader. This only works if a
+    // class in a namespace starting with Drupal\foo belongs to the
+    // "drupal/foo" project. Otherwise, it needs to be added to the root
+    // composer.json as a file type autoload.
+    foreach ($container_definition['services'] as $definition) {
+      if (!isset($definition['class'])) {
+        continue;
+      }
+      $parts = explode('\\', $definition['class']);
+      if (isset($parts[1])) {
+        $name = 'drupal/' . $parts[1];
+        if (isset($paths[$name])) {
+          $parts[0] = $paths[$name];
+          $parts[1] = 'src';
+          $return[] = implode('/', $parts) . '.php';
+        }
+      }
+    }
+    $container_definition = var_export($container_definition, TRUE);
+    $contents = <<<__EOD__
+<?php
+
+// phpcs:disable
+
+namespace Drupal;
+
+/**
+ * PreBootstrapDefinition.
+ */
+class PreBootstrapDefinition {
+
+  public const array DEFINITION = $container_definition;
+
+}
+
+__EOD__;
+
+    $vendor_dir = $composer->getConfig()->get('vendor-dir');
+    $return[] = static::writeDrupalClass($vendor_dir, 'PreBootstrapDefinition.php', $contents);
+    return $return;
+  }
+
+  /**
+   * Make the Composer autoloader init Drupal's pre-bootstrap container.
+   *
+   * @param \Composer\Script\Event $event
+   *   The event.
+   */
+  public static function postAutoloadDump(Event $event): void {
+    $composer = $event->getComposer();
+    $io = $event->getIO();
+    $fs = new Filesystem();
+    $vendor_dir = $composer->getConfig()->get('vendor-dir');
+    $vendor_dir = $fs->normalizePath($vendor_dir);
+    $core = $composer
+      ->getRepositoryManager()
+      ->getLocalRepository()
+      ->findPackage('drupal/core', '*');
+    if (!$core) {
+      // This can only happen in testing scenarios.
+      $io->write('This is not a Drupal install, Drupal autoloader skipped.');
+      return;
+    }
+    $core_path = $composer
+      ->getInstallationManager()
+      ->getInstallPath($core);
+    $fs->rename($vendor_dir . '/autoload.php', $vendor_dir . '/autoload_composer.php');
+    $fs->safeCopy($core_path . '/assets/scaffold/files/autoload.php', $vendor_dir . '/autoload.php');
+    $io->write('Drupal autoloader copied.');
+  }
+
+  /**
+   * Writes a Drupal class into vendor/Drupal.
+   *
+   * @param string $vendor_dir
+   *   Typically, the string vendor.
+   * @param string $filename
+   *   The name of the file to write.
+   * @param string $contents
+   *   The contents of the file to write.
+   *
+   * @return string
+   *   The path to be added to the autoloader.
+   */
+  protected static function writeDrupalClass(string $vendor_dir, string $filename, string $contents): string {
     $filesystem = new Filesystem();
     // Do not remove double realpath() calls.
     // Fixes failing Windows realpath() implementation.
@@ -208,10 +331,8 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
     $vendor_path = realpath(realpath($vendor_dir));
     $filesystem->ensureDirectoryExists($vendor_path . '/drupal');
     // Create the Drupal\DrupalInstalled class.
-    file_put_contents($vendor_path . '/drupal/DrupalInstalled.php', DrupalInstalledTemplate::getCode($package, $repository));
-    $autoload['classmap'][] = $vendor_dir . '/drupal/DrupalInstalled.php';
-
-    $package->setAutoload($autoload);
+    file_put_contents($vendor_path . '/drupal/' . $filename, $contents);
+    return $vendor_dir . '/drupal/' . $filename;
   }
 
 }
