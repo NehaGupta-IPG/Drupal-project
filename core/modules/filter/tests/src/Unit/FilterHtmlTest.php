@@ -52,6 +52,8 @@ class FilterHtmlTest extends UnitTestCase {
   }
 
   /**
+   * Tests filter process 
+   * 
    * @legacy-covers ::process
    *
    * @param string $html
