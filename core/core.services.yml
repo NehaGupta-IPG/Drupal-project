@@ -556,7 +556,7 @@ services:
   Drupal\Core\KeyValueStore\KeyValueExpirableFactoryInterface: '@keyvalue.expirable'
   keyvalue.expirable.database:
     class: Drupal\Core\KeyValueStore\KeyValueDatabaseExpirableFactory
-    arguments: ['@serialization.phpserialize', '@database', '@datetime.time']
+    arguments: ['@Drupal\Component\Serialization\ObjectAwareSerializationInterface', '@database', '@datetime.time']
   logger.factory:
     class: Drupal\Core\Logger\LoggerChannelFactory
     arguments: ['@request_stack', '@current_user']
