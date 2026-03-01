@@ -148,12 +148,16 @@ class FilterHtmlTest extends UnitTestCase {
       ['<a>link text</a>', 'link text'],
       ['<em>emphasis</em>', 'emphasis'],
       // Preserve summary delimiter.
-      ['<p>some content</p><!--break--><p>some more content</p>', '<p>some content</p><!--break--><p>some more content</p>'],
+      [
+        '<p>some content</p><!--break--><p>some more content</p>', 
+        '<p>some content</p><!--break--><p>some more content</p>',
+      ],
     ];
   }
 
   /**
    * Tests set configuration.
+   *
    * @covers ::setConfiguration
    */
   public function testSetConfiguration(): void {
