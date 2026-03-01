@@ -8,9 +8,13 @@ source:
   plugin: variable
   variables:
     - image_jpeg_quality
+    - image_webp_quality
+    - image_webp_lossless
   source_module: system
 process:
   jpeg_quality: image_jpeg_quality
+  webp_quality: image_webp_quality
+  webp_lossless: image_webp_lossless
 destination:
   plugin: config
   config_name: system.image.gd

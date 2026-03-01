@@ -564,6 +564,7 @@ webcal
 webflo
 webhosting
 webmention
+webp
 webroot
 webservers
 widthx

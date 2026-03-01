@@ -132,6 +132,33 @@ class GDToolkit extends ImageToolkitBase {
       '#default_value' => $this->configFactory->getEditable('system.image.gd')->get('jpeg_quality', FALSE),
       '#field_suffix' => $this->t('%'),
     ];
+
+    // The PHP GD extension offers lossless encoding for WebP images. It
+    // provides a constant IMG_WEBP_LOSSLESS. When this constant is passed to
+    // the imagewebp function, it enables lossless compression of a GdImage
+    // object.
+    $form['image_webp_lossless'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Lossless WebP'),
+      '#description' => $this->t('Define the image quality for WebP to lossless compression. This will override the WebP quality setting below.'),
+      '#default_value' => $this->configFactory->getEditable('system.image.gd')
+        ->get('webp_lossless', FALSE),
+    ];
+    $form['image_webp_quality'] = [
+      '#type' => 'number',
+      '#title' => $this->t('WebP quality'),
+      '#description' => $this->t('Define the image quality for WebP manipulations. Ranges from 0 to 100. Higher values mean better image quality but bigger files.'),
+      '#min' => 0,
+      '#max' => 100,
+      '#default_value' => $this->configFactory->getEditable('system.image.gd')
+        ->get('webp_quality', FALSE),
+      '#field_suffix' => $this->t('%'),
+      '#states' => [
+        'invisible' => [
+          ':input[name="gd[image_webp_lossless]"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
     return $form;
   }
 
@@ -139,8 +166,14 @@ class GDToolkit extends ImageToolkitBase {
    * {@inheritdoc}
    */
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+    if ($form_state->hasValue(['gd', 'image_webp_lossless'])) {
+      $this->configFactory->getEditable('system.image.gd')
+        ->set('webp_lossless', $form_state->getValue(['gd', 'image_webp_lossless']))
+        ->save();
+    }
     $this->configFactory->getEditable('system.image.gd')
       ->set('jpeg_quality', $form_state->getValue(['gd', 'image_jpeg_quality']))
+      ->set('webp_quality', $form_state->getValue(['gd', 'image_webp_quality']))
       ->save();
   }
 
@@ -262,7 +295,15 @@ class GDToolkit extends ImageToolkitBase {
         imagesavealpha($this->getImage(), TRUE);
       }
       try {
-        $success = $function($this->getImage(), $destination);
+        if ($this->getType() == IMAGETYPE_WEBP) {
+          $webp_quality = $this->configFactory->get('system.image.gd')->get('webp_lossless')
+            ? constant('IMG_WEBP_LOSSLESS')
+            : $this->configFactory->get('system.image.gd')->get('webp_quality');
+          $success = $function($this->getImage(), $destination, $webp_quality);
+        }
+        else {
+          $success = $function($this->getImage(), $destination);
+        }
       }
       catch (\Throwable $t) {
         $this->logger->error("The image toolkit '@toolkit' failed saving image '@image'. Reported error: @class - @message", [

@@ -61,6 +61,8 @@ class MigrateSystemConfigurationTest extends MigrateDrupal6TestBase {
     ],
     'system.image.gd' => [
       'jpeg_quality' => 75,
+      'webp_quality' => 75,
+      'webp_lossless' => FALSE,
     ],
     'system.image' => [
       'toolkit' => 'gd',
