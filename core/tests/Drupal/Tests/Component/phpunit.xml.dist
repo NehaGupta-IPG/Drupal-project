@@ -22,9 +22,10 @@
   <extensions>
     <!-- Deprecation handler. -->
     <bootstrap class="Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler">
-      <parameter name="enabled" value="true"/>
-      <parameter name="debugClassLoader" value="true"/>
-      <parameter name="ignoreFile" value="core/.deprecation-ignore.txt"/>
+      <parameter name="enableProjectIgnores" value="true"/>
+      <parameter name="projectIgnoreFile" value="core/.deprecation-ignore.txt"/>
+      <parameter name="enableDebugClassLoader" value="true"/>
+      <parameter name="enableCollectStats" value="true"/>
     </bootstrap>
   </extensions>
   <testsuites>

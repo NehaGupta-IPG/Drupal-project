@@ -287,12 +287,11 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
     else {
       // If the deprecation handler bridge is active, we need to fail when there
       // are deprecations that get reported (i.e. not ignored or expected).
-      $deprecationConfiguration = DeprecationHandler::getConfiguration();
-      if ($deprecationConfiguration !== FALSE) {
-        $command[] = '--fail-on-deprecation';
-        if ($deprecationConfiguration['failOnPhpunitDeprecation']) {
-          $command[] = '--fail-on-phpunit-deprecation';
-        }
+      $command[] = '--fail-on-deprecation';
+      $env = getenv('PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION');
+      $failOnPhpUnitDeprecation = filter_var(($env !== FALSE ? $env : TRUE), \FILTER_VALIDATE_BOOLEAN);
+      if ($failOnPhpUnitDeprecation) {
+        $command[] = '--fail-on-phpunit-deprecation';
       }
     }
 

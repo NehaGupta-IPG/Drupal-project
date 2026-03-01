@@ -59,7 +59,7 @@ final class BootstrapErrorHandler {
     int $errorLine,
     ?TestCase $testCase = NULL,
   ): bool {
-    if (!DeprecationHandler::isEnabled()) {
+    if (!DeprecationHandler::projectIgnoresEnabled()) {
       throw new \RuntimeException(__METHOD__ . '() must not be called if the deprecation handler is not enabled.');
     }
 

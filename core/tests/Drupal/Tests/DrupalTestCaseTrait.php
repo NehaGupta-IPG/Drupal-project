@@ -23,7 +23,7 @@ trait DrupalTestCaseTrait {
     // We expect that the current error handler is the one set during the
     // PHPUnit bootstrap. If not, the error handler was changed during the test
     // execution but not properly restored during ::tearDown().
-    if (DeprecationHandler::isEnabled() && !get_error_handler() instanceof BootstrapErrorHandler) {
+    if (DeprecationHandler::projectIgnoresEnabled() && !get_error_handler() instanceof BootstrapErrorHandler) {
       throw new \RuntimeException(sprintf('%s registered its own error handler without restoring the previous one before or during tear down. This can cause unpredictable test results. Ensure the test cleans up after itself.', $this->name()));
     }
   }
