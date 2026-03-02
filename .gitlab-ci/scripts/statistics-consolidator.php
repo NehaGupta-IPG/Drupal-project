@@ -94,6 +94,6 @@ foreach ($tmp_test as $test => $ignored) {
   if ($ignored === 0) {
     $msg = "\033[" . "33" . "m" . $msg . "\033[0m";
   }
-  echo sprintf($msg . "\n", trim_with_ellipsis(rtrim($test, "\n"), 80, \STR_PAD_RIGHT));
+  echo sprintf($msg . "\n", $ignored, trim_with_ellipsis(rtrim($test, "\n"), 80, \STR_PAD_RIGHT));
 }
 echo "-----------+----------------------------------------------------------------------\n";
