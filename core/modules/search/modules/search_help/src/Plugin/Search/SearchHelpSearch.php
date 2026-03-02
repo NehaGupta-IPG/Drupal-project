@@ -7,7 +7,6 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\PagerSelectExtender;
-use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Messenger\MessengerInterface;
@@ -157,7 +156,7 @@ class SearchHelpSearch extends SearchPluginBase implements AccessibleInterface, 
     }
     $query->searchExpression($this->getKeywords(), $this->getType());
 
-    $find = $query
+    $result = $query
       ->fields('i', ['langcode'])
       ->fields('hsi', ['section_plugin_id', 'topic_id'])
       // Since SearchQuery makes these into GROUP BY queries, if we add
@@ -168,6 +167,8 @@ class SearchHelpSearch extends SearchPluginBase implements AccessibleInterface, 
       ->groupBy('hsi.topic_id')
       ->limit(10)
       ->execute();
+
+    $find = $result?->fetchAll() ?: [];
 
     // Check query status and set messages if needed.
     $status = $query->getStatus();
@@ -195,13 +196,13 @@ class SearchHelpSearch extends SearchPluginBase implements AccessibleInterface, 
   /**
    * Prepares search results for display.
    *
-   * @param \Drupal\Core\Database\StatementInterface $found
+   * @param array $found
    *   Results found from a successful search query execute() method.
    *
    * @return array
    *   List of search result render arrays, with links, snippets, etc.
    */
-  protected function prepareResults(StatementInterface $found) {
+  protected function prepareResults(array $found) {
     $results = [];
     $plugins = [];
     $languages = [];
