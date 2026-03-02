@@ -40,6 +40,15 @@ class DateTimeDefaultWidget extends DateTimeWidgetBase {
   /**
    * {@inheritdoc}
    */
+  public static function defaultSettings() {
+    return [
+      'date_increment' => '1',
+    ] + parent::defaultSettings();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $plugin_id,
@@ -56,6 +65,8 @@ class DateTimeDefaultWidget extends DateTimeWidgetBase {
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
+
+    $element['value']['#date_increment'] = $this->getSetting('date_increment');
 
     // If the field is date-only, make sure the title is displayed. Otherwise,
     // wrap everything in a fieldset, and the title will be shown in the legend.
@@ -94,6 +105,33 @@ class DateTimeDefaultWidget extends DateTimeWidgetBase {
     ];
 
     return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsForm(array $form, FormStateInterface $form_state) {
+    $element = [];
+    if ($this->getFieldSetting('datetime_type') === DateTimeItem::DATETIME_TYPE_DATETIME) {
+      // Create the date increment element. Default to one second.
+      $element['date_increment'] = [
+        '#type' => 'number',
+        '#title' => $this->t('Step'),
+        '#description' => $this->t('The number of seconds the element will step over. If the value is a multiple of 60, seconds will be disabled in the element. If the value is a multiple of 3600, minutes will be disabled.'),
+        '#default_value' => $this->getSetting('date_increment'),
+      ];
+    }
+    return $element;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function settingsSummary() {
+    if ($this->getFieldSetting('datetime_type') === DateTimeItem::DATETIME_TYPE_DATETIME) {
+      return [$this->t('Step: @step', ['@step' => $this->getSetting('date_increment')])];
+    }
+    return [];
   }
 
 }
