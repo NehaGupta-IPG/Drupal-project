@@ -234,7 +234,7 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
     $this->addNodeRankings($query);
 
     // Run the query.
-    $find = $query
+    $result = $query
       // Add the language code of the indexed item to the result of the query,
       // since the node will be rendered using the respective language.
       ->fields('i', ['langcode'])
@@ -243,7 +243,8 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
       // GROUP BY. In this case, we want GROUP BY.
       ->groupBy('i.langcode')
       ->limit(10)
-      ->execute()->fetchAll();
+      ->execute();
+    $find = $result?->fetchAll() ?: [];
 
     // Check query status and set messages if needed.
     $status = $query->getStatus();
