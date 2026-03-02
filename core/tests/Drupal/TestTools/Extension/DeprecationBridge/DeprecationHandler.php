@@ -163,6 +163,8 @@ final class DeprecationHandler implements Extension {
     putenv('_DRUPAL_DEPRECATION_HANDLER_CONFIG=' . $config);
 
     $facade->registerSubscriber(new TestPreparationStartedSubscriber());
+    $facade->registerSubscriber(new DeprecationSubscriber());
+    $facade->registerSubscriber(new PhpDeprecationSubscriber());
     $facade->registerSubscriber(new TestFinishedSubscriber());
     $facade->registerSubscriber(new TestRunnerFinishedSubscriber($this));
 
@@ -327,7 +329,9 @@ final class DeprecationHandler implements Extension {
   /**
    * Write a statistic entry.
    */
-  public static function writeStatisticEntry(string $status, ?TestMethod $testMethod, ?string $ignorePattern, string $triggeringMessage): void {
+  public static function writeStatisticEntry(string $status, array $stat): void {
+    $stat['status'] = $status;
+
     $configEnv = getenv('_DRUPAL_DEPRECATION_HANDLER_CONFIG');
 
     if (empty($configEnv)) {
@@ -336,16 +340,6 @@ final class DeprecationHandler implements Extension {
     }
 
     $config = (array) json_decode($configEnv);
-
-    $stat = [];
-    $stat['status'] = $status;
-    if ($testMethod !== NULL) {
-      $stat['test'] = $testMethod->id();
-    }
-    $stat['message'] = $triggeringMessage;
-    if ($ignorePattern !== NULL) {
-      $stat['ignore-pattern'] = $ignorePattern;
-    }
 
     file_put_contents(
       $config['stagingFilePath'],
@@ -365,7 +359,7 @@ final class DeprecationHandler implements Extension {
    * @param string $deprecationMessage
    *   The actual deprecation message triggered via trigger_error().
    */
-  public static function isIgnoredByProject(?TestMethod $testMethod, string $deprecationMessage): bool {
+  public static function isIgnoredByProject(?string $testMethod, string $deprecationMessage): bool {
     if (!self::projectIgnoresEnabled()) {
       return FALSE;
     }
@@ -375,29 +369,16 @@ final class DeprecationHandler implements Extension {
         throw new \RuntimeException(preg_last_error_msg());
       }
       if ((bool) $result) {
-        self::writeStatisticEntry('ignored_by_project', $testMethod, $pattern, $deprecationMessage);
+        $stat = [];
+        if ($testMethod !== NULL) {
+          $stat['test'] = $testMethod;
+        }
+        $stat['message'] = $deprecationMessage;
+        $stat['ignore-pattern'] = $pattern;
+        self::writeStatisticEntry('ignored_by_project', $stat);
         return TRUE;
       }
     }
-    return FALSE;
-  }
-
-  /**
-   * Determines if an actual deprecation is ignored by the project.
-   *
-   * Deprecations that match the patterns included in the ignore file should
-   * be ignored.
-   *
-   * @param \PHPUnit\Framework\TestMethod|null $testMethod
-   *   The test case being executed.
-   * @param string $deprecationMessage
-   *   The actual deprecation message triggered via trigger_error().
-   */
-  public static function reported(?TestMethod $testMethod, string $deprecationMessage): bool {
-    if (!self::projectIgnoresEnabled()) {
-      return FALSE;
-    }
-    self::writeStatisticEntry('reported', $testMethod, NULL, $deprecationMessage);
     return FALSE;
   }
 

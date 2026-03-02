@@ -16,7 +16,7 @@ use PHPUnit\Event\Test\FinishedSubscriber;
 final class TestFinishedSubscriber implements FinishedSubscriber {
 
   public function notify(Finished $event): void {
-    BootstrapErrorHandler::setCurrentTest(NULL);
+    BootstrapErrorHandler::testFinished();
   }
 
 }
