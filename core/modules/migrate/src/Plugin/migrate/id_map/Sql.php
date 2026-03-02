@@ -922,7 +922,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
     $this->result = $this->getDatabase()->select($this->mapTableName(), 'map')
       ->fields('map', $fields)
       ->orderBy('destid1')
-      ->execute();
+      ->execute()->fetchAll(FetchAs::Associative);
     $this->next();
   }
 
@@ -987,7 +987,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
    * from rewind().
    */
   public function next(): void {
-    $this->currentRow = $this->result->fetchAssoc();
+    $this->currentRow = array_shift($this->result) ?: FALSE;
     $this->currentKey = [];
     if ($this->currentRow) {
       foreach ($this->sourceIdFields() as $map_field) {
