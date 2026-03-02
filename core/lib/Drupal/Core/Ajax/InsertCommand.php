@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Ajax;
 
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
+
 /**
  * Generic AJAX command for inserting content.
  *
@@ -14,7 +16,7 @@ namespace Drupal\Core\Ajax;
  *
  * @ingroup ajax
  */
-class InsertCommand implements CommandInterface, CommandWithAttachedAssetsInterface {
+class InsertCommand implements CommandInterface, CommandWithAttachedAssetsInterface, RefinableCacheableDependencyInterface {
 
   use CommandWithAttachedAssetsTrait;
 

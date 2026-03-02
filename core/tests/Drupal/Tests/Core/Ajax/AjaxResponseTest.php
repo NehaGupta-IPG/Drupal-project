@@ -6,6 +6,8 @@ namespace Drupal\Tests\Core\Ajax;
 
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\CommandInterface;
+use Drupal\Core\Ajax\InsertCommand;
+use Drupal\Core\Cache\CacheableAjaxResponse;
 use Drupal\Core\EventSubscriber\AjaxResponseSubscriber;
 use Drupal\Core\Render\AttachmentsResponseProcessorInterface;
 use Drupal\Tests\UnitTestCase;
@@ -146,6 +148,25 @@ class AjaxResponseTest extends UnitTestCase {
   }
 
   /**
+   * Tests CacheableAjaxResponse with commands.
+   */
+  public function testCommandCache(): void {
+    // Check that the command cache tags correctly bubble to the response.
+    $response = new CacheableAjaxResponse();
+    $command = $this->createCommandMockWithSettingsAndLibrariesAttachments(
+      InsertCommand::class,
+      NULL,
+      NULL,
+      'command_with_cache'
+    );
+    $response->addCommand($command);
+    self::assertEquals(
+      ['my_cache_tag'],
+      $response->getCacheableMetadata()->getCacheTags()
+    );
+  }
+
+  /**
    * Creates a mock of a provided subclass of CommandInterface.
    *
    * Adds given settings and libraries to assets mock
@@ -176,6 +197,10 @@ class AjaxResponseTest extends UnitTestCase {
     $assets->expects($this->once())->method('getSettings')->willReturn($settings);
 
     $command->expects($this->once())->method('getAttachedAssets')->willReturn($assets);
+
+    $command->expects($this->any())
+      ->method('getCacheTags')
+      ->willReturn(['my_cache_tag']);
 
     return $command;
   }

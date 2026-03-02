@@ -3,13 +3,14 @@
 namespace Drupal\Core\Ajax;
 
 use Drupal\Component\Render\PlainTextOutput;
+use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 
 /**
  * Defines an AJAX command to open certain content in a dialog.
  *
  * @ingroup ajax
  */
-class OpenDialogCommand implements CommandInterface, CommandWithAttachedAssetsInterface {
+class OpenDialogCommand implements CommandInterface, CommandWithAttachedAssetsInterface, RefinableCacheableDependencyInterface {
 
   use CommandWithAttachedAssetsTrait;
 
