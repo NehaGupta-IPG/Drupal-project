@@ -306,4 +306,33 @@ class TableTest extends KernelTestBase {
     $this->assertRaw('Update my favorite fruit is <strong>bananas</strong>');
   }
 
+  /**
+   * Tests multi rows header table.
+   */
+  public function testThemeTableHeaderMultiRows(): void {
+    $table = [
+      '#type' => 'table',
+      '#header' => [
+        'row1' => [
+          'bigcell' => [
+            'data' => 'Big header',
+            'rowspan' => 2,
+          ],
+          'longcell' => [
+            'data' => 'Long header',
+            'colspan' => 2,
+          ],
+          'Small header',
+        ],
+        'row2' => ['cell1', 'cell2', 'cell3'],
+      ],
+      '#header_multilevel' => TRUE,
+      '#empty' => 'There are no lines here.',
+    ];
+    $this->render($table);
+    $this->removeWhiteSpace();
+    $this->assertRaw('<thead><tr><th rowspan="2">Big header</th><th colspan="2">Long header</th><th>Small header</th></tr><tr><th>cell1</th><th>cell2</th><th>cell3</th></tr></thead>', 'Table header found.');
+    $this->assertRaw('<tbody><tr><td colspan="4">There are no lines here.</td></tr></tbody>', 'Table empty message found.');
+  }
+
 }

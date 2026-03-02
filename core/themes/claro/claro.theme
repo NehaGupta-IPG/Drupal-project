@@ -1046,12 +1046,15 @@ function claro_preprocess_table(&$variables): void {
   // @todo Revisit after https://www.drupal.org/node/3025726 or
   //   https://www.drupal.org/node/1973418 is in.
   if (!empty($variables['header'])) {
-    foreach ($variables['header'] as &$header_cell) {
-      if ($header_cell['content'] instanceof Link) {
-        $query = $header_cell['content']->getUrl()->getOption('query') ?: [];
+    $rows = empty($variables['header_multilevel']) ? [$variables['header']] : $variables['header'];
+    foreach ($rows as $header_row) {
+      foreach ($header_row as $header_cell) {
+        if ($header_cell['content'] instanceof Link) {
+          $query = $header_cell['content']->getUrl()->getOption('query') ?: [];
 
-        if (isset($query['order']) && isset($query['sort'])) {
-          $header_cell['attributes']->addClass('sortable-heading');
+          if (isset($query['order']) && isset($query['sort'])) {
+            $header_cell['attributes']->addClass('sortable-heading');
+          }
         }
       }
     }

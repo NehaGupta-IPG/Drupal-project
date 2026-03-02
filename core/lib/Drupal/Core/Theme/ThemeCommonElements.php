@@ -115,6 +115,7 @@ class ThemeCommonElements {
       'table' => [
         'variables' => [
           'header' => NULL,
+          'header_multilevel' => NULL,
           'rows' => NULL,
           'footer' => NULL,
           'attributes' => [],
