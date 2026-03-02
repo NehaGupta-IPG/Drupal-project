@@ -8,6 +8,7 @@ use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
 use PHPUnit\Event\Code\NoTestCaseObjectOnCallStackException;
 use PHPUnit\Event\Code\TestMethod;
 use PHPUnit\Event\Test\DeprecationTriggered;
+use PHPUnit\Event\Test\PhpDeprecationTriggered;
 use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
 
 /**
@@ -52,7 +53,7 @@ final class BootstrapErrorHandler {
     }
   }
 
-  public static function deprecationTriggered(DeprecationTriggered $deprecation): void {
+  public static function deprecationTriggered(DeprecationTriggered|PhpDeprecationTriggered $deprecation): void {
     if ($deprecation->ignoredByTest() || $deprecation->ignoredByBaseline()) {
       self::$currentTest['ignored_by_phpunit'][] = $deprecation->message();
       return;
