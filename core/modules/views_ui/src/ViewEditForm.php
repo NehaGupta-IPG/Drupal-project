@@ -2,12 +2,13 @@
 
 namespace Drupal\views_ui;
 
-use Drupal\Component\Utility\Html;
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\HtmlCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Datetime\DateFormatterInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Render\ElementInfoManagerInterface;
@@ -19,7 +20,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
  * Form controller for the Views edit form.
@@ -221,7 +221,6 @@ class ViewEditForm extends ViewFormBase {
         $tab_content['#attributes']['class'][] = 'views-display-deleted';
       }
       // Mark disabled displays as such.
-
       if ($view->getExecutable()->displayHandlers->has($display_id) && !$view->getExecutable()->displayHandlers->get($display_id)->isEnabled()) {
         $tab_content['#attributes']['class'][] = 'views-display-disabled';
       }
@@ -772,6 +771,16 @@ class ViewEditForm extends ViewFormBase {
         'reorder' => [
           'title' => $this->t('Reorder displays'),
           'url' => Url::fromRoute('views_ui.form_reorder_displays', ['js' => 'nojs', 'view' => $view->id(), 'display_id' => $display_id]),
+          'attributes' => ['class' => ['views-ajax-link']],
+        ],
+        'enable' => [
+          'title' => $this->t('Enable View'),
+          'url' => Url::fromRoute('entity.view.enable', ['js' => 'nojs', 'view' => $view->id(), 'display_id' => $display_id]),
+          'attributes' => ['class' => ['views-ajax-link']],
+        ],
+        'disable' => [
+          'title' => $this->t('Disable View'),
+          'url' => Url::fromRoute('entity.view.disable', ['js' => 'nojs', 'view' => $view->id(), 'display_id' => $display_id]),
           'attributes' => ['class' => ['views-ajax-link']],
         ],
       ],
