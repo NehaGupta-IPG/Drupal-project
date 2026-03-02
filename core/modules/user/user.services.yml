@@ -31,9 +31,6 @@ services:
     tags:
       - { name: backend_overridable }
   Drupal\user\UserDataInterface: '@user.data'
-  user_maintenance_mode_subscriber:
-    class: Drupal\user\EventSubscriber\MaintenanceModeSubscriber
-    arguments: ['@maintenance_mode', '@current_user']
   user_access_denied_subscriber:
     class: Drupal\user\EventSubscriber\AccessDeniedSubscriber
     arguments: ['@current_user']

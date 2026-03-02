@@ -15,6 +15,7 @@ user.logout:
     _csrf_token: 'TRUE'
   options:
     _csrf_confirm_form_route: 'user.logout.confirm'
+    _maintenance_access: TRUE
 
 user.logout.confirm:
   path: '/user/logout/confirm'
@@ -22,6 +23,8 @@ user.logout.confirm:
     _form: '\Drupal\user\Form\UserLogoutConfirm'
   requirements:
     _user_is_logged_in: 'TRUE'
+  options:
+    _maintenance_access: TRUE
 
 user.admin_index:
   path: '/admin/config/people'

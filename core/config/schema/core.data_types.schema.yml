@@ -209,6 +209,14 @@ _core_config_info:
         # works, this is always going to be 43 characters long.
         Length:
           exactly: 43
+    schemas:
+      type: sequence
+      label: 'Schemas'
+      sequence:
+        type: string
+    schema_signature:
+      type: string
+      label: 'Schema signature'
   constraints:
     ValidKeys:
       allowedKeys: ['default_config_hash']
