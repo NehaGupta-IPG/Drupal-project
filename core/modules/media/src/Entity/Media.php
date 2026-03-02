@@ -143,7 +143,8 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
    * {@inheritdoc}
    */
   public function getCreatedTime() {
-    return $this->get('created')->value;
+    $value = $this->get('created')->value;
+    return isset($value) ? (int) $value : NULL;
   }
 
   /**

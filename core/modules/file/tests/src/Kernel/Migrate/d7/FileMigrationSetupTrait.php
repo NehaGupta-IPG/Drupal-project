@@ -75,7 +75,7 @@ trait FileMigrationSetupTrait {
     $this->assertSame($size, $file->getSize());
     // isPermanent(), isTemporary(), etc. are determined by the status column.
     $this->assertTrue($file->isPermanent());
-    $this->assertSame($created, $file->getCreatedTime());
+    $this->assertSame((int) $created, $file->getCreatedTime());
     $this->assertSame($changed, $file->getChangedTime());
     $this->assertSame($uid, $file->getOwnerId());
   }

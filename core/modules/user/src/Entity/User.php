@@ -280,7 +280,10 @@ class User extends ContentEntityBase implements UserInterface {
    * {@inheritdoc}
    */
   public function getCreatedTime() {
-    return $this->get('created')->value;
+    $value = $this->get('created')->value;
+    // @todo Change to not return NULL according to UserInterface in
+    //   https://www.drupal.org/project/drupal/issues/3533981
+    return isset($value) ? (int) $value : NULL;
   }
 
   /**

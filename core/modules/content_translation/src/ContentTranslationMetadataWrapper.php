@@ -105,7 +105,8 @@ class ContentTranslationMetadataWrapper implements ContentTranslationMetadataWra
    */
   public function getCreatedTime() {
     $field_name = $this->translation->hasField('content_translation_created') ? 'content_translation_created' : 'created';
-    return $this->translation->get($field_name)->value;
+    $value = $this->translation->get($field_name)->value;
+    return isset($value) ? (int) $value : NULL;
   }
 
   /**

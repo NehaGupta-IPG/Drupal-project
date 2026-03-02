@@ -71,7 +71,7 @@ class MigrateCommentTest extends MigrateDrupal7TestBase {
     $comment = Comment::load(1);
     $this->assertInstanceOf(Comment::class, $comment);
     $this->assertSame('Subject field in English', $comment->getSubject());
-    $this->assertSame('1421727536', $comment->getCreatedTime());
+    $this->assertSame(1421727536, $comment->getCreatedTime());
     $this->assertSame(1421727536, $comment->getChangedTime());
     $this->assertTrue($comment->isPublished());
     $this->assertSame('admin', $comment->getAuthorName());
@@ -113,7 +113,7 @@ class MigrateCommentTest extends MigrateDrupal7TestBase {
     $comment = Comment::load(4);
     $this->assertInstanceOf(Comment::class, $comment);
     $this->assertSame('Comment without language', $comment->getSubject());
-    $this->assertSame('1426781880', $comment->getCreatedTime());
+    $this->assertSame(1426781880, $comment->getCreatedTime());
     $this->assertSame(1426781880, $comment->getChangedTime());
     $this->assertTrue($comment->isPublished());
     $this->assertSame('Bob', $comment->getAuthorName());
@@ -149,7 +149,7 @@ class MigrateCommentTest extends MigrateDrupal7TestBase {
     $this->assertFalse($metadata_fr->isPublished());
     $this->assertSame('en', $metadata_fr->getSource());
     $this->assertSame('1', $metadata_fr->getAuthor()->uid->value);
-    $this->assertSame('1531837764', $metadata_fr->getCreatedTime());
+    $this->assertSame(1531837764, $metadata_fr->getCreatedTime());
     $this->assertSame(1531837764, $metadata_fr->getChangedTime());
     $this->assertFalse($metadata_fr->isOutdated());
 
@@ -158,7 +158,7 @@ class MigrateCommentTest extends MigrateDrupal7TestBase {
     $this->assertTrue($metadata_is->isPublished());
     $this->assertSame('en', $metadata_is->getSource());
     $this->assertSame('2', $metadata_is->getAuthor()->uid->value);
-    $this->assertSame('1531838064', $metadata_is->getCreatedTime());
+    $this->assertSame(1531838064, $metadata_is->getCreatedTime());
     $this->assertSame(1531838064, $metadata_is->getChangedTime());
     $this->assertTrue($metadata_is->isOutdated());
   }

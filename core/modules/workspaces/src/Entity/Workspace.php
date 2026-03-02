@@ -132,7 +132,10 @@ class Workspace extends ContentEntityBase implements WorkspaceInterface {
    * {@inheritdoc}
    */
   public function getCreatedTime() {
-    return $this->get('created')->value;
+    $value = $this->get('created')->value;
+    // @todo Change to not return NULL according to WorkspaceInterface in
+    //   https://www.drupal.org/project/drupal/issues/3533981
+    return isset($value) ? (int) $value : NULL;
   }
 
   /**

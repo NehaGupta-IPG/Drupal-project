@@ -236,7 +236,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '2',
           'title' => 'An English Node',
-          'created' => '1529615790',
+          'created' => 1529615790,
           'changed' => '1529615790',
           'promote' => '1',
           'sticky' => '0',
@@ -254,7 +254,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '2',
           'title' => 'The thing about Deep Space 9',
-          'created' => '1441306772',
+          'created' => 1441306772,
           'changed' => '1564543637',
           'promote' => '1',
           'sticky' => '0',
@@ -272,7 +272,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'is - The thing about Deep Space 9',
-          'created' => '1471428152',
+          'created' => 1471428152,
           'changed' => '1564543706',
           'promote' => '1',
           'sticky' => '0',
@@ -290,7 +290,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'en - The thing about Firefly',
-          'created' => '1478755314',
+          'created' => 1478755314,
           'changed' => '1564543929',
           'promote' => '1',
           'sticky' => '0',
@@ -308,7 +308,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'is - The thing about Firefly',
-          'created' => '1478755274',
+          'created' => 1478755274,
           'changed' => '1564543810',
           'promote' => '1',
           'sticky' => '0',
@@ -326,7 +326,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'Comments are closed :-(',
-          'created' => '1504715414',
+          'created' => 1504715414,
           'changed' => '1504715414',
           'promote' => '0',
           'sticky' => '0',
@@ -344,7 +344,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'Comments are open :-)',
-          'created' => '1504715432',
+          'created' => 1504715432,
           'changed' => '1504715432',
           'promote' => '0',
           'sticky' => '0',
@@ -362,7 +362,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'The number 47',
-          'created' => '1551000341',
+          'created' => 1551000341,
           'changed' => '1552126247',
           'promote' => '1',
           'sticky' => '0',
@@ -380,7 +380,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'fr - The number 47',
-          'created' => '1552126296',
+          'created' => 1552126296,
           'changed' => '1552126296',
           'promote' => '1',
           'sticky' => '0',
@@ -398,7 +398,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'is - The number 47',
-          'created' => '1552126363',
+          'created' => 1552126363,
           'changed' => '1552126363',
           'promote' => '1',
           'sticky' => '0',
@@ -416,7 +416,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'Page one',
-          'created' => '1568261523',
+          'created' => 1568261523,
           'changed' => '1568261687',
           'promote' => '0',
           'sticky' => '0',
@@ -434,7 +434,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'Page one',
-          'created' => '1568261721',
+          'created' => 1568261721,
           'changed' => '1568261721',
           'promote' => '0',
           'sticky' => '0',
@@ -452,7 +452,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'Page one',
-          'created' => '1568261548',
+          'created' => 1568261548,
           'changed' => '1568261548',
           'promote' => '0',
           'sticky' => '0',
@@ -480,7 +480,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '2',
           'title' => 'An English Node',
-          'created' => '1529615790',
+          'created' => 1529615790,
           'changed' => '1529615790',
           'promote' => '1',
           'sticky' => '0',
@@ -497,7 +497,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '2',
           'title' => 'The thing about Deep Space 9 (1st rev)',
-          'created' => '1441306772',
+          'created' => 1441306772,
           'changed' => '1564543588',
           'promote' => '1',
           'sticky' => '0',
@@ -514,7 +514,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '2',
           'title' => 'The thing about Deep Space 9 (1st rev)',
-          'created' => '1441306772',
+          'created' => 1441306772,
           'changed' => '1564543588',
           'promote' => '1',
           'sticky' => '0',
@@ -531,7 +531,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'is - The thing about Deep Space 9 (1st rev)',
-          'created' => '1471428152',
+          'created' => 1471428152,
           'changed' => '1564543677',
           'promote' => '1',
           'sticky' => '0',
@@ -548,7 +548,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'is - The thing about Firefly (1st rev)',
-          'created' => '1478755274',
+          'created' => 1478755274,
           'changed' => '1478755274',
           'promote' => '1',
           'sticky' => '0',
@@ -565,7 +565,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'en - The thing about Firefly (1st rev)',
-          'created' => '1478755314',
+          'created' => 1478755314,
           'changed' => '1564543887',
           'promote' => '1',
           'sticky' => '0',
@@ -582,7 +582,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'is - The thing about Firefly (1st rev)',
-          'created' => '1478755274',
+          'created' => 1478755274,
           'changed' => '1478755274',
           'promote' => '1',
           'sticky' => '0',
@@ -599,7 +599,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'Comments are closed :-(',
-          'created' => '1504715414',
+          'created' => 1504715414,
           'changed' => '1504715414',
           'promote' => '0',
           'sticky' => '0',
@@ -616,7 +616,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'Comments are open :-)',
-          'created' => '1504715432',
+          'created' => 1504715432,
           'changed' => '1504715432',
           'promote' => '0',
           'sticky' => '0',
@@ -633,7 +633,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'The number 47',
-          'created' => '1551000341',
+          'created' => 1551000341,
           'changed' => '1552126247',
           'promote' => '1',
           'sticky' => '0',
@@ -650,7 +650,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'The number 47',
-          'created' => '1551000341',
+          'created' => 1551000341,
           'changed' => '1552126247',
           'promote' => '1',
           'sticky' => '0',
@@ -667,7 +667,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'fr - The number 47',
-          'created' => '1552126296',
+          'created' => 1552126296,
           'changed' => '1552126296',
           'promote' => '1',
           'sticky' => '0',
@@ -684,7 +684,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'The number 47',
-          'created' => '1551000341',
+          'created' => 1551000341,
           'changed' => '1552126247',
           'promote' => '1',
           'sticky' => '0',
@@ -701,7 +701,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'fr - The number 47',
-          'created' => '1552126296',
+          'created' => 1552126296,
           'changed' => '1552126296',
           'promote' => '1',
           'sticky' => '0',
@@ -718,7 +718,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'is - The number 47',
-          'created' => '1552126363',
+          'created' => 1552126363,
           'changed' => '1552126363',
           'promote' => '1',
           'sticky' => '0',
@@ -735,7 +735,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '2',
           'title' => 'The thing about Deep Space 9',
-          'created' => '1441306772',
+          'created' => 1441306772,
           'changed' => '1564543637',
           'promote' => '1',
           'sticky' => '0',
@@ -752,7 +752,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'is - The thing about Deep Space 9 (1st rev)',
-          'created' => '1471428152',
+          'created' => 1471428152,
           'changed' => '1564543637',
           'promote' => '1',
           'sticky' => '0',
@@ -769,7 +769,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '2',
           'title' => 'The thing about Deep Space 9',
-          'created' => '1441306772',
+          'created' => 1441306772,
           'changed' => '1564543637',
           'promote' => '1',
           'sticky' => '0',
@@ -786,7 +786,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'is - The thing about Deep Space 9',
-          'created' => '1471428152',
+          'created' => 1471428152,
           'changed' => '1564543706',
           'promote' => '1',
           'sticky' => '0',
@@ -803,7 +803,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'en - The thing about Firefly (1st rev)',
-          'created' => '1478755314',
+          'created' => 1478755314,
           'changed' => '1564543887',
           'promote' => '1',
           'sticky' => '0',
@@ -820,7 +820,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'is - The thing about Firefly',
-          'created' => '1478755274',
+          'created' => 1478755274,
           'changed' => '1564543810',
           'promote' => '1',
           'sticky' => '0',
@@ -837,7 +837,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'en - The thing about Firefly',
-          'created' => '1478755314',
+          'created' => 1478755314,
           'changed' => '1564543929',
           'promote' => '1',
           'sticky' => '0',
@@ -854,7 +854,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'is - The thing about Firefly',
-          'created' => '1478755274',
+          'created' => 1478755274,
           'changed' => '1564543810',
           'promote' => '1',
           'sticky' => '0',
@@ -871,7 +871,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'Page one',
-          'created' => '1568261523',
+          'created' => 1568261523,
           'changed' => '1568261523',
           'promote' => '0',
           'sticky' => '0',
@@ -888,7 +888,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'Page one',
-          'created' => '1568261523',
+          'created' => 1568261523,
           'changed' => '1568261523',
           'promote' => '0',
           'sticky' => '0',
@@ -905,7 +905,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'Page one',
-          'created' => '1568261548',
+          'created' => 1568261548,
           'changed' => '1568261548',
           'promote' => '0',
           'sticky' => '0',
@@ -922,7 +922,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'Page one',
-          'created' => '1568261523',
+          'created' => 1568261523,
           'changed' => '1568261687',
           'promote' => '0',
           'sticky' => '0',
@@ -939,7 +939,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'Page one',
-          'created' => '1568261548',
+          'created' => 1568261548,
           'changed' => '1568261548',
           'promote' => '0',
           'sticky' => '0',
@@ -956,7 +956,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'Page one',
-          'created' => '1568261523',
+          'created' => 1568261523,
           'changed' => '1568261687',
           'promote' => '0',
           'sticky' => '0',
@@ -973,7 +973,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'Page one',
-          'created' => '1568261721',
+          'created' => 1568261721,
           'changed' => '1568261721',
           'promote' => '0',
           'sticky' => '0',
@@ -990,7 +990,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           'status' => '1',
           'uid' => '1',
           'title' => 'Page one',
-          'created' => '1568261548',
+          'created' => 1568261548,
           'changed' => '1568261548',
           'promote' => '0',
           'sticky' => '0',
@@ -1016,161 +1016,161 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
           [
             'log' => NULL,
             'field_text_long_plain' => NULL,
-            'revision_created' => '1529615790',
+            'revision_created' => 1529615790,
           ],
         // Node 2, revision 2, en.
         1 =>
           [
             'log' => 'DS9 1st rev',
             'field_text_long_plain' => 'DS9 1st rev',
-            'revision_created' => '1564543588',
+            'revision_created' => 1564543588,
           ],
         // Node 2, revision 3, en.
         2 =>
           [
             'log' => 'is - DS9 1st rev',
             'field_text_long_plain' => 'DS9 1st rev',
-            'revision_created' => '1564543677',
+            'revision_created' => 1564543677,
           ],
         // Node 2, revision 3, is.
         3 =>
           [
             'log' => 'is - DS9 1st rev',
             'field_text_long_plain' => 'is - DS9 1st rev',
-            'revision_created' => '1564543677',
+            'revision_created' => 1564543677,
           ],
         // Node 4, revision 4, is.
         4 =>
           [
             'log' => 'is - Firefly 1st rev',
             'field_text_long_plain' => NULL,
-            'revision_created' => '1478755274',
+            'revision_created' => 1478755274,
           ],
         // Node 4, revision 5, en.
         5 =>
           [
             'log' => 'Firefly 1st rev',
             'field_text_long_plain' => NULL,
-            'revision_created' => '1564543887',
+            'revision_created' => 1564543887,
           ],
         // Node 4, revision 5, is.
         6 =>
           [
             'log' => 'Firefly 1st rev',
             'field_text_long_plain' => NULL,
-            'revision_created' => '1564543887',
+            'revision_created' => 1564543887,
           ],
         // Node 6, revision 6, en.
         7 =>
           [
             'log' => NULL,
             'field_text_long_plain' => NULL,
-            'revision_created' => '1504715414',
+            'revision_created' => 1504715414,
           ],
         // Node 7, revision 7, en.
         8 =>
           [
             'log' => NULL,
             'field_text_long_plain' => NULL,
-            'revision_created' => '1504715432',
+            'revision_created' => 1504715432,
           ],
         // Node 8, revision 8, en.
         9 =>
           [
             'log' => NULL,
             'field_text_long_plain' => NULL,
-            'revision_created' => '1552126247',
+            'revision_created' => 1552126247,
           ],
         // Node 8, revision 9, en.
         10 =>
           [
             'log' => NULL,
             'field_text_long_plain' => NULL,
-            'revision_created' => '1552126296',
+            'revision_created' => 1552126296,
           ],
         // Node 8, revision 9, fr.
         11 =>
           [
             'log' => NULL,
             'field_text_long_plain' => NULL,
-            'revision_created' => '1552126296',
+            'revision_created' => 1552126296,
           ],
         // Node 8, revision 10, en.
         12 =>
           [
             'log' => NULL,
             'field_text_long_plain' => NULL,
-            'revision_created' => '1552126363',
+            'revision_created' => 1552126363,
           ],
         // Node 8, revision 10, fr.
         13 =>
           [
             'log' => NULL,
             'field_text_long_plain' => NULL,
-            'revision_created' => '1552126363',
+            'revision_created' => 1552126363,
           ],
         // Node 8, revision 10, is.
         14 =>
           [
             'log' => NULL,
             'field_text_long_plain' => NULL,
-            'revision_created' => '1552126363',
+            'revision_created' => 1552126363,
           ],
         // Node 2, revision 11, en.
         15 =>
           [
             'log' => 'DS9 2nd rev',
             'field_text_long_plain' => NULL,
-            'revision_created' => '1564543637',
+            'revision_created' => 1564543637,
           ],
         // Node 2, revision 11, is.
         16 =>
           [
             'log' => 'DS9 2nd rev',
             'field_text_long_plain' => NULL,
-            'revision_created' => '1564543637',
+            'revision_created' => 1564543637,
           ],
         // Node 2, revision 12, en.
         17 =>
           [
             'log' => 'is - DS9 2nd rev',
             'field_text_long_plain' => NULL,
-            'revision_created' => '1564543706',
+            'revision_created' => 1564543706,
           ],
         // Node 2, revision 12, is.
         18 =>
           [
             'log' => 'is - DS9 2nd rev',
             'field_text_long_plain' => NULL,
-            'revision_created' => '1564543706',
+            'revision_created' => 1564543706,
           ],
         // Node 4, revision 13, en.
         19 =>
           [
             'log' => 'is - Firefly 2nd rev',
             'field_text_long_plain' => NULL,
-            'revision_created' => '1564543810',
+            'revision_created' => 1564543810,
           ],
         // Node 4, revision 13, is.
         20 =>
           [
             'log' => 'is - Firefly 2nd rev',
             'field_text_long_plain' => NULL,
-            'revision_created' => '1564543810',
+            'revision_created' => 1564543810,
           ],
         // Node 4, revision 14, en.
         21 =>
           [
             'log' => 'Firefly 2nd rev',
             'field_text_long_plain' => NULL,
-            'revision_created' => '1564543929',
+            'revision_created' => 1564543929,
           ],
         // Node 4, revision 14, is.
         22 =>
           [
             'log' => 'Firefly 2nd rev',
             'field_text_long_plain' => NULL,
-            'revision_created' => '1564543929',
+            'revision_created' => 1564543929,
           ],
         // Node 11, revision 15, en.
         23 =>
@@ -1178,7 +1178,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
             'log' => NULL,
             'body' => '1st',
             'field_tree' => 'lancewood',
-            'revision_created' => '1568261523',
+            'revision_created' => 1568261523,
           ],
         // Node 11, revision 16, en.
         24 =>
@@ -1186,7 +1186,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
             'log' => NULL,
             'body' => '1st',
             'field_tree' => 'lancewood',
-            'revision_created' => '1568261548',
+            'revision_created' => 1568261548,
           ],
         // Node 11, revision 16, is.
         25 =>
@@ -1194,7 +1194,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
             'log' => NULL,
             'body' => '1st',
             'field_tree' => 'is - lancewood',
-            'revision_created' => '1568261548',
+            'revision_created' => 1568261548,
           ],
         // Node 11, revision 17, en.
         26 =>
@@ -1202,7 +1202,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
             'log' => '2nd',
             'body' => '2nd',
             'field_tree' => 'lancewood',
-            'revision_created' => '1568261548',
+            'revision_created' => 1568261548,
           ],
         // Node 11, revision 17, is.
         27 =>
@@ -1210,7 +1210,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
             'log' => '2nd',
             'body' => '2nd',
             'field_tree' => 'is - lancewood',
-            'revision_created' => '1568261548',
+            'revision_created' => 1568261548,
           ],
         // Node 11, revision 18, en.
         28 =>
@@ -1218,7 +1218,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
             'log' => NULL,
             'body' => '2nd',
             'field_tree' => 'lancewood',
-            'revision_created' => '1568261548',
+            'revision_created' => 1568261548,
           ],
         // Node 11, revision 18, f5.
         29 =>
@@ -1226,7 +1226,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
             'log' => NULL,
             'body' => '2nd',
             'field_tree' => 'fr - lancewood',
-            'revision_created' => '1568261548',
+            'revision_created' => 1568261548,
           ],
         // Node 11, revision 18, is.
         30 =>
@@ -1234,7 +1234,7 @@ class MigrateNodeCompleteTest extends MigrateDrupal7TestBase {
             'log' => NULL,
             'body' => '2nd',
             'field_tree' => 'is - lancewood',
-            'revision_created' => '1568261548',
+            'revision_created' => 1568261548,
           ],
       ],
     ];

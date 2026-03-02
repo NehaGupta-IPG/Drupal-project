@@ -37,8 +37,8 @@ interface MediaInterface extends ContentEntityInterface, EntityChangedInterface,
    * @todo Remove and use the new interface when #2833378 is done.
    * @see https://www.drupal.org/node/2833378
    *
-   * @return int
-   *   Creation timestamp of the media item.
+   * @return int|null
+   *   Creation timestamp of the media item, or NULL if unknown.
    */
   public function getCreatedTime();
 

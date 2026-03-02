@@ -181,7 +181,7 @@ class MigrateTaxonomyTermTest extends MigrateDrupal7TestBase {
     $this->assertTrue($metadata_fr->isPublished());
     $this->assertSame('en', $metadata_fr->getSource());
     $this->assertSame('2', $metadata_fr->getAuthor()->uid->value);
-    $this->assertSame('1531922267', $metadata_fr->getCreatedTime());
+    $this->assertSame(1531922267, $metadata_fr->getCreatedTime());
     $this->assertSame(1531922268, $metadata_fr->getChangedTime());
     $this->assertTrue($metadata_fr->isOutdated());
 
@@ -190,7 +190,7 @@ class MigrateTaxonomyTermTest extends MigrateDrupal7TestBase {
     $this->assertFalse($metadata_is->isPublished());
     $this->assertSame('en', $metadata_is->getSource());
     $this->assertSame('1', $metadata_is->getAuthor()->uid->value);
-    $this->assertSame('1531922278', $metadata_is->getCreatedTime());
+    $this->assertSame(1531922278, $metadata_is->getCreatedTime());
     $this->assertSame(1531922279, $metadata_is->getChangedTime());
     $this->assertFalse($metadata_is->isOutdated());
 
