@@ -58,7 +58,7 @@ class FieldInstanceSettings extends ProcessPluginBase {
         'field' => '_none',
         'direction' => 'ASC',
       ];
-      if (!empty(array_filter($field_settings['handler_settings']['sort']))) {
+      if (!empty(array_filter($field_settings['handler_settings']['sort'] ?? []))) {
         if ($field_settings['handler_settings']['sort']['type'] == "property") {
           $sort = [
             'field' => $field_settings['handler_settings']['sort']['property'],

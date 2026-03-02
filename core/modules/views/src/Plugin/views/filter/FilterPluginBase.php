@@ -139,7 +139,7 @@ abstract class FilterPluginBase extends HandlerBase implements CacheableDependen
     }
 
     if ($this->multipleExposedInput()) {
-      $this->group_info = array_filter($options['group_info']['default_group_multiple']);
+      $this->group_info = array_filter($options['group_info']['default_group_multiple'] ?? []);
       $this->options['expose']['multiple'] = TRUE;
     }
 
