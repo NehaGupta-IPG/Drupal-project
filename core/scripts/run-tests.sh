@@ -225,12 +225,16 @@ try {
   );
 
   $tmp = [];
+  $tmp_test = [];
   $metadata = NULL;
   foreach ($files as $file) {
     $contents = json_decode(file_get_contents($file->uri), TRUE);
     $metadata = $contents['metadata'];
     foreach ($contents['skips'] as $key => $count) {
       $tmp[$key] = isset($tmp[$key]) ? $tmp[$key] + $count : $count;
+    }
+    foreach ($contents['tests'] as $key => $count) {
+      $tmp_test[$key] = $count;
     }
   }
 
@@ -241,6 +245,7 @@ try {
   file_put_contents($outputFile, json_encode([
     'metadata' => $metadata,
     'skips' => $tmp,
+    'tests' => $tmp_test,
   ]));
 }
 catch (\Exception) {

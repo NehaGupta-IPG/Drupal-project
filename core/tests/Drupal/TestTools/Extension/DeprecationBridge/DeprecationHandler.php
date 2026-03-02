@@ -308,13 +308,20 @@ final class DeprecationHandler implements Extension {
     $stats = [
       'metadata' => self::metadata(),
       'skips' => [],
+      'tests' => [],
     ];
     foreach ($encodedStats as $encodedStat) {
       $stat = (array) json_decode(base64_decode($encodedStat));
       // @todo echo "\n********\n";.
       // @todo var_export($stat);.
-      if (!empty($stat) && $stat['status'] === 'ignored_by_project') {
+      if (empty($stat)) {
+        continue;
+      }
+      if ($stat['status'] === 'ignored_by_project') {
         $stats['skips'][$stat['ignore-pattern']] = isset($stats['skips'][$stat['ignore-pattern']]) ? $stats['skips'][$stat['ignore-pattern']] + 1 : 1;
+      }
+      if ($stat['status'] === 'test_stats') {
+        $stats['tests'][$stat['test']] = $stat['ignoredByPhpunit'];
       }
     }
     // @todo echo "\n********\n";.
