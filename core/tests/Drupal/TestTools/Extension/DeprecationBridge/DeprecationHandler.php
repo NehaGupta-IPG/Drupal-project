@@ -310,10 +310,13 @@ final class DeprecationHandler implements Extension {
     ];
     foreach ($encodedStats as $encodedStat) {
       $stat = (array) json_decode(base64_decode($encodedStat));
+      // echo "\n********\n";
+      // var_export($stat);
       if (!empty($stat) && $stat['status'] === 'ignored_by_project') {
         $stats['skips'][$stat['ignore-pattern']] = isset($stats['skips'][$stat['ignore-pattern']]) ? $stats['skips'][$stat['ignore-pattern']] + 1 : 1;
       }
     }
+    // echo "\n********\n";
 
     file_put_contents(
       $statisticsArtifactDirectory . \DIRECTORY_SEPARATOR . $dumpFileName,
@@ -325,15 +328,13 @@ final class DeprecationHandler implements Extension {
    * Write a statistic entry.
    */
   public static function writeStatisticEntry(string $status, ?TestMethod $testMethod, ?string $ignorePattern, string $triggeringMessage): void {
-    $artifactEnv = getenv('_DRUPAL_TEST_ARTIFACT_CONFIG');
     $configEnv = getenv('_DRUPAL_DEPRECATION_HANDLER_CONFIG');
 
-    if (empty($artifactEnv) || empty($configEnv)) {
+    if (empty($configEnv)) {
       // If no config available, we cannot record the stats.
       return;
     }
 
-    $artifact = (array) json_decode($artifactEnv);
     $config = (array) json_decode($configEnv);
 
     $stat = [];

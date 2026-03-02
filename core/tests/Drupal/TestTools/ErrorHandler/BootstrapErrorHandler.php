@@ -29,7 +29,7 @@ final class BootstrapErrorHandler {
    * @see \Drupal\TestTools\Extension\DeprecationBridge\TestPreparationStartedSubscriber
    * @see \Drupal\TestTools\Extension\DeprecationBridge\TestFinishedSubscriber
    */
-  static ?TestMethod $currentTest = NULL;
+  private static ?TestMethod $currentTest = NULL;
 
   /**
    * @param \PHPUnit\Runner\ErrorHandler $phpUnitErrorHandler
