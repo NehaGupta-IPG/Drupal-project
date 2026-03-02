@@ -9,7 +9,6 @@ use Drupal\Core\Config\Config;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\PagerSelectExtender;
 use Drupal\Core\Database\Query\SelectExtender;
-use Drupal\Core\Database\StatementInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -244,7 +243,7 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
       // GROUP BY. In this case, we want GROUP BY.
       ->groupBy('i.langcode')
       ->limit(10)
-      ->execute();
+      ->execute()->fetchAll();
 
     // Check query status and set messages if needed.
     $status = $query->getStatus();
@@ -267,13 +266,13 @@ class NodeSearch extends ConfigurableSearchPluginBase implements AccessibleInter
   /**
    * Prepares search results for rendering.
    *
-   * @param \Drupal\Core\Database\StatementInterface $found
+   * @param array $found
    *   Results found from a successful search query execute() method.
    *
    * @return array
    *   Array of search result item render arrays (empty array if no results).
    */
-  protected function prepareResults(StatementInterface $found) {
+  protected function prepareResults(array $found) {
     $results = [];
 
     $node_storage = $this->entityTypeManager->getStorage('node');
