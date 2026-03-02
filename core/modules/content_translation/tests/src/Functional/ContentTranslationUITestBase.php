@@ -22,6 +22,11 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
   use AssertPageCacheContextsAndTagsTrait;
 
   /**
+   * {@inheritdoc}
+   */
+  protected bool $usesSuperUserAccessPolicy = TRUE;
+
+  /**
    * The id of the entity being translated.
    *
    * @var mixed
@@ -125,6 +130,23 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
       $this->assertSession()->responseNotContains('&lt;span class=&quot;translation-entity-all-languages&quot;&gt;(all languages)&lt;/span&gt;');
       $this->assertSession()->responseContains('<span class="translation-entity-all-languages">(all languages)</span>');
     }
+
+    // Asserts that once a translation exists the user is redirected to the
+    // translations overview page.
+    if ($entity_type_id === 'entity_test_mul_changed') {
+      $this->drupalGet($add_url);
+      $this->assertSession()->statusCodeEquals(200);
+      $this->assertSession()->pageTextContains('Translations');
+      $this->assertStringContainsString('/entity_test_mul_changed/manage/1/translations', $this->getUrl());
+      // Ensure the redirect works also for user 1.
+      $this->drupalLogin($this->rootUser);
+      $this->drupalGet($add_url);
+      $this->assertSession()->statusCodeEquals(200);
+      $this->assertSession()->pageTextContains('Translations');
+      $this->assertStringContainsString('/entity_test_mul_changed/manage/1/translations', $this->getUrl());
+    }
+
+    $this->drupalLogin($this->translator);
 
     // Ensure that the content language cache context is not yet added to the
     // page.
