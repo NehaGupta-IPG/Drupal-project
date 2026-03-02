@@ -6,7 +6,6 @@ namespace Drupal\TestTools\Extension\DeprecationBridge;
 
 use Drupal\Core\Database\Database;
 use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
-use PHPUnit\Event\Code\TestMethod;
 use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
 use PHPUnit\Runner\Extension\Extension;
 use PHPUnit\Runner\Extension\Facade;
