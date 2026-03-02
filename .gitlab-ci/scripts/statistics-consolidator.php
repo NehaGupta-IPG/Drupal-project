@@ -84,7 +84,16 @@ foreach (file(__DIR__ . '/../../core' . \DIRECTORY_SEPARATOR . '.deprecation-ign
 }
 echo "-----------+----------------------------------------------------------------------\n";
 
+ksort($tmp_test);
 echo "\n\nTests ignoring deprecations\n";
 echo "-----------+----------------------------------------------------------------------\n";
-dump($tmp_test);
+echo "  Ignored# | Test\n";
+echo "-----------+----------------------------------------------------------------------\n";
+foreach ($tmp_test as $test => $ignored) {
+  $msg = "%10d | %s";
+  if ($ignored === 0) {
+    $msg = "\033[" . "33" . "m" . $msg . "\033[0m";
+  }
+  echo sprintf($msg . "\n", trim_with_ellipsis(rtrim($test, "\n"), 80, \STR_PAD_RIGHT));
+}
 echo "-----------+----------------------------------------------------------------------\n";
