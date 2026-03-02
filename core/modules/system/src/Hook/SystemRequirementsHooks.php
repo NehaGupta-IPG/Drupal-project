@@ -501,7 +501,7 @@ class SystemRequirementsHooks {
       $requirements['database_system_version']['description'] = $error_message;
     }
 
-    if (in_array($phase, ['runtime', 'update'], TRUE) && !Database::getConnection()->hasJson()) {
+    if (!Database::getConnection()->hasJson()) {
 
       // Show JSON is not supported in both the runtime (status report) and
       // update phases.
