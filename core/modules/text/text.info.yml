@@ -6,4 +6,3 @@ version: VERSION
 dependencies:
   - drupal:field
   - drupal:filter
-  - drupal:text_with_summary_field
