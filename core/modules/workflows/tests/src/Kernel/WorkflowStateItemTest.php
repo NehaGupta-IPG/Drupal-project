@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\workflows\Kernel;
 
+use Drupal\Core\Form\FormState;
 use Drupal\entity_test\Entity\EntityTest;
-use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\workflows\Entity\Workflow;
 use Drupal\workflows\Plugin\Field\FieldType\WorkflowStateItem;
+use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -265,6 +266,27 @@ class WorkflowStateItemTest extends KernelTestBase {
 
     $entity = EntityTest::create(['name' => 'Test entity']);
     $this->assertEquals('test_workflow', $entity->get('field_state')->first()->getWorkflow()->id());
+  }
+
+  /**
+   * Tests default value form handling when workflow resolution is not possible.
+   */
+  public function testDefaultValuesFormWithoutWorkflow(): void {
+    $form = [];
+    $form_state = new FormState();
+
+    $entity = EntityTest::create(['name' => 'Test entity']);
+    $default_values_form = $entity->get('field_state')->defaultValuesForm($form, $form_state);
+    $this->assertSame('Draft', $default_values_form['#plain_text']);
+
+    FieldConfig::loadByName('entity_test', 'entity_test', 'field_state')
+      ->setSetting('workflow', '')
+      ->save();
+
+    $entity = EntityTest::create(['name' => 'Test entity']);
+    $item_list = $entity->get('field_state');
+    $this->assertNull($item_list->first());
+    $this->assertSame([], $item_list->defaultValuesForm($form, $form_state));
   }
 
   /**

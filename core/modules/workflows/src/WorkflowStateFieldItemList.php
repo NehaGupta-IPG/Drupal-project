@@ -39,9 +39,18 @@ class WorkflowStateFieldItemList extends FieldItemList {
    * {@inheritdoc}
    */
   public function defaultValuesForm(array &$form, FormStateInterface $form_state) {
-    $workflow = $this->list[0]->getWorkflow();
+    $item = $this->first();
+    if (!$item instanceof WorkflowStateItemInterface) {
+      return [];
+    }
+
+    $label = $item->getStateLabel();
+    if ($label === '') {
+      return [];
+    }
+
     return [
-      '#markup' => $workflow->getTypePlugin()->getState($this->list[0]->value)->label(),
+      '#plain_text' => $label,
     ];
   }
 
