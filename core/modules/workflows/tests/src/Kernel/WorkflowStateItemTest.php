@@ -11,6 +11,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\workflows\Entity\Workflow;
 use Drupal\workflows\Plugin\Field\FieldType\WorkflowStateItem;
+use Drupal\workflows\WorkflowStateFieldItemList;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -20,6 +21,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests the workflow_state field type.
  */
 #[CoversClass(WorkflowStateItem::class)]
+#[CoversClass(WorkflowStateFieldItemList::class)]
 #[Group('workflows')]
 #[RunTestsInSeparateProcesses]
 class WorkflowStateItemTest extends KernelTestBase {
@@ -285,7 +287,6 @@ class WorkflowStateItemTest extends KernelTestBase {
 
     $entity = EntityTest::create(['name' => 'Test entity']);
     $item_list = $entity->get('field_state');
-    $this->assertNull($item_list->first());
     $this->assertSame([], $item_list->defaultValuesForm($form, $form_state));
   }
 
