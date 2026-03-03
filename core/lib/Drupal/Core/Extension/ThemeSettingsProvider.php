@@ -106,8 +106,8 @@ class ThemeSettingsProvider {
       }
 
       // If the theme is a subtheme, get the name of its base theme.
-      if (isset($themeObject->info['base_theme'])) {
-        $base_theme = strtolower($themeObject->info['base_theme']);
+      if (isset($themeObject->info['base theme'])) {
+        $base_theme = strtolower($themeObject->info['base theme']);
       }
 
       // Generate the path to the logo image.
@@ -127,7 +127,7 @@ class ThemeSettingsProvider {
           if (file_exists($favicon = $themeObject->getPath() . '/favicon.ico')) {
             $themeSettings->set('favicon.url', $this->fileUrlGenerator->generateString($favicon));
           }
-          elseif (isset($base_theme) && file_exists($favicon = dirname($themes[$base_theme]->filename) . '/favicon.ico')) {
+          elseif (isset($base_theme) && file_exists($favicon = $themes[$base_theme]->getPath() . '/favicon.ico')) {
             $themeSettings->set('favicon.url', $this->fileUrlGenerator->generateString($favicon));
           }
           else {
