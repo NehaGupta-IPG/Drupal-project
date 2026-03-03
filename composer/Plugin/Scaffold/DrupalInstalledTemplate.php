@@ -23,7 +23,7 @@ class DrupalInstalledTemplate {
    * @return string
    *   The PHP code to write to the DrupalInstalled class.
    */
-  public static function getCode(PackageInterface $root_package, InstalledRepositoryInterface $repository): string {
+  public static function getCode(PackageInterface $root_package, InstalledRepositoryInterface $repository, string $relative_app_root): string {
     // Ensure the packages are sorted consistently.
     $packages = $repository->getPackages();
     usort($packages, static function (PackageInterface $a, PackageInterface $b) {
@@ -56,6 +56,14 @@ class DrupalInstalledTemplate {
          * A hash of all the installed packages and their versions.
          */
         public const string VERSIONS_HASH = '$version_hash';
+
+        /**
+         * Defines the root directory of the Drupal installation.
+         *
+         * This is the directory containing the scaffolded index.php file which is
+         * Drupal's web entry point.
+         */
+        public const APP_ROOT = __DIR__ . '$relative_app_root';
 
       }
 
