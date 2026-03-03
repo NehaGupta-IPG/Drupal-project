@@ -7,7 +7,6 @@ use Drupal\Component\EventDispatcher\Event;
 use Drupal\Component\FileCache\FileCacheFactory;
 use Drupal\Component\Serialization\PhpSerialize;
 use Drupal\Component\Utility\UrlHelper;
-use Drupal\Locations\DrupalLocation;
 use Drupal\Core\Cache\DatabaseBackend;
 use Drupal\Core\ClassLoader\BackwardsCompatibilityClassLoader;
 use Drupal\Core\Config\BootstrapConfigStorageFactory;
@@ -379,8 +378,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @see \Drupal\Composer\Plugin\Scaffold\GenerateAutoloadReferenceFile
    */
   protected static function getApplicationRoot() {
-    if (class_exists(DrupalLocation::class)) {
-      return DrupalLocation::APP_ROOT;
+    if (class_exists(DrupalInstalled::class)) {
+      return DrupalInstalled::APP_ROOT;
     }
     else {
       // Determine the application root by:

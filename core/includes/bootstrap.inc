@@ -6,10 +6,10 @@
  */
 
 use Drupal\Component\Utility\Crypt;
-use Drupal\Locations\DrupalLocation;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\Core\Utility\Error;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\DrupalInstalled;
 
 // cspell:ignore htkey
 
@@ -48,8 +48,8 @@ const DRUPAL_EXTENSION_NAME_MAX_LENGTH = 50;
  * the fallback is to assume the app root is two directory levels above this
  * file.
  */
-if (class_exists(DrupalLocation::class)) {
-  define('DRUPAL_ROOT', DrupalLocation::APP_ROOT);
+if (class_exists(DrupalInstalled::class)) {
+  define('DRUPAL_ROOT', DrupalInstalled::APP_ROOT);
 }
 else {
   define('DRUPAL_ROOT', dirname(__DIR__, 2));
