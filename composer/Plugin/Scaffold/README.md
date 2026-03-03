@@ -231,40 +231,21 @@ directory is changed for any reason, and the `autoload.php` file has been
 committed to the repository, manually delete it and then run `composer install`
 to update it.
 
-### DrupalLocation file
+### DrupalInstalled file
 
-The DrupalLocation file is a PHP class file which this plugin writes
+The DrupalInstalled file is a PHP class file which this plugin writes
 automatically. The class holds the location of the Drupal application root (that
 is, the location of Drupal's index.php file).
 
-This file is written to the root of the Composer project, and must be specified
-in the root composer.json:
-
-```
-    "autoload": {
-        "psr-4": {
-            "Drupal\\Locations\\": ""
-        }
-    },
-```
-
 Because it is an autoloadable file, any code that has included the Composer
-autoloader may use the \Drupal\Locations\DrupalLocation::APP_ROOT to get the
-filepath where Drupal core is installed.
-
-The DrupalLocation file is not necessary when Drupal is installed one of the
-following configurations:
-    - Installed with the drupal/recommended-project Composer template,
-    - Installed with the drupal/legacy-project Composer template,
-    - Installed directly from a Drupal core git clone.
-
-In these configurations, Drupal is able to guess its location.
+autoloader may use the \Drupal\DrupalInstalled::APP_ROOT to get the filepath
+where Drupal core is installed.
 
 #### API
 
 Code that is part of a project's own codebase, and therefore can guarantee the
-presence of this plugin, can use the \Drupal\Locations\DrupalLocation::APP_ROOT
-constant to get the filepath where Drupal core is installed. Because this is an
+presence of this plugin, can use the \Drupal\DrupalInstalled::APP_ROOT constant
+to get the filepath where Drupal core is installed. Because this is an
 autoloadable file, any code that has included the Composer autoloader may use
 this.
 
