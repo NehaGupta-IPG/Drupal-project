@@ -43,7 +43,7 @@ abstract class EntityViewModeResourceTestBase extends ConfigEntityResourceTestBa
     $entity_view_mode = EntityViewMode::create([
       'id' => 'user.test',
       'label' => 'Test',
-      'description' => '',
+      'description' => NULL,
       'targetEntityType' => 'user',
     ]);
     $entity_view_mode->save();

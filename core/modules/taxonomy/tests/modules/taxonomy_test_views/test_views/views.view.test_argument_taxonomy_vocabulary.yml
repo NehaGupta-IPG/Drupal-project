@@ -7,7 +7,7 @@ dependencies:
 id: test_argument_taxonomy_vocabulary
 label: test_argument_taxonomy_vocabulary
 module: views
-description: ''
+description: null
 tag: ''
 base_table: taxonomy_term_field_data
 base_field: tid

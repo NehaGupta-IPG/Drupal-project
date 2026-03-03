@@ -126,7 +126,7 @@ abstract class EntityDisplayModeBase extends ConfigEntityBase implements EntityD
   /**
    * {@inheritdoc}
    */
-  public function getDescription(): string {
+  public function getDescription(): ?string {
     return $this->description ?? '';
   }
 

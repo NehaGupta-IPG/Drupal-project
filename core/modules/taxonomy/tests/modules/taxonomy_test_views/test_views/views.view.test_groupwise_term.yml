@@ -8,7 +8,7 @@ dependencies:
 id: test_groupwise_term
 label: test_groupwise
 module: views
-description: ''
+description: null
 tag: default
 base_table: taxonomy_term_field_data
 base_field: tid

@@ -7,7 +7,7 @@ dependencies:
 id: taxonomy_default_argument_test
 label: taxonomy_default_argument_test
 module: views
-description: ''
+description: null
 tag: ''
 base_table: taxonomy_term_field_data
 base_field: tid

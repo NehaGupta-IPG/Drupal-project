@@ -5,6 +5,6 @@ dependencies:
     - media
 id: media.responsive_3x2
 label: 'Responsive 3x2'
-description: ''
+description: null
 targetEntityType: media
 cache: true

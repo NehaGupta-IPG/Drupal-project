@@ -9,7 +9,7 @@ dependencies:
 id: test_taxonomy_name_argument
 label: 'Test taxonomy term argument'
 module: views
-description: ''
+description: null
 tag: ''
 base_table: taxonomy_term_field_data
 base_field: tid

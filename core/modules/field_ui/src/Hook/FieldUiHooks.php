@@ -198,6 +198,10 @@ class FieldUiHooks {
    */
   #[Hook('entity_view_mode_presave')]
   public function entityViewModePresave(EntityViewModeInterface $view_mode): void {
+    if (trim($view_mode->getDescription()) === '') {
+      $view_mode->set('description', NULL);
+    }
+
     \Drupal::service('router.builder')->setRebuildNeeded();
   }
 
