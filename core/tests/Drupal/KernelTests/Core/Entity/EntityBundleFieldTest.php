@@ -91,12 +91,12 @@ class EntityBundleFieldTest extends EntityKernelTestBase {
     EntityTestHelper::deleteBundle('custom', 'entity_test_update');
 
     $table = $table_mapping->getDedicatedDataTableName($entity->getFieldDefinition('custom_bundle_field')->getFieldStorageDefinition(), TRUE);
-    $result = $this->database->select($table, 'f')
+    $count = $this->database->select($table, 'f')
       ->condition('f.entity_id', $entity->id())
       ->condition('deleted', 1)
       ->countQuery()
-      ->execute();
-    $this->assertEquals(1, $result->fetchField(), 'Field data has been deleted');
+      ->execute()->fetchField();
+    $this->assertEquals(1, $count, 'Field data has been deleted');
 
     // Ensure that the field no longer exists in the field map.
     $field_map = \Drupal::service('entity_field.manager')->getFieldMap();
