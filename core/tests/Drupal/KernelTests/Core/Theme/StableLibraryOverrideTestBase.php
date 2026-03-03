@@ -70,7 +70,6 @@ abstract class StableLibraryOverrideTestBase extends KernelTestBase {
     $this->allModules[] = 'system';
     $this->allModules[] = 'user';
     $this->allModules[] = 'path_alias';
-    $this->allModules[] = 'text_with_summary_field';
     $database_module = \Drupal::database()->getProvider();
     if ($database_module !== 'core') {
       $this->allModules[] = $database_module;
