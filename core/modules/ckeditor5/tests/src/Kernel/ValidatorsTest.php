@@ -1492,9 +1492,7 @@ class ValidatorsTest extends KernelTestBase {
         ],
         'plugins' => [
           'ckeditor5_sourceEditing' => [
-            'allowed_tags' => [
-              '<kbd>',
-            ],
+            'allowed_tags' => [],
           ],
           'ckeditor5_style' => [
             'styles' => [
