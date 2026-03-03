@@ -13,6 +13,9 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
  */
 class CanaryTransport extends AbstractTransport implements TransportInterface {
 
+  /**
+   * {@inheritdoc}
+   */
   protected function doSend(SentMessage $message): void {
   }
 

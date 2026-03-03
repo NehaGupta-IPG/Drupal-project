@@ -11,8 +11,6 @@ use Drupal\Core\Hook\Attribute\Hook;
  *
  * By default, these will be called in module order, which is predictable due
  * to the alphabetical module names.
- *
- * @see \Drupal\KernelTests\Core\Hook\HookAlterOrderTest
  */
 class DAlterHooks {
 

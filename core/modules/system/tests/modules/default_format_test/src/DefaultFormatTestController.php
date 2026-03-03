@@ -12,6 +12,9 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class DefaultFormatTestController {
 
+  /**
+   * Returns a response with the MIME type for the format of the request.
+   */
   public function content(Request $request) {
     $format = $request->getRequestFormat();
     return new CacheableResponse('format:' . $format, 200, ['Content-Type' => $request->getMimeType($format)]);

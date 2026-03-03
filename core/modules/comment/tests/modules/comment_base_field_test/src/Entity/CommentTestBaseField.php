@@ -26,6 +26,9 @@ use Drupal\entity_test\Entity\EntityTest;
 )]
 class CommentTestBaseField extends EntityTest {
 
+  /**
+   * {@inheritdoc}
+   */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
     $fields = parent::baseFieldDefinitions($entity_type);
 

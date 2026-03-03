@@ -19,6 +19,9 @@ class CircularDependencyHooks {
     public readonly ModuleHandlerInterface $moduleHandler,
   ) {}
 
+  /**
+   * Implements hook_test_hook().
+   */
   #[Hook('test_hook')]
   public function testHook(): string {
     // The hook method does not need to actually use the module handler.

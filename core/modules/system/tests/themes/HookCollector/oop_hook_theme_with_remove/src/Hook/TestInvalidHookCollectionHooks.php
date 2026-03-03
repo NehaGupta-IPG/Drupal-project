@@ -12,6 +12,9 @@ use Drupal\Core\Hook\Attribute\RemoveHook;
  */
 class TestInvalidHookCollectionHooks {
 
+  /**
+   * Implements hook_test_hook_alter().
+   */
   #[Hook('test_hook_alter')]
   #[RemoveHook('test_hook_alter', self::class, 'testHook')]
   public function testHook(array &$calls): void {

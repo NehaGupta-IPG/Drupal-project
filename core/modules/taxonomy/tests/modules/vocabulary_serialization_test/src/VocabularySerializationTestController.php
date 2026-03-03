@@ -11,6 +11,9 @@ use Drupal\taxonomy\VocabularyInterface;
  */
 class VocabularySerializationTestController {
 
+  /**
+   * Sets the vocabulary on the response.
+   */
   public function vocabularyResponse(VocabularyInterface $taxonomy_vocabulary) {
     $response = new VocabularyResponse('this is the output');
     $response->setVocabulary($taxonomy_vocabulary);

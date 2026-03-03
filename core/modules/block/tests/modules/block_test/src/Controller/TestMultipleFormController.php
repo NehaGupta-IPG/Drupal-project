@@ -12,6 +12,9 @@ use Drupal\Core\Form\FormState;
  */
 class TestMultipleFormController extends ControllerBase {
 
+  /**
+   * Tests a block containing multiple forms.
+   */
   public function testMultipleForms() {
     $form_state = new FormState();
     $build = [

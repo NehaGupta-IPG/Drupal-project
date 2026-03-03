@@ -17,6 +17,9 @@ class VocabularyResponse extends CacheableResponse {
    */
   protected $vocabulary;
 
+  /**
+   * Sets the vocabulary.
+   */
   public function setVocabulary(VocabularyInterface $vocabulary) {
     $this->vocabulary = $vocabulary;
   }

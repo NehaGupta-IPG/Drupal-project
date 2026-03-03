@@ -7,10 +7,22 @@
 
 declare(strict_types=1);
 
+/**
+ * Implements hook_preprocess_HOOK().
+ *
+ * This implementation tests that a procedural preprocess hook with a prefix is
+ * executed.
+ */
 function module_test_procedural_preprocess_preprocess($arg): mixed {
   return $arg;
 }
 
+/**
+ * Implements hook_preprocess_HOOK().
+ *
+ * This implementation tests that a procedural preprocess hook with a prefix and
+ * suffix is executed.
+ */
 function module_test_procedural_preprocess_preprocess_test($arg): mixed {
   return $arg;
 }

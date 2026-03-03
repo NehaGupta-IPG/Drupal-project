@@ -97,6 +97,9 @@ class HtmxTestForm extends FormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void {}
 
+  /**
+   * Builds the options array for the given select element of the test form.
+   */
   protected function buildDependentOptions(string $selected): array {
     $options = [
       'a' => [
@@ -113,6 +116,9 @@ class HtmxTestForm extends FormBase {
     return $options[$selected] ?? [];
   }
 
+  /**
+   * Gets the element that was selected.
+   */
   protected function getTriggerElement($form_state): string|bool {
     $input = $form_state->getUserInput();
     return !empty($input['_triggering_element_name']) ? $input['_triggering_element_name'] : FALSE;

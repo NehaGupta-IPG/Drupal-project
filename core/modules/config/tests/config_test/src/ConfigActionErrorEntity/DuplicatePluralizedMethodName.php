@@ -12,6 +12,9 @@ use Drupal\Core\Config\Action\Attribute\ActionMethod;
  */
 class DuplicatePluralizedMethodName extends ConfigTest {
 
+  /**
+   * Provides an action that tries to pluralize itself.
+   */
   #[ActionMethod(pluralize: 'testMethod')]
   public function testMethod() {
   }

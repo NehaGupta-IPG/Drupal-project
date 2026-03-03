@@ -11,11 +11,23 @@ use Drupal\Core\Hook\Attribute\Hook;
  */
 class ModuleTestOopPreprocessThemeHooks {
 
+  /**
+   * Implements hook_preprocess().
+   *
+   * This implementation is used to test that an OOP preprocess hook with a
+   * prefix is executed.
+   */
   #[Hook('preprocess')]
   public function rootPreprocess($arg): mixed {
     return $arg;
   }
 
+  /**
+   * Implements hook_preprocess_HOOK().
+   *
+   * This implementation is used to test that an OOP preprocess hook with a
+   * prefix and suffix is executed.
+   */
   #[Hook('preprocess_test')]
   public function preprocessTest($arg): mixed {
     return $arg;

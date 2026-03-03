@@ -23,6 +23,9 @@ class LonelyMonkeyController extends ControllerBase implements ContainerInjectio
     $this->class = $class;
   }
 
+  /**
+   * Defines a controller.
+   */
   public function testBrokenClass() {
     return [
       '#markup' => $this->t('This should be broken.'),

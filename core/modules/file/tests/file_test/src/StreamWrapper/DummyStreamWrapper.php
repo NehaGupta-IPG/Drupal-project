@@ -27,6 +27,9 @@ class DummyStreamWrapper extends LocalStream {
     return 'Dummy wrapper for testing.';
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function getDirectoryPath() {
     return \Drupal::getContainer()->getParameter('site.path') . '/files';
   }

@@ -11,6 +11,9 @@ use Drupal\Core\Hook\Attribute\Hook;
  */
 class TestHookCollectionHooks {
 
+  /**
+   * Implements hook_test_hook_alter().
+   */
   #[Hook('test_hook_alter')]
   public function testHookAlter(array &$calls): void {
     $calls[] = __METHOD__;

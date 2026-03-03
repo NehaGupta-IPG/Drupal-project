@@ -90,6 +90,9 @@ class Test {
     throw new HttpException($code);
   }
 
+  /**
+   * Triggers an error for testing exceptions in BrowserTestBase.
+   */
   public function error() {
     trigger_error('foo', E_USER_NOTICE);
     return [
@@ -97,6 +100,9 @@ class Test {
     ];
   }
 
+  /**
+   * Returns a render array with a #plain_text element with escaped characters.
+   */
   public function escapedCharacters() {
     return [
       '#prefix' => '<div class="escaped">',
@@ -105,6 +111,9 @@ class Test {
     ];
   }
 
+  /**
+   * Returns a render array with a #plain_text element with an escaped script.
+   */
   public function escapedScript() {
     return [
       '#prefix' => '<div class="escaped">',
@@ -115,6 +124,9 @@ class Test {
     ];
   }
 
+  /**
+   * Returns a render array with a #plain_text element with a plain script.
+   */
   public function unEscapedScript() {
     return [
       '#prefix' => '<div class="unescaped">',

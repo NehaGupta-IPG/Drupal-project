@@ -92,6 +92,11 @@
     <include-pattern>*/Unit/*</include-pattern>
     <include-pattern>core/lib/*</include-pattern>
     <include-pattern>core/modules/system/tests/modules/HookOrder/*</include-pattern>
+    <include-pattern>core/modules/*/tests</include-pattern>
+    <include-pattern>core/modules/[a-r]*/tests</include-pattern>
+    <include-pattern>core/modules/[t-z]*/tests</include-pattern>
+    <include-pattern>core/modules/system/tests/modules/[a-g]*</include-pattern>
+    <include-pattern>core/modules/system/tests/modules/[i-z]*</include-pattern>
   </rule>
   <rule ref="Drupal.Commenting.FunctionComment.MissingParamType"/>
   <rule ref="Drupal.Commenting.FunctionComment.MissingReturnComment"/>

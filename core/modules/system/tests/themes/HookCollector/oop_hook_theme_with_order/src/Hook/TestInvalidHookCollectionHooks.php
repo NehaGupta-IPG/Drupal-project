@@ -12,6 +12,9 @@ use Drupal\Core\Hook\Order\Order;
  */
 class TestInvalidHookCollectionHooks {
 
+  /**
+   * Implements hook_test_hook_alter().
+   */
   #[Hook('test_hook_alter', order: Order::First)]
   public function testHook(array &$calls): void {
     $calls[] = __METHOD__;
