@@ -1935,17 +1935,12 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       $column_names = $table_mapping->getColumnNames($storage_definition->getName());
     }
 
-    $index_keys = [
-      'indexes' => 'addIndex',
-      'unique keys' => 'addUniqueKey',
-    ];
-
     foreach ($this->getEntitySchemaData($this->entityType, $entity_schema) as $table_name => $schema) {
       // Add fields schema because database driver may depend on this data to
       // perform index normalization.
       $schema['fields'] = $entity_schema[$table_name]['fields'];
 
-      foreach ($index_keys as $key => $add_method) {
+      foreach (['indexes', 'unique keys'] as $key) {
         if (!empty($schema[$key])) {
           foreach ($schema[$key] as $name => $specifier) {
             // If a set of field columns were specified we process only indexes
@@ -1968,7 +1963,10 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
               }
             }
             if ($create) {
-              $this->{$add_method}($table_name, $name, $specifier, $schema);
+              match ($key) {
+                'indexes' => $this->addIndex($table_name, $name, $specifier, $schema),
+                'unique keys' => $this->addUniqueKey($table_name, $name, $specifier),
+              };
             }
           }
         }
@@ -2069,7 +2067,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
 
     // Check that the schema does not include forbidden column names.
     if (array_intersect(array_keys($field_schema['columns']), $table_mapping->getReservedColumns())) {
-      throw new FieldException("Illegal field column names on {$storage_definition->getName()}");
+      throw new FieldException("Reserved field column names on {$storage_definition->getName()}");
     }
 
     $field_name = $storage_definition->getName();
@@ -2091,15 +2089,15 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
       if ($initial_value_field_name = $storage_definition->getInitialValueFromField()) {
         // Check that the field used for populating initial values is valid.
         if (!isset($this->fieldStorageDefinitions[$initial_value_field_name])) {
-          throw new FieldException("Illegal initial value definition on {$storage_definition->getName()}: The field $initial_value_field_name does not exist.");
+          throw new FieldException("Invalid initial value definition on {$storage_definition->getName()}: The field $initial_value_field_name does not exist.");
         }
 
         if ($storage_definition->getType() !== $this->fieldStorageDefinitions[$initial_value_field_name]->getType()) {
-          throw new FieldException("Illegal initial value definition on {$storage_definition->getName()}: The field types do not match.");
+          throw new FieldException("Invalid initial value definition on {$storage_definition->getName()}: The field types do not match.");
         }
 
         if (!$table_mapping->allowsSharedTableStorage($this->fieldStorageDefinitions[$initial_value_field_name])) {
-          throw new FieldException("Illegal initial value definition on {$storage_definition->getName()}: Both fields have to be stored in the shared entity tables.");
+          throw new FieldException("Invalid initial value definition on {$storage_definition->getName()}: Both fields have to be stored in the shared entity tables.");
         }
 
         $initial_value_from_field = $table_mapping->getColumnNames($initial_value_field_name);
@@ -2336,7 +2334,7 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
     $properties = $storage_definition->getPropertyDefinitions();
     $table_mapping = $this->getTableMapping($entity_type, [$storage_definition]);
     if (array_intersect(array_keys($schema['columns']), $table_mapping->getReservedColumns())) {
-      throw new FieldException("Illegal field column names on {$storage_definition->getName()}");
+      throw new FieldException("Reserved field column names on {$storage_definition->getName()}");
     }
 
     // Add field columns.
