@@ -100,7 +100,7 @@ class AssetResolverTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->libraryDiscovery = $this->getMockBuilder('Drupal\Core\Asset\LibraryDiscovery')
+    $this->libraryDiscovery = $this->getMockBuilder('Drupal\Core\Asset\LibraryDiscoveryCollector')
       ->disableOriginalConstructor()
       ->getMock();
     $this->libraryDiscovery->expects($this->any())
@@ -204,8 +204,6 @@ class AssetResolverTest extends UnitTestCase {
 
   /**
    * Tests get css assets.
-   *
-   * @legacy-covers ::getCssAssets
    */
   #[DataProvider('providerAttachedCssAssets')]
   public function testGetCssAssets(AttachedAssetsInterface $assets_a, AttachedAssetsInterface $assets_b, $expected_css_cache_item_count): void {
@@ -236,8 +234,6 @@ class AssetResolverTest extends UnitTestCase {
 
   /**
    * Tests get js assets.
-   *
-   * @legacy-covers ::getJsAssets
    */
   #[DataProvider('providerAttachedJsAssets')]
   public function testGetJsAssets(AttachedAssetsInterface $assets_a, AttachedAssetsInterface $assets_b, $expected_js_cache_item_count, $expected_multilingual_js_cache_item_count): void {

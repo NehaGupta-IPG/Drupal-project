@@ -43,6 +43,10 @@ final class Settings {
       'replacement' => '',
       'message' => 'The "state_cache" setting is deprecated in drupal:11.0.0. This setting should be removed from the settings file, since its usage has been removed. See https://www.drupal.org/node/3177901.',
     ],
+    'allow_authorize_operations' => [
+      'replacement' => '',
+      'message' => 'The "allow_authorize_operations" setting is deprecated in drupal:12.0.0. This setting should be removed from settings files, since its usage has been removed (since drupal:11.2.0). See https://www.drupal.org/node/3571399.',
+    ],
   ];
 
   /**
@@ -129,7 +133,7 @@ final class Settings {
    *   The app root.
    * @param string $site_path
    *   The current site path.
-   * @param \Composer\Autoload\ClassLoader $class_loader
+   * @param \Composer\Autoload\ClassLoader|null $class_loader
    *   The class loader that is used for this request. Passed by reference and
    *   exposed to the local scope of settings.php, so as to allow it to be
    *   decorated.
