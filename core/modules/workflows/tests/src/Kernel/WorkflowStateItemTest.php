@@ -9,10 +9,10 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\workflows\Entity\Workflow;
 use Drupal\workflows\Plugin\Field\FieldType\WorkflowStateItem;
 use Drupal\workflows\WorkflowStateFieldItemList;
-use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -281,13 +281,23 @@ class WorkflowStateItemTest extends KernelTestBase {
     $default_values_form = $entity->get('field_state')->defaultValuesForm($form, $form_state);
     $this->assertSame('Draft', $default_values_form['#plain_text']);
 
-    FieldConfig::loadByName('entity_test', 'entity_test', 'field_state')
-      ->setSetting('workflow', '')
-      ->save();
+    $field_config = FieldConfig::loadByName('entity_test', 'entity_test', 'field_state');
+    $this->assertNotNull($field_config);
+    $field_config->setSetting('workflow', '')->save();
+    $this->container->get('entity_field.manager')->clearCachedFieldDefinitions();
 
     $entity = EntityTest::create(['name' => 'Test entity']);
     $item_list = $entity->get('field_state');
     $this->assertSame([], $item_list->defaultValuesForm($form, $form_state));
+
+    $field_config->setSetting('workflow', 'test_workflow')->save();
+    $this->container->get('entity_field.manager')->clearCachedFieldDefinitions();
+
+    $entity = EntityTest::create([
+      'name' => 'Test entity',
+      'field_state' => 'missing_state',
+    ]);
+    $this->assertSame([], $entity->get('field_state')->defaultValuesForm($form, $form_state));
   }
 
   /**
