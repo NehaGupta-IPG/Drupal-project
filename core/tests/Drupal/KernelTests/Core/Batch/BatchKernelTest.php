@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Batch;
 
-use Drupal\Core\Batch\BatchProcessorInterface;
+use Drupal\Core\Batch\BatchProcessor;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
@@ -38,12 +38,12 @@ class BatchKernelTest extends KernelTestBase {
   }
 
   /**
-   * Tests BatchProcessorInterface::needsUpdate().
+   * Tests BatchProcessor::needsUpdate().
    *
-   * @see \Drupal\Core\Batch\BatchProcessorInterface::needsUpdate()
+   * @see \Drupal\Core\Batch\BatchProcessor::needsUpdate()
    */
   public function testNeedsUpdate(): void {
-    $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+    $batch_processor = \Drupal::service(BatchProcessor::class);
     // Before ever being called, the return value should be FALSE.
     $this->assertEquals(FALSE, $batch_processor->needsUpdate());
 

@@ -1597,10 +1597,9 @@ services:
     class: Drupal\Core\Utility\Token
     arguments: ['@module_handler', '@cache.default', '@language_manager', '@cache_tags.invalidator', '@renderer']
   Drupal\Core\Utility\Token: '@token'
-  batch.processor:
+  Drupal\Core\Batch\BatchProcessor:
     class: Drupal\Core\Batch\BatchProcessor
     autowire: true
-  Drupal\Core\Batch\BatchProcessorInterface: '@batch.processor'
   batch.storage:
     class: Drupal\Core\Batch\BatchStorage
     arguments: ['@database', '@session', '@csrf_token', '@datetime.time']

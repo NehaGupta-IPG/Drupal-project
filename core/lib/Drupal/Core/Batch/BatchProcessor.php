@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  *
  * @internal
  */
-class BatchProcessor implements BatchProcessorInterface {
+class BatchProcessor {
 
   /**
    * Creates a new BatchProcessor.
@@ -32,7 +32,23 @@ class BatchProcessor implements BatchProcessorInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Places the batch in the queue to be processed.
+   *
+   * Batch operations are added as new batch sets. Batch sets are used to spread
+   * processing (primarily, but not exclusively, forms processing) over several
+   * page requests. This helps to ensure that the processing is not interrupted
+   * due to PHP timeouts, while users are still able to receive feedback on the
+   * progress of the ongoing operations. Combining related operations into
+   * distinct batch sets provides clean code independence for each batch set,
+   * ensuring that two or more batches, submitted independently, can be
+   * processed without mutual interference. Each batch set may specify its own
+   * set of operations and results, produce its own UI messages, and trigger
+   * its own 'finished' callback. Batch sets are processed sequentially, with
+   * the progress bar starting afresh for each new set.
+   *
+   * @param array $batch_definition
+   *   An associative array defining the batch. The array can be built by using
+   *   toArray() method of a populated \Drupal\Core\Batch\BatchBuilder object.
    */
   public function queue(array $batch_definition): self {
     batch_set($batch_definition);
@@ -40,21 +56,55 @@ class BatchProcessor implements BatchProcessorInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Retrieves the current batch.
    */
   public function &getCurrentBatch(): null|array|false {
     return batch_get();
   }
 
   /**
-   * {@inheritdoc}
+   * Processes the batch.
+   *
+   * This function is generally not needed in form submit handlers;
+   * Form API takes care of batches that were set during form submission.
+   *
+   * @param \Drupal\Core\Url|string|null $redirect
+   *   (optional) Either path or Url object to redirect to when the batch has
+   *   finished processing. Note that to simply force a batch to (conditionally)
+   *   redirect to a custom location after it is finished processing but to
+   *   otherwise allow the standard form API batch handling to occur, it is not
+   *   necessary to call batch_process() and use this parameter. Instead, make
+   *   the batch 'finished' callback return an instance of
+   *   \Symfony\Component\HttpFoundation\RedirectResponse, which will be used
+   *   automatically by the standard batch processing pipeline (and which takes
+   *   precedence over this parameter).
+   * @param \Drupal\Core\Url|null $url
+   *   (optional) URL of the batch processing page.
+   *   Should only be used for separate scripts like update.php.
+   * @param string|null $redirect_callback
+   *   (optional) Specify a function to be called to redirect to the progressive
+   *   processing page.
+   *
+   * @return \Symfony\Component\HttpFoundation\RedirectResponse|null
+   *   A redirect response if the batch is progressive. No return value
+   *   otherwise.
    */
   public function process(Url|string|null $redirect = NULL, ?Url $url = NULL, ?string $redirect_callback = NULL): ?RedirectResponse {
     return batch_process($redirect, $url, $redirect_callback);
   }
 
   /**
-   * {@inheritdoc}
+   * Appends a batch set to a running batch.
+   *
+   * Inserts the new set right after the current one to ensure execution order,
+   * and stores its operations in a queue. If the current batch has already
+   * inserted a new set, additional sets will be inserted after the last
+   * inserted set.
+   *
+   * @param array &$batch
+   *   The batch array.
+   * @param array $batch_set
+   *   The batch set.
    *
    * @internal
    */
@@ -63,7 +113,17 @@ class BatchProcessor implements BatchProcessorInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Populates a job queue with the operations of a batch set.
+   *
+   * Depending on whether the batch is progressive or not, the
+   * Drupal\Core\Queue\Batch or Drupal\Core\Queue\BatchMemory handler classes
+   * will be used. The name and class of the queue are added by reference to the
+   * batch set.
+   *
+   * @param array $batch
+   *   The batch array.
+   * @param string $set_id
+   *   The id of the set to process.
    *
    * @internal
    */
@@ -72,7 +132,13 @@ class BatchProcessor implements BatchProcessorInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Returns a queue object for a batch set.
+   *
+   * @param array $batch_set
+   *   The batch set.
+   *
+   * @return \Drupal\Core\Queue\QueueInterface|null
+   *   The queue object.
    *
    * @internal
    */
@@ -81,44 +147,90 @@ class BatchProcessor implements BatchProcessorInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Processes sets in a batch.
+   *
+   * If the batch was marked for progressive execution (default), this executes
+   * as many operations in batch sets until an execution time of 1 second has
+   * been exceeded. It will continue with the next operation of the same batch
+   * set in the next request.
+   *
+   * @return array
+   *   An array containing a completion value (in percent) and a status message.
+   *
+   * @internal
    */
   public function processQueue(): array|NULL|RedirectResponse|JsonResponse {
     return _batch_process();
   }
 
   /**
-   * {@inheritdoc}
+   * Returns the batch set being currently processed.
+   *
+   * @return array
+   *   The current batch set.
+   *
+   * @internal
    */
   public function &getCurrentSet(): array {
     return _batch_current_set();
   }
 
   /**
-   * {@inheritdoc}
+   * Retrieves the next set in a batch.
+   *
+   * If there is a subsequent set in this batch, assign it as the new set to
+   * process and execute its form submit handler (if defined), which may add
+   * further sets to this batch.
+   *
+   * @return bool
+   *   TRUE if a subsequent set was found in the batch; FALSE will be returned
+   *   if no subsequent set was found.
+   *
+   * @internal
    */
   public function nextSet(): bool {
     return _batch_next_set();
   }
 
   /**
-   * {@inheritdoc}
+   * Ends the batch processing.
+   *
+   * Call the 'finished' callback of each batch set to allow custom handling of
+   * the results and resolve page redirection.
+   *
+   * @return \Symfony\Component\HttpFoundation\RedirectResponse|null
+   *   A redirect response to the completed page or NULL to stay at the current
+   *   URL.
    *
    * @see \Drupal\Core\Form\FormSubmitter::submitForm()
+   *
+   * @internal
    */
   public function finishedProcessing(): ?RedirectResponse {
     return _batch_finished();
   }
 
   /**
-   * {@inheritdoc}
+   * Shutdown function: Stores the current batch data for the next request.
+   *
+   * @see _batch_page()
+   * @see drupal_register_shutdown_function()
+   * @internal
    */
   public function shutdown(): void {
     _batch_shutdown();
   }
 
   /**
-   * {@inheritdoc}
+   * Checks whether the batch information needs to be updated in the storage.
+   *
+   * @param bool $new_value
+   *   (optional) A new value to set.
+   *
+   * @return bool
+   *   TRUE if the batch information needs to be updated; FALSE otherwise.
+   *
+   * @internal
    */
   public function needsUpdate(?bool $new_value = NULL): bool {
     return _batch_needs_update($new_value);

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Kernel\Form;
 
-use Drupal\Core\Batch\BatchProcessorInterface;
+use Drupal\Core\Batch\BatchProcessor;
 use Drupal\Core\Form\FormState;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -26,7 +26,7 @@ class ProgrammaticTest extends KernelTestBase {
    * Tests the programmatic form submission workflow.
    */
   public function testSubmissionWorkflow(): void {
-    $batch_processor = \Drupal::service(BatchProcessorInterface::class);
+    $batch_processor = \Drupal::service(BatchProcessor::class);
     // Backup the current batch status and reset it to avoid conflicts while
     // processing the dummy form submit handler.
     $current_batch = $batch =& $batch_processor->getCurrentBatch();

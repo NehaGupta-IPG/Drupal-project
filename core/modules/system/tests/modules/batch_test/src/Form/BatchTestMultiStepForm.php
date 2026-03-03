@@ -6,7 +6,7 @@ namespace Drupal\batch_test\Form;
 
 use Drupal\batch_test\BatchTestDefinitions;
 use Drupal\batch_test\BatchTestHelper;
-use Drupal\Core\Batch\BatchProcessorInterface;
+use Drupal\Core\Batch\BatchProcessor;
 use Drupal\Core\DependencyInjection\AutowireTrait;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -23,11 +23,11 @@ class BatchTestMultiStepForm extends FormBase {
   /**
    * Constructs a new BatchTestMultiStepForm object.
    *
-   * @param \Drupal\Core\Batch\BatchProcessorInterface $batchProcessor
+   * @param \Drupal\Core\Batch\BatchProcessor $batchProcessor
    *   The batch processor.
    */
   public function __construct(
-    protected readonly BatchProcessorInterface $batchProcessor,
+    protected readonly BatchProcessor $batchProcessor,
   ) {}
 
   /**

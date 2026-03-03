@@ -26,22 +26,24 @@ class BatchControllerTest extends UnitTestCase {
    */
   public function testBatchPageTitle(): void {
     $batch_storage = $this->createStub(BatchStorageInterface::class);
-    // $batch_processor = $this->createMock(BatchProcessorInterface::class);
     $batch_processor = new BatchProcessor($this->root);
     $controller = new BatchController($this->root, $batch_storage);
-    require_once $this->root . '/core/includes/form.inc';
     $this->assertSame('', $controller->batchPageTitle(new Request()));
     // Test no batch loaded from storage and batch loaded from storage cases.
     $current_set = 0;
     $batch = ['sets' => [['title' => 'foobar']], 'current_set' => $current_set];
-    // $batch_processor->method('getCurrentBatch')->willReturnReference($batch);
-    $batch_storage->method('load')->willReturn(FALSE, $batch);
+    $batch_storage->method('load')->willReturnOnConsecutiveCalls(FALSE, $batch);
     $this->assertSame('', $controller->batchPageTitle(new Request(['id' => 1234])));
-    // $batch_processor->method('getCurrentSet')->willReturnReference($batch['sets'][$current_set]);
+    // Clear the global batch state.
+    $global_batch = &$batch_processor->getCurrentBatch();
+    $global_batch = [];
     $this->assertSame('foobar', $controller->batchPageTitle(new Request(['id' => 1234])));
+    // Verify BatchProcessor OOP API can access the batch loaded by controller.
+    $batch_ref = &$batch_processor->getCurrentBatch();
+    $this->assertSame($batch['sets'][$current_set]['title'], $batch_ref['sets'][$current_set]['title']);
+    $this->assertSame($batch['sets'][$current_set], $batch_processor->getCurrentSet());
     // Test batch returned by &$batch_processor->getCurrentBatch() call.
-    $batch = &$batch_processor->getCurrentBatch();
-    $batch['sets'][$current_set]['title'] = 'Updated title';
+    $batch_ref['sets'][$current_set]['title'] = 'Updated title';
     $this->assertSame('Updated title', $controller->batchPageTitle(new Request(['id' => 1234])));
   }
 
