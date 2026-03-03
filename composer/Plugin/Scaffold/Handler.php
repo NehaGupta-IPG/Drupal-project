@@ -173,6 +173,10 @@ class Handler {
       $scaffold_results[] = GenerateAutoloadReferenceFile::generateAutoload($this->io, $this->rootPackageName(), $web_root, $this->getVendorPath());
     }
 
+    // Generate the locations class file.
+    $drupal_locations_manager = new ManageDrupalLocations($this->io, $web_root);
+    $drupal_locations_manager->manageLocationsClass();
+
     // Add the managed scaffold files to .gitignore if applicable.
     $gitIgnoreManager = new ManageGitIgnore($this->io, getcwd());
     $gitIgnoreManager->manageIgnored($scaffold_results, $scaffold_options);

@@ -7,6 +7,7 @@ namespace Drupal\KernelTests\Core\DrupalKernel;
 use Composer\Autoload\ClassLoader;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\DrupalKernelInterface;
+use Drupal\Core\Test\KernelWithAppRoot;
 use Drupal\KernelTests\KernelTestBase;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -268,8 +269,9 @@ class DrupalKernelTest extends KernelTestBase {
       $classloader->setApcuPrefix(Argument::type('string'))->shouldNotBeCalled();
     }
 
-    // Create a kernel suitable for testing.
-    $kernel = new DrupalKernel('test', $classloader->reveal(), FALSE, vfsStream::url('root'));
+    // Create a kernel whose app root we can set.
+    KernelWithAppRoot::$appRoot = vfsStream::url('root');
+    $kernel = new KernelWithAppRoot('test', $classloader->reveal(), FALSE);
     $kernel->setSitePath(vfsStream::url('root/sites/default'));
     $kernel->boot();
   }

@@ -17,18 +17,30 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-// Change the directory to the Drupal root.
-chdir('..');
+// Use SCRIPT_FILENAME rather than the current filename so that symlinks are not
+// resolved.
+$app_root = dirname($_SERVER['SCRIPT_FILENAME'], 2);
 
-$autoloader = require_once __DIR__ . '/../autoload.php';
-require_once __DIR__ . '/includes/utility.inc';
+// Change the directory to the Drupal root.
+chdir($app_root);
+
+// In the case where the whole of the Drupal Composer project is in a symlink,
+// rebuilding using the app root detected from the server parameters will create
+// the wrong cache ID for the compiled container. Therefore, get the app root
+// back from the current directory, as PHP's chdir() resolves symlinks.
+// (Drupal is notably run in a symlink on drupal.org CI: see
+// https://www.drupal.org/project/drupalci_testbot/issues/2838194)
+$app_root = getcwd();
+
+$autoloader = require_once $app_root . '/autoload.php';
+require_once $app_root . '/core/includes/utility.inc';
 
 $request = Request::createFromGlobals();
 // Manually resemble early bootstrap of DrupalKernel::boot().
 DrupalKernel::bootEnvironment();
 
 try {
-  Settings::initialize(dirname(__DIR__), DrupalKernel::findSitePath($request), $autoloader);
+  Settings::initialize($app_root, DrupalKernel::findSitePath($request), $autoloader);
 }
 catch (HttpExceptionInterface $e) {
   $response = new Response('', $e->getStatusCode());

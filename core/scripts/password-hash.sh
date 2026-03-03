@@ -18,6 +18,8 @@ if (PHP_SAPI !== 'cli') {
   return;
 }
 
+$autoloader = require_once 'autoload.php';
+
 $script = basename(array_shift($_SERVER['argv']));
 
 if (in_array('--help', $_SERVER['argv']) || empty($_SERVER['argv'])) {
@@ -46,8 +48,6 @@ EOF;
 
 // Password list to be processed.
 $passwords = $_SERVER['argv'];
-
-$autoloader = require __DIR__ . '/../../autoload.php';
 
 $request = Request::createFromGlobals();
 $kernel = DrupalKernel::createFromRequest($request, $autoloader, 'prod', FALSE);

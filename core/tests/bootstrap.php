@@ -50,7 +50,7 @@ function drupal_phpunit_find_extension_directories($scan_directory) {
  */
 function drupal_phpunit_contrib_extension_directory_roots($root = NULL): array {
   if ($root === NULL) {
-    $root = dirname(__DIR__, 2);
+    $root = $_ENV['DRUPAL_APP_ROOT'] ?? dirname(__DIR__, 2);
   }
   $paths = [
     $root . '/core/modules',
@@ -103,7 +103,12 @@ function drupal_phpunit_get_extension_namespaces($dirs) {
 // phpunit.xml.dist is located in a non-default directory relative to the
 // PHPUnit executable.
 if (!defined('PHPUNIT_COMPOSER_INSTALL')) {
-  define('PHPUNIT_COMPOSER_INSTALL', __DIR__ . '/../../autoload.php');
+  if (isset($_ENV['PROJECT_ROOT'])) {
+    define('PHPUNIT_COMPOSER_INSTALL', $_ENV['PROJECT_ROOT'] . '/vendor/autoload.php');
+  }
+  else {
+    define('PHPUNIT_COMPOSER_INSTALL', __DIR__ . '/../../autoload.php');
+  }
 }
 
 /**
@@ -117,7 +122,12 @@ if (!defined('PHPUNIT_COMPOSER_INSTALL')) {
 function drupal_phpunit_populate_class_loader() {
 
   /** @var \Composer\Autoload\ClassLoader $loader */
-  $loader = require __DIR__ . '/../../autoload.php';
+  if (isset($_ENV['PROJECT_ROOT'])) {
+    $loader = require $_ENV['PROJECT_ROOT'] . '/vendor/autoload.php';
+  }
+  else {
+    $loader = require __DIR__ . '/../../autoload.php';
+  }
 
   // Start with classes in known locations.
   $loader->add('Drupal\\BuildTests', __DIR__);

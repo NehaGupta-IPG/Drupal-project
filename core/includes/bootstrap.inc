@@ -6,6 +6,7 @@
  */
 
 use Drupal\Component\Utility\Crypt;
+use Drupal\Locations\DrupalLocation;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\Core\Utility\Error;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
@@ -40,9 +41,19 @@ const DRUPAL_EXTENSION_NAME_MAX_LENGTH = 50;
 /**
  * Defines the root directory of the Drupal installation.
  *
- * This strips two levels of directories off the current directory.
+ * This uses the constant written in \Drupal\Locations\DrupalLocation by the
+ * drupal/core-composer-scaffold Composer plugin.
+ *
+ * For backwards compatibility with installations that do not use Composer,
+ * the fallback is to assume the app root is two directory levels above this
+ * file.
  */
-define('DRUPAL_ROOT', dirname(__DIR__, 2));
+if (class_exists(DrupalLocation::class)) {
+  define('DRUPAL_ROOT', DrupalLocation::APP_ROOT);
+}
+else {
+  define('DRUPAL_ROOT', dirname(__DIR__, 2));
+}
 
 /**
  * Translates a string to the current language or to a given language.
