@@ -9,8 +9,6 @@ This takes care of:
     individual files may be scaffolded with this plugin.
   - Writing a DrupalInstalled.php file, which holds a PHP class that defines
     values about the current installation as class constants.
-  - Writing the DrupalLocation class, which allows Drupal to determine its
-    location within the project at runtime.
   - Writing an autoload.php file to the web root, which includes the Composer
     autoload.php file.
 
