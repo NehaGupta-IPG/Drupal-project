@@ -63,7 +63,7 @@ class DrupalInstalledTemplate {
          * This is the directory containing the scaffolded index.php file which is
          * Drupal's web entry point.
          */
-        public const APP_ROOT = __DIR__ . '$relative_app_root';
+        public const string APP_ROOT = __DIR__ . '$relative_app_root';
 
       }
 
