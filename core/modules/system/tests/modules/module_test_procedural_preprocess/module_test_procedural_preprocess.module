@@ -8,34 +8,6 @@
 declare(strict_types=1);
 
 /**
- * Implements hook_theme().
- */
-function module_test_procedural_preprocess_theme(): array {
-  $path = \Drupal::service('extension.list.module')->getPath('module_test_procedural_preprocess');
-  return [
-    'module_test_procedural_preprocess_theme' => [
-      'file' => 'module_test_procedural_preprocess.theme.inc',
-    ],
-    'module_test_procedural_preprocess_includes' => [
-      'includes' => [
-        $path . '/module_test_procedural_preprocess.additional.inc',
-      ],
-    ],
-  ];
-}
-
-/**
- * Implements template_preprocess_HOOK().
- *
- * This implementation tests that template_preprocess_HOOK functions are
- * gathered and executed when there is no initial preprocess key set on
- * hook_theme.
- */
-function template_preprocess_test($arg): mixed {
-  return $arg;
-}
-
-/**
  * Implements hook_preprocess().
  *
  * This implementation tests that a procedural preprocess hook with a prefix is
