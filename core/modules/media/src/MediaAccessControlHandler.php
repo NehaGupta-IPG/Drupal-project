@@ -59,6 +59,18 @@ class MediaAccessControlHandler extends EntityAccessControlHandler implements En
     $type = $entity->bundle();
     $is_owner = ($account->id() && $account->id() === $entity->getOwnerId());
     switch ($operation) {
+      case 'view standalone url':
+        $access_result = AccessResult::allowedIfHasPermissions($account, [
+          "view $type standalone media URL",
+          'view any standalone media URL',
+        ], 'OR')->cachePerPermissions();
+        if (!$access_result->isAllowed()) {
+          $access_result->setReason("The 'view any standalone media URL' OR 'view $type standalone media URL' permission is required to access the standalone media URL.");
+        }
+        // Also require regular view access to the entity.
+        $view_access_result = $this->checkAccess($entity, 'view', $account);
+        return $access_result->andIf($view_access_result);
+
       case 'view':
         if ($entity->isPublished()) {
           $access_result = AccessResult::allowedIf($account->hasPermission('view media'))

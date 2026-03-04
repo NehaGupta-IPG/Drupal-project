@@ -45,7 +45,10 @@ class MediaRouteProvider extends AdminHtmlRouteProvider {
    */
   protected function getCanonicalRoute(EntityTypeInterface $entity_type) {
     if ($this->config->get('standalone_url')) {
-      return parent::getCanonicalRoute($entity_type);
+      $route = parent::getCanonicalRoute($entity_type);
+      $operation = 'view standalone url';
+      $route->setRequirement('_entity_access', "{$entity_type->id()}.$operation");
+      return $route;
     }
     else {
       return parent::getEditFormRoute($entity_type);
