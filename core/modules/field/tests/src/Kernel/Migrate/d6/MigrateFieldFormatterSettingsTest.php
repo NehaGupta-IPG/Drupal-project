@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\field\Kernel\Migrate\d6;
 
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
+use Drupal\file\Plugin\Field\FieldFormatter\FileFormatterBase;
 use Drupal\Tests\migrate_drupal\Kernel\d6\MigrateDrupal6TestBase;
 
 /**
@@ -142,7 +143,7 @@ class MigrateFieldFormatterSettingsTest extends MigrateDrupal6TestBase {
     $this->assertSame($expected, $component);
     $display = EntityViewDisplay::load('node.story.default');
     $expected['type'] = 'file_url_plain';
-    $expected['settings'] = [];
+    $expected['settings'] = ['show_link_as' => FileFormatterBase::RELATIVE_URL];
     $component = $display->getComponent('field_test_filefield');
     $this->assertSame($expected, $component);
 

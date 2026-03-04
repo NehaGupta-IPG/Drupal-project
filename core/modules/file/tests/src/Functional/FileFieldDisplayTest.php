@@ -6,6 +6,7 @@ namespace Drupal\Tests\file\Functional;
 
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\file\Entity\File;
+use Drupal\file\Plugin\Field\FieldFormatter\FileFormatterBase;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 
@@ -244,6 +245,61 @@ class FileFieldDisplayTest extends FileFieldTestBase {
     $node->save();
     $this->drupalGet('node/' . $nid);
     $this->assertSession()->elementTextEquals('xpath', '//a[@href="' . $node->{$field_name}->entity->createFileUrl() . '"]/../../../td[2]', 'Unknown');
+  }
+
+  /**
+   * Test "Absolute url" settings for "file_url_plain" formatter.
+   */
+  public function testAbsoluteFileUrlFormatterValue(): void {
+    $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
+    $field_name = strtolower($this->randomMachineName());
+    $type_name = 'article';
+    $field_storage_settings = [
+      'display_field' => '1',
+      'display_default' => '1',
+      'cardinality' => '1',
+    ];
+    $field_settings = [
+      'file_directory' => '',
+    ];
+    $widget_settings = [];
+    $this->createFileField($field_name, 'node', $type_name, $field_storage_settings, $field_settings, $widget_settings);
+
+    $display_options = [
+      'type' => 'file_url_plain',
+      'settings' => [
+        'show_link_as' => FileFormatterBase::ABSOLUTE_URL,
+      ],
+    ];
+    $display = \Drupal::service('entity_display.repository')
+      ->getViewDisplay('node', $type_name);
+    $display->setComponent($field_name, $display_options)
+      ->save();
+
+    $test_file = $this->getTestFile('text');
+
+    // Create a new node with the uploaded file.
+    $nid = $this->uploadNodeFile($test_file, $field_name, $type_name);
+    $node_storage->resetCache([$nid]);
+    $node = $node_storage->load($nid);
+    $file = $node->{$field_name}->entity;
+    $expected_url = \Drupal::service('file_url_generator')->generateAbsoluteString($file->getFileUri());
+    $this->assertEquals($expected_url, $node->{$field_name}->view($display_options)[0]['#markup']);
+    $this->assertContains('url.site', $node->{$field_name}->view($display_options)[0]['#cache']['contexts']);
+
+    // Disable the "absolute_url" option and check the cache context is valid.
+    $display_options = [
+      'type' => 'file_url_plain',
+      'settings' => [
+        'show_link_as' => FileFormatterBase::RELATIVE_URL,
+      ],
+    ];
+    $display = \Drupal::service('entity_display.repository')
+      ->getViewDisplay('node', $type_name);
+    $display->setComponent($field_name, $display_options)
+      ->save();
+    $this->assertNotContains('url.site', $node->{$field_name}->view($display_options)[0]['#cache']['contexts']);
+
   }
 
 }
