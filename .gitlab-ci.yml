@@ -1029,10 +1029,10 @@ default:
 # Consolidate stage jobs
 ########################
 
-'Deprecations statistics':
+'Deprecation statistics':
   stage: 🚚 Consolidate
   script:
-    - find test-artifacts
+    #- find test-artifacts
     - php .gitlab-ci/scripts/statistics-consolidator.php test-artifacts $_TARGET_PHP
   artifacts:
     when: always

@@ -6,9 +6,6 @@ namespace Drupal\TestTools\ErrorHandler;
 
 use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
 use PHPUnit\Event\Code\NoTestCaseObjectOnCallStackException;
-use PHPUnit\Event\Code\TestMethod;
-use PHPUnit\Event\Test\DeprecationTriggered;
-use PHPUnit\Event\Test\PhpDeprecationTriggered;
 use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
 
 /**
@@ -26,62 +23,15 @@ use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
 final class BootstrapErrorHandler {
 
   /**
-   * Statistics for the currently executing test case.
+   * Constructor.
    *
-   * @see \Drupal\TestTools\Extension\DeprecationBridge\TestPreparationStartedSubscriber
-   * @see \Drupal\TestTools\Extension\DeprecationBridge\TestFinishedSubscriber
-   */
-  private static ?array $currentTest = NULL;
-
-  /**
    * @param \PHPUnit\Runner\ErrorHandler $phpUnitErrorHandler
    *   An instance of PHPUnit's runner own error handler. Any error not
-   *   managed here will fall back to it.
+   *   managed here will be relayed to it.
    */
   public function __construct(
     private readonly PhpUnitErrorHandler $phpUnitErrorHandler,
   ) {
-  }
-
-  public static function setCurrentTest(TestMethod $test): void {
-    assert(DeprecationHandler::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
-
-    self::$currentTest['testId'] = $test->id();
-    if ($test->metadata()->isIgnoreDeprecations()) {
-      self::$currentTest['testIgnoresDeprecations'] = !$test->metadata()->isIgnoreDeprecations()->isEmpty();
-    }
-    else {
-      self::$currentTest['testIgnoresDeprecations'] = FALSE;
-    }
-  }
-
-  public static function deprecationTriggered(DeprecationTriggered|PhpDeprecationTriggered $deprecation): void {
-    assert(DeprecationHandler::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
-
-    if ($deprecation->ignoredByTest() || $deprecation->ignoredByBaseline()) {
-      self::$currentTest['ignored_by_phpunit'][] = $deprecation->message();
-      return;
-    }
-    self::$currentTest['reported'][] = $deprecation->message();
-  }
-
-  public static function testFinished(): void {
-    assert(DeprecationHandler::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
-
-    if (self::$currentTest['testIgnoresDeprecations']) {
-      $stat = [];
-      $stat['test'] = self::$currentTest['testId'];
-      $stat['ignoreDeprecations'] = self::$currentTest['testIgnoresDeprecations'];
-      if (isset(self::$currentTest['ignored_by_project'])) {
-        $stat['ignoredByProject'] = count(self::$currentTest['ignored_by_project']);
-      }
-      $stat['ignoredByPhpunit'] = isset(self::$currentTest['ignored_by_phpunit']) ? count(self::$currentTest['ignored_by_phpunit']) : 0;
-      if (isset(self::$currentTest['reported'])) {
-        $stat['reported'] = count(self::$currentTest['reported']);
-      }
-      DeprecationHandler::writeStatisticEntry('test_stats', $stat);
-    }
-    self::$currentTest = [];
   }
 
   /**
@@ -101,21 +51,13 @@ final class BootstrapErrorHandler {
    *   continue.
    */
   public function __invoke(int $errorNumber, string $errorString, string $errorFile, int $errorLine): bool {
-    if (!DeprecationHandler::projectIgnoresEnabled()) {
-      throw new \RuntimeException(__METHOD__ . '() must not be called if the deprecation handler is not enabled.');
-    }
+    assert(DeprecationHandler::projectIgnoresEnabled(), __METHOD__ . '() must not be called if the deprecation handler is not enabled.');
 
-    // If the deprecation handled is one of those in the ignore list, we keep
-    // running.
+    // Stop processing the deprecation if it is one of those in the ignore
+    // list.
     if (E_USER_DEPRECATED === $errorNumber || E_DEPRECATED === $errorNumber) {
-      if (DeprecationHandler::isIgnoredByProject(self::$currentTest['testId'] ?? NULL, $errorString)) {
-        if (self::$currentTest) {
-          self::$currentTest['ignored_by_project'][] = $errorString;
-        }
+      if (DeprecationHandler::handle($errorNumber, $errorString, $errorFile, $errorLine)) {
         return TRUE;
-      }
-      if (self::$currentTest) {
-        self::$currentTest['relayed_to_phpunit'][] = $errorString;
       }
     }
 

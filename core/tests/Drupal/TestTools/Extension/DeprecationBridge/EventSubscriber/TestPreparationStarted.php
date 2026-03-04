@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Drupal\TestTools\Extension\DeprecationBridge;
+namespace Drupal\TestTools\Extension\DeprecationBridge\EventSubscriber;
 
-use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
+use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
 use PHPUnit\Event\Test\PreparationStarted;
 use PHPUnit\Event\Test\PreparationStartedSubscriber;
 
@@ -13,10 +13,10 @@ use PHPUnit\Event\Test\PreparationStartedSubscriber;
  *
  * @internal
  */
-final class TestPreparationStartedSubscriber implements PreparationStartedSubscriber {
+final class TestPreparationStarted implements PreparationStartedSubscriber {
 
   public function notify(PreparationStarted $event): void {
-    BootstrapErrorHandler::setCurrentTest($event->test());
+    DeprecationHandler::setCurrentTest($event->test());
   }
 
 }

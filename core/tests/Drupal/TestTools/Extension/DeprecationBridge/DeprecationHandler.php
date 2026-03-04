@@ -6,6 +6,14 @@ namespace Drupal\TestTools\Extension\DeprecationBridge;
 
 use Drupal\Core\Database\Database;
 use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
+use Drupal\TestTools\Extension\DeprecationBridge\EventSubscriber\Deprecation;
+use Drupal\TestTools\Extension\DeprecationBridge\EventSubscriber\PhpDeprecation;
+use Drupal\TestTools\Extension\DeprecationBridge\EventSubscriber\TestFinished;
+use Drupal\TestTools\Extension\DeprecationBridge\EventSubscriber\TestPreparationStarted;
+use Drupal\TestTools\Extension\DeprecationBridge\EventSubscriber\TestRunnerFinished;
+use PHPUnit\Event\Code\TestMethod;
+use PHPUnit\Event\Test\DeprecationTriggered;
+use PHPUnit\Event\Test\PhpDeprecationTriggered;
 use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
 use PHPUnit\Runner\Extension\Extension;
 use PHPUnit\Runner\Extension\Facade;
@@ -85,6 +93,14 @@ final class DeprecationHandler implements Extension {
    * @todo remove.
    */
   private static ?string $databaseVersion = NULL;
+
+  /**
+   * Statistics for the currently executing test case.
+   *
+   * @see \Drupal\TestTools\Extension\DeprecationBridge\TestPreparationStartedSubscriber
+   * @see \Drupal\TestTools\Extension\DeprecationBridge\TestFinishedSubscriber
+   */
+  private static ?array $currentTest = NULL;
 
   /**
    * Remove.
@@ -168,11 +184,11 @@ final class DeprecationHandler implements Extension {
     ]);
     putenv('_DRUPAL_DEPRECATION_HANDLER_CONFIG=' . $config);
 
-    $facade->registerSubscriber(new TestPreparationStartedSubscriber());
-    $facade->registerSubscriber(new DeprecationSubscriber());
-    $facade->registerSubscriber(new PhpDeprecationSubscriber());
-    $facade->registerSubscriber(new TestFinishedSubscriber());
-    $facade->registerSubscriber(new TestRunnerFinishedSubscriber($this));
+    $facade->registerSubscriber(new TestPreparationStarted());
+    $facade->registerSubscriber(new Deprecation());
+    $facade->registerSubscriber(new PhpDeprecation());
+    $facade->registerSubscriber(new TestFinished());
+    $facade->registerSubscriber(new TestRunnerFinished($this));
 
     // Artifacts directory.
     // $directory = $parameters->get('directory');
@@ -444,6 +460,62 @@ final class DeprecationHandler implements Extension {
       $tmp['database_version'] = self::$databaseVersion;
     }
     return $tmp;
+  }
+
+  public static function setCurrentTest(TestMethod $test): void {
+    assert(self::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+
+    self::$currentTest['testId'] = $test->id();
+    if ($test->metadata()->isIgnoreDeprecations()) {
+      self::$currentTest['testIgnoresDeprecations'] = !$test->metadata()->isIgnoreDeprecations()->isEmpty();
+    }
+    else {
+      self::$currentTest['testIgnoresDeprecations'] = FALSE;
+    }
+  }
+
+  public static function deprecationTriggered(DeprecationTriggered|PhpDeprecationTriggered $deprecation): void {
+    assert(self::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+
+    if ($deprecation->ignoredByTest() || $deprecation->ignoredByBaseline()) {
+      self::$currentTest['ignored_by_phpunit'][] = $deprecation->message();
+      return;
+    }
+    self::$currentTest['reported'][] = $deprecation->message();
+  }
+
+  public static function testFinished(): void {
+    assert(self::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+
+    if (self::$currentTest['testIgnoresDeprecations']) {
+      $stat = [];
+      $stat['test'] = self::$currentTest['testId'];
+      $stat['ignoreDeprecations'] = self::$currentTest['testIgnoresDeprecations'];
+      if (isset(self::$currentTest['ignored_by_project'])) {
+        $stat['ignoredByProject'] = count(self::$currentTest['ignored_by_project']);
+      }
+      $stat['ignoredByPhpunit'] = isset(self::$currentTest['ignored_by_phpunit']) ? count(self::$currentTest['ignored_by_phpunit']) : 0;
+      if (isset(self::$currentTest['reported'])) {
+        $stat['reported'] = count(self::$currentTest['reported']);
+      }
+      self::writeStatisticEntry('test_stats', $stat);
+    }
+    self::$currentTest = [];
+  }
+
+  public static function handle(int $errorNumber, string $errorString, string $errorFile, int $errorLine): bool {
+    assert(self::projectIgnoresEnabled(), __METHOD__ . '() must not be called if the deprecation handler is not enabled.');
+
+    if (self::isIgnoredByProject(self::$currentTest['testId'] ?? NULL, $errorString)) {
+      if (self::$currentTest) {
+        self::$currentTest['ignored_by_project'][] = $errorString;
+      }
+      return TRUE;
+    }
+    if (self::$currentTest) {
+      self::$currentTest['relayed_to_phpunit'][] = $errorString;
+    }
+    return FALSE;
   }
 
 }

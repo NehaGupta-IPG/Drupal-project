@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Drupal\TestTools\Extension\DeprecationBridge;
+namespace Drupal\TestTools\Extension\DeprecationBridge\EventSubscriber;
 
-use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
+use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
 use PHPUnit\Event\Test\DeprecationTriggered;
 use PHPUnit\Event\Test\DeprecationTriggeredSubscriber;
 
@@ -13,10 +13,10 @@ use PHPUnit\Event\Test\DeprecationTriggeredSubscriber;
  *
  * @internal
  */
-final class DeprecationSubscriber implements DeprecationTriggeredSubscriber {
+final class Deprecation implements DeprecationTriggeredSubscriber {
 
   public function notify(DeprecationTriggered $event): void {
-    BootstrapErrorHandler::deprecationTriggered($event);
+    DeprecationHandler::deprecationTriggered($event);
   }
 
 }
