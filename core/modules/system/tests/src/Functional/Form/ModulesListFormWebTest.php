@@ -178,6 +178,7 @@ BROKEN;
     $info = [
       'name' => 'Module that changes',
       'type' => 'module',
+      'package' => 'Testing',
     ];
     $compatible_info = $info + ['core_version_requirement' => '*'];
     $incompatible_info = $info + ['core_version_requirement' => '^1'];

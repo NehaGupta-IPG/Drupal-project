@@ -347,6 +347,7 @@ class ThemeUiTest extends BrowserTestBase {
     $info = [
       'name' => $theme_name,
       'type' => 'theme',
+      'package' => 'Testing',
       'base theme' => FALSE,
     ];
 

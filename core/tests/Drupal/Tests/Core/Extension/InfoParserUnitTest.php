@@ -219,6 +219,7 @@ COMMON;
 name: core_test
 type: module
 version: "VERSION"
+package: Testing
 description: 'testing info file parsing'
 CORE;
 
@@ -247,6 +248,7 @@ CORE;
 core_version_requirement: $constraint
 name: common_test
 type: module
+package: Testing
 description: 'testing info file parsing'
 simple_string: 'A simple string'
 version: "VERSION"
@@ -308,6 +310,7 @@ CORE_INCOMPATIBILITY;
 core_version_requirement: '*'
 name: The Perfect Profile
 type: profile
+package: Testing
 description: 'This profile makes Drupal perfect. You should have no complaints.'
 PROFILE_TEST;
 
@@ -331,7 +334,7 @@ PROFILE_TEST;
 # info.yml for testing invalid core_version_requirement value.
 name: Not this module
 description: 'Not the module you are looking for.'
-package: Core
+package: Testing
 type: module
 version: VERSION
 core_version_requirement: not-this-version
