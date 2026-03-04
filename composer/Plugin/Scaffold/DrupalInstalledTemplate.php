@@ -60,7 +60,7 @@ class DrupalInstalledTemplate {
         public const string VERSIONS_HASH = '$version_hash';
 
         /**
-         * Defines the root directory of the Drupal installation.
+         * The absolute path to the root directory of the Drupal installation.
          *
          * This is the directory containing the scaffolded index.php file which is
          * Drupal's web entry point.
