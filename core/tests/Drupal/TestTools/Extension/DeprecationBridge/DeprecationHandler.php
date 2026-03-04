@@ -198,11 +198,11 @@ final class DeprecationHandler implements Extension {
     if ($realDirectory === FALSE || !is_dir($realDirectory) || !is_writable($realDirectory)) {
       throw new \RuntimeException("Test artifacts directory {$directory} is not a writable directory.");
     }
-    $this->$directory = $realDirectory;
+    $this->directory = $realDirectory;
 
     // PHP major/minor version.
     preg_match('/^\d+\.\d+/', \PHP_VERSION, $matches);
-    $this->$phpVersion = $matches[0];
+    $this->phpVersion = $matches[0];
 
     // Database driver.
     if (!empty(getenv('SIMPLETEST_DB'))) {
@@ -210,21 +210,21 @@ final class DeprecationHandler implements Extension {
       chdir(dirname(__DIR__, 6));
       $dbInfo = Database::convertDbUrlToConnectionInfo(getenv('SIMPLETEST_DB'), TRUE);
       chdir($currDir);
-      $this->$databaseDriver = $dbInfo['driver'];
+      $this->databaseDriver = $dbInfo['driver'];
     }
 
     // Database version.
     if (!empty(getenv('_TARGET_DB'))) {
-      $this->$databaseVersion = getenv('_TARGET_DB');
+      $this->databaseVersion = getenv('_TARGET_DB');
     }
 
     // Set an environment variable with the configuration, so that isolated
     // tests can access it.
     $config = json_encode([
-      'directory' => $this->$directory,
-      'php_version' => $this->$phpVersion,
-      'database_driver' => $this->$databaseDriver,
-      'database_version' => $this->$databaseVersion,
+      'directory' => $this->directory,
+      'php_version' => $this->phpVersion,
+      'database_driver' => $this->databaseDriver,
+      'database_version' => $this->databaseVersion,
     ]);
     putenv('_DRUPAL_TEST_ARTIFACT_CONFIG=' . $config);
   }
@@ -318,7 +318,7 @@ final class DeprecationHandler implements Extension {
     assert(self::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
 
     $content = @file_get_contents($this->statisticsStagingFilePath);
-    $statisticsArtifactDirectory = $this->$directory . \DIRECTORY_SEPARATOR . 'deprecation-handler';
+    $statisticsArtifactDirectory = $this->directory . \DIRECTORY_SEPARATOR . 'deprecation-handler';
     Filesystem::createDirectory($statisticsArtifactDirectory);
 
     $test_run_id = getenv('DRUPAL_TEST_RUN_ID');
@@ -450,14 +450,14 @@ final class DeprecationHandler implements Extension {
     if ($env !== FALSE && in_array('phpunit-testsuite', $contextKeys)) {
       $tmp['phpunit_testsuite'] = $env;
     }
-    if ($this->$phpVersion && in_array('php-version', $contextKeys)) {
-      $tmp['php_version'] = $this->$phpVersion;
+    if ($this->phpVersion && in_array('php-version', $contextKeys)) {
+      $tmp['php_version'] = $this->phpVersion;
     }
-    if ($this->$databaseDriver && in_array('database-driver', $contextKeys)) {
-      $tmp['database_driver'] = $this->$databaseDriver;
+    if ($this->databaseDriver && in_array('database-driver', $contextKeys)) {
+      $tmp['database_driver'] = $this->databaseDriver;
     }
-    if ($this->$databaseVersion && in_array('database-version', $contextKeys)) {
-      $tmp['database_version'] = $this->$databaseVersion;
+    if ($this->databaseVersion && in_array('database-version', $contextKeys)) {
+      $tmp['database_version'] = $this->databaseVersion;
     }
     return $tmp;
   }
