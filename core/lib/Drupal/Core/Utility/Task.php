@@ -57,50 +57,59 @@ class Task {
    *
    * @param \Fiber|callable $tasks
    *   A list of tasks to wait for.
+   *
+   * @return array{mixed[], \Throwable[]}
+   *   A tuple of lists. Index 0 holds the results, index 1 a list of errors.
    */
   public static function awaitAll(array $tasks): array {
     $results = [];
+    $errors = [];
     $iterations = 0;
-    while (count($results) !== count($tasks)) {
+    while (count($results) + count($errors) !== count($tasks)) {
       foreach ($tasks as $index => $task) {
         if (array_key_exists($index, $results)) {
           continue;
         }
-        // @todo This needs to be wrapped into a try-catch block and exceptions
-        // need to be propagated to the caller. This is necessary to cover
-        // BigPipe requirements.
-        if ($task instanceof \Fiber) {
-          if (!$task->isStarted()) {
-            $task->start();
-          }
-          elseif ($task->isSuspended()) {
-            $task->resume();
-          }
-
-          // If the Fiber hasn't terminated by this point, move onto the next
-          // task, we'll resume this fiber again when we get back here.
-          if (!$task->isTerminated()) {
-            // If we've gone through the tasks once already, and they're
-            // still not finished, then start to allow code higher up the stack
-            // to get on with something else.
-            if ($iterations) {
-              $fiber = \Fiber::getCurrent();
-              if ($fiber !== NULL) {
-                $fiber->suspend(FiberResumeType::Immediate);
-              }
-            }
-            continue;
-          }
-          $results[$index] = $task->getReturn();
+        if (array_key_exists($index, $errors)) {
+          continue;
         }
-        else {
-          $results[$index] = $task();
+        try {
+          if ($task instanceof \Fiber) {
+            if (!$task->isStarted()) {
+              $task->start();
+            }
+            elseif ($task->isSuspended()) {
+              $task->resume();
+            }
+
+            // If the Fiber hasn't terminated by this point, move onto the next
+            // task, we'll resume this fiber again when we get back here.
+            if (!$task->isTerminated()) {
+              // If we've gone through the tasks once already, and they're
+              // still not finished, then start to allow code higher up the stack
+              // to get on with something else.
+              if ($iterations) {
+                $fiber = \Fiber::getCurrent();
+                if ($fiber !== NULL) {
+                  $fiber->suspend(FiberResumeType::Immediate);
+                }
+              }
+              continue;
+            }
+            $results[$index] = $task->getReturn();
+          }
+          else {
+            $results[$index] = $task();
+          }
+        }
+        catch (\Throwable $error) {
+          $errors[$index] = $error;
         }
       }
       $iterations++;
     }
 
-    return $results;
+    return [$results, $errors];
   }
 
 }

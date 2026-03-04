@@ -747,7 +747,10 @@ class Renderer implements RendererInterface {
         });
       }
     }
-    $results = Task::awaitAll($tasks);
+    [$results, $errors] = Task::awaitAll($tasks);
+    if (count($errors) > 0) {
+      throw(reset($errors));
+    }
     foreach ($results as $placeholder => [$markup, $placeholder_element]) {
       $elements = $this->doReplacePlaceholder($placeholder, $markup, $elements, $placeholder_element);
       unset($tasks[$placeholder]);
