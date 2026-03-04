@@ -86,8 +86,8 @@ class Task {
             // task, we'll resume this fiber again when we get back here.
             if (!$task->isTerminated()) {
               // If we've gone through the tasks once already, and they're
-              // still not finished, then start to allow code higher up the stack
-              // to get on with something else.
+              // still not finished, then start to allow code higher up the
+              // stack to get on with something else.
               if ($iterations) {
                 $fiber = \Fiber::getCurrent();
                 if ($fiber !== NULL) {
