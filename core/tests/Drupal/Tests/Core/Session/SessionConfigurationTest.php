@@ -38,8 +38,8 @@ class SessionConfigurationTest extends UnitTestCase {
    * @legacy-covers ::getOptions
    */
   #[DataProvider('providerTestGeneratedCookieDomain')]
-  public function testGeneratedCookieDomain($uri, $expected_domain): void {
-    $config = $this->createSessionConfiguration();
+  public function testGeneratedCookieDomain($uri, $expected_domain, $bc_mode = FALSE): void {
+    $config = $this->createSessionConfiguration(['cookie_domain_bc_mode' => $bc_mode]);
 
     $request = Request::create($uri);
     $options = $config->getOptions($request);
@@ -55,11 +55,16 @@ class SessionConfigurationTest extends UnitTestCase {
    */
   public static function providerTestGeneratedCookieDomain(): array {
     return [
-      ['http://example.com/path/index.php', '.example.com'],
-      ['http://www.example.com/path/index.php', '.www.example.com'],
-      ['http://subdomain.example.com/path/index.php', '.subdomain.example.com'],
-      ['http://example.com:8080/path/index.php', '.example.com'],
-      ['https://example.com/path/index.php', '.example.com'],
+      ['http://example.com/path/index.php', '.example.com', TRUE],
+      ['http://www.example.com/path/index.php', '.www.example.com', TRUE],
+      ['http://subdomain.example.com/path/index.php', '.subdomain.example.com', TRUE],
+      ['http://example.com:8080/path/index.php', '.example.com', TRUE],
+      ['https://example.com/path/index.php', '.example.com', TRUE],
+      ['http://example.com/path/index.php', ''],
+      ['http://www.example.com/path/index.php', ''],
+      ['http://subdomain.example.com/path/index.php', ''],
+      ['http://example.com:8080/path/index.php', ''],
+      ['https://example.com/path/index.php', ''],
       ['http://localhost/path/index.php', ''],
       ['http://127.0.0.1/path/index.php', ''],
       ['http://127.0.0.1:8888/path/index.php', ''],
@@ -76,8 +81,11 @@ class SessionConfigurationTest extends UnitTestCase {
    * @legacy-covers ::getOptions
    */
   #[DataProvider('providerTestEnforcedCookieDomain')]
-  public function testEnforcedCookieDomain($uri, $expected_domain): void {
-    $config = $this->createSessionConfiguration(['cookie_domain' => '.example.com']);
+  public function testEnforcedCookieDomain($uri, $expected_domain, $bc_mode = FALSE): void {
+    $config = $this->createSessionConfiguration([
+      'cookie_domain' => '.example.com',
+      'cookie_domain_bc_mode' => $bc_mode,
+    ]);
 
     $request = Request::create($uri);
     $options = $config->getOptions($request);
@@ -93,8 +101,10 @@ class SessionConfigurationTest extends UnitTestCase {
    */
   public static function providerTestEnforcedCookieDomain(): array {
     return [
+      ['http://example.com/path/index.php', '.example.com', TRUE],
       ['http://example.com/path/index.php', '.example.com'],
       ['http://www.example.com/path/index.php', '.example.com'],
+      ['http://subdomain.example.com/path/index.php', '.example.com', TRUE],
       ['http://subdomain.example.com/path/index.php', '.example.com'],
       ['http://example.com:8080/path/index.php', '.example.com'],
       ['https://example.com/path/index.php', '.example.com'],

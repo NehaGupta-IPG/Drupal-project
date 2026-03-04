@@ -51,6 +51,14 @@ parameters:
     # information.
     # @default no value
     cookie_samesite: Lax
+    #
+    # Prior to Drupal 10.1.0 the cookie domain was set to a dot plus the current
+    # domain. For example, if Drupal we served from 'www.example.com' the cookie
+    # domain would be set to '.www.example.com'. From Drupal 10.1.0 onwards,
+    # by default, host-only cookies are used and the browser will determine the
+    # cookie name. If you want to customize the cookie domain use the
+    # 'cookie_domain' parameter as documented above.
+    cookie_domain_bc_mode: false
     # By default, Drupal generates a session cookie name based on the full
     # domain name. Set the name_suffix to a short random string to ensure this
     # session cookie name is unique on different installations on the same
