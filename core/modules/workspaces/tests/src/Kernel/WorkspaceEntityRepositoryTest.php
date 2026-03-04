@@ -212,6 +212,10 @@ class WorkspaceEntityRepositoryTest extends KernelTestBase {
     $active = $this->entityRepository->getActiveMultiple($entity_type_id, [$entity_3->id()], $en_contexts)[0];
     $this->assertSame($non_default_live_revision->getLoadedRevisionId(), $active->getLoadedRevisionId());
     $this->assertSame($non_default_live_revision->language()->getId(), $active->language()->getId());
+
+    // Make sure methods return null when entity doesn't exist.
+    $this->assertNull($this->entityRepository->getActive($entity_type_id, 123456, $en_contexts));
+    $this->assertEmpty($this->entityRepository->getActiveMultiple($entity_type_id, [123456, 654321], $en_contexts));
   }
 
 }
