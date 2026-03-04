@@ -3908,6 +3908,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/DrupalKernel.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Core\\\\DrupalKernel\\:\\:guessApplicationRoot\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/DrupalKernel.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\DrupalKernel\\:\\:initializeRequestGlobals\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
