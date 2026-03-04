@@ -5,6 +5,7 @@ namespace Drupal\Core\Installer\Form;
 use Drupal\Core\Datetime\TimeZoneFormHelper;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleInstallerInterface;
+use Drupal\Core\File\FilePermissions;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Site\Settings;
@@ -34,6 +35,8 @@ class SiteConfigureForm extends ConfigFormBase {
    *   The user validator.
    * @param bool $superUserAccessPolicy
    *   The value of the 'security.enable_super_user' container parameter.
+   * @param \Drupal\Core\File\FilePermissions $filePermissions
+   *   The file permissions service.
    */
   public function __construct(
     protected $root,
@@ -42,6 +45,7 @@ class SiteConfigureForm extends ConfigFormBase {
     protected ModuleInstallerInterface $moduleInstaller,
     protected UserNameValidator $userNameValidator,
     protected bool $superUserAccessPolicy,
+    protected FilePermissions $filePermissions,
   ) {}
 
   /**
@@ -58,6 +62,7 @@ class SiteConfigureForm extends ConfigFormBase {
       // the container parameter is missing then the policy is enabled. See
       // \Drupal\Core\DependencyInjection\Compiler\SuperUserAccessPolicyPass.
       $container->getParameter('security.enable_super_user') ?? TRUE,
+      $container->get(FilePermissions::class),
     );
   }
 
@@ -97,7 +102,12 @@ class SiteConfigureForm extends ConfigFormBase {
     // distract from the message that the Drupal installation has completed
     // successfully.)
     $post_params = $this->getRequest()->request->all();
-    if (empty($post_params) && (Settings::get('skip_permissions_hardening') || !drupal_verify_install_file($this->root . '/' . $settings_file, FILE_EXIST | FILE_READABLE | FILE_NOT_WRITABLE) || !drupal_verify_install_file($this->root . '/' . $settings_dir, FILE_NOT_WRITABLE, 'dir'))) {
+    if (
+      empty($post_params) &&
+      (Settings::get('skip_permissions_hardening') ||
+        !$this->filePermissions->verifyFile($this->root . '/' . $settings_file, FilePermissions::EXIST | FilePermissions::READABLE | FilePermissions::NOT_WRITABLE) ||
+        !$this->filePermissions->verifyDirectory($this->root . '/' . $settings_dir, FilePermissions::NOT_WRITABLE))
+    ) {
       $this->messenger()
         ->addWarning($this->t('All necessary changes to %dir and %file have been made, so you should remove write permissions to them now in order to avoid security risks. If you are unsure how to do so, consult the <a href=":handbook_url">online handbook</a>.', [
           '%dir' => $settings_dir,
