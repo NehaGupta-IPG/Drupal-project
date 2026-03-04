@@ -136,6 +136,10 @@ final class DeprecationHandler implements Extension {
     if (self::$debugClassLoader) {
       DebugClassLoader::enable();
     }
+
+    // Determine if collection of deprecation statistics is enabled.
+    $collectStats = filter_var($parameters['enableCollectStats'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
+    self::$collectStats = $collectStats;
   }
 
   /**
@@ -151,6 +155,9 @@ final class DeprecationHandler implements Extension {
       return;
     }
 
+    if (!self::collectStatsEnabled()) {
+      return;
+    }
     // Determine staging file path.
     $this->statisticsStagingFilePath = tempnam(sys_get_temp_dir(), 'depsta');
 
@@ -292,6 +299,8 @@ final class DeprecationHandler implements Extension {
    * Dump statistics after test runner end.
    */
   public function processStatisticsArtifact(): void {
+    assert(self::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+
     $content = @file_get_contents($this->statisticsStagingFilePath);
     $statisticsArtifactDirectory = self::$directory . \DIRECTORY_SEPARATOR . 'deprecation-handler';
     Filesystem::createDirectory($statisticsArtifactDirectory);
@@ -336,6 +345,8 @@ final class DeprecationHandler implements Extension {
    * Write a statistic entry.
    */
   public static function writeStatisticEntry(string $status, array $stat): void {
+    assert(self::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+
     $stat['status'] = $status;
 
     $configEnv = getenv('_DRUPAL_DEPRECATION_HANDLER_CONFIG');
@@ -375,13 +386,15 @@ final class DeprecationHandler implements Extension {
         throw new \RuntimeException(preg_last_error_msg());
       }
       if ((bool) $result) {
-        $stat = [];
-        if ($testMethod !== NULL) {
-          $stat['test'] = $testMethod;
+        if (self::collectStatsEnabled()) {
+          $stat = [];
+          if ($testMethod !== NULL) {
+            $stat['test'] = $testMethod;
+          }
+          $stat['message'] = $deprecationMessage;
+          $stat['ignore-pattern'] = $pattern;
+          self::writeStatisticEntry('ignored_by_project', $stat);
         }
-        $stat['message'] = $deprecationMessage;
-        $stat['ignore-pattern'] = $pattern;
-        self::writeStatisticEntry('ignored_by_project', $stat);
         return TRUE;
       }
     }

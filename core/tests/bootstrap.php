@@ -161,9 +161,8 @@ mb_language('uni');
 // reduce the fragility of the testing system in general.
 date_default_timezone_set('Australia/Sydney');
 
-// Get deprecation override handling as early as possible. If the deprecation
-// bridge extension is not enabled, overrides will be reverted during extension
-// bootstrap.
+// Get deprecation override handling as early as possible, depending on the
+// extension configuration.
 try {
   DeprecationHandler::preBootstrap(PhpunitConfigurationRegistry::get());
 }

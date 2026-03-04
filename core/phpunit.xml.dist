@@ -49,7 +49,7 @@
       <parameter name="enableProjectIgnores" value="true"/>
       <parameter name="projectIgnoreFile" value="core/.deprecation-ignore.txt"/>
       <parameter name="enableDebugClassLoader" value="true"/>
-      <parameter name="enableCollectStats" value="true"/>
+      <parameter name="enableCollectStats" value="false"/>
     </bootstrap>
     <!-- Functional tests HTML output logging. -->
     <bootstrap class="Drupal\TestTools\Extension\HtmlLogging\HtmlOutputLogger">

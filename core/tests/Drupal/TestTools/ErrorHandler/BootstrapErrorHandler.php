@@ -44,6 +44,8 @@ final class BootstrapErrorHandler {
   }
 
   public static function setCurrentTest(TestMethod $test): void {
+    assert(DeprecationHandler::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+
     self::$currentTest['testId'] = $test->id();
     if ($test->metadata()->isIgnoreDeprecations()) {
       self::$currentTest['testIgnoresDeprecations'] = !$test->metadata()->isIgnoreDeprecations()->isEmpty();
@@ -54,6 +56,8 @@ final class BootstrapErrorHandler {
   }
 
   public static function deprecationTriggered(DeprecationTriggered|PhpDeprecationTriggered $deprecation): void {
+    assert(DeprecationHandler::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+
     if ($deprecation->ignoredByTest() || $deprecation->ignoredByBaseline()) {
       self::$currentTest['ignored_by_phpunit'][] = $deprecation->message();
       return;
@@ -62,6 +66,8 @@ final class BootstrapErrorHandler {
   }
 
   public static function testFinished(): void {
+    assert(DeprecationHandler::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+
     if (self::$currentTest['testIgnoresDeprecations']) {
       $stat = [];
       $stat['test'] = self::$currentTest['testId'];
