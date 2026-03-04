@@ -617,31 +617,39 @@ class Renderer implements RendererInterface {
     // Set the provided context and call the callable, it will use that context.
     $this->setCurrentRenderContext($context);
 
-    $fiber = new \Fiber(static fn () => $callable());
-    $fiber->start();
-    $resume_type = NULL;
-    while (!$fiber->isTerminated()) {
-      if ($fiber->isSuspended()) {
-        // When ::executeInRenderContext() is executed within a Fiber, which is
-        // always the case when rendering placeholders, if the callback results
-        // in this fiber being suspended, we need to suspend again up to the
-        // parent Fiber. Doing so allows other placeholders to be rendered
-        // before returning here.
-        if (\Fiber::getCurrent() !== NULL) {
-          $this->setCurrentRenderContext($previous_context);
-          \Fiber::suspend(FiberResumeType::Immediate);
-          $this->setCurrentRenderContext($context);
+    $task = Task::async($callable);
+
+    // Same as Task::await() but with special treatment of parent render
+    // context.
+    if ($task instanceof \Fiber) {
+      $task->start();
+      $resume_type = NULL;
+      while (!$task->isTerminated()) {
+        if ($task->isSuspended()) {
+          // When ::executeInRenderContext() is executed within a Fiber, which
+          // is always the case when rendering placeholders, if the callback
+          // results in this fiber being suspended, we need to suspend again up
+          // to the parent Fiber. Doing so allows other placeholders to be
+          // rendered before returning here.
+          if (\Fiber::getCurrent() !== NULL) {
+            $this->setCurrentRenderContext($previous_context);
+            \Fiber::suspend(FiberResumeType::Immediate);
+            $this->setCurrentRenderContext($context);
+          }
+          $resume_type = $task->resume();
         }
-        $resume_type = $fiber->resume();
+        // If the fiber has been suspended and has not signaled that it can be
+        // immediately resumed, assume that the fiber is waiting on an async
+        // operation and wait a bit.
+        if (!$task->isTerminated() && $resume_type !== FiberResumeType::Immediate) {
+          usleep(500);
+        }
       }
-      // If the fiber has been suspended and has not signaled that it can be
-      // immediately resumed, assume that the fiber is waiting on an async
-      // operation and wait a bit.
-      if (!$fiber->isTerminated() && $resume_type !== FiberResumeType::Immediate) {
-        usleep(500);
-      }
+      $result = $task->getReturn();
     }
-    $result = $fiber->getReturn();
+    else {
+      $result = $task();
+    }
     assert($context->count() <= 1, 'Bubbling failed.');
 
     // Restore the original render context.
