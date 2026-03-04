@@ -45,7 +45,7 @@ class WorkspacesEntityRepository implements EntityRepositoryInterface {
     // workspace, the active entity variant is the canonical one.
     if (!$this->workspaceManager->hasActiveWorkspace()) {
       $canonical = $this->inner->getCanonical($entity_type_id, $entity_id, $contexts);
-      if ($this->workspaceTracker->getEntityTrackingWorkspaceIds($canonical, TRUE)) {
+      if ($canonical && $this->workspaceTracker->getEntityTrackingWorkspaceIds($canonical, TRUE)) {
         return $canonical;
       }
     }
@@ -61,7 +61,10 @@ class WorkspacesEntityRepository implements EntityRepositoryInterface {
     if (!$this->workspaceManager->hasActiveWorkspace()) {
       $entities = [];
       foreach ($entity_ids as $entity_id) {
-        $entities[] = $this->getActive($entity_type_id, $entity_id, $contexts);
+        $active = $this->getActive($entity_type_id, $entity_id, $contexts);
+        if ($active) {
+          $entities[] = $active;
+        }
       }
       return $entities;
     }
