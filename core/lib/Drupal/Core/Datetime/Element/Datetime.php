@@ -19,9 +19,8 @@ class Datetime extends DateElementBase {
 
   use DoTrustedCallbackTrait;
 
+  // phpcs:ignore Drupal.Commenting.DocComment.MissingShort
   /**
-   * The date time service.
-   *
    * @var \DateTimeInterface
    */
   protected static $dateExample;
