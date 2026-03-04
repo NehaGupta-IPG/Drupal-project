@@ -204,6 +204,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
     // Get the web root defined in composer.json.
     $manage_options = new ManageOptions($event->getComposer());
     $web_root = $manage_options->getOptions()->getLocation('web-root');
+    $web_root = trim($web_root, '/');
 
     // Composer changes the current directory to the project root, even if it
     // run in a subdirectory.
@@ -212,8 +213,6 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
     $absolute_app_root = $absolute_project_root . '/' . $web_root;
     $absolute_app_root = realpath($absolute_app_root);
 
-    $relative_app_root = '/' . trim($web_root, '/');
-
     $filesystem = new Filesystem();
     // Do not remove double realpath() calls.
     // Fixes failing Windows realpath() implementation.
@@ -221,7 +220,7 @@ class Plugin implements PluginInterface, EventSubscriberInterface, Capable {
     $vendor_path = realpath(realpath($vendor_dir));
     $filesystem->ensureDirectoryExists($vendor_path . '/drupal');
     // Create the Drupal\DrupalInstalled class.
-    file_put_contents($vendor_path . '/drupal/DrupalInstalled.php', DrupalInstalledTemplate::getCode($package, $repository, $relative_app_root));
+    file_put_contents($vendor_path . '/drupal/DrupalInstalled.php', DrupalInstalledTemplate::getCode($package, $repository, $absolute_app_root));
     $autoload['classmap'][] = $vendor_dir . '/drupal/DrupalInstalled.php';
 
     $package->setAutoload($autoload);

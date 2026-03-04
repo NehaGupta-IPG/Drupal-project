@@ -19,13 +19,13 @@ class DrupalInstalledTemplate {
    *   The root package.
    * @param \Composer\Repository\InstalledRepositoryInterface $repository
    *   The local installed repository.
-   * @param string $relative_app_root
-   *   The relative app root where Drupal is installed.
+   * @param string $absolute_app_root
+   *   The absolute path to the app root where Drupal is installed.
    *
    * @return string
    *   The PHP code to write to the DrupalInstalled class.
    */
-  public static function getCode(PackageInterface $root_package, InstalledRepositoryInterface $repository, string $relative_app_root): string {
+  public static function getCode(PackageInterface $root_package, InstalledRepositoryInterface $repository, string $absolute_app_root): string {
     // Ensure the packages are sorted consistently.
     $packages = $repository->getPackages();
     usort($packages, static function (PackageInterface $a, PackageInterface $b) {
@@ -65,7 +65,7 @@ class DrupalInstalledTemplate {
          * This is the directory containing the scaffolded index.php file which is
          * Drupal's web entry point.
          */
-        public const string APP_ROOT = __DIR__ . '$relative_app_root';
+        public const string APP_ROOT = '$absolute_app_root';
 
       }
 
