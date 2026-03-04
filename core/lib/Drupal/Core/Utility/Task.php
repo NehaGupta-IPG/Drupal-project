@@ -6,11 +6,19 @@ use Drupal\Core\Site\Settings;
 
 /**
  * Basic async primitives wrapping PHP fibers.
+ *
+ * @template TStart
+ * @template TResume
+ * @template TReturn
+ * @template TSuspend
  */
 class Task {
 
   /**
    * Create an awaitable task from the given callable.
+   *
+   * @return \Fiber<TStart,TResume,TReturn,TSuspend>|callable
+   *   Awaitable task.
    */
   public static function async(callable $task): \Fiber|callable {
     if (Settings::get('async_fibers_enabled', TRUE)) {
@@ -54,11 +62,11 @@ class Task {
     $results = [];
     $iterations = 0;
     while (count($results) !== count($tasks)) {
-      foreach ($task as $index => $task) {
+      foreach ($tasks as $index => $task) {
         if (array_key_exists($index, $results)) {
           continue;
         }
-        // TODO: This needs to be wrapped into a try-catch block and exceptions
+        // @todo This needs to be wrapped into a try-catch block and exceptions
         // need to be propagated to the caller. This is necessary to cover
         // BigPipe requirements.
         if ($task instanceof \Fiber) {
