@@ -10,7 +10,7 @@ use Psr\Container\ContainerInterface;
  *
  * @see \Drupal\Core\StreamWrapper\StreamWrapperInterface
  */
-class StreamWrapperManager implements StreamWrapperManagerInterface {
+class StreamWrapperManager implements StreamWrapperManagerInterface, CoreStreamWrapperManagerInterface {
 
   /**
    * Constructs a StreamWrapperManager object.
@@ -145,18 +145,9 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
   }
 
   /**
-   * Adds a stream wrapper.
-   *
-   * Internal use only.
-   *
-   * @param string $service_id
-   *   The service id.
-   * @param string $class
-   *   The stream wrapper class.
-   * @param string $scheme
-   *   The scheme for which the wrapper should be registered.
+   * {@inheritdoc}
    */
-  public function addStreamWrapper($service_id, $class, $scheme) {
+  public function addStreamWrapper($service_id, $class, $scheme): void {
     $this->info[$scheme] = [
       'class' => $class,
       'type' => $class::getType(),
@@ -165,22 +156,18 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
   }
 
   /**
-   * Registers the tagged stream wrappers.
-   *
-   * Internal use only.
+   * {@inheritdoc}
    */
-  public function register() {
+  public function register(): void {
     foreach ($this->info as $scheme => $info) {
       $this->registerWrapper($scheme, $info['class'], $info['type']);
     }
   }
 
   /**
-   * Deregisters the tagged stream wrappers.
-   *
-   * Internal use only.
+   * {@inheritdoc}
    */
-  public function unregister() {
+  public function unregister(): void {
     // Normally, there are definitely wrappers set for the ALL filter. However,
     // in some cases involving many container rebuilds (e.g. BrowserTestBase),
     // $this->wrappers may be empty although wrappers are still registered
@@ -229,19 +216,7 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
   }
 
   /**
-   * Normalizes a URI by making it syntactically correct.
-   *
-   * A stream is referenced as "scheme://target".
-   *
-   * The following actions are taken:
-   * - Remove trailing slashes from target
-   * - Trim erroneous leading slashes from target. e.g. ":///" becomes "://".
-   *
-   * @param string $uri
-   *   String reference containing the URI to normalize.
-   *
-   * @return string
-   *   The normalized URI.
+   * {@inheritdoc}
    */
   public function normalizeUri($uri) {
     $scheme = $this->getScheme($uri);
