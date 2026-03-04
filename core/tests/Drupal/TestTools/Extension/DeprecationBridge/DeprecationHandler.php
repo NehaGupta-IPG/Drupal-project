@@ -71,28 +71,28 @@ final class DeprecationHandler implements Extension {
    *
    * @todo remove.
    */
-  private static string $directory;
+  private string $directory;
 
   /**
    * The PHP major/minor version in use.
    *
    * @todo remove.
    */
-  private static string $phpVersion;
+  private string $phpVersion;
 
   /**
    * The database driver used by the SUT.
    *
    * @todo remove.
    */
-  private static ?string $databaseDriver = NULL;
+  private ?string $databaseDriver = NULL;
 
   /**
    * The database version used by the SUT.
    *
    * @todo remove.
    */
-  private static ?string $databaseVersion = NULL;
+  private ?string $databaseVersion = NULL;
 
   /**
    * Statistics for the currently executing test case.
@@ -184,10 +184,10 @@ final class DeprecationHandler implements Extension {
     ]);
     putenv('_DRUPAL_DEPRECATION_HANDLER_CONFIG=' . $config);
 
-    $facade->registerSubscriber(new TestPreparationStarted());
-    $facade->registerSubscriber(new Deprecation());
-    $facade->registerSubscriber(new PhpDeprecation());
-    $facade->registerSubscriber(new TestFinished());
+    $facade->registerSubscriber(new TestPreparationStarted($this));
+    $facade->registerSubscriber(new Deprecation($this));
+    $facade->registerSubscriber(new PhpDeprecation($this));
+    $facade->registerSubscriber(new TestFinished($this));
     $facade->registerSubscriber(new TestRunnerFinished($this));
 
     // Artifacts directory.
@@ -198,11 +198,11 @@ final class DeprecationHandler implements Extension {
     if ($realDirectory === FALSE || !is_dir($realDirectory) || !is_writable($realDirectory)) {
       throw new \RuntimeException("Test artifacts directory {$directory} is not a writable directory.");
     }
-    self::$directory = $realDirectory;
+    $this->$directory = $realDirectory;
 
     // PHP major/minor version.
     preg_match('/^\d+\.\d+/', \PHP_VERSION, $matches);
-    self::$phpVersion = $matches[0];
+    $this->$phpVersion = $matches[0];
 
     // Database driver.
     if (!empty(getenv('SIMPLETEST_DB'))) {
@@ -210,21 +210,21 @@ final class DeprecationHandler implements Extension {
       chdir(dirname(__DIR__, 6));
       $dbInfo = Database::convertDbUrlToConnectionInfo(getenv('SIMPLETEST_DB'), TRUE);
       chdir($currDir);
-      self::$databaseDriver = $dbInfo['driver'];
+      $this->$databaseDriver = $dbInfo['driver'];
     }
 
     // Database version.
     if (!empty(getenv('_TARGET_DB'))) {
-      self::$databaseVersion = getenv('_TARGET_DB');
+      $this->$databaseVersion = getenv('_TARGET_DB');
     }
 
     // Set an environment variable with the configuration, so that isolated
     // tests can access it.
     $config = json_encode([
-      'directory' => self::$directory,
-      'php_version' => self::$phpVersion,
-      'database_driver' => self::$databaseDriver,
-      'database_version' => self::$databaseVersion,
+      'directory' => $this->$directory,
+      'php_version' => $this->$phpVersion,
+      'database_driver' => $this->$databaseDriver,
+      'database_version' => $this->$databaseVersion,
     ]);
     putenv('_DRUPAL_TEST_ARTIFACT_CONFIG=' . $config);
   }
@@ -318,7 +318,7 @@ final class DeprecationHandler implements Extension {
     assert(self::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
 
     $content = @file_get_contents($this->statisticsStagingFilePath);
-    $statisticsArtifactDirectory = self::$directory . \DIRECTORY_SEPARATOR . 'deprecation-handler';
+    $statisticsArtifactDirectory = $this->$directory . \DIRECTORY_SEPARATOR . 'deprecation-handler';
     Filesystem::createDirectory($statisticsArtifactDirectory);
 
     $test_run_id = getenv('DRUPAL_TEST_RUN_ID');
@@ -331,7 +331,7 @@ final class DeprecationHandler implements Extension {
 
     $encodedStats = explode("\n", $content);
     $stats = [
-      'metadata' => self::metadata(),
+      'metadata' => $this->metadata(),
       'skips' => [],
       'tests' => [],
     ];
@@ -360,7 +360,7 @@ final class DeprecationHandler implements Extension {
   /**
    * Write a statistic entry.
    */
-  public static function writeStatisticEntry(string $status, array $stat): void {
+  private static function writeStatisticEntry(string $status, array $stat): void {
     assert(self::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
 
     $stat['status'] = $status;
@@ -422,7 +422,7 @@ final class DeprecationHandler implements Extension {
    *
    * @todo remove.
    */
-  public static function metadata(): array {
+  public function metadata(): array {
     if ($env = getenv('DRUPAL_TEST_CONTEXT_KEYS')) {
       $contextKeys = explode(",", $env);
     }
@@ -450,19 +450,19 @@ final class DeprecationHandler implements Extension {
     if ($env !== FALSE && in_array('phpunit-testsuite', $contextKeys)) {
       $tmp['phpunit_testsuite'] = $env;
     }
-    if (self::$phpVersion && in_array('php-version', $contextKeys)) {
-      $tmp['php_version'] = self::$phpVersion;
+    if ($this->$phpVersion && in_array('php-version', $contextKeys)) {
+      $tmp['php_version'] = $this->$phpVersion;
     }
-    if (self::$databaseDriver && in_array('database-driver', $contextKeys)) {
-      $tmp['database_driver'] = self::$databaseDriver;
+    if ($this->$databaseDriver && in_array('database-driver', $contextKeys)) {
+      $tmp['database_driver'] = $this->$databaseDriver;
     }
-    if (self::$databaseVersion && in_array('database-version', $contextKeys)) {
-      $tmp['database_version'] = self::$databaseVersion;
+    if ($this->$databaseVersion && in_array('database-version', $contextKeys)) {
+      $tmp['database_version'] = $this->$databaseVersion;
     }
     return $tmp;
   }
 
-  public static function setCurrentTest(TestMethod $test): void {
+  public function setCurrentTest(TestMethod $test): void {
     assert(self::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
 
     self::$currentTest['testId'] = $test->id();
@@ -474,7 +474,7 @@ final class DeprecationHandler implements Extension {
     }
   }
 
-  public static function deprecationTriggered(DeprecationTriggered|PhpDeprecationTriggered $deprecation): void {
+  public function deprecationTriggered(DeprecationTriggered|PhpDeprecationTriggered $deprecation): void {
     assert(self::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
 
     if ($deprecation->ignoredByTest() || $deprecation->ignoredByBaseline()) {
@@ -484,7 +484,7 @@ final class DeprecationHandler implements Extension {
     self::$currentTest['reported'][] = $deprecation->message();
   }
 
-  public static function testFinished(): void {
+  public function testFinished(): void {
     assert(self::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
 
     if (self::$currentTest['testIgnoresDeprecations']) {
@@ -498,7 +498,7 @@ final class DeprecationHandler implements Extension {
       if (isset(self::$currentTest['reported'])) {
         $stat['reported'] = count(self::$currentTest['reported']);
       }
-      self::writeStatisticEntry('test_stats', $stat);
+      $this->writeStatisticEntry('test_stats', $stat);
     }
     self::$currentTest = [];
   }

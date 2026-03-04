@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\TestTools\Extension\DeprecationBridge\EventSubscriber;
 
-use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
 use PHPUnit\Event\Test\PreparationStarted;
 use PHPUnit\Event\Test\PreparationStartedSubscriber;
 
@@ -13,10 +12,10 @@ use PHPUnit\Event\Test\PreparationStartedSubscriber;
  *
  * @internal
  */
-final class TestPreparationStarted implements PreparationStartedSubscriber {
+final class TestPreparationStarted extends SubscriberBase implements PreparationStartedSubscriber {
 
   public function notify(PreparationStarted $event): void {
-    DeprecationHandler::setCurrentTest($event->test());
+    $this->handler()->setCurrentTest($event->test());
   }
 
 }

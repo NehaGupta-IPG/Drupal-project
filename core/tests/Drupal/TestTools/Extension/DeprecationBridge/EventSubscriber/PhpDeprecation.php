@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\TestTools\Extension\DeprecationBridge\EventSubscriber;
 
-use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
 use PHPUnit\Event\Test\PhpDeprecationTriggered;
 use PHPUnit\Event\Test\PhpDeprecationTriggeredSubscriber;
 
@@ -13,10 +12,10 @@ use PHPUnit\Event\Test\PhpDeprecationTriggeredSubscriber;
  *
  * @internal
  */
-final class PhpDeprecation implements PhpDeprecationTriggeredSubscriber {
+final class PhpDeprecation extends SubscriberBase implements PhpDeprecationTriggeredSubscriber {
 
   public function notify(PhpDeprecationTriggered $event): void {
-    DeprecationHandler::deprecationTriggered($event);
+    $this->handler()->deprecationTriggered($event);
   }
 
 }

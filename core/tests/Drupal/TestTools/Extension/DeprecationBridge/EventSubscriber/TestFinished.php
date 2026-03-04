@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\TestTools\Extension\DeprecationBridge\EventSubscriber;
 
-use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
 use PHPUnit\Event\Test\Finished;
 use PHPUnit\Event\Test\FinishedSubscriber;
 
@@ -13,10 +12,10 @@ use PHPUnit\Event\Test\FinishedSubscriber;
  *
  * @internal
  */
-final class TestFinished implements FinishedSubscriber {
+final class TestFinished extends SubscriberBase implements FinishedSubscriber {
 
   public function notify(Finished $event): void {
-    DeprecationHandler::testFinished();
+    $this->handler()->testFinished();
   }
 
 }
