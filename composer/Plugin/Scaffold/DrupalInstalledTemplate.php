@@ -19,6 +19,8 @@ class DrupalInstalledTemplate {
    *   The root package.
    * @param \Composer\Repository\InstalledRepositoryInterface $repository
    *   The local installed repository.
+   * @param string $relative_app_root
+   *   The relative app root where Drupal is installed.
    *
    * @return string
    *   The PHP code to write to the DrupalInstalled class.
