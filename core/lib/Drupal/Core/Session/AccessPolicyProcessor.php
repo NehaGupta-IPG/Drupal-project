@@ -6,7 +6,7 @@ use Drupal\Core\Cache\CacheOptionalInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\VariationCacheInterface;
-use Drupal\Core\Utility\FiberResumeType;
+use Drupal\Core\Utility\Task;
 
 /**
  * Processes access policies into permissions for an account.
@@ -46,18 +46,8 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
 
     // If running in a fiber, prevent the current user switch from escaping to
     // outside the fiber by resuming the fiber if it was suspended.
-    $fiber = new \Fiber([$this, 'doProcessAccessPolicies']);
-    $fiber->start($account, $scope);
-    while (!$fiber->isTerminated()) {
-      if ($fiber->isSuspended()) {
-        $resume_type = $fiber->resume();
-        if (!$fiber->isTerminated() && $resume_type !== FiberResumeType::Immediate) {
-          usleep(500);
-        }
-      }
-    }
-
-    return $fiber->getReturn();
+    $fiber = new \Fiber(fn() => $this->doProcessAccessPolicies($account, $scope));
+    return Task::await($fiber);
   }
 
   /**
