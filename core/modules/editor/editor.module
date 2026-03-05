@@ -100,7 +100,7 @@ function editor_form_filter_admin_format_submit($form, FormStateInterface $form_
     // @see editor.image_upload_settings.1
     // @see editor.schema.yml
     $image_upload_settings = $editor->getImageUploadSettings();
-    if (!$image_upload_settings['status']) {
+    if (isset($image_upload_settings['status']) && !$image_upload_settings['status']) {
       $editor->setImageUploadSettings(['status' => FALSE]);
     }
     $editor->save();
