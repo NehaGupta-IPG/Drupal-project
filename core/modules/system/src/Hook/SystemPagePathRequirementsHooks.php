@@ -6,7 +6,6 @@ use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 
 /**
@@ -102,4 +101,3 @@ class SystemPagePathRequirementsHooks {
   }
 
 }
-
