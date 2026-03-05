@@ -151,7 +151,11 @@ class ViewsViewsHooks {
       if (empty($actions)) {
         continue;
       }
-      $data[$entity_info->getBaseTable()][$entity_type . '_bulk_form'] = [
+      if (!$base_table = $entity_info->getBaseTable()) {
+        // We cannot do anything if for some reason there is no base table.
+        continue;
+      }
+      $data[$base_table][$entity_type . '_bulk_form'] = [
         'title' => $this->t('Bulk update'),
         'help' => $this->t('Allows users to apply an action to one or more items.'),
         'field' => [
