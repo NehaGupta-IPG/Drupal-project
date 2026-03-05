@@ -7,13 +7,15 @@ namespace Drupal\KernelTests\Core\Theme;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\Theme\Registry;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Stable 9's template overrides.
- *
- * @group Theme
- * @group #slow
  */
+#[Group('Theme')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class Stable9TemplateOverrideTest extends KernelTestBase {
 
   /**
@@ -36,13 +38,6 @@ class Stable9TemplateOverrideTest extends KernelTestBase {
   ];
 
   /**
-   * The theme handler.
-   *
-   * @var \Drupal\Core\Extension\ThemeHandlerInterface
-   */
-  protected $themeHandler;
-
-  /**
    * A list of all core modules.
    *
    * @var string[]
@@ -54,9 +49,10 @@ class Stable9TemplateOverrideTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->themeHandler = $this->container->get('theme_handler');
+    $this->installConfig(['system', 'user']);
 
     $this->container->get('theme_installer')->install(['stable9']);
+    $this->config('system.theme')->set('default', 'stable9')->save();
 
     $this->installAllModules();
   }
@@ -75,7 +71,8 @@ class Stable9TemplateOverrideTest extends KernelTestBase {
         || $module->status == TRUE
         || $module->info['package'] == 'Testing'
         || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::EXPERIMENTAL
-        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED) {
+        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED
+        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::OBSOLETE) {
         return FALSE;
       }
       return TRUE;
@@ -85,16 +82,13 @@ class Stable9TemplateOverrideTest extends KernelTestBase {
 
     $module_installer = $this->container->get('module_installer');
     $module_installer->install($this->allModules);
-
-    $this->installConfig(['system', 'user']);
   }
 
   /**
    * Ensures that Stable 9 overrides all relevant core templates.
    */
   public function testStable9TemplateOverrides(): void {
-    $registry = new Registry($this->root, \Drupal::cache(), \Drupal::lock(), \Drupal::moduleHandler(), $this->themeHandler, \Drupal::service('theme.initialization'), \Drupal::service('cache.bootstrap'), \Drupal::service('extension.list.module'), \Drupal::service('kernel'), 'stable9');
-    $registry->setThemeManager(\Drupal::theme());
+    $registry = \Drupal::service(Registry::class);
 
     $registry_full = $registry->get();
 

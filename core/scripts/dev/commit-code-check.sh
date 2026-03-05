@@ -25,6 +25,7 @@ contains_element() {
   return 1
 }
 
+MEMORY_UNLIMITED=0
 CACHED=0
 DRUPALCI=0
 BRANCH=""
@@ -38,6 +39,7 @@ while test $# -gt 0; do
       echo "--branch BRANCH           creates list of files to check by comparing against a branch"
       echo "--cached                  checks staged files"
       echo "--drupalci                a special mode for DrupalCI"
+      echo "--memory-unlimited        bypass PHP memory limit for PHPStan and PHPCS"
       echo " "
       echo "Example usage: sh ./core/scripts/dev/commit-code-check.sh --branch 9.2.x"
       exit 0
@@ -58,11 +60,23 @@ while test $# -gt 0; do
       DRUPALCI=1
       shift
       ;;
+    --memory-unlimited)
+      MEMORY_UNLIMITED=1
+      shift
+      ;;
     *)
       break
       ;;
   esac
 done
+
+memory_limit=""
+phpcs_memory_limit=""
+
+if [[ "$MEMORY_UNLIMITED" == "1" ]]; then
+  memory_limit="--memory-limit=-1"
+  phpcs_memory_limit="-d memory_limit=-1"
+fi
 
 # Set up variables to make colored output simple. Color output is disabled on
 # DrupalCI because it is breaks reporting.
@@ -75,6 +89,7 @@ if [[ "$DRUPALCI" == "1" ]]; then
   GIT="sudo -u www-data git"
 else
   red=$(tput setaf 1 && tput bold)
+  blue=$(tput setaf 4 && tput bold)
   green=$(tput setaf 2)
   reset=$(tput sgr0)
   GIT="git"
@@ -180,6 +195,11 @@ for FILE in $FILES; do
   if [[ $FILE == "core/misc/cspell/dictionary.txt" || $FILE == "core/misc/cspell/drupal-dictionary.txt" || $FILE == "core/.cspell.json" ]]; then
     CSPELL_DICTIONARY_FILE_CHANGED=1;
   fi
+
+  if [[ $FILE == "core/MAINTAINERS.txt" ]]; then
+    MAINTAINERS_TXT_CHANGED=1;
+  fi
+
 done
 
 # Exit early if there are no files.
@@ -238,11 +258,11 @@ printf "\n"
 # APCu is disabled to ensure that the composer classmap is not corrupted.
 if [[ $PHPSTAN_DIST_FILE_CHANGED == "1" ]] || [[ "$DRUPALCI" == "1" ]]; then
   printf "\nRunning PHPStan on *all* files.\n"
-  php -d apc.enabled=0 -d apc.enable_cli=0 vendor/bin/phpstan analyze --no-progress --configuration="$TOP_LEVEL/core/phpstan.neon.dist"
+  php -d apc.enabled=0 -d apc.enable_cli=0 vendor/bin/phpstan analyze --no-progress --configuration="$TOP_LEVEL/core/phpstan.neon.dist" $memory_limit
 else
   # Only run PHPStan on changed files locally.
   printf "\nRunning PHPStan on changed files.\n"
-  php -d apc.enabled=0 -d apc.enable_cli=0 vendor/bin/phpstan analyze --no-progress --configuration="$TOP_LEVEL/core/phpstan-partial.neon" $ABS_FILES
+  php -d apc.enabled=0 -d apc.enable_cli=0 vendor/bin/phpstan analyze --no-progress --configuration="$TOP_LEVEL/core/phpstan-partial.neon" $ABS_FILES $memory_limit
 fi
 
 if [ "$?" -ne "0" ]; then
@@ -261,7 +281,7 @@ printf "\n"
 # Run PHPCS on all files on DrupalCI or when phpcs files are changed.
 if [[ $PHPCS_XML_DIST_FILE_CHANGED == "1" ]] || [[ "$DRUPALCI" == "1" ]]; then
   # Test all files with phpcs rules.
-  vendor/bin/phpcs -ps --parallel="$( (nproc || sysctl -n hw.logicalcpu || echo 4) 2>/dev/null)" --standard="$TOP_LEVEL/core/phpcs.xml.dist"
+  vendor/bin/phpcs $phpcs_memory_limit -ps --parallel="$( (nproc || sysctl -n hw.logicalcpu || echo 4) 2>/dev/null)" --standard="$TOP_LEVEL/core/phpcs.xml.dist"
   PHPCS=$?
   if [ "$PHPCS" -ne "0" ]; then
     # If there are failures set the status to a number other than 0.
@@ -386,7 +406,7 @@ for FILE in $FILES; do
   ############################################################################
   if [[ -f "$TOP_LEVEL/$FILE" ]] && [[ $FILE =~ \.(inc|install|module|php|profile|test|theme|yml)$ ]] && [[ $PHPCS_XML_DIST_FILE_CHANGED == "0" ]] && [[ "$DRUPALCI" == "0" ]]; then
     # Test files with phpcs rules.
-    vendor/bin/phpcs "$TOP_LEVEL/$FILE" --standard="$TOP_LEVEL/core/phpcs.xml.dist"
+    vendor/bin/phpcs $phpcs_memory_limit "$TOP_LEVEL/$FILE" --standard="$TOP_LEVEL/core/phpcs.xml.dist"
     PHPCS=$?
     if [ "$PHPCS" -ne "0" ]; then
       # If there are failures set the status to a number other than 0.
@@ -499,6 +519,17 @@ for FILE in $FILES; do
   printf -- '-%.0s' {1..100}
   printf "\n"
 done
+
+if [[ "$MAINTAINERS_TXT_CHANGED" == "1" ]]; then
+  printf "\n${blue}INFO: MAINTAINERS.TXT changed"
+  printf "\n      Make sure follow up changes are made to documentation, Slack channel, email group etc."
+  printf "\n      See https://www.drupal.org/about/core/policies/maintainers/add-or-remove-a-subsystem-or-topic-maintainer.${reset}\n\n"
+
+  # Add a separator line to make the output easier to read.
+  printf "\n"
+  printf -- '-%.0s' {1..100}
+  printf "\n"
+fi
 
 if [[ "$FINAL_STATUS" == "1" ]] && [[ "$DRUPALCI" == "1" ]]; then
   printf "${red}Drupal code quality checks failed.${reset}\n"

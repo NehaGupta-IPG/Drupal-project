@@ -6,7 +6,6 @@
 
 use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\File\Exception\FileException;
-use Drupal\Core\Hook\Attribute\ProceduralHookScanStop;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\file\FileInterface;
@@ -37,7 +36,6 @@ use Drupal\locale\Gettext;
  *   l10n_update functionality to feed in translation files alike.
  *   https://www.drupal.org/node/1191488
  */
-#[ProceduralHookScanStop]
 function locale_translate_batch_import_files(array $options, $force = FALSE) {
   $options += [
     'overwrite_options' => [],
@@ -89,7 +87,7 @@ function locale_translate_batch_import_files(array $options, $force = FALSE) {
 function locale_translate_get_interface_translation_files(array $projects = [], array $langcodes = []): array {
   \Drupal::moduleHandler()->loadInclude('locale', 'inc', 'locale.compare');
   $files = [];
-  $projects = $projects ?: array_keys(locale_translation_get_projects());
+  $projects = $projects ?: array_keys(\Drupal::service('locale.project')->getProjects());
   $langcodes = $langcodes ?: array_keys(locale_translatable_language_list());
 
   // Scan the translations directory for files matching a name pattern
@@ -435,7 +433,7 @@ function locale_translate_batch_finished($success, array $results): void {
  */
 function locale_translate_file_create($filepath) {
   $file = new stdClass();
-  $file->filename = \Drupal::service('file_system')->basename($filepath);
+  $file->filename = basename($filepath);
   $file->uri = $filepath;
   $file->timestamp = filemtime($file->uri);
   return $file;
@@ -468,7 +466,8 @@ function locale_translate_file_attach_properties($file, array $options = []) {
   }
 
   // Extract project, version and language code from the file name. Supported:
-  // {project}-{version}.{langcode}.po, {prefix}.{langcode}.po or {langcode}.po
+  // "{project}-{version}.{langcode}.po", "{prefix}.{langcode}.po" or
+  // "{langcode}.po".
   preg_match('!
     (                       # project OR project and version OR empty (group 1)
       ([a-z_]+)             # project name (group 2)
@@ -621,24 +620,6 @@ function locale_config_batch_update_default_config_langcodes(&$context): void {
 /**
  * Implements callback_batch_operation().
  *
- * Updates default configuration when new modules or themes are installed.
- *
- * @param array|\ArrayAccess $context
- *   The batch context.
- *
- * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use
- * locale_config_batch_update_default_config_langcodes(&$context) instead.
- *
- * @see https://www.drupal.org/node/3475054
- */
-function locale_config_batch_set_config_langcodes(&$context): void {
-  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use locale_config_batch_update_default_config_langcodes() instead. See https://www.drupal.org/node/3475054', E_USER_DEPRECATED);
-  locale_config_batch_update_default_config_langcodes($context);
-}
-
-/**
- * Implements callback_batch_operation().
- *
  * Performs configuration translation refresh.
  *
  * @param array $names
@@ -661,29 +642,6 @@ function locale_config_batch_update_config_translations(array $names, array $lan
   }
   $context['results']['langcodes'] = $langcodes;
   $context['finished'] = 1;
-}
-
-/**
- * Implements callback_batch_operation().
- *
- * Performs configuration translation refresh.
- *
- * @param array $names
- *   An array of names of configuration objects to update.
- * @param array $langcodes
- *   (optional) Array of language codes to update. Defaults to all languages.
- * @param array|\ArrayAccess $context
- *   Contains a list of files imported.
- *
- * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use
- * locale_config_batch_update_config_translations($names, $langcodes, $context)
- * instead.
- *
- * @see https://www.drupal.org/node/3475054
- */
-function locale_config_batch_refresh_name(array $names, array $langcodes, &$context): void {
-  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use locale_config_batch_update_config_translations() instead. See https://www.drupal.org/node/3475054', E_USER_DEPRECATED);
-  locale_config_batch_update_config_translations($names, $langcodes, $context);
 }
 
 /**

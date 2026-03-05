@@ -35,5 +35,36 @@ function update_post_update_clear_disk_cache(): void {
       \Drupal::service('file_system')->deleteRecursive($directory);
     }
   }
+}
 
+/**
+ * Remove empty email addresses from update.settings configuration.
+ */
+function update_post_update_fix_update_emails(): void {
+  $config = \Drupal::configFactory()->getEditable('update.settings');
+  $emails = $config->get('notification.emails');
+  $filtered_emails = is_array($emails) ? array_filter($emails) : [];
+  if ($emails !== $filtered_emails) {
+    $config->set('notification.emails', $filtered_emails)->save();
+  }
+}
+
+/**
+ * Removes the legacy 'Update Manager' disk cache (again).
+ */
+function update_post_update_clear_disk_cache_again(): void {
+  // @see _update_manager_unique_id()
+  $id = substr(hash('sha256', Settings::getHashSalt()), 0, 8);
+  // List of legacy 'Update Manager' cache directories.
+  $directories = [
+    // @see _update_manager_cache_directory()
+    "temporary://update-cache-$id",
+    // @see _update_manager_extract_directory()
+    "temporary://update-extraction-$id",
+  ];
+  foreach ($directories as $directory) {
+    if (is_dir($directory)) {
+      \Drupal::service('file_system')->deleteRecursive($directory);
+    }
+  }
 }

@@ -6,21 +6,23 @@ namespace Drupal\Tests\comment\Functional\Views;
 
 use Drupal\block_content\Entity\BlockContent;
 use Drupal\block_content\Entity\BlockContentType;
-use Drupal\comment\CommentInterface;
+use Drupal\comment\AnonymousContact;
 use Drupal\comment\Entity\Comment;
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
-use Drupal\language\Entity\ConfigurableLanguage;
-use Drupal\Tests\comment\Functional\CommentTestBase as CommentBrowserTestBase;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
+use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\Tests\comment\Functional\CommentTestBase as CommentBrowserTestBase;
 use Drupal\user\RoleInterface;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests comment approval functionality.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentAdminTest extends CommentBrowserTestBase {
 
   /**
@@ -65,7 +67,7 @@ class CommentAdminTest extends CommentBrowserTestBase {
     $this->drupalPlaceBlock('page_title_block');
     $this->drupalLogin($this->adminUser);
     // Ensure that doesn't require contact info.
-    $this->setCommentAnonymous(CommentInterface::ANONYMOUS_MAYNOT_CONTACT);
+    $this->setCommentAnonymous(AnonymousContact::Forbidden);
 
     // Test that the comments page loads correctly when there are no comments.
     $this->drupalGet('admin/content/comment');

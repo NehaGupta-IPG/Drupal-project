@@ -9,13 +9,15 @@ use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests access to text formats.
- *
- * @group Access
- * @group filter
  */
+#[Group('Access')]
+#[Group('filter')]
+#[RunTestsInSeparateProcesses]
 class FilterFormatAccessTest extends BrowserTestBase {
 
   /**
@@ -151,27 +153,6 @@ class FilterFormatAccessTest extends BrowserTestBase {
     $this->assertSession()->optionExists('body[0][format]', $this->allowedFormat->id());
     $this->assertSession()->optionNotExists('body[0][format]', $this->disallowedFormat->id());
     $this->assertSession()->optionNotExists('body[0][format]', filter_fallback_format());
-
-    // Check regular user access to the filter tips pages.
-    $this->drupalGet('filter/tips/' . $this->allowedFormat->id());
-    $this->assertSession()->statusCodeEquals(200);
-    $this->drupalGet('filter/tips/' . $this->disallowedFormat->id());
-    $this->assertSession()->statusCodeEquals(403);
-    $this->drupalGet('filter/tips/' . filter_fallback_format());
-    $this->assertSession()->statusCodeEquals(200);
-    $this->drupalGet('filter/tips/invalid-format');
-    $this->assertSession()->statusCodeEquals(404);
-
-    // Check admin user access to the filter tips pages.
-    $this->drupalLogin($this->adminUser);
-    $this->drupalGet('filter/tips/' . $this->allowedFormat->id());
-    $this->assertSession()->statusCodeEquals(200);
-    $this->drupalGet('filter/tips/' . $this->disallowedFormat->id());
-    $this->assertSession()->statusCodeEquals(200);
-    $this->drupalGet('filter/tips/' . filter_fallback_format());
-    $this->assertSession()->statusCodeEquals(200);
-    $this->drupalGet('filter/tips/invalid-format');
-    $this->assertSession()->statusCodeEquals(404);
   }
 
   /**
