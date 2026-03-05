@@ -36,6 +36,7 @@ class RssFields extends RowPluginBase {
     $options['description_field'] = ['default' => ''];
     $options['creator_field'] = ['default' => ''];
     $options['date_field'] = ['default' => ''];
+    $options['category_field'] = ['default' => ''];
     $options['guid_field_options']['contains']['guid_field'] = ['default' => ''];
     $options['guid_field_options']['contains']['guid_field_is_permalink'] = ['default' => TRUE];
     return $options;
@@ -192,7 +193,8 @@ class RssFields extends RowPluginBase {
         }
 
        unset($category_field, $category_field_item, $category_entity);
-     }
+      }
+    }
      
     $guid_is_permalink_string = 'false';
     $item_guid = $this->getField($row_index, $this->options['guid_field_options']['guid_field']);
