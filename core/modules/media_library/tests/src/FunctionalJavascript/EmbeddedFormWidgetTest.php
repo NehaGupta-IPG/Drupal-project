@@ -167,4 +167,19 @@ class EmbeddedFormWidgetTest extends WebDriverTestBase {
     ];
   }
 
+  /**
+   * Test submitting media library form without selecting media items.
+   */
+  public function testEmptySelection(): void {
+    $assert_session = $this->assertSession();
+    $this->drupalGet('node/add/basic_page');
+    $assert_session
+      ->elementExists('css', '#media_image_field-media-library-wrapper')
+      ->pressButton('Add media');
+    $assert_session
+      ->waitForElement('xpath', '//button[contains(text(), "Insert selected")]')
+      ->click();
+    $assert_session->statusMessageContainsAfterWait('No items selected', 'error');
+  }
+
 }
