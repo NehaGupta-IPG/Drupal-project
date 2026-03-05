@@ -379,8 +379,10 @@ use Drupal\Core\Database\Query\SelectInterface;
  *       query conditions. Supported syntax for JSON paths vary slightly between
  *       database vendors, so distributed code should use widely-used syntax
  *       only, such as '.' and '[]'. For more detail on supported syntax, see:
- *       - Postgres: https://www.postgresql.org/docs/current/datatype-json.html#DATATYPE-JSONPATH
- *       - MySQL: https://dev.mysql.com/doc/refman/8.0/en/json.html#json-path-syntax
+ *       - Postgres:
+ *         https://www.postgresql.org/docs/current/datatype-json.html#DATATYPE-JSONPATH
+ *       - MySQL:
+ *         https://dev.mysql.com/doc/refman/8.0/en/json.html#json-path-syntax
  *       - MariaDB: https://mariadb.com/kb/en/jsonpath-expressions/
  *       - SQLite: https://sqlite.org/json1.html#jptr
  *       - SQL:2016 standard: https://www.iso.org/standard/78937.html

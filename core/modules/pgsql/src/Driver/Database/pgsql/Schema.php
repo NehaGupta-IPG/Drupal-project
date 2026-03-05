@@ -396,7 +396,7 @@ EOD;
       ),
       new Index(
         [$field_name],
-        ['pgsql' => ['type' => IndexType::GIN]]
+        ['pgsql' => ['type' => IndexType::Gin]]
       )
     ) : NULL;
   }
@@ -972,7 +972,7 @@ EOD;
       if ($contains_json_field) {
         if (count($fields) === 1) {
           return !($fields instanceof Index)
-            ? new Index($fields, ['pgsql' => ['type' => IndexType::GIN]])
+            ? new Index($fields, ['pgsql' => ['type' => IndexType::Gin]])
             : $fields;
         }
         throw new SchemaIndexOnJsonFieldUnsupportedException(

@@ -455,7 +455,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
       ['text'],
       [
         'pgsql' => [
-          'type' => IndexType::GIST,
+          'type' => IndexType::Gist,
           'operator' => 'gist_trgm_ops',
         ],
       ]
@@ -501,7 +501,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
           ['json'],
           [
             'pgsql' => [
-              'type' => IndexType::GIN,
+              'type' => IndexType::Gin,
             ],
           ]
         ),

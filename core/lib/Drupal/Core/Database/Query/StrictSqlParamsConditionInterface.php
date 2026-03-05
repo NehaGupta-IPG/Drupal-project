@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Database\Query;
 
+/**
+ * Interface for conditions that support strict SQL parameter binding.
+ */
 interface StrictSqlParamsConditionInterface {
 
   /**

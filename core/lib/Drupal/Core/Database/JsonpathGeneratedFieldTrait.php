@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Database;
 
+/**
+ * Provides methods for managing generated columns derived from JSON fields.
+ */
 trait JsonpathGeneratedFieldTrait {
 
   /**

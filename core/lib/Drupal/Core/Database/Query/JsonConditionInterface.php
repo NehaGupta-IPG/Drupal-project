@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Database\Query;
 
+/**
+ * Interface for conditions on JSON-backed fields.
+ */
 interface JsonConditionInterface extends StrictSqlParamsConditionInterface {
 
   /**

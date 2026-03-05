@@ -7,6 +7,9 @@ namespace Drupal\Core\Database;
 use Drupal\Core\Database\Query\PlaceholderInterface;
 use Drupal\Core\Database\Query\SelectInterface;
 
+/**
+ * Provides condition handling for JSON fields with generated columns.
+ */
 trait JsonpathGeneratedFieldConditionTrait {
 
   /**

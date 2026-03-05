@@ -1496,7 +1496,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
           ['text'],
           [
             'pgsql' => [
-              'type' => IndexType::GIST,
+              'type' => IndexType::Gist,
               'operator' => 'gist_trgm_ops',
             ],
           ]

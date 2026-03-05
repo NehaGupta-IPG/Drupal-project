@@ -20,6 +20,9 @@ class Condition extends QueryCondition {
     getJsonFieldFragmentFunction as doGetJsonFieldFragmentFunction;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   protected function processJsonCondition(array $condition, Connection $connection, bool &$ignore_operator, PlaceholderInterface $query_placeholder): string {
     if ($condition['operator'] === '@>') {
       $ignore_operator = TRUE;
