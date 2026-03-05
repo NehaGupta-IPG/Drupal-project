@@ -45,11 +45,15 @@ use Drupal\user\Entity\Role;
     ],
     'list_builder' => FilterFormatListBuilder::class,
     'access' => FilterFormatAccessControlHandler::class,
+    'route_provider' => [
+      'permissions' => 'Drupal\user\Entity\EntityPermissionsRouteProvider',
+    ],
   ],
   links: [
     'edit-form' => '/admin/config/content/formats/manage/{filter_format}',
     'disable' => '/admin/config/content/formats/manage/{filter_format}/disable',
     'enable' => '/admin/config/content/formats/manage/{filter_format}/enable',
+    'entity-permissions-form' => '/admin/config/content/formats/manage/{filter_format}/permissions',
   ],
   admin_permission: 'administer filters',
   label_count: [

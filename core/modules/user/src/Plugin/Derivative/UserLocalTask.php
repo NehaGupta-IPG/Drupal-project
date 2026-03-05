@@ -2,6 +2,7 @@
 
 namespace Drupal\user\Plugin\Derivative;
 
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Component\Plugin\Derivative\DeriverBase;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
@@ -57,12 +58,17 @@ class UserLocalTask extends DeriverBase implements ContainerDeriverInterface {
         continue;
       }
 
-      if (!$entity_type_id = $bundle_entity_type->getBundleOf()) {
-        continue;
+      $base_route = NULL;
+      if ($entity_type_id = $bundle_entity_type->getBundleOf()) {
+        $entity_type = $entity_definitions[$entity_type_id];
+        $base_route = $entity_type->get('field_ui_base_route');
+      }
+      elseif ($bundle_entity_type->entityClassImplements(ConfigEntityInterface::class) && $bundle_entity_type->hasLinkTemplate('edit-form')) {
+        // Use the entity type as the plugin ID.
+        $base_route = "entity.{$bundle_type_id}.edit_form";
       }
 
-      $entity_type = $entity_definitions[$entity_type_id];
-      if (!$base_route = $entity_type->get('field_ui_base_route')) {
+      if (!$base_route) {
         continue;
       }
 

@@ -40,11 +40,11 @@ class EntityPermissionsForm extends UserPermissionsForm {
   protected $entityTypeManager;
 
   /**
-   * The bundle object.
+   * The entity object.
    *
    * @var \Drupal\Core\Entity\EntityInterface
    */
-  protected $bundle;
+  protected $entity;
 
   /**
    * Constructs a new EntityPermissionsForm.
@@ -91,7 +91,7 @@ class EntityPermissionsForm extends UserPermissionsForm {
    */
   protected function permissionsByProvider(): array {
     // Get the names of all config entities that depend on $this->bundle.
-    $config_name = $this->bundle->getConfigDependencyName();
+    $config_name = $this->entity->getConfigDependencyName();
     $config_entities = $this->configManager
       ->findConfigEntityDependencies('config', [$config_name]);
     $config_names = array_map(
@@ -127,15 +127,17 @@ class EntityPermissionsForm extends UserPermissionsForm {
    *   (optional) Either the bundle name or the bundle object.
    */
   public function buildForm(array $form, FormStateInterface $form_state, ?string $bundle_entity_type = NULL, $bundle = NULL): array {
-    // Set $this->bundle for use by ::permissionsByProvider().
+    // Set $this->entity for use by ::permissionsByProvider().
     if ($bundle instanceof EntityInterface) {
-      $this->bundle = $bundle;
+      $this->entity = $bundle;
       return parent::buildForm($form, $form_state);
     }
 
-    $this->bundle = $this->entityTypeManager
+    $bundle_name = is_string($bundle) ? $bundle : $this->getRouteMatch()->getRawParameter($bundle_entity_type);
+
+    $this->entity = $this->entityTypeManager
       ->getStorage($bundle_entity_type)
-      ->load($bundle);
+      ->load($bundle_name);
 
     return parent::buildForm($form, $form_state);
   }
@@ -169,19 +171,19 @@ class EntityPermissionsForm extends UserPermissionsForm {
     if ($permission && !$this->currentUser()->hasPermission($permission)) {
       return AccessResult::neutral()->cachePerPermissions();
     }
-    // Set $this->bundle for use by ::permissionsByProvider().
+    // Set $this->entity for use by ::permissionsByProvider().
     if ($bundle instanceof EntityInterface) {
-      $this->bundle = $bundle;
+      $this->entity = $bundle;
     }
     else {
       $bundle_entity_type = $route->getDefault('bundle_entity_type');
       $bundle_name = is_string($bundle) ? $bundle : $route_match->getRawParameter($bundle_entity_type);
-      $this->bundle = $this->entityTypeManager
+      $this->entity = $this->entityTypeManager
         ->getStorage($bundle_entity_type)
         ->load($bundle_name);
     }
 
-    if (empty($this->bundle)) {
+    if (empty($this->entity)) {
       // A typo in the request path can lead to this case.
       return AccessResult::forbidden();
     }

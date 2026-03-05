@@ -2,6 +2,7 @@
 
 namespace Drupal\user\Entity;
 
+use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\Entity\EntityHandlerInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -76,7 +77,7 @@ class EntityPermissionsRouteProvider implements EntityRouteProviderInterface, En
       return NULL;
     }
 
-    if (!$bundle_of_id = $entity_type->getBundleOf()) {
+    if (!$entity_type instanceof ConfigEntityTypeInterface) {
       return NULL;
     }
 
@@ -86,7 +87,7 @@ class EntityPermissionsRouteProvider implements EntityRouteProviderInterface, En
       [
         '_title' => 'Manage permissions',
         '_form' => 'Drupal\user\Form\EntityPermissionsForm',
-        'entity_type_id' => $bundle_of_id,
+        'entity_type_id' => $entity_type->getBundleOf() ?? $entity_type_id,
         'bundle_entity_type' => $entity_type_id,
       ],
       [
