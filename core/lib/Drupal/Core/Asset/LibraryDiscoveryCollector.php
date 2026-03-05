@@ -124,7 +124,7 @@ class LibraryDiscoveryCollector extends CacheCollector implements LibraryDiscove
    *   The name of the extension for which library definitions will be extended.
    * @param string $library_name
    *   The name of the library whose definitions is to be extended.
-   * @param $library_definition
+   * @param array $library_definition
    *   The library definition to be extended.
    *
    * @return array
@@ -187,18 +187,6 @@ class LibraryDiscoveryCollector extends CacheCollector implements LibraryDiscove
   public function reset() {
     parent::reset();
     $this->cid = NULL;
-  }
-
-  /**
-   * Clears static and persistent cache.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use
-   * LibraryDiscoveryCollector::clear() instead.
-   * @see https://www.drupal.org/node/3462970
-   */
-  public function clearCachedDefinitions() {
-    @trigger_error(__METHOD__ . 'is deprecated in drupal:11.0.0 and is removed from drupal:12.0.0. Use ::clear() instead. See https://www.drupal.org/node/3462970', E_USER_DEPRECATED);
-    $this->clear();
   }
 
 }

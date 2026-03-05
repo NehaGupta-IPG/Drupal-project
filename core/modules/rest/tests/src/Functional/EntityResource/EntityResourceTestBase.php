@@ -52,9 +52,9 @@ use Psr\Http\Message\ResponseInterface;
  *    (permissions or perhaps custom access control handling, such as node
  *    grants), plus
  * 2. a concrete subclass extending the abstract entity type-specific subclass
- *    that specifies the exact @code $format @endcode, @code $mimeType @endcode
- *    and @code $auth @endcode for this concrete test. Usually that's all that's
- *    necessary: most concrete subclasses will be very thin.
+ *    that specifies the exact "$format", "$mimeType" and "$auth" for this
+ *    concrete test. Usually that's all that's necessary: most concrete
+ *    subclasses will be very thin.
  *
  * For every of these concrete subclasses, a comprehensive test scenario will
  * run per HTTP method:
@@ -227,10 +227,12 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
         ->setTranslatable(FALSE)
         ->save();
 
-      // Reload entity so that it has the new field.
-      $reloaded_entity = $this->entityStorage->loadUnchanged($this->entity->id());
-      // Some entity types are not stored, hence they cannot be reloaded.
-      if ($reloaded_entity !== NULL) {
+      $entity_id = $this->entity->id();
+      // Some entity types have no ID, hence they cannot be reloaded.
+      if ($entity_id !== NULL) {
+        // Reload entity so that it has the new field.
+        $reloaded_entity = $this->entityStorage->loadUnchanged($entity_id);
+
         $this->entity = $reloaded_entity;
 
         // Set a default value on the fields.
@@ -272,6 +274,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
    * @see ::createEntity()
    *
    * @return array
+   *   An array structure as returned by ::getExpectedNormalizedEntity().
    */
   abstract protected function getExpectedNormalizedEntity();
 
@@ -281,6 +284,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
    * @see ::testPost
    *
    * @return array
+   *   An array structure as returned by ::getNormalizedPostEntity().
    */
   abstract protected function getNormalizedPostEntity();
 
@@ -293,6 +297,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
    * @see ::testPatch
    *
    * @return array
+   *   An array structure as returned by ::getNormalizedPostEntity().
    */
   protected function getNormalizedPatchEntity() {
     return $this->getNormalizedPostEntity();
@@ -377,6 +382,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
    * @see ::testGet
    *
    * @return string[]
+   *   The expected cache tags.
    */
   protected function getExpectedCacheTags() {
     $expected_cache_tags = [
@@ -395,6 +401,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
    * @see ::testGet
    *
    * @return string[]
+   *   The expected cache contexts.
    */
   protected function getExpectedCacheContexts() {
     return [
@@ -422,7 +429,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     // response because missing ?_format query string.
     $response = $this->request('GET', $url, $request_options);
     $this->assertSame($has_canonical_url ? 403 : 404, $response->getStatusCode());
-    $this->assertSame(['text/html; charset=UTF-8'], $response->getHeader('Content-Type'));
+    $this->assertSame(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
 
     $url->setOption('query', ['_format' => static::$format]);
 
@@ -475,12 +482,13 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     $this->provisionEntityResource(TRUE);
     $expected_403_cacheability = $this->getExpectedUnauthorizedAccessCacheability()
       ->addCacheableDependency($this->getExpectedUnauthorizedEntityAccessCacheability(static::$auth !== FALSE));
-    // DX: 403 because unauthorized single-format route, ?_format is omittable.
+    // DX: 403 because unauthorized single-format route, ?_format can be
+    // omitted.
     $url->setOption('query', []);
     $response = $this->request('GET', $url, $request_options);
     if ($has_canonical_url) {
       $this->assertSame(403, $response->getStatusCode());
-      $this->assertSame(['text/html; charset=UTF-8'], $response->getHeader('Content-Type'));
+      $this->assertSame(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
     }
     else {
       $this->assertResourceErrorResponse(403, FALSE, $response, $expected_403_cacheability->getCacheTags(), $expected_403_cacheability->getCacheContexts(), static::$auth ? FALSE : 'MISS', FALSE);
@@ -496,19 +504,22 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
 
     // Then, what we'll use for the remainder of the test: multiple formats.
     $this->provisionEntityResource();
-    // DX: 406 because despite unauthorized, ?_format is not omittable.
+    // DX: 406 because despite unauthorized, ?_format can not be omitted.
     $url->setOption('query', []);
     $response = $this->request('GET', $url, $request_options);
     if ($has_canonical_url) {
       $this->assertSame(403, $response->getStatusCode());
-      $dynamic_cache = str_starts_with($response->getHeader('X-Drupal-Cache-Max-Age')[0], '0') || !empty(array_intersect(['user', 'session'], explode(' ', $response->getHeader('X-Drupal-Cache-Contexts')[0]))) ? 'UNCACHEABLE (poor cacheability)' : 'MISS';
+      $dynamic_cache = str_starts_with($response->getHeader('X-Drupal-Cache-Max-Age')[0], '0')
+        || !empty(array_intersect(
+          ['user', 'session'],
+          explode(' ', $response->getHeader('X-Drupal-Cache-Contexts')[0]))) ? 'UNCACHEABLE (poor cacheability)' : 'MISS';
       $this->assertSame([$dynamic_cache], $response->getHeader('X-Drupal-Dynamic-Cache'));
     }
     else {
       $this->assertSame(406, $response->getStatusCode());
       $this->assertSame(['UNCACHEABLE (poor cacheability)'], $response->getHeader('X-Drupal-Dynamic-Cache'));
     }
-    $this->assertSame(['text/html; charset=UTF-8'], $response->getHeader('Content-Type'));
+    $this->assertSame(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
     $this->assertSame(static::$auth ? ['UNCACHEABLE (request policy)'] : ['MISS'], $response->getHeader('X-Drupal-Cache'));
     // DX: 403 because unauthorized.
     $url->setOption('query', ['_format' => static::$format]);
@@ -609,7 +620,14 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     // 'Vary' headers are also added to the list of headers to ignore, as they
     // may be added to GET requests, depending on web server configuration. They
     // are usually 'Transfer-Encoding: chunked' and 'Vary: Accept-Encoding'.
-    $ignored_headers = ['Date', 'Content-Length', 'X-Drupal-Cache', 'X-Drupal-Dynamic-Cache', 'Transfer-Encoding', 'Vary'];
+    $ignored_headers = [
+      'Date',
+      'Content-Length',
+      'X-Drupal-Cache',
+      'X-Drupal-Dynamic-Cache',
+      'Transfer-Encoding',
+      'Vary',
+    ];
     $header_cleaner = function ($headers) use ($ignored_headers) {
       foreach ($headers as $header => $value) {
         if (str_starts_with($header, 'X-Drupal-Assertion-') || in_array($header, $ignored_headers)) {
@@ -647,7 +665,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     // DX: 406 when requesting unsupported format.
     $response = $this->request('GET', $url, $request_options);
     $this->assert406Response($response);
-    $this->assertSame(['text/plain; charset=UTF-8'], $response->getHeader('Content-Type'));
+    $this->assertSame(['text/plain; charset=utf-8'], $response->getHeader('Content-Type'));
 
     $request_options[RequestOptions::HEADERS]['Accept'] = static::$mimeType;
 
@@ -655,7 +673,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     // should result in a text/plain response.
     $response = $this->request('GET', $url, $request_options);
     $this->assert406Response($response);
-    $this->assertSame(['text/plain; charset=UTF-8'], $response->getHeader('Content-Type'));
+    $this->assertSame(['text/plain; charset=utf-8'], $response->getHeader('Content-Type'));
 
     $url = Url::fromRoute('rest.entity.' . static::$entityTypeId . '.GET');
     $url->setRouteParameter(static::$entityTypeId, 987654321);
@@ -663,7 +681,11 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
 
     // DX: 404 when GETting non-existing entity.
     $response = $this->request('GET', $url, $request_options);
-    $path = str_replace('987654321', '{' . static::$entityTypeId . '}', $url->setAbsolute()->setOptions(['base_url' => '', 'query' => []])->toString());
+    $path = str_replace(
+      '987654321',
+      '{' . static::$entityTypeId . '}',
+      $url->setAbsolute()->setOptions(['base_url' => '', 'query' => []])->toString(),
+    );
     $message = 'The "' . static::$entityTypeId . '" parameter was not converted for the path "' . $path . '" (route name: "rest.entity.' . static::$entityTypeId . '.GET")';
     $this->assertResourceErrorResponse(404, $message, $response);
   }
@@ -723,7 +745,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     // ?_format query string.
     $response = $this->request('POST', $url, $request_options);
     $this->assertSame(404, $response->getStatusCode());
-    $this->assertSame(['text/html; charset=UTF-8'], $response->getHeader('Content-Type'));
+    $this->assertSame(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
 
     $url->setOption('query', ['_format' => static::$format]);
 
@@ -739,7 +761,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     // missing ?_format query string.
     $response = $this->request('POST', $url, $request_options);
     $this->assertSame(415, $response->getStatusCode());
-    $this->assertSame(['text/html; charset=UTF-8'], $response->getHeader('Content-Type'));
+    $this->assertSame(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
     $this->assertStringContainsString('A client error happened', (string) $response->getBody());
 
     $url->setOption('query', ['_format' => static::$format]);
@@ -905,12 +927,12 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     if ($has_canonical_url) {
       $this->assertSame(405, $response->getStatusCode());
       $this->assertSame(['GET, POST, HEAD'], $response->getHeader('Allow'));
-      $this->assertSame(['text/html; charset=UTF-8'], $response->getHeader('Content-Type'));
+      $this->assertSame(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
       $this->assertStringContainsString('A client error happened', (string) $response->getBody());
     }
     else {
       $this->assertSame(404, $response->getStatusCode());
-      $this->assertSame(['text/html; charset=UTF-8'], $response->getHeader('Content-Type'));
+      $this->assertSame(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
     }
 
     $url->setOption('query', ['_format' => static::$format]);
@@ -931,7 +953,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     // DX: 415 when no Content-Type request header.
     $response = $this->request('PATCH', $url, $request_options);
     $this->assertSame(415, $response->getStatusCode());
-    $this->assertSame(['text/html; charset=UTF-8'], $response->getHeader('Content-Type'));
+    $this->assertSame(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
     $this->assertStringContainsString('A client error happened', (string) $response->getBody());
 
     $url->setOption('query', ['_format' => static::$format]);
@@ -1129,12 +1151,12 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     if ($has_canonical_url) {
       $this->assertSame(405, $response->getStatusCode());
       $this->assertSame(['GET, POST, HEAD'], $response->getHeader('Allow'));
-      $this->assertSame(['text/html; charset=UTF-8'], $response->getHeader('Content-Type'));
+      $this->assertSame(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
       $this->assertStringContainsString('A client error happened', (string) $response->getBody());
     }
     else {
       $this->assertSame(404, $response->getStatusCode());
-      $this->assertSame(['text/html; charset=UTF-8'], $response->getHeader('Content-Type'));
+      $this->assertSame(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
     }
 
     $url->setOption('query', ['_format' => static::$format]);
@@ -1445,9 +1467,9 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
    * A response may include more properties, we only need to ensure that all
    * items in the request exist in the response.
    *
-   * @param $expected
+   * @param array $expected
    *   An array of expected values, may contain further nested arrays.
-   * @param $actual
+   * @param array $actual
    *   The object to test.
    */
   protected function assertEntityArraySubset($expected, $actual) {

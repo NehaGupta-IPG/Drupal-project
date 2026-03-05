@@ -6,14 +6,15 @@ namespace Drupal\Tests\taxonomy\Kernel\Views;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
  * Tests the representative node relationship for terms.
- *
- * @group taxonomy
  */
+#[Group('taxonomy')]
+#[RunTestsInSeparateProcesses]
 class TaxonomyDefaultArgumentTest extends TaxonomyTestBase {
 
   /**
@@ -22,6 +23,16 @@ class TaxonomyDefaultArgumentTest extends TaxonomyTestBase {
    * @var array
    */
   public static $testViews = ['taxonomy_default_argument_test'];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp($import_test_views = TRUE): void {
+    parent::setUp($import_test_views);
+
+    // The view requires the current user to be logged in.
+    $this->setUpCurrentUser(permissions: ['access content']);
+  }
 
   /**
    * Init view with a request by provided URL.
@@ -43,8 +54,7 @@ class TaxonomyDefaultArgumentTest extends TaxonomyTestBase {
     $request->server->set('SCRIPT_NAME', $GLOBALS['base_path'] . 'index.php');
     $request->server->set('SCRIPT_FILENAME', 'index.php');
 
-    $response = $this->container->get('http_kernel')
-      ->handle($request, HttpKernelInterface::SUB_REQUEST);
+    $response = $this->container->get('http_kernel')->handle($request);
 
     $view->setRequest($request);
     $view->setResponse($response);
@@ -65,6 +75,9 @@ class TaxonomyDefaultArgumentTest extends TaxonomyTestBase {
     $view->destroy();
   }
 
+  /**
+   * Tests the entity reference field using a view for selection.
+   */
   public function testNodePathWithViewSelection(): void {
     // Change the term entity reference field to use a view as selection plugin.
     \Drupal::service('module_installer')->install(['entity_reference_test']);
@@ -87,6 +100,9 @@ class TaxonomyDefaultArgumentTest extends TaxonomyTestBase {
     $this->assertEquals($this->nodes[0]->getCacheTags(), $view->argument['tid']->getPlugin('argument_default')->getCacheTags());
   }
 
+  /**
+   * Tests the behavior of term ID argument when accessing a term path.
+   */
   public function testTermPath(): void {
     $view = $this->initViewWithRequest($this->term1->toUrl()->toString());
 

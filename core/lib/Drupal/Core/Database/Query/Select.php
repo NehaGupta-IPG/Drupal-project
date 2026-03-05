@@ -30,34 +30,34 @@ class Select extends Query implements SelectInterface, JsonConditionInterface {
   /**
    * The tables against which to JOIN.
    *
+   * @var array
    * This property is a nested array. Each entry is an array representing
    * a single table against which to join. The structure of each entry is:
    *
-   * array(
+   * @code
+   * [
    *   'type' => $join_type (one of INNER, LEFT OUTER, RIGHT OUTER),
    *   'table' => $table,
    *   'alias' => $alias_of_the_table,
    *   'condition' => $join_condition (string or Condition object),
    *   'arguments' => $array_of_arguments_for_placeholders_in_the condition.
    *   'all_fields' => TRUE to SELECT $alias.*, FALSE or NULL otherwise.
-   * )
-   *
+   * ]
+   * @endcode
    * If $table is a string, it is taken as the name of a table. If it is
    * a Select query object, it is taken as a subquery.
    *
    * If $join_condition is a Condition object, any arguments should be
    * incorporated into the object; a separate array of arguments does not
    * need to be provided.
-   *
-   * @var array
    */
   protected $tables = [];
 
   /**
    * The fields by which to order this query.
    *
-   * This is an associative array. The keys are the fields to order, and the value
-   * is the direction to order, either ASC or DESC.
+   * This is an associative array. The keys are the fields to order, and the
+   * value is the direction to order, either ASC or DESC.
    *
    * @var array
    */
@@ -107,6 +107,7 @@ class Select extends Query implements SelectInterface, JsonConditionInterface {
 
   /**
    * Indicates if preExecute() has already been called.
+   *
    * @var bool
    */
   protected $prepared = FALSE;
@@ -166,15 +167,15 @@ class Select extends Query implements SelectInterface, JsonConditionInterface {
   /**
    * {@inheritdoc}
    */
-  public function hasAllTags() {
-    return !(boolean) array_diff(func_get_args(), array_keys($this->alterTags));
+  public function hasAllTags(string ...$tags) {
+    return !(bool) array_diff($tags, array_keys($this->alterTags));
   }
 
   /**
    * {@inheritdoc}
    */
-  public function hasAnyTag() {
-    return (boolean) array_intersect(func_get_args(), array_keys($this->alterTags));
+  public function hasAnyTag(string ...$tags) {
+    return (bool) array_intersect($tags, array_keys($this->alterTags));
   }
 
   /**
@@ -513,8 +514,8 @@ class Select extends Query implements SelectInterface, JsonConditionInterface {
    * {@inheritdoc}
    */
   public function execute() {
-    // If validation fails, simply return NULL.
-    // Note that validation routines in preExecute() may throw exceptions instead.
+    // If validation fails, simply return NULL. Note that validation routines in
+    // preExecute() may throw exceptions instead.
     if (!$this->preExecute()) {
       return NULL;
     }
@@ -545,7 +546,8 @@ class Select extends Query implements SelectInterface, JsonConditionInterface {
       $alias = $table_alias . '_' . $field;
     }
 
-    // If that is already used, just add a counter until we find an unused alias.
+    // If that is already used, just add a counter until we find an unused
+    // alias.
     $alias_candidate = $alias;
     $count = 2;
     while (!empty($this->fields[$alias_candidate])) {
@@ -764,8 +766,8 @@ class Select extends Query implements SelectInterface, JsonConditionInterface {
         }
       }
 
-      // Also remove 'all_fields' statements, which are expanded into tablename.*
-      // when the query is executed.
+      // Also remove 'all_fields' statements, which are expanded into
+      // tablename.* when the query is executed.
       foreach ($count->tables as &$table) {
         unset($table['all_fields']);
       }
@@ -782,7 +784,8 @@ class Select extends Query implements SelectInterface, JsonConditionInterface {
 
     if ($count->distinct && !empty($group_by)) {
       // If the query is distinct and contains a GROUP BY, we need to remove the
-      // distinct because SQL99 does not support counting on distinct multiple fields.
+      // distinct because SQL99 does not support counting on distinct multiple
+      // fields.
       $count->distinct = FALSE;
     }
 
@@ -810,13 +813,13 @@ class Select extends Query implements SelectInterface, JsonConditionInterface {
     // Create a sanitized comment string to prepend to the query.
     $comments = $this->connection->makeComment($this->comments);
 
-    // SELECT
+    // SELECT.
     $query = $comments . 'SELECT ';
     if ($this->distinct) {
       $query .= 'DISTINCT ';
     }
 
-    // FIELDS and EXPRESSIONS
+    // FIELDS and EXPRESSIONS.
     $fields = [];
     foreach ($this->tables as $alias => $table) {
       if (!empty($table['all_fields'])) {
@@ -836,7 +839,8 @@ class Select extends Query implements SelectInterface, JsonConditionInterface {
     }
     $query .= implode(', ', $fields);
 
-    // FROM - We presume all queries have a FROM, as any query that doesn't won't need the query builder anyway.
+    // FROM - We presume all queries have a FROM, as any query that doesn't
+    // won't need the query builder anyway.
     $query .= "\nFROM";
     foreach ($this->tables as $table) {
       $query .= "\n";
@@ -844,7 +848,8 @@ class Select extends Query implements SelectInterface, JsonConditionInterface {
         $query .= $table['join type'] . ' JOIN ';
       }
 
-      // If the table is a subquery, compile it and integrate it into this query.
+      // If the table is a subquery, compile it and integrate it into this
+      // query.
       if ($table['table'] instanceof SelectInterface) {
         // Run preparation steps on this sub-query before converting to string.
         $subquery = $table['table'];
@@ -868,13 +873,13 @@ class Select extends Query implements SelectInterface, JsonConditionInterface {
       }
     }
 
-    // WHERE
+    // WHERE.
     if (count($this->condition)) {
       // There is an implicit string cast on $this->condition.
       $query .= "\nWHERE " . $this->condition;
     }
 
-    // GROUP BY
+    // GROUP BY.
     if ($this->group) {
       $group_by_fields = array_map(function (string $field): string {
         return $this->connection->escapeField($field);
@@ -882,7 +887,7 @@ class Select extends Query implements SelectInterface, JsonConditionInterface {
       $query .= "\nGROUP BY " . implode(', ', $group_by_fields);
     }
 
-    // HAVING
+    // HAVING.
     if (count($this->having)) {
       // There is an implicit string cast on $this->having.
       $query .= "\nHAVING " . $this->having;
@@ -896,7 +901,7 @@ class Select extends Query implements SelectInterface, JsonConditionInterface {
       }
     }
 
-    // ORDER BY
+    // ORDER BY.
     if ($this->order) {
       $query .= "\nORDER BY ";
       $fields = [];

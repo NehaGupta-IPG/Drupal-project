@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\filter\Functional;
 
-use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\node\Entity\Node;
-use Drupal\node\Entity\NodeType;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Thoroughly test the administrative interface of the filter module.
- *
- * @group filter
  */
+#[Group('filter')]
+#[RunTestsInSeparateProcesses]
 class FilterAdminTest extends BrowserTestBase {
 
   /**
@@ -268,7 +268,6 @@ class FilterAdminTest extends BrowserTestBase {
     $this->assertSession()->checkboxChecked('filters[' . $second_filter . '][status]');
     $this->assertSession()->checkboxChecked('filters[' . $first_filter . '][status]');
     /** @var \Drupal\user\Entity\Role $role */
-    \Drupal::entityTypeManager()->getStorage('user_role')->resetCache([RoleInterface::AUTHENTICATED_ID]);
     $role = Role::load(RoleInterface::AUTHENTICATED_ID);
     $this->assertTrue($role->hasPermission($format->getPermissionName()), 'The authenticated role has permission to use the filter.');
 
@@ -277,7 +276,6 @@ class FilterAdminTest extends BrowserTestBase {
     $this->submitForm([], 'Disable');
     $this->assertSession()->addressEquals('admin/config/content/formats');
     $this->assertSession()->statusMessageContains("Disabled text format {$edit['name']}.", 'status');
-    \Drupal::entityTypeManager()->getStorage('user_role')->resetCache([RoleInterface::AUTHENTICATED_ID]);
     $role = Role::load(RoleInterface::AUTHENTICATED_ID);
     $this->assertFalse($role->hasPermission($format->getPermissionName()), 'The filter permission has been removed from the authenticated role');
 
@@ -385,41 +383,14 @@ class FilterAdminTest extends BrowserTestBase {
   }
 
   /**
-   * Tests whether filter tips page is not HTML escaped.
-   */
-  public function testFilterTipHtmlEscape(): void {
-    $this->drupalLogin($this->adminUser);
-    global $base_url;
-
-    $site_name_with_markup = 'Filter test <script>alert(\'here\');</script> site name';
-    $this->config('system.site')->set('name', $site_name_with_markup)->save();
-
-    // It is not possible to test the whole filter tip page.
-    // Therefore we test only some parts.
-    $link = '<a href="' . $base_url . '">' . Html::escape($site_name_with_markup) . '</a>';
-    $ampersand = '&amp;';
-    $link_as_code = '<code>' . Html::escape($link) . '</code>';
-    $ampersand_as_code = '<code>' . Html::escape($ampersand) . '</code>';
-
-    $this->drupalGet('filter/tips');
-
-    $this->assertSession()->responseContains('<td class="type">' . $link_as_code . '</td>');
-    $this->assertSession()->responseContains('<td class="get">' . $link . '</td>');
-    $this->assertSession()->responseContains('<td class="type">' . $ampersand_as_code . '</td>');
-    $this->assertSession()->responseContains('<td class="get">' . $ampersand . '</td>');
-  }
-
-  /**
    * Tests whether a field using a disabled format is rendered.
    */
   public function testDisabledFormat(): void {
     // Create a node type and add a standard body field.
-    $node_type = NodeType::create([
+    $node_type = $this->drupalCreateContentType([
       'type' => $this->randomMachineName(),
       'name' => $this->randomString(),
     ]);
-    $node_type->save();
-    node_add_body_field($node_type, $this->randomString());
 
     // Create a text format with a filter that returns a static string.
     $format = FilterFormat::create([
@@ -497,12 +468,10 @@ class FilterAdminTest extends BrowserTestBase {
     $filter_test->save();
 
     // Create a node type and add a standard body field.
-    $node_type = NodeType::create([
+    $node_type = $this->drupalCreateContentType([
       'type' => $this->randomMachineName(),
       'name' => $this->randomString(),
     ]);
-    $node_type->save();
-    node_add_body_field($node_type, $this->randomString());
 
     // Create a new node of the new node type.
     $title = $this->randomString();
