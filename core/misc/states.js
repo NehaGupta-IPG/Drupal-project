@@ -534,11 +534,21 @@
       // 'keyup' is the (native DOM) event that we watch for.
       keyup() {
         // The function associated with that trigger returns the new value for
-        // the state.
+        // the state. For custom elements whose .value is an array (e.g. a
+        // multi-value selector), check array length instead of strict equality.
+        const val = this[0]?.value;
+        if (Array.isArray(val)) {
+          return val.length === 0;
+        }
         return this.val() === '';
       },
-      // Listen to 'change' for number native "spinner" widgets.
+      // Listen to 'change' for number native "spinner" widgets and for custom
+      // elements that dispatch a native change event.
       change() {
+        const val = this[0]?.value;
+        if (Array.isArray(val)) {
+          return val.length === 0;
+        }
         return this.val() === '';
       },
     },
@@ -701,6 +711,12 @@
         .find(tagsSupportDisable)
         .addBack(tagsSupportDisable)
         .prop('disabled', e.value);
+      // Custom elements (identified by a hyphen in the tag name per the HTML
+      // spec) support the disabled property but are not matched by
+      // tagsSupportDisable.
+      if (e.target.tagName?.includes('-')) {
+        e.target.disabled = e.value;
+      }
     }
   });
 
