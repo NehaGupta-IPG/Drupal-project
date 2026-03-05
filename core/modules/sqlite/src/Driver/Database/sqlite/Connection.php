@@ -544,23 +544,4 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     return new TransactionManager($this);
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function startTransaction($name = '') {
-    return $this->transactionManager()->push($name);
-  }
-
-  /**
-   * Determines whether this version of SQLite supports generated columns.
-   *
-   * @return bool
-   *   TRUE if supported, FALSE if not.
-   *
-   * @see https://www.sqlite.org/gencol.html#compatibility
-   */
-  public function supportsGeneratedColumns(): bool {
-    return version_compare($this->version(), '3.31.0', '>=');
-  }
-
 }

@@ -3,7 +3,7 @@
 namespace Drupal\sqlite\Driver\Database\sqlite;
 
 use Drupal\Core\Database\JsonIndexValidationTrait;
-use Drupal\Core\Database\JsonpathGeneratedFieldTrait;
+use Drupal\Core\Database\JsonpathIndexTrait;
 use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\Schema as DatabaseSchema;
@@ -20,8 +20,8 @@ use Drupal\Core\Database\Schema as DatabaseSchema;
  */
 class Schema extends DatabaseSchema {
 
-  use JsonpathGeneratedFieldTrait;
   use JsonIndexValidationTrait;
+  use JsonpathIndexTrait;
 
   /**
    * Override DatabaseSchema::$defaultSchema.
@@ -31,13 +31,39 @@ class Schema extends DatabaseSchema {
   protected $defaultSchema = 'main';
 
   /**
-   * Get a list of column names for a table.
+   * Get the expression to retrieve a JSON value at a given jsonpath.
    *
-   * @return array
-   *   Array of column names for the table.
+   * @param string $field
+   *   Field name.
+   * @param string $jsonpath
+   *   Jsonpath.
+   *
+   * @return string
+   *   SQLite expression to retrieve data at this jsonpath.
    */
-  public function getFields(string $table): array {
-    return array_keys($this->introspectSchema($table)['fields']);
+  public static function getJsonExtractValueExpression(string $field, string $jsonpath): string {
+    return "json_extract({$field}, '{$jsonpath}')";
+  }
+
+  /**
+   * Add expression index entries for JSON hotpaths to a table schema.
+   *
+   * Expression indexes are stored as string values in the 'indexes' array,
+   * as opposed to regular column-based indexes which are arrays of column
+   * names.
+   *
+   * @param array $table
+   *   Table schema definition, modified by reference.
+   */
+  protected function addJsonpathExpressionIndexes(array &$table): void {
+    foreach ($table['fields'] as $field_name => $field) {
+      if (!empty($field['json_hotpaths'])) {
+        foreach ($field['json_hotpaths'] as $hotpath) {
+          $index_name = self::getJsonpathIndexName($field_name, $hotpath['jsonpath']);
+          $table['indexes'][$index_name] = self::getJsonExtractValueExpression($field_name, $hotpath['jsonpath']);
+        }
+      }
+    }
   }
 
   /**
@@ -69,6 +95,7 @@ class Schema extends DatabaseSchema {
       $this->ensureNotNullPrimaryKey($table['primary key'], $table['fields']);
     }
 
+    $this->addJsonpathExpressionIndexes($table);
     $sql = [];
     $sql[] = "CREATE TABLE {" . $name . "} (\n" . $this->createColumnsSql($name, $table) . "\n)\n";
     return array_merge($sql, $this->createIndexSql($name, $table));
@@ -87,7 +114,10 @@ class Schema extends DatabaseSchema {
     }
     if (!empty($schema['indexes'])) {
       foreach ($schema['indexes'] as $key => $fields) {
-        $sql[] = 'CREATE INDEX [' . $info['schema'] . '].[' . $info['table'] . '_' . $key . '] ON [' . $info['table'] . '] (' . $this->createKeySql($fields) . ")\n";
+        // Expression indexes are stored as strings, column-based indexes as
+        // arrays. Both use the same CREATE INDEX syntax.
+        $columns = is_string($fields) ? $fields : $this->createKeySql($fields);
+        $sql[] = 'CREATE INDEX [' . $info['schema'] . '].[' . $info['table'] . '_' . $key . '] ON [' . $info['table'] . '] (' . $columns . ")\n";
       }
     }
     return $sql;
@@ -112,10 +142,6 @@ class Schema extends DatabaseSchema {
         }
       }
       $sql_array[] = $this->createFieldSql($name, $this->processField($field));
-      assert($this->connection instanceof Connection);
-      if ($this->connection->supportsGeneratedColumns()) {
-        $sql_array = array_merge($sql_array, $this->processJsonpathGeneratedFields($name, $schema, $table_name));
-      }
     }
 
     // Process keys.
@@ -124,13 +150,6 @@ class Schema extends DatabaseSchema {
     }
 
     return implode(", \n", array_filter($sql_array));
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static function getJsonExtractValueExpression(string $field, string $jsonpath): string {
-    return "json_extract([{$field}], \"{$jsonpath}\")";
   }
 
   /**
@@ -223,10 +242,6 @@ class Schema extends DatabaseSchema {
         }
       }
 
-      if (!empty($spec['as'])) {
-        $sql .= ' GENERATED ALWAYS AS (' . $spec['as'] . ') VIRTUAL';
-      }
-
       if (!empty($spec['unsigned'])) {
         $sql .= ' CHECK (' . $name . '>= 0)';
       }
@@ -238,7 +253,7 @@ class Schema extends DatabaseSchema {
         $sql .= ' DEFAULT ' . $spec['default'];
       }
 
-      if (empty($spec['not null']) && !isset($spec['default']) && empty($spec['as'])) {
+      if (empty($spec['not null']) && !isset($spec['default'])) {
         $sql .= ' DEFAULT NULL';
       }
     }
@@ -362,12 +377,18 @@ class Schema extends DatabaseSchema {
     // SQLite doesn't have a full-featured ALTER TABLE statement. It only
     // supports adding new fields to a table, in some simple cases. In most
     // cases, we have to create a new table and copy the data over.
-    // JSON data type gets special handling due to automatic index creation.
-    if (empty($keys_new) && $specification['type'] !== 'json' && (empty($specification['not null']) || isset($specification['default']))) {
+    if (empty($keys_new) && (empty($specification['not null']) || isset($specification['default']))) {
       // When we don't have to create new keys and we are not creating a NOT
       // NULL column without a default value, we can use the quicker version.
       $query = 'ALTER TABLE {' . $table . '} ADD ' . $this->createFieldSql($field, $this->processField($specification));
       $this->executeDdlStatement($query);
+
+      // Create expression indexes for JSON hotpaths.
+      $temp_schema = ['fields' => [$field => $specification], 'indexes' => []];
+      $this->addJsonpathExpressionIndexes($temp_schema);
+      foreach ($this->createIndexSql($table, $temp_schema) as $stmt) {
+        $this->executeDdlStatement($stmt);
+      }
 
       // Apply the initial value if set.
       if (isset($specification['initial_from_field'])) {
@@ -534,10 +555,6 @@ class Schema extends DatabaseSchema {
         $type = $row->type;
         $length = NULL;
       }
-      // We could match generated columns by $row->hidden, but we need the type.
-      if (preg_match('/(.*)\sGENERATED(\sALWAYS)?/', $type, $matches)) {
-        $type = $matches[1];
-      }
       if (isset($mapped_fields[$type])) {
         [$type, $size] = explode(':', $mapped_fields[$type]);
         $schema['fields'][$row->name] = [
@@ -598,8 +615,30 @@ class Schema extends DatabaseSchema {
       // Get index name without prefix.
       $index_name = substr($name, strlen($info['table']) + 1);
       $result = $this->connection->query('PRAGMA [' . $info['schema'] . '].index_info([' . $name . '])');
+      $is_expression_index = FALSE;
+      $columns = [];
       foreach ($result as $row) {
-        $schema[$index['schema_key']][$index_name][] = $row->name;
+        if ($row->name === NULL) {
+          $is_expression_index = TRUE;
+        }
+        else {
+          $columns[] = $row->name;
+        }
+      }
+      if ($is_expression_index) {
+        // Expression indexes return NULL for column names in PRAGMA
+        // index_info. Retrieve the expression from sqlite_master and store
+        // it as a string (vs. array for column-based indexes).
+        $create_sql = $this->connection->query(
+          "SELECT sql FROM [{$info['schema']}].sqlite_master WHERE type = 'index' AND name = :name",
+          [':name' => $name]
+        )->fetchField();
+        if ($create_sql && preg_match('/\bON\s+\S+\s*\((.+)\)\s*$/i', $create_sql, $matches)) {
+          $schema['indexes'][$index_name] = trim($matches[1]);
+        }
+      }
+      else {
+        $schema[$index['schema_key']][$index_name] = $columns;
       }
     }
     return $schema;
@@ -625,17 +664,17 @@ class Schema extends DatabaseSchema {
       unset($new_schema['primary key']);
     }
 
-    // When dropping a field that had a JSON path generated field automatically
-    // created for purposes of index optimization, drop the generated field and
-    // corresponding index.
-    $auto_generated_column_prefix = self::getJsonpathGeneratedFieldPrefix($field);
-    foreach (array_filter($this->getFields($table), fn(string $name) => str_starts_with($name, $auto_generated_column_prefix)) as $field_name) {
-      unset($new_schema['fields'][$field_name]);
-      unset($new_schema['indexes'][$field_name]);
-    }
-
     // Handle possible index changes.
+    $auto_generated_prefix = self::getJsonpathIndexPrefix($field);
     foreach ($new_schema['indexes'] as $index => $fields) {
+      // Expression indexes (strings) for this field are identified by prefix.
+      if (is_string($fields)) {
+        if (str_starts_with($index, $auto_generated_prefix)) {
+          unset($new_schema['indexes'][$index]);
+        }
+        continue;
+      }
+      // Column-based indexes (arrays): remove the dropped field.
       foreach ($fields as $key => $field_name) {
         if ($field_name == $field) {
           unset($new_schema['indexes'][$index][$key]);

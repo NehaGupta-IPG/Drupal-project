@@ -16,7 +16,7 @@ interface JsonConditionInterface extends StrictSqlParamsConditionInterface {
    *   The name of the field to check.
    * @param string $jsonpath
    *   The jsonpath for value comparison.
-   * @param string|int|array|bool|null $value
+   * @param string|int|float|array|bool|null $value
    *   The value to test the field against. Unlike most other SQL queries, which
    *   match with automatic type-casting, JSON data comparisons are more
    *   sensitive to type-matching, specifically for integers and boolean values.

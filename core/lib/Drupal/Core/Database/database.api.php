@@ -366,15 +366,10 @@ use Drupal\Core\Database\Query\SelectInterface;
  *       'varchar' or 'text' fields to use case-sensitive binary collation.
  *       This has no effect on other database types for which case sensitivity
  *       is already the default behavior.
- *     - 'as': An expression for determining the value of a generated column.
- *       This key should be used only with 'type' and 'description'.
- *       Not all database drivers support specifying 'default', e.g. SQLite.
- *       Generated columns are VIRTUAL except when the driver only supports
- *       STORED.
  *     - 'json_hotpaths': An array of 'type' and 'jsonpath' pairs corresponding
  *       to a SQL type and JSON path, representing a value which should be used
- *       for indexing. The specific mechanism for optimization (e.g., generated
- *       column and/or index creation) is abstracted and driver-specific.
+ *       for indexing. The specific mechanism for optimization (e.g., functional
+ *       or expression index creation) is abstracted and driver-specific.
  *       Specify any jsonpath expressions which are regularly used in database
  *       query conditions. Supported syntax for JSON paths vary slightly between
  *       database vendors, so distributed code should use widely-used syntax

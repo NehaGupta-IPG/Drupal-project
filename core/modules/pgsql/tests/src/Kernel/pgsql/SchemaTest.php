@@ -529,10 +529,10 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     // Test validation of malformed indexes.
     try {
       $this->schema->addIndex('test_json', 'invalid_index', ['id', 'test_field'], self::JSON_TABLE_SPECIFICATION);
+      $this->fail('Expected SchemaIndexOnJsonFieldUnsupportedException was not thrown.');
     }
     catch (SchemaIndexOnJsonFieldUnsupportedException $e) {
       $this->assertEquals('JSON data columns must be indexed only by themselves when using Postgres: Table test_json, index invalid_index contains incompatible source columns.', $e->getMessage());
-      $this->assertTrue(TRUE);
     }
 
     foreach (self::JSON_TEST_DATA as $path => $expected) {

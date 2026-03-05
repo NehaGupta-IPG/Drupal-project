@@ -1509,37 +1509,6 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->assertIndexOnColumns($table_name, ['text']);
   }
 
-  /**
-   * Test creation of a generated column.
-   */
-  public function testGeneratedColumn(): void {
-    $this->schema->createTable('with_generated', [
-      'fields' => [
-        'id' => ['type' => 'serial', 'not null' => TRUE],
-        'text_field' => [
-          'type' => 'text',
-          'description' => 'A text field',
-        ],
-        'gen' => [
-          'as' => 'text_field',
-          'type' => 'text',
-          'description' => 'A generated field.',
-        ],
-      ],
-      'primary key' => ['id'],
-    ]);
-    $sourceValue = 'Generated fields are useful.';
-    $this->assertTrue($this->schema->fieldExists('with_generated', 'gen'));
-    $this->connection->insert('with_generated')
-      ->fields(['text_field' => $sourceValue])
-      ->execute();
-    $result = $this->connection->select('with_generated')
-      ->fields('with_generated', ['gen'])
-      ->execute()
-      ->fetchField();
-    $this->assertSame($sourceValue, $result);
-  }
-
   const JSON_TEST_VALUE = '{"key": "value1", "number": 0, "bool": true, "list": ["a","b","c"], "nested": {"key": "value2"}, "float": 5.5}';
 
   const JSON_TEST_DATA = [
@@ -1597,15 +1566,14 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     // Not all db drivers support creating an index directly on a JSON field.
     try {
       $this->schema->addIndex('test_json', 'test_simple_index', ['test_field'], $spec);
-    }
-    catch (\Throwable $e) {
-      if (!$allow_direct_indexes && $e instanceof SchemaIndexOnJsonFieldUnsupportedException) {
-        $this->assertTrue(TRUE);
+      if (!$allow_direct_indexes) {
+        $this->fail('Expected SchemaIndexOnJsonFieldUnsupportedException was not thrown.');
       }
-    }
-    if ($allow_direct_indexes) {
       $this->assertTrue($this->schema->indexExists('test_json', 'test_simple_index'));
       $this->schema->dropIndex('test_json', 'test_simple_index');
+    }
+    catch (SchemaIndexOnJsonFieldUnsupportedException) {
+      $this->assertFalse($allow_direct_indexes, 'Unexpected exception for driver that supports direct JSON indexes.');
     }
 
     $this->connection->insert('test_json')

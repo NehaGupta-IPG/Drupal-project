@@ -213,7 +213,6 @@ hhvm
 hilited
 hmac
 hookname
-hostnames
 hotpath
 hotpaths
 hrefs

@@ -641,7 +641,7 @@ class SelectTest extends DatabaseTestBase {
   public static function providerJsonConditionOperators(): array {
     return [
       'LTE with matching' => ['$.number', 5, '<=', 1],
-      'LTE with no matching' => ['$.number', 5, '<=', 1],
+      'LTE with no matching' => ['$.number', -10, '<=', 0],
       'GT with matching' => ['$.number', -2, '>', 3],
       'GT with subset matching' => ['$.number', 7, '>', 2],
       'Equals' => ['$.number', 10, '=', 2],

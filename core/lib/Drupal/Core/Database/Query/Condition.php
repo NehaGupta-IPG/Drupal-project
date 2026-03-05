@@ -383,12 +383,11 @@ class Condition implements ConditionInterface, JsonConditionInterface, \Countabl
   }
 
   /**
-   * Compile a JSON condition.
+   * Compile a JSON condition into a SQL field fragment.
    *
-   * Drivers supporting JSON data types may have widely-varying syntax on
-   * SQL syntax for queries. This default implementation delegates to a function
-   * which provides a simple field fragment, however some drivers (e.g., PgSQL)
-   * may need more complex syntax.
+   * Drivers supporting JSON data types may have widely-varying SQL syntax
+   * for queries. Each driver must override this method to produce the
+   * appropriate SQL fragment.
    *
    * @param array $condition
    *   Condition.
@@ -403,9 +402,6 @@ class Condition implements ConditionInterface, JsonConditionInterface, \Countabl
    *   Field fragment.
    */
   protected function processJsonCondition(array $condition, Connection $connection, bool &$ignore_operator, PlaceholderInterface $query_placeholder): string {
-    if (method_exists($this, 'getJsonFieldFragment')) {
-      return $this->getJsonFieldFragment($condition['field'], $condition, $connection, $query_placeholder);
-    }
     throw new \RuntimeException('Database driver must implement ' . __FUNCTION__);
   }
 

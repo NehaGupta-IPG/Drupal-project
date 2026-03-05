@@ -2,6 +2,7 @@
 
 namespace Drupal\pgsql\Driver\Database\pgsql;
 
+use Drupal\Core\Database\JsonpathIndexTrait;
 use Drupal\Core\Database\Schema\Index;
 use Drupal\Core\Database\Exception\SchemaIndexOnJsonFieldUnsupportedException;
 use Drupal\Core\Database\SchemaObjectExistsException;
@@ -24,6 +25,8 @@ use Drupal\pgsql\Schema\IndexType;
  * PostgreSQL implementation of \Drupal\Core\Database\Schema.
  */
 class Schema extends DatabaseSchema {
+
+  use JsonpathIndexTrait;
 
   /**
    * A cache of information about blob columns and sequences of tables.
@@ -63,26 +66,6 @@ class Schema extends DatabaseSchema {
     // If the schema is not set in the connection options then schema defaults
     // to public.
     $this->defaultSchema = $connection->getConnectionOptions()['schema'] ?? 'public';
-  }
-
-  /**
-   * Get a list of column names for a table.
-   *
-   * @return array
-   *   Array of column names for the table.
-   */
-  public function getFields(string $table): array {
-    $sql = <<<'EOD'
-SELECT attrelid::regclass AS tbl
-     , attname            AS col
-     , atttypid::regtype  AS datatype
-FROM   pg_attribute
-WHERE  attrelid = :table::regclass
-AND    attnum > 0
-AND    NOT attisdropped
-ORDER  BY attnum;
-EOD;
-    return array_keys($this->connection->query($sql, [':table' => $this->connection->getPrefix() . $table])->fetchAllAssoc('col'));
   }
 
   /**
@@ -390,10 +373,7 @@ EOD;
   protected function createAutoJsonIndexSql(string $table, string $field_name, array $spec): ?string {
     return !empty($spec['type']) && $spec['type'] === 'json' ? $this->_createIndexSql(
       $table,
-      sprintf(
-        'auto_gen_%s',
-        $field_name,
-      ),
+      self::getJsonpathIndexPrefix($field_name),
       new Index(
         [$field_name],
         ['pgsql' => ['type' => IndexType::Gin]]
@@ -422,11 +402,6 @@ EOD;
     }
     elseif (isset($spec['precision']) && isset($spec['scale'])) {
       $sql .= '(' . $spec['precision'] . ', ' . $spec['scale'] . ')';
-    }
-
-    if (!empty($spec['as'])) {
-      // Virtual generated columns are not yet supported in Postgres.
-      $sql .= ' GENERATED ALWAYS AS (' . $spec['as'] . ') STORED';
     }
 
     if (!empty($spec['unsigned'])) {
@@ -945,7 +920,7 @@ EOD;
   /**
    * Process index fields and perform basic sanity checking.
    *
-   * @param array|IndexSpecification $fields
+   * @param array|\Drupal\Core\Database\Schema\Index $fields
    *   Field specification.
    * @param array $table_spec
    *   Table spec.
@@ -954,7 +929,7 @@ EOD;
    * @param string $index
    *   Index name.
    *
-   * @return array|IndexSpecification
+   * @return array|\Drupal\Core\Database\Schema\Index
    *   Processed index specification.
    *
    * @throws \Drupal\Core\Database\Exception\SchemaIndexOnJsonFieldUnsupportedException
@@ -1176,7 +1151,7 @@ EOD;
     if ($fields instanceof Index && ($config = $fields->getDriverConfig('pgsql')) && !empty($config['type']) && $config['type'] instanceof IndexType) {
       // Both GIN and GiST indexes may cover only one column.
       if (count($fields) > 1) {
-        throw new \RuntimeException('Postgres indexes of %s type may only cover a single column. See https://www.postgresql.org/docs/current/textsearch-indexes.html', $config['type']->value);
+        throw new \RuntimeException(sprintf('Postgres indexes of %s type may only cover a single column. See https://www.postgresql.org/docs/current/textsearch-indexes.html', $config['type']->value));
       }
       // Index must be on a full column.
       if (is_array($fields->getIterator()->current())) {

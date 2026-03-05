@@ -102,9 +102,9 @@ class StatementWrapperIterator extends StatementBase {
    * For a \PDO client connection, this will call \PDO::bindValue(). Database
    * drivers need to override this method to use client-specific methods.
    *
-   * @var mixed[] $arguments
+   * @param mixed[] $arguments
    *   The arguments to bind to the statement object.
-   * @var bool $strict
+   * @param bool $strict
    *   (Optional) Whether strict typing should be used. Defaults to FALSE.
    */
   protected function bindArguments(array $arguments, bool $strict = FALSE): void {
