@@ -61,7 +61,11 @@ class ToolbarActiveTrailTest extends WebDriverTestBase {
     $this->assertNotEmpty($assert_session->waitForElementVisible('css', '#toolbar-item-administration.is-active'));
 
     // If testing for vertical orientation of the toolbar then switch to it.
+    // The active tray is kept inert to prevent screen reader focus jumping
+    // (see ToolbarVisualView.js), so remove inert before clicking the
+    // orientation toggle inside the tray.
     if ($orientation === 'vertical') {
+      $this->removeInertFromActiveTray();
       $page->pressButton('Vertical orientation');
     }
 
@@ -76,6 +80,7 @@ class ToolbarActiveTrailTest extends WebDriverTestBase {
       $this->assertNotNull($assert_session->waitForElementVisible('css', '.menu-item--active-trail a:contains("Structure")'));
       $this->assertNotNull($assert_session->waitForElementVisible('css', '.menu-item--active-trail a:contains("Content types")'));
       // Change orientation and check focus is maintained.
+      $this->removeInertFromActiveTray();
       $page->pressButton('Horizontal orientation');
       $this->assertNotNull($assert_session->waitForElementVisible('css', '#toolbar-link-system-admin_structure.is-active'));
     }
@@ -83,12 +88,27 @@ class ToolbarActiveTrailTest extends WebDriverTestBase {
       // Assert that is-active was maintained.
       $this->assertNotNull($assert_session->waitForElementVisible('css', '#toolbar-link-system-admin_structure.is-active'));
       // Change orientation and check focus is maintained.
+      $this->removeInertFromActiveTray();
       $page->pressButton('Vertical orientation');
       // Introduce a delay to let the focus load.
       $this->getSession()->wait(150);
       $this->assertNotNull($assert_session->waitForElementVisible('css', '.menu-item--active-trail a:contains("Structure")'));
       $this->assertNotNull($assert_session->waitForElementVisible('css', '.menu-item--active-trail a:contains("Content types")'));
     }
+  }
+
+  /**
+   * Removes the inert attribute from the active toolbar tray.
+   *
+   * The toolbar keeps the active tray inert to prevent screen reader focus
+   * jumping. This helper simulates what happens when a keyboard user presses
+   * Tab on the trigger to enter the tray, allowing WebDriver to interact
+   * with tray elements like the orientation toggle.
+   */
+  protected function removeInertFromActiveTray(): void {
+    $this->getSession()->executeScript(
+      "document.querySelector('.toolbar-tray.is-active')?.removeAttribute('inert')"
+    );
   }
 
 }

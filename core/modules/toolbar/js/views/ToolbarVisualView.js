@@ -303,15 +303,13 @@
           );
           if ($tray.length) {
             $tray.addClass('is-active');
-            // Remove inert so tray elements are clickable, but keep
-            // aria-hidden so VoiceOver's virtual cursor and tap gestures
-            // cannot reach fixed-position tray elements while the user
-            // navigates page content. The tray is visually open and
-            // mouse-interactive, but hidden from assistive technology.
-            // Keyboard/AT users access tray content by pressing Tab from
-            // the trigger (see keydown handler in initialize), which
-            // removes aria-hidden.
-            $tray.get(0).removeAttribute('inert');
+            // Keep the tray inert and aria-hidden so VoiceOver's tap
+            // gestures and virtual cursor cannot reach fixed-position
+            // tray elements while the user navigates page content. The
+            // tray is visually open but blocked from all interaction.
+            // Users access tray content by pressing Tab from the trigger
+            // (see keydown handler in initialize), which removes both
+            // inert and aria-hidden.
             $tray.get(0).setAttribute('aria-hidden', 'true');
             this.model.set('activeTray', $tray.get(0));
           } else {
