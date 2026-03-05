@@ -62,6 +62,64 @@
           .has('.toolbar-menu')
           .append(Drupal.theme('toolbarOrientationToggle'));
 
+        // Set inert on all trays initially so screen readers cannot focus into
+        // closed trays. The attribute is removed when a tray becomes active.
+        this.$el.find('.toolbar-tray').each(function () {
+          this.setAttribute('inert', '');
+        });
+
+        const self = this;
+
+        // When a toolbar trigger with an open tray receives a Tab keypress,
+        // move focus into the tray (removing inert and aria-hidden so AT can
+        // see it). This gives VoiceOver/keyboard users explicit access to tray
+        // content without the tray interfering with page navigation otherwise.
+        this.$el.on('keydown.toolbar', '.trigger', function (event) {
+          if (event.key !== 'Tab' || event.shiftKey) {
+            return;
+          }
+          const activeTray = self.model.get('activeTray');
+          if (!activeTray || !$(this).hasClass('is-active')) {
+            return;
+          }
+          // Remove inert and aria-hidden so the tray is fully interactive.
+          activeTray.removeAttribute('inert');
+          activeTray.removeAttribute('aria-hidden');
+          // Focus the first focusable element in the tray.
+          const firstFocusable = activeTray.querySelector(
+            'a[href], button:not([disabled]), input:not([disabled])',
+          );
+          if (firstFocusable) {
+            event.preventDefault();
+            firstFocusable.focus();
+          }
+        });
+
+        // When focus leaves the tray, make it inert and hidden from AT again.
+        // Use a short delay to allow focus to settle (focusout fires before
+        // focusin on the new target, so we check if focus moved within tray).
+        this.$el.on('focusout.toolbar', '.toolbar-tray', function () {
+          const tray = this;
+          setTimeout(function () {
+            if (!tray.contains(document.activeElement)) {
+              tray.setAttribute('inert', '');
+              tray.setAttribute('aria-hidden', 'true');
+            }
+          }, 0);
+        });
+
+        // Close the active tray on Escape and return focus to the trigger.
+        $(document).on('keydown.toolbar', function (event) {
+          if (event.key === 'Escape' && self.model.get('activeTray')) {
+            const previousTab = self.model.get('activeTab');
+            self.model.set('activeTab', null);
+            if (previousTab) {
+              previousTab.focus();
+            }
+            event.preventDefault();
+          }
+        });
+
         // Trigger an activeTab change so that listening scripts can respond on
         // page load. This will call render.
         this.model.trigger('change:activeTab');
@@ -207,12 +265,19 @@
        */
       updateTabs() {
         const $tab = $(this.model.get('activeTab'));
+        const previousTab = this.model.previous('activeTab');
+        const previousTray = this.model.previous('activeTray');
+
         // Deactivate the previous tab.
-        $(this.model.previous('activeTab'))
-          .removeClass('is-active')
-          .attr('aria-pressed', false);
-        // Deactivate the previous tray.
-        $(this.model.previous('activeTray')).removeClass('is-active');
+        $(previousTab).removeClass('is-active').attr('aria-pressed', 'false');
+
+        // Deactivate the previous tray and make it inert so screen readers
+        // can no longer focus into it.
+        if (previousTray) {
+          $(previousTray).removeClass('is-active');
+          previousTray.removeAttribute('aria-hidden');
+          previousTray.setAttribute('inert', '');
+        }
 
         // The stored active tab is removed as updateTabs() can be called when
         // a tray is explicitly closed, thus not replaced with a new active tab.
@@ -221,8 +286,8 @@
         if ($tab.length > 0) {
           $tab
             .addClass('is-active')
-            // Mark the tab as pressed.
-            .attr('aria-pressed', true);
+            // Mark the tab as pressed (tray is visible).
+            .attr('aria-pressed', 'true');
           const name = $tab.attr('data-toolbar-tray');
           // Store the active tab name or remove the setting.
           const id = $tab.get(0).id;
@@ -238,6 +303,16 @@
           );
           if ($tray.length) {
             $tray.addClass('is-active');
+            // Remove inert so tray elements are clickable, but keep
+            // aria-hidden so VoiceOver's virtual cursor and tap gestures
+            // cannot reach fixed-position tray elements while the user
+            // navigates page content. The tray is visually open and
+            // mouse-interactive, but hidden from assistive technology.
+            // Keyboard/AT users access tray content by pressing Tab from
+            // the trigger (see keydown handler in initialize), which
+            // removes aria-hidden.
+            $tray.get(0).removeAttribute('inert');
+            $tray.get(0).setAttribute('aria-hidden', 'true');
             this.model.set('activeTray', $tray.get(0));
           } else {
             // There is no active tray.
