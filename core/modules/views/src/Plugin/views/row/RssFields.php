@@ -83,6 +83,13 @@ class RssFields extends RowPluginBase {
       '#default_value' => $this->options['creator_field'],
       '#required' => TRUE,
     ];
+    $form['category_field'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Category field'),
+      '#description' => $this->t('A string that identifies the item.'),
+      '#options' => $view_fields_labels,
+      '#default_value' => $this->options['category_field'],
+    ];
     $form['date_field'] = [
       '#type' => 'select',
       '#title' => $this->t('Publication date field'),
@@ -158,6 +165,35 @@ class RssFields extends RowPluginBase {
         'namespace' => ['xmlns:dc' => 'http://purl.org/dc/elements/1.1/'],
       ],
     ];
+
+    if ($this->options['category_field']) {
+      $field_name = $this->options['category_field'];
+      $category_field = $entity->$field_name;
+     
+      if ($category_field instanceof EntityReferenceFieldItemList) {
+        foreach ($category_field as $category_field_item) {
+          $category_entity = $category_field_item
+            ?->get('entity')
+            ?->getTarget()
+            ?->getValue();
+
+            if ($category_entity instanceof EntityInterface) {
+              $currentLangcode = \Drupal::languageManager()->getCurrentLanguage()->getId();
+              if ($category_entity->hasTranslation($currentLangcode)) {
+                $category_entity = $category_entity->getTranslation($currentLangcode);
+              }
+              
+              $item->elements[] = [
+                'key' => 'category',
+                'value' => $category_entity->label(),
+              ];
+            }
+          }
+        }
+
+       unset($category_field, $category_field_item, $category_entity);
+     }
+     
     $guid_is_permalink_string = 'false';
     $item_guid = $this->getField($row_index, $this->options['guid_field_options']['guid_field']);
     if ($this->options['guid_field_options']['guid_field_is_permalink']) {
