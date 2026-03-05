@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\Core\Database\Database;
-use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Entity\Query\QueryException;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\Entity\EntityTestMulRev;
@@ -36,10 +35,7 @@ class EntityQueryTest extends EntityKernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = [
-    'field_test',
-    'language',
-  ];
+  protected static $modules = ['field_test', 'language'];
 
   /**
    * An array of entity IDs keyed by the revision or entity ID.
@@ -70,13 +66,6 @@ class EntityQueryTest extends EntityKernelTestBase {
   public $figures;
 
   /**
-   * Field name for the JSON field.
-   *
-   * @var string
-   */
-  protected string $json;
-
-  /**
    * The entity_test_mulrev entity storage.
    *
    * @var \Drupal\Core\Entity\EntityStorageInterface
@@ -95,8 +84,7 @@ class EntityQueryTest extends EntityKernelTestBase {
 
     $figures = $this->randomMachineName();
     $greetings = $this->randomMachineName();
-    $json = $this->randomMachineName();
-    foreach ([$figures => 'shape', $greetings => 'text', $json => 'json_backed_test'] as $field_name => $field_type) {
+    foreach ([$figures => 'shape', $greetings => 'text'] as $field_name => $field_type) {
       $field_storage = FieldStorageConfig::create([
         'field_name' => $field_name,
         'entity_type' => 'entity_test_mulrev',
@@ -186,7 +174,6 @@ class EntityQueryTest extends EntityKernelTestBase {
     $this->bundles = $bundles;
     $this->figures = $figures;
     $this->greetings = $greetings;
-    $this->json = $json;
     $this->storage = $this->container->get('entity_type.manager')->getStorage('entity_test_mulrev');
   }
 
@@ -1541,83 +1528,6 @@ class EntityQueryTest extends EntityKernelTestBase {
     // to tell PHPStan to ignore this.
     // @phpstan-ignore-next-line
     $this->storage->getQuery()->execute();
-  }
-
-  /**
-   * Test entity queries on fields backed by JSON data storage.
-   */
-  public function testQueryJsonBackedField(): void {
-    [$entity1, $entity2] = array_values($this->storage->loadMultiple(
-      $this->storage->getQuery()
-        ->accessCheck(FALSE)
-        ->range(0, 2)
-        ->execute()
-    ));
-    assert($entity1 instanceof FieldableEntityInterface);
-    $entity1->set($this->json, ['string' => 'PHP is not dead.', 'bool' => TRUE, 'number' => 5]);
-    $entity1->save();
-    assert($entity2 instanceof FieldableEntityInterface);
-    $entity2->set($this->json, ['string' => 'Drupal has good JSON support.', 'bool' => TRUE, 'number' => -5]);
-    $entity2->save();
-    $this->assertSame(
-      $entity1->id(),
-      current(
-        $this->storage->getQuery()
-          ->accessCheck(FALSE)
-          ->jsonCondition($this->json, '$.number', 5)
-          ->execute()
-      )
-    );
-    // Test numeric filtering but also proper handling of floats.
-    $this->assertSame(
-      2,
-      $this->storage->getQuery()
-        ->accessCheck(FALSE)
-        ->jsonCondition($this->json, '$.number', -5.5, '>')
-        ->count()
-        ->execute()
-    );
-    $this->assertSame(
-      1,
-      $this->storage->getQuery()
-        ->accessCheck(FALSE)
-        ->jsonCondition($this->json, '$.number', 0, '<')
-        ->count()
-        ->execute()
-    );
-    $this->assertSame(
-      0,
-      $this->storage->getQuery()
-        ->accessCheck(FALSE)
-        ->jsonCondition($this->json, '$.number', -5.1, '<')
-        ->count()
-        ->execute()
-    );
-    $this->assertSame(
-      1,
-      $this->storage->getQuery()
-        ->accessCheck(FALSE)
-        ->jsonCondition($this->json, '$.number', -5, '<>')
-        ->count()
-        ->execute()
-    );
-    $this->assertSame(
-      1,
-      $this->storage->getQuery()
-        ->accessCheck(FALSE)
-        ->jsonCondition($this->json, '$.string', 'PHP is not dead.', '!=')
-        ->count()
-        ->execute()
-    );
-    $this->expectExceptionMessageMatches('/^Operator \<=\> is not supported/');
-    $this->assertSame(
-      1,
-      $this->storage->getQuery()
-        ->accessCheck(FALSE)
-        ->jsonCondition($this->json, '$.bool', FALSE, '<=>')
-        ->count()
-        ->execute()
-    );
   }
 
 }

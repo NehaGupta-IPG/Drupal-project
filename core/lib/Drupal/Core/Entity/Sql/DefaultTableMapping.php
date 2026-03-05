@@ -427,13 +427,9 @@ class DefaultTableMapping implements TableMappingInterface {
    */
   public function getFieldColumnName(FieldStorageDefinitionInterface $storage_definition, $property_name) {
     $field_name = $storage_definition->getName();
-    $columns = $storage_definition->getColumns();
-    if ($property_name === NULL && !$storage_definition->getMainPropertyName() && count($columns) === 1) {
-      $property_name = key($columns);
-    }
 
     if ($this->allowsSharedTableStorage($storage_definition)) {
-      $column_name = count($columns) == 1 ? $field_name : $field_name . '__' . $property_name;
+      $column_name = count($storage_definition->getColumns()) == 1 ? $field_name : $field_name . '__' . $property_name;
     }
     elseif ($this->requiresDedicatedTableStorage($storage_definition)) {
       if ($property_name == TableMappingInterface::DELTA) {

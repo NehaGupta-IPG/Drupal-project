@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Entity\Query\Sql;
 
-use Drupal\Core\Database\Query\JsonConditionInterface;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\Core\Entity\Query\ConditionBase;
 use Drupal\Core\Entity\Query\ConditionInterface;
@@ -10,12 +9,7 @@ use Drupal\Core\Entity\Query\ConditionInterface;
 /**
  * Implements entity query conditions for SQL databases.
  */
-class Condition extends ConditionBase implements JsonConditionInterface {
-
-  /**
-   * Whether the resulting query should have its parameters strictly-bound.
-   */
-  protected bool $strictParams = FALSE;
+class Condition extends ConditionBase {
 
   /**
    * Whether this condition is nested inside an OR condition.
@@ -78,14 +72,6 @@ class Condition extends ConditionBase implements JsonConditionInterface {
         // Add the translated conditions back to the condition container.
         if (isset($condition['where']) && isset($condition['where_args'])) {
           $conditionContainer->where($condition['where'], $condition['where_args']);
-        }
-        elseif (isset($condition['jsonpath'])) {
-          $conditionContainer->jsonCondition(
-            $field,
-            $condition['jsonpath'],
-            $condition['value'],
-            $condition['operator']
-          );
         }
         else {
           $conditionContainer->condition($field, $condition['value'], $condition['operator']);
@@ -180,56 +166,6 @@ class Condition extends ConditionBase implements JsonConditionInterface {
         $condition['value'] = '%' . $sql_query->escapeLike($condition['value']);
         break;
     }
-  }
-
-  /**
-   * Builds a conditional clause on a JSON-backed field.
-   *
-   * @todo Validate this docblock, it is copied from ::condition() and needs updating.
-   *
-   * @param string $field
-   *   The name of the field to check.
-   * @param string $jsonpath
-   *   The jsonpath for value comparison.
-   * @param string|int|array|SelectInterface|bool|null $value
-   *   The value to test the field against. In most cases, and depending on the
-   *   operator, this will be a scalar or an array. As SQL accepts select
-   *   queries on any place where a scalar value or set is expected, $value may
-   *   also be a SelectInterface or an array of SelectInterfaces. If $operator
-   *   is a unary operator, e.g. IS NULL, $value will be ignored and should be
-   *   null. If the operator requires a subquery, e.g. EXISTS, the $field will
-   *   be ignored and $value should be a SelectInterface object.
-   * @param string|null $operator
-   *   The operator to use. Supported for all supported databases are at least:
-   *   - The comparison operators =, <>, <, <=, >, >=.
-   *   - The operators (NOT) BETWEEN, (NOT) IN, (NOT) EXISTS, (NOT) LIKE.
-   *   Other operators (e.g. LIKE, BINARY) may or may not work. Defaults to =.
-   * @param string $langcode
-   *   (optional) For which language the entity should be prepared, defaults to
-   *   the current content language.
-   *
-   * @return $this
-   *   The called object.
-   */
-  public function jsonCondition(string $field, string $jsonpath, string|int|float|array|bool|null $value = NULL, string $operator = '=', ?string $langcode = NULL): self {
-    $this->conditions[] = [
-      'field' => $field,
-      'jsonpath' => $jsonpath,
-      'value' => $value,
-      'operator' => $operator,
-      'langcode' => $langcode,
-    ];
-
-    $this->strictParams = TRUE;
-
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function usesStrictParameters(): bool {
-    return $this->strictParams;
   }
 
 }

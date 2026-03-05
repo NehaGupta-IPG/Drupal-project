@@ -1,5 +1,0 @@
-name: 'User data service tests'
-type: module
-description: 'Support module for user data service testing.'
-package: Testing
-version: VERSION
