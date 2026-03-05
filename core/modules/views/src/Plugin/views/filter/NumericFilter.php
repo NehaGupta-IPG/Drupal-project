@@ -431,7 +431,7 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
       return FALSE;
     }
     $value = &$input[$this->options[$key]['identifier']];
-    if (!is_array($value)) {
+    if (!is_array($value) && !is_null($value)) {
       $value = [
         'value' => $value,
       ];
@@ -439,7 +439,7 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
 
     $rc = parent::acceptExposedInput($input);
 
-    if (empty($this->options['expose']['required'])) {
+    if (empty($this->options['expose']['required']) && is_array($value)) {
       // We have to do some of our own checking for non-required filters.
       $info = $this->operators();
       if (!empty($info[$this->operator]['values'])) {
