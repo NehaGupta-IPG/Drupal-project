@@ -39,7 +39,7 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    *   The string for the plural case. Make sure it is clear this is plural, to
    *   ease translation. Use @count in place of the item count, as in
    *   "@count new comments".
-   * @param array $args
+   * @param array<non-empty-string, string|\Stringable> $args
    *   (optional) An array with placeholder replacements, keyed by placeholder.
    *   See \Drupal\Component\Render\FormattableMarkup::placeholderFormat() for
    *   additional information about placeholders. Note that you do not need to

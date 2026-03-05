@@ -102,7 +102,7 @@ class TranslatableMarkup extends FormattableMarkup {
    *
    * @param string $string
    *   A string containing the English text to translate.
-   * @param array $arguments
+   * @param array<non-empty-string, string|\Stringable> $arguments
    *   (optional) An associative array of replacements to make after
    *   translation. Based on the first character of the key, the value is
    *   escaped and/or themed. See

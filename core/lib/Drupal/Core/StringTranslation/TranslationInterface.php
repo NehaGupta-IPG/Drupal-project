@@ -21,7 +21,7 @@ interface TranslationInterface {
    *
    * @param string $string
    *   A string containing the English text to translate.
-   * @param array $args
+   * @param array<non-empty-string, string|\Stringable> $args
    *   (optional) An associative array of replacements to make after
    *   translation. Based on the first character of the key, the value is
    *   escaped and/or themed. See
@@ -89,7 +89,7 @@ interface TranslationInterface {
    *   The string for the plural case. Make sure it is clear this is plural, to
    *   ease translation. Use @count in place of the item count, as in
    *   "@count new comments".
-   * @param array $args
+   * @param array<non-empty-string, string|\Stringable> $args
    *   An associative array of replacements to make after translation. Instances
    *   of any key in this array are replaced with the corresponding value.
    *   Based on the first character of the key, the value is escaped and/or
