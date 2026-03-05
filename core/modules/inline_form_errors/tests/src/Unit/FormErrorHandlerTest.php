@@ -249,7 +249,7 @@ class FormErrorHandlerTest extends UnitTestCase {
       ->method('addMessage');
 
     $this->renderer->expects($this->never())
-      ->method('renderPlain');
+      ->method('renderInIsolation');
 
     $this->testForm['#inline_form_errors_summary'] = FALSE;
 
