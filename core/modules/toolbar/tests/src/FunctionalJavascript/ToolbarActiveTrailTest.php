@@ -16,6 +16,8 @@ use PHPUnit\Framework\Attributes\TestWith;
 #[RunTestsInSeparateProcesses]
 class ToolbarActiveTrailTest extends WebDriverTestBase {
 
+  use ToolbarTrayTestTrait;
+
   /**
    * {@inheritdoc}
    */
@@ -95,20 +97,6 @@ class ToolbarActiveTrailTest extends WebDriverTestBase {
       $this->assertNotNull($assert_session->waitForElementVisible('css', '.menu-item--active-trail a:contains("Structure")'));
       $this->assertNotNull($assert_session->waitForElementVisible('css', '.menu-item--active-trail a:contains("Content types")'));
     }
-  }
-
-  /**
-   * Removes the inert attribute from the active toolbar tray.
-   *
-   * The toolbar keeps the active tray inert to prevent screen reader focus
-   * jumping. This helper simulates what happens when a keyboard user presses
-   * Tab on the trigger to enter the tray, allowing WebDriver to interact
-   * with tray elements like the orientation toggle.
-   */
-  protected function removeInertFromActiveTray(): void {
-    $this->getSession()->executeScript(
-      "document.querySelector('.toolbar-tray.is-active')?.removeAttribute('inert')"
-    );
   }
 
 }

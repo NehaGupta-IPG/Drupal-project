@@ -16,6 +16,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class ToolbarStoredStateTest extends WebDriverTestBase {
 
+  use ToolbarTrayTestTrait;
+
   /**
    * {@inheritdoc}
    */
@@ -85,6 +87,7 @@ class ToolbarStoredStateTest extends WebDriverTestBase {
 
     $page->clickLink('toolbar-item-administration');
     $orientation_toggle = $assert_session->waitForElementVisible('css', '[title="Vertical orientation"]');
+    $this->removeInertFromActiveTray();
     $orientation_toggle->click();
     $assert_session->waitForElementVisible('css', 'body.toolbar-vertical');
 

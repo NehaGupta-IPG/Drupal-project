@@ -10,6 +10,17 @@ const itemUser = '#toolbar-item-user';
 const itemUserTray = '#toolbar-item-user-tray';
 const userOrientationBtn = `${itemUserTray} .toolbar-toggle-orientation button`;
 
+// The toolbar keeps the active tray inert to prevent screen reader focus
+// jumping. This helper removes inert so Nightwatch can click tray elements.
+function removeInertFromActiveTray(browser) {
+  browser.execute(function () {
+    const tray = document.querySelector('.toolbar-tray.is-active');
+    if (tray) {
+      tray.removeAttribute('inert');
+    }
+  });
+}
+
 module.exports = {
   '@tags': ['core'],
   before(browser) {
@@ -49,11 +60,13 @@ module.exports = {
       itemAdministrationTray,
       'is-active toolbar-tray-horizontal',
     );
+    removeInertFromActiveTray(browser);
     browser.click(adminOrientationButton);
     browser.assert.hasClass(
       itemAdministrationTray,
       'is-active toolbar-tray-vertical',
     );
+    removeInertFromActiveTray(browser);
     browser.click(adminOrientationButton);
     browser.assert.hasClass(
       itemAdministrationTray,
@@ -75,6 +88,7 @@ module.exports = {
       itemAdministrationTray,
       'is-active toolbar-tray-horizontal',
     );
+    removeInertFromActiveTray(browser);
     browser.click(adminOrientationButton);
     browser.assert.hasClass(
       itemAdministrationTray,
@@ -319,6 +333,7 @@ module.exports = {
     // Set orientation to vertical.
     browser.waitForElementPresent(userOrientationBtn);
     browser.assert.hasClass(itemUserTray, 'is-active toolbar-tray-horizontal');
+    removeInertFromActiveTray(browser);
     browser.click(userOrientationBtn);
     browser.assert.hasClass(itemUserTray, 'is-active toolbar-tray-vertical');
     browser.refresh();

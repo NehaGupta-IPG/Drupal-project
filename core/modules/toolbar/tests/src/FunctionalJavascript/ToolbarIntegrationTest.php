@@ -16,6 +16,8 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class ToolbarIntegrationTest extends WebDriverTestBase {
 
+  use ToolbarTrayTestTrait;
+
   /**
    * {@inheritdoc}
    */
@@ -66,9 +68,11 @@ class ToolbarIntegrationTest extends WebDriverTestBase {
     // Test toggling the toolbar tray between horizontal and vertical.
     $tray = $page->findById('toolbar-item-administration-tray');
     $this->assertFalse($tray->hasClass('toolbar-tray-vertical'), 'Toolbar tray is not vertically oriented by default.');
+    $this->removeInertFromActiveTray();
     $page->pressButton('Vertical orientation');
     $this->assertTrue($tray->hasClass('toolbar-tray-vertical'), 'After toggling the orientation the toolbar tray is now displayed vertically.');
 
+    $this->removeInertFromActiveTray();
     $page->pressButton('Horizontal orientation');
     $this->assertTrue($tray->hasClass('toolbar-tray-horizontal'), 'After toggling the orientation a second time the toolbar tray is displayed horizontally again.');
   }
