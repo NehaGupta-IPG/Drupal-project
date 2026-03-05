@@ -17,6 +17,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\layout_builder\Plugin\Derivative\InlineBlockDeriver;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines an inline block plugin type.
@@ -99,6 +100,20 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
   /**
    * {@inheritdoc}
    */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('entity_type.manager'),
+      $container->get('entity_display.repository'),
+      $container->get('current_user'),
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function defaultConfiguration() {
     return [
       'view_mode' => 'full',
@@ -153,6 +168,9 @@ class InlineBlock extends BlockBase implements ContainerFactoryPluginInterface, 
     EntityFormDisplay::collectRenderDisplay($block, 'edit')->buildForm($block, $element, $form_state);
     $element['revision_log']['#access'] = FALSE;
     $element['info']['#access'] = FALSE;
+    if (isset($element['langcode'])) {
+      $element['langcode']['#access'] = FALSE;
+    }
     return $element;
   }
 
