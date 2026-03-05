@@ -703,19 +703,15 @@ services:
   Drupal\Core\Extension\ProfileExtensionList: '@extension.list.profile'
   extension.list.theme:
     class: Drupal\Core\Extension\ThemeExtensionList
-    arguments: ['%app.root%', 'theme', '@cache.bootstrap', '@info_parser', '@module_handler', '@state', '@config.factory', '@extension.list.theme_engine', '%install_profile%']
+    autowire: true
   Drupal\Core\Extension\ThemeExtensionList: '@extension.list.theme'
-  extension.list.theme_engine:
-    class: Drupal\Core\Extension\ThemeEngineExtensionList
-    arguments: ['%app.root%', 'theme_engine', '@cache.default', '@info_parser', '@module_handler', '@state', '%install_profile%']
-  Drupal\Core\Extension\ThemeEngineExtensionList: '@extension.list.theme_engine'
   extension.list.database_driver:
     class: Drupal\Core\Extension\DatabaseDriverList
     arguments: ['%app.root%', 'database_driver', '@cache.default']
   Drupal\Core\Extension\DatabaseDriverList: '@extension.list.database_driver'
   extension.path.resolver:
     class: Drupal\Core\Extension\ExtensionPathResolver
-    arguments: ['@extension.list.module', '@extension.list.profile', '@extension.list.theme', '@extension.list.theme_engine']
+    arguments: ['@extension.list.module', '@extension.list.profile', '@extension.list.theme']
   Drupal\Core\Extension\ExtensionPathResolver: '@extension.path.resolver'
   content_uninstall_validator:
     class: Drupal\Core\Entity\ContentUninstallValidator
@@ -1714,6 +1710,11 @@ services:
     class: Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag
     public: false
   Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface: '@session.attribute_bag'
+  Drupal\Core\Session\UserSessionRepositoryInterface:
+    class: Drupal\Core\Session\UserSessionRepository
+    autowire: true
+    tags:
+      - { name: backend_overridable }
   session_handler:
     alias: session_handler.storage
   session_handler.storage:
@@ -1728,11 +1729,7 @@ services:
   Drupal\Core\Session\WriteSafeSessionHandlerInterface: '@session_handler.write_safe'
   session_manager:
     class: Drupal\Core\Session\SessionManager
-    arguments: ['@request_stack', '@database', '@session_manager.metadata_bag', '@session_configuration', '@datetime.time', '@session_handler']
-    tags:
-      - { name: backend_overridable }
-    calls:
-      - [setWriteSafeHandler, ['@session_handler.write_safe']]
+    arguments: ['@request_stack', '@session_handler', '@session_manager.metadata_bag', '@session_configuration', '@datetime.time', '@Drupal\Core\Session\UserSessionRepositoryInterface']
   Drupal\Core\Session\SessionManagerInterface: '@session_manager'
   session_manager.metadata_bag:
     class: Drupal\Core\Session\MetadataBag
@@ -1877,8 +1874,6 @@ services:
     public: false
   Drupal\Core\File\MimeType\MimeTypeMapInterface:
     factory: ['@Drupal\Core\File\MimeType\MimeTypeMapFactory', create]
-  Drupal\Core\File\EventSubscriber\LegacyMimeTypeMapLoadedSubscriber:
-    autowire: true
   # Currently needs to be public as it is called by
   # \Drupal\Core\Render\Element\StatusMessages.
   # @todo Consider making this service private again after
