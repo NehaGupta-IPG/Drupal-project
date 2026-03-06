@@ -94,7 +94,7 @@ final class DeprecationHandler implements Extension {
     }
     $config->load($parameters);
 
-    // Get the overriden configuration provided via env variable.
+    // Get the overridden configuration provided via env variable.
     $environmentVariable = getenv('DEPRECATION_HANDLER_CONFIG');
     if ($environmentVariable !== FALSE) {
       $overrideConfig = (array) json_decode($environmentVariable);
