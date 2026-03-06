@@ -116,7 +116,6 @@ class AccessManagerTest extends UnitTestCase {
       ->willReturnMap($map);
 
     $this->paramConverter = $this->createMock('Drupal\Core\ParamConverter\ParamConverterManagerInterface');
-
     $this->account = $this->createMock('Drupal\Core\Session\AccountInterface');
     $this->currentUser = $this->createMock('Drupal\Core\Session\AccountInterface');
     $this->argumentsResolverFactory = $this->createMock('Drupal\Core\Access\AccessArgumentsResolverFactoryInterface');
