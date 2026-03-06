@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Composer\Plugin\Scaffold\Functional;
 
 use Drupal\BuildTests\Framework\BuildTestBase;
+use Drupal\DrupalInstalled;
 use Drupal\Tests\Composer\Plugin\ExecTrait;
 use Drupal\Tests\Composer\Plugin\Scaffold\Fixtures;
 use PHPUnit\Framework\Attributes\Group;
@@ -55,13 +56,21 @@ class DrupalInstalledTest extends BuildTestBase {
   }
 
   /**
-   * Tests DrupalInstalled.php hash changes when scaffolding is run.
+   * Tests values in the DrupalInstalled class.
    */
   public function testDrupalInstalledHash(): void {
     $topLevelProjectDir = 'drupal-installed-fixture';
     $sut = $this->fixturesDir . '/' . $topLevelProjectDir;
 
     $this->mustExec("composer install --no-ansi", $sut);
+
+    // Tests the app root.
+    $this->assertNotEmpty(DrupalInstalled::APP_ROOT);
+    $this->assertStringStartsWith('/', DrupalInstalled::APP_ROOT, 'The app root in DrupalInstalled is an absolute path.');
+    $this->assertStringEndsNotWith('/', DrupalInstalled::APP_ROOT);
+    $this->assertFileExists(DrupalInstalled::APP_ROOT . '/index.php');
+
+    // Tests DrupalInstalled.php hash changes when scaffolding is run.
     $original_version_hash = sha1_file($sut . '/vendor/drupal/DrupalInstalled.php');
 
     // Require two fixtures and ensure that the DrupalInstalled.php file is
