@@ -7,10 +7,12 @@ namespace Drupal\navigation\Plugin\Block;
 use Drupal\Core\Block\Attribute\Block;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\navigation\Menu\NavigationMenuLinkTreeManipulators;
 use Drupal\navigation\Plugin\Derivative\SystemMenuNavigationBlock as SystemMenuNavigationBlockDeriver;
 use Drupal\system\Plugin\Block\SystemMenuBlock;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides a generic menu navigation block.
@@ -23,9 +25,18 @@ use Drupal\system\Plugin\Block\SystemMenuBlock;
   category: new TranslatableMarkup("Menus (Navigation)"),
   deriver: SystemMenuNavigationBlockDeriver::class,
 )]
-final class NavigationMenuBlock extends SystemMenuBlock {
+final class NavigationMenuBlock extends SystemMenuBlock implements ContainerFactoryPluginInterface {
 
   const NAVIGATION_MAX_DEPTH = 3;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
+    $instance = new static($configuration, $plugin_id, $plugin_definition);
+    $instance->setMenuTree($container->get('navigation.menu_tree'));
+    return $instance;
+  }
 
   /**
    * {@inheritdoc}
