@@ -65,10 +65,10 @@ class DrupalInstalledTest extends BuildTestBase {
     $this->mustExec("composer install --no-ansi", $sut);
 
     // Tests the app root.
-    $this->assertNotEmpty(DrupalInstalled::APP_ROOT);
-    $this->assertStringStartsWith('/', DrupalInstalled::APP_ROOT, 'The app root in DrupalInstalled is an absolute path.');
-    $this->assertStringEndsNotWith('/', DrupalInstalled::APP_ROOT);
-    $this->assertFileExists(DrupalInstalled::APP_ROOT . '/index.php');
+    $this->assertNotEmpty(DrupalInstalled::getAppRoot());
+    $this->assertStringStartsWith('/', DrupalInstalled::getAppRoot(), 'The app root in DrupalInstalled is an absolute path.');
+    $this->assertStringEndsNotWith('/', DrupalInstalled::getAppRoot());
+    $this->assertFileExists(DrupalInstalled::getAppRoot() . '/index.php');
 
     // Tests DrupalInstalled.php hash changes when scaffolding is run.
     $original_version_hash = sha1_file($sut . '/vendor/drupal/DrupalInstalled.php');

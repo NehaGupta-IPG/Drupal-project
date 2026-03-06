@@ -236,16 +236,15 @@ automatically. The class holds the location of the Drupal application root (that
 is, the location of Drupal's index.php file).
 
 Because it is an autoloadable file, any code that has included the Composer
-autoloader may use the \Drupal\DrupalInstalled::APP_ROOT to get the filepath
+autoloader may use \Drupal\DrupalInstalled::getAppRoot() to get the filepath
 where Drupal core is installed.
 
 #### API
 
 Code that is part of a project's own codebase, and therefore can guarantee the
-presence of this plugin, can use the \Drupal\DrupalInstalled::APP_ROOT constant
-to get the filepath where Drupal core is installed. Because this is an
-autoloadable file, any code that has included the Composer autoloader may use
-this.
+presence of this plugin, can use \Drupal\DrupalInstalled::getAppRoot() to get
+the filepath where Drupal core is installed. Because this is an autoloadable
+file, any code that has included the Composer autoloader may use this.
 
 If your code is not part of a project, but is a package that may be included in
 projects, it can either require this plugin, or use

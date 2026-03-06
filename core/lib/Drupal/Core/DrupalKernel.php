@@ -379,7 +379,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   protected static function getApplicationRoot() {
     if (class_exists(DrupalInstalled::class)) {
-      return DrupalInstalled::APP_ROOT;
+      return DrupalInstalled::getAppRoot();
     }
     else {
       // Determine the application root by:

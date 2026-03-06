@@ -49,7 +49,7 @@ const DRUPAL_EXTENSION_NAME_MAX_LENGTH = 50;
  * file.
  */
 if (class_exists(DrupalInstalled::class)) {
-  define('DRUPAL_ROOT', DrupalInstalled::APP_ROOT);
+  define('DRUPAL_ROOT', DrupalInstalled::getAppRoot());
 }
 else {
   define('DRUPAL_ROOT', dirname(__DIR__, 2));
