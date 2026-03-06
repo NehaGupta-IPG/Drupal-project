@@ -3,6 +3,16 @@
 includes:
   - .phpstan-baseline.php
 
+services:
+  errorFormatter.multiplex:
+    class: Drupal\PHPStan\ErrorFormatter\MultiplexErrorFormatter
+    arguments:
+      basePath: ::getenv(_ARTIFACTS_DIR)
+      outputs:
+        gitlab: phpstan-gitlab.json
+        junit: phpstan-junit.xml
+        table: php://stdout
+
 parameters:
 
   tmpDir: phpstan-tmp
@@ -33,6 +43,8 @@ parameters:
     - phpstan-tmp/*
     # Skip Drupal's own PHPStan rules test fixtures.
     - tests/PHPStan/fixtures/*
+    # Skip Drupal's own PHPStan vendor directory
+    - tests/PHPStan/vendor/*
     # Skip Drupal 6 & 7 code.
     - scripts/dump-database-d?.sh
     - scripts/generate-d?-content.sh

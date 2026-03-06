@@ -176,12 +176,30 @@ class EntityTypedDataDefinitionTest extends KernelTestBase {
   /**
    * Provides test cases for testEntityDefinitionIsInternal.
    */
-  public static function entityDefinitionIsInternalProvider() {
+  public static function entityDefinitionIsInternalProvider(): array {
     return [
       'internal' => [TRUE, TRUE],
       'external' => [FALSE, FALSE],
       'undefined' => [NULL, FALSE],
     ];
+  }
+
+  /**
+   * Tests the ContentEntityType::hasIntegerId() method.
+   *
+   * @legacy-covers \Drupal\Core\Entity\ContentEntityType::hasIntegerId
+   */
+  public function testHasIntegerId(): void {
+    $manager = $this->container->get('entity_type.manager');
+
+    // Check an entity type which lacks an ID key.
+    $this->assertNull($manager->getDefinition('entity_test_no_id')->hasIntegerId());
+
+    // Check an entity type with integer ID.
+    $this->assertTrue($manager->getDefinition('entity_test')->hasIntegerId());
+
+    // Check an entity type with string ID.
+    $this->assertFalse($manager->getDefinition('entity_test_string_id')->hasIntegerId());
   }
 
 }

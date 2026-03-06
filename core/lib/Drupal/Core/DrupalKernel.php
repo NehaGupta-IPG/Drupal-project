@@ -618,7 +618,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // Initialize legacy request globals.
     $this->initializeRequestGlobals($request);
 
-    // Put the request on the stack.
+    // Put the request on the stack. Main requests will be popped in
+    // \Drupal\Core\DrupalKernel::terminate() and sub requests will be popped in
+    // \Drupal\Core\StackMiddleware\KernelPreHandle::handle().
     $this->container->get('request_stack')->push($request);
 
     // Set the allowed protocols.
@@ -727,6 +729,12 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
           $service->destruct();
         }
       }
+
+      // Pop the request added in \Drupal\Core\DrupalKernel::preHandle() from
+      // request stack at the end of the execution cycle.
+      if ($this->prepared === TRUE) {
+        $this->container->get('request_stack')->pop();
+      }
     }
   }
 
@@ -750,12 +758,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       }
 
       $response = $this->handleException($e, $request, $type);
-    }
-
-    // Backward compatibility for Symfony 7.4, which sets the charset to utf-8.
-    // @todo Remove this in https://www.drupal.org/project/drupal/issues/3555537
-    if (!$response->getCharset()) {
-      $response->setCharset('UTF-8');
     }
 
     // Adapt response headers to the current request.
@@ -1123,10 +1125,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       // in the query string.
       ini_set('session.use_cookies', '1');
       ini_set('session.use_strict_mode', '1');
-      if (\PHP_VERSION_ID < 80400) {
-        ini_set('session.use_only_cookies', '1');
-        ini_set('session.use_trans_sid', '0');
-      }
       // Don't send HTTP headers using PHP's session handler.
       // Send an empty string to disable the cache limiter.
       ini_set('session.cache_limiter', '');
@@ -1218,8 +1216,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // For a request URI of '/index.php/foo', $_SERVER['SCRIPT_NAME'] is
     // '/index.php', whereas $_SERVER['PHP_SELF'] is '/index.php/foo'.
     if ($dir = rtrim(dirname($request->server->get('SCRIPT_NAME')), '\/')) {
-      // Remove "core" directory if present, allowing install.php,
-      // authorize.php, and others to auto-detect a base path.
+      // Remove "core" directory if present, allowing install.php, rebuild.php,
+      // and others to auto-detect a base path.
       $core_position = strrpos($dir, '/core');
       if ($core_position !== FALSE && strlen($dir) - 5 == $core_position) {
         $base_path = substr($dir, 0, $core_position);

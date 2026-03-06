@@ -11,7 +11,6 @@ use Drupal\Core\Link;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\TempStore\Lock;
 use Drupal\views\Controller\ViewAjaxController;
-use Drupal\views\Views;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\views\ViewExecutable;
 use Drupal\Core\Database\Database;
@@ -43,7 +42,7 @@ class ViewUI implements ViewEntityInterface {
    *
    * @var array
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $changed_display;
 
   /**
@@ -51,7 +50,7 @@ class ViewUI implements ViewEntityInterface {
    *
    * @var float
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $render_time;
 
   /**
@@ -76,7 +75,7 @@ class ViewUI implements ViewEntityInterface {
    *
    * @var array
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $temporary_options;
 
   /**
@@ -91,7 +90,7 @@ class ViewUI implements ViewEntityInterface {
    *
    * @var bool
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   public $live_preview;
 
   /**
@@ -492,7 +491,7 @@ class ViewUI implements ViewEntityInterface {
           'table' => $table,
           'field' => $field,
         ];
-        $handler = Views::handlerManager($key)->getHandler($item);
+        $handler = \Drupal::service('views.plugin_managers')->get($key)->getHandler($item);
         if ($this->getExecutable()->displayHandlers->get('default')->useGroupBy() && $handler->usesGroupBy()) {
           $this->addFormToStack('handler-group', $display_id, $type, $id);
         }
@@ -612,13 +611,6 @@ class ViewUI implements ViewEntityInterface {
       $request->setSession($request_stack->getSession());
       $request_stack->push($request);
 
-      // Suppress contextual links of entities within the result set during a
-      // Preview.
-      // @todo We'll want to add contextual links specific to editing the View,
-      //   so the suppression may need to be moved deeper into the Preview
-      //   pipeline.
-      views_ui_contextual_links_suppress_push();
-
       $show_additional_queries = $config->get('ui.show.additional_queries');
 
       Timer::start('entity.view.preview_form');
@@ -635,8 +627,6 @@ class ViewUI implements ViewEntityInterface {
       }
 
       $this->render_time = Timer::stop('entity.view.preview_form')['time'];
-
-      views_ui_contextual_links_suppress_pop();
 
       // Prepare the query information and statistics to show either above or
       // below the view preview.

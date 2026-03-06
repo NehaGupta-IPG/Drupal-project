@@ -433,7 +433,7 @@ class LibraryDiscoveryParser {
    *   The extension name.
    * @param array $overrides
    *   The library overrides.
-   * @param Drupal\Core\Theme\ActiveTheme $active_theme
+   * @param \Drupal\Core\Theme\ActiveTheme $active_theme
    *   The active theme.
    *
    * @return array
@@ -541,7 +541,7 @@ class LibraryDiscoveryParser {
             // A string or boolean definition implies an override (or removal)
             // for the whole library. Use the override key to specify that this
             // library will be overridden when it is called.
-            // @see \Drupal\Core\Asset\LibraryDiscovery::getLibraryByName()
+            // @see \Drupal\Core\Asset\LibraryDiscoveryCollector::getLibraryByName()
             if ($override_definition) {
               $libraries[$library_name]['override'] = $override_definition;
             }

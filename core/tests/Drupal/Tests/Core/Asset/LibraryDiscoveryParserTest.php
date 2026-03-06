@@ -125,8 +125,6 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
 
   /**
    * Tests that basic functionality works for getLibraryByName.
-   *
-   * @legacy-covers ::buildByExtension
    */
   #[RunInSeparateProcess]
   public function testBuildByExtensionSimple(): void {
@@ -166,8 +164,6 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
 
   /**
    * Tests that a theme can be used instead of a module.
-   *
-   * @legacy-covers ::buildByExtension
    */
   public function testBuildByExtensionWithTheme(): void {
     $this->moduleHandler->expects($this->atLeastOnce())
@@ -193,8 +189,6 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
 
   /**
    * Tests that a module with a missing library file results in FALSE.
-   *
-   * @legacy-covers ::buildByExtension
    */
   public function testBuildByExtensionWithMissingLibraryFile(): void {
     $this->moduleHandler->expects($this->atLeastOnce())
@@ -236,8 +230,6 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
 
   /**
    * Tests that no exception is thrown when only dependencies are specified.
-   *
-   * @legacy-covers ::buildByExtension
    */
   public function testBuildByExtensionWithOnlyDependencies(): void {
     $this->moduleHandler->expects($this->atLeastOnce())
@@ -258,8 +250,6 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
 
   /**
    * Tests that an exception is thrown with only the version property specified.
-   *
-   * @legacy-covers ::buildByExtension
    */
   public function testBuildByExtensionWithMissingInformation(): void {
     $this->moduleHandler->expects($this->atLeastOnce())
@@ -694,7 +684,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
    */
   #[IgnoreDeprecations]
   public function testLibraryOverrideDeprecated(): void {
-    $this->expectDeprecation('Theme "deprecated" is overriding a deprecated library. The "deprecated/deprecated" asset library is deprecated in drupal:X.0.0 and is removed from drupal:Y.0.0. Use another library instead. See https://www.example.com');
+    $this->expectUserDeprecationMessage('Theme "deprecated" is overriding a deprecated library. The "deprecated/deprecated" asset library is deprecated in drupal:X.0.0 and is removed from drupal:Y.0.0. Use another library instead. See https://www.example.com');
     $mock_theme_path = 'mocked_themes/kittens';
     $this->themeManager = $this->createMock(ThemeManagerInterface::class);
     $this->activeTheme = $this->getMockBuilder(ActiveTheme::class)
@@ -764,11 +754,20 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
   /**
    * Data provider for testing bad CSS declarations.
    */
-  public static function providerTestCssAssert() {
+  public static function providerTestCssAssert(): array {
     return [
-      'css_bad_category' => ['css_bad_category', 'See https://www.drupal.org/node/2274843.'],
-      'Improper CSS nesting' => ['css_bad_nesting', 'CSS must be nested under a category. See https://www.drupal.org/node/2274843.'],
-      'Improper CSS nesting array' => ['css_bad_nesting_array', 'CSS files should be specified as key/value pairs, where the values are configuration options. See https://www.drupal.org/node/2274843.'],
+      'css_bad_category' => [
+        'css_bad_category',
+        'See https://www.drupal.org/node/2274843.',
+      ],
+      'Improper CSS nesting' => [
+        'css_bad_nesting',
+        'CSS must be nested under a category. See https://www.drupal.org/node/2274843.',
+      ],
+      'Improper CSS nesting array' => [
+        'css_bad_nesting_array',
+        'CSS files should be specified as key/value pairs, where the values are configuration options. See https://www.drupal.org/node/2274843.',
+      ],
     ];
   }
 

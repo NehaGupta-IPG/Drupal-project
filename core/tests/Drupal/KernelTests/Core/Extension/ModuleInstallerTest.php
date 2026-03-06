@@ -131,7 +131,7 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
   /**
    * Data provider for testInvalidCoreInstall().
    */
-  public static function providerTestInvalidCoreInstall() {
+  public static function providerTestInvalidCoreInstall(): array {
     return [
       'no dependencies system_core_incompatible_semver_test' => [
         'system_core_incompatible_semver_test',
@@ -197,6 +197,7 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
    * Data provider for ::testContainerRebuildRequired().
    */
   public static function containerRebuildRequiredProvider(): array {
+    // phpcs:disable Drupal.Arrays.Array.LongLineDeclaration
     return [
       [['container_rebuild_required_true'], 1],
       [['container_rebuild_required_false'], 1],
@@ -210,6 +211,7 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
       [['container_rebuild_required_false_2', 'container_rebuild_required_dependency_false'], 3],
       [['container_rebuild_required_false_2', 'container_rebuild_required_dependency_false', 'container_rebuild_required_true'], 3],
     ];
+    // phpcs:enable
   }
 
   /**
@@ -219,7 +221,7 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
    */
   #[IgnoreDeprecations]
   public function testDeprecatedInstall(): void {
-    $this->expectDeprecation("The module 'deprecated_module' is deprecated. See http://example.com/deprecated");
+    $this->expectUserDeprecationMessage("The module 'deprecated_module' is deprecated. See http://example.com/deprecated");
     \Drupal::service('module_installer')->install(['deprecated_module']);
     $this->assertTrue(\Drupal::service('module_handler')->moduleExists('deprecated_module'));
   }
@@ -232,7 +234,7 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
    */
   #[IgnoreDeprecations]
   public function testUninstallValidatorsBC(): void {
-    $this->expectDeprecation('The "module_installer.uninstall_validators" service is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Inject "!tagged_iterator module_install.uninstall_validator" instead. See https://www.drupal.org/node/3432595');
+    $this->expectUserDeprecationMessage('The "module_installer.uninstall_validators" service is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Inject "!tagged_iterator module_install.uninstall_validator" instead. See https://www.drupal.org/node/3432595');
     $module_installer = new ModuleInstaller(
       $this->container->getParameter('app.root'),
       $this->container->get('module_handler'),
@@ -242,7 +244,7 @@ class ModuleInstallerTest extends KernelTestBase implements LoggerInterface {
       $this->container->get('logger.channel.default'),
     );
 
-    $this->expectDeprecation('Drupal\Core\Extension\ModuleInstaller::addUninstallValidator is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Inject the uninstall validators into the constructor instead. See https://www.drupal.org/node/3432595');
+    $this->expectUserDeprecationMessage('Drupal\Core\Extension\ModuleInstaller::addUninstallValidator is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Inject the uninstall validators into the constructor instead. See https://www.drupal.org/node/3432595');
     $module_installer->addUninstallValidator($this->createMock(ModuleUninstallValidatorInterface::class));
   }
 
