@@ -503,7 +503,8 @@ class Schema extends DatabaseSchema {
    *   Table schema definition, modified by reference.
    */
   protected function resolveJsonIndexes(array &$table): void {
-    // MariaDB does not support functional indexes (MDEV-35853).
+    // MariaDB does not support functional indexes.
+    // @see https://jira.mariadb.org/browse/MDEV-35853
     if ($this->connection->isMariaDb()) {
       foreach ($table['indexes'] ?? [] as $index_name => $index) {
         if ($index instanceof JsonIndex) {

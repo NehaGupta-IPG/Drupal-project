@@ -1487,6 +1487,9 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     '$.float' => 5.5,
   ];
 
+  /**
+   * Returns the table specification for JSON tests.
+   */
   protected static function jsonTableSpecification(): array {
     return [
       'fields' => [

@@ -131,9 +131,9 @@ class Statement extends StatementBase {
   /**
    * Binds parameters with explicit type specifiers.
    *
-   * mysqli_stmt::execute() treats all array values as strings. When strict
-   * parameter binding is required (e.g. for JSON column comparisons), this
-   * method uses bind_param() to preserve PHP types.
+   * The mysqli_stmt::execute() function treats all array values as strings.
+   * When strict parameter binding is required (e.g. for JSON column
+   * comparisons), this method uses bind_param() to preserve PHP types.
    *
    * @param array $args
    *   Positional parameter values.

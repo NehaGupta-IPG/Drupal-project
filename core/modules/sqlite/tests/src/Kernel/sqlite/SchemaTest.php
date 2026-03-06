@@ -134,8 +134,6 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
 
   /**
    * Tests automatic optimization to use a JSON expression index.
-   *
-   * @covers ::indexExists
    */
   public function testJsonOptimization(): void {
     $this->schema->createTable('test_json', static::jsonTableSpecification());
