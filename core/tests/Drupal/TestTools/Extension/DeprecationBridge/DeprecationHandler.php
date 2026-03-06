@@ -94,6 +94,13 @@ final class DeprecationHandler implements Extension {
     }
     $config->load($parameters);
 
+    // Get the overriden configuration provided via env variable.
+    $environmentVariable = getenv('DEPRECATION_HANDLER_CONFIG');
+    if ($environmentVariable !== FALSE) {
+      $overrideConfig = (array) json_decode($environmentVariable);
+      $config->load($overrideConfig);
+    }
+
     // Get the legacy configuration provided via Symfony env variable.
     $config->load(self::legacySymfonyConfiguration());
 

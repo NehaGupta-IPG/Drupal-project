@@ -20,12 +20,14 @@
     <ini name="memory_limit" value="-1"/>
   </php>
   <extensions>
-    <!-- Deprecation handler. -->
+    <!-- Deprecation handler.
+       See core/phpunit.xml.dist for details on the extension configuration.
+    -->
     <bootstrap class="Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler">
       <parameter name="enableProjectIgnores" value="true"/>
       <parameter name="projectIgnoreFile" value="core/.deprecation-ignore.txt"/>
       <parameter name="enableDebugClassLoader" value="true"/>
-      <parameter name="enableCollectStats" value="true"/>
+      <parameter name="enableCollectStats" value="false"/>
     </bootstrap>
   </extensions>
   <testsuites>

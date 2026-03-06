@@ -44,12 +44,30 @@
     <env name="MINK_DRIVER_ARGS_WEBDRIVER" value=""/>
   </php>
   <extensions>
-    <!-- Deprecation handler. -->
+    <!-- Deprecation handler.
+      This extension allows to ignore some deprecations on the project overall,
+      to enable the Symfony debug classloader to trigger deprecations checking
+      class parameters and return types at class loading time, and to collect
+      statistics on deprecations triggered during testing.
+      The configuration defined here can be overridden by defining the
+      environment variable DEPRECATION_HANDLER_CONFIG whose value must be a
+      JSON string containing an array with the same parameter names as keys.
+      For example, DEPRECATION_HANDLER_CONFIG='{"enableCollectStats":true}'
+    -->
     <bootstrap class="Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler">
+      <!-- Set to true to enable project level deprecation ignore patterns.
+        The deprecations ignored with this mechanism are not relayed to PHPUnit
+        for processing. -->
       <parameter name="enableProjectIgnores" value="true"/>
+      <!-- The path to a file containing the deprecation ignore patterns.
+        Relative paths are resolved againt Drupal's root directory. -->
       <parameter name="projectIgnoreFile" value="core/.deprecation-ignore.txt"/>
+      <!-- Set to true to enable Symfony's DebugClassLoader.
+        See https://github.com/symfony/error-handler -->
       <parameter name="enableDebugClassLoader" value="true"/>
-      <parameter name="enableCollectStats" value="true"/>
+      <!-- Set to true to enable collection and reporting of deprecations
+        triggered during the execution of the tests. -->
+      <parameter name="enableCollectStats" value="false"/>
     </bootstrap>
     <!-- Functional tests HTML output logging. -->
     <bootstrap class="Drupal\TestTools\Extension\HtmlLogging\HtmlOutputLogger">
