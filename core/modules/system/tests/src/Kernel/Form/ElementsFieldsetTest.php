@@ -96,6 +96,12 @@ class ElementsFieldsetTest extends KernelTestBase implements FormInterface {
       '#type' => 'textfield',
       '#title' => 'Nested text field inside meta_invisible element',
     ];
+    $form['fieldset_required'] = [
+      '#type' => 'fieldset',
+      '#required' => TRUE,
+      '#title' => 'Fieldset title for required description display',
+      '#description' => 'Fieldset description for required description display.',
+    ];
 
     return $form;
   }
@@ -148,6 +154,20 @@ class ElementsFieldsetTest extends KernelTestBase implements FormInterface {
     \Drupal::formBuilder()->submitForm($this, $form_state);
     $errors = $form_state->getErrors();
     $this->assertEmpty($errors);
+  }
+
+  /**
+   * Tests markup for required fieldsets.
+   */
+  public function testFieldsetRequired(): void {
+    $form = \Drupal::formBuilder()->getForm($this);
+    $this->render($form);
+
+    $field_id = 'edit-fieldset-required';
+
+    // Legend element contains a "(required)" text.
+    $elements = $this->xpath('//fieldset[@id="' . $field_id . '"]//legend//span[contains(@class,"js-form-required")]//span[@aria-hidden="true" and @class="hidden" and contains(text(), "(required)")]');
+    $this->assertCount(1, $elements);
   }
 
 }
