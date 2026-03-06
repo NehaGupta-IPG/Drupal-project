@@ -35,7 +35,7 @@ class ThemeAdminUpdateTest extends UpdatePathTestBase {
    * Tests the upgrade path for updating empty admin theme to NULL.
    */
   public function testEmptyAdminThemeUpdate(): void {
-    $this->expectUserDeprecationMessage("Setting the admin theme to an empty string is deprecated in drupal:12.1.0 and will not be allowed in drupal:13.0.0. See https://www.drupal.org/node/3441503");
+    $this->expectUserDeprecationMessage("Setting the admin theme to an empty string is deprecated in drupal:11.4.0 and will not be allowed in drupal:13.0.0. See https://www.drupal.org/node/3441503");
     $this->config('system.theme')->set('admin', '')->save();
     // Run Updates and no errors should occur.
     $this->runUpdates();

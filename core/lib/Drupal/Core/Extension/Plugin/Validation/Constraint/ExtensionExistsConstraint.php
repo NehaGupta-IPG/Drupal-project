@@ -58,11 +58,11 @@ class ExtensionExistsConstraint extends SymfonyConstraint {
    */
   public function __get(string $name): mixed {
     if ($name === 'moduleMessage') {
-      @trigger_error('The moduleMessage property is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use moduleNotFoundMessage or moduleNotInstalledMessage instead. See https://www.drupal.org/node/3536194', E_USER_DEPRECATED);
+      @trigger_error('The moduleMessage property is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use moduleNotFoundMessage or moduleNotInstalledMessage instead. See https://www.drupal.org/node/3536194', E_USER_DEPRECATED);
       return $this->moduleNotInstalledMessage;
     }
     if ($name === 'themeMessage') {
-      @trigger_error('The themeMessage property is deprecated in drupal:12.1.0 and is removed from drupal:13.0.0. Use themeNotFoundMessage or themeNotInstalledMessage instead. See https://www.drupal.org/node/3536194', E_USER_DEPRECATED);
+      @trigger_error('The themeMessage property is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use themeNotFoundMessage or themeNotInstalledMessage instead. See https://www.drupal.org/node/3536194', E_USER_DEPRECATED);
       return $this->themeNotInstalledMessage;
     }
     return parent::__get($name);

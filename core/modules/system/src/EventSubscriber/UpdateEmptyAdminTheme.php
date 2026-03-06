@@ -53,7 +53,7 @@ final class UpdateEmptyAdminTheme implements EventSubscriberInterface {
       $deprecations_triggered = &$this->triggeredDeprecations['3441503'][$saved_config->getName()];
       if ($this->deprecationsEnabled && !$deprecations_triggered) {
         $deprecations_triggered = TRUE;
-        @trigger_error("Setting the admin theme to an empty string is deprecated in drupal:12.1.0 and will not be allowed in drupal:13.0.0. See https://www.drupal.org/node/3441503", E_USER_DEPRECATED);
+        @trigger_error("Setting the admin theme to an empty string is deprecated in drupal:11.4.0 and will not be allowed in drupal:13.0.0. See https://www.drupal.org/node/3441503", E_USER_DEPRECATED);
       }
     }
   }
