@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests;
 
 use Drupal\TestTools\ErrorHandler\BootstrapErrorHandler;
-use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
+use Drupal\TestTools\Extension\DeprecationBridge\Configuration as DeprecationHandlerConfiguration;
 use PHPUnit\Framework\Attributes\After;
 
 /**
@@ -23,7 +23,7 @@ trait DrupalTestCaseTrait {
     // We expect that the current error handler is the one set during the
     // PHPUnit bootstrap. If not, the error handler was changed during the test
     // execution but not properly restored during ::tearDown().
-    if (DeprecationHandler::projectIgnoresEnabled() && !get_error_handler() instanceof BootstrapErrorHandler) {
+    if (DeprecationHandlerConfiguration::projectIgnoresEnabled() && !get_error_handler() instanceof BootstrapErrorHandler) {
       throw new \RuntimeException(sprintf('%s registered its own error handler without restoring the previous one before or during tear down. This can cause unpredictable test results. Ensure the test cleans up after itself.', $this->name()));
     }
   }

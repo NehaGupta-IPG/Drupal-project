@@ -18,11 +18,11 @@ use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
 use PHPUnit\Runner\Extension\Extension;
 use PHPUnit\Runner\Extension\Facade;
 use PHPUnit\Runner\Extension\ParameterCollection;
-use PHPUnit\TextUI\Configuration\Configuration;
+use PHPUnit\TextUI\Configuration\Configuration as PhpUnitConfiguration;
 use PHPUnit\Util\Filesystem;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
 
-// cspell:ignore depsta bootstrapper bootstrappers
+// cspell:ignore depsta
 
 /**
  * Drupal's PHPUnit extension to manage code deprecation.
@@ -33,33 +33,6 @@ use Symfony\Component\ErrorHandler\DebugClassLoader;
  * @internal
  */
 final class DeprecationHandler implements Extension {
-
-  /**
-   * Indicates if the project deprecation ignores are enabled.
-   */
-  private static bool $projectIgnores = FALSE;
-
-  /**
-   * Indicates if the debug class loader is enabled.
-   */
-  private static bool $debugClassLoader = FALSE;
-
-  /**
-   * Indicates if the deprecation stats collection is enabled.
-   */
-  private static bool $collectStats = FALSE;
-
-  /**
-   * A list of deprecation messages that should be ignored if detected.
-   *
-   * @var list<string>
-   */
-  private static array $deprecationIgnorePatterns = [];
-
-  /**
-   * Directory for files produced by the extension.
-   */
-  private static string $statisticsArtifactDirectory;
 
   /**
    * The path to the statistics staging file.
@@ -107,7 +80,9 @@ final class DeprecationHandler implements Extension {
    *
    * @todo remove.
    */
-  public static function preBootstrap(Configuration $configuration): void {
+  public static function preBootstrap(PhpUnitConfiguration $configuration): void {
+    $config = Configuration::instance();
+
     // Find the extension parameters from current PHPUnit configuration.
     $extensionBootstrappers = $configuration->extensionBootstrappers();
     $parameters = [];
@@ -117,26 +92,18 @@ final class DeprecationHandler implements Extension {
         break;
       }
     }
+    $config->load($parameters);
 
     // Get the legacy configuration provided via Symfony env variable.
-    $legacyConfiguration = self::legacySymfonyConfiguration();
+    $config->load(self::legacySymfonyConfiguration());
 
     // Determine if project ignores are enabled. If so, loads the deprecation
     // patterns to be ignored from the ignore file and sets the error handler
     // to Drupal\TestTools\ErrorHandler\BootstrapErrorHandler. This allows to
     // capture deprecations triggered by PHP or by the DebugClassLoader, that
     // can occur before tests' ::setUp() methods are called.
-    $projectIgnores = filter_var($parameters['enableProjectIgnores'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
-    if ($legacyConfiguration) {
-      $projectIgnores = $legacyConfiguration['enabled'];
-    }
-    self::$projectIgnores = $projectIgnores;
-    if (self::projectIgnoresEnabled()) {
-      $ignoreFilePath = realpath(dirname(__DIR__, 6) . '//' . $parameters['projectIgnoreFile']);
-      if ($legacyConfiguration && isset($legacyConfiguration['ignoreFile'])) {
-        $ignoreFilePath = $legacyConfiguration['ignoreFile'];
-      }
-      self::loadDeprecationIgnorePatterns($ignoreFilePath);
+    if ($config->projectIgnoresEnabled()) {
+      $config->loadDeprecationIgnorePatterns();
       // We pass an instance of the PHPUnit error handler to redirect any error
       // not managed by our layer back to PHPUnit.
       set_error_handler(new BootstrapErrorHandler(PhpUnitErrorHandler::instance()));
@@ -144,34 +111,27 @@ final class DeprecationHandler implements Extension {
 
     // Enable the DebugClassLoader to get deprecations for methods' signature
     // changes.
-    $debugClassLoader = filter_var($parameters['enableDebugClassLoader'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
-    if ($legacyConfiguration) {
-      $debugClassLoader = $legacyConfiguration['enabled'];
-    }
-    self::$debugClassLoader = $debugClassLoader;
-    if (self::$debugClassLoader) {
+    if ($config->debugClassLoaderEnabled()) {
       DebugClassLoader::enable();
     }
-
-    // Determine if collection of deprecation statistics is enabled.
-    $collectStats = filter_var($parameters['enableCollectStats'] ?? FALSE, \FILTER_VALIDATE_BOOLEAN);
-    self::$collectStats = $collectStats;
   }
 
   /**
    * {@inheritdoc}
    */
   public function bootstrap(
-    Configuration $configuration,
+    PhpUnitConfiguration $configuration,
     Facade $facade,
     ParameterCollection $parameters,
   ): void {
+    $config = Configuration::instance();
+
     // Bail out if the project ignores were disabled in ::preBootstrap().
-    if (!self::projectIgnoresEnabled()) {
+    if (!$config->projectIgnoresEnabled()) {
       return;
     }
 
-    if (!self::collectStatsEnabled()) {
+    if (!$config->collectStatsEnabled()) {
       return;
     }
     // Determine staging file path.
@@ -236,86 +196,35 @@ final class DeprecationHandler implements Extension {
    * SYMFONY_DEPRECATIONS_HELPER environment variable.
    *
    * @return array|false
-   *   An array of configuration variables, of FALSE if the environment
-   *   variable is missing.
+   *   An array of configuration variables.
    */
-  private static function legacySymfonyConfiguration(): array|false {
+  private static function legacySymfonyConfiguration(): array {
     $environmentVariable = getenv('SYMFONY_DEPRECATIONS_HELPER');
     if ($environmentVariable === FALSE) {
-      return FALSE;
+      return [];
     }
     if ($environmentVariable === 'disabled') {
-      return ['enabled' => FALSE];
+      return [
+        'enableProjectIgnores' => FALSE,
+        'enableDebugClassLoader' => FALSE,
+      ];
     }
     parse_str($environmentVariable, $configuration);
-    $configuration['enabled'] = TRUE;
-    return $configuration;
-  }
-
-  /**
-   * Determines if the project ignores are enabled.
-   *
-   * @return bool
-   *   TRUE if enabled, FALSE if disabled.
-   */
-  public static function projectIgnoresEnabled(): bool {
-    return self::$projectIgnores;
-  }
-
-  /**
-   * Determines if the debug class loader is enabled.
-   *
-   * @return bool
-   *   TRUE if enabled, FALSE if disabled.
-   */
-  public static function debugClassLoaderEnabled(): bool {
-    return self::$debugClassLoader;
-  }
-
-  /**
-   * Determines if collection of deprecation statistics is enabled.
-   *
-   * @return bool
-   *   TRUE if enabled, FALSE if disabled.
-   */
-  public static function collectStatsEnabled(): bool {
-    return self::$collectStats;
-  }
-
-  /**
-   * Loads the deprecation ignore patterns from the ignore file.
-   *
-   * @param string|null $ignoreFile
-   *   The path to a file containing ignore patterns for deprecations.
-   */
-  private static function loadDeprecationIgnorePatterns(?string $ignoreFile = NULL): void {
-    // Load the deprecation ignore patterns from the specified file.
-    if ($ignoreFile && !self::$deprecationIgnorePatterns) {
-      if (!is_file($ignoreFile)) {
-        throw new \InvalidArgumentException(sprintf('The ignoreFile "%s" does not exist.', $ignoreFile));
-      }
-      set_error_handler(static function ($t, $m) use ($ignoreFile, &$line): void {
-        throw new \RuntimeException(sprintf('Invalid pattern found in "%s" on line "%d"', $ignoreFile, 1 + $line) . substr($m, 12));
-      });
-      try {
-        foreach (file($ignoreFile) as $line => $pattern) {
-          if ((trim($pattern)[0] ?? '#') !== '#') {
-            preg_match($pattern, '');
-            self::$deprecationIgnorePatterns[] = $pattern;
-          }
-        }
-      }
-      finally {
-        restore_error_handler();
-      }
+    $ret = [
+      'enableProjectIgnores' => TRUE,
+      'enableDebugClassLoader' => TRUE,
+    ];
+    if (isset($configuration['ignoreFile'])) {
+      $ret['projectIgnoreFile'] = $configuration['ignoreFile'];
     }
+    return $ret;
   }
 
   /**
    * Dump statistics after test runner end.
    */
   public function processStatisticsArtifact(): void {
-    assert(self::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+    assert(Configuration::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
 
     $content = @file_get_contents($this->statisticsStagingFilePath);
     $statisticsArtifactDirectory = $this->directory . \DIRECTORY_SEPARATOR . 'deprecation-handler';
@@ -361,7 +270,7 @@ final class DeprecationHandler implements Extension {
    * Write a statistic entry.
    */
   private static function writeStatisticEntry(string $status, array $stat): void {
-    assert(self::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+    assert(Configuration::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
 
     $stat['status'] = $status;
 
@@ -393,16 +302,16 @@ final class DeprecationHandler implements Extension {
    *   The actual deprecation message triggered via trigger_error().
    */
   public static function isIgnoredByProject(?string $testMethod, string $deprecationMessage): bool {
-    if (!self::projectIgnoresEnabled()) {
+    if (!Configuration::projectIgnoresEnabled()) {
       return FALSE;
     }
-    foreach (self::$deprecationIgnorePatterns as $pattern) {
+    foreach (Configuration::deprecationIgnorePatterns() as $pattern) {
       $result = @preg_filter($pattern, '$0', $deprecationMessage);
       if (preg_last_error() !== \PREG_NO_ERROR) {
         throw new \RuntimeException(preg_last_error_msg());
       }
       if ((bool) $result) {
-        if (self::collectStatsEnabled()) {
+        if (Configuration::collectStatsEnabled()) {
           $stat = [];
           if ($testMethod !== NULL) {
             $stat['test'] = $testMethod;
@@ -463,7 +372,7 @@ final class DeprecationHandler implements Extension {
   }
 
   public function setCurrentTest(TestMethod $test): void {
-    assert(self::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+    assert(Configuration::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
 
     self::$currentTest['testId'] = $test->id();
     if ($test->metadata()->isIgnoreDeprecations()) {
@@ -475,7 +384,7 @@ final class DeprecationHandler implements Extension {
   }
 
   public function deprecationTriggered(DeprecationTriggered|PhpDeprecationTriggered $deprecation): void {
-    assert(self::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+    assert(Configuration::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
 
     if ($deprecation->ignoredByTest() || $deprecation->ignoredByBaseline()) {
       self::$currentTest['ignored_by_phpunit'][] = $deprecation->message();
@@ -485,7 +394,7 @@ final class DeprecationHandler implements Extension {
   }
 
   public function testFinished(): void {
-    assert(self::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
+    assert(Configuration::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
 
     if (self::$currentTest['testIgnoresDeprecations']) {
       $stat = [];
@@ -504,7 +413,7 @@ final class DeprecationHandler implements Extension {
   }
 
   public static function handle(int $errorNumber, string $errorString, string $errorFile, int $errorLine): bool {
-    assert(self::projectIgnoresEnabled(), __METHOD__ . '() must not be called if the deprecation handler is not enabled.');
+    assert(Configuration::projectIgnoresEnabled(), __METHOD__ . '() must not be called if the deprecation handler is not enabled.');
 
     if (self::isIgnoredByProject(self::$currentTest['testId'] ?? NULL, $errorString)) {
       if (self::$currentTest) {
