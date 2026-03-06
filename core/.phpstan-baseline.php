@@ -9800,12 +9800,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/StreamWrapper/StreamWrapperInterface.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\StreamWrapper\\\\StreamWrapperManager\\:\\:addStreamWrapper\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/StreamWrapper/StreamWrapperManager.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\StreamWrapper\\\\StreamWrapperManager\\:\\:register\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -30395,12 +30389,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\taxonomy\\\\Plugin\\\\views\\\\argument_default\\\\Tid\\:\\:getArgument\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/src/Plugin/views/argument_default/Tid.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\taxonomy\\\\Plugin\\\\views\\\\argument_default\\\\Tid\\:\\:getCacheTags\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/taxonomy/src/Plugin/views/argument_default/Tid.php',
