@@ -366,21 +366,6 @@ use Drupal\Core\Database\Query\SelectInterface;
  *       'varchar' or 'text' fields to use case-sensitive binary collation.
  *       This has no effect on other database types for which case sensitivity
  *       is already the default behavior.
- *     - 'json_hotpaths': An array of 'type' and 'jsonpath' pairs corresponding
- *       to a SQL type and JSON path, representing a value which should be used
- *       for indexing. The specific mechanism for optimization (e.g., functional
- *       or expression index creation) is abstracted and driver-specific.
- *       Specify any jsonpath expressions which are regularly used in database
- *       query conditions. Supported syntax for JSON paths vary slightly between
- *       database vendors, so distributed code should use widely-used syntax
- *       only, such as '.' and '[]'. For more detail on supported syntax, see:
- *       - Postgres:
- *         https://www.postgresql.org/docs/current/datatype-json.html#DATATYPE-JSONPATH
- *       - MySQL:
- *         https://dev.mysql.com/doc/refman/8.0/en/json.html#json-path-syntax
- *       - MariaDB: https://mariadb.com/kb/en/jsonpath-expressions/
- *       - SQLite: https://sqlite.org/json1.html#jptr
- *       - SQL:2016 standard: https://www.iso.org/standard/78937.html
  *     All parameters apart from 'type' are optional except that type
  *     'numeric' columns must specify 'precision' and 'scale', and type
  *     'varchar' must specify the 'length' parameter.
@@ -396,9 +381,20 @@ use Drupal\Core\Database\Query\SelectInterface;
  *    'referenced_column'). This key is for documentation purposes only; foreign
  *    keys are not created in the database, nor are they enforced by Drupal.
  *  - 'indexes':  An associative array of indexes ('indexname' =>
- *    specification). Each specification is an array or Index object containing
- *    one or more key column specifiers (see below) that form an index on the
- *    table.
+ *    specification). Each specification is an array of one or more
+ *    key column specifiers (see below) that form an index on the
+ *    table. For JSON columns, use a JsonIndex object to create expression
+ *    indexes on specific JSON paths:
+ *    @code
+ *    'indexes' => [
+ *      'idx_status' => JsonIndex::on('data', '$.status'),
+ *      'idx_score'  => JsonIndex::on('data', '$.score', JsonCastType::Int),
+ *    ],
+ *    @endcode
+ *    The JsonCastType enum (Text, Int, Float) ensures the index expression
+ *    matches the query expression for optimizer use. The specific index
+ *    mechanism is driver-specific: MySQL uses functional indexes, SQLite
+ *    uses expression indexes, and PostgreSQL uses GIN indexes.
  *
  * A key column specifier is either a string naming a column or an array of two
  * elements, column name and length, specifying a prefix of the named column.

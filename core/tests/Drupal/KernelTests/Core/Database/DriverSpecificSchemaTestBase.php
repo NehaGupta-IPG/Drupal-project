@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Database;
 
-use Drupal\Core\Database\Schema\Index;
+use Drupal\Core\Database\Query\JsonCastType;
+use Drupal\Core\Database\Schema\JsonIndex;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Exception\SchemaIndexOnJsonFieldUnsupportedException;
 use Drupal\Core\Database\Schema;
 use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Database\SchemaException;
-use Drupal\pgsql\Schema\IndexType;
 use Drupal\Tests\Core\Database\SchemaIntrospectionTestTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -1475,40 +1475,6 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     $this->assertEquals($id + 1, $id_two);
   }
 
-  /**
-   * Tests creating an index with the index specification value object.
-   */
-  public function testObjectIndexSyntax(): void {
-    $specification = [
-      'fields' => [
-        'id' => [
-          'type' => 'serial',
-          'not null' => TRUE,
-          'description' => 'Primary Key: Unique ID.',
-        ],
-        'text' => [
-          'type' => 'text',
-          'description' => 'A text field',
-        ],
-      ],
-      'indexes' => [
-        'text_column_index' => new Index(
-          ['text'],
-          [
-            'pgsql' => [
-              'type' => IndexType::Gist,
-              'operator' => 'gist_trgm_ops',
-            ],
-          ]
-        ),
-      ],
-      'primary key' => ['id'],
-    ];
-    $table_name = 'index_with_object';
-    $this->schema->createTable($table_name, $specification);
-    $this->assertIndexOnColumns($table_name, ['text']);
-  }
-
   const JSON_TEST_VALUE = '{"key": "value1", "number": 0, "bool": true, "list": ["a","b","c"], "nested": {"key": "value2"}, "float": 5.5}';
 
   const JSON_TEST_DATA = [
@@ -1521,29 +1487,20 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
     '$.float' => 5.5,
   ];
 
-  const JSON_TABLE_SPECIFICATION = [
-    'fields' => [
-      'id' => ['type' => 'serial', 'not null' => TRUE],
-      'test_field' => [
-        'type' => 'json',
-        'json_hotpaths' => [
-          [
-            'type' => 'int',
-            'jsonpath' => '$.number',
-          ],
-          [
-            'type' => 'text',
-            'jsonpath' => '$.key',
-          ],
-          [
-            'type' => 'float',
-            'jsonpath' => '$.float',
-          ],
-        ],
+  protected static function jsonTableSpecification(): array {
+    return [
+      'fields' => [
+        'id' => ['type' => 'serial', 'not null' => TRUE],
+        'test_field' => ['type' => 'json'],
       ],
-    ],
-    'primary key' => ['id'],
-  ];
+      'primary key' => ['id'],
+      'indexes' => [
+        'idx_number' => JsonIndex::on('test_field', '$.number', JsonCastType::Int),
+        'idx_key' => JsonIndex::on('test_field', '$.key'),
+        'idx_float' => JsonIndex::on('test_field', '$.float', JsonCastType::Float),
+      ],
+    ];
+  }
 
   /**
    * Tests JSON schema type.
@@ -1552,7 +1509,7 @@ abstract class DriverSpecificSchemaTestBase extends DriverSpecificKernelTestBase
    *   Whether to allow direct index creation on a JSON data column.
    */
   protected function doTestJsonSchema(bool $allow_direct_indexes = FALSE): void {
-    $spec = static::JSON_TABLE_SPECIFICATION;
+    $spec = static::jsonTableSpecification();
     $this->schema->createTable('test_json', $spec);
     $this->assertTrue($this->schema->tableExists('test_json'), 'Table with database specific datatype was created.');
 

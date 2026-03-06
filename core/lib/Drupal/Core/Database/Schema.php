@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Database;
 
+use Drupal\Core\Database\Exception\SchemaIndexOnJsonFieldUnsupportedException;
 use Drupal\Core\Database\Query\PlaceholderInterface;
 
 /**
@@ -752,6 +753,30 @@ abstract class Schema implements PlaceholderInterface {
     foreach (array_intersect($primary_key, array_keys($fields)) as $field_name) {
       if (!isset($fields[$field_name]['not null']) || $fields[$field_name]['not null'] !== TRUE) {
         throw new SchemaException("The '$field_name' field specification does not define 'not null' as TRUE.");
+      }
+    }
+  }
+
+  /**
+   * Ensures that an index does not directly reference JSON columns.
+   *
+   * @param string $table
+   *   Table name.
+   * @param string $index
+   *   Index name.
+   * @param array $fields
+   *   Index field specification.
+   * @param array $table_spec
+   *   Table schema.
+   *
+   * @throws \Drupal\Core\Database\Exception\SchemaIndexOnJsonFieldUnsupportedException
+   *   Thrown when a regular index references a JSON column.
+   */
+  protected function ensureNoDirectJsonIndexes(string $table, string $index, array $fields, array $table_spec): void {
+    foreach ($fields as $field_spec) {
+      $field_name = is_array($field_spec) ? $field_spec[0] : $field_spec;
+      if (($table_spec['fields'][$field_name]['type'] ?? NULL) === 'json') {
+        throw SchemaIndexOnJsonFieldUnsupportedException::forColumn($table, $index, $field_name);
       }
     }
   }

@@ -105,6 +105,20 @@ class ConnectionTest extends UnitTestCase {
         'SELECT * FROM {table}',
         ['[', ']'],
       ],
+      // JSON inside single quotes must not be treated as table references.
+      [
+        'SELECT * FROM "test_table" WHERE col = \'{"key": 1}\'',
+        'test_',
+        'SELECT * FROM {table} WHERE col = \'{"key": 1}\'',
+        ['"', '"'],
+      ],
+      // Valid JSON with a word that looks like a table name.
+      [
+        'SELECT * FROM "test_table" WHERE col = \'{"table": 1}\'',
+        'test_',
+        'SELECT * FROM {table} WHERE col = \'{"table": 1}\'',
+        ['"', '"'],
+      ],
     ];
   }
 

@@ -375,8 +375,8 @@ abstract class Connection {
     // portions of the statement. They are then passed over when matching
     // the second half of the pattern finding curly-braced table names which
     // require prefixing.
-    $retSql = preg_replace_callback(
-      "/(?:'(.*(?<!\\\))')|(?'simple'{(\w+)})/U",
+    return preg_replace_callback(
+      "/'([^'\\\\]*(?:\\\\.[^'\\\\]*)*)'|(?'simple'\{(\w+)\})/",
       function ($matches) {
         return match (TRUE) {
           // Curly brace table not contained inside single quotes.
@@ -384,19 +384,17 @@ abstract class Connection {
           // BC layer: Some table names are contained inside single quotes, but
           // still require expansion. This was historically valid, but makes
           // these cases difficult to isolate from inlined JSON.
-          // This check determines if there are curly braces in the string,
+          // This check determines if there are {table} patterns in the string,
           // and determines they need replacement if the overall string is not
           // itself valid JSON. This would match '{table1}' but not
-          // '{"table": 1}'. The return value is the original, simple logic
-          // from this method.
-          preg_match('/[{}]+/', $matches[1]) && !json_validate($matches[1]) => str_replace(['{', '}'], $this->tablePlaceholderReplacements, $matches[0]),
+          // '{"table": 1}'.
+          preg_match('/\{\w+\}/', $matches[1]) && !json_validate($matches[1]) => preg_replace_callback('/\{(\w+)\}/', fn($m) => "{$this->tablePlaceholderReplacements[0]}{$m[1]}{$this->tablePlaceholderReplacements[1]}", $matches[0]),
           // Return single-quoted string as-is.
           default => $matches[0],
         };
       },
       $sql
     );
-    return $retSql;
   }
 
   /**
@@ -429,7 +427,7 @@ abstract class Connection {
     // matching the second half of the pattern finding bracketed identifiers
     // requiring quotes.
     return preg_replace_callback(
-      "/(?:'.*(?<!\\\)')|(\[(\w+)])/U",
+      "/'[^'\\\\]*(?:\\\\.[^'\\\\]*)*'|(\[(\w+)])/",
       function ($matches) {
         return count($matches) > 1
           ? "{$this->identifierQuotes[0]}{$matches[2]}{$this->identifierQuotes[1]}"

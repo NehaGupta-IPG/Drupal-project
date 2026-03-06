@@ -3,8 +3,8 @@
 namespace Drupal\mysql\Driver\Database\mysql;
 
 use Drupal\Core\Database\Exception\SchemaPrimaryKeyMustBeDroppedException;
-use Drupal\Core\Database\JsonIndexValidationTrait;
-use Drupal\Core\Database\JsonpathIndexTrait;
+use Drupal\Core\Database\Query\JsonCastType;
+use Drupal\Core\Database\Schema\JsonIndex;
 use Drupal\Core\Database\SchemaException;
 use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
@@ -22,9 +22,6 @@ use Drupal\Component\Utility\Unicode;
  * MySQL implementation of \Drupal\Core\Database\Schema.
  */
 class Schema extends DatabaseSchema {
-
-  use JsonpathIndexTrait;
-  use JsonIndexValidationTrait;
 
   /**
    * Maximum length of a table comment in MySQL.
@@ -106,9 +103,6 @@ class Schema extends DatabaseSchema {
     foreach ($table['fields'] as $field_name => $field) {
       $sql .= $this->createFieldSql($field_name, $this->processField($field)) . ", \n";
     }
-
-    // Add functional indexes for JSON hotpaths.
-    $this->addJsonpathFunctionalIndexes($table);
 
     // Process keys & indexes.
     if (!empty($table['primary key']) && is_array($table['primary key'])) {
@@ -297,6 +291,8 @@ class Schema extends DatabaseSchema {
       }
     }
     if (!empty($spec['indexes'])) {
+      // Resolve any JsonIndex objects before normalization.
+      $this->resolveJsonIndexes($spec);
       $indexes = $this->getNormalizedIndexes($spec);
       foreach ($indexes as $index => $fields) {
         // Functional indexes are stored as strings, column-based indexes as
@@ -331,8 +327,8 @@ class Schema extends DatabaseSchema {
   protected function getNormalizedIndexes(array $spec) {
     $indexes = $spec['indexes'] ?? [];
     foreach ($indexes as $index_name => $index_fields) {
-      // Skip expression indexes (strings) — no normalization needed.
-      if (is_string($index_fields)) {
+      // Skip expression indexes (strings) and JsonIndex instances.
+      if (is_string($index_fields) || $index_fields instanceof JsonIndex) {
         continue;
       }
       foreach ($index_fields as $index_key => $index_field) {
@@ -472,13 +468,6 @@ class Schema extends DatabaseSchema {
       }
     }
 
-    // Create functional indexes for JSON hotpaths.
-    $add_ons = ['fields' => [$field => $spec], 'indexes' => []];
-    $this->addJsonpathFunctionalIndexes($add_ons);
-    foreach ($add_ons['indexes'] as $index_name => $expression) {
-      $this->executeDdlStatement('ALTER TABLE {' . $table . '} ADD INDEX [' . $index_name . '] ((' . $expression . '))');
-    }
-
     if (isset($spec['initial_from_field'])) {
       if (isset($spec['initial'])) {
         $expression = 'COALESCE(' . $spec['initial_from_field'] . ', :default_initial_value)';
@@ -504,7 +493,7 @@ class Schema extends DatabaseSchema {
   }
 
   /**
-   * Add functional index entries for JSON hotpaths to a table schema.
+   * Converts JsonIndex entries in the indexes array to expression strings.
    *
    * Functional indexes are stored as string values in the 'indexes' array,
    * as opposed to regular column-based indexes which are arrays of column
@@ -513,17 +502,20 @@ class Schema extends DatabaseSchema {
    * @param array $table
    *   Table schema definition, modified by reference.
    */
-  protected function addJsonpathFunctionalIndexes(array &$table): void {
-    // MariaDB does not support functional indexes.
+  protected function resolveJsonIndexes(array &$table): void {
+    // MariaDB does not support functional indexes (MDEV-35853).
     if ($this->connection->isMariaDb()) {
+      foreach ($table['indexes'] ?? [] as $index_name => $index) {
+        if ($index instanceof JsonIndex) {
+          unset($table['indexes'][$index_name]);
+        }
+      }
       return;
     }
-    foreach ($table['fields'] as $field_name => $field) {
-      if (!empty($field['json_hotpaths'])) {
-        foreach ($field['json_hotpaths'] as $hotpath) {
-          $index_name = self::getJsonpathIndexName($field_name, $hotpath['jsonpath']);
-          $table['indexes'][$index_name] = self::getTypedJsonExtractExpression($field_name, $hotpath['jsonpath'], $hotpath['type']);
-        }
+    foreach ($table['indexes'] ?? [] as $index_name => $index) {
+      if ($index instanceof JsonIndex) {
+        $expression = new JsonExpression($this->connection, $index->field, $index->jsonpath);
+        $table['indexes'][$index_name] = $expression->toCastSql($index->type);
       }
     }
   }
@@ -539,18 +531,18 @@ class Schema extends DatabaseSchema {
    *   Field name.
    * @param string $jsonpath
    *   JSON path expression.
-   * @param string $type
-   *   The Drupal schema type ('int', 'float', 'text', etc.).
+   * @param \Drupal\Core\Database\Query\JsonCastType $type
+   *   The cast type.
    *
    * @return string
    *   SQL expression with appropriate CAST.
    */
-  public static function getTypedJsonExtractExpression(string $field, string $jsonpath, string $type): string {
+  public static function getTypedJsonExtractExpression(string $field, string $jsonpath, JsonCastType $type): string {
     $extract = "JSON_EXTRACT({$field}, '{$jsonpath}')";
     return match ($type) {
-      'int' => "CAST({$extract} AS SIGNED)",
-      'float' => "CAST({$extract} AS DOUBLE)",
-      default => "CAST(JSON_UNQUOTE({$extract}) AS CHAR(255))",
+      JsonCastType::Int => "CAST({$extract} AS SIGNED)",
+      JsonCastType::Float => "CAST({$extract} AS DOUBLE)",
+      JsonCastType::Text => "CAST(JSON_UNQUOTE({$extract}) AS CHAR(255))",
     };
   }
 
@@ -574,13 +566,15 @@ class Schema extends DatabaseSchema {
       $this->dropPrimaryKey($table);
     }
 
-    // When dropping a field that had functional indexes automatically created
-    // for JSON hotpath optimization, drop those indexes.
-    $auto_generated_prefix = self::getJsonpathIndexPrefix($field);
+    // Drop functional indexes that reference the field being dropped.
+    // MySQL does not auto-drop functional indexes when the column they
+    // reference is removed, so we must do it explicitly.
     $result = $this->connection->query('SHOW INDEX FROM {' . $table . '}');
+    $dropped = [];
     foreach ($result as $row) {
-      if (str_starts_with($row->Key_name, $auto_generated_prefix)) {
+      if ($row->Expression !== NULL && !isset($dropped[$row->Key_name]) && str_contains($row->Expression, '`' . $field . '`')) {
         $this->dropIndex($table, $row->Key_name);
+        $dropped[$row->Key_name] = TRUE;
       }
     }
 
@@ -672,9 +666,18 @@ class Schema extends DatabaseSchema {
       throw new SchemaObjectExistsException("Cannot add index '$name' to table '$table': index already exists.");
     }
 
+    if ($fields instanceof JsonIndex) {
+      if ($this->connection->isMariaDb()) {
+        return;
+      }
+      $expression = new JsonExpression($this->connection, $fields->field, $fields->jsonpath);
+      $this->executeDdlStatement('ALTER TABLE {' . $table . '} ADD INDEX [' . $name . '] ((' . $expression->toCastSql($fields->type) . '))');
+      return;
+    }
+
     $spec['indexes'][$name] = $fields;
 
-    $this::guardNoDirectJsonIndexes($table, $name, $fields, $spec);
+    $this->ensureNoDirectJsonIndexes($table, $name, $fields, $spec);
 
     if (is_string($fields)) {
       $this->executeDdlStatement('ALTER TABLE {' . $table . '} ADD INDEX [' . $name . '] ((' . $fields . '))');

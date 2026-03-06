@@ -9,7 +9,7 @@ use Drupal\Core\Database\Connection;
  *
  * @ingroup database
  */
-class Select extends Query implements SelectInterface, JsonConditionInterface {
+class Select extends Query implements SelectInterface {
 
   use QueryConditionTrait;
 
@@ -237,9 +237,6 @@ class Select extends Query implements SelectInterface, JsonConditionInterface {
    */
   public function compile(Connection $connection, PlaceholderInterface $queryPlaceholder) {
     $this->condition->compile($connection, $queryPlaceholder);
-    if (($this->condition instanceof StrictSqlParamsConditionInterface) && $this->condition->usesStrictParameters()) {
-      $this->queryOptions['strict_params'] = TRUE;
-    }
     $this->having->compile($connection, $queryPlaceholder);
 
     foreach ($this->tables as $table) {
@@ -250,6 +247,21 @@ class Select extends Query implements SelectInterface, JsonConditionInterface {
       // Make sure join conditions are also compiled.
       if (!empty($table['condition']) && $table['condition'] instanceof ConditionInterface) {
         $table['condition']->compile($connection, $queryPlaceholder);
+      }
+    }
+
+    // Enable strict parameter binding if any condition group contains a
+    // JsonCondition (or other StrictSqlParamsConditionInterface).
+    foreach ([$this->condition, $this->having] as $conditionGroup) {
+      if ($conditionGroup instanceof StrictSqlParamsConditionInterface && $conditionGroup->usesStrictParameters()) {
+        $this->queryOptions['strict_params'] = TRUE;
+        break;
+      }
+    }
+    foreach ($this->tables as $table) {
+      if (!empty($table['condition']) && $table['condition'] instanceof StrictSqlParamsConditionInterface && $table['condition']->usesStrictParameters()) {
+        $this->queryOptions['strict_params'] = TRUE;
+        break;
       }
     }
 
@@ -669,6 +681,42 @@ class Select extends Query implements SelectInterface, JsonConditionInterface {
     // Only allow ASC and DESC, default to ASC.
     $direction = strtoupper($direction) == 'DESC' ? 'DESC' : 'ASC';
     $this->order[$field] = $direction;
+    return $this;
+  }
+
+  /**
+   * Orders the result set by a value extracted from a JSON column.
+   *
+   * This adds the JSON extraction as an expression in the SELECT list and
+   * orders by its alias. NULLs are sorted last regardless of direction.
+   *
+   * @param string $field
+   *   The JSON column name.
+   * @param string $jsonpath
+   *   The JSONPath expression (must start with '$').
+   * @param string $direction
+   *   The sort direction: 'ASC' or 'DESC'.
+   * @param \Drupal\Core\Database\Query\JsonCastType|null $cast
+   *   Optional type cast for correct ordering. Without a cast, the extracted
+   *   JSON value retains its native type which may produce unexpected sort
+   *   order (e.g. string "10" before "9").
+   *
+   * @return $this
+   */
+  public function jsonOrderBy(string $field, string $jsonpath, string $direction = 'ASC', ?JsonCastType $cast = NULL): self {
+    $driverClass = $this->connection->getDriverClass('JsonExpression');
+    $class = $driverClass !== 'JsonExpression'
+      ? $driverClass
+      : JsonExpression::class;
+    $expression = new $class($this->connection, $field, $jsonpath);
+    $sql = $cast !== NULL ? $expression->toCastSql($cast) : $expression->toSql();
+
+    // NULLS LAST: rows where the JSON value is NULL sort after non-NULL.
+    $nullAlias = $this->addExpression("({$sql} IS NULL)");
+    $this->orderBy($nullAlias, 'ASC');
+
+    $alias = $this->addExpression($sql);
+    $this->orderBy($alias, $direction);
     return $this;
   }
 

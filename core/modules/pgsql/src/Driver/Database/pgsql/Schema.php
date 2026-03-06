@@ -2,19 +2,16 @@
 
 namespace Drupal\pgsql\Driver\Database\pgsql;
 
-use Drupal\Core\Database\JsonpathIndexTrait;
-use Drupal\Core\Database\Schema\Index;
-use Drupal\Core\Database\Exception\SchemaIndexOnJsonFieldUnsupportedException;
+use Drupal\Core\Database\Schema\JsonIndex;
 use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\Schema as DatabaseSchema;
-use Drupal\pgsql\Schema\IndexType;
 
 // cSpell:ignore adbin adnum adrelid adsrc attisdropped attname attnum attrdef
 // cSpell:ignore attrelid atttypid atttypmod bigserial conkey conname conrelid
 // cSpell:ignore contype fillfactor indexname indexrelid indisprimary indkey
 // cSpell:ignore indrelid nextval nspname regclass relkind relname relnamespace
-// cSpell:ignore schemaname setval regtype tsvector indexdef
+// cSpell:ignore schemaname setval regtype tsvector
 
 /**
  * @addtogroup schemaapi
@@ -25,8 +22,6 @@ use Drupal\pgsql\Schema\IndexType;
  * PostgreSQL implementation of \Drupal\Core\Database\Schema.
  */
 class Schema extends DatabaseSchema {
-
-  use JsonpathIndexTrait;
 
   /**
    * A cache of information about blob columns and sequences of tables.
@@ -323,8 +318,24 @@ EOD;
 
     $indexed_full_columns = [];
     if (isset($table['indexes']) && is_array($table['indexes'])) {
+      // PgSQL uses whole-column GIN indexes for JSON, which cover all
+      // containment (@>), existence (?), and path (@?) operators regardless
+      // of the specific jsonpath or cast type. This is more general than the
+      // per-path expression indexes used by MySQL/SQLite. Multiple JsonIndex
+      // entries on the same column are deduplicated into a single GIN index
+      // using the first entry's name; subsequent entries are silently skipped.
+      $json_gin_columns = [];
       foreach ($table['indexes'] as $key_name => $spec) {
-        $statements[] = $this->_createIndexSql($name, $key_name, $this->processIndexFields($spec, $table, $name, $name));
+        if ($spec instanceof JsonIndex) {
+          if (!in_array($spec->field, $json_gin_columns, TRUE)) {
+            $json_gin_columns[] = $spec->field;
+            $indexed_full_columns[] = $spec->field;
+            $statements[] = $this->_createGinIndexSql($name, $key_name, $spec->field);
+          }
+          continue;
+        }
+        $this->ensureNoDirectJsonIndexes($name, $key_name, $spec, $table);
+        $statements[] = $this->_createIndexSql($name, $key_name, $spec);
         foreach ($spec as $column) {
           if (is_string($column)) {
             $indexed_full_columns[] = $column;
@@ -371,14 +382,9 @@ EOD;
    *   Index creation SQL or NULL if unnecessary.
    */
   protected function createAutoJsonIndexSql(string $table, string $field_name, array $spec): ?string {
-    return !empty($spec['type']) && $spec['type'] === 'json' ? $this->_createIndexSql(
-      $table,
-      self::getJsonpathIndexPrefix($field_name),
-      new Index(
-        [$field_name],
-        ['pgsql' => ['type' => IndexType::Gin]]
-      )
-    ) : NULL;
+    return !empty($spec['type']) && $spec['type'] === 'json'
+      ? $this->_createGinIndexSql($table, 'auto_gin_' . $field_name, $field_name)
+      : NULL;
   }
 
   /**
@@ -751,7 +757,7 @@ EOD;
       $this->executeDdlStatement('COMMENT ON COLUMN {' . $table . '}.' . $field . ' IS ' . $this->prepareComment($spec['description']));
     }
     if ($sql = $this->createAutoJsonIndexSql($table, $field, $spec)) {
-      $this->connection->query($sql);
+      $this->executeDdlStatement($sql);
     }
     $this->resetTableInformation($table);
   }
@@ -913,53 +919,33 @@ EOD;
       throw new SchemaObjectExistsException("Cannot add index '$name' to table '$table': index already exists.");
     }
 
-    $this->executeDdlStatement($this->_createIndexSql($table, $name, $this->processIndexFields($fields, $spec, $table, $name)));
+    // JsonIndex entries are converted to GIN indexes on PgSQL.
+    if ($fields instanceof JsonIndex) {
+      $this->executeDdlStatement($this->_createGinIndexSql($table, $name, $fields->field));
+      $this->resetTableInformation($table);
+      return;
+    }
+
+    $this->ensureNoDirectJsonIndexes($table, $name, $fields, $spec);
+    $this->executeDdlStatement($this->_createIndexSql($table, $name, $fields));
     $this->resetTableInformation($table);
   }
 
   /**
-   * Process index fields and perform basic sanity checking.
+   * Creates a GIN index statement for a single column.
    *
-   * @param array|\Drupal\Core\Database\Schema\Index $fields
-   *   Field specification.
-   * @param array $table_spec
-   *   Table spec.
    * @param string $table
    *   Table name.
-   * @param string $index
+   * @param string $name
    *   Index name.
+   * @param string $column
+   *   Column name.
    *
-   * @return array|\Drupal\Core\Database\Schema\Index
-   *   Processed index specification.
-   *
-   * @throws \Drupal\Core\Database\Exception\SchemaIndexOnJsonFieldUnsupportedException
-   *   Thrown when index specification is malformed.
+   * @return string
+   *   The CREATE INDEX statement.
    */
-  protected function processIndexFields(array|Index $fields, array $table_spec, string $table, string $index): array|Index {
-    if (!($fields instanceof Index) || (($config = $fields->getDriverConfig('pgsql')) && !($config['type'] ?? NULL) instanceof IndexType)) {
-      $contains_json_field = FALSE;
-      foreach ($fields as $field_spec) {
-        if (($table_spec['fields'][is_array($field_spec) ? $field_spec[0] : $field_spec]['type'] ?? NULL) === 'json') {
-          $contains_json_field = TRUE;
-          break;
-        }
-      }
-      if ($contains_json_field) {
-        if (count($fields) === 1) {
-          return !($fields instanceof Index)
-            ? new Index($fields, ['pgsql' => ['type' => IndexType::Gin]])
-            : $fields;
-        }
-        throw new SchemaIndexOnJsonFieldUnsupportedException(
-          sprintf(
-            'JSON data columns must be indexed only by themselves when using Postgres: Table %s, index %s contains incompatible source columns.',
-            $table,
-            $index,
-          )
-        );
-      }
-    }
-    return $fields;
+  protected function _createGinIndexSql(string $table, string $name, string $column): string {
+    return 'CREATE INDEX ' . $this->ensureIdentifiersLength($table, $name, 'idx') . ' ON {' . $table . '} USING GIN ("' . $column . '")';
   }
 
   /**
@@ -991,7 +977,7 @@ EOD;
 
     // Get the schema and tablename for the table without identifier quotes.
     $full_name = str_replace('"', '', $this->connection->prefixTables('{' . $table . '}'));
-    $result = $this->connection->query("SELECT i.relname AS index_name, a.attname AS column_name, pg_get_indexdef(i.oid) AS indexdef FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND a.attnum = ANY(ix.indkey) AND t.relkind = 'r' AND t.relname = :table_name ORDER BY index_name ASC, column_name ASC", [
+    $result = $this->connection->query("SELECT i.relname AS index_name, a.attname AS column_name FROM pg_class t, pg_class i, pg_index ix, pg_attribute a WHERE t.oid = ix.indrelid AND i.oid = ix.indexrelid AND a.attrelid = t.oid AND a.attnum = ANY(ix.indkey) AND t.relkind = 'r' AND t.relname = :table_name ORDER BY index_name ASC, column_name ASC", [
       ':table_name' => $full_name,
     ])->fetchAll();
     foreach ($result as $row) {
@@ -1003,7 +989,6 @@ EOD;
       }
       elseif (str_ends_with($row->index_name, '_idx')) {
         $index_schema['indexes'][$row->index_name][] = $row->column_name;
-        $index_schema['index_definitions'][$row->index_name] = $row->indexdef;
       }
     }
 
@@ -1134,40 +1119,10 @@ EOD;
 
   /**
    * Creates a statement for an SQL index for the given fields.
-   *
-   * @param string $table
-   *   Table name.
-   * @param string $name
-   *   Index name.
-   * @param iterable $fields
-   *   Fields used by the index.
-   *
-   * @return string
-   *   Database statement.
    */
-  protected function _createIndexSql(string $table, string $name, iterable $fields) {
-    $query = 'CREATE INDEX ' . $this->ensureIdentifiersLength($table, $name, 'idx') . ' ON {' . $table . '} ';
-    $operator = '';
-    if ($fields instanceof Index && ($config = $fields->getDriverConfig('pgsql')) && !empty($config['type']) && $config['type'] instanceof IndexType) {
-      // Both GIN and GiST indexes may cover only one column.
-      if (count($fields) > 1) {
-        throw new \RuntimeException(sprintf('Postgres indexes of %s type may only cover a single column. See https://www.postgresql.org/docs/current/textsearch-indexes.html', $config['type']->value));
-      }
-      // Index must be on a full column.
-      if (is_array($fields->getIterator()->current())) {
-        throw new \RuntimeException(sprintf('Postgres %s indexes are incompatible with substring column definition.', $config['type']->value));
-      }
-      $query .= 'USING ' . $config['type']->value . ' ';
-      // While the operator is technically applied to a specific column, we
-      // include it in the index config as it is impractical to introduce a
-      // second layer of value objects into the schema definition array.
-      $operator = $config['operator'] ?? '';
-    }
-    $query .= sprintf(
-      '(%s %s)',
-      $this->_createKeySql($fields),
-      $operator,
-    );
+  protected function _createIndexSql($table, $name, $fields) {
+    $query = 'CREATE INDEX ' . $this->ensureIdentifiersLength($table, $name, 'idx') . ' ON {' . $table . '} (';
+    $query .= $this->_createKeySql($fields) . ')';
     return $query;
   }
 

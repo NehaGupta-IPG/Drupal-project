@@ -13,7 +13,7 @@ use Drupal\Core\Database\SchemaException;
 final class SchemaIndexOnJsonFieldUnsupportedException extends SchemaException implements DatabaseException {
 
   /**
-   * Constructor.
+   * Creates an exception for a direct index on a JSON column.
    *
    * @param string $table
    *   Table name.
@@ -24,7 +24,7 @@ final class SchemaIndexOnJsonFieldUnsupportedException extends SchemaException i
    */
   public static function forColumn(string $table, string $index, string $column): self {
     return new self(sprintf(
-      'Database does not support creating indexes directly on JSON data column: Index %s for table %s, JSON data column %s. Specify "json_hotpaths" in the schema, instead.',
+      'Database does not support creating indexes directly on JSON data column: Index %s for table %s, JSON data column %s. Use JsonIndex::on() in the indexes array instead.',
       $index,
       $table,
       $column,

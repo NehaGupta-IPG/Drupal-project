@@ -138,7 +138,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
    * @covers ::indexExists
    */
   public function testJsonOptimization(): void {
-    $this->schema->createTable('test_json', static::JSON_TABLE_SPECIFICATION);
+    $this->schema->createTable('test_json', static::jsonTableSpecification());
     $query = $this->connection->select('test_json');
     $query->jsonCondition('test_field', '$.number', 0);
     $query->addExpression('id');
@@ -163,7 +163,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
    * Tests cleanup of expression indexes when a JSON field is dropped.
    */
   public function testExpressionIndexCleanup(): void {
-    $this->schema->createTable('test_json', static::JSON_TABLE_SPECIFICATION);
+    $this->schema->createTable('test_json', static::jsonTableSpecification());
     $introspect = new \ReflectionMethod(get_class($this->schema), 'introspectIndexSchema');
     $index_schema = $introspect->invoke($this->schema, 'test_json');
     $expression_indexes = array_filter($index_schema['indexes'], 'is_string');

@@ -39,7 +39,11 @@ trait QueryConditionTrait {
    * {@inheritdoc}
    */
   public function jsonCondition(string $field, string $jsonpath, string|int|float|array|bool|null $value = NULL, string $operator = '='): self {
-    $this->condition->jsonCondition($field, $jsonpath, $value, $operator);
+    $driverClass = $this->connection->getDriverClass('JsonCondition');
+    $class = $driverClass !== 'JsonCondition'
+      ? $driverClass
+      : JsonCondition::class;
+    $this->condition->condition(new $class($field, $jsonpath, $value, $operator));
     return $this;
   }
 

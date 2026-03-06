@@ -76,9 +76,13 @@ class StatementWrapperIterator extends StatementBase {
 
     $startEvent = $this->dispatchStatementExecutionStartEvent($args ?? []);
 
-    $this->bindArguments($args ?? [], $options['strict_params'] ?? FALSE);
+    $strict = !empty($options['strict_params']);
+    $this->bindArguments($args ?? [], $strict);
     try {
-      $return = $this->clientExecute($args, $options);
+      // When strict params are active, arguments were already bound with
+      // explicit types via bindValue(). Passing them to execute() would
+      // re-bind everything as PDO::PARAM_STR, defeating strict typing.
+      $return = $this->clientExecute($strict ? NULL : $args, $options);
       $this->result = new PdoResult(
         $this->fetchMode,
         $this->fetchOptions,
@@ -99,13 +103,21 @@ class StatementWrapperIterator extends StatementBase {
   /**
    * Binds arguments to the client statement object.
    *
-   * For a \PDO client connection, this will call \PDO::bindValue(). Database
-   * drivers need to override this method to use client-specific methods.
+   * Both PDO and mysqli bind all parameters as strings by default
+   * (\PDO::PARAM_STR and mysqli_stmt::execute() respectively). This causes
+   * implicit type coercion when the database compares against typed values
+   * (e.g. JSON-extracted integers). When $strict is TRUE, each parameter is
+   * bound with its native PHP type so that comparisons are exact.
+   *
+   * Drivers not extending this class must implement equivalent strict binding
+   * in their own statement class.
    *
    * @param mixed[] $arguments
    *   The arguments to bind to the statement object.
    * @param bool $strict
    *   (Optional) Whether strict typing should be used. Defaults to FALSE.
+   *
+   * @see \Drupal\mysqli\Driver\Database\mysqli\Statement::bindStrictParams()
    */
   protected function bindArguments(array $arguments, bool $strict = FALSE): void {
     foreach ($arguments as $param_name => $param_value) {

@@ -8,7 +8,7 @@ use Drupal\Core\Database\InvalidQueryException;
 /**
  * Generic class for a series of conditions in a query.
  */
-class Condition implements ConditionInterface, JsonConditionInterface, \Countable {
+class Condition implements ConditionInterface, StrictSqlParamsConditionInterface, \Countable {
 
   /**
    * Provides a map of condition operators to condition operator options.
@@ -142,45 +142,6 @@ class Condition implements ConditionInterface, JsonConditionInterface, \Countabl
   /**
    * {@inheritdoc}
    */
-  public function jsonCondition(string $field, string $jsonpath, string|int|float|array|bool|null $value = NULL, string $operator = '='): self {
-    $array_operators = ['@>'];
-    $scalar_operators = ['=', '<>', '!=', '<', '<=', '>', '>='];
-    if (!in_array($operator, [...$scalar_operators, ...$array_operators], TRUE)) {
-      throw new InvalidQueryException(sprintf(
-        'Operator %s is not supported by %s. Allowed operators include: %s',
-        $operator,
-        __METHOD__,
-        implode(', ', [...$scalar_operators, ...$array_operators]),
-      ));
-    }
-    if (in_array($operator, $array_operators, TRUE) && !is_array($value)) {
-      throw new InvalidQueryException(sprintf(
-        'Operator %s is only supported with an array $value.',
-        $operator,
-      ));
-    }
-    if (!str_starts_with($jsonpath, '$')) {
-      throw new InvalidQueryException(sprintf(
-        'The provided jsonpath %s is invalid. Supported jsonpath expressions must begin with "$".',
-        $jsonpath,
-      ));
-    }
-    $this->conditions[] = [
-      'field' => $field,
-      'jsonpath' => $jsonpath,
-      'value' => $value,
-      'operator' => $operator,
-    ];
-
-    $this->strictParams = TRUE;
-    $this->changed = TRUE;
-
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function where($snippet, $args = []) {
     $this->conditions[] = [
       'field' => $snippet,
@@ -272,6 +233,10 @@ class Condition implements ConditionInterface, JsonConditionInterface, \Countabl
             $field_fragment = '(' . $field_fragment . ')';
           }
           $arguments += $condition['field']->arguments();
+          // Propagate strict parameter binding from nested conditions.
+          if ($condition['field'] instanceof StrictSqlParamsConditionInterface && $condition['field']->usesStrictParameters()) {
+            $this->strictParams = TRUE;
+          }
           // If the operator and value were not passed in to the
           // ConditionInterface::condition() method (and thus have the default
           // value as defined over there) it is assumed to be a valid condition
@@ -286,10 +251,6 @@ class Condition implements ConditionInterface, JsonConditionInterface, \Countabl
           $field_fragment = '(' . $condition['field'] . ')';
           $arguments += $condition['value'];
           $ignore_operator = TRUE;
-        }
-        elseif (isset($condition['jsonpath'])) {
-          $ignore_operator = FALSE;
-          $field_fragment = $this->processJsonCondition($condition, $connection, $ignore_operator, $queryPlaceholder);
         }
         else {
           // Left hand part is a normal field. Add it as is.
@@ -380,29 +341,6 @@ class Condition implements ConditionInterface, JsonConditionInterface, \Countabl
       $this->arguments = $arguments;
       $this->changed = FALSE;
     }
-  }
-
-  /**
-   * Compile a JSON condition into a SQL field fragment.
-   *
-   * Drivers supporting JSON data types may have widely-varying SQL syntax
-   * for queries. Each driver must override this method to produce the
-   * appropriate SQL fragment.
-   *
-   * @param array $condition
-   *   Condition.
-   * @param \Drupal\Core\Database\Connection $connection
-   *   Connection.
-   * @param bool $ignore_operator
-   *   Ignore operator flag, passed by reference.
-   * @param PlaceholderInterface $query_placeholder
-   *   Query placeholder.
-   *
-   * @return string
-   *   Field fragment.
-   */
-  protected function processJsonCondition(array $condition, Connection $connection, bool &$ignore_operator, PlaceholderInterface $query_placeholder): string {
-    throw new \RuntimeException('Database driver must implement ' . __FUNCTION__);
   }
 
   /**

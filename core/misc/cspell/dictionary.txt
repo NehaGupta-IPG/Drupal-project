@@ -213,8 +213,6 @@ hhvm
 hilited
 hmac
 hookname
-hotpath
-hotpaths
 hrefs
 htmlcorrector
 htmx

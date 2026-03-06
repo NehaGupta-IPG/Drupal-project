@@ -147,6 +147,17 @@ trait DatabaseTestSchemaDataTrait {
         'id' => 6,
         'test_field' => '{"associative": {"mountain": "Handies"}}',
       ])
+      ->values([
+        'id' => 8,
+        'test_field' => '{"float": 3.14, "nested": {"inner": "deep value"}, "items": [10, 20, 30], "special": "100% off_sale"}',
+      ])
+      ->execute();
+
+    // Row 7 has a SQL NULL column value (not just a missing JSON key).
+    // Inserted separately because NULL in a multi-insert may be skipped.
+    $this->connection->insert('json')
+      ->fields(['id', 'test_field'])
+      ->values(['id' => 7, 'test_field' => NULL])
       ->execute();
   }
 

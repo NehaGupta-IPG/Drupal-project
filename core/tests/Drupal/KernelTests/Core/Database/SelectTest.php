@@ -7,6 +7,8 @@ namespace Drupal\KernelTests\Core\Database;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\InvalidQueryException;
+use Drupal\Core\Database\Query\JsonCastType;
+use Drupal\Core\Database\Query\JsonCondition;
 use Drupal\Core\Database\Query\SelectExtender;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -640,22 +642,97 @@ class SelectTest extends DatabaseTestBase {
    */
   public static function providerJsonConditionOperators(): array {
     return [
-      'LTE with matching' => ['$.number', 5, '<=', 1],
-      'LTE with no matching' => ['$.number', -10, '<=', 0],
-      'GT with matching' => ['$.number', -2, '>', 3],
-      'GT with subset matching' => ['$.number', 7, '>', 2],
-      'Equals' => ['$.number', 10, '=', 2],
-      'Text equals' => ['$.key', 'some text', '=', 1],
-      'Boolean TRUE' => ['$.boolean', TRUE, '=', 2],
-      'Boolean FALSE' => ['$.boolean', FALSE, '=', 1],
-      'Boolean invalid condition' => ['$.boolean', 'invalid string argument', '=', 0],
-      'Non-matching text' => ['$.key', 'nothing to see here', '=', 0],
-      'String instead of number' => ['$.number', 'stringy', '=', 0],
-      'Array value with full containment' => ['$.array', [32, 41], '@>', 1],
-      'Array value with partial containment' => ['$.array', [41], '@>', 1],
-      'Array value with no containment' => ['$.array', [81235], '@>', 0],
-      'Associative array value with containment' => ['$.associative', ['mountain' => 'Handies'], '@>', 1],
-      'Associative array value with no containment' => ['$.associative', ['mountain' => 'Uncompahgre'], '@>', 0],
+      // Scalar comparisons.
+      'Equals' => ['$.number', 10, '=', [2, 3]],
+      'Text equals' => ['$.key', 'some text', '=', [3]],
+      'Not equals <>' => ['$.number', 10, '<>', [1]],
+      'Not equals !=' => ['$.number', 10, '!=', [1]],
+      'LT with matching' => ['$.number', 10, '<', [1]],
+      'LT with no matching' => ['$.number', 5, '<', []],
+      'LTE with matching' => ['$.number', 5, '<=', [1]],
+      'LTE with no matching' => ['$.number', -10, '<=', []],
+      'GT with matching' => ['$.number', -2, '>', [1, 2, 3]],
+      'GT with subset matching' => ['$.number', 7, '>', [2, 3]],
+      'GTE with matching' => ['$.number', 10, '>=', [2, 3]],
+      'GTE with boundary' => ['$.number', 5, '>=', [1, 2, 3]],
+
+      // Boolean comparisons.
+      'Boolean TRUE' => ['$.boolean', TRUE, '=', [1, 4]],
+      'Boolean FALSE' => ['$.boolean', FALSE, '=', [2]],
+      'Boolean invalid condition' => ['$.boolean', 'invalid string argument', '=', []],
+
+      // Type mismatch.
+      'Non-matching text' => ['$.key', 'nothing to see here', '=', []],
+      'String instead of number' => ['$.number', 'stringy', '=', []],
+
+      // IN / NOT IN.
+      'IN with matching' => ['$.number', [5, 10], 'IN', [1, 2, 3]],
+      'IN with partial matching' => ['$.number', [5], 'IN', [1]],
+      'IN with no matching' => ['$.number', [99, 100], 'IN', []],
+      'NOT IN with matching' => ['$.number', [10], 'NOT IN', [1]],
+
+      // JSON_CONTAINS.
+      'Array value with full containment' => ['$.array', [32, 41], 'JSON_CONTAINS', [5]],
+      'Array value with partial containment' => ['$.array', [41], 'JSON_CONTAINS', [5]],
+      'Array value with no containment' => ['$.array', [81235], 'JSON_CONTAINS', []],
+      'Associative array value with containment' => [
+        '$.associative', ['mountain' => 'Handies'], 'JSON_CONTAINS', [6],
+      ],
+      'Associative array value with no containment' => [
+        '$.associative', ['mountain' => 'Uncompahgre'], 'JSON_CONTAINS', [],
+      ],
+
+      // String LIKE operators.
+      'String CONTAINS matching' => ['$.key', 'some', 'CONTAINS', [3, 4]],
+      'String CONTAINS partial' => ['$.key', 'other', 'CONTAINS', [4]],
+      'String CONTAINS no match' => ['$.key', 'xyz', 'CONTAINS', []],
+      'STARTS_WITH matching' => ['$.key', 'some', 'STARTS_WITH', [3, 4]],
+      'STARTS_WITH no match' => ['$.key', 'xyz', 'STARTS_WITH', []],
+      'ENDS_WITH matching' => ['$.key', 'text', 'ENDS_WITH', [3, 4]],
+      'ENDS_WITH partial match' => ['$.key', 'other text', 'ENDS_WITH', [4]],
+
+      // BETWEEN / NOT BETWEEN.
+      'BETWEEN matching integers' => ['$.number', [5, 10], 'BETWEEN', [1, 2, 3]],
+      'BETWEEN matching subset' => ['$.number', [6, 10], 'BETWEEN', [2, 3]],
+      'BETWEEN no match' => ['$.number', [100, 200], 'BETWEEN', []],
+      'NOT BETWEEN matching' => ['$.number', [6, 10], 'NOT BETWEEN', [1]],
+
+      // IS NULL / IS NOT NULL (includes row 7 which has SQL NULL column).
+      'IS NULL' => ['$.number', NULL, 'IS NULL', [4, 5, 6, 7, 8]],
+      'IS NOT NULL' => ['$.number', NULL, 'IS NOT NULL', [1, 2, 3]],
+      'IS NULL includes NULL column' => ['$.float', NULL, 'IS NULL', [1, 2, 3, 4, 5, 6, 7]],
+      'IS NOT NULL on float path' => ['$.float', NULL, 'IS NOT NULL', [8]],
+
+      // HAS KEY.
+      'HAS KEY' => ['$.key', NULL, 'HAS KEY', [3, 4]],
+      'HAS KEY no match' => ['$.nonexistent', NULL, 'HAS KEY', []],
+
+      // Float comparisons.
+      'Float equals' => ['$.float', 3.14, '=', [8]],
+      'Float greater than' => ['$.float', 3.0, '>', [8]],
+      'Float less than' => ['$.float', 4.0, '<', [8]],
+      'Float BETWEEN' => ['$.float', [3.0, 4.0], 'BETWEEN', [8]],
+
+      // Nested paths.
+      'Nested path equals' => ['$.nested.inner', 'deep value', '=', [8]],
+      'Nested path no match' => ['$.nested.inner', 'wrong', '=', []],
+
+      // Array indices.
+      'Array index [0]' => ['$.array[0]', 32, '=', [5]],
+      'Array index [1]' => ['$.array[1]', 41, '=', [5]],
+      'Array index on items' => ['$.items[0]', 10, '=', [8]],
+
+      // LIKE special characters (must be treated as literals, not wildcards).
+      'CONTAINS percent literal' => ['$.special', '%', 'CONTAINS', [8]],
+      'CONTAINS underscore literal' => ['$.special', '_', 'CONTAINS', [8]],
+      'STARTS_WITH percent' => ['$.special', '100%', 'STARTS_WITH', [8]],
+      'ENDS_WITH underscore' => ['$.special', '_sale', 'ENDS_WITH', [8]],
+      'CONTAINS percent no false positive' => ['$.key', '%', 'CONTAINS', []],
+
+      // Values with quotes must not break SQL string literals.
+      'Quotes in JSON_CONTAINS value' => ['$.associative', ['mountain' => "' OR 1=1--"], 'JSON_CONTAINS', []],
+      'Quotes in scalar value' => ['$.key', "' OR 1=1--", '=', []],
+      'Quotes in CONTAINS value' => ['$.key', "' OR '1'='1", 'CONTAINS', []],
     ];
   }
 
@@ -666,18 +743,138 @@ class SelectTest extends DatabaseTestBase {
    * implementing JSON data types. Variable typing becomes far more sensitive
    * when matching JSON documents vs. other data which is stored directly in SQL
    * tables.
-   *
-   * @dataProvider providerJsonConditionOperators
    */
-  public function testJsonCondition(string $jsonpath, int|string|bool|array $value, string $operator, int $expected_count): void {
-    if ($operator === '@>' && $this->connection->driver() === 'sqlite') {
-      $this->markTestSkipped('SQLite does not support containment operator.');
-    }
+  #[DataProvider('providerJsonConditionOperators')]
+  public function testJsonCondition(
+    string $jsonpath,
+    int|string|float|bool|array|null $value,
+    string $operator,
+    array $expected_ids,
+  ): void {
     $query = $this->connection->select('json', 'j');
-    $query->fields('j');
+    $query->addField('j', 'id');
     $query->jsonCondition('test_field', $jsonpath, $value, $operator);
-    $retrieved = $query->execute()->fetchAll();
-    $this->assertEquals($expected_count, count($retrieved));
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    sort($ids);
+    $this->assertEquals($expected_ids, $ids);
+  }
+
+  /**
+   * Tests that JsonCondition validates its arguments.
+   */
+  public function testJsonConditionValidation(): void {
+    $cases = [
+      'invalid jsonpath' => ['field', 'invalid', 'value', '='],
+      'unsupported operator' => ['field', '$.path', 'value', 'INVALID'],
+      'IN requires array' => ['field', '$.path', 'string', 'IN'],
+      'BETWEEN requires two' => ['field', '$.path', [1], 'BETWEEN'],
+      // Try to exploit jsonpath with special characters.
+      'single quote in path' => ['f', "$.key' OR 1=1--", 'v', '='],
+      'semicolon in path' => ['f', '$.key; DROP TABLE', 'v', '='],
+      'space in path' => ['f', '$.key OR true', 'v', '='],
+      'parenthesis in path' => ['f', '$.key)', 'v', '='],
+    ];
+    foreach ($cases as $label => [$field, $path, $value, $op]) {
+      try {
+        new JsonCondition($field, $path, $value, $op);
+        $this->fail("Expected exception for: $label");
+      }
+      catch (InvalidQueryException) {
+        $this->addToAssertionCount(1);
+      }
+    }
+  }
+
+  /**
+   * Tests that jsonOrderBy rejects invalid jsonpath expressions.
+   */
+  public function testJsonOrderByInvalidPath(): void {
+    $this->expectException(InvalidQueryException::class);
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonOrderBy('test_field', "$.key' OR 1=1--");
+  }
+
+  /**
+   * Tests combining JSON conditions with AND, OR, and regular conditions.
+   */
+  public function testJsonConditionCombined(): void {
+    // AND: number >= 5 AND boolean = true → row 1 only.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonCondition('test_field', '$.number', 5, '>=');
+    $query->jsonCondition('test_field', '$.boolean', TRUE, '=');
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    sort($ids);
+    $this->assertEquals([1], $ids);
+
+    // OR: key = "some text" OR number = 5 → rows 1, 3.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $or = $query->orConditionGroup();
+    $or->condition(new JsonCondition('test_field', '$.key', 'some text'));
+    $or->condition(new JsonCondition('test_field', '$.number', 5));
+    $query->condition($or);
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    sort($ids);
+    $this->assertEquals([1, 3], $ids);
+
+    // Mixed: jsonCondition AND regular condition.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonCondition('test_field', '$.number', 10, '=');
+    $query->condition('j.id', 3);
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEquals([3], $ids);
+  }
+
+  /**
+   * Tests JSON ORDER BY with integer cast ascending.
+   */
+  public function testJsonOrderByIntAsc(): void {
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonOrderBy('test_field', '$.number', 'ASC', JsonCastType::Int);
+    $ids = array_map('intval', $query->execute()->fetchCol());
+
+    // Rows with $.number: 1 (5), 2 (10), 3 (10). Rows without: 4-8.
+    // ASC: 5 before 10, NULLs last.
+    $this->assertEquals(1, $ids[0]);
+    $this->assertContains(2, array_slice($ids, 1, 2));
+    $this->assertContains(3, array_slice($ids, 1, 2));
+    $this->assertEqualsCanonicalizing([4, 5, 6, 7, 8], array_slice($ids, 3));
+  }
+
+  /**
+   * Tests JSON ORDER BY with integer cast descending.
+   */
+  public function testJsonOrderByIntDesc(): void {
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonOrderBy('test_field', '$.number', 'DESC', JsonCastType::Int);
+    $ids = array_map('intval', $query->execute()->fetchCol());
+
+    // DESC: 10 before 5, NULLs last.
+    $this->assertContains(2, array_slice($ids, 0, 2));
+    $this->assertContains(3, array_slice($ids, 0, 2));
+    $this->assertEquals(1, $ids[2]);
+    $this->assertEqualsCanonicalizing([4, 5, 6, 7, 8], array_slice($ids, 3));
+  }
+
+  /**
+   * Tests JSON ORDER BY on a string value.
+   */
+  public function testJsonOrderByString(): void {
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonOrderBy('test_field', '$.key', 'ASC');
+    $ids = $query->execute()->fetchCol();
+
+    // Rows with $.key: 3 ("some text"), 4 ("some other text").
+    // ASC: "some other text" < "some text", so 4 then 3. NULLs last.
+    $this->assertEquals(4, $ids[0]);
+    $this->assertEquals(3, $ids[1]);
+    $this->assertEqualsCanonicalizing([1, 2, 5, 6, 7, 8], array_slice($ids, 2));
   }
 
 }
