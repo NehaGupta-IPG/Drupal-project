@@ -248,6 +248,8 @@ class DateTimeFieldTest extends DateTestBase {
     $this->assertSession()->elementTextContains('xpath', '//fieldset[@id="edit-' . $field_name . '-0"]/legend', $field_label);
     $this->assertSession()->elementExists('xpath', '//fieldset[@aria-describedby="edit-' . $field_name . '-0--description"]');
     $this->assertSession()->elementExists('xpath', '//div[@id="edit-' . $field_name . '-0--description"]');
+    // Legend element contains a "(required)" text.
+    $this->assertSession()->elementExists('xpath', '//fieldset[@id="edit-' . $field_name . '-0"]//legend//span[contains(@class,"js-form-required")]//span[@aria-hidden="true" and @class="hidden" and contains(text(), "(required)")]');
 
     // Build up a date in the UTC timezone.
     $value = '2012-12-31 00:00:00';
