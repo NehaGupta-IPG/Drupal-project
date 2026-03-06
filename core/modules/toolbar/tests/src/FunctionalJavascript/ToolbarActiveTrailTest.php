@@ -71,7 +71,8 @@ class ToolbarActiveTrailTest extends WebDriverTestBase {
       $page->pressButton('Vertical orientation');
     }
 
-    // Traverse deeper.
+    // Traverse deeper. Remove inert so links inside the tray are clickable.
+    $this->removeInertFromActiveTray();
     $this->clickLink('Structure');
     $this->clickLink('Content types');
     $this->clickLink('Manage fields');

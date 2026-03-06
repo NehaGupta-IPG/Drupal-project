@@ -105,6 +105,7 @@ module.exports = {
       '#toolbar-item-administration-tray li:nth-child(2) button',
       'open',
     );
+    removeInertFromActiveTray(browser);
     browser.click('#toolbar-item-administration-tray li:nth-child(2) button');
     browser.assert.hasClass(
       '#toolbar-item-administration-tray li:nth-child(2)',
