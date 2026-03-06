@@ -11,6 +11,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\system\Form\ClearCacheForm;
+use Symfony\Contracts\Service\Attribute\Required;
 
 /**
  * Provides a block to display 'Clear cache' elements.
@@ -22,19 +23,16 @@ use Drupal\system\Form\ClearCacheForm;
 class ClearCacheBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   /**
-   * Creates a ClearCacheBlock instance.
-   *
-   * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
-   * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
-   * @param mixed $plugin_definition
-   *   The plugin implementation definition.
-   * @param \Drupal\Core\Form\FormBuilderInterface $formBuilder
-   *   The form builder.
+   * phpcs:ignore Commenting.VariableComment
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected FormBuilderInterface $formBuilder) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  protected FormBuilderInterface $formBuilder;
+
+  /**
+   * phpcs:ignore Commenting.FunctionComment
+   */
+  #[Required]
+  public function setFormBuilder(FormBuilderInterface $formBuilder): void {
+    $this->formBuilder = $formBuilder;
   }
 
   /**
