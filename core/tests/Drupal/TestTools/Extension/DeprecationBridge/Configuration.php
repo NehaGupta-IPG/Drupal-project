@@ -159,10 +159,13 @@ final class Configuration {
     if (!str_starts_with($path, \DIRECTORY_SEPARATOR)) {
       $realPath = realpath(dirname(__DIR__, 6) . \DIRECTORY_SEPARATOR . $path);
     }
-    if ($realPath === FALSE || !is_file($path)) {
+    else {
+      $realPath = $path;
+    }
+    if ($realPath === FALSE || !is_file($realPath)) {
       throw new \InvalidArgumentException(sprintf('The file "%s" does not exist.', $path));
     }
-    return $realPath ?? $path;
+    return $realPath;
   }
 
 }

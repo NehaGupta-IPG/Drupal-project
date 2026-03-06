@@ -22,7 +22,7 @@ use PHPUnit\TextUI\Configuration\Configuration as PhpUnitConfiguration;
 use PHPUnit\Util\Filesystem;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
 
-// cspell:ignore depsta bootstrapper
+// cspell:ignore depsta bootstrapper bootstrappers
 
 /**
  * Drupal's PHPUnit extension to manage code deprecation.
