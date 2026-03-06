@@ -7,11 +7,13 @@ namespace Drupal\Tests\system\Kernel\Common;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests alteration of arguments passed to \Drupal::moduleHandler->alter().
  */
 #[Group('Common')]
+#[RunTestsInSeparateProcesses]
 class AlterTest extends KernelTestBase {
 
   /**
@@ -20,7 +22,6 @@ class AlterTest extends KernelTestBase {
   protected static $modules = [
     'block',
     'common_test',
-    'module_implements_alter_test',
     'system',
   ];
 
@@ -66,7 +67,7 @@ class AlterTest extends KernelTestBase {
     $this->assertEquals($array2_expected, $array2_copy, 'Third argument to \\Drupal::moduleHandler->alter() was altered.');
 
     // Verify alteration order when passing an array of types to
-    // \Drupal::moduleHandler->alter(). common_test_module_implements_alter()
+    // \Drupal::moduleHandler->alter(). The Order::Last directive
     // places 'block' implementation after other modules.
     $array_copy = $array;
     $array_expected = ['foo' => 'Drupal block theme'];

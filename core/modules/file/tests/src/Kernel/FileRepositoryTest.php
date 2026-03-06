@@ -14,12 +14,14 @@ use Drupal\file\Entity\File;
 use Drupal\file\FileRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the FileRepository.
  */
 #[CoversClass(FileRepository::class)]
 #[Group('file')]
+#[RunTestsInSeparateProcesses]
 class FileRepositoryTest extends FileManagedUnitTestBase {
 
   /**
@@ -203,8 +205,6 @@ class FileRepositoryTest extends FileManagedUnitTestBase {
 
   /**
    * Tests loading a file by URI.
-   *
-   * @legacy-covers ::loadByUri
    */
   public function testLoadByUri(): void {
     $source = $this->createFile();
@@ -214,8 +214,6 @@ class FileRepositoryTest extends FileManagedUnitTestBase {
 
   /**
    * Tests loading a file by case-sensitive URI.
-   *
-   * @legacy-covers ::loadByUri
    */
   public function testLoadByUriCaseSensitive(): void {
     $source = $this->createFile('FooBar.txt');

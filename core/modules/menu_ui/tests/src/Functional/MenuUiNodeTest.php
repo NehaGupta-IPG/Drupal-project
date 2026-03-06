@@ -166,6 +166,8 @@ class MenuUiNodeTest extends BrowserTestBase {
       'menu[enabled]' => 1,
     ];
     $this->drupalGet('node/' . $node->id() . '/edit');
+    // Assert that the details form is closed.
+    $this->assertSession()->elementAttributeNotExists('css', 'details.menu-link-form', 'open');
     $this->submitForm($edit, 'Save');
     // Assert that there is a link for the node.
     $this->drupalGet('test-page');
@@ -189,6 +191,8 @@ class MenuUiNodeTest extends BrowserTestBase {
       'status[value]' => FALSE,
     ];
     $this->drupalGet('node/' . $node->id() . '/edit');
+    // Assert that the details form is still closed even though menu is enabled.
+    $this->assertSession()->elementAttributeNotExists('css', 'details.menu-link-form', 'open');
     $this->submitForm($edit, 'Save');
     $this->drupalGet('test-page');
     $this->assertSession()->linkNotExists($node_title, 'Found no menu link with the node unpublished');
@@ -309,7 +313,7 @@ class MenuUiNodeTest extends BrowserTestBase {
       $languages[$langcode] = ConfigurableLanguage::load($langcode);
     }
 
-    // Enable translation for pages and menu link content..
+    // Enable translation for pages and menu link content.
     $this->enableContentTranslation('node', 'page');
     $this->enableContentTranslation('menu_link_content', 'menu_link_content');
 

@@ -79,9 +79,6 @@ services:
   Drupal\system\ModuleAdminLinksHelper: '@system.module_admin_links_helper'
   system.module_admin_links_helper:
     class: Drupal\system\ModuleAdminLinksHelper
-    arguments: ['@menu.link_tree', '@system.module_admin_links_memory_cache']
-  system.module_admin_links_memory_cache:
-    class: Drupal\Core\Cache\MemoryCache\MemoryCache
-    arguments: ['@datetime.time']
+    arguments: ['@menu.link_tree', '@cache.memory']
   system.access_route_alter_subscriber:
     class: Drupal\system\EventSubscriber\AccessRouteAlterSubscriber

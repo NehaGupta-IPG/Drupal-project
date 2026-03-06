@@ -73,8 +73,6 @@ class LoggerChannelTest extends UnitTestCase {
 
   /**
    * Tests LoggerChannel::log() recursion protection.
-   *
-   * @legacy-covers ::log
    */
   public function testLogRecursionProtection(): void {
     $channel = new LoggerChannel('test');
@@ -99,7 +97,7 @@ class LoggerChannelTest extends UnitTestCase {
       $logger = $this->createMock('Psr\Log\LoggerInterface');
       $logger->expects($this->once())
         ->method('log')
-        ->willReturnCallback(function () use ($i, &$index_order) {
+        ->willReturnCallback(function () use ($i, &$index_order): void {
           // Append the $i to the index order, so that we know the order that
           // loggers got called with.
           $index_order .= $i;

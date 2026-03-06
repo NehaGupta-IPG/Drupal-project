@@ -7,6 +7,7 @@ namespace Drupal\Tests\views\Functional\Update;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use Drupal\views\Entity\View;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the update view mode when removing system.rss.
@@ -14,7 +15,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @see system_post_update_delete_rss_config()
  */
 #[Group('update')]
-#[Group('legacy')]
+#[RunTestsInSeparateProcesses]
 class RssDefaultRowViewModeUpdateTest extends UpdatePathTestBase {
 
   /**
@@ -23,6 +24,9 @@ class RssDefaultRowViewModeUpdateTest extends UpdatePathTestBase {
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-history.php',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-ban.php',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-contact.php',
       __DIR__ . '/../../../fixtures/update/rss-default-view-mode.php',
     ];
   }

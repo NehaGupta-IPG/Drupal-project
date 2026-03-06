@@ -16,12 +16,14 @@ use Drupal\views\Views;
 use Drupal\workflows\Entity\Workflow;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the views 'moderation_state_filter' filter plugin.
  */
 #[CoversClass(ModerationStateFilter::class)]
 #[Group('content_moderation')]
+#[RunTestsInSeparateProcesses]
 class ViewsModerationStateFilterTest extends ViewsKernelTestBase {
 
   use ContentModerationTestTrait;
@@ -38,7 +40,6 @@ class ViewsModerationStateFilterTest extends ViewsKernelTestBase {
     'workflow_type_test',
     'entity_test',
     'language',
-    'content_translation',
   ];
 
   /**
@@ -361,13 +362,13 @@ class ViewsModerationStateFilterTest extends ViewsKernelTestBase {
   /**
    * Assert the plugin states.
    *
-   * @param string[] $states
+   * @param string[][] $states
    *   The states which should appear in the filter.
    *
    * @internal
    */
   protected function assertPluginStates(array $states): void {
-    $plugin = Views::pluginManager('filter')->createInstance('moderation_state_filter', []);
+    $plugin = \Drupal::service('plugin.manager.views.filter')->createInstance('moderation_state_filter', []);
     $view = Views::getView('test_content_moderation_state_filter_base_table');
     $plugin->init($view, $view->getDisplay());
     $this->assertEquals($states, $plugin->getValueOptions());

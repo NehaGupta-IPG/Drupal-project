@@ -23,17 +23,12 @@ class WorkspaceOperationFactory {
     protected EntityTypeManagerInterface $entityTypeManager,
     protected Connection $database,
     protected WorkspaceManagerInterface $workspaceManager,
-    protected WorkspaceAssociationInterface $workspaceAssociation,
+    protected WorkspaceTrackerInterface $workspaceTracker,
     protected EventDispatcherInterface $eventDispatcher,
     #[Autowire(service: 'logger.channel.workspaces')]
     protected LoggerInterface $logger,
-    protected ?TimeInterface $time = NULL,
-  ) {
-    if ($time === NULL) {
-      @trigger_error('Calling ' . __CLASS__ . ' constructor without the $time argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3531037', E_USER_DEPRECATED);
-      $this->time = \Drupal::time();
-    }
-  }
+    protected TimeInterface $time,
+  ) {}
 
   /**
    * Gets the workspace publisher.
@@ -45,7 +40,7 @@ class WorkspaceOperationFactory {
    *   A workspace publisher object.
    */
   public function getPublisher(WorkspaceInterface $source) {
-    return new WorkspacePublisher($this->entityTypeManager, $this->database, $this->workspaceManager, $this->workspaceAssociation, $this->eventDispatcher, $source, $this->logger, $this->time);
+    return new WorkspacePublisher($this->entityTypeManager, $this->database, $this->workspaceManager, $this->workspaceTracker, $this->eventDispatcher, $source, $this->logger, $this->time);
   }
 
   /**
@@ -60,7 +55,7 @@ class WorkspaceOperationFactory {
    *   A workspace merger object.
    */
   public function getMerger(WorkspaceInterface $source, WorkspaceInterface $target) {
-    return new WorkspaceMerger($this->entityTypeManager, $this->database, $this->workspaceAssociation, $source, $target, $this->logger);
+    return new WorkspaceMerger($this->entityTypeManager, $this->database, $this->workspaceTracker, $source, $target, $this->logger);
   }
 
 }

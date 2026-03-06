@@ -9,36 +9,6 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Update\EquivalentUpdate;
 
-// cspell:ignore quickedit
-
-/**
- * An array of machine names of modules that were removed from Drupal core.
- */
-const DRUPAL_CORE_REMOVED_MODULE_LIST = [
-  'action' => 'Action UI',
-  'book' => 'Book',
-  'aggregator' => 'Aggregator',
-  'ckeditor' => 'CKEditor',
-  'color' => 'Color',
-  'forum' => 'Forum',
-  'hal' => 'HAL',
-  'quickedit' => 'Quick Edit',
-  'rdf' => 'RDF',
-  'statistics' => 'Statistics',
-  'tour' => 'Tour',
-  'tracker' => 'Tracker',
-];
-
-/**
- * An array of machine names of themes that were removed from Drupal core.
- */
-const DRUPAL_CORE_REMOVED_THEME_LIST = [
-  'bartik' => 'Bartik',
-  'classy' => 'Classy',
-  'seven' => 'Seven',
-  'stable' => 'Stable',
-];
-
 /**
  * Implements hook_install().
  */
@@ -57,29 +27,6 @@ function system_install(): void {
 
   // Populate the dummy query string added to all CSS and JavaScript files.
   \Drupal::service('asset.query_string')->reset();
-}
-
-/**
- * Implements hook_schema().
- */
-function system_schema(): array {
-  // @deprecated The sequences table has been deprecated in drupal:10.2.0 and is
-  // removed from drupal:12.0.0. See https://www.drupal.org/node/3220378.
-  // @todo Remove sequences table in Drupal 12. See https://www.drupal.org/i/3335756
-  $schema['sequences'] = [
-    'description' => 'Stores IDs.',
-    'fields' => [
-      'value' => [
-        'description' => 'The value of the sequence.',
-        'type' => 'serial',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-      ],
-    ],
-    'primary key' => ['value'],
-  ];
-
-  return $schema;
 }
 
 /**
@@ -180,5 +127,29 @@ function system_update_11202(): void {
       'default' => 0,
       'description' => 'The exit code of the test executed.',
     ]);
+  }
+}
+
+/**
+ * Equivalent update to 10600.
+ */
+function system_update_11300(): TranslatableMarkup|null {
+  // This is a no-op that exists to prevent an upgrade from 10.6+ to 11.2. That
+  // path is actually a downgrade.
+  $equivalent_update = \Drupal::service('update.update_hook_registry')
+    ->getEquivalentUpdate();
+  if ($equivalent_update instanceof EquivalentUpdate) {
+    return $equivalent_update->toSkipMessage();
+  }
+  return NULL;
+}
+
+/**
+ * Remove the deprecated sequences table.
+ */
+function system_update_12000(): void {
+  $schema = \Drupal::database()->schema();
+  if ($schema->tableExists('sequences')) {
+    $schema->dropTable('sequences');
   }
 }

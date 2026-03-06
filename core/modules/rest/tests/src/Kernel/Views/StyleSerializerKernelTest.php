@@ -10,12 +10,14 @@ use Drupal\views\Entity\View;
 use Drupal\views\Tests\ViewTestData;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\rest\Plugin\views\style\Serializer.
  */
 #[CoversClass(Serializer::class)]
 #[Group('views')]
+#[RunTestsInSeparateProcesses]
 class StyleSerializerKernelTest extends ViewsKernelTestBase {
 
   /**
@@ -39,8 +41,6 @@ class StyleSerializerKernelTest extends ViewsKernelTestBase {
 
   /**
    * Tests calculate dependencies.
-   *
-   * @legacy-covers ::calculateDependencies
    */
   public function testCalculateDependencies(): void {
     /** @var \Drupal\views\Entity\View $view */

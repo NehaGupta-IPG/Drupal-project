@@ -55,12 +55,28 @@ class PathMatcherTest extends UnitTestCase {
   }
 
   /**
+   * Tests matchPath when page.front is null.
+   */
+  public function testMatchPathNullFront(): void {
+    $config_factory_stub = $this->getConfigFactoryStub(
+      [
+        'system.site' => [
+          'page.front' => NULL,
+        ],
+      ]
+    );
+    $route_match = $this->createMock('Drupal\Core\Routing\RouteMatchInterface');
+    $pathMatcher = new PathMatcher($config_factory_stub, $route_match);
+    $this->assertTrue($pathMatcher->matchPath('/foo', '/*'));
+  }
+
+  /**
    * Provides test path data.
    *
    * @return array
    *   A nested array of pattern arrays and path arrays.
    */
-  public static function getMatchPathData() {
+  public static function getMatchPathData(): array {
     return [
       [
         // Single absolute paths.

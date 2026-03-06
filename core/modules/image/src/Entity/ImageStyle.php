@@ -41,6 +41,7 @@ use Drupal\Core\Entity\Entity\EntityViewDisplay;
   label_singular: new TranslatableMarkup('image style'),
   label_plural: new TranslatableMarkup('image styles'),
   config_prefix: 'style',
+  static_cache: TRUE,
   entity_keys: [
     'id' => 'name',
     'label' => 'label',
@@ -430,15 +431,6 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
     $configuration['uuid'] = $this->uuidGenerator()->generate();
     $this->getEffects()->addInstanceId($configuration['uuid'], $configuration);
     return $configuration['uuid'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getReplacementID() {
-    /** @var \Drupal\image\ImageStyleStorageInterface $storage */
-    $storage = $this->entityTypeManager()->getStorage($this->getEntityTypeId());
-    return $storage->getReplacementId($this->id());
   }
 
   /**

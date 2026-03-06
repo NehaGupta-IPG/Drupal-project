@@ -21,6 +21,7 @@ use Drupal\layout_builder\SectionStorageInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Prophecy\Argument;
 
 /**
@@ -28,6 +29,7 @@ use Prophecy\Argument;
  */
 #[CoversClass(LayoutEntityHelperTrait::class)]
 #[Group('layout_builder')]
+#[RunTestsInSeparateProcesses]
 class LayoutEntityHelperTraitTest extends KernelTestBase {
 
   /**
@@ -79,8 +81,6 @@ class LayoutEntityHelperTraitTest extends KernelTestBase {
 
   /**
    * Tests get section storage for entity.
-   *
-   * @legacy-covers ::getSectionStorageForEntity
    */
   #[DataProvider('providerTestGetSectionStorageForEntity')]
   public function testGetSectionStorageForEntity($entity_type_id, $values, $expected_context_keys): void {
@@ -184,8 +184,6 @@ class LayoutEntityHelperTraitTest extends KernelTestBase {
 
   /**
    * Tests original entity uses default storage.
-   *
-   * @legacy-covers ::originalEntityUsesDefaultStorage
    */
   #[DataProvider('providerTestOriginalEntityUsesDefaultStorage')]
   public function testOriginalEntityUsesDefaultStorage($entity_storages, $is_new, $has_original, $expected): void {
@@ -223,8 +221,6 @@ class LayoutEntityHelperTraitTest extends KernelTestBase {
 
   /**
    * Tests get entity sections.
-   *
-   * @legacy-covers ::getEntitySections
    */
   public function testGetEntitySections(): void {
     $entity = EntityTest::create(['name' => 'updated']);

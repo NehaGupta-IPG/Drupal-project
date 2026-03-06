@@ -86,13 +86,6 @@ comment.reply:
       entity:
         type: entity:{entity_type}
 
-comment.new_comments_node_links:
-  path: '/comments/render_new_comments_node_links'
-  defaults:
-    _controller: '\Drupal\comment\Controller\CommentController::renderNewCommentsNodeLinks'
-  requirements:
-    _permission: 'access content'
-
 comment.node_redirect:
   path: '/comment/{node}/reply'
   defaults:

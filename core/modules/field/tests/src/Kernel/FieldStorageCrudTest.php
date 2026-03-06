@@ -12,11 +12,13 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field_test\FieldTestHelper;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests field storage create, read, update, and delete.
  */
 #[Group('field')]
+#[RunTestsInSeparateProcesses]
 class FieldStorageCrudTest extends FieldKernelTestBase {
 
   /**
@@ -145,7 +147,7 @@ class FieldStorageCrudTest extends FieldKernelTestBase {
         'type' => 'test_field',
       ];
       FieldStorageConfig::create($field_storage_definition)->save();
-      $this->fail('Cannot create a field with a name containing an illegal character.');
+      $this->fail('Cannot create a field with a name containing an invalid character.');
     }
     catch (\Exception $e) {
       $this->assertInstanceOf(FieldException::class, $e);

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Theme;
 
 use Drupal\Core\Extension\ModuleExtensionList;
+use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
+use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
 use Drupal\Core\Theme\ActiveTheme;
 use Drupal\Core\Theme\Registry;
 use Drupal\Tests\UnitTestCase;
@@ -54,13 +56,6 @@ class RegistryTest extends UnitTestCase {
   protected $themeHandler;
 
   /**
-   * The mocked theme initialization.
-   *
-   * @var \Drupal\Core\Theme\ThemeInitializationInterface|\PHPUnit\Framework\MockObject\MockObject
-   */
-  protected $themeInitialization;
-
-  /**
    * The mocked cache backend.
    *
    * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
@@ -89,6 +84,13 @@ class RegistryTest extends UnitTestCase {
   protected $kernel;
 
   /**
+   * They key value factory.
+   *
+   * @var \Drupal\Core\KeyValueStore\KeyValueFactoryInterface
+   */
+  protected KeyValueFactoryInterface $keyValueFactory;
+
+  /**
    * The list of functions that get_defined_functions() should provide.
    *
    * @var array
@@ -105,12 +107,13 @@ class RegistryTest extends UnitTestCase {
     $this->lock = $this->createMock('Drupal\Core\Lock\LockBackendInterface');
     $this->moduleHandler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
     $this->themeHandler = $this->createMock('Drupal\Core\Extension\ThemeHandlerInterface');
-    $this->themeInitialization = $this->createMock('Drupal\Core\Theme\ThemeInitializationInterface');
     $this->runtimeCache = $this->createMock('Drupal\Core\Cache\CacheBackendInterface');
     $this->themeManager = $this->createMock('Drupal\Core\Theme\ThemeManagerInterface');
     $this->moduleList = $this->createMock(ModuleExtensionList::class);
     $this->kernel = $this->createMock(HttpKernelInterface::class);
-    $this->registry = new Registry($this->root, $this->cache, $this->lock, $this->moduleHandler, $this->themeHandler, $this->themeInitialization, $this->runtimeCache, $this->moduleList, $this->kernel);
+    $this->keyValueFactory = new KeyValueMemoryFactory();
+
+    $this->registry = new Registry($this->cache, $this->lock, $this->moduleHandler, $this->themeHandler, $this->runtimeCache, $this->moduleList, $this->kernel, $this->keyValueFactory);
     $this->registry->setThemeManager($this->themeManager);
   }
 
@@ -154,8 +157,15 @@ class RegistryTest extends UnitTestCase {
       ->method('getActiveTheme')
       ->willReturnOnConsecutiveCalls($test_theme, $test_stable);
 
-    // Include the theme file so that hook_theme can be called.
-    include_once $this->root . '/core/tests/fixtures/test_stable/test_stable.theme';
+    // Set up a mock theme hook list for the test_stable theme. This does
+    // not actually need to exist for this test.
+    $this->keyValueFactory->get('hook_data')->set('theme_hook_list', [
+      'test_stable' => [
+        'preprocess_theme_test_render_element' => [
+          'Drupal\test_stable\Hook\TestStableHooks::preprocessThemeTestRenderElement',
+        ],
+      ],
+    ]);
     $themeTestTheme = new ThemeTestHooks();
     $this->moduleHandler->expects($this->exactly(2))
       ->method('invoke')
@@ -196,7 +206,11 @@ class RegistryTest extends UnitTestCase {
     // preprocess function worked.
     $other_registry = $this->registry->get();
     $this->assertNotSame($registry, $other_registry);
-    $this->assertContains('test_stable_preprocess_theme_test_render_element', $other_registry['theme_test_render_element']['preprocess functions']);
+    // The "function" is just a map to the invoke map which contains the theme
+    // and hook name.
+    $function = 'test_stable_preprocess_theme_test_render_element';
+    $this->assertContains($function, $other_registry['theme_test_render_element']['preprocess functions']);
+    $this->assertEquals(['theme' => 'test_stable', 'hook' => 'preprocess_theme_test_render_element'], $other_registry['preprocess invokes'][$function]);
   }
 
   /**
@@ -236,7 +250,7 @@ class RegistryTest extends UnitTestCase {
   /**
    * Provides test data to ::testPostProcessExtension().
    */
-  public static function providerTestPostProcessExtension() {
+  public static function providerTestPostProcessExtension(): array {
     // This is test data for unit testing
     // \Drupal\Core\Theme\Registry::postProcessExtension(), not what happens
     // before it. Therefore, for all test data:

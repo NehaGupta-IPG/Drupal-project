@@ -7,6 +7,7 @@ namespace Drupal\Tests\system\Unit\Breadcrumbs;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultAllowed;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Link;
 use Drupal\Core\Path\PathMatcherInterface;
 use Drupal\Core\Routing\RouteObjectInterface;
@@ -103,7 +104,7 @@ class PathBasedBreadcrumbBuilderTest extends UnitTestCase {
 
     $this->requestMatcher = $this->createMock('\Symfony\Component\Routing\Matcher\RequestMatcherInterface');
 
-    $config_factory = $this->getConfigFactoryStub(['system.site' => ['front' => 'test_frontpage']]);
+    $config_factory = $this->getConfigFactoryStub(['system.site' => ['page' => ['front' => 'test_frontpage']]]);
 
     $this->pathProcessor = $this->createMock('\Drupal\Core\PathProcessor\InboundPathProcessorInterface');
     $this->context = $this->createMock('\Drupal\Core\Routing\RequestContext');
@@ -147,8 +148,6 @@ class PathBasedBreadcrumbBuilderTest extends UnitTestCase {
 
   /**
    * Tests the build method on the frontpage.
-   *
-   * @legacy-covers ::build
    */
   public function testBuildOnFrontpage(): void {
     $this->pathMatcher->expects($this->once())
@@ -164,8 +163,6 @@ class PathBasedBreadcrumbBuilderTest extends UnitTestCase {
 
   /**
    * Tests the build method with one path element.
-   *
-   * @legacy-covers ::build
    */
   public function testBuildWithOnePathElement(): void {
     $this->context->expects($this->once())
@@ -423,11 +420,9 @@ class PathBasedBreadcrumbBuilderTest extends UnitTestCase {
 
   /**
    * Tests the applied method.
-   *
-   * @legacy-covers ::applies
    */
   public function testApplies(): void {
-    $this->assertTrue($this->builder->applies($this->createMock('Drupal\Core\Routing\RouteMatchInterface')));
+    $this->assertTrue($this->builder->applies($this->createMock('Drupal\Core\Routing\RouteMatchInterface'), new CacheableMetadata()));
   }
 
   /**
