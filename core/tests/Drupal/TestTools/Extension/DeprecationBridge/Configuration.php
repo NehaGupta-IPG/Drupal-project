@@ -119,15 +119,12 @@ final class Configuration {
     assert(empty($this->deprecationIgnorePatterns), 'deprecationIgnorePatterns can only be loaded once');
 
     // Load the deprecation ignore patterns from the specified file.
-    if (!is_file($this->ignoreFilePath)) {
-      throw new \InvalidArgumentException(sprintf('The ignoreFile "%s" does not exist.', $this->ignoreFilePath));
-    }
-    $path = $this->ignoreFilePath;
-    set_error_handler(static function ($t, $m) use ($path, &$line): void {
-      throw new \RuntimeException(sprintf('Invalid pattern found in "%s" on line "%d"', $path, 1 + $line) . substr($m, 12));
+    $path = $this->absoluteAndExistingPath($this->ignoreFilePath);
+    set_error_handler(static function () use ($path, &$line): void {
+      throw new \RuntimeException(sprintf('Invalid pattern found in "%s" on line %d', $path, 1 + $line));
     });
     try {
-      foreach (file($this->ignoreFilePath) as $line => $pattern) {
+      foreach (file($path) as $line => $pattern) {
         if ((trim($pattern)[0] ?? '#') !== '#') {
           preg_match($pattern, '');
           $this->deprecationIgnorePatterns[] = $pattern;
@@ -147,6 +144,25 @@ final class Configuration {
    */
   public static function deprecationIgnorePatterns(): array {
     return self::instance()->deprecationIgnorePatterns;
+  }
+
+  /**
+   * Returns an absolute file path, resolving relative ones from Drupal root.
+   *
+   * @param string $path
+   *   A file path.
+   *
+   * @return string
+   *   An absolute file path.
+   */
+  private function absoluteAndExistingPath(string $path): string {
+    if (!str_starts_with($path, \DIRECTORY_SEPARATOR)) {
+      $realPath = realpath(dirname(__DIR__, 6) . \DIRECTORY_SEPARATOR . $path);
+    }
+    if ($realPath === FALSE || !is_file($path)) {
+      throw new \InvalidArgumentException(sprintf('The file "%s" does not exist.', $path));
+    }
+    return $realPath ?? $path;
   }
 
 }
