@@ -405,7 +405,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
           catch (MigrateException $e) {
             // Prepend the process plugin id to the message.
             $message = sprintf("%s: %s", $plugin->getPluginId(), $e->getMessage());
-            throw new MigrateException($message, previous: $e->getPrevious());
+            throw new MigrateException($message, $e->getCode(), $e->getPrevious());
           }
           if ($plugin->isPipelineStopped()) {
             $break = TRUE;
@@ -428,7 +428,7 @@ class MigrateExecutable implements MigrateExecutableInterface {
         catch (MigrateException $e) {
           // Prepend the process plugin id to the message.
           $message = sprintf("%s: %s", $plugin->getPluginId(), $e->getMessage());
-          throw new MigrateException($message, previous: $e->getPrevious());
+          throw new MigrateException($message, $e->getCode(), $e->getPrevious());
         }
         if ($plugin->isPipelineStopped()) {
           break;
