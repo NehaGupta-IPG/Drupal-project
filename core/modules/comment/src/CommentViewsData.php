@@ -249,7 +249,8 @@ class CommentViewsData extends EntityViewsData {
       // table to {comment_entity_statistics} for each field as multiple joins
       // between the same two tables is not supported.
       if (\Drupal::service('comment.manager')->getFields($type)) {
-        $data['comment_entity_statistics']['table']['join'][$entity_type->getDataTable() ?: $entity_type->getBaseTable()] = [
+        $table = $entity_type->getDataTable() ?: $entity_type->getBaseTable();
+        $data['comment_entity_statistics']['table']['join'][$table] = [
           'type' => 'LEFT',
           'left_field' => $entity_type->getKey('id'),
           'field' => 'entity_id',
@@ -307,9 +308,13 @@ class CommentViewsData extends EntityViewsData {
       ],
     ];
 
+    // Provide last_updated for comment_entity_statistics table.
+    // The handler will determine whether to use GREATEST() with entity changed
+    // time or just the comment timestamp based on whether the entity implements
+    // EntityChangedInterface.
     $data['comment_entity_statistics']['last_updated'] = [
       'title' => $this->t('Updated/commented date'),
-      'help' => $this->t('The most recent of last comment posted or entity updated time.'),
+      'help' => $this->t('The most recent of last comment posted or entity updated time. For entities without a changed field, this is just the last comment timestamp.'),
       'field' => [
         'id' => 'comment_ces_last_updated',
         'no group by' => TRUE,
