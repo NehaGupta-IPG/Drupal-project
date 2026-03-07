@@ -772,7 +772,11 @@ function claro_preprocess_views_exposed_form(&$variables): void {
       }
 
       if (!in_array($form[$child_key]['#type'], ['hidden', 'actions'])) {
-        $form[$child_key]['#wrapper_attributes']['class'][] = 'views-exposed-form__item';
+        $attr_key = $form[$child_key]['#type'] === 'fieldset' ? '#attributes' : '#wrapper_attributes';
+        $form[$child_key][$attr_key]['class'][] = 'views-exposed-form__item';
+        if ($form[$child_key]['#type'] === 'fieldset') {
+          $form[$child_key][$attr_key]['class'][] = 'container-inline';
+        }
         $last_key = $child_key;
       }
     }
