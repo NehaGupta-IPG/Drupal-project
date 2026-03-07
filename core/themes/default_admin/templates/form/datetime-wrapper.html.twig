@@ -35,7 +35,12 @@
   <div class="help-icon">
   {% endif %}
   {% if title %}
-  <h4{{ title_attributes.addClass(title_classes) }}>{{ title }}</h4>
+  <h4{{ title_attributes.addClass(title_classes) }}>
+    {{- title -}}
+    {%- if required -%}
+      <span aria-hidden="true" class="hidden"> {{ '(required)'|t }}</span>
+    {%- endif -%}
+  </h4>
   {% endif %}
   {% if show_description_toggle %}
     {{ attach_library('default_admin/description_toggle') }}
