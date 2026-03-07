@@ -74,7 +74,7 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
     if ($template_id = $this->getHtmlBodyTemplate()) {
       return [
         '#theme' => $template_id,
-        '#params' => $this->params,
+        '#params' => $this->getParams(),
       ];
     }
     return NULL;
@@ -84,7 +84,7 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
     if ($template_id = $this->getTextBodyTemplate()) {
       return [
         '#theme' => $template_id,
-        '#params' => $this->params,
+        '#params' => $this->getParams(),
       ];
     }
     return NULL;
@@ -147,8 +147,21 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
     return $this;
   }
 
-  public function params(array $params): static {
+  public function getParams(): array {
+    return $this->params;
+  }
+
+  public function setParams(array $params): static {
     $this->params = $params;
+    return $this;
+  }
+
+  public function getParam(string $key): mixed {
+    return $this->params[$key] ?? NULL;
+  }
+
+  public function setParam(string $key, mixed $value): static {
+    $this->params[$key] = $value;
     return $this;
   }
 

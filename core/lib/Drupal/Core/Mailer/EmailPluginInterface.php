@@ -45,4 +45,12 @@ interface EmailPluginInterface extends PluginInspectionInterface, ContainerFacto
 
   public function getDefaultSubject(): \Stringable|string|null;
 
+  public function setParams(array $params): static;
+
+  public function getParams(): array;
+
+  public function setParam(string $key, mixed $value): static;
+
+  public function getParam(string $key): mixed;
+
 }
