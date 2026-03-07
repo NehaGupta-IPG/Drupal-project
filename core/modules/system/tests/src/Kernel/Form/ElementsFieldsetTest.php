@@ -99,8 +99,8 @@ class ElementsFieldsetTest extends KernelTestBase implements FormInterface {
     $form['fieldset_required'] = [
       '#type' => 'fieldset',
       '#required' => TRUE,
-      '#title' => 'Fieldset title for required description display',
-      '#description' => 'Fieldset description for required description display.',
+      '#title' => 'Fieldset title for required fieldset',
+      '#description' => 'Fieldset description for required fieldset.',
     ];
 
     return $form;
@@ -165,7 +165,7 @@ class ElementsFieldsetTest extends KernelTestBase implements FormInterface {
 
     $field_id = 'edit-fieldset-required';
 
-    // Legend element contains a "(required)" text.
+    // Verify that element contains a "(required)" text.
     $elements = $this->xpath('//fieldset[@id="' . $field_id . '"]//legend//span[contains(@class,"js-form-required")]//span[@aria-hidden="true" and @class="hidden" and contains(text(), "(required)")]');
     $this->assertCount(1, $elements);
   }
