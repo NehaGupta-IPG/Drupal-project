@@ -14,8 +14,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests that sizes-type breakpoint mappings use the largest width descriptor's
- * transformed dimensions for width/height attributes on the <source> tag.
+ * Sizes-type breakpoint mappings use the largest width descriptor's dimensions.
  *
  * @see \Drupal\responsive_image\ResponsiveImageBuilder::buildSourceAttributes()
  */
@@ -254,7 +253,7 @@ class ResponsiveImageSizesDimensionsTest extends ImageFieldTestBase {
       ])
       ->save();
 
-    [$nid, $image_uri] = $this->createTestNode();
+    [$nid] = $this->createTestNode();
     $this->drupalGet('node/' . $nid);
 
     // Narrow (sizes): must use the 480w descriptor's dimensions.
@@ -268,8 +267,10 @@ class ResponsiveImageSizesDimensionsTest extends ImageFieldTestBase {
   }
 
   /**
-   * Creates a test node with an image field, configures the display formatter,
-   * and returns the node ID plus the uploaded image's file URI.
+   * Creates a test node with an image field.
+   *
+   * Configures the display formatter, and returns the node ID plus
+   * the uploaded image's file URI.
    *
    * @return array{0: int, 1: string}
    *   Tuple of [node ID, image file URI].
