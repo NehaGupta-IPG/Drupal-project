@@ -1,0 +1,100 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\user\Plugin\PermissionsParser;
+
+use Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Utility\CallableResolver;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\user\Attribute\PermissionsParser;
+use Drupal\user\PermissionsParserPluginBase;
+use Drupal\user\Permissions\PermissionsRepositoryInterface;
+
+/**
+ * Parse the "section_callbacks" key of permissions data.
+ */
+#[PermissionsParser(
+  id: 'user_permissions_parser_section_callbacks',
+  label: new TranslatableMarkup('PermissionsParser: section callbacks'),
+  description: new TranslatableMarkup('Parse the "section_callbacks" key of permissions data.'),
+  weight: 200,
+  legacy: FALSE,
+)]
+class SectionCallbacks extends PermissionsParserPluginBase implements ContainerFactoryPluginInterface {
+
+  /**
+   * Constructs a SectionCallbacks object.
+   *
+   * {@inheritdoc}
+   */
+  public function __construct(array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    TranslationInterface $stringTranslation,
+    CallableResolver $callableResolver) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $stringTranslation, $callableResolver);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('string_translation'),
+      $container->get('callable_resolver')
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function parse(array &$permissions, string $provider, PermissionsRepositoryInterface $permissionObj): int {
+    if (empty($permissions['section_callbacks']) || !empty($permissions['section_callbacks'][self::PROCESSED_KEY]) || !is_iterable($permissions['section_callbacks'])) {
+      return 0;
+    }
+
+    $permissions['section_callbacks'][self::PROCESSED_KEY] = TRUE;
+    $count = 0;
+
+    foreach ($permissions['section_callbacks'] as $k => $callbackDefinition) {
+      if ($k == self::PROCESSED_KEY) {
+        continue;
+      }
+
+      // The next will throw an exception if $callbackDefinition isn't valid.
+      $callback = $this->callableResolver->getCallableFromDefinition($callbackDefinition);
+      $sections = call_user_func($callback);
+      if (!$sections || !is_iterable($sections)) {
+        continue;
+      }
+
+      foreach ($sections as $key => $section) {
+        if (!is_array($section)) {
+          $section = [
+            'title' => $section,
+          ];
+        }
+
+        if (empty($section['title'])) {
+          continue;
+        }
+
+        $section['key'] = $section['title'];
+        $section['title'] = $this->tWrapper($section['title'], [], ['context' => 'permissions: section title']);
+        $section['extended_help'] = !empty($section['extended_help']) ? $this->tWrapper($section['extended_help'], [], ['context' => 'permissions: extended help']) : '';
+
+        $permissionObj->addSection($provider, $section);
+        $count++;
+      }
+    }
+
+    return $count++;
+  }
+
+}
