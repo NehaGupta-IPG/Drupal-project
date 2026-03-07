@@ -19,6 +19,7 @@ use Drupal\Core\Render\RenderableInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Theme\Registry;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -75,7 +76,15 @@ class EmailManager extends DefaultPluginManager {
   /**
    * Constructs EmailPluginManager object.
    */
-  public function __construct(\Traversable $namespaces, ModuleHandlerInterface $module_handler, RendererInterface $renderer, MailerInterface $mailer, Registry $themeRegistry, CacheBackendInterface $cache_backend) {
+  public function __construct(
+    #[Autowire(service: 'container.namespaces')]
+    \Traversable $namespaces,
+    ModuleHandlerInterface $module_handler,
+    RendererInterface $renderer,
+    MailerInterface $mailer,
+    Registry $themeRegistry,
+    #[Autowire(service: 'cache.discovery')]
+    CacheBackendInterface $cache_backend) {
     parent::__construct('Plugin/Email', $namespaces, $module_handler, EmailPluginInterface::class, EmailAttribute::class);
     $this->factory = new ContainerFactory($this, EmailPluginInterface::class);
     $this->moduleHandler = $module_handler;

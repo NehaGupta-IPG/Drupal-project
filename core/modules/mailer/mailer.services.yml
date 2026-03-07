@@ -49,6 +49,9 @@ services:
   Symfony\Component\Mailer\Mailer:
     autowire: true
   Symfony\Component\Mailer\MailerInterface: '@Symfony\Component\Mailer\Mailer'
+  plugin.manager.email:
+    class: Drupal\Core\Mailer\EmailManager
+    autowire: true
   Drupal\Core\Mailer\EventSubscriber\OriginatorSubscriber:
     autowire: true
   plugin.manager.email:
