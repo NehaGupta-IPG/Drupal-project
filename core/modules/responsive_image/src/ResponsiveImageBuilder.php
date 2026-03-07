@@ -238,7 +238,7 @@ class ResponsiveImageBuilder {
     if (!empty($sizes)) {
       $source_attributes->setAttribute('sizes', implode(',', array_unique($sizes)));
     }
-   // If sizes were used, choose the largest width descriptor's transformed
+    // If sizes were used, choose the largest width descriptor's transformed
     // dimensions to populate width/height on the source tag. This provides a
     // stable intrinsic ratio and aligns the <img> attribute copy when an <img>
     // is emitted instead of <picture>.
