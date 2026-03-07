@@ -63,18 +63,18 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
   }
 
   public function getHtmlBodyTemplate(): ?string {
-    return $this->pluginDefinition['html_body_template'];
+    return strtr($this->pluginDefinition['html_body_template'], '-', '_');
   }
 
   public function getTextBodyTemplate(): ?string {
-    return $this->pluginDefinition['text_body_template'];
+    return strtr($this->pluginDefinition['text_body_template'], '-', '_');
   }
 
   public function htmlBody(): RenderableInterface|array|null {
     if ($template_id = $this->getHtmlBodyTemplate()) {
       return [
         '#theme' => $template_id,
-        '#params' => $this->getParams(),
+        '#email' => $this,
       ];
     }
     return NULL;
@@ -84,7 +84,7 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
     if ($template_id = $this->getTextBodyTemplate()) {
       return [
         '#theme' => $template_id,
-        '#params' => $this->getParams(),
+        '#email' => $this,
       ];
     }
     return NULL;

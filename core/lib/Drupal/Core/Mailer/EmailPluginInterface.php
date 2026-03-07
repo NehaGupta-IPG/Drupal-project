@@ -53,4 +53,6 @@ interface EmailPluginInterface extends PluginInspectionInterface, ContainerFacto
 
   public function getParam(string $key): mixed;
 
+  public function getLangcode(): ?string;
+
 }

@@ -19,6 +19,7 @@ use Drupal\Core\Render\RenderableInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Theme\Registry;
+use Drupal\mailer\Hook\MailerThemeHooks;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
@@ -119,6 +120,7 @@ class EmailManager extends DefaultPluginManager {
     if (empty($definition['module'])) {
       $definition['module'] = $definition['provider'];
     }
+
     $this->determineEmailBodyTemplates($definition, $plugin_id);
   }
 
@@ -130,16 +132,27 @@ class EmailManager extends DefaultPluginManager {
    */
   protected function determineEmailBodyTemplates(array &$definition, string $plugin_id): void {
     if (empty($definition['html_body_template'])) {
-      $html_template_id = 'email_body_html_' . str_replace('.', '_', $plugin_id);
-      if ($this->themeRegistry->getRuntime()->get($html_template_id)) {
-        $definition['html_body_template'] = $html_template_id;
-      }
+      $definition['html_body_template'] = 'email_body_html_' . str_replace('.', '_', $plugin_id);
     }
     if (empty($definition['text_body_template'])) {
-      $text_template_id = 'email_body_text_' . str_replace('.', '_', $plugin_id);
-      if ($this->themeRegistry->getRuntime()->get($text_template_id)) {
-        $definition['text_body_template'] = $text_template_id;
-      }
+      $definition['text_body_template'] = 'email_body_text_' . str_replace('.', '_', $plugin_id);
+    }
+    $module = $this->moduleHandler->getModule($definition['module']);
+    if ($module !== NULL && !empty($definition['html_body_template'])) {
+      $template_parts = explode('/', $definition['html_body_template']);
+      $template = array_pop($template_parts);
+      $template_path = $module->getPath() . '/emails/' . implode('/', $template_parts);
+      $definition['html_body_template'] = $template;
+      $definition['html_body_template_hook'] = strtr($template, '-', '_');
+      $definition['html_body_template_path'] = $template_path;
+    }
+    if ($module !== NULL && !empty($definition['text_body_template'])) {
+      $template_parts = explode('/', $definition['text_body_template']);
+      $template = array_pop($template_parts);
+      $template_path = $module->getPath() . '/emails/' . implode('/', $template_parts);
+      $definition['text_body_template'] = $template;
+      $definition['text_body_template_hook'] = strtr($template, '-', '_');
+      $definition['text_body_template_path'] = $template_path;
     }
   }
 
@@ -221,6 +234,38 @@ class EmailManager extends DefaultPluginManager {
       return FALSE;
     }
     return TRUE;
+  }
+
+  public function getThemeImplementations() {
+    $hooks = [];
+    $hooks['email_body_html'] = [
+      'render element' => 'elements',
+      'initial preprocess' => MailerThemeHooks::class . ':preprocessEmail',
+    ];
+    $hooks['email_body_text'] = [
+      'render element' => 'elements',
+      'initial preprocess' => MailerThemeHooks::class . ':preprocessEmail',
+    ];
+    $definitions = $this->getDefinitions();
+    foreach ($definitions as $definition) {
+      if ($template = $definition['html_body_template'] ?? NULL) {
+        $hooks[$definition['html_body_template_hook']] = [
+          'render element' => 'elements',
+          'base hook' => 'email_body_html',
+          'template' => $template,
+          'path' => $definition['html_body_template_path'] ?? NULL,
+        ];
+      }
+      if ($template = $definition['text_body_template'] ?? NULL) {
+        $hooks[$definition['text_body_template_hook']] = [
+          'render element' => 'elements',
+          'base hook' => 'email_body_text',
+          'template' => $template,
+          'path' => $definition['text_body_template_path'] ?? NULL,
+        ];
+      }
+    }
+    return $hooks;
   }
 
 }
