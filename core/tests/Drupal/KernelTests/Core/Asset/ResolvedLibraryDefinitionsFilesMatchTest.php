@@ -128,7 +128,8 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
         || $module->status == TRUE
         || $module->info['package'] == 'Testing'
         || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::EXPERIMENTAL
-        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED) {
+        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED
+        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::OBSOLETE) {
         return FALSE;
       }
       return TRUE;
@@ -171,9 +172,6 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
    */
   #[IgnoreDeprecations]
   public function testCoreLibraryCompletenessDeprecated(): void {
-    // Install the 'path_alias' entity schema because the path alias path
-    // processor requires it.
-    $this->installEntitySchema('path_alias');
     // Find and install deprecated modules to test.
     $all_modules = $this->container->get('extension.list.module')->getList();
     $deprecated_modules_to_test = array_filter($all_modules, function ($module) {

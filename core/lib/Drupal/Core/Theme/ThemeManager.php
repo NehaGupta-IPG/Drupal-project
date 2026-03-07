@@ -239,24 +239,10 @@ class ThemeManager implements ThemeManagerInterface {
       }
     }
 
-    // Include a file if the variable preprocessor is held elsewhere.
-    if (!empty($info['includes'])) {
-      foreach ($info['includes'] as $include_file) {
-        include_once $this->root . '/' . $include_file;
-      }
-    }
-
     // Invoke the variable preprocessors, if any.
     if (isset($info['base hook'])) {
       $base_hook = $info['base hook'];
       $base_hook_info = $theme_registry->get($base_hook);
-      // Include files required by the base hook, since its variable
-      // preprocessors might reside there.
-      if (!empty($base_hook_info['includes'])) {
-        foreach ($base_hook_info['includes'] as $include_file) {
-          include_once $this->root . '/' . $include_file;
-        }
-      }
       if (isset($base_hook_info['preprocess functions'])) {
         // Set a variable for the 'theme_hook_suggestion'. This is used to
         // maintain backwards compatibility with template engines.
@@ -374,24 +360,6 @@ class ThemeManager implements ThemeManagerInterface {
     else {
       $theme_engine = 'twig';
     }
-    if ($theme_engine_service = $this->getThemeEngine($theme_engine)) {
-      $render_function = [$theme_engine_service, 'renderTemplate'];
-      $extension = '';
-    }
-    else {
-      // @todo Remove in Drupal 12 in https://www.drupal.org/project/drupal/issues/3555931
-      $render_function = $theme_engine . '_render_template';
-      if (!function_exists($render_function)) {
-        $render_function = 'twig_render_template';
-      }
-      $extension_function = $theme_engine . '_extension';
-      if (function_exists($extension_function)) {
-        $extension = $extension_function();
-      }
-      else {
-        $extension = '.html.twig';
-      }
-    }
 
     if (!isset($default_attributes)) {
       $default_attributes = new Attribute();
@@ -409,7 +377,7 @@ class ThemeManager implements ThemeManagerInterface {
     }
 
     // Render the output using the template file.
-    $template_file = $info['template'] . $extension;
+    $template_file = $info['template'];
     if (isset($info['path'])) {
       $template_file = $info['path'] . '/' . $template_file;
     }
@@ -425,7 +393,7 @@ class ThemeManager implements ThemeManagerInterface {
     if (isset($theme_hook_suggestion)) {
       $variables['theme_hook_suggestion'] = $theme_hook_suggestion;
     }
-    $output = $render_function($template_file, $variables);
+    $output = $this->getThemeEngine($theme_engine)->renderTemplate($template_file, $variables);
     return ($output instanceof MarkupInterface) ? $output : (string) $output;
   }
 
