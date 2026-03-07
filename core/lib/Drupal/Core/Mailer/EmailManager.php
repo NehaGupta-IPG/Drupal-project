@@ -132,10 +132,10 @@ class EmailManager extends DefaultPluginManager {
    */
   protected function determineEmailBodyTemplates(array &$definition, string $plugin_id): void {
     if (empty($definition['html_body_template'])) {
-      $definition['html_body_template'] = 'email_body_html_' . str_replace('.', '_', $plugin_id);
+      $definition['html_body_template'] = 'email-body-html-' . str_replace('.', '-', $plugin_id);
     }
     if (empty($definition['text_body_template'])) {
-      $definition['text_body_template'] = 'email_body_text_' . str_replace('.', '_', $plugin_id);
+      $definition['text_body_template'] = 'email-body-text-' . str_replace('.', '-', $plugin_id);
     }
     $module = $this->moduleHandler->getModule($definition['module']);
     if ($module !== NULL && !empty($definition['html_body_template'])) {
