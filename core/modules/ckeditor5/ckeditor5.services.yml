@@ -28,4 +28,3 @@ services:
     class: Drupal\ckeditor5\Hook\Ckeditor5Hooks
     arguments:
       - '@Drupal\ckeditor5\LanguageMapper'
-

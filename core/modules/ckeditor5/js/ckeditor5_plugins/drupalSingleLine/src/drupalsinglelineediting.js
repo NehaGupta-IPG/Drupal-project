@@ -84,7 +84,9 @@ class DrupalSingleLineEditing extends Plugin {
             // Remove non-content elements (scripts, styles, comments, etc.).
             // These should not appear in editor content.
             const nonContentElements = Array.from(
-              tempDiv.querySelectorAll('script, style, noscript, iframe, object, embed'),
+              tempDiv.querySelectorAll(
+                'script, style, noscript, iframe, object, embed',
+              ),
             );
             nonContentElements.forEach((el) => el.remove());
 
@@ -95,18 +97,46 @@ class DrupalSingleLineEditing extends Plugin {
             // iterating.
             const blockSelectors = [
               // Text containers (from CKEditor 5's $block text containers).
-              'p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'pre',
+              'p',
+              'div',
+              'h1',
+              'h2',
+              'h3',
+              'h4',
+              'h5',
+              'h6',
+              'pre',
               // Lists and list items.
-              'ul', 'ol', 'li',
+              'ul',
+              'ol',
+              'li',
               // Block quotes and horizontal rules.
-              'blockquote', 'hr',
+              'blockquote',
+              'hr',
               // Tables (all table-related elements should be removed).
-              'table', 'thead', 'tbody', 'tfoot', 'tr', 'td', 'th', 'caption',
+              'table',
+              'thead',
+              'tbody',
+              'tfoot',
+              'tr',
+              'td',
+              'th',
+              'caption',
               // Media containers.
-              'figure', 'figcaption',
+              'figure',
+              'figcaption',
               // Other block elements.
-              'section', 'article', 'aside', 'header', 'footer', 'nav', 'main',
-              'address', 'dl', 'dt', 'dd',
+              'section',
+              'article',
+              'aside',
+              'header',
+              'footer',
+              'nav',
+              'main',
+              'address',
+              'dl',
+              'dt',
+              'dd',
             ];
             const blockElements = Array.from(
               tempDiv.querySelectorAll(blockSelectors.join(', ')),
@@ -173,7 +203,10 @@ class DrupalSingleLineEditing extends Plugin {
           } catch (error) {
             // If HTML parsing fails, fall through to plain text handling.
             // eslint-disable-next-line no-console
-            console.warn('Failed to parse pasted HTML, falling back to plain text:', error);
+            console.warn(
+              'Failed to parse pasted HTML, falling back to plain text:',
+              error,
+            );
           }
         }
 
@@ -200,4 +233,3 @@ class DrupalSingleLineEditing extends Plugin {
 }
 
 export default DrupalSingleLineEditing;
-

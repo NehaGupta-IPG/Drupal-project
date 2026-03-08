@@ -28,6 +28,12 @@ class SingleLinePluginTest extends UnitTestCase {
   public function testGetDynamicPluginConfig(): void {
     $definition_block = new CKEditor5PluginDefinition([
       'id' => 'ckeditor5_list',
+      'ckeditor5' => [
+        'plugins' => [
+          'list.List',
+          'list.ListUI',
+        ],
+      ],
       'drupal' => [
         'toolbar_items' => [
           'bulletedList' => ['label' => 'Bulleted List'],
@@ -39,6 +45,11 @@ class SingleLinePluginTest extends UnitTestCase {
 
     $definition_inline = new CKEditor5PluginDefinition([
       'id' => 'ckeditor5_bold',
+      'ckeditor5' => [
+        'plugins' => [
+          'basicStyles.Bold',
+        ],
+      ],
       'drupal' => [
         'toolbar_items' => [
           'bold' => ['label' => 'Bold'],
@@ -68,8 +79,8 @@ class SingleLinePluginTest extends UnitTestCase {
       $dynamic_config['drupalSingleLine']['blockToolbarItems']
     );
     $this->assertSame(
-      ['bulletedList', 'numberedList'],
-      $dynamic_config['drupalSingleLine']['blockCommands']
+      ['list.List', 'list.ListUI'],
+      $dynamic_config['drupalSingleLine']['blockCKEditor5Plugins']
     );
   }
 
@@ -79,7 +90,6 @@ class SingleLinePluginTest extends UnitTestCase {
   protected function setProtectedProperty(object $object, string $property, mixed $value): void {
     $ref = new \ReflectionObject($object);
     $prop = $ref->getProperty($property);
-    $prop->setAccessible(TRUE);
     $prop->setValue($object, $value);
   }
 

@@ -362,10 +362,12 @@
       // block-level features. Automatically enable single-line mode for
       // text_textfield widgets.
       let filteredToolbar = toolbar;
-      const isSingleLine = element.getAttribute('data-drupal-ckeditor5-single-line') === 'true';
+      const isSingleLine =
+        element.getAttribute('data-drupal-ckeditor5-single-line') === 'true';
       if (isSingleLine) {
         const singleLineConfig = pluginConfig.drupalSingleLine || {};
-        const blockCKEditor5Plugins = singleLineConfig.blockCKEditor5Plugins || [];
+        const blockCKEditor5Plugins =
+          singleLineConfig.blockCKEditor5Plugins || [];
         const blockToolbarItems = singleLineConfig.blockToolbarItems || [];
 
         // Filter out non-inline plugins to prevent them from loading.
@@ -386,8 +388,15 @@
       let extraPlugins = selectPlugins(filteredPlugins);
 
       // Load the single-line plugin if available for single-line editors.
-      if (isSingleLine && CKEditor5.drupalSingleLine && CKEditor5.drupalSingleLine.DrupalSingleLineEditing) {
-        extraPlugins = [...extraPlugins, CKEditor5.drupalSingleLine.DrupalSingleLineEditing];
+      if (
+        isSingleLine &&
+        CKEditor5.drupalSingleLine &&
+        CKEditor5.drupalSingleLine.DrupalSingleLineEditing
+      ) {
+        extraPlugins = [
+          ...extraPlugins,
+          CKEditor5.drupalSingleLine.DrupalSingleLineEditing,
+        ];
       }
 
       const editorConfig = {
@@ -441,14 +450,19 @@
           Drupal.CKEditor5Instances.set(id, editor);
 
           // Copy single-line attribute to CKEditor element for CSS targeting.
-          const singleLineAttr = element.getAttribute('data-drupal-ckeditor5-single-line');
-          const ckEditorElement = editor.ui.view.editable.element.closest('.ck-editor');
+          const singleLineAttr = element.getAttribute(
+            'data-drupal-ckeditor5-single-line',
+          );
+          const ckEditorElement =
+            editor.ui.view.editable.element.closest('.ck-editor');
           if (singleLineAttr) {
-            ckEditorElement.setAttribute('data-drupal-ckeditor5-single-line', singleLineAttr);
+            ckEditorElement.setAttribute(
+              'data-drupal-ckeditor5-single-line',
+              singleLineAttr,
+            );
             // For single-line editors, set a compact min-height that fits one line of text.
             ckEditorElement.style.setProperty('--ck-min-height', '2.25rem');
-          }
-          else {
+          } else {
             // Set the minimum height of the editable area to correspond with the
             // value of the number of rows. We attach this custom property to
             // the `.ck-editor` element, as that doesn't get its inline styles

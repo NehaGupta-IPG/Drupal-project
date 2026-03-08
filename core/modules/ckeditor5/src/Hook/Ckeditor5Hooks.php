@@ -30,7 +30,6 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\editor\EditorInterface;
 use Drupal\filter\Entity\FilterFormat;
-use Drupal\ckeditor5\Plugin\CKEditor5Plugin\SingleLine;
 
 /**
  * Hook implementations for ckeditor5.
@@ -510,7 +509,6 @@ class Ckeditor5Hooks {
     // The attribute is already set in applySingleLineEnhancementsAfterBuild().
     // Just attach the library and other enhancements.
     $element['#attached']['library'][] = 'ckeditor5/internal.drupal.ckeditor5.singleLine';
-
 
     // Add validation handler to normalize the value to a single line.
     // This needs to be on the parent element, not the value child.

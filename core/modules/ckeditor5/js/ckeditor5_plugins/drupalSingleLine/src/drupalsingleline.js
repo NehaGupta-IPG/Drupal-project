@@ -26,4 +26,3 @@ class DrupalSingleLine extends Plugin {
 }
 
 export default DrupalSingleLine;
-
