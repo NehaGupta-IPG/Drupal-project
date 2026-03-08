@@ -50,6 +50,13 @@ class MediaSettingsTest extends MediaFunctionalTestBase {
     ], 'Save configuration');
     $assert_session->statusMessageContains('The configuration options have been saved.', 'status');
     $this->assertNull($this->config('media.settings')->get('iframe_domain'));
+
+    // Check that the correct value for the "X-Frame-Options" header is set when
+    // using an alternate IFRAME domain.
+    $iframe_domain = 'http://example.com';
+    $this->config('media.settings')->set('iframe_domain', $iframe_domain)->save();
+    $this->drupalGet('<front>');
+    $assert_session->responseHeaderEquals('X-Frame-Options', 'ALLOW-FROM: ' . $iframe_domain);
   }
 
 }
