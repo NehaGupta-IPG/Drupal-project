@@ -162,8 +162,15 @@ class ThemeInstaller implements ThemeInstallerInterface {
       // Reset theme listing.
       $this->themeHandler->reset();
 
+      // Add new themes to the list of installed themes.
+      $register_themes = array_merge(array_keys($installed_themes), $themes_installed);
+      // Get list of extensions for the new list of themes.
+      $register_themes = array_intersect_key($theme_data, array_flip($register_themes));
+      // Reset system to clear caches and register plugins.
+      $this->resetSystem($register_themes);
+
       // Only install default configuration if this theme has not been installed
-      // already.
+      // previously.
       if (!isset($installed_themes[$key])) {
         // Install default configuration of the theme.
         $this->configInstaller->installDefaultConfig('theme', $key);
@@ -175,11 +182,6 @@ class ThemeInstaller implements ThemeInstallerInterface {
     }
 
     $this->cssCollectionOptimizer->deleteAll();
-    // Add new themes to the list of installed themes.
-    $register_themes = array_merge(array_keys($installed_themes), $themes_installed);
-    // Get list of extensions for the new list of themes.
-    $register_themes = array_intersect_key($theme_data, array_flip($register_themes));
-    $this->resetSystem($register_themes);
 
     // Invoke hook_themes_installed() after the themes have been installed.
     $this->moduleHandler->invokeAll('themes_installed', [$themes_installed]);
