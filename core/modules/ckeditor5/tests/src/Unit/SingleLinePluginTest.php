@@ -12,7 +12,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\ckeditor5\Plugin\CKEditor5Plugin\SingleLine
+ * Tests the single-line CKEditor 5 plugin.
  *
  * @internal
  */
