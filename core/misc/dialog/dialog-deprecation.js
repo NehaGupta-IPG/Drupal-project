@@ -55,4 +55,21 @@
       $(dialog).off(`dialogButtonsChange.dialogDeprecation`);
     });
   }
+
+  // jQuery UI dialog position deprecation.
+  const originalOption = $.ui.dialog.prototype.option;
+
+  $.ui.dialog.prototype.option = function (key, ...rest) {
+    if (typeof key === 'object') {
+      Object.keys(key).forEach((k) => {
+        if (k === 'position') {
+          Drupal.deprecationError({
+            message: `Using 'position' option in dialog is deprecated and will be removed in future versions. See https://www.drupal.org/node/3474095`,
+          });
+        }
+      });
+    }
+
+    return originalOption.apply(this, [key, ...rest]);
+  };
 })(jQuery, Drupal, once);

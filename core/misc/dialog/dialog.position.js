@@ -1,3 +1,4 @@
+/* cspell:ignore autoupdate, uidom */
 /**
  * @file
  * Positioning extensions for dialogs.
@@ -9,117 +10,95 @@
  * @event dialogContentResize
  */
 
-(function ($, Drupal, drupalSettings, debounce, displace) {
+(function (
+  $,
+  drupalSettings,
+  displace,
+  { autoUpdate, computePosition, offset, size },
+) {
   // autoResize option will turn off resizable and draggable.
   drupalSettings.dialog = $.extend(
     { autoResize: true, maxHeight: '95%' },
     drupalSettings.dialog,
   );
 
-  /**
-   * Position the dialog's center at the center of displace.offsets boundaries.
-   *
-   * @function Drupal.dialog~resetPosition
-   *
-   * @param {object} options
-   *   Options object.
-   *
-   * @return {object}
-   *   Altered options object.
-   */
-  function resetPosition(options) {
-    const offsets = displace.offsets;
-    const left = offsets.left - offsets.right;
-    const top = offsets.top - offsets.bottom;
+  // Feature of floating UI.
+  // https://floating-ui.com/docs/virtual-elements
 
-    const leftString = `${
-      (left > 0 ? '+' : '-') + Math.abs(Math.round(left / 2))
-    }px`;
-    const topString = `${
-      (top > 0 ? '+' : '-') + Math.abs(Math.round(top / 2))
-    }px`;
-    options.position = {
-      my: `center${left !== 0 ? leftString : ''} center${
-        top !== 0 ? topString : ''
-      }`,
-      of: window,
+  const getVirtualEl = ({ settings }) => {
+    const availableSpace = {
+      x: 0,
+      y: 0,
+      top: 0,
+      left: 0,
+      bottom: 0,
+      right: 0,
+      width: window.innerWidth,
+      height: window.innerHeight,
     };
-    return options;
-  }
 
-  /**
-   * Resets the current options for positioning.
-   *
-   * This is used as a window resize and scroll callback to reposition the
-   * jQuery UI dialog. Although not a built-in jQuery UI option, this can
-   * be disabled by setting autoResize: false in the options array when creating
-   * a new {@link Drupal.dialog}.
-   *
-   * @function Drupal.dialog~resetSize
-   *
-   * @param {jQuery.Event} event
-   *   The event triggered.
-   *
-   * @fires event:dialogContentResize
-   */
-  function resetSize(event) {
-    const positionOptions = [
-      'width',
-      'height',
-      'minWidth',
-      'minHeight',
-      'maxHeight',
-      'maxWidth',
-      'position',
-    ];
-    let adjustedOptions = {};
-    let windowHeight = $(window).height();
-    let option;
-    let optionValue;
-    let adjustedValue;
-    for (let n = 0; n < positionOptions.length; n++) {
-      option = positionOptions[n];
-      optionValue = event.data.settings[option];
-      if (optionValue) {
-        // jQuery UI does not support percentages on heights, convert to pixels.
-        if (
-          typeof optionValue === 'string' &&
-          optionValue.endsWith('%') &&
-          /height/i.test(option)
-        ) {
-          // Take offsets in account.
-          windowHeight -= displace.offsets.top + displace.offsets.bottom;
-          adjustedValue = parseInt(
-            0.01 * parseInt(optionValue, 10) * windowHeight,
-            10,
-          );
-          // Don't force the dialog to be bigger vertically than needed.
-          if (
-            option === 'height' &&
-            Math.round(event.data.$element.parent().outerHeight()) <
-              adjustedValue
-          ) {
-            adjustedValue = 'auto';
-          }
-          adjustedOptions[option] = adjustedValue;
-        }
-      }
+    if (!settings.modal) {
+      availableSpace.top = displace.offsets.top;
+      availableSpace.left = displace.offsets.left;
+      availableSpace.bottom = displace.offsets.bottom;
+      availableSpace.right = displace.offsets.right;
+      availableSpace.width =
+        window.innerWidth - displace.offsets.left - displace.offsets.right;
+      availableSpace.height =
+        window.innerHeight - displace.offsets.top - displace.offsets.bottom;
     }
-    // Offset the dialog center to be at the center of Drupal.displace.offsets.
-    if (!event.data.settings.modal) {
-      adjustedOptions = resetPosition(adjustedOptions);
-    }
-    event.data.$element.dialog('option', adjustedOptions);
 
-    event.data.$element
-      ?.get(0)
-      ?.dispatchEvent(
+    return {
+      getBoundingClientRect() {
+        return availableSpace;
+      },
+    };
+  };
+
+  const resetPositionFloatingUI = (e) => {
+    const widget = e.target.closest('[role="dialog"]');
+    const virtualEl = getVirtualEl(e);
+
+    const updatePosition = () => {
+      computePosition(getVirtualEl(e), widget, {
+        strategy: 'fixed',
+        middleware: [
+          offset(({ rects }) => {
+            return {
+              mainAxis: -rects.reference.height / 2 - rects.floating.height / 2,
+            };
+          }),
+          size({
+            apply({ availableWidth, availableHeight, elements }) {
+              Object.assign(elements.floating.style, {
+                maxWidth: `${availableWidth}px`,
+                maxHeight: `${availableHeight}px`,
+              });
+            },
+          }),
+        ],
+      }).then(({ x, y }) => {
+        Object.assign(widget.style, {
+          left: `${x}px`,
+          top: `${y}px`,
+        });
+      });
+
+      // Same custom event.
+      // https://www.drupal.org/project/drupal/issues/3445033
+      e.target?.dispatchEvent(
         new CustomEvent('dialogContentResize', { bubbles: true }),
       );
-  }
+    };
+
+    // Feature of floating UI.
+    // https://floating-ui.com/docs/autoUpdate
+    const cleanup = autoUpdate(virtualEl, widget, updatePosition);
+
+    return { cleanup, updatePosition };
+  };
 
   window.addEventListener('dialog:aftercreate', (e) => {
-    const autoResize = debounce(resetSize, 20);
     const $element = $(e.target);
     const { settings } = e;
     const eventData = { settings, $element };
@@ -129,19 +108,22 @@
         .dialog('option', { resizable: false, draggable: false })
         .dialog('widget');
       uiDialog[0].style.position = 'fixed';
-      $(window)
-        .on('resize.dialogResize scroll.dialogResize', eventData, autoResize)
-        .trigger('resize.dialogResize');
+
+      const { cleanup, updatePosition } = resetPositionFloatingUI(e);
+      e.target.addEventListener('disable-resize-autoupdate', () => {
+        cleanup();
+      });
+
       $(document).on(
         'drupalViewportOffsetChange.dialogResize',
         eventData,
-        autoResize,
+        updatePosition,
       );
     }
   });
 
-  window.addEventListener('dialog:beforeclose', () => {
-    $(window).off('.dialogResize');
+  window.addEventListener('dialog:beforeclose', (e) => {
+    e.target.dispatchEvent(new CustomEvent('disable-resize-autoupdate'));
     $(document).off('.dialogResize');
   });
-})(jQuery, Drupal, drupalSettings, Drupal.debounce, Drupal.displace);
+})(jQuery, drupalSettings, Drupal.displace, FloatingUIDOM);
