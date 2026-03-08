@@ -507,8 +507,7 @@ ckeditor5_autoformat:
 
 ckeditor5_singleLine:
   ckeditor5:
-    plugins:
-      - drupalSingleLine.DrupalSingleLine
+    plugins: []
   drupal:
     label: Single line editing
     library: ckeditor5/internal.drupal.ckeditor5.singleLine
