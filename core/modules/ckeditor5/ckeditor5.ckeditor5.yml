@@ -510,7 +510,6 @@ ckeditor5_singleLine:
     plugins: []
   drupal:
     label: Single line editing
-    library: ckeditor5/internal.drupal.ckeditor5.singleLine
     class: Drupal\ckeditor5\Plugin\CKEditor5Plugin\SingleLine
     elements: false
     conditions: []
