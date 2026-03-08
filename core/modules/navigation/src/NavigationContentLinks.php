@@ -25,23 +25,20 @@ final class NavigationContentLinks implements ContainerInjectionInterface {
 
   use StringTranslationTrait;
 
-  /**
-   * Construct a new NavigationContentLinks object.
-   *
-   * @param \Drupal\Core\Routing\RouteProviderInterface $routeProvider
-   *   The route provider.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   */
-  public function __construct(private RouteProviderInterface $routeProvider, private EntityTypeManagerInterface $entityTypeManager) {}
+  public function __construct(
+    private RouteProviderInterface $routeProvider,
+    private EntityTypeManagerInterface $entityTypeManager,
+    private MenuLinkManagerInterface $menuLinkManager,
+  ) {}
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container): static {
     return new static(
-      $container->get('router.route_provider'),
-      $container->get('entity_type.manager')
+      $container->get(RouteProviderInterface::class),
+      $container->get(EntityTypeManagerInterface::class),
+      $container->get(MenuLinkManagerInterface::class),
     );
   }
 
@@ -121,10 +118,8 @@ final class NavigationContentLinks implements ContainerInjectionInterface {
    *
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity that was updated.
-   * @param \Drupal\Core\Menu\MenuLinkManagerInterface $menuLinkManager
-   *   The menu link manager.
    */
-  public function updateCreateEntityLinks(EntityInterface $entity, MenuLinkManagerInterface $menuLinkManager): void {
+  public function updateCreateEntityLinks(EntityInterface $entity): void {
     $entity_type_id = $entity->getEntityTypeId();
     $bundle_types = static::getBundleEntityTypes();
     if (!isset($bundle_types[$entity_type_id])) {
@@ -135,10 +130,11 @@ final class NavigationContentLinks implements ContainerInjectionInterface {
       return;
     }
     $link_id = 'navigation.content.' . $entity_type_id . '.' . $entity->id();
-    if (!$menuLinkManager->hasDefinition($link_id)) {
+    if (!$this->menuLinkManager->hasDefinition($link_id)) {
       return;
     }
-    $menuLinkManager->updateDefinition($link_id, ['title' => $entity->label()]);
+
+    $this->menuLinkManager->rebuild();
   }
 
   /**
