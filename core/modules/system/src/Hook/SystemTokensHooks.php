@@ -342,7 +342,7 @@ class SystemTokensHooks {
    *   The logo path, or NULL if the "logo.url" setting does not exist for the
    *   theme.
    */
-  protected function getLogoPath(string $theme, BubbleableMetadata $bubbleable_metadata) {
+  protected function getLogoPath(string $theme, BubbleableMetadata $bubbleable_metadata): ?string {
     if ($theme === 'default-theme') {
       // Add the cache dependency.
       $system_theme_config = \Drupal::config('system.theme');
@@ -377,7 +377,7 @@ class SystemTokensHooks {
    *   An HTML <img> tag for the logo or an empty string if no logo is
    *   configured for the theme.
    */
-  protected function getLogoRendered(string $theme, BubbleableMetadata $bubbleable_metadata) {
+  protected function getLogoRendered(string $theme, BubbleableMetadata $bubbleable_metadata): MarkupInterface|string {
     $logo_path = $this->getLogoPath($theme, $bubbleable_metadata);
     // No active / default theme logo is configured, simply return an empty
     // string:
