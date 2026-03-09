@@ -620,7 +620,7 @@ abstract class Database {
     $additional_class_loader->register(TRUE);
 
     /** @var ConnectionInfoArray $options */
-    $options = $connection_class::createConnectionOptionsFromUrl($url, NULL);
+    $options = $connection_class::createConnectionOptionsFromUrl($url);
 
     // Add the necessary information to autoload code.
     // @see \Drupal\Core\Site\Settings::initialize()

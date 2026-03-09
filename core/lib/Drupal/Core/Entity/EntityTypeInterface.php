@@ -814,12 +814,16 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    *
    * @param string $constraint_name
    *   The name of the constraint to add, i.e. its plugin id.
+   * phpcs:disable Drupal.Commenting
+   * @todo Uncomment new method parameter signature before drupal:12.0.0.
+   * @see https://www.drupal.org/node/3554746
    * @param array|null $options
    *   The constraint options as required by the constraint plugin, or NULL.
+   * phpcs:enable
    *
    * @return $this
    */
-  public function addConstraint($constraint_name, $options = NULL);
+  public function addConstraint($constraint_name, /* ?array */$options = NULL);
 
   /**
    * Gets the config dependency info for this entity, if any exists.
@@ -833,5 +837,16 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    *   - 'name': The name of the config dependency.
    */
   public function getBundleConfigDependency($bundle);
+
+  /**
+   * Checks if this entity type has an integer ID.
+   *
+   * @return bool|null
+   *   Returns:
+   *     - TRUE if the entity type ID is defined as integer;
+   *     - FALSE if the entity type ID is defined as string;
+   *     - NULL if the entity type lacks an ID key.
+   */
+  public function hasIntegerId(): ?bool;
 
 }

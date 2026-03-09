@@ -126,8 +126,6 @@ class ConfigEntityTypeTest extends UnitTestCase {
 
   /**
    * Tests set storage class.
-   *
-   * @legacy-covers ::setStorageClass
    */
   public function testSetStorageClass(): void {
     $config_entity = $this->setUpConfigEntityType([]);
@@ -138,8 +136,6 @@ class ConfigEntityTypeTest extends UnitTestCase {
 
   /**
    * Tests the getConfigPrefix() method.
-   *
-   * @legacy-covers ::getConfigPrefix
    */
   #[DataProvider('providerTestGetConfigPrefix')]
   public function testGetConfigPrefix($definition, $expected): void {
@@ -159,8 +155,6 @@ class ConfigEntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get properties to export.
-   *
-   * @legacy-covers ::getPropertiesToExport
    */
   #[DataProvider('providerGetPropertiesToExport')]
   public function testGetPropertiesToExport($definition, $expected): void {
@@ -212,14 +206,24 @@ class ConfigEntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get properties to export no fallback.
-   *
-   * @legacy-covers ::getPropertiesToExport
    */
   public function testGetPropertiesToExportNoFallback(): void {
     $config_entity_type = new ConfigEntityType([
       'id' => 'example_config_entity_type',
     ]);
     $this->assertNull($config_entity_type->getPropertiesToExport());
+  }
+
+  /**
+   * Tests get ConfigEntityType::hasIntegerId() method.
+   *
+   * @legacy-covers ::hasIntegerId
+   */
+  public function testHasIntegerId(): void {
+    $config_entity_type = new ConfigEntityType([
+      'id' => 'example_config_entity_type',
+    ]);
+    $this->assertFalse($config_entity_type->hasIntegerId());
   }
 
 }

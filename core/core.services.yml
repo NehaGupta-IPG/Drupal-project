@@ -421,7 +421,6 @@ services:
   config.installer:
     class: Drupal\Core\Config\ConfigInstaller
     arguments: ['@config.factory', '@config.storage', '@config.typed', '@config.manager', '@event_dispatcher', '%install_profile%', '@extension.path.resolver']
-    lazy: true
   Drupal\Core\Config\ConfigInstallerInterface: '@config.installer'
   config.storage:
     class: Drupal\Core\Config\CachedStorage
@@ -689,7 +688,6 @@ services:
   module_installer:
     class: Drupal\Core\Extension\ModuleInstaller
     autowire: true
-    lazy: true
   Drupal\Core\Extension\ModuleInstallerInterface: '@module_installer'
   module_installer.uninstall_validators:
     class: \IteratorIterator
@@ -959,7 +957,7 @@ services:
     arguments: ['@event_dispatcher', '@controller_resolver', '@request_stack', '@http_kernel.controller.argument_resolver', true]
   http_kernel.controller.argument_resolver:
     class: Symfony\Component\HttpKernel\Controller\ArgumentResolver
-    arguments: ['@http_kernel.controller.argument_metadata_factory', ['@argument_resolver.request_attribute', '@argument_resolver.request', '@argument_resolver.psr7_request', '@argument_resolver.route_match', '@argument_resolver.default']]
+    arguments: ['@http_kernel.controller.argument_metadata_factory', ['@argument_resolver.request_attribute', '@argument_resolver.request', '@argument_resolver.psr7_request', '@argument_resolver.route_match', '@argument_resolver.query_parameter', '@argument_resolver.default']]
   Symfony\Component\HttpKernel\Controller\ArgumentResolverInterface: '@http_kernel.controller.argument_resolver'
   http_kernel.controller.argument_metadata_factory:
     class: Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory
@@ -980,6 +978,9 @@ services:
     public: false
   argument_resolver.default:
     class: Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver
+    public: false
+  argument_resolver.query_parameter:
+    class: Symfony\Component\HttpKernel\Controller\ArgumentResolver\QueryParameterValueResolver
     public: false
   http_middleware.content_length:
     class: Drupal\Core\StackMiddleware\ContentLength
@@ -1161,10 +1162,6 @@ services:
     arguments: ['@database']
     tags:
       - { name: backend_overridable }
-  pgsql.entity.query.sql:
-    class: Drupal\Core\Entity\Query\Sql\pgsql\QueryFactory
-    arguments: ['@database']
-    deprecated: The "%service_id%" service is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Install the pgsql module to replace this service. See https://www.drupal.org/node/3488580
   entity.query.null:
     class: Drupal\Core\Entity\Query\Null\QueryFactory
   entity.query.keyvalue:
@@ -1568,14 +1565,14 @@ services:
       - { name: stream_wrapper, scheme: theme }
   image.toolkit.manager:
     class: Drupal\Core\ImageToolkit\ImageToolkitManager
-    arguments: ['@config.factory']
+    autowire: true
     parent: default_plugin_manager
     tags:
       - { name: plugin_manager_cache_clear }
   Drupal\Core\ImageToolkit\ImageToolkitManager: '@image.toolkit.manager'
   image.toolkit.operation.manager:
     class: Drupal\Core\ImageToolkit\ImageToolkitOperationManager
-    arguments: ['@logger.channel.image', '@image.toolkit.manager']
+    autowire: true
     parent: default_plugin_manager
     tags:
       - { name: plugin_manager_cache_clear }
