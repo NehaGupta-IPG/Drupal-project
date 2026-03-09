@@ -501,10 +501,13 @@ abstract class Connection {
    * signature. We therefore also ensure that this function is only ever
    * called once.
    *
-   * @param string $target
+   * @param string|int $target
    *   (optional) The target this connection is for.
    */
   public function setTarget($target = NULL) {
+    if (is_int($target)) {
+      @trigger_error('Passing an integer value to the $target parameter in ' . __METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
+    }
     if (!isset($this->target)) {
       $this->target = $target;
     }
@@ -523,10 +526,13 @@ abstract class Connection {
   /**
    * Tells this connection object what its key is.
    *
-   * @param string $key
+   * @param string|int $key
    *   The key this connection is for.
    */
   public function setKey($key) {
+    if (is_int($key)) {
+      @trigger_error('Passing an integer value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
+    }
     if (!isset($this->key)) {
       $this->key = $key;
     }
