@@ -55,7 +55,7 @@ class Log {
   /**
    * Constructor.
    *
-   * @param string|int $key
+   * @param string $key
    *   The database connection key for which to enable logging.
    */
   public function __construct($key = 'default') {

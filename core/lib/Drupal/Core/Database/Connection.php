@@ -499,7 +499,7 @@ abstract class Connection {
    * signature. We therefore also ensure that this function is only ever
    * called once.
    *
-   * @param string|int $target
+   * @param string $target
    *   (optional) The target this connection is for.
    */
   public function setTarget($target = NULL) {
@@ -524,7 +524,7 @@ abstract class Connection {
   /**
    * Tells this connection object what its key is.
    *
-   * @param string|int $key
+   * @param string $key
    *   The key this connection is for.
    */
   public function setKey($key) {

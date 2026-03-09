@@ -101,7 +101,7 @@ abstract class Database {
    *
    * @param string $logging_key
    *   The logging key to log.
-   * @param string|int $key
+   * @param string $key
    *   The database connection key for which we want to log.
    *
    * @return \Drupal\Core\Database\Log
@@ -116,7 +116,7 @@ abstract class Database {
       @trigger_error('Passing an integer value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
     }
     if (empty(self::$logs[$key])) {
-      self::$logs[$key] = new Log($key);
+      self::$logs[$key] = new Log((string) $key);
 
       // Every target already active for this connection key needs to have the
       // logging object associated with it.
@@ -142,7 +142,7 @@ abstract class Database {
    *
    * @param string $logging_key
    *   The logging key to log.
-   * @param string|int $key
+   * @param string $key
    *   The database connection key for which we want to log.
    *
    * @return list<DatabaseLogEntry>
@@ -165,9 +165,9 @@ abstract class Database {
   /**
    * Gets the connection object for the specified database key and target.
    *
-   * @param string|int $target
+   * @param string $target
    *   The database target name.
-   * @param string|int|null $key
+   * @param ?string $key
    *   (optional) The database connection key. Defaults to NULL which means the
    *   active key.
    *
@@ -218,10 +218,10 @@ abstract class Database {
   /**
    * Sets the active connection to the specified key.
    *
-   * @param string|int $key
+   * @param string $key
    *   The database connection key.
    *
-   * @return string|int|null
+   * @return ?string
    *   The previous database connection key, or NULL if no connection was
    *   previously active.
    */
@@ -319,9 +319,9 @@ abstract class Database {
    *
    * If the given key/target pair already exists, this method will be ignored.
    *
-   * @param string|int $key
+   * @param string $key
    *   The database key.
-   * @param string|int $target
+   * @param string $target
    *   The database target name.
    * @param UnprocessedConnectionInfoArray $info
    *   The database connection information, as defined in settings.php. The
@@ -370,7 +370,7 @@ abstract class Database {
   /**
    * Gets information on the specified database connection.
    *
-   * @param string|int $key
+   * @param string $key
    *   (optional) The connection key for which to return information. If not
    *   specified, the 'default' connection key will be returned.
    *
@@ -422,9 +422,9 @@ abstract class Database {
   /**
    * Rename a connection and its corresponding connection information.
    *
-   * @param string|int $old_key
+   * @param string $old_key
    *   The old connection key.
-   * @param string|int $new_key
+   * @param string $new_key
    *   The new connection key.
    *
    * @return bool
@@ -456,7 +456,7 @@ abstract class Database {
   /**
    * Remove a connection and its corresponding connection information.
    *
-   * @param string|int $key
+   * @param string $key
    *   The connection key.
    *
    * @return bool
@@ -477,9 +477,9 @@ abstract class Database {
   /**
    * Opens a connection to the server specified by the given key and target.
    *
-   * @param string|int $key
+   * @param string $key
    *   The database connection key, as specified in settings.php.
-   * @param string|int $target
+   * @param string $target
    *   The database target to open.
    *
    * @throws \Drupal\Core\Database\ConnectionNotDefinedException
@@ -509,8 +509,8 @@ abstract class Database {
     $client_connection = $driver_class::open(self::$databaseInfo[$key][$target]);
     $new_connection = new $driver_class($client_connection, self::$databaseInfo[$key][$target]);
     assert($new_connection instanceof Connection);
-    $new_connection->setTarget($target);
-    $new_connection->setKey($key);
+    $new_connection->setTarget((string) $target);
+    $new_connection->setKey((string) $key);
 
     // If we have any active logging objects for this connection key, we need
     // to associate them with the connection we just opened.
@@ -525,10 +525,10 @@ abstract class Database {
   /**
    * Closes a connection to the server specified by the given key and target.
    *
-   * @param string|int|null $target
+   * @param ?string $target
    *   (optional) The database target name. Defaults to NULL meaning that all
    *   target connections will be closed.
-   * @param string|int|null $key
+   * @param ?string $key
    *   (optional) The database connection key. Defaults to NULL which means the
    *   active key.
    */
@@ -573,9 +573,9 @@ abstract class Database {
    * key will then always fall back to 'default' for that key, even if it's
    * defined.
    *
-   * @param string|int $key
+   * @param string $key
    *   The database connection key.
-   * @param string|int $target
+   * @param string $target
    *   The target of the specified key to ignore.
    */
   public static function ignoreTarget(string|int $key, string|int $target): void {
@@ -687,7 +687,7 @@ abstract class Database {
   /**
    * Gets database connection info as a URL.
    *
-   * @param string|int $key
+   * @param string $key
    *   (Optional) The database connection key. If not specified, the 'default'
    *   connection key will be returned.
    *
