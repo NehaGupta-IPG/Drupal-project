@@ -32,6 +32,7 @@ services:
         '@menu.active_trail',
         '@callable_resolver',
         '@module_handler',
+        '@event_dispatcher',
       ]
 
   navigation.entity_route_helper:

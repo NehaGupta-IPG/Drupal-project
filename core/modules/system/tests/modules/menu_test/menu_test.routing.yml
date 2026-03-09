@@ -585,6 +585,30 @@ menu_test.breadcrumb3:
   requirements:
     _access: 'TRUE'
 
+menu_test.manipulator1:
+  path: '/menu-test/manipulators/1'
+  defaults:
+    _controller: '\Drupal\menu_test\Controller\MenuTestController::menuTestCallback'
+    _title: 'Link 1'
+  requirements:
+    _access: 'TRUE'
+
+menu_test.manipulator2:
+  path: '/menu-test/manipulators/2'
+  defaults:
+    _controller: '\Drupal\menu_test\Controller\MenuTestController::menuTestCallback'
+    _title: 'Link 2'
+  requirements:
+    _access: 'TRUE'
+
+menu_test.manipulator3:
+  path: '/menu-test/manipulators/3'
+  defaults:
+    _controller: '\Drupal\menu_test\Controller\MenuTestController::menuTestCallback'
+    _title: 'Link 1'
+  requirements:
+    _access: 'TRUE'
+
 menu_test.skippable-breadcrumb:
   path: '/menu-test/skippable-breadcrumb'
   defaults:

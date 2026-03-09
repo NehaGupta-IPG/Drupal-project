@@ -9,6 +9,7 @@ use Drupal\Core\Routing\PreloadableRouteProviderInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Utility\CallableResolver;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Implements the loading, transforming and rendering of menu link trees.
@@ -28,6 +29,8 @@ class MenuLinkTree implements MenuLinkTreeInterface {
    *   The active menu trail service.
    * @param \Drupal\Core\Utility\CallableResolver $callableResolver
    *   The callable resolver.
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|null $eventDispatcher
+   *   The event dispatcher.
    */
   public function __construct(
     protected MenuTreeStorageInterface $treeStorage,
@@ -35,7 +38,12 @@ class MenuLinkTree implements MenuLinkTreeInterface {
     protected RouteProviderInterface $routeProvider,
     protected MenuActiveTrailInterface $menuActiveTrail,
     protected CallableResolver $callableResolver,
+    protected ?EventDispatcherInterface $eventDispatcher = NULL,
   ) {
+    if ($eventDispatcher === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $eventDispatcher argument is deprecated in drupal:11.4.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3463907', E_USER_DEPRECATED);
+      $this->eventDispatcher = \Drupal::service('event_dispatcher');
+    }
   }
 
   /**
@@ -102,7 +110,9 @@ class MenuLinkTree implements MenuLinkTreeInterface {
    * {@inheritdoc}
    */
   public function transform(array $tree, array $manipulators) {
-    foreach ($manipulators as $manipulator) {
+    $event = new MenuLinkTreeManipulatorsAlterEvent($tree, $manipulators, $this);
+    $this->eventDispatcher->dispatch($event);
+    foreach ($event->getManipulators() as $manipulator) {
       $callable = $this->callableResolver->getCallableFromDefinition($manipulator['callable']);
       // Prepare the arguments for the menu tree manipulator callable; the first
       // argument is always the menu link tree.

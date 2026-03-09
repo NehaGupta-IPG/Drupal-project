@@ -13,6 +13,7 @@ use Drupal\Core\Menu\MenuLinkTree;
 use Drupal\Core\Menu\MenuTreeStorageInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Utility\CallableResolver;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Extends MenuLinkTree to add specific theme suggestions for the navigation.
@@ -36,6 +37,8 @@ final class NavigationMenuLinkTree extends MenuLinkTree {
    *   The callable resolver.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|null $eventDispatcher
+   *   The event dispatcher.
    */
   public function __construct(
     MenuTreeStorageInterface $treeStorage,
@@ -44,8 +47,13 @@ final class NavigationMenuLinkTree extends MenuLinkTree {
     MenuActiveTrailInterface $menuActiveTrail,
     CallableResolver $callableResolver,
     protected ModuleHandlerInterface $moduleHandler,
+    protected ?EventDispatcherInterface $eventDispatcher = NULL,
   ) {
-    parent::__construct($treeStorage, $menuLinkManager, $routeProvider, $menuActiveTrail, $callableResolver);
+    if ($eventDispatcher === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $eventDispatcher argument is deprecated in drupal:11.4.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3463907', E_USER_DEPRECATED);
+      $eventDispatcher = \Drupal::service('event_dispatcher');
+    }
+    parent::__construct($treeStorage, $menuLinkManager, $routeProvider, $menuActiveTrail, $callableResolver, $eventDispatcher);
   }
 
   /**

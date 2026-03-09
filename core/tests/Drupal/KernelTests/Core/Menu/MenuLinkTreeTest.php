@@ -242,4 +242,49 @@ class MenuLinkTreeTest extends KernelTestBase {
     $this->assertSame(['user_logout_example'], $get_accessible_links());
   }
 
+  /**
+   * Tests menu link manipulator alter events.
+   */
+  public function testMenuManipulatorAlter(): void {
+    $links = [
+      1 => MenuLinkMock::createMock([
+        'id' => 'test.link1',
+        'route_name' => 'menu_test.manipulator1',
+        'title' => 'Link 1',
+        'parent' => '',
+      ]),
+      2 => MenuLinkMock::createMock([
+        'id' => 'test.link2',
+        'route_name' => 'menu_test.manipulator2',
+        'title' => 'Link 2',
+        'parent' => '',
+      ]),
+      3 => MenuLinkMock::createMock([
+        'id' => 'test.link3',
+        'route_name' => 'menu_test.manipulator3',
+        'title' => 'Link 3',
+        'parent' => '',
+      ]),
+    ];
+    foreach ($links as $instance) {
+      $this->menuLinkManager->addDefinition($instance->getPluginId(),
+        $instance->getPluginDefinition());
+    }
+    $parameters = new MenuTreeParameters();
+    $tree = $this->linkTree->load('mock', $parameters);
+    $manipulators = [
+      ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
+    ];
+    $tree = $this->linkTree->transform($tree, $manipulators);
+
+    $this->assertCount(3, $tree);
+    /** @var \Drupal\Core\Menu\MenuLinkTreeElement[] $tree */
+    list($link1, $link2, $link3) = array_values($tree);
+
+    // Check that the correct links have an additional class.
+    $this->assertNotContains('menu-test-link', $link1->options['attributes']['class'] ?? []);
+    $this->assertContains('menu-test-link', $link2->options['attributes']['class'] ?? []);
+    $this->assertContains('menu-test-link', $link3->options['attributes']['class'] ?? []);
+  }
+
 }

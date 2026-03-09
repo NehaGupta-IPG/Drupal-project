@@ -9,3 +9,8 @@ services:
     arguments: ['@request_stack']
     tags:
       - { name: access_check, applies_to: _menu_test_session_access }
+
+  menu_test.event_subscriber.menu_link_tree:
+    class: Drupal\menu_test\EventSubscriber\MenuLinkTreeEventSubscriber
+    tags:
+      - { name: event_subscriber }

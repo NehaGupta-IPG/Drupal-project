@@ -43,7 +43,8 @@ class MenuLinkTreeTest extends UnitTestCase {
       $this->createMock('\Drupal\Core\Menu\MenuLinkManagerInterface'),
       $this->createMock('\Drupal\Core\Routing\RouteProviderInterface'),
       $this->createMock('\Drupal\Core\Menu\MenuActiveTrailInterface'),
-      $this->createMock(CallableResolver::class)
+      $this->createMock(CallableResolver::class),
+      $this->createMock('\Symfony\Component\EventDispatcher\EventDispatcherInterface')
     );
 
     $cache_contexts_manager = $this->getMockBuilder('Drupal\Core\Cache\Context\CacheContextsManager')
