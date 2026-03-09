@@ -1,0 +1,7 @@
+name: 'Layout Builder Recursive Test'
+type: module
+description: 'Support module for testing recursion prevention.'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:views

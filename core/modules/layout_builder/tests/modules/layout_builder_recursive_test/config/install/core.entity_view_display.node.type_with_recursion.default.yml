@@ -1,0 +1,66 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.type_with_recursion.body
+    - node.type.type_with_recursion
+    - views.view.list_all_nodes
+  module:
+    - layout_builder
+    - layout_discovery
+    - text
+    - user
+    - views
+third_party_settings:
+  layout_builder:
+    sections:
+      -
+        layout_id: layout_onecol
+        layout_settings: {  }
+        components:
+          17412d69-83ed-4958-9385-0f4bf4ce03c7:
+            uuid: 17412d69-83ed-4958-9385-0f4bf4ce03c7
+            region: content
+            configuration:
+              id: 'field_block:node:type_with_recursion:body'
+              label_display: ''
+              formatter:
+                label: hidden
+                type: text_default
+                settings: {  }
+                third_party_settings: {  }
+              context_mapping:
+                entity: layout_builder.entity
+            additional: {  }
+            weight: 0
+          7c7b9a4c-4bbe-411b-9dc2-e924668b2713:
+            uuid: 7c7b9a4c-4bbe-411b-9dc2-e924668b2713
+            region: content
+            configuration:
+              id: 'views_block:list_all_nodes-block_1'
+              label: ''
+              provider: views
+              label_display: visible
+              views_label: ''
+              items_per_page: none
+              context_mapping: {  }
+            additional: {  }
+            weight: 1
+id: node.type_with_recursion.default
+targetEntityType: node
+bundle: type_with_recursion
+mode: default
+content:
+  body:
+    label: hidden
+    type: text_default
+    weight: 101
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+  links:
+    weight: 100
+    settings: {  }
+    third_party_settings: {  }
+    region: content
+hidden: {  }

@@ -53,7 +53,7 @@ services:
   Drupal\layout_builder\Entity\SampleEntityGeneratorInterface: '@layout_builder.sample_entity_generator'
   layout_builder.render_block_component_subscriber:
     class: Drupal\layout_builder\EventSubscriber\BlockComponentRenderArray
-    arguments: ['@current_user']
+    arguments: ['@current_user', '@logger.channel.layout_builder']
   logger.channel.layout_builder:
     parent: logger.channel_base
     arguments: ['layout_builder']
