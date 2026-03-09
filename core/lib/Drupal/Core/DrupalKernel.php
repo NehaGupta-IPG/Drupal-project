@@ -618,7 +618,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // Initialize legacy request globals.
     $this->initializeRequestGlobals($request);
 
-    // Put the request on the stack.
+    // Put the request on the stack. Main requests will be popped in
+    // \Drupal\Core\DrupalKernel::terminate() and sub requests will be popped in
+    // \Drupal\Core\StackMiddleware\KernelPreHandle::handle().
     $this->container->get('request_stack')->push($request);
 
     // Set the allowed protocols.
@@ -727,6 +729,12 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
           $service->destruct();
         }
       }
+
+      // Pop the request added in \Drupal\Core\DrupalKernel::preHandle() from
+      // request stack at the end of the execution cycle.
+      if ($this->prepared === TRUE) {
+        $this->container->get('request_stack')->pop();
+      }
     }
   }
 
@@ -750,12 +758,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       }
 
       $response = $this->handleException($e, $request, $type);
-    }
-
-    // Backward compatibility for Symfony 7.4, which sets the charset to utf-8.
-    // @todo Remove this in https://www.drupal.org/project/drupal/issues/3555537
-    if (!$response->getCharset()) {
-      $response->setCharset('UTF-8');
     }
 
     // Adapt response headers to the current request.
@@ -1123,10 +1125,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       // in the query string.
       ini_set('session.use_cookies', '1');
       ini_set('session.use_strict_mode', '1');
-      if (\PHP_VERSION_ID < 80400) {
-        ini_set('session.use_only_cookies', '1');
-        ini_set('session.use_trans_sid', '0');
-      }
       // Don't send HTTP headers using PHP's session handler.
       // Send an empty string to disable the cache limiter.
       ini_set('session.cache_limiter', '');
@@ -1218,8 +1216,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // For a request URI of '/index.php/foo', $_SERVER['SCRIPT_NAME'] is
     // '/index.php', whereas $_SERVER['PHP_SELF'] is '/index.php/foo'.
     if ($dir = rtrim(dirname($request->server->get('SCRIPT_NAME')), '\/')) {
-      // Remove "core" directory if present, allowing install.php,
-      // authorize.php, and others to auto-detect a base path.
+      // Remove "core" directory if present, allowing install.php, rebuild.php,
+      // and others to auto-detect a base path.
       $core_position = strrpos($dir, '/core');
       if ($core_position !== FALSE && strlen($dir) - 5 == $core_position) {
         $base_path = substr($dir, 0, $core_position);
@@ -1608,23 +1606,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   }
 
   /**
-   * Returns an array of Extension class parameters for all enabled modules.
-   *
-   * @return array
-   *   An associated array of module class parameters, keyed by module name, for
-   *   all enabled modules.
-   *
-   * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use
-   *   getExtensionsParameter() instead.
-   *
-   * @see https://www.drupal.org/node/3551652
-   */
-  protected function getModulesParameter() {
-    @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use getExtensionsParameter() instead. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
-    return $this->getExtensionsParameter($this->moduleList, [$this, 'moduleData']);
-  }
-
-  /**
    * Returns an array of Extension class parameters for all enabled extensions.
    *
    * @param array $extension_list
@@ -1651,23 +1632,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   }
 
   /**
-   * Gets the filenames for each enabled module.
-   *
-   * @return array
-   *   Array where each key is a module name, and each value is a path to the
-   *   respective *.info.yml file.
-   *
-   * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use
-   *   getExtensionFileNames() instead.
-   *
-   * @see https://www.drupal.org/node/3551652
-   */
-  protected function getModuleFileNames() {
-    @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use getExtensionFileNames() instead. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
-    return $this->getExtensionFileNames($this->moduleList, [$this, 'moduleData']);
-  }
-
-  /**
    * Gets the filenames for each enabled extension.
    *
    * @param array $extension_list
@@ -1687,28 +1651,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       }
     }
     return $filenames;
-  }
-
-  /**
-   * Gets the PSR-4 base directories for module namespaces.
-   *
-   * @param string[] $module_file_names
-   *   Array where each key is a module name, and each value is a path to
-   *   the respective *.info.yml file.
-   *
-   * @return string[]
-   *   Array where each key is a module namespace like 'Drupal\system', and
-   *   each value is the PSR-4 base directory associated with the module
-   *   namespace.
-   *
-   * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use
-   *   getExtensionNamespacesPsr4() instead.
-   *
-   * @see https://www.drupal.org/node/3551652
-   */
-  protected function getModuleNamespacesPsr4($module_file_names) {
-    @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use getExtensionNamespacesPsr4() instead. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
-    return $this->getExtensionNamespacesPsr4($module_file_names);
   }
 
   /**

@@ -404,7 +404,7 @@ class Url implements TrustedCallbackInterface {
     // Both PathValidator::getUrlIfValidWithoutAccessCheck() and 'base:' URIs
     // only accept/contain paths without a leading slash, unlike 'internal:'
     // URIs, for which the leading slash means "relative to Drupal root" and
-    // "relative to Symfony app root" (just like in Symfony/Drupal 8 routes).
+    // "relative to Symfony app root" (just like in Symfony/Drupal routes).
     if (empty($uri_parts['path'])) {
       $uri_parts['path'] = '<none>';
     }
@@ -588,7 +588,7 @@ class Url implements TrustedCallbackInterface {
    */
   public function getRouteParameters() {
     if ($this->unrouted) {
-      throw new \UnexpectedValueException('External URLs do not have internal route parameters.');
+      throw new \UnexpectedValueException($this->getUri() . ' has no corresponding route.');
     }
 
     return $this->routeParameters;
@@ -607,7 +607,7 @@ class Url implements TrustedCallbackInterface {
    */
   public function setRouteParameters($parameters) {
     if ($this->unrouted) {
-      throw new \UnexpectedValueException('External URLs do not have route parameters.');
+      throw new \UnexpectedValueException($this->getUri() . ' has no corresponding route.');
     }
     $this->routeParameters = $parameters;
     return $this;
@@ -628,7 +628,7 @@ class Url implements TrustedCallbackInterface {
    */
   public function setRouteParameter($key, $value) {
     if ($this->unrouted) {
-      throw new \UnexpectedValueException('External URLs do not have route parameters.');
+      throw new \UnexpectedValueException($this->getUri() . ' has no corresponding route.');
     }
     $this->routeParameters[$key] = $value;
     return $this;

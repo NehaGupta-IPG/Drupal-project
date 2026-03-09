@@ -18,7 +18,6 @@ use Drupal\Core\DependencyInjection\Compiler\ProxyServicesPass;
 use Drupal\Core\DependencyInjection\Compiler\RegisterAccessChecksPass;
 use Drupal\Core\DependencyInjection\Compiler\RegisterEventSubscribersPass;
 use Drupal\Core\DependencyInjection\Compiler\RegisterServicesForDestructionPass;
-use Drupal\Core\DependencyInjection\Compiler\RegisterStreamWrappersPass;
 use Drupal\Core\DependencyInjection\Compiler\StackedKernelPass;
 use Drupal\Core\DependencyInjection\Compiler\StackedSessionHandlerPass;
 use Drupal\Core\DependencyInjection\Compiler\SuperUserAccessPolicyPass;
@@ -91,7 +90,6 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
 
     // Collect tagged handler services as method calls on consumer services.
     $container->addCompilerPass(new TaggedHandlersPass());
-    $container->addCompilerPass(new RegisterStreamWrappersPass());
     $container->addCompilerPass(new TwigExtensionPass());
 
     // Add a compiler pass for registering event subscribers.
@@ -130,17 +128,6 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
 
     $container->registerForAutoconfiguration(ModuleUninstallValidatorInterface::class)
       ->addTag('module_install.uninstall_validator');
-
-    // Deprecated parameters.
-    if ($container->hasParameter('session.storage.options')) {
-      $session_storage_options = $container->getParameter('session.storage.options');
-      if (array_key_exists('sid_length', $session_storage_options)) {
-        @trigger_error('The "sid_length" parameter is deprecated in drupal:11.1.0 and will be removed in drupal:12.0.0. This setting should be removed from the settings file, since its usage has been removed. See https://www.drupal.org/node/3469305', E_USER_DEPRECATED);
-      }
-      if (array_key_exists('sid_bits_per_character', $session_storage_options)) {
-        @trigger_error('The "sid_bits_per_character" parameter is deprecated in drupal:11.1.0 and will be removed in drupal:12.0.0. This setting should be removed from the settings file, since its usage has been removed. See https://www.drupal.org/node/3469305', E_USER_DEPRECATED);
-      }
-    }
   }
 
   /**

@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Asset;
 
-use Drupal\Core\Asset\LibraryDiscovery;
+use Drupal\Core\Asset\LibraryDiscoveryCollector;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 
 /**
- * Tests Drupal\Core\Asset\LibraryDiscovery.
+ * Tests Drupal\Core\Asset\LibraryDiscoveryCollector.
  */
-#[CoversClass(LibraryDiscovery::class)]
+#[CoversClass(LibraryDiscoveryCollector::class)]
 #[Group('Asset')]
 class LibraryDiscoveryTest extends UnitTestCase {
 
@@ -80,8 +80,6 @@ class LibraryDiscoveryTest extends UnitTestCase {
 
   /**
    * Tests getting a library by name.
-   *
-   * @legacy-covers ::getLibraryByName
    */
   public function testGetLibraryByName(): void {
     $this->assertSame($this->libraryData['test_1'], $this->libraryDiscovery->getLibraryByName('test', 'test_1'));
