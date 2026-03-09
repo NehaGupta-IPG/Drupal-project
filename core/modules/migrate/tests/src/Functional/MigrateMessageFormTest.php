@@ -81,6 +81,7 @@ class MigrateMessageFormTest extends MigrateMessageTestBase {
    *   - msg_id: (string) A message id.
    *   - severity: (int) The MigrationInterface error level.
    *   - message: (string) The migration message.
+   *   - last_imported: (string) The formatted last imported date.
    */
   protected function getMessages(): array {
     $levels = [
@@ -93,11 +94,12 @@ class MigrateMessageFormTest extends MigrateMessageTestBase {
     $table = $this->xpath('.//table[@id="admin-migrate-msg"]/tbody/tr');
     foreach ($table as $row) {
       $cells = $row->findAll('css', 'td');
-      if (count($cells) === 3) {
+      if (count($cells) === 4) {
         $entries[] = [
           'msg_id' => $cells[0]->getText(),
           'severity' => $levels[$cells[1]->getText()],
           'message' => $cells[2]->getText(),
+          'last_imported' => $cells[3]->getText(),
         ];
       }
     }
