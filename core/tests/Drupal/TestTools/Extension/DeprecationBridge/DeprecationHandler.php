@@ -271,7 +271,8 @@ final class DeprecationHandler implements Extension {
 
     if (empty($tempFilePath)) {
       // If no config available, we cannot record the stats.
-      return;
+      throw new \RuntimeException("debug - " . var_export($stat, TRUE));
+      // @todo return;.
     }
 
     file_put_contents(
