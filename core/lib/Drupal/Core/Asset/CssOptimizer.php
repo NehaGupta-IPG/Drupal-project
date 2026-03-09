@@ -143,7 +143,7 @@ class CssOptimizer implements AssetOptimizerInterface {
     // Store the parent base path to restore it later.
     $parent_base_path = $base_path;
     // Set the current base path to process possible child imports.
-    $base_path = dirname($file);
+    $base_path = dirname($file ?? '');
 
     // Load the CSS stylesheet. We suppress errors because themes may specify
     // stylesheets in their .info.yml file that don't exist in the theme's path,
