@@ -18,7 +18,7 @@ class PathFieldItemList extends FieldItemList {
   /**
    * {@inheritdoc}
    */
-  protected function computeValue(): void {
+  protected function computeValue() {
     // Default the langcode to the current language if this is a new entity or
     // there is no alias for an existent entity.
     $value = ['langcode' => $this->getLangcode()];
