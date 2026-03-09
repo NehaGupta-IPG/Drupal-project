@@ -36,7 +36,6 @@ class NavigationHooks {
     #[Autowire('@plugin.manager.config_action')]
     protected ConfigActionManager $configActionManager,
     protected TopBarItemManagerInterface $topBarItemManager,
-    protected ClassResolverInterface $classResolver,
   ) {
   }
 
@@ -84,7 +83,7 @@ class NavigationHooks {
    */
   #[Hook('menu_links_discovered_alter')]
   public function menuLinksDiscoveredAlter(&$links): void {
-    $navigation_links = $this->classResolver->getInstanceFromDefinition(NavigationContentLinks::class);
+    $navigation_links = \Drupal::classResolver(NavigationContentLinks::class);
     assert($navigation_links instanceof NavigationContentLinks);
     $navigation_links->addMenuLinks($links);
   }
@@ -94,7 +93,7 @@ class NavigationHooks {
    */
   #[Hook('entity_update')]
   public function entityUpdate(EntityInterface $entity): void {
-    $navigation_links = $this->classResolver->getInstanceFromDefinition(NavigationContentLinks::class);
+    $navigation_links = \Drupal::classResolver(NavigationContentLinks::class);
     assert($navigation_links instanceof NavigationContentLinks);
     $navigation_links->updateCreateEntityLinks($entity);
   }

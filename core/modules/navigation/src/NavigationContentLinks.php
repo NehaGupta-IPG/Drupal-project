@@ -81,7 +81,7 @@ final class NavigationContentLinks implements ContainerInjectionInterface {
     }
 
     // Add supported add links under the Create button.
-    foreach (static::getBundleEntityTypes() as $entity_type => $config) {
+    foreach ($this->getBundleEntityTypes() as $entity_type => $config) {
       $this->addCreateEntityLinks($entity_type, $config['add_route'], $links, $config['bundle_allow_list']);
     }
 
@@ -100,7 +100,7 @@ final class NavigationContentLinks implements ContainerInjectionInterface {
    * @return array
    *   A map of entity type IDs to their add route and bundle allow list.
    */
-  public static function getBundleEntityTypes(): array {
+  protected function getBundleEntityTypes(): array {
     return [
       'node_type' => [
         'add_route' => 'entity.node.add_form',
@@ -121,7 +121,7 @@ final class NavigationContentLinks implements ContainerInjectionInterface {
    */
   public function updateCreateEntityLinks(EntityInterface $entity): void {
     $entity_type_id = $entity->getEntityTypeId();
-    $bundle_types = static::getBundleEntityTypes();
+    $bundle_types = $this->getBundleEntityTypes();
     if (!isset($bundle_types[$entity_type_id])) {
       return;
     }

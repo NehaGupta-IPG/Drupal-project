@@ -65,7 +65,6 @@ class NavigationContentLinksTest extends KernelTestBase {
    */
   public function testNavigationContentLinks(): void {
     $module_installer = \Drupal::service('module_installer');
-    $route_provider = \Drupal::service('router.route_provider');
     $menu_link_manager = \Drupal::service('plugin.manager.menu.link');
     $links = $menu_link_manager->getDefinitions();
 
@@ -127,7 +126,6 @@ class NavigationContentLinksTest extends KernelTestBase {
 
     // Install the block_content module and rebuild the menu links.
     $module_installer->install(['block_content']);
-    $route_provider->reset();
     // Rebuild the links after module installation.
     $menu_link_manager->rebuild();
     $links = $menu_link_manager->getDefinitions();
