@@ -297,7 +297,9 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
     $has_icon_pattern = \str_contains($path_info_filename, self::ICON_ID_PATTERN);
 
     foreach ($finder as $file) {
+      /** @var SplFileInfo $file */
       $file_absolute_path = $file->getPathName();
+      /** @var \Symfony\Component\Finder\SplFileInfo $file */
       $icon_id = $file->getFilenameWithoutExtension();
 
       // If an {icon_id} pattern is used, extract it to be used.
@@ -305,10 +307,19 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
         $icon_id = self::extractIconIdFromFilename($icon_id, $path_info_filename);
       }
 
+      // Source is the url to access the image, based on the absolute path to
+      // handle icons relative to definition or Drupal root.
+      $source = str_replace($this->appRoot, '', $file_absolute_path);
+      // Url generation with `generateString` method rely on `base_path()` that
+      // will add a prefix based on $GLOBALS['base_path'], default `/`.
+      // Remove any left slash to allow to url generation with a custom
+      // base_path.
+      $source = $this->fileUrlGenerator->generateString(ltrim($source, '/'));
+
       // Icon ID is used as index to avoid duplicates.
       $result[$icon_id] = [
         'icon_id' => $icon_id,
-        'source' => $this->fileUrlGenerator->generateString(str_replace($this->appRoot, '', $file_absolute_path)),
+        'source' => $source,
         'absolute_path' => $file_absolute_path,
         'group' => $group_position === NULL ? NULL : self::extractGroupFromPath($file->getPath(), $group_position),
       ];
