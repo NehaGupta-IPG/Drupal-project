@@ -368,7 +368,7 @@
             "dist": {
                 "type": "path",
                 "url": "core",
-                "reference": "03e77defebe97a6c6e23a34f1cb4493020caa2f1"
+                "reference": "6e83a5006d9f1cb2dbdd7a94f118341845f9ea3e"
             },
             "require": {
                 "asm89/stack-cors": "^2.3",
@@ -482,6 +482,19 @@
                         "[web-root]/modules/README.txt": "assets/scaffold/files/modules.README.txt",
                         "[web-root]/profiles/README.txt": "assets/scaffold/files/profiles.README.txt",
                         "[web-root]/themes/README.txt": "assets/scaffold/files/themes.README.txt"
+                    }
+                },
+                "drupal-pre-bootstrap": {
+                    "services": {
+                        "ApplicationRootGuesser": {
+                            "class": "Drupal\\Core\\Boot\\ApplicationRootGuesser"
+                        },
+                        "InitializeEnvironment": {
+                            "class": "Drupal\\Core\\Boot\\InitializeEnvironment",
+                            "arguments": [
+                                "@ApplicationRootGuesser"
+                            ]
+                        }
                     }
                 }
             },
@@ -10177,5 +10190,5 @@
     "platform-overrides": {
         "php": "8.5.0"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
