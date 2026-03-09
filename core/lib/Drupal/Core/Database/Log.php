@@ -15,7 +15,14 @@ use Drupal\Core\Database\Event\StatementExecutionEndEvent;
  * Every connection has one and only one logging object on it for all targets
  * and logging keys.
  *
- * @phpstan-type DatabaseLogEntry array{'query': string, 'args': list<mixed>, 'caller': string, 'target': string, 'time': float, 'start': float}
+ * @phpstan-type DatabaseLogEntry array{
+ *   'query': string,
+ *   'args': list<mixed>,
+ *   'caller': string,
+ *   'target': string,
+ *   'time': float,
+ *   'start': float,
+ * }
  */
 class Log {
 
