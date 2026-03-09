@@ -102,7 +102,8 @@ abstract class Database {
    * @param string $logging_key
    *   The logging key to log.
    * @param string $key
-   *   The database connection key for which we want to log.
+   *   (optional) The database connection key for which we want to log. If not
+   *   specified, the 'default' connection key will be logged.
    *
    * @return \Drupal\Core\Database\Log
    *   The query log object. Note that the log object does support richer
@@ -143,7 +144,8 @@ abstract class Database {
    * @param string $logging_key
    *   The logging key to log.
    * @param string $key
-   *   The database connection key for which we want to log.
+   *   (optional) The database connection key for which we want to log. If not
+   *   specified, the log for the 'default' connection key will be returned.
    *
    * @return list<DatabaseLogEntry>
    *   The query log for the specified logging key and connection.
@@ -166,7 +168,8 @@ abstract class Database {
    * Gets the connection object for the specified database key and target.
    *
    * @param string $target
-   *   The database target name.
+   *   (optional) The database target name. If not specified, the 'default'
+   *   target will be returned.
    * @param ?string $key
    *   (optional) The database connection key. Defaults to NULL which means the
    *   active key.
@@ -219,7 +222,8 @@ abstract class Database {
    * Sets the active connection to the specified key.
    *
    * @param string $key
-   *   The database connection key.
+   *   (optional) The database connection key. If not specified, the 'default'
+   *   connection key will be activated.
    *
    * @return ?string
    *   The previous database connection key, or NULL if no connection was

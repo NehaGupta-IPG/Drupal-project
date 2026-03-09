@@ -59,7 +59,7 @@ class Log {
    *   The database connection key for which to enable logging.
    */
   public function __construct($key = 'default') {
-    if (is_int($key)) {
+    if (!is_string($key)) {
       @trigger_error('Passing a non-string value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
     }
     $this->connectionKey = $key;
