@@ -504,7 +504,7 @@ abstract class Connection {
    */
   public function setTarget($target = NULL) {
     if (!is_string($target)) {
-      @trigger_error('Passing an non-string value to the $target parameter in ' . __METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
+      @trigger_error('Passing a non-string value to the $target parameter in ' . __METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
     }
     if (!isset($this->target)) {
       $this->target = $target;
@@ -529,7 +529,7 @@ abstract class Connection {
    */
   public function setKey($key) {
     if (!is_string($key)) {
-      @trigger_error('Passing an non-string value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
+      @trigger_error('Passing a non-string value to the $key parameter in ' . __METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Pass only string values instead. See https://www.drupal.org/node/3577925', E_USER_DEPRECATED);
     }
     if (!isset($this->key)) {
       $this->key = $key;
