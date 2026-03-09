@@ -110,10 +110,6 @@ final class NavigationContentLinks implements ContainerInjectionInterface {
     if (!empty($allow_list) && !in_array($entity->id(), $allow_list, TRUE)) {
       return;
     }
-    $link_id = 'navigation.content.' . $entity_type_id . '.' . $entity->id();
-    if (!$this->menuLinkManager->hasDefinition($link_id)) {
-      return;
-    }
 
     $this->menuLinkManager->rebuild();
   }

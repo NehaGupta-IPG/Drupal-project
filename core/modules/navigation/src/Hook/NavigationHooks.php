@@ -89,9 +89,15 @@ class NavigationHooks {
   }
 
   /**
+   * Implements hook_entity_insert().
+   *
    * Implements hook_entity_update().
+   *
+   * Implements hook_entity_delete().
    */
   #[Hook('entity_update')]
+  #[Hook('entity_insert')]
+  #[Hook('entity_delete')]
   public function entityUpdate(EntityInterface $entity): void {
     $navigation_links = \Drupal::classResolver(NavigationContentLinks::class);
     assert($navigation_links instanceof NavigationContentLinks);
