@@ -122,6 +122,9 @@ class LinkFormatterTest extends UnitTestCase {
       ->method('__get')
       ->with('options')
       ->willReturn([]);
+    $linkItem->expects($this->once())
+      ->method('getCacheTags')
+      ->willReturn(['example_tag']);
     $fieldDefinition = $this->createMock(FieldDefinitionInterface::class);
     $fieldList = new FieldItemList($fieldDefinition, '', $linkItem);
 
@@ -149,6 +152,7 @@ class LinkFormatterTest extends UnitTestCase {
         '#title' => 'http://example.com',
         '#url' => $expectedUrl,
       ],
+      '#cache' => ['tags' => ['example_tag']],
     ], $elements);
   }
 

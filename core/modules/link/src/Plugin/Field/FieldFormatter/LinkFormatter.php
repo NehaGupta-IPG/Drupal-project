@@ -3,6 +3,7 @@
 namespace Drupal\link\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -157,7 +158,9 @@ class LinkFormatter extends FormatterBase {
     $element = [];
     $entity = $items->getEntity();
     $settings = $this->getSettings();
+    $cache_tags = [];
 
+    /** @var \Drupal\link\LinkItemInterface $item */
     foreach ($items as $delta => $item) {
       // By default use the full URL as the link text.
       $url = $this->buildUrl($item);
@@ -204,8 +207,13 @@ class LinkFormatter extends FormatterBase {
           unset($item->_attributes);
         }
       }
+
+      $cache_tags = Cache::mergeTags($cache_tags, $item->getCacheTags());
     }
 
+    if ($cache_tags) {
+      $element['#cache']['tags'] = $cache_tags;
+    }
     return $element;
   }
 

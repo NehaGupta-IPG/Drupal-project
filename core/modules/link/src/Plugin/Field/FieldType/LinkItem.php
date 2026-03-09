@@ -196,4 +196,23 @@ class LinkItem extends FieldItemBase implements LinkItemInterface {
     parent::setValue($values, $notify);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags(): array {
+    // Get cache tags from any referenced entity.
+    $uri_parts = parse_url($this->uri);
+    if ($uri_parts === FALSE || !isset($uri_parts['scheme']) || $uri_parts['scheme'] != 'entity') {
+      return [];
+    }
+    [$entity_type_id, $entity_id] = explode('/', $uri_parts['path'], 2);
+    try {
+      $entity = \Drupal::entityTypeManager()->getStorage($entity_type_id)->load($entity_id);
+      return $entity->getCacheTags();
+    }
+    catch (\Exception) {
+      return [];
+    }
+  }
+
 }

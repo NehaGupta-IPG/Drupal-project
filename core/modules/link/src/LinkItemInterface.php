@@ -51,4 +51,12 @@ interface LinkItemInterface extends FieldItemInterface {
    */
   public function getTitle(): ?string;
 
+  /**
+   * Gets an array of cache tags for the link.
+   *
+   * @return array
+   *   The cache tags.
+   */
+  public function getCacheTags(): array;
+
 }
