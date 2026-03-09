@@ -705,18 +705,21 @@
     const tagsSupportDisable =
       'button, fieldset, optgroup, option, select, textarea, input';
     if (e.trigger) {
+      // Custom elements (identified by a hyphen in the tag name per the HTML
+      // spec) manage their own disabled state. Disable them directly and return
+      // early to avoid the ancestor traversal below, which would otherwise
+      // search upward to the nearest .js-form-wrapper and disable any standard
+      // inputs found there — including the dependee that controls this element.
+      if (e.target.tagName?.includes('-')) {
+        e.target.disabled = e.value;
+        return;
+      }
       $(e.target)
         .closest('.js-form-item, .js-form-submit, .js-form-wrapper')
         .toggleClass('form-disabled', e.value)
         .find(tagsSupportDisable)
         .addBack(tagsSupportDisable)
         .prop('disabled', e.value);
-      // Custom elements (identified by a hyphen in the tag name per the HTML
-      // spec) support the disabled property but are not matched by
-      // tagsSupportDisable.
-      if (e.target.tagName?.includes('-')) {
-        e.target.disabled = e.value;
-      }
     }
   });
 
