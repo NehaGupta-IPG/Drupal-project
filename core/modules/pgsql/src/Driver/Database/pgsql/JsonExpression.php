@@ -18,8 +18,11 @@ class JsonExpression extends BaseJsonExpression {
    * {@inheritdoc}
    */
   public function toSql(): string {
-    // Uses the #>> operator to extract a JSON value as text.
-    return "{$this->field} #>> '{" . implode(',', $this->pathSegments()) . "}'";
+    // Uses the #>> operator to extract a JSON value as text. Uses ARRAY[]
+    // constructor instead of '{a,b}' literal so the curly braces don't need to
+    // survive prefixTables() and quoteIdentifiers().
+    $segments = array_map(fn($s) => "'" . $s . "'", $this->pathSegments());
+    return "{$this->field} #>> ARRAY[" . implode(',', $segments) . "]::text[]";
   }
 
   /**
@@ -30,7 +33,9 @@ class JsonExpression extends BaseJsonExpression {
     return match ($type) {
       JsonCastType::Int => "({$sql})::integer",
       JsonCastType::Float => "({$sql})::double precision",
-      JsonCastType::Text => $sql,
+      // Parentheses prevent PgSQL's prepareStatement() from appending ::text to
+      // the ARRAY[]::text[] portion when used before LIKE/ILIKE.
+      JsonCastType::Text => "({$sql})",
     };
   }
 
@@ -38,8 +43,8 @@ class JsonExpression extends BaseJsonExpression {
    * {@inheritdoc}
    */
   public function toHasKeySql(): string {
-    // @? checks if the jsonpath returns any items. PDO requires doubling
-    // the ? to avoid placeholder interpretation.
+    // @? checks if the jsonpath returns any items. PDO requires doubling the ?
+    // to avoid placeholder interpretation.
     return "{$this->field} @?? '{$this->path}'";
   }
 

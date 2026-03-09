@@ -5,6 +5,7 @@ namespace Drupal\Driver\Database\fake;
 use Drupal\Core\Database\Connection as CoreConnection;
 use Drupal\Core\Database\ExceptionHandler;
 use Drupal\Core\Database\Query\Condition;
+use Drupal\Core\Database\Query\JsonExpression;
 use Drupal\Core\Database\Query\Delete;
 use Drupal\Core\Database\Query\Insert;
 use Drupal\Core\Database\Query\Merge;
@@ -147,6 +148,13 @@ class Connection extends CoreConnection {
    */
   public function condition($conjunction): Condition {
     return new Condition($conjunction, FALSE);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function jsonExpression(string $field, string $path): JsonExpression {
+    throw new \LogicException('Not implemented.');
   }
 
   /**

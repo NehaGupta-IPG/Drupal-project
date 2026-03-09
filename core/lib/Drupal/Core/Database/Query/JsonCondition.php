@@ -141,7 +141,8 @@ class JsonCondition extends Condition {
           $placeholder = ':db_condition_placeholder_' . $queryPlaceholder->nextPlaceholder();
           $this->arguments[$placeholder] = $val;
         }
-        $this->stringVersion = "{$expression->toCastSql(JsonCastType::Text)} {$this->operator} (" . implode(', ', array_keys($this->arguments)) . ')';
+        $castType = JsonCastType::fromPhpValue($this->value[array_key_first($this->value)]);
+        $this->stringVersion = "{$expression->toCastSql($castType)} {$this->operator} (" . implode(', ', array_keys($this->arguments)) . ')';
         return;
 
       case 'CONTAINS':

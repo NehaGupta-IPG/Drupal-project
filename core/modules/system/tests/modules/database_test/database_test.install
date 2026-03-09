@@ -363,8 +363,8 @@ function database_test_schema(): array {
     ],
     'primary key' => ['id'],
     'indexes' => [
-      'idx_number' => JsonIndex::on('test_field', '$.number', JsonCastType::Int),
-      'idx_key' => JsonIndex::on('test_field', '$.key'),
+      'idx_number' => [JsonIndex::on('test_field', '$.number', JsonCastType::Int)],
+      'idx_key' => [JsonIndex::on('test_field', '$.key')],
     ],
   ];
 

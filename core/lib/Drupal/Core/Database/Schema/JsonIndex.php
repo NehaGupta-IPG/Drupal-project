@@ -9,18 +9,22 @@ use Drupal\Core\Database\Query\JsonCastType;
 /**
  * Represents a JSON expression index in a schema definition.
  *
- * Place in the 'indexes' array of a table schema to declare an expression
- * index on a specific JSON path. Each database driver converts this into
- * the appropriate driver-specific index DDL.
+ * Use as an element in the 'indexes' array of a table schema to declare an
+ * expression index on a specific JSON path. Can be combined with regular
+ * column names to create composite indexes. Each database driver converts
+ * this into the appropriate driver-specific index DDL.
  *
  * @code
  * $schema = [
  *   'fields' => [
  *     'data' => ['type' => 'json'],
+ *     'status' => ['type' => 'int', 'not null' => TRUE],
  *   ],
  *   'indexes' => [
- *     'idx_status' => JsonIndex::on('data', '$.status'),
- *     'idx_score'  => JsonIndex::on('data', '$.score', JsonCastType::Int),
+ *     // JSON-only index.
+ *     'idx_score' => [JsonIndex::on('data', '$.score', JsonCastType::Int)],
+ *     // Composite index mixing a regular column and a JSON expression.
+ *     'idx_status_cat' => ['status', JsonIndex::on('data', '$.category')],
  *   ],
  * ];
  * @endcode

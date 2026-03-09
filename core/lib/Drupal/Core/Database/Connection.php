@@ -368,29 +368,21 @@ abstract class Connection {
    *   The properly-prefixed string.
    */
   public function prefixTables($sql) {
-    // Historically, this was a simple str_replace() call. Sadly, blindly
-    // replacing curly braces is incompatible with the inlined JSON expressions
-    // that must be within single quotes. We cannot placeholder that JSON, as it
-    // is within single-quoted portions of the SQL statement that are not
-    // interpolated. This regex matches first against those single-quoted
-    // portions of the statement. They are then passed over when matching
-    // the second half of the pattern finding curly-braced table names which
-    // require prefixing.
+    // A simple str_replace() would mangle JSON strings embedded in
+    // single-quoted SQL literals, e.g. '{"key": 1}' would have its curly
+    // braces replaced. The regex below skips single-quoted strings entirely,
+    // then replaces {table} patterns only outside of them.
     return preg_replace_callback(
       "/'([^'\\\\]*(?:\\\\.[^'\\\\]*)*)'|(?'simple'\{(\w+)\})/",
       function ($matches) {
         return match (TRUE) {
-          // Curly brace table not contained inside single quotes.
+          // {table} outside single quotes — apply prefix.
           array_key_exists('simple', $matches) => "{$this->tablePlaceholderReplacements[0]}{$matches[3]}{$this->tablePlaceholderReplacements[1]}",
-          // BC layer: Some table names are contained inside single quotes, but
-          // still require expansion. This was historically valid, but makes
-          // these cases difficult to isolate from inlined JSON.
-          // This check determines if there are {table} patterns in the string,
-          // and determines they need replacement if the overall string is not
-          // itself valid JSON. This would match '{table1}' but not
-          // '{"table": 1}'.
+          // BC layer: historically, '{table}' inside single quotes was valid.
+          // Replace {word} patterns only when the quoted string is not valid
+          // JSON, so '{"key": 1}' is preserved but '{table}' is expanded.
           preg_match('/\{\w+\}/', $matches[1]) && !json_validate($matches[1]) => preg_replace_callback('/\{(\w+)\}/', fn($m) => "{$this->tablePlaceholderReplacements[0]}{$m[1]}{$this->tablePlaceholderReplacements[1]}", $matches[0]),
-          // Return single-quoted string as-is.
+          // Single-quoted string without {word} patterns — return as-is.
           default => $matches[0],
         };
       },
@@ -419,14 +411,10 @@ abstract class Connection {
    *   This method should only be called by database API code.
    */
   public function quoteIdentifiers($sql) {
-    // Historically, this was a simple str_replace() call. Sadly, blindly
-    // replacing square brackets is incompatible with the inlined JSON
-    // expressions that must be within single quotes. We cannot placeholder that
-    // JSON, as it is within single-quoted portions of the SQL statement that
-    // are not interpolated. This regex matches first against those
-    // single-quoted portions of the statement. They are then passed over when
-    // matching the second half of the pattern finding bracketed identifiers
-    // requiring quotes.
+    // A simple str_replace() would mangle SQL array constructors like
+    // ARRAY['a','b'] used by JSON expressions. The regex below skips
+    // single-quoted strings entirely, then replaces [identifier] patterns
+    // only outside of them.
     return preg_replace_callback(
       "/'[^'\\\\]*(?:\\\\.[^'\\\\]*)*'|(\[(\w+)])/",
       function ($matches) {

@@ -294,14 +294,7 @@ class Schema extends DatabaseSchema {
       $this->resolveJsonIndexes($spec);
       $indexes = $this->getNormalizedIndexes($spec);
       foreach ($indexes as $index => $fields) {
-        // Functional indexes are stored as strings, column-based indexes as
-        // arrays. Functional indexes use double parentheses in MySQL.
-        if (is_string($fields)) {
-          $keys[] = 'INDEX [' . $index . '] ((' . $fields . '))';
-        }
-        else {
-          $keys[] = 'INDEX [' . $index . '] (' . $this->createKeySql($fields) . ')';
-        }
+        $keys[] = 'INDEX [' . $index . '] (' . $this->createKeySql($fields) . ')';
       }
     }
 
@@ -326,11 +319,11 @@ class Schema extends DatabaseSchema {
   protected function getNormalizedIndexes(array $spec) {
     $indexes = $spec['indexes'] ?? [];
     foreach ($indexes as $index_name => $index_fields) {
-      // Skip expression indexes (strings) and JsonIndex instances.
-      if (is_string($index_fields) || $index_fields instanceof JsonIndex) {
-        continue;
-      }
       foreach ($index_fields as $index_key => $index_field) {
+        // Skip expression strings (resolved from JsonIndex).
+        if (is_string($index_field) && str_contains($index_field, '(')) {
+          continue;
+        }
         // Get the name of the field from the index specification.
         $field_name = is_array($index_field) ? $index_field[0] : $index_field;
         // Check whether the field is defined in the table specification.
@@ -382,9 +375,16 @@ class Schema extends DatabaseSchema {
     $return = [];
     foreach ($fields as $field) {
       if (is_array($field)) {
+        // Column name with prefix length.
         $return[] = '[' . $field[0] . '] (' . $field[1] . ')';
       }
+      elseif (str_contains($field, '(')) {
+        // Expression indexes (e.g. from resolved JsonIndex) use double
+        // parentheses in MySQL.
+        $return[] = '((' . $field . '))';
+      }
       else {
+        // Regular column name.
         $return[] = '[' . $field . ']';
       }
     }
@@ -492,29 +492,43 @@ class Schema extends DatabaseSchema {
   }
 
   /**
-   * Converts JsonIndex entries in the indexes array to expression strings.
+   * Resolves JsonIndex elements within index arrays to expression strings.
    *
-   * Functional indexes are stored as string values in the 'indexes' array,
-   * as opposed to regular column-based indexes which are arrays of column
-   * names.
+   * Each element in an index array can be a column name (string), a column
+   * with prefix length (array), or a JsonIndex object. JsonIndex elements are
+   * converted to expression strings that the driver uses for functional
+   * indexes.
    *
    * @param array $table
    *   Table schema definition, modified by reference.
    */
   protected function resolveJsonIndexes(array &$table): void {
-    // MariaDB does not support functional indexes.
-    // @see https://jira.mariadb.org/browse/MDEV-35853
-    if ($this->connection->isMariaDb()) {
-      foreach ($table['indexes'] ?? [] as $index_name => $index) {
-        if ($index instanceof JsonIndex) {
-          unset($table['indexes'][$index_name]);
-        }
-      }
+    if (empty($table['indexes'])) {
       return;
     }
-    foreach ($table['indexes'] ?? [] as $index_name => $index) {
-      if ($index instanceof JsonIndex) {
-        $table['indexes'][$index_name] = $this->connection->jsonExpression($index->field, $index->jsonpath)->toCastSql($index->type);
+    $isMariaDb = $this->connection->isMariaDb();
+    foreach ($table['indexes'] as $index_name => $index_fields) {
+      if (!is_array($index_fields)) {
+        continue;
+      }
+      $resolved = [];
+      foreach ($index_fields as $element) {
+        if ($element instanceof JsonIndex) {
+          // MariaDB does not support functional indexes.
+          // @see https://jira.mariadb.org/browse/MDEV-35853
+          if (!$isMariaDb) {
+            $resolved[] = $this->connection->jsonExpression($element->field, $element->jsonpath)->toCastSql($element->type);
+          }
+        }
+        else {
+          $resolved[] = $element;
+        }
+      }
+      if (empty($resolved)) {
+        unset($table['indexes'][$index_name]);
+      }
+      else {
+        $table['indexes'][$index_name] = $resolved;
       }
     }
   }
@@ -639,17 +653,16 @@ class Schema extends DatabaseSchema {
       throw new SchemaObjectExistsException("Cannot add index '$name' to table '$table': index already exists.");
     }
 
-    if ($fields instanceof JsonIndex) {
-      if ($this->connection->isMariaDb()) {
-        return;
-      }
-      $this->executeDdlStatement('ALTER TABLE {' . $table . '} ADD INDEX [' . $name . '] ((' . $this->connection->jsonExpression($fields->field, $fields->jsonpath)->toCastSql($fields->type) . '))');
+    $spec['indexes'][$name] = $fields;
+    $this->resolveJsonIndexes($spec);
+
+    // Index may have been removed (e.g. MariaDB doesn't support functional
+    // indexes).
+    if (!isset($spec['indexes'][$name])) {
       return;
     }
 
-    $spec['indexes'][$name] = $fields;
     $indexes = $this->getNormalizedIndexes($spec);
-
     $this->executeDdlStatement('ALTER TABLE {' . $table . '} ADD INDEX [' . $name . '] (' . $this->createKeySql($indexes[$name]) . ')');
   }
 
@@ -713,11 +726,32 @@ class Schema extends DatabaseSchema {
       $this->ensureNotNullPrimaryKey($keys_new['primary key'], [$field_new => $spec]);
     }
 
+    // MySQL 8 blocks renaming columns used in functional indexes. Drop those
+    // indexes first, then recreate them with the updated column name.
+    $restored_indexes = [];
+    if ($field !== $field_new) {
+      $existing = $this->introspectIndexSchema($table);
+      foreach ($existing['indexes'] as $index_name => $index_def) {
+        if (is_string($index_def) && preg_match('/\b' . preg_quote($field, '/') . '\b/', $index_def)) {
+          $this->dropIndex($table, $index_name);
+          // MySQL's SHOW INDEX returns expressions with backslash-escaped
+          // single quotes; unescape them for use in DDL statements.
+          $expression = stripslashes($index_def);
+          $restored_indexes[$index_name] = str_replace('`' . $field . '`', '`' . $field_new . '`', $expression);
+        }
+      }
+    }
+
     $sql = 'ALTER TABLE {' . $table . '} CHANGE [' . $field . '] ' . $this->createFieldSql($field_new, $this->processField($spec));
     if ($keys_sql = $this->createKeysSql($keys_new)) {
       $sql .= ', ADD ' . implode(', ADD ', $keys_sql);
     }
     $this->executeDdlStatement($sql);
+
+    // Recreate functional indexes with the new column name.
+    foreach ($restored_indexes as $index_name => $expression) {
+      $this->executeDdlStatement('ALTER TABLE {' . $table . '} ADD INDEX [' . $index_name . '] ((' . $expression . '))');
+    }
 
     if ($spec['type'] === 'serial') {
       $max = $this->connection->query('SELECT MAX(`' . $field_new . '`) FROM {' . $table . '}')->fetchField();

@@ -383,12 +383,13 @@ use Drupal\Core\Database\Query\SelectInterface;
  *  - 'indexes':  An associative array of indexes ('indexname' =>
  *    specification). Each specification is an array of one or more
  *    key column specifiers (see below) that form an index on the
- *    table. For JSON columns, use a JsonIndex object to create expression
- *    indexes on specific JSON paths:
+ *    table. For JSON columns, use a JsonIndex object as an element in the
+ *    array to create expression indexes on specific JSON paths. JsonIndex
+ *    elements can be combined with regular column names for composite indexes:
  *    @code
  *    'indexes' => [
- *      'idx_status' => JsonIndex::on('data', '$.status'),
- *      'idx_score'  => JsonIndex::on('data', '$.score', JsonCastType::Int),
+ *      'idx_score'  => [JsonIndex::on('data', '$.score', JsonCastType::Int)],
+ *      'idx_composite' => ['status', JsonIndex::on('data', '$.category')],
  *    ],
  *    @endcode
  *    The JsonCastType enum (Text, Int, Float) ensures the index expression

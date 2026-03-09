@@ -73,15 +73,12 @@ class Schema extends DatabaseSchema {
     }
     if (!empty($schema['indexes'])) {
       foreach ($schema['indexes'] as $key => $fields) {
-        if ($fields instanceof JsonIndex) {
-          $columns = $this->connection->jsonExpression($fields->field, $fields->jsonpath)->toCastSql($fields->type);
-        }
-        elseif (is_string($fields)) {
-          // Expression indexes are stored as strings.
+        if (is_string($fields)) {
+          // Expression indexes from introspected schemas are stored as strings.
           $columns = $fields;
         }
         else {
-          $columns = $this->createKeySql($fields);
+          $columns = $this->createKeySql($this->resolveJsonIndexElements($fields));
         }
         $sql[] = 'CREATE INDEX [' . $info['schema'] . '].[' . $info['table'] . '_' . $key . '] ON [' . $info['table'] . '] (' . $columns . ")\n";
       }
@@ -127,11 +124,33 @@ class Schema extends DatabaseSchema {
       if (is_array($field)) {
         $return[] = '[' . $field[0] . ']';
       }
+      elseif (str_contains($field, '(')) {
+        // Expression indexes (e.g. from resolved JsonIndex).
+        $return[] = $field;
+      }
       else {
         $return[] = '[' . $field . ']';
       }
     }
     return implode(', ', $return);
+  }
+
+  /**
+   * Resolves JsonIndex elements within an index field list to SQL expressions.
+   *
+   * @param array $fields
+   *   The index field list, which may contain JsonIndex objects.
+   *
+   * @return array
+   *   The field list with JsonIndex objects replaced by expression strings.
+   */
+  protected function resolveJsonIndexElements(array $fields): array {
+    foreach ($fields as $key => $element) {
+      if ($element instanceof JsonIndex) {
+        $fields[$key] = $this->connection->jsonExpression($element->field, $element->jsonpath)->toCastSql($element->type);
+      }
+    }
+    return $fields;
   }
 
   /**
@@ -626,10 +645,11 @@ class Schema extends DatabaseSchema {
     // Handle possible index changes.
     foreach ($new_schema['indexes'] as $index => $fields) {
       // Expression indexes (strings) that reference the dropped field.
-      // Match the field name as an argument to json_extract/json_type to
-      // avoid false positives from field names appearing in JSON paths.
+      // Match the field name (optionally quoted) as an argument to
+      // json_extract/json_type to avoid false positives from field names
+      // appearing in JSON paths.
       if (is_string($fields)) {
-        if (preg_match('/\bjson_\w+\(\s*' . preg_quote($field, '/') . '\b/', $fields)) {
+        if (preg_match('/\bjson_\w+\(\s*"?' . preg_quote($field, '/') . '"?\b/', $fields)) {
           unset($new_schema['indexes'][$index]);
         }
         continue;
@@ -689,8 +709,8 @@ class Schema extends DatabaseSchema {
         if (is_string($key_definition)) {
           foreach ($mapping as $new_name => $old_name) {
             $key_definition = preg_replace(
-              '/(json_\w+\(\s*)' . preg_quote($old_name, '/') . '\b/',
-              '${1}' . $new_name,
+              '/(json_\w+\(\s*)"?' . preg_quote($old_name, '/') . '("|\b)/',
+              '${1}"' . $new_name . '"',
               $key_definition,
             );
           }

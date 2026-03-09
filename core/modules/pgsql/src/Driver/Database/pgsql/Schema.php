@@ -322,23 +322,34 @@ EOD;
       // containment (@>), existence (?), and path (@?) operators regardless
       // of the specific jsonpath or cast type. This is more general than the
       // per-path expression indexes used by MySQL/SQLite. Multiple JsonIndex
-      // entries on the same column are deduplicated into a single GIN index
-      // using the first entry's name; subsequent entries are silently skipped.
+      // entries on the same column are deduplicated into a single GIN index.
       $json_gin_columns = [];
       foreach ($table['indexes'] as $key_name => $spec) {
-        if ($spec instanceof JsonIndex) {
-          if (!in_array($spec->field, $json_gin_columns, TRUE)) {
-            $json_gin_columns[] = $spec->field;
-            $indexed_full_columns[] = $spec->field;
-            $statements[] = $this->_createGinIndexSql($name, $key_name, $spec->field);
+        // Separate JsonIndex elements from regular column specs.
+        $json_elements = $regular_columns = [];
+        foreach ($spec as $element) {
+          if ($element instanceof JsonIndex) {
+            $json_elements[] = $element;
           }
-          continue;
+          else {
+            $regular_columns[] = $element;
+            if (is_string($element)) {
+              $indexed_full_columns[] = $element;
+            }
+          }
         }
-        $statements[] = $this->_createIndexSql($name, $key_name, $spec);
-        foreach ($spec as $column) {
-          if (is_string($column)) {
-            $indexed_full_columns[] = $column;
+        // Use the index name directly for JSON-only indexes, append '_gin'
+        // for composite indexes that also have regular columns.
+        $gin_name = !empty($regular_columns) ? $key_name . '_gin' : $key_name;
+        foreach ($json_elements as $json_index) {
+          if (!in_array($json_index->field, $json_gin_columns, TRUE)) {
+            $json_gin_columns[] = $json_index->field;
+            $indexed_full_columns[] = $json_index->field;
+            $statements[] = $this->_createGinIndexSql($name, $gin_name, $json_index->field);
           }
+        }
+        if (!empty($regular_columns)) {
+          $statements[] = $this->_createIndexSql($name, $key_name, $regular_columns);
         }
       }
     }
@@ -918,12 +929,29 @@ EOD;
       throw new SchemaObjectExistsException("Cannot add index '$name' to table '$table': index already exists.");
     }
 
-    // JsonIndex entries are converted to GIN indexes on PgSQL.
-    $sql = $fields instanceof JsonIndex
-      ? $this->_createGinIndexSql($table, $name, $fields->field)
-      : $this->_createIndexSql($table, $name, $fields);
-
-    $this->executeDdlStatement($sql);
+    // Extract JsonIndex elements for GIN index creation, keep regular columns
+    // for a standard index.
+    $regular_columns = [];
+    $has_json = FALSE;
+    foreach ($fields as $element) {
+      if ($element instanceof JsonIndex) {
+        $has_json = TRUE;
+      }
+      else {
+        $regular_columns[] = $element;
+      }
+    }
+    // Use the index name directly for JSON-only indexes, append '_gin' for
+    // composite indexes that also have regular columns.
+    $gin_name = !empty($regular_columns) ? $name . '_gin' : $name;
+    foreach ($fields as $element) {
+      if ($element instanceof JsonIndex) {
+        $this->executeDdlStatement($this->_createGinIndexSql($table, $gin_name, $element->field));
+      }
+    }
+    if (!empty($regular_columns)) {
+      $this->executeDdlStatement($this->_createIndexSql($table, $name, $regular_columns));
+    }
     $this->resetTableInformation($table);
   }
 

@@ -459,6 +459,51 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
   /**
    * {@inheritdoc}
    */
+  protected function doTestJsonIndexAndFieldOperations(): void {
+    // PgSQL uses whole-column GIN indexes for JSON. Multiple JsonIndex entries
+    // on the same column are deduplicated into a single GIN index, so only
+    // the first named index actually exists. Override the base test to check
+    // for the first index name rather than all of them.
+    $this->schema->dropTable('test_json');
+    $spec = static::jsonTableSpecification();
+    unset($spec['indexes']);
+    $this->schema->createTable('test_json', $spec);
+
+    $this->schema->addIndex('test_json', 'idx_number', [\Drupal\Core\Database\Schema\JsonIndex::on('test_field', '$.number', \Drupal\Core\Database\Query\JsonCastType::Int)], $spec);
+    $this->assertTrue($this->schema->indexExists('test_json', 'idx_number'));
+
+    // Dropping an unrelated field should not affect GIN indexes.
+    $this->schema->dropTable('test_json');
+    $spec = static::jsonTableSpecification();
+    $spec['fields']['extra_field'] = [
+      'type' => 'varchar',
+      'length' => 64,
+      'not null' => TRUE,
+      'default' => '',
+    ];
+    $this->schema->createTable('test_json', $spec);
+    $this->schema->dropField('test_json', 'extra_field');
+    $this->assertTrue($this->schema->indexExists('test_json', 'idx_number'), 'GIN index should survive unrelated field drop.');
+
+    // Renaming the JSON field should preserve the GIN index.
+    $this->schema->changeField('test_json', 'test_field', 'data_field', ['type' => 'json']);
+    $this->assertTrue($this->schema->fieldExists('test_json', 'data_field'));
+    $this->connection->insert('test_json')
+      ->fields(['data_field' => self::JSON_TEST_VALUE])
+      ->execute();
+    $stored = $this->connection->select('test_json')
+      ->fields('test_json', ['data_field'])
+      ->execute()
+      ->fetchField();
+    $this->assertEquals(
+      json_decode(self::JSON_TEST_VALUE, TRUE),
+      json_decode($stored, TRUE),
+    );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function doTestJsonIndexCleanup(): void {
     $prefix = $this->connection->getPrefix();
     $gin_indexes = fn() => array_filter(
