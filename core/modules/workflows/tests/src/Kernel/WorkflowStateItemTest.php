@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\workflows\Kernel;
 
 use Drupal\Core\Form\FormState;
+use Drupal\Core\Render\RenderContext;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\workflows\Entity\Workflow;
+use Drupal\workflows\Plugin\Field\FieldFormatter\WorkflowStateFormatter;
 use Drupal\workflows\Plugin\Field\FieldType\WorkflowStateItem;
 use Drupal\workflows\WorkflowStateFieldItemList;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -22,6 +24,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[CoversClass(WorkflowStateItem::class)]
 #[CoversClass(WorkflowStateFieldItemList::class)]
+#[CoversClass(WorkflowStateFormatter::class)]
 #[Group('workflows')]
 #[RunTestsInSeparateProcesses]
 class WorkflowStateItemTest extends KernelTestBase {
@@ -298,6 +301,110 @@ class WorkflowStateItemTest extends KernelTestBase {
       'field_state' => 'missing_state',
     ]);
     $this->assertSame([], $entity->get('field_state')->defaultValuesForm($form, $form_state));
+  }
+
+  /**
+   * Tests that pre/post transition hooks fire with correct arguments on save.
+   */
+  public function testTransitionHooks(): void {
+    // Create and save in the initial state so the entity has a stable ID before
+    // any transition hook is expected to fire.
+    $entity = EntityTest::create(['name' => 'Test entity']);
+    $entity->save();
+    $entity_id = $entity->id();
+
+    // Apply a transition and save: both hooks should fire once.
+    $entity = EntityTest::load($entity_id);
+    $entity->get('field_state')->first()->applyTransitionById('send_to_review');
+    $entity->save();
+
+    $pre_log = \Drupal::state()->get('workflow_type_test.pre_transition_log', []);
+    $post_log = \Drupal::state()->get('workflow_type_test.post_transition_log', []);
+
+    $this->assertCount(1, $pre_log, 'hook_workflows_pre_transition fired once.');
+    $this->assertEquals('test_workflow', $pre_log[0]['workflow']);
+    $this->assertEquals('send_to_review', $pre_log[0]['transition']);
+    $this->assertEquals($entity_id, $pre_log[0]['entity_id']);
+    $this->assertEquals('field_state', $pre_log[0]['field_name']);
+
+    $this->assertCount(1, $post_log, 'hook_workflows_post_transition fired once.');
+    $this->assertEquals('test_workflow', $post_log[0]['workflow']);
+    $this->assertEquals('send_to_review', $post_log[0]['transition']);
+    $this->assertEquals($entity_id, $post_log[0]['entity_id']);
+    $this->assertEquals('field_state', $post_log[0]['field_name']);
+
+    // Re-save without a state change: hooks must NOT fire again.
+    $entity = EntityTest::load($entity_id);
+    $entity->save();
+
+    $pre_log = \Drupal::state()->get('workflow_type_test.pre_transition_log', []);
+    $post_log = \Drupal::state()->get('workflow_type_test.post_transition_log', []);
+    $this->assertCount(1, $pre_log, 'hook_workflows_pre_transition does not fire when state is unchanged.');
+    $this->assertCount(1, $post_log, 'hook_workflows_post_transition does not fire when state is unchanged.');
+  }
+
+  /**
+   * Tests the workflow_state formatter outputs the state label (or raw ID).
+   */
+  public function testFormatter(): void {
+    $entity = EntityTest::create(['name' => 'Test entity']);
+    $entity->save();
+
+    // The formatter renders the state label.
+    $output = $this->container->get('renderer')->executeInRenderContext(new RenderContext(), function () use ($entity) {
+      return $entity->get('field_state')->view(['type' => 'workflow_state']);
+    });
+    $this->assertEquals(['#markup' => 'Draft'], $output[0]);
+
+    // When the stored state no longer exists in the workflow, fall back to the
+    // raw state ID.
+    \Drupal::database()->update('entity_test__field_state')
+      ->fields(['field_state_value' => 'orphaned_state'])
+      ->condition('entity_id', $entity->id())
+      ->execute();
+
+    $entity = EntityTest::load($entity->id());
+    $output = $this->container->get('renderer')->executeInRenderContext(new RenderContext(), function () use ($entity) {
+      return $entity->get('field_state')->view(['type' => 'workflow_state']);
+    });
+    $this->assertEquals(['#markup' => 'orphaned_state'], $output[0]);
+  }
+
+  /**
+   * Tests fieldSettingsForm() filters to EntityWorkflowTypeInterface workflows.
+   */
+  public function testFieldSettingsForm(): void {
+    // Create an incompatible workflow (workflow_type_test does not implement
+    // EntityWorkflowTypeInterface).
+    $incompatible = Workflow::create([
+      'id' => 'incompatible_workflow',
+      'label' => 'Incompatible Workflow',
+      'type' => 'workflow_type_test',
+    ]);
+    $incompatible->getTypePlugin()->addState('start', 'Start');
+    $incompatible->save();
+
+    $item = EntityTest::create(['name' => 'Test entity'])
+      ->get('field_state')
+      ->first();
+
+    $form = [];
+    $form_state = new FormState();
+    $element = $item->fieldSettingsForm($form, $form_state);
+
+    // Compatible workflow appears in the select options.
+    $this->assertArrayHasKey('test_workflow', $element['workflow']['#options']);
+    // Incompatible workflow is excluded.
+    $this->assertArrayNotHasKey('incompatible_workflow', $element['workflow']['#options']);
+  }
+
+  /**
+   * Tests calculateDependencies() returns the workflow config dependency.
+   */
+  public function testCalculateDependencies(): void {
+    $field_definition = FieldConfig::loadByName('entity_test', 'entity_test', 'field_state');
+    $dependencies = WorkflowStateItem::calculateDependencies($field_definition);
+    $this->assertEquals(['workflows.workflow.test_workflow'], $dependencies['config']);
   }
 
   /**

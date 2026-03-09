@@ -7,7 +7,9 @@ namespace Drupal\workflow_type_test\Hook;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultInterface;
 use Drupal\workflow_type_test\Plugin\WorkflowType\WorkflowCustomAccessType;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\workflows\TransitionInterface;
 use Drupal\workflows\WorkflowInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 
@@ -26,6 +28,36 @@ class WorkflowTypeTestHooks {
     if ($state->get('workflow_type_test.plugin_definitions') !== NULL) {
       $definitions = $state->get('workflow_type_test.plugin_definitions');
     }
+  }
+
+  /**
+   * Implements hook_workflows_pre_transition().
+   */
+  #[Hook('workflows_pre_transition')]
+  public function workflowsPreTransition(WorkflowInterface $workflow, TransitionInterface $transition, FieldableEntityInterface $entity, string $field_name): void {
+    $log = \Drupal::state()->get('workflow_type_test.pre_transition_log', []);
+    $log[] = [
+      'workflow' => $workflow->id(),
+      'transition' => $transition->id(),
+      'entity_id' => $entity->id(),
+      'field_name' => $field_name,
+    ];
+    \Drupal::state()->set('workflow_type_test.pre_transition_log', $log);
+  }
+
+  /**
+   * Implements hook_workflows_post_transition().
+   */
+  #[Hook('workflows_post_transition')]
+  public function workflowsPostTransition(WorkflowInterface $workflow, TransitionInterface $transition, FieldableEntityInterface $entity, string $field_name): void {
+    $log = \Drupal::state()->get('workflow_type_test.post_transition_log', []);
+    $log[] = [
+      'workflow' => $workflow->id(),
+      'transition' => $transition->id(),
+      'entity_id' => $entity->id(),
+      'field_name' => $field_name,
+    ];
+    \Drupal::state()->set('workflow_type_test.post_transition_log', $log);
   }
 
   /**
