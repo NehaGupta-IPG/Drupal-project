@@ -371,7 +371,8 @@ abstract class Database {
    * Gets information on the specified database connection.
    *
    * @param string|int $key
-   *   (optional) The connection key for which to return information.
+   *   (optional) The connection key for which to return information. If not
+   *   specified, the 'default' connection key will be returned.
    *
    * @return array<string|int,ConnectionInfoArray>
    *   An associative array of database information, keyed by target. Defaults
@@ -686,8 +687,9 @@ abstract class Database {
   /**
    * Gets database connection info as a URL.
    *
-   * @param string $key
-   *   (Optional) The database connection key.
+   * @param string|int $key
+   *   (Optional) The database connection key. If not specified, the 'default'
+   *   connection key will be returned.
    *
    * @return string
    *   The connection info as a URL.
@@ -695,7 +697,7 @@ abstract class Database {
    * @throws \RuntimeException
    *   When the database connection is not defined.
    */
-  public static function getConnectionInfoAsUrl(string $key = 'default'): string {
+  public static function getConnectionInfoAsUrl(string|int $key = 'default'): string {
     $db_info = static::getConnectionInfo($key);
     if (empty($db_info) || empty($db_info['default'])) {
       throw new \RuntimeException("Database connection $key not defined or missing the 'default' settings");
