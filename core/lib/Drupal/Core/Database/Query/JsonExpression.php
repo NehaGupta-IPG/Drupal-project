@@ -14,8 +14,7 @@ use Drupal\Core\Database\InvalidQueryException;
  * Used internally by JsonCondition and Select::jsonOrderBy(). Can also be
  * used directly to add JSON extractions to a SELECT field list:
  * @code
- * $class = $connection->getDriverClass('JsonExpression');
- * $expr = new $class($connection, 'field_data', '$.status');
+ * $expr = $connection->jsonExpression('field_data', '$.status');
  * $query->addExpression($expr->toSql(), 'status');
  * // With a type cast:
  * $query->addExpression($expr->toCastSql(JsonCastType::Int), 'score');

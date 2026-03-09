@@ -704,11 +704,7 @@ class Select extends Query implements SelectInterface {
    * @return $this
    */
   public function jsonOrderBy(string $field, string $jsonpath, string $direction = 'ASC', ?JsonCastType $cast = NULL): self {
-    $driverClass = $this->connection->getDriverClass('JsonExpression');
-    $class = $driverClass !== 'JsonExpression'
-      ? $driverClass
-      : JsonExpression::class;
-    $expression = new $class($this->connection, $field, $jsonpath);
+    $expression = $this->connection->jsonExpression($field, $jsonpath);
     $sql = $cast !== NULL ? $expression->toCastSql($cast) : $expression->toSql();
 
     // NULLS LAST: rows where the JSON value is NULL sort after non-NULL.

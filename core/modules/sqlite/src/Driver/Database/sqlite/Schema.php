@@ -7,7 +7,7 @@ use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
 use Drupal\Core\Database\Schema as DatabaseSchema;
 
-// cspell:ignore autoincrement autoindex xinfo
+// cspell:ignore autoincrement autoindex
 
 /**
  * @ingroup schemaapi
@@ -25,25 +25,6 @@ class Schema extends DatabaseSchema {
    * @var string
    */
   protected $defaultSchema = 'main';
-
-  /**
-   * Converts JsonIndex entries in the indexes array to expression strings.
-   *
-   * Expression indexes are stored as string values in the 'indexes' array,
-   * as opposed to regular column-based indexes which are arrays of column
-   * names.
-   *
-   * @param array $table
-   *   Table schema definition, modified by reference.
-   */
-  protected function resolveJsonIndexes(array &$table): void {
-    foreach ($table['indexes'] ?? [] as $index_name => $index) {
-      if ($index instanceof JsonIndex) {
-        $expression = new JsonExpression($this->connection, $index->field, $index->jsonpath);
-        $table['indexes'][$index_name] = $expression->toCastSql($index->type);
-      }
-    }
-  }
 
   /**
    * {@inheritdoc}
@@ -74,7 +55,6 @@ class Schema extends DatabaseSchema {
       $this->ensureNotNullPrimaryKey($table['primary key'], $table['fields']);
     }
 
-    $this->resolveJsonIndexes($table);
     $sql = [];
     $sql[] = "CREATE TABLE {" . $name . "} (\n" . $this->createColumnsSql($name, $table) . "\n)\n";
     return array_merge($sql, $this->createIndexSql($name, $table));
@@ -94,8 +74,7 @@ class Schema extends DatabaseSchema {
     if (!empty($schema['indexes'])) {
       foreach ($schema['indexes'] as $key => $fields) {
         if ($fields instanceof JsonIndex) {
-          $expression = new JsonExpression($this->connection, $fields->field, $fields->jsonpath);
-          $columns = $expression->toCastSql($fields->type);
+          $columns = $this->connection->jsonExpression($fields->field, $fields->jsonpath)->toCastSql($fields->type);
         }
         elseif (is_string($fields)) {
           // Expression indexes are stored as strings.
@@ -136,7 +115,7 @@ class Schema extends DatabaseSchema {
       $sql_array[] = " PRIMARY KEY (" . $this->createKeySql($schema['primary key']) . ")";
     }
 
-    return implode(", \n", array_filter($sql_array));
+    return implode(", \n", $sql_array);
   }
 
   /**
@@ -525,7 +504,7 @@ class Schema extends DatabaseSchema {
     ];
 
     $info = $this->getPrefixInfo($table);
-    $result = $this->connection->query('PRAGMA [' . $info['schema'] . '].table_xinfo([' . $info['table'] . '])');
+    $result = $this->connection->query('PRAGMA [' . $info['schema'] . '].table_info([' . $info['table'] . '])');
     foreach ($result as $row) {
       if (preg_match('/^([^(]+)\((.*)\)$/', $row->type, $matches)) {
         $type = $matches[1];
@@ -703,10 +682,17 @@ class Schema extends DatabaseSchema {
     $new_schema['primary key'] = $this->mapKeyDefinition($new_schema['primary key'], $mapping);
     foreach (['unique keys', 'indexes'] as $k) {
       foreach ($new_schema[$k] as &$key_definition) {
-        // Expression indexes are strings; update the field name in-place.
+        // Expression indexes are strings; update the column name that
+        // appears as the first argument to json_extract/json_type etc.
+        // A plain str_replace would corrupt JSON paths containing the
+        // column name (e.g. '$.id' when renaming column 'id').
         if (is_string($key_definition)) {
           foreach ($mapping as $new_name => $old_name) {
-            $key_definition = str_replace($old_name, $new_name, $key_definition);
+            $key_definition = preg_replace(
+              '/(json_\w+\(\s*)' . preg_quote($old_name, '/') . '\b/',
+              '${1}' . $new_name,
+              $key_definition,
+            );
           }
           continue;
         }
@@ -759,10 +745,6 @@ class Schema extends DatabaseSchema {
     }
     if ($this->indexExists($table, $name)) {
       throw new SchemaObjectExistsException("Cannot add index '$name' to table '$table': index already exists.");
-    }
-
-    if (!($fields instanceof JsonIndex)) {
-      $this->ensureNoDirectJsonIndexes($table, $name, $fields, $spec);
     }
 
     $schema['indexes'][$name] = $fields;

@@ -3,7 +3,6 @@
 namespace Drupal\mysql\Driver\Database\mysql;
 
 use Drupal\Core\Database\Exception\SchemaPrimaryKeyMustBeDroppedException;
-use Drupal\Core\Database\Query\JsonCastType;
 use Drupal\Core\Database\Schema\JsonIndex;
 use Drupal\Core\Database\SchemaException;
 use Drupal\Core\Database\SchemaObjectExistsException;
@@ -515,36 +514,9 @@ class Schema extends DatabaseSchema {
     }
     foreach ($table['indexes'] ?? [] as $index_name => $index) {
       if ($index instanceof JsonIndex) {
-        $expression = new JsonExpression($this->connection, $index->field, $index->jsonpath);
-        $table['indexes'][$index_name] = $expression->toCastSql($index->type);
+        $table['indexes'][$index_name] = $this->connection->jsonExpression($index->field, $index->jsonpath)->toCastSql($index->type);
       }
     }
-  }
-
-  /**
-   * Get a typed SQL expression for extracting a JSON value.
-   *
-   * MySQL functional indexes cannot return BLOB or TEXT, so we must wrap
-   * the extraction in an appropriate CAST. The Condition class uses the same
-   * method to produce matching WHERE clause expressions.
-   *
-   * @param string $field
-   *   Field name.
-   * @param string $jsonpath
-   *   JSON path expression.
-   * @param \Drupal\Core\Database\Query\JsonCastType $type
-   *   The cast type.
-   *
-   * @return string
-   *   SQL expression with appropriate CAST.
-   */
-  public static function getTypedJsonExtractExpression(string $field, string $jsonpath, JsonCastType $type): string {
-    $extract = "JSON_EXTRACT({$field}, '{$jsonpath}')";
-    return match ($type) {
-      JsonCastType::Int => "CAST({$extract} AS SIGNED)",
-      JsonCastType::Float => "CAST({$extract} AS DOUBLE)",
-      JsonCastType::Text => "CAST(JSON_UNQUOTE({$extract}) AS CHAR(255))",
-    };
   }
 
   /**
@@ -671,22 +643,14 @@ class Schema extends DatabaseSchema {
       if ($this->connection->isMariaDb()) {
         return;
       }
-      $expression = new JsonExpression($this->connection, $fields->field, $fields->jsonpath);
-      $this->executeDdlStatement('ALTER TABLE {' . $table . '} ADD INDEX [' . $name . '] ((' . $expression->toCastSql($fields->type) . '))');
+      $this->executeDdlStatement('ALTER TABLE {' . $table . '} ADD INDEX [' . $name . '] ((' . $this->connection->jsonExpression($fields->field, $fields->jsonpath)->toCastSql($fields->type) . '))');
       return;
     }
 
     $spec['indexes'][$name] = $fields;
+    $indexes = $this->getNormalizedIndexes($spec);
 
-    $this->ensureNoDirectJsonIndexes($table, $name, $fields, $spec);
-
-    if (is_string($fields)) {
-      $this->executeDdlStatement('ALTER TABLE {' . $table . '} ADD INDEX [' . $name . '] ((' . $fields . '))');
-    }
-    else {
-      $indexes = $this->getNormalizedIndexes($spec);
-      $this->executeDdlStatement('ALTER TABLE {' . $table . '} ADD INDEX [' . $name . '] (' . $this->createKeySql($indexes[$name]) . ')');
-    }
+    $this->executeDdlStatement('ALTER TABLE {' . $table . '} ADD INDEX [' . $name . '] (' . $this->createKeySql($indexes[$name]) . ')');
   }
 
   /**

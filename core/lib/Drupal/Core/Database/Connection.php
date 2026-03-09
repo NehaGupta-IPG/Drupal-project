@@ -8,6 +8,7 @@ use Drupal\Core\Database\Exception\EventException;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Query\Delete;
 use Drupal\Core\Database\Query\Insert;
+use Drupal\Core\Database\Query\JsonExpression;
 use Drupal\Core\Database\Query\Merge;
 use Drupal\Core\Database\Query\Select;
 use Drupal\Core\Database\Query\Truncate;
@@ -996,6 +997,19 @@ abstract class Connection {
    *   The database Schema object for this connection.
    */
   abstract public function schema();
+
+  /**
+   * Creates a JsonExpression for extracting a value from a JSON column.
+   *
+   * @param string $field
+   *   The column name, optionally table-qualified (e.g. "t.data").
+   * @param string $path
+   *   The JSONPath expression (e.g. "$.status").
+   *
+   * @return \Drupal\Core\Database\Query\JsonExpression
+   *   A driver-specific JsonExpression instance.
+   */
+  abstract public function jsonExpression(string $field, string $path): JsonExpression;
 
   /**
    * Prepares and returns a CONDITION query object.

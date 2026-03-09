@@ -24,7 +24,12 @@ class JsonExpression extends BaseJsonExpression {
    * {@inheritdoc}
    */
   public function toCastSql(JsonCastType $type): string {
-    return Schema::getTypedJsonExtractExpression($this->field, $this->path, $type);
+    $extract = $this->toSql();
+    return match ($type) {
+      JsonCastType::Int => "CAST({$extract} AS SIGNED)",
+      JsonCastType::Float => "CAST({$extract} AS DOUBLE)",
+      JsonCastType::Text => "CAST(JSON_UNQUOTE({$extract}) AS CHAR(255))",
+    };
   }
 
   /**

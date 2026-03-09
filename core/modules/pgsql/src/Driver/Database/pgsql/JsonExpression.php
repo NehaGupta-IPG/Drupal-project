@@ -11,8 +11,6 @@ use Drupal\Core\Database\Query\PlaceholderInterface;
 
 /**
  * PostgreSQL implementation of JsonExpression.
- *
- * Uses the #>> operator to extract a JSON value as text.
  */
 class JsonExpression extends BaseJsonExpression {
 
@@ -20,6 +18,7 @@ class JsonExpression extends BaseJsonExpression {
    * {@inheritdoc}
    */
   public function toSql(): string {
+    // Uses the #>> operator to extract a JSON value as text.
     return "{$this->field} #>> '{" . implode(',', $this->pathSegments()) . "}'";
   }
 

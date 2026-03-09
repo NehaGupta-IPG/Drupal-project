@@ -111,9 +111,7 @@ class JsonCondition extends Condition {
     }
     $this->changed = FALSE;
 
-    $class = $connection->getDriverClass('JsonExpression');
-    $expression = new $class($connection, $this->field, $this->path);
-    assert($expression instanceof JsonExpression);
+    $expression = $connection->jsonExpression($this->field, $this->path);
 
     // All operators are handled generically via the driver-specific
     // JsonExpression methods: toSql(), toCastSql(), toHasKeySql(),

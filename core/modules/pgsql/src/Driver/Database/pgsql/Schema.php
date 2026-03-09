@@ -334,7 +334,6 @@ EOD;
           }
           continue;
         }
-        $this->ensureNoDirectJsonIndexes($name, $key_name, $spec, $table);
         $statements[] = $this->_createIndexSql($name, $key_name, $spec);
         foreach ($spec as $column) {
           if (is_string($column)) {
@@ -920,14 +919,11 @@ EOD;
     }
 
     // JsonIndex entries are converted to GIN indexes on PgSQL.
-    if ($fields instanceof JsonIndex) {
-      $this->executeDdlStatement($this->_createGinIndexSql($table, $name, $fields->field));
-      $this->resetTableInformation($table);
-      return;
-    }
+    $sql = $fields instanceof JsonIndex
+      ? $this->_createGinIndexSql($table, $name, $fields->field)
+      : $this->_createIndexSql($table, $name, $fields);
 
-    $this->ensureNoDirectJsonIndexes($table, $name, $fields, $spec);
-    $this->executeDdlStatement($this->_createIndexSql($table, $name, $fields));
+    $this->executeDdlStatement($sql);
     $this->resetTableInformation($table);
   }
 
