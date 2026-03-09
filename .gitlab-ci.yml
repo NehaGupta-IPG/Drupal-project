@@ -301,7 +301,7 @@ default:
     KUBERNETES_CPU_REQUEST: "4"
     CONCURRENCY: 24
     PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
-    DRUPAL_PHPUNIT_TESTSUITE: "unit"
+    TESTSUITE: "unit"
     DRUPAL_TEST_CONTEXT_KEYS: "php-version,phpunit-testsuite"
   before_script:
     - *composer-setup
@@ -345,7 +345,7 @@ default:
     KUBERNETES_CPU_REQUEST: "2"
     _ARTIFACTS_DIR: "test-artifacts/phpunit"
     PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
-    DRUPAL_PHPUNIT_TESTSUITE: "unit-component"
+    TESTSUITE: "unit-component"
     DRUPAL_TEST_CONTEXT_KEYS: "php-version,phpunit-testsuite"
   before_script:
     - mkdir -p $_ARTIFACTS_DIR
@@ -423,7 +423,6 @@ default:
     TESTSUITE: PHPUnit-FunctionalJavascript
     CONCURRENCY: "12"
     KUBERNETES_CPU_REQUEST: "16"
-    DRUPAL_PHPUNIT_TESTSUITE: "functional-javascript"
     DRUPAL_TEST_CONTEXT_KEYS: "php-version,phpunit-testsuite,database-driver,database-version"
   services:
     - <<: *with-database
@@ -439,7 +438,6 @@ default:
     TESTSUITE: PHPUnit-Build
     KUBERNETES_CPU_REQUEST: "8"
     CONCURRENCY: "5"
-    DRUPAL_PHPUNIT_TESTSUITE: "build"
     DRUPAL_TEST_CONTEXT_KEYS: "php-version,phpunit-testsuite,database-driver,database-version"
   services:
     - <<: *with-database
@@ -451,7 +449,6 @@ default:
     TESTSUITE: PHPUnit-Functional
     CONCURRENCY: "24"
     KUBERNETES_CPU_REQUEST: "16"
-    DRUPAL_PHPUNIT_TESTSUITE: "functional"
     DRUPAL_TEST_CONTEXT_KEYS: "php-version,phpunit-testsuite,database-driver,database-version"
   services:
     - <<: *with-database
@@ -463,7 +460,6 @@ default:
     TESTSUITE: PHPUnit-Kernel
     KUBERNETES_CPU_REQUEST: "8"
     CONCURRENCY: "24"
-    DRUPAL_PHPUNIT_TESTSUITE: "kernel"
     DRUPAL_TEST_CONTEXT_KEYS: "php-version,phpunit-testsuite,database-driver,database-version"
   services:
     - <<: *with-database

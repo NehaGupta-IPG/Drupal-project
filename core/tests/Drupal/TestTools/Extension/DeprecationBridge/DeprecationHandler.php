@@ -37,7 +37,7 @@ final class DeprecationHandler implements Extension {
   /**
    * The path to the statistics staging file.
    */
-  private string $statisticsStagingFilePath;
+  private static string $statisticsStagingFilePath;
 
   /**
    * The path to the artifacts base directory.
@@ -121,6 +121,13 @@ final class DeprecationHandler implements Extension {
     if ($config->debugClassLoaderEnabled()) {
       DebugClassLoader::enable();
     }
+
+    // When deprecation statistics are enabled, prepare a temp data collection
+    // file and make its path visible to isolated tests via an env variable.
+    if ($config->collectStatsEnabled()) {
+      self::$statisticsStagingFilePath = tempnam(sys_get_temp_dir(), 'depsta');
+      putenv('_DEPRECATION_HANDLER_STATS_TEMP_FILE=' . self::$statisticsStagingFilePath);
+    }
   }
 
   /**
@@ -141,15 +148,6 @@ final class DeprecationHandler implements Extension {
     if (!$config->collectStatsEnabled()) {
       return;
     }
-    // Determine staging file path.
-    $this->statisticsStagingFilePath = tempnam(sys_get_temp_dir(), 'depsta');
-
-    // Set an environment variable with the configuration, so that isolated
-    // tests can access it.
-    $config = json_encode([
-      'stagingFilePath' => $this->statisticsStagingFilePath,
-    ]);
-    putenv('_DRUPAL_DEPRECATION_HANDLER_CONFIG=' . $config);
 
     $facade->registerSubscriber(new TestPreparationStarted($this));
     $facade->registerSubscriber(new Deprecation($this));
@@ -184,16 +182,6 @@ final class DeprecationHandler implements Extension {
     if (!empty(getenv('_TARGET_DB'))) {
       $this->databaseVersion = getenv('_TARGET_DB');
     }
-
-    // Set an environment variable with the configuration, so that isolated
-    // tests can access it.
-    $config = json_encode([
-      'directory' => $this->directory,
-      'php_version' => $this->phpVersion,
-      'database_driver' => $this->databaseDriver,
-      'database_version' => $this->databaseVersion,
-    ]);
-    putenv('_DRUPAL_TEST_ARTIFACT_CONFIG=' . $config);
   }
 
   /**
@@ -233,7 +221,7 @@ final class DeprecationHandler implements Extension {
   public function processStatisticsArtifact(): void {
     assert(Configuration::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
 
-    $content = @file_get_contents($this->statisticsStagingFilePath);
+    $content = @file_get_contents(self::$statisticsStagingFilePath);
     $statisticsArtifactDirectory = $this->directory . \DIRECTORY_SEPARATOR . 'deprecation-handler';
     Filesystem::createDirectory($statisticsArtifactDirectory);
 
@@ -281,17 +269,15 @@ final class DeprecationHandler implements Extension {
 
     $stat['status'] = $status;
 
-    $configEnv = getenv('_DRUPAL_DEPRECATION_HANDLER_CONFIG');
+    $tempFilePath = getenv('_DEPRECATION_HANDLER_STATS_TEMP_FILE');
 
-    if (empty($configEnv)) {
+    if (empty($tempFilePath)) {
       // If no config available, we cannot record the stats.
       return;
     }
 
-    $config = (array) json_decode($configEnv);
-
     file_put_contents(
-      $config['stagingFilePath'],
+      $tempFilePath,
       base64_encode(json_encode($stat)) . "\n",
       \FILE_APPEND,
     );
@@ -362,7 +348,7 @@ final class DeprecationHandler implements Extension {
     if ($env = getenv('CI_JOB_NAME')) {
       $tmp['CI_JOB_NAME'] = $env;
     }
-    $env = getenv('DRUPAL_PHPUNIT_TESTSUITE');
+    $env = getenv('TESTSUITE');
     if ($env !== FALSE && in_array('phpunit-testsuite', $contextKeys)) {
       $tmp['phpunit_testsuite'] = $env;
     }
