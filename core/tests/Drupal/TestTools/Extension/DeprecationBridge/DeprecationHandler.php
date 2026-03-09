@@ -37,7 +37,7 @@ final class DeprecationHandler implements Extension {
   /**
    * The path to the statistics staging file.
    */
-  private static string $statisticsStagingFilePath;
+  private string $statisticsStagingFilePath;
 
   /**
    * The path to the artifacts base directory.
@@ -121,13 +121,6 @@ final class DeprecationHandler implements Extension {
     if ($config->debugClassLoaderEnabled()) {
       DebugClassLoader::enable();
     }
-
-    // When deprecation statistics are enabled, prepare a temp data collection
-    // file and make its path visible to isolated tests via an env variable.
-    if ($config->collectStatsEnabled()) {
-      self::$statisticsStagingFilePath = tempnam(sys_get_temp_dir(), 'depsta');
-      putenv('_DEPRECATION_HANDLER_STATS_TEMP_FILE=' . self::$statisticsStagingFilePath);
-    }
   }
 
   /**
@@ -148,6 +141,11 @@ final class DeprecationHandler implements Extension {
     if (!$config->collectStatsEnabled()) {
       return;
     }
+
+    // When deprecation statistics are enabled, prepare a temp data collection
+    // file and make its path visible to isolated tests via an env variable.
+    $this->statisticsStagingFilePath = tempnam(sys_get_temp_dir(), 'depsta');
+    putenv('_DEPRECATION_HANDLER_STATS_TEMP_FILE=' . $this->statisticsStagingFilePath);
 
     $facade->registerSubscriber(new TestPreparationStarted($this));
     $facade->registerSubscriber(new Deprecation($this));
@@ -221,7 +219,7 @@ final class DeprecationHandler implements Extension {
   public function processStatisticsArtifact(): void {
     assert(Configuration::collectStatsEnabled(), __METHOD__ . '() must not be called if deprecation statistics collection is not enabled.');
 
-    $content = @file_get_contents(self::$statisticsStagingFilePath);
+    $content = @file_get_contents($this->statisticsStagingFilePath);
     $statisticsArtifactDirectory = $this->directory . \DIRECTORY_SEPARATOR . 'deprecation-handler';
     Filesystem::createDirectory($statisticsArtifactDirectory);
 
