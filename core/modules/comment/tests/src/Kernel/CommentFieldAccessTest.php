@@ -13,6 +13,7 @@ use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
+use Drupal\Tests\comment\Traits\CommentCreationTrait;
 use Drupal\Tests\Traits\Core\GeneratePermutationsTrait;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
@@ -27,6 +28,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class CommentFieldAccessTest extends EntityKernelTestBase {
 
+  use CommentCreationTrait;
   use CommentTestTrait;
   use GeneratePermutationsTrait;
 
@@ -364,6 +366,108 @@ class CommentFieldAccessTest extends EntityKernelTestBase {
       $may_view = $set['comment']->mail->access('view', $set['user']);
       $this->assertEquals($may_view, $set['user']->hasPermission('administer comments'));
     }
+  }
+
+  /**
+   * Tests that the comment field view access allows login-to-comment prompt.
+   *
+   * When comments are open and neither 'view comment list' nor 'create' grants
+   * access (e.g. an anonymous user without 'post comments' on a node with no
+   * existing comments), the field must still be accessible so the formatter can
+   * display a login-to-comment prompt. Without this the formatter is skipped
+   * entirely and no prompt is ever shown.
+   */
+  public function testFieldViewAccessForLoginPrompt(): void {
+    $this->createCommentType('entity_test');
+    $this->addDefaultCommentField('entity_test', 'entity_test', 'comment');
+
+    $host = EntityTest::create();
+    $host->save();
+
+    $role = Role::load(RoleInterface::ANONYMOUS_ID);
+    $role->revokePermission('post comments');
+    $role->save();
+
+    $anonymous = new AnonymousUserSession();
+
+    $host = EntityTest::load($host->id());
+    /** @var \Drupal\comment\CommentFieldItemList $comment_field */
+    $comment_field = $host->get('comment');
+
+    // Preconditions: no published comments exist and anonymous cannot create.
+    $this->assertFalse($comment_field->access('view comment list', $anonymous));
+    $this->assertFalse($comment_field->access('create', $anonymous));
+
+    // Despite both checks being denied, 'view' must still grant access
+    // because comments are open, so the formatter can show a login prompt.
+    $this->assertTrue($comment_field->access('view', $anonymous));
+    $this->assertTrue($comment_field->access('view', $anonymous, TRUE)->isAllowed());
+
+    // Closed: nothing to show (no comments, no form, no prompt).
+    $host->comment->status = CommentItemInterface::CLOSED;
+    $host->save();
+    $host = EntityTest::load($host->id());
+    $comment_field = $host->get('comment');
+    $this->assertFalse($comment_field->access('view', $anonymous));
+
+    // Hidden: field is completely suppressed.
+    $host->comment->status = CommentItemInterface::HIDDEN;
+    $host->save();
+    $host = EntityTest::load($host->id());
+    $comment_field = $host->get('comment');
+    $this->assertFalse($comment_field->access('view', $anonymous));
+  }
+
+  /**
+   * Tests the comment field item list 'view comment list' access.
+   */
+  public function testFieldViewOnlyOperationAccess(): void {
+    // Create a comment type and attach a comment field to entity_test.
+    $this->createCommentType('entity_test');
+    $this->addDefaultCommentField('entity_test', 'entity_test', 'comment');
+
+    // Create a testing host entity.
+    $host = EntityTest::create();
+    $host->save();
+
+    // Enable comment statistics creation.
+    $this->container->get('state')->set('comment.maintain_entity_statistics', TRUE);
+
+    // An initial published comment.
+    $enabled = $this->createComment([
+      'entity_type' => 'entity_test',
+      'entity_id' => $host->id(),
+    ]);
+
+    // The last comment is disabled.
+    $this->createComment([
+      'entity_type' => 'entity_test',
+      'entity_id' => $host->id(),
+      'status' => FALSE,
+    ]);
+
+    $account = $this->createUser(['access comments', 'view test entity']);
+
+    // Reload the entity.
+    $host = EntityTest::load($host->id());
+    /** @var \Drupal\comment\CommentFieldItemList $comment_field */
+    $comment_field = $host->get('comment');
+
+    // Check that the 'view comment list' access to the field is permitted.
+    $this->assertTrue($comment_field->access('view comment list', $account));
+    // And the last comment is comment statistic is the enabled comment.
+    $this->assertSame($enabled->id(), $comment_field->cid);
+
+    // Delete the published comment. From now on the field contains only
+    // unpublished comments.
+    $enabled->delete();
+
+    // Reload the entity.
+    $host = EntityTest::load($host->id());
+    /** @var \Drupal\comment\CommentFieldItemList $comment_field */
+    $comment_field = $host->get('comment');
+    // Check that the 'view comment list' access to the field is not permitted.
+    $this->assertFalse($comment_field->access('view comment list', $account));
   }
 
 }

@@ -352,13 +352,15 @@ class CommentHooks {
         continue;
       }
       // Do not make a string if comments are hidden.
-      $status = $node->get($field_name)->status;
-      if (\Drupal::currentUser()->hasPermission('access comments') && $status != CommentItemInterface::HIDDEN) {
-        if ($status == CommentItemInterface::OPEN) {
+      $status = (int) $node->get($field_name)->status;
+      if ($status !== CommentItemInterface::HIDDEN) {
+        if ($status === CommentItemInterface::OPEN) {
           // At least one comment field is open.
           $open = TRUE;
         }
-        $comments += $node->get($field_name)->comment_count;
+        if ($node->get($field_name)->access('view comment list')) {
+          $comments += $node->get($field_name)->comment_count;
+        }
       }
     }
     // Do not make a string if there are no comment fields, or no comments exist

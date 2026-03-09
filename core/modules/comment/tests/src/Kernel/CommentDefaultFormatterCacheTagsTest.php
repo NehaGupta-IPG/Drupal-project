@@ -128,19 +128,15 @@ class CommentDefaultFormatterCacheTagsTest extends EntityKernelTestBase {
       ->view($commented_entity);
     $renderer->renderRoot($build);
     $expected_cache_tags = [
-      'entity_test_view',
-      'entity_test:' . $commented_entity->id(),
-      'comment_view',
-      'comment:' . $comment->id(),
-      'config:filter.format.plain_text',
-      'user_view',
       'CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form',
-      'user:' . $user->id(),
+      'comment:' . $comment->id(),
       'config:core.entity_form_display.comment.comment.default',
       'config:field.field.comment.comment.comment_body',
       'config:field.field.entity_test.entity_test.comment',
       'config:field.storage.comment.comment_body',
       'config:user.settings',
+      'entity_test:' . $commented_entity->id(),
+      'entity_test_view',
     ];
     $this->assertEqualsCanonicalizing($expected_cache_tags, $build['#cache']['tags']);
 

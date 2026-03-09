@@ -1,0 +1,49 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Drupal\Tests\comment\Functional\Update;
+
+use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
+use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
+/**
+ * Tests Comment module update paths.
+ */
+#[Group('comment')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
+class CommentUpdateTest extends UpdatePathTestBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setDatabaseDumpFiles(): void {
+    $this->databaseDumpFiles = [
+      __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-10.3.0.bare.standard.php.gz',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-history.php',
+    ];
+  }
+
+  /**
+   * Tests comment_post_update_add_thread_limit_field_setting().
+   *
+   * @see comment_post_update_add_thread_limit_field_setting()
+   */
+  public function testCommentUpdate9100(): void {
+    $config_factory = \Drupal::configFactory();
+
+    $config = $config_factory->get('field.field.node.article.comment');
+    $this->assertArrayNotHasKey('thread_limit', $config->get('settings'));
+
+    $this->runUpdates();
+
+    $config = $config_factory->get('field.field.node.article.comment');
+    $this->assertSame(2, $config->get('settings.thread_limit.depth'));
+    $this->assertSame(CommentItemInterface::THREAD_DEPTH_REPLY_MODE_ALLOW, $config->get('settings.thread_limit.mode'));
+  }
+
+}

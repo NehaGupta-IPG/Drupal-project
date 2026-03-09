@@ -3,6 +3,7 @@
 namespace Drupal\comment;
 
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityFormBuilderInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -114,7 +115,25 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
       'pid' => NULL,
     ];
     $comment = $this->entityTypeManager->getStorage('comment')->create($values);
-    return $this->entityFormBuilder->getForm($comment);
+
+    // Use createAccess() with the commented entity in context so that access
+    // handlers and buildCreateAccessCid() have the full picture.
+    $commented_entity = $comment->getCommentedEntity();
+    $context = ['commented_entity' => $commented_entity];
+    /** @var \Drupal\Core\Access\AccessResultInterface $access */
+    $access = $this->entityTypeManager->getAccessControlHandler('comment')
+      ->createAccess($comment_type_id, $this->currentUser, $context, TRUE);
+    if ($commented_entity) {
+      $access->addCacheableDependency($commented_entity);
+    }
+    $form = $access->isAllowed() ? $this->entityFormBuilder->getForm($comment) : [];
+
+    // Merge access cacheable metadata into the form render array.
+    CacheableMetadata::createFromRenderArray($form)
+      ->merge(CacheableMetadata::createFromObject($access))
+      ->applyTo($form);
+
+    return $form;
   }
 
   /**
@@ -191,9 +210,8 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
         ];
       }
       $field_definition = $commented_entity->getFieldDefinition($entity->getFieldName());
-      if ($entity->isPublished()
-        && $entity->access('create')
-        && $field_definition->getSetting('default_mode') === CommentManagerInterface::COMMENT_MODE_THREADED) {
+      $is_threaded = $field_definition->getSetting('default_mode') !== CommentManagerInterface::COMMENT_MODE_FLAT;
+      if ($is_threaded && $entity->access('reply')) {
         $links['comment-reply'] = [
           'title' => $this->t('Reply'),
           'url' => Url::fromRoute('comment.reply', [

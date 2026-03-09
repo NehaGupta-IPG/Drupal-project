@@ -3,6 +3,7 @@
 namespace Drupal\comment\Plugin\Field\FieldFormatter;
 
 use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Entity\EntityDisplayRepositoryInterface;
 use Drupal\Core\Entity\EntityFormBuilderInterface;
@@ -122,6 +123,7 @@ class CommentDefaultFormatter extends FormatterBase {
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
     $output = [];
+    $cacheability = new CacheableMetadata();
 
     $field_name = $this->fieldDefinition->getName();
     $entity = $items->getEntity();
@@ -139,14 +141,18 @@ class CommentDefaultFormatter extends FormatterBase {
       // Unpublished comments are not included in
       // $entity->get($field_name)->comment_count, but unpublished comments
       // should display if the user is an administrator.
-      $elements['#cache']['contexts'][] = 'user.permissions';
-      if ($this->currentUser->hasPermission('access comments') || $this->currentUser->hasPermission('administer comments')) {
+      $comment_admin = $this->currentUser->hasPermission('administer comments');
+      $cacheability->addCacheContexts(['user.permissions']);
+      $items_access = $items->access('view comment list', $this->currentUser, TRUE);
+      $cacheability->addCacheableDependency($items_access);
+      if ($comment_admin || $items_access->isAllowed()) {
         $output['comments'] = [];
 
-        if ($entity->get($field_name)->comment_count || $this->currentUser->hasPermission('administer comments')) {
+        if ($items->comment_count || $comment_admin) {
           $mode = $comment_settings['default_mode'];
           $comments_per_page = $comment_settings['per_page'];
           $comments = $this->storage->loadThread($entity, $field_name, $mode, $comments_per_page, $this->getSetting('pager_id'));
+
           if ($comments) {
             $build = $this->viewBuilder->viewMultiple($comments, $this->getSetting('view_mode'));
             $build['pager']['#type'] = 'pager';
@@ -167,9 +173,13 @@ class CommentDefaultFormatter extends FormatterBase {
       // Append comment form if the comments are open and the form is set to
       // display below the entity. Do not show the form for the print view mode.
       if ($status == CommentItemInterface::OPEN && $comment_settings['form_location'] == CommentItemInterface::FORM_BELOW && $this->viewMode != 'print') {
-        // Only show the add comment form if the user has permission.
-        $elements['#cache']['contexts'][] = 'user.roles';
-        if ($this->currentUser->hasPermission('post comments')) {
+        // Only add the comment form if the user has create access. This
+        // prevents the template's {% if comment_form %} from evaluating to
+        // TRUE (due to a non-empty lazy builder render array) and rendering
+        // the "Add new comment" heading for users who cannot post.
+        $create_access = $items->access('create', $this->currentUser, TRUE);
+        $cacheability->addCacheableDependency($create_access);
+        if ($create_access->isAllowed()) {
           $output['comment_form'] = [
             '#lazy_builder' => [
               'comment.lazy_builders:renderForm',
@@ -193,6 +203,7 @@ class CommentDefaultFormatter extends FormatterBase {
       ];
     }
 
+    $cacheability->applyTo($elements);
     return $elements;
   }
 
