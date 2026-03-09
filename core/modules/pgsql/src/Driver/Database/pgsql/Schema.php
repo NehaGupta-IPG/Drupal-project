@@ -931,16 +931,8 @@ EOD;
 
     // Extract JsonIndex elements for GIN index creation, keep regular columns
     // for a standard index.
-    $regular_columns = [];
-    $has_json = FALSE;
-    foreach ($fields as $element) {
-      if ($element instanceof JsonIndex) {
-        $has_json = TRUE;
-      }
-      else {
-        $regular_columns[] = $element;
-      }
-    }
+    $regular_columns = array_filter($fields, fn($e) => !$e instanceof JsonIndex);
+
     // Use the index name directly for JSON-only indexes, append '_gin' for
     // composite indexes that also have regular columns.
     $gin_name = !empty($regular_columns) ? $name . '_gin' : $name;

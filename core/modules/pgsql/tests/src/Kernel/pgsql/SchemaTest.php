@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\pgsql\Kernel\pgsql;
 
+use Drupal\Core\Database\Query\JsonCastType;
+use Drupal\Core\Database\Schema\JsonIndex;
 use Drupal\KernelTests\Core\Database\DriverSpecificSchemaTestBase;
 use Drupal\pgsql\Driver\Database\pgsql\Schema;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -469,7 +471,7 @@ class SchemaTest extends DriverSpecificSchemaTestBase {
     unset($spec['indexes']);
     $this->schema->createTable('test_json', $spec);
 
-    $this->schema->addIndex('test_json', 'idx_number', [\Drupal\Core\Database\Schema\JsonIndex::on('test_field', '$.number', \Drupal\Core\Database\Query\JsonCastType::Int)], $spec);
+    $this->schema->addIndex('test_json', 'idx_number', [JsonIndex::on('test_field', '$.number', JsonCastType::Int)], $spec);
     $this->assertTrue($this->schema->indexExists('test_json', 'idx_number'));
 
     // Dropping an unrelated field should not affect GIN indexes.

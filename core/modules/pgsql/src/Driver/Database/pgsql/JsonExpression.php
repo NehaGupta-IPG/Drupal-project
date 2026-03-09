@@ -9,6 +9,8 @@ use Drupal\Core\Database\Query\JsonCastType;
 use Drupal\Core\Database\Query\JsonExpression as BaseJsonExpression;
 use Drupal\Core\Database\Query\PlaceholderInterface;
 
+// cSpell:ignore ilike
+
 /**
  * PostgreSQL implementation of JsonExpression.
  */
