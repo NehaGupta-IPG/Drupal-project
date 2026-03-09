@@ -95,7 +95,7 @@ class NavigationHooks {
   public function entityUpdate(EntityInterface $entity): void {
     $navigation_links = \Drupal::classResolver(NavigationContentLinks::class);
     assert($navigation_links instanceof NavigationContentLinks);
-    $navigation_links->updateCreateEntityLinks($entity);
+    $navigation_links->updateMenuLinks($entity);
   }
 
   /**

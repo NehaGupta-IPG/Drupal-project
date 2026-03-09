@@ -95,6 +95,30 @@ final class NavigationContentLinks implements ContainerInjectionInterface {
   }
 
   /**
+   * Update the menu link title when a bundle entity is renamed.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity that was updated.
+   */
+  public function updateMenuLinks(EntityInterface $entity): void {
+    $entity_type_id = $entity->getEntityTypeId();
+    $bundle_types = $this->getBundleEntityTypes();
+    if (!isset($bundle_types[$entity_type_id])) {
+      return;
+    }
+    $allow_list = $bundle_types[$entity_type_id]['bundle_allow_list'];
+    if (!empty($allow_list) && !in_array($entity->id(), $allow_list, TRUE)) {
+      return;
+    }
+    $link_id = 'navigation.content.' . $entity_type_id . '.' . $entity->id();
+    if (!$this->menuLinkManager->hasDefinition($link_id)) {
+      return;
+    }
+
+    $this->menuLinkManager->rebuild();
+  }
+
+  /**
    * Returns the bundle entity types and their configuration.
    *
    * @return array
@@ -111,30 +135,6 @@ final class NavigationContentLinks implements ContainerInjectionInterface {
         'bundle_allow_list' => ['document', 'image'],
       ],
     ];
-  }
-
-  /**
-   * Update the menu link title when a bundle entity is renamed.
-   *
-   * @param \Drupal\Core\Entity\EntityInterface $entity
-   *   The entity that was updated.
-   */
-  public function updateCreateEntityLinks(EntityInterface $entity): void {
-    $entity_type_id = $entity->getEntityTypeId();
-    $bundle_types = $this->getBundleEntityTypes();
-    if (!isset($bundle_types[$entity_type_id])) {
-      return;
-    }
-    $allow_list = $bundle_types[$entity_type_id]['bundle_allow_list'];
-    if (!empty($allow_list) && !in_array($entity->id(), $allow_list, TRUE)) {
-      return;
-    }
-    $link_id = 'navigation.content.' . $entity_type_id . '.' . $entity->id();
-    if (!$this->menuLinkManager->hasDefinition($link_id)) {
-      return;
-    }
-
-    $this->menuLinkManager->rebuild();
   }
 
   /**
