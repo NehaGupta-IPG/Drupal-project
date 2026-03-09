@@ -2,6 +2,7 @@
 
 namespace Drupal\system\Hook;
 
+use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\Core\Extension\ThemeSettingsProvider;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
