@@ -30,7 +30,10 @@ use Drupal\Core\Cache\NullBackend;
  *   'pdo'?: array<mixed>,
  *   'isolation_level'?: int|string,
  *   'init_commands'?: list<string>,
- *   'dependencies'?: array<string,array{'autoload': string, 'namespace': string}>,
+ *   'dependencies'?: array<string,array{
+ *     'autoload': string,
+ *     'namespace': string,
+ *   }>,
  * }
  * @phpstan-type ConnectionInfoArray array{
  *   'driver': string,
@@ -46,7 +49,10 @@ use Drupal\Core\Cache\NullBackend;
  *   'pdo'?: array<mixed>,
  *   'isolation_level'?: int|string,
  *   'init_commands'?: list<string>,
- *   'dependencies'?: array<string,array{'autoload': string, 'namespace': string}>,
+ *   'dependencies'?: array<string,array{
+ *     'autoload': string,
+ *     'namespace': string,
+ *   }>,
  * }
  * @phpstan-import-type DatabaseLogEntry from \Drupal\Core\Database\Log
  *
