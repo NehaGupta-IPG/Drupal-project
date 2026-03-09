@@ -132,7 +132,7 @@ class DateTimePlusTest extends TestCase {
   /**
    * Tests creating dates from timestamps, and manipulating timezones.
    *
-   * @param int $input
+   * @param int|float|string $input
    *   Input argument for DateTimePlus::createFromTimestamp().
    * @param array $initial
    *   An array containing:
@@ -157,7 +157,7 @@ class DateTimePlusTest extends TestCase {
    *      DateTimePlus::getOffset(), after timezone transform.
    */
   #[DataProvider('providerTestTimestamp')]
-  public function testTimestamp($input, array $initial, array $transform): void {
+  public function testTimestamp(int|float|string $input, array $initial, array $transform): void {
     // Initialize a new date object.
     $date = DateTimePlus::createFromTimestamp($input, $initial['timezone']);
     $this->assertDateTimestamp($date, $input, $initial, $transform);
@@ -185,7 +185,7 @@ class DateTimePlusTest extends TestCase {
    *
    * @param \Drupal\Component\Datetime\DateTimePlus $date
    *   DateTimePlus to test.
-   * @param string|int $input
+   * @param int|float|string $input
    *   The original input passed to the test method.
    * @param array $initial
    *   @see testTimestamp()
@@ -194,7 +194,7 @@ class DateTimePlusTest extends TestCase {
    *
    * @internal
    */
-  public function assertDateTimestamp(DateTimePlus $date, string|int $input, array $initial, array $transform): void {
+  public function assertDateTimestamp(DateTimePlus $date, int|float|string $input, array $initial, array $transform): void {
     // Check format.
     $value = $date->format($initial['format']);
     $this->assertEquals($initial['expected_date'], $value, sprintf("Test new DateTimePlus(%s, %s): should be %s, found %s.", $input, $initial['timezone'], $initial['expected_date'], $value));
@@ -709,7 +709,7 @@ class DateTimePlusTest extends TestCase {
    * @see testTimestamp()
    */
   public static function providerTestTimestamp(): array {
-    return [
+    $data = [
       // Create date object from a unix timestamp and display it in
       // local time.
       [
@@ -749,6 +749,27 @@ class DateTimePlusTest extends TestCase {
         ],
       ],
     ];
+
+    foreach ([1321009860, '1321009860', '1321009860.1', 1321009860.1] as $input) {
+      $data[] = [
+        'input' => $input,
+        'initial' => [
+          'timezone' => 'UTC',
+          'format' => 'c',
+          'expected_date' => '2011-11-11T11:11:00+00:00',
+          'expected_timezone' => 'UTC',
+          'expected_offset' => 0,
+        ],
+        'transform' => [
+          'timezone' => 'America/Los_Angeles',
+          'format' => 'c',
+          'expected_date' => '2011-11-11T03:11:00-08:00',
+          'expected_timezone' => 'America/Los_Angeles',
+          'expected_offset' => '-28800',
+        ],
+      ];
+    }
+    return $data;
   }
 
   /**
