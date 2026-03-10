@@ -700,8 +700,8 @@ class SelectTest extends DatabaseTestBase {
       // IS NULL / IS NOT NULL (includes row 7 which has SQL NULL column).
       'IS NULL' => ['$.number', NULL, 'IS NULL', [4, 5, 6, 7, 8, 9, 10]],
       'IS NOT NULL' => ['$.number', NULL, 'IS NOT NULL', [1, 2, 3]],
-      'IS NULL includes NULL column' => ['$.float', NULL, 'IS NULL', [1, 2, 3, 4, 5, 6, 7, 9, 10]],
-      'IS NOT NULL on float path' => ['$.float', NULL, 'IS NOT NULL', [8]],
+      'IS NULL includes NULL column' => ['$.float', NULL, 'IS NULL', [1, 2, 3, 4, 6, 7, 9, 10]],
+      'IS NOT NULL on float path' => ['$.float', NULL, 'IS NOT NULL', [5, 8]],
 
       // HAS KEY.
       'HAS KEY' => ['$.key', NULL, 'HAS KEY', [3, 4]],
@@ -710,7 +710,7 @@ class SelectTest extends DatabaseTestBase {
       // Float comparisons.
       'Float equals' => ['$.float', 3.14, '=', [8]],
       'Float greater than' => ['$.float', 3.0, '>', [8]],
-      'Float less than' => ['$.float', 4.0, '<', [8]],
+      'Float less than' => ['$.float', 4.0, '<', [5, 8]],
       'Float BETWEEN' => ['$.float', [3.0, 4.0], 'BETWEEN', [8]],
 
       // Nested paths.
@@ -852,52 +852,66 @@ class SelectTest extends DatabaseTestBase {
   }
 
   /**
-   * Tests JSON ORDER BY with integer cast ascending.
+   * Tests JSON ORDER BY with different types and directions.
    */
-  public function testJsonOrderByIntAsc(): void {
+  public function testJsonOrderBy(): void {
+    // Integer ASC: rows with $.number: 1 (5), 2 (10), 3 (10). NULLs last.
     $query = $this->connection->select('json', 'j');
     $query->addField('j', 'id');
     $query->jsonOrderBy('test_field', '$.number', 'ASC', JsonCastType::Int);
     $ids = array_map('intval', $query->execute()->fetchCol());
-
-    // Rows with $.number: 1 (5), 2 (10), 3 (10). Rows without: 4-10.
-    // ASC: 5 before 10, NULLs last.
     $this->assertEquals(1, $ids[0]);
     $this->assertContains(2, array_slice($ids, 1, 2));
     $this->assertContains(3, array_slice($ids, 1, 2));
+    // Rows without $.number sort as NULL; their order is undefined.
     $this->assertEqualsCanonicalizing([4, 5, 6, 7, 8, 9, 10], array_slice($ids, 3));
-  }
 
-  /**
-   * Tests JSON ORDER BY with integer cast descending.
-   */
-  public function testJsonOrderByIntDesc(): void {
+    // Integer DESC: 10 before 5, NULLs last.
     $query = $this->connection->select('json', 'j');
     $query->addField('j', 'id');
     $query->jsonOrderBy('test_field', '$.number', 'DESC', JsonCastType::Int);
     $ids = array_map('intval', $query->execute()->fetchCol());
-
-    // DESC: 10 before 5, NULLs last.
     $this->assertContains(2, array_slice($ids, 0, 2));
     $this->assertContains(3, array_slice($ids, 0, 2));
     $this->assertEquals(1, $ids[2]);
     $this->assertEqualsCanonicalizing([4, 5, 6, 7, 8, 9, 10], array_slice($ids, 3));
-  }
 
-  /**
-   * Tests JSON ORDER BY on a string value.
-   */
-  public function testJsonOrderByString(): void {
+    // String ASC: rows with $.key: 3 ("some text"), 4 ("some other text").
+    // "some other text" < "some text", so 4 then 3. NULLs last.
     $query = $this->connection->select('json', 'j');
     $query->addField('j', 'id');
     $query->jsonOrderBy('test_field', '$.key', 'ASC');
     $ids = $query->execute()->fetchCol();
-
-    // Rows with $.key: 3 ("some text"), 4 ("some other text").
-    // ASC: "some other text" < "some text", so 4 then 3. NULLs last.
     $this->assertEquals(4, $ids[0]);
     $this->assertEquals(3, $ids[1]);
     $this->assertEqualsCanonicalizing([1, 2, 5, 6, 7, 8, 9, 10], array_slice($ids, 2));
+
+    // String DESC: "some text" > "some other text", so 3 then 4. NULLs last.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonOrderBy('test_field', '$.key', 'DESC');
+    $ids = $query->execute()->fetchCol();
+    $this->assertEquals(3, $ids[0]);
+    $this->assertEquals(4, $ids[1]);
+    $this->assertEqualsCanonicalizing([1, 2, 5, 6, 7, 8, 9, 10], array_slice($ids, 2));
+
+    // Float ASC: row 5 (1.5) before row 8 (3.14). NULLs last.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonOrderBy('test_field', '$.float', 'ASC', JsonCastType::Float);
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEquals(5, $ids[0]);
+    $this->assertEquals(8, $ids[1]);
+    $this->assertEqualsCanonicalizing([1, 2, 3, 4, 6, 7, 9, 10], array_slice($ids, 2));
+
+    // Float DESC: row 8 (3.14) before row 5 (1.5). NULLs last.
+    $query = $this->connection->select('json', 'j');
+    $query->addField('j', 'id');
+    $query->jsonOrderBy('test_field', '$.float', 'DESC', JsonCastType::Float);
+    $ids = array_map('intval', $query->execute()->fetchCol());
+    $this->assertEquals(8, $ids[0]);
+    $this->assertEquals(5, $ids[1]);
+    $this->assertEqualsCanonicalizing([1, 2, 3, 4, 6, 7, 9, 10], array_slice($ids, 2));
   }
 
 }

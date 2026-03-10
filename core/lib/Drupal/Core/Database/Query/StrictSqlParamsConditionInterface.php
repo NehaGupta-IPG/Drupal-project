@@ -10,10 +10,14 @@ namespace Drupal\Core\Database\Query;
 interface StrictSqlParamsConditionInterface {
 
   /**
-   * Public getter for the strict parameters flag.
+   * Whether this condition requires strict parameter binding.
+   *
+   * When TRUE, parameters are bound with their native PHP types instead of
+   * as strings. This is needed for queries that compare values in JSON columns,
+   * where type coercion would produce incorrect results.
    *
    * @return bool
-   *   Whether the resulting query should strictly-bind parameters.
+   *   TRUE if strict parameter binding should be used, FALSE otherwise.
    */
   public function usesStrictParameters(): bool;
 

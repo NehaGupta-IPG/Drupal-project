@@ -88,13 +88,8 @@ class Schema extends DatabaseSchema {
 
   /**
    * Build the SQL expression for creating columns.
-   *
-   * @param string $table_name
-   *   Table name.
-   * @param array $schema
-   *   Table schema, passed by reference.
    */
-  protected function createColumnsSql($table_name, &$schema) {
+  protected function createColumnsSql($table_name, $schema) {
     $sql_array = [];
 
     // Add the SQL statement for each field.

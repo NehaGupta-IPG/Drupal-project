@@ -141,7 +141,7 @@ trait DatabaseTestSchemaDataTrait {
       ])
       ->values([
         'id' => 5,
-        'test_field' => '{"array": [32, 41]}',
+        'test_field' => '{"array": [32, 41], "float": 1.5}',
       ])
       ->values([
         'id' => 6,

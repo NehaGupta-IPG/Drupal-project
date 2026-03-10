@@ -119,6 +119,69 @@ class ConnectionTest extends UnitTestCase {
         'SELECT * FROM {table} WHERE col = \'{"table": 1}\'',
         ['"', '"'],
       ],
+      // Nested JSON objects.
+      [
+        'SELECT * FROM "test_table" WHERE col = \'{"a": {"b": 1}}\'',
+        'test_',
+        'SELECT * FROM {table} WHERE col = \'{"a": {"b": 1}}\'',
+        ['"', '"'],
+      ],
+      // JSON array with curly braces.
+      [
+        'SELECT * FROM "test_table" WHERE col = \'[{"key": 1}]\'',
+        'test_',
+        'SELECT * FROM {table} WHERE col = \'[{"key": 1}]\'',
+        ['"', '"'],
+      ],
+      // Multiple table references with JSON in between.
+      [
+        'SELECT "test_a".col, "test_b".col FROM "test_a" JOIN "test_b" WHERE "test_a".data = \'{"key": 1}\'',
+        'test_',
+        'SELECT {a}.col, {b}.col FROM {a} JOIN {b} WHERE {a}.data = \'{"key": 1}\'',
+        ['"', '"'],
+      ],
+      // Escaped single quote inside a string literal.
+      [
+        'SELECT * FROM "test_table" WHERE col = \'it\\\'s a test\'',
+        'test_',
+        'SELECT * FROM {table} WHERE col = \'it\\\'s a test\'',
+        ['"', '"'],
+      ],
+      // BC: {table} inside single quotes that is not valid JSON gets expanded.
+      [
+        "SELECT * FROM \"test_table\" WHERE col = '\"test_table\"'",
+        'test_',
+        "SELECT * FROM {table} WHERE col = '{table}'",
+        ['"', '"'],
+      ],
+      // BC: multiple {word} patterns inside single quotes that are not JSON.
+      [
+        "SELECT * FROM \"test_table\" WHERE col = '\"test_a\" and \"test_b\"'",
+        'test_',
+        "SELECT * FROM {table} WHERE col = '{a} and {b}'",
+        ['"', '"'],
+      ],
+      // JSON object with a {word}-like key is preserved (not expanded).
+      [
+        'SELECT * FROM "test_table" WHERE col = \'{"items": [1, 2]}\'',
+        'test_',
+        'SELECT * FROM {table} WHERE col = \'{"items": [1, 2]}\'',
+        ['"', '"'],
+      ],
+      // JSON with multiple keys that look like table names.
+      [
+        'SELECT * FROM "test_table" WHERE col = \'{"users": 1, "nodes": 2}\'',
+        'test_',
+        'SELECT * FROM {table} WHERE col = \'{"users": 1, "nodes": 2}\'',
+        ['"', '"'],
+      ],
+      // Single-quoted string without any {word} patterns is left alone.
+      [
+        'SELECT * FROM "test_table" WHERE col = \'plain string\'',
+        'test_',
+        'SELECT * FROM {table} WHERE col = \'plain string\'',
+        ['"', '"'],
+      ],
     ];
   }
 
@@ -130,6 +193,72 @@ class ConnectionTest extends UnitTestCase {
     $mock_pdo = $this->createMock('Drupal\Tests\Core\Database\Stub\StubPDO');
     $connection = new StubConnection($mock_pdo, ['prefix' => $prefix_info], $quote_identifier);
     $this->assertEquals($expected, $connection->prefixTables($query));
+  }
+
+  /**
+   * Data provider for testQuoteIdentifiers().
+   *
+   * @return array
+   *   Array of arrays with the following elements:
+   *   - Expected result.
+   *   - SQL query to process.
+   *   - Identifier quotes.
+   */
+  public static function providerTestQuoteIdentifiers(): array {
+    return [
+      // Basic identifier quoting.
+      [
+        'SELECT * FROM "table"',
+        'SELECT * FROM [table]',
+        ['"', '"'],
+      ],
+      // Multiple identifiers.
+      [
+        'SELECT "col1", "col2" FROM "table"',
+        'SELECT [col1], [col2] FROM [table]',
+        ['"', '"'],
+      ],
+      // Backtick quotes.
+      [
+        'SELECT `col` FROM `table`',
+        'SELECT [col] FROM [table]',
+        ['`', '`'],
+      ],
+      // Square brackets inside single-quoted strings must not be replaced.
+      [
+        "SELECT * FROM \"table\" WHERE col = 'ARRAY[1,2]'",
+        "SELECT * FROM [table] WHERE col = 'ARRAY[1,2]'",
+        ['"', '"'],
+      ],
+      // ARRAY[] constructor used by PgSQL JSON expressions.
+      [
+        "SELECT \"col\" #>> ARRAY['key1','key2']::text[] FROM \"table\"",
+        "SELECT [col] #>> ARRAY['key1','key2']::text[] FROM [table]",
+        ['"', '"'],
+      ],
+      // Mixed: identifiers and single-quoted strings with brackets.
+      [
+        "SELECT \"t\".\"data\" #>> ARRAY['a','b']::text[] FROM \"table\" \"t\" WHERE \"t\".\"id\" = 1",
+        "SELECT [t].[data] #>> ARRAY['a','b']::text[] FROM [table] [t] WHERE [t].[id] = 1",
+        ['"', '"'],
+      ],
+      // Escaped single quote inside a string literal with brackets.
+      [
+        "SELECT * FROM \"table\" WHERE col = 'it\\'s [not] replaced'",
+        "SELECT * FROM [table] WHERE col = 'it\\'s [not] replaced'",
+        ['"', '"'],
+      ],
+    ];
+  }
+
+  /**
+   * Tests the quoteIdentifiers() method.
+   */
+  #[DataProvider('providerTestQuoteIdentifiers')]
+  public function testQuoteIdentifiers($expected, $query, array $quote_identifier = ['"', '"']): void {
+    $mock_pdo = $this->createMock('Drupal\Tests\Core\Database\Stub\StubPDO');
+    $connection = new StubConnection($mock_pdo, [], $quote_identifier);
+    $this->assertEquals($expected, $connection->quoteIdentifiers($query));
   }
 
   /**

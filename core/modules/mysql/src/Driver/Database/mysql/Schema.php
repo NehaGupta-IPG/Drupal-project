@@ -506,19 +506,17 @@ class Schema extends DatabaseSchema {
     if (empty($table['indexes'])) {
       return;
     }
-    $isMariaDb = $this->connection->isMariaDb();
+
     foreach ($table['indexes'] as $index_name => $index_fields) {
       if (!is_array($index_fields)) {
         continue;
       }
       $resolved = [];
       foreach ($index_fields as $element) {
-        if ($element instanceof JsonIndex) {
-          // MariaDB does not support functional indexes.
-          // @see https://jira.mariadb.org/browse/MDEV-35853
-          if (!$isMariaDb) {
-            $resolved[] = $this->connection->jsonExpression($element->field, $element->jsonpath)->toCastSql($element->type);
-          }
+        // MariaDB does not support functional indexes.
+        // @see https://jira.mariadb.org/browse/MDEV-35853
+        if ($element instanceof JsonIndex && !$this->connection->isMariaDb()) {
+          $resolved[] = $this->connection->jsonExpression($element->field, $element->jsonpath)->toCastSql($element->type);
         }
         else {
           $resolved[] = $element;

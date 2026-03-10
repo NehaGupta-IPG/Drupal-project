@@ -12,8 +12,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
-// cSpell:ignore attname attnum attrelid objid refobjid refobjsubid
-// cspell:ignore indexdef regclass relkind relname seqscan
+// cSpell:ignore attname attnum attrelid indexdef objid refobjid refobjsubid
+// cSpell:ignore regclass relkind relname seqscan
 
 /**
  * Tests schema API for the PostgreSQL driver.

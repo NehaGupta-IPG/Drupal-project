@@ -379,7 +379,7 @@ EOD;
   }
 
   /**
-   * Create automatic index creation SQL for field, if necessary.
+   * Creates a GIN index for a JSON field, if applicable.
    *
    * @param string $table
    *   Table name.
