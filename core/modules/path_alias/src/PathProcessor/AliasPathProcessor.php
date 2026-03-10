@@ -2,6 +2,7 @@
 
 namespace Drupal\path_alias\PathProcessor;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\PathProcessor\InboundPathProcessorInterface;
 use Drupal\Core\PathProcessor\OutboundPathProcessorInterface;
 use Drupal\Core\Render\BubbleableMetadata;
@@ -21,13 +22,23 @@ class AliasPathProcessor implements InboundPathProcessorInterface, OutboundPathP
   protected $aliasManager;
 
   /**
+   * A config factory for retrieving required config settings.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $config;
+
+  /**
    * Constructs a AliasPathProcessor object.
    *
    * @param \Drupal\path_alias\AliasManagerInterface $alias_manager
    *   An alias manager for looking up the system path.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   *   The config factory to get the system config from.
    */
-  public function __construct(AliasManagerInterface $alias_manager) {
+  public function __construct(AliasManagerInterface $alias_manager, ConfigFactoryInterface $configFactory) {
     $this->aliasManager = $alias_manager;
+    $this->config = $configFactory->get('system.site');
   }
 
   /**
@@ -55,6 +66,30 @@ class AliasPathProcessor implements InboundPathProcessorInterface, OutboundPathP
         $path = '/' . ltrim($path, '/');
       }
     }
+
+    // The special path '<front>' links to the default front page.
+    if ($path === '/<front>') {
+      return '/';
+    }
+
+    // Look for paths that are not already the front page.
+    if ($path !== '/') {
+      $front = $this->config->get('page.front');
+      $langcode = !empty($options['language']) ? $options['language']->getId() : NULL;
+
+      // Get path and alias for the configured frontpage setting
+      $front_path = $this->aliasManager->getPathByAlias($front, $langcode);
+      $front_alias = $this->aliasManager->getAliasByPath($front, $langcode);
+
+      // Replace the path and alias with default frontpage path
+      if (!empty($front_path) && $path === $front_path) {
+        return '/';
+      }
+      if (!empty($front_alias) && $path === $front_alias) {
+        return '/';
+      }
+    }
+
     return $path;
   }
 

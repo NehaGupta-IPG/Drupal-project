@@ -9,7 +9,7 @@ services:
     tags:
       - { name: path_processor_inbound, priority: 100 }
       - { name: path_processor_outbound, priority: 300 }
-    arguments: ['@path_alias.manager']
+    arguments: ['@path_alias.manager', '@config.factory']
   path_alias.manager:
     class: Drupal\path_alias\AliasManager
     arguments: ['@path_alias.repository', '@path_alias.prefix_list', '@language_manager', '@cache.data', '@datetime.time']

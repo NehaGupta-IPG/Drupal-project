@@ -153,6 +153,15 @@ class UrlGeneratorTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
 
+    // Create an config factory stub:
+    $configFactory = $this->getConfigFactoryStub(
+      [
+        'system.site' => [
+          'page.front' => '<front>',
+        ],
+      ]
+    );
+
     $alias_manager->expects($this->any())
       ->method('getAliasByPath')
       ->willReturnCallback([$this, 'aliasManagerCallback']);
@@ -166,7 +175,7 @@ class UrlGeneratorTest extends UnitTestCase {
     $this->context = new RequestContext();
     $this->context->fromRequestStack($this->requestStack);
 
-    $processor = new AliasPathProcessor($this->aliasManager);
+    $processor = new AliasPathProcessor($this->aliasManager, $configFactory);
     $processor_manager = new PathProcessorManager();
     $processor_manager->addOutbound($processor, 1000);
     $this->processorManager = $processor_manager;
