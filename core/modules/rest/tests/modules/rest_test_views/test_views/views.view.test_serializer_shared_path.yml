@@ -30,6 +30,8 @@ display:
         type: basic
       style:
         type: serializer
+        options:
+          pager: false
       row:
         type: data_entity
       sorts:

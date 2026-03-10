@@ -6,6 +6,8 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\rest\Plugin\views\style\Serializer;
+use Drupal\views\ViewExecutable;
 
 /**
  * Hook implementations for rest.
@@ -59,6 +61,42 @@ class RestHooks {
         return $output;
     }
     return NULL;
+  }
+
+  /**
+   * Implements hook_views_pre_execute().
+   *
+   * Adds page-based offset support for REST serializer views whose pager does
+   * not natively handle pagination (e.g. "some" pager).
+   *
+   * For pagers that do not use pagination (usePager() returns FALSE), this
+   * hook enables page-based navigation by adjusting the query offset. The
+   * pager's current page is also updated so that Serializer::wrapRowsInPager()
+   * can report the correct page number.
+   */
+  #[Hook('views_pre_execute')]
+  public function viewsPreExecute(ViewExecutable $view): void {
+    $style = $view->getStyle();
+    if (!$style instanceof Serializer || empty($style->options['pager'])) {
+      return;
+    }
+    $pager = $view->pager;
+    if (!$pager || $pager->usePager()) {
+      return;
+    }
+    $items_per_page = (int) $pager->getItemsPerPage();
+    if ($items_per_page <= 0) {
+      return;
+    }
+    // For pagers that don't natively support pagination, we need to manually
+    // handle page navigation. Update the pager's current page state so that
+    // getCurrentPage() returns the correct value for metadata reporting.
+    $current_page = $view->getRequest()->query->getInt('page');
+    $pager->setCurrentPage($current_page);
+    if ($current_page > 0) {
+      $base_offset = (int) $pager->getOffset();
+      $view->query->setOffset($base_offset + ($current_page * $items_per_page));
+    }
   }
 
 }

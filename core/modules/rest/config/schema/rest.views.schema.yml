@@ -39,3 +39,6 @@ views.style.serializer:
       sequence:
         type: string
         label: 'Format'
+    pager:
+      type: boolean
+      label: 'Add pager information'

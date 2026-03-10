@@ -81,7 +81,9 @@ class SerializerTest extends UnitTestCase {
       $mock_serializer->reveal(),
       ['json', 'xml'],
       ['json' => 'serialization', 'xml' => 'serialization']);
-    $view_serializer_style->options = ['formats' => ['xml', 'json']];
+    // Define a minimal value for options or the class will break for using an
+    // empty array of options.
+    $view_serializer_style->options = ['formats' => [], 'pager' => []];
     $view_serializer_style->view = $this->view;
     $view_serializer_style->displayHandler = $this->displayHandler;
     $view_serializer_style->render();

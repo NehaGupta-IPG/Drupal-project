@@ -6,6 +6,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\rest\Plugin\views\display\RestExport;
 use Drupal\views\Attribute\ViewsStyle;
 use Drupal\views\Plugin\views\style\StylePluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -87,6 +88,7 @@ class Serializer extends StylePluginBase implements CacheableDependencyInterface
   protected function defineOptions() {
     $options = parent::defineOptions();
     $options['formats'] = ['default' => []];
+    $options['pager'] = ['default' => FALSE];
 
     return $options;
   }
@@ -103,6 +105,12 @@ class Serializer extends StylePluginBase implements CacheableDependencyInterface
       '#description' => $this->t('Request formats that will be allowed in responses. If none are selected all formats will be allowed.'),
       '#options' => $this->getFormatOptions(),
       '#default_value' => $this->options['formats'],
+    ];
+    $form['pager'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Add pager information'),
+      '#description' => $this->t('Pager information will be added to rest export. <b>Output structure will be changed.</b>'),
+      '#default_value' => $this->options['pager'],
     ];
   }
 
@@ -140,7 +148,62 @@ class Serializer extends StylePluginBase implements CacheableDependencyInterface
     else {
       $content_type = !empty($this->options['formats']) ? reset($this->options['formats']) : 'json';
     }
-    return $this->serializer->serialize($rows, $content_type, ['views_style_plugin' => $this]);
+
+    $result = $rows;
+    if ($this->options['pager'] && $this->view->pager && $this->displayHandler instanceof RestExport) {
+      $result = $this->wrapRowsInPager($rows);
+    }
+
+    return $this->serializer->serialize($result, $content_type, ['views_style_plugin' => $this]);
+  }
+
+  /**
+   * Wraps an array of rows in another array with page info.
+   *
+   * @param array $rows
+   *   Array with the rows to wrap.
+   *
+   * @return array
+   *   An array with the following keys:
+   *   - rows: the original rows array.
+   *   - pager: an array with the following keys:
+   *     - current_page: the zero-based current page number.
+   *     - items_per_page: the number of items displayed per page.
+   *     - total_items: the total number of items in the view result.
+   *     - total_pages: the total number of pages.
+   */
+  protected function wrapRowsInPager(array $rows): array {
+    $pager = $this->view->pager;
+    $items_per_page = (int) $pager->getItemsPerPage();
+    $current_page = (int) $pager->getCurrentPage();
+
+    if ($pager->useCountQuery()) {
+      $total_items = (int) $pager->getTotalItems();
+    }
+    elseif (isset($this->view->build_info['count_query'])) {
+      // Pagers without a count query (e.g. "some") do not track total items
+      // accurately, so run the count query if available.
+      $count_query = clone $this->view->build_info['count_query'];
+      $count_query->preExecute();
+      $total_items = (int) $count_query->countQuery()->execute()->fetchField();
+    }
+    else {
+      $total_items = (int) $pager->getTotalItems();
+    }
+
+    $total_pages = ($items_per_page > 0)
+      ? (int) ceil($total_items / $items_per_page)
+      : 1;
+
+    return [
+      'rows' => $rows,
+      'pager' => [
+        'current_page' => $current_page,
+        'items_per_page' => $items_per_page,
+        'total_items' => $total_items,
+        'total_pages' => $total_pages,
+      ],
+    ];
   }
 
   /**
@@ -167,7 +230,11 @@ class Serializer extends StylePluginBase implements CacheableDependencyInterface
    * {@inheritdoc}
    */
   public function getCacheContexts() {
-    return ['request_format'];
+    $contexts = ['request_format'];
+    if ($this->options['pager']) {
+      $contexts[] = 'url.query_args:page';
+    }
+    return $contexts;
   }
 
   /**

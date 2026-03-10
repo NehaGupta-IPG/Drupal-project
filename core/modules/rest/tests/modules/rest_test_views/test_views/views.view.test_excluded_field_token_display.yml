@@ -66,6 +66,8 @@ display:
             next: ››
       style:
         type: serializer
+        options:
+          pager: false
       row:
         type: fields
         options:
@@ -258,6 +260,7 @@ display:
         options:
           formats:
             json: json
+          pager: false
       row:
         type: data_field
         options:
