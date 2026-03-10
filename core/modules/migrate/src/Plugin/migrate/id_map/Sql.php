@@ -147,6 +147,11 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
   protected $currentKey = [];
 
   /**
+   * The current result delta.
+   */
+  protected int $currentDelta = 0;
+
+  /**
    * The migration plugin manager.
    *
    * @var \Drupal\migrate\Plugin\MigrationPluginManagerInterface
@@ -911,6 +916,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
    * This is called before beginning a foreach loop.
    */
   public function rewind(): void {
+    $this->currentDelta = 0;
     $this->currentRow = NULL;
     $fields = [];
     foreach ($this->sourceIdFields() as $field) {
@@ -987,7 +993,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
    * from rewind().
    */
   public function next(): void {
-    $this->currentRow = array_shift($this->result) ?: FALSE;
+    $this->currentRow = $this->result[$this->currentDelta];
     $this->currentKey = [];
     if ($this->currentRow) {
       foreach ($this->sourceIdFields() as $map_field) {
@@ -996,6 +1002,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
         unset($this->currentRow[$map_field]);
       }
     }
+    $this->currentDelta++;
   }
 
   /**
