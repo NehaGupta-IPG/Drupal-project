@@ -993,7 +993,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
    * from rewind().
    */
   public function next(): void {
-    $this->currentRow = $this->result[$this->currentDelta];
+    $this->currentRow = $this->result[$this->currentDelta] ?? FALSE;
     $this->currentKey = [];
     if ($this->currentRow) {
       foreach ($this->sourceIdFields() as $map_field) {
