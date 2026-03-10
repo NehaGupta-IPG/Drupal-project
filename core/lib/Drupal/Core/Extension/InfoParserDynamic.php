@@ -107,9 +107,10 @@ class InfoParserDynamic implements InfoParserInterface {
     // typically not include the latest development version of core.
     $ignore_core_version = FALSE;
     if (Settings::get('extension_discovery_ignore_core_version_requirement', FALSE)) {
-      // We skip extensions in the 'Testing' package, because there are fixture
-      // modules which are specifically for tests to check for an extension
-      // being incompatible.
+      // We skip extensions whose package is 'Testing' or which have no package
+      // (which means they are test fixtures), because there are fixture modules
+      // which are specifically for tests to check for an extension being
+      // incompatible.
       if (!str_starts_with($filename, 'core/') && !str_starts_with($filename, $this->root . '/core/') && (!isset($parsed_info['package']) || $parsed_info['package'] !== 'Testing')) {
         $ignore_core_version = TRUE;
       }
