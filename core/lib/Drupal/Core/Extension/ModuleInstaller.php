@@ -97,23 +97,13 @@ class ModuleInstaller implements ModuleInstallerInterface {
     #[Autowire(service: 'logger.channel.default')]
     protected LoggerInterface $logger,
     #[AutowireIterator(tag: 'module_install.uninstall_validator')]
-    protected ?\Traversable $uninstallValidators = NULL,
+    protected \Traversable $uninstallValidators,
   ) {
     $this->root = $root;
     $this->moduleHandler = $module_handler;
     $this->kernel = $kernel;
     $this->connection = $connection;
     $this->updateRegistry = $update_registry;
-    if ($this->uninstallValidators === NULL) {
-      $this->uninstallValidators = \Drupal::service('module_installer.uninstall_validators');
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function addUninstallValidator(ModuleUninstallValidatorInterface $uninstall_validator) {
-    @trigger_error(__METHOD__ . ' is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Inject the uninstall validators into the constructor instead. See https://www.drupal.org/node/3432595', E_USER_DEPRECATED);
   }
 
   /**
@@ -714,13 +704,6 @@ class ModuleInstaller implements ModuleInstallerInterface {
    *   The list of installed modules.
    */
   protected function updateKernel($module_filenames) {
-    // Save current state of config installer, so it can be restored after the
-    // container is rebuilt.
-    /** @var \Drupal\Core\Config\ConfigInstallerInterface $config_installer */
-    $config_installer = $this->kernel->getContainer()->get('config.installer');
-    $sync_status = $config_installer->isSyncing();
-    $source_storage = $config_installer->getSourceStorage();
-
     if (!empty($module_filenames)) {
       // This reboots the kernel to register the module's bundle and its
       // services in the service container. The $module_filenames argument is
@@ -738,13 +721,6 @@ class ModuleInstaller implements ModuleInstallerInterface {
     $this->moduleHandler = $container->get('module_handler');
     $this->connection = $container->get('database');
     $this->updateRegistry = $container->get('update.update_hook_registry');
-
-    // Restore state of config installer.
-    if ($sync_status) {
-      $container->get('config.installer')
-        ->setSyncing(TRUE)
-        ->setSourceStorage($source_storage);
-    }
   }
 
   /**
