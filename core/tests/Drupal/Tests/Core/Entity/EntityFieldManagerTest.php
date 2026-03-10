@@ -194,7 +194,7 @@ class EntityFieldManagerTest extends UnitTestCase {
    * @param \Drupal\Core\Entity\EntityTypeInterface[]|\Prophecy\Prophecy\ProphecyInterface[] $definitions
    *   (optional) An array of entity type definitions.
    */
-  protected function setUpEntityTypeDefinitions($definitions = []): void {
+  protected function setUpEntityTypeDefinitions(array $definitions = []): void {
     foreach ($definitions as $key => $entity_type) {
       // \Drupal\Core\Entity\EntityTypeInterface::getLinkTemplates() is called
       // by \Drupal\Core\Entity\EntityTypeManager::processDefinition() so it
@@ -241,6 +241,11 @@ class EntityFieldManagerTest extends UnitTestCase {
    * @legacy-covers ::buildBundleFieldDefinitions
    */
   public function testGetFieldDefinitions(): void {
+    $this->entityTypeBundleInfo->getBundleInfo('test_entity_type')->willReturn([
+      'test_entity_bundle' => 'test_entity_bundle',
+      'test_entity_bundle_class' => 'test_entity_bundle_class',
+      'some_other_bundle' => 'some_other_bundle',
+    ])->shouldBeCalled();
     $field_definition = $this->setUpEntityWithFieldDefinition();
 
     $bundle_field_definition = $this->prophesize()
@@ -319,7 +324,7 @@ class EntityFieldManagerTest extends UnitTestCase {
       ->will(function ($arguments) use ($definitions): void {
         [, $callback] = $arguments;
         $callback(
-          function () use ($definitions) {
+          function () use ($definitions): array {
             return $definitions;
           },
           'example_module',
@@ -342,7 +347,7 @@ class EntityFieldManagerTest extends UnitTestCase {
    * @legacy-covers ::buildBaseFieldDefinitions
    */
   #[DataProvider('providerTestGetBaseFieldDefinitionsTranslatableEntityTypeDefaultLangcode')]
-  public function testGetBaseFieldDefinitionsTranslatableEntityTypeDefaultLangcode($default_langcode_key): void {
+  public function testGetBaseFieldDefinitionsTranslatableEntityTypeDefaultLangcode(string $default_langcode_key): void {
     $this->setUpEntityWithFieldDefinition(FALSE, 'id', [
       'langcode' => 'langcode',
       'default_langcode' => $default_langcode_key,
@@ -381,7 +386,7 @@ class EntityFieldManagerTest extends UnitTestCase {
    * @legacy-covers ::buildBaseFieldDefinitions
    */
   #[DataProvider('providerTestGetBaseFieldDefinitionsTranslatableEntityTypeLangcode')]
-  public function testGetBaseFieldDefinitionsTranslatableEntityTypeLangcode($provide_key, $provide_field, $translatable): void {
+  public function testGetBaseFieldDefinitionsTranslatableEntityTypeLangcode(bool $provide_key, bool $provide_field, bool $translatable): void {
     $keys = $provide_key ? ['langcode' => 'langcode'] : [];
     $this->setUpEntityWithFieldDefinition(FALSE, 'id', $keys);
 
@@ -451,28 +456,28 @@ class EntityFieldManagerTest extends UnitTestCase {
    * Tests the getFieldDefinitions() method with caching.
    */
   public function testGetFieldDefinitionsWithCaching(): void {
+    $this->entityTypeBundleInfo->getBundleInfo('test_entity_type')->willReturn([
+      'test_bundle' => 'test_bundle',
+    ])->shouldBeCalled();
     $field_definition = $this->setUpEntityWithFieldDefinition(FALSE, 'id');
 
     $expected = ['id' => $field_definition];
 
-    $cacheBackend = $this->cacheBackend;
     $this->cacheBackend->get('entity_base_field_definitions:test_entity_type:en')
       ->willReturn((object) ['data' => $expected])
       ->shouldBeCalledTimes(2);
     $this->cacheBackend->get('entity_bundle_field_definitions:test_entity_type:test_bundle:en')
       ->willReturn(FALSE)
-      ->shouldBeCalledTimes(1);
-    $this->cacheBackend->set('entity_bundle_field_definitions:test_entity_type:test_bundle:en', Argument::any(), Cache::PERMANENT, [
-      'entity_types',
-      'entity_field_info',
-    ])
-      ->will(function (array $args) use ($cacheBackend): void {
-        $data = (object) ['data' => $args[1]];
-        $cacheBackend->get('entity_bundle_field_definitions:test_entity_type:test_bundle:en')
-          ->willReturn($data)
-          ->shouldBeCalled();
-      })
-      ->shouldBeCalled();
+      ->shouldBeCalledTimes(2);
+    $this->cacheBackend->setMultiple([
+      'entity_bundle_field_definitions:test_entity_type:test_bundle:en' => [
+        'data' => [],
+        'tags' => [
+          'entity_types',
+          'entity_field_info',
+        ],
+      ],
+    ])->shouldBeCalledTimes(2);
 
     $this->assertSame($expected, $this->entityFieldManager->getFieldDefinitions('test_entity_type', 'test_bundle'));
     $this->entityFieldManager->testClearEntityFieldInfo();
@@ -493,7 +498,7 @@ class EntityFieldManagerTest extends UnitTestCase {
       ->will(function ($arguments) use ($definitions): void {
         [, $callback] = $arguments;
         $callback(
-          function () use ($definitions) {
+          function () use ($definitions): array {
             return $definitions;
           },
           'example_module',
@@ -551,6 +556,9 @@ class EntityFieldManagerTest extends UnitTestCase {
    * @legacy-covers ::buildBundleFieldDefinitions
    */
   public function testGetFieldDefinitionsProvider(): void {
+    $this->entityTypeBundleInfo->getBundleInfo('test_entity_type')->willReturn([
+      'test_bundle' => 'test_bundle',
+    ])->shouldBeCalled();
     $this->setUpEntityWithFieldDefinition(TRUE);
 
     $module = 'entity_field_manager_test_module';
@@ -572,7 +580,7 @@ class EntityFieldManagerTest extends UnitTestCase {
       ->will(function ($arguments) use ($field_definition, $module): void {
         [, $callback] = $arguments;
         $callback(
-          function () use ($field_definition) {
+          function () use ($field_definition): array {
             return [$field_definition->reveal()];
           },
           $module,

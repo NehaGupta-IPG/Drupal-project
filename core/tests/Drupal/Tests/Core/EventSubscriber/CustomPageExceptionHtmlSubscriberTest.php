@@ -134,6 +134,7 @@ class CustomPageExceptionHtmlSubscriberTest extends UnitTestCase {
    */
   protected function tearDown(): void {
     ini_set('error_log', $this->errorLog);
+    parent::tearDown();
   }
 
   /**
@@ -148,7 +149,7 @@ class CustomPageExceptionHtmlSubscriberTest extends UnitTestCase {
       ->method('getContext')
       ->willReturn($request_context);
 
-    $this->kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
+    $this->kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request): HtmlResponse {
       return new HtmlResponse($request->getMethod());
     });
 
@@ -175,7 +176,7 @@ class CustomPageExceptionHtmlSubscriberTest extends UnitTestCase {
       ->method('getContext')
       ->willReturn($request_context);
 
-    $this->kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
+    $this->kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request): Response {
       return new Response($request->getMethod() . ' ' . UrlHelper::buildQuery($request->query->all()));
     });
 

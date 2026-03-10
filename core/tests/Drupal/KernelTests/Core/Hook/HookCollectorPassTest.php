@@ -81,9 +81,6 @@ class HookCollectorPassTest extends KernelTestBase {
         'module_handler_test_all1_hook' => 'module_handler_test_all1',
         'module_handler_test_all2_hook' => 'module_handler_test_all2',
       ],
-      'module_implements_alter' => [
-        'module_handler_test_all1_module_implements_alter' => 'module_handler_test_all1',
-      ],
       'order1' => [
         'module_handler_test_all2_order1' => 'module_handler_test_all2',
         ModuleHandlerTestAll1Hooks::class . '::order' => 'module_handler_test_all1',
@@ -93,25 +90,6 @@ class HookCollectorPassTest extends KernelTestBase {
         'module_handler_test_all2_order2' => 'module_handler_test_all2',
       ],
     ], $container);
-  }
-
-  /**
-   * Test LegacyModuleImplementsAlter.
-   */
-  public function testLegacyModuleImplementsAlter(): void {
-    $container = new ContainerBuilder();
-    $module_filenames = [
-      'module_implements_alter_test_legacy' => ['pathname' => "core/tests/Drupal/Tests/Core/Extension/modules/module_implements_alter_test_legacy/module_implements_alter_test_legacy.info.yml"],
-    ];
-    include_once 'core/tests/Drupal/Tests/Core/Extension/modules/module_implements_alter_test_legacy/module_implements_alter_test_legacy.module';
-    $container->setParameter('container.modules', $module_filenames);
-    $keyvalue = new KeyValueMemoryFactory();
-    $container->set('keyvalue', $keyvalue);
-    $container->set('cache.bootstrap', new NullBackend('bootstrap'));
-    (new HookCollectorPass())->process($container);
-
-    // This test will also fail if the deprecation notice shows up.
-    $this->assertFalse(isset($GLOBALS['ShouldNotRunLegacyModuleImplementsAlter']));
   }
 
   /**
@@ -154,6 +132,19 @@ class HookCollectorPassTest extends KernelTestBase {
     $this->assertTrue(isset($GLOBALS['procedural_attribute_skip_find']));
     $this->assertTrue(isset($GLOBALS['skipped_procedural_oop_cache_flush']));
     $this->assertFalse($this->container->hasParameter('hook_collector_skip_procedural.skip_procedural_hook_scan'));
+  }
+
+  /**
+   * Test Hook attribute with named arguments, and class with invoke method.
+   */
+  public function testHookAttribute(): void {
+    $module_installer = $this->container->get('module_installer');
+    $this->assertTrue($module_installer->install(['hook_collector_hook_attribute']));
+    $this->assertFalse(isset($GLOBALS['hook_named_arguments']));
+    $this->assertFalse(isset($GLOBALS['hook_invoke_method']));
+    drupal_flush_all_caches();
+    $this->assertTrue(isset($GLOBALS['hook_named_arguments']));
+    $this->assertTrue(isset($GLOBALS['hook_invoke_method']));
   }
 
   /**
