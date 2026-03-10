@@ -36,6 +36,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   include mappings for the entity ID and the entity language field. If this
  *   property is TRUE, the migration will also have an additional destination ID
  *   for the language code.
+ * - protect_properties: (optional) This is the opposite of
+ *   overwrite_properties. Any listed properties will not be overwritten.
+ *   Any properties that are not listed can be overwritten. Only one of
+ *   overwrite_properties and protect_properties can be set.
  * - overwrite_properties: (optional) A list of properties that will be
  *   overwritten if an entity with the same ID already exists. Any properties
  *   that are not listed will not be overwritten.
@@ -146,6 +150,9 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
    *   The entity type bundle info service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, MigrationInterface $migration, EntityStorageInterface $storage, array $bundles, EntityFieldManagerInterface $entity_field_manager, FieldTypePluginManagerInterface $field_type_manager, ?AccountSwitcherInterface $account_switcher = NULL, ?EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL) {
+    if (isset($configuration['overwrite_properties']) && isset($configuration['protect_properties'])) {
+      throw new \InvalidArgumentException('Only one of overwrite_properties and protect_properties may be set.');
+    }
     parent::__construct($configuration, $plugin_id, $plugin_definition, $migration, $storage, $bundles);
     $this->entityFieldManager = $entity_field_manager;
     $this->fieldTypeManager = $field_type_manager;
@@ -325,11 +332,18 @@ class EntityContentBase extends Entity implements HighestIdInterface, MigrateVal
     foreach ($row->getDestination() as $field_name => $values) {
       $field = $entity->$field_name;
       if ($field instanceof TypedDataInterface) {
-        $field->setValue($values);
+        if (isset($this->configuration['protect_properties']) && in_array($field_name, $this->configuration['protect_properties'], TRUE) && !$field->isEmpty()) {
+          // The entity has a non-empty value for this field we want to protect.
+        }
+        else {
+          $field->setValue($values);
+        }
       }
     }
     foreach ($empty_destinations as $field_name) {
-      $entity->$field_name = NULL;
+      if (!isset($this->configuration['protect_properties']) || !in_array($field_name, $this->configuration['protect_properties'], TRUE)) {
+        $entity->$field_name = NULL;
+      }
     }
 
     $this->setRollbackAction($row->getIdMap(), $rollback_action);
