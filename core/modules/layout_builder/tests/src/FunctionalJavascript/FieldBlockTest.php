@@ -8,6 +8,8 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\layout_builder\Plugin\Block\FieldBlock;
+use Drupal\layout_builder_test\Hook\LayoutBuilderTestFieldHooks;
+use Drupal\layout_builder_test\Hook\LayoutBuilderTestFieldTwoHooks;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
@@ -34,6 +36,7 @@ class FieldBlockTest extends WebDriverTestBase {
     // See \Drupal\layout_builder_field_block_test\Plugin\Block\FieldBlock.
     'layout_builder_field_block_test',
     'layout_builder_expose_all_field_blocks',
+    'layout_builder_test',
   ];
 
   /**
@@ -109,6 +112,9 @@ class FieldBlockTest extends WebDriverTestBase {
     // Changing the formatter removes the old settings and introduces new ones.
     $assert_session->fieldNotExists('settings[formatter][settings][format_type]');
     $assert_session->fieldExists('settings[formatter][settings][granularity]');
+    $page->selectFieldOption('settings[context_mapping][view_mode]', '@layout_builder_test.i_have_runtime_contexts:runtime_contexts');
+    $assert_session->pageTextContains(LayoutBuilderTestFieldHooks::MESSAGE);
+    $assert_session->pageTextContains(LayoutBuilderTestFieldTwoHooks::MESSAGE);
     $page->pressButton('Save block');
     $this->assertTrue($assert_session->waitForText('The block configuration has been saved.'));
 
