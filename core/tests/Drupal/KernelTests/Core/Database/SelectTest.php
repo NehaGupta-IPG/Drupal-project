@@ -698,9 +698,9 @@ class SelectTest extends DatabaseTestBase {
       'NOT BETWEEN matching' => ['$.number', [6, 10], 'NOT BETWEEN', [1]],
 
       // IS NULL / IS NOT NULL (includes row 7 which has SQL NULL column).
-      'IS NULL' => ['$.number', NULL, 'IS NULL', [4, 5, 6, 7, 8]],
+      'IS NULL' => ['$.number', NULL, 'IS NULL', [4, 5, 6, 7, 8, 9, 10]],
       'IS NOT NULL' => ['$.number', NULL, 'IS NOT NULL', [1, 2, 3]],
-      'IS NULL includes NULL column' => ['$.float', NULL, 'IS NULL', [1, 2, 3, 4, 5, 6, 7]],
+      'IS NULL includes NULL column' => ['$.float', NULL, 'IS NULL', [1, 2, 3, 4, 5, 6, 7, 9, 10]],
       'IS NOT NULL on float path' => ['$.float', NULL, 'IS NOT NULL', [8]],
 
       // HAS KEY.
@@ -733,6 +733,27 @@ class SelectTest extends DatabaseTestBase {
       'Quotes in JSON_CONTAINS value' => ['$.associative', ['mountain' => "' OR 1=1--"], 'JSON_CONTAINS', []],
       'Quotes in scalar value' => ['$.key', "' OR 1=1--", '=', []],
       'Quotes in CONTAINS value' => ['$.key', "' OR '1'='1", 'CONTAINS', []],
+
+      // Hyphenated key names.
+      'Hyphenated key equals' => ['$.hyphen-key', 'hyphen value', '=', [9]],
+      'Hyphenated key no match' => ['$.hyphen-key', 'wrong', '=', []],
+      'Hyphenated key IS NOT NULL' => ['$.hyphen-key', NULL, 'IS NOT NULL', [9]],
+      'Hyphenated key IS NULL' => ['$.hyphen-key', NULL, 'IS NULL', [1, 2, 3, 4, 5, 6, 7, 8, 10]],
+      'Nested hyphenated key' => ['$.nested-obj.inner-key', 42, '=', [9]],
+
+      // Bracket notation with quoted keys.
+      'Bracket notation equals' => ['$["hyphen-key"]', 'hyphen value', '=', [9]],
+      'Bracket nested' => ['$["nested-obj"]["inner-key"]', 42, '=', [9]],
+      'Bracket mixed with dot' => ['$.nested-obj["inner-key"]', 42, '=', [9]],
+      'Bracket with single quote no injection' => ['$["key\' OR \'1\'=\'1"]', 'value', '=', []],
+
+      // Wildcard path matching.
+      'Wildcard nested equals' => ['$.deps.*.status', 'enabled', '=', [10]],
+      'Wildcard nested equals other value' => ['$.deps.*.status', 'disabled', '=', [10]],
+      'Wildcard nested not equals' => ['$.deps.*.status', 'enabled', '<>', [10]],
+      'Wildcard nested no match' => ['$.deps.*.status', 'unknown', '=', []],
+      'Wildcard top-level key' => ['$.*.inner', 'deep value', '=', [8]],
+      'Wildcard numeric value' => ['$.deps.*.status', 42, '=', []],
     ];
   }
 
@@ -744,35 +765,24 @@ class SelectTest extends DatabaseTestBase {
    * when matching JSON documents vs. other data which is stored directly in SQL
    * tables.
    */
-  #[DataProvider('providerJsonConditionOperators')]
-  public function testJsonCondition(
-    string $jsonpath,
-    int|string|float|bool|array|null $value,
-    string $operator,
-    array $expected_ids,
-  ): void {
-    $query = $this->connection->select('json', 'j');
-    $query->addField('j', 'id');
-    $query->jsonCondition('test_field', $jsonpath, $value, $operator);
-    $ids = array_map('intval', $query->execute()->fetchCol());
-    sort($ids);
-    $this->assertEquals($expected_ids, $ids);
+  public function testJsonCondition(): void {
+    foreach (static::providerJsonConditionOperators() as $label => [$jsonpath, $value, $operator, $expected_ids]) {
+      $query = $this->connection->select('json', 'j');
+      $query->addField('j', 'id');
+      $query->jsonCondition('j.test_field', $jsonpath, $value, $operator);
+      $ids = $query->execute()->fetchCol();
+      $this->assertEquals($expected_ids, $ids, "Failed: $label");
+    }
   }
 
   /**
    * Tests that JsonCondition validates its arguments.
    */
-  public function testJsonConditionValidation(): void {
+  public function testJsonConditionOperatorValidation(): void {
     $cases = [
-      'invalid jsonpath' => ['field', 'invalid', 'value', '='],
       'unsupported operator' => ['field', '$.path', 'value', 'INVALID'],
       'IN requires array' => ['field', '$.path', 'string', 'IN'],
       'BETWEEN requires two' => ['field', '$.path', [1], 'BETWEEN'],
-      // Try to exploit jsonpath with special characters.
-      'single quote in path' => ['f', "$.key' OR 1=1--", 'v', '='],
-      'semicolon in path' => ['f', '$.key; DROP TABLE', 'v', '='],
-      'space in path' => ['f', '$.key OR true', 'v', '='],
-      'parenthesis in path' => ['f', '$.key)', 'v', '='],
     ];
     foreach ($cases as $label => [$field, $path, $value, $op]) {
       try {
@@ -786,13 +796,26 @@ class SelectTest extends DatabaseTestBase {
   }
 
   /**
-   * Tests that jsonOrderBy rejects invalid jsonpath expressions.
+   * Tests that JsonExpression rejects invalid jsonpath expressions.
    */
-  public function testJsonOrderByInvalidPath(): void {
-    $this->expectException(InvalidQueryException::class);
-    $query = $this->connection->select('json', 'j');
-    $query->addField('j', 'id');
-    $query->jsonOrderBy('test_field', "$.key' OR 1=1--");
+  public function testJsonExpressionPathValidation(): void {
+    $cases = [
+      'no dollar prefix' => 'invalid',
+      'single quote in path' => "$.key' OR 1=1--",
+      'semicolon in path' => '$.key; DROP TABLE',
+      'space in path' => '$.key OR true',
+      'parenthesis in path' => '$.key)',
+      'multiple wildcards' => '$.level1.*.level2.*.level3',
+    ];
+    foreach ($cases as $label => $path) {
+      try {
+        $this->connection->jsonExpression('test_field', $path);
+        $this->fail("Expected exception for: $label");
+      }
+      catch (InvalidQueryException) {
+        $this->addToAssertionCount(1);
+      }
+    }
   }
 
   /**
@@ -837,12 +860,12 @@ class SelectTest extends DatabaseTestBase {
     $query->jsonOrderBy('test_field', '$.number', 'ASC', JsonCastType::Int);
     $ids = array_map('intval', $query->execute()->fetchCol());
 
-    // Rows with $.number: 1 (5), 2 (10), 3 (10). Rows without: 4-8.
+    // Rows with $.number: 1 (5), 2 (10), 3 (10). Rows without: 4-10.
     // ASC: 5 before 10, NULLs last.
     $this->assertEquals(1, $ids[0]);
     $this->assertContains(2, array_slice($ids, 1, 2));
     $this->assertContains(3, array_slice($ids, 1, 2));
-    $this->assertEqualsCanonicalizing([4, 5, 6, 7, 8], array_slice($ids, 3));
+    $this->assertEqualsCanonicalizing([4, 5, 6, 7, 8, 9, 10], array_slice($ids, 3));
   }
 
   /**
@@ -858,7 +881,7 @@ class SelectTest extends DatabaseTestBase {
     $this->assertContains(2, array_slice($ids, 0, 2));
     $this->assertContains(3, array_slice($ids, 0, 2));
     $this->assertEquals(1, $ids[2]);
-    $this->assertEqualsCanonicalizing([4, 5, 6, 7, 8], array_slice($ids, 3));
+    $this->assertEqualsCanonicalizing([4, 5, 6, 7, 8, 9, 10], array_slice($ids, 3));
   }
 
   /**
@@ -874,7 +897,7 @@ class SelectTest extends DatabaseTestBase {
     // ASC: "some other text" < "some text", so 4 then 3. NULLs last.
     $this->assertEquals(4, $ids[0]);
     $this->assertEquals(3, $ids[1]);
-    $this->assertEqualsCanonicalizing([1, 2, 5, 6, 7, 8], array_slice($ids, 2));
+    $this->assertEqualsCanonicalizing([1, 2, 5, 6, 7, 8, 9, 10], array_slice($ids, 2));
   }
 
 }

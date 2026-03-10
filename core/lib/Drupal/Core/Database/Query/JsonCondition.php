@@ -58,7 +58,7 @@ class JsonCondition extends Condition {
   ) {
     parent::__construct('AND');
     $this->operator = strtoupper($operator);
-    $this->validateArguments();
+    $this->validateOperator();
   }
 
   /**
@@ -66,7 +66,7 @@ class JsonCondition extends Condition {
    *
    * @throws \Drupal\Core\Database\InvalidQueryException
    */
-  protected function validateArguments(): void {
+  protected function validateOperator(): void {
     if (!in_array($this->operator, self::SUPPORTED_OPERATORS, TRUE)) {
       throw new InvalidQueryException(sprintf(
         'Operator %s is not supported by %s. Allowed operators include: %s',
@@ -85,12 +85,6 @@ class JsonCondition extends Condition {
       throw new InvalidQueryException(sprintf(
         'Operator %s requires an array of exactly two values.',
         $this->operator,
-      ));
-    }
-    if (!preg_match('/^\$(\.\w+|\[\d+\])*$/', $this->path)) {
-      throw new InvalidQueryException(sprintf(
-        'The provided jsonpath "%s" is invalid. Supported jsonpath expressions must start with "$" and use dot notation ($.key) or bracket notation ($[0]) with alphanumeric identifiers.',
-        $this->path,
       ));
     }
   }
@@ -130,7 +124,7 @@ class JsonCondition extends Condition {
 
       case 'JSON_CONTAINS':
         $encoded = json_encode($this->value, JSON_THROW_ON_ERROR);
-        $this->stringVersion = $expression->toContainsSql($connection, $encoded);
+        $this->stringVersion = $expression->toContainsSql($encoded);
         $this->arguments = [];
         return;
 
@@ -141,8 +135,8 @@ class JsonCondition extends Condition {
           $placeholder = ':db_condition_placeholder_' . $queryPlaceholder->nextPlaceholder();
           $this->arguments[$placeholder] = $val;
         }
-        $castType = JsonCastType::fromPhpValue($this->value[array_key_first($this->value)]);
-        $this->stringVersion = "{$expression->toCastSql($castType)} {$this->operator} (" . implode(', ', array_keys($this->arguments)) . ')';
+        $cast_type = JsonCastType::fromPhpValue($this->value[array_key_first($this->value)]);
+        $this->stringVersion = "{$expression->toCastSql($cast_type)} {$this->operator} (" . implode(', ', array_keys($this->arguments)) . ')';
         return;
 
       case 'CONTAINS':
@@ -150,16 +144,16 @@ class JsonCondition extends Condition {
       case 'ENDS_WITH':
         $placeholder = ':db_condition_placeholder_' . $queryPlaceholder->nextPlaceholder();
         $escaped = $connection->escapeLike((string) $this->value);
-        $likeValue = match ($this->operator) {
+        $like_value = match ($this->operator) {
           'CONTAINS' => '%' . $escaped . '%',
           'STARTS_WITH' => $escaped . '%',
           'ENDS_WITH' => '%' . $escaped,
         };
-        $likeOperator = $connection->mapConditionOperator('LIKE')
+        $like_operator = $connection->mapConditionOperator('LIKE')
           ?? $this->mapConditionOperator('LIKE');
-        $escape = $likeOperator['postfix'] ?? '';
+        $escape = $like_operator['postfix'] ?? '';
         $this->stringVersion = "{$expression->toCastSql(JsonCastType::Text)} LIKE {$placeholder}{$escape}";
-        $this->arguments = [$placeholder => $likeValue];
+        $this->arguments = [$placeholder => $like_value];
         return;
 
       case 'BETWEEN':
@@ -176,7 +170,7 @@ class JsonCondition extends Condition {
     // Scalar and boolean comparisons are handled by the expression, which
     // generates driver-appropriate SQL (extract+placeholder for MySQL/SQLite,
     // jsonpath operators for PgSQL).
-    $result = $expression->toComparisonSql($this->operator, $this->value, $connection, $queryPlaceholder);
+    $result = $expression->toComparisonSql($this->operator, $this->value, $queryPlaceholder);
     $this->stringVersion = $result['sql'];
     $this->arguments = $result['args'];
   }

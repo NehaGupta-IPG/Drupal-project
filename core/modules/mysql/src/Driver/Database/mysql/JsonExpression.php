@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\mysql\Driver\Database\mysql;
 
-use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Query\JsonCastType;
 use Drupal\Core\Database\Query\JsonExpression as BaseJsonExpression;
+use Drupal\Core\Database\Query\PlaceholderInterface;
 
 /**
  * MySQL implementation of JsonExpression.
@@ -17,7 +17,7 @@ class JsonExpression extends BaseJsonExpression {
    * {@inheritdoc}
    */
   public function toSql(): string {
-    return "JSON_EXTRACT({$this->field}, '{$this->path}')";
+    return "JSON_EXTRACT({$this->field}, {$this->connection->quote($this->path)})";
   }
 
   /**
@@ -36,15 +36,41 @@ class JsonExpression extends BaseJsonExpression {
    * {@inheritdoc}
    */
   public function toHasKeySql(): string {
-    return "JSON_CONTAINS_PATH({$this->field}, 'one', '{$this->path}')";
+    return "JSON_CONTAINS_PATH({$this->field}, 'one', {$this->connection->quote($this->path)})";
   }
 
   /**
    * {@inheritdoc}
    */
-  public function toContainsSql(Connection $connection, string $encodedValue): string {
-    $quoted = $connection->quote($encodedValue);
-    return "JSON_CONTAINS({$this->field}, {$quoted}, '{$this->path}')";
+  public function toContainsSql(string $encoded_value): string {
+    $quoted = $this->connection->quote($encoded_value);
+    return "JSON_CONTAINS({$this->field}, {$quoted}, {$this->connection->quote($this->path)})";
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function toComparisonSql(string $operator, string|int|float|bool $value, PlaceholderInterface $queryPlaceholder): array {
+    if (!$this->hasWildcard()) {
+      return parent::toComparisonSql($operator, $value, $queryPlaceholder);
+    }
+
+    // JSON_EXTRACT with a wildcard path returns a JSON array. Use JSON_TABLE
+    // to iterate the elements so any comparison operator can be applied.
+    // A scalar subquery with COUNT(*) > 0 is used instead of EXISTS because
+    // MySQL 8.0 has a bug where EXISTS with correlated JSON_TABLE returns
+    // incorrect results when evaluating multiple rows.
+    // @see https://bugs.mysql.com/bug.php?id=110819
+    [$prefix, $suffix] = $this->splitAtWildcard();
+    $placeholder = ':db_condition_placeholder_' . $queryPlaceholder->nextPlaceholder();
+    $extract = $suffix === '$'
+      ? 'jt.val'
+      : "JSON_EXTRACT(jt.val, {$this->connection->quote($suffix)})";
+    $json_table_path = $this->connection->quote($prefix . '.*');
+    return [
+      'sql' => "(SELECT COUNT(*) FROM JSON_TABLE({$this->field}, {$json_table_path} COLUMNS (val JSON PATH '$')) jt WHERE {$extract} {$operator} {$placeholder}) > 0",
+      'args' => [$placeholder => $value],
+    ];
   }
 
 }
