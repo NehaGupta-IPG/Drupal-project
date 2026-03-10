@@ -10,11 +10,14 @@ use Drupal\Core\Site\Settings;
 /**
  * Parses dynamic .info.yml files that might change during the page request.
  *
- * To allow extensions to be installed regardless of core compatibility, add
+ * The core compatibility check for installing extensions may be bypassed in
+ * development by adding the following to settings.php:
  * @code
  * $settings['extension_discovery_ignore_core_version_requirement'] = TRUE;
  * @endcode
- * to your settings.php.
+ * This is a development feature for installing modules when Drupal core is on
+ * a development branch, and should not be used to work around the core version
+ * requirement of a module.
  */
 class InfoParserDynamic implements InfoParserInterface {
 
