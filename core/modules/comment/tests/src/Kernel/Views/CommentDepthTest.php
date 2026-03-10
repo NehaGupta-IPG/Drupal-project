@@ -38,6 +38,8 @@ class CommentDepthTest extends CommentViewsKernelTestBase {
     parent::setUp($import_test_views);
 
     $this->installEntitySchema('entity_test');
+    $this->installSchema('comment', 'comment_entity_statistics');
+    $this->installEntitySchema('comment');
   }
 
   /**

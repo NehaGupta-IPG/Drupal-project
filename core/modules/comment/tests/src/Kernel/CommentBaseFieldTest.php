@@ -36,6 +36,7 @@ class CommentBaseFieldTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->installEntitySchema('comment_test_base_field');
+    $this->installSchema('comment', 'comment_entity_statistics');
     $this->installEntitySchema('comment');
     $this->installEntitySchema('user');
   }
