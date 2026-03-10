@@ -130,13 +130,16 @@ class JsonCondition extends Condition {
 
       case 'IN':
       case 'NOT IN':
-        $this->arguments = [];
-        foreach ($this->value as $val) {
-          $placeholder = ':db_condition_placeholder_' . $queryPlaceholder->nextPlaceholder();
-          $this->arguments[$placeholder] = $val;
+        // IN with an empty set matches nothing; NOT IN with an empty set
+        // matches everything.
+        if (empty($this->value)) {
+          $this->stringVersion = $this->operator === 'IN' ? '1 = 0' : '1 = 1';
+          $this->arguments = [];
+          return;
         }
-        $cast_type = JsonCastType::fromPhpValue($this->value[array_key_first($this->value)]);
-        $this->stringVersion = "{$expression->toCastSql($cast_type)} {$this->operator} (" . implode(', ', array_keys($this->arguments)) . ')';
+        $result = $expression->toComparisonSql($this->operator, $this->value, $queryPlaceholder);
+        $this->stringVersion = $result['sql'];
+        $this->arguments = $result['args'];
         return;
 
       case 'CONTAINS':

@@ -9,25 +9,28 @@ namespace Drupal\Core\Database\Query;
  */
 enum JsonCastType: string {
 
-  case Text = 'text';
-
   case Int = 'int';
 
   case Float = 'float';
 
+  case Bool = 'bool';
+
+  case Text = 'text';
+
   /**
    * Infers the cast type from a PHP value's type.
    *
-   * @param string|int|float $value
+   * @param string|int|float|bool|null $value
    *   The value to infer from.
    *
    * @return self
    *   The matching cast type.
    */
-  public static function fromPhpValue(string|int|float $value): self {
+  public static function fromPhpValue(string|int|float|bool|null $value): self {
     return match (TRUE) {
       is_int($value) => self::Int,
       is_float($value) => self::Float,
+      is_bool($value) => self::Bool,
       default => self::Text,
     };
   }

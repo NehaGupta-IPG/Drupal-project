@@ -29,9 +29,10 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * {@inheritdoc}
    */
-  public function toCastSql(JsonCastType $type): string {
-    $sql = $this->toSql();
+  public function toCastSql(JsonCastType $type, ?string $expression = NULL): string {
+    $sql = $expression ?? $this->toSql();
     return match ($type) {
+      JsonCastType::Bool => "({$sql})::boolean::integer",
       JsonCastType::Int => "({$sql})::integer",
       JsonCastType::Float => "({$sql})::double precision",
       // Parentheses prevent PgSQL's prepareStatement() from appending ::text to
@@ -64,7 +65,23 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * {@inheritdoc}
    */
-  public function toComparisonSql(string $operator, string|int|float|bool $value, PlaceholderInterface $queryPlaceholder): array {
+  public function toComparisonSql(string $operator, string|int|float|bool|array $value, PlaceholderInterface $queryPlaceholder): array {
+    // Non-wildcard arrays delegate to the base class.
+    if (is_array($value) && !$this->hasWildcard()) {
+      return parent::toComparisonSql($operator, $value, $queryPlaceholder);
+    }
+
+    // Wildcard IN/NOT IN: use jsonb_path_query to expand the wildcard into a
+    // set of values, then cast and compare each value.
+    if (is_array($value)) {
+      $escaped_path = str_replace("'", "''", $this->path);
+      ['args' => $args, 'cast_type' => $cast_type, 'placeholders' => $placeholders] = $this->buildInPlaceholders($value, $queryPlaceholder);
+      return [
+        'sql' => "EXISTS (SELECT 1 FROM jsonb_path_query({$this->field}::jsonb, '{$escaped_path}') AS v WHERE {$this->toCastSql($cast_type, "v #>> '{}'")} {$operator} ({$placeholders}))",
+        'args' => $args,
+      ];
+    }
+
     // PgSQL uses jsonpath operators for scalar comparisons, which bake the
     // value into the SQL expression instead of using placeholders.
     $op = $operator === '=' ? '==' : $operator;

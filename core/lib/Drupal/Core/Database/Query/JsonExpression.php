@@ -80,18 +80,23 @@ abstract class JsonExpression {
   abstract public function toSql(): string;
 
   /**
-   * Generates a SQL extraction expression with a type cast.
+   * Generates a SQL expression with a type cast.
    *
-   * Used for ORDER BY and other contexts where the extracted JSON value
-   * must be cast to a specific SQL type for correct sorting/comparison.
+   * When called without $expression, extracts and casts the value at this
+   * expression's JSON path. When called with $expression, applies the same
+   * driver-specific cast to an arbitrary SQL expression (e.g. a wildcard
+   * subquery alias like 'jt.val' or 'je.value').
    *
    * @param \Drupal\Core\Database\Query\JsonCastType $type
    *   The cast type.
+   * @param string|null $expression
+   *   A SQL expression to cast. If NULL, uses toSql() to extract from the
+   *   JSON column.
    *
    * @return string
-   *   A SQL fragment that extracts and casts the value at the given path.
+   *   A SQL fragment that casts the value to the given type.
    */
-  abstract public function toCastSql(JsonCastType $type): string;
+  abstract public function toCastSql(JsonCastType $type, ?string $expression = NULL): string;
 
   /**
    * Generates SQL to check if the JSON path exists (has a key/element).
@@ -114,35 +119,55 @@ abstract class JsonExpression {
   abstract public function toContainsSql(string $encoded_value): string;
 
   /**
-   * Generates SQL for a scalar or boolean comparison.
+   * Generates SQL for a comparison against a scalar or array value.
    *
-   * The default implementation uses extract+placeholder, which works for
-   * MySQL and SQLite. PgSQL overrides this to use jsonpath operators where
-   * values are embedded directly in the SQL expression.
+   * For scalar values, produces a simple comparison (e.g. extract = :p).
+   * For array values, produces an IN/NOT IN clause. Drivers override this
+   * to expand wildcard paths into row sets using driver-specific mechanisms
+   * (JSON_TABLE, json_each, jsonb_path_query).
    *
    * @param string $operator
-   *   The comparison operator (=, <>, <, >, etc.).
-   * @param string|int|float|bool $value
-   *   The value to compare against.
+   *   The comparison operator (=, <>, <, >, IN, NOT IN, etc.).
+   * @param string|int|float|bool|array $value
+   *   The value to compare against. An array for IN/NOT IN operators.
    * @param \Drupal\Core\Database\Query\PlaceholderInterface $queryPlaceholder
    *   The placeholder interface for generating unique placeholders.
    *
    * @return array{sql: string, args: array}
    *   An array with 'sql' (the SQL fragment) and 'args' (placeholder values).
    */
-  public function toComparisonSql(string $operator, string|int|float|bool $value, PlaceholderInterface $queryPlaceholder): array {
-    if (is_bool($value)) {
-      return [
-        'sql' => "{$this->toCastSql(JsonCastType::Int)} = " . (int) $value,
-        'args' => [],
-      ];
-    }
-
-    $type = JsonCastType::fromPhpValue($value);
-    $placeholder = ':db_condition_placeholder_' . $queryPlaceholder->nextPlaceholder();
+  public function toComparisonSql(string $operator, string|int|float|bool|array $value, PlaceholderInterface $queryPlaceholder): array {
+    ['args' => $args, 'cast_type' => $cast_type, 'placeholders' => $placeholders] = $this->buildInPlaceholders((array) $value, $queryPlaceholder);
     return [
-      'sql' => "{$this->toCastSql($type)} {$operator} {$placeholder}",
-      'args' => [$placeholder => $value],
+      'sql' => "{$this->toCastSql($cast_type)} {$operator} ({$placeholders})",
+      'args' => $args,
+    ];
+  }
+
+  /**
+   * Builds placeholder arguments for an IN/NOT IN comparison.
+   *
+   * @param array $value
+   *   The array of values.
+   * @param \Drupal\Core\Database\Query\PlaceholderInterface $queryPlaceholder
+   *   The placeholder interface for generating unique placeholders.
+   *
+   * @return array{args: array, cast_type: JsonCastType, placeholders: string}
+   *   An array with 'args' (placeholder-to-value map), 'cast_type' (the
+   *   inferred cast type), and 'placeholders' (comma-separated tokens).
+   */
+  protected function buildInPlaceholders(array $value, PlaceholderInterface $queryPlaceholder): array {
+    $args = [];
+    $first_value = $value[array_key_first($value)];
+    $cast_to_int = is_bool($first_value);
+    foreach ($value as $val) {
+      $placeholder = ':db_condition_placeholder_' . $queryPlaceholder->nextPlaceholder();
+      $args[$placeholder] = $cast_to_int ? (int) $val : $val;
+    }
+    return [
+      'args' => $args,
+      'cast_type' => JsonCastType::fromPhpValue($first_value),
+      'placeholders' => implode(', ', array_keys($args)),
     ];
   }
 

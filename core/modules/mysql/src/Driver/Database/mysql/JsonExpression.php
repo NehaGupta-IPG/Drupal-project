@@ -23,10 +23,10 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * {@inheritdoc}
    */
-  public function toCastSql(JsonCastType $type): string {
-    $extract = $this->toSql();
+  public function toCastSql(JsonCastType $type, ?string $expression = NULL): string {
+    $extract = $expression ?? $this->toSql();
     return match ($type) {
-      JsonCastType::Int => "CAST({$extract} AS SIGNED)",
+      JsonCastType::Bool, JsonCastType::Int => "CAST({$extract} AS SIGNED)",
       JsonCastType::Float => "CAST({$extract} AS DOUBLE)",
       JsonCastType::Text => "CAST(JSON_UNQUOTE({$extract}) AS CHAR(255))",
     };
@@ -50,7 +50,7 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * {@inheritdoc}
    */
-  public function toComparisonSql(string $operator, string|int|float|bool $value, PlaceholderInterface $queryPlaceholder): array {
+  public function toComparisonSql(string $operator, string|int|float|bool|array $value, PlaceholderInterface $queryPlaceholder): array {
     if (!$this->hasWildcard()) {
       return parent::toComparisonSql($operator, $value, $queryPlaceholder);
     }
@@ -62,14 +62,15 @@ class JsonExpression extends BaseJsonExpression {
     // incorrect results when evaluating multiple rows.
     // @see https://bugs.mysql.com/bug.php?id=110819
     [$prefix, $suffix] = $this->splitAtWildcard();
-    $placeholder = ':db_condition_placeholder_' . $queryPlaceholder->nextPlaceholder();
     $extract = $suffix === '$'
       ? 'jt.val'
       : "JSON_EXTRACT(jt.val, {$this->connection->quote($suffix)})";
     $json_table_path = $this->connection->quote($prefix . '.*');
+
+    ['args' => $args, 'cast_type' => $cast_type, 'placeholders' => $placeholders] = $this->buildInPlaceholders((array) $value, $queryPlaceholder);
     return [
-      'sql' => "(SELECT COUNT(*) FROM JSON_TABLE({$this->field}, {$json_table_path} COLUMNS (val JSON PATH '$')) jt WHERE {$extract} {$operator} {$placeholder}) > 0",
-      'args' => [$placeholder => $value],
+      'sql' => "(SELECT COUNT(*) FROM JSON_TABLE({$this->field}, {$json_table_path} COLUMNS (val JSON PATH '$')) jt WHERE {$this->toCastSql($cast_type, $extract)} {$operator} ({$placeholders})) > 0",
+      'args' => $args,
     ];
   }
 

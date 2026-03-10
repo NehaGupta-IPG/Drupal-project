@@ -23,10 +23,10 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * {@inheritdoc}
    */
-  public function toCastSql(JsonCastType $type): string {
-    $sql = $this->toSql();
+  public function toCastSql(JsonCastType $type, ?string $expression = NULL): string {
+    $sql = $expression ?? $this->toSql();
     return match ($type) {
-      JsonCastType::Int => "CAST({$sql} AS INTEGER)",
+      JsonCastType::Bool, JsonCastType::Int => "CAST({$sql} AS INTEGER)",
       JsonCastType::Float => "CAST({$sql} AS REAL)",
       JsonCastType::Text => $sql,
     };
@@ -50,7 +50,7 @@ class JsonExpression extends BaseJsonExpression {
   /**
    * {@inheritdoc}
    */
-  public function toComparisonSql(string $operator, string|int|float|bool $value, PlaceholderInterface $queryPlaceholder): array {
+  public function toComparisonSql(string $operator, string|int|float|bool|array $value, PlaceholderInterface $queryPlaceholder): array {
     if (!$this->hasWildcard()) {
       return parent::toComparisonSql($operator, $value, $queryPlaceholder);
     }
@@ -59,7 +59,6 @@ class JsonExpression extends BaseJsonExpression {
     // iterate the wildcard level and check each element's value for the
     // remaining suffix path.
     [$prefix, $suffix] = $this->splitAtWildcard();
-    $placeholder = ':db_condition_placeholder_' . $queryPlaceholder->nextPlaceholder();
     if ($suffix === '$') {
       $extract = 'je.value';
       $type_guard = '';
@@ -70,9 +69,11 @@ class JsonExpression extends BaseJsonExpression {
       $extract = "json_extract(je.value, {$this->connection->quote($suffix)})";
       $type_guard = "je.type IN ('object', 'array') AND ";
     }
+
+    ['args' => $args, 'cast_type' => $cast_type, 'placeholders' => $placeholders] = $this->buildInPlaceholders((array) $value, $queryPlaceholder);
     return [
-      'sql' => "EXISTS (SELECT 1 FROM json_each({$this->field}, {$this->connection->quote($prefix)}) je WHERE {$type_guard}{$extract} {$operator} {$placeholder})",
-      'args' => [$placeholder => $value],
+      'sql' => "EXISTS (SELECT 1 FROM json_each({$this->field}, {$this->connection->quote($prefix)}) je WHERE {$type_guard}{$this->toCastSql($cast_type, $extract)} {$operator} ({$placeholders}))",
+      'args' => $args,
     ];
   }
 

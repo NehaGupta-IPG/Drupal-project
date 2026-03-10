@@ -660,6 +660,10 @@ class SelectTest extends DatabaseTestBase {
       'Boolean TRUE' => ['$.boolean', TRUE, '=', [1, 4]],
       'Boolean FALSE' => ['$.boolean', FALSE, '=', [2]],
       'Boolean invalid condition' => ['$.boolean', 'invalid string argument', '=', []],
+      'Boolean IN TRUE' => ['$.boolean', [TRUE], 'IN', [1, 4]],
+      'Boolean IN FALSE' => ['$.boolean', [FALSE], 'IN', [2]],
+      'Boolean IN both' => ['$.boolean', [TRUE, FALSE], 'IN', [1, 2, 4]],
+      'Boolean NOT IN TRUE' => ['$.boolean', [TRUE], 'NOT IN', [2]],
 
       // Type mismatch.
       'Non-matching text' => ['$.key', 'nothing to see here', '=', []],
@@ -670,6 +674,8 @@ class SelectTest extends DatabaseTestBase {
       'IN with partial matching' => ['$.number', [5], 'IN', [1]],
       'IN with no matching' => ['$.number', [99, 100], 'IN', []],
       'NOT IN with matching' => ['$.number', [10], 'NOT IN', [1]],
+      'IN with empty array' => ['$.number', [], 'IN', []],
+      'NOT IN with empty array' => ['$.number', [], 'NOT IN', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]],
 
       // JSON_CONTAINS.
       'Array value with full containment' => ['$.array', [32, 41], 'JSON_CONTAINS', [5]],
@@ -754,6 +760,14 @@ class SelectTest extends DatabaseTestBase {
       'Wildcard nested no match' => ['$.deps.*.status', 'unknown', '=', []],
       'Wildcard top-level key' => ['$.*.inner', 'deep value', '=', [8]],
       'Wildcard numeric value' => ['$.deps.*.status', 42, '=', []],
+
+      // Wildcard IN / NOT IN.
+      'Wildcard IN matching one' => ['$.deps.*.status', ['enabled'], 'IN', [10]],
+      'Wildcard IN matching both' => ['$.deps.*.status', ['enabled', 'disabled'], 'IN', [10]],
+      'Wildcard IN no match' => ['$.deps.*.status', ['unknown'], 'IN', []],
+      'Wildcard NOT IN excludes all' => ['$.deps.*.status', ['enabled', 'disabled'], 'NOT IN', []],
+      'Wildcard NOT IN partial' => ['$.deps.*.status', ['enabled'], 'NOT IN', [10]],
+      'Wildcard top-level IN' => ['$.*.inner', ['deep value', 'other'], 'IN', [8]],
     ];
   }
 
@@ -771,7 +785,7 @@ class SelectTest extends DatabaseTestBase {
       $query->addField('j', 'id');
       $query->jsonCondition('j.test_field', $jsonpath, $value, $operator);
       $ids = $query->execute()->fetchCol();
-      $this->assertEquals($expected_ids, $ids, "Failed: $label");
+      $this->assertEqualsCanonicalizing($expected_ids, $ids, "Failed: $label");
     }
   }
 
