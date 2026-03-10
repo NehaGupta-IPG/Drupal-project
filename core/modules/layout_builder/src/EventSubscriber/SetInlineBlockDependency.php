@@ -71,13 +71,13 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
     protected ?RouteMatchInterface $currentRouteMatch = NULL,
   ) {
     if (!$entityRepository instanceof EntityRepositoryInterface) {
-      @trigger_error('Calling ' . __METHOD__ . ' without passing the entity repository as the first argument is deprecated in drupal:11.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3507600', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without passing the entity repository as the first argument is deprecated in drupal:11.4.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3507600', E_USER_DEPRECATED);
       $entityRepository = \Drupal::service('entity.repository');
     }
     $this->entityRepository = $entityRepository;
     $this->sectionStorageManager = $sectionStorageManager;
     if ($currentRouteMatch === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $currentRouteMatch argument is deprecated in drupal:11.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3507600', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . ' without the $currentRouteMatch argument is deprecated in drupal:11.4.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3507600', E_USER_DEPRECATED);
       $this->currentRouteMatch = \Drupal::service('current_route_match');
     }
   }
