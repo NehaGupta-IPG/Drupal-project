@@ -1012,6 +1012,7 @@ function hook_update_last_removed(): int {
  *   - severity: (optional) The requirement's severity. Defaults to
  *     RequirementSeverity::OK when installing, or RequirementSeverity::Info
  *     otherwise.
+ *   - weight: (optional) no longer used, included for legacy purposes.
  */
 function hook_requirements($phase): array {
   $requirements = [];

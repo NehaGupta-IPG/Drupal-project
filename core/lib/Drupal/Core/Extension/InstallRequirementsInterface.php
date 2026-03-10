@@ -5,7 +5,6 @@ namespace Drupal\Core\Extension;
 /**
  * Provides method for checking requirements during install time.
  *
- * phpcs:disable
  * @phpstan-type RequirementInfo array{
  *   'title'?: \Drupal\Core\StringTranslation\TranslatableMarkup,
  *   'value'?: \Drupal\Core\StringTranslation\TranslatableMarkup|array<string, mixed>|string,
@@ -13,7 +12,6 @@ namespace Drupal\Core\Extension;
  *   'severity'?: \Drupal\Core\Extension\Requirement\RequirementSeverity,
  *   'weight'?: int,
  * }
- * phpcs:enable
  */
 interface InstallRequirementsInterface {
 
@@ -51,6 +49,7 @@ interface InstallRequirementsInterface {
    *   - severity: (optional) An instance of
    *     \Drupal\Core\Extension\Requirement\RequirementSeverity enum. Defaults
    *     to RequirementSeverity::OK when installing.
+   *   - weight: (optional) no longer used, included for legacy purposes.
    */
   public static function getRequirements(): array;
 
