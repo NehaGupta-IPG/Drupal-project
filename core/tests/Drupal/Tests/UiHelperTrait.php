@@ -201,11 +201,19 @@ trait UiHelperTrait {
     // screen.
     $assert_session = $this->assertSession();
     $destination = Url::fromRoute('user.page')->toString();
-    $this->synchronizeCsrfTokenSeed();
-    $this->drupalGet(Url::fromRoute('user.logout')->setOption('query', [
-      'token' => \Drupal::service(CsrfTokenGenerator::class)->get('user/logout'),
-      'destination' => $destination,
-    ]));
+    if ($this->getSessionName() === NULL) {
+      $this->drupalGet(Url::fromRoute('user.logout.confirm', options: ['query' => ['destination' => $destination]]));
+      // Target the submit button using the name rather than the value to work
+      // regardless of the user interface language.
+      $this->submitForm([], 'op', 'user-logout-confirm');
+    }
+    else {
+      $this->synchronizeCsrfTokenSeed();
+      $this->drupalGet(Url::fromRoute('user.logout')->setOption('query', [
+        'token' => \Drupal::service(CsrfTokenGenerator::class)->get('user/logout'),
+        'destination' => $destination,
+      ]));
+    }
     $assert_session->fieldExists('name');
     $assert_session->fieldExists('pass');
 
