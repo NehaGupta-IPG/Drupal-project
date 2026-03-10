@@ -333,7 +333,7 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
       $build[$region]['layout_builder_add_block']['link'] = [
         '#type' => 'link',
         // Add one to the current delta since it is zero-indexed.
-        '#title' => $this->t('Add block <span class="visually-hidden">in @section, @region region</span>', ['@section' => $section_label, '@region' => $region_labels[$region]]),
+        '#title' => $this->t('Add block in @region <span class="visually-hidden">region, @section</span>', ['@section' => $section_label, '@region' => $region_labels[$region]]),
         '#url' => Url::fromRoute('layout_builder.choose_block',
           [
             'section_storage_type' => $storage_type,
