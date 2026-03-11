@@ -24,6 +24,8 @@ class DependencySerializationTest extends UnitTestCase {
    *
    * @legacy-covers ::__sleep
    * @legacy-covers ::__wakeup
+   * @legacy-covers ::__serialize
+   * @legacy-covers ::__unserialize
    */
   public function testSerialization(): void {
     // Create a pseudo service and dependency injected object.

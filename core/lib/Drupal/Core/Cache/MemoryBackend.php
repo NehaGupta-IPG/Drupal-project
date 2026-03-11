@@ -205,8 +205,40 @@ class MemoryBackend implements CacheBackendInterface, CacheTagsInvalidatorInterf
   /**
    * Prevents data stored in memory backends from being serialized.
    */
+  public function __serialize(): array {
+    return ['time' => $this->time];
+  }
+
+  /**
+   * Restores the time service from serialized data.
+   *
+   * @param array<mixed> $data
+   *   The serialized data.
+   */
+  public function __unserialize(array $data): void {
+    $this->time = $data['time'];
+  }
+
+  /**
+   * Prevents data stored in memory backends from being serialized.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   *   __serialize() instead.
+   * @see https://www.drupal.org/node/3578423
+   */
   public function __sleep(): array {
     return ['time'];
+  }
+
+  /**
+   * Restores the time service from serialized data.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   *   __unserialize() instead.
+   * @see https://www.drupal.org/node/3578423
+   */
+  public function __wakeup(): void {
+    $this->__unserialize(['time' => $this->time]);
   }
 
   /**

@@ -30,8 +30,11 @@ trait DependencySerializationTrait {
   /**
    * {@inheritdoc}
    */
-  public function __sleep(): array {
+  public function __serialize(): array {
     $vars = get_object_vars($this);
+    $service_ids = [];
+    $entity_storages = [];
+
     try {
       $container = \Drupal::getContainer();
       $reverse_container = $container->get(ReverseContainer::class);
@@ -48,14 +51,14 @@ trait DependencySerializationTrait {
           // entity objects. Additionally we ensure that we'll not have multiple
           // storage objects for the same entity type and therefore prevent
           // returning different references for the same entity.
-          $this->_entityStorages[$key] = $value->getEntityTypeId();
+          $entity_storages[$key] = $value->getEntityTypeId();
           unset($vars[$key]);
         }
         elseif ($service_id = $reverse_container->getId($value)) {
           // If a class member was instantiated by the dependency injection
           // container, only store its ID so it can be used to get a fresh
           // object on unserialization.
-          $this->_serviceIds[$key] = $service_id;
+          $service_ids[$key] = $service_id;
           unset($vars[$key]);
         }
       }
@@ -64,31 +67,69 @@ trait DependencySerializationTrait {
       // No container, no problem.
     }
 
-    return array_keys($vars);
+    // Return the serialized data including service IDs and entity storages.
+    return array_keys($vars) + ['_serviceIds' => $service_ids, '_entityStorages' => $entity_storages];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function __wakeup(): void {
-    // Avoid trying to wakeup if there's nothing to do.
-    if (empty($this->_serviceIds) && empty($this->_entityStorages)) {
+  public function __unserialize(array $data): void {
+    // Extract service IDs and entity storages from the serialized data.
+    $service_ids = $data['_serviceIds'] ?? [];
+    $entity_storages = $data['_entityStorages'] ?? [];
+
+    // Avoid trying to unserialize if there's nothing to do.
+    if (empty($service_ids) && empty($entity_storages)) {
       return;
     }
+
     $container = \Drupal::getContainer();
-    foreach ($this->_serviceIds as $key => $service_id) {
+    foreach ($service_ids as $key => $service_id) {
       $this->$key = $container->get($service_id);
     }
-    $this->_serviceIds = [];
 
-    if ($this->_entityStorages) {
+    if ($entity_storages) {
       /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */
       $entity_type_manager = $container->get('entity_type.manager');
-      foreach ($this->_entityStorages as $key => $entity_type_id) {
+      foreach ($entity_storages as $key => $entity_type_id) {
         $this->$key = $entity_type_manager->getStorage($entity_type_id);
       }
     }
-    $this->_entityStorages = [];
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   *   __serialize() instead.
+   * @see https://www.drupal.org/node/3578423
+   */
+  public function __sleep(): array {
+    // Store service IDs and entity storages as instance properties for
+    // backward compatibility.
+    $serialized = $this->__serialize();
+    $this->_serviceIds = $serialized['_serviceIds'] ?? [];
+    $this->_entityStorages = $serialized['_entityStorages'] ?? [];
+    unset($serialized['_serviceIds'], $serialized['_entityStorages']);
+    return $serialized;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   *   __unserialize() instead.
+   * @see https://www.drupal.org/node/3578423
+   */
+  public function __wakeup(): void {
+    // Reconstruct data array from instance properties for backward
+    // compatibility.
+    $data = [
+      '_serviceIds' => $this->_serviceIds,
+      '_entityStorages' => $this->_entityStorages,
+    ];
+    $this->__unserialize($data);
   }
 
 }
