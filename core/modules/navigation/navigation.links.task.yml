@@ -1,0 +1,10 @@
+navigation.settings:
+  title: Settings
+  route_name: navigation.settings
+  base_route: navigation.settings
+
+navigation.layout:
+  title: Layout
+  route_name: layout_builder.navigation.view
+  base_route: navigation.settings
+  weight: 10
