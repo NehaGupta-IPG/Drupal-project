@@ -19,6 +19,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Unit tests for TestDiscovery.
@@ -35,7 +36,7 @@ class TestDiscoveryTest extends UnitTestCase {
    */
   #[DataProvider('infoParserProvider')]
   #[RunInSeparateProcess]
-  public function testTestInfoParser($expected, $classname, $doc_comment = NULL): void {
+  public function testTestInfoParser(array $expected, $classname, $doc_comment = NULL): void {
     try {
       $info = TestDiscovery::getTestInfo($classname, $doc_comment);
       $this->assertEquals($expected, $info);
@@ -55,7 +56,7 @@ class TestDiscoveryTest extends UnitTestCase {
     }
   }
 
-  public static function infoParserProvider() {
+  public static function infoParserProvider(): array {
     // A module provided unit test.
     $tests[] = [
       // Expected result.
@@ -304,13 +305,31 @@ EOF;
             'src' => [
               'Functional' => [
                 'FunctionalExampleTest.php' => $test_file,
-                'FunctionalExampleTest2.php' => str_replace(['FunctionalExampleTest', '@group example'], ['FunctionalExampleTest2', '@group example2'], $test_file),
+                'FunctionalExampleTest2.php' => str_replace([
+                  'FunctionalExampleTest',
+                  '@group example',
+                ], ['FunctionalExampleTest2', '@group example2'], $test_file),
               ],
               'Kernel' => [
-                'KernelExampleTest3.php' => str_replace(['FunctionalExampleTest', '@group example'], ['KernelExampleTest3', "@group example2\n * @group kernel\n"], $test_file),
-                'KernelExampleTestBase.php' => str_replace(['FunctionalExampleTest', '@group example'], ['KernelExampleTestBase', '@group example2'], $test_file),
-                'KernelExampleTrait.php' => str_replace(['FunctionalExampleTest', '@group example'], ['KernelExampleTrait', '@group example2'], $test_file),
-                'KernelExampleInterface.php' => str_replace(['FunctionalExampleTest', '@group example'], ['KernelExampleInterface', '@group example2'], $test_file),
+                'KernelExampleTest3.php' => str_replace([
+                  'FunctionalExampleTest',
+                  '@group example',
+                ], [
+                  'KernelExampleTest3',
+                  "@group example2\n * @group kernel\n",
+                ], $test_file),
+                'KernelExampleTestBase.php' => str_replace([
+                  'FunctionalExampleTest',
+                  '@group example',
+                ], ['KernelExampleTestBase', '@group example2'], $test_file),
+                'KernelExampleTrait.php' => str_replace([
+                  'FunctionalExampleTest',
+                  '@group example',
+                ], ['KernelExampleTrait', '@group example2'], $test_file),
+                'KernelExampleInterface.php' => str_replace([
+                  'FunctionalExampleTest',
+                  '@group example',
+                ], ['KernelExampleInterface', '@group example2'], $test_file),
               ],
             ],
           ],
@@ -325,7 +344,10 @@ EOF;
               'tests' => [
                 'src' => [
                   'Kernel' => [
-                    'KernelExampleTest4.php' => str_replace(['FunctionalExampleTest', '@group example'], ['KernelExampleTest4', '@group example3'], $test_file),
+                    'KernelExampleTest4.php' => str_replace([
+                      'FunctionalExampleTest',
+                      '@group example',
+                    ], ['KernelExampleTest4', '@group example3'], $test_file),
                   ],
                 ],
               ],
@@ -337,7 +359,7 @@ EOF;
   }
 
   /**
-   * @legacy-covers ::getTestClasses
+   * Tests get test classes.
    */
   public function testGetTestClasses(): void {
     $this->setupVfsWithTestClasses();
@@ -389,7 +411,7 @@ EOF;
   /**
    * Mock a TestDiscovery object to return specific extension values.
    */
-  protected function getTestDiscoveryMock($app_root, $extensions) {
+  protected function getTestDiscoveryMock($app_root, $extensions): MockObject {
     $class_loader = $this->prophesize(ClassLoader::class);
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
 
@@ -406,7 +428,7 @@ EOF;
   }
 
   /**
-   * @legacy-covers ::getTestClasses
+   * Tests get test classes with selected types.
    */
   public function testGetTestClassesWithSelectedTypes(): void {
     $this->setupVfsWithTestClasses();
@@ -480,20 +502,23 @@ EOF;
   }
 
   /**
-   * @legacy-covers ::getPhpunitTestSuite
+   * Tests get phpunit test suite.
    */
   #[DataProvider('providerTestGetPhpunitTestSuite')]
   public function testGetPhpunitTestSuite($classname, $expected): void {
     $this->assertEquals($expected, TestDiscovery::getPhpunitTestSuite($classname));
   }
 
-  public static function providerTestGetPhpunitTestSuite() {
+  public static function providerTestGetPhpunitTestSuite(): array {
     $data = [];
     $data['simpletest-web test'] = ['\Drupal\rest\Tests\NodeTest', FALSE];
     $data['module-unittest'] = [static::class, 'Unit'];
     $data['module-kernel test'] = ['\Drupal\KernelTests\Core\Theme\TwigMarkupInterfaceTest', 'Kernel'];
     $data['module-functional test'] = ['\Drupal\FunctionalTests\BrowserTestBaseTest', 'Functional'];
-    $data['module-functional javascript test'] = ['\Drupal\Tests\toolbar\FunctionalJavascript\ToolbarIntegrationTest', 'FunctionalJavascript'];
+    $data['module-functional javascript test'] = [
+      '\Drupal\Tests\toolbar\FunctionalJavascript\ToolbarIntegrationTest',
+      'FunctionalJavascript',
+    ];
     $data['core-unittest'] = ['\Drupal\Tests\ComposerIntegrationTest', 'Unit'];
     $data['core-unittest2'] = ['Drupal\Tests\Core\DrupalTest', 'Unit'];
     $data['core-script-test'] = ['Drupal\KernelTests\Scripts\TestSiteApplicationTest', 'Kernel'];
@@ -507,8 +532,6 @@ EOF;
 
   /**
    * Ensure that classes are not reflected when the docblock is empty.
-   *
-   * @legacy-covers ::getTestInfo
    */
   public function testGetTestInfoEmptyDocblock(): void {
     // If getTestInfo() performed reflection, it won't be able to find the
@@ -522,8 +545,6 @@ EOF;
 
   /**
    * Ensure TestDiscovery::scanDirectory() ignores certain abstract file types.
-   *
-   * @legacy-covers ::scanDirectory
    */
   public function testScanDirectoryNoAbstract(): void {
     $this->setupVfsWithTestClasses();

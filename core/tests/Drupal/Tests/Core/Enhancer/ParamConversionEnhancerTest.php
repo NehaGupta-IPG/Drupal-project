@@ -42,8 +42,6 @@ class ParamConversionEnhancerTest extends UnitTestCase {
 
   /**
    * Tests enhance.
-   *
-   * @legacy-covers ::enhance
    */
   public function testEnhance(): void {
     $route = new Route('/test/{id}/{literal}/{null}');
@@ -63,7 +61,7 @@ class ParamConversionEnhancerTest extends UnitTestCase {
 
     $this->paramConverterManager->expects($this->once())
       ->method('convert')
-      ->with($this->isType('array'))
+      ->with($this->isArray())
       ->willReturn($expected);
 
     $result = $this->paramConversionEnhancer->enhance($defaults, new Request());
@@ -79,8 +77,6 @@ class ParamConversionEnhancerTest extends UnitTestCase {
 
   /**
    * Tests copy raw variables.
-   *
-   * @legacy-covers ::copyRawVariables
    */
   public function testCopyRawVariables(): void {
     $route = new Route('/test/{id}');
@@ -93,8 +89,8 @@ class ParamConversionEnhancerTest extends UnitTestCase {
     $defaults['bar'] = &$defaults['id'];
     $this->paramConverterManager->expects($this->any())
       ->method('convert')
-      ->with($this->isType('array'))
-      ->willReturnCallback(function ($defaults) {
+      ->with($this->isArray())
+      ->willReturnCallback(function (array $defaults): array {
         // Convert the mirrored default to another value.
         $defaults['bar'] = '2';
 

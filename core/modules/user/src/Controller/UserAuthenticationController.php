@@ -237,7 +237,7 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
     }
     // Always register an IP-based failed login event.
     $this->userFloodControl->register('user.failed_login_ip', $flood_config->get('ip_window'));
-    throw new BadRequestHttpException('Sorry, unrecognized username or password.');
+    throw new BadRequestHttpException('Unrecognized username or password.');
   }
 
   /**
@@ -287,7 +287,10 @@ class UserAuthenticationController extends ControllerBase implements ContainerIn
         throw new BadRequestHttpException('Unable to send email. Contact the site administrator if the problem persists.');
       }
       else {
-        $this->logger->info('Password reset instructions mailed to %name at %email.', ['%name' => $account->getAccountName(), '%email' => $account->getEmail()]);
+        $this->logger->info('Password reset instructions mailed to %name at %email.', [
+          '%name' => $account->getAccountName(),
+          '%email' => $account->getEmail(),
+        ]);
         return new Response();
       }
     }

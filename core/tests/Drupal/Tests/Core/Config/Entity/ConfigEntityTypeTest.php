@@ -48,7 +48,7 @@ class ConfigEntityTypeTest extends UnitTestCase {
    * @return \Drupal\Core\Config\Entity\ConfigEntityTypeInterface
    *   The ConfigEntityType object.
    */
-  protected function setUpConfigEntityType($definition) {
+  protected function setUpConfigEntityType(array $definition): ConfigEntityType {
     if (!isset($definition['id'])) {
       $definition += [
         'id' => 'example_config_entity_type',
@@ -126,8 +126,6 @@ class ConfigEntityTypeTest extends UnitTestCase {
 
   /**
    * Tests set storage class.
-   *
-   * @legacy-covers ::setStorageClass
    */
   public function testSetStorageClass(): void {
     $config_entity = $this->setUpConfigEntityType([]);
@@ -138,11 +136,9 @@ class ConfigEntityTypeTest extends UnitTestCase {
 
   /**
    * Tests the getConfigPrefix() method.
-   *
-   * @legacy-covers ::getConfigPrefix
    */
   #[DataProvider('providerTestGetConfigPrefix')]
-  public function testGetConfigPrefix($definition, $expected): void {
+  public function testGetConfigPrefix(array $definition, string $expected): void {
     $entity_type = $this->setUpConfigEntityType($definition);
     $this->assertSame($expected, $entity_type->getConfigPrefix());
   }
@@ -150,7 +146,7 @@ class ConfigEntityTypeTest extends UnitTestCase {
   /**
    * Provides test data.
    */
-  public static function providerTestGetConfigPrefix() {
+  public static function providerTestGetConfigPrefix(): array {
     return [
       [['provider' => 'node', 'id' => 'node_type', 'config_prefix' => 'type'], 'node.type'],
       [['provider' => 'views', 'id' => 'view'], 'views.view'],
@@ -159,8 +155,6 @@ class ConfigEntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get properties to export.
-   *
-   * @legacy-covers ::getPropertiesToExport
    */
   #[DataProvider('providerGetPropertiesToExport')]
   public function testGetPropertiesToExport($definition, $expected): void {
@@ -173,7 +167,7 @@ class ConfigEntityTypeTest extends UnitTestCase {
     $this->assertSame($expected, $properties_to_export);
   }
 
-  public static function providerGetPropertiesToExport() {
+  public static function providerGetPropertiesToExport(): array {
     $data = [];
     $data[] = [
       [
@@ -212,14 +206,24 @@ class ConfigEntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get properties to export no fallback.
-   *
-   * @legacy-covers ::getPropertiesToExport
    */
   public function testGetPropertiesToExportNoFallback(): void {
     $config_entity_type = new ConfigEntityType([
       'id' => 'example_config_entity_type',
     ]);
     $this->assertNull($config_entity_type->getPropertiesToExport());
+  }
+
+  /**
+   * Tests get ConfigEntityType::hasIntegerId() method.
+   *
+   * @legacy-covers ::hasIntegerId
+   */
+  public function testHasIntegerId(): void {
+    $config_entity_type = new ConfigEntityType([
+      'id' => 'example_config_entity_type',
+    ]);
+    $this->assertFalse($config_entity_type->hasIntegerId());
   }
 
 }

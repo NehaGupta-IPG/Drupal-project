@@ -20,8 +20,6 @@ class HtmlTagTest extends RendererTestBase {
 
   /**
    * Tests get info.
-   *
-   * @legacy-covers ::getInfo
    */
   public function testGetInfo(): void {
     $htmlTag = new HtmlTag([], 'test', 'test');
@@ -33,8 +31,6 @@ class HtmlTagTest extends RendererTestBase {
 
   /**
    * Tests pre render html tag.
-   *
-   * @legacy-covers ::preRenderHtmlTag
    */
   #[DataProvider('providerPreRenderHtmlTag')]
   public function testPreRenderHtmlTag($element, $expected): void {
@@ -50,7 +46,7 @@ class HtmlTagTest extends RendererTestBase {
   /**
    * Data provider for preRenderHtmlTag test.
    */
-  public static function providerPreRenderHtmlTag() {
+  public static function providerPreRenderHtmlTag(): array {
     $tags = [];
 
     // Value prefix/suffix.
@@ -90,7 +86,10 @@ class HtmlTagTest extends RendererTestBase {
       '#tag' => 'p><script>alert()</script><p',
       '#value' => 'value',
     ];
-    $tags['sanitized-tag'] = [$element, "<p&gt;&lt;script&gt;alert()&lt;/script&gt;&lt;p>value</p&gt;&lt;script&gt;alert()&lt;/script&gt;&lt;p>\n"];
+    $tags['sanitized-tag'] = [
+      $element,
+      "<p&gt;&lt;script&gt;alert()&lt;/script&gt;&lt;p>value</p&gt;&lt;script&gt;alert()&lt;/script&gt;&lt;p>\n",
+    ];
 
     // Ensure that #value is not filtered if it is marked as safe.
     $element = [
@@ -178,7 +177,10 @@ class HtmlTagTest extends RendererTestBase {
         'stroke-width' => 3,
       ],
     ];
-    $tags['path'] = [$element, '<path d="M 100 100 L 300 100 L 200 300 z" fill="orange" stroke="black" stroke-width="3" />' . "\n"];
+    $tags['path'] = [
+      $element,
+      '<path d="M 100 100 L 300 100 L 200 300 z" fill="orange" stroke="black" stroke-width="3" />' . "\n",
+    ];
 
     $element = [
       '#tag' => 'stop',
@@ -210,7 +212,10 @@ class HtmlTagTest extends RendererTestBase {
         ],
       ],
     ];
-    $tags['linearGradient'] = [$element, '<linearGradient><stop offset="5%" stop-color="#F60" />' . "\n" . '<stop offset="95%" stop-color="#FF6" />' . "\n" . '</linearGradient>' . "\n"];
+    $tags['linearGradient'] = [
+      $element,
+      '<linearGradient><stop offset="5%" stop-color="#F60" />' . "\n" . '<stop offset="95%" stop-color="#FF6" />' . "\n" . '</linearGradient>' . "\n",
+    ];
 
     // Simple link.
     $element = [

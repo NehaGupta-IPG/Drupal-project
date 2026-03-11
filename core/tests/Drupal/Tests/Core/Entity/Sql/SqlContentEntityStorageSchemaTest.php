@@ -1185,8 +1185,6 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
 
   /**
    * Tests requires entity data migration.
-   *
-   * @legacy-covers ::requiresEntityDataMigration
    */
   #[DataProvider('providerTestRequiresEntityDataMigration')]
   public function testRequiresEntityDataMigration(string $storage_class, bool|null $original_storage_has_data, bool $shared_table_structure_changed, bool $migration_required): void {
@@ -1213,7 +1211,14 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
       ->willReturn($this->storageDefinitions);
 
     $this->storageSchema = $this->getMockBuilder('Drupal\Core\Entity\Sql\SqlContentEntityStorageSchema')
-      ->setConstructorArgs([$this->entityTypeManager->reveal(), $this->entityType, $this->storage, $connection, $this->entityFieldManager->reveal(), $this->entityLastInstalledSchemaRepository])
+      ->setConstructorArgs([
+        $this->entityTypeManager->reveal(),
+        $this->entityType,
+        $this->storage,
+        $connection,
+        $this->entityFieldManager->reveal(),
+        $this->entityLastInstalledSchemaRepository,
+      ])
       ->onlyMethods(['installedStorageSchema', 'hasSharedTableStructureChange'])
       ->getMock();
 
@@ -1258,8 +1263,6 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
 
   /**
    * Tests requires entity storage schema changes.
-   *
-   * @legacy-covers ::requiresEntityStorageSchemaChanges
    */
   #[DataProvider('providerTestRequiresEntityStorageSchemaChanges')]
   public function testRequiresEntityStorageSchemaChanges(bool $requires_change, bool $change_schema, bool $change_shared_table, ?string $method = NULL): void {
@@ -1372,14 +1375,14 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
       $this->dbSchemaHandler->expects($this->any())
         ->method('createTable')
         ->with(
-          $this->callback(function ($table_name) use (&$invocation_count, $expected_table_names) {
+          $this->callback(function ($table_name) use (&$invocation_count, $expected_table_names): bool {
             return $expected_table_names[$invocation_count] == $table_name;
           }),
-          $this->callback(function ($table_schema) use (&$invocation_count, $expected_table_schemas) {
+          $this->callback(function ($table_schema) use (&$invocation_count, $expected_table_schemas): bool {
             return $expected_table_schemas[$invocation_count] == $table_schema;
           })
         )
-        ->willReturnCallback(function () use (&$invocation_count) {
+        ->willReturnCallback(function () use (&$invocation_count): void {
           $invocation_count++;
         });
     }
@@ -1403,8 +1406,21 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
       ->willReturn($this->storageDefinitions);
 
     $this->storageSchema = $this->getMockBuilder('Drupal\Core\Entity\Sql\SqlContentEntityStorageSchema')
-      ->setConstructorArgs([$this->entityTypeManager->reveal(), $this->entityType, $this->storage, $connection, $this->entityFieldManager->reveal(), $this->entityLastInstalledSchemaRepository])
-      ->onlyMethods(['installedStorageSchema', 'loadEntitySchemaData', 'hasSharedTableNameChanges', 'isTableEmpty', 'getTableMapping'])
+      ->setConstructorArgs([
+        $this->entityTypeManager->reveal(),
+        $this->entityType,
+        $this->storage,
+        $connection,
+        $this->entityFieldManager->reveal(),
+        $this->entityLastInstalledSchemaRepository,
+      ])
+      ->onlyMethods([
+        'installedStorageSchema',
+        'loadEntitySchemaData',
+        'hasSharedTableNameChanges',
+        'isTableEmpty',
+        'getTableMapping',
+      ])
       ->getMock();
     $this->storageSchema
       ->expects($this->any())
@@ -1527,7 +1543,7 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
     $indexes = ['entity_test__b588603cb9', 'entity_test__removed_field', 'entity_test__b588603cb9'];
     $this->dbSchemaHandler->expects($this->exactly(count($indexes)))
       ->method('dropIndex')
-      ->with('entity_test', $this->callback(function ($index) use (&$indexes) {
+      ->with('entity_test', $this->callback(function ($index) use (&$indexes): bool {
         return array_shift($indexes) === $index;
       }));
 
@@ -1536,7 +1552,7 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
       ->willReturn(TRUE);
     $this->dbSchemaHandler->expects($this->atLeastOnce())
       ->method('addIndex')
-      ->with('entity_test', 'entity_test__b588603cb9', [['long_index_name', 10]], $this->callback(function ($actual_value) use ($expected) {
+      ->with('entity_test', 'entity_test__b588603cb9', [['long_index_name', 10]], $this->callback(function (array $actual_value) use ($expected): true {
         $this->assertEquals($expected['entity_test']['indexes'], $actual_value['indexes']);
         $this->assertEquals($expected['entity_test']['fields'], $actual_value['fields']);
         // If the parameters don't match, the assertions above will throw an
@@ -1558,8 +1574,6 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
    *   The tested value.
    * @param array $schema
    *   The schema for the table column.
-   *
-   * @legacy-covers ::castValue
    */
   #[DataProvider('providerSchemaCastValue')]
   public function testCastValue($expected, $value, array $schema): void {
@@ -1569,7 +1583,7 @@ class SqlContentEntityStorageSchemaTest extends UnitTestCase {
   /**
    * Provides data for testCastValue().
    */
-  public static function providerSchemaCastValue() {
+  public static function providerSchemaCastValue(): array {
     $cases = [];
     // Tests NULL values.
     $cases[] = [
