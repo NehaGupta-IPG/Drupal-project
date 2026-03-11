@@ -15,8 +15,8 @@ use Drupal\Core\DependencyInjection\DependencySerializationTrait;
  */
 class StorageComparer implements StorageComparerInterface {
   use DependencySerializationTrait {
-    __sleep as defaultSleep;
-    __wakeup as defaultWakeup;
+    __serialize as traitSerialize;
+    __unserialize as traitUnserialize;
   }
 
   /**
@@ -505,15 +505,17 @@ class StorageComparer implements StorageComparerInterface {
   /**
    * {@inheritdoc}
    */
-  public function __sleep(): array {
-    return array_diff($this->__serialize(), ['targetStorages']);
+  public function __serialize(): array {
+    $vars = $this->traitSerialize();
+    unset($vars['targetStorages']);
+    return $vars;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function __wakeup(): void {
-    $this->__unserialize([]);
+  public function __unserialize(array $data): void {
+    $this->traitUnserialize($data);
     $this->targetStorages = [];
     $this->targetCacheStorage->deleteAll();
   }

@@ -198,6 +198,29 @@ class TranslatableMarkup extends FormattableMarkup {
   }
 
   /**
+   * Magic __serialize() method to avoid serializing the string translator.
+   */
+  public function __serialize(): array {
+    return [
+      'string' => $this->string,
+      'arguments' => $this->arguments,
+      'options' => $this->options,
+    ];
+  }
+
+  /**
+   * Magic __unserialize() method to restore the object properties.
+   *
+   * @param array<mixed> $data
+   *   The serialized data.
+   */
+  public function __unserialize(array $data): void {
+    $this->string = $data['string'];
+    $this->arguments = $data['arguments'];
+    $this->options = $data['options'];
+  }
+
+  /**
    * Magic __sleep() method to avoid serializing the string translator.
    */
   public function __sleep(): array {

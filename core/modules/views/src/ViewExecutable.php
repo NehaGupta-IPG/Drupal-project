@@ -2530,6 +2530,39 @@ class ViewExecutable {
    * Magic method implementation to serialize the view executable.
    *
    * @return array
+   *   The data that should be serialized.
+   */
+  public function __serialize(): array {
+    return [
+      'serializationData' => [
+        'storage' => $this->storage->id(),
+        'current_display' => $this->current_display,
+        'args' => $this->args,
+        'current_page' => $this->current_page,
+        'exposed_input' => $this->exposed_input,
+        'exposed_raw_input' => $this->exposed_raw_input,
+        'exposed_data' => $this->exposed_data,
+        'dom_id' => $this->dom_id,
+        'executed' => $this->executed,
+      ],
+    ];
+  }
+
+  /**
+   * Magic method implementation to unserialize the view executable.
+   *
+   * @param array<mixed> $data
+   *   The serialized data.
+   */
+  public function __unserialize(array $data): void {
+    $this->serializationData = $data['serializationData'] ?? [];
+    $this->__wakeup();
+  }
+
+  /**
+   * Magic method implementation to serialize the view executable.
+   *
+   * @return array
    *   The names of all variables that should be serialized.
    */
   public function __sleep(): array {

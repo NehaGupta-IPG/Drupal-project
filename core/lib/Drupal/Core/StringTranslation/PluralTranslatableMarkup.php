@@ -143,6 +143,23 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
   /**
    * {@inheritdoc}
    */
+  public function __serialize(): array {
+    $data = parent::__serialize();
+    $data['count'] = $this->count;
+    return $data;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __unserialize(array $data): void {
+    parent::__unserialize($data);
+    $this->count = $data['count'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function __sleep(): array {
     return array_merge(parent::__sleep(), ['count']);
   }

@@ -81,19 +81,40 @@ abstract class Query implements PlaceholderInterface {
   }
 
   /**
+   * Implements the magic __serialize function to disconnect from the database.
+   */
+  public function __serialize(): array {
+    $vars = get_object_vars($this);
+    unset($vars['connection']);
+    return $vars;
+  }
+
+  /**
+   * Implements the magic __unserialize function to reconnect to the database.
+   *
+   * @param array<mixed> $data
+   *   The serialized data.
+   */
+  public function __unserialize(array $data): void {
+    foreach ($data as $key => $value) {
+      $this->$key = $value;
+    }
+
+    $this->connection = Database::getConnection($this->connectionTarget, $this->connectionKey);
+  }
+
+  /**
    * Implements the magic __sleep function to disconnect from the database.
    */
   public function __sleep(): array {
-    $keys = get_object_vars($this);
-    unset($keys['connection']);
-    return array_keys($keys);
+    return array_keys($this->__serialize());
   }
 
   /**
    * Implements the magic __wakeup function to reconnect to the database.
    */
   public function __wakeup(): void {
-    $this->connection = Database::getConnection($this->connectionTarget, $this->connectionKey);
+    $this->__unserialize([]);
   }
 
   /**

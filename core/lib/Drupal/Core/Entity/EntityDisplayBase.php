@@ -558,6 +558,27 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
   /**
    * {@inheritdoc}
    */
+  public function __serialize(): array {
+    return [
+      'data' => $this->toArray(),
+      'entityTypeId' => $this->entityTypeId,
+      'enforceIsNew' => $this->enforceIsNew,
+      'initialized' => $this->initialized,
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __unserialize(array $data): void {
+    $this->initialized = $data['initialized'];
+    $this->__construct($data['data'], $data['entityTypeId']);
+    $this->enforceIsNew = $data['enforceIsNew'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function __sleep(): array {
     // Only store the definition, not external objects or derived data.
     $keys = array_keys($this->toArray());

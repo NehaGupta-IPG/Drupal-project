@@ -67,19 +67,22 @@ trait DependencySerializationTrait {
       // No container, no problem.
     }
 
-    // Return the serialized data including service IDs and entity storages.
-    return array_keys($vars) + ['_serviceIds' => $service_ids, '_entityStorages' => $entity_storages];
+    $vars['_serviceIds'] = $service_ids;
+    $vars['_entityStorages'] = $entity_storages;
+    return $vars;
   }
 
   /**
    * {@inheritdoc}
    */
   public function __unserialize(array $data): void {
-    // Extract service IDs and entity storages from the serialized data.
     $service_ids = $data['_serviceIds'] ?? [];
     $entity_storages = $data['_entityStorages'] ?? [];
 
-    // Avoid trying to unserialize if there's nothing to do.
+    foreach ($data as $key => $value) {
+      $this->$key = $value;
+    }
+
     if (empty($service_ids) && empty($entity_storages)) {
       return;
     }
@@ -96,6 +99,9 @@ trait DependencySerializationTrait {
         $this->$key = $entity_type_manager->getStorage($entity_type_id);
       }
     }
+
+    $this->_serviceIds = [];
+    $this->_entityStorages = [];
   }
 
   /**
@@ -106,13 +112,10 @@ trait DependencySerializationTrait {
    * @see https://www.drupal.org/node/3578423
    */
   public function __sleep(): array {
-    // Store service IDs and entity storages as instance properties for
-    // backward compatibility.
     $serialized = $this->__serialize();
     $this->_serviceIds = $serialized['_serviceIds'] ?? [];
     $this->_entityStorages = $serialized['_entityStorages'] ?? [];
-    unset($serialized['_serviceIds'], $serialized['_entityStorages']);
-    return $serialized;
+    return array_keys($serialized);
   }
 
   /**
