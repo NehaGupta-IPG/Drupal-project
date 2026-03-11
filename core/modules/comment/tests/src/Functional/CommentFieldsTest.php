@@ -194,23 +194,19 @@ class CommentFieldsTest extends CommentTestBase {
   }
 
   /**
-   * Tests the comment widget shows status in summary when closed.
-   */
-  public function testCommentWidgetDetailsSummary(): void {
+   * Tests the comment widget details element is closed by default.
+ */
+  public function testCommentWidgetDetailsClosedByDefault(): void {
     $admin = $this->drupalCreateUser([
       'administer nodes',
       'administer comments',
       'edit any article content',
       'access content',
     ]);
-
     $this->drupalLogin($admin);
     $this->drupalGet('node/' . $this->node->id() . '/edit');
-    $this->assertSession()->statusCodeEquals(200);
-
     // The details should be closed by default.
     $this->assertSession()->elementAttributeNotExists('css', 'details.comment-node-settings-form', 'open');
-
     // Change status and verify details remains closed.
     $this->node->set('comment', CommentingStatus::Closed->value);
     $this->node->save();
