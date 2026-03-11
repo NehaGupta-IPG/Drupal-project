@@ -92,9 +92,6 @@ class FormValuesTest extends WebDriverTestBase {
     // whilst doing so are expected. Do not interpret them as a test failure.
     $this->failOnJavascriptConsoleErrors = FALSE;
 
-    // We don't need to check for the X-Drupal-Ajax-Token header with these
-    // invalid requests.
-    $this->assertAjaxHeader = FALSE;
     $invalid_callbacks = [
       'null' => NULL,
       'empty' => '',
