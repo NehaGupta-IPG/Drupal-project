@@ -215,9 +215,36 @@ class TranslatableMarkup extends FormattableMarkup {
    *   The serialized data.
    */
   public function __unserialize(array $data): void {
-    $this->string = $data['string'];
-    $this->arguments = $data['arguments'];
-    $this->options = $data['options'];
+    // Support both __serialize()-style keys and legacy property-mangled keys
+    // that can appear when unserializing payloads generated before migration.
+    $this->string = $this->getSerializedValue($data, 'string', '');
+    $this->arguments = $this->getSerializedValue($data, 'arguments', []);
+    $this->options = $this->getSerializedValue($data, 'options', []);
+  }
+
+  /**
+   * Retrieves a value from serialized data supporting legacy key formats.
+   *
+   * @param array<mixed> $data
+   *   Serialized data payload.
+   * @param string $key
+   *   Expected key name.
+   * @param mixed $default
+   *   Fallback value.
+   *
+   * @return mixed
+   *   The found value or fallback.
+   */
+  protected function getSerializedValue(array $data, string $key, mixed $default): mixed {
+    if (array_key_exists($key, $data)) {
+      return $data[$key];
+    }
+    foreach ($data as $candidate_key => $value) {
+      if (is_string($candidate_key) && str_ends_with($candidate_key, "\x00$key")) {
+        return $value;
+      }
+    }
+    return $default;
   }
 
   /**

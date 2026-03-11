@@ -154,7 +154,7 @@ class PluralTranslatableMarkup extends TranslatableMarkup {
    */
   public function __unserialize(array $data): void {
     parent::__unserialize($data);
-    $this->count = $data['count'];
+    $this->count = $this->getSerializedValue($data, 'count', 0);
   }
 
   /**
