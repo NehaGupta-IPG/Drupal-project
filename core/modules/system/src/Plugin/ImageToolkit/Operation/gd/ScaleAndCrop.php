@@ -55,15 +55,11 @@ class ScaleAndCrop extends GDImageToolkitOperationBase {
    * {@inheritdoc}
    */
   protected function validateArguments(ImageInterface|array $arguments, $extra = NULL) {
-    if ($arguments instanceof ImageInterface) {
-      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
-      $image = $arguments;
-      $arguments = $extra;
-      assert(is_array($arguments));
-    }
-    else {
-      // @todo fix.
-    }
+    assert($arguments instanceof ImageInterface);
+    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+    $image = $arguments;
+    $arguments = $extra;
+    assert(is_array($arguments));
 
     $actualWidth = $image->getWidth();
     $actualHeight = $image->getHeight();

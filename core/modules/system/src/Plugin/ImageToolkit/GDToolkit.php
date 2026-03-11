@@ -45,10 +45,12 @@ class GDToolkit extends ImageToolkitBase {
   protected ?\GdImage $image {
     get {
       @trigger_error('Getting ' . __CLASS__ . '::$image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+      // @phpstan-ignore property.deprecated
       return $this->backfillImage->getGdImageObject();
     }
     set(?\GdImage $image) {
       @trigger_error('Setting ' . __CLASS__ . '::$image is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+      // @phpstan-ignore property.deprecated
       $this->backfillImage->setGdImageObject($image);
     }
   }
@@ -66,10 +68,12 @@ class GDToolkit extends ImageToolkitBase {
   protected $type {
     get {
       @trigger_error('Getting ' . __CLASS__ . '::$type is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+      // @phpstan-ignore property.deprecated
       return $this->backfillImage->getType();
     }
     set($type) {
       @trigger_error('Setting ' . __CLASS__ . '::$type is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+      // @phpstan-ignore property.deprecated
       $this->backfillImage->setType($type);
     }
   }

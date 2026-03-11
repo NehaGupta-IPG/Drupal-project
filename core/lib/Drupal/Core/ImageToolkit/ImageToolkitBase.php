@@ -20,7 +20,9 @@ use Psr\Log\LoggerInterface;
  */
 abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterface, ContainerFactoryPluginInterface {
 
+  // @todo remove ignoreFile once PHPCS can parse property hooks.
   // phpcs:ignoreFile
+
   /**
    * BC layer.
    *
@@ -41,6 +43,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    */
   public bool $isStateful {
     get => TRUE;
+    // @phpstan-ignore property.deprecated
     set => throw new ImageToolkitException('Cannot set $isStateful');
   }
 
@@ -53,14 +56,17 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    * @see https://www.drupal.org/node/7654123
    */
   public ?ImageInterface $backfillImage {
+    // @phpstan-ignore property.deprecated
     get => $this->backfillImage ?? NULL;
     set(?ImageInterface $image) {
+      // @phpstan-ignore property.deprecated,property.deprecated
       if (!$this->isStateful && !$this->isClone) {
         throw new ImageToolkitException('Cannot set $backfillImage in the toolkit singleton');
       }
       if ($image === NULL) {
         throw new ImageToolkitException('$backfillImage cannot be set to NULL');
       }
+      // @phpstan-ignore property.deprecated
       $this->backfillImage = $image;
     }
   }
@@ -78,10 +84,12 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
   protected $source {
     get {
       @trigger_error('Getting ' . __CLASS__ . '::$source is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+      // @phpstan-ignore property.deprecated,property.deprecated
       return isset($this->backfillImage) ? $this->backfillImage->getSource() : '';
     }
     set($source) {
       @trigger_error('Setting ' . __CLASS__ . '::$source is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
+      // @phpstan-ignore property.deprecated
       $this->backfillImage->setSource($source);
     }
   }
@@ -177,6 +185,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
     // @todo BC layer - remove in drupal:43.0.0.
     $args = func_get_args();
     $image = $args[2] ?? NULL;
+    // @phpstan-ignore property.deprecated
     $image ??= $this->backfillImage;
     assert($image instanceof ImageInterface);
 

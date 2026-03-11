@@ -48,15 +48,11 @@ class Rotate extends GDImageToolkitOperationBase {
    * {@inheritdoc}
    */
   protected function validateArguments(ImageInterface|array $arguments, $extra = NULL) {
-    if ($arguments instanceof ImageInterface) {
-      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
-      $image = $arguments;
-      $arguments = $extra;
-      assert(is_array($arguments));
-    }
-    else {
-      // @todo fix.
-    }
+    assert($arguments instanceof ImageInterface);
+    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+    $image = $arguments;
+    $arguments = $extra;
+    assert(is_array($arguments));
 
     // PHP 5.5 GD bug: https://bugs.php.net/bug.php?id=65148: To prevent buggy
     // behavior on negative multiples of 90 degrees we convert any negative

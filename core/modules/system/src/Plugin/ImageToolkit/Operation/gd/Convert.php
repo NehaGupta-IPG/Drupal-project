@@ -62,14 +62,10 @@ class Convert extends GDImageToolkitOperationBase {
    * {@inheritdoc}
    */
   protected function execute(ImageInterface|array $arguments, $extra = NULL) {
-    if ($arguments instanceof ImageInterface) {
-      $image = $arguments;
-      $arguments = $extra;
-      assert(is_array($arguments));
-    }
-    else {
-      // @todo fix.
-    }
+    assert($arguments instanceof ImageInterface);
+    $image = $arguments;
+    $arguments = $extra;
+    assert(is_array($arguments));
 
     // Create a new image of the required dimensions and format, and copy
     // the original image on it with resampling. Restore the original image upon

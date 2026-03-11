@@ -19,7 +19,9 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  */
 abstract class ImageToolkitOperationBase extends PluginBase implements ImageToolkitOperationInterface, ContainerFactoryPluginInterface {
 
+  // @todo remove ignoreFile once PHPCS can parse property hooks.
   // phpcs:ignoreFile
+
   /**
    * BC layer.
    *
