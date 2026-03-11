@@ -45,6 +45,7 @@ Release managers
 - Dave Long 'longwave' https://www.drupal.org/u/longwave
 - Jess Myrbo 'xjm' https://www.drupal.org/u/xjm
 - Victoria Spagnolo 'quietone' https://www.drupal.org/u/quietone
+- (provisional) Edward Wu 'godotislate' https://www.drupal.org/u/godotislate
 
 Core JavaScript packages
 - Théodore Biadala 'nod_' https://www.drupal.org/u/nod_
@@ -140,11 +141,6 @@ Configuration UI
 Configuration Translation
 - Gábor Hojtsy 'Gábor Hojtsy' https://www.drupal.org/u/gábor-hojtsy
 - Vijayachandran Mani 'vijaycs85' https://www.drupal.org/u/vijaycs85
-
-Contact
-- Lee Rowlands 'larowlan' https://www.drupal.org/u/larowlan
-- Jibran Ijaz 'jibran' https://www.drupal.org/u/jibran
-- Andrey Postnikov 'andypost' https://www.drupal.org/u/andypost
 
 Content Moderation
 - Andrei Mateescu 'amateescu' https://www.drupal.org/u/amateescu
