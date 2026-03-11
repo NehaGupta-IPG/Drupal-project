@@ -559,8 +559,13 @@ abstract class EntityDisplayBase extends ConfigEntityBase implements EntityDispl
    * {@inheritdoc}
    */
   public function __serialize(): array {
+    // Preserve the same values that legacy __sleep() serialized: select the
+    // properties identified by toArray() keys, but keep their in-memory
+    // object state (which can include initialized defaults not represented in
+    // toArray()).
+    $serialized_values = array_intersect_key(get_object_vars($this), array_flip(array_keys($this->toArray())));
     return [
-      'data' => $this->toArray(),
+      'data' => $serialized_values,
       'entityTypeId' => $this->entityTypeId,
       'enforceIsNew' => $this->enforceIsNew,
       'initialized' => $this->initialized,
