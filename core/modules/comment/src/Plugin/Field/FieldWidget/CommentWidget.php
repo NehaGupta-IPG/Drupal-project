@@ -58,15 +58,8 @@ class CommentWidget extends WidgetBase {
     // second column on wide-resolutions), place the field as a details element
     // in this tab-set.
     if (isset($form['advanced'])) {
-      // Show current status in the summary when details is closed.
-      $status_labels = [
-        CommentItemInterface::OPEN => $this->t('Open'),
-        CommentItemInterface::CLOSED => $this->t('Closed'),
-        CommentItemInterface::HIDDEN => $this->t('Hidden'),
-      ];
-      $current_status = $status_labels[$items->status] ?? $status_labels[CommentItemInterface::OPEN];
 
-      $element['#title'] = $this->t('Comment settings: @status', ['@status' => $current_status]);
+      $element['#title'] = $this->t('Comment settings');
 
       $element += [
         '#type' => 'details',
