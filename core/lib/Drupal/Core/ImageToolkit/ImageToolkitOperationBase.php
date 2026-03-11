@@ -32,6 +32,7 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
    */
   public bool $needsToolkitInjection {
     get => TRUE;
+    // @phpstan-ignore property.deprecated
     set => throw new ImageToolkitException('Cannot set $needsToolkitInjection');
   }
 
@@ -76,6 +77,7 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     if ($toolkit instanceof ImageToolkitInterface) {
       @trigger_error('The $toolkit argument of ' . __METHOD__ . ' is deprecated in drupal:11.4.0 and the argument is removed from drupal:13.0.0. Use ::setToolkit() instead. See https://www.drupal.org/node/3562304', E_USER_DEPRECATED);
+      // @phpstan-ignore property.deprecated
       $this->toolkit = $toolkit;
       $this->logger = $logger;
     }
@@ -230,14 +232,18 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
       $image = NULL;
     }
     $arguments = $this->prepareArguments($arguments);
+    // @phpstan-ignore property.deprecated
     if ($this->needsToolkitInjection) {
       if ($image) {
+        // @phpstan-ignore property.deprecated
         $this->toolkit->backfillImage = $image;
       }
       $arguments = $this->validateArguments($arguments);
       return $this->execute($arguments);
     }
+    // @phpstan-ignore arguments.count
     $arguments = $this->validateArguments($image, $arguments);
+    // @phpstan-ignore arguments.count
     return $this->execute($image, $arguments);
   }
 

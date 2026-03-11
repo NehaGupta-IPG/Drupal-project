@@ -96,14 +96,10 @@ class CreateNew extends GDImageToolkitOperationBase {
    * {@inheritdoc}
    */
   protected function execute(ImageInterface|array $arguments, $extra = NULL) {
-    if ($arguments instanceof ImageInterface) {
-      $image = $arguments;
-      $arguments = $extra;
-      assert(is_array($arguments));
-    }
-    else {
-      // @todo fix.
-    }
+    assert($arguments instanceof ImageInterface);
+    $image = $arguments;
+    $arguments = $extra;
+    assert(is_array($arguments));
 
     // Get the image type.
     $type = $image->toolkit()->extensionToImageType($arguments['extension']);

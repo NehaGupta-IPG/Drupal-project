@@ -96,15 +96,11 @@ class Scale extends Resize {
    * {@inheritdoc}
    */
   protected function execute(ImageInterface|array $arguments, $extra = NULL) {
-    if ($arguments instanceof ImageInterface) {
-      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
-      $image = $arguments;
-      $arguments = $extra;
-      assert(is_array($arguments));
-    }
-    else {
-      // @todo fix.
-    }
+    assert($arguments instanceof ImageInterface);
+    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+    $image = $arguments;
+    $arguments = $extra;
+    assert(is_array($arguments));
 
     // Don't scale if we don't change the dimensions at all.
     if ($arguments['width'] !== $image->getWidth() || $arguments['height'] !== $image->getHeight()) {
