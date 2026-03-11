@@ -47,7 +47,7 @@ class Dropbutton extends Links {
     parent::buildOptionsForm($form, $form_state);
     // Add an option to select the dropbutton type.
     // @see \Drupal\Core\Render\Element\Dropbutton
-    $options = self::getDropbuttonTypes(TRUE);
+    $options = self::getDropbuttonTypes(FALSE);
     $form['dropbutton_type'] = [
       '#type' => 'select',
       '#title' => $this->t('Dropbutton type'),
@@ -63,9 +63,9 @@ class Dropbutton extends Links {
    * This is used for the config field schema
    * and also for the field options form.
    *
-   * @param ?bool $options
-   *   Whether to return the full options array.
-   *   If NULL, only the keys are returned (default).
+   * @param bool $keys_only
+   *   Whether to return only the keys of the options array.
+   *   If TRUE, only the keys are returned (default).
    *   For example, keys only for config schema
    *   Choices validation purposes.
    *
@@ -73,8 +73,10 @@ class Dropbutton extends Links {
    *
    * @return array
    *   An array of allowed dropbutton type choices.
+   *
+   * @internal
    */
-  public static function getDropbuttonTypes(?bool $options = NULL): array {
+  public static function getDropbuttonTypes(bool $keys_only = TRUE): array {
     // Return allowed dropbutton types.
     // More can be added here as needed.
     $values = [
@@ -82,9 +84,9 @@ class Dropbutton extends Links {
       'small' => t('Small'),
       'extrasmall' => t('Extra small'),
     ];
-    // If $options is NULL (default), return only the keys.
+    // If $keys_only is TRUE (default), return only the keys.
     // This is used for config schema validation.
-    if ($options === NULL) {
+    if ($keys_only) {
       return array_keys($values);
     }
 
