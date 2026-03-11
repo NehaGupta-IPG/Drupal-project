@@ -132,7 +132,9 @@
 
     requestAssetsLoaded.set(
       detail.xhr,
-      requestAssetsLoaded.get(detail.xhr).then(() => Drupal.htmx.addAssets(data)),
+      requestAssetsLoaded
+        .get(detail.xhr)
+        .then(() => Drupal.htmx.addAssets(data)),
     );
   });
 
