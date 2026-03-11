@@ -5,7 +5,7 @@
  */
 
 (function ($, Drupal) {
-  Drupal.warnIfSizzleSelector = function warnIfSizzleSelector(selector) {
+  Drupal.deprecateSizzleSelector = function deprecateSizzleSelector(selector) {
     try {
       document.querySelector(selector);
     } catch (error) {
@@ -15,10 +15,6 @@
         });
       }
     }
-  };
-
-  Drupal.deprecateSizzleSelector = function deprecateSizzleSelector(selector) {
-    Drupal.warnIfSizzleSelector(selector);
     return $(selector);
   };
 })(jQuery, Drupal);
