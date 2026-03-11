@@ -25,9 +25,7 @@
         .find('.comment-node-settings-form')
         .drupalSetSummary((context) =>
           Drupal.checkPlain(
-            $(context)
-              .find('input:checked')
-              .next('label')[0].textContent,
+            $(context).find('input:checked').next('label')[0].textContent,
           ),
         );
     },
