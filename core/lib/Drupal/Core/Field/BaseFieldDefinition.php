@@ -645,11 +645,69 @@ class BaseFieldDefinition extends ListDataDefinition implements FieldDefinitionI
   /**
    * {@inheritdoc}
    */
-  public function __sleep(): array {
+  public function __serialize(): array {
     // Do not serialize the statically cached property definitions.
     $vars = get_object_vars($this);
     unset($vars['propertyDefinitions'], $vars['typedDataManager']);
-    return array_keys($vars);
+    return $vars;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __unserialize(array $data): void {
+    foreach ($data as $key => $value) {
+      $normalized_key = $this->normalizeSerializedKey($key);
+      if ($normalized_key !== NULL && property_exists($this, $normalized_key)) {
+        $this->$normalized_key = $value;
+      }
+    }
+  }
+
+  /**
+   * Normalizes serialized property keys for backward compatibility.
+   *
+   * @param mixed $key
+   *   Serialized key.
+   *
+   * @return string|null
+   *   Normalized property name, or NULL when key cannot map to a property.
+   */
+  private function normalizeSerializedKey(mixed $key): ?string {
+    if (!is_string($key)) {
+      return NULL;
+    }
+    // Legacy serialized payloads may contain mangled protected/private keys:
+    // "\0*\0property" or "\0Class\0property".
+    if ($key !== '' && $key[0] === "\0") {
+      $pos = strrpos($key, "\0");
+      if ($pos !== FALSE) {
+        return substr($key, $pos + 1);
+      }
+    }
+    return $key;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   *   __serialize() instead.
+   * @see https://www.drupal.org/node/3578423
+   */
+  public function __sleep(): array {
+    return array_keys($this->__serialize());
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   *   __unserialize() instead.
+   * @see https://www.drupal.org/node/3578423
+   */
+  public function __wakeup(): void {
+    $this->__unserialize(get_object_vars($this));
   }
 
   /**

@@ -264,12 +264,28 @@ class BaseFieldOverride extends FieldConfigBase {
   }
 
   /**
-   * Implements the magic __sleep() method.
+   * {@inheritdoc}
+   */
+  public function __serialize(): array {
+    $base_field_definition = $this->baseFieldDefinition ?? NULL;
+    unset($this->baseFieldDefinition);
+    $properties = parent::__serialize();
+
+    if ($base_field_definition !== NULL) {
+      $this->baseFieldDefinition = $base_field_definition;
+    }
+
+    return $properties;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   *   __serialize() instead.
+   * @see https://www.drupal.org/node/3578423
    */
   public function __sleep(): array {
-    // Only serialize necessary properties, excluding those that can be
-    // recalculated.
-    unset($this->baseFieldDefinition);
     return parent::__sleep();
   }
 
