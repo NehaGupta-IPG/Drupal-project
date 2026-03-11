@@ -194,7 +194,7 @@ class BasicAuth implements AuthenticationProviderInterface, AuthenticationProvid
    *   Check the user account status.
    *
    * @return \Drupal\User\UserInterface|false
-   *   The user account on success, or FALSE on failure to authenticate.
+   *   The user account on success, or FALSE otherwise.
    */
   protected function getUserAccount(string $identifier, bool $check_status): UserInterface|false {
     $account = FALSE;
