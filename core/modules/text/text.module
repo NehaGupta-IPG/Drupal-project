@@ -7,6 +7,8 @@
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Unicode;
 use Drupal\filter\Entity\FilterFormat;
+use Drupal\Component\Render\MarkupInterface;
+use Drupal\Core\Render\Markup;
 
 /**
  * Generates a trimmed, formatted version of a text field value.
@@ -47,7 +49,11 @@ function text_summary($text, $format = NULL, $size = NULL) {
 
   // If a valid delimiter has been specified, use it to chop off the summary.
   if ($delimiter !== FALSE) {
-    return substr($text, 0, $delimiter);
+    $summary = substr($text, 0, $delimiter);
+    if ($text instanceof MarkupInterface) {
+      $summary = Markup::create($summary);
+    }
+    return $summary;
   }
 
   // Retrieve the filters of the specified text format, if any.
@@ -130,6 +136,9 @@ function text_summary($text, $format = NULL, $size = NULL) {
     if ($filter_enabled('filter_html') || $filter_enabled('filter_htmlcorrector')) {
       $summary = Html::normalize($summary);
     }
+  }
+  if ($text instanceof MarkupInterface) {
+    return Markup::create($summary);
   }
 
   return $summary;
