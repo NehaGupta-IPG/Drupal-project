@@ -5,6 +5,6 @@ dependencies:
     - node
 id: node.search_index
 label: 'Search index'
-description: 'Includes fields used when indexing content for search.'
+description: 'Used to provide content for search indexing.'
 targetEntityType: node
 cache: true

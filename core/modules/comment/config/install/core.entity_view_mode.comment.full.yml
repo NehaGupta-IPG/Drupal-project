@@ -5,6 +5,6 @@ dependencies:
     - comment
 id: comment.full
 label: 'Full comment'
-description: 'Displays the full comment.'
+description: 'Used when showing a full comment.'
 targetEntityType: comment
 cache: true

@@ -5,6 +5,6 @@ dependencies:
     - user
 id: user.compact
 label: Compact
-description: 'Displays user information in compact form.'
+description: 'Used when showing a compact user profile.'
 targetEntityType: user
 cache: true

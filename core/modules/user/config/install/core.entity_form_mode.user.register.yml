@@ -5,6 +5,6 @@ dependencies:
     - user
 id: user.register
 label: Register
-description: 'Provides the user registration form.'
+description: 'Used for the user registration form.'
 targetEntityType: user
 cache: true

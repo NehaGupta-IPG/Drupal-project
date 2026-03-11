@@ -5,6 +5,6 @@ dependencies:
     - node
 id: node.full
 label: 'Full content'
-description: 'Displays content in full on its own page.'
+description: 'Used when showing a content item on its own page.'
 targetEntityType: node
 cache: true
