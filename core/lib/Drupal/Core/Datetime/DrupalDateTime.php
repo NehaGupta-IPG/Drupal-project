@@ -183,7 +183,7 @@ class DrupalDateTime extends DateTimePlus {
    * {@inheritdoc}
    */
   public function __sleep(): array {
-    return array_diff($this->defaultSleep(), ['formatTranslationCache']);
+    return array_diff($this->__serialize(), ['formatTranslationCache']);
   }
 
 }

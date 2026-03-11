@@ -169,7 +169,7 @@ class LocaleTranslation implements TranslatorInterface, DestructableInterface {
   public function __sleep(): array {
     // ::$translations is an array of LocaleLookup objects, which have the
     // database service injected and therefore cannot be serialized safely.
-    return array_diff($this->traitSleep(), ['translations']);
+    return array_diff($this->__serialize(), ['translations']);
   }
 
 }

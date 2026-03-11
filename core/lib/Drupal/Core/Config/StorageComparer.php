@@ -506,14 +506,14 @@ class StorageComparer implements StorageComparerInterface {
    * {@inheritdoc}
    */
   public function __sleep(): array {
-    return array_diff($this->defaultSleep(), ['targetStorages']);
+    return array_diff($this->__serialize(), ['targetStorages']);
   }
 
   /**
    * {@inheritdoc}
    */
   public function __wakeup(): void {
-    $this->defaultWakeup();
+    $this->__unserialize([]);
     $this->targetStorages = [];
     $this->targetCacheStorage->deleteAll();
   }

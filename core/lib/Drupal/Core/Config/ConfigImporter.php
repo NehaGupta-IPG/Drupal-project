@@ -1167,13 +1167,13 @@ class ConfigImporter {
   protected function reInjectMe() {
     // When rebuilding the container,
     // \Drupal\Core\DrupalKernel::initializeContainer() saves the hashes of the
-    // old container and passes them to the new one. So __sleep() will
-    // recognize the old services and then __wakeup() will restore them from
-    // the new container.
-    $this->__sleep();
-    $this->__wakeup();
-    $this->storageComparer->__sleep();
-    $this->storageComparer->__wakeup();
+    // old container and passes them to the new one. So __serialize() will
+    // recognize the old services and then __unserialize() will restore them
+    // from the new container.
+    $this->__serialize();
+    $this->__unserialize([]);
+    $this->storageComparer->__serialize();
+    $this->storageComparer->__unserialize([]);
   }
 
 }
