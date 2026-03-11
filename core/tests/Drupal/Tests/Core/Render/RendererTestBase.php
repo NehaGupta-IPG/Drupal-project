@@ -134,7 +134,7 @@ abstract class RendererTestBase extends UnitTestCase {
     $this->elementInfo = $this->createMock('Drupal\Core\Render\ElementInfoManagerInterface');
     $this->elementInfo->expects($this->any())
       ->method('getInfo')
-      ->willReturnCallback(function ($type) {
+      ->willReturnCallback(function ($type): array {
         switch ($type) {
           case 'details':
             $info = ['#theme_wrappers' => ['details']];
@@ -167,7 +167,7 @@ abstract class RendererTestBase extends UnitTestCase {
     $current_user_role = &$this->currentUserRole;
     $this->cacheContextsManager->expects($this->any())
       ->method('convertTokensToKeys')
-      ->willReturnCallback(function ($context_tokens) use (&$current_user_role) {
+      ->willReturnCallback(function ($context_tokens) use (&$current_user_role): ContextCacheKeys {
         $keys = [];
         foreach ($context_tokens as $context_id) {
           switch ($context_id) {
@@ -247,7 +247,7 @@ abstract class RendererTestBase extends UnitTestCase {
    * @param string $method
    *   The HTTP method to use for the request. Defaults to 'GET'.
    */
-  protected function setUpRequest($method = 'GET') {
+  protected function setUpRequest(string $method = 'GET') {
     $request = Request::create('/', $method);
     // Ensure that the request time is set as expected.
     $request->server->set('REQUEST_TIME', (int) $_SERVER['REQUEST_TIME']);
@@ -264,7 +264,7 @@ abstract class RendererTestBase extends UnitTestCase {
    * @param string $bin
    *   The expected cache bin.
    */
-  protected function assertRenderCacheItem($keys, $data, $bin = 'render') {
+  protected function assertRenderCacheItem(array $keys, array $data, $bin = 'render') {
     $cache_backend = $this->cacheFactory->get($bin);
     $cached = $cache_backend->get($keys, CacheableMetadata::createFromRenderArray($data));
     $this->assertNotFalse($cached, sprintf('Expected cache item "%s" exists.', implode(':', $keys)));
@@ -305,7 +305,7 @@ class PlaceholdersTest implements TrustedCallbackInterface {
    * @return array
    *   A renderable array.
    */
-  public static function callback($animal, $use_animal_as_array_key = FALSE) {
+  public static function callback($animal, $use_animal_as_array_key = FALSE): array {
     $value = $animal;
     if ($use_animal_as_array_key) {
       $value = [$animal => TRUE];
@@ -329,7 +329,7 @@ class PlaceholdersTest implements TrustedCallbackInterface {
    * @return array
    *   A renderable array.
    */
-  public static function callbackPerUser($animal) {
+  public static function callbackPerUser($animal): array {
     // As well as adding the user cache context, additionally suspend the
     // current Fiber if there is one.
     if ($fiber = \Fiber::getCurrent()) {
@@ -349,7 +349,7 @@ class PlaceholdersTest implements TrustedCallbackInterface {
    * @return array
    *   A renderable array.
    */
-  public static function callbackTagCurrentTemperature($animal) {
+  public static function callbackTagCurrentTemperature($animal): array {
     $build = static::callback($animal);
     $build['#cache']['tags'][] = 'current-temperature';
     return $build;
@@ -361,14 +361,14 @@ class PlaceholdersTest implements TrustedCallbackInterface {
    * @return bool
    *   TRUE, which is not a valid return value for a lazy builder.
    */
-  public static function callbackNonArrayReturn() {
+  public static function callbackNonArrayReturn(): bool {
     return TRUE;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function trustedCallbacks() {
+  public static function trustedCallbacks(): array {
     return ['callbackTagCurrentTemperature', 'callbackPerUser', 'callback', 'callbackNonArrayReturn'];
   }
 

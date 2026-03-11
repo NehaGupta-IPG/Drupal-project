@@ -11,14 +11,21 @@ use Drupal\package_manager\Event\PostCreateEvent;
 use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\PathLocator;
 use Drupal\package_manager\ValidationResult;
+use Drupal\package_manager\Validator\OverwriteExistingPackagesValidator;
 use Drupal\package_manager\Validator\SupportedReleaseValidator;
 use Drupal\Tests\package_manager\Traits\ComposerInstallersTrait;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @covers \Drupal\package_manager\Validator\OverwriteExistingPackagesValidator
- * @group package_manager
+ * Tests Overwrite Existing Packages Validator.
+ *
  * @internal
  */
+#[Group('package_manager')]
+#[CoversClass(OverwriteExistingPackagesValidator::class)]
+#[RunTestsInSeparateProcesses]
 class OverwriteExistingPackagesValidatorTest extends PackageManagerKernelTestBase {
 
   use ComposerInstallersTrait;
@@ -134,13 +141,13 @@ class OverwriteExistingPackagesValidatorTest extends PackageManagerKernelTestBas
     );
     $inspector = $this->container->get(ComposerInspector::class);
     $listener = function (PostCreateEvent $event) use ($inspector) {
-      $list = $inspector->getInstalledPackagesList($event->stage->getStageDirectory());
+      $list = $inspector->getInstalledPackagesList($event->sandboxManager->getSandboxDirectory());
       $this->assertArrayHasKey('drupal/sub-module', $list->getArrayCopy());
       $this->assertArrayHasKey('drupal/other_module_1', $list->getArrayCopy());
       // Confirm that metapackage will have a NULL install path.
       $this->assertNull($list['drupal/sub-module']->path);
       // Confirm another package has specified install path.
-      $this->assertSame($list['drupal/other_module_1']->path, $event->stage->getStageDirectory() . '/modules/module_1');
+      $this->assertSame($list['drupal/other_module_1']->path, $event->sandboxManager->getSandboxDirectory() . '/modules/module_1');
     };
     $this->addEventTestListener($listener, PostCreateEvent::class);
 

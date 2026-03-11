@@ -7,16 +7,20 @@ namespace Drupal\Tests\Core\Logger;
 use Drupal\Core\Logger\LoggerChannel;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerTrait;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Psr\Log\LoggerInterface;
-use Psr\Log\LoggerTrait;
 
 /**
- * @coversDefaultClass \Drupal\Core\Logger\LoggerChannel
- * @group Logger
+ * Tests Drupal\Core\Logger\LoggerChannel.
  */
+#[CoversClass(LoggerChannel::class)]
+#[Group('Logger')]
 class LoggerChannelTest extends UnitTestCase {
 
   /**
@@ -30,11 +34,11 @@ class LoggerChannelTest extends UnitTestCase {
    * @param bool $account
    *   Whether to pass an account to the channel under test.
    *
-   * @dataProvider providerTestLog
-   * @covers ::log
-   * @covers ::setCurrentUser
-   * @covers ::setRequestStack
+   * @legacy-covers ::log
+   * @legacy-covers ::setCurrentUser
+   * @legacy-covers ::setRequestStack
    */
+  #[DataProvider('providerTestLog')]
   public function testLog(callable $expected, bool $request = FALSE, bool $account = FALSE): void {
     $channel = new LoggerChannel('test');
     $message = $this->randomMachineName();
@@ -69,8 +73,6 @@ class LoggerChannelTest extends UnitTestCase {
 
   /**
    * Tests LoggerChannel::log() recursion protection.
-   *
-   * @covers ::log
    */
   public function testLogRecursionProtection(): void {
     $channel = new LoggerChannel('test');
@@ -85,8 +87,8 @@ class LoggerChannelTest extends UnitTestCase {
   /**
    * Tests LoggerChannel::addLoggers().
    *
-   * @covers ::addLogger
-   * @covers ::sortLoggers
+   * @legacy-covers ::addLogger
+   * @legacy-covers ::sortLoggers
    */
   public function testSortLoggers(): void {
     $channel = new LoggerChannel($this->randomMachineName());
@@ -95,7 +97,7 @@ class LoggerChannelTest extends UnitTestCase {
       $logger = $this->createMock('Psr\Log\LoggerInterface');
       $logger->expects($this->once())
         ->method('log')
-        ->willReturnCallback(function () use ($i, &$index_order) {
+        ->willReturnCallback(function () use ($i, &$index_order): void {
           // Append the $i to the index order, so that we know the order that
           // loggers got called with.
           $index_order .= $i;
@@ -114,7 +116,7 @@ class LoggerChannelTest extends UnitTestCase {
   public function testNullIp(): void {
     // Create a logger that will fail if $context['ip'] is not an empty string.
     $logger = $this->createMock(LoggerInterface::class);
-    $expected = function ($context) {
+    $expected = function (array $context): bool {
       return $context['channel'] == 'test' && $context['ip'] === '';
     };
     $logger->expects($this->once())
@@ -147,7 +149,7 @@ class LoggerChannelTest extends UnitTestCase {
   public static function providerTestLog(): \Generator {
     // No request or account.
     yield [
-      function ($context) {
+      function (array $context): bool {
         return $context['channel'] == 'test' && empty($context['uid']) && $context['ip'] === '';
       },
       FALSE,
@@ -157,7 +159,7 @@ class LoggerChannelTest extends UnitTestCase {
     // With account but not request. Since the request is not available the
     // current user should not be used.
     yield [
-      function ($context) {
+      function (array $context): bool {
         return $context['uid'] === 0 && $context['ip'] === '';
       },
       FALSE,
@@ -166,7 +168,7 @@ class LoggerChannelTest extends UnitTestCase {
 
     // With request but not account.
     yield [
-      function ($context) {
+      function (array $context): bool {
         return $context['ip'] === '127.0.0.1' && empty($context['uid']);
       },
       TRUE,
@@ -175,7 +177,7 @@ class LoggerChannelTest extends UnitTestCase {
 
     // Both request and account.
     yield [
-      function ($context) {
+      function (array $context): bool {
         return $context['ip'] === '127.0.0.1' && $context['uid'] === 1;
       },
       TRUE,

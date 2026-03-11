@@ -12,6 +12,9 @@ use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\Traits\Core\CronRunTrait;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
 use Drupal\TestTools\Extension\Dump\DebugDump;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\ExpectationFailedException;
 
 // cspell:ignore htkey
@@ -19,9 +22,12 @@ use PHPUnit\Framework\ExpectationFailedException;
 /**
  * Tests BrowserTestBase functionality.
  *
- * @group browsertestbase
+ * @final
  */
+#[Group('browsertestbase')]
+#[RunTestsInSeparateProcesses]
 class BrowserTestBaseTest extends BrowserTestBase {
+
   use PathAliasTestTrait;
   use CronRunTrait;
 
@@ -33,6 +39,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
     'form_test',
     'system_test',
     'node',
+    'deprecation_test',
   ];
 
   /**
@@ -183,6 +190,12 @@ class BrowserTestBaseTest extends BrowserTestBase {
 
     // Submit the form using the button name.
     $this->submitForm(['bananas' => 'purple'], 'op');
+    $value = $config_factory->get('form_test.object')->get('bananas');
+    $this->assertSame('purple', $value);
+
+    // Submit using the form attribute of a button.
+    $this->drupalGet('form-test/button-form-attribute');
+    $this->submitForm(['bananas' => 'purple'], 'Attribute Button');
     $value = $config_factory->get('form_test.object')->get('bananas');
     $this->assertSame('purple', $value);
 
@@ -476,8 +489,8 @@ class BrowserTestBaseTest extends BrowserTestBase {
     $htaccess_filename = $this->tempFilesDirectory . '/.htaccess';
     $this->assertFileExists($htaccess_filename);
 
-    // Ensure the update module is not installed.
-    $this->assertFalse(\Drupal::moduleHandler()->moduleExists('update'), 'The Update module is not installed.');
+    // Ensure the Update Status module is not installed.
+    $this->assertFalse(\Drupal::moduleHandler()->moduleExists('update'), 'The Update Status module should not be installed.');
   }
 
   /**
@@ -485,7 +498,7 @@ class BrowserTestBaseTest extends BrowserTestBase {
    */
   public function testLocalTimeZone(): void {
     $expected = 'Australia/Sydney';
-    // The 'Australia/Sydney' time zone is set in core/tests/bootstrap.php
+    // The 'Australia/Sydney' time zone is set in core/tests/bootstrap.php.
     $this->assertEquals($expected, date_default_timezone_get());
 
     // The 'Australia/Sydney' time zone is also set in
@@ -568,10 +581,9 @@ class BrowserTestBaseTest extends BrowserTestBase {
   /**
    * Tests that deprecation headers do not get duplicated.
    *
-   * @group legacy
-   *
    * @see \Drupal\Core\Test\HttpClientMiddleware\TestHttpClientMiddleware::__invoke()
    */
+  #[IgnoreDeprecations]
   public function testDeprecationHeaders(): void {
     $this->drupalGet('/test-deprecations');
 
@@ -590,10 +602,26 @@ class BrowserTestBaseTest extends BrowserTestBase {
     }
 
     $this->assertContains('Test deprecation message', $deprecation_messages);
-    $test_deprecation_messages = array_filter($deprecation_messages, function ($message) {
+    $test_deprecation_messages = array_filter($deprecation_messages, function (string $message): bool {
       return $message === 'Test deprecation message';
     });
     $this->assertCount(1, $test_deprecation_messages);
+  }
+
+  /**
+   * Tests deprecation message from deprecated route.
+   *
+   * This test verifies that TestHttpClientMiddleware is properly re-throwing
+   * deprecations occurred in the SUT and collected in the response header.
+   *
+   * @see \Drupal\Core\Test\HttpClientMiddleware\TestHttpClientMiddleware
+   * @see _drupal_error_handler
+   * @see _drupal_error_handler_real
+   */
+  #[IgnoreDeprecations]
+  public function testDeprecationTriggeredInSystemUnderTest(): void {
+    $this->expectUserDeprecationMessage('This is the deprecation message for deprecation_test_function().');
+    $this->drupalGet(Url::fromRoute('deprecation_test.route'));
   }
 
   /**

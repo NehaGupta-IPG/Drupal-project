@@ -6,15 +6,21 @@ namespace Drupal\Tests\Core\Test\RunTests;
 
 use Drupal\Core\Test\RunTests\TestFileParser;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
- * @coversDefaultClass \Drupal\Core\Test\RunTests\TestFileParser
- * @group Test
- * @group RunTests
+ * Tests for the deprecated TestFileParser class.
  */
+#[CoversClass(TestFileParser::class)]
+#[Group('Test')]
+#[Group('RunTest')]
+#[IgnoreDeprecations]
 class TestFileParserTest extends UnitTestCase {
 
-  public static function provideTestFileContents() {
+  public static function provideTestFileContents(): array {
     return [
       'empty' => [[], ''],
       'no-namespace' => [['ConcreteClass'],
@@ -66,10 +72,10 @@ COMPOUND
   }
 
   /**
-   * @covers ::parseContents
-   * @dataProvider provideTestFileContents
+   * Tests parse contents.
    */
-  public function testParseContents($expected, $contents): void {
+  #[DataProvider('provideTestFileContents')]
+  public function testParseContents(array $expected, string $contents): void {
     $parser = new TestFileParser();
 
     $ref_parse = new \ReflectionMethod($parser, 'parseContents');
@@ -78,7 +84,7 @@ COMPOUND
   }
 
   /**
-   * @covers ::getTestListFromFile
+   * Tests get test list from file.
    */
   public function testGetTestListFromFile(): void {
     $parser = new TestFileParser();

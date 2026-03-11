@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Kernel;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 /**
  * Tests basic node_access functionality.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeAccessTest extends NodeAccessTestBase {
 
   /**
@@ -154,6 +157,32 @@ class NodeAccessTest extends NodeAccessTestBase {
     $query->addTag('node_access');
 
     $this->assertEquals(4, $query->countQuery()->execute()->fetchField());
+  }
+
+  /**
+   * Tests that multiple calls to node_access_rebuild only result in one batch.
+   */
+  public function testDuplicateBatchRebuild(): void {
+    $this->enableModules(['node_access_test']);
+    $batch = batch_get();
+    $this->assertEmpty($batch);
+    node_access_rebuild(TRUE);
+    $batch = batch_get();
+    $this->assertCount(1, $batch['sets']);
+    node_access_rebuild(TRUE);
+    $batch = batch_get();
+    $this->assertCount(1, $batch['sets']);
+  }
+
+  /**
+   * Tests node_access_needs_rebuild is set when node_access_rebuild is called.
+   */
+  public function testNodeAccessRebuildNeedsRebuild(): void {
+    $this->assertFalse(node_access_needs_rebuild());
+    $this->enableModules(['node_access_test']);
+    // Call as batch so rebuild is not run immediately.
+    node_access_rebuild(TRUE);
+    $this->assertTrue(node_access_needs_rebuild());
   }
 
 }

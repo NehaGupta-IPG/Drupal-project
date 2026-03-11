@@ -6,18 +6,23 @@ namespace Drupal\Tests\system\Functional\Theme;
 
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\Tests\WaitTerminateTestTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the loading of Claro assets on a non-Claro default theme.
- *
- * @group Theme
  */
+#[Group('Theme')]
+#[RunTestsInSeparateProcesses]
 class ToolbarClaroOverridesTest extends BrowserTestBase {
+
+  use WaitTerminateTestTrait;
 
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['toolbar', 'test_page_test', 'shortcut', 'node'];
+  protected static $modules = ['toolbar', 'test_page_test', 'node'];
 
   /**
    * {@inheritdoc}
@@ -48,14 +53,12 @@ class ToolbarClaroOverridesTest extends BrowserTestBase {
     $this->themeManager = $this->container->get('theme.manager');
     $this->themeInstaller->install(['claro']);
 
-    // Create user with sufficient permissions to have the shortcut toolbar menu
-    // be available.
     $this->drupalLogin($this->drupalCreateUser([
       'access toolbar',
-      'access shortcuts',
-      'administer shortcuts',
       'access content overview',
     ]));
+
+    $this->setWaitForTerminate();
   }
 
   /**

@@ -23,9 +23,11 @@ use Drupal\layout_builder\Form\LayoutBuilderEntityViewDisplayForm;
 use Drupal\layout_builder\Form\DefaultsEntityForm;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplayStorage;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
+use Drupal\layout_builder\LayoutOverrideFieldHelper;
 use Drupal\Core\Url;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Hook\Order\Order;
 
 /**
  * Hook implementations for layout_builder.
@@ -145,13 +147,12 @@ class LayoutBuilderHooks {
    * implementations of hook_entity_view_alter() to add the rendered output of
    * the extra fields they provide, so we cannot get the rendered output of
    * extra fields before this point in the view process.
-   * layout_builder_module_implements_alter() moves this implementation of
-   * hook_entity_view_alter() to the end of the list.
+   * Hook ordering moves this implementation of hook_entity_view_alter() to the
+   * end of the list.
    *
    * @see \Drupal\layout_builder\Plugin\Block\ExtraFieldBlock::build()
-   * @see layout_builder_module_implements_alter()
    */
-  #[Hook('entity_view_alter')]
+  #[Hook('entity_view_alter', order: Order::Last)]
   public function entityViewAlter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display): void {
     // Only replace extra fields when Layout Builder has been used to alter the
     // build. See \Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay::buildMultiple().
@@ -215,6 +216,26 @@ class LayoutBuilderHooks {
       /** @var \Drupal\layout_builder\InlineBlockEntityOperations $entity_operations */
       $entity_operations = \Drupal::classResolver(InlineBlockEntityOperations::class);
       $entity_operations->handleEntityDelete($entity);
+    }
+  }
+
+  /**
+   * Implements hook_entity_update().
+   */
+  #[Hook('entity_update')]
+  public function entityUpdate(EntityInterface $entity): void {
+    // See if the entity's layout must be updated with the new entity values if:
+    // 1. It is a fieldable layout
+    // 2. A layout override field is present.
+    // @todo Remove instanceof FieldableEntityInterface check in
+    //   https://www.drupal.org/node/3046216
+    if ($entity instanceof FieldableEntityInterface && $entity->hasField(OverridesSectionStorage::FIELD_NAME)) {
+      // If an entity's field values change, and it also has a layout override
+      // in the tempstore, the tempstore must be updated to reflect those new
+      // values.
+      /** @var \Drupal\layout_builder\LayoutOverrideFieldHelper $override_field_helper */
+      $override_field_helper = \Drupal::classResolver(LayoutOverrideFieldHelper::class);
+      $override_field_helper->updateTempstoreEntityContext($entity);
     }
   }
 

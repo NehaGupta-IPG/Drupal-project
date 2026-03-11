@@ -8,15 +8,17 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\entity_test\Entity\EntityTest;
+use Drupal\views\Entity\View;
 use Drupal\views\Tests\AssertViewsCacheTagsTrait;
 use Drupal\views\Views;
-use Drupal\views\Entity\View;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the general integration between views and the render cache.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class RenderCacheIntegrationTest extends ViewsKernelTestBase {
 
   use AssertViewsCacheTagsTrait;
@@ -292,7 +294,16 @@ class RenderCacheIntegrationTest extends ViewsKernelTestBase {
     $view = View::load('test_display');
     $view->save();
 
-    $this->assertEqualsCanonicalizing(['languages:' . LanguageInterface::TYPE_CONTENT, 'languages:' . LanguageInterface::TYPE_INTERFACE, 'url.query_args', 'user.node_grants:view', 'user.permissions'], $view->getDisplay('default')['cache_metadata']['contexts']);
+    $this->assertEqualsCanonicalizing(
+      [
+        'languages:' . LanguageInterface::TYPE_CONTENT,
+        'languages:' . LanguageInterface::TYPE_INTERFACE,
+        'url.query_args',
+        'user.node_grants:view',
+        'user.permissions',
+      ],
+      $view->getDisplay('default')['cache_metadata']['contexts']
+    );
   }
 
 }

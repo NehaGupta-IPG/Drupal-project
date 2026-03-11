@@ -3,10 +3,8 @@ description: 'Provides a standard site with commonly used features pre-configure
 type: 'Site'
 recipes:
   - basic_block_type
-  - basic_shortcuts
   - article_comment
   - article_tags
-  - feedback_contact_form
   - article_content_type
   - page_content_type
   - basic_html_format_editor
@@ -24,17 +22,15 @@ recipes:
 install:
   - image
   - help
-  - history
   - config
   - contextual
   - menu_link_content
   - datetime
   - menu_ui
   - options
-  - toolbar
+  - navigation
   - field_ui
   - views_ui
-  - shortcut
 config:
   # This recipe is intended to set up a full site from scratch, fulfilling certain
   # expectations. It's not really designed to be a building block. Therefore, treat
@@ -49,6 +45,11 @@ config:
     image:
       - image.style.large
       - image.style.thumbnail
+    navigation:
+      - navigation.block_layout
+      - navigation.settings
+      - system.menu.content
+      - system.menu.navigation-user-links
     node:
       - views.view.archive
       - views.view.content
@@ -59,7 +60,6 @@ config:
       - block.block.olivero_help
       - block.block.olivero_search_form_narrow
       - block.block.olivero_search_form_wide
-      - block.block.olivero_syndicate
     user:
       - core.entity_view_mode.user.compact
       - search.page.user_search
@@ -84,7 +84,7 @@ config:
         - 'access content overview'
         - 'access contextual links'
         - 'access files overview'
-        - 'access toolbar'
+        - 'access navigation'
         - 'administer url aliases'
         - 'create terms in tags'
         - 'create url aliases'

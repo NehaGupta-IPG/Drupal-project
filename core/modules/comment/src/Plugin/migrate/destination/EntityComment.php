@@ -88,20 +88,6 @@ class EntityComment extends EntityContentBase {
   /**
    * {@inheritdoc}
    */
-  public function import(Row $row, array $old_destination_id_values = []) {
-    if ($row->isStub() && ($state = $this->state->get('comment.maintain_entity_statistics', 0))) {
-      $this->state->set('comment.maintain_entity_statistics', 0);
-    }
-    $return = parent::import($row, $old_destination_id_values);
-    if ($row->isStub() && $state) {
-      $this->state->set('comment.maintain_entity_statistics', $state);
-    }
-    return $return;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function processStubRow(Row $row) {
     parent::processStubRow($row);
     // Neither uid nor name is required in itself, but it is required to set one
