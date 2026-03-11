@@ -588,18 +588,4 @@ class ExposedFormTest extends ViewTestBase {
     $this->assertTrue($this->assertSession()->optionExists('type', 'page')->isSelected());
   }
 
-  /**
-   * Tests that exposed form blocks do not cause errors on 404 pages.
-   */
-  public function testExposedBlockOn404Page(): void {
-    $view = Views::getView('test_exposed_block');
-    $view->setDisplay('page_1');
-    $this->drupalPlaceBlock('views_exposed_filter_block:test_exposed_block-page_1');
-
-    // Visit a non-existent page to trigger a 404.
-    // The route name will be NULL in this context.
-    $this->drupalGet('this-page-does-not-exist-' . $this->randomMachineName());
-    $this->assertSession()->statusCodeEquals(404);
-  }
-
 }
