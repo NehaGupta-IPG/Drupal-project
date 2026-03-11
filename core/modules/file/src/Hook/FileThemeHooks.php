@@ -198,7 +198,8 @@ class FileThemeHooks {
   public function preprocessManagedFile(array &$variables): void {
     $element = $variables['element'];
 
-    $variables['attributes'] = [];
+    // Initialize only if the attributes is not already set.
+    $variables['attributes'] ??= [];
     if (isset($element['#id'])) {
       $variables['attributes']['id'] = $element['#id'];
     }
