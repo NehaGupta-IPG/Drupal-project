@@ -327,6 +327,9 @@ class EntityForm extends FormBase implements EntityFormInterface {
    *   The callable, or the original definition if it could not be resolved.
    */
   protected function getCallableFromDefinition(string | array $definition): callable | string | array {
+    if (is_callable($definition)) {
+      return $definition;
+    }
     if (\Drupal::hasService(CallableResolver::class)) {
       return \Drupal::service(CallableResolver::class)->getCallableFromDefinition($definition);
     }
