@@ -15,12 +15,9 @@ use Drupal\Component\Utility\Html as HtmlUtility;
  *
  * Properties:
  * - #header: An array of table header labels.
- * - #rows: An array of table rows.
- *   Each row may be provided in one of the following formats:
- *   - An indexed array of cell values. Each cell value may be:
- *     - A string.
- *     - A render array.
- *     - An associative array representing a cell definition (see below).
+ * - #rows: An array of table rows. Each row may be provided in one of the
+ *   following formats:
+ *   - An indexed array of cell values.
  *   - An associative array keyed by column identifiers (for example,
  *     matching keys used in #header). Each value represents a cell and
  *     may be:
@@ -32,10 +29,16 @@ use Drupal\Component\Utility\Html as HtmlUtility;
  *         <td> element.
  *   A row may also contain row-level properties such as:
  *     - attributes: An array of HTML attributes for the <tr> element.
- *   Alternatively, table data may be provided as child elements of the
- *   table render element. In this case, each child element represents a
- *   row and its children represent column cells. The #rows property is
- *   populated automatically during preRenderTable().
+ *   Alternatively, instead of the #rows property, table data may be provided
+ *   as child elements of the table render element. In this case:
+ *     - Each child element represents a table row.
+ *     - The children of each row represent column cells and must be render
+ *        arrays (for example, form or render elements).
+ *     - Cell attributes can be applied using the element's
+ *       #wrapper_attributes, which are rendered on the <td> element.
+ *     - Row-level attributes can be applied using #attributes on the row
+ *       <tr> element.
+ *   The #rows property is populated automatically by preRenderTable().
  * - #empty: Text to display when no rows are present.
  * - #responsive: Indicates whether to add the drupal.tableresponsive library
  *   providing responsive tables.  Defaults to TRUE.
