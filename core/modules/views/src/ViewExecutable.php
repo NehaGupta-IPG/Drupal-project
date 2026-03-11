@@ -2556,7 +2556,7 @@ class ViewExecutable {
    */
   public function __unserialize(array $data): void {
     $this->serializationData = $data['serializationData'] ?? [];
-    $this->__wakeup();
+    $this->restoreSerializedState();
   }
 
   /**
@@ -2586,6 +2586,13 @@ class ViewExecutable {
    * Magic method implementation to unserialize the view executable.
    */
   public function __wakeup(): void {
+    $this->restoreSerializedState();
+  }
+
+  /**
+   * Restores the executable from serialized state.
+   */
+  private function restoreSerializedState(): void {
     // There are cases, like in testing where we don't have a container
     // available.
     if (\Drupal::hasContainer() && !empty($this->serializationData)) {

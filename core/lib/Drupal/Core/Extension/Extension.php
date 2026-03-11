@@ -207,7 +207,7 @@ class Extension {
       $this->$key = $value;
     }
 
-    $this->__wakeup();
+    $this->restoreRoot();
   }
 
   /**
@@ -224,6 +224,13 @@ class Extension {
    * Magic method implementation to unserialize the extension object.
    */
   public function __wakeup(): void {
+    $this->restoreRoot();
+  }
+
+  /**
+   * Restores the app root after unserialization.
+   */
+  private function restoreRoot(): void {
     // Get the app root from the container. While compiling the container we
     // have to discover all the extension service files in
     // \Drupal\Core\DrupalKernel::initializeServiceProviders(). This results in
