@@ -5,29 +5,25 @@
 
 (function ($, Drupal) {
   /**
+   * Provide the summary information for the comment settings vertical tab.
    *
    * @type {Drupal~behavior}
+   *
+   * @prop {Drupal~behaviorAttach} attach
+   *   Attaches summary behavior for comment settings.
    */
   Drupal.behaviors.commentFieldsetSummaries = {
     attach(context) {
       const $context = $(context);
       $context
-        .find('fieldset.comment-entity-settings-form')
-        .drupalSetSummary((context) =>
-          Drupal.checkPlain(
-            $(context)
-              .find('.js-form-item-comment input:checked')
-              .next('label')[0].textContent,
-          ),
-        );
-
-      $context
-        .find('.comment-node-settings-form')
-        .drupalSetSummary((context) =>
-          Drupal.checkPlain(
-            $(context).find('input:checked').next('label')[0].textContent,
-          ),
-        );
+        .find('[class*="comment-"][class*="-settings-form"]')
+        .drupalSetSummary((context) => {
+          const checked = context.querySelector('[class*="js-form-item-comment"] input:checked');
+          const label = checked
+            ? context.querySelector(`label[for="${checked.id}"]`)
+            : null;
+          return label != null ? Drupal.checkPlain(label.textContent) : '';
+        });
     },
   };
 })(jQuery, Drupal);
