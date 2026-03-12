@@ -331,7 +331,6 @@ CORE_INCOMPATIBILITY;
 
   /**
    * Tests core incompatibility can be ignored with a setting.
-   *
    */
   #[CoversMethod(InfoParser::class, 'parse')]
   public function testCoreIncompatibilityIgnoreSetting() {
