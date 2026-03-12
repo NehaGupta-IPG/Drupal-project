@@ -620,7 +620,6 @@
       const $contextualFilters = $contextualFiltersBucket.find(
         '.views-display-setting a',
       );
-      const previewArgs = document.getElementById('preview-args');
       $(document.getElementById('preview-args').parentElement).toggle(
         $contextualFilters.length,
       );
@@ -1179,18 +1178,15 @@
       const $context = $(context);
 
       function changeDefaultWidget(event) {
-        const $defRadios = $context.find(':has(>input.default-radios)');
-        const $radiosRow = $context.find(':has(>td.any-default-radios-row)');
-        const $defCheckboxes = $context.find(':has(>input.default-checkboxes)');
-        if ($(event.target).prop('checked')) {
-          $defRadios.hide();
-          $radiosRow.hide();
-          $defCheckboxes.show();
-        } else {
-          $defCheckboxes.hide();
-          $radiosRow.show();
-          $defRadios.show();
-        }
+        $context
+          .find(':has(>input.default-radios)')
+          .toggle(!$(event.target).prop('checked'));
+        $context
+          .find(':has(>td.any-default-radios-row)')
+          .toggle(!$(event.target).prop('checked'));
+        $context
+          .find(':has(>input.default-checkboxes)')
+          .toggle($(event.target).prop('checked'));
       }
 
       // Update on widget change.
@@ -1212,14 +1208,12 @@
    */
   Drupal.viewsUi.Checkboxifier = function (button) {
     this.$button = $(button);
-    this.$parent = $(
-      document.evaluate(
-        './parent::div[contains(@class, "views-expose") or contains(@class, "views-grouped")]',
-        this.$button[0],
-        null,
-        XPathResult.FIRST_ORDERED_NODE_TYPE,
-      ).singleNodeValue,
-    );
+    const parent = button.parentElement;
+    this.$parent =
+      parent.classList.contains('views-expose') ||
+      parent.classList.contains('views-grouped')
+        ? $(parent)
+        : $();
     this.$input = this.$parent.find('input:checkbox, input:radio');
     // Hide the button and its description.
     this.$button.hide();
