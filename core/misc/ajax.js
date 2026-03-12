@@ -402,7 +402,29 @@
    */
   Drupal.ajax._unlockPointerEvents = function (elements, key) {
     $(elements).each(function () {
-      const $el = $(this);
+      let el = this;
+      let $el = $(el);
+
+      // If the element has been replaced by an AJAX command (e.g.,
+      // replaceWith), the original reference is stale (detached from the DOM).
+      // In that case, find the replacement element using the stable
+      // data-drupal-selector attribute.
+      if (!document.body.contains(el)) {
+        const selector = el.getAttribute('data-drupal-selector');
+        if (selector) {
+          const replacement = document.querySelector(
+            `[data-drupal-selector="${selector}"]`,
+          );
+          if (replacement) {
+            // Clear pointer-events on the replacement element directly since
+            // it will not have the jQuery data from the old element.
+            replacement.style.pointerEvents = '';
+            $(replacement).removeData('drupalPeLocks');
+          }
+        }
+        return;
+      }
+
       const data = $el.data('drupalPeLocks');
       if (!data) {
         return;
