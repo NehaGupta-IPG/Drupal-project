@@ -125,7 +125,7 @@ class ConfigImportForm extends FormBase {
             $files[] = $file['filename'];
           }
         }
-        $archiver->extractList($files, $this->settings->get('config_sync_directory'), '', FALSE, FALSE);
+        $archiver->extractList($files, $this->settings->get('config_sync_directory'));
         foreach ($files as $file) {
           $this->fileSystem->chmod($this->settings->get('config_sync_directory') . DIRECTORY_SEPARATOR . $file);
         }
