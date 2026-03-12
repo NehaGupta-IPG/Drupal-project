@@ -120,7 +120,7 @@ final class Configuration {
 
     // Load the deprecation ignore patterns from the specified file.
     $path = $this->absoluteAndExistingPath($this->ignoreFilePath);
-    set_error_handler(static function () use ($path, &$line): void {
+    set_error_handler(static function () use ($path, &$line): never {
       throw new \RuntimeException(sprintf('Invalid pattern found in "%s" on line %d', $path, 1 + $line));
     });
     try {
