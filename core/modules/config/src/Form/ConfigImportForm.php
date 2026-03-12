@@ -121,11 +121,15 @@ class ConfigImportForm extends FormBase {
       $tar_gz_path = $path . '.tar.gz';
       copy($path, $tar_gz_path);
       try {
-        $archiver = new \PharData($tar_gz_path);
+        // Use the canonical absolute path so that the phar:// URI prefix
+        // produced by getPathname() can be reliably stripped.
+        $canonical_path = realpath($tar_gz_path) ?: $tar_gz_path;
+        $archiver = new \PharData($canonical_path);
+        $phar_prefix = 'phar://' . $canonical_path . '/';
         $files = [];
         foreach (new \RecursiveIteratorIterator($archiver) as $file) {
           if (str_ends_with($file->getFilename(), '.yml')) {
-            $files[] = $file->getSubPathname();
+            $files[] = substr($file->getPathname(), strlen($phar_prefix));
           }
         }
         $destination = $this->settings->get('config_sync_directory');
