@@ -116,12 +116,16 @@ class ConfigImportForm extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     if ($path = $form_state->getValue('import_tarball')) {
       $this->configStorage->deleteAll();
+      // PharData requires a recognized file extension to determine the archive
+      // format. Copy the uploaded temp file to a path with .tar.gz extension.
+      $tar_gz_path = $path . '.tar.gz';
+      copy($path, $tar_gz_path);
       try {
-        $archiver = new \PharData($path);
+        $archiver = new \PharData($tar_gz_path);
         $files = [];
-        foreach ($archiver as $file) {
+        foreach (new \RecursiveIteratorIterator($archiver) as $file) {
           if (str_ends_with($file->getFilename(), '.yml')) {
-            $files[] = $file->getFilename();
+            $files[] = $file->getSubPathname();
           }
         }
         $destination = $this->settings->get('config_sync_directory');
@@ -135,6 +139,7 @@ class ConfigImportForm extends FormBase {
       catch (\Exception $e) {
         $this->messenger()->addError($this->t('Could not extract the contents of the tar file. The error message is <em>@message</em>', ['@message' => $e->getMessage()]));
       }
+      @unlink($tar_gz_path);
       $this->fileSystem->unlink($path);
     }
   }

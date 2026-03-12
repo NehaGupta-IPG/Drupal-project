@@ -238,7 +238,7 @@ class ConfigExportImportUITest extends BrowserTestBase {
     $this->drupalGet('admin/config/development/configuration/full/export');
     $this->submitForm([], 'Export');
     $this->tarball = $this->getSession()->getPage()->getContent();
-    $filename = \Drupal::service('file_system')->getTempDirectory() . '/' . $this->randomMachineName();
+    $filename = \Drupal::service('file_system')->getTempDirectory() . '/' . $this->randomMachineName() . '.tar.gz';
     file_put_contents($filename, $this->tarball);
 
     // Set up the active storage collections to test import.
@@ -272,7 +272,7 @@ class ConfigExportImportUITest extends BrowserTestBase {
     // Convert the list of files into something easy to search.
     $files = [];
     foreach (new \RecursiveIteratorIterator($tar) as $file) {
-      $files[] = $file->getFilename();
+      $files[] = $file->getSubPathname();
     }
     $this->assertContains('collection/test1/config_test.create.yml', $files, 'Config export contains collection/test1/config_test.create.yml.');
     $this->assertContains('collection/test2/config_test.another_create.yml', $files, 'Config export contains collection/test2/config_test.another_create.yml.');
