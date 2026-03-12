@@ -27,7 +27,7 @@ class DatabaseBackend implements CacheBackendInterface {
    *
    * Read about how to change it in the @link cache Cache API topic. @endlink
    */
-  const DEFAULT_MAX_ROWS = 5000;
+  const DEFAULT_MAX_ROWS = 50000;
 
   /**
    * Indicates that an infinite number of rows is allowed for the cache backend.
