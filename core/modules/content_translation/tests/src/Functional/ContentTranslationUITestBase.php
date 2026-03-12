@@ -328,14 +328,14 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
     // Post different authoring information for each translation.
     foreach ($this->langcodes as $langcode) {
       $user = $this->drupalCreateUser();
-      $url = $entity->toUrl('edit-form', ['language' => ConfigurableLanguage::load($langcode)]);
-      $this->drupalGet($url);
       $values[$langcode] = [
         'uid' => $user->id(),
         'created' => \Drupal::time()->getRequestTime() - mt_rand(0, 1000),
       ];
       $edit = $this->getMetadataValueAndAssertNoField('uid', $user->getAccountName());
       $edit += $this->getMetadataValueAndAssertNoField('created', $values[$langcode]['created']);
+      $url = $entity->toUrl('edit-form', ['language' => ConfigurableLanguage::load($langcode)]);
+      $this->drupalGet($url);
       $this->submitForm($edit, $this->getFormSubmitAction($entity, $langcode));
     }
 
@@ -350,17 +350,9 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
 
     // Try to post non valid values and check that they are rejected.
     $langcode = 'en';
-    $entity_types = ['block_content', 'image', 'menu_link_content', 'shortcut', 'taxonomy_term', 'user'];
-    $uid = (in_array($entity->getEntityTypeId(), $entity_types)) ? 'content_translation[uid]' : 'uid';
-    $created = (in_array($entity->getEntityTypeId(), $entity_types)) ? 'content_translation[created]' : 'created';
-    $edit = [
-      // User names have by default length 8.
-      $uid => $this->randomMachineName(12),
-      $created => '19/11/1978',
-    ];
-    $this->drupalGet($entity->toUrl('edit-form'));
     $edit = $this->getMetadataValueAndAssertNoField('uid', $this->randomMachineName(12));
     $edit += $this->getMetadataValueAndAssertNoField('created', '19/11/1978');
+    $this->drupalGet($entity->toUrl('edit-form'));
     $this->submitForm($edit, $this->getFormSubmitAction($entity, $langcode));
     $this->assertSession()->statusMessageExists('error');
     $metadata = $this->manager->getTranslationMetadata($entity->getTranslation($langcode));
@@ -369,11 +361,9 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
 
     // Verify that long usernames can be saved as the translation author.
     $user = $this->drupalCreateUser([], $this->randomMachineName(UserInterface::USERNAME_MAX_LENGTH));
-    $edit = [
-      // Format the username as it is entered in autocomplete fields.
-      $uid => $user->getAccountName() . ' (' . $user->id() . ')',
-      $created => $this->container->get('date.formatter')->format($values[$langcode]['created'], 'custom', 'Y-m-d H:i:s O'),
-    ];
+    // Format the username as it is entered in autocomplete fields.
+    $edit = $this->getMetadataValueAndAssertNoField('uid', $user->getAccountName() . ' (' . $user->id() . ')');
+    $edit += $this->getMetadataValueAndAssertNoField('created', $values[$langcode]['created']);
     $this->submitForm($edit, $this->getFormSubmitAction($entity, $langcode));
     $reloaded_entity = $storage->load($this->entityId);
     $metadata = $this->manager->getTranslationMetadata($reloaded_entity->getTranslation($langcode));
