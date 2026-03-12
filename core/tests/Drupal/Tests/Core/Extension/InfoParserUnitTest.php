@@ -12,6 +12,7 @@ use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
 // cspell:ignore skynet
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
