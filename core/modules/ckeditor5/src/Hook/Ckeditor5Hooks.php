@@ -15,6 +15,7 @@ use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Asset\LibraryDependencyResolverInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Core\Field\FieldItemListInterface;
@@ -29,6 +30,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\editor\EditorInterface;
+use Drupal\field\FieldConfigInterface;
 use Drupal\filter\Entity\FilterFormat;
 
 /**
@@ -407,6 +409,35 @@ class Ckeditor5Hooks {
     $definitions['ckeditor5_valid_pair__format_and_editor']['mapping']['filters'] = $definitions['filter.format.*']['mapping']['filters'];
     // @see @see editor.editor.*.image_upload
     $definitions['ckeditor5_valid_pair__format_and_editor']['mapping']['image_upload'] = $definitions['editor.editor.*']['mapping']['image_upload'];
+  }
+
+  /**
+   * Implements hook_form_FORM_ID_alter() for field_config_edit_form.
+   *
+   * Adds a note when the field is the short (single-line) text type that the
+   * selected format's toolbar and features may be limited to inline features.
+   *
+   * @internal
+   */
+  #[Hook('form_field_config_edit_form_alter')]
+  public function formFieldConfigEditFormAlter(array &$form, FormStateInterface $form_state, string $form_id): void {
+    $form_object = $form_state->getFormObject();
+    if (!$form_object instanceof EntityForm) {
+      return;
+    }
+    $entity = $form_object->getEntity();
+    if (!$entity instanceof FieldConfigInterface) {
+      return;
+    }
+    // Only the "text" (short text) field type uses the single-line widget.
+    // text_long and text_with_summary use the textarea.
+    if ($entity->getFieldStorageDefinition()->getType() !== 'text') {
+      return;
+    }
+    if (!isset($form['settings']['allowed_formats'])) {
+      return;
+    }
+    $form['settings']['allowed_formats']['#description'] .= ' ' . $this->t("When this field is used as a single-line (inline) text field, the selected format's toolbar and features may be limited to inline-only options.");
   }
 
   /**
