@@ -7,6 +7,7 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\views\Plugin\views\PluginBase;
 use Drupal\Core\Database\Query\SelectInterface;
 use Drupal\views\ResultRow;
+use Drupal\Core\Entity\EntityInterface;
 
 /**
  * @defgroup views_cache_plugins Views cache plugins
@@ -326,7 +327,7 @@ abstract class CachePluginBase extends PluginBase {
 
     if (!empty($row->_relationship_entities)) {
       foreach ($row->_relationship_entities as $entity) {
-        if (empty($entity)) {
+        if (!($entity instanceof EntityInterface)) {
           continue;
         }
         $tags = Cache::mergeTags($tags, $entity->getCacheTags());
