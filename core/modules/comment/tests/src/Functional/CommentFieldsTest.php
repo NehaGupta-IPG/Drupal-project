@@ -195,7 +195,7 @@ class CommentFieldsTest extends CommentTestBase {
 
   /**
    * Tests the comment widget details element is closed by default.
- */
+   */
   public function testCommentWidgetDetailsClosedByDefault(): void {
     $admin = $this->drupalCreateUser([
       'administer nodes',

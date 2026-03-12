@@ -9,11 +9,13 @@ use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\node\Entity\NodeType;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the comment widget summary text via JavaScript.
  */
 #[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentWidgetSummaryTest extends WebDriverTestBase {
 
   use CommentTestTrait;
