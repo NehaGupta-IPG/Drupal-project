@@ -99,17 +99,15 @@ class IgbinarySerializeTest extends TestCase {
   }
 
   /**
-   * Tests that igbinary payloads fail clearly without the extension.
+   * Tests that igbinary payloads return FALSE without the extension.
    */
   public function testDecodeIgbinaryPayloadWithoutExtension(): void {
     if (!function_exists('igbinary_serialize')) {
       $this->markTestSkipped('Requires the igbinary extension.');
     }
 
-    $this->expectException(InvalidDataTypeException::class);
-    $this->expectExceptionMessage('The igbinary extension is required to decode igbinary cache data.');
-
-    TestIgbinarySerializeWithoutExtension::decode(IgbinarySerialize::encode(['foo' => 'bar']));
+    $encoded = IgbinarySerialize::encode(['foo' => 'bar']);
+    $this->assertFalse(@TestIgbinarySerializeWithoutExtension::decode($encoded));
   }
 
   /**
@@ -148,7 +146,7 @@ class TestIgbinarySerializeWithoutExtension extends IgbinarySerialize {
       );
     }
 
-    throw new InvalidDataTypeException('The igbinary extension is required to decode igbinary cache data.');
+    return FALSE;
   }
 
   /**

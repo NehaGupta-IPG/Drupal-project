@@ -52,7 +52,9 @@ class IgbinarySerialize implements ObjectAwareSerializationInterface {
     static $is_igbinary_unserialize = function_exists('igbinary_unserialize');
 
     if (!$is_igbinary_unserialize) {
-      throw new InvalidDataTypeException('The igbinary extension is required to decode igbinary cache data.');
+      // The extension may have been disabled or removed after data was stored.
+      @trigger_error('The igbinary extension is required to decode igbinary serialized data.', E_USER_WARNING);
+      return FALSE;
     }
 
     return static::executeDecoding(
