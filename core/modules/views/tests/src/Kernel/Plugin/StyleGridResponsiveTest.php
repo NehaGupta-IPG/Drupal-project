@@ -125,6 +125,24 @@ class StyleGridResponsiveTest extends PluginKernelTestBase {
           'col_class_custom' => 'pb-2 mb-4',
         ],
       ],
+      'token replacement' => [
+        'options' => [
+          'columns' => 4,
+          'cell_min_width' => 100,
+          'grid_gutter' => 10,
+          'alignment' => 'horizontal',
+          'row_class_custom' => '',
+          'col_class_custom' => 'name-{{ name }}',
+        ],
+        'expected' => [
+          'columns' => 4,
+          'cell_min_width' => 100,
+          'grid_gutter' => 10,
+          'alignment' => 'horizontal',
+          'row_class_custom' => '',
+          'col_class_custom' => 'name-John',
+        ],
+      ],
       'default options' => [
         'options' => [],
         'expected' => [
