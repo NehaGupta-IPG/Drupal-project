@@ -18,7 +18,9 @@
       $context
         .find('[class*="comment-"][class*="-settings-form"]')
         .drupalSetSummary((context) => {
-          const checked = context.querySelector('[class*="js-form-item-comment"] input:checked');
+          const checked = context.querySelector(
+            '[class*="js-form-item-comment"] input:checked'
+          );
           const label = checked
             ? context.querySelector(`label[for="${checked.id}"]`)
             : null;
