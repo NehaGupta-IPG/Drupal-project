@@ -1760,7 +1760,7 @@ services:
   Drupal\Core\Asset\LibraryDiscoveryInterface: '@library.discovery'
   library.discovery.parser:
     class: Drupal\Core\Asset\LibraryDiscoveryParser
-    arguments: ['%app.root%', '@module_handler', '@theme.manager', '@stream_wrapper_manager', '@library.libraries_directory_file_finder', '@extension.path.resolver', '@plugin.manager.sdc']
+    arguments: ['%app.root%', '@module_handler', '@theme.manager', '@theme_handler', '@info_parser', '@stream_wrapper_manager', '@library.libraries_directory_file_finder', '@extension.path.resolver', '@plugin.manager.sdc']
   Drupal\Core\Asset\LibraryDiscoveryParser: '@library.discovery.parser'
   library.libraries_directory_file_finder:
     class: Drupal\Core\Asset\LibrariesDirectoryFileFinder

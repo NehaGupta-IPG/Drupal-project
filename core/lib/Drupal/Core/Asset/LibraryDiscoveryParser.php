@@ -11,7 +11,9 @@ use Drupal\Core\Asset\Exception\InvalidLibrariesOverrideSpecificationException;
 use Drupal\Core\Asset\Exception\InvalidLibraryFileException;
 use Drupal\Core\Asset\Exception\LibraryDefinitionMissingLicenseException;
 use Drupal\Core\Extension\ExtensionPathResolver;
+use Drupal\Core\Extension\InfoParserInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Drupal\Core\Theme\ComponentPluginManager;
@@ -37,6 +39,19 @@ class LibraryDiscoveryParser {
    * @var \Drupal\Core\Theme\ThemeManagerInterface
    */
   protected $themeManager;
+  /**
+   * The theme handler.
+   *
+   * @var \Drupal\Core\Theme\ThemeHandlerInterface
+   */
+  protected $themeHandler;
+
+  /**
+   * The info parser.
+   *
+   * @var \Drupal\Core\Extension\InfoParserInterface
+   */
+  protected $infoParser;
 
   /**
    * The app root.
@@ -89,6 +104,10 @@ class LibraryDiscoveryParser {
    *   The module handler.
    * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
    *   The theme manager.
+   * @param \Drupal\Core\Theme\ThemeHandlerInterface $theme_handler
+   *   The theme handler.
+   * @param \Drupal\Core\Extension\InfoParserInterface $info_parser
+   *   The info parser.
    * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager
    *   The stream wrapper manager.
    * @param \Drupal\Core\Asset\LibrariesDirectoryFileFinder $libraries_directory_file_finder
@@ -98,10 +117,12 @@ class LibraryDiscoveryParser {
    * @param \Drupal\Core\Theme\ComponentPluginManager $component_plugin_manager
    *   The component plugin manager.
    */
-  public function __construct($root, ModuleHandlerInterface $module_handler, ThemeManagerInterface $theme_manager, StreamWrapperManagerInterface $stream_wrapper_manager, LibrariesDirectoryFileFinder $libraries_directory_file_finder, ExtensionPathResolver $extension_path_resolver, ComponentPluginManager $component_plugin_manager) {
+  public function __construct($root, ModuleHandlerInterface $module_handler, ThemeManagerInterface $theme_manager, ThemeHandlerInterface $theme_handler, InfoParserInterface $info_parser, StreamWrapperManagerInterface $stream_wrapper_manager, LibrariesDirectoryFileFinder $libraries_directory_file_finder, ExtensionPathResolver $extension_path_resolver, ?ComponentPluginManager $component_plugin_manager = NULL) {
     $this->root = $root;
     $this->moduleHandler = $module_handler;
     $this->themeManager = $theme_manager;
+    $this->themeHandler = $theme_handler;
+    $this->infoParser = $info_parser;
     $this->streamWrapperManager = $stream_wrapper_manager;
     $this->librariesDirectoryFileFinder = $libraries_directory_file_finder;
     $this->extensionPathResolver = $extension_path_resolver;
@@ -166,10 +187,24 @@ class LibraryDiscoveryParser {
       if (isset($library['version'])) {
         // @todo Retrieve version of a non-core extension.
         if ($library['version'] === 'VERSION') {
-          $library['version'] = \Drupal::VERSION;
+          if ($extension_type === 'core' || $extension === 'system') {
+            $real_version = 'VERSION';
+          }
+          elseif ($extension_type === 'theme') {
+            $info = $this->themeHandler->getTheme($extension)->info ?? $this->infoParser->parse($this->themeHandler->getTheme($extension)->getPathname());
+            $real_version = $info['version'] ?? ($info ? NULL : 'VERSION');
+          }
+          else {
+            $info = $this->moduleHandler->getModule($extension)->info ?? $this->infoParser->parse($this->moduleHandler->getModule($extension)->getPathname());
+            $real_version = $info['version'] ?? ($info ? NULL : 'VERSION');
+          }
+          $library['version'] = isset($real_version) ? (($real_version === 'VERSION') ? \Drupal::VERSION : $real_version) : \Drupal::VERSION;
+          if (empty($library['version'])) {
+            unset($library['version']);
+          }
         }
         // Remove 'v' prefix from external library versions.
-        elseif (is_string($library['version']) && $library['version'][0] === 'v') {
+        if (is_string($library['version']) && $library['version'][0] === 'v') {
           $library['version'] = substr($library['version'], 1);
         }
       }

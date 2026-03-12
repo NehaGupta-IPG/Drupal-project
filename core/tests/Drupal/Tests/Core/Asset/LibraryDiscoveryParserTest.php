@@ -58,6 +58,20 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
   protected $themeManager;
 
   /**
+   * The theme handler.
+   *
+   * @var \Drupal\Core\Theme\ThemeHandlerInterface
+   */
+  protected $themeHandler;
+
+  /**
+   * The info parser.
+   *
+   * @var \Drupal\Core\Extension\InfoParserInterface
+   */
+  protected $infoParser;
+
+  /**
    * The mocked active theme.
    *
    * @var \Drupal\Core\Theme\ActiveTheme|\PHPUnit\Framework\MockObject\MockObject
@@ -107,6 +121,8 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
 
     $this->moduleHandler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
     $this->themeManager = $this->createMock(ThemeManagerInterface::class);
+    $this->themeHandler = $this->createMock('Drupal\Core\Extension\ThemeHandlerInterface');
+    $this->infoParser = $this->createMock('\Drupal\Core\Extension\InfoParser');
     $this->activeTheme = $this->getMockBuilder(ActiveTheme::class)
       ->disableOriginalConstructor()
       ->getMock();
@@ -120,7 +136,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
     $this->librariesDirectoryFileFinder = $this->createMock(LibrariesDirectoryFileFinder::class);
     $this->extensionPathResolver = $this->createMock(ExtensionPathResolver::class);
     $this->componentPluginManager = $this->createMock(ComponentPluginManager::class);
-    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager);
+    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->themeHandler, $this->infoParser, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager);
   }
 
   /**
@@ -133,12 +149,22 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
     FileCacheFactory::setConfiguration([
       'library_parser' => [],
     ]);
-    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager);
+    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->themeHandler, $this->infoParser, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager);
     $this->moduleHandler->expects($this->atLeastOnce())
       ->method('moduleExists')
       ->with('example_module')
       ->willReturn(TRUE);
 
+    $mockExtension = $this->getMockBuilder('Drupal\Core\Extension\Extension')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->moduleHandler->expects($this->atLeastOnce())
+      ->method('getModule')
+      ->with('example_module')
+      ->willReturn($mockExtension);
+    $this->infoParser->expects($this->atLeastOnce())
+      ->method('parse')
+      ->willReturn(['version' => 'VERSION']);
     $path = __DIR__ . '/library_test_files';
     $path = substr($path, strlen($this->root) + 1);
     $this->extensionPathResolver->expects($this->atLeastOnce())
@@ -270,24 +296,77 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
   }
 
   /**
-   * Tests the version property, and how it propagates to the contained assets.
+   * Tests the version property, and how it propagates to the module assets.
    *
    * @legacy-covers ::buildByExtension
    */
-  public function testVersion(): void {
+  public function testModuleVersion(): void {
+    $path = __DIR__ . '/library_test_files';
+    $path = substr($path, strlen($this->root) + 1);
+
     $this->moduleHandler->expects($this->atLeastOnce())
       ->method('moduleExists')
-      ->with('versions')
+      ->with('versions_module')
       ->willReturn(TRUE);
+    $mockExtension = $this->getMockBuilder('Drupal\Core\Extension\Extension')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->moduleHandler->expects($this->atLeastOnce())
+      ->method('getModule')
+      ->with('versions_module')
+      ->willReturn($mockExtension);
+    $mockExtension->expects($this->atLeastOnce())
+      ->method('getPathname')
+      ->willReturn($path . '/versions_module.info.yml');
+    $this->infoParser->expects($this->atLeastOnce())
+      ->method('parse')
+      ->with($this->equalTo($path . '/versions_module.info.yml'))
+      ->willReturn(['version' => '8.x-1.2']);
+
+    $libraries = $this->libraryDiscoveryParser->buildByExtension('versions_module');
+
+    $this->assertFalse(array_key_exists('version', $libraries['versionless']));
+    $this->assertEquals(-1, $libraries['versionless']['css'][0]['version']);
+    $this->assertEquals(-1, $libraries['versionless']['js'][0]['version']);
+
+    $this->assertEquals('9.8.7.6', $libraries['versioned']['version']);
+    $this->assertEquals('9.8.7.6', $libraries['versioned']['css'][0]['version']);
+    $this->assertEquals('9.8.7.6', $libraries['versioned']['js'][0]['version']);
+
+    $this->assertEquals('8.x-1.2', $libraries['module-versioned']['version']);
+    $this->assertEquals('8.x-1.2', $libraries['module-versioned']['css'][0]['version']);
+    $this->assertEquals('8.x-1.2', $libraries['module-versioned']['js'][0]['version']);
+  }
+
+  /**
+   * Tests the version property, and how it propagates to the theme assets.
+   *
+   * @covers ::buildByExtension
+   */
+  public function testThemeVersion(): void {
 
     $path = __DIR__ . '/library_test_files';
     $path = substr($path, strlen($this->root) + 1);
-    $this->extensionPathResolver->expects($this->atLeastOnce())
-      ->method('getPath')
-      ->with('module', 'versions')
-      ->willReturn($path);
+    $this->moduleHandler->expects($this->atLeastOnce())
+      ->method('moduleExists')
+      ->with('versions_theme')
+      ->willReturn(FALSE);
+    $mockExtension = $this->getMockBuilder('Drupal\Core\Extension\Extension')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $this->themeHandler->expects($this->atLeastOnce())
+      ->method('getTheme')
+      ->with('versions_theme')
+      ->willReturn($mockExtension);
+    $mockExtension->expects($this->atLeastOnce())
+      ->method('getPathname')
+      ->willReturn($path . '/versions_theme.info.yml');
+    $this->infoParser->expects($this->atLeastOnce())
+      ->method('parse')
+      ->with($this->equalTo($path . '/versions_theme.info.yml'))
+      ->willReturn(['version' => '8.x-2.1']);
 
-    $libraries = $this->libraryDiscoveryParser->buildByExtension('versions');
+    $libraries = $this->libraryDiscoveryParser->buildByExtension('versions_theme');
 
     $this->assertArrayNotHasKey('version', $libraries['no_version']);
     $this->assertEquals(-1, $libraries['no_version']['css'][0]['version']);
@@ -297,9 +376,9 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
     $this->assertEquals('9.8.7.6', $libraries['versioned']['css'][0]['version']);
     $this->assertEquals('9.8.7.6', $libraries['versioned']['js'][0]['version']);
 
-    $this->assertEquals(\Drupal::VERSION, $libraries['core-versioned']['version']);
-    $this->assertEquals(\Drupal::VERSION, $libraries['core-versioned']['css'][0]['version']);
-    $this->assertEquals(\Drupal::VERSION, $libraries['core-versioned']['js'][0]['version']);
+    $this->assertEquals('8.x-2.1', $libraries['theme-versioned']['version']);
+    $this->assertEquals('8.x-2.1', $libraries['theme-versioned']['css'][0]['version']);
+    $this->assertEquals('8.x-2.1', $libraries['theme-versioned']['js'][0]['version']);
   }
 
   /**
@@ -661,7 +740,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
       ->willReturn($path);
     $this->componentPluginManager = $this->createMock(ComponentPluginManager::class);
 
-    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager);
+    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->themeHandler, $this->infoParser, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager);
 
     $this->moduleHandler->expects($this->atLeastOnce())
       ->method('moduleExists')
@@ -714,7 +793,7 @@ class LibraryDiscoveryParserTest extends UnitTestCase {
       ->with('module', 'deprecated')
       ->willReturn($path);
     $this->componentPluginManager = $this->createMock(ComponentPluginManager::class);
-    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager);
+    $this->libraryDiscoveryParser = new TestLibraryDiscoveryParser($this->root, $this->moduleHandler, $this->themeManager, $this->themeHandler, $this->infoParser, $this->streamWrapperManager, $this->librariesDirectoryFileFinder, $this->extensionPathResolver, $this->componentPluginManager);
 
     $this->moduleHandler->expects($this->atLeastOnce())
       ->method('moduleExists')

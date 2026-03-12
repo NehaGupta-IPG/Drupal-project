@@ -1,0 +1,22 @@
+versionless:
+  css:
+    theme:
+      versionless.css: {}
+  js:
+    versionless.js: {}
+
+versioned:
+  version: "9.8.7.6"
+  css:
+    theme:
+      versioned.css: {}
+  js:
+    versioned.js: {}
+
+module-versioned:
+  version: VERSION
+  css:
+    theme:
+      module-versioned.css: {}
+  js:
+    module-versioned.js: {}
