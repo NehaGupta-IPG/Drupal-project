@@ -133,6 +133,7 @@ class DisplayKernelTest extends ViewsKernelTestBase {
 
     // This should not throw any deprecation or TypeError.
     $view->display_handler->viewExposedFormBlocks();
+    $this->addToAssertionCount(1);
   }
 
   /**
