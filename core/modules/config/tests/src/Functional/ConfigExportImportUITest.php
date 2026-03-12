@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\config\Functional;
 
-use Drupal\Core\Archiver\ArchiveTar;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
@@ -269,12 +268,11 @@ class ConfigExportImportUITest extends BrowserTestBase {
     $this->assertFalse($test2_snapshot->read('config_test.another_create'), 'The config_test.another_create in collection.test2 does not exist in the snapshot storage.');
 
     // Create the tar that contains the expected content for the collections.
-    $tar = new ArchiveTar($filename, 'gz');
-    $content_list = $tar->listContent();
+    $tar = new \PharData($filename);
     // Convert the list of files into something easy to search.
     $files = [];
-    foreach ($content_list as $file) {
-      $files[] = $file['filename'];
+    foreach (new \RecursiveIteratorIterator($tar) as $file) {
+      $files[] = $file->getFilename();
     }
     $this->assertContains('collection/test1/config_test.create.yml', $files, 'Config export contains collection/test1/config_test.create.yml.');
     $this->assertContains('collection/test2/config_test.another_create.yml', $files, 'Config export contains collection/test2/config_test.another_create.yml.');

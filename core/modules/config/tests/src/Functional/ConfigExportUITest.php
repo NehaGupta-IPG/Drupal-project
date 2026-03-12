@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\config\Functional;
 
-use Drupal\Core\Archiver\ArchiveTar;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\Tests\BrowserTestBase;
@@ -68,8 +67,11 @@ class ConfigExportUITest extends BrowserTestBase {
     assert($file_system instanceof FileSystemInterface);
     $temp_directory = $file_system->getTempDirectory();
     $file_path = $temp_directory . '/config.tar.gz';
-    $archiver = new ArchiveTar($file_path);
-    $archive_contents = array_map(static fn(array $item): string => $item['filename'], $archiver->listContent());
+    $archiver = new \PharData($file_path);
+    $archive_contents = [];
+    foreach ($archiver as $item) {
+      $archive_contents[] = $item->getFilename();
+    }
     $this->assertNotEmpty($archive_contents, 'Downloaded archive file is not empty.');
 
     // Prepare the list of config files from active storage, see

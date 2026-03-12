@@ -2,7 +2,6 @@
 
 namespace Drupal\config\Form;
 
-use Drupal\Core\Archiver\ArchiveTar;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormBase;
@@ -118,16 +117,17 @@ class ConfigImportForm extends FormBase {
     if ($path = $form_state->getValue('import_tarball')) {
       $this->configStorage->deleteAll();
       try {
-        $archiver = new ArchiveTar($path, 'gz');
+        $archiver = new \PharData($path);
         $files = [];
-        foreach ($archiver->listContent() as $file) {
-          if (str_ends_with($file['filename'], '.yml')) {
-            $files[] = $file['filename'];
+        foreach ($archiver as $file) {
+          if (str_ends_with($file->getFilename(), '.yml')) {
+            $files[] = $file->getFilename();
           }
         }
-        $archiver->extractList($files, $this->settings->get('config_sync_directory'), '', FALSE, FALSE);
+        $destination = $this->settings->get('config_sync_directory');
+        $archiver->extractTo($destination, $files, TRUE);
         foreach ($files as $file) {
-          $this->fileSystem->chmod($this->settings->get('config_sync_directory') . DIRECTORY_SEPARATOR . $file);
+          $this->fileSystem->chmod($destination . DIRECTORY_SEPARATOR . $file);
         }
         $this->messenger()->addStatus($this->t('Your configuration files were successfully uploaded and are ready for import.'));
         $form_state->setRedirect('config.sync');
