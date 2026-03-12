@@ -281,8 +281,6 @@ abstract class SourcePluginBase extends PluginBase implements MigrateSourceInter
    *   The migration context in which the plugin will run.
    *
    * @return static
-   *
-   * @see \Drupal\Core\Plugin\ContainerFactoryPluginInterface
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, ?MigrationInterface $migration = NULL) {
     return static::createInstanceAutowired($container, $configuration, $plugin_id, $plugin_definition, $migration);
