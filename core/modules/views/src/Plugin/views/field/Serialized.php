@@ -74,7 +74,7 @@ class Serialized extends FieldPluginBase {
     }
     elseif ($this->options['format'] == 'key' && !empty($this->options['key'])) {
       $value = (array) unserialize($value);
-      return $this->sanitizeValue($value[$this->options['key']]);
+      return $this->sanitizeValue($value[$this->options['key']] ?? NULL);
     }
 
     return $value;
