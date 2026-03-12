@@ -1,0 +1,6 @@
+name: Dr Pepper Module
+description: Tests adding react as an external dependency.
+package: Custom
+
+type: module
+core_version_requirement: ^10 || ^11

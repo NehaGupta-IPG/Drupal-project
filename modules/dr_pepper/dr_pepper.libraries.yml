@@ -1,0 +1,19 @@
+dr_pepper:
+  version: 1.0
+  js:
+    app/dist/assets/index.js:
+      weight: -10
+      attributes: { type: module }
+  css:
+    theme:
+      app/dist/assets/index.css:
+        weight: 11
+        preprocess: false
+  dependencies:
+    - core/drupal.react
+
+dr_pepper_dev:
+  version: 1.0
+  css:
+    theme:
+      app/dist/assets/index.css: {}

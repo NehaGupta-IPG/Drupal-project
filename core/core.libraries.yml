@@ -960,3 +960,15 @@ drupal.fieldListKeyboardNavigation:
   dependencies:
     - core/drupal
     - core/tabbable
+
+drupal.react:
+  version: VERSION
+  js:
+    assets/vendor/react/react.development.js: {}
+    assets/vendor/react-dom/react-dom.development.js: {}
+#    assets/vendor/babel/babel.min.js: {}
+#    assets/vendor/redux/redux.js: {}
+#    assets/vendor/redux-toolkit/redux-toolkit.js: {}
+#    assets/vendor/redux-toolkit/immer/immer.legacy-esm.js: {}
+#    assets/vendor/redux-toolkit/redux-thunk/redux-thunk.legacy-esm.js: {}
+#    assets/vendor/redux-toolkit/reselect/reselect.legacy-esm.js: {}
