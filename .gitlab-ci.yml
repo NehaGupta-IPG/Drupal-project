@@ -416,6 +416,17 @@ default:
 # Test Jobs
 ################
 
+'👷️️️ PHPUnit Build':
+  <<: [ *with-composer, *test-setup ]
+  retry: 1
+  variables:
+    TESTSUITE: PHPUnit-Build
+    KUBERNETES_CPU_REQUEST: "12"
+    CONCURRENCY: "6"
+    DRUPAL_TEST_CONTEXT_KEYS: "php-version,phpunit-testsuite,database-driver,database-version"
+  services:
+    - <<: *with-database
+
 '🖱️️️ PHPUnit Functional Javascript':
   <<: [ *with-composer, *test-setup ]
   parallel: 3
@@ -430,17 +441,6 @@ default:
   after_script:
     - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
     - cp /builds/chromedriver.log ./
-
-'👷️️️ PHPUnit Build':
-  <<: [ *with-composer, *test-setup ]
-  retry: 1
-  variables:
-    TESTSUITE: PHPUnit-Build
-    KUBERNETES_CPU_REQUEST: "8"
-    CONCURRENCY: "5"
-    DRUPAL_TEST_CONTEXT_KEYS: "php-version,phpunit-testsuite,database-driver,database-version"
-  services:
-    - <<: *with-database
 
 '🌐️️ PHPUnit Functional':
   <<: [ *with-composer, *test-setup ]
@@ -458,8 +458,8 @@ default:
   parallel: 4
   variables:
     TESTSUITE: PHPUnit-Kernel
-    KUBERNETES_CPU_REQUEST: "8"
-    CONCURRENCY: "24"
+    KUBERNETES_CPU_REQUEST: "12"
+    CONCURRENCY: "20"
     DRUPAL_TEST_CONTEXT_KEYS: "php-version,phpunit-testsuite,database-driver,database-version"
   services:
     - <<: *with-database

@@ -993,6 +993,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $this->containerNeedsDumping = FALSE;
     $session_started = FALSE;
     $all_messages = [];
+    $config_is_syncing = FALSE;
+    $source_storage = NULL;
     if (isset($this->container)) {
       // Save the id of the currently logged in user.
       if ($this->container->initialized('current_user')) {
@@ -1016,6 +1018,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       }
 
       $all_messages = $this->container->get('messenger')->all();
+      $config_is_syncing = $this->container->get('config.installer')->isSyncing();
+      $source_storage = $this->container->get('config.installer')->getSourceStorage();
     }
 
     // If the module list hasn't already been set in updateModules and we are
@@ -1075,6 +1079,15 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     foreach ($all_messages as $type => $messages) {
       foreach ($messages as $message) {
         $this->container->get('messenger')->addMessage($message, $type);
+      }
+    }
+
+    // Restore syncing flag, as this is often set when modules or themes
+    // are installed which triggers a container rebuild.
+    if ($config_is_syncing) {
+      $this->container->get('config.installer')->setSyncing(TRUE);
+      if ($source_storage) {
+        $this->container->get('config.installer')->setSourceStorage($source_storage);
       }
     }
 
@@ -1606,23 +1619,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   }
 
   /**
-   * Returns an array of Extension class parameters for all enabled modules.
-   *
-   * @return array
-   *   An associated array of module class parameters, keyed by module name, for
-   *   all enabled modules.
-   *
-   * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use
-   *   getExtensionsParameter() instead.
-   *
-   * @see https://www.drupal.org/node/3551652
-   */
-  protected function getModulesParameter() {
-    @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use getExtensionsParameter() instead. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
-    return $this->getExtensionsParameter($this->moduleList, [$this, 'moduleData']);
-  }
-
-  /**
    * Returns an array of Extension class parameters for all enabled extensions.
    *
    * @param array $extension_list
@@ -1649,23 +1645,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   }
 
   /**
-   * Gets the filenames for each enabled module.
-   *
-   * @return array
-   *   Array where each key is a module name, and each value is a path to the
-   *   respective *.info.yml file.
-   *
-   * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use
-   *   getExtensionFileNames() instead.
-   *
-   * @see https://www.drupal.org/node/3551652
-   */
-  protected function getModuleFileNames() {
-    @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use getExtensionFileNames() instead. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
-    return $this->getExtensionFileNames($this->moduleList, [$this, 'moduleData']);
-  }
-
-  /**
    * Gets the filenames for each enabled extension.
    *
    * @param array $extension_list
@@ -1685,28 +1664,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       }
     }
     return $filenames;
-  }
-
-  /**
-   * Gets the PSR-4 base directories for module namespaces.
-   *
-   * @param string[] $module_file_names
-   *   Array where each key is a module name, and each value is a path to
-   *   the respective *.info.yml file.
-   *
-   * @return string[]
-   *   Array where each key is a module namespace like 'Drupal\system', and
-   *   each value is the PSR-4 base directory associated with the module
-   *   namespace.
-   *
-   * @deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use
-   *   getExtensionNamespacesPsr4() instead.
-   *
-   * @see https://www.drupal.org/node/3551652
-   */
-  protected function getModuleNamespacesPsr4($module_file_names) {
-    @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use getExtensionNamespacesPsr4() instead. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
-    return $this->getExtensionNamespacesPsr4($module_file_names);
   }
 
   /**

@@ -13,11 +13,6 @@ parameters:
   core.moved_classes:
     'Drupal\Core\StringTranslation\TranslationWrapper':
       class: 'Drupal\Core\StringTranslation\TranslatableMarkup'
-    'Doctrine\Common\Annotations\AnnotationException':
-      class: 'Drupal\Component\Annotation\Doctrine\AnnotationException'
-      deprecation_version: drupal:11.3.0
-      removed_version: drupal:12.0.0
-      change_record: https://www.drupal.org/node/3551049
   session.storage.options:
     gc_probability: 1
     gc_divisor: 100
@@ -689,10 +684,6 @@ services:
     class: Drupal\Core\Extension\ModuleInstaller
     autowire: true
   Drupal\Core\Extension\ModuleInstallerInterface: '@module_installer'
-  module_installer.uninstall_validators:
-    class: \IteratorIterator
-    arguments: [!tagged_iterator module_install.uninstall_validator]
-    deprecated: The "%service_id%" service is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Inject "!tagged_iterator module_install.uninstall_validator" instead. See https://www.drupal.org/node/3432595
   extension.list.module:
     class: Drupal\Core\Extension\ModuleExtensionList
     arguments: ['%app.root%', 'module', '@cache.default', '@info_parser', '@module_handler', '@state', '@config.factory', '@extension.list.profile', '%install_profile%', '%container.modules%']
@@ -1298,7 +1289,7 @@ services:
   # Main content view subscriber plus the renderers it uses.
   main_content_view_subscriber:
     class: Drupal\Core\EventSubscriber\MainContentViewSubscriber
-    arguments: ['@class_resolver', '@current_route_match', '%main_content_renderers%']
+    autowire: true
   renderer_non_html:
     class: Drupal\Core\EventSubscriber\RenderArrayNonHtmlSubscriber
   main_content_renderer.html:
@@ -1727,7 +1718,7 @@ services:
   Drupal\Core\Session\WriteSafeSessionHandlerInterface: '@session_handler.write_safe'
   session_manager:
     class: Drupal\Core\Session\SessionManager
-    arguments: ['@request_stack', '@session_handler', '@session_manager.metadata_bag', '@session_configuration', '@datetime.time', '@Drupal\Core\Session\UserSessionRepositoryInterface']
+    arguments: ['@request_stack', '@session_handler', '@session_manager.metadata_bag', '@session_configuration', '@datetime.time']
   Drupal\Core\Session\SessionManagerInterface: '@session_manager'
   session_manager.metadata_bag:
     class: Drupal\Core\Session\MetadataBag
@@ -2006,7 +1997,7 @@ services:
     class: Drupal\Core\Theme\Icon\IconExtractorPluginManager
     parent: default_plugin_manager
     arguments: ['@plugin_form.factory']
-  Drupal\Core\Theme\Icon\IconExtractorInterface: '@plugin.manager.icon_extractor'
+  Drupal\Core\Theme\Icon\IconExtractorPluginManager: '@plugin.manager.icon_extractor'
   Drupal\Core\Theme\Icon\IconFinder:
     autowire: true
     arguments:

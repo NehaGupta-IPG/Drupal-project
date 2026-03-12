@@ -171,7 +171,10 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
    */
   protected function loadLanguageTypesConfiguration() {
     if (!$this->languageTypes) {
-      $this->languageTypes = $this->configFactory->get('language.types')->get() ?: ['configurable' => [], 'all' => parent::getLanguageTypes()];
+      $this->languageTypes = $this->configFactory->get('language.types')->get() ?: [
+        'configurable' => [],
+        'all' => parent::getLanguageTypes(),
+      ];
     }
     return $this->languageTypes;
   }
@@ -204,7 +207,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
     if (isset($values['all'])) {
       $config->set('all', $values['all']);
     }
-    $config->save(TRUE);
+    $config->save();
   }
 
   /**
