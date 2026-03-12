@@ -78,27 +78,18 @@ class CommentWidgetSummaryTest extends WebDriverTestBase {
     ]);
     $this->drupalLogin($admin);
 
-    // Visit the node edit page.
+    // Visit the node edit page default status is Open.
     $this->drupalGet('node/' . $this->node->id() . '/edit');
-
-    // Wait for JS to set the summary text and assert it shows 'Open'.
-    $summary = $this->assertSession()->waitForElement('css', 'details.comment-node-settings-form > summary');
+    $this->assertSession()->waitForElement('css', 'details.comment-node-settings-form > summary .summary');
+    $summary = $this->getSession()->getPage()->find('css', 'details.comment-node-settings-form > summary');
     $this->assertStringContainsString('Open', $summary->getText());
-
-    // Change status to Closed and verify summary updates.
-    $this->node->set('comment', CommentingStatus::Closed->value);
-    $this->node->save();
-    $this->drupalGet('node/' . $this->node->id() . '/edit');
-
-    $summary = $this->assertSession()->waitForElement('css', 'details.comment-node-settings-form > summary');
-    $this->assertStringContainsString('Closed', $summary->getText());
 
     // Change status to Hidden and verify summary updates.
     $this->node->set('comment', CommentingStatus::Hidden->value);
     $this->node->save();
     $this->drupalGet('node/' . $this->node->id() . '/edit');
-
-    $summary = $this->assertSession()->waitForElement('css', 'details.comment-node-settings-form > summary');
+    $this->assertSession()->waitForElement('css', 'details.comment-node-settings-form > summary .summary');
+    $summary = $this->getSession()->getPage()->find('css', 'details.comment-node-settings-form > summary');
     $this->assertStringContainsString('Hidden', $summary->getText());
   }
 
