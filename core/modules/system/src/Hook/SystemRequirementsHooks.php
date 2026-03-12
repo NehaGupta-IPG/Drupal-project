@@ -1557,7 +1557,7 @@ class SystemRequirementsHooks {
       if (Settings::get('extension_discovery_ignore_core_version_requirement')) {
         $requirements['extension_discovery_core_version_requirement_disabled'] = [
           'title' => $this->t('Extension discovery core version requirement'),
-          'value' => $this->t('The check for core compatibility of modules and themes is disabled in settings.php. This may affect stability of the site and pose a security risk.'),
+          'value' => $this->t('The check for core compatibility of modules and themes is disabled in settings.php. This is meant for development purposes only. This may affect stability of the site and pose a security risk.'),
           'severity' => RequirementSeverity::Warning,
         ];
       }
