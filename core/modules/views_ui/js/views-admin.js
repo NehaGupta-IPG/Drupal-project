@@ -1178,15 +1178,10 @@
       const $context = $(context);
 
       function changeDefaultWidget(event) {
-        $context
-          .find(':has(>input.default-radios)')
-          .toggle(!$(event.target).prop('checked'));
-        $context
-          .find(':has(>td.any-default-radios-row)')
-          .toggle(!$(event.target).prop('checked'));
-        $context
-          .find(':has(>input.default-checkboxes)')
-          .toggle($(event.target).prop('checked'));
+        const isChecked = $(event.target).prop('checked');
+        $context.find(':has(>input.default-radios)').toggle(!isChecked);
+        $context.find(':has(>td.any-default-radios-row)').toggle(!isChecked);
+        $context.find(':has(>input.default-checkboxes)').toggle(isChecked);
       }
 
       // Update on widget change.
