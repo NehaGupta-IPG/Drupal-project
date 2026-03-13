@@ -696,7 +696,7 @@
       'button, fieldset, optgroup, option, select, textarea, input';
     if (e.trigger) {
       const disabledClass =
-        drupalSettings.states?.classes?.disabled || 'form-disabled';
+        drupalSettings.states_api?.classes?.disabled || 'form-disabled';
       $(e.target)
         .closest('.js-form-item, .js-form-submit, .js-form-wrapper')
         .toggleClass(disabledClass, e.value)
@@ -709,7 +709,7 @@
   $document.on('state:readonly', (e) => {
     if (e.trigger) {
       const readonlyClass =
-        drupalSettings.states?.classes?.readonly || 'form-readonly';
+        drupalSettings.states_api?.classes?.readonly || 'form-readonly';
       $(e.target)
         .closest('.js-form-item, .js-form-submit, .js-form-wrapper')
         .toggleClass(readonlyClass, e.value)
@@ -721,7 +721,7 @@
   $document.on('state:required', (e) => {
     if (e.trigger) {
       const requiredClass =
-        drupalSettings.states?.classes?.required || 'form-required';
+        drupalSettings.states_api?.classes?.required || 'form-required';
       if (e.value) {
         const label = `label${e.target.id ? `[for=${e.target.id}]` : ''}`;
         const $label = $(e.target)
