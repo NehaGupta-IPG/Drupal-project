@@ -53,13 +53,6 @@ class TypedConfigTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
-    // When saving trusted data, it normally skips validation. So we need
-    // to disable the config schema checker.
-    // @todo Possibly remove in https://www.drupal.org/i/3347842
-    if ($this->name() === 'testPrimitiveDataTypesConsistencyWhenTrustingData') {
-      self::$configSchemaCheckerExclusions[] = 'config_test.types';
-    }
-
     parent::setUp();
 
     $this->installConfig('config_test');
@@ -509,22 +502,6 @@ class TypedConfigTest extends KernelTestBase {
         ),
       );
     }
-  }
-
-  /**
-  * Test primitive config data types consistency with trusted data.
-  *
-  * @todo Possibly remove in https://www.drupal.org/i/3347842
-  */
-  #[DataProvider('providerBooleanDataType')]
-  #[DataProvider('providerIntegerDataType')]
-  #[DataProvider('providerFloatDataType')]
-  #[DataProvider('providerStringDataType')]
-  public function testPrimitiveDataTypesConsistencyWhenTrustingData(...$arguments): void {
-    // When trusting data, the provided value is saved without magic. Set the
-    // 5th argument ($expected_saved_value) to the 2nd argument ($value_to_set).
-    $arguments[3] = $arguments[1];
-    $this->assertPrimitiveDataTypesConsistency(TRUE, ...$arguments);
   }
 
   /**
