@@ -79,7 +79,7 @@ class ResourceType {
    *
    * @var bool
    */
-  private bool $isTranslatable;
+  protected bool $isTranslatable;
 
   /**
    * Whether this resource type's resources are versionable.
