@@ -2,14 +2,15 @@
 
 namespace Drupal\views\Entity;
 
-use Drupal\Core\Entity\Attribute\ConfigEntityType;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Config\Action\Attribute\ActionMethod;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Plugin\DependentWithRemovalPluginInterface;
 use Drupal\views\PostSaveProcess;
 use Drupal\views\PostSaveViewInterface;
@@ -150,6 +151,7 @@ class View extends ConfigEntityBase implements ViewEntityInterface {
   /**
    * {@inheritdoc}
    */
+  #[ActionMethod(adminLabel: new TranslatableMarkup('Add display'))]
   public function addDisplay($plugin_id = 'page', $title = NULL, $id = NULL) {
     if (empty($plugin_id)) {
       return FALSE;
@@ -237,6 +239,7 @@ class View extends ConfigEntityBase implements ViewEntityInterface {
   /**
    * {@inheritdoc}
    */
+  #[ActionMethod(adminLabel: new TranslatableMarkup('Duplicate display as type'), pluralize: FALSE)]
   public function duplicateDisplayAsType($old_display_id, $new_display_type) {
     $executable = $this->getExecutable();
     $display = $executable->newDisplay($new_display_type);
