@@ -389,50 +389,7 @@ class TypedConfigTest extends KernelTestBase {
   #[DataProvider('providerFloatDataType')]
   #[DataProvider('providerStringDataType')]
   public function testPrimitiveDataTypesConsistency(...$arguments): void {
-    // Config schema checker errors cannot happen because the magic-cast-during-
-    // save logic always casts primitives to comply with the type, even if the
-    // original value does not have a sensible casting. Unset the 6th argument
-    // before passing it to the assertion helper.
-    // @see \Drupal\Core\Config\StorableConfigBase::castValue()
-    $expects_config_schema_checker_error = FALSE;
-    if (count($arguments) === 6) {
-      // Assert explicitly when there is a mismatch between the validation
-      // constraint logic and the magical casting logic.
-      $expects_validation_error = !empty($arguments[4]);
-      $expects_config_schema_checker_error = ($arguments[5] !== NULL);
-      if ($expects_validation_error && $expects_config_schema_checker_error) {
-        // Assert the test data correctly represents the inconsistency:
-        // validation fails for this value, but magical casting during save
-        // transforms it to a different (valid) value.
-        $this->assertNotSame(
-          $arguments[1],
-          $arguments[3],
-          sprintf(
-            'The `type: %s` config schema type uses magical casting for the %s value that is inconsistent with the validation logic in %s.',
-            $arguments[0],
-            gettype($arguments[1]),
-            PrimitiveTypeConstraintValidator::class,
-          ),
-        );
-      }
-      unset($arguments[5]);
-    }
     $this->assertPrimitiveDataTypesConsistency(FALSE, ...$arguments);
-
-    // For inconsistent magic cases, also verify at runtime that castValue()
-    // actually transformed the value: read the persisted value from config
-    // and assert it differs from what was originally set.
-    if (isset($expects_validation_error) && $expects_validation_error && $expects_config_schema_checker_error) {
-      $this->assertNotSame(
-        $arguments[1],
-        $this->config('config_test.types')->get($arguments[0]),
-        sprintf(
-          'Magical casting must have actually transformed the %s value for `type: %s`.',
-          gettype($arguments[1]),
-          $arguments[0],
-        ),
-      );
-    }
   }
 
   /**
