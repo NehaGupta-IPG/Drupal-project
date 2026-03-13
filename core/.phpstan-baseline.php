@@ -1508,6 +1508,18 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Annotation/Translation.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Core\\\\Archiver\\\\ArchiveTar\\:\\:_error\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Archiver/ArchiveTar.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Core\\\\Archiver\\\\ArchiveTar\\:\\:_warning\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Archiver/ArchiveTar.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Asset\\\\AssetCollectionOptimizerInterface\\:\\:deleteAll\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
