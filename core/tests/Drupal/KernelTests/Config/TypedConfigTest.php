@@ -198,10 +198,6 @@ class TypedConfigTest extends KernelTestBase {
    *   3. the value we expect to be validated
    *   4. the value we expect to be saved
    *   5. the expected validation errors from TypedDataInterface::validate().
-   *   6. whether we expect a complaint from the ConfigSchemaChecker when saving
-   *      as trusted data (and hence bypassing the magic-cast-during-save logic).
-   *
-   * @todo Possibly remove 6 in https://www.drupal.org/i/3347842
    */
   public static function providerBooleanDataType(): \Generator {
     // @see core/modules/config/tests/config_test/config/install/config_test.types.yml
@@ -215,42 +211,30 @@ class TypedConfigTest extends KernelTestBase {
 
     // Magic: values 2–4 are not identical.
     // First: intentional magic — no validation errors triggered.
-    yield "$key: MAGIC: `0` → `false`" => [
-      $key, 0, 0, FALSE, [],
-      'variable type is integer but applied schema class is Drupal\Core\TypedData\Plugin\DataType\BooleanData',
-    ];
-    yield "$key: MAGIC: `1` → `true`" => [
-      $key, 1, 1, TRUE, [],
-      'variable type is integer but applied schema class is Drupal\Core\TypedData\Plugin\DataType\BooleanData',
-    ];
-    yield "$key: MAGIC: `'1'` → `true`" => [
-      $key, '1', '1', TRUE, [],
-      'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\BooleanData',
-    ];
-    yield "$key: MAGIC: `'0'` → `false`" => [
-      $key, '0', '0', FALSE, [],
-      'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\BooleanData',
-    ];
+    yield "$key: MAGIC: `0` → `false`" => [$key, 0, 0, FALSE, []];
+    yield "$key: MAGIC: `1` → `true`" => [$key, 1, 1, TRUE, []];
+    yield "$key: MAGIC: `'1'` → `true`" => [$key, '1', '1', TRUE, []];
+    yield "$key: MAGIC: `'0'` → `false`" => [$key, '0', '0', FALSE, []];
     // Second: accidental magic — validation errors are triggered.
     yield "$key: MAGIC: `'test'` → `true`" => [
-      $key, 'test', 'test', TRUE, [$key => 'This value should be of the correct primitive type.'],
-      'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\BooleanData',
+      $key, 'test', 'test', TRUE,
+      [$key => 'This value should be of the correct primitive type.'],
     ];
     yield "$key: MAGIC: `'yes'` → `true`" => [
-      $key, 'no', 'no', TRUE, [$key => 'This value should be of the correct primitive type.'],
-      'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\BooleanData',
+      $key, 'no', 'no', TRUE,
+      [$key => 'This value should be of the correct primitive type.'],
     ];
     yield "$key: MAGIC: `'no'` → `true` ⚠️" => [
-      $key, 'no', 'no', TRUE, [$key => 'This value should be of the correct primitive type.'],
-      'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\BooleanData',
+      $key, 'no', 'no', TRUE,
+      [$key => 'This value should be of the correct primitive type.'],
     ];
     yield "$key: MAGIC: `'false'` → `true` ⚠️" => [
-      $key, 'false', 'false', TRUE, [$key => 'This value should be of the correct primitive type.'],
-      'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\BooleanData',
+      $key, 'false', 'false', TRUE,
+      [$key => 'This value should be of the correct primitive type.'],
     ];
     yield "$key: MAGIC: `''` → `false`" => [
-      $key, '', '', FALSE, [$key => 'This value should be of the correct primitive type.'],
-      'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\BooleanData',
+      $key, '', '', FALSE,
+      [$key => 'This value should be of the correct primitive type.'],
     ];
   }
 
@@ -265,10 +249,6 @@ class TypedConfigTest extends KernelTestBase {
    *   3. the value we expect to be validated
    *   4. the value we expect to be saved
    *   5. the expected validation errors
-   *   6. whether we expect a complaint from the ConfigSchemaChecker when saving
-   *      as trusted data (and hence bypassing the magic-cast-during-save logic).
-   *
-   * @todo Possibly remove 6 in https://www.drupal.org/i/3347842
    */
   public static function providerIntegerDataType(): \Generator {
     // @see core/modules/config/tests/config_test/config/install/config_test.types.yml
@@ -285,26 +265,20 @@ class TypedConfigTest extends KernelTestBase {
 
     // Magic: arguments 2–4 are not identical.
     // First: intentional magic — no validation errors triggered.
-    yield "$key: MAGIC: `'55'` → `55`" => [
-      $key, '55', '55', 55, [],
-      'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\IntegerData',
-    ];
-    yield "$key: MAGIC: `true` → `1`" => [
-      $key, TRUE, TRUE, 1, [],
-      'variable type is boolean but applied schema class is Drupal\Core\TypedData\Plugin\DataType\IntegerData',
-    ];
+    yield "$key: MAGIC: `'55'` → `55`" => [$key, '55', '55', 55, []];
+    yield "$key: MAGIC: `true` → `1`" => [$key, TRUE, TRUE, 1, []];
     // Second: accidental magic: validation errors are triggered.
     yield "$key: MAGIC: `''` → `null`" => [
-      $key, '', '', NULL, [$key => 'This value should be of the correct primitive type.'],
-      'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\IntegerData',
+      $key, '', '', NULL,
+      [$key => 'This value should be of the correct primitive type.'],
     ];
     yield "$key: MAGIC: `'55%'` → `55`" => [
-      $key, '55%', '55%', 55, [$key => 'This value should be of the correct primitive type.'],
-      'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\IntegerData',
+      $key, '55%', '55%', 55,
+      [$key => 'This value should be of the correct primitive type.'],
     ];
     yield "$key: MAGIC: `false` → `0`" => [
-      $key, FALSE, FALSE, 0, [$key => 'This value should be of the correct primitive type.'],
-      'variable type is boolean but applied schema class is Drupal\Core\TypedData\Plugin\DataType\IntegerData',
+      $key, FALSE, FALSE, 0,
+      [$key => 'This value should be of the correct primitive type.'],
     ];
   }
 
@@ -319,10 +293,6 @@ class TypedConfigTest extends KernelTestBase {
    *   3. the value we expect to be validated
    *   4. the value we expect to be saved
    *   5. the expected validation errors
-   *   6. whether we expect a complaint from the ConfigSchemaChecker when saving
-   *      as trusted data (and hence bypassing the magic-cast-during-save logic).
-   *
-   * @todo Possibly remove 6 in https://www.drupal.org/i/3347842
    */
   public static function providerFloatDataType(): \Generator {
     // @see core/modules/config/tests/config_test/config/install/config_test.types.yml
@@ -347,26 +317,20 @@ class TypedConfigTest extends KernelTestBase {
 
     // Magic: arguments 2–4 are not identical.
     // First: intentional magic — no validation errors triggered.
-    yield "$key: MAGIC: `'3.14159'` → `3.14159`" => [
-      $key, '3.14159', '3.14159', 3.14159, [],
-      'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\FloatData',
-    ];
-    yield "$key: MAGIC: `true` → `1.0`" => [
-      $key, TRUE, TRUE, 1.0, [],
-      'variable type is boolean but applied schema class is Drupal\Core\TypedData\Plugin\DataType\FloatData',
-    ];
+    yield "$key: MAGIC: `'3.14159'` → `3.14159`" => [$key, '3.14159', '3.14159', 3.14159, []];
+    yield "$key: MAGIC: `true` → `1.0`" => [$key, TRUE, TRUE, 1.0, []];
     // Second: accidental magic: validation errors are triggered.
     yield "$key: MAGIC: `''` → `null`" => [
-      $key, '', '', NULL, [$key => 'This value should be of the correct primitive type.'],
-      'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\FloatData',
+      $key, '', '', NULL,
+      [$key => 'This value should be of the correct primitive type.'],
     ];
     yield "$key: MAGIC: `'55%'` → `55.0`" => [
-      $key, '55%', '55%', 55.0, [$key => 'This value should be of the correct primitive type.'],
-      'variable type is string but applied schema class is Drupal\Core\TypedData\Plugin\DataType\FloatData',
+      $key, '55%', '55%', 55.0,
+      [$key => 'This value should be of the correct primitive type.'],
     ];
     yield "$key: MAGIC: `false` → `0`" => [
-      $key, FALSE, FALSE, 0.0, [$key => 'This value should be of the correct primitive type.'],
-      'variable type is boolean but applied schema class is Drupal\Core\TypedData\Plugin\DataType\FloatData',
+      $key, FALSE, FALSE, 0.0,
+      [$key => 'This value should be of the correct primitive type.'],
     ];
   }
 
@@ -399,53 +363,20 @@ class TypedConfigTest extends KernelTestBase {
     // Magic: arguments 2–4 are not identical.
     // First: intentional magic — no validation errors triggered.
     // Booleans.
-    yield "$key: MAGIC: `true` → `'1'`" => [
-      $key, TRUE, TRUE, '1', [],
-      'variable type is boolean but applied schema class is Drupal\Core\TypedData\Plugin\DataType\StringData',
-    ];
-    yield "$key: MAGIC: `false` → `''`" => [
-      $key, FALSE, FALSE, '', [],
-      'variable type is boolean but applied schema class is Drupal\Core\TypedData\Plugin\DataType\StringData',
-    ];
+    yield "$key: MAGIC: `true` → `'1'`" => [$key, TRUE, TRUE, '1', []];
+    yield "$key: MAGIC: `false` → `''`" => [$key, FALSE, FALSE, '', []];
     // Integers.
-    yield "$key: 🪄: `0` → `'0'`" => [
-      $key, 0, 0, '0', [],
-      'variable type is integer but applied schema class is Drupal\Core\TypedData\Plugin\DataType\StringData',
-    ];
-    yield "$key: 🪄: `1` → `'1'`" => [
-      $key, 1, 1, '1', [],
-      'variable type is integer but applied schema class is Drupal\Core\TypedData\Plugin\DataType\StringData',
-    ];
-    yield "$key: 🪄: `-1` → `'-1'`" => [
-      $key, -1, -1, '-1', [],
-      'variable type is integer but applied schema class is Drupal\Core\TypedData\Plugin\DataType\StringData',
-    ];
+    yield "$key: 🪄: `0` → `'0'`" => [$key, 0, 0, '0', []];
+    yield "$key: 🪄: `1` → `'1'`" => [$key, 1, 1, '1', []];
+    yield "$key: 🪄: `-1` → `'-1'`" => [$key, -1, -1, '-1', []];
     // Testing min and max value for integers.
-    yield "$key: 🪄: `-2147483648` -> '-2147483648'" => [
-      $key, -2147483648, -2147483648, '-2147483648', [],
-      'variable type is integer but applied schema class is Drupal\Core\TypedData\Plugin\DataType\StringData',
-    ];
+    yield "$key: 🪄: `-2147483648` -> '-2147483648'" => [$key, -2147483648, -2147483648, '-2147483648', []];
     // Floats.
-    yield "$key:🪄: `0.0` → `'0'`" => [
-      $key, 0.0, 0.0, '0', [],
-      'variable type is double but applied schema class is Drupal\Core\TypedData\Plugin\DataType\StringData',
-    ];
-    yield "$key:🪄: `1.0` → `'1'`" => [
-      $key, 1.0, 1.0, '1', [],
-      'variable type is double but applied schema class is Drupal\Core\TypedData\Plugin\DataType\StringData',
-    ];
-    yield "$key:🪄: `-1.0` → `'-1'`" => [
-      $key, -1.0, -1.0, '-1', [],
-      'variable type is double but applied schema class is Drupal\Core\TypedData\Plugin\DataType\StringData',
-    ];
-    yield "$key:🪄: `3.14159` -> '3.14159'" => [
-      $key, 3.14159, 3.14159, '3.14159', [],
-      'variable type is double but applied schema class is Drupal\Core\TypedData\Plugin\DataType\StringData',
-    ];
-    yield "$key:🪄: `-3.14159` -> '-3.14159'" => [
-      $key, -3.14159, -3.14159, '-3.14159', [],
-      'variable type is double but applied schema class is Drupal\Core\TypedData\Plugin\DataType\StringData',
-    ];
+    yield "$key:🪄: `0.0` → `'0'`" => [$key, 0.0, 0.0, '0', []];
+    yield "$key:🪄: `1.0` → `'1'`" => [$key, 1.0, 1.0, '1', []];
+    yield "$key:🪄: `-1.0` → `'-1'`" => [$key, -1.0, -1.0, '-1', []];
+    yield "$key:🪄: `3.14159` -> '3.14159'" => [$key, 3.14159, 3.14159, '3.14159', []];
+    yield "$key:🪄: `-3.14159` -> '-3.14159'" => [$key, -3.14159, -3.14159, '-3.14159', []];
     // Second: accidental magic: validation errors are triggered.
     // None.
   }
