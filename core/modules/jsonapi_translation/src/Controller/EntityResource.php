@@ -99,9 +99,9 @@ final class EntityResource extends JsonApiEntityResource {
 
     $entity = $this->getDefaultTranslation($entity);
 
-    // If a resource language is explicitly provided, a resource translation was
-    // unambiguously specified. Otherwise we rely on the "Accept-Language" header
-    // for the fallback logic.
+    // If a resource language is explicitly provided, a resource translation
+    // was unambiguously specified. Otherwise we rely on the "Accept-Language"
+    // header for the fallback logic.
     if ($resource_language) {
       $translation = $this->getResourceTranslation($entity, $request);
       if (!$translation) {
@@ -127,8 +127,9 @@ final class EntityResource extends JsonApiEntityResource {
       $response->addCacheableDependency($url);
       $response->headers->set('Content-Location', $url->getGeneratedUrl());
 
-      // @todo Internal page cache does not support the "Accept-Language" header
-      //   currently. Remove this once it does. See https://www.drupal.org/project/drupal/issues/2430335.
+      // @todo Internal page cache does not support the "Accept-Language"
+      // header currently. Remove this once it does.
+      // See https://www.drupal.org/project/drupal/issues/2430335.
       \Drupal::service('page_cache_kill_switch')->trigger();
     }
 
