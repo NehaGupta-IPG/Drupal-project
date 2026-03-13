@@ -334,7 +334,7 @@ CORE_INCOMPATIBILITY;
    * Tests core incompatibility can be ignored with a setting.
    */
   #[CoversMethod(InfoParser::class, 'parse')]
-  public function testCoreIncompatibilityIgnoreSetting() {
+  public function testCoreIncompatibilityIgnoreSetting(): void {
     $settings['extension_discovery_ignore_core_version_requirement'] = TRUE;
     new Settings($settings);
 
