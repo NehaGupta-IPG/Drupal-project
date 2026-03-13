@@ -11,13 +11,13 @@ use Symfony\Component\ErrorHandler\DebugClassLoader;
  *
  * Symfony's DebugClassLoader uses the first namespace segment as the vendor
  * boundary for return type deprecation checks. Since all Drupal code shares
- * "Drupal\" as the first segment, cross-module return type deprecations
+ * "Drupal\" as the first segment, cross-extension return type deprecations
  * (e.g., contrib extending core) are never triggered.
  *
- * This subclass treats each Drupal module (the second namespace segment) as
- * the vendor boundary, enabling return type deprecation notices when a module
- * overrides a method from a different module without adding native return
- * types.
+ * This subclass treats each Drupal extension (the second namespace segment)
+ * as the vendor boundary, enabling return type deprecation notices when an
+ * extension overrides a method from a different extension without adding
+ * native return types.
  *
  * @internal
  */
@@ -52,7 +52,7 @@ class DrupalDebugClassLoader extends DebugClassLoader {
       return $deprecations;
     }
 
-    $classModule = self::getDrupalModule($class);
+    $classExtension = self::getExtensionName($class);
     $className = str_contains($class, "@anonymous\0")
       ? (get_parent_class($class) ?: key(class_implements($class)) ?: 'class') . '@anonymous'
       : $class;
@@ -60,10 +60,10 @@ class DrupalDebugClassLoader extends DebugClassLoader {
     foreach ($returnTypes as $method => $returnTypeData) {
       [$normalizedType, , $declaringClass] = $returnTypeData;
 
-      // Skip if no cross-module boundary: empty declaring class (magic
-      // methods), same class (own @return), or same/non-Drupal module.
-      $declaringModule = self::getDrupalModule($declaringClass);
-      if ($declaringClass === '' || $declaringClass === $class || $declaringModule === NULL || $classModule === $declaringModule) {
+      // Skip if no cross-extension boundary: empty declaring class (magic
+      // methods), same class (own @return), or same/non-Drupal extension.
+      $declaringExtension = self::getExtensionName($declaringClass);
+      if ($declaringClass === '' || $declaringClass === $class || $declaringExtension === NULL || $classExtension === $declaringExtension) {
         continue;
       }
 
@@ -93,15 +93,15 @@ class DrupalDebugClassLoader extends DebugClassLoader {
   }
 
   /**
-   * Extracts the Drupal module name from a fully qualified class name.
+   * Extracts the Drupal extension name from a fully qualified class name.
    *
    * @param string $class
    *   The fully qualified class name.
    *
    * @return string|null
-   *   The module name, or NULL for non-Drupal classes.
+   *   The extension name, or NULL for non-Drupal classes.
    */
-  public static function getDrupalModule(string $class): ?string {
+  private static function getExtensionName(string $class): ?string {
     if (!str_starts_with($class, 'Drupal\\')) {
       return NULL;
     }
