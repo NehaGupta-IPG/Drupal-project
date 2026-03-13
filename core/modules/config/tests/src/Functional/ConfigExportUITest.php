@@ -83,10 +83,8 @@ class ConfigExportUITest extends BrowserTestBase {
     }
     // Assert that the downloaded archive file contents are the same as the test
     // site active store. PharData sorts entries alphabetically regardless of
-    // insertion order, so sort both arrays before comparing.
-    sort($config_files);
-    sort($archive_contents);
-    $this->assertSame($config_files, $archive_contents);
+    // insertion order.
+    $this->assertEqualsCanonicalizing($config_files, $archive_contents);
 
     // Ensure the test configuration override is in effect but was not exported.
     $this->assertSame('Foo', \Drupal::config('system.maintenance')->get('message'));
