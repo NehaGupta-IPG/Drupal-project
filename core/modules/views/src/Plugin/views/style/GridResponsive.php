@@ -87,9 +87,6 @@ class GridResponsive extends StylePluginBase {
       '#type' => 'textfield',
       '#default_value' => $this->options['col_class_custom'],
     ];
-    if ($this->usesFields()) {
-      $form['col_class_custom']['#description'] .= ' ' . $this->t('You may use field tokens as per the "Replacement patterns" used in "Rewrite the output of this field" for all fields.');
-    }
     $form['row_class_custom'] = [
       '#title' => $this->t('Custom row class'),
       '#description' => $this->t('Additional classes to provide on each row. Separated by a space.'),
@@ -97,7 +94,9 @@ class GridResponsive extends StylePluginBase {
       '#default_value' => $this->options['row_class_custom'],
     ];
     if ($this->usesFields()) {
-      $form['row_class_custom']['#description'] .= ' ' . $this->t('You may use field tokens as per the "Replacement patterns" used in "Rewrite the output of this field" for all fields.');
+      $token_description = ' ' . $this->t('You may use field tokens as per the "Replacement patterns" used in "Rewrite the output of this field" for all fields.');
+      $form['row_class_custom']['#description'] .= $token_description;
+      $form['col_class_custom']['#description'] .= $token_description;
     }
   }
 
