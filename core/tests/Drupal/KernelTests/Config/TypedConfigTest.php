@@ -18,7 +18,6 @@ use Drupal\Core\TypedData\Validation\RecursiveContextualValidator;
 use Drupal\Core\TypedData\Validation\RecursiveValidator;
 use Drupal\Core\Validation\ConstraintValidatorFactory;
 use Drupal\Core\Validation\DrupalTranslator;
-use Drupal\Core\Validation\Plugin\Validation\Constraint\PrimitiveTypeConstraintValidator;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -382,21 +381,8 @@ class TypedConfigTest extends KernelTestBase {
   }
 
   /**
-   * Test primitive config data types consistency.
-   */
-  #[DataProvider('providerBooleanDataType')]
-  #[DataProvider('providerIntegerDataType')]
-  #[DataProvider('providerFloatDataType')]
-  #[DataProvider('providerStringDataType')]
-  public function testPrimitiveDataTypesConsistency(...$arguments): void {
-    $this->assertPrimitiveDataTypesConsistency(FALSE, ...$arguments);
-  }
-
-  /**
    * Asserts consistency of primitive config data while validating and saving.
    *
-   * @param bool $trust_data
-   *   Whether to tell Config::save() to trust the config data or not.
    * @param string $key
    *   The key to set in the `config_test.types` config object.
    * @param mixed $value_to_set
@@ -410,7 +396,11 @@ class TypedConfigTest extends KernelTestBase {
    * @param string|null $expected_config_schema_checker_error
    *   (optional) The expected config schema checker error, if any.
    */
-  public function assertPrimitiveDataTypesConsistency(bool $trust_data, string $key, mixed $value_to_set, mixed $expected_validated_value, mixed $expected_saved_value, array $expected_validation_errors, ?string $expected_config_schema_checker_error = NULL): void {
+  #[DataProvider('providerBooleanDataType')]
+  #[DataProvider('providerIntegerDataType')]
+  #[DataProvider('providerFloatDataType')]
+  #[DataProvider('providerStringDataType')]
+  public function testPrimitiveDataTypesConsistency(string $key, mixed $value_to_set, mixed $expected_validated_value, mixed $expected_saved_value, array $expected_validation_errors, ?string $expected_config_schema_checker_error = NULL): void {
     $name = 'config_test.types';
     $config = $this->config($name);
 
@@ -496,7 +486,7 @@ class TypedConfigTest extends KernelTestBase {
     $developer_provided_data = $typed_config->toArray();
     $config->setData($developer_provided_data);
     $this->assertSame($value_to_set, $config->get($key));
-    $config->save($trust_data);
+    $config->save();
 
     // 4. Verify the expected value is saved.
     $this->assertSame($expected_saved_value, $config->get($key));
