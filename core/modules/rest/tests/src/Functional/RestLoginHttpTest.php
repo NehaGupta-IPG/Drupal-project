@@ -11,6 +11,7 @@ use Drupal\Core\Url;
 use Drupal\rest\Controller\RestAuthenticationController;
 use Drupal\Tests\BrowserTestBase;
 use GuzzleHttp\Cookie\CookieJar;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Http\Message\ResponseInterface;
@@ -608,6 +609,56 @@ class RestLoginHttpTest extends BrowserTestBase {
     $this->drupalGet($resetURL);
     $this->submitForm([], 'Log in');
     $this->assertSession()->pageTextContains('You have used a one-time login link. You can set your new password now.');
+  }
+
+  /**
+   * Tests that DeprecatedUserRoutesSubscriber correctly alters the controller.
+   */
+  #[DataProvider('providerDeprecatedUserRoutesSubscriber')]
+  public function testDeprecatedUserRoutesSubscriber(string $routeName, string $userController, string $restController): void {
+    $this->assertEquals(
+      $restController,
+      \Drupal::service('router.route_provider')
+        ->getRouteByName($routeName)
+        ->getDefault('_controller')
+    );
+
+    $this->container->get('module_installer')->uninstall(['rest']);
+    $this->rebuildAll();
+
+    $this->assertEquals(
+      $userController,
+      \Drupal::service('router.route_provider')
+        ->getRouteByName($routeName)
+        ->getDefault('_controller')
+    );
+  }
+
+  /**
+   * @return \Generator
+   *   Test scenarios.
+   */
+  public static function providerDeprecatedUserRoutesSubscriber(): \Generator {
+    yield [
+      'user.login_status.http',
+      '\Drupal\user\Controller\UserAuthenticationController::loginStatus',
+      '\Drupal\rest\Controller\RestAuthenticationController::loginStatus',
+    ];
+    yield [
+      'user.pass.http',
+      '\Drupal\user\Controller\UserAuthenticationController::resetPassword',
+      '\Drupal\rest\Controller\RestAuthenticationController::resetPassword',
+    ];
+    yield [
+      'user.login.http',
+      '\Drupal\user\Controller\UserAuthenticationController::login',
+      '\Drupal\rest\Controller\RestAuthenticationController::login',
+    ];
+    yield [
+      'user.logout.http',
+      '\Drupal\user\Controller\UserAuthenticationController::logout',
+      '\Drupal\rest\Controller\RestAuthenticationController::logout',
+    ];
   }
 
 }
