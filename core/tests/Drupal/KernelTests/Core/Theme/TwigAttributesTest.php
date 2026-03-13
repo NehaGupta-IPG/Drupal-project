@@ -42,4 +42,25 @@ class TwigAttributesTest extends KernelTestBase {
     $this->assertEquals(' class="test1 test2" class="test1"', $environment->renderInline($template, ['attributes' => $attributes]));
   }
 
+  /**
+   * Tests that attribute values are properly escaped and rendered.
+   *
+   * @legacy-covers \Drupal\Core\Template\AttributeValueBase
+   */
+  public function testAttributeValueMarkup(): void {
+    /** @var \Drupal\Core\Template\TwigEnvironment $environment */
+    $environment = \Drupal::service('twig');
+    $template = '<a{{- attributes|without("class", "href") }} class="{{ attributes.class }}" href="{{ attributes.href }}">link</a>';
+    $expected = '<a id="foo" aria-label="Foo &amp; bar link" class="foo&amp;bar" href="/foobar?foo=bar&amp;baz[0]=quux:123">link</a>';
+    $attributes = [
+      'id' => 'foo',
+      'class' => 'foo&bar',
+      'href' => '/foobar?foo=bar&baz[0]=quux:123',
+      'aria-label' => 'Foo & bar link',
+    ];
+    $context['attributes'] = new Attribute($attributes);
+    $result = (string) $environment->renderInline($template, $context);
+    $this->assertEquals($expected, $result);
+  }
+
 }
