@@ -64,9 +64,9 @@ router_test.11:
     _auth: [ 'basic_auth' ]
   requirements:
     _user_is_logged_in: 'TRUE'
+    _csrf_token: 'FALSE'
   defaults:
     _controller: '\Drupal\router_test\TestContent::test11'
-    _csrf_token: 'FALSE'
 
 router_test.12:
   path: '/router_test/test12/{user}'

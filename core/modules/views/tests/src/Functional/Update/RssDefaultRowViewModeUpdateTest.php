@@ -27,6 +27,7 @@ class RssDefaultRowViewModeUpdateTest extends UpdatePathTestBase {
       __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-history.php',
       __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-ban.php',
       __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-contact.php',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/csrf-db-update-route.php',
       __DIR__ . '/../../../fixtures/update/rss-default-view-mode.php',
     ];
   }
