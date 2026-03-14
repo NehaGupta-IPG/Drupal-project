@@ -17,7 +17,7 @@ class Insert extends QueryInsert {
   /**
    * {@inheritdoc}
    */
-  public function execute() {
+  public function execute(): int|string|null {
     if (!$this->preExecute()) {
       return NULL;
     }
