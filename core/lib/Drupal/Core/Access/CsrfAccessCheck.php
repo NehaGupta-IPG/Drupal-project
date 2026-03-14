@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Access;
 
-use Drupal\Core\Routing\Access\AccessInterface as RoutingAccessInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,7 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
  * @see \Drupal\Core\Access\CsrfTokenGenerator
  * @see https://www.drupal.org/docs/8/api/routing-system/access-checking-on-routes/csrf-access-checking
  */
-class CsrfAccessCheck implements RoutingAccessInterface {
+class CsrfAccessCheck implements AccessCheckInterface {
 
   use RoutePathGenerationTrait;
 
@@ -55,10 +54,6 @@ class CsrfAccessCheck implements RoutingAccessInterface {
    *   The access result.
    */
   public function access(Route $route, Request $request, RouteMatchInterface $route_match) {
-    if ($route->getRequirement('_csrf_token') === 'FALSE') {
-      return AccessResult::allowed();
-    }
-
     $path = $this->generateRoutePath($route, $route_match->getRawParameters()->all());
     if ($this->csrfToken->validate($request->query->get('token', ''), $path)) {
       $result = AccessResult::allowed();
@@ -68,6 +63,14 @@ class CsrfAccessCheck implements RoutingAccessInterface {
     }
     // Not cacheable because the CSRF token is highly dynamic.
     return $result->setCacheMaxAge(0);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function applies(Route $route): bool {
+    return $route->hasRequirement('_csrf_token')
+      && $route->getRequirement('_csrf_token') !== 'FALSE';
   }
 
 }
