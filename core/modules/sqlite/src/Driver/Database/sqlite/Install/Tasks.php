@@ -4,6 +4,7 @@ namespace Drupal\sqlite\Driver\Database\sqlite\Install;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\sqlite\Driver\Database\sqlite\Connection;
 use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\Install\Tasks as InstallTasks;
@@ -32,7 +33,7 @@ class Tasks extends InstallTasks {
   /**
    * {@inheritdoc}
    */
-  public function name() {
+  public function name(): TranslatableMarkup {
     return $this->t('SQLite');
   }
 

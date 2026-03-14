@@ -6,6 +6,7 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Database\Install\Tasks as InstallTasks;
 use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 
 // cspell:ignore proname trgm
 
@@ -59,7 +60,7 @@ class Tasks extends InstallTasks {
   /**
    * {@inheritdoc}
    */
-  public function name() {
+  public function name(): TranslatableMarkup {
     return $this->t('PostgreSQL');
   }
 

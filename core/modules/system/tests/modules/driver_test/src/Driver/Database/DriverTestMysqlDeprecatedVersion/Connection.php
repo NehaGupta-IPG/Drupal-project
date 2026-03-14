@@ -23,7 +23,7 @@ class Connection extends CoreConnection {
   /**
    * {@inheritdoc}
    */
-  public function driver() {
+  public function driver(): string {
     return 'DriverTestMysqlDeprecatedVersion';
   }
 
@@ -37,7 +37,7 @@ class Connection extends CoreConnection {
   /**
    * {@inheritdoc}
    */
-  public function version() {
+  public function version(): string {
     return $this->databaseVersion;
   }
 

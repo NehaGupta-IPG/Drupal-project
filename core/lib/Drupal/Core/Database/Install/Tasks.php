@@ -126,7 +126,7 @@ abstract class Tasks {
   /**
    * Returns the human-readable name of the driver.
    *
-   * @return string
+   * @return \Drupal\Core\StringTranslation\TranslatableMarkup
    *   The human-readable name of the driver.
    */
   abstract public function name();

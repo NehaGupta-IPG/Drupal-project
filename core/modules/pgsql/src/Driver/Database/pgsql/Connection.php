@@ -137,7 +137,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public static function open(array &$connection_options = []) {
+  public static function open(array &$connection_options = []): Pgsql {
     // Default to TCP connection on port 5432.
     if (empty($connection_options['port'])) {
       $connection_options['port'] = 5432;
@@ -199,7 +199,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public function query($query, array $args = [], $options = []) {
+  public function query($query, array $args = [], $options = []): ?StatementInterface {
     $options += $this->defaultOptions();
 
     // The PDO PostgreSQL driver has a bug which doesn't type cast booleans
@@ -260,14 +260,14 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public function queryRange($query, $from, $count, array $args = [], array $options = []) {
+  public function queryRange($query, $from, $count, array $args = [], array $options = []): StatementInterface {
     return $this->query($query . ' LIMIT ' . (int) $count . ' OFFSET ' . (int) $from, $args, $options);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function queryTemporary($query, array $args = [], array $options = []) {
+  public function queryTemporary($query, array $args = [], array $options = []): string {
     $tablename = 'db_temporary_' . uniqid();
     $this->query('CREATE TEMPORARY TABLE {' . $tablename . '} AS ' . $query, $args, $options);
     return $tablename;
@@ -276,14 +276,14 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public function driver() {
+  public function driver(): string {
     return 'pgsql';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function databaseType() {
+  public function databaseType(): string {
     return 'pgsql';
   }
 
@@ -361,7 +361,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public function getFullQualifiedTableName($table) {
+  public function getFullQualifiedTableName($table): string {
     $options = $this->getConnectionOptions();
     $schema = $options['schema'] ?? 'public';
 
@@ -428,56 +428,56 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public function exceptionHandler() {
+  public function exceptionHandler(): ExceptionHandler {
     return new ExceptionHandler();
   }
 
   /**
    * {@inheritdoc}
    */
-  public function select($table, $alias = NULL, array $options = []) {
+  public function select($table, $alias = NULL, array $options = []): Select {
     return new Select($this, $table, $alias, $options);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function insert($table, array $options = []) {
+  public function insert($table, array $options = []): Insert {
     return new Insert($this, $table, $options);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function upsert($table, array $options = []) {
+  public function upsert($table, array $options = []): Upsert {
     return new Upsert($this, $table, $options);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function update($table, array $options = []) {
+  public function update($table, array $options = []): Update {
     return new Update($this, $table, $options);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function delete($table, array $options = []) {
+  public function delete($table, array $options = []): Delete {
     return new Delete($this, $table, $options);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function truncate($table, array $options = []) {
+  public function truncate($table, array $options = []): Truncate {
     return new Truncate($this, $table, $options);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function schema() {
+  public function schema(): Schema {
     if (empty($this->schema)) {
       $this->schema = new Schema($this);
     }
