@@ -76,6 +76,7 @@ class InstallTasksTest extends UnitTestCase {
        * {@inheritdoc}
        */
       protected function t($string, array $args = [], array $options = []) {
+        // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
         return new TranslatableMarkup($string);
       }
 
@@ -109,6 +110,7 @@ class InstallTasksTest extends UnitTestCase {
        * {@inheritdoc}
        */
       protected function t($string, array $args = [], array $options = []) {
+        // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
         return new TranslatableMarkup($string);
       }
 
