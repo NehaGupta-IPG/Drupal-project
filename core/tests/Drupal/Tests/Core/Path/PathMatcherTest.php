@@ -47,11 +47,27 @@ class PathMatcherTest extends UnitTestCase {
    * Tests that standard paths works with multiple patterns.
    */
   #[DataProvider('getMatchPathData')]
-  public function testMatchPath($patterns, $paths): void {
+  public function testMatchPath(string $patterns, array $paths): void {
     foreach ($paths as $path => $expected_result) {
       $actual_result = $this->pathMatcher->matchPath($path, $patterns);
       $this->assertEquals($actual_result, $expected_result, "Tried matching the path '$path' to the pattern '$patterns'.");
     }
+  }
+
+  /**
+   * Tests matchPath when page.front is null.
+   */
+  public function testMatchPathNullFront(): void {
+    $config_factory_stub = $this->getConfigFactoryStub(
+      [
+        'system.site' => [
+          'page.front' => NULL,
+        ],
+      ]
+    );
+    $route_match = $this->createMock('Drupal\Core\Routing\RouteMatchInterface');
+    $pathMatcher = new PathMatcher($config_factory_stub, $route_match);
+    $this->assertTrue($pathMatcher->matchPath('/foo', '/*'));
   }
 
   /**
