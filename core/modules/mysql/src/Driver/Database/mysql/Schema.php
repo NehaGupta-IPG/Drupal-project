@@ -3,6 +3,7 @@
 namespace Drupal\mysql\Driver\Database\mysql;
 
 use Drupal\Core\Database\Exception\SchemaPrimaryKeyMustBeDroppedException;
+use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\SchemaException;
 use Drupal\Core\Database\SchemaObjectExistsException;
 use Drupal\Core\Database\SchemaObjectDoesNotExistException;
@@ -74,7 +75,7 @@ class Schema extends DatabaseSchema {
    * database as the schema unless specified otherwise, and exclude
    * table_catalog from the condition criteria.
    */
-  protected function buildTableNameCondition($table_name, $operator = '=', $add_prefix = TRUE) {
+  protected function buildTableNameCondition($table_name, $operator = '=', $add_prefix = TRUE): Condition {
     $table_info = $this->getPrefixInfo($table_name, $add_prefix);
 
     $condition = $this->connection->condition('AND');
@@ -86,7 +87,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  protected function createTableSql($name, $table) {
+  protected function createTableSql($name, $table): array {
     $info = $this->connection->getConnectionOptions();
 
     // Provide defaults if needed.
@@ -228,7 +229,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function getFieldTypeMap() {
+  public function getFieldTypeMap(): array {
     // Put :normal last so it gets preserved by array_flip. This makes
     // it much easier for modules (such as schema.module) to map
     // database types back into schema types.
@@ -392,7 +393,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function dropTable($table) {
+  public function dropTable($table): bool {
     if (!$this->tableExists($table)) {
       return FALSE;
     }
@@ -477,7 +478,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function dropField($table, $field) {
+  public function dropField($table, $field): bool {
     if (!$this->fieldExists($table, $field)) {
       return FALSE;
     }
@@ -501,7 +502,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function indexExists($table, $name) {
+  public function indexExists($table, $name): bool {
     // Returns one row for each column in the index. Result is string or FALSE.
     // Details at http://dev.mysql.com/doc/refman/5.0/en/show-index.html
     $row = $this->connection->query('SHOW INDEX FROM {' . $table . '} WHERE key_name = ' . $this->connection->quote($name))->fetchAssoc();
@@ -525,7 +526,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function dropPrimaryKey($table) {
+  public function dropPrimaryKey($table): bool {
     if (!$this->indexExists($table, 'PRIMARY')) {
       return FALSE;
     }
@@ -537,7 +538,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  protected function findPrimaryKeyColumns($table) {
+  protected function findPrimaryKeyColumns($table): array|false {
     if (!$this->tableExists($table)) {
       return FALSE;
     }
@@ -562,7 +563,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function dropUniqueKey($table, $name) {
+  public function dropUniqueKey($table, $name): bool {
     if (!$this->indexExists($table, $name)) {
       return FALSE;
     }
@@ -591,7 +592,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function dropIndex($table, $name) {
+  public function dropIndex($table, $name): bool {
     if (!$this->indexExists($table, $name)) {
       return FALSE;
     }
@@ -603,7 +604,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  protected function introspectIndexSchema($table) {
+  protected function introspectIndexSchema($table): array {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("The table $table doesn't exist.");
     }
@@ -659,7 +660,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function prepareComment($comment, $length = NULL) {
+  public function prepareComment($comment, $length = NULL): string {
     // Truncate comment to maximum comment length.
     if (isset($length)) {
       // Add table prefix before truncating.

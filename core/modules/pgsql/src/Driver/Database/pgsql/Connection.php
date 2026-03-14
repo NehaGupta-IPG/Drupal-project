@@ -332,7 +332,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  public function mapConditionOperator($operator) {
+  public function mapConditionOperator($operator): ?array {
     return static::$postgresqlConditionOperatorMap[$operator] ?? NULL;
   }
 

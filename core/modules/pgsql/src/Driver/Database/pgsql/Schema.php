@@ -285,7 +285,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  protected function createTableSql($name, $table) {
+  protected function createTableSql($name, $table): array {
     $sql_fields = [];
     foreach ($table['fields'] as $field_name => $field) {
       $sql_fields[] = $this->createFieldSql($field_name, $this->processField($field));
@@ -429,7 +429,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function getFieldTypeMap() {
+  public function getFieldTypeMap(): array {
     // Put :normal last so it gets preserved by array_flip. This makes
     // it much easier for modules (such as schema.module) to map
     // database types back into schema types.
@@ -511,7 +511,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function tableExists($table, $add_prefix = TRUE) {
+  public function tableExists($table, $add_prefix = TRUE): bool {
     $prefixInfo = $this->getPrefixInfo($table, $add_prefix);
 
     return (bool) $this->connection->query("SELECT 1 FROM pg_tables WHERE schemaname = :schema AND tablename = :table", [
@@ -523,7 +523,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function findTables($table_expression) {
+  public function findTables($table_expression): array {
     $prefix = $this->connection->getPrefix();
     $prefix_length = strlen($prefix);
     $tables = [];
@@ -634,7 +634,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function dropTable($table) {
+  public function dropTable($table): bool {
     if (!$this->tableExists($table)) {
       return FALSE;
     }
@@ -709,7 +709,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function dropField($table, $field) {
+  public function dropField($table, $field): bool {
     if (!$this->fieldExists($table, $field)) {
       return FALSE;
     }
@@ -722,7 +722,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function fieldExists($table, $column) {
+  public function fieldExists($table, $column): bool {
     $prefixInfo = $this->getPrefixInfo($table);
 
     return (bool) $this->connection->query("SELECT 1 FROM pg_attribute WHERE attrelid = :key::regclass AND attname = :column AND NOT attisdropped AND attnum > 0", [
@@ -734,7 +734,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function indexExists($table, $name) {
+  public function indexExists($table, $name): bool {
     // Details https://www.postgresql.org/docs/12/view-pg-indexes.html
     $index_name = $this->ensureIdentifiersLength($table, $name, 'idx');
     // Remove leading and trailing quotes because the index name is in a WHERE
@@ -798,7 +798,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function dropPrimaryKey($table) {
+  public function dropPrimaryKey($table): bool {
     if (!$this->constraintExists($table, 'pkey')) {
       return FALSE;
     }
@@ -811,7 +811,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  protected function findPrimaryKeyColumns($table) {
+  protected function findPrimaryKeyColumns($table): array|false {
     if (!$this->tableExists($table)) {
       return FALSE;
     }
@@ -839,7 +839,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function dropUniqueKey($table, $name) {
+  public function dropUniqueKey($table, $name): bool {
     if (!$this->constraintExists($table, $name . '__key')) {
       return FALSE;
     }
@@ -867,7 +867,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  public function dropIndex($table, $name) {
+  public function dropIndex($table, $name): bool {
     if (!$this->indexExists($table, $name)) {
       return FALSE;
     }
@@ -880,7 +880,7 @@ EOD;
   /**
    * {@inheritdoc}
    */
-  protected function introspectIndexSchema($table) {
+  protected function introspectIndexSchema($table): array {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("The table $table doesn't exist.");
     }
