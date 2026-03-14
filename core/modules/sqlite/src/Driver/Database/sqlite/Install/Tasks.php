@@ -40,14 +40,14 @@ class Tasks extends InstallTasks {
   /**
    * {@inheritdoc}
    */
-  public function minimumVersion() {
+  public function minimumVersion(): ?string {
     return static::SQLITE_MINIMUM_VERSION;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getFormOptions(array $database) {
+  public function getFormOptions(array $database): array {
     $form = parent::getFormOptions($database);
 
     // Remove the options that only apply to client/server style databases.
@@ -64,7 +64,7 @@ class Tasks extends InstallTasks {
   /**
    * {@inheritdoc}
    */
-  protected function connect() {
+  protected function connect(): bool {
     try {
       // This doesn't actually test the connection.
       Database::setActiveConnection();

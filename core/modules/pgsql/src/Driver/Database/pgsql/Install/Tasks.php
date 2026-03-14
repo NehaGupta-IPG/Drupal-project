@@ -67,14 +67,14 @@ class Tasks extends InstallTasks {
   /**
    * {@inheritdoc}
    */
-  public function minimumVersion() {
+  public function minimumVersion(): ?string {
     return static::PGSQL_MINIMUM_VERSION;
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function connect() {
+  protected function connect(): bool {
     try {
       // This doesn't actually test the connection.
       Database::setActiveConnection();
@@ -320,7 +320,7 @@ class Tasks extends InstallTasks {
   /**
    * {@inheritdoc}
    */
-  public function getFormOptions(array $database) {
+  public function getFormOptions(array $database): array {
     $form = parent::getFormOptions($database);
     if (empty($form['advanced_options']['port']['#default_value'])) {
       $form['advanced_options']['port']['#default_value'] = '5432';
