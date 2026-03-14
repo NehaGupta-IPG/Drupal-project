@@ -31,6 +31,7 @@ class PreventDowngradeTest extends UpdatePathTestBase {
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/uninstall-history.php';
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/uninstall-ban.php';
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/uninstall-contact.php';
+    $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/csrf-db-update-route.php';
   }
 
   /**

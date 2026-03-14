@@ -34,6 +34,7 @@ class UpdatePathTestBaseFilledTest extends UpdatePathTestBase {
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/uninstall-contact.php';
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/drupal-8.update-test-schema-enabled.php';
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/drupal-8.update-test-semver-update-n-enabled.php';
+    $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/csrf-db-update-route.php';
   }
 
   /**

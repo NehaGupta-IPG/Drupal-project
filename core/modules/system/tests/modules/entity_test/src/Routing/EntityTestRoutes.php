@@ -27,7 +27,7 @@ class EntityTestRoutes {
       $routes["entity.$entity_type_id.admin_form"] = new Route(
         "$entity_type_id/structure/{bundle}",
         ['_controller' => '\Drupal\entity_test\Controller\EntityTestController::testAdmin'],
-        ['_permission' => 'administer entity_test content'],
+        ['_permission' => 'administer entity_test content', '_csrf_token' => 'FALSE'],
         ['_admin_route' => TRUE]
       );
     }

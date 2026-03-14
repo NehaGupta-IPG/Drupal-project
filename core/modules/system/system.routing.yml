@@ -434,6 +434,8 @@ system.theme_settings_theme:
 
 '<current>':
   path: '<current>'
+  requirements:
+    _csrf_token: 'FALSE'
 
 system.modules_uninstall:
   path: '/admin/modules/uninstall'

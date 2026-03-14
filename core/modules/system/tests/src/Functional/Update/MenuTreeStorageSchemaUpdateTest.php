@@ -41,6 +41,7 @@ class MenuTreeStorageSchemaUpdateTest extends UpdatePathTestBase {
       DRUPAL_ROOT . '/core/modules/system/tests/fixtures/update/drupal-10.3.0.bare.standard.php.gz',
       DRUPAL_ROOT . '/core/modules/system/tests/fixtures/update/uninstall-history.php',
       DRUPAL_ROOT . '/core/modules/system/tests/fixtures/update/uninstall-contact.php',
+      DRUPAL_ROOT . '/core/modules/system/tests/fixtures/update/csrf-db-update-route.php',
     ];
   }
 
