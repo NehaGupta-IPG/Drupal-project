@@ -45,7 +45,8 @@ class OptionsTestHooks {
   #[Hook('entity_field_storage_info_alter')]
   public function entityFieldStorageInfoAlter(&$fields, EntityTypeInterface $entity_type): void {
     if (($entity_type->id() === 'node') && isset($fields['field_options_allowed_values'])) {
-      $fields['field_options_allowed_values']->setSetting('allowed_values_function', [OptionsAllowedValues::class, 'simpleValues']);
+      $fields['field_options_allowed_values']
+        ->setSetting('allowed_values_function', [OptionsAllowedValues::class, 'simpleValues']);
     }
   }
 
