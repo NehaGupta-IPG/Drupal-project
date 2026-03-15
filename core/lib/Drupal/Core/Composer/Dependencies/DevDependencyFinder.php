@@ -17,20 +17,14 @@ class DevDependencyFinder {
   use StringTranslationTrait;
 
   /**
-   * The Composer project root service.
-   */
-  protected ProjectRootInterface $projectRoot;
-
-  /**
    * Constructor.
    *
-   * @param \Drupal\Core\Composer\ProjectRootInterface $project_root
+   * @param \Drupal\Core\Composer\ProjectRootInterface $projectRoot
    *   The Composer project root service.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
    */
-  public function __construct(ProjectRootInterface $project_root, TranslationInterface $string_translation) {
-    $this->projectRoot = $project_root;
+  public function __construct(protected ProjectRootInterface $projectRoot, TranslationInterface $string_translation) {
     $this->setStringTranslation($string_translation);
   }
 
