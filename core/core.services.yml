@@ -405,7 +405,7 @@ services:
   Drupal\Core\Composer\ProjectRootInterface: '@composer.project_root'
   composer.dev_dependency_finder:
     class: Drupal\Core\Composer\Dependencies\DevDependencyFinder
-    arguments: ['@composer.project_root', '@string_translation']
+    autowire: true
   Drupal\Core\Composer\Dependencies\DevDependencyFinder: '@composer.dev_dependency_finder'
   config.manager:
     class: Drupal\Core\Config\ConfigManager
