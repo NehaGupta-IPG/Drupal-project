@@ -54,6 +54,7 @@ use Symfony\Component\VarDumper\VarDumper;
  */
 abstract class BrowserTestBase extends TestCase {
 
+  use DrupalTestCaseTrait;
   use FunctionalTestSetupTrait;
   use UiHelperTrait {
     FunctionalTestSetupTrait::refreshVariables insteadof UiHelperTrait;
@@ -379,7 +380,7 @@ abstract class BrowserTestBase extends TestCase {
    *
    * @see \Drupal\Core\File\FileSystemInterface::deleteRecursive()
    */
-  public static function filePreDeleteCallback($path) {
+  public static function filePreDeleteCallback($path): void {
     // When the webserver runs with the same system user as phpunit, we can
     // make read-only files writable again. If not, chmod will fail while the
     // file deletion still works if file permissions have been configured
@@ -422,10 +423,12 @@ abstract class BrowserTestBase extends TestCase {
 
     if ($this->container) {
       // Cleanup mock session started in DrupalKernel::preHandle().
-      /** @var \Symfony\Component\HttpFoundation\Session\Session $session */
-      $session = $this->container->get('request_stack')->getSession();
-      $session->clear();
-      $session->save();
+      if ($this->container->has('request_stack')) {
+        /** @var \Symfony\Component\HttpFoundation\Session\Session $session */
+        $session = $this->container->get('request_stack')->getSession();
+        $session->clear();
+        $session->save();
+      }
 
       // If cron is running because Automated Cron started it at the end of a
       // test request, wait for it to complete.
@@ -546,7 +549,7 @@ abstract class BrowserTestBase extends TestCase {
   /**
    * Installs Drupal into the test site.
    */
-  public function installDrupal() {
+  public function installDrupal(): void {
     $this->initUserSession();
     $this->prepareSettings();
     $this->doInstall();

@@ -90,7 +90,12 @@ class CustomPageExceptionHtmlSubscriberTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->configFactory = $this->getConfigFactoryStub(['system.site' => ['page.403' => '/access-denied-page', 'page.404' => '/not-found-page']]);
+    $this->configFactory = $this->getConfigFactoryStub([
+      'system.site' => [
+        'page.403' => '/access-denied-page',
+        'page.404' => '/not-found-page',
+      ],
+    ]);
 
     $this->kernel = $this->createMock('Symfony\Component\HttpKernel\HttpKernelInterface');
     $this->logger = $this->createMock('Psr\Log\LoggerInterface');
@@ -129,6 +134,7 @@ class CustomPageExceptionHtmlSubscriberTest extends UnitTestCase {
    */
   protected function tearDown(): void {
     ini_set('error_log', $this->errorLog);
+    parent::tearDown();
   }
 
   /**
@@ -143,7 +149,7 @@ class CustomPageExceptionHtmlSubscriberTest extends UnitTestCase {
       ->method('getContext')
       ->willReturn($request_context);
 
-    $this->kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
+    $this->kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request): HtmlResponse {
       return new HtmlResponse($request->getMethod());
     });
 
@@ -170,7 +176,7 @@ class CustomPageExceptionHtmlSubscriberTest extends UnitTestCase {
       ->method('getContext')
       ->willReturn($request_context);
 
-    $this->kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request) {
+    $this->kernel->expects($this->once())->method('handle')->willReturnCallback(function (Request $request): Response {
       return new Response($request->getMethod() . ' ' . UrlHelper::buildQuery($request->query->all()));
     });
 

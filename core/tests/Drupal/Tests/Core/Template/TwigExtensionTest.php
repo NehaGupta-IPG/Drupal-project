@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Template;
 
+// cspell:ignore mila
+
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\GeneratedLink;
@@ -16,7 +18,6 @@ use Drupal\Core\Template\TwigEnvironment;
 use Drupal\Core\Template\TwigExtension;
 use Drupal\Core\Url;
 use Drupal\Tests\UnitTestCase;
-// cspell:ignore mila
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -95,7 +96,7 @@ class TwigExtensionTest extends UnitTestCase {
    * Tests the escaping.
    */
   #[DataProvider('providerTestEscaping')]
-  public function testEscaping($template, $expected): void {
+  public function testEscaping(string $template, bool $expected): void {
     $loader = new FilesystemLoader();
     $twig = new Environment($loader, [
       'debug' => TRUE,
@@ -120,7 +121,7 @@ class TwigExtensionTest extends UnitTestCase {
    *   An array of test data each containing of a twig template string and
    *   a boolean expecting whether the path will be safe.
    */
-  public static function providerTestEscaping() {
+  public static function providerTestEscaping(): array {
     return [
       ['{{ path("foo") }}', FALSE],
       ['{{ path("foo", {}) }}', FALSE],
@@ -171,7 +172,7 @@ class TwigExtensionTest extends UnitTestCase {
   public function testFormatDate(): void {
     $this->dateFormatter->expects($this->exactly(1))
       ->method('format')
-      ->willReturnCallback(function ($timestamp) {
+      ->willReturnCallback(function ($timestamp): string {
         return date('Y-m-d', $timestamp);
       });
 
@@ -262,8 +263,6 @@ class TwigExtensionTest extends UnitTestCase {
 
   /**
    * Tests safe join.
-   *
-   * @legacy-covers ::safeJoin
    */
   public function testSafeJoin(): void {
     $this->renderer->expects($this->any())
@@ -316,7 +315,7 @@ class TwigExtensionTest extends UnitTestCase {
     $this->assertEquals('Rendered output', $this->systemUnderTest->renderVar($input));
   }
 
-  public static function providerTestRenderVar() {
+  public static function providerTestRenderVar(): array {
     $data = [];
 
     $renderable = (new Prophet())->prophesize(RenderableInterface::class);
@@ -390,11 +389,9 @@ class TwigExtensionTest extends UnitTestCase {
 
   /**
    * Tests render var early return.
-   *
-   * @legacy-covers ::renderVar
    */
   #[DataProvider('providerTestRenderVarEarlyReturn')]
-  public function testRenderVarEarlyReturn($expected, $input): void {
+  public function testRenderVarEarlyReturn(string|int|float|bool $expected, float|int|string|bool|array|null $input): void {
     $result = $this->systemUnderTest->renderVar($input);
     $this->assertSame($expected, $result);
   }
@@ -402,7 +399,7 @@ class TwigExtensionTest extends UnitTestCase {
   /**
    * Data provider for ::testRenderVarEarlyReturn().
    */
-  public static function providerTestRenderVarEarlyReturn() {
+  public static function providerTestRenderVarEarlyReturn(): array {
     return [
       'null' => ['', NULL],
       'empty array' => ['', []],
@@ -419,8 +416,6 @@ class TwigExtensionTest extends UnitTestCase {
 
   /**
    * Tests creating attributes within a Twig template.
-   *
-   * @legacy-covers ::createAttribute
    */
   public function testCreateAttribute(): void {
     $name = '__string_template_test_1__';
@@ -466,7 +461,7 @@ class TwigExtensionTest extends UnitTestCase {
    * @legacy-covers ::suggestThemeHook
    */
   #[DataProvider('providerTestTwigAddSuggestionFilter')]
-  public function testTwigAddSuggestionFilter($original_render_array, $suggestion, $expected_render_array): void {
+  public function testTwigAddSuggestionFilter(?array $original_render_array, string $suggestion, ?array $expected_render_array): void {
     $processed_render_array = $this->systemUnderTest->suggestThemeHook($original_render_array, $suggestion);
     $this->assertEquals($expected_render_array, $processed_render_array);
   }
@@ -583,7 +578,7 @@ class TwigExtensionTest extends UnitTestCase {
    * @legacy-covers ::addClass
    */
   #[DataProvider('providerTestTwigAddClass')]
-  public function testTwigAddClass($element, $classes, $expected_result): void {
+  public function testTwigAddClass(array $element, string|array $classes, array $expected_result): void {
     $processed = $this->systemUnderTest->addClass($element, $classes);
     $this->assertEquals($expected_result, $processed);
   }
@@ -634,7 +629,7 @@ class TwigExtensionTest extends UnitTestCase {
    * @legacy-covers ::setAttribute
    */
   #[DataProvider('providerTestTwigSetAttribute')]
-  public function testTwigSetAttribute($element, $key, $value, $expected_result): void {
+  public function testTwigSetAttribute(array $element, string $key, ?string $value, array $expected_result): void {
     $processed = $this->systemUnderTest->setAttribute($element, $key, $value);
     $this->assertEquals($expected_result, $processed);
   }
@@ -721,7 +716,7 @@ class TwigExtensionTestString {
     $this->string = $string;
   }
 
-  public function __toString() {
+  public function __toString(): string {
     return $this->string;
   }
 

@@ -9,9 +9,9 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Test\FunctionalTestSetupTrait;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\Core\Test\TestSetupTrait;
+use Drupal\Tests\RandomGeneratorTrait;
 use Drupal\TestSite\TestPreinstallInterface;
 use Drupal\TestSite\TestSetupInterface;
-use Drupal\Tests\RandomGeneratorTrait;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -83,7 +83,7 @@ class TestSiteInstallCommand extends Command {
   /**
    * {@inheritdoc}
    */
-  protected function configure() {
+  protected function configure(): void {
     $this->setName('install')
       ->setDescription('Creates a test Drupal site')
       ->setHelp('The details to connect to the test site created will be displayed upon success. It will contain the database prefix and the user agent.')
@@ -193,7 +193,7 @@ class TestSiteInstallCommand extends Command {
    * @param string $root
    *   The Drupal root.
    */
-  protected function ensureDirectory($root) {
+  protected function ensureDirectory(string $root) {
     if (!is_writable($root . '/sites/simpletest')) {
       if (!@mkdir($root . '/sites/simpletest')) {
         throw new \RuntimeException($root . '/sites/simpletest must exist and be writable to install a test site');
@@ -212,7 +212,7 @@ class TestSiteInstallCommand extends Command {
    * @param string $langcode
    *   (optional) The language to install the site in.
    */
-  public function setup($profile = 'testing', $setup_class = NULL, $langcode = 'en') {
+  public function setup($profile = 'testing', $setup_class = NULL, $langcode = 'en'): void {
     $this->profile = $profile;
     $this->langcode = $langcode;
     $this->setupBaseUrl();

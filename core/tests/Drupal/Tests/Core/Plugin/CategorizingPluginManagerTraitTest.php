@@ -43,7 +43,7 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
     $module_extension_list = $this->createMock(ModuleExtensionList::class);
     $module_extension_list->expects($this->any())
       ->method('getName')
-      ->willReturnCallback(function ($argument) {
+      ->willReturnCallback(function ($argument): string {
         if ($argument == 'node') {
           return 'Node';
         }
@@ -55,8 +55,6 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
 
   /**
    * Tests get categories.
-   *
-   * @legacy-covers ::getCategories
    */
   public function testGetCategories(): void {
     $this->assertSame([
@@ -67,8 +65,6 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
 
   /**
    * Tests get sorted definitions.
-   *
-   * @legacy-covers ::getSortedDefinitions
    */
   public function testGetSortedDefinitions(): void {
     $sorted = $this->pluginManager->getSortedDefinitions();
@@ -77,8 +73,6 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
 
   /**
    * Tests get grouped definitions.
-   *
-   * @legacy-covers ::getGroupedDefinitions
    */
   public function testGetGroupedDefinitions(): void {
     $grouped = $this->pluginManager->getGroupedDefinitions();
@@ -89,8 +83,6 @@ class CategorizingPluginManagerTraitTest extends UnitTestCase {
 
   /**
    * Tests process definition category.
-   *
-   * @legacy-covers ::processDefinitionCategory
    */
   public function testProcessDefinitionCategory(): void {
     // Existing category.
@@ -146,7 +138,7 @@ class CategorizingPluginManager extends DefaultPluginManager implements Categori
    *
    * Provides some test definitions to the trait.
    */
-  public function getDefinitions() {
+  public function getDefinitions(): array {
     return [
       'cucumber' => [
         'label' => 'cucumber',

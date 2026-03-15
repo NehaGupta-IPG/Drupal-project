@@ -327,7 +327,7 @@ END;
     $this->webRoot = 'project/' . $data['extra']['drupal-scaffold']['locations']['web-root'];
 
     // Install Drupal.
-    $this->installQuickStart('standard');
+    $this->installQuickStart('minimal');
     $this->formLogin($this->adminUsername, $this->adminPassword);
 
     // When checking for updates, we need to be able to make sub-requests, but
@@ -357,6 +357,7 @@ END;
 
     // Install helpful modules.
     $this->installModules([
+      'automated_cron',
       'package_manager_test_api',
       'package_manager_test_event_logger',
       'package_manager_test_release_history',
@@ -432,7 +433,7 @@ END;
       // versions that are newer than the ones being polyfilled, which means we
       // won't be able to build our test project because these polyfills aren't
       // available in the local code base. Since we're guaranteed to be on PHP
-      // 8.3 or later, no package should need to polyfill older versions.
+      // 8.5 or later, no package should need to polyfill older versions.
       unset(
         $requirements['symfony/polyfill-php72'],
         $requirements['symfony/polyfill-php73'],
@@ -441,8 +442,8 @@ END;
         $requirements['symfony/polyfill-php81'],
         $requirements['symfony/polyfill-php82'],
         $requirements['symfony/polyfill-php83'],
-        // Needed for PHP 8.4 features while PHP 8.3 is the minimum.
         $requirements['symfony/polyfill-php84'],
+        $requirements['symfony/polyfill-php85'],
       );
       // If this package requires any Drupal core packages, ensure it allows
       // any version.

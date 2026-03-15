@@ -21,11 +21,9 @@ class HeadersCacheContextTest extends UnitTestCase {
 
   /**
    * Tests get context.
-   *
-   * @legacy-covers ::getContext
    */
   #[DataProvider('providerTestGetContext')]
-  public function testGetContext($headers, $header_name, $context): void {
+  public function testGetContext(array $headers, ?string $header_name, string $context): void {
     $request_stack = new RequestStack();
     $request = Request::create('/', 'GET');
     // Request defaults could change, so compare with default values instead of
@@ -39,17 +37,41 @@ class HeadersCacheContextTest extends UnitTestCase {
   /**
    * Provides a list of headers and expected cache contexts.
    */
-  public static function providerTestGetContext() {
+  public static function providerTestGetContext(): array {
     return [
       [[], NULL, ''],
       [[], 'foo', ''],
       // Non-empty headers.
-      [['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'], NULL, 'alpaca=&llama=rocks&panda=drools&z=0'],
-      [['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'], 'llama', 'rocks'],
-      [['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'], 'alpaca', '?valueless?'],
-      [['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'], 'panda', 'drools'],
-      [['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'], 'z', '0'],
-      [['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'], 'chicken', ''],
+      [
+        ['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'],
+        NULL,
+        'alpaca=&llama=rocks&panda=drools&z=0',
+      ],
+      [
+        ['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'],
+        'llama',
+        'rocks',
+      ],
+      [
+        ['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'],
+        'alpaca',
+        '?valueless?',
+      ],
+      [
+        ['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'],
+        'panda',
+        'drools',
+      ],
+      [
+        ['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'],
+        'z',
+        '0',
+      ],
+      [
+        ['llama' => 'rocks', 'alpaca' => '', 'panda' => 'drools', 'z' => '0'],
+        'chicken',
+        '',
+      ],
       // Header value could be an array.
       [['z' => ['0', '1']], NULL, 'z=0,1'],
       // Values are sorted to minimize cache variations.

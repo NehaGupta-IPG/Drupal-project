@@ -57,8 +57,6 @@ class FormAjaxResponseBuilderTest extends UnitTestCase {
 
   /**
    * Tests build response no triggering element.
-   *
-   * @legacy-covers ::buildResponse
    */
   public function testBuildResponseNoTriggeringElement(): void {
     $this->renderer->expects($this->never())
@@ -75,8 +73,6 @@ class FormAjaxResponseBuilderTest extends UnitTestCase {
 
   /**
    * Tests build response no callable.
-   *
-   * @legacy-covers ::buildResponse
    */
   public function testBuildResponseNoCallable(): void {
     $this->renderer->expects($this->never())
@@ -97,8 +93,6 @@ class FormAjaxResponseBuilderTest extends UnitTestCase {
 
   /**
    * Tests build response render array.
-   *
-   * @legacy-covers ::buildResponse
    */
   public function testBuildResponseRenderArray(): void {
     $triggering_element = [
@@ -133,13 +127,11 @@ class FormAjaxResponseBuilderTest extends UnitTestCase {
 
   /**
    * Tests build response response.
-   *
-   * @legacy-covers ::buildResponse
    */
   public function testBuildResponseResponse(): void {
     $triggering_element = [
       '#ajax' => [
-        'callback' => function (array $form, FormStateInterface $form_state) {
+        'callback' => function (array $form, FormStateInterface $form_state): AjaxResponse {
           return new AjaxResponse([]);
         },
       ],
@@ -163,13 +155,11 @@ class FormAjaxResponseBuilderTest extends UnitTestCase {
 
   /**
    * Tests build response with commands.
-   *
-   * @legacy-covers ::buildResponse
    */
   public function testBuildResponseWithCommands(): void {
     $triggering_element = [
       '#ajax' => [
-        'callback' => function (array $form, FormStateInterface $form_state) {
+        'callback' => function (array $form, FormStateInterface $form_state): AjaxResponse {
           return new AjaxResponse([]);
         },
       ],
@@ -201,13 +191,11 @@ class FormAjaxResponseBuilderTest extends UnitTestCase {
 
   /**
    * Tests build response with update command.
-   *
-   * @legacy-covers ::buildResponse
    */
   public function testBuildResponseWithUpdateCommand(): void {
     $triggering_element = [
       '#ajax' => [
-        'callback' => function (array $form, FormStateInterface $form_state) {
+        'callback' => function (array $form, FormStateInterface $form_state): AjaxResponse {
           return new AjaxResponse([]);
         },
       ],

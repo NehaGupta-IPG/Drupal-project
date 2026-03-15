@@ -253,7 +253,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
    * @legacy-covers ::doSave
    */
   #[\PHPUnit\Framework\Attributes\Depends('testCreate')]
-  public function testSaveInsert(EntityInterface $entity) {
+  public function testSaveInsert(EntityInterface $entity): EntityInterface {
     $immutable_config_object = $this->prophesize(ImmutableConfig::class);
     $immutable_config_object->isNew()->willReturn(TRUE);
 
@@ -267,7 +267,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
         'status' => TRUE,
       ])
       ->shouldBeCalled();
-    $config_object->save(FALSE)->shouldBeCalled();
+    $config_object->save()->shouldBeCalled();
     $config_object->get()->willReturn([
       'id' => 'foo',
       'uuid' => 'bar',
@@ -314,7 +314,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
    * @legacy-covers ::doSave
    */
   #[\PHPUnit\Framework\Attributes\Depends('testSaveInsert')]
-  public function testSaveUpdate(EntityInterface $entity) {
+  public function testSaveUpdate(EntityInterface $entity): EntityInterface {
     $immutable_config_object = $this->prophesize(ImmutableConfig::class);
     $immutable_config_object->isNew()->willReturn(FALSE);
 
@@ -328,7 +328,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
         'status' => TRUE,
       ])
       ->shouldBeCalled();
-    $config_object->save(FALSE)->shouldBeCalled();
+    $config_object->save()->shouldBeCalled();
     $config_object->get()->willReturn([
       'id' => 'foo',
       'uuid' => 'bar',
@@ -390,7 +390,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
         'status' => TRUE,
       ])
       ->shouldBeCalled();
-    $config_object->save(FALSE)
+    $config_object->save()
       ->shouldBeCalled();
     $config_object->get()->willReturn([
       'id' => 'bar',
@@ -427,8 +427,6 @@ class ConfigEntityStorageTest extends UnitTestCase {
 
   /**
    * Tests save invalid.
-   *
-   * @legacy-covers ::save
    */
   public function testSaveInvalid(): void {
     $this->cacheTagsInvalidator->invalidateTags(Argument::cetera())
@@ -515,7 +513,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
         'status' => TRUE,
       ])
       ->shouldBeCalled();
-    $config_object->save(FALSE)->shouldBeCalled();
+    $config_object->save()->shouldBeCalled();
 
     $this->cacheTagsInvalidator->invalidateTags([$this->entityTypeId . '_list'])
       ->shouldBeCalled();
