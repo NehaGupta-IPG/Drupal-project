@@ -41,15 +41,6 @@ class ProjectRootTest extends UnitTestCase {
     return $root;
   }
 
-  public static function provideEmptyInstalledJson(): array {
-    return [
-      ['filesystem' => ['vendor' => ['composer' => []]]],
-      ['filesystem' => ['vendor' => ['composer' => ['installed.json' => ' ']]]],
-      ['filesystem' => ['vendor' => ['composer' => ['installed.json' => '[]']]]],
-      ['filesystem' => ['vendor' => ['composer' => ['installed.json' => '[{"key": "value"}]']]]],
-    ];
-  }
-
   public static function provideInstalledJson(): array {
     return [
       [
