@@ -60,4 +60,17 @@ class ImageModuleTestHooks {
     return [];
   }
 
+  /**
+   * Implements hook_image_style_uri_alter().
+   */
+  #[Hook('image_style_uri_alter')]
+  public function imageStyleUriAlter(&$uri, array $context): void {
+    if (($name = $context['image_style']->id()) === 'watermarked_low_resolution') {
+      $path = $context['path'];
+      // Low resolution, watermarked images are available publicly, in the
+      // public:// stream wrapper.
+      $uri = "public://styles/$name/public/$path";
+    }
+  }
+
 }

@@ -96,6 +96,15 @@ class ImageStyleTest extends UnitTestCase {
       ->method('getDefinition')
       ->with($this->entityTypeId)
       ->willReturn($this->entityType);
+    $module_handler = $this->getMockBuilder('\Drupal\Core\Extension\ModuleHandler')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $module_handler->expects($this->any())
+      ->method('alter')
+      ->willReturnArgument(1);
+    $container = new ContainerBuilder();
+    \Drupal::setContainer($container);
+    $container->set('module_handler', $module_handler);
   }
 
   /**

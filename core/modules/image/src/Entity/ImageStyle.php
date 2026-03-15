@@ -207,7 +207,16 @@ class ImageStyle extends ConfigEntityBase implements ImageStyleInterface, Entity
       $path = $uri;
       $source_scheme = $scheme = $default_scheme;
     }
-    return "$scheme://styles/{$this->id()}/$source_scheme/{$this->addExtension($path)}";
+    // Append a different extension to the image file name, if the image style
+    // specifies so.
+    $path = $this->addExtension($path);
+    $uri = "$scheme://styles/{$this->id()}/$source_scheme/$path";
+
+    // Allow modules to alter the URI before it is returned.
+    $context = ['scheme' => $scheme, 'path' => $path, 'image_style' => $this];
+    \Drupal::moduleHandler()->alter('image_style_uri', $uri, $context);
+
+    return $uri;
   }
 
   /**

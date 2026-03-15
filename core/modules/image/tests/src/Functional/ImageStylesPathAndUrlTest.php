@@ -345,4 +345,19 @@ class ImageStylesPathAndUrlTest extends BrowserTestBase {
     $this->assertDirectoryDoesNotExist($directory);
   }
 
+  /**
+   * Tests hook_image_style_uri_alter().
+   */
+  public function testImageStyleUriAlter() {
+    $style = ImageStyle::create([
+      'name' => 'watermarked_low_resolution',
+      'label' => $this->randomString(),
+    ]);
+    $style->save();
+
+    $original = 'private://bar/baz.png';
+    // The 'watermarked_low_resolution' derivatives are available publicly.
+    $this->assertSame($style->buildUri($original), 'public://styles/watermarked_low_resolution/public/bar/baz.png');
+  }
+
 }
