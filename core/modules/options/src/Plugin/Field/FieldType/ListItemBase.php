@@ -107,6 +107,10 @@ abstract class ListItemBase extends FieldItemBase implements OptionsProviderInte
 
     $allowed_values = $form_state->getStorage()['allowed_values'];
     $allowed_values_function = $this->getSetting('allowed_values_function');
+    if (is_array($allowed_values_function)) {
+      // The function is set as callable with array syntax.
+      $allowed_values_function = implode('::', $allowed_values_function);
+    }
 
     if (!$form_state->get('items_count')) {
       $form_state->set('items_count', max(count($allowed_values), 0));
