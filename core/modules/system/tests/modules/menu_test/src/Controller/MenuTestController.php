@@ -85,15 +85,10 @@ class MenuTestController extends ControllerBase {
    * Translated strings (such as those in routing.yml files) cannot contain
    * unsafe HTML.
    *
-   * @param array $_title_arguments
-   *   Optional array from the route defaults.
-   * @param string $_title
-   *   Optional _title string from the route defaults.
-   *
    * @return string
    *   An untranslated route title that has a script tag in it.
    */
-  public function titleCallbackXss(array $_title_arguments = [], $_title = '') {
+  public function titleCallbackXss(): string {
     return '<script>alert(12);</script>';
   }
 
