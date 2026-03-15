@@ -565,7 +565,7 @@ menu_test.breadcrumb1:
   path: '/menu-test/breadcrumb1'
   defaults:
     _controller: '\Drupal\menu_test\Controller\MenuTestController::menuTestCallback'
-    _title: '<script>alert(12);</script>'
+    _title_callback: '\Drupal\menu_test\Controller\MenuTestController::titleCallbackXss'
   requirements:
     _access: 'TRUE'
 
