@@ -200,7 +200,7 @@ class ResponsiveImageBuilder {
             // this breakpoint should be merged into one srcset and the sizes
             // attribute should be merged as well.
             if (is_null($dimensions['width'])) {
-              \Drupal::logger('responsive_image')->error(
+              ($this->loggerClosure)()->error(
                 "Could not determine image width for '@uri' using image style with ID: @image_style_name. This image style can not be used for a responsive image style mapping using the 'sizes' attribute.",
                 [
                   '@uri' => $variables['uri'],
