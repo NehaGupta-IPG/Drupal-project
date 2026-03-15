@@ -111,6 +111,7 @@ class EntityUrlTest extends UnitTestCase {
   public function testToUrlDefaultException(): void {
     $values = ['id' => static::ENTITY_ID];
     $entity = $this->getEntity(StubEntityBase::class, $values);
+    // @phpstan-ignore method.deprecated
     $this->entityType->getUriCallback()->willReturn(NULL);
 
     $this->expectException(UndefinedLinkTemplateException::class);
@@ -160,7 +161,7 @@ class EntityUrlTest extends UnitTestCase {
    * @legacy-covers ::urlRouteParameters
    */
   #[DataProvider('providerTestToUrlLinkTemplates')]
-  public function testToUrlLinkTemplates($link_template, $expected_route_name): void {
+  public function testToUrlLinkTemplates($link_template, string $expected_route_name): void {
     $values = ['id' => static::ENTITY_ID, 'langcode' => $this->langcode];
     $entity = $this->getEntity(StubEntityBase::class, $values);
     $this->registerLinkTemplate($link_template);
@@ -272,7 +273,7 @@ class EntityUrlTest extends UnitTestCase {
    * @legacy-covers ::urlRouteParameters
    */
   #[DataProvider('providerTestToUrlLinkTemplateNoId')]
-  public function testToUrlLinkTemplateNoId($link_template, $expected_route_name): void {
+  public function testToUrlLinkTemplateNoId($link_template, string $expected_route_name): void {
     $entity = $this->getEntity(StubEntityBase::class, ['id' => static::ENTITY_ID]);
     $this->registerLinkTemplate($link_template);
 
@@ -364,6 +365,7 @@ class EntityUrlTest extends UnitTestCase {
     $entity = $this->getEntity(StubEntityBase::class, ['id' => static::ENTITY_ID]);
 
     $this->registerBundleInfo($bundle_info);
+    // @phpstan-ignore method.deprecated
     $this->entityType->getUriCallback()->willReturn($uri_callback);
 
     $link_template = 'canonical';
@@ -404,6 +406,7 @@ class EntityUrlTest extends UnitTestCase {
     $entity = $this->getEntity(StubEntityBase::class, ['id' => static::ENTITY_ID, 'langcode' => $this->langcode]);
 
     $this->registerBundleInfo($bundle_info);
+    // @phpstan-ignore method.deprecated
     $this->entityType->getUriCallback()->willReturn($uri_callback);
 
     /** @var \Drupal\Core\Url $url */

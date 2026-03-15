@@ -1197,9 +1197,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    *   The sanitized list of entity key values.
    */
   protected function cleanIds(array $ids, $entity_key = 'id') {
-    $definitions = $this->entityFieldManager->getActiveFieldStorageDefinitions($this->entityTypeId);
-    $field_name = $this->entityType->getKey($entity_key);
-    if ($field_name && $definitions[$field_name]->getType() == 'integer') {
+    if ($entity_key === 'revision' || $this->entityType->hasIntegerId()) {
       $ids = array_filter($ids, function ($id) {
         return is_numeric($id) && $id == (int) $id;
       });
@@ -1478,25 +1476,6 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
         $this->cacheBackend->deleteAll();
       }
     }
-  }
-
-  /**
-   * Warns about deprecated/removed properties.
-   *
-   * @param string $name
-   *   The property to get the value of.
-   *
-   * @return mixed
-   *   The value of the deprecated/removed $name property.
-   */
-  public function __get(string $name) {
-    if ($name === 'latestRevisionIds') {
-      @trigger_error('Getting the static cache of latest revision IDs is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. You can retrieve it from the \'entity.memory_cache\' service instead. See https://www.drupal.org/node/3535160', E_USER_DEPRECATED);
-      return [];
-    }
-
-    trigger_error('Undefined property ' . __CLASS__ . "::\${$name}", E_USER_WARNING);
-    return NULL;
   }
 
   /**

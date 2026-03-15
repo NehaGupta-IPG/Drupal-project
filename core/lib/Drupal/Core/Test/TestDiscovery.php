@@ -61,7 +61,7 @@ class TestDiscovery {
    *
    * @param string $root
    *   The app root.
-   * @param class-string $class_loader
+   * @param \Composer\Autoload\ClassLoader $class_loader
    *   The class loader. Normally Composer's ClassLoader, as included by the
    *   front controller, but may also be decorated.
    */
@@ -185,8 +185,8 @@ class TestDiscovery {
         $info = static::getTestInfo($classname, $parser->getDocComment());
       }
       catch (MissingGroupException $e) {
-        // If the class name ends in Test and is not a migrate table dump.
-        if (str_ends_with($classname, 'Test') && !str_contains($classname, 'migrate_drupal\Tests\Table')) {
+        // If the class name ends in Test.
+        if (str_ends_with($classname, 'Test')) {
           $reflection = new \ReflectionClass($classname);
           $groupAttributes = $reflection->getAttributes(Group::class, \ReflectionAttribute::IS_INSTANCEOF);
           if (!empty($groupAttributes)) {
