@@ -1552,10 +1552,6 @@ class Sql extends QueryPluginBase {
       $start = microtime(TRUE);
 
       try {
-        if ($view->pager->useCountQuery() || !empty($view->get_total_rows)) {
-          $view->pager->executeCountQuery($count_query);
-        }
-
         // Let the pager modify the query to add limits.
         $view->pager->preExecute($query);
 
@@ -1575,6 +1571,30 @@ class Sql extends QueryPluginBase {
         array_walk($view->result, function (ResultRow $row, $index) {
           $row->index = $index;
         });
+
+        // Some pager types (e.g. Full, but not Mini) need a total item
+        // count to render page numbers. Views with get_total_rows also
+        // need it for result summaries (e.g. "Showing 1-10 of 42").
+        if ($view->pager->useCountQuery() || !empty($view->get_total_rows)) {
+          $items_per_page = $view->pager->getItemsPerPage();
+          $current_page = $view->pager->getCurrentPage();
+          $row_count = count($view->result);
+          $on_last_page = $items_per_page > 0 && $row_count < $items_per_page;
+          $out_of_range = $current_page > 0 && $row_count === 0;
+
+          // When the data query returns fewer rows than the page limit, we
+          // are on the last page and already know the total, so the COUNT
+          // query can be skipped. The exception is when no results are
+          // returned on any page after the first, which means the
+          // requested page is beyond the result set. The COUNT query is
+          // still needed so the pager can redirect to a valid page.
+          if ($on_last_page && !$out_of_range) {
+            $view->pager->total_items = $current_page * $items_per_page + $row_count;
+          }
+          else {
+            $view->pager->executeCountQuery($count_query);
+          }
+        }
 
         $view->pager->postExecute($view->result);
         $view->pager->updatePageInfo();
