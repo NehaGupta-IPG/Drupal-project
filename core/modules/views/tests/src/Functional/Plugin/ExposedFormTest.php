@@ -349,9 +349,9 @@ class ExposedFormTest extends ViewTestBase {
   }
 
   /**
-   * Tests exposed form actions for an unrouted display without link display.
+   * Tests exposed form actions for an unrouted display use the linked path.
    */
-  public function testExposedFormActionFallsBackToCurrentRoute(): void {
+  public function testExposedFormActionUsesLinkedPathWhenNoLinkDisplayIsSet(): void {
     $node = $this->nodes[0];
     $block = $this->drupalPlaceBlock('views_exposed_filter_block:test_exposed_form_action-block_2');
     $view = Views::getView('test_exposed_form_action');
@@ -362,9 +362,8 @@ class ExposedFormTest extends ViewTestBase {
     $form = $this->assertSession()->elementExists('css', 'form#' . $form_id);
     $action = $form->getAttribute('action');
 
-    $this->assertSame(Url::fromRoute('entity.node.canonical', ['node' => $node->id()])->toString(), $action);
+    $this->assertSame('test-exposed-form-action-feed', $action);
     $this->assertNotSame(Url::fromUserInput('/test-exposed-form-action-page')->toString(), $action);
-    $this->assertNotSame(Url::fromUserInput('/test-exposed-form-action-feed')->toString(), $action);
     $this->assertNotNull($block);
   }
 

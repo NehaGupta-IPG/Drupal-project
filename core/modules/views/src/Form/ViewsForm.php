@@ -197,7 +197,7 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
           $form_action = Url::fromUserInput($this->currentPath->getPath())->setOptions($options)->toString();
         }
         else {
-          $form_action = Url::fromRoute('<current>')->setOptions($options)->toString();
+          $form_action = $view->display_handler->getPath() ?: Url::fromRoute('<current>')->toString();
         }
       }
     }

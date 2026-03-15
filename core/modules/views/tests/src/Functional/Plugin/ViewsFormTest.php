@@ -6,6 +6,7 @@ namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Core\Url;
 use Drupal\Tests\views\Functional\ViewTestBase;
+use Drupal\views\Entity\View;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -24,7 +25,7 @@ class ViewsFormTest extends ViewTestBase {
   /**
    * {@inheritdoc}
    */
-  protected $defaultTheme = 'stark';
+  protected $defaultTheme = 'olivero';
 
   /**
    * Tests the Views form wrapper.
@@ -46,18 +47,43 @@ class ViewsFormTest extends ViewTestBase {
   }
 
   /**
-   * Tests Views form actions for an unrouted display without link display.
+   * Tests Views form actions for an unrouted display use the linked path.
    */
-  public function testFormActionFallsBackToCurrentRoute(): void {
+  public function testFormActionUsesLinkedPathWhenNoLinkDisplayIsSet(): void {
     $this->drupalCreateContentType(['type' => 'article']);
     $node = $this->drupalCreateNode(['type' => 'article']);
-    $this->drupalPlaceBlock('views_block:test_bulk_form-block_1');
+    $this->drupalPlaceBlock('views_block:test_bulk_form-block_1', ['region' => 'content']);
 
     $this->drupalGet('node/' . $node->id());
     $form = $this->assertSession()->elementExists('css', '.views-form form');
     $action = $form->getAttribute('action');
 
-    $this->assertSame(Url::fromRoute('entity.node.canonical', ['node' => $node->id()])->toString(), $action);
+    $this->assertSame('test_bulk_form', $action);
+    $this->assertNotSame(Url::fromRoute('entity.node.canonical', ['node' => $node->id()])->toString(), $action);
+  }
+
+  /**
+   * Tests Views form actions honor a custom link display URL.
+   */
+  public function testFormActionUsesCustomLinkDisplayPath(): void {
+    $view = View::load('test_bulk_form');
+    $displays = $view->get('display');
+    $displays['block_1']['display_options']['link_display'] = 'custom_url';
+    $displays['block_1']['display_options']['link_url'] = '/custom-bulk-form';
+    $displays['block_1']['display_options']['defaults']['link_display'] = FALSE;
+    $displays['block_1']['display_options']['defaults']['link_url'] = FALSE;
+    $view->set('display', $displays);
+    $view->save();
+
+    $this->drupalCreateContentType(['type' => 'article']);
+    $node = $this->drupalCreateNode(['type' => 'article']);
+    $this->drupalPlaceBlock('views_block:test_bulk_form-block_1', ['region' => 'content']);
+
+    $this->drupalGet('node/' . $node->id());
+    $form = $this->assertSession()->elementExists('css', '.views-form form');
+    $action = $form->getAttribute('action');
+
+    $this->assertSame(Url::fromUserInput('/custom-bulk-form')->toString(), $action);
   }
 
 }
