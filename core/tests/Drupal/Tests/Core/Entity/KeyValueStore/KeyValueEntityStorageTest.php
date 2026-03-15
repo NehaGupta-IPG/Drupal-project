@@ -100,7 +100,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
   /**
    * Prepares the key value entity storage.
    *
-   * @param string $uuid_key
+   * @param string|null $uuid_key
    *   (optional) The entity key used for the UUID. Defaults to 'uuid'.
    *
    * @legacy-covers ::__construct
@@ -326,7 +326,7 @@ class KeyValueEntityStorageTest extends UnitTestCase {
    * @legacy-covers ::save
    * @legacy-covers ::doSave
    */
-  public function testSaveConfigEntity() {
+  public function testSaveConfigEntity(): MockObject {
     $this->setUpKeyValueEntityStorage();
 
     $entity = $this->getMockEntity('Drupal\Core\Config\Entity\ConfigEntityBase', [['id' => 'foo']], [

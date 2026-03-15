@@ -6,13 +6,6 @@ drupal.comment:
     - core/jquery
     - core/drupal
     - core/drupal.form
-  moved_files:
-    comment/drupal.comment:
-      deprecation_version: drupal:11.1.0
-      removed_version: drupal:12.0.0
-      deprecation_link: https://www.drupal.org/node/3471539
-      js:
-        comment-entity-form.js: 'js/comment-entity-form.js'
 
 drupal.comment-by-viewer:
   version: VERSION
@@ -22,18 +15,6 @@ drupal.comment-by-viewer:
     - core/jquery
     - core/drupal
     - core/drupalSettings
-
-drupal.comment-new-indicator:
-  version: VERSION
-  dependencies:
-    - history/drupal.comment-new-indicator
-  deprecated: The "%library_id%" asset library is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use history/drupal.comment-new-indicator instead. See https://www.drupal.org/node/3537055
-
-drupal.node-new-comments-link:
-  version: VERSION
-  dependencies:
-    - history/drupal.node-new-comments-link
-  deprecated: The "%library_id%" asset library is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use history/drupal.comment-new-indicator instead. See https://www.drupal.org/node/3537055
 
 drupal.comment-icon:
   version: VERSION

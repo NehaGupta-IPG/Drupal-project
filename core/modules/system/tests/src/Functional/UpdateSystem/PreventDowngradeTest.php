@@ -28,6 +28,9 @@ class PreventDowngradeTest extends UpdatePathTestBase {
    */
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz';
+    $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/uninstall-history.php';
+    $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/uninstall-ban.php';
+    $this->databaseDumpFiles[] = __DIR__ . '/../../../../tests/fixtures/update/uninstall-contact.php';
   }
 
   /**

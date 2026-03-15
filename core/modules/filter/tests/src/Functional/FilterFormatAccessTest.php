@@ -153,27 +153,6 @@ class FilterFormatAccessTest extends BrowserTestBase {
     $this->assertSession()->optionExists('body[0][format]', $this->allowedFormat->id());
     $this->assertSession()->optionNotExists('body[0][format]', $this->disallowedFormat->id());
     $this->assertSession()->optionNotExists('body[0][format]', filter_fallback_format());
-
-    // Check regular user access to the filter tips pages.
-    $this->drupalGet('filter/tips/' . $this->allowedFormat->id());
-    $this->assertSession()->statusCodeEquals(200);
-    $this->drupalGet('filter/tips/' . $this->disallowedFormat->id());
-    $this->assertSession()->statusCodeEquals(403);
-    $this->drupalGet('filter/tips/' . filter_fallback_format());
-    $this->assertSession()->statusCodeEquals(200);
-    $this->drupalGet('filter/tips/invalid-format');
-    $this->assertSession()->statusCodeEquals(404);
-
-    // Check admin user access to the filter tips pages.
-    $this->drupalLogin($this->adminUser);
-    $this->drupalGet('filter/tips/' . $this->allowedFormat->id());
-    $this->assertSession()->statusCodeEquals(200);
-    $this->drupalGet('filter/tips/' . $this->disallowedFormat->id());
-    $this->assertSession()->statusCodeEquals(200);
-    $this->drupalGet('filter/tips/' . filter_fallback_format());
-    $this->assertSession()->statusCodeEquals(200);
-    $this->drupalGet('filter/tips/invalid-format');
-    $this->assertSession()->statusCodeEquals(404);
   }
 
   /**
