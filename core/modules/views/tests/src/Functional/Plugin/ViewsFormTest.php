@@ -83,7 +83,7 @@ class ViewsFormTest extends ViewTestBase {
     $form = $this->assertSession()->elementExists('css', '.views-form form');
     $action = $form->getAttribute('action');
 
-    $this->assertSame(Url::fromUserInput('/custom-bulk-form')->toString(), $action);
+    $this->assertSame('/custom-bulk-form', $action);
   }
 
 }
