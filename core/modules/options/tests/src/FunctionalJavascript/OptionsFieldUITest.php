@@ -7,6 +7,7 @@ namespace Drupal\Tests\options\FunctionalJavascript;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\options_test\OptionsAllowedValues;
 use Drupal\Tests\field_ui\Traits\FieldUiJSTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -27,6 +28,7 @@ class OptionsFieldUITest extends WebDriverTestBase {
   protected static $modules = [
     'node',
     'options',
+    'options_test',
     'field_ui',
     'block',
   ];
@@ -199,6 +201,20 @@ class OptionsFieldUITest extends WebDriverTestBase {
     $rows = $this->getSession()->getPage()->findAll('css', '#allowed-values-order tr.draggable');
     $this->assertSession()->buttonExists('Edit', $rows[$index])->click();
     $this->assertSession()->waitForElementVisible('css', "[name='field_storage[subform][settings][allowed_values][table][$index][item][key]']");
+  }
+
+  /**
+   * Tests displaying the allowed values function.
+   */
+  public function testAllowedValuesFunctionDisplay(): void {
+    $this->fieldName = 'field_options_allowed_values';
+    $this->createOptionsField('list_string');
+    $this->drupalGet($this->adminPath);
+
+    $allowed_values_function = implode('::', [OptionsAllowedValues::class, 'simpleValues']);
+
+    $element = $this->getSession()->getPage()->find('css', '#edit-field-storage-subform-settings-allowed-values-function');
+    $this->assertStringContainsString($allowed_values_function, $element->getHtml());
   }
 
 }

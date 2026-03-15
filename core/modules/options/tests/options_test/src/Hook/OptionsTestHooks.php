@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\options_test\Hook;
 
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\options_test\OptionsAllowedValues;
 
 /**
  * Hook implementations for options_test.
@@ -34,6 +36,16 @@ class OptionsTestHooks {
     if ($context['fieldDefinition']->getName() === 'card_4' && $context['entity']->bundle() === 'entity_test') {
       // Remove 0 option.
       unset($options[0]);
+    }
+  }
+
+  /**
+   * Implements hook_entity_field_storage_info_alter().
+   */
+  #[Hook('entity_field_storage_info_alter')]
+  public function entityFieldStorageInfoAlter(&$fields, EntityTypeInterface $entity_type): void {
+    if (($entity_type->id() === 'node') && isset($fields['field_options_allowed_values'])) {
+      $fields['field_options_allowed_values']->setSetting('allowed_values_function', [OptionsAllowedValues::class, 'simpleValues']);
     }
   }
 
