@@ -29,6 +29,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
     'content_translation',
     'migrate_drupal_ui',
     'update',
+    'shortcut',
   ];
 
   /**
@@ -44,7 +45,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->loadFixture($this->getModulePath('contact') . '/tests/fixtures/drupal6.php');
-    $this->expectedLoggedErrors = 12;
+    $this->expectedLoggedErrors = 10;
     // If saving the logs, then set the admin user.
     if ($this->outputLogs) {
       $this->migratedAdminUserName = 'admin';
@@ -85,13 +86,13 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
       'filter_format' => 7,
       'image_style' => 4,
       'language_content_settings' => 4,
-      'menu' => 8,
+      'menu' => 10,
       'menu_link_content' => 6,
       'node' => 1,
       'node_type' => 2,
       'path_alias' => 0,
       'search_page' => 3,
-      'shortcut' => 2,
+      'shortcut' => 0,
       'shortcut_set' => 1,
       'taxonomy_term' => 1,
       'taxonomy_vocabulary' => 1,

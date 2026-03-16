@@ -55,8 +55,6 @@ class FilterIdTest extends KernelTestBase {
    * @param bool $stop_pipeline
    *   (optional) Set to TRUE if we expect the filter to be skipped because it
    *   is a transformation-only filter.
-   *
-   * @legacy-covers ::transform
    */
   #[DataProvider('provideFilters')]
   public function testTransform($value, $expected_value, $invalid_id = NULL, $stop_pipeline = FALSE): void {
@@ -67,6 +65,7 @@ class FilterIdTest extends KernelTestBase {
         'baz' => 'php_code',
       ],
     ];
+    // @phpstan-ignore-next-line
     $plugin = FilterID::create($this->container, $configuration, 'filter_id', []);
 
     if ($stop_pipeline) {

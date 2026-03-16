@@ -618,7 +618,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // Initialize legacy request globals.
     $this->initializeRequestGlobals($request);
 
-    // Put the request on the stack.
+    // Put the request on the stack. Main requests will be popped in
+    // \Drupal\Core\DrupalKernel::terminate() and sub requests will be popped in
+    // \Drupal\Core\StackMiddleware\KernelPreHandle::handle().
     $this->container->get('request_stack')->push($request);
 
     // Set the allowed protocols.
@@ -727,6 +729,12 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
           $service->destruct();
         }
       }
+
+      // Pop the request added in \Drupal\Core\DrupalKernel::preHandle() from
+      // request stack at the end of the execution cycle.
+      if ($this->prepared === TRUE) {
+        $this->container->get('request_stack')->pop();
+      }
     }
   }
 
@@ -750,12 +758,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       }
 
       $response = $this->handleException($e, $request, $type);
-    }
-
-    // Backward compatibility for Symfony 7.4, which sets the charset to utf-8.
-    // @todo Remove this in https://www.drupal.org/project/drupal/issues/3555537
-    if (!$response->getCharset()) {
-      $response->setCharset('UTF-8');
     }
 
     // Adapt response headers to the current request.
@@ -991,6 +993,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $this->containerNeedsDumping = FALSE;
     $session_started = FALSE;
     $all_messages = [];
+    $config_is_syncing = FALSE;
+    $source_storage = NULL;
     if (isset($this->container)) {
       // Save the id of the currently logged in user.
       if ($this->container->initialized('current_user')) {
@@ -1014,6 +1018,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       }
 
       $all_messages = $this->container->get('messenger')->all();
+      $config_is_syncing = $this->container->get('config.installer')->isSyncing();
+      $source_storage = $this->container->get('config.installer')->getSourceStorage();
     }
 
     // If the module list hasn't already been set in updateModules and we are
@@ -1073,6 +1079,15 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     foreach ($all_messages as $type => $messages) {
       foreach ($messages as $message) {
         $this->container->get('messenger')->addMessage($message, $type);
+      }
+    }
+
+    // Restore syncing flag, as this is often set when modules or themes
+    // are installed which triggers a container rebuild.
+    if ($config_is_syncing) {
+      $this->container->get('config.installer')->setSyncing(TRUE);
+      if ($source_storage) {
+        $this->container->get('config.installer')->setSourceStorage($source_storage);
       }
     }
 

@@ -24,6 +24,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Prophecy\Argument;
 
@@ -195,8 +196,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests pre save during sync.
-   *
-   * @legacy-covers ::preSave
    */
   public function testPreSaveDuringSync(): void {
     $this->moduleHandler->moduleExists('node')->willReturn(TRUE);
@@ -232,8 +231,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests add dependency.
-   *
-   * @legacy-covers ::addDependency
    */
   public function testAddDependency(): void {
     $method = new \ReflectionMethod('\Drupal\Core\Config\Entity\ConfigEntityBase', 'addDependency');
@@ -347,8 +344,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Test dependency removal on entities with plugin collections.
-   *
-   * @legacy-covers ::onDependencyRemoval
    */
   #[DataProvider('providerOnDependencyRemovalWithPluginCollections')]
   public function testOnDependencyRemovalWithPluginCollections(
@@ -587,8 +582,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests is new.
-   *
-   * @legacy-covers ::isNew
    */
   public function testIsNew(): void {
     $this->assertFalse($this->entity->isNew());
@@ -628,8 +621,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests enable.
-   *
-   * @legacy-covers ::enable
    */
   #[Depends('testSetStatus')]
   public function testEnable(): void {
@@ -640,8 +631,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests disable.
-   *
-   * @legacy-covers ::disable
    */
   #[Depends('testSetStatus')]
   public function testDisable(): void {
@@ -666,8 +655,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests create duplicate.
-   *
-   * @legacy-covers ::createDuplicate
    */
   public function testCreateDuplicate(): void {
     $this->entityType->expects($this->exactly(2))
@@ -705,8 +692,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests sort.
-   *
-   * @legacy-covers ::sort
    */
   public function testSort(): void {
     $this->entityType->expects($this->atLeastOnce())
@@ -740,8 +725,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests to array.
-   *
-   * @legacy-covers ::toArray
    */
   public function testToArray(): void {
     $this->typedConfigManager->expects($this->never())
@@ -756,8 +739,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests to array id key.
-   *
-   * @legacy-covers ::toArray
    */
   public function testToArrayIdKey(): void {
     $entity = $this->getMockBuilder(StubConfigEntity::class)
@@ -823,8 +804,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests to array schema exception.
-   *
-   * @legacy-covers ::toArray
    */
   public function testToArraySchemaException(): void {
     $this->entityType->expects($this->any())
@@ -840,8 +819,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests set with plugin collections.
-   *
-   * @legacy-covers ::set
    */
   #[DataProvider('providerTestSetAndPreSaveWithPluginCollections')]
   public function testSetWithPluginCollections(bool $syncing, string $expected_value): void {
@@ -876,8 +853,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests pre save with plugin collections.
-   *
-   * @legacy-covers ::preSave
    */
   #[DataProvider('providerTestSetAndPreSaveWithPluginCollections')]
   public function testPreSaveWithPluginCollections(bool $syncing, string $expected_value): void {
@@ -933,6 +908,17 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
       'Not syncing' => [FALSE, 'new_value'],
       'Syncing' => [TRUE, 'original_value'],
     ];
+  }
+
+  /**
+   * Tests trusted data deprecations.
+   */
+  #[IgnoreDeprecations]
+  public function testTrustDataDeprecations(): void {
+    $this->expectUserDeprecationMessage('Drupal\\Core\\Config\\Entity\\ConfigEntityBase::trustData() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3348180');
+    $this->assertFalse($this->entity->hasTrustedData());
+    $this->entity->trustData();
+    $this->assertTrue($this->entity->hasTrustedData());
   }
 
 }

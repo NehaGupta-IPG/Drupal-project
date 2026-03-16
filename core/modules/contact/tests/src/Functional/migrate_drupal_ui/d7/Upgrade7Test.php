@@ -28,6 +28,7 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
     'contact',
     'content_translation',
     'migrate_drupal_ui',
+    'shortcut',
   ];
 
   /**
@@ -78,7 +79,7 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
       'editor' => 2,
       'entity_form_display' => 13,
       'entity_form_mode' => 1,
-      'entity_view_display' => 20,
+      'entity_view_display' => 19,
       'entity_view_mode' => 11,
       'field_config' => 31,
       'field_storage_config' => 22,
@@ -86,13 +87,13 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
       'filter_format' => 7,
       'image_style' => 7,
       'language_content_settings' => 14,
-      'menu' => 5,
+      'menu' => 7,
       'menu_link_content' => 2,
       'node' => 1,
       'node_type' => 5,
       'path_alias' => 1,
       'search_page' => 3,
-      'shortcut' => 6,
+      'shortcut' => 4,
       'shortcut_set' => 2,
       'taxonomy_term' => 2,
       'taxonomy_vocabulary' => 2,

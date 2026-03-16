@@ -319,8 +319,6 @@ class ConnectionTest extends UnitTestCase {
 
   /**
    * Tests get driver class.
-   *
-   * @legacy-covers ::getDriverClass
    */
   #[DataProvider('providerGetDriverClass')]
   #[IgnoreDeprecations]
@@ -475,8 +473,6 @@ class ConnectionTest extends UnitTestCase {
 
   /**
    * Tests escape table.
-   *
-   * @legacy-covers ::escapeTable
    */
   #[DataProvider('providerEscapeTables')]
   public function testEscapeTable($expected, $name, array $identifier_quote = ['"', '"']): void {
@@ -508,8 +504,6 @@ class ConnectionTest extends UnitTestCase {
 
   /**
    * Tests escape alias.
-   *
-   * @legacy-covers ::escapeAlias
    */
   #[DataProvider('providerEscapeAlias')]
   public function testEscapeAlias($expected, $name, array $identifier_quote = ['"', '"']): void {
@@ -544,8 +538,6 @@ class ConnectionTest extends UnitTestCase {
 
   /**
    * Tests escape field.
-   *
-   * @legacy-covers ::escapeField
    */
   #[DataProvider('providerEscapeFields')]
   public function testEscapeField($expected, $name, array $identifier_quote = ['"', '"']): void {
@@ -575,8 +567,6 @@ class ConnectionTest extends UnitTestCase {
 
   /**
    * Tests escape database.
-   *
-   * @legacy-covers ::escapeDatabase
    */
   #[DataProvider('providerEscapeDatabase')]
   public function testEscapeDatabase($expected, $name, array $identifier_quote = ['"', '"']): void {
@@ -920,7 +910,7 @@ class ConnectionTest extends UnitTestCase {
   #[IgnoreDeprecations]
   #[DataProvider('providerSupportedLegacyFetchModes')]
   public function testSupportedLegacyFetchModes(int $mode): void {
-    $this->expectDeprecation("Passing the \$mode argument as an integer to setFetchMode() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338");
+    $this->expectUserDeprecationMessage("Passing the \$mode argument as an integer to setFetchMode() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338");
     $mockPdo = $this->createMock(StubPDO::class);
     $mockConnection = new StubConnection($mockPdo, []);
     $statement = new StatementPrefetchIterator($mockPdo, $mockConnection, '');
@@ -984,7 +974,7 @@ class ConnectionTest extends UnitTestCase {
   #[IgnoreDeprecations]
   #[DataProvider('providerUnsupportedFetchModes')]
   public function testUnsupportedFetchModes(int $mode): void {
-    $this->expectDeprecation("Passing the \$mode argument as an integer to setFetchMode() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338");
+    $this->expectUserDeprecationMessage("Passing the \$mode argument as an integer to setFetchMode() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use a case of \Drupal\Core\Database\Statement\FetchAs enum instead. See https://www.drupal.org/node/3488338");
     $this->expectException(\RuntimeException::class);
     $this->expectExceptionMessageMatches("/^Fetch mode FETCH_.* is not supported\\. Use supported modes only/");
     $mockPdo = $this->createMock(StubPDO::class);

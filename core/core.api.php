@@ -563,7 +563,7 @@
  *
  * Drupal is a content management system, so naturally you want changes to your
  * content to be reflected everywhere, immediately. That's why we made sure that
- * every entity type in Drupal 8 automatically has support for cache tags: when
+ * every entity type in Drupal automatically has support for cache tags: when
  * you save an entity, you can be sure that the cache items that have the
  * corresponding cache tags will be invalidated.
  * This also is the case when you define your own entity types: you'll get the
@@ -2690,8 +2690,8 @@ function hook_validation_constraint_alter(array &$definitions) {
  * Creating a tag for a service does not do anything on its own, but tags
  * can be discovered or queried in a compiler pass when the container is built,
  * and a corresponding action can be taken. See
- * \Drupal\Core\Render\MainContent\MainContentRenderersPass for an example of
- * finding tagged services.
+ * \Drupal\Core\DependencyInjection\Compiler\TaggedHandlersPass for an example
+ * of finding tagged services.
  *
  * See @link container Services and Dependency Injection Container @endlink for
  * information on services and the dependency injection container.

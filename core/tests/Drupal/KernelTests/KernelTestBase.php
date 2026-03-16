@@ -21,6 +21,7 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\Test\EventSubscriber\FieldStorageCreateCheckSubscriber;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\Tests\ConfigTestTrait;
+use Drupal\Tests\DrupalTestCaseTrait;
 use Drupal\Tests\ExtensionListTestTrait;
 use Drupal\Tests\PhpUnitCompatibilityTrait;
 use Drupal\Tests\RandomGeneratorTrait;
@@ -96,6 +97,7 @@ use Symfony\Component\VarDumper\VarDumper;
  */
 abstract class KernelTestBase extends TestCase implements ServiceProviderInterface {
 
+  use DrupalTestCaseTrait;
   use AssertContentTrait;
   use RandomGeneratorTrait;
   use ConfigTestTrait;
@@ -673,7 +675,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * {@inheritdoc}
    */
   protected function tearDown(): void {
-    if ($this->container) {
+    if ($this->container?->get('request_stack')->getCurrentRequest() !== NULL) {
       // Clean up mock session started in DrupalKernel::preHandle().
       /** @var \Symfony\Component\HttpFoundation\Session\Session $session */
       $session = $this->container->get('request_stack')->getSession();

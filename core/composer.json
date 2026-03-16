@@ -31,7 +31,7 @@
         "symfony/routing": "^7.4",
         "symfony/serializer": "^7.4",
         "symfony/validator": "^7.4",
-        "symfony/process": "^7.4",
+        "symfony/process": "^7.4.5",
         "symfony/polyfill-iconv": "^1.32",
         "symfony/polyfill-php84": "^1.32",
         "symfony/polyfill-php85": "^1.32",
@@ -129,6 +129,9 @@
         "ext-zip": "Needed to extend the plugin.manager.archiver service capability with the handling of files in the ZIP format."
     },
     "extra": {
+        "branch-alias": {
+            "dev-main": "11.x-dev"
+        },
         "drupal-scaffold": {
             "file-mapping": {
                 "[project-root]/.editorconfig": "assets/scaffold/files/editorconfig",

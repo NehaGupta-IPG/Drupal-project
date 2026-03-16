@@ -19,6 +19,7 @@ use Drupal\Core\Theme\ThemeManagerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\MockObject\MockObject;
 
 // cspell:ignore fooalert
@@ -1057,8 +1058,6 @@ class RendererTest extends RendererTestBase {
 
   /**
    * Tests add cacheable dependency.
-   *
-   * @legacy-covers ::addCacheableDependency
    */
   #[DataProvider('providerTestAddCacheableDependency')]
   public function testAddCacheableDependency(array $build, $object, array $expected): void {
@@ -1133,8 +1132,6 @@ class RendererTest extends RendererTestBase {
 
   /**
    * Tests has render context.
-   *
-   * @legacy-covers ::hasRenderContext
    */
   public function testHasRenderContext(): void {
     // Tests with no render context.
@@ -1152,8 +1149,6 @@ class RendererTest extends RendererTestBase {
 
   /**
    * Tests execute in render context.
-   *
-   * @legacy-covers ::executeInRenderContext
    */
   public function testExecuteInRenderContext(): void {
     $return = $this->renderer->executeInRenderContext(new RenderContext(), function () {
@@ -1212,6 +1207,17 @@ class RendererTest extends RendererTestBase {
       return $fiber->getReturn();
     });
     $this->assertEquals(Markup::create('foo'), $return);
+  }
+
+  #[IgnoreDeprecations]
+  public function testDeprecatedAccess(): void {
+    $build = [
+      '#markup' => 'foo',
+      '#access' => 'bar',
+    ];
+
+    $this->expectUserDeprecationMessage('Using a #access value other than a boolean or an AccessResultInterface object is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. See https://www.drupal.org/node/3549344');
+    $this->renderer->renderRoot($build);
   }
 
 }
