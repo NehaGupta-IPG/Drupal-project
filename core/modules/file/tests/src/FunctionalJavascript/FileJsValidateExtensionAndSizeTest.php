@@ -6,6 +6,7 @@ namespace Drupal\Tests\file\FunctionalJavascript;
 
 use Drupal\Core\Url;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -116,7 +117,12 @@ final class FileJsValidateExtensionAndSizeTest extends WebDriverTestBase {
   /**
    * Covers humanFileSize() formatting by asserting multiple unit outputs.
    */
-  public function testHumanFileSizeFormatsMultipleUnits(): void {
+  #[DataProvider('providerHumanFileSizeFormatsMultipleUnits')]
+  public function testHumanFileSizeFormatsMultipleUnits(
+    int $bytes,
+    string $expected,
+    bool $expects_error,
+  ): void {
     $this->drupalGet(Url::fromRoute('file_module_test.managed_test'));
 
     $this->assertSession()->elementExists('css', 'div.js-form-managed-file input[type="file"]');
@@ -129,32 +135,34 @@ final class FileJsValidateExtensionAndSizeTest extends WebDriverTestBase {
       'txt'
     );
 
-    $cases = [
-      // Bytes => expected fragment, expects error?
-      [0, '0.00 B', FALSE],
-      [1, '1.00 B', FALSE],
-      [1024, '1.00 KB', TRUE],
-      [2048, '2.00 KB', TRUE],
-      [1024 * 1024, '1.00 MB', TRUE],
-    ];
+    $this->removeErrors();
 
-    foreach ($cases as [$bytes, $expected, $expects_error]) {
-      $this->removeErrors();
+    $this->setSyntheticFileAndTriggerChange(
+      'div.js-form-managed-file input[type="file"]',
+      $bytes,
+      "size-$bytes.txt"
+    );
 
-      $this->setSyntheticFileAndTriggerChange(
-        'div.js-form-managed-file input[type="file"]',
-        (int) $bytes,
-        "size-$bytes.txt"
-      );
-
-      if ($expects_error) {
-        $this->assertSession()->waitForElementVisible('css', '.file-upload-js-error');
-        $this->assertSession()->pageTextContains($expected);
-      }
-      else {
-        $this->assertSession()->elementNotExists('css', '.file-upload-js-error');
-      }
+    if ($expects_error) {
+      $this->assertSession()->waitForElementVisible('css', '.file-upload-js-error');
+      $this->assertSession()->pageTextContains($expected);
     }
+    else {
+      $this->assertSession()->elementNotExists('css', '.file-upload-js-error');
+    }
+  }
+
+  /**
+   * Provides file sizes and expected formatted output strings.
+   */
+  public static function providerHumanFileSizeFormatsMultipleUnits(): array {
+    return [
+      'zero bytes' => [0, '0.00 B', FALSE],
+      'one byte' => [1, '1.00 B', FALSE],
+      'one kilobyte' => [1024, '1.00 KB', TRUE],
+      'two kilobytes' => [2048, '2.00 KB', TRUE],
+      'one megabyte' => [1024 * 1024, '1.00 MB', TRUE],
+    ];
   }
 
   /**
