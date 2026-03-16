@@ -79,6 +79,12 @@ function _batch_page(Request $request) {
 
   $response = FALSE;
   $op = $request->query->get('op', '');
+
+  // JSON requests always use the 'do' operation. The 'do_nojs' fallback
+  // only applies to HTML requests where JavaScript is not available.
+  if ($request->getRequestFormat() !== 'html' && $op === 'do_nojs') {
+    $op = 'do';
+  }
   switch ($op) {
     case 'start':
     case 'do_nojs':
