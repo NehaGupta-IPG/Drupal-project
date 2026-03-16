@@ -12,7 +12,9 @@ export default defineConfig({
     ['html', { open: 'never', outputFolder }],
   ],
   use: {
-    baseURL: process.env.DRUPAL_TEST_BASE_URL,
+    // Playwright expects `/` at the end of the baseURL to make relative URLs
+    // work with the provided subdirectory in the base URL.
+    baseURL: `${process.env.DRUPAL_TEST_BASE_URL}/`,
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
     headless: true,
