@@ -40,7 +40,7 @@ async function drupalInstall(browser, options = {}) {
   const dbPrefix = installData.db_prefix;
   const sitePath = installData.site_path;
 
-  const context = await browser.newContext({ baseURL: baseUrl });
+  const context = await browser.newContext({ baseURL: `${baseUrl}/` });
   await context.addCookies([
     {
       name: 'SIMPLETEST_USER_AGENT',
