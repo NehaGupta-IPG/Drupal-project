@@ -320,9 +320,6 @@ abstract class Connection {
    * @param string $database
    *   The database to be attached to the connection.
    *
-   * @return void
-   *   No return value.
-   *
    * @internal
    */
   public function attachDatabase(string $database): void {
@@ -758,7 +755,7 @@ abstract class Connection {
    * @param string $class
    *   The class for which we want the potentially driver-specific class.
    *
-   * @return string
+   * @return class-string
    *   The name of the class that should be used for this driver.
    */
   public function getDriverClass($class) {
@@ -1126,7 +1123,6 @@ abstract class Connection {
    * \Drupal\Core\Database\Transaction\TransactionManagerBase, and instantiate
    * it here.
    *
-   * phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn
    * @return \Drupal\Core\Database\Transaction\TransactionManagerInterface
    *   The transaction manager.
    *

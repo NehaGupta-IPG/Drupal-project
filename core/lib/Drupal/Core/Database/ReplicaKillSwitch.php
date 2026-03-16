@@ -54,6 +54,9 @@ class ReplicaKillSwitch implements EventSubscriberInterface {
   /**
    * Denies access to replica database on the current request.
    *
+   * @return void
+   *   No return value.
+   *
    * @see https://www.drupal.org/node/2286193
    */
   public function trigger() {
@@ -75,6 +78,9 @@ class ReplicaKillSwitch implements EventSubscriberInterface {
    *
    * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
    *   The Event to process.
+   *
+   * @return void
+   *   No return value.
    */
   public function checkReplicaServer(RequestEvent $event) {
     // Ignore replica database servers for this request.

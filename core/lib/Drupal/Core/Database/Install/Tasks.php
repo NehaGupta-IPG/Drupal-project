@@ -211,6 +211,9 @@ abstract class Tasks {
 
   /**
    * Ensures the database can execute commands with the current user.
+   *
+   * @return ?bool
+   *   NULL in case of success, or a bool in case of an exception was thrown.
    */
   protected function runTestQuery($query, $pass, $fail, $fatal = FALSE) {
     try {
@@ -223,6 +226,7 @@ abstract class Tasks {
       $this->fail($this->t($fail, ['%query' => $query, '%error' => $e->getMessage(), '%name' => $this->name()]));
       return !$fatal;
     }
+    return NULL;
   }
 
   /**

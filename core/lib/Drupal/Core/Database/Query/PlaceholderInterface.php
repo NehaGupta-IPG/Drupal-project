@@ -9,6 +9,9 @@ interface PlaceholderInterface {
 
   /**
    * Returns a unique identifier for this object.
+   *
+   * @return string
+   *   A unique identifier for this object.
    */
   public function uniqueIdentifier();
 

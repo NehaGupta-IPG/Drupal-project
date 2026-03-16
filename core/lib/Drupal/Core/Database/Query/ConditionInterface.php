@@ -186,6 +186,9 @@ interface ConditionInterface {
    * @param \Drupal\Core\Database\Query\PlaceholderInterface $queryPlaceholder
    *   The query this condition belongs to. If not given, the current query is
    *   used.
+   *
+   * @return void
+   *   No return value.
    */
   public function compile(Connection $connection, PlaceholderInterface $queryPlaceholder);
 

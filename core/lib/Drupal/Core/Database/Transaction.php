@@ -47,6 +47,9 @@ class Transaction {
 
   /**
    * Retrieves the name of the transaction or savepoint.
+   *
+   * @return string
+   *   The transaction name.
    */
   public function name() {
     return $this->name;
@@ -69,6 +72,9 @@ class Transaction {
    * Depending on the state of the transaction stack, this leads to a ROLLBACK
    * operation (for a root item), or to a ROLLBACK TO SAVEPOINT + a RELEASE
    * SAVEPOINT operations (for a savepoint item) executed on the database.
+   *
+   * @return void
+   *   No return value.
    */
   public function rollBack() {
     $this->connection->transactionManager()->rollback($this->name, $this->id);

@@ -109,6 +109,9 @@ abstract class Schema implements PlaceholderInterface {
    * Create names for indexes, primary keys and constraints.
    *
    * This prevents using {} around non-table names like indexes and keys.
+   *
+   * @return string
+   *   The database object name.
    */
   public function prefixNonTable($table) {
     $args = func_get_args();
@@ -556,7 +559,6 @@ abstract class Schema implements PlaceholderInterface {
    * @param string $table
    *   The name of the table.
    *
-   * phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn
    * @return array
    *   A schema array with the following keys: 'primary key', 'unique keys' and
    *   'indexes', and values as arrays of database columns.
@@ -681,7 +683,6 @@ abstract class Schema implements PlaceholderInterface {
    * @param array $table
    *   A Schema API table definition array.
    *
-   * phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn
    * @return array
    *   An array of SQL statements to create the table.
    *
