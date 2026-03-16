@@ -4,7 +4,7 @@ test.describe('AJAX execution order', { tag: ['@core', '@ajax'] }, () => {
   test('Test Execution Order', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'ajax_test', true);
 
-    await page.goto('/ajax-test/promise-form');
+    await page.goto('./ajax-test/promise-form');
     await expect(page.locator('body')).toBeVisible();
     await page
       .locator('[data-drupal-selector="edit-test-execution-order-button"]')

@@ -29,7 +29,7 @@ test.describe('Claro Drupal messages', { tag: ['@core', '@claro'] }, () => {
     await drupalInstallModule(page, 'js_message_test');
     await drupalEnableTheme(page, 'Claro');
 
-    await page.goto('/js_message_test_link_with_system_messages');
+    await page.goto('./js_message_test_link_with_system_messages');
     await page.locator(mainContent).waitFor({ state: 'visible' });
     await expect(page.locator(mainMessagesContainer)).toBeAttached();
 
@@ -73,7 +73,7 @@ test.describe('Claro Drupal messages', { tag: ['@core', '@claro'] }, () => {
     await drupalInstallModule(page, 'js_message_test');
     await drupalEnableTheme(page, 'Claro');
 
-    await page.goto('/js_message_test_link_with_system_messages');
+    await page.goto('./js_message_test_link_with_system_messages');
     await page.locator(mainContent).waitFor({ state: 'visible' });
     await expect(page.locator(secondaryMessagesContainer)).toBeAttached();
 

@@ -106,14 +106,14 @@ export async function drupalLoginAsAdmin(page) {
   const userLink = testSiteCommand(
     `user-login 1 --site-path ${page._drupal.sitePath}`,
   );
-  await page.goto(userLink);
+  await page.goto(`./${userLink}`);
 }
 
 /**
  * Log out of Drupal.
  */
 export async function drupalLogout(page) {
-  await page.goto('/user/logout/confirm');
+  await page.goto('./user/logout/confirm');
   await page.locator('#user-logout-confirm').locator('[type="submit"]').click();
 }
 
@@ -132,7 +132,7 @@ export async function drupalCreateUser(
       .substring(2, 15);
     // Create role: login as admin, create role with permissions.
     await drupalLoginAsAdmin(page);
-    await page.goto('/admin/people/roles/add');
+    await page.goto('./admin/people/roles/add');
     await page.locator('input[name="label"]').fill(roleLabel);
     // Trigger JS machine name generation and wait for it to appear.
     await page.locator('input[name="label"]').dispatchEvent('formUpdated');
@@ -145,7 +145,7 @@ export async function drupalCreateUser(
     await page.locator('#user-role-form').locator('[type="submit"]').click();
 
     // Assign permissions.
-    await page.goto('/admin/people/permissions');
+    await page.goto('./admin/people/permissions');
     await page.locator('table.permissions').waitFor({ state: 'visible' });
     for (const perm of permissions) {
       await page.locator(`input[name="${machineName}[${perm}]"]`).check();
@@ -159,7 +159,7 @@ export async function drupalCreateUser(
 
   // Create user: login as admin.
   await drupalLoginAsAdmin(page);
-  await page.goto('/admin/people/create');
+  await page.goto('./admin/people/create');
   await page.locator('input[name="name"]').fill(name);
   await page.locator('input[name="notify"]').uncheck();
   await page.locator('input[name="pass[pass1]"]').fill(password);
@@ -180,7 +180,7 @@ export async function drupalCreateUser(
  * Log in as a given user via the login form.
  */
 export async function drupalLogin(page, { name, password }) {
-  await page.goto('/user/login');
+  await page.goto('./user/login');
   await page.locator('input[name="name"]').fill(name);
   await page.locator('input[name="pass"]').fill(password);
   await page.locator('#user-login-form').locator('[type="submit"]').click();
@@ -199,7 +199,7 @@ export async function drupalLogin(page, { name, password }) {
  */
 export async function drupalInstallModule(page, module, force = false) {
   await drupalLoginAsAdmin(page);
-  await page.goto('/admin/modules');
+  await page.goto('./admin/modules');
   // Filter the module list to expand collapsed <details> elements.
   await page
     .locator('form.system-modules [data-drupal-selector="edit-text"]')
@@ -251,7 +251,7 @@ export async function assertDeprecationErrorExists(page, expected) {
  */
 export async function drupalEnableTheme(page, themeName) {
   await drupalLoginAsAdmin(page);
-  await page.goto('/admin/appearance');
+  await page.goto('./admin/appearance');
   await page.locator(`[title="Install ${themeName} as default theme"]`).click();
   await page
     .locator('.system-themes-list')
