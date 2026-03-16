@@ -90,6 +90,9 @@ class ParentWithReturn {
  */
 class SameModuleChild extends ParentWithReturn {
 
+  /**
+   * {@inheritdoc}
+   */
   public function testMethod() {
     return 'same module';
   }
@@ -105,6 +108,9 @@ use Drupal\drupal_debug_test_core\ParentWithReturn;
  */
 class ChildWithoutReturnType extends ParentWithReturn {
 
+  /**
+   * {@inheritdoc}
+   */
   public function testMethod() {
     return 'overridden';
   }
@@ -116,6 +122,9 @@ class ChildWithoutReturnType extends ParentWithReturn {
  */
 class ChildWithNativeReturnType extends ParentWithReturn {
 
+  /**
+   * {@inheritdoc}
+   */
   public function testMethod(): string {
     return 'overridden';
   }
