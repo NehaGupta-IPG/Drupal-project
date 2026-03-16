@@ -70,10 +70,7 @@ class MenuLinkMock extends MenuLinkBase {
    * {@inheritdoc}
    */
   public function getAdminDescription() {
-    if ($this->pluginDefinition['admin_description']) {
-      return $this->pluginDefinition['admin_description'];
-    }
-    return '';
+    return $this->pluginDefinition['admin_description'] ?: '';
   }
 
   /**
