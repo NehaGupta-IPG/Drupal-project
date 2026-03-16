@@ -238,6 +238,7 @@ variables:
     - yarn install
     - echo -e "Node version $(node --version)\nYarn version $(yarn --version)"
     - yarn playwright install --with-deps chromium-headless-shell
+    - printenv
     - yarn run test:playwright --workers 1 --max-failures 3
   after_script:
     - find . -name playwright_output
