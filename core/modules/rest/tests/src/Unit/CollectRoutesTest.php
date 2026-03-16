@@ -86,7 +86,6 @@ class CollectRoutesTest extends UnitTestCase {
         'display' => $display_manager,
         'style' => $style_manager,
       });
-    $container->set('views.plugin_managers', $locator);
 
     $authentication_collector = $this->createMock('\Drupal\Core\Authentication\AuthenticationCollectorInterface');
     $container->set('authentication_collector', $authentication_collector);
@@ -99,6 +98,7 @@ class CollectRoutesTest extends UnitTestCase {
     \Drupal::setContainer($container);
 
     $this->restExport = RestExport::create($container, [], "test_routes", []);
+    $this->restExport->setPluginManagers($locator);
     $this->restExport->view = $view_executable;
 
     // Initialize a display.
