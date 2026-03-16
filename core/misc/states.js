@@ -536,18 +536,26 @@
         // The function associated with that trigger returns the new value for
         // the state. For custom elements whose .value is an array (e.g. a
         // multi-value selector), check array length instead of strict equality.
-        const val = this[0]?.value;
-        if (Array.isArray(val)) {
-          return val.length === 0;
+        // Custom elements are identified by a hyphen in their tag name per the
+        // HTML spec.
+        if (this[0]?.tagName?.includes('-')) {
+          const val = this[0].value;
+          if (Array.isArray(val)) {
+            return val.length === 0;
+          }
+          return !val;
         }
         return this.val() === '';
       },
       // Listen to 'change' for number native "spinner" widgets and for custom
       // elements that dispatch a native change event.
       change() {
-        const val = this[0]?.value;
-        if (Array.isArray(val)) {
-          return val.length === 0;
+        if (this[0]?.tagName?.includes('-')) {
+          const val = this[0].value;
+          if (Array.isArray(val)) {
+            return val.length === 0;
+          }
+          return !val;
         }
         return this.val() === '';
       },
