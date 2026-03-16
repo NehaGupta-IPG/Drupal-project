@@ -42,13 +42,6 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
   protected $requestStack;
 
   /**
-   * The current path stack.
-   *
-   * @var \Drupal\Core\Path\CurrentPathStack
-   */
-  protected $currentPath;
-
-  /**
    * The URL generator to generate the form action.
    *
    * @var \Drupal\Core\Routing\UrlGeneratorInterface
@@ -94,7 +87,7 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
    * @param string[] $view_args
    *   The arguments passed to the active view.
    */
-  public function __construct(ClassResolverInterface $class_resolver, UrlGeneratorInterface $url_generator, RequestStack $requestStack, CurrentPathStack $current_path, $view_id, $view_display_id, array $view_args) {
+  public function __construct(ClassResolverInterface $class_resolver, UrlGeneratorInterface $url_generator, RequestStack $requestStack, protected CurrentPathStack $current_path, $view_id, $view_display_id, array $view_args) {
     $this->classResolver = $class_resolver;
     $this->urlGenerator = $url_generator;
     $this->requestStack = $requestStack;
