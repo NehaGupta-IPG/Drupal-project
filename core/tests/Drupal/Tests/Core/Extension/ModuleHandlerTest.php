@@ -47,7 +47,7 @@ class ModuleHandlerTest extends UnitTestCase {
    * @return \Drupal\Core\Extension\ModuleHandler
    *   The module handler to test.
    */
-  protected function getModuleHandler($modules = [], $implementations = [], $loadAll = TRUE): ModuleHandler {
+  protected function getModuleHandler(array $modules = [], array $implementations = [], bool $loadAll = TRUE): ModuleHandler {
     // This only works if there's a single $hook.
     $modules['module_handler_test'] = 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test';
     $moduleList = [];
@@ -94,7 +94,6 @@ class ModuleHandlerTest extends UnitTestCase {
   /**
    * Tests loading all modules.
    */
-  #[IgnoreDeprecations]
   public function testLoadAllModules(): void {
     $moduleList = [
       'module_handler_test_all1' => 'core/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all1',
@@ -216,7 +215,7 @@ class ModuleHandlerTest extends UnitTestCase {
    */
   #[IgnoreDeprecations]
   public function testLoadAllIncludes(): void {
-    $this->expectDeprecation('ModuleHandler::loadAllIncludes() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3536432');
+    $this->expectUserDeprecationMessage('ModuleHandler::loadAllIncludes() is deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3536432');
     $this->assertTrue(TRUE);
     $module_handler = $this->getMockBuilder(ModuleHandler::class)
       ->setConstructorArgs([
@@ -270,7 +269,6 @@ class ModuleHandlerTest extends UnitTestCase {
   /**
    * Tests invoke all.
    */
-  #[IgnoreDeprecations]
   public function testInvokeAll(): void {
     $implementations = [
       'hook' => [
@@ -304,7 +302,7 @@ class ModuleHandlerTest extends UnitTestCase {
     $module_handler = $this->getModuleHandler([], $implementations);
     $module_handler->setModuleList(['some_module' => TRUE]);
     $r = new \ReflectionObject($module_handler);
-    $get_lists = fn () => $r->getProperty('hookImplementationLists')->getValue($module_handler);
+    $get_lists = fn (): mixed => $r->getProperty('hookImplementationLists')->getValue($module_handler);
 
     $this->assertSame([], $get_lists());
     $this->assertTrue($module_handler->hasImplementations('some_hook'));

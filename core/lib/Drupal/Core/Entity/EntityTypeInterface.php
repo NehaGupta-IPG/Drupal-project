@@ -682,6 +682,11 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    *
    * @return callable|null
    *   A valid callback that is passed the entity or NULL if none is specified.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use link
+   *   templates or a route provider to specify entity URIs.
+   *
+   * @see https://www.drupal.org/node/3575062
    */
   public function getUriCallback();
 
@@ -692,6 +697,11 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    *   A callback to use to provide a URI for the entity.
    *
    * @return $this
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use link
+   *   templates or a route provider to specify entity URIs.
+   *
+   * @see https://www.drupal.org/node/3575062
    */
   public function setUriCallback($callback);
 
@@ -814,16 +824,12 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
    *
    * @param string $constraint_name
    *   The name of the constraint to add, i.e. its plugin id.
-   * phpcs:disable Drupal.Commenting
-   * @todo Uncomment new method parameter signature before drupal:12.0.0.
-   * @see https://www.drupal.org/node/3554746
    * @param array|null $options
    *   The constraint options as required by the constraint plugin, or NULL.
-   * phpcs:enable
    *
    * @return $this
    */
-  public function addConstraint($constraint_name, /* ?array */$options = NULL);
+  public function addConstraint(string $constraint_name, ?array $options = NULL): static;
 
   /**
    * Gets the config dependency info for this entity, if any exists.

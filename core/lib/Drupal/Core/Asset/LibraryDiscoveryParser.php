@@ -530,7 +530,7 @@ class LibraryDiscoveryParser {
         // Process libraries overrides.
         if (isset($libraries_overrides["$extension/$library_name"])) {
           if (isset($library['deprecated'])) {
-            $override_message = sprintf('Theme "%s" is overriding a deprecated library.', $extension);
+            $override_message = sprintf('Theme "%s" is overriding a deprecated library.', $active_theme->getName());
             $library_deprecation = str_replace('%library_id%', "$extension/$library_name", $library['deprecated']);
             // phpcs:ignore Drupal.Semantics.FunctionTriggerError
             @trigger_error("$override_message $library_deprecation", E_USER_DEPRECATED);
@@ -541,7 +541,7 @@ class LibraryDiscoveryParser {
             // A string or boolean definition implies an override (or removal)
             // for the whole library. Use the override key to specify that this
             // library will be overridden when it is called.
-            // @see \Drupal\Core\Asset\LibraryDiscovery::getLibraryByName()
+            // @see \Drupal\Core\Asset\LibraryDiscoveryCollector::getLibraryByName()
             if ($override_definition) {
               $libraries[$library_name]['override'] = $override_definition;
             }

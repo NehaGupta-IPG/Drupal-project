@@ -359,7 +359,7 @@ class UrlGeneratorTest extends UnitTestCase {
    * Confirms that generated routes will have aliased paths with options.
    */
   #[DataProvider('providerTestAliasGenerationWithOptions')]
-  public function testAliasGenerationWithOptions($route_name, $route_parameters, $options, $expected): void {
+  public function testAliasGenerationWithOptions(string $route_name, array $route_parameters, array $options, string $expected): void {
     $this->assertGenerateFromRoute($route_name, $route_parameters, $options, $expected, (new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT));
   }
 
@@ -502,7 +502,7 @@ class UrlGeneratorTest extends UnitTestCase {
    * @legacy-covers ::generateFromRoute
    */
   #[DataProvider('providerTestNoPath')]
-  public function testNoPath($options, $expected_url): void {
+  public function testNoPath(array $options, string $expected_url): void {
     $url = $this->generator->generateFromRoute('<none>', [], $options);
     $this->assertEquals($expected_url, $url);
   }
@@ -536,7 +536,7 @@ class UrlGeneratorTest extends UnitTestCase {
     $path_processor = $this->createMock(OutboundPathProcessorInterface::CLASS);
     $path_processor->expects($this->atLeastOnce())
       ->method('processOutbound')
-      ->willReturnCallback(function ($path, &$options = [], ?Request $request = NULL, ?BubbleableMetadata $bubbleable_metadata = NULL) {
+      ->willReturnCallback(function ($path, array &$options = [], ?Request $request = NULL, ?BubbleableMetadata $bubbleable_metadata = NULL) {
         $options['query'] = ['zoo' => 5];
         $options['fragment'] = 'foo';
         return $path;
@@ -572,6 +572,34 @@ class UrlGeneratorTest extends UnitTestCase {
     $generated_url = $this->generator->generateFromRoute($route_name, $route_parameters, $options, TRUE);
     $this->assertSame($expected_url, $generated_url->getGeneratedUrl());
     $this->assertEquals($expected_bubbleable_metadata, BubbleableMetadata::createFromObject($generated_url));
+  }
+
+  /**
+   * Tests that route name and parameters are passed to path processors.
+   *
+   * @legacy-covers ::generateFromRoute
+   */
+  public function testGenerateWithRouteNameInOptions(): void {
+    $path_processor = $this->createMock(OutboundPathProcessorInterface::class);
+
+    $path_processor->expects($this->atLeastOnce())
+      ->method('processOutbound')
+      ->willReturnCallback(function ($path, &$options = []) {
+        // Assert that 'route_name' exists in options and is the expected value.
+        $this->assertArrayHasKey('route_name', $options);
+        $this->assertEquals('test_1', $options['route_name']);
+
+        // Assert that 'route_parameters' exists in options and
+        // is the expected value.
+        $this->assertArrayHasKey('route_parameters', $options);
+        $this->assertEquals(['node' => 1], $options['route_parameters']);
+        return $path;
+      });
+
+    $this->processorManager->addOutbound($path_processor);
+
+    $options = [];
+    $this->assertGenerateFromRoute('test_1', ['node' => 1], $options, '/hello/world?node=1', (new BubbleableMetadata())->setCacheMaxAge(Cache::PERMANENT));
   }
 
 }
