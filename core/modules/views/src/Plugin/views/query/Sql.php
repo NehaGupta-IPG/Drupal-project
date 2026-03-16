@@ -1725,10 +1725,9 @@ class Sql extends QueryPluginBase {
     // Add cache tags for each row, if there is an entity associated with it.
     if (!$this->hasAggregate) {
       foreach ($this->getAllEntities() as $entity) {
-        if (!($entity instanceof EntityInterface)) {
-          continue;
+        if ($entity instanceof EntityInterface) {
+          $tags = Cache::mergeTags($entity->getCacheTags(), $tags);
         }
-        $tags = Cache::mergeTags($entity->getCacheTags(), $tags);
       }
     }
 
@@ -1741,10 +1740,9 @@ class Sql extends QueryPluginBase {
   public function getCacheMaxAge() {
     $max_age = parent::getCacheMaxAge();
     foreach ($this->getAllEntities() as $entity) {
-      if (!($entity instanceof EntityInterface)) {
-        continue;
+      if ($entity instanceof EntityInterface) {
+        $max_age = Cache::mergeMaxAges($max_age, $entity->getCacheMaxAge());
       }
-      $max_age = Cache::mergeMaxAges($max_age, $entity->getCacheMaxAge());
     }
 
     return $max_age;

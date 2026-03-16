@@ -327,10 +327,9 @@ abstract class CachePluginBase extends PluginBase {
 
     if (!empty($row->_relationship_entities)) {
       foreach ($row->_relationship_entities as $entity) {
-        if (!($entity instanceof EntityInterface)) {
-          continue;
+        if ($entity instanceof EntityInterface) {
+          $tags = Cache::mergeTags($tags, $entity->getCacheTags());
         }
-        $tags = Cache::mergeTags($tags, $entity->getCacheTags());
       }
     }
 
