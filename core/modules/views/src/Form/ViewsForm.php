@@ -78,7 +78,7 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
    *   The URL generator to generate the form action.
    * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
    *   The request stack.
-   * @param \Drupal\Core\Path\CurrentPathStack $current_path
+   * @param \Drupal\Core\Path\CurrentPathStack $currentPath
    *   The current path stack.
    * @param string $view_id
    *   The ID of the view.
@@ -87,11 +87,10 @@ class ViewsForm implements FormInterface, ContainerInjectionInterface {
    * @param string[] $view_args
    *   The arguments passed to the active view.
    */
-  public function __construct(ClassResolverInterface $class_resolver, UrlGeneratorInterface $url_generator, RequestStack $requestStack, protected CurrentPathStack $current_path, $view_id, $view_display_id, array $view_args) {
+  public function __construct(ClassResolverInterface $class_resolver, UrlGeneratorInterface $url_generator, RequestStack $requestStack, protected CurrentPathStack $currentPath, $view_id, $view_display_id, array $view_args) {
     $this->classResolver = $class_resolver;
     $this->urlGenerator = $url_generator;
     $this->requestStack = $requestStack;
-    $this->currentPath = $current_path;
     $this->viewId = $view_id;
     $this->viewDisplayId = $view_display_id;
     $this->viewArguments = $view_args;
