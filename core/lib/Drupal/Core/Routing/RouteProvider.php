@@ -178,9 +178,20 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
       return $cached->data['routes'];
     }
     else {
-      // Just trim on the right side.
-      $path = $request->getPathInfo();
-      $path = $path === '/' ? $path : rtrim($request->getPathInfo(), '/');
+      // Decode the URL and trim spaces so that paths are normalized.
+      // If the path has encoded trailing whitespace, then preserve the encoded
+      // space so that it doesn't get normalized to the same path as without.
+      $path_info = $request->getPathInfo();
+      if (str_ends_with($path_info, '%20')) {
+        $path = trim(urldecode($path_info)) . '%20';
+      }
+      else {
+        $path = trim(urldecode($path_info));
+      }
+      // Trim trailing slashes.
+      if ($path !== '/') {
+        $path = rtrim($path, '/');
+      }
       $path = $this->pathProcessor->processInbound($path, $request);
       $this->currentPath->setPath($path, $request);
       // Incoming path processors may also set query parameters.
@@ -480,7 +491,21 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
       $key_parts[] = '[' . $provider . ']=' . $key_part;
     }
 
-    return 'route:' . implode(':', $key_parts) . ':' . $request->getPathInfo();
+    // @todo add path as a parameter instead of duplicating this logic.
+    // @see https://www.drupal.org/project/drupal/issues/3462696
+    $path_info = $request->getPathInfo();
+    if (str_ends_with($path_info, '%20')) {
+      $path = trim(urldecode($path_info)) . '%20';
+    }
+    else {
+      $path = trim(urldecode($path_info));
+    }
+    // Trim trailing slashes.
+    if ($path !== '/') {
+      $path = rtrim($path, '/');
+    }
+
+    return 'route:' . implode(':', $key_parts) . ':' . $path;
   }
 
   /**
