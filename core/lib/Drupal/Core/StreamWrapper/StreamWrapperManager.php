@@ -69,9 +69,7 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
   public function getNames($filter = StreamWrapperInterface::ALL) {
     $names = [];
     foreach (array_keys($this->getWrappers($filter)) as $scheme) {
-      if ($this->container->has($scheme)) {
-        $names[$scheme] = $this->container->get($scheme)->getName();
-      }
+      $names[$scheme] = $this->getViaScheme($scheme)->getName();
     }
 
     return $names;
@@ -83,9 +81,7 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
   public function getDescriptions($filter = StreamWrapperInterface::ALL) {
     $descriptions = [];
     foreach (array_keys($this->getWrappers($filter)) as $scheme) {
-      if ($this->container->has($scheme)) {
-        $descriptions[$scheme] = $this->container->get($scheme)->getDescription();
-      }
+      $descriptions[$scheme] = $this->getViaScheme($scheme)->getDescription();
     }
 
     return $descriptions;
@@ -95,7 +91,10 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
    * {@inheritdoc}
    */
   public function getViaScheme($scheme) {
-    return $this->getWrapper($scheme, $scheme . '://');
+    if ($this->container->has($scheme)) {
+      return $this->container->get($scheme);
+    }
+    return FALSE;
   }
 
   /**
