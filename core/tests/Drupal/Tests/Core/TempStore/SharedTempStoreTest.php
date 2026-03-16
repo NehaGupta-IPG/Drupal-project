@@ -73,6 +73,13 @@ class SharedTempStoreTest extends UnitTestCase {
   protected $otherObject;
 
   /**
+   * Default entry expiration TTL.
+   *
+   * @var int
+   */
+  protected static int $defaultExpire;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -87,7 +94,9 @@ class SharedTempStoreTest extends UnitTestCase {
     $this->requestStack->push($request);
     $current_user = $this->createMock(AccountProxyInterface::class);
 
-    $this->tempStore = new SharedTempStore($this->keyValue, $this->lock, $this->owner, $this->requestStack, $current_user, 604800);
+    self::$defaultExpire = 604800;
+
+    $this->tempStore = new SharedTempStore($this->keyValue, $this->lock, $this->owner, $this->requestStack, $current_user, self::$defaultExpire);
 
     $this->ownObject = (object) [
       'data' => 'test_data',
@@ -162,7 +171,7 @@ class SharedTempStoreTest extends UnitTestCase {
   /**
    * Tests a successful set() call.
    */
-  public function testSet(): void {
+  public function testSet(?int $expire, int $expected_expire): void {
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('test')
@@ -175,21 +184,35 @@ class SharedTempStoreTest extends UnitTestCase {
 
     $this->keyValue->expects($this->once())
       ->method('setWithExpire')
-      ->with('test', $this->ownObject, 604800);
+      ->with('test', $this->ownObject, $expected_expire);
 
-    $this->tempStore->set('test', 'test_data');
+    $this->tempStore->set('test', 'test_data', $expire);
   }
 
   /**
    * Tests the setIfNotExists() methods.
    */
-  public function testSetIfNotExists(): void {
+  public function testSetIfNotExists(?int $expire, int $expected_expire): void {
     $this->keyValue->expects($this->once())
       ->method('setWithExpireIfNotExists')
-      ->with('test', $this->ownObject, 604800)
+      ->with('test', $this->ownObject, $expected_expire)
       ->willReturn(TRUE);
 
-    $this->assertTrue($this->tempStore->setIfNotExists('test', 'test_data'));
+    $this->assertTrue($this->tempStore->setIfNotExists('test', 'test_data', $expire));
+  }
+
+  /**
+   * Provide test data for ::set* methods.
+   *
+   * @return array
+   *   Test data.
+   */
+  public static function providerTestSetExpire(): array {
+    return [
+      // A NULL expire value falls back to the default value.
+      [NULL, self::$defaultExpire],
+      [123456, 123456],
+    ];
   }
 
   /**
