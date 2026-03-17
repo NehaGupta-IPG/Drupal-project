@@ -8,7 +8,7 @@ namespace Drupal\Core\PageCache;
  * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
  *   \Drupal\Core\PageCache\RequestPolicyInterface instead.
  *
- * @see https://www.drupal.org/node/9999999
+ * @see https://www.drupal.org/node/3579668
  */
 interface ChainRequestPolicyInterface extends RequestPolicyInterface {
 

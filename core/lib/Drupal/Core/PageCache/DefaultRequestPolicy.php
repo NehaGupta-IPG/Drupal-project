@@ -8,7 +8,7 @@ namespace Drupal\Core\PageCache;
  * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
  *   \Drupal\Core\PageCache\ChainRequestPolicy with tagged services instead.
  *
- * @see https://www.drupal.org/node/9999999
+ * @see https://www.drupal.org/node/3579668
  */
 class DefaultRequestPolicy extends ChainRequestPolicy {
 
@@ -16,7 +16,7 @@ class DefaultRequestPolicy extends ChainRequestPolicy {
    * Constructs the default page cache request policy.
    */
   public function __construct() {
-    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\PageCache\ChainRequestPolicy with tagged services instead. See https://www.drupal.org/node/9999999', E_USER_DEPRECATED);
+    @trigger_error(__CLASS__ . ' is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\Core\PageCache\ChainRequestPolicy with tagged services instead. See https://www.drupal.org/node/3579668', E_USER_DEPRECATED);
     parent::__construct(NULL);
   }
 
