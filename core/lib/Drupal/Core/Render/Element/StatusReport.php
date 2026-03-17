@@ -36,7 +36,6 @@ class StatusReport extends RenderElementBase {
    */
   public static function preRenderGroupRequirements($element) {
     $grouped_requirements = [];
-    RequirementSeverity::convertLegacyIntSeveritiesToEnums($element['#requirements'], __METHOD__);
     /** @var array{title: \Drupal\Core\StringTranslation\TranslatableMarkup, value: mixed, description: \Drupal\Core\StringTranslation\TranslatableMarkup, severity: \Drupal\Core\Extension\Requirement\RequirementSeverity} $requirement */
     foreach ($element['#requirements'] as $key => $requirement) {
       $severity = RequirementSeverity::Info;
@@ -61,40 +60,6 @@ class StatusReport extends RenderElementBase {
     $element['#grouped_requirements'] = $grouped_requirements;
 
     return $element;
-  }
-
-  /**
-   * Gets the severities.
-   *
-   * @return array
-   *   An associative array of the requirements severities. The keys are the
-   *   requirement constants defined in install.inc.
-   *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no
-   *   replacement.
-   *
-   * @see https://www.drupal.org/node/3410939
-   */
-  public static function getSeverities() {
-    @trigger_error('Calling ' . __METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3410939', \E_USER_DEPRECATED);
-    return [
-      RequirementSeverity::Info->value => [
-        'title' => t('Checked', [], ['context' => 'Examined']),
-        'status' => 'checked',
-      ],
-      RequirementSeverity::OK->value => [
-        'title' => t('OK'),
-        'status' => 'ok',
-      ],
-      RequirementSeverity::Warning->value => [
-        'title' => t('Warnings found'),
-        'status' => 'warning',
-      ],
-      RequirementSeverity::Error->value => [
-        'title' => t('Errors found'),
-        'status' => 'error',
-      ],
-    ];
   }
 
 }

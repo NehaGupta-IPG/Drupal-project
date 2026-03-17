@@ -6,6 +6,7 @@ use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Utility\FiberResumeType;
 
 /**
  * The default alias manager implementation.
@@ -91,7 +92,7 @@ class AliasManager implements AliasManagerInterface {
 
     // Look for path in storage.
     if ($path_alias = $this->pathAliasRepository->lookupByAlias($alias, $langcode)) {
-      $this->lookupMap[$langcode][$path_alias['path']] = $alias;
+      $this->lookupMap[$langcode][$path_alias['path']] = $path_alias['alias'];
       return $path_alias['path'];
     }
 
@@ -137,7 +138,7 @@ class AliasManager implements AliasManagerInterface {
     // If we're inside a Fiber, suspend now, this allows other fibers to collect
     // more requested paths.
     if (\Fiber::getCurrent() !== NULL) {
-      \Fiber::suspend();
+      \Fiber::suspend(FiberResumeType::Immediate);
     }
 
     // If we reach here, then either there are no other Fibers, or none of them
@@ -208,24 +209,6 @@ class AliasManager implements AliasManagerInterface {
       }
     }
     $this->pathPrefixes->clear();
-  }
-
-  /**
-   * Rebuild the path alias prefix list.
-   *
-   * @param string $path
-   *   An optional path for which an alias is being inserted.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0.
-   *  Use \Drupal\path_alias\AliasManager::pathAliasPrefixListRebuild instead.
-   *
-   * @see https://www.drupal.org/node/3467559
-   *
-   * cspell:ignore whitelist
-   */
-  protected function pathAliasWhitelistRebuild($path = NULL) {
-    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use \Drupal\path_alias\AliasManager::pathAliasPrefixListRebuild() instead. See https://www.drupal.org/node/3467559', E_USER_DEPRECATED);
-    $this->pathAliasPrefixListRebuild($path);
   }
 
 }

@@ -95,7 +95,7 @@ class MigrateSourceTest extends MigrateTestCase {
       ->willReturn($key_value);
     $container->set('keyvalue', $key_value_factory);
 
-    $container->set('cache.migrate', $this->createMock(CacheBackendInterface::class));
+    $container->set('cache.migrate', $this->createStub(CacheBackendInterface::class));
 
     $this->migrationConfiguration = $this->defaultMigrationConfiguration + $migrate_config;
     $this->migration = parent::getMigration();
@@ -168,24 +168,22 @@ class MigrateSourceTest extends MigrateTestCase {
 
   /**
    * Tests that the source count is correct.
-   *
-   * @legacy-covers ::count
    */
   public function testCount(): void {
-    // Mock the cache to validate set() receives appropriate arguments.
-    $container = new ContainerBuilder();
-    $cache = $this->createMock(CacheBackendInterface::class);
-    $cache->expects($this->any())->method('set')
-      ->with($this->isType('string'), $this->isType('int'), $this->isType('int'));
-    $container->set('cache.migrate', $cache);
-    \Drupal::setContainer($container);
-
     // Test that the basic count works.
     $source = $this->getSource();
     $this->assertEquals(1, $source->count());
 
     // Test caching the count works.
     $source = $this->getSource(['cache_counts' => TRUE]);
+    // Override the stubbed cache service to validate that set() receives
+    // appropriate arguments.
+    $cache = $this->createMock(CacheBackendInterface::class);
+    $cache->expects($this->once())
+      ->method('set')
+      ->with($this->isString(), $this->isInt(), $this->isInt());
+    \Drupal::getContainer()->set('cache.migrate', $cache);
+
     $this->assertEquals(1, $source->count());
 
     // Test the skip argument.
@@ -206,20 +204,17 @@ class MigrateSourceTest extends MigrateTestCase {
 
   /**
    * Tests that the key can be set for the count cache.
-   *
-   * @legacy-covers ::count
    */
   public function testCountCacheKey(): void {
-    // Mock the cache to validate set() receives appropriate arguments.
-    $container = new ContainerBuilder();
-    $cache = $this->createMock(CacheBackendInterface::class);
-    $cache->expects($this->any())->method('set')
-      ->with('test_key', $this->isType('int'), $this->isType('int'));
-    $container->set('cache.migrate', $cache);
-    \Drupal::setContainer($container);
-
     // Test caching the count with a configured key works.
     $source = $this->getSource(['cache_counts' => TRUE, 'cache_key' => 'test_key']);
+    // Override the stubbed cache service to validate that set() receives
+    // appropriate arguments.
+    $cache = $this->createMock(CacheBackendInterface::class);
+    $cache->expects($this->once())
+      ->method('set')
+      ->with('test_key', $this->isInt(), $this->isInt());
+    \Drupal::getContainer()->set('cache.migrate', $cache);
     $this->assertEquals(1, $source->count());
   }
 
@@ -287,8 +282,6 @@ class MigrateSourceTest extends MigrateTestCase {
 
   /**
    * Tests basic row preparation.
-   *
-   * @legacy-covers ::prepareRow
    */
   public function testPrepareRow(): void {
     $this->migrationConfiguration['id'] = 'test_migration';
@@ -330,8 +323,6 @@ class MigrateSourceTest extends MigrateTestCase {
 
   /**
    * Tests that global prepare hooks can skip rows.
-   *
-   * @legacy-covers ::prepareRow
    */
   public function testPrepareRowGlobalPrepareSkip(): void {
     $this->migrationConfiguration['id'] = 'test_migration';
@@ -359,8 +350,6 @@ class MigrateSourceTest extends MigrateTestCase {
 
   /**
    * Tests that migrate specific prepare hooks can skip rows.
-   *
-   * @legacy-covers ::prepareRow
    */
   public function testPrepareRowMigratePrepareSkip(): void {
     $this->migrationConfiguration['id'] = 'test_migration';
@@ -388,8 +377,6 @@ class MigrateSourceTest extends MigrateTestCase {
 
   /**
    * Tests that a skip exception during prepare hooks correctly skips.
-   *
-   * @legacy-covers ::prepareRow
    */
   public function testPrepareRowPrepareException(): void {
     $this->migrationConfiguration['id'] = 'test_migration';
@@ -456,8 +443,6 @@ class MigrateSourceTest extends MigrateTestCase {
 
   /**
    * Tests pre rollback.
-   *
-   * @legacy-covers ::preRollback
    */
   public function testPreRollback(): void {
     $this->migrationConfiguration['id'] = 'test_migration';

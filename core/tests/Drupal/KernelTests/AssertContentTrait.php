@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests;
 
+use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\Html;
-use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Component\Utility\Xss;
 use Drupal\Core\Render\RenderContext;
 use Symfony\Component\CssSelector\CssSelectorConverter;
@@ -122,7 +122,7 @@ trait AssertContentTrait {
    * @return \SimpleXMLElement|false
    *   A SimpleXMLElement or FALSE on failure.
    */
-  protected function parse() {
+  protected function parse(): ?\SimpleXMLElement {
     if (!isset($this->elements)) {
       $content = $this->getRawContent();
       $dom = Html::load($content);
@@ -232,7 +232,7 @@ trait AssertContentTrait {
    *   The return value of the XPath search performed after converting the CSS
    *   selector to an XPath selector.
    */
-  protected function cssSelect($selector) {
+  protected function cssSelect(string $selector) {
     return $this->xpath((new CssSelectorConverter())->toXPath($selector));
   }
 
@@ -788,7 +788,7 @@ trait AssertContentTrait {
    *   \Drupal\Component\Render\FormattableMarkup unless you cast the object to
    *   a string. If left blank, a default message will be displayed.
    */
-  protected function assertThemeOutput($callback, array $variables = [], $expected = '', $message = '') {
+  protected function assertThemeOutput(string $callback, array $variables = [], $expected = '', $message = '') {
     /** @var \Drupal\Core\Render\RendererInterface $renderer */
     $renderer = \Drupal::service('renderer');
 
@@ -1172,7 +1172,7 @@ trait AssertContentTrait {
    *
    * @see https://www.drupal.org/node/3476110
    */
-  protected function assertOptionByText($id, $text, $message = '') {
+  protected function assertOptionByText(string $id, string $text, $message = '') {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
     $options = $this->xpath('//select[@id=:id]//option[normalize-space(text())=:text]', [':id' => $id, ':text' => $text]);
     $this->assertTrue(isset($options[0]), $message ?: 'Option with text label ' . $text . ' for select field ' . $id . ' exits.');
@@ -1194,7 +1194,10 @@ trait AssertContentTrait {
    */
   protected function assertOptionWithDrupalSelector($drupal_selector, $option, $message = '') {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    $options = $this->xpath('//select[@data-drupal-selector=:data_drupal_selector]//option[@value=:option]', [':data_drupal_selector' => $drupal_selector, ':option' => $option]);
+    $options = $this->xpath(
+      '//select[@data-drupal-selector=:data_drupal_selector]//option[@value=:option]',
+      [':data_drupal_selector' => $drupal_selector, ':option' => $option],
+    );
     $message = $message ?: sprintf('Option %s for field %s exists.', $option, $drupal_selector);
     $this->assertTrue(isset($options[0]), $message);
   }
@@ -1257,7 +1260,10 @@ trait AssertContentTrait {
    */
   protected function assertOptionSelected($id, $option, $message = ''): bool {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    $message = $message ?: new FormattableMarkup('Option @option for field @id is selected.', ['@option' => $option, '@id' => $id]);
+    $message = $message ?: new FormattableMarkup(
+      'Option @option for field @id is selected.',
+      ['@option' => $option, '@id' => $id]
+    );
     $elements = $this->xpath('//select[@id=:id]//option[@value=:option]', [':id' => $id, ':option' => $option]);
     $this->assertNotEmpty($elements, $message);
     $this->assertNotEmpty($elements[0]['selected'], $message);
@@ -1290,8 +1296,14 @@ trait AssertContentTrait {
    */
   protected function assertOptionSelectedWithDrupalSelector($drupal_selector, $option, $message = ''): bool {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    $message = $message ?: new FormattableMarkup('Option @option for field @data_drupal_selector is selected.', ['@option' => $option, '@data_drupal_selector' => $drupal_selector]);
-    $elements = $this->xpath('//select[@data-drupal-selector=:data_drupal_selector]//option[@value=:option]', [':data_drupal_selector' => $drupal_selector, ':option' => $option]);
+    $message = $message ?: new FormattableMarkup(
+      'Option @option for field @data_drupal_selector is selected.',
+      ['@option' => $option, '@data_drupal_selector' => $drupal_selector]
+    );
+    $elements = $this->xpath(
+      '//select[@data-drupal-selector=:data_drupal_selector]//option[@value=:option]',
+      [':data_drupal_selector' => $drupal_selector, ':option' => $option]
+    );
     $this->assertNotEmpty($elements, $message);
     $this->assertNotEmpty($elements[0]['selected'], $message);
     return TRUE;
@@ -1321,7 +1333,10 @@ trait AssertContentTrait {
    */
   protected function assertNoOptionSelected($id, $option, $message = ''): bool {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3476110', E_USER_DEPRECATED);
-    $message = $message ?: new FormattableMarkup('Option @option for field @id is not selected.', ['@option' => $option, '@id' => $id]);
+    $message = $message ?: new FormattableMarkup(
+      'Option @option for field @id is not selected.',
+      ['@option' => $option, '@id' => $id]
+    );
     $elements = $this->xpath('//select[@id=:id]//option[@value=:option]', [':id' => $id, ':option' => $option]);
     $this->assertNotEmpty($elements, $message);
     $this->assertEmpty($elements[0]['selected'], $message);
@@ -1425,7 +1440,7 @@ trait AssertContentTrait {
    * @return string
    *   XPath for specified values.
    */
-  protected function constructFieldXpath($attribute, $value) {
+  protected function constructFieldXpath(string $attribute, $value) {
     $xpath = '//textarea[@' . $attribute . '=:value]|//input[@' . $attribute . '=:value]|//select[@' . $attribute . '=:value]';
     return $this->buildXPathQuery($xpath, [':value' => $value]);
   }

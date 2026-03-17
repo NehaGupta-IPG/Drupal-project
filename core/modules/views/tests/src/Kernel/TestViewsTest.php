@@ -31,12 +31,10 @@ class TestViewsTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'views',
     // For NodeType config entities to exist, its module must be installed.
     'node',
-    // `system.menu.tools` is a config dependency. It is one of the default
-    // config of the System module.
-    // @see core/modules/views/tests/modules/views_test_config/test_views/views.view.test_row_render_cache_none.yml
+    // For node configuration to be installed, system module must be installed
+    // because it provides schema for actions.
     'system',
     // There are a number of `field.storage.*.*` config dependencies. For these
     // to be created, the Field module must be installed.
@@ -65,53 +63,38 @@ class TestViewsTest extends KernelTestBase {
     'views_test_data',
     // `block_content` is a module dependency.
     // @see core/modules/block_content/tests/modules/block_content_test_views/test_views/views.view.test_block_content_redirect_destination.yml
-    'block_content',
     // `comment` is a module dependency.
     // @see core/modules/comment/tests/modules/comment_test_views/test_views/views.view.test_comment.yml
-    'comment',
     // `comment_test_views` is a module dependency.
     // @see core/modules/comment/tests/modules/comment_test_views/test_views/views.view.test_comment_user_uid.yml
     'comment_test_views',
     // `contact` is a module dependency.
     // @see core/modules/contact/tests/modules/contact_test_views/test_views/views.view.test_contact_link.yml
-    'contact',
     // `content_translation` is a module dependency.
     // @see core/modules/content_translation/tests/modules/content_translation_test_views/test_views/views.view.test_entity_translations_link.yml
-    'content_translation',
     // `content_translation` is a module dependency.
     // @see core/modules/content_translation/tests/modules/content_translation_test_views/test_views/views.view.test_entity_translations_link.yml
-    'content_translation',
     // The `language_content_settings` config entity type must exist because the
     // `content_translation` module A) depends on it, B) actively uses it
     // whenever new bundles are installed.
     // @see content_translation_entity_bundle_info_alter()
-    'language',
     // `datetime` is a module dependency.
     // @see core/modules/datetime/tests/modules/datetime_test/test_views/views.view.test_exposed_filter_datetime.yml
-    'datetime',
     // `dblog` is a module dependency.
     // @see core/modules/dblog/tests/modules/dblog_test_views/test_views/views.view.dblog_integration_test.yml
-    'dblog',
     // `file` is a module dependency.
     // @see core/modules/image/tests/modules/image_test_views/test_views/views.view.test_image_user_image_data.yml
     'file',
     // `media` is a module dependency.
     // @see core/modules/media/tests/modules/media_test_views/test_views/views.view.test_media_revision_uid.yml
-    'media',
     // `rest` is a module dependency.
     // @see core/modules/rest/tests/modules/rest_test_views/test_views/views.view.test_excluded_field_token_display.yml
-    'rest',
     // `serialization` is a dependency of the `rest` module.
-    'serialization',
     // `rest_test_views` is a module dependency.
     // @see core/modules/rest/tests/modules/rest_test_views/test_views/views.view.test_serializer_node_display_field.yml
     'rest_test_views',
     // `search` is a module dependency.
     // @see core/modules/views/tests/modules/views_test_config/test_views/views.view.test_argument_dependency.yml
-    'search',
-    // `history` is a module dependency.
-    // @see core/modules/views/tests/modules/views_test_config/test_views/views.view.test_history.yml
-    'history',
     // The `image` module is required by at least one of the Node module's
     // views.
     'image',
@@ -131,10 +114,6 @@ class TestViewsTest extends KernelTestBase {
     // default config of the User module.
     // @see core/modules/views/tests/modules/views_test_config/test_views/views.view.test_feed_icon.yml
     $this->installConfig('user');
-    // `system.menu.tools` is a config dependency. It is one of the default
-    // config of the System module.
-    // @see core/modules/views/tests/modules/views_test_config/test_views/views.view.test_row_render_cache_none.yml
-    $this->installConfig('system');
     // `node.type.article` is a config dependency.
     // @see core/modules/options/tests/options_test_views/test_views/views.view.test_options_list_argument_numeric.yml
     NodeType::create(['type' => 'article', 'name' => 'Article'])->save();

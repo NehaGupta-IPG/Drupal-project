@@ -11,7 +11,6 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheRedirect;
-use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Entity\ContentEntityNullStorage;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
@@ -23,6 +22,8 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\path\Plugin\Field\FieldType\PathItem;
 use Drupal\rest\ResourceResponseInterface;
 use Drupal\Tests\rest\Functional\ResourceTestBase;
+use Drupal\user\Entity\Role;
+use Drupal\user\RoleInterface;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
 
@@ -58,10 +59,10 @@ use Psr\Http\Message\ResponseInterface;
  *
  * For every of these concrete subclasses, a comprehensive test scenario will
  * run per HTTP method:
- * - ::testGet()
- * - ::testPost()
- * - ::testPatch()
- * - ::testDelete()
+ * - ::doTestGet()
+ * - ::doTestPost()
+ * - ::doTestPatch()
+ * - ::doTestDelete()
  *
  * If there is an entity type-specific edge case scenario to test, then add that
  * to the entity type-specific abstract subclass. Example:
@@ -110,24 +111,24 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
   protected static $labelFieldName = NULL;
 
   /**
-   * The entity ID for the first created entity in testPost().
+   * The entity ID for the first created entity in doTestPost().
    *
    * The default value of 2 should work for most content entities.
    *
    * @var string|int
    *
-   * @see ::testPost()
+   * @see ::doTestPost()
    */
   protected static $firstCreatedEntityId = 2;
 
   /**
-   * The entity ID for the second created entity in testPost().
+   * The entity ID for the second created entity in doTestPost().
    *
    * The default value of 3 should work for most content entities.
    *
    * @var string|int
    *
-   * @see ::testPost()
+   * @see ::doTestPost()
    */
   protected static $secondCreatedEntityId = 3;
 
@@ -181,6 +182,9 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    if (static::$format === 'xml' && in_array($this->name(), ['testPatch', 'testPost'], TRUE)) {
+      $this->markTestSkipped('Deserialization of the XML format is not supported.');
+    }
     parent::setUp();
 
     // Calculate REST Resource config entity ID.
@@ -227,10 +231,12 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
         ->setTranslatable(FALSE)
         ->save();
 
-      // Reload entity so that it has the new field.
-      $reloaded_entity = $this->entityStorage->loadUnchanged($this->entity->id());
-      // Some entity types are not stored, hence they cannot be reloaded.
-      if ($reloaded_entity !== NULL) {
+      $entity_id = $this->entity->id();
+      // Some entity types have no ID, hence they cannot be reloaded.
+      if ($entity_id !== NULL) {
+        // Reload entity so that it has the new field.
+        $reloaded_entity = $this->entityStorage->loadUnchanged($entity_id);
+
         $this->entity = $reloaded_entity;
 
         // Set a default value on the fields.
@@ -279,7 +285,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
   /**
    * Returns the normalized POST entity.
    *
-   * @see ::testPost
+   * @see ::doTestPost
    *
    * @return array
    *   An array structure as returned by ::getNormalizedPostEntity().
@@ -292,7 +298,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
    * By default, reuses ::getNormalizedPostEntity(), which works fine for most
    * entity types. A counterexample: the 'comment' entity type.
    *
-   * @see ::testPatch
+   * @see ::doTestPatch
    *
    * @return array
    *   An array structure as returned by ::getNormalizedPostEntity().
@@ -304,7 +310,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
   /**
    * Gets the normalized POST entity with random values for its unique fields.
    *
-   * @see ::testPost
+   * @see ::doTestPost
    * @see ::getNormalizedPostEntity
    *
    * @return array
@@ -377,7 +383,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
   /**
    * The expected cache tags for the GET/HEAD response of the test entity.
    *
-   * @see ::testGet
+   * @see ::doTestGet
    *
    * @return string[]
    *   The expected cache tags.
@@ -396,7 +402,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
   /**
    * The expected cache contexts for the GET/HEAD response of the test entity.
    *
-   * @see ::testGet
+   * @see ::doTestGet
    *
    * @return string[]
    *   The expected cache contexts.
@@ -409,9 +415,39 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
   }
 
   /**
+   * Tests all CRUD operations in a single test method.
+   */
+  public function testCrud(): void {
+    $this->doTestGet();
+    $this->doTestPost();
+    $this->doTestPatch();
+    $this->doTestDelete();
+  }
+
+  /**
+   * Revokes all permissions from anonymous and authenticated roles.
+   *
+   * Used between chained test operations in testCrud() to reset authorization
+   * state, ensuring each operation starts with a clean permission slate.
+   */
+  protected function revokeAllPermissions(): void {
+    $user_role = Role::load(RoleInterface::ANONYMOUS_ID);
+    foreach ($user_role->getPermissions() as $permission) {
+      $user_role->revokePermission($permission);
+    }
+    $user_role->save();
+
+    $user_role = Role::load(RoleInterface::AUTHENTICATED_ID);
+    foreach ($user_role->getPermissions() as $permission) {
+      $user_role->revokePermission($permission);
+    }
+    $user_role->save();
+  }
+
+  /**
    * Tests a GET request for an entity, plus edge cases to ensure good DX.
    */
-  public function testGet(): void {
+  protected function doTestGet(): void {
     $this->initAuthentication();
     $has_canonical_url = $this->entity->hasLinkTemplate('canonical');
 
@@ -427,7 +463,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     // response because missing ?_format query string.
     $response = $this->request('GET', $url, $request_options);
     $this->assertSame($has_canonical_url ? 403 : 404, $response->getStatusCode());
-    $this->assertSame(['text/html; charset=UTF-8'], $response->getHeader('Content-Type'));
+    $this->assertSame(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
 
     $url->setOption('query', ['_format' => static::$format]);
 
@@ -486,7 +522,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     $response = $this->request('GET', $url, $request_options);
     if ($has_canonical_url) {
       $this->assertSame(403, $response->getStatusCode());
-      $this->assertSame(['text/html; charset=UTF-8'], $response->getHeader('Content-Type'));
+      $this->assertSame(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
     }
     else {
       $this->assertResourceErrorResponse(403, FALSE, $response, $expected_403_cacheability->getCacheTags(), $expected_403_cacheability->getCacheContexts(), static::$auth ? FALSE : 'MISS', FALSE);
@@ -517,7 +553,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
       $this->assertSame(406, $response->getStatusCode());
       $this->assertSame(['UNCACHEABLE (poor cacheability)'], $response->getHeader('X-Drupal-Dynamic-Cache'));
     }
-    $this->assertSame(['text/html; charset=UTF-8'], $response->getHeader('Content-Type'));
+    $this->assertSame(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
     $this->assertSame(static::$auth ? ['UNCACHEABLE (request policy)'] : ['MISS'], $response->getHeader('X-Drupal-Cache'));
     // DX: 403 because unauthorized.
     $url->setOption('query', ['_format' => static::$format]);
@@ -663,7 +699,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     // DX: 406 when requesting unsupported format.
     $response = $this->request('GET', $url, $request_options);
     $this->assert406Response($response);
-    $this->assertSame(['text/plain; charset=UTF-8'], $response->getHeader('Content-Type'));
+    $this->assertSame(['text/plain; charset=utf-8'], $response->getHeader('Content-Type'));
 
     $request_options[RequestOptions::HEADERS]['Accept'] = static::$mimeType;
 
@@ -671,7 +707,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     // should result in a text/plain response.
     $response = $this->request('GET', $url, $request_options);
     $this->assert406Response($response);
-    $this->assertSame(['text/plain; charset=UTF-8'], $response->getHeader('Content-Type'));
+    $this->assertSame(['text/plain; charset=utf-8'], $response->getHeader('Content-Type'));
 
     $url = Url::fromRoute('rest.entity.' . static::$entityTypeId . '.GET');
     $url->setRouteParameter(static::$entityTypeId, 987654321);
@@ -686,6 +722,11 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     );
     $message = 'The "' . static::$entityTypeId . '" parameter was not converted for the path "' . $path . '" (route name: "rest.entity.' . static::$entityTypeId . '.GET")';
     $this->assertResourceErrorResponse(404, $message, $response);
+
+    $this->resourceConfigStorage->load(static::$resourceConfigId)->delete();
+    $this->refreshTestStateAfterRestConfigChange();
+    $this->entity = $this->entityStorage->loadUnchanged($this->entity->id());
+    $this->revokeAllPermissions();
   }
 
   /**
@@ -715,12 +756,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
   /**
    * Tests a POST request for an entity, plus edge cases to ensure good DX.
    */
-  public function testPost(): void {
-    // @todo Remove this in https://www.drupal.org/node/2300677.
-    if ($this->entity instanceof ConfigEntityInterface) {
-      $this->markTestSkipped('POSTing config entities is not yet supported.');
-    }
-
+  protected function doTestPost(): void {
     $this->initAuthentication();
     $has_canonical_url = $this->entity->hasLinkTemplate('canonical');
 
@@ -743,7 +779,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     // ?_format query string.
     $response = $this->request('POST', $url, $request_options);
     $this->assertSame(404, $response->getStatusCode());
-    $this->assertSame(['text/html; charset=UTF-8'], $response->getHeader('Content-Type'));
+    $this->assertSame(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
 
     $url->setOption('query', ['_format' => static::$format]);
 
@@ -759,7 +795,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     // missing ?_format query string.
     $response = $this->request('POST', $url, $request_options);
     $this->assertSame(415, $response->getStatusCode());
-    $this->assertSame(['text/html; charset=UTF-8'], $response->getHeader('Content-Type'));
+    $this->assertSame(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
     $this->assertStringContainsString('A client error happened', (string) $response->getBody());
 
     $url->setOption('query', ['_format' => static::$format]);
@@ -850,6 +886,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
       // Assert that the entity was indeed created, and that the response body
       // contains the serialized created entity.
       $created_entity = $this->entityStorage->loadUnchanged(static::$firstCreatedEntityId);
+      $this->assertInstanceOf(FieldableEntityInterface::class, $created_entity);
       $created_entity_normalization = $this->serializer->normalize($created_entity, static::$format, ['account' => $this->account]);
       $this->assertSame($created_entity_normalization, $this->serializer->decode((string) $response->getBody(), static::$format));
       $this->assertStoredEntityMatchesSentNormalization($this->getNormalizedPostEntity(), $created_entity);
@@ -884,17 +921,21 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
       $this->assertNotNull($new_entity);
       $new_entity->delete();
     }
+
+    // Clean up entities created during testing.
+    if (get_class($this->entityStorage) !== ContentEntityNullStorage::class) {
+      $this->entityStorage->load(static::$firstCreatedEntityId)?->delete();
+    }
+    $this->resourceConfigStorage->load(static::$resourceConfigId)->delete();
+    $this->refreshTestStateAfterRestConfigChange();
+    $this->entity = $this->entityStorage->loadUnchanged($this->entity->id());
+    $this->revokeAllPermissions();
   }
 
   /**
    * Tests a PATCH request for an entity, plus edge cases to ensure good DX.
    */
-  public function testPatch(): void {
-    // @todo Remove this in https://www.drupal.org/node/2300677.
-    if ($this->entity instanceof ConfigEntityInterface) {
-      $this->markTestSkipped('PATCHing config entities is not yet supported.');
-    }
-
+  protected function doTestPatch(): void {
     // Patch testing requires that another entity of the same type exists.
     $this->anotherEntity = $this->createAnotherEntity();
 
@@ -925,12 +966,12 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     if ($has_canonical_url) {
       $this->assertSame(405, $response->getStatusCode());
       $this->assertSame(['GET, POST, HEAD'], $response->getHeader('Allow'));
-      $this->assertSame(['text/html; charset=UTF-8'], $response->getHeader('Content-Type'));
+      $this->assertSame(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
       $this->assertStringContainsString('A client error happened', (string) $response->getBody());
     }
     else {
       $this->assertSame(404, $response->getStatusCode());
-      $this->assertSame(['text/html; charset=UTF-8'], $response->getHeader('Content-Type'));
+      $this->assertSame(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
     }
 
     $url->setOption('query', ['_format' => static::$format]);
@@ -951,7 +992,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     // DX: 415 when no Content-Type request header.
     $response = $this->request('PATCH', $url, $request_options);
     $this->assertSame(415, $response->getStatusCode());
-    $this->assertSame(['text/html; charset=UTF-8'], $response->getHeader('Content-Type'));
+    $this->assertSame(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
     $this->assertStringContainsString('A client error happened', (string) $response->getBody());
 
     $url->setOption('query', ['_format' => static::$format]);
@@ -1096,6 +1137,7 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     // Assert that the entity was indeed updated, and that the response body
     // contains the serialized updated entity.
     $updated_entity = $this->entityStorage->loadUnchanged($this->entity->id());
+    $this->assertInstanceOf(FieldableEntityInterface::class, $updated_entity);
     $updated_entity_normalization = $this->serializer->normalize($updated_entity, static::$format, ['account' => $this->account]);
     $this->assertSame($updated_entity_normalization, $this->serializer->decode((string) $response->getBody(), static::$format));
     $this->assertStoredEntityMatchesSentNormalization($this->getNormalizedPatchEntity(), $updated_entity);
@@ -1121,17 +1163,18 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     $response = $this->request('PATCH', $url, $request_options);
     $this->assertResourceResponse(200, FALSE, $response);
     $this->assertSame([0 => ['value' => 'One'], 1 => ['value' => 'Two'], 2 => ['value' => 'Three']], $this->entityStorage->loadUnchanged($this->entity->id())->get('field_rest_test_multivalue')->getValue());
+
+    // Clean up entities created during testing.
+    $this->resourceConfigStorage->load(static::$resourceConfigId)->delete();
+    $this->refreshTestStateAfterRestConfigChange();
+    $this->entity = $this->entityStorage->loadUnchanged($this->entity->id());
+    $this->revokeAllPermissions();
   }
 
   /**
    * Tests a DELETE request for an entity, plus edge cases to ensure good DX.
    */
-  public function testDelete(): void {
-    // @todo Remove this in https://www.drupal.org/node/2300677.
-    if ($this->entity instanceof ConfigEntityInterface) {
-      $this->markTestSkipped('DELETEing config entities is not yet supported.');
-    }
-
+  protected function doTestDelete(): void {
     $this->initAuthentication();
     $has_canonical_url = $this->entity->hasLinkTemplate('canonical');
 
@@ -1149,12 +1192,12 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
     if ($has_canonical_url) {
       $this->assertSame(405, $response->getStatusCode());
       $this->assertSame(['GET, POST, HEAD'], $response->getHeader('Allow'));
-      $this->assertSame(['text/html; charset=UTF-8'], $response->getHeader('Content-Type'));
+      $this->assertSame(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
       $this->assertStringContainsString('A client error happened', (string) $response->getBody());
     }
     else {
       $this->assertSame(404, $response->getStatusCode());
-      $this->assertSame(['text/html; charset=UTF-8'], $response->getHeader('Content-Type'));
+      $this->assertSame(['text/html; charset=utf-8'], $response->getHeader('Content-Type'));
     }
 
     $url->setOption('query', ['_format' => static::$format]);

@@ -11,6 +11,7 @@ use Drupal\Tests\DrupalTestBrowser;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Tests Drupal\Tests\BrowserTestBase.
@@ -19,7 +20,7 @@ use PHPUnit\Framework\Attributes\Group;
 #[Group('Test')]
 class BrowserTestBaseTest extends UnitTestCase {
 
-  protected function mockBrowserTestBaseWithDriver($driver) {
+  protected function mockBrowserTestBaseWithDriver($driver): MockObject {
     $session = $this->getMockBuilder(Session::class)
       ->disableOriginalConstructor()
       ->onlyMethods(['getDriver'])
@@ -41,8 +42,6 @@ class BrowserTestBaseTest extends UnitTestCase {
 
   /**
    * Tests get http client.
-   *
-   * @legacy-covers ::getHttpClient
    */
   public function testGetHttpClient(): void {
     // Our stand-in for the Guzzle client object.
@@ -66,8 +65,6 @@ class BrowserTestBaseTest extends UnitTestCase {
 
   /**
    * Tests get http client exception.
-   *
-   * @legacy-covers ::getHttpClient
    */
   public function testGetHttpClientException(): void {
     // A driver type that isn't BrowserKitDriver. This should cause a
@@ -83,8 +80,6 @@ class BrowserTestBaseTest extends UnitTestCase {
 
   /**
    * Tests that tearDown doesn't call cleanupEnvironment if setUp is not called.
-   *
-   * @legacy-covers ::tearDown
    */
   public function testTearDownWithoutSetUp(): void {
     $method = 'cleanupEnvironment';
@@ -102,6 +97,8 @@ class BrowserTestBaseTest extends UnitTestCase {
 
 /**
  * A class extending BrowserTestBase for testing purposes.
+ *
+ * @phpstan-ignore testClass.missingAttribute.Group, testClass.missingAttribute.RunInSeparateProcesses
  */
 class BrowserTestBaseMockableClassTest extends BrowserTestBase {
 

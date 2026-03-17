@@ -28,7 +28,6 @@ class FieldItemNormalizerTest extends JsonapiKernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'file',
     'user',
     'link',
     'entity_test',
@@ -61,8 +60,6 @@ class FieldItemNormalizerTest extends JsonapiKernelTestBase {
 
   /**
    * Tests a field item that has no properties.
-   *
-   * @legacy-covers ::normalize
    */
   public function testNormalizeFieldItemWithoutProperties(): void {
     $item = $this->prophesize(FieldItemInterface::class);

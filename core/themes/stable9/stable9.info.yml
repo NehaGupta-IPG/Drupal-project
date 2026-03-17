@@ -204,23 +204,25 @@ libraries-override:
       theme:
         css/menu_ui.admin.css: css/menu_ui/menu_ui.admin.css
 
-  migrate_drupal_ui/base:
+  navigation/admin-reset-styles:
     css:
-      component:
-        css/components/upgrade-analysis-report-tables.css: css/migrate_drupal_ui/components/upgrade-analysis-report-tables.css
+      base:
+        css/base/admin-reset-styles.css: css/navigation/admin-reset-styles.css
 
-  node/drupal.node:
+  navigation/body-scroll-lock:
     css:
-      layout:
-        css/node.module.css: css/node/node.module.css
+      base:
+        css/components/body-scroll-lock.css: css/navigation/body-scroll-lock.css
+
+  navigation/navigation.layoutBuilder:
+    css:
+      base:
+        css/base/layout-builder.css: css/navigation/layout-builder.css
+
   node/drupal.node.preview:
     css:
       theme:
         css/node.preview.css: css/node/node.preview.css
-  node/form:
-    css:
-      layout:
-        css/node.module.css: css/node/node.module.css
   node/drupal.node.admin:
     css:
       theme:

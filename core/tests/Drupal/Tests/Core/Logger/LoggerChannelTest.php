@@ -73,8 +73,6 @@ class LoggerChannelTest extends UnitTestCase {
 
   /**
    * Tests LoggerChannel::log() recursion protection.
-   *
-   * @legacy-covers ::log
    */
   public function testLogRecursionProtection(): void {
     $channel = new LoggerChannel('test');
@@ -99,7 +97,7 @@ class LoggerChannelTest extends UnitTestCase {
       $logger = $this->createMock('Psr\Log\LoggerInterface');
       $logger->expects($this->once())
         ->method('log')
-        ->willReturnCallback(function () use ($i, &$index_order) {
+        ->willReturnCallback(function () use ($i, &$index_order): void {
           // Append the $i to the index order, so that we know the order that
           // loggers got called with.
           $index_order .= $i;
@@ -118,7 +116,7 @@ class LoggerChannelTest extends UnitTestCase {
   public function testNullIp(): void {
     // Create a logger that will fail if $context['ip'] is not an empty string.
     $logger = $this->createMock(LoggerInterface::class);
-    $expected = function ($context) {
+    $expected = function (array $context): bool {
       return $context['channel'] == 'test' && $context['ip'] === '';
     };
     $logger->expects($this->once())
@@ -151,7 +149,7 @@ class LoggerChannelTest extends UnitTestCase {
   public static function providerTestLog(): \Generator {
     // No request or account.
     yield [
-      function ($context) {
+      function (array $context): bool {
         return $context['channel'] == 'test' && empty($context['uid']) && $context['ip'] === '';
       },
       FALSE,
@@ -161,7 +159,7 @@ class LoggerChannelTest extends UnitTestCase {
     // With account but not request. Since the request is not available the
     // current user should not be used.
     yield [
-      function ($context) {
+      function (array $context): bool {
         return $context['uid'] === 0 && $context['ip'] === '';
       },
       FALSE,
@@ -170,7 +168,7 @@ class LoggerChannelTest extends UnitTestCase {
 
     // With request but not account.
     yield [
-      function ($context) {
+      function (array $context): bool {
         return $context['ip'] === '127.0.0.1' && empty($context['uid']);
       },
       TRUE,
@@ -179,7 +177,7 @@ class LoggerChannelTest extends UnitTestCase {
 
     // Both request and account.
     yield [
-      function ($context) {
+      function (array $context): bool {
         return $context['ip'] === '127.0.0.1' && $context['uid'] === 1;
       },
       TRUE,
