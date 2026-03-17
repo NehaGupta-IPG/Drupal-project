@@ -133,7 +133,7 @@ default:
       optional: true
 
 .with-database: &with-database
-  name: $_CONFIG_DOCKERHUB_ROOT/$_TARGET_DB:production
+  name: $_CONFIG_DOCKERHUB_ROOT/$_TARGET_DB:dev
   alias: database
 
 .with-selenium-chrome: &with-selenium-chrome
