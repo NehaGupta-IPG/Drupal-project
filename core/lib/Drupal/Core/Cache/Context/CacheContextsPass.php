@@ -22,7 +22,7 @@ class CacheContextsPass implements CompilerPassInterface {
       foreach ($tags as $attributes) {
         if (!isset($attributes['id'])) {
           if (!str_starts_with($service_id, 'cache_context.')) {
-            throw new \InvalidArgumentException(sprintf('The service "%s" has an invalid service ID: cache context service IDs must use the "cache_context." prefix, or specify an "id" attribute on the tag.', $service_id));
+            throw new \InvalidArgumentException(sprintf('The service "%s" has an invalid service ID. Specify an "id" attribute on the tag.', $service_id));
           }
           $attributes['id'] = substr($service_id, 14);
         }
