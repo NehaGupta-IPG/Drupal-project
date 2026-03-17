@@ -9,7 +9,7 @@ test.describe('States API', { tag: '@core' }, () => {
   test('Test form with state API', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'form_test', true);
 
-    await page.goto('/form-test/javascript-states-form');
+    await page.goto('./form-test/javascript-states-form');
     await expect(page.locator('body')).toBeVisible();
     await expect(page.locator('input[name="textfield"]')).not.toBeVisible();
     await assertNoDeprecationErrors(page);
@@ -20,7 +20,7 @@ test.describe('States API', { tag: '@core' }, () => {
   }) => {
     await drupalInstallModule(page, 'form_test', true);
 
-    await page.goto('/form-test/javascript-states-form');
+    await page.goto('./form-test/javascript-states-form');
     await expect(page.locator('body')).toBeVisible();
     await expect(
       page.locator('#edit-item-visible-when-number-trigger-filled-by-spinner'),

@@ -21,7 +21,7 @@ test.describe('Claro autocomplete', { tag: ['@core'] }, () => {
     });
     await drupalLogin(page, { name: 'user', password: '123' });
 
-    await page.goto('/form-test/autocomplete');
+    await page.goto('./form-test/autocomplete');
     await page.locator('body').waitFor({ state: 'visible' });
 
     // Entering a denied first character should not start autocomplete.

@@ -30,7 +30,7 @@ test.describe('Olivero comments', { tag: ['@core', '@olivero'] }, () => {
     });
     await drupalLogin(page, { name: 'user', password: '123' });
 
-    await page.goto('/node/1');
+    await page.goto('./node/1');
     await expect(page.locator('body')).toContainText(
       'Article without comments',
     );
@@ -51,7 +51,7 @@ test.describe('Olivero comments', { tag: ['@core', '@olivero'] }, () => {
     });
     await drupalLogin(page, { name: 'user', password: '123' });
 
-    await page.goto('/node/2');
+    await page.goto('./node/2');
     await expect(page.locator('body')).toContainText('Article with comments');
     await expect(page.locator('h2.comments__title')).toBeAttached();
     await expect(page.locator(commentCountSelector)).toBeAttached();

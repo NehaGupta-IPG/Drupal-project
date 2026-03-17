@@ -12,7 +12,7 @@ test.describe('Navigation displace', { tag: ['@core', '@navigation'] }, () => {
 
     await page.setViewportSize({ width: 1220, height: 800 });
     await drupalLoginAsAdmin(page);
-    await page.goto('/admin/');
+    await page.goto('./admin/');
     await expect(
       page.locator('.admin-toolbar__displace-placeholder[data-offset-left]'),
     ).toBeAttached();

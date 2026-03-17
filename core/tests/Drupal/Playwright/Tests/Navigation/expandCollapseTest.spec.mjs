@@ -27,7 +27,7 @@ test.describe(
 
       await page.setViewportSize({ width: 1220, height: 800 });
       await drupalLoginAsAdmin(page);
-      await page.goto('/admin/config/development/performance');
+      await page.goto('./admin/config/development/performance');
       await page.locator(selectors.clearCacheButton).click();
       await expect(
         page.locator('[data-once="admin-toolbar-document-triggers-listener"]'),

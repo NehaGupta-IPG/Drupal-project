@@ -32,7 +32,7 @@ test.describe(
       await drupalLogin(page, { name: 'user', password: '123' });
 
       await page.setViewportSize({ width: 1400, height: 800 });
-      await page.goto('/contact/olivero_test_contact_form');
+      await page.goto('./contact/olivero_test_contact_form');
       await expect(page.locator(tableSelector)).toBeVisible();
       await expect(page.locator(tableSelector)).toHaveClass(
         /tabledrag-disabled/,

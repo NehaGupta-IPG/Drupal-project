@@ -19,7 +19,7 @@ test.describe('Login', { tag: '@core' }, () => {
     await drupalLogin(page, { name: 'user', password: '123' });
 
     // Navigate to /admin/reports and assert content.
-    await page.goto('/admin/reports');
+    await page.goto('./admin/reports');
     await expect(page.locator('body')).toBeVisible();
     await expect(page.locator('h1')).toContainText('Reports');
 

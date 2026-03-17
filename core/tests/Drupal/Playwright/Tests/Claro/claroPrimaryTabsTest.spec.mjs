@@ -31,7 +31,7 @@ test.describe('Claro primary tabs', { tag: ['@core', '@claro'] }, () => {
 
   test('Verify desktop primary tab display', async ({ drupalPage: page }) => {
     await page.setViewportSize({ width: 1600, height: 800 });
-    await page.goto('/node/1');
+    await page.goto('./node/1');
     await expect(page.locator(primaryTabsWrapper)).toBeVisible();
     await expect(page.locator(activeTab)).toBeVisible();
     await expect(page.locator(inactiveTab)).toBeVisible();
@@ -42,7 +42,7 @@ test.describe('Claro primary tabs', { tag: ['@core', '@claro'] }, () => {
     drupalPage: page,
   }) => {
     await page.setViewportSize({ width: 699, height: 800 });
-    await page.goto('/node/1');
+    await page.goto('./node/1');
     await expect(page.locator(primaryTabsWrapper)).toBeVisible();
     await expect(page.locator(activeTab)).toBeVisible();
     await expect(page.locator(inactiveTab)).not.toBeVisible();

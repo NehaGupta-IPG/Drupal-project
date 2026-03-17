@@ -21,7 +21,7 @@ test.describe('Olivero desktop menu', { tag: ['@core', '@olivero'] }, () => {
   test.beforeEach(async ({ drupalPage: page }) => {
     // Set max-nesting depth to unlimited so tertiary menu items are visible.
     await drupalLoginAsAdmin(page);
-    await page.goto('/admin/structure/block/manage/olivero_main_menu');
+    await page.goto('./admin/structure/block/manage/olivero_main_menu');
     await page
       .locator('[data-drupal-selector="edit-settings-depth"]')
       .waitFor({ state: 'visible' });
@@ -37,7 +37,7 @@ test.describe('Olivero desktop menu', { tag: ['@core', '@olivero'] }, () => {
   test('Verify desktop menu click functionality', async ({
     drupalPage: page,
   }) => {
-    await page.goto('/node');
+    await page.goto('./node');
     await page.locator(headerNavSelector).waitFor({ state: 'visible' });
     await expect(page.locator(`#${linkSubMenuId}`)).not.toBeVisible();
     await expect(
@@ -71,7 +71,7 @@ test.describe('Olivero desktop menu', { tag: ['@core', '@olivero'] }, () => {
   test('Verify desktop menu hover functionality', async ({
     drupalPage: page,
   }) => {
-    await page.goto('/node');
+    await page.goto('./node');
     await page.locator(headerNavSelector).waitFor({ state: 'visible' });
     await expect(page.locator(headerNavSelector)).toBeVisible();
     await expect(page.locator(`#${linkSubMenuId}`)).not.toBeVisible();
@@ -93,7 +93,7 @@ test.describe('Olivero desktop menu', { tag: ['@core', '@olivero'] }, () => {
   test('Verify desktop menu converts to mobile if it gets too long', async ({
     drupalPage: page,
   }) => {
-    await page.goto('/node');
+    await page.goto('./node');
     await page.locator('body').waitFor({ state: 'visible' });
     await expect(page.locator('body.is-always-mobile-nav')).not.toBeAttached();
 

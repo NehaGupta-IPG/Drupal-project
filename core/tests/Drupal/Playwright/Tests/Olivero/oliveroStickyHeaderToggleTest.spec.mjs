@@ -16,7 +16,7 @@ test.describe('Olivero sticky header', { tag: ['@core', '@olivero'] }, () => {
     drupalPage: page,
   }) => {
     await page.setViewportSize({ width: 1400, height: 800 });
-    await page.goto('/node');
+    await page.goto('./node');
     // Button is in the DOM but invisible (opacity: 0) before scrolling.
     await expect(page.locator(buttonSelector)).toHaveCSS('opacity', '0');
     await expect(page.locator(buttonSelector)).toHaveAttribute(
@@ -39,7 +39,7 @@ test.describe('Olivero sticky header', { tag: ['@core', '@olivero'] }, () => {
     );
 
     // Sticky header should remain open after page reload in open state.
-    await page.goto('/node');
+    await page.goto('./node');
     await expect(page.locator(mainMenuSelector)).toBeVisible();
     await expect(page.locator(buttonSelector)).toHaveAttribute(
       'aria-checked',

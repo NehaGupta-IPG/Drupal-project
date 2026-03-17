@@ -21,7 +21,7 @@ test.describe(
       drupalPage: page,
     }) => {
       await drupalLoginAsAdmin(page);
-      await page.goto('/admin/structure/block');
+      await page.goto('./admin/structure/block');
 
       // Disable narrow search form block.
       await page
@@ -60,7 +60,7 @@ test.describe(
       await drupalLogout(page);
 
       // Verify no console errors on the front page.
-      await page.goto('/');
+      await page.goto('./');
       await page.locator('body').waitFor({ state: 'visible' });
       const noErrors = await page.evaluate(() => Drupal.errorLog.length === 0);
       expect(noErrors).toBe(true);

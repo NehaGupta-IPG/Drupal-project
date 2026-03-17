@@ -35,7 +35,7 @@ test.describe('Olivero search form', { tag: ['@core', '@olivero'] }, () => {
     drupalPage: page,
   }) => {
     await page.setViewportSize({ width: 1400, height: 800 });
-    await page.goto('/');
+    await page.goto('./');
     await page.locator(searchButtonSelector).waitFor({ state: 'visible' });
     await expect(page.locator(searchButtonSelector)).toHaveAttribute(
       'aria-expanded',
@@ -71,7 +71,7 @@ test.describe('Olivero search form', { tag: ['@core', '@olivero'] }, () => {
 
   test('Test focus management', async ({ drupalPage: page }) => {
     await page.setViewportSize({ width: 1400, height: 800 });
-    await page.goto('/');
+    await page.goto('./');
     await page.locator(searchButtonSelector).waitFor({ state: 'visible' });
     await page.locator(searchButtonSelector).click();
     await page.locator(searchWideInputSelector).waitFor({ state: 'visible' });
@@ -100,7 +100,7 @@ test.describe('Olivero search form', { tag: ['@core', '@olivero'] }, () => {
 
   test('search narrow form is accessible', async ({ drupalPage: page }) => {
     await page.setViewportSize({ width: 1000, height: 800 });
-    await page.goto('/');
+    await page.goto('./');
     await page.locator(mobileNavButtonSelector).click();
     await page.locator(headerNavSelector).waitFor({ state: 'visible' });
     await expect(
@@ -112,7 +112,7 @@ test.describe('Olivero search form', { tag: ['@core', '@olivero'] }, () => {
     drupalPage: page,
   }) => {
     await page.setViewportSize({ width: 1400, height: 800 });
-    await page.goto('/form-test/object-controller-builder');
+    await page.goto('./form-test/object-controller-builder');
     await expect(
       page.locator('#edit-actions input[type=submit].button--primary'),
     ).toBeAttached();
@@ -120,7 +120,7 @@ test.describe('Olivero search form', { tag: ['@core', '@olivero'] }, () => {
 
   test('search page is altered', async ({ drupalPage: page }) => {
     await page.setViewportSize({ width: 1400, height: 800 });
-    await page.goto('/search');
+    await page.goto('./search');
     await expect(
       page.locator('.search-form input[name=keys]').first(),
     ).toHaveAttribute('placeholder', /Search by keyword or phrase\./);

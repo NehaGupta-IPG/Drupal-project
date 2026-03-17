@@ -15,12 +15,12 @@ test.use({
 test.describe('HTMX', { tag: ['@core', '@htmx'] }, () => {
   test('Asset Load', async ({ drupalPage: page }) => {
     // Verify the source markup has the initialized element.
-    await page.goto('/htmx-test-attachments/replace');
+    await page.goto('./htmx-test-attachments/replace');
     await page.locator('body').waitFor({ state: 'visible' });
     await expect(page.locator(elementInitSelector)).toBeAttached();
 
     // Load the page with htmx-enhanced button.
-    await page.goto('/htmx-test-attachments/page');
+    await page.goto('./htmx-test-attachments/page');
     await page.locator('body').waitFor({ state: 'visible' });
     await expect(page.locator(scriptSelector)).not.toBeAttached();
     await expect(page.locator(cssSelector)).not.toBeAttached();
@@ -34,7 +34,7 @@ test.describe('HTMX', { tag: ['@core', '@htmx'] }, () => {
   });
 
   test('Asset Load with wrapper format', async ({ drupalPage: page }) => {
-    await page.goto('/htmx-test-attachments/wrapper');
+    await page.goto('./htmx-test-attachments/wrapper');
     await page.locator('body').waitFor({ state: 'visible' });
     await expect(page.locator(scriptSelector)).not.toBeAttached();
     await expect(page.locator(cssSelector)).not.toBeAttached();
@@ -49,11 +49,11 @@ test.describe('HTMX', { tag: ['@core', '@htmx'] }, () => {
 
   test('Swap Before', async ({ drupalPage: page }) => {
     // Verify source markup.
-    await page.goto('/htmx-test-attachments/replace');
+    await page.goto('./htmx-test-attachments/replace');
     await page.locator('body').waitFor({ state: 'visible' });
     await expect(page.locator(elementInitSelector)).toBeAttached();
 
-    await page.goto('/htmx-test-attachments/before');
+    await page.goto('./htmx-test-attachments/before');
     await page.locator('body').waitFor({ state: 'visible' });
     await expect(page.locator(scriptSelector)).not.toBeAttached();
     await expect(page.locator(cssSelector)).not.toBeAttached();
@@ -68,11 +68,11 @@ test.describe('HTMX', { tag: ['@core', '@htmx'] }, () => {
 
   test('Swap After', async ({ drupalPage: page }) => {
     // Verify source markup.
-    await page.goto('/htmx-test-attachments/replace');
+    await page.goto('./htmx-test-attachments/replace');
     await page.locator('body').waitFor({ state: 'visible' });
     await expect(page.locator(elementInitSelector)).toBeAttached();
 
-    await page.goto('/htmx-test-attachments/after');
+    await page.goto('./htmx-test-attachments/after');
     await page.locator('body').waitFor({ state: 'visible' });
     await expect(page.locator(scriptSelector)).not.toBeAttached();
     await expect(page.locator(cssSelector)).not.toBeAttached();
@@ -87,12 +87,12 @@ test.describe('HTMX', { tag: ['@core', '@htmx'] }, () => {
 
   test('Ajax Load HTMX Element', async ({ drupalPage: page }) => {
     // Verify source markup.
-    await page.goto('/htmx-test-attachments/replace');
+    await page.goto('./htmx-test-attachments/replace');
     await page.locator('body').waitFor({ state: 'visible' });
     await expect(page.locator(scriptSelector)).toBeAttached();
 
     // Load page with AJAX-powered button that inserts an htmx element.
-    await page.goto('/htmx-test-attachments/ajax');
+    await page.goto('./htmx-test-attachments/ajax');
     await page.locator('body').waitFor({ state: 'visible' });
     await expect(page.locator(scriptSelector)).not.toBeAttached();
     await expect(page.locator(cssSelector)).not.toBeAttached();

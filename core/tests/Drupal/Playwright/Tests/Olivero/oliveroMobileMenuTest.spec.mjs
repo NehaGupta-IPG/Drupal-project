@@ -13,6 +13,10 @@ const buttonSubMenuId = 'primary-menu-item-12';
 /**
  * Tab a specified number of times, then check that the focused element
  * matches the given parent selector.
+ * @param page
+ * @param parentSelector
+ * @param tabCount
+ * @param tabBackwards
  */
 async function focusTrapCheck(page, parentSelector, tabCount, tabBackwards) {
   if (tabBackwards) {
@@ -45,7 +49,7 @@ test.describe('Olivero mobile menu', { tag: ['@core', '@olivero'] }, () => {
     drupalPage: page,
   }) => {
     await page.setViewportSize({ width: 1000, height: 800 });
-    await page.goto('/');
+    await page.goto('./');
     await expect(page.locator(headerNavSelector)).not.toBeVisible();
     await page.locator(mobileNavButtonSelector).click();
     await page.locator(headerNavSelector).waitFor({ state: 'visible' });
@@ -80,7 +84,7 @@ test.describe('Olivero mobile menu', { tag: ['@core', '@olivero'] }, () => {
 
   test('Verify mobile menu focus trap', async ({ drupalPage: page }) => {
     await page.setViewportSize({ width: 1000, height: 800 });
-    await page.goto('/');
+    await page.goto('./');
     await page.locator(mobileNavButtonSelector).click();
     await page.locator(headerNavSelector).waitFor({ state: 'visible' });
 
@@ -101,7 +105,7 @@ test.describe('Olivero mobile menu', { tag: ['@core', '@olivero'] }, () => {
     drupalPage: page,
   }) => {
     await page.setViewportSize({ width: 1000, height: 800 });
-    await page.goto('/node');
+    await page.goto('./node');
     await page.locator('body').waitFor({ state: 'visible' });
     await page.locator(mobileNavButtonSelector).click();
     await page.locator(headerNavSelector).waitFor({ state: 'visible' });
@@ -154,7 +158,7 @@ test.describe('Olivero mobile menu', { tag: ['@core', '@olivero'] }, () => {
     drupalPage: page,
   }) => {
     await page.setViewportSize({ width: 1000, height: 800 });
-    await page.goto('/node');
+    await page.goto('./node');
     await page.locator('body').waitFor({ state: 'visible' });
     await page.locator(mobileNavButtonSelector).click();
     await page.locator(headerNavSelector).waitFor({ state: 'visible' });
@@ -168,7 +172,7 @@ test.describe('Olivero mobile menu', { tag: ['@core', '@olivero'] }, () => {
     await page.setViewportSize({ width: 1000, height: 800 });
     await drupalInstallModule(page, 'big_pipe');
     await drupalLoginAsAdmin(page);
-    await page.goto('/');
+    await page.goto('./');
     await expect(page.locator(headerNavSelector)).not.toBeVisible();
     await page.locator(mobileNavButtonSelector).click();
     await page.locator(headerNavSelector).waitFor({ state: 'visible' });

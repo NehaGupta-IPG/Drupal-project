@@ -28,7 +28,7 @@ test.describe('Olivero Drupal messages', { tag: ['@core', '@olivero'] }, () => {
   test('Verify default placement of javascript-created messages', async ({
     drupalPage: page,
   }) => {
-    await page.goto('/js_message_test_link_with_system_messages');
+    await page.goto('./js_message_test_link_with_system_messages');
     await page.locator(mainContent).waitFor({ state: 'visible' });
     await expect(page.locator(mainMessagesContainer)).toBeAttached();
 
@@ -69,7 +69,7 @@ test.describe('Olivero Drupal messages', { tag: ['@core', '@olivero'] }, () => {
   test('Verify customized placement of javascript-created messages', async ({
     drupalPage: page,
   }) => {
-    await page.goto('/js_message_test_link_with_system_messages');
+    await page.goto('./js_message_test_link_with_system_messages');
     await page.locator(mainContent).waitFor({ state: 'visible' });
     await expect(page.locator(secondaryMessagesContainer)).toBeAttached();
 

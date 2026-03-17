@@ -225,7 +225,7 @@ const machineNameTestArray = [
 test.describe('Machine name transliteration', { tag: ['@core'] }, () => {
   test('Machine name generation test', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'form_test', true);
-    await page.goto('/form-test/machine-name');
+    await page.goto('./form-test/machine-name');
 
     for (const iteration of machineNameTestArray) {
       const result = await page.evaluate((obj) => {

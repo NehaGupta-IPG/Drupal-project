@@ -3,7 +3,7 @@ import { test, expect, drupalInstallModule } from '../drupal-fixtures';
 test.describe('Tabbing manager', { tag: ['@core'] }, () => {
   test('test tabbingmanager', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'tabbingmanager_test');
-    await page.goto('/tabbingmanager-test');
+    await page.goto('./tabbingmanager-test');
     await page
       .locator('#tabbingmanager-test-container')
       .waitFor({ state: 'attached' });

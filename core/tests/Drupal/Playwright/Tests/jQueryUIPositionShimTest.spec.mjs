@@ -743,7 +743,7 @@ test.describe('jQuery UI Position Shim', { tag: ['@core'] }, () => {
   test('test position', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'position_shim_test');
     await page.setViewportSize({ width: 1200, height: 600 });
-    await page.goto('/position-shim-test');
+    await page.goto('./position-shim-test');
     await page.locator('#position-reference-1').waitFor({ state: 'attached' });
 
     const result = await page.evaluate(async (testIterations) => {
@@ -864,7 +864,7 @@ test.describe('jQuery UI Position Shim', { tag: ['@core'] }, () => {
 
   test('my, at, of', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'position_shim_test');
-    await page.goto('/position-shim-test-ported-from-jqueryui');
+    await page.goto('./position-shim-test-ported-from-jqueryui');
     await page.locator('#el1').waitFor({ state: 'visible' });
 
     const result = await page.evaluate(() => {
@@ -920,7 +920,7 @@ test.describe('jQuery UI Position Shim', { tag: ['@core'] }, () => {
 
   test('multiple elements', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'position_shim_test');
-    await page.goto('/position-shim-test-ported-from-jqueryui');
+    await page.goto('./position-shim-test-ported-from-jqueryui');
     await page.locator('#el1').waitFor({ state: 'visible' });
 
     const result = await page.evaluate(() => {
@@ -948,7 +948,7 @@ test.describe('jQuery UI Position Shim', { tag: ['@core'] }, () => {
 
   test('positions', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'position_shim_test');
-    await page.goto('/position-shim-test-ported-from-jqueryui');
+    await page.goto('./position-shim-test-ported-from-jqueryui');
     await page.locator('#el1').waitFor({ state: 'visible' });
 
     const result = await page.evaluate(() => {
@@ -988,7 +988,7 @@ test.describe('jQuery UI Position Shim', { tag: ['@core'] }, () => {
 
   test('of', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'position_shim_test');
-    await page.goto('/position-shim-test-ported-from-jqueryui');
+    await page.goto('./position-shim-test-ported-from-jqueryui');
     await page.locator('#el1').waitFor({ state: 'visible' });
 
     const result = await page.evaluate(() => {
@@ -1140,7 +1140,7 @@ test.describe('jQuery UI Position Shim', { tag: ['@core'] }, () => {
 
   test('offsets', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'position_shim_test');
-    await page.goto('/position-shim-test-ported-from-jqueryui');
+    await page.goto('./position-shim-test-ported-from-jqueryui');
     await page.locator('#el1').waitFor({ state: 'visible' });
 
     const result = await page.evaluate(() => {
@@ -1242,7 +1242,7 @@ test.describe('jQuery UI Position Shim', { tag: ['@core'] }, () => {
 
   test('using', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'position_shim_test');
-    await page.goto('/position-shim-test-ported-from-jqueryui');
+    await page.goto('./position-shim-test-ported-from-jqueryui');
     await page.locator('#el1').waitFor({ state: 'visible' });
 
     const result = await page.evaluate(() => {
@@ -1301,7 +1301,7 @@ test.describe('jQuery UI Position Shim', { tag: ['@core'] }, () => {
 
   test('collision: fit, no collision', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'position_shim_test');
-    await page.goto('/position-shim-test-ported-from-jqueryui');
+    await page.goto('./position-shim-test-ported-from-jqueryui');
     await page.locator('#el1').waitFor({ state: 'visible' });
 
     const result = await page.evaluate(() => {
@@ -1337,7 +1337,7 @@ test.describe('jQuery UI Position Shim', { tag: ['@core'] }, () => {
 
   test('collision: fit, collision', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'position_shim_test');
-    await page.goto('/position-shim-test-ported-from-jqueryui');
+    await page.goto('./position-shim-test-ported-from-jqueryui');
     await page.locator('#el1').waitFor({ state: 'visible' });
 
     const result = await page.evaluate(() => {
@@ -1395,7 +1395,7 @@ test.describe('jQuery UI Position Shim', { tag: ['@core'] }, () => {
 
   test('collision: flip, no collision', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'position_shim_test');
-    await page.goto('/position-shim-test-ported-from-jqueryui');
+    await page.goto('./position-shim-test-ported-from-jqueryui');
     await page.locator('#el1').waitFor({ state: 'visible' });
 
     const result = await page.evaluate(() => {
@@ -1431,7 +1431,7 @@ test.describe('jQuery UI Position Shim', { tag: ['@core'] }, () => {
 
   test('collision: flip, collision', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'position_shim_test');
-    await page.goto('/position-shim-test-ported-from-jqueryui');
+    await page.goto('./position-shim-test-ported-from-jqueryui');
     await page.locator('#el1').waitFor({ state: 'visible' });
 
     const result = await page.evaluate(() => {
@@ -1467,7 +1467,7 @@ test.describe('jQuery UI Position Shim', { tag: ['@core'] }, () => {
 
   test('collision: flipfit, no collision', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'position_shim_test');
-    await page.goto('/position-shim-test-ported-from-jqueryui');
+    await page.goto('./position-shim-test-ported-from-jqueryui');
     await page.locator('#el1').waitFor({ state: 'visible' });
 
     const result = await page.evaluate(() => {
@@ -1503,7 +1503,7 @@ test.describe('jQuery UI Position Shim', { tag: ['@core'] }, () => {
 
   test('collision: flipfit, collision', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'position_shim_test');
-    await page.goto('/position-shim-test-ported-from-jqueryui');
+    await page.goto('./position-shim-test-ported-from-jqueryui');
     await page.locator('#el1').waitFor({ state: 'visible' });
 
     const result = await page.evaluate(() => {
@@ -1539,7 +1539,7 @@ test.describe('jQuery UI Position Shim', { tag: ['@core'] }, () => {
 
   test('collision: none, no collision', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'position_shim_test');
-    await page.goto('/position-shim-test-ported-from-jqueryui');
+    await page.goto('./position-shim-test-ported-from-jqueryui');
     await page.locator('#el1').waitFor({ state: 'visible' });
 
     const result = await page.evaluate(() => {
@@ -1575,7 +1575,7 @@ test.describe('jQuery UI Position Shim', { tag: ['@core'] }, () => {
 
   test('collision: none, collision', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'position_shim_test');
-    await page.goto('/position-shim-test-ported-from-jqueryui');
+    await page.goto('./position-shim-test-ported-from-jqueryui');
     await page.locator('#el1').waitFor({ state: 'visible' });
 
     const result = await page.evaluate(() => {
@@ -1611,7 +1611,7 @@ test.describe('jQuery UI Position Shim', { tag: ['@core'] }, () => {
 
   test('collision: fit, with margin', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'position_shim_test');
-    await page.goto('/position-shim-test-ported-from-jqueryui');
+    await page.goto('./position-shim-test-ported-from-jqueryui');
     await page.locator('#el1').waitFor({ state: 'visible' });
 
     const result = await page.evaluate(() => {
@@ -1648,7 +1648,7 @@ test.describe('jQuery UI Position Shim', { tag: ['@core'] }, () => {
 
   test('collision: flip, with margin', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'position_shim_test');
-    await page.goto('/position-shim-test-ported-from-jqueryui');
+    await page.goto('./position-shim-test-ported-from-jqueryui');
     await page.locator('#el1').waitFor({ state: 'visible' });
 
     const result = await page.evaluate(() => {
@@ -1695,7 +1695,7 @@ test.describe('jQuery UI Position Shim', { tag: ['@core'] }, () => {
 
   test('within', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'position_shim_test');
-    await page.goto('/position-shim-test-ported-from-jqueryui');
+    await page.goto('./position-shim-test-ported-from-jqueryui');
     await page.locator('#el1').waitFor({ state: 'visible' });
 
     const result = await page.evaluate(() => {
@@ -1788,7 +1788,7 @@ test.describe('jQuery UI Position Shim', { tag: ['@core'] }, () => {
 
   test('with scrollbars', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'position_shim_test');
-    await page.goto('/position-shim-test-ported-from-jqueryui');
+    await page.goto('./position-shim-test-ported-from-jqueryui');
     await page.locator('#el1').waitFor({ state: 'visible' });
 
     const result = await page.evaluate(() => {
@@ -1860,7 +1860,7 @@ test.describe('jQuery UI Position Shim', { tag: ['@core'] }, () => {
 
   test('fractions', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'position_shim_test');
-    await page.goto('/position-shim-test-ported-from-jqueryui');
+    await page.goto('./position-shim-test-ported-from-jqueryui');
     await page.locator('#el1').waitFor({ state: 'visible' });
 
     const result = await page.evaluate(() => {
@@ -1881,7 +1881,7 @@ test.describe('jQuery UI Position Shim', { tag: ['@core'] }, () => {
 
   test('bug #5280: consistent results', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'position_shim_test');
-    await page.goto('/position-shim-test-ported-from-jqueryui');
+    await page.goto('./position-shim-test-ported-from-jqueryui');
     await page.locator('#el1').waitFor({ state: 'visible' });
 
     const result = await page.evaluate(() => {
@@ -1913,7 +1913,7 @@ test.describe('jQuery UI Position Shim', { tag: ['@core'] }, () => {
     drupalPage: page,
   }) => {
     await drupalInstallModule(page, 'position_shim_test');
-    await page.goto('/position-shim-test-ported-from-jqueryui');
+    await page.goto('./position-shim-test-ported-from-jqueryui');
     await page.locator('#el1').waitFor({ state: 'visible' });
 
     const result = await page.evaluate(() => {

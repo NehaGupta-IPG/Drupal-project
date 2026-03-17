@@ -49,7 +49,7 @@ test.describe(
       drupalPage: page,
     }) => {
       await page.setViewportSize({ width: 1400, height: 800 });
-      await page.goto('/form_test/form-labels');
+      await page.goto('./form_test/form-labels');
       await page.locator(checkboxSelector).waitFor({ state: 'visible' });
       await expect(page.locator(checkboxSelector)).toHaveAttribute(
         'title',
@@ -58,7 +58,7 @@ test.describe(
     });
 
     test('Check form element classes by type', async ({ drupalPage: page }) => {
-      await page.goto('/form_test/form-labels');
+      await page.goto('./form_test/form-labels');
 
       for (const inputType of inputTypes) {
         await expect(page.locator(inputType.selector)).toHaveClass(

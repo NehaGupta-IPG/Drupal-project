@@ -62,7 +62,7 @@ test.describe('Drupal.displace() API', { tag: ['@core'] }, () => {
     drupalPage: page,
   }) => {
     await drupalInstallModule(page, 'js_displace');
-    await page.goto('/');
+    await page.goto('./');
     await page.locator('body').waitFor({ state: 'visible' });
 
     // Test displace() returns proper offsets.

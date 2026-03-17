@@ -17,7 +17,7 @@ test.use({
 
 test.describe('Olivero misc', { tag: ['@core', '@olivero'] }, () => {
   test('Verify font loading', async ({ drupalPage: page }) => {
-    await page.goto('/');
+    await page.goto('./');
     await page.locator('body').waitFor({ state: 'visible' });
 
     // Check that <link rel="preload"> tags properly reference fonts.

@@ -44,7 +44,7 @@ test.describe('Olivero color settings', { tag: ['@core', '@olivero'] }, () => {
   test('Color schemes update individual values', async ({
     drupalPage: page,
   }) => {
-    await page.goto('/admin/appearance/settings/olivero');
+    await page.goto('./admin/appearance/settings/olivero');
     await page.locator(selectors.schemePicker).waitFor({ state: 'visible' });
 
     for (const [scheme, colors] of Object.entries(colorSchemes)) {
@@ -72,7 +72,7 @@ test.describe('Olivero color settings', { tag: ['@core', '@olivero'] }, () => {
   });
 
   test('Color inputs stay synchronized', async ({ drupalPage: page }) => {
-    await page.goto('/admin/appearance/settings/olivero');
+    await page.goto('./admin/appearance/settings/olivero');
     await page
       .locator(selectors.primaryColor.text)
       .waitFor({ state: 'visible' });
@@ -89,7 +89,7 @@ test.describe('Olivero color settings', { tag: ['@core', '@olivero'] }, () => {
   test('Color selections impact olivero theme', async ({
     drupalPage: page,
   }) => {
-    await page.goto('/admin/appearance/settings/olivero');
+    await page.goto('./admin/appearance/settings/olivero');
     await page
       .locator(selectors.primaryColor.color)
       .waitFor({ state: 'visible' });
@@ -99,7 +99,7 @@ test.describe('Olivero color settings', { tag: ['@core', '@olivero'] }, () => {
       .locator(selectors.primaryColor.color)
       .waitFor({ state: 'visible' });
 
-    await page.goto('/');
+    await page.goto('./');
     await page.locator(selectors.siteHeader).waitFor({ state: 'visible' });
     await expect(page.locator(selectors.siteHeader)).toHaveCSS(
       'background-color',
@@ -107,7 +107,7 @@ test.describe('Olivero color settings', { tag: ['@core', '@olivero'] }, () => {
     );
 
     // Change to plum color and verify.
-    await page.goto('/admin/appearance/settings/olivero');
+    await page.goto('./admin/appearance/settings/olivero');
     await page
       .locator(selectors.primaryColor.color)
       .waitFor({ state: 'visible' });
@@ -117,7 +117,7 @@ test.describe('Olivero color settings', { tag: ['@core', '@olivero'] }, () => {
       .locator(selectors.primaryColor.color)
       .waitFor({ state: 'visible' });
 
-    await page.goto('/');
+    await page.goto('./');
     await page.locator(selectors.siteHeader).waitFor({ state: 'visible' });
     await expect(page.locator(selectors.siteHeader)).toHaveCSS(
       'background-color',

@@ -10,7 +10,7 @@ test.use({
 
 test.describe('Langcode', { tag: '@core' }, () => {
   test('Test page with langcode', async ({ drupalPage: page }) => {
-    await page.goto('/test-page');
+    await page.goto('./test-page');
     await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
   });
 });

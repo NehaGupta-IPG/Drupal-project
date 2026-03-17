@@ -4,7 +4,7 @@ test.describe('Once API', { tag: ['@core'] }, () => {
   test('Test simple once call', async ({ drupalPage: page }) => {
     await drupalInstallModule(page, 'js_once_test');
 
-    await page.goto('/js_once_test');
+    await page.goto('./js_once_test');
     await page
       .locator('[data-drupal-item]')
       .first()
