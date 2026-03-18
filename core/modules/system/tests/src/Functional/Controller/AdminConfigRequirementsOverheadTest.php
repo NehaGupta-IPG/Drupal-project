@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\Controller;
 
 use Drupal\Tests\BrowserTestBase;
-use Drupal\Tests\Traits\Core\CronRunTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -18,8 +17,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[Group('system')]
 #[RunTestsInSeparateProcesses]
 class AdminConfigRequirementsOverheadTest extends BrowserTestBase {
-
-  use CronRunTrait;
 
   /**
    * {@inheritdoc}
@@ -58,7 +55,7 @@ class AdminConfigRequirementsOverheadTest extends BrowserTestBase {
     $this->assertSame(0, \Drupal::state()->get('requirements_overview_test.count', 0));
 
     // Cron caches the error reported by requirements_overview_error_test.
-    $this->cronRun();
+    $this->drupalGet('cron/' . \Drupal::state()->get('system.cron_key'));
     \Drupal::state()->set('requirements_overview_test.count', 0);
 
     // The warning must appear from cached state, not a live check.
