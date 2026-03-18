@@ -220,6 +220,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
         'data' => [
           '#type' => 'operations',
           '#links' => $links,
+          '#prefix' => $is_current_revision ? $this->t('<em>Current revision</em>') : '',
         ],
       ];
 
