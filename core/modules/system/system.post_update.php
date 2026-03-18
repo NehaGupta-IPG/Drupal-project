@@ -148,3 +148,12 @@ function system_post_update_delete_rss_config(array &$sandbox): void {
     \Drupal::configFactory()->getEditable('system.rss')->delete();
   }
 }
+
+/**
+ * Populate the cached requirements error status.
+ */
+function system_post_update_cache_requirements_status(): void {
+  /** @var \Drupal\system\SystemManager $system_manager */
+  $system_manager = \Drupal::service('system.manager');
+  $system_manager->listRequirements();
+}

@@ -83,7 +83,8 @@ class SystemManager {
    *   Returns the status of the system.
    */
   public function checkRequirements() {
-    return $this->hasErrors($this->listRequirements());
+    $requirements = $this->listRequirements();
+    return RequirementSeverity::maxSeverityFromRequirements($requirements) === RequirementSeverity::Error;
   }
 
   /**
@@ -97,30 +98,10 @@ class SystemManager {
   }
 
   /**
-   * Caches whether the given requirements contain errors.
-   *
-   * @param array $requirements
-   *   A requirements array as returned by listRequirements().
-   */
-  public function cacheRequirementsStatus(array $requirements): void {
-    $this->state->set('system.requirements_has_errors', $this->hasErrors($requirements));
-  }
-
-  /**
-   * Checks if a requirements array contains errors.
-   *
-   * @param array $requirements
-   *   A requirements array as returned by listRequirements().
-   *
-   * @return bool
-   *   TRUE if the requirements contain at least one error.
-   */
-  protected function hasErrors(array $requirements): bool {
-    return RequirementSeverity::maxSeverityFromRequirements($requirements) === RequirementSeverity::Error;
-  }
-
-  /**
    * Displays the site status report. Can also be used as a pure check.
+   *
+   * Also caches the error status in state so that /admin/config can read it
+   * without invoking all hook_requirements() implementations.
    *
    * @return array
    *   An array of system requirements.
@@ -146,6 +127,8 @@ class SystemManager {
       }
       return isset($b['weight']) ? $a['weight'] - $b['weight'] : $a['weight'];
     });
+
+    $this->state->set('system.requirements_has_errors', RequirementSeverity::maxSeverityFromRequirements($requirements) === RequirementSeverity::Error);
 
     return $requirements;
   }

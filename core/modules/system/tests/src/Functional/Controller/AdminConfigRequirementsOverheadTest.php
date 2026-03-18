@@ -54,8 +54,9 @@ class AdminConfigRequirementsOverheadTest extends BrowserTestBase {
     // The counter tracks hook_runtime_requirements() calls. It must be 0.
     $this->assertSame(0, \Drupal::state()->get('requirements_overview_test.count', 0));
 
-    // Cron caches the error reported by requirements_overview_error_test.
-    $this->drupalGet('cron/' . \Drupal::state()->get('system.cron_key'));
+    // The status report caches the error from requirements_overview_error_test.
+    $this->drupalGet('admin/reports/status');
+    $this->assertSession()->statusCodeEquals(200);
     \Drupal::state()->set('requirements_overview_test.count', 0);
 
     // The warning must appear from cached state, not a live check.
