@@ -76,8 +76,9 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
     if ($entity instanceof RevisionableInterface) {
       /** @var \Drupal\Core\Entity\RevisionableInterface $entity */
       $cid .= ':' . $entity->getRevisionId();
-      // It is not possible to delete or revert the default revision.
-      if ($entity->isDefaultRevision() && ($operation === 'revert' || $operation === 'delete revision')) {
+      // Prevent deleting the default revision, or reverting to the latest revision.
+      if ($entity->isDefaultRevision() && $operation === 'delete revision' ||
+          $entity->isLatestRevision() && $operation === 'revert') {
         return $return_as_object ? AccessResult::forbidden() : FALSE;
       }
     }
