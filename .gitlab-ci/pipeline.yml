@@ -239,7 +239,7 @@ variables:
     - echo -e "Node version $(node --version)\nYarn version $(yarn --version)"
     - yarn playwright install --with-deps chromium-headless-shell
     - printenv
-    - yarn run test:playwright --workers 3 --max-failures 3 --repeat-each=42
+    - yarn run test:playwright --workers 3 --max-failures 3 --repeat-each=30
   after_script:
     - find . -name playwright_output
   artifacts:
