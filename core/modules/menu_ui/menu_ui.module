@@ -48,6 +48,10 @@ function _menu_ui_node_save(NodeInterface $node, array $values): void {
   $entity->menu_name->value = $values['menu_name'];
   $entity->parent->value = $values['parent'];
   $entity->weight->value = $values['weight'] ?? 0;
+
+  // Initialize the needs_save flag.
+  $needs_save = TRUE;
+
   if ($entity->isNew()) {
     // @todo The menu link doesn't need to be changed in a workspace context.
     //   Fix this in https://www.drupal.org/project/drupal/issues/3511204.
@@ -60,15 +64,34 @@ function _menu_ui_node_save(NodeInterface $node, array $values): void {
     }
   }
   else {
-    $entity->isDefaultRevision($node->isDefaultRevision());
-    if (!$entity->isDefaultRevision()) {
-      $entity->setNewRevision(TRUE);
-    }
-    elseif ($entity->get('link')->uri !== 'entity:node/' . $node->id()) {
-      $entity->get('link')->uri = 'entity:node/' . $node->id();
+    // Check if the menu link actually needs to be saved to avoid phantom
+    // workspace tracking entries.
+    // See https://www.drupal.org/project/drupal/issues/3511204
+    $needs_save = (
+      $entity->title->value !== trim($values['title']) ||
+      $entity->description->value !== trim($values['description']) ||
+      $entity->menu_name->value !== $values['menu_name'] ||
+      $entity->parent->value !== $values['parent'] ||
+      $entity->weight->value !== ($values['weight'] ?? 0) ||
+      $entity->get('link')->uri !== 'entity:node/' . $node->id()
+    );
+
+    // Only save if something actually changed
+    if ($needs_save) {
+      $entity->isDefaultRevision($node->isDefaultRevision());
+      if (!$entity->isDefaultRevision()) {
+        $entity->setNewRevision(TRUE);
+      }
+      elseif ($entity->get('link')->uri !== 'entity:node/' . $node->id()) {
+        $entity->get('link')->uri = 'entity:node/' . $node->id();
+      }
     }
   }
-  $entity->save();
+
+  // Always save new entities, only save existing entities if they changed
+  if ($entity->isNew() || (!empty($needs_save))) {
+    $entity->save();
+  }
 }
 
 /**
