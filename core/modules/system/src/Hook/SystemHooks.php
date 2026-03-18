@@ -306,6 +306,12 @@ class SystemHooks {
       $fetcher = \Drupal::service('system.sa_fetcher');
       $fetcher->getSecurityAdvisories();
     }
+    // Update the cached requirements status so /admin/config can show a
+    // warning without running expensive checks on every page load.
+    // @see https://www.drupal.org/project/drupal/issues/3336621
+    /** @var \Drupal\system\SystemManager $system_manager */
+    $system_manager = \Drupal::service('system.manager');
+    $system_manager->cacheRequirementsStatus($system_manager->listRequirements());
   }
 
   /**

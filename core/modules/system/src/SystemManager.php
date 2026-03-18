@@ -8,6 +8,7 @@ use Drupal\Core\Menu\MenuActiveTrailInterface;
 use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Menu\MenuLinkTreeInterface;
 use Drupal\Core\Menu\MenuTreeParameters;
+use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -47,6 +48,13 @@ class SystemManager {
   protected $menuActiveTrail;
 
   /**
+   * The state service.
+   *
+   * @var \Drupal\Core\State\StateInterface
+   */
+  protected $state;
+
+  /**
    * Constructs a SystemManager object.
    *
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
@@ -57,12 +65,15 @@ class SystemManager {
    *   The menu tree manager.
    * @param \Drupal\Core\Menu\MenuActiveTrailInterface $menu_active_trail
    *   The active menu trail service.
+   * @param \Drupal\Core\State\StateInterface $state
+   *   The state service.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, RequestStack $request_stack, MenuLinkTreeInterface $menu_tree, MenuActiveTrailInterface $menu_active_trail) {
+  public function __construct(ModuleHandlerInterface $module_handler, RequestStack $request_stack, MenuLinkTreeInterface $menu_tree, MenuActiveTrailInterface $menu_active_trail, StateInterface $state) {
     $this->moduleHandler = $module_handler;
     $this->requestStack = $request_stack;
     $this->menuTree = $menu_tree;
     $this->menuActiveTrail = $menu_active_trail;
+    $this->state = $state;
   }
 
   /**
@@ -72,7 +83,39 @@ class SystemManager {
    *   Returns the status of the system.
    */
   public function checkRequirements() {
-    $requirements = $this->listRequirements();
+    return $this->hasErrors($this->listRequirements());
+  }
+
+  /**
+   * Returns the cached result of the last requirements check.
+   *
+   * @return bool
+   *   TRUE if the last check found requirement errors.
+   */
+  public function hasCachedRequirementErrors(): bool {
+    return (bool) $this->state->get('system.requirements_has_errors', FALSE);
+  }
+
+  /**
+   * Caches whether the given requirements contain errors.
+   *
+   * @param array $requirements
+   *   A requirements array as returned by listRequirements().
+   */
+  public function cacheRequirementsStatus(array $requirements): void {
+    $this->state->set('system.requirements_has_errors', $this->hasErrors($requirements));
+  }
+
+  /**
+   * Checks if a requirements array contains errors.
+   *
+   * @param array $requirements
+   *   A requirements array as returned by listRequirements().
+   *
+   * @return bool
+   *   TRUE if the requirements contain at least one error.
+   */
+  protected function hasErrors(array $requirements): bool {
     return RequirementSeverity::maxSeverityFromRequirements($requirements) === RequirementSeverity::Error;
   }
 
