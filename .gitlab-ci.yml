@@ -595,7 +595,7 @@ default:
   parallel:
     matrix:
       - _TARGET_PHP: !reference [.php_versions]
-        _TARGET_DB: [mariadb-10.6]
+        _TARGET_DB: [mariadb-10.11]
   variables:
     _TARGET_DB_DRIVER: "mysql"
     _TARGET_DB_DRIVER_MODULE: "mysql"
@@ -682,17 +682,17 @@ default:
     _TARGET_PHP: $MINIMUM_PHP
     _TARGET_DB: "sqlite-3"
 
-'[Daily] MariaDB 10.6':
+'[Daily] MariaDB 10.11':
   <<: [ *recursive-trigger, *run-daily ]
   needs: [ '[Daily] PHP minimum SQLite 3.45' ]
   variables:
-    _TARGET_DB: "mariadb-10.6"
+    _TARGET_DB: "mariadb-10.11"
     _TARGET_DB_DRIVER: "mysql"
     _TARGET_DB_DRIVER_MODULE: "mysql"
 
 '[Daily] MySQL 9.3':
   <<: [ *recursive-trigger, *run-daily ]
-  needs: [ '[Daily] MariaDB 10.6' ]
+  needs: [ '[Daily] MariaDB 10.11' ]
   variables:
     _TARGET_DB: "mysql-9"
     _TARGET_DB_DRIVER: "mysql"
