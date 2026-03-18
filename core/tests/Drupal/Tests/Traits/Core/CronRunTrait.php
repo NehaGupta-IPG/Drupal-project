@@ -12,7 +12,7 @@ trait CronRunTrait {
   /**
    * Runs cron on the test site.
    */
-  protected function cronRun(): void {
+  protected function cronRun() {
     $this->drupalGet('cron/' . \Drupal::state()->get('system.cron_key'));
   }
 
