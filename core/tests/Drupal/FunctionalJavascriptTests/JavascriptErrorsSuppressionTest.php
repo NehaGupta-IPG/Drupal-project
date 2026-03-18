@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalJavascriptTests;
 
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -32,6 +33,7 @@ class JavascriptErrorsSuppressionTest extends WebDriverTestBase {
   /**
    * Tests that JavaScript console errors can be suppressed.
    */
+  #[DoesNotPerformAssertions]
   public function testJavascriptErrors(): void {
     // Visit page that will throw a JavaScript console error.
     $this->drupalGet('js_errors_test');

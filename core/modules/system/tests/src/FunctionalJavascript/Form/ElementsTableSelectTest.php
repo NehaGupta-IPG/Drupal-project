@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\FunctionalJavascript\Form;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -28,6 +29,7 @@ class ElementsTableSelectTest extends WebDriverTestBase {
   /**
    * Tests the presence of ajax functionality for all options.
    */
+  #[DoesNotPerformAssertions]
   public function testAjax(): void {
     // Test checkboxes (#multiple == TRUE).
     $this->drupalGet('form_test/tableselect/multiple-true');

@@ -276,7 +276,7 @@ class DateTimePlus {
    *   The formatted value of the date including the name of the timezone.
    */
   public function render() {
-    return $this->format(static::FORMAT) . ' ' . $this->getTimeZone()->getName();
+    return $this->format(static::FORMAT) . ' ' . $this->getTimezone()->getName();
   }
 
   /**
