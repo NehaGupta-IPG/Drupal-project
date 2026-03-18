@@ -51,7 +51,7 @@ class Schema extends DatabaseSchema {
    * @return array
    *   A keyed array with information about the database, table name and prefix.
    */
-  protected function getPrefixInfo($table = 'default', $add_prefix = TRUE) {
+  protected function getPrefixInfo($table = 'default', $add_prefix = TRUE): array {
     $info = ['prefix' => $this->connection->getPrefix()];
     if ($add_prefix) {
       $table = $info['prefix'] . $table;
@@ -140,8 +140,11 @@ class Schema extends DatabaseSchema {
    *   Name of the field.
    * @param array $spec
    *   The field specification, as per the schema data structure format.
+   *
+   * @return string
+   *   The SQL string.
    */
-  protected function createFieldSql($name, $spec) {
+  protected function createFieldSql($name, $spec): string {
     $sql = "[" . $name . "] " . $spec['mysql_type'];
 
     if (in_array($spec['mysql_type'], $this->mysqlStringTypes)) {
@@ -202,8 +205,11 @@ class Schema extends DatabaseSchema {
    *
    * @param array $field
    *   A field description array, as specified in the schema documentation.
+   *
+   * @return array
+   *   Database-engine specific properties.
    */
-  protected function processField($field) {
+  protected function processField($field): array {
 
     if (!isset($field['size'])) {
       $field['size'] = 'normal';
@@ -274,8 +280,11 @@ class Schema extends DatabaseSchema {
 
   /**
    * Creates the keys for an SQL table.
+   *
+   * @return list<string>
+   *   The keys.
    */
-  protected function createKeysSql($spec) {
+  protected function createKeysSql($spec): array {
     $keys = [];
 
     if (!empty($spec['primary key'])) {
@@ -311,7 +320,7 @@ class Schema extends DatabaseSchema {
    * @throws \Drupal\Core\Database\SchemaException
    *   Thrown if field specification is missing.
    */
-  protected function getNormalizedIndexes(array $spec) {
+  protected function getNormalizedIndexes(array $spec): array {
     $indexes = $spec['indexes'] ?? [];
     foreach ($indexes as $index_name => $index_fields) {
       foreach ($index_fields as $index_key => $index_field) {
@@ -345,10 +354,13 @@ class Schema extends DatabaseSchema {
    * @param array $index
    *   The index array to be used in createKeySql.
    *
+   * @return void
+   *   No return value.
+   *
    * @see Drupal\mysql\Driver\Database\mysql\Schema::createKeySql()
    * @see Drupal\mysql\Driver\Database\mysql\Schema::normalizeIndexes()
    */
-  protected function shortenIndex(&$index) {
+  protected function shortenIndex(&$index): void {
     if (is_array($index)) {
       if ($index[1] > 191) {
         $index[1] = 191;
@@ -361,8 +373,11 @@ class Schema extends DatabaseSchema {
 
   /**
    * Creates an SQL key for the given fields.
+   *
+   * @return string
+   *   The SQL key.
    */
-  protected function createKeySql($fields) {
+  protected function createKeySql($fields): string {
     $return = [];
     foreach ($fields as $field) {
       if (is_array($field)) {
@@ -378,7 +393,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function renameTable($table, $new_name) {
+  public function renameTable($table, $new_name): void {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot rename '$table' to '$new_name': table '$table' doesn't exist.");
     }
@@ -405,7 +420,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function addField($table, $field, $spec, $keys_new = []) {
+  public function addField($table, $field, $spec, $keys_new = []): void {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot add field '$table.$field': table doesn't exist.");
     }
@@ -512,7 +527,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function addPrimaryKey($table, $fields) {
+  public function addPrimaryKey($table, $fields): void {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot add primary key to table '$table': table doesn't exist.");
     }
@@ -549,7 +564,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function addUniqueKey($table, $name, $fields) {
+  public function addUniqueKey($table, $name, $fields): void {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot add unique key '$name' to table '$table': table doesn't exist.");
     }
@@ -575,7 +590,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function addIndex($table, $name, $fields, array $spec) {
+  public function addIndex($table, $name, $fields, array $spec): void {
     if (!$this->tableExists($table)) {
       throw new SchemaObjectDoesNotExistException("Cannot add index '$name' to table '$table': table doesn't exist.");
     }
@@ -634,7 +649,7 @@ class Schema extends DatabaseSchema {
   /**
    * {@inheritdoc}
    */
-  public function changeField($table, $field, $field_new, $spec, $keys_new = []) {
+  public function changeField($table, $field, $field_new, $spec, $keys_new = []): void {
     if (!$this->fieldExists($table, $field)) {
       throw new SchemaObjectDoesNotExistException("Cannot change the definition of field '$table.$field': field doesn't exist.");
     }
@@ -682,7 +697,7 @@ class Schema extends DatabaseSchema {
    * @return string|false
    *   The table or column comment. FALSE if the table or column does not exist.
    */
-  public function getComment($table, $column = NULL) {
+  public function getComment($table, $column = NULL): string|false {
     $condition = $this->buildTableNameCondition($table);
     if (isset($column)) {
       if (!$this->tableExists($table)) {

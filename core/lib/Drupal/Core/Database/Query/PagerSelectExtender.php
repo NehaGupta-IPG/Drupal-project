@@ -87,6 +87,9 @@ class PagerSelectExtender extends SelectExtender {
    *
    * After running this method, access $this->element to get the element for
    * this query.
+   *
+   * @return void
+   *   No return value.
    */
   protected function ensureElement() {
     if (!isset($this->element)) {
@@ -103,6 +106,9 @@ class PagerSelectExtender extends SelectExtender {
    * @param \Drupal\Core\Database\Query\SelectInterface $query
    *   The count query object. It must return a single row with a single column,
    *   which is the total number of records.
+   *
+   * @return void
+   *   No return value.
    */
   public function setCountQuery(SelectInterface $query) {
     $this->customCountQuery = $query;
@@ -134,6 +140,8 @@ class PagerSelectExtender extends SelectExtender {
    * @param int|false $limit
    *   An integer specifying the number of elements per page. If passed a false
    *   value (FALSE, 0, NULL), the pager is disabled.
+   *
+   * @return static
    */
   public function limit($limit = 10) {
     $this->limit = $limit;
@@ -155,6 +163,8 @@ class PagerSelectExtender extends SelectExtender {
    *
    * @param int $element
    *   Element ID that is used to differentiate different pager queries.
+   *
+   * @return static
    */
   public function element($element) {
     $this->element = $element;

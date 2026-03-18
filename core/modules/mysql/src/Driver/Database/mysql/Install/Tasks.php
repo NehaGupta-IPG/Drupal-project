@@ -157,8 +157,11 @@ class Tasks extends InstallTasks {
 
   /**
    * Ensure that InnoDB is available.
+   *
+   * @return void
+   *   No return value.
    */
-  public function ensureInnoDbAvailable() {
+  public function ensureInnoDbAvailable(): void {
     $engines = Database::getConnection()->query('SHOW ENGINES')->fetchAllKeyed();
     if (isset($engines['MyISAM']) && $engines['MyISAM'] == 'DEFAULT' && !isset($engines['InnoDB'])) {
       $this->fail($this->t('The MyISAM storage engine is not supported.'));
