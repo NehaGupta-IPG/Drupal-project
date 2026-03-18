@@ -120,6 +120,52 @@ class BasicAuthTest extends BrowserTestBase {
   }
 
   /**
+   * Tests the global login flood control on only the username.
+   */
+  public function testGlobalLoginFloodControlOnUsername(): void {
+    $this->writeSettings([
+      'settings' => [
+        'basic_auth_3241232_sa_username_enumeration' => (object) [
+          'value' => TRUE,
+          'required' => TRUE,
+        ],
+      ],
+    ]);
+    $this->config('user.flood')
+      ->set('ip_limit', 2)
+      // Set a high per-user limit out so that it is not relevant in the test.
+      ->set('user_limit', 4000)
+      ->save();
+
+    $user = $this->drupalCreateUser([]);
+    $blocked_user = $this->drupalCreateUser([], NULL, FALSE, [
+      'status' => '0',
+    ]);
+    $incorrect_user = clone $user;
+    $incorrect_user->setUsername($incorrect_user->getAccountName() . 'incorrect');
+    $incorrect_user->pass_raw .= 'incorrect';
+    $url = Url::fromRoute('router_test.11');
+
+    // Attempt 2 failed logins with invalid usernames, but the user's IP should
+    // not be banned.
+    for ($i = 0; $i < 2; $i++) {
+      $this->basicAuthGet($url, $incorrect_user->getAccountName(), $incorrect_user->pass_raw);
+    }
+    // The user should be able to login.
+    $this->basicAuthGet($url, $user->getAccountName(), $user->pass_raw);
+    $this->assertSession()->statusCodeEquals(200);
+
+    // 2 failed logins with valid usernames should cause the user to be banned
+    // as normal.
+    $this->basicAuthGet($url, $user->getAccountName(), $incorrect_user->pass_raw);
+    $this->basicAuthGet($url, $blocked_user->getAccountName(), $incorrect_user->pass_raw);
+
+    // The IP limit has been reached. Even valid user credentials will fail.
+    $this->basicAuthGet($url, $user->getAccountName(), $user->pass_raw);
+    $this->assertSession()->statusCodeEquals(403);
+  }
+
+  /**
    * Tests the per-user login flood control.
    */
   public function testPerUserLoginFloodControl(): void {
