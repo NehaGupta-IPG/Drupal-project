@@ -95,6 +95,7 @@ class CollectRoutesTest extends UnitTestCase {
       ->willReturn(['basic_auth' => 'data', 'cookie' => 'data']);
 
     $container->setParameter('serializer.format_providers', ['json']);
+    $container->set('string_translation', $this->getStringTranslationStub());
 
     \Drupal::setContainer($container);
 
