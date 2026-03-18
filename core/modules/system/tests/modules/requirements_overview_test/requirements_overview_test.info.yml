@@ -1,0 +1,5 @@
+name: 'Requirements Overview Test'
+type: module
+description: 'Test module that tracks hook_runtime_requirements() invocations.'
+package: Testing
+version: VERSION

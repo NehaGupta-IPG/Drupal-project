@@ -1,0 +1,5 @@
+name: 'Requirements Overview Error Test'
+type: module
+description: 'Test module that always reports a runtime requirements error.'
+package: Testing
+version: VERSION
