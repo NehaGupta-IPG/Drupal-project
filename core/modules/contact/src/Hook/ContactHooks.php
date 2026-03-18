@@ -132,7 +132,7 @@ class ContactHooks {
     $language = \Drupal::languageManager()->getLanguage($message['langcode']);
     $variables = [
       '@site-name' => \Drupal::config('system.site')->get('name'),
-      '@subject' => $contact_message->getSubject(),
+      '@subject' => $contact_message->getSubject() ?? 'submission from ' . \Drupal::config('system.site')->get('name'),
       '@form' => !empty($params['contact_form']) ? $params['contact_form']->label() : '',
       '@form-url' => Url::fromRoute('<current>', [], [
         'absolute' => TRUE,
