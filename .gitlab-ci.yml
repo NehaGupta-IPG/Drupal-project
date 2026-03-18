@@ -625,7 +625,7 @@ default:
   parallel:
     matrix:
       - _TARGET_PHP: !reference [.php_versions]
-        _TARGET_DB: [pgsql-16, pgsql-17, pgsql-18]
+        _TARGET_DB: [pgsql-18]
 
 'SQLite':
   <<: [ *recursive-trigger, *run-on-mr ]
@@ -636,15 +636,15 @@ default:
 
 # Jobs running on commits.
 # The value set in the "needs" property will determine the order in the sequence.
-'[Commit] PHP 8.5 PostgreSQL 16':
+'[Commit] PHP 8.5 PostgreSQL 18':
   <<: [ *recursive-trigger, *run-on-commit ]
   variables:
     _TARGET_PHP: $MINIMUM_PHP
-    _TARGET_DB: "pgsql-16"
+    _TARGET_DB: "pgsql-18"
 
 '[Commit] PHP 8.5 MySQL 9 via mysqli':
   <<: [ *recursive-trigger, *run-on-commit ]
-  needs: [ '[Commit] PHP 8.5 PostgreSQL 16' ]
+  needs: [ '[Commit] PHP 8.5 PostgreSQL 18' ]
   variables:
     _TARGET_PHP: $MINIMUM_PHP
     _TARGET_DB: "mysql-9"
@@ -660,15 +660,15 @@ default:
 
 # Jobs running daily.
 # The value set in the "needs" property will determine the order in the sequence.
-'[Daily] PHP minimum PostgreSQL 16':
+'[Daily] PHP minimum PostgreSQL 18':
   <<: [ *recursive-trigger, *run-daily ]
   variables:
     _TARGET_PHP: $MINIMUM_PHP
-    _TARGET_DB: "pgsql-16"
+    _TARGET_DB: "pgsql-18"
 
 '[Daily] PHP 8.5 MySQL 9 via mysqli':
   <<: [ *recursive-trigger, *run-daily ]
-  needs: [ '[Daily] PHP minimum PostgreSQL 16' ]
+  needs: [ '[Daily] PHP minimum PostgreSQL 18' ]
   variables:
     _TARGET_PHP: "8.5-ubuntu"
     _TARGET_DB: "mysql-9"
@@ -697,12 +697,6 @@ default:
     _TARGET_DB: "mysql-9"
     _TARGET_DB_DRIVER: "mysql"
     _TARGET_DB_DRIVER_MODULE: "mysql"
-
-'[Daily] PostgreSQL 18':
-  <<: [ *recursive-trigger, *run-daily ]
-  needs: [ '[Daily] MySQL 9.3' ]
-  variables:
-    _TARGET_DB: "pgsql-18"
 
 ################
 # Lint Jobs
