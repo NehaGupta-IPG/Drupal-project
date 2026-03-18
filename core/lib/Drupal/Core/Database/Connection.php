@@ -1123,6 +1123,7 @@ abstract class Connection {
    * \Drupal\Core\Database\Transaction\TransactionManagerBase, and instantiate
    * it here.
    *
+   * phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn
    * @return \Drupal\Core\Database\Transaction\TransactionManagerInterface
    *   The transaction manager.
    *
