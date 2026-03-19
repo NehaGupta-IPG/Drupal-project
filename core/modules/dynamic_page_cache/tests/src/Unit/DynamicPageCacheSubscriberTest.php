@@ -111,18 +111,17 @@ class DynamicPageCacheSubscriberTest extends UnitTestCase {
     $this->requestStack = new RequestStack();
     $this->requestStack->push($this->request);
 
-    // Set up mocks used for testing.
-    $this->cacheContextsManager = $this->createMock(CacheContextsManager::class);
-    $this->cacheContextsManager->expects($this->any())
+    // Set up objects used for testing.
+    $this->cacheContextsManager = $this->createStub(CacheContextsManager::class);
+    $this->cacheContextsManager
       ->method('assertValidTokens')
       ->willReturn(TRUE);
-    $this->cacheContextsManager->expects($this->any())
+    $this->cacheContextsManager
       ->method('convertTokensToKeys')
       ->willReturnCallback(function (array $context_tokens): ContextCacheKeys {
         return new ContextCacheKeys($context_tokens);
       });
     $this->cacheContextsManager
-      ->expects($this->any())
       ->method('optimizeTokens')
       ->willReturnCallback(function (array $context_tokens): array {
         return $context_tokens;
