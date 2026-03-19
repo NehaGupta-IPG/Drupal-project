@@ -13,7 +13,7 @@ class Update extends QueryUpdate {
   /**
    * {@inheritdoc}
    */
-  public function execute() {
+  public function execute(): ?int {
     $max_placeholder = 0;
     $blobs = [];
     $blob_count = 0;

@@ -68,7 +68,7 @@ class Statement extends StatementBase {
   /**
    * {@inheritdoc}
    */
-  public function execute($args = [], $options = []) {
+  public function execute($args = [], $options = []): bool {
     if (isset($options['fetch'])) {
       if (is_string($options['fetch'])) {
         $this->setFetchMode(FetchAs::ClassObject, $options['fetch']);

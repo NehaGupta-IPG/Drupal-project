@@ -50,11 +50,13 @@ class Insert extends Query implements \Countable {
   /**
    * Executes the insert query.
    *
-   * @return int|null|string
+   * @return int|string|\Drupal\Core\Database\StatementInterface|null
    *   The last insert ID of the query, if one exists. If the query was given
    *   multiple sets of values to insert, the return value is undefined. If no
    *   fields are specified, this method will do nothing and return NULL. That
-   *   That makes it safe to use in multi-insert loops.
+   *   makes it safe to use in multi-insert loops. If we're selecting from a
+   *   SelectQuery, finish building the query and pass it back as statement
+   *   object.
    */
   public function execute() {
     // If validation fails, simply return NULL. Note that validation routines

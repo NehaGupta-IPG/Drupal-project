@@ -14,7 +14,7 @@ class Upsert extends QueryUpsert {
   /**
    * {@inheritdoc}
    */
-  public function execute() {
+  public function execute(): ?int {
     if (!$this->preExecute()) {
       return NULL;
     }
