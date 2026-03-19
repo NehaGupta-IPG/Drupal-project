@@ -167,11 +167,10 @@ class UserTemplateTest extends KernelTestBase {
 
     // Ensure cache metadata from user entity and access control added.
     $expected_cache_tags = array_merge(
-      $user->getCacheTags(),
-      $user->testAccessAddCacheTags
+      $user->testAccessAddCacheTags,
+      $user->getCacheTags()
     );
-    sort($expected_cache_tags);
-    $this->assertEquals($expected_cache_tags, $build['#cache']['tags'], 'Cache tags found for user');
+    $this->assertEqualsCanonicalizing($expected_cache_tags, $build['#cache']['tags'], 'Cache tags found for user');
     return $result;
   }
 
