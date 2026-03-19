@@ -131,14 +131,17 @@ class DynamicPageCacheSubscriberTest extends UnitTestCase {
     $this->responsePolicy = $this->createStub(ResponsePolicyInterface::class);
 
     // Set up a basic memory-based variation cache for testing.
-    $this->memoryCache = new VariationCache($this->requestStack, new MemoryBackend(new Time($this->requestStack)), $this->cacheContextsManager);
+    $this->memoryCache = new VariationCache($this->requestStack, new MemoryBackend($time = new Time($this->requestStack)), $this->cacheContextsManager);
 
     // Set up a container for static cache context validation.
     $container = new Container();
     $container->set('cache_contexts_manager', $this->cacheContextsManager);
-    $container->set('datetime.time', new Time($this->requestStack));
+    $container->set('datetime.time', $time);
 
     \Drupal::setContainer($container);
+
+    // Initialize the request time.
+    $this->setRequestTime();
 
     // Set up a basic dynamic page cache subscriber for testing.
     //
@@ -152,6 +155,19 @@ class DynamicPageCacheSubscriberTest extends UnitTestCase {
       ],
       'tags' => [],
     ]);
+  }
+
+  /**
+   * Set the request time with an optional delta applied to it.
+   *
+   * If a delta is supplied, it will be added to the original request time;
+   * otherwise, the original request time will be used instead.
+   *
+   * @param int $delta
+   *   The delta to apply to the request time (default: 0).
+   */
+  protected function setRequestTime(int $delta = 0): void {
+    $this->request->server->set('REQUEST_TIME', $_SERVER['REQUEST_TIME'] + $delta);
   }
 
   /**
@@ -200,9 +216,8 @@ class DynamicPageCacheSubscriberTest extends UnitTestCase {
 
     // Store a cached response with the specified max age.
     $this->storeResponseInCache($response);
-    // Update the request time using the specified age delta.
-    $request = $this->requestStack->getCurrentRequest();
-    $request->server->set('REQUEST_TIME', $_SERVER['REQUEST_TIME'] + $delta);
+    // Update the request time using the specified delta.
+    $this->setRequestTime($delta);
 
     // Set up the mocks used by the subscriber.
     $this->requestPolicy
