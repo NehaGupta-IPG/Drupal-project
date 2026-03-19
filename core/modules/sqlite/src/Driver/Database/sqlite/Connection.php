@@ -236,7 +236,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * SQLite compatibility implementation for the GREATEST() SQL function.
    */
-  public static function sqlFunctionGreatest(): ?int {
+  public static function sqlFunctionGreatest(): mixed {
     $args = func_get_args();
     foreach ($args as $v) {
       if (!isset($v)) {
@@ -254,7 +254,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * SQLite compatibility implementation for the LEAST() SQL function.
    */
-  public static function sqlFunctionLeast(): ?int {
+  public static function sqlFunctionLeast(): mixed {
     // Remove all NULL, FALSE and empty strings values but leaves 0 (zero)
     // values.
     $values = FilterArray::removeEmptyStrings(func_get_args());
@@ -275,7 +275,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    *
    * @see http://dev.mysql.com/doc/refman/5.6/en/string-functions.html#function_concat-ws
    */
-  public static function sqlFunctionConcatWs(): bool|string|null {
+  public static function sqlFunctionConcatWs(): ?string {
     $args = func_get_args();
     $separator = array_shift($args);
     // If the separator is NULL, the result is NULL.

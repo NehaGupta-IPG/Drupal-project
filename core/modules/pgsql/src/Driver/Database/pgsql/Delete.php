@@ -12,7 +12,7 @@ class Delete extends QueryDelete {
   /**
    * {@inheritdoc}
    */
-  public function execute() {
+  public function execute(): int {
     $this->connection->addSavepoint();
     try {
       $result = parent::execute();
