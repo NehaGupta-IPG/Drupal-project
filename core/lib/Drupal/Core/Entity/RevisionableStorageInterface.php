@@ -73,6 +73,11 @@ interface RevisionableStorageInterface extends EntityStorageInterface {
   /**
    * Returns the latest revision identifier for an entity.
    *
+   * For translatable entities, this will always return the same value,
+   * regardless of which translation it is called on. To get the revision
+   * identifier of a specific translation, use
+   * TranslatableRevisionableStorageInterface::getLatestTranslationAffectedRevisionId().
+   *
    * @param int|string $entity_id
    *   The entity identifier.
    *
