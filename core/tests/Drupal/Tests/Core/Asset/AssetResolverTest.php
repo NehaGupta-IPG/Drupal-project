@@ -16,6 +16,8 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Tests Drupal\Core\Asset\AssetResolver.
@@ -93,6 +95,13 @@ class AssetResolverTest extends UnitTestCase {
    * An array of library definitions.
    */
   protected array $libraries = [];
+
+  /**
+   * The mocked request stack.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected $requestStack;
 
   /**
    * {@inheritdoc}
@@ -199,7 +208,15 @@ class AssetResolverTest extends UnitTestCase {
 
     $this->themeHandler = $this->createMock('\Drupal\Core\Extension\ThemeHandlerInterface');
 
-    $this->assetResolver = new AssetResolver($this->libraryDiscovery, $this->libraryDependencyResolver, $this->moduleHandler, $this->themeManager, $this->languageManager, $this->cache, $this->themeHandler);
+    $request = $this->createMock(Request::class);
+    $request->expects($this->any())
+      ->method('getBasePath')
+      ->willReturn('');
+    $this->requestStack = $this->createMock(RequestStack::class);
+    $this->requestStack->expects($this->any())
+      ->method('getCurrentRequest')
+      ->willReturn($request);
+    $this->assetResolver = new AssetResolver($this->libraryDiscovery, $this->libraryDependencyResolver, $this->moduleHandler, $this->themeManager, $this->languageManager, $this->cache, $this->themeHandler, $this->requestStack);
   }
 
   /**
