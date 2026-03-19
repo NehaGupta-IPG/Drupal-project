@@ -175,6 +175,7 @@ class QueryAggregate extends Query implements QueryAggregateInterface {
     foreach ($this->sqlQuery->execute() as $row) {
       $return[] = (array) $row;
     }
+    $this->finalizePager(count($return));
     return $return;
   }
 
