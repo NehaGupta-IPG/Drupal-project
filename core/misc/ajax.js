@@ -402,8 +402,8 @@
    */
   Drupal.ajax._unlockPointerEvents = function (elements, key) {
     $(elements).each(function () {
-      let el = this;
-      let $el = $(el);
+      const el = this;
+      const $el = $(el);
 
       // If the element has been replaced by an AJAX command (e.g.,
       // replaceWith), the original reference is stale (detached from the DOM).
@@ -760,10 +760,31 @@
                 ajax._peRequestKey = null;
                 ajax._peersSnapshot = null;
               }
-              if (ajax._focusPeKey && ajax._peers) {
-                Drupal.ajax._unlockPointerEvents(ajax._peers, ajax._focusPeKey);
-                ajax._peers = null;
+              if (ajax._focusPeKey) {
+                if (ajax._peers) {
+                  Drupal.ajax._unlockPointerEvents(
+                    ajax._peers,
+                    ajax._focusPeKey,
+                  );
+                  ajax._peers = null;
+                }
+                // Always unlock the element itself — beforeSend locks it
+                // with the focus key even when _peers is no longer available
+                // (e.g. focusin did not fire because the element already had
+                // focus from a previous AJAX cycle).
+                if (ajax.element) {
+                  Drupal.ajax._unlockPointerEvents(
+                    [ajax.element],
+                    ajax._focusPeKey,
+                  );
+                }
+                ajax._focusPeKey = null;
                 ajax._focusActive = false;
+              }
+              // Clear the form-level AJAX processing flag so that focusin
+              // handlers resume normal pointer-events locking.
+              if (ajax.$form) {
+                ajax.$form.removeData('drupalAjaxProcessing');
               }
               // jQuery normally triggers the ajaxSuccess, ajaxComplete, and
               // ajaxStop events after the "success" function passed to $.ajax()
@@ -795,10 +816,22 @@
             ajax._peRequestKey = null;
             ajax._peersSnapshot = null;
           }
-          if (ajax._focusPeKey && ajax._peers) {
-            Drupal.ajax._unlockPointerEvents(ajax._peers, ajax._focusPeKey);
-            ajax._peers = null;
+          if (ajax._focusPeKey) {
+            if (ajax._peers) {
+              Drupal.ajax._unlockPointerEvents(ajax._peers, ajax._focusPeKey);
+              ajax._peers = null;
+            }
+            if (ajax.element) {
+              Drupal.ajax._unlockPointerEvents(
+                [ajax.element],
+                ajax._focusPeKey,
+              );
+            }
+            ajax._focusPeKey = null;
             ajax._focusActive = false;
+          }
+          if (ajax.$form) {
+            ajax.$form.removeData('drupalAjaxProcessing');
           }
           return ajax.error(xmlhttprequest, ajax.url);
         }
@@ -865,11 +898,23 @@
     // 2) When triggering an Ajax request from this element: disable pointer
     //    events on all Ajax-enabled elements in the same form until the request
     //    completes.
-    const focusKey = `pe:${ajax.instanceIndex}:focus`;
-    ajax._focusPeKey = focusKey;
-    ajax._focusHandlers = ajax._focusHandlers || {};
-
     $(ajax.element).on('focusin', function () {
+      // Skip pointer-events locking if the form is currently processing an
+      // AJAX response. Focus restoration during success() would otherwise
+      // create orphaned locks on peers (including submit buttons) that
+      // could never be released.
+      if (
+        ajax.element &&
+        ajax.element.form &&
+        $(ajax.element.form).data('drupalAjaxProcessing')
+      ) {
+        return;
+      }
+      // Compute focusKey lazily: instanceIndex is only assigned after the
+      // constructor returns (in the Drupal.ajax factory), so capturing it
+      // at bind time would produce the stale key "pe:false:focus".
+      const focusKey = `pe:${ajax.instanceIndex}:focus`;
+      ajax._focusPeKey = focusKey;
       const peers = Drupal.ajax._getFocusPeersWithSubmitControls(ajax.element);
       ajax._peers = peers;
       const others = peers.filter
@@ -887,7 +932,6 @@
         }
         $(ajax.element).off('blur.ajaxPe change.ajaxPe keydown.ajaxPe');
       };
-      ajax._focusHandlers.restoreIfNoAjax = restoreIfNoAjax;
 
       $(ajax.element)
         .on('blur.ajaxPe', restoreIfNoAjax)
@@ -1350,6 +1394,12 @@
         // the triggering element or one of its parents if that element does not
         // exist anymore.
         .then(() => {
+          // Set a form-level flag before focus restoration and behavior
+          // re-attachment. This prevents focusin handlers on newly created
+          // AJAX elements from locking submit buttons during processing.
+          if (this.$form) {
+            this.$form.data('drupalAjaxProcessing', true);
+          }
           if (!focusChanged) {
             let target = false;
             if (this.element) {

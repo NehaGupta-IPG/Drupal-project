@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\ajax_test\Form;
 
-use Drupal\Core\Ajax\AjaxResponse;
-use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -79,14 +77,14 @@ class AjaxTestPointerEventsForm extends FormBase {
    * Returns the rebuilt wrapper, which causes the insert command to use
    * replaceWith, detaching original DOM elements and inserting new ones.
    */
-  public function ajaxReplaceWrapper(array &$form, FormStateInterface $form_state) {
+  public function ajaxReplaceWrapper(array &$form, FormStateInterface $form_state): array {
     return $form['ajax_wrapper'];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->messenger()->addStatus($this->t('Form submitted successfully.'));
   }
 
