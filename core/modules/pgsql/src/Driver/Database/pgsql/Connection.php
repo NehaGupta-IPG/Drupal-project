@@ -117,7 +117,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * {@inheritdoc}
    */
-  protected function setPrefix($prefix) {
+  protected function setPrefix($prefix): void {
     assert(is_string($prefix), 'The \'$prefix\' argument to ' . __METHOD__ . '() must be a string');
     $this->prefix = $prefix;
 
@@ -295,7 +295,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    *
    * @throws \Drupal\Core\Database\DatabaseNotFoundException
    */
-  public function createDatabase($database) {
+  public function createDatabase($database): void {
     // Escape the database name.
     $database = Database::getConnection()->escapeDatabase($database);
     $db_created = FALSE;
@@ -351,7 +351,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    *
    * @internal
    */
-  public function makeSequenceName($table, $field) {
+  public function makeSequenceName($table, $field): string {
     $sequence_name = $this->prefixTables('{' . $table . '}_' . $field . '_seq');
     // Remove identifier quotes as we are constructing a new name from a
     // prefixed and quoted table name.
@@ -379,8 +379,11 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * @param string $savepoint_name
    *   A string representing the savepoint name. By default,
    *   "mimic_implicit_commit" is used.
+   *
+   * @return void
+   *   No return value.
    */
-  public function addSavepoint($savepoint_name = 'mimic_implicit_commit') {
+  public function addSavepoint($savepoint_name = 'mimic_implicit_commit'): void {
     if ($this->inTransaction()) {
       $this->savepoints[$savepoint_name] = $this->startTransaction($savepoint_name);
     }
@@ -392,8 +395,11 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * @param string $savepoint_name
    *   A string representing the savepoint name. By default,
    *   "mimic_implicit_commit" is used.
+   *
+   * @return void
+   *   No return value.
    */
-  public function releaseSavepoint($savepoint_name = 'mimic_implicit_commit') {
+  public function releaseSavepoint($savepoint_name = 'mimic_implicit_commit'): void {
     if ($this->inTransaction() && $this->transactionManager()->has($savepoint_name)) {
       unset($this->savepoints[$savepoint_name]);
     }
@@ -405,8 +411,11 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * @param string $savepoint_name
    *   A string representing the savepoint name. By default,
    *   "mimic_implicit_commit" is used.
+   *
+   * @return void
+   *   No return value.
    */
-  public function rollbackSavepoint($savepoint_name = 'mimic_implicit_commit') {
+  public function rollbackSavepoint($savepoint_name = 'mimic_implicit_commit'): void {
     if ($this->inTransaction() && $this->transactionManager()->has($savepoint_name)) {
       $this->savepoints[$savepoint_name]->rollBack();
       unset($this->savepoints[$savepoint_name]);

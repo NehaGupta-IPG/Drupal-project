@@ -312,9 +312,12 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * @param string $database
    *   The name of the database to create.
    *
+   * @return void
+   *   No return value.
+   *
    * @throws \Drupal\Core\Database\DatabaseNotFoundException
    */
-  public function createDatabase($database) {
+  public function createDatabase($database): void {
     // Escape the database name.
     $database = Database::getConnection()->escapeDatabase($database);
 

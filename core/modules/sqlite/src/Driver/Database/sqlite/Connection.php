@@ -222,21 +222,21 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    *
    * @see \Drupal\sqlite\Driver\Database\sqlite\Connection::__construct()
    */
-  public function getAttachedDatabases() {
+  public function getAttachedDatabases(): array {
     return $this->attachedDatabases;
   }
 
   /**
    * SQLite compatibility implementation for the IF() SQL function.
    */
-  public static function sqlFunctionIf($condition, $expr1, $expr2 = NULL) {
+  public static function sqlFunctionIf($condition, $expr1, $expr2 = NULL): mixed {
     return $condition ? $expr1 : $expr2;
   }
 
   /**
    * SQLite compatibility implementation for the GREATEST() SQL function.
    */
-  public static function sqlFunctionGreatest() {
+  public static function sqlFunctionGreatest(): ?int {
     $args = func_get_args();
     foreach ($args as $v) {
       if (!isset($v)) {
@@ -254,7 +254,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * SQLite compatibility implementation for the LEAST() SQL function.
    */
-  public static function sqlFunctionLeast() {
+  public static function sqlFunctionLeast(): ?int {
     // Remove all NULL, FALSE and empty strings values but leaves 0 (zero)
     // values.
     $values = FilterArray::removeEmptyStrings(func_get_args());
@@ -265,7 +265,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * SQLite compatibility implementation for the CONCAT() SQL function.
    */
-  public static function sqlFunctionConcat() {
+  public static function sqlFunctionConcat(): string {
     $args = func_get_args();
     return implode('', $args);
   }
@@ -275,7 +275,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    *
    * @see http://dev.mysql.com/doc/refman/5.6/en/string-functions.html#function_concat-ws
    */
-  public static function sqlFunctionConcatWs() {
+  public static function sqlFunctionConcatWs(): bool|string|null {
     $args = func_get_args();
     $separator = array_shift($args);
     // If the separator is NULL, the result is NULL.
@@ -292,14 +292,14 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * SQLite compatibility implementation for the SUBSTRING() SQL function.
    */
-  public static function sqlFunctionSubstring($string, $from, $length) {
+  public static function sqlFunctionSubstring($string, $from, $length): string {
     return substr($string, $from - 1, $length);
   }
 
   /**
    * SQLite compatibility implementation for the SUBSTRING_INDEX() SQL function.
    */
-  public static function sqlFunctionSubstringIndex($string, $delimiter, $count) {
+  public static function sqlFunctionSubstringIndex($string, $delimiter, $count): string {
     // If string is empty, simply return an empty string.
     if (empty($string)) {
       return '';
@@ -317,7 +317,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
   /**
    * SQLite compatibility implementation for the RAND() SQL function.
    */
-  public static function sqlFunctionRand($seed = NULL) {
+  public static function sqlFunctionRand($seed = NULL): float {
     if (isset($seed)) {
       mt_srand($seed);
     }
@@ -331,7 +331,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    *
    * @see http://www.sqlite.org/lang_expr.html#regexp
    */
-  public static function sqlFunctionRegexp($pattern, $subject) {
+  public static function sqlFunctionRegexp($pattern, $subject): mixed {
     // preg_quote() cannot be used here, since $pattern may contain reserved
     // regular expression characters already (such as ^, $, etc). Therefore,
     // use a rare character as PCRE delimiter.
@@ -349,7 +349,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * @see https://sqlite.org/pragma.html#pragma_case_sensitive_like
    * @see https://sqlite.org/lang_expr.html#like
    */
-  public static function sqlFunctionLikeBinary($pattern, $subject) {
+  public static function sqlFunctionLikeBinary($pattern, $subject): mixed {
     // Replace the SQL LIKE wildcard meta-characters with the equivalent regular
     // expression meta-characters and escape the delimiter that will be used for
     // matching.
@@ -402,7 +402,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    *
    * @throws \Drupal\Core\Database\DatabaseNotFoundException
    */
-  public function createDatabase($database) {
+  public function createDatabase($database): void {
     // Verify the database is writable.
     $db_directory = new \SplFileInfo(dirname($database));
     if (!$db_directory->isDir() && !\Drupal::service('file_system')->mkdir($db_directory->getPathName(), 0755, TRUE)) {
