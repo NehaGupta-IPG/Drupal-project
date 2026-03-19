@@ -448,7 +448,13 @@ class WorkspaceTracker implements WorkspaceTrackerInterface, EventSubscriberInte
         $select->groupBy($id_field);
 
         $storage = $this->entityTypeManager->getStorage($entity_type_id);
+        $workspace_tree = $this->workspaceRepository->loadTree();
         foreach ($select->execute() as $record) {
+          // Skip re-tracking for workspaces that have been deleted but still
+          // have data being purged.
+          if (!isset($workspace_tree[$record->workspace])) {
+            continue;
+          }
           if ($entity = $storage->loadRevision($record->target_entity_revision_id)) {
             $this->trackEntity($record->workspace, $entity);
           }
