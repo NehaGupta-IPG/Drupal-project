@@ -69,9 +69,9 @@ class BatchPageTest extends KernelTestBase {
   /**
    * Tests that a JSON request with op=do_nojs is corrected to op=do.
    *
-   * Reverse proxies like Cloudflare with Query String Sort can reorder and
-   * deduplicate query parameters. When batch.js appends "&op=do" to a URI
-   * that already contains "op=do_nojs", the proxy may drop the duplicate,
+   * Reverse proxies with query string sorting can reorder and deduplicate
+   * query parameters. When batch.js appends "&op=do" to a URI that already
+   * contains "op=do_nojs", the proxy may drop the duplicate,
    * leaving only op=do_nojs on what is actually an AJAX request. The server
    * should recognize that a JSON request never needs the no-JS fallback.
    */
