@@ -78,8 +78,8 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
       $cid .= ':' . $entity->getRevisionId();
       // Prevent deletion of the default revision, and prevent reverting
       // to the latest revision.
-      if ($entity->isDefaultRevision() && $operation === 'delete revision' ||
-          $entity->isLatestRevision() && $operation === 'revert') {
+      if ($operation === 'delete revision' && $entity->isDefaultRevision() ||
+        $operation === 'revert' && $entity->isLatestRevision()) {
         return $return_as_object ? AccessResult::forbidden() : FALSE;
       }
     }
