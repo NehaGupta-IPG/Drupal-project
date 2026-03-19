@@ -31,6 +31,9 @@ class ListIntegerItem extends ListItemBase {
    * {@inheritdoc}
    */
   public static function defaultStorageSettings() {
+    // Defaults to the schema used before these settings were introduced, for
+    // backwards compatibility, even though in most cases there is no need for
+    // signed integer nor for a "normal" size.
     return [
       'unsigned' => FALSE,
       // Valid size property values include: 'tiny', 'small', 'medium', 'normal'
@@ -54,16 +57,34 @@ class ListIntegerItem extends ListItemBase {
    * {@inheritdoc}
    */
   public static function schema(FieldStorageDefinitionInterface $field_definition) {
+    // Existing field storage configuration objects would not have values for
+    // these settings when they are introduced, and this can cause errors
+    // because the SQL storage tries to change the schema - which is rejected if
+    // there are data already for the field. Not sure if there's a better way,
+    // keeping the schema as it was before the settings were introduced
+    // maintains backwards compatibility.
+    $has_non_defaults = FALSE;
+    if ($field_definition->getSetting('unsigned') !== FALSE) {
+      $has_non_defaults = TRUE;
+    }
+    if ($field_definition->getSetting('size') !== 'normal') {
+      $has_non_defaults = TRUE;
+    }
+
+    $value = ['type' => 'int'];
+    if ($has_non_defaults) {
+      $value += [
+        // Expose the 'unsigned' setting in the field item schema.
+        'unsigned' => $field_definition->getSetting('unsigned'),
+        // Expose the 'size' setting in the field item schema. For instance,
+        // supply 'big' as a value to produce a 'bigint' type.
+        'size' => $field_definition->getSetting('size'),
+      ];
+    }
+
     return [
       'columns' => [
-        'value' => [
-          'type' => 'int',
-          // Expose the 'unsigned' setting in the field item schema.
-          'unsigned' => $field_definition->getSetting('unsigned'),
-          // Expose the 'size' setting in the field item schema. For instance,
-          // supply 'big' as a value to produce a 'bigint' type.
-          'size' => $field_definition->getSetting('size'),
-        ],
+        'value' => $value,
       ],
       'indexes' => [
         'value' => ['value'],
