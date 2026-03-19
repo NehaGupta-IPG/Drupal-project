@@ -27,7 +27,7 @@
         $(once('fileValidate', $context.find(selector))).on(
           'change.fileValidate',
           { extensions: elements[selector] },
-          Drupal.file.validateExtensionAndSize,
+          Drupal.file.validateExtension,
         );
       }
 
@@ -43,7 +43,7 @@
       function removeFileValidation(selector) {
         $(once.remove('fileValidate', $context.find(selector))).off(
           'change.fileValidate',
-          Drupal.file.validateExtensionAndSize,
+          Drupal.file.validateExtension,
         );
       }
 
@@ -145,12 +145,12 @@
     /**
      * Client-side file input validation of file extensions and file size.
      *
-     * @name Drupal.file.validateExtensionAndSize
+     * @name Drupal.file.validateExtension
      *
      * @param {jQuery.Event} event
      *   The event triggered. For example `change.fileValidate`.
      */
-    validateExtensionAndSize(event) {
+    validateExtension(event) {
       event.preventDefault();
       const file = this.files[0];
 
