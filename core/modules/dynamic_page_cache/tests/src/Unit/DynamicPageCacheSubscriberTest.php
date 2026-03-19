@@ -51,9 +51,9 @@ class DynamicPageCacheSubscriberTest extends UnitTestCase {
   ];
 
   /**
-   * The cache contexts manager mock.
+   * The cache contexts manager stub.
    *
-   * @var \PHPUnit\Framework\MockObject\MockObject&\Drupal\Core\Cache\Context\CacheContextsManager
+   * @var \PHPUnit\Framework\MockObject\Stub&\Drupal\Core\Cache\Context\CacheContextsManager
    */
   protected CacheContextsManager $cacheContextsManager;
 
