@@ -1780,7 +1780,7 @@ services:
       - [ appendBackend, [ '@cache.data' ] ]
   asset.resolver:
     class: Drupal\Core\Asset\AssetResolver
-    arguments: ['@library.discovery', '@library.dependency_resolver', '@module_handler', '@theme.manager', '@language_manager', '@cache.asset_chain', '@theme_handler']
+    arguments: ['@library.discovery', '@library.dependency_resolver', '@module_handler', '@theme.manager', '@language_manager', '@cache.asset_chain', '@theme_handler', '@request_stack']
   Drupal\Core\Asset\AssetResolverInterface: '@asset.resolver'
   info_parser:
     class: Drupal\Core\Extension\InfoParser

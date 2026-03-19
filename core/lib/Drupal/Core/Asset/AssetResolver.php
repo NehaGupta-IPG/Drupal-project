@@ -11,6 +11,7 @@ use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * The default asset resolver.
@@ -67,6 +68,13 @@ class AssetResolver implements AssetResolverInterface {
   protected $themeHandler;
 
   /**
+   * The request stack.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack
+   */
+  protected $requestStack;
+
+  /**
    * Constructs a new AssetResolver instance.
    *
    * @param \Drupal\Core\Asset\LibraryDiscoveryInterface $library_discovery
@@ -84,7 +92,7 @@ class AssetResolver implements AssetResolverInterface {
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
    *   The theme handler service.
    */
-  public function __construct(LibraryDiscoveryInterface $library_discovery, LibraryDependencyResolverInterface $library_dependency_resolver, ModuleHandlerInterface $module_handler, ThemeManagerInterface $theme_manager, LanguageManagerInterface $language_manager, CacheBackendInterface $cache, ThemeHandlerInterface $theme_handler) {
+  public function __construct(LibraryDiscoveryInterface $library_discovery, LibraryDependencyResolverInterface $library_dependency_resolver, ModuleHandlerInterface $module_handler, ThemeManagerInterface $theme_manager, LanguageManagerInterface $language_manager, CacheBackendInterface $cache, ThemeHandlerInterface $theme_handler, ?RequestStack $request_stack = NULL) {
     $this->libraryDiscovery = $library_discovery;
     $this->libraryDependencyResolver = $library_dependency_resolver;
     $this->moduleHandler = $module_handler;
@@ -92,6 +100,12 @@ class AssetResolver implements AssetResolverInterface {
     $this->languageManager = $language_manager;
     $this->cache = $cache;
     $this->themeHandler = $theme_handler;
+
+    if ($request_stack === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $request_stack argument is deprecated in drupal:10.6.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3432092.', E_USER_DEPRECATED);
+      $request_stack = \Drupal::service('request_stack');
+    }
+    $this->requestStack = $request_stack;
   }
 
   /**
@@ -198,7 +212,10 @@ class AssetResolver implements AssetResolverInterface {
     // active admin theme may include the default theme's ckeditor5-stylesheets
     // and default themes may be set conditionally and dynamically.
     $default_theme = $this->themeHandler->getDefault();
-    $cid = 'css:' . $active_theme . ':' . $default_theme . ':' . $language->getId() . Crypt::hashBase64(serialize($libraries_to_load)) . (int) $optimize;
+    // Include the base path in the cache key so that sites served from
+    // different base paths (e.g. behind a reverse proxy with a path prefix)
+    // get separate cached aggregate URLs.
+    $cid = 'css:' . $active_theme . ':' . $default_theme . ':' . $language->getId() . Crypt::hashBase64(serialize($libraries_to_load)) . (int) $optimize . ':' . Crypt::hashBase64($this->requestStack->getCurrentRequest()->getBasePath());
     if ($cached = $this->cache->get($cid)) {
       return $cached->data;
     }
@@ -312,7 +329,10 @@ class AssetResolver implements AssetResolverInterface {
     // Add the theme name to the cache key since themes may implement
     // hook_library_info_alter(). Additionally add the current language to
     // support translation of JavaScript files via hook_js_alter().
-    $cid = 'js:' . $theme_info->getName() . ':' . $language->getId() . ':' . Crypt::hashBase64(serialize($libraries_to_load)) . ':' . (int) $optimize;
+    // Include the base path in the cache key so that sites served from
+    // different base paths (e.g. behind a reverse proxy with a path prefix)
+    // get separate cached aggregate URLs.
+    $cid = 'js:' . $theme_info->getName() . ':' . $language->getId() . ':' . Crypt::hashBase64(serialize($libraries_to_load)) . ':' . (int) $optimize . ':' . Crypt::hashBase64($this->requestStack->getCurrentRequest()->getBasePath());
 
     if ($cached = $this->cache->get($cid)) {
       [$js_assets_header, $js_assets_footer, $settings, $settings_in_header] = $cached->data;
