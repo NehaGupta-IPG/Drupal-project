@@ -992,10 +992,10 @@ class RendererTest extends RendererTestBase {
    *
    * @param int $max_age
    *   The initial max age of the element.
-   * @param int $age
-   *   The age of the element to simulate.
+   * @param int $delta
+   *   The delta to apply to the request time for this test.
    * @param int|false $expected_ttl
-   *   The expected time-to-live for the simulated age.
+   *   The expected time-to-live.
    * @param bool $multiple
    *   TRUE to test ::getMultiple(), FALSE to test ::get().
    *
@@ -1003,7 +1003,7 @@ class RendererTest extends RendererTestBase {
    * @legacy-covers \Drupal\Core\Render\RenderCache::getMultiple
    */
   #[DataProvider('providerTestRenderCacheMaxAgeCorrection')]
-  public function testRenderCacheMaxAgeCorrection(int $max_age, int $age, int|false $expected_ttl, bool $multiple): void {
+  public function testRenderCacheMaxAgeCorrection(int $max_age, int $delta, int|false $expected_ttl, bool $multiple): void {
     $this->setUpMemoryCache();
 
     $element = [
@@ -1016,20 +1016,26 @@ class RendererTest extends RendererTestBase {
     $this->renderer->renderRoot($element);
 
     $request = $this->requestStack->getCurrentRequest();
-    $request->server->set('REQUEST_TIME', $_SERVER['REQUEST_TIME'] + $age);
+    $request->server->set('REQUEST_TIME', $_SERVER['REQUEST_TIME'] + $delta);
 
     $cache = $multiple ? $this->renderCache->getMultiple([$element])[0] ?? FALSE : $this->renderCache->get($element);
     $this->assertSame($expected_ttl, $cache !== FALSE ? $cache['#cache']['max-age'] : FALSE);
   }
 
+  /**
+   * Data provider for ::testRenderCacheMaxAgeCorrection().
+   *
+   * @return array
+   *   The test case conditions.
+   */
   public static function providerTestRenderCacheMaxAgeCorrection(): array {
     return [
       'Newly-inserted cache item, single' => [800, 0, 800, FALSE],
       'Newly-inserted cache item, multiple' => [800, 0, 800, TRUE],
       'Aged cache item, single' => [800, 500, 300, FALSE],
       'Aged cache item, multiple' => [800, 500, 300, TRUE],
-      'Almost-expired cache item, single' => [800, 800, 0, FALSE],
-      'Almost-expired cache item, multiple' => [800, 800, 0, TRUE],
+      'Expiring cache item, single' => [800, 800, 0, FALSE],
+      'Expiring cache item, multiple' => [800, 800, 0, TRUE],
       'Expired cache item, single' => [800, 801, FALSE, FALSE],
       'Expired cache item, multiple' => [800, 801, FALSE, TRUE],
     ];

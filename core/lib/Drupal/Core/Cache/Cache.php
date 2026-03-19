@@ -140,4 +140,27 @@ class Cache {
     return $bins;
   }
 
+  /**
+   * Given an expire timestamp, returns a TTL value.
+   *
+   * @param int $expire
+   *   The expire timestamp.
+   * @param int|null $request_time
+   *   Reference timestamp. Defaults to the current request time.
+   *
+   * @return int
+   *   The cache time-to-live value.
+   */
+  public static function ttlFromExpire(int $expire, ?int $request_time = NULL): int {
+    if ($expire !== static::PERMANENT) {
+      if (!isset($request_time)) {
+        $request_time = \Drupal::time()->getRequestTime();
+      }
+
+      return max($expire - $request_time, 0);
+    }
+
+    return static::PERMANENT;
+  }
+
 }

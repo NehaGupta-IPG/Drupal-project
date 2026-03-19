@@ -93,9 +93,9 @@ class DynamicPageCacheSubscriberTest extends UnitTestCase {
   protected RequestStack $requestStack;
 
   /**
-   * The response policy mock.
+   * The response policy stub.
    *
-   * @var \PHPUnit\Framework\MockObject\MockObject&\Drupal\Core\PageCache\ResponsePolicyInterface
+   * @var \PHPUnit\Framework\MockObject\Stub&\Drupal\Core\PageCache\ResponsePolicyInterface
    */
   protected ResponsePolicyInterface $responsePolicy;
 
@@ -129,7 +129,7 @@ class DynamicPageCacheSubscriberTest extends UnitTestCase {
       });
 
     $this->requestPolicy = $this->createMock(RequestPolicyInterface::class);
-    $this->responsePolicy = $this->createMock(ResponsePolicyInterface::class);
+    $this->responsePolicy = $this->createStub(ResponsePolicyInterface::class);
 
     // Set up a basic memory-based variation cache for testing.
     $this->memoryCache = new VariationCache($this->requestStack, new MemoryBackend(new Time($this->requestStack)), $this->cacheContextsManager);
@@ -137,11 +137,9 @@ class DynamicPageCacheSubscriberTest extends UnitTestCase {
     // Set up a container for static cache context validation.
     $container = new Container();
     $container->set('cache_contexts_manager', $this->cacheContextsManager);
+    $container->set('datetime.time', new Time($this->requestStack));
 
     \Drupal::setContainer($container);
-
-    // Initialize the request time.
-    $this->setRequestTime();
 
     // Set up a basic dynamic page cache subscriber for testing.
     //
@@ -155,19 +153,6 @@ class DynamicPageCacheSubscriberTest extends UnitTestCase {
       ],
       'tags' => [],
     ]);
-  }
-
-  /**
-   * Set the request time with an optional delta applied to it.
-   *
-   * If a delta is supplied, it will be added to the original request time;
-   * otherwise, the original request time will be used instead.
-   *
-   * @param int $delta
-   *   The delta to apply to the request time (default: 0).
-   */
-  protected function setRequestTime(int $delta = 0): void {
-    $this->request->server->set('REQUEST_TIME', $_SERVER['REQUEST_TIME'] + $delta);
   }
 
   /**
@@ -201,13 +186,13 @@ class DynamicPageCacheSubscriberTest extends UnitTestCase {
    *
    * @param int $max_age
    *   The initial max age of the response.
-   * @param int $age
-   *   The age of the response to simulate.
+   * @param int $delta
+   *   The delta to apply to the request time for this test.
    * @param int|false $expected_ttl
-   *   The expected time-to-live for the simulated age.
+   *   The expected time-to-live.
    */
   #[DataProvider('providerTestResponseMaxAgeCorrection')]
-  public function testResponseMaxAgeCorrection(int $max_age, int $age, int|false $expected_ttl): void {
+  public function testResponseMaxAgeCorrection(int $max_age, int $delta, int|false $expected_ttl): void {
     $cacheability = new CacheableMetadata();
     $cacheability->setCacheMaxAge($max_age);
 
@@ -217,7 +202,8 @@ class DynamicPageCacheSubscriberTest extends UnitTestCase {
     // Store a cached response with the specified max age.
     $this->storeResponseInCache($response);
     // Update the request time using the specified age delta.
-    $this->setRequestTime($age);
+    $request = $this->requestStack->getCurrentRequest();
+    $request->server->set('REQUEST_TIME', $_SERVER['REQUEST_TIME'] + $delta);
 
     // Set up the mocks used by the subscriber.
     $this->requestPolicy
@@ -225,7 +211,7 @@ class DynamicPageCacheSubscriberTest extends UnitTestCase {
       ->method('check')
       ->willReturn(NULL);
 
-    $kernel = $this->createMock(HttpKernelInterface::class);
+    $kernel = $this->createStub(HttpKernelInterface::class);
     $event = new RequestEvent($kernel, $this->request, HttpKernelInterface::MAIN_REQUEST);
 
     // Execute the subscriber callback and check the TTL of the response.
@@ -250,7 +236,7 @@ class DynamicPageCacheSubscriberTest extends UnitTestCase {
     return [
       'Newly-inserted cache item' => [800, 0, 800],
       'Aged cache item' => [800, 500, 300],
-      'Almost-expired cache item' => [800, 800, 0],
+      'Expiring cache item' => [800, 800, 0],
       'Expired cache item' => [800, 801, FALSE],
     ];
   }

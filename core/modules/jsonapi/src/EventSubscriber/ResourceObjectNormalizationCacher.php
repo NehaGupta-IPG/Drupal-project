@@ -2,6 +2,7 @@
 
 namespace Drupal\jsonapi\EventSubscriber;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\VariationCacheInterface;
 use Drupal\jsonapi\JsonApiResource\ResourceObject;
@@ -122,9 +123,8 @@ class ResourceObjectNormalizationCacher implements EventSubscriberInterface {
     $normalizer_values = $cached->data;
     assert(is_array($normalizer_values));
     if ($cached->expire >= 0) {
-      $max_age = max($cached->expire - $this->requestStack->getCurrentRequest()->server->get('REQUEST_TIME'), 0);
       $cacheability = new CacheableMetadata();
-      $cacheability->setCacheMaxAge($max_age);
+      $cacheability->setCacheMaxAge(Cache::ttlFromExpire($cached->expire));
 
       $subsets = [
         ResourceObjectNormalizationCacher::RESOURCE_CACHE_SUBSET_BASE,
