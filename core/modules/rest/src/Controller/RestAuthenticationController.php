@@ -8,7 +8,6 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\user\UserAuthenticationInterface;
-use Drupal\user\UserAuthInterface;
 use Drupal\user\UserFloodControlInterface;
 use Drupal\user\UserInterface;
 use Psr\Log\LoggerInterface;
@@ -62,7 +61,7 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
   /**
    * The user authentication.
    *
-   * @var \Drupal\user\UserAuthInterface|\Drupal\user\UserAuthenticationInterface
+   * @var \Drupal\user\UserAuthenticationInterface
    */
   protected $userAuth;
 
@@ -103,7 +102,7 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
    *   The entity type manager.
    * @param \Drupal\Core\Access\CsrfTokenGenerator $csrf_token
    *   The CSRF token generator.
-   * @param \Drupal\user\UserAuthenticationInterface|\Drupal\user\UserAuthenticationInterface $user_auth
+   * @param \Drupal\user\UserAuthenticationInterface $user_auth
    *   The user authentication.
    * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
    *   The route provider.
@@ -114,13 +113,10 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
    */
-  public function __construct(UserFloodControlInterface $user_flood_control, EntityTypeManagerInterface $entity_type_manager, CsrfTokenGenerator $csrf_token, UserAuthenticationInterface|UserAuthInterface $user_auth, RouteProviderInterface $route_provider, Serializer $serializer, array $serializer_formats, LoggerInterface $logger) {
+  public function __construct(UserFloodControlInterface $user_flood_control, EntityTypeManagerInterface $entity_type_manager, CsrfTokenGenerator $csrf_token, UserAuthenticationInterface $user_auth, RouteProviderInterface $route_provider, Serializer $serializer, array $serializer_formats, LoggerInterface $logger) {
     $this->userFloodControl = $user_flood_control;
     $this->entityTypeManager = $entity_type_manager;
     $this->csrfToken = $csrf_token;
-    if (!$user_auth instanceof UserAuthenticationInterface) {
-      @trigger_error('The $user_auth parameter implementing UserAuthInterface is deprecated in drupal:11.4.0 and will be removed in drupal:12.0.0. Implement UserAuthenticationInterface instead. See https://www.drupal.org/node/3411040');
-    }
     $this->userAuth = $user_auth;
     $this->serializer = $serializer;
     $this->serializerFormats = $serializer_formats;
@@ -171,28 +167,12 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
 
     $this->floodControl($request, $credentials['name']);
 
-    $account = FALSE;
-
-    if ($this->userAuth instanceof UserAuthenticationInterface) {
-      $account = $this->userAuth->lookupAccount($credentials['name']);
-    }
-    else {
-      $accounts = $this->entityTypeManager->getStorage('user')->loadByProperties(['name' => $credentials['name']]);
-      if ($accounts) {
-        $account = reset($accounts);
-      }
-    }
-
+    $account = $this->userAuth->lookupAccount($credentials['name']);
     if ($account) {
       if ($account->isBlocked()) {
         throw new BadRequestHttpException('The user has not been activated or is blocked.');
       }
-      if ($this->userAuth instanceof UserAuthenticationInterface) {
-        $authenticated = $this->userAuth->authenticateAccount($account, $credentials['pass']) ? $account->id() : FALSE;
-      }
-      else {
-        $authenticated = $this->userAuth->authenticate($credentials['name'], $credentials['pass']);
-      }
+      $authenticated = $this->userAuth->authenticateAccount($account, $credentials['pass']) && $account->id();
       if ($authenticated) {
         $this->userFloodControl->clear('user.http_login', $this->getLoginFloodIdentifier($request, $credentials['name']));
         $this->userLoginFinalize($account);
