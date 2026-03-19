@@ -98,6 +98,33 @@ class LanguageSwitchingTest extends BrowserTestBase {
     $this->doTestLanguageBlock404($block->label(), 'system/404');
     $this->drupalLogin($this->drupalCreateUser());
     $this->doTestLanguageBlock404($block->label(), 'system/404');
+
+    // Test that the language switcher is absent when the language switcher
+    // links are NULL.
+    \Drupal::service('module_installer')->uninstall(['language_test']);
+    // Set the links to NULL in language_switcher_test_links_alter.
+    \Drupal::service('module_installer')->install(['language_switcher_test']);
+    $this->rebuildAll();
+    // Go to home page.
+    $this->DrupalGet('<front>');
+    // Check Status.
+    $this->assertSession()->statusCodeEquals(200);
+    // The language switcher block should not display.
+    $this->assertSession()->pageTextNotContains($block->label());
+    // Uninstall 'language_switcher_test' module.
+    \Drupal::service('module_installer')->uninstall(['language_switcher_test']);
+    $this->rebuildAll();
+
+    // Test that the language switcher is absent when the language switcher
+    // links are an empty array.
+    \Drupal::service('module_installer')->install(['language_switcher_test_empty_array']);
+    $this->rebuildAll();
+    // Go to home page.
+    $this->DrupalGet('<front>');
+    // Check Status.
+    $this->assertSession()->statusCodeEquals(200);
+    // The language switcher block should not display.
+    $this->assertSession()->pageTextNotContains($block->label());
   }
 
   /**

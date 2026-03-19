@@ -5,6 +5,8 @@
  * Hooks provided by the Language module.
  */
 
+use Drupal\Core\Url;
+
 /**
  * @addtogroup hooks
  * @{
@@ -108,6 +110,25 @@ function hook_language_fallback_candidates_OPERATION_alter(array &$candidates, a
   // here.
   if ($context['data']->getEntityTypeId() == 'node') {
     $candidates = array_reverse($candidates);
+  }
+}
+
+/**
+ * Allow modules to alter the links of the language switcher block.
+ *
+ * @param array $links
+ *   An array of language switch links, empty array hides the block.
+ * @param string $type
+ *   The language type.
+ * @param \Drupal\Core\Url $url
+ *   The URL the switch links will be relative to.
+ *
+ * @see \Drupal\Core\Language\LanguageManagerInterface::getLanguageSwitchLinks()
+ */
+function hook_language_switch_links_alter(array &$links, string $type, Url $url): void {
+  // Change the title for French to a custom title.
+  if (isset($links['fr'])) {
+    $links['fr']['title'] = ['Custom title'];
   }
 }
 

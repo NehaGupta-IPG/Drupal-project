@@ -1,0 +1,20 @@
+<?php
+
+/**
+ * @file
+ * Test module for testing the language switcher block.
+ */
+
+declare(strict_types=1);
+
+use Drupal\Core\Hook\Attribute\LegacyHook;
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_language_switch_links_alter().
+ */
+#[LegacyHook]
+function language_switcher_test_language_switch_links_alter(&$links, string $type, Url $url): void {
+  // Return NULL which will hide the language switcher block.
+  $links = NULL;
+}

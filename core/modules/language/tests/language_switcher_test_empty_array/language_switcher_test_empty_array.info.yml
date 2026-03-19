@@ -1,0 +1,5 @@
+name: 'Language Switcher test with empty array as result'
+type: module
+description: 'Support module for the language switcher tests.'
+package: Testing
+version: VERSION
