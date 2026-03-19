@@ -4,10 +4,10 @@ namespace Drupal\migrate\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Database\DatabaseConnectionRefusedException;
 use Drupal\Core\Database\DatabaseNotFoundException;
 use Drupal\Core\Database\Query\SelectInterface;
+use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
@@ -221,8 +221,8 @@ class MigrateMessageController extends ControllerBase {
       $new_row['level'] = $levels[$message_row->level];
       $new_row['message'] = $message_row->message;
       $new_row['last_imported'] = !empty($message_row->last_imported)
-      ? $this->dateFormatter->format($message_row->last_imported, 'short')
-      : $this->t('Not available');
+        ? $this->dateFormatter->format($message_row->last_imported, 'short')
+        : $this->t('Not available');
       $rows[] = $new_row;
     }
 
