@@ -91,6 +91,8 @@ class AssetResolver implements AssetResolverInterface {
    *   The cache backend.
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
    *   The theme handler service.
+   * @param \Symfony\Component\HttpFoundation\RequestStack|null $request_stack
+   *   The request stack.
    */
   public function __construct(LibraryDiscoveryInterface $library_discovery, LibraryDependencyResolverInterface $library_dependency_resolver, ModuleHandlerInterface $module_handler, ThemeManagerInterface $theme_manager, LanguageManagerInterface $language_manager, CacheBackendInterface $cache, ThemeHandlerInterface $theme_handler, ?RequestStack $request_stack = NULL) {
     $this->libraryDiscovery = $library_discovery;
@@ -102,7 +104,7 @@ class AssetResolver implements AssetResolverInterface {
     $this->themeHandler = $theme_handler;
 
     if ($request_stack === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $request_stack argument is deprecated in drupal:11.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3432092.', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $request_stack argument is deprecated in drupal:11.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3432092', E_USER_DEPRECATED);
       $request_stack = \Drupal::service('request_stack');
     }
     $this->requestStack = $request_stack;
