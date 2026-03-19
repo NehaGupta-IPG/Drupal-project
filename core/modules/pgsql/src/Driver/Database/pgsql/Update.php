@@ -81,6 +81,8 @@ class Update extends QueryUpdate {
       $this->connection->rollbackSavepoint();
       $this->connection->exceptionHandler()->handleExecutionException($e, $stmt, [], $this->queryOptions);
     }
+
+    return NULL;
   }
 
 }
