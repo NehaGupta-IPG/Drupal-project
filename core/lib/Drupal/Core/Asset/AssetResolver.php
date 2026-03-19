@@ -102,7 +102,7 @@ class AssetResolver implements AssetResolverInterface {
     $this->themeHandler = $theme_handler;
 
     if ($request_stack === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $request_stack argument is deprecated in drupal:10.6.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3432092.', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $request_stack argument is deprecated in drupal:11.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3432092.', E_USER_DEPRECATED);
       $request_stack = \Drupal::service('request_stack');
     }
     $this->requestStack = $request_stack;
