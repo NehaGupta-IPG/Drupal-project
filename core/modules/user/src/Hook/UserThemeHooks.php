@@ -4,7 +4,6 @@ namespace Drupal\user\Hook;
 
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Access\AccessibleInterface;
-use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Extension\ThemeSettingsProvider;
@@ -103,10 +102,8 @@ class UserThemeHooks {
     if ($account instanceof EntityInterface) {
       $access = $account->access('view label', NULL, TRUE);
       $access_label = $access->isAllowed();
-      $cacheability = new CacheableMetadata();
-      $cacheability
+      $metadata
         ->addCacheableDependency($access)
-        ->addCacheableDependency($account)
         ->applyTo($variables);
     }
     else {
