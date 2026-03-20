@@ -136,4 +136,40 @@ class NavigationContentLinksTest extends KernelTestBase {
     $this->assertEquals('Blocks', $links['navigation.blocks']['title']);
   }
 
+  /**
+   * Tests that renaming a content type updates the navigation menu link label.
+   */
+  public function testNavigationContentLinksRename(): void {
+    $menu_link_manager = \Drupal::service('plugin.manager.menu.link');
+
+    // Trigger the initial link build so the links exist in the tree.
+    $menu_link_manager->getDefinitions();
+
+    // Rename the article node type and save it.
+    $node_type = \Drupal::entityTypeManager()->getStorage('node_type')->load('article');
+    $node_type->set('name', 'Articles to Follow');
+    $node_type->save();
+
+    $links = $menu_link_manager->getDefinitions();
+    $this->assertArrayHasKey('navigation.content.node_type.article', $links);
+    $this->assertEquals('Articles to Follow', $links['navigation.content.node_type.article']['title']);
+
+    // Rename a media type that is in the allow list and assert the link updated.
+    $media_type = \Drupal::entityTypeManager()->getStorage('media_type')->load('document');
+    $media_type->set('label', 'Documentation');
+    $media_type->save();
+
+    $links = $menu_link_manager->getDefinitions();
+    $this->assertArrayHasKey('navigation.content.media_type.document', $links);
+    $this->assertEquals('Documentation', $links['navigation.content.media_type.document']['title']);
+
+    // Rename a media type that is NOT in the allow list and assert no link exists.
+    $media_type = \Drupal::entityTypeManager()->getStorage('media_type')->load('special');
+    $media_type->set('label', 'Special Renamed');
+    $media_type->save();
+
+    $links = $menu_link_manager->getDefinitions();
+    $this->assertArrayNotHasKey('navigation.content.media_type.special', $links);
+  }
+
 }

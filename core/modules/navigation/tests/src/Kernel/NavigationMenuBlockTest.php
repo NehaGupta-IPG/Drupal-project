@@ -93,13 +93,6 @@ class NavigationMenuBlockTest extends KernelTestBase {
     $this->installEntitySchema('user');
     $this->installEntitySchema('menu_link_content');
 
-    $account = User::create([
-      'name' => $this->randomMachineName(),
-      'status' => 1,
-    ]);
-    $account->save();
-    $this->container->get('current_user')->setAccount($account);
-
     $this->menuLinkManager = $this->container->get('plugin.manager.menu.link');
     $this->linkTree = $this->container->get('menu.link_tree');
     $this->blockManager = $this->container->get('plugin.manager.block');
@@ -127,6 +120,13 @@ class NavigationMenuBlockTest extends KernelTestBase {
     // Define our RouteProvider mock.
     $mock_route_provider = new MockRouteProvider($routes);
     $this->container->set('router.route_provider', $mock_route_provider);
+
+    $account = User::create([
+      'name' => $this->randomMachineName(),
+      'status' => 1,
+    ]);
+    $account->save();
+    $this->container->get('current_user')->setAccount($account);
 
     // Define our UrlGenerator service that use the new RouteProvider.
     $url_generator_non_bubbling = new UrlGenerator(

@@ -5,6 +5,7 @@ namespace Drupal\navigation\Hook;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Config\Action\ConfigActionManager;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Hook\Attribute\RemoveHook;
@@ -27,20 +28,6 @@ class NavigationHooks {
 
   use StringTranslationTrait;
 
-  /**
-   * NavigationHooks constructor.
-   *
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
-   *   The module handler.
-   * @param \Drupal\Core\Session\AccountInterface $currentUser
-   *   The current user.
-   * @param \Drupal\navigation\NavigationRenderer $navigationRenderer
-   *   The navigation renderer.
-   * @param \Drupal\Core\Config\Action\ConfigActionManager $configActionManager
-   *   The config action manager.
-   * @param \Drupal\navigation\TopBarItemManagerInterface $topBarItemManager
-   *   The Top Bar Item manager.
-   */
   public function __construct(
     protected ModuleHandlerInterface $moduleHandler,
     protected AccountInterface $currentUser,
@@ -98,6 +85,22 @@ class NavigationHooks {
     $navigation_links = \Drupal::classResolver(NavigationContentLinks::class);
     assert($navigation_links instanceof NavigationContentLinks);
     $navigation_links->addMenuLinks($links);
+  }
+
+  /**
+   * Implements hook_entity_insert().
+   *
+   * Implements hook_entity_update().
+   *
+   * Implements hook_entity_delete().
+   */
+  #[Hook('entity_update')]
+  #[Hook('entity_insert')]
+  #[Hook('entity_delete')]
+  public function entityUpdate(EntityInterface $entity): void {
+    $navigation_links = \Drupal::classResolver(NavigationContentLinks::class);
+    assert($navigation_links instanceof NavigationContentLinks);
+    $navigation_links->updateMenuLinks($entity);
   }
 
   /**
@@ -183,14 +186,13 @@ class NavigationHooks {
   #[Hook('navigation_content_top')]
   public function navigationWorkspaces(): array {
     // This navigation item requires the Workspaces UI module.
-    if (!\Drupal::moduleHandler()->moduleExists('workspaces_ui')) {
+    if (!$this->moduleHandler->moduleExists('workspaces_ui')) {
       return [];
     }
 
-    $current_user = \Drupal::currentUser();
-    if (!$current_user->hasPermission('administer workspaces')
-      && !$current_user->hasPermission('view own workspace')
-      && !$current_user->hasPermission('view any workspace')
+    if (!$this->currentUser->hasPermission('administer workspaces')
+      && !$this->currentUser->hasPermission('view own workspace')
+      && !$this->currentUser->hasPermission('view any workspace')
     ) {
       return [];
     }

@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Drupal\navigation;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -23,23 +25,20 @@ final class NavigationContentLinks implements ContainerInjectionInterface {
 
   use StringTranslationTrait;
 
-  /**
-   * Construct a new NavigationContentLinks object.
-   *
-   * @param \Drupal\Core\Routing\RouteProviderInterface $routeProvider
-   *   The route provider.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
-   *   The entity type manager.
-   */
-  public function __construct(private RouteProviderInterface $routeProvider, private EntityTypeManagerInterface $entityTypeManager) {}
+  public function __construct(
+    private RouteProviderInterface $routeProvider,
+    private EntityTypeManagerInterface $entityTypeManager,
+    private MenuLinkManagerInterface $menuLinkManager,
+  ) {}
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container): static {
     return new static(
-      $container->get('router.route_provider'),
-      $container->get('entity_type.manager')
+      $container->get(RouteProviderInterface::class),
+      $container->get(EntityTypeManagerInterface::class),
+      $container->get(MenuLinkManagerInterface::class),
     );
   }
 
@@ -82,8 +81,9 @@ final class NavigationContentLinks implements ContainerInjectionInterface {
     }
 
     // Add supported add links under the Create button.
-    $this->addCreateEntityLinks('node_type', 'entity.node.add_form', $links);
-    $this->addCreateEntityLinks('media_type', 'entity.media.add_form', $links, ['document', 'image']);
+    foreach ($this->getBundleEntityTypes() as $entity_type => $config) {
+      $this->addCreateEntityLinks($entity_type, $config['add_route'], $links, $config['bundle_allow_list']);
+    }
 
     // Finally, add the bundleless User link and pin it to the bottom.
     $this->addLink('navigation.create.user', [
@@ -92,6 +92,45 @@ final class NavigationContentLinks implements ContainerInjectionInterface {
       'parent' => 'navigation.create',
       'weight' => 100,
     ], $links);
+  }
+
+  /**
+   * Update the menu link title when a bundle entity is renamed.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity that was updated.
+   */
+  public function updateMenuLinks(EntityInterface $entity): void {
+    $entity_type_id = $entity->getEntityTypeId();
+    $bundle_types = $this->getBundleEntityTypes();
+    if (!isset($bundle_types[$entity_type_id])) {
+      return;
+    }
+    $allow_list = $bundle_types[$entity_type_id]['bundle_allow_list'];
+    if (!empty($allow_list) && !in_array($entity->id(), $allow_list, TRUE)) {
+      return;
+    }
+
+    $this->menuLinkManager->rebuild();
+  }
+
+  /**
+   * Returns the bundle entity types and their configuration.
+   *
+   * @return array
+   *   A map of entity type IDs to their add route and bundle allow list.
+   */
+  protected function getBundleEntityTypes(): array {
+    return [
+      'node_type' => [
+        'add_route' => 'entity.node.add_form',
+        'bundle_allow_list' => [],
+      ],
+      'media_type' => [
+        'add_route' => 'entity.media.add_form',
+        'bundle_allow_list' => ['document', 'image'],
+      ],
+    ];
   }
 
   /**
