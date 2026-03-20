@@ -21,6 +21,7 @@ class NullArgument extends ArgumentPluginBase {
   protected function defineOptions() {
     $options = parent::defineOptions();
     $options['must_not_be'] = ['default' => FALSE];
+    unset($options['exception']);
     return $options;
   }
 
