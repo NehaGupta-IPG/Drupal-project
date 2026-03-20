@@ -258,9 +258,11 @@ class Query extends QueryBase implements QueryInterface {
    * Overrides the default to defer the COUNT query. The COUNT is only
    * executed in finalizePager() if the data query fills the page limit.
    */
-  protected function initializePager() {
+  protected function initializePager(): void {
     if ($this->pager && !empty($this->pager['limit']) && !$this->count) {
       $page = \Drupal::service('pager.parameters')->findPage($this->pager['element']);
+      // Clone must happen before range() is applied, otherwise the COUNT
+      // query would include the LIMIT and return a wrong total.
       $this->pager['count_query'] = clone $this;
       $this->pager['page'] = $page;
       $this->pager['start'] = $page * $this->pager['limit'];
