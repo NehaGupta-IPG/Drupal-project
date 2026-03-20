@@ -1530,17 +1530,6 @@ class Sql extends QueryPluginBase {
     if ($query) {
       $additional_arguments = \Drupal::moduleHandler()->invokeAll('views_query_substitutions', [$view]);
 
-      // Count queries must be run through the preExecute() method.
-      // If not, then hook_query_node_access_alter() may munge the count by
-      // adding a distinct against an empty query string
-      // (e.g. COUNT DISTINCT(1) ...) and no pager will return.
-      // See \Drupal\Core\Database\Query\PagerSelectExtender::execute()
-      // See https://www.drupal.org/node/1046170.
-      $count_query->preExecute();
-
-      // Build the count query.
-      $count_query = $count_query->countQuery();
-
       // Add additional arguments as a fake condition.
       // XXX: this doesn't work, because PDO mandates that all bound arguments
       // are used on the query. TODO: Find a better way to do this.
@@ -1592,6 +1581,14 @@ class Sql extends QueryPluginBase {
             $view->pager->total_items = $current_page * $items_per_page + $row_count;
           }
           else {
+            // Count queries must be run through the preExecute() method.
+            // If not, then hook_query_node_access_alter() may munge the
+            // count by adding a distinct against an empty query string
+            // (e.g. COUNT DISTINCT(1) ...) and no pager will return.
+            // See \Drupal\Core\Database\Query\PagerSelectExtender::execute()
+            // See https://www.drupal.org/node/1046170.
+            $count_query->preExecute();
+            $count_query = $count_query->countQuery();
             $view->pager->executeCountQuery($count_query);
           }
         }
