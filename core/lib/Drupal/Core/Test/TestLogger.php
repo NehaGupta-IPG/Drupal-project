@@ -60,7 +60,7 @@ final class TestLogger {
     $log_file = static::getLogFile();
     $lock = static::acquireLock($log_file);
     try {
-      file_put_contents($log_file, serialize($assertion) . PHP_EOL, FILE_APPEND);
+      file_put_contents($log_file, rawurlencode(serialize($assertion)) . PHP_EOL, FILE_APPEND);
     }
     finally {
       static::releaseLock($lock);
@@ -94,7 +94,7 @@ final class TestLogger {
       static::releaseLock($lock);
     }
     foreach (explode(PHP_EOL, trim($content)) as $line) {
-      $parameters = unserialize($line, ['allowed_classes' => FALSE]);
+      $parameters = unserialize(rawurldecode($line), ['allowed_classes' => FALSE]);
       if (count($parameters) === 3) {
         if ($parameters[1] === 'User deprecated function') {
           // Fire the same deprecation message to allow it to be
