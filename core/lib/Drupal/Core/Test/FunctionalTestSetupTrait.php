@@ -678,6 +678,7 @@ trait FunctionalTestSetupTrait {
     // Create test directory ahead of installation so fatal errors and debug
     // information can be logged during installation process.
     \Drupal::service('file_system')->prepareDirectory($this->siteDirectory, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
+    mkdir($this->siteDirectory . '/logs');
 
     // Prepare filesystem directory paths.
     $this->publicFilesDirectory = $this->siteDirectory . '/files';
@@ -704,7 +705,7 @@ trait FunctionalTestSetupTrait {
 
     // Log fatal errors.
     ini_set('log_errors', 1);
-    ini_set('error_log', DRUPAL_ROOT . '/' . $this->siteDirectory . '/error.log');
+    ini_set('error_log', DRUPAL_ROOT . '/' . $this->siteDirectory . '/logs/error.log');
 
     // Change the database prefix.
     $this->changeDatabasePrefix();
