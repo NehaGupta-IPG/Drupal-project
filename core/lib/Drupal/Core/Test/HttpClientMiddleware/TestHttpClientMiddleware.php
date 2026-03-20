@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Test\HttpClientMiddleware;
 
+use Drupal\Core\Test\TestLogger;
 use Drupal\Core\Utility\Error;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -40,6 +41,7 @@ class TestHttpClientMiddleware {
             }
             $headers = $response->getHeaders();
             foreach ($headers as $header_name => $header_values) {
+              // @todo trigger deprecation if we get here.
               if (preg_match('/^X-Drupal-Assertion-[0-9]+$/', $header_name, $matches)) {
                 foreach ($header_values as $header_value) {
                   $parameters = unserialize(urldecode($header_value));
@@ -60,6 +62,7 @@ class TestHttpClientMiddleware {
                 }
               }
             }
+            TestLogger::reTriggerErrors();
             return $response;
           });
       };

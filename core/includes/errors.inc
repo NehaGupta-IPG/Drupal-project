@@ -10,6 +10,7 @@ use Drupal\Component\Utility\Xss;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Test\TestLogger;
 use Drupal\Core\Utility\Error;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -157,8 +158,8 @@ function _drupal_log_error($error, $fatal = FALSE): void {
 
   // When running inside the testing framework, we relay the errors
   // to the tested site by the way of HTTP headers.
-  if (defined('DRUPAL_TEST_IN_CHILD_SITE') && DRUPAL_TEST_IN_CHILD_SITE && !headers_sent() && (!defined('SIMPLETEST_COLLECT_ERRORS') || SIMPLETEST_COLLECT_ERRORS)) {
-    _drupal_error_header($error['@message'], $error['%type'], $error['%function'], $error['%file'], $error['%line']);
+  if (defined('DRUPAL_TEST_IN_CHILD_SITE') && DRUPAL_TEST_IN_CHILD_SITE && (!defined('SIMPLETEST_COLLECT_ERRORS') || SIMPLETEST_COLLECT_ERRORS)) {
+    TestLogger::writeError($error['@message'], $error['%type'], $error['%function'], $error['%file'], $error['%line']);
   }
 
   $response = new Response();
@@ -359,6 +360,7 @@ function _drupal_get_error_level() {
  *   The line number in file that emitted the error.
  */
 function _drupal_error_header($message, $type, $function, $file, $line): void {
+  // @todo trigger deprecation if we get here.
   // $number does not use drupal_static as it should not be reset
   // as it uniquely identifies each PHP error.
   static $number = 0;
