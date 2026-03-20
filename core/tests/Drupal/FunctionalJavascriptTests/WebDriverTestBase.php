@@ -77,6 +77,8 @@ abstract class WebDriverTestBase extends BrowserTestBase {
     self::$modules = [
       'js_testing_ajax_request_test',
       'js_testing_log_test',
+      // Support dynamic additions.
+      ...self::$modules,
     ];
     if ($this->disableCssAnimations) {
       self::$modules[] = 'css_disable_transitions_test';
