@@ -1,0 +1,5 @@
+name: 'Router route callback primary'
+type: module
+description: 'Primary support module for route_callbacks.'
+package: Testing
+version: VERSION

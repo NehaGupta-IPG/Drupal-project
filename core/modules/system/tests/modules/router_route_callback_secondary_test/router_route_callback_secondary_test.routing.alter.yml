@@ -1,0 +1,4 @@
+router_route_callback_primary_test:
+  route_callbacks_alter:
+    - '\Drupal\router_route_callback_primary_test\Routing\PrimaryRouterTestRoutes::routes': '\Drupal\router_route_callback_secondary_test\Routing\SecondaryRouterTestRoutes::routes'
+  weight: 100

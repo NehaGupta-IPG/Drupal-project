@@ -1,0 +1,5 @@
+name: 'Router route callback third'
+type: module
+description: 'Third support module for route_callbacks.'
+package: Testing
+version: VERSION

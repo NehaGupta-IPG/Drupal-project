@@ -1,0 +1,5 @@
+name: 'Router route callback secondary'
+type: module
+description: 'Secondary support module for route_callbacks.'
+package: Testing
+version: VERSION

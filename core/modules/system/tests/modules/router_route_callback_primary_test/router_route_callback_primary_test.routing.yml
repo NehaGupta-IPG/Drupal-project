@@ -1,0 +1,2 @@
+route_callbacks:
+  - '\Drupal\router_route_callback_primary_test\Routing\PrimaryRouterTestRoutes::routes'

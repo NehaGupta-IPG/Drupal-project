@@ -6,19 +6,20 @@ echo "ℹ️ Changes from ${BASELINE}"
 git diff ${BASELINE} --name-only
 echo "If this list contains more files than what you changed, then you need to rebase your branch."
 
-echo "1️⃣ Reverting non test changes"
-if [[ $(git diff ${BASELINE} --diff-filter=DM --name-only|grep -Ev "*/tests/*"|grep -v .gitlab-ci|grep -v scripts/run-tests.sh) ]]; then
-git diff ${BASELINE} --diff-filter=DM --name-only|grep -Ev "*/tests/*"|grep -v .gitlab-ci|grep -v scripts/run-tests.sh|while read file;do
-  echo "↩️ Reverting $file";
-  git checkout ${BASELINE} -- $file;
-done
-fi
-if [[ $(git diff ${BASELINE} --diff-filter=A --name-only|grep -Ev "*/tests/*"|grep -v .gitlab-ci|grep -v scripts/run-tests.sh) ]]; then
-git diff ${BASELINE} --diff-filter=A --name-only|grep -Ev "*/tests/*"|grep -v .gitlab-ci|grep -v scripts/run-tests.sh|while read file;do
-  echo "🗑️️ Deleting $file";
-  git rm $file;
-done
-fi
+# @todo Remove for testing
+#echo "1️⃣ Reverting non test changes"
+#if [[ $(git diff ${BASELINE} --diff-filter=DM --name-only|grep -Ev "*/tests/*"|grep -v .gitlab-ci|grep -v scripts/run-tests.sh) ]]; then
+#git diff ${BASELINE} --diff-filter=DM --name-only|grep -Ev "*/tests/*"|grep -v .gitlab-ci|grep -v scripts/run-tests.sh|while read file;do
+#  echo "↩️ Reverting $file";
+#  git checkout ${BASELINE} -- $file;
+#done
+#fi
+#if [[ $(git diff ${BASELINE} --diff-filter=A --name-only|grep -Ev "*/tests/*"|grep -v .gitlab-ci|grep -v scripts/run-tests.sh) ]]; then
+#git diff ${BASELINE} --diff-filter=A --name-only|grep -Ev "*/tests/*"|grep -v .gitlab-ci|grep -v scripts/run-tests.sh|while read file;do
+#  echo "🗑️️ Deleting $file";
+#  git rm $file;
+#done
+#fi
 
 echo "2️⃣ Running test changes for this branch"
 EXIT_CODE=0
