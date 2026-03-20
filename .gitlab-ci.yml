@@ -123,6 +123,8 @@ default:
   needs:
     - job: '🧹 PHP Coding standards (PHPCS)'
       optional: true
+    - job: '🧹 PHP Static Analysis (phpstan)'
+      optional: true
     - job: '📦 Composer'
       optional: true
 
@@ -413,42 +415,8 @@ default:
   retry: 1
   variables:
     TESTSUITE: PHPUnit-Build
-    KUBERNETES_CPU_REQUEST: "12"
-    CONCURRENCY: "6"
-  services:
-    - <<: *with-database
-
-'🖱️️️ PHPUnit Functional Javascript':
-  <<: [ *with-composer, *test-setup ]
-  parallel: 3
-  variables:
-    TESTSUITE: PHPUnit-FunctionalJavascript
-    CONCURRENCY: "12"
     KUBERNETES_CPU_REQUEST: "16"
-  services:
-    - <<: *with-database
-    - <<: *with-selenium-chrome
-  after_script:
-    - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
-    - cp /builds/chromedriver.log ./
-
-'🌐️️ PHPUnit Functional':
-  <<: [ *with-composer, *test-setup ]
-  parallel: 8
-  variables:
-    TESTSUITE: PHPUnit-Functional
-    CONCURRENCY: "24"
-    KUBERNETES_CPU_REQUEST: "16"
-  services:
-    - <<: *with-database
-
-'⚙️️ PHPUnit Kernel':
-  <<: [ *with-composer, *test-setup ]
-  parallel: 4
-  variables:
-    TESTSUITE: PHPUnit-Kernel
-    KUBERNETES_CPU_REQUEST: "12"
-    CONCURRENCY: "20"
+    CONCURRENCY: "8"
   services:
     - <<: *with-database
 
@@ -499,6 +467,40 @@ default:
     paths:
       - ./core/.yarn/cache
     policy: pull
+
+'🖱️️️ PHPUnit Functional Javascript':
+  <<: [ *with-composer, *test-setup ]
+  parallel: 3
+  variables:
+    TESTSUITE: PHPUnit-FunctionalJavascript
+    CONCURRENCY: "12"
+    KUBERNETES_CPU_REQUEST: "14"
+  services:
+    - <<: *with-database
+    - <<: *with-selenium-chrome
+  after_script:
+    - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
+    - cp /builds/chromedriver.log ./
+
+'🌐️️ PHPUnit Functional':
+  <<: [ *with-composer, *test-setup ]
+  parallel: 8
+  variables:
+    TESTSUITE: PHPUnit-Functional
+    CONCURRENCY: "20"
+    KUBERNETES_CPU_REQUEST: "12"
+  services:
+    - <<: *with-database
+
+'⚙️️ PHPUnit Kernel':
+  <<: [ *with-composer, *test-setup ]
+  parallel: 4
+  variables:
+    TESTSUITE: PHPUnit-Kernel
+    KUBERNETES_CPU_REQUEST: "10"
+    CONCURRENCY: "20"
+  services:
+    - <<: *with-database
 
 '🔁 Repeat Class Test':
   <<: [ *with-composer, *test-setup ]
