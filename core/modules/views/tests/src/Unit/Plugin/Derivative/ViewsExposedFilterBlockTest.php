@@ -39,9 +39,6 @@ class ViewsExposedFilterBlockTest extends UnitTestCase {
     return new ViewsExposedFilterBlock($factory, $storage);
   }
 
-  /**
-   * @covers ::getDerivativeDefinitions
-   */
   public function testAdminLabelUsesBlockDescription(): void {
     $delta = 'test_view-page_1';
 
@@ -79,9 +76,6 @@ class ViewsExposedFilterBlockTest extends UnitTestCase {
     );
   }
 
-  /**
-   * @covers ::getDerivativeDefinitions
-   */
   public function testAdminLabelFallsBackToDisplayTitle(): void {
     $delta = 'test_view-page_1';
 
