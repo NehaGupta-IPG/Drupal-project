@@ -39,6 +39,9 @@ class ViewsExposedFilterBlockTest extends UnitTestCase {
     return new ViewsExposedFilterBlock($factory, $storage);
   }
 
+  /**
+   * Tests admin label uses block description when available.
+   */
   public function testAdminLabelUsesBlockDescription(): void {
     $delta = 'test_view-page_1';
 
@@ -76,6 +79,9 @@ class ViewsExposedFilterBlockTest extends UnitTestCase {
     );
   }
 
+  /**
+   * Tests admin label falls back to display title when no description exists.
+   */
   public function testAdminLabelFallsBackToDisplayTitle(): void {
     $delta = 'test_view-page_1';
 
