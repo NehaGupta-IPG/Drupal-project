@@ -160,7 +160,8 @@ abstract class SearchPageFormBase extends EntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $this->entity->save();
-    // Rebuild routes to ensure the new search page route is available immediately.
+    // Rebuild routes to ensure the new search page route is available
+    // immediately.
     $this->routerBuilder->rebuildIfNeeded();
     $form_state->setRedirectUrl($this->entity->toUrl('collection'));
   }
