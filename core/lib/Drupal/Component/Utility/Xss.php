@@ -467,7 +467,7 @@ class Xss {
   }
 
   /**
-   * Whether dangerous protocol should be filtered from this attribute's value.
+   * Checks whether dangerous protocols should be filtered from an attribute.
    *
    * @param string $attribute
    *   Attribute name.
