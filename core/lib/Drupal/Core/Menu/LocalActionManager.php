@@ -211,7 +211,7 @@ class LocalActionManager extends DefaultPluginManager implements LocalActionMana
   /**
    * {@inheritdoc}
    */
-  protected function alterDefinitions(&$definitions) {
+  protected function alterDefinitions(&$definitions): void {
     $this->moduleHandler->alterDeprecated('Deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Use hook_local_actions_alter instead. See https://www.drupal.org/node/3216578.', 'menu_local_actions', $definitions);
     parent::alterDefinitions($definitions);
   }

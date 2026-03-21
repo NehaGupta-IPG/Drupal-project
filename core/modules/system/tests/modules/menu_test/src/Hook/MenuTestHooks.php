@@ -68,7 +68,7 @@ class MenuTestHooks {
    * Implements hook_local_actions_alter().
    */
   #[Hook('local_actions_alter')]
-  function localActionsAlter(array &$local_actions): void {
+  public function localActionsAlter(array &$local_actions): void {
     $local_actions['menu_test.local_action9'] = [
       'id' => 'menu_test.local_action9',
       'title' => 'Hook alter action',
