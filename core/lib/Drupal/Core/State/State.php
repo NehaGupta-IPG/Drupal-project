@@ -40,6 +40,7 @@ class State extends CacheCollector implements StateInterface {
    */
   protected array $keysSetDuringRequest = [];
 
+  /**
    * Whether to write to the cache at the end of the request.
    */
   protected bool $writeCache = TRUE;
@@ -193,30 +194,6 @@ class State extends CacheCollector implements StateInterface {
   /**
    * {@inheritdoc}
    */
-  public function setMultiple(array $data) {
-    $this->keyValueStore->setMultiple($data);
-    foreach ($data as $key => $value) {
-      $this->registerKeySetDuringRequest($key, $value, parent::get($key));
-      parent::set($key, $value);
-      $this->persist($key);
-    }
-    // If another request had a cache miss before this request, and also hasn't
-    // written to cache yet, then it may already have read this value from the
-    // database and could write that value to the cache to the end of the
-    // request. To avoid this race condition, attempt to acquire a the lock and
-    // write to the cache immediately after calling parent::set(). This allows
-    // the race condition detection in CacheCollector::updateCache() to work.
-    $lock_name = $this->getCid() . ':' . CacheCollector::class;
-    $lock_acquired = $this->lock->acquire($lock_name);
-    $this->cache->set($this->getCid(), [$data], CacheBackendInterface::CACHE_PERMANENT, $this->tags);
-    if ($lock_acquired) {
-      $this->lock->release($lock_name);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function delete($key) {
     $this->keyValueStore->delete($key);
     parent::delete($key);
@@ -264,7 +241,7 @@ class State extends CacheCollector implements StateInterface {
   }
 
   /**
-   * {@inheridoc}
+   * {@inheritdoc}
    */
   protected function updateCache($lock = TRUE): void {
     if ($this->writeCache) {
