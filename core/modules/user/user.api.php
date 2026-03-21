@@ -17,11 +17,12 @@ use Drupal\user\UserInterface;
 /**
  * Act on user account cancellations.
  *
- * This hook is invoked from user_cancel() before a user account is canceled.
- * Depending on the account cancellation method, the module should either do
- * nothing, unpublish content, or anonymize content. See user_cancel_methods()
- * for the list of default account cancellation methods provided by User module.
- * Modules may add further methods via hook_user_cancel_methods_alter().
+ * This hook is invoked from \Drupal\user\AccountCancellation::cancel() before a
+ * user account is canceled. Depending on the account cancellation method, the
+ * module should either do nothing, unpublish content, or anonymize content. See
+ * user_cancel_methods() for the list of default account cancellation methods
+ * provided by User module. Modules may add further methods via
+ * hook_user_cancel_methods_alter().
  *
  * This hook is NOT invoked for the 'user_cancel_delete' account cancellation
  * method. To react to that method, implement hook_ENTITY_TYPE_predelete() or

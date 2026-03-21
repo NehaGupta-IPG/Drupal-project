@@ -4,10 +4,10 @@
  * @file
  */
 
-use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AnonymousUserSession;
+use Drupal\user\AccountCancellation;
 use Drupal\user\Entity\User;
 use Drupal\user\Hook\UserThemeHooks;
 use Drupal\user\LoginFinalizer;
@@ -192,9 +192,14 @@ function user_pass_rehash(UserInterface $account, $timestamp) {
  * @param string $method
  *   The account cancellation method to use.
  *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\user\AccountCancellation::cancel() instead.
+ *
+ * @see https://www.drupal.org/node/3566774
  * @see _user_cancel()
  */
 function user_cancel($edit, $uid, $method): void {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\user\AccountCancellation::cancel() instead. See https://www.drupal.org/node/3566774', E_USER_DEPRECATED);
   $account = User::load($uid);
 
   if (!$account) {
@@ -203,36 +208,7 @@ function user_cancel($edit, $uid, $method): void {
     return;
   }
 
-  // Initialize batch (to set title).
-  $batch_builder = (new BatchBuilder())
-    ->setTitle(t('Cancelling account'));
-  batch_set($batch_builder->toArray());
-
-  // When the 'user_cancel_delete' method is used, user_delete() is called,
-  // which invokes hook_ENTITY_TYPE_predelete() and hook_ENTITY_TYPE_delete()
-  // for the user entity. Modules should use those hooks to respond to the
-  // account deletion.
-  if ($method != 'user_cancel_delete') {
-    // Allow modules to add further sets to this batch.
-    \Drupal::moduleHandler()->invokeAll('user_cancel', [$edit, $account, $method]);
-  }
-
-  // Finish the batch and actually cancel the account.
-  $batch_builder = (new BatchBuilder())
-    ->setTitle(t('Cancelling user account'))
-    ->addOperation('_user_cancel', [$edit, $account, $method]);
-
-  // After cancelling account, ensure that user is logged out.
-  if ($account->id() == \Drupal::currentUser()->id()) {
-    // Batch API stores data in the session, so use the finished operation to
-    // manipulate the current user's session id.
-    $batch_builder->setFinishCallback('_user_cancel_session_regenerate');
-  }
-
-  batch_set($batch_builder->toArray());
-
-  // Batch processing is either handled via Form API or has to be invoked
-  // manually.
+  \Drupal::service(AccountCancellation::class)->cancel($account, $method, $edit);
 }
 
 /**

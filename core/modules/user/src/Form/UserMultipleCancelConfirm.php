@@ -9,6 +9,7 @@ use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Drupal\Core\TempStore\PrivateTempStoreFactory;
+use Drupal\user\AccountCancellation;
 use Drupal\user\UserStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Attribute\Route;
@@ -52,19 +53,24 @@ class UserMultipleCancelConfirm extends ConfirmFormBase {
   protected $entityTypeManager;
 
   /**
-   * Constructs a new UserMultipleCancelConfirm.
-   *
-   * @param \Drupal\Core\TempStore\PrivateTempStoreFactory $temp_store_factory
-   *   The temp store factory.
-   * @param \Drupal\user\UserStorageInterface $user_storage
-   *   The user storage.
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager.
+   * The user account cancellation service.
    */
-  public function __construct(PrivateTempStoreFactory $temp_store_factory, UserStorageInterface $user_storage, EntityTypeManagerInterface $entity_type_manager) {
+  protected AccountCancellation $accountCancellation;
+
+  public function __construct(
+    PrivateTempStoreFactory $temp_store_factory,
+    UserStorageInterface $user_storage,
+    EntityTypeManagerInterface $entity_type_manager,
+    ?AccountCancellation $account_cancellation = NULL,
+  ) {
     $this->tempStoreFactory = $temp_store_factory;
     $this->userStorage = $user_storage;
     $this->entityTypeManager = $entity_type_manager;
+    if (!$account_cancellation) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $account_cancellation argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3566774', E_USER_DEPRECATED);
+      $account_cancellation = \Drupal::service(AccountCancellation::class);
+    }
+    $this->accountCancellation = $account_cancellation;
   }
 
   /**
@@ -74,7 +80,8 @@ class UserMultipleCancelConfirm extends ConfirmFormBase {
     return new static(
       $container->get('tempstore.private'),
       $container->get('entity_type.manager')->getStorage('user'),
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get(AccountCancellation::class),
     );
   }
 
@@ -218,15 +225,16 @@ class UserMultipleCancelConfirm extends ConfirmFormBase {
         if ($uid <= 1) {
           continue;
         }
+
+        // The $user global is not a complete user entity. Load the full entity.
+        $account = $this->userStorage->load($uid);
+
         // Prevent user administrators from deleting themselves without
         // confirmation.
         if ($uid == $current_user_id) {
           $admin_form_mock = [];
           $admin_form_state = $form_state;
           $admin_form_state->unsetValue('user_cancel_confirm');
-          // The $user global is not a complete user entity, so load the full
-          // entity.
-          $account = $this->userStorage->load($uid);
           $admin_form = $this->entityTypeManager->getFormObject('user', 'cancel');
           $admin_form->setEntity($account);
           // Calling this directly required to init form object with $account.
@@ -234,7 +242,7 @@ class UserMultipleCancelConfirm extends ConfirmFormBase {
           $admin_form->submitForm($admin_form_mock, $admin_form_state);
         }
         else {
-          user_cancel($form_state->getValues(), $uid, $form_state->getValue('user_cancel_method'));
+          $this->accountCancellation->cancel($account, $form_state->getValue('user_cancel_method'), $form_state->getValues());
         }
       }
     }

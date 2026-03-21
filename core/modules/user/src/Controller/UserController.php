@@ -10,6 +10,7 @@ use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Flood\FloodInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
+use Drupal\user\AccountCancellation;
 use Drupal\user\Form\UserPasswordResetForm;
 use Drupal\user\OneTimeAuthentication;
 use Drupal\user\UserDataInterface;
@@ -30,41 +31,6 @@ use Symfony\Component\Routing\Attribute\Route;
 class UserController extends ControllerBase {
 
   /**
-   * The date formatter service.
-   *
-   * @var \Drupal\Core\Datetime\DateFormatterInterface
-   */
-  protected $dateFormatter;
-
-  /**
-   * The user storage.
-   *
-   * @var \Drupal\user\UserStorageInterface
-   */
-  protected $userStorage;
-
-  /**
-   * The user data service.
-   *
-   * @var \Drupal\user\UserDataInterface
-   */
-  protected $userData;
-
-  /**
-   * A logger instance.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
-   * The flood service.
-   *
-   * @var \Drupal\Core\Flood\FloodInterface
-   */
-  protected $flood;
-
-  /**
    * One time authentication service.
    */
   protected OneTimeAuthentication $oneTimeAuthentication;
@@ -79,36 +45,46 @@ class UserController extends ControllerBase {
    */
   protected LogoutFinalizer $logoutFinalizer;
 
+  /**
+   * The accountCancellation service.
+   */
+  protected AccountCancellation $accountCancellation;
+
   public function __construct(
-    DateFormatterInterface $date_formatter,
-    UserStorageInterface $user_storage,
-    UserDataInterface $user_data,
-    LoggerInterface $logger,
-    FloodInterface $flood,
+    protected DateFormatterInterface $date_formatter,
+    protected UserStorageInterface $user_storage,
+    protected UserDataInterface $user_data,
+    protected LoggerInterface $logger,
+    protected FloodInterface $flood,
     protected TimeInterface $time,
     ?OneTimeAuthentication $one_time_authentication = NULL,
-    ?LoginFinalizer $loginFinalizer = NULL,
-    ?LogoutFinalizer $logoutFinalizer = NULL,
+    ?LoginFinalizer $login_finalizer = NULL,
+    ?LogoutFinalizer $logout_finalizer = NULL,
+    ?AccountCancellation $account_cancellation = NULL,
   ) {
-    $this->dateFormatter = $date_formatter;
-    $this->userStorage = $user_storage;
-    $this->userData = $user_data;
-    $this->logger = $logger;
-    $this->flood = $flood;
     if ($one_time_authentication === NULL) {
       @trigger_error('Calling ' . __METHOD__ . '() without the $one_time_authentication argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3581062', E_USER_DEPRECATED);
+      $one_time_authentication = \Drupal::service(OneTimeAuthentication::class);
     }
-    $this->oneTimeAuthentication = $one_time_authentication ?? \Drupal::service(OneTimeAuthentication::class);
-    if ($loginFinalizer === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $loginFinalizer argument is deprecated in drupal:11.5.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3379194', E_USER_DEPRECATED);
-      $loginFinalizer = \Drupal::service(LoginFinalizer::class);
+    $this->oneTimeAuthentication = $one_time_authentication;
+
+    if ($login_finalizer === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $login_finalizer argument is deprecated in drupal:11.5.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3379194', E_USER_DEPRECATED);
+      $login_finalizer = \Drupal::service(LoginFinalizer::class);
     }
-    $this->loginFinalizer = $loginFinalizer;
-    if ($logoutFinalizer === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $logoutFinalizer argument is deprecated in drupal:11.5.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3379194', E_USER_DEPRECATED);
-      $logoutFinalizer = \Drupal::service(LogoutFinalizer::class);
+    $this->loginFinalizer = $login_finalizer;
+
+    if ($logout_finalizer === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $logout_finalizer argument is deprecated in drupal:11.5.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3379194', E_USER_DEPRECATED);
+      $logout_finalizer = \Drupal::service(LogoutFinalizer::class);
     }
-    $this->logoutFinalizer = $logoutFinalizer;
+    $this->logoutFinalizer = $logout_finalizer;
+    
+    if ($account_cancellation === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $account_cancellation argument is deprecated in drupal:11.5.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3566774', E_USER_DEPRECATED);
+      $account_cancellation = \Drupal::service(AccountCancellation::class);
+    }
+    $this->accountCancellation = $account_cancellation;
   }
 
   /**
@@ -125,6 +101,7 @@ class UserController extends ControllerBase {
       $container->get(OneTimeAuthentication::class),
       $container->get(LoginFinalizer::class),
       $container->get(LogoutFinalizer::class),
+      $container->get(AccountCancellation::class),
     );
   }
 
@@ -524,10 +501,10 @@ class UserController extends ControllerBase {
         $edit = [
           'user_cancel_notify' => $account_data['cancel_notify'] ?? $this->config('user.settings')->get('notify.status_canceled'),
         ];
-        user_cancel($edit, $user->id(), $account_data['cancel_method']);
-        // Since user_cancel() is not invoked via Form API, batch processing
-        // needs to be invoked manually and should redirect to the front page
-        // after completion.
+        $this->accountCancellation->cancel($user, $account_data['cancel_method'], $edit);
+        // Since \Drupal\user\AccountCancellation::cancel() is not invoked via
+        // Form API, batch processing needs to be invoked manually and should
+        // redirect to the front page after completion.
         return batch_process('<front>');
       }
       else {
