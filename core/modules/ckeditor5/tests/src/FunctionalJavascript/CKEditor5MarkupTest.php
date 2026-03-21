@@ -11,6 +11,7 @@ use Drupal\filter\Entity\FilterFormat;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\ckeditor5\Traits\CKEditor5TestTrait;
 use Drupal\Tests\TestFileCreationTrait;
+use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -47,7 +48,6 @@ class CKEditor5MarkupTest extends CKEditor5TestBase {
     FilterFormat::create([
       'format' => 'ckeditor5',
       'name' => 'CKEditor 5 with image upload',
-      'roles' => [RoleInterface::AUTHENTICATED_ID],
     ])->save();
     Editor::create([
       'format' => 'ckeditor5',
@@ -78,6 +78,11 @@ class CKEditor5MarkupTest extends CKEditor5TestBase {
         FilterFormat::load('ckeditor5')
       ))
     ));
+
+    $this->grantPermissions(
+      Role::load(RoleInterface::AUTHENTICATED_ID),
+      ["use text format ckeditor5"]
+    );
 
     $this->drupalGet('node/add/page');
     $this->waitForEditor();
@@ -167,7 +172,6 @@ class CKEditor5MarkupTest extends CKEditor5TestBase {
     FilterFormat::create([
       'format' => 'ckeditor5',
       'name' => 'CKEditor 5 HTML comments test',
-      'roles' => [RoleInterface::AUTHENTICATED_ID],
     ])->save();
     Editor::create([
       'format' => 'ckeditor5',
@@ -185,6 +189,11 @@ class CKEditor5MarkupTest extends CKEditor5TestBase {
         FilterFormat::load('ckeditor5')
       ))
     ));
+
+    $this->grantPermissions(
+      Role::load(RoleInterface::AUTHENTICATED_ID),
+      ["use text format ckeditor5"]
+    );
 
     $this->drupalGet('node/1/edit');
     $page->selectFieldOption('body[0][format]', 'ckeditor5');
@@ -301,7 +310,6 @@ class CKEditor5MarkupTest extends CKEditor5TestBase {
     FilterFormat::create([
       'format' => 'ckeditor5',
       'name' => 'CKEditor 5 HTML',
-      'roles' => [RoleInterface::AUTHENTICATED_ID],
     ])->save();
     Editor::create([
       'format' => 'ckeditor5',
@@ -331,6 +339,11 @@ class CKEditor5MarkupTest extends CKEditor5TestBase {
         FilterFormat::load('ckeditor5')
       ))
     ));
+
+    $this->grantPermissions(
+      Role::load(RoleInterface::AUTHENTICATED_ID),
+      ["use text format ckeditor5"]
+    );
 
     // Add a node with text rendered via the CKEditor 5 HTML format.
     foreach ($test_cases as $test_case_name => $test_case) {

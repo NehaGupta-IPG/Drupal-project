@@ -1,0 +1,7 @@
+name: 'Filter legacy test module'
+type: module
+description: 'Tests legacy filter behavior.'
+package: Testing
+version: VERSION
+dependencies:
+  - drupal:filter

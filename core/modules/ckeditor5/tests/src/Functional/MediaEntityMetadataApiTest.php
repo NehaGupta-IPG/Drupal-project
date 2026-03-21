@@ -18,7 +18,6 @@ use Drupal\Tests\ckeditor5\Traits\SynchronizeCsrfTokenSeedTrait;
 use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 use Drupal\Tests\TestFileCreationTrait;
 use Drupal\user\Entity\User;
-use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -136,7 +135,6 @@ class MediaEntityMetadataApiTest extends BrowserTestBase {
           ],
         ],
       ],
-      'roles' => [RoleInterface::AUTHENTICATED_ID],
     ]);
     $filtered_html_format->save();
     $this->editor = Editor::create([

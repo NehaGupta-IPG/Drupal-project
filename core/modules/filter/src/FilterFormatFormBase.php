@@ -2,12 +2,10 @@
 
 namespace Drupal\filter;
 
-use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\EntityForm;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\filter\Plugin\Filter\FilterNull;
-use Drupal\user\Entity\Role;
-use Drupal\user\RoleInterface;
 
 /**
  * Provides a base form for a filter format.
@@ -19,7 +17,6 @@ abstract class FilterFormatFormBase extends EntityForm {
    */
   public function form(array $form, FormStateInterface $form_state) {
     $format = $this->entity;
-    $is_fallback = ($format->id() == $this->config('filter.settings')->get('fallback_format'));
 
     $form['#tree'] = TRUE;
     $form['#attached']['library'][] = 'filter/drupal.filter.admin';
@@ -43,22 +40,6 @@ abstract class FilterFormatFormBase extends EntityForm {
       '#disabled' => !$format->isNew(),
       '#weight' => -20,
     ];
-
-    // Add user role access selection.
-    $form['roles'] = [
-      '#type' => 'checkboxes',
-      '#title' => $this->t('Roles'),
-      '#options' => array_map(fn(RoleInterface $role) => Html::escape($role->label()), Role::loadMultiple()),
-      '#disabled' => $is_fallback,
-      '#weight' => -10,
-    ];
-    if ($is_fallback) {
-      $form['roles']['#description'] = $this->t('All roles for this text format must be enabled and cannot be changed.');
-    }
-    if (!$format->isNew()) {
-      // If editing an existing text format, pre-select its current permissions.
-      $form['roles']['#default_value'] = array_keys(filter_get_roles_by_format($format));
-    }
 
     // Create filter plugin instances for all available filters, including both
     // enabled/configured ones as well as new and not yet configured ones.
@@ -188,6 +169,18 @@ abstract class FilterFormatFormBase extends EntityForm {
   /**
    * {@inheritdoc}
    */
+  protected function copyFormValuesToEntity(EntityInterface $entity, array $form, FormStateInterface $form_state): void {
+
+    parent::copyFormValuesToEntity($entity, $form, $form_state);
+
+    foreach ($form_state->getValue('filters') as $instance_id => $config) {
+      $entity->setFilterConfig($instance_id, $config);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
 
@@ -208,36 +201,6 @@ abstract class FilterFormatFormBase extends EntityForm {
     if ($format_exists) {
       $form_state->setErrorByName('name', $this->t('Text format names must be unique. A format named %name already exists.', ['%name' => $format_name]));
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
-    parent::submitForm($form, $form_state);
-
-    // Add the submitted form values to the text format, and save it.
-    $format = $this->entity;
-    foreach ($form_state->getValues() as $key => $value) {
-      if ($key != 'filters') {
-        $format->set($key, $value);
-      }
-      else {
-        foreach ($value as $instance_id => $config) {
-          $format->setFilterConfig($instance_id, $config);
-        }
-      }
-    }
-    $format->save();
-
-    // Save user permissions.
-    if ($permission = $format->getPermissionName()) {
-      foreach ($form_state->getValue('roles') as $rid => $enabled) {
-        user_role_change_permissions($rid, [$permission => $enabled]);
-      }
-    }
-
-    return $this->entity;
   }
 
   /**

@@ -8,6 +8,7 @@ use Drupal\ckeditor5\Plugin\Editor\CKEditor5;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\ckeditor5\Traits\CKEditor5TestTrait;
+use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -40,7 +41,6 @@ class CKEditor5DialogTest extends CKEditor5TestBase {
     FilterFormat::create([
       'format' => 'test_format',
       'name' => 'CKEditor 5 with link',
-      'roles' => [RoleInterface::AUTHENTICATED_ID],
     ])->save();
     Editor::create([
       'format' => 'test_format',
@@ -64,6 +64,11 @@ class CKEditor5DialogTest extends CKEditor5TestBase {
         FilterFormat::load('test_format')
       ))
     ));
+
+    $this->grantPermissions(
+      Role::load(RoleInterface::AUTHENTICATED_ID),
+      ['use text format test_format']
+    );
 
     $page = $this->getSession()->getPage();
     $assert_session = $this->assertSession();

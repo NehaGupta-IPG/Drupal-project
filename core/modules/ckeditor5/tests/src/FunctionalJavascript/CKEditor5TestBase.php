@@ -8,6 +8,7 @@ use Behat\Mink\Element\TraversableElement;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 
 // cspell:ignore esque
@@ -54,7 +55,6 @@ abstract class CKEditor5TestBase extends WebDriverTestBase {
   protected function addNewTextFormat($name = 'ckeditor5'): void {
     FilterFormat::create([
       'format' => $name,
-      'roles' => [RoleInterface::AUTHENTICATED_ID],
       'name' => $name,
       'filters' => [
         'filter_html' => [
@@ -75,6 +75,11 @@ abstract class CKEditor5TestBase extends WebDriverTestBase {
         'status' => FALSE,
       ],
     ])->save();
+
+    $this->grantPermissions(
+      Role::load(RoleInterface::AUTHENTICATED_ID),
+      ["use text format $name"]
+    );
   }
 
   /**
@@ -85,7 +90,6 @@ abstract class CKEditor5TestBase extends WebDriverTestBase {
     $page->fillField('name', $name);
     $assert_session->waitForText('Machine name');
     $this->assertNotEmpty($assert_session->waitForText($name));
-    $page->checkField('roles[authenticated]');
 
     if ($name === 'ckeditor5') {
       // Enable the HTML filter, at least one HTML restricting filter is needed
@@ -105,8 +109,19 @@ abstract class CKEditor5TestBase extends WebDriverTestBase {
    * Save the new text format.
    */
   public function saveNewTextFormat($page, $assert_session) {
+    $machine_name = $page->findField('edit-format')->getValue();
+
     $page->pressButton('Save configuration');
     $this->assertTrue($assert_session->waitForText('Added text format'), "Confirm new text format saved");
+
+    if ($this->checkPermissions(["use text format $machine_name"])) {
+      // @see core/profiles/standard/config/install/user.role.authenticated.yml
+      $this->grantPermissions(
+        Role::load(RoleInterface::AUTHENTICATED_ID),
+        ["use text format $machine_name"]
+      );
+    }
+
   }
 
   /**

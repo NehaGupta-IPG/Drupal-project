@@ -22,7 +22,6 @@ class FilterFormatEditForm extends FilterFormatFormBase {
 
     $form['#title'] = $this->entity->label();
     $form = parent::form($form, $form_state);
-    $form['roles']['#default_value'] = array_keys(filter_get_roles_by_format($this->entity));
     return $form;
   }
 

@@ -9,7 +9,6 @@ use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\User;
-use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -58,7 +57,6 @@ class AddedStylesheetsTest extends BrowserTestBase {
       'format' => 'llama',
       'name' => 'Llama',
       'filters' => [],
-      'roles' => [RoleInterface::AUTHENTICATED_ID],
     ]);
     $filtered_html_format->save();
     $this->editor = Editor::create([
