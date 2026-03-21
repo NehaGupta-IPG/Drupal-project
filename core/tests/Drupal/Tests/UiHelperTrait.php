@@ -7,6 +7,7 @@ namespace Drupal\Tests;
 use Behat\Mink\Driver\BrowserKitDriver;
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
+use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Test\RefreshVariablesTrait;
@@ -200,14 +201,32 @@ trait UiHelperTrait {
     // screen.
     $assert_session = $this->assertSession();
     $destination = Url::fromRoute('user.page')->toString();
-    $this->drupalGet(Url::fromRoute('user.logout.confirm', options: ['query' => ['destination' => $destination]]));
-    // Target the submit button using the name rather than the value to work
-    // regardless of the user interface language.
-    $this->submitForm([], 'op', 'user-logout-confirm');
+    if ($this->getSessionName() === NULL) {
+      $this->drupalGet(Url::fromRoute('user.logout.confirm', options: ['query' => ['destination' => $destination]]));
+      // Target the submit button using the name rather than the value to work
+      // regardless of the user interface language.
+      $this->submitForm([], 'op', 'user-logout-confirm');
+    }
+    else {
+      $this->synchronizeCsrfTokenSeed();
+      $this->drupalGet(Url::fromRoute('user.logout')->setOption('query', [
+        'token' => \Drupal::service(CsrfTokenGenerator::class)->get('user/logout'),
+        'destination' => $destination,
+      ]));
+    }
     $assert_session->fieldExists('name');
     $assert_session->fieldExists('pass');
 
     $this->drupalResetSession();
+  }
+
+  /**
+   * Synchronizes the child site's CSRF token seed back to the test runner.
+   */
+  protected function synchronizeCsrfTokenSeed(): void {
+    $session_data = $this->container->get('session_handler.write_safe')->read($this->getSession()->getCookie($this->getSessionName()));
+    $csrf_token_seed = unserialize(explode('_sf2_meta|', $session_data)[1])['s'];
+    $this->container->get('session_manager.metadata_bag')->setCsrfTokenSeed($csrf_token_seed);
   }
 
   /**
