@@ -43,15 +43,15 @@ class LegacyLocalTaskManagerTest extends KernelTestBase {
       ->willReturn(new Language(['id' => 'en']));
     $this->expectUserDeprecationMessage('Calling Drupal\Core\Menu\LocalTaskManager::__construct() without the $logger argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3443775');
     $manager = new LocalTaskManager(
-      $this->createMock(ArgumentResolverInterface::class),
+      $this->createStub(ArgumentResolverInterface::class),
       $request_stack,
-      $this->createMock(RouteMatchInterface::class),
-      $this->createMock(RouteProviderInterface::class),
-      $this->createMock(ModuleHandlerInterface::class),
+      $this->createStub(RouteMatchInterface::class),
+      $this->createStub(RouteProviderInterface::class),
+      $this->createStub(ModuleHandlerInterface::class),
       $this->prophesize(CacheBackendInterface::class)->reveal(),
       $language_manager,
-      $this->createMock(AccessManagerInterface::class),
-      $this->createMock(AccountInterface::class));
+      $this->createStub(AccessManagerInterface::class),
+      $this->createStub(AccountInterface::class));
     $this->assertNotNull($manager);
   }
 
