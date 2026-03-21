@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Theme;
 
+use Drupal\Core\Extension\Extension;
+
 /**
  * Defines a theme and its information needed at runtime.
  *
@@ -94,7 +96,6 @@ class ActiveTheme {
       'engine' => 'twig',
       'logo' => '',
       'libraries' => [],
-      'extension' => 'html.twig',
       'base_theme_extensions' => [],
       'regions' => [],
       'libraries_override' => [],
@@ -106,6 +107,9 @@ class ActiveTheme {
     $this->path = $values['path'];
     $this->engine = $values['engine'];
     $this->libraries = $values['libraries'];
+    if (!isset($values['extension']) || !$values['extension'] instanceof Extension) {
+      throw new \InvalidArgumentException('The "extension" value must be an instance of Drupal\Core\Extension\Extension.');
+    }
     $this->extension = $values['extension'];
     $this->baseThemeExtensions = $values['base_theme_extensions'];
     $this->regions = $values['regions'];
