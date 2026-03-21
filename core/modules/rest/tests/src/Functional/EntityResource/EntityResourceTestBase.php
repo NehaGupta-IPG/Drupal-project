@@ -11,11 +11,13 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheRedirect;
+use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Entity\ContentEntityNullStorage;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\BooleanItem;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
+use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
@@ -26,6 +28,7 @@ use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Defines a base class for testing all entity resources.
@@ -904,6 +907,16 @@ abstract class EntityResourceTestBase extends ResourceTestBase {
       $response = $this->request('POST', $url, $request_options);
       $this->assertSame(500, $response->getStatusCode());
       $this->assertStringContainsString('Internal Server Error', (string) $response->getBody());
+      $this->dbLogReader->withSeverity(RfcLogLevel::ERROR)->assertReadLoggedException(
+        'comment',
+        IntegrityConstraintViolationException::class,
+        pattern: '#^SQLSTATE\[23000\]: Integrity constraint violation: 19 UNIQUE constraint failed: comment\.uuid#',
+      );
+      $this->dbLogReader->withSeverity(RfcLogLevel::ERROR)->assertReadLoggedException(
+        'php',
+        HttpException::class,
+        'Internal Server Error',
+      );
 
       // 201 when successfully creating an entity with a new UUID.
       $normalized_entity = $this->getModifiedEntityForPostTesting();
