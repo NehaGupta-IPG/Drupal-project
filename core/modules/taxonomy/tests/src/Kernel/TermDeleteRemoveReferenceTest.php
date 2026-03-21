@@ -19,7 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('taxonomy')]
 #[RunTestsInSeparateProcesses]
-class PendingRevisionTest extends KernelTestBase {
+class TermDeleteRemoveReferenceTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
@@ -96,7 +96,7 @@ class PendingRevisionTest extends KernelTestBase {
     $taxonomy_index = $this->getTaxonomyIndex();
     $this->assertEquals($term->id(), $taxonomy_index[$node->id()]->tid);
 
-    @todo Add code to delete a term or > 1 terms. Then assert whether the tid has been removed from the node reference field.
+    // TODO: Add code to delete a term or > 1 terms. Then assert whether the tid has been removed from the node reference field.
 
     $taxonomy_index = $this->getTaxonomyIndex();
     $this->assertEquals($term->id(), $taxonomy_index[$node->id()]->tid);
