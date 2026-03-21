@@ -96,7 +96,7 @@ class TermDeleteRemoveReferenceTest extends KernelTestBase {
     $taxonomy_index = $this->getTaxonomyIndex();
     $this->assertEquals($term->id(), $taxonomy_index[$node->id()]->tid);
 
-    // TODO: Add code to delete a term or > 1 terms. Then assert whether the tid has been removed from the node reference field.
+    // @todo Add code to delete a term or > 1 terms then show that the tid has been removed from the node reference field.
 
     $taxonomy_index = $this->getTaxonomyIndex();
     $this->assertEquals($term->id(), $taxonomy_index[$node->id()]->tid);
