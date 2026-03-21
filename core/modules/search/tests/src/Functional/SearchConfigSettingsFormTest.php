@@ -160,6 +160,7 @@ class SearchConfigSettingsFormTest extends BrowserTestBase {
     $this->submitForm($edit, 'Save');
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->addressEquals('admin/config/search/pages');
+    $this->assertSession()->statusMessageContains('The Test page search page has been added.', 'status');
 
     $this->drupalGet('search/test-page');
     $this->assertSession()->statusCodeEquals(200);
