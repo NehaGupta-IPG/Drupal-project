@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\views\Unit\Plugin\argument_validator;
 
+use Drupal\Core\Access\AccessResultAllowed;
+use Drupal\Core\Access\AccessResultForbidden;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Tests\Core\Entity\StubEntityBase;
@@ -73,9 +75,9 @@ class EntityTest extends UnitTestCase {
     $mock_entity->expects($this->any())
       ->method('access')
       ->willReturnMap([
-        ['test_op', NULL, FALSE, TRUE],
-        ['test_op_2', NULL, FALSE, FALSE],
-        ['test_op_3', NULL, FALSE, TRUE],
+        ['test_op', NULL, TRUE, new AccessResultAllowed()],
+        ['test_op_2', NULL, TRUE, new AccessResultForbidden()],
+        ['test_op_3', NULL, TRUE, new AccessResultAllowed()],
       ]);
 
     $mock_entity_bundle_2 = $this->getMockBuilder(StubEntityBase::class)
@@ -88,9 +90,9 @@ class EntityTest extends UnitTestCase {
     $mock_entity_bundle_2->expects($this->any())
       ->method('access')
       ->willReturnMap([
-        ['test_op', NULL, FALSE, FALSE],
-        ['test_op_2', NULL, FALSE, FALSE],
-        ['test_op_3', NULL, FALSE, TRUE],
+        ['test_op', NULL, TRUE, new AccessResultForbidden()],
+        ['test_op_2', NULL, TRUE, new AccessResultForbidden()],
+        ['test_op_3', NULL, TRUE, new AccessResultAllowed()],
       ]);
 
     $storage = $this->createMock('Drupal\Core\Entity\EntityStorageInterface');

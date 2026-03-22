@@ -83,4 +83,36 @@ class EntityArgumentTest extends TaxonomyTestBase {
     $assert_session->titleEquals('test: title ' . $this->term2->label() . ' + ' . $this->term1->label() . ', input ' . $this->term2->id() . '+' . $this->term1->id() . ' | Drupal');
   }
 
+  /**
+   * Tests validating access to the argument.
+   */
+  public function testArgumentValidateAccess(): void {
+    $assert_session = $this->assertSession();
+    // Unpublish term2.
+    $this->term2->setUnpublished()->save();
+
+    // Admin is logged in and has access to unpublished taxonomy.
+    $this->drupalGet('/entity-id-argument-test-access/1');
+    $assert_session->statusCodeEquals(200);
+    $this->drupalGet('/entity-id-argument-test-access/2');
+    $assert_session->statusCodeEquals(200);
+
+    // Create a less privileged user who can't access term2.
+    $this->drupalLogin($this->drupalCreateUser(['access content']));
+    $this->drupalGet('/entity-id-argument-test-access/1');
+    $assert_session->statusCodeEquals(200);
+    $this->drupalGet('/entity-id-argument-test-access/2');
+    $assert_session->statusCodeEquals(403);
+
+    // Publish term2 so this user has access to it.
+    $this->term2->setPublished()->save();
+    $this->drupalGet('/entity-id-argument-test-access/2');
+    $assert_session->statusCodeEquals(200);
+
+    // Re-unpublish term2 and confirm access is rescinded.
+    $this->term2->setUnpublished()->save();
+    $this->drupalGet('/entity-id-argument-test-access/2');
+    $assert_session->statusCodeEquals(403);
+  }
+
 }

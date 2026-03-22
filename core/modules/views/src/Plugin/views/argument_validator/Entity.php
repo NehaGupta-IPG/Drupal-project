@@ -2,6 +2,7 @@
 
 namespace Drupal\views\Plugin\views\argument_validator;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -201,8 +202,15 @@ class Entity extends ArgumentValidatorPluginBase {
    */
   protected function validateEntity(EntityInterface $entity) {
     // If access restricted by entity operation.
-    if ($this->options['access'] && !$entity->access($this->options['operation'])) {
-      return FALSE;
+    if ($this->options['access']) {
+      $access = $entity->access($this->options['operation'], NULL, TRUE);
+      // Add runtime cacheability of the access result to the executable.
+      CacheableMetadata::createFromRenderArray($this->view->element)
+        ->merge(CacheableMetadata::createFromObject($access))
+        ->applyTo($this->view->element);
+      if (!$access->isAllowed()) {
+        return FALSE;
+      }
     }
     // If restricted by bundle.
     $bundles = $this->options['bundles'];
