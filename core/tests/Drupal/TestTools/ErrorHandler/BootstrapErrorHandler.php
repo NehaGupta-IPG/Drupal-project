@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\TestTools\ErrorHandler;
 
+use Drupal\Component\Serialization\Yaml;
 use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
 use PHPUnit\Event\Code\NoTestCaseObjectOnCallStackException;
 use PHPUnit\Runner\ErrorHandler as PhpUnitErrorHandler;
@@ -69,6 +70,23 @@ final class BootstrapErrorHandler {
       // If we end up here, it's likely because a test's processing has
       // finished already and we are processing an error that occurred while
       // dealing with STDOUT rewinding or truncating. Do nothing.
+    }
+    catch (\UnexpectedValueException $e) {
+      throw new \RuntimeException(sprintf("A %s occurred in the error handler.\n\n%s", get_class($e), Yaml::encode([
+        'original error' => [
+          'level' => $errorNumber,
+          'message' => $errorString,
+          'file' => $errorFile . ':' . $errorLine,
+        ],
+        'error handler' => get_debug_type($this->phpUnitErrorHandler),
+        'exception from handler' => [
+          'class' => get_class($e),
+          'message' => $e->getMessage(),
+          'file' => $e->getFile() . ':' . $e->getLine(),
+          'previous' => get_debug_type($e->getPrevious()),
+          'trace' => $e->getTraceAsString(),
+        ],
+      ])), previous: $e);
     }
     return TRUE;
   }
