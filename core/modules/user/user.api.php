@@ -86,17 +86,16 @@ function hook_user_cancel($edit, UserInterface $account, $method): void {
  *   a method. If 'access' is defined, the method cannot be configured as
  *   default method.
  *
- * @param array<string, array{title: string|\Stringable, description: string|\Stringable, access?: bool}> $methods
- *   An array containing user account cancellation methods, keyed by method ID.
+ * @param array $methods
+ *   An array containing user account cancellation methods, keyed by method id.
  *
  * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. To define a
  *   new account cancellation method, create a plugin implementing
  *   \Drupal\user\AccountCancelMethodInterface. To alter existing cancellation
  *   method plugins, implement hook_user_cancel_method_info_alter().
  *
- * @see https://www.drupal.org/node/3566774
- * @see \Drupal\user\AccountCancellation::getMethods()
- * @see \Drupal\user\AccountCancellation::getMethodsFormElement()
+ * @see https://www.drupal.org/node/3580745
+ * @see user_cancel_methods()
  * @see \Drupal\user\Form\UserCancelForm
  */
 function hook_user_cancel_methods_alter(&$methods) {

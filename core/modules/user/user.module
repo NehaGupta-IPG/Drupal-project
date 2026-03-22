@@ -195,11 +195,11 @@ function user_pass_rehash(UserInterface $account, $timestamp) {
  * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
  *   \Drupal\user\AccountCancellation::cancel() instead.
  *
- * @see https://www.drupal.org/node/3566774
+ * @see https://www.drupal.org/node/3580745
  * @see _user_cancel()
  */
 function user_cancel($edit, $uid, $method): void {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\user\AccountCancellation::cancel() instead. See https://www.drupal.org/node/3566774', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\user\AccountCancellation::cancel() instead. See https://www.drupal.org/node/3580745', E_USER_DEPRECATED);
   $account = User::load($uid);
 
   if (!$account) {
@@ -229,11 +229,11 @@ function user_cancel($edit, $uid, $method): void {
  * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
  *   \Drupal\user\AccountCancellation::cancelAccount() instead.
  *
- * @see https://www.drupal.org/node/3566774
+ * @see https://www.drupal.org/node/3580745
  * @see user_cancel()
  */
 function _user_cancel($edit, $account, $method): void {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\user\AccountCancellation::cancelAccount() instead. See https://www.drupal.org/node/3566774', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\user\AccountCancellation::cancelAccount() instead. See https://www.drupal.org/node/3580745', E_USER_DEPRECATED);
   AccountCancellation::cancelAccount($account, $method, $edit);
 }
 
@@ -245,11 +245,11 @@ function _user_cancel($edit, $account, $method): void {
  * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
  *   \Drupal\user\AccountCancellation::regenerateSession() instead.
  *
- * @see https://www.drupal.org/node/3566774
+ * @see https://www.drupal.org/node/3580745
  * @see user_cancel()
  */
 function _user_cancel_session_regenerate(): void {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\user\AccountCancellation::regenerateSession() instead. See https://www.drupal.org/node/3566774', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\user\AccountCancellation::regenerateSession() instead. See https://www.drupal.org/node/3580745', E_USER_DEPRECATED);
   AccountCancellation::regenerateSession();
 }
 
@@ -264,12 +264,12 @@ function _user_cancel_session_regenerate(): void {
  * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
  *   \Drupal\user\AccountCancellation::getMethodsFormElement() instead.
  *
- * @see https://www.drupal.org/node/3566774
+ * @see https://www.drupal.org/node/3580745
  * @see hook_user_cancel_methods_alter()
  * @see user_admin_settings()
  */
 function user_cancel_methods(): array {
-  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\user\AccountCancellation::getMethodsFormElement() instead. See https://www.drupal.org/node/3566774', E_USER_DEPRECATED);
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\user\AccountCancellation::getMethodsFormElement() instead. See https://www.drupal.org/node/3580745', E_USER_DEPRECATED);
   return \Drupal::service(AccountCancellation::class)->getMethodsFormElement();
 }
 
