@@ -33,16 +33,16 @@ class AccountSettingsForm extends ConfigFormBase {
   protected $roleStorage;
 
   /**
-   * Constructs a \Drupal\user\AccountSettingsForm object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The factory for configuration objects.
-   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
-   *   The typed config manager.
-   * @param \Drupal\user\RoleStorageInterface|\Drupal\Core\Extension\ModuleHandlerInterface $role_storage
-   *   The role storage.
+   * The user account cancellation service.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, TypedConfigManagerInterface $typedConfigManager, RoleStorageInterface|ModuleHandlerInterface $role_storage) {
+  protected AccountCancellation $accountCancellation;
+
+  public function __construct(
+    ConfigFactoryInterface $config_factory,
+    TypedConfigManagerInterface $typedConfigManager,
+    RoleStorageInterface|ModuleHandlerInterface $role_storage,
+    ?AccountCancellation $account_cancellation = NULL,
+  ) {
     parent::__construct($config_factory, $typedConfigManager);
 
     $this->roleStorage = $role_storage;
@@ -51,6 +51,11 @@ class AccountSettingsForm extends ConfigFormBase {
       $this->roleStorage = func_get_arg(3);
       @trigger_error('Calling ' . __METHOD__ . '() with the $module_handler argument is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3566911', E_USER_DEPRECATED);
     }
+    if (!$account_cancellation) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $account_cancellation argument is deprecated in drupal:11.4.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3566774', E_USER_DEPRECATED);
+      $account_cancellation = \Drupal::service(AccountCancellation::class);
+    }
+    $this->accountCancellation = $account_cancellation;
   }
 
   /**
@@ -60,7 +65,8 @@ class AccountSettingsForm extends ConfigFormBase {
     return new static(
       $container->get('config.factory'),
       $container->get('config.typed'),
-      $container->get('entity_type.manager')->getStorage('user_role')
+      $container->get('entity_type.manager')->getStorage('user_role'),
+      $container->get(AccountCancellation::class)
     );
   }
 
@@ -144,7 +150,7 @@ class AccountSettingsForm extends ConfigFormBase {
           ->toString(),
       ]),
     ];
-    $form['registration_cancellation']['user_cancel_method'] += user_cancel_methods();
+    $form['registration_cancellation']['user_cancel_method'] += $this->accountCancellation->getMethodsFormElement();
     foreach (Element::children($form['registration_cancellation']['user_cancel_method']) as $key) {
       // All account cancellation methods that specify #access cannot be
       // configured as default method.

@@ -294,52 +294,16 @@ function _user_cancel_session_regenerate(): void {
  * @return array
  *   An array containing all account cancellation methods as form elements.
  *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\user\AccountCancellation::getMethodsFormElement() instead.
+ *
+ * @see https://www.drupal.org/node/3566774
  * @see hook_user_cancel_methods_alter()
  * @see user_admin_settings()
  */
 function user_cancel_methods(): array {
-  $user_settings = \Drupal::config('user.settings');
-  $anonymous_name = $user_settings->get('anonymous');
-  $methods = [
-    'user_cancel_block' => [
-      'title' => t('Disable the account and keep its content.'),
-      'description' => t('Your account will be blocked and you will no longer be able to log in. All of your content will remain attributed to your username.'),
-    ],
-    'user_cancel_block_unpublish' => [
-      'title' => t('Disable the account and unpublish its content.'),
-      'description' => t('Your account will be blocked and you will no longer be able to log in. All of your content will be hidden from everyone but administrators.'),
-    ],
-    'user_cancel_reassign' => [
-      'title' => t('Delete the account and make its content belong to the %anonymous-name user. This action cannot be undone.', ['%anonymous-name' => $anonymous_name]),
-      'description' => t('Your account will be removed and all account information deleted. All of your content will be assigned to the %anonymous-name user.', ['%anonymous-name' => $anonymous_name]),
-    ],
-    'user_cancel_delete' => [
-      'title' => t('Delete the account and its content. This action cannot be undone.'),
-      'description' => t('Your account will be removed and all account information deleted. All of your content will also be deleted.'),
-      'access' => \Drupal::currentUser()->hasPermission('administer users'),
-    ],
-  ];
-  // Allow modules to customize account cancellation methods.
-  \Drupal::moduleHandler()->alter('user_cancel_methods', $methods);
-
-  // Turn all methods into real form elements.
-  $form = [
-    '#options' => [],
-    '#default_value' => $user_settings->get('cancel_method'),
-  ];
-  foreach ($methods as $name => $method) {
-    $form['#options'][$name] = $method['title'];
-    // Add the description for the confirmation form. This description is never
-    // shown for the cancel method option, only on the confirmation form.
-    // Therefore, we use a custom #confirm_description property.
-    if (isset($method['description'])) {
-      $form[$name]['#confirm_description'] = $method['description'];
-    }
-    if (isset($method['access'])) {
-      $form[$name]['#access'] = $method['access'];
-    }
-  }
-  return $form;
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\user\AccountCancellation::getMethodsFormElement() instead. See https://www.drupal.org/node/3566774', E_USER_DEPRECATED);
+  return \Drupal::service(AccountCancellation::class)->getMethodsFormElement();
 }
 
 /**

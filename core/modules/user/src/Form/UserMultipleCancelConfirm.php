@@ -178,7 +178,7 @@ class UserMultipleCancelConfirm extends ConfirmFormBase {
       '#access' => $selectCancel,
     ];
 
-    $form['user_cancel_method'] += user_cancel_methods();
+    $form['user_cancel_method'] += $this->accountCancellation->getMethodsFormElement();
 
     if (!$selectCancel) {
       // Display an item to inform the user of the setting.
