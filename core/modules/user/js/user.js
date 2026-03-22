@@ -290,7 +290,7 @@
 
     // Starting with 20 points for the first character, assign a decreasing
     // number of strength points for each additional character.
-    strength += ((password.length ^ 0.2375) - 1) * 100;
+    strength += ((password.length ** 0.2375) - 1) * 100;
 
     if (password.length < 12) {
       msg.push(passwordSettings.tooShort);
