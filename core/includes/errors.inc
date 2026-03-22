@@ -366,6 +366,7 @@ function _drupal_error_header($message, $type, $function, $file, $line): void {
       'function' => $function,
       'file' => $file,
       'line' => $line,
+      'backtrace' => (new \Exception())->getTraceAsString(),
     ],
   ];
   // For non-fatal errors (e.g. PHP notices) _drupal_log_error can be called
