@@ -58,7 +58,7 @@ class CryptTest extends TestCase {
   #[DataProvider('providerTestHmacBase64Invalid')]
   public function testHmacBase64Invalid(\stdClass|string|int|array|null $data, \stdClass|string|int|array|null $key): void {
     $this->expectException('InvalidArgumentException');
-    Crypt::hmacBase64($data, $key);
+    (void) Crypt::hmacBase64($data, $key);
   }
 
   /**

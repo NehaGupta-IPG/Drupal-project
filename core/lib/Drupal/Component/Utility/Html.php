@@ -96,6 +96,7 @@ class Html {
    *
    * @see https://www.w3.org/TR/CSS21/syndata.html#characters
    */
+  #[\NoDiscard]
   public static function cleanCssIdentifier(
     $identifier,
     array $filter = [
@@ -258,6 +259,7 @@ class Html {
    * @return string
    *   The normalized HTML string.
    */
+  #[\NoDiscard]
   public static function normalize($html) {
     $document = static::load($html);
     return static::serialize($document);
@@ -430,6 +432,7 @@ class Html {
    *
    * @ingroup sanitization
    */
+  #[\NoDiscard]
   public static function escape(string $text): string {
     return htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
   }

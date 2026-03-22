@@ -294,6 +294,7 @@ class NestedArray {
    *
    * @see NestedArray::mergeDeepArray()
    */
+  #[\NoDiscard]
   public static function mergeDeep(...$arrays) {
     return self::mergeDeepArray($arrays);
   }
@@ -324,6 +325,7 @@ class NestedArray {
    *
    * @see NestedArray::mergeDeep()
    */
+  #[\NoDiscard]
   public static function mergeDeepArray(array $arrays, $preserve_integer_keys = FALSE) {
     $result = [];
     foreach ($arrays as $array) {
@@ -358,6 +360,7 @@ class NestedArray {
    * @return array
    *   The filtered array.
    */
+  #[\NoDiscard]
   public static function filter(array $array, ?callable $callable = NULL) {
     $array = is_callable($callable) ? array_filter($array, $callable) : array_filter($array);
     foreach ($array as &$element) {
