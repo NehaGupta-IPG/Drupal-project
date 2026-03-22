@@ -22,7 +22,9 @@ use Drupal\user\UserInterface;
  * module should either do nothing, unpublish content, or anonymize content. See
  * \Drupal\user\AccountCancellation::getMethods() for the list of default
  * account cancellation methods provided by User module. Modules may add further
- * methods by implementing hook_user_cancel_methods_alter().
+ * methods by creating plugins implementing AccountCancelMethodInterface. To
+ * alter existing cancellation method plugins, implement
+ * hook_user_cancel_method_info_alter().
  *
  * This hook is NOT invoked for the 'user_cancel_delete' account cancellation
  * method. To react to that method, implement hook_ENTITY_TYPE_predelete() or
@@ -39,7 +41,6 @@ use Drupal\user\UserInterface;
  *   The account cancellation method.
  *
  * @see \Drupal\user\AccountCancellation::getMethods()
- * @see hook_user_cancel_methods_alter()
  */
 function hook_user_cancel($edit, UserInterface $account, $method): void {
   switch ($method) {
@@ -88,6 +89,12 @@ function hook_user_cancel($edit, UserInterface $account, $method): void {
  * @param array<string, array{title: string|\Stringable, description: string|\Stringable, access?: bool}> $methods
  *   An array containing user account cancellation methods, keyed by method ID.
  *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. To define a
+ *   new account cancellation method, create a plugin implementing
+ *   \Drupal\user\AccountCancelMethodInterface. To alter existing cancellation
+ *   method plugins, implement hook_user_cancel_method_info_alter().
+ *
+ * @see https://www.drupal.org/node/3566774
  * @see \Drupal\user\AccountCancellation::getMethods()
  * @see \Drupal\user\AccountCancellation::getMethodsFormElement()
  * @see \Drupal\user\Form\UserCancelForm
@@ -176,6 +183,19 @@ function hook_user_logout(AccountInterface $account): void {
       'time' => time(),
     ])
     ->execute();
+}
+
+/**
+ * Alters the account cancellation method plugin definitions.
+ *
+ * @param array $definitions
+ *   The array of account cancellation method definitions, keyed by plugin ID.
+ */
+function hook_user_cancel_method_info_alter(array &$definitions): void {
+  if (isset($definitions['user_cancel_block'])) {
+    // Using a custom class for the 'user_cancel_block' method.
+    $definitions['user_cancel_block']['class'] = Foo::class;
+  }
 }
 
 /**

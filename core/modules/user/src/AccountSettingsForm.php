@@ -153,8 +153,7 @@ class AccountSettingsForm extends ConfigFormBase {
     $form['registration_cancellation']['user_cancel_method'] += $this->accountCancellation->getMethodsFormElement();
     foreach (Element::children($form['registration_cancellation']['user_cancel_method']) as $key) {
       // All account cancellation methods that specify #access cannot be
-      // configured as default method.
-      // @see hook_user_cancel_methods_alter()
+      // configured as the default method.
       if (isset($form['registration_cancellation']['user_cancel_method'][$key]['#access'])) {
         $form['registration_cancellation']['user_cancel_method'][$key]['#access'] = FALSE;
       }

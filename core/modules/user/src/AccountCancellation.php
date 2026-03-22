@@ -8,6 +8,7 @@ use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**
@@ -21,6 +22,7 @@ class AccountCancellation {
     protected ModuleHandlerInterface $moduleHandler,
     protected AccountInterface $currentUser,
     protected ConfigFactoryInterface $configFactory,
+    protected AccountCancelMethodManager $accountCancelMethodManager,
   ) {}
 
   /**
@@ -37,8 +39,6 @@ class AccountCancellation {
    * @param array $context
    *   (optional) Associative array with context value. For instance, when used
    *   in the form API, the submitted form values can be passed in this array.
-   *
-   * @see _user_cancel()
    */
   public function cancel(UserInterface $account, string $method, array $context = []): void {
     // Initialize batch (to set the title).
@@ -57,13 +57,13 @@ class AccountCancellation {
     // Finish the batch and actually cancel the account.
     $batchBuilder = new BatchBuilder()
       ->setTitle($this->t('Cancelling user account'))
-      ->addOperation('_user_cancel', [$context, $account, $method]);
+      ->addOperation([static::class, 'cancelAccount'], [$account, $method, $context]);
 
     // After cancelling the account, ensure that the user is logged out.
     if ($account->id() == $this->currentUser->id()) {
       // Batch API stores data in the session, so use the finished operation to
-      // manipulate the current user's session id.
-      $batchBuilder->setFinishCallback('_user_cancel_session_regenerate');
+      // manipulate the current user's session ID.
+      $batchBuilder->setFinishCallback([static::class, 'regenerateSession']);
     }
 
     batch_set($batchBuilder->toArray());
@@ -73,45 +73,48 @@ class AccountCancellation {
   }
 
   /**
-   * Returns the available account cancellation methods.
+   * Provides a finish callback for the batch that actually cancels the account.
    *
-   * @return array<string, array{title: string|\Stringable, description: string|\Stringable, access?: bool}>
-   *   An array containing all account cancellation methods.
-   *
-   * @see hook_user_cancel_methods_alter()
+   * @param \Drupal\user\UserInterface $account
+   *   The user account to cancel.
+   * @param string $method
+   *   The account cancellation method to use.
+   * @param array $context
+   *   (optional) Associative array with context value. For instance, when used
+   *   in the form API, the submitted form values can be passed in this array.
    */
-  public function getMethods(): array {
-    $anonymousName = $this->configFactory->get('user.settings')->get('anonymous');
+  public static function cancelAccount(UserInterface $account, string $method, array $context): void {
+    $manager = \Drupal::service(AccountCancelMethodManager::class);
 
-    // Built-in user account cancellation methods.
-    $methods = [
-      'user_cancel_block' => [
-        'title' => $this->t('Disable the account and keep its content.'),
-        'description' => $this->t('Your account will be blocked and you will no longer be able to log in. All of your content will remain attributed to your username.'),
-      ],
-      'user_cancel_block_unpublish' => [
-        'title' => $this->t('Disable the account and unpublish its content.'),
-        'description' => $this->t('Your account will be blocked and you will no longer be able to log in. All of your content will be hidden from everyone but administrators.'),
-      ],
-      'user_cancel_reassign' => [
-        'title' => $this->t('Delete the account and make its content belong to the %anonymous-name user. This action cannot be undone.', [
-          '%anonymous-name' => $anonymousName,
-        ]),
-        'description' => $this->t('Your account will be removed and all account information deleted. All of your content will be assigned to the %anonymous-name user.', [
-          '%anonymous-name' => $anonymousName,
-        ]),
-      ],
-      'user_cancel_delete' => [
-        'title' => $this->t('Delete the account and its content. This action cannot be undone.'),
-        'description' => $this->t('Your account will be removed and all account information deleted. All of your content will also be deleted.'),
-        'access' => $this->currentUser->hasPermission('administer users'),
-      ],
-    ];
+    if ($manager->hasDefinition($method)) {
+      $manager->createInstance($method)->cancel($account, $context);
+    }
+    else {
+      @trigger_error("Defining account cancellation methods by implementing hook_user_cancel_methods_alter() is deprecated in drupal:11.4.0 and is removed from drupal:11.4.0. To define a new account cancellation method, create a plugin implementing \Drupal\user\AccountCancelMethodInterface. See https://www.drupal.org/node/356677", E_USER_DEPRECATED);
+      // In the legacy system, any custom method did execute the same code as
+      // the 'block' core method. This was a bug. For backwards compatibility
+      // reasons, we replicate the legacy behavior here. This will be removed
+      // when the backwards compatibility layer is discontinued.
+      // @see https://www.drupal.org/project/drupal/issues/3135592
+      $manager->createInstance('user_cancel_block')->cancel($account, $context);
+    }
 
-    // Allow modules to customize account cancellation methods.
-    $this->moduleHandler->alter('user_cancel_methods', $methods);
+    // After cancelling the account, ensure that the user is logged out. We
+    // can't destroy their session, though, as we might have information in it,
+    // and we can't regenerate it because batch API uses the session ID, we will
+    // regenerate it in _user_cancel_session_regenerate().
+    if ($account->id() == \Drupal::currentUser()->id()) {
+      \Drupal::currentUser()->setAccount(new AnonymousUserSession());
+    }
+  }
 
-    return $methods;
+  /**
+   * Finishes the batch processing for cancelling a user account.
+   */
+  public static function regenerateSession(): void {
+    // Regenerate the user's session instead of calling session_destroy() as we
+    // want to preserve any messages that might have been set.
+    \Drupal::service('session')->migrate();
   }
 
   /**
@@ -121,12 +124,29 @@ class AccountCancellation {
    *   Form element for selecting the account cancellation method.
    */
   public function getMethodsFormElement(): array {
+    $methods = [];
+    foreach ($this->accountCancelMethodManager->getDefinitions() as $pluginId => $definition) {
+      $plugin = $this->accountCancelMethodManager->createInstance($pluginId);
+
+      $methods[$pluginId] = [
+        'title' => $plugin->getPluginDefinition()['label'],
+        'description' => $plugin->getPluginDefinition()['description'] ?? NULL,
+        'access' => $plugin->access($this->currentUser),
+      ];
+    }
+
+    $this->moduleHandler->alterDeprecated(
+      'Implementing hook_user_cancel_methods_alter() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. To define a new account cancellation method, create a plugin implementing \Drupal\user\AccountCancelMethodInterface. To alter existing cancellation method plugins, implement hook_user_cancel_method_info_alter(). See https://www.drupal.org/node/3566774',
+      'user_cancel_methods',
+      $methods,
+    );
+
     $element = [
       '#options' => [],
       '#default_value' => $this->configFactory->get('user.settings')->get('cancel_method'),
     ];
 
-    foreach ($this->getMethods() as $name => $method) {
+    foreach ($methods as $name => $method) {
       $element['#options'][$name] = $method['title'];
       // Add the description for the confirmation form. This description is
       // never shown for the cancel method option, only on the confirmation

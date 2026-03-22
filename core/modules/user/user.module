@@ -226,51 +226,15 @@ function user_cancel($edit, $uid, $method): void {
  * @param string $method
  *   The account cancellation method to use.
  *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\user\AccountCancellation::cancelAccount() instead.
+ *
+ * @see https://www.drupal.org/node/3566774
  * @see user_cancel()
  */
 function _user_cancel($edit, $account, $method): void {
-  $logger = \Drupal::logger('user');
-  $notificationHandler = \Drupal::service(NotificationHandler::class);
-
-  switch ($method) {
-    case 'user_cancel_block':
-    case 'user_cancel_block_unpublish':
-    default:
-      // Send account blocked notification if option was checked.
-      if (!empty($edit['user_cancel_notify'])) {
-        $notificationHandler->sendStatusBlocked($account);
-      }
-      $account->block();
-      $account->save();
-      \Drupal::messenger()->addStatus(t('Account %name has been disabled.', ['%name' => $account->getDisplayName()]));
-      $logger->notice('Blocked user: %name %email.', [
-        '%name' => $account->getAccountName(),
-        '%email' => '<' . $account->getEmail() . '>',
-      ]);
-      break;
-
-    case 'user_cancel_reassign':
-    case 'user_cancel_delete':
-      // Send account canceled notification if option was checked.
-      if (!empty($edit['user_cancel_notify'])) {
-        $notificationHandler->sendStatusCancelled($account);
-      }
-      $account->delete();
-      \Drupal::messenger()->addStatus(t('Account %name has been deleted.', ['%name' => $account->getDisplayName()]));
-      $logger->notice('Deleted user: %name %email.', [
-        '%name' => $account->getAccountName(),
-        '%email' => '<' . $account->getEmail() . '>',
-      ]);
-      break;
-  }
-
-  // After cancelling account, ensure that user is logged out. We can't destroy
-  // their session though, as we might have information in it, and we can't
-  // regenerate it because batch API uses the session ID, we will regenerate it
-  // in _user_cancel_session_regenerate().
-  if ($account->id() == \Drupal::currentUser()->id()) {
-    \Drupal::currentUser()->setAccount(new AnonymousUserSession());
-  }
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\user\AccountCancellation::cancelAccount() instead. See https://www.drupal.org/node/3566774', E_USER_DEPRECATED);
+  AccountCancellation::cancelAccount($account, $method, $edit);
 }
 
 /**
@@ -278,12 +242,15 @@ function _user_cancel($edit, $account, $method): void {
  *
  * Finished batch processing callback for cancelling a user account.
  *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+ *   \Drupal\user\AccountCancellation::regenerateSession() instead.
+ *
+ * @see https://www.drupal.org/node/3566774
  * @see user_cancel()
  */
 function _user_cancel_session_regenerate(): void {
-  // Regenerate the users session instead of calling session_destroy() as we
-  // want to preserve any messages that might have been set.
-  \Drupal::service('session')->migrate();
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal\user\AccountCancellation::regenerateSession() instead. See https://www.drupal.org/node/3566774', E_USER_DEPRECATED);
+  AccountCancellation::regenerateSession();
 }
 
 /**
