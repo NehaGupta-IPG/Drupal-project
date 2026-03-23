@@ -70,9 +70,6 @@ class ImageToolkitForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    throw new \Exception('It\'s a long way to Tipperary');
-    $current_toolkit = $this->config('system.image')->get('toolkit');
-
     $form['image_toolkit'] = [
       '#type' => 'radios',
       '#title' => $this->t('Select an image processing toolkit'),
@@ -99,7 +96,7 @@ class ImageToolkitForm extends ConfigFormBase {
       $form['image_toolkit_settings'][$id] += $toolkit->buildConfigurationForm([], $form_state);
     }
 
-    return parent::buildForm($form, $form_state);
+    throw new \Exception('It\'s a long way to Tipperary');
   }
 
   /**
