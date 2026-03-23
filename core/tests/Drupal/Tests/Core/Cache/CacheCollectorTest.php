@@ -246,16 +246,16 @@ class CacheCollectorTest extends UnitTestCase {
   /**
    * Tests updating the cache when there is a conflict after cache invalidation.
    */
-  #[TestWith([TRUE, TRUE, TRUE, FALSE])]
-  #[TestWith([FALSE, TRUE, TRUE, FALSE])]
-  #[TestWith([TRUE, FALSE, TRUE, FALSE])]
-  #[TestWith([FALSE, FALSE, TRUE, FALSE])]
-  #[TestWith([TRUE, TRUE, FALSE, FALSE])]
-  #[TestWith([FALSE, TRUE, FALSE, FALSE])]
-  #[TestWith([TRUE, FALSE, FALSE, FALSE])]
-  #[TestWith([FALSE, FALSE, FALSE, FALSE])]
   #[TestWith([TRUE, TRUE, TRUE, TRUE])]
+  #[TestWith([TRUE, TRUE, TRUE, FALSE])]
+  #[TestWith([TRUE, TRUE, FALSE, FALSE])]
+  #[TestWith([TRUE, FALSE, FALSE, FALSE])]
+  #[TestWith([TRUE, FALSE, TRUE, FALSE])]
+  #[TestWith([FALSE, FALSE, FALSE, FALSE])]
+  #[TestWith([FALSE, TRUE, FALSE, FALSE])]
+  #[TestWith([FALSE, FALSE, TRUE, FALSE])]
   #[TestWith([FALSE, TRUE, TRUE, TRUE])]
+  #[TestWith([FALSE, TRUE, TRUE, FALSE])]
   public function testUpdateCacheInvalidatedConflict(bool $lock_acquired, bool $start_cache_item, bool $end_cache_item, bool $timestamp_matches): void {
     $this->setUpMockCacheBackend();
     $this->setUpMockLockBackend();
