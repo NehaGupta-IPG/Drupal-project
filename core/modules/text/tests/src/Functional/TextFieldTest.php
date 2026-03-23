@@ -312,6 +312,7 @@ class TextFieldTest extends StringFieldTest {
   public function _testTextfieldWidgetsFormatted($field_type, $widget_type): void {
     // Create a field.
     $field_name = $this->randomMachineName();
+    $field_label = $this->randomMachineName() . '_label';
     $field_storage = FieldStorageConfig::create([
       'field_name' => $field_name,
       'entity_type' => 'entity_test',
@@ -321,7 +322,7 @@ class TextFieldTest extends StringFieldTest {
     FieldConfig::create([
       'field_storage' => $field_storage,
       'bundle' => 'entity_test',
-      'label' => $this->randomMachineName() . '_label',
+      'label' => $field_label,
     ])->save();
     /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $display_repository */
     $display_repository = \Drupal::service('entity_display.repository');
@@ -405,6 +406,10 @@ class TextFieldTest extends StringFieldTest {
     $content = $display->build($entity);
     $rendered_entity = \Drupal::service('renderer')->renderRoot($content);
     $this->assertStringContainsString($value, (string) $rendered_entity);
+
+    FilterFormat::load($format_id)->delete();
+    $this->drupalGet('entity_test/' . $id);
+    $this->assertSession()->pageTextContains('The ' . $field_label . ' field is not displayed because the text format used is not available. You may need to edit this content and select a different text format.');
   }
 
 }

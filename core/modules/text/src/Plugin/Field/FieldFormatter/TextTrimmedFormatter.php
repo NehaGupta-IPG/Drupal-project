@@ -8,6 +8,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\filter\Entity\FilterFormat;
 use Drupal\text\TextSummary;
 
 /**
@@ -82,6 +83,11 @@ class TextTrimmedFormatter extends FormatterBase implements TrustedCallbackInter
     // The ProcessedText element already handles cache context & tag bubbling.
     // @see \Drupal\filter\Element\ProcessedText::preRenderText()
     foreach ($items as $delta => $item) {
+      $format = FilterFormat::load($item->format);
+      if ($item->format && (!$format || !$format->status())) {
+        $this->addInvalidFormatWarning($items);
+        continue;
+      }
       $elements[$delta] = [
         '#type' => 'processed_text',
         '#text' => NULL,
