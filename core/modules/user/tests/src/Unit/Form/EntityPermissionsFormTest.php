@@ -19,12 +19,14 @@ use Drupal\user\PermissionHandlerInterface;
 use Drupal\user\RoleStorageInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Routing\Route;
 
 /**
  * Tests the permissions administration form for a bundle.
  */
 #[CoversClass(EntityPermissionsForm::class)]
+#[Group('user')]
 class EntityPermissionsFormTest extends UnitTestCase {
 
   /**
@@ -98,6 +100,7 @@ class EntityPermissionsFormTest extends UnitTestCase {
    * Provides data for the testPermissionsByProvider method.
    *
    * @return array
+   *   An array of test cases with dependency name and expected found status.
    */
   public static function providerTestPermissionsByProvider() {
     return [
