@@ -248,15 +248,19 @@ class CacheCollectorTest extends UnitTestCase {
    */
   #[TestWith([TRUE, TRUE, TRUE, TRUE])]
   #[TestWith([TRUE, TRUE, TRUE, FALSE])]
-  #[TestWith([TRUE, TRUE, FALSE, FALSE])]
-  #[TestWith([TRUE, FALSE, FALSE, FALSE])]
+  #[TestWith([TRUE, TRUE, FALSE, NULL])]
+  #[TestWith([TRUE, FALSE, FALSE, NULL])]
   #[TestWith([TRUE, FALSE, TRUE, FALSE])]
-  #[TestWith([FALSE, FALSE, FALSE, FALSE])]
-  #[TestWith([FALSE, TRUE, FALSE, FALSE])]
+  #[TestWith([FALSE, FALSE, FALSE, NULL])]
+  #[TestWith([FALSE, TRUE, FALSE, NULL])]
   #[TestWith([FALSE, FALSE, TRUE, FALSE])]
   #[TestWith([FALSE, TRUE, TRUE, TRUE])]
   #[TestWith([FALSE, TRUE, TRUE, FALSE])]
-  public function testUpdateCacheInvalidatedConflict(bool $lock_acquired, bool $start_cache_item, bool $end_cache_item, bool $timestamp_matches): void {
+  public function testUpdateCacheInvalidatedConflict(bool $lock_acquired, bool $start_cache_item, bool $end_cache_item, ?bool $timestamp_matches): void {
+
+    if ($end_cache_item === FALSE && isset($timestamp_matches)) {
+      throw new \BadMethodCallException('timestamp_matches is ignored when end_cache_item is FALSE');
+    }
     $this->setUpMockCacheBackend();
     $this->setUpMockLockBackend();
 
