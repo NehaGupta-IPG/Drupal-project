@@ -12,6 +12,7 @@ use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Tests Drupal\Core\Cache\CacheCollector.
@@ -245,7 +246,15 @@ class CacheCollectorTest extends UnitTestCase {
   /**
    * Tests updating the cache when there is a conflict after cache invalidation.
    */
-  public function testUpdateCacheInvalidatedConflict(): void {
+  #[TestWith([TRUE, TRUE, TRUE])]
+  #[TestWith([FALSE, TRUE, TRUE])]
+  #[TestWith([TRUE, FALSE, TRUE])]
+  #[TestWith([FALSE, FALSE, TRUE])]
+  #[TestWith([TRUE, TRUE, FALSE])]
+  #[TestWith([FALSE, TRUE, FALSE])]
+  #[TestWith([TRUE, FALSE, FALSE])]
+  #[TestWith([FALSE, FALSE, FALSE])]
+  public function testUpdateCacheInvalidatedConflict($lock_acquired, $start_cache_item, $end_cache_item): void {
     $this->setUpMockCacheBackend();
     $this->setUpMockLockBackend();
 
@@ -257,14 +266,14 @@ class CacheCollectorTest extends UnitTestCase {
       ->method('get')
       ->with($this->cid)
       ->willReturnOnConsecutiveCalls(
-        (object) [
+        $start_cache_item ? (object) [
           'data' => [$key => $value],
           'created' => (int) $_SERVER['REQUEST_TIME'],
-        ],
-        (object) [
+        ] : FALSE,
+        $end_cache_item ? (object) [
           'data' => [$key => $value],
           'created' => (int) $_SERVER['REQUEST_TIME'] + 1,
-        ],
+        ] : FALSE,
       );
 
     $this->cacheBackend->expects($this->once())
@@ -277,14 +286,17 @@ class CacheCollectorTest extends UnitTestCase {
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with($this->cid . ':Drupal\Core\Cache\CacheCollector')
-      ->willReturn(TRUE);
-    $this->cacheBackend->expects($this->once())
-      ->method('delete')
-      ->with($this->cid);
-    $this->lock->expects($this->once())
-      ->method('release')
-      ->with($this->cid . ':Drupal\Core\Cache\CacheCollector');
-
+      ->willReturn($lock_acquired);
+    if ($end_cache_item) {
+      $this->cacheBackend->expects($this->once())
+        ->method('delete')
+        ->with($this->cid);
+    }
+    if ($lock_acquired) {
+      $this->lock->expects($this->once())
+        ->method('release')
+        ->with($this->cid . ':Drupal\Core\Cache\CacheCollector');
+    }
     // Destruct the object to trigger the update data process.
     $this->collector->destruct();
   }
