@@ -137,8 +137,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'CacheGetCount' => 101,
       'CacheGetCountByBin' => [
         'page' => 1,
-        'config' =>
-          20,
+        'config' => 20,
         'data' => 5,
         'discovery' => 40,
         'bootstrap' => 11,
