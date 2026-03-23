@@ -303,6 +303,8 @@ class StateTest extends UnitTestCase {
       $lock->expects($this->once())
         ->method('acquire')
         ->willReturn(TRUE);
+      $lock->expects($this->once())
+        ->method('release');
       $cache->expects($this->once())
         ->method('set');
     }
@@ -312,6 +314,8 @@ class StateTest extends UnitTestCase {
         ->willReturn(FALSE);
       $cache->expects($this->exactly(2))
         ->method('set');
+      $lock->expects($this->never())
+        ->method('release');
     }
     $state = new State($factory, $cache, $lock);
     $values = ['key1' => 'value1', 'key2' => 'value2', 'key3' => 'value3'];
