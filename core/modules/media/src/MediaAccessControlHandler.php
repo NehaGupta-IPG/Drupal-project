@@ -169,7 +169,7 @@ class MediaAccessControlHandler extends EntityAccessControlHandler implements En
     // fields.
     $administrative_fields = ['uid', 'status', 'created'];
     if ($operation == 'edit' && in_array($field_definition->getName(), $administrative_fields, TRUE)) {
-      return AccessResult::allowedIfHasPermission($account, 'update media');
+      return $this->access($items->getEntity(), 'update', $account, TRUE);
     }
 
     return parent::checkFieldAccess($operation, $field_definition, $account, $items);
