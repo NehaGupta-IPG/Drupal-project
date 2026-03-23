@@ -34,6 +34,8 @@ class TestPageTestController {
    * Returns a test page and with the call to the dump() function.
    */
   public function testPageVarDump() {
+    // Using dump() causes a warning about headers already being sent.
+    define('SIMPLETEST_COLLECT_ERRORS', FALSE);
     $role = Role::create(['id' => 'test_role', 'label' => 'Test role']);
     dump($role);
     return [

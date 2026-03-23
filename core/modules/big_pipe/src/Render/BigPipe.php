@@ -524,8 +524,17 @@ class BigPipe {
             }
             continue;
           }
-          $elements = $fiber->getReturn();
-          unset($fibers[$placeholder_id]);
+          try {
+            $elements = $fiber->getReturn();
+          }
+          catch (\Throwable $e) {
+            // Fiber threw an exception.
+            // @todo what should happen here?
+            continue;
+          }
+          finally {
+            unset($fibers[$placeholder_id]);
+          }
 
           if ($this->debugCacheabilityHeaders) {
             $cacheable_metadata->addCacheableDependency(CacheableMetadata::createFromRenderArray($elements));

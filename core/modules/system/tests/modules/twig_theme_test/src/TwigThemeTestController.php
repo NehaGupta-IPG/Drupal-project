@@ -117,6 +117,8 @@ class TwigThemeTestController {
    * Renders for testing drupal_dump function.
    */
   public function dump() {
+    // Using dump() causes a warning about headers already being sent.
+    define('SIMPLETEST_COLLECT_ERRORS', FALSE);
     return ['#theme' => 'twig_theme_test_dump'];
   }
 

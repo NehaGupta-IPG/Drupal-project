@@ -6,6 +6,7 @@ namespace Drupal\big_pipe_test\EventSubscriber;
 
 use Drupal\Core\Render\AttachmentsInterface;
 use Drupal\Core\Render\HtmlResponse;
+use Drupal\Core\Test\Exception\TestErrorLoggerIgnoreException;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -42,7 +43,7 @@ class BigPipeTestSubscriber implements EventSubscriberInterface {
     $attachments = $response->getAttachments();
     if (!isset($attachments['big_pipe_placeholders']) && !isset($attachments['big_pipe_nojs_placeholders'])) {
       if (str_contains($response->getContent(), static::CONTENT_TRIGGER_EXCEPTION)) {
-        throw new \Exception('Oh noes!');
+        throw new TestErrorLoggerIgnoreException('Oh noes!');
       }
     }
   }

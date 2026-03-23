@@ -8,6 +8,7 @@ use Drupal\big_pipe\Render\BigPipeMarkup;
 use Drupal\big_pipe_test\EventSubscriber\BigPipeTestSubscriber;
 use Drupal\Core\Form\EnforcedResponseException;
 use Drupal\Core\Security\TrustedCallbackInterface;
+use Drupal\Core\Test\Exception\TestErrorLoggerIgnoreException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
@@ -194,7 +195,7 @@ class BigPipeTestController implements TrustedCallbackInterface {
    * @throws \Exception
    */
   public static function exception() {
-    throw new \Exception('You are not allowed to say llamas are not cool!');
+    throw new TestErrorLoggerIgnoreException('You are not allowed to say llamas are not cool!');
   }
 
   /**

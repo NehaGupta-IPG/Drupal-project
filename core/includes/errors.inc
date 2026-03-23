@@ -159,7 +159,7 @@ function _drupal_log_error($error, $fatal = FALSE): void {
   // When running inside the testing framework, we relay the errors
   // to the tested site by the way of HTTP headers.
   if (defined('DRUPAL_TEST_IN_CHILD_SITE') && DRUPAL_TEST_IN_CHILD_SITE && (!defined('SIMPLETEST_COLLECT_ERRORS') || SIMPLETEST_COLLECT_ERRORS)) {
-    TestErrorLogger::writeError($error['@message'], $error['%type'], $error['%function'], $error['%file'], $error['%line']);
+    TestErrorLogger::writeError($error['@message'], $error['%type'], $error['%function'], $error['%file'], $error['%line'], $exception);
   }
 
   $response = new Response();
@@ -288,7 +288,8 @@ function _drupal_log_error($error, $fatal = FALSE): void {
       $response->setContent($message);
       $response->setStatusCode(500, '500 Service unavailable (with message)');
 
-      $response->send();
+      // Disable further error reporting as this is part of reporting the error.
+      @$response->send();
       // An exception must halt script execution.
       exit;
     }

@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Test;
 
+use Drupal\Core\Test\Exception\TestErrorLoggerIgnoreException;
 use Drupal\Core\Utility\Error;
 
 /**
@@ -46,8 +47,14 @@ final class TestErrorLogger {
    *   The file where the error occurred.
    * @param int $line
    *   The line number where the error occurred.
+   * @param \Throwable|null $exception
+   *   The exception that triggered the error, or NULL if the error was not
+   *   triggered by an exception.
    */
-  public static function writeError(string $message, string $type, string $function, string $file, int $line): void {
+  public static function writeError(string $message, string $type, string $function, string $file, int $line, ?\Throwable $exception): void {
+    if ($exception instanceof TestErrorLoggerIgnoreException || $exception === NULL && str_starts_with($message, TestErrorLoggerIgnoreException::class)) {
+      return;
+    }
     $assertion = [
       $message,
       $type,
