@@ -31,12 +31,9 @@ class MigrationPluginListTest extends KernelTestBase {
   protected static $modules = [
     'migrate',
     // Test with all modules containing Drupal migrations.
-    // @todo Remove Ban in https://www.drupal.org/project/drupal/issues/3488827
-    'ban',
     'block',
     'block_content',
     'comment',
-    'contact',
     'content_translation',
     'dblog',
     'field',
@@ -71,8 +68,6 @@ class MigrationPluginListTest extends KernelTestBase {
 
   /**
    * Tests get definitions.
-   *
-   * @legacy-covers ::getDefinitions
    */
   public function testGetDefinitions(): void {
     // Create an entity reference field to make sure that migrations derived by

@@ -19,7 +19,6 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Prophecy\Argument;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -147,8 +146,6 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
 
   /**
    * Tests the clearCachedBundles() method.
-   *
-   * @legacy-covers ::clearCachedBundles
    */
   public function testClearCachedBundles(): void {
     $this->setUpEntityTypeDefinitions();
@@ -162,8 +159,6 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
 
   /**
    * Tests the getBundleInfo() method.
-   *
-   * @legacy-covers ::getBundleInfo
    */
   #[DataProvider('providerTestGetBundleInfo')]
   public function testGetBundleInfo($entity_type_id, $expected): void {
@@ -193,7 +188,7 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
    * @return array
    *   Test data.
    */
-  public static function providerTestGetBundleInfo() {
+  public static function providerTestGetBundleInfo(): array {
     return [
       [
         'apple',
@@ -213,8 +208,6 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
 
   /**
    * Tests the getAllBundleInfo() method.
-   *
-   * @legacy-covers ::getAllBundleInfo
    */
   public function testGetAllBundleInfo(): void {
     $this->moduleHandler->invokeAll('entity_bundle_info')->willReturn([]);
@@ -235,8 +228,11 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
 
     $cacheBackend = $this->cacheBackend;
     $this->cacheBackend->get('entity_bundle_info:en')->willReturn(FALSE);
-    $this->cacheBackend->set('entity_bundle_info:en', Argument::any(), Cache::PERMANENT, ['entity_types', 'entity_bundles'])
-      ->will(function () use ($cacheBackend) {
+    $this->cacheBackend->set('entity_bundle_info:en', Argument::any(), Cache::PERMANENT, [
+      'entity_types',
+      'entity_bundles',
+    ])
+      ->will(function () use ($cacheBackend): void {
         $cacheBackend->get('entity_bundle_info:en')
           ->willReturn((object) ['data' => 'cached data'])
           ->shouldBeCalled();
@@ -273,8 +269,6 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
 
   /**
    * Tests get all bundle info with entity bundle info.
-   *
-   * @legacy-covers ::getAllBundleInfo
    */
   public function testGetAllBundleInfoWithEntityBundleInfo(): void {
     // Ensure that EntityTypeBundleInfo::getAllBundleInfo() does not add
@@ -320,8 +314,6 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
 
   /**
    * Tests the getBundleLabels() method.
-   *
-   * @legacy-covers ::getBundleLabels
    */
   #[DataProvider('providerTestGetBundleLabels')]
   public function testGetBundleLabels(string $entity_type_id, array $expected): void {
@@ -342,18 +334,6 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
     ]);
 
     $this->assertSame($expected, $this->entityTypeBundleInfo->getBundleLabels($entity_type_id));
-  }
-
-  /**
-   * Tests calling getBundleInfo() method with a NULL.
-   *
-   * @legacy-covers ::getBundleInfo
-   */
-  #[IgnoreDeprecations]
-  public function testGetBundleInfoWithNull(): void {
-    $this->expectDeprecation('Calling Drupal\Core\Entity\EntityTypeBundleInfo::getBundleInfo() with a non-string $entity_type_id is deprecated in drupal:11.3.0 and throws an exception in drupal:12.0.0. See https://www.drupal.org/node/3557136');
-    $bundle_info = $this->entityTypeBundleInfo->getBundleInfo(NULL);
-    $this->assertSame([], $bundle_info);
   }
 
   /**

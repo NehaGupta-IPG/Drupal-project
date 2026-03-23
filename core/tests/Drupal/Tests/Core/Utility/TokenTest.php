@@ -110,8 +110,6 @@ class TokenTest extends UnitTestCase {
 
   /**
    * Tests get info.
-   *
-   * @legacy-covers ::getInfo
    */
   public function testGetInfo(): void {
     $token_info = [
@@ -158,8 +156,6 @@ class TokenTest extends UnitTestCase {
 
   /**
    * Tests replace with bubbleable metadata object.
-   *
-   * @legacy-covers ::replace
    */
   public function testReplaceWithBubbleableMetadataObject(): void {
     $this->moduleHandler->expects($this->any())
@@ -189,8 +185,6 @@ class TokenTest extends UnitTestCase {
 
   /**
    * Tests replace with hook tokens with bubbleable metadata.
-   *
-   * @legacy-covers ::replace
    */
   public function testReplaceWithHookTokensWithBubbleableMetadata(): void {
     $this->moduleHandler->expects($this->any())
@@ -237,7 +231,7 @@ class TokenTest extends UnitTestCase {
 
     $this->moduleHandler->expects($this->any())
       ->method('alter')
-      ->willReturnCallback(function ($hook_name, array &$replacements, array $context, BubbleableMetadata $bubbleable_metadata) {
+      ->willReturnCallback(function ($hook_name, array &$replacements, array $context, BubbleableMetadata $bubbleable_metadata): void {
         $replacements['[node:title]'] = 'hello world';
         $bubbleable_metadata->addCacheContexts(['custom_context']);
         $bubbleable_metadata->addCacheTags(['node:1']);
@@ -266,8 +260,6 @@ class TokenTest extends UnitTestCase {
 
   /**
    * Tests reset info.
-   *
-   * @legacy-covers ::resetInfo
    */
   public function testResetInfo(): void {
     $this->cacheTagsInvalidator->expects($this->once())
@@ -279,8 +271,6 @@ class TokenTest extends UnitTestCase {
 
   /**
    * Tests replace escaping.
-   *
-   * @legacy-covers ::replace
    */
   #[DataProvider('providerTestReplaceEscaping')]
   public function testReplaceEscaping($string, array $tokens, $expected): void {
@@ -295,7 +285,7 @@ class TokenTest extends UnitTestCase {
     $this->assertEquals($expected, $result);
   }
 
-  public static function providerTestReplaceEscaping() {
+  public static function providerTestReplaceEscaping(): array {
     $data = [];
 
     // No tokens. The first argument to Token::replace() should not be escaped.
@@ -303,7 +293,11 @@ class TokenTest extends UnitTestCase {
     $data['html-in-string'] = ['<h1>Giraffe</h1>', [], '<h1>Giraffe</h1>'];
     $data['html-in-string-quote'] = ['<h1>Giraffe"</h1>', [], '<h1>Giraffe"</h1>'];
 
-    $data['simple-placeholder-with-plain-text'] = ['<h1>[token:meh]</h1>', ['[token:meh]' => 'Giraffe"'], '<h1>' . Html::escape('Giraffe"') . '</h1>'];
+    $data['simple-placeholder-with-plain-text'] = [
+      '<h1>[token:meh]</h1>',
+      ['[token:meh]' => 'Giraffe"'],
+      '<h1>' . Html::escape('Giraffe"') . '</h1>',
+    ];
 
     $data['simple-placeholder-with-safe-html'] = [
       '<h1>[token:meh]</h1>',
@@ -316,8 +310,6 @@ class TokenTest extends UnitTestCase {
 
   /**
    * Tests replace plain.
-   *
-   * @legacy-covers ::replacePlain
    */
   public function testReplacePlain(): void {
     $this->setupSiteTokens();

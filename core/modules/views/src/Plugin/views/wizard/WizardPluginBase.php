@@ -13,7 +13,6 @@ use Drupal\views\Views;
 use Drupal\views_ui\ViewUI;
 use Drupal\views\Plugin\views\display\DisplayPluginBase;
 use Drupal\views\Plugin\views\PluginBase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * @defgroup views_wizard_plugins Views wizard plugins
@@ -126,19 +125,6 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
    * @var \Drupal\Core\Menu\MenuParentFormSelectorInterface
    */
   protected $parentFormSelector;
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('entity_type.bundle.info'),
-      $container->get('menu.parent_form_selector')
-    );
-  }
 
   /**
    * Constructs a WizardPluginBase object.
@@ -588,7 +574,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
   protected function buildFormStyle(array &$form, FormStateInterface $form_state, $type) {
     $style_form = &$form['displays'][$type]['options']['style'];
     $style = $style_form['style_plugin']['#default_value'];
-    $style_plugin = Views::pluginManager('style')->createInstance($style);
+    $style_plugin = \Drupal::service('plugin.manager.views.style')->createInstance($style);
     if (isset($style_plugin) && $style_plugin->usesRowPlugin()) {
       $options = $this->rowStyleOptions();
       $style_form['row_plugin'] = [
@@ -769,7 +755,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
   protected function alterDisplayOptions(&$display_options, $form, FormStateInterface $form_state) {
     foreach ($display_options as $display_type => $options) {
       // Allow style plugins to hook in and provide some settings.
-      $style_plugin = Views::pluginManager('style')->createInstance($options['style']['type']);
+      $style_plugin = \Drupal::service('plugin.manager.views.style')->createInstance($options['style']['type']);
       $style_plugin->wizardSubmit($form, $form_state, $this, $display_options, $display_type);
     }
   }
@@ -963,7 +949,7 @@ abstract class WizardPluginBase extends PluginBase implements WizardInterface {
         $table_data = Views::viewsData()->get($table);
         // If the 'in' operator is being used, map the values to an array.
         $handler = $table_data[$bundle_key]['filter']['id'];
-        $handler_definition = Views::pluginManager('filter')
+        $handler_definition = \Drupal::service('plugin.manager.views.filter')
           ->getDefinition($handler);
         if ($handler == 'in_operator' || is_subclass_of($handler_definition['class'], 'Drupal\\views\\Plugin\\views\\filter\\InOperator')) {
           $value = [$type => $type];

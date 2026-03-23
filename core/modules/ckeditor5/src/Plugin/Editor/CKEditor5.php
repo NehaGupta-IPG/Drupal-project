@@ -28,7 +28,7 @@ use Drupal\editor\Entity\Editor as EditorEntity;
 use Drupal\editor\Plugin\EditorBase;
 use Drupal\filter\FilterFormatInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
@@ -137,7 +137,20 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
    * @param \Drupal\ckeditor5\LanguageMapper $languageMapper
    *   The ckeditor language mapper.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, CKEditor5PluginManagerInterface $ckeditor5_plugin_manager, LanguageManagerInterface $language_manager, ModuleHandlerInterface $module_handler, SmartDefaultSettings $smart_default_settings, CacheBackendInterface $cache, LoggerInterface $logger, LanguageMapper $languageMapper) {
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    CKEditor5PluginManagerInterface $ckeditor5_plugin_manager,
+    LanguageManagerInterface $language_manager,
+    ModuleHandlerInterface $module_handler,
+    SmartDefaultSettings $smart_default_settings,
+    #[Autowire(service: 'cache.default')]
+    CacheBackendInterface $cache,
+    #[Autowire(service: 'logger.channel.ckeditor5')]
+    LoggerInterface $logger,
+    LanguageMapper $languageMapper,
+  ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->ckeditor5PluginManager = $ckeditor5_plugin_manager;
     $this->languageManager = $language_manager;
@@ -145,29 +158,7 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
     $this->smartDefaultSettings = $smart_default_settings;
     $this->cache = $cache;
     $this->logger = $logger;
-    if (!$languageMapper) {
-      @trigger_error('Calling ' . __METHOD__ . ' without the $languageMapper argument is deprecated in drupal:11.3.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/node/3551652', E_USER_DEPRECATED);
-      $languageMapper = \Drupal::service(LanguageMapper::class);
-    }
     $this->languageMapper = $languageMapper;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('plugin.manager.ckeditor5.plugin'),
-      $container->get('language_manager'),
-      $container->get('module_handler'),
-      $container->get('ckeditor5.smart_default_settings'),
-      $container->get('cache.default'),
-      $container->get('logger.channel.ckeditor5'),
-      $container->get(LanguageMapper::class)
-    );
   }
 
   /**

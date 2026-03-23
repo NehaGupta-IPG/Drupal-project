@@ -166,7 +166,7 @@ class BlockHooks {
     $profile = \Drupal::installProfile();
     if (in_array($profile, $modules, TRUE)) {
       foreach (\Drupal::service('theme_handler')->listInfo() as $theme => $data) {
-        block_theme_initialize($theme);
+        $this->themeInitialize($theme);
       }
     }
   }
@@ -198,7 +198,7 @@ class BlockHooks {
     foreach ($theme_list as $theme) {
       // Don't initialize themes that are not displayed in the UI.
       if (\Drupal::service('theme_handler')->hasUi($theme)) {
-        block_theme_initialize($theme);
+        $this->themeInitialize($theme);
       }
     }
   }
@@ -217,7 +217,11 @@ class BlockHooks {
           // Disable blocks in invalid regions.
           if (!isset($regions[$block->getRegion()])) {
             if ($block->status()) {
-              \Drupal::messenger()->addWarning($this->t('The block %info was assigned to the invalid region %region and has been disabled.', ['%info' => $block_id, '%region' => $block->getRegion()]));
+              \Drupal::messenger()
+                ->addWarning($this->t('The block %info was assigned to the invalid region %region and has been disabled.', [
+                  '%info' => $block_id,
+                  '%region' => $block->getRegion(),
+                ]));
             }
             $block->setRegion(system_default_region($theme))->disable()->save();
           }
@@ -297,6 +301,47 @@ class BlockHooks {
         ],
       ],
     ];
+  }
+
+  /**
+   * Assigns an initial, default set of blocks for a theme.
+   *
+   * This function is called the first time a new theme is installed. The new
+   * theme gets a copy of the default theme's blocks, with the difference that
+   * if a particular region isn't available in the new theme, the block is
+   * assigned to the new theme's default region.
+   *
+   * @param string $theme
+   *   The name of a theme.
+   */
+  protected function themeInitialize(string $theme): void {
+    $storage = \Drupal::entityTypeManager()->getStorage('block');
+
+    // Initialize theme's blocks if none already registered.
+    $has_blocks = $storage->loadByProperties(['theme' => $theme]);
+    if (!$has_blocks) {
+      $default_theme = \Drupal::configFactory()->get('system.theme')->get('default');
+      // Apply only to new theme's visible regions.
+      $regions = system_region_list($theme, REGIONS_VISIBLE);
+      $default_theme_blocks = $storage->loadByProperties(['theme' => $default_theme]);
+      $block_repository = \Drupal::service('block.repository');
+      foreach ($default_theme_blocks as $default_theme_block_id => $default_theme_block) {
+        if (str_starts_with($default_theme_block_id, $default_theme . '_')) {
+          $id = str_replace($default_theme . '_', '', $default_theme_block_id);
+        }
+        else {
+          $id = $default_theme_block_id;
+        }
+        $id = $block_repository->getUniqueMachineName($id, $theme);
+        $block = $default_theme_block->createDuplicateBlock($id, $theme);
+        // If the region isn't supported by the theme, assign the block to the
+        // theme's default region.
+        if (!isset($regions[$block->getRegion()])) {
+          $block->setRegion(system_default_region($theme));
+        }
+        $block->save();
+      }
+    }
   }
 
 }

@@ -20,7 +20,7 @@ class ContextTest extends TestCase {
   /**
    * Data provider for testGetContextValue.
    */
-  public static function providerGetContextValue() {
+  public static function providerGetContextValue(): array {
     return [
       ['context_value', 'context_value', FALSE, 'data_type'],
       [NULL, NULL, FALSE, 'data_type'],
@@ -29,7 +29,7 @@ class ContextTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::getContextValue
+   * Tests get context value.
    */
   #[DataProvider('providerGetContextValue')]
   public function testGetContextValue($expected, $context_value, $is_required, $data_type): void {
@@ -46,6 +46,9 @@ class ContextTest extends TestCase {
       $ref_context_value = new \ReflectionProperty($mock_context, 'contextValue');
       // Set contextValue to a testable state.
       $ref_context_value->setValue($mock_context, $context_value);
+      // Set expectation for getContextDefinition().
+      $mock_context->expects($this->never())
+        ->method('getContextDefinition');
       // Exercise getContextValue().
       $this->assertEquals($context_value, $mock_context->getContextValue());
     }
@@ -86,7 +89,7 @@ class ContextTest extends TestCase {
   /**
    * Data provider for testHasContextValue.
    */
-  public static function providerHasContextValue() {
+  public static function providerHasContextValue(): array {
     return [
       [TRUE, FALSE],
       [TRUE, 0],
@@ -101,7 +104,7 @@ class ContextTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::hasContextValue
+   * Tests has context value.
    */
   #[DataProvider('providerHasContextValue')]
   public function testHasContextValue($has_context_value, $default_value): void {

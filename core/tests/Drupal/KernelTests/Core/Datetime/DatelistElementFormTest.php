@@ -31,7 +31,7 @@ class DatelistElementFormTest extends KernelTestBase implements FormInterface, T
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'test_datelist_element';
   }
 
@@ -58,7 +58,7 @@ class DatelistElementFormTest extends KernelTestBase implements FormInterface, T
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, string $date_callback = 'datelistDateCallbackTrusted') {
+  public function buildForm(array $form, FormStateInterface $form_state, string $date_callback = 'datelistDateCallbackTrusted'): array {
 
     $form['datelist_element'] = [
       '#title' => 'datelist test',
@@ -126,9 +126,26 @@ class DatelistElementFormTest extends KernelTestBase implements FormInterface, T
   }
 
   /**
+   * Tests proper timezone handling of the Datelist element.
+   */
+  public function testTimezoneHandling(): void {
+    // Render the form once with the site's timezone.
+    $form = \Drupal::formBuilder()->getForm($this);
+    $this->render($form);
+    $this->assertEquals('Australia/Sydney', $form['datelist_element']['#date_timezone']);
+
+    // Mimic a user with a different timezone than Australia/Sydney.
+    date_default_timezone_set('UTC');
+
+    $form = \Drupal::formBuilder()->getForm($this);
+    $this->render($form);
+    $this->assertEquals('UTC', $form['datelist_element']['#date_timezone']);
+  }
+
+  /**
    * {@inheritdoc}
    */
-  public static function trustedCallbacks() {
+  public static function trustedCallbacks(): array {
     return [
       'datelistDateCallbackTrusted',
     ];

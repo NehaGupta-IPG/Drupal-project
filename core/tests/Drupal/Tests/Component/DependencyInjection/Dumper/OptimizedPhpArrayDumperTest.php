@@ -6,7 +6,6 @@ namespace Drupal\Tests\Component\DependencyInjection\Dumper;
 
 use Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper;
 use Drupal\Component\Utility\Crypt;
-use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -31,7 +30,6 @@ use Symfony\Component\ExpressionLanguage\Expression;
 #[Group('DependencyInjection')]
 class OptimizedPhpArrayDumperTest extends TestCase {
 
-  use ExpectDeprecationTrait;
   use ProphecyTrait;
 
   /**
@@ -107,8 +105,6 @@ class OptimizedPhpArrayDumperTest extends TestCase {
 
   /**
    * Tests that alias processing works properly.
-   *
-   * @legacy-covers ::getAliases
    */
   #[DataProvider('getAliasesDataProvider')]
   public function testGetAliases($aliases, $definition_aliases): void {
@@ -125,7 +121,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
    *     - aliases as returned by ContainerBuilder.
    *     - aliases as expected in the container definition.
    */
-  public static function getAliasesDataProvider() {
+  public static function getAliasesDataProvider(): array {
     return [
       [[], []],
       [
@@ -169,7 +165,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
    *     - parameters as expected in the container definition.
    *     - frozen value
    */
-  public static function getParametersDataProvider() {
+  public static function getParametersDataProvider(): array {
     return [
       [[], [], TRUE],
       [
@@ -471,7 +467,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
    *
    * Used to override serialization.
    */
-  protected static function serializeDefinition(array $service_definition) {
+  protected static function serializeDefinition(array $service_definition): string|array {
     return serialize($service_definition);
   }
 
@@ -547,7 +543,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
     $this->assertEquals(static::serializeDefinition($data), $dump['services']['foo'], 'Expected definition matches dump.');
   }
 
-  public static function publicPrivateDataProvider() {
+  public static function publicPrivateDataProvider(): array {
     return [
       [TRUE],
       [FALSE],
@@ -559,8 +555,6 @@ class OptimizedPhpArrayDumperTest extends TestCase {
    *
    * Tests that the correct InvalidArgumentException is thrown for
    * getDecoratedService().
-   *
-   * @legacy-covers ::getServiceDefinition
    */
   public function testGetServiceDefinitionForDecoratedService(): void {
     $bar_definition = new Definition('\stdClass');
@@ -657,7 +651,7 @@ class OptimizedPhpArrayDumperTest extends TestCase {
    *     - expected final value.
    *     - escaped value in service definition.
    */
-  public static function percentsEscapeProvider() {
+  public static function percentsEscapeProvider(): array {
     return [
       ['%foo%', '%%foo%%'],
       ['foo%bar%', 'foo%%bar%%'],

@@ -15,8 +15,8 @@ use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\StorageComparer;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Database\Database;
-use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
+use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Form\FormState;
@@ -32,12 +32,13 @@ use Drupal\Core\Recipe\RecipeRunner;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\StringTranslation\Translator\FileTranslation;
 use Drupal\Core\StackMiddleware\ReverseProxyMiddleware;
-use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Url;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Core\Routing\RouteObjectInterface;
+use Drupal\locale\LocaleDefaultOptions;
+use Drupal\locale\LocaleFetch;
 use Psr\Http\Client\ClientExceptionInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
@@ -392,18 +393,27 @@ function install_begin_request($class_loader, &$install_state): void {
   // settings will be checked by \Drupal\system\Install\SystemRequirements.
   $install_state['settings_verified'] = $install_state['config_verified'] && $install_state['database_verified'] && (bool) Settings::get('hash_salt', FALSE);
 
+  // Query the database directly for the install_task state entry. This tells us
+  // whether a previous install request made progress, so we know whether to use
+  // the full service container (NormalInstallerServiceProvider) or the minimal
+  // one (InstallerServiceProvider).
   if ($install_state['settings_verified']) {
     try {
-      $system_schema = system_schema();
-      $table = array_key_last($system_schema);
-      $install_state['base_system_verified'] = Database::getConnection()->schema()->tableExists($table);
+      $result = Database::getConnection()
+        ->query("SELECT [value] FROM {key_value} WHERE [collection] = :collection AND [name] = :name", [
+          ':collection' => 'state',
+          ':name' => 'install_task',
+        ])
+        ->fetchField();
+      if ($result !== FALSE) {
+        $install_state['base_system_verified'] = TRUE;
+        $install_state['completed_task'] = unserialize($result);
+      }
     }
-    catch (DatabaseExceptionWrapper) {
-      // The last defined table of the base system_schema() does not exist yet.
+    catch (\Exception) {
+      // Database not set up yet, or key_value table doesn't exist.
       // $install_state['base_system_verified'] defaults to FALSE, so the code
       // following below will use the minimal installer service container.
-      // As soon as the base system is verified here, the installer operates in
-      // a full and regular Drupal environment, without any kind of exceptions.
     }
   }
 
@@ -423,6 +433,12 @@ function install_begin_request($class_loader, &$install_state): void {
   // already initialized.
   $kernel = new InstallerKernel($environment, $class_loader, FALSE);
   $kernel::bootEnvironment();
+
+  // Add list of all available profiles to the installation state.
+  $listing = new ExtensionDiscovery($kernel->getAppRoot(), FALSE);
+  $listing->setProfileDirectories([]);
+  $install_state['profiles'] += $listing->scan('profile');
+
   $kernel->setSitePath($site_path);
   $kernel->boot();
   // Get the new version of the container from the kernel. This is now a
@@ -443,11 +459,6 @@ function install_begin_request($class_loader, &$install_state): void {
   $container->set('string_translator.file_translation', new FileTranslation($directory, $file_system));
   $container->get('string_translation')
     ->addTranslator($container->get('string_translator.file_translation'));
-
-  // Add list of all available profiles to the installation state.
-  $listing = new ExtensionDiscovery($container->getParameter('app.root'));
-  $listing->setProfileDirectories([]);
-  $install_state['profiles'] += $listing->scan('profile');
 
   /** @var \Drupal\Core\Extension\ModuleExtensionList $module_list */
   $module_list = \Drupal::service('extension.list.module');
@@ -517,7 +528,18 @@ function install_begin_request($class_loader, &$install_state): void {
     install_verify_database_ready();
   }
   // Verify the last completed task in the database, if there is one.
-  $task = install_verify_completed_task();
+  if ($install_state['base_system_verified']) {
+    // We already queried for install_task before kernel boot. Use the value
+    // we found, but still check for the 'done' state which means Drupal is
+    // already fully installed.
+    $task = $install_state['completed_task'];
+    if ($task === 'done') {
+      throw new AlreadyInstalledException($container->get('string_translation'));
+    }
+  }
+  else {
+    $task = install_verify_completed_task();
+  }
 
   // Ensure that the active configuration is empty before installation starts.
   if ($install_state['config_verified'] && empty($task)) {
@@ -1167,17 +1189,13 @@ function install_verify_database_settings($site_path) {
  * Verify that the database is ready (no existing Drupal installation).
  *
  * @throws \Drupal\Core\Installer\Exception\AlreadyInstalledException
- *   Thrown when the database already has a table that would be created by
- *   installing the System module.
+ *   Thrown when the database already has a Drupal key_value table.
  */
 function install_verify_database_ready(): void {
-  $system_schema = system_schema();
-  $table = array_key_last($system_schema);
-
   $existing_install = FALSE;
   if (Database::getConnectionInfo()) {
     try {
-      $existing_install = Database::getConnection()->schema()->tableExists($table);
+      $existing_install = Database::getConnection()->schema()->tableExists('key_value');
     }
     // Do not trigger an error if the database query fails, since the database
     // might not be set up yet.
@@ -1761,9 +1779,6 @@ function install_download_additional_translations_operations(&$install_state): a
  *   The batch definition, if there are language files to import.
  */
 function install_import_translations(&$install_state) {
-  $module_handler = \Drupal::moduleHandler();
-  $module_handler->loadInclude('locale', 'inc', 'locale.translation');
-
   // If there is more than one language or the single one is not English, we
   // should import translations.
   $batch_builder = (new BatchBuilder())
@@ -1793,7 +1808,6 @@ function install_import_translations(&$install_state) {
       );
     }
 
-    $module_handler->loadInclude('locale', 'inc', 'locale.fetch');
     $batch_builder
       ->setTitle(t('Updating translations.'))
       ->setProgressMessage('')
@@ -1842,9 +1856,6 @@ function _install_prepare_import($langcodes, $server_pattern): void {
           ];
           \Drupal::service('locale.project')->set($data['name'], $data);
           $module_handler->loadInclude('locale', 'inc', 'locale.compare');
-          // Reset project information static cache so that it uses the data
-          // set above.
-          locale_translation_clear_cache_projects();
           locale_translation_check_projects_local(['drupal'], [$langcode]);
         }
       }
@@ -1876,8 +1887,8 @@ function install_finish_translations(&$install_state): array {
   $languages = \Drupal::languageManager()->getLanguages();
   $batches = [];
   if (count($projects) > 1) {
-    $options = _locale_translation_default_update_options();
-    if ($batch = locale_translation_batch_update_build([], array_keys($languages), $options)) {
+    $options = LocaleDefaultOptions::updateOptions();
+    if ($batch = \Drupal::service(LocaleFetch::class)->batchUpdateBuild([], array_keys($languages), $options)) {
       $batches[] = $batch;
     }
   }
