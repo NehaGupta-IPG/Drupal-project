@@ -38,7 +38,7 @@ use Drupal\Core\Database\TransactionOutOfOrderException;
  * is active, and mysqli does not fail when rolling back and no transaction
  * active.
  */
-class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
+abstract class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
 
   /**
    * Keeps track of the post-transaction callback action executed.
@@ -111,7 +111,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * @param bool $ddl_statement
    *   Whether to execute a DDL statement during the inner transaction.
    */
-  protected function transactionOuterLayer($suffix, $rollback = FALSE, $ddl_statement = FALSE) {
+  protected function transactionOuterLayer(string $suffix, $rollback = FALSE, $ddl_statement = FALSE) {
     $depth = $this->connection->transactionManager()->stackDepth();
     $txn = $this->connection->startTransaction();
 
@@ -152,7 +152,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * @param bool $ddl_statement
    *   Whether to execute a DDL statement during the transaction.
    */
-  protected function transactionInnerLayer($suffix, $rollback = FALSE, $ddl_statement = FALSE) {
+  protected function transactionInnerLayer(string $suffix, $rollback = FALSE, $ddl_statement = FALSE) {
     $depth = $this->connection->transactionManager()->stackDepth();
     // Start a transaction. If we're being called from ->transactionOuterLayer,
     // then we're already in a transaction. Normally, that would make starting
@@ -520,7 +520,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * @internal
    */
   public function assertRowPresent(string $name, ?string $message = NULL): void {
-    $present = (boolean) $this->connection->query('SELECT 1 FROM {test} WHERE [name] = :name', [':name' => $name])->fetchField();
+    $present = (bool) $this->connection->query('SELECT 1 FROM {test} WHERE [name] = :name', [':name' => $name])->fetchField();
     $this->assertTrue($present, $message ?? "Row '{$name}' should be present, but it actually does not exist.");
   }
 
@@ -535,7 +535,7 @@ class DriverSpecificTransactionTestBase extends DriverSpecificDatabaseTestBase {
    * @internal
    */
   public function assertRowAbsent(string $name, ?string $message = NULL): void {
-    $present = (boolean) $this->connection->query('SELECT 1 FROM {test} WHERE [name] = :name', [':name' => $name])->fetchField();
+    $present = (bool) $this->connection->query('SELECT 1 FROM {test} WHERE [name] = :name', [':name' => $name])->fetchField();
     $this->assertFalse($present, $message ?? "Row '{$name}' should be absent, but it actually exists.");
   }
 

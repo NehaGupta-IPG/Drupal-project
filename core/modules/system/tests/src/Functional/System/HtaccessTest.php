@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\System;
 
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests .htaccess is working correctly.
- *
- * @group system
  */
+#[Group('system')]
+#[RunTestsInSeparateProcesses]
 class HtaccessTest extends BrowserTestBase {
 
   /**
@@ -39,7 +41,6 @@ class HtaccessTest extends BrowserTestBase {
       'engine',
       'inc',
       'install',
-      'less',
       'make',
       'module',
       'module~',
@@ -48,8 +49,6 @@ class HtaccessTest extends BrowserTestBase {
       'module.save',
       'module.swo',
       'module.swp',
-      'pcss',
-      'pcss.css',
       'php~',
       'php.bak',
       'php.orig',
@@ -58,8 +57,6 @@ class HtaccessTest extends BrowserTestBase {
       'php.swp',
       'profile',
       'po',
-      'sass',
-      'scss',
       'sh',
       'sql',
       'theme',

@@ -6,48 +6,8 @@
 
 use Drupal\Core\Database\Query\AlterableInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\field\FieldStorageConfigInterface;
-use Drupal\views\ViewExecutable;
 use Drupal\views\Entity\View;
 use Drupal\views\Views;
-
-/**
- * Allows view-based node templates if called from a view.
- *
- * The 'modules/node.views.inc' file is a better place for this, but
- * we haven't got a chance to load that file before Drupal builds the
- * node portion of the theme registry.
- */
-function views_preprocess_node(&$variables): void {
-  // The 'view' attribute of the node is added in
-  // \Drupal\views\Plugin\views\row\EntityRow::preRender().
-  if (!empty($variables['node']->view) && $variables['node']->view->storage->id()) {
-    $variables['view'] = $variables['node']->view;
-
-    // The view variable is deprecated.
-    $variables['deprecations']['view'] = "'view' is deprecated in drupal:11.1.0 and is removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3459903";
-
-    // If a node is being rendered in a view, and the view does not have a path,
-    // prevent drupal from accidentally setting the $page variable:
-    if (!empty($variables['view']->current_display)
-        && $variables['page']
-        && $variables['view_mode'] == 'full'
-        && !$variables['view']->display_handler->hasPath()) {
-      $variables['page'] = FALSE;
-    }
-  }
-}
-
-/**
- * Allows view-based comment templates if called from a view.
- */
-function views_preprocess_comment(&$variables): void {
-  // The view data is added to the comment in
-  // \Drupal\views\Plugin\views\row\EntityRow::preRender().
-  if (!empty($variables['comment']->view) && $variables['comment']->view->storage->id()) {
-    $variables['view'] = $variables['comment']->view;
-  }
-}
 
 /**
  * Adds contextual links associated with a view display to a renderable array.
@@ -112,7 +72,7 @@ function views_preprocess_comment(&$variables): void {
  *     - #view_display_plugin_id: The plugin ID of the display.
  *
  * @see \Drupal\views\Plugin\Block\ViewsBlock::addContextualLinks()
- * @see template_preprocess_views_view()
+ * @see \Drupal\views\Hook\ViewsThemeHooks::preprocessViewsView()
  */
 function views_add_contextual_links(&$render_element, $location, $display_id, ?array $view_element = NULL): void {
   if (!isset($view_element)) {
@@ -129,7 +89,7 @@ function views_add_contextual_links(&$render_element, $location, $display_id, ?a
     // Also do not do anything if the display plugin has not defined any
     // contextual links that are intended to be displayed in the requested
     // location.
-    $plugin = Views::pluginManager('display')->getDefinition($display_plugin_id);
+    $plugin = \Drupal::service('plugin.manager.views.display')->getDefinition($display_plugin_id);
     // If contextual_links_locations are not set, provide a sane default. (To
     // avoid displaying any contextual links at all, a display plugin can still
     // set 'contextual_links_locations' to, e.g., {""}.)
@@ -243,49 +203,6 @@ function &views_set_current_view($view = NULL) {
  */
 function &views_get_current_view() {
   return views_set_current_view();
-}
-
-/**
- * Implements hook_hook_info().
- */
-function views_hook_info(): array {
-  $hooks = [];
-
-  $hooks += array_fill_keys([
-    'views_data',
-    'views_data_alter',
-    'views_analyze',
-    'views_invalidate_cache',
-  ], ['group' => 'views']);
-
-  // Register a views_plugins alter hook for all plugin types.
-  foreach (ViewExecutable::getPluginTypes() as $type) {
-    $hooks['views_plugins_' . $type . '_alter'] = [
-      'group' => 'views',
-    ];
-  }
-
-  $hooks += array_fill_keys([
-    'views_query_substitutions',
-    'views_form_substitutions',
-    'views_pre_view',
-    'views_pre_build',
-    'views_post_build',
-    'views_pre_execute',
-    'views_post_execute',
-    'views_pre_render',
-    'views_post_render',
-    'views_query_alter',
-  ], ['group' => 'views_execution']);
-
-  $hooks['field_views_data'] = [
-    'group' => 'views',
-  ];
-  $hooks['field_views_data_alter'] = [
-    'group' => 'views',
-  ];
-
-  return $hooks;
 }
 
 /**
@@ -460,57 +377,4 @@ function views_element_validate_tags($element, FormStateInterface $form_state): 
       return;
     }
   }
-}
-
-/**
- * Determines whether the entity type the field appears in is SQL based.
- *
- * @param \Drupal\field\FieldStorageConfigInterface $field_storage
- *   The field storage definition.
- *
- * @return \Drupal\Core\Entity\Sql\SqlContentEntityStorage
- *   Returns the entity type storage if supported.
- *
- * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
- * \Drupal::service('views.field_data_provider')
- * ->getSqlStorageForField($field_storage); instead.
- * @see https://www.drupal.org/node/3489502
- */
-function _views_field_get_entity_type_storage(FieldStorageConfigInterface $field_storage) {
-  @trigger_error('_views_field_get_entity_type_storage() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal::service(\'views.field_data_provider\')->getSqlStorageForField($field_storage). See https://www.drupal.org/node/3489502', E_USER_DEPRECATED);
-  return \Drupal::service('views.field_data_provider')->getSqlStorageForField($field_storage);
-}
-
-/**
- * Default views data implementation for a field.
- *
- * @param \Drupal\field\FieldStorageConfigInterface $field_storage
- *   The field definition.
- *
- * @return array
- *   The default views data for the field.
- *
- * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
- * \Drupal::service('views.field_data_provider')
- * ->defaultFieldImplementation($field_storage); instead.
- * @see https://www.drupal.org/node/3489502
- */
-function views_field_default_views_data(FieldStorageConfigInterface $field_storage) {
-  @trigger_error('views_field_default_views_data() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal::service(\'views.field_data_provider\')->defaultFieldImplementation($field_storage). See https://www.drupal.org/node/3489502', E_USER_DEPRECATED);
-  return \Drupal::service('views.field_data_provider')->defaultFieldImplementation($field_storage);
-}
-
-/**
- * Returns the label of a certain field.
- *
- * Therefore it looks up in all bundles to find the most used field.
- *
- * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use
- *   \Drupal::service('entity_field.manager')->getFieldLabels() instead.
- *
- * @see https://www.drupal.org/node/3489411
- */
-function views_entity_field_label($entity_type, $field_name) {
-  @trigger_error("views_entity_field_label() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal::service('entity_field.manager')->getFieldLabels(). See https://www.drupal.org/node/3489411", E_USER_DEPRECATED);
-  return \Drupal::service('entity_field.manager')->getFieldLabels($entity_type, $field_name);
 }

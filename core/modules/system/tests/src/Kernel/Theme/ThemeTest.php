@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Kernel\Theme;
 
-use Drupal\KernelTests\KernelTestBase;
 use Drupal\Component\Render\MarkupInterface;
+use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests low-level theme functions.
- *
- * @group Theme
  */
+#[Group('Theme')]
+#[RunTestsInSeparateProcesses]
 class ThemeTest extends KernelTestBase {
 
   /**
@@ -34,7 +36,7 @@ class ThemeTest extends KernelTestBase {
    * must ensure the attributes at different occasions are all merged correctly:
    *   - $variables['attributes'] as passed in to the theme hook implementation.
    *   - the render element's #attributes
-   *   - any attributes set in the template's preprocessing function
+   *   - any attributes set in the template's preprocessing function.
    */
   public function testAttributeMerging(): void {
     $theme_test_render_element = [
@@ -120,9 +122,6 @@ class ThemeTest extends KernelTestBase {
     $this->assertSame($base_theme_list, $themes['test_subtheme']->base_themes, 'Subtheme\'s object includes list of base themes.');
     // Check for theme engine in subtheme.
     $this->assertSame('twig', $themes['test_subtheme']->engine, 'Subtheme\'s object includes the theme engine.');
-    // Check for theme engine prefix.
-    $this->assertSame('twig', $themes['test_base_theme']->prefix, 'Base theme\'s object includes the theme engine prefix.');
-    $this->assertSame('twig', $themes['test_subtheme']->prefix, 'Subtheme\'s object includes the theme engine prefix.');
   }
 
   /**

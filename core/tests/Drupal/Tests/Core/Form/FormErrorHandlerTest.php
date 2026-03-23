@@ -10,11 +10,14 @@ use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Tests\UnitTestCase;
 use Prophecy\Argument;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Form\FormErrorHandler
- * @group Form
+ * Tests Drupal\Core\Form\FormErrorHandler.
  */
+#[CoversClass(FormErrorHandler::class)]
+#[Group('Form')]
 class FormErrorHandlerTest extends UnitTestCase {
 
   /**
@@ -53,8 +56,10 @@ class FormErrorHandlerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::handleFormErrors
-   * @covers ::displayErrorMessages
+   * Tests display error messages.
+   *
+   * @legacy-covers ::handleFormErrors
+   * @legacy-covers ::displayErrorMessages
    */
   public function testDisplayErrorMessages(): void {
     $messages = [
@@ -132,8 +137,10 @@ class FormErrorHandlerTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::handleFormErrors
-   * @covers ::setElementErrorsFromFormState
+   * Tests set element errors from form state.
+   *
+   * @legacy-covers ::handleFormErrors
+   * @legacy-covers ::setElementErrorsFromFormState
    */
   public function testSetElementErrorsFromFormState(): void {
     $form = [

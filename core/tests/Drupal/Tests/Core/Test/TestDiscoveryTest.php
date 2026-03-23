@@ -10,6 +10,7 @@ use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\Extension;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Test\Exception\MissingGroupException;
+use Drupal\Core\Test\PhpUnitTestDiscovery;
 use Drupal\Core\Test\TestDiscovery;
 use Drupal\Tests\UnitTestCase;
 use org\bovigo\vfs\vfsStream;
@@ -17,25 +18,45 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * Unit tests for TestDiscovery.
  */
 #[CoversClass(TestDiscovery::class)]
 #[Group('Test')]
-#[IgnoreDeprecations]
 class TestDiscoveryTest extends UnitTestCase {
 
   /**
+   * Tests test info parser.
+   *
    * @legacy-covers ::getTestInfo
    */
   #[DataProvider('infoParserProvider')]
-  public function testTestInfoParser($expected, $classname, $doc_comment = NULL): void {
-    $info = TestDiscovery::getTestInfo($classname, $doc_comment);
-    $this->assertEquals($expected, $info);
+  #[RunInSeparateProcess]
+  #[IgnoreDeprecations]
+  public function testTestInfoParser(array $expected, $classname, $doc_comment = NULL): void {
+    try {
+      $info = TestDiscovery::getTestInfo($classname, $doc_comment);
+      $this->assertEquals($expected, $info);
+    }
+    catch (MissingGroupException) {
+      // In case the test class was converted to attributes already, we need to
+      // get the data from PHPUnit discovery instead.
+      $configurationFilePath = $this->root . \DIRECTORY_SEPARATOR . 'core';
+      $phpUnitTestDiscovery = PhpUnitTestDiscovery::instance()->setConfigurationFilePath($configurationFilePath);
+      $classes = $phpUnitTestDiscovery->getTestClasses(NULL, [$expected['type']]);
+      $info = $classes[$expected['group']][$classname];
+      // The 'file' and 'tests_count' keys are additional in PHPUnit, and the
+      // computed 'description' key may differ, but that's irrelevant. Remove
+      // the keys before comparison.
+      unset($info['file'], $info['tests_count'], $info['description'], $expected['description']);
+      $this->assertEquals($expected, $info);
+    }
   }
 
-  public static function infoParserProvider() {
+  public static function infoParserProvider(): array {
     // A module provided unit test.
     $tests[] = [
       // Expected result.
@@ -96,14 +117,14 @@ class TestDiscoveryTest extends UnitTestCase {
     $tests['phpunit-kernel'] = [
       // Expected result.
       [
-        'name' => '\Drupal\Tests\file\Kernel\FileItemValidationTest',
+        'name' => 'Drupal\Tests\file\Kernel\FileItemValidationTest',
         'group' => 'file',
         'groups' => ['file'],
         'description' => 'Tests that files referenced in file and image fields are always validated.',
         'type' => 'PHPUnit-Kernel',
       ],
       // Classname.
-      '\Drupal\Tests\file\Kernel\FileItemValidationTest',
+      'Drupal\Tests\file\Kernel\FileItemValidationTest',
     ];
 
     // Test with a different amount of leading spaces.
@@ -225,6 +246,7 @@ class TestDiscoveryTest extends UnitTestCase {
   /**
    * @legacy-covers ::getTestInfo
    */
+  #[IgnoreDeprecations]
   public function testTestInfoParserMissingGroup(): void {
     $classname = 'Drupal\KernelTests\field\BulkDeleteTest';
     $doc_comment = <<<EOT
@@ -240,6 +262,7 @@ EOT;
   /**
    * @legacy-covers ::getTestInfo
    */
+  #[IgnoreDeprecations]
   public function testTestInfoParserMissingSummary(): void {
     $classname = 'Drupal\KernelTests\field\BulkDeleteTest';
     $doc_comment = <<<EOT
@@ -284,13 +307,31 @@ EOF;
             'src' => [
               'Functional' => [
                 'FunctionalExampleTest.php' => $test_file,
-                'FunctionalExampleTest2.php' => str_replace(['FunctionalExampleTest', '@group example'], ['FunctionalExampleTest2', '@group example2'], $test_file),
+                'FunctionalExampleTest2.php' => str_replace([
+                  'FunctionalExampleTest',
+                  '@group example',
+                ], ['FunctionalExampleTest2', '@group example2'], $test_file),
               ],
               'Kernel' => [
-                'KernelExampleTest3.php' => str_replace(['FunctionalExampleTest', '@group example'], ['KernelExampleTest3', "@group example2\n * @group kernel\n"], $test_file),
-                'KernelExampleTestBase.php' => str_replace(['FunctionalExampleTest', '@group example'], ['KernelExampleTestBase', '@group example2'], $test_file),
-                'KernelExampleTrait.php' => str_replace(['FunctionalExampleTest', '@group example'], ['KernelExampleTrait', '@group example2'], $test_file),
-                'KernelExampleInterface.php' => str_replace(['FunctionalExampleTest', '@group example'], ['KernelExampleInterface', '@group example2'], $test_file),
+                'KernelExampleTest3.php' => str_replace([
+                  'FunctionalExampleTest',
+                  '@group example',
+                ], [
+                  'KernelExampleTest3',
+                  "@group example2\n * @group kernel\n",
+                ], $test_file),
+                'KernelExampleTestBase.php' => str_replace([
+                  'FunctionalExampleTest',
+                  '@group example',
+                ], ['KernelExampleTestBase', '@group example2'], $test_file),
+                'KernelExampleTrait.php' => str_replace([
+                  'FunctionalExampleTest',
+                  '@group example',
+                ], ['KernelExampleTrait', '@group example2'], $test_file),
+                'KernelExampleInterface.php' => str_replace([
+                  'FunctionalExampleTest',
+                  '@group example',
+                ], ['KernelExampleInterface', '@group example2'], $test_file),
               ],
             ],
           ],
@@ -305,7 +346,10 @@ EOF;
               'tests' => [
                 'src' => [
                   'Kernel' => [
-                    'KernelExampleTest4.php' => str_replace(['FunctionalExampleTest', '@group example'], ['KernelExampleTest4', '@group example3'], $test_file),
+                    'KernelExampleTest4.php' => str_replace([
+                      'FunctionalExampleTest',
+                      '@group example',
+                    ], ['KernelExampleTest4', '@group example3'], $test_file),
                   ],
                 ],
               ],
@@ -317,8 +361,9 @@ EOF;
   }
 
   /**
-   * @legacy-covers ::getTestClasses
+   * Tests get test classes.
    */
+  #[IgnoreDeprecations]
   public function testGetTestClasses(): void {
     $this->setupVfsWithTestClasses();
     $extensions = [
@@ -369,7 +414,7 @@ EOF;
   /**
    * Mock a TestDiscovery object to return specific extension values.
    */
-  protected function getTestDiscoveryMock($app_root, $extensions) {
+  protected function getTestDiscoveryMock($app_root, $extensions): MockObject {
     $class_loader = $this->prophesize(ClassLoader::class);
     $module_handler = $this->prophesize(ModuleHandlerInterface::class);
 
@@ -386,8 +431,9 @@ EOF;
   }
 
   /**
-   * @legacy-covers ::getTestClasses
+   * Tests get test classes with selected types.
    */
+  #[IgnoreDeprecations]
   public function testGetTestClassesWithSelectedTypes(): void {
     $this->setupVfsWithTestClasses();
     $extensions = [
@@ -433,6 +479,7 @@ EOF;
   /**
    * @legacy-covers ::getTestClasses
    */
+  #[IgnoreDeprecations]
   public function testGetTestsInProfiles(): void {
     $this->setupVfsWithTestClasses();
     $class_loader = $this->prophesize(ClassLoader::class);
@@ -460,20 +507,23 @@ EOF;
   }
 
   /**
-   * @legacy-covers ::getPhpunitTestSuite
+   * Tests get phpunit test suite.
    */
   #[DataProvider('providerTestGetPhpunitTestSuite')]
   public function testGetPhpunitTestSuite($classname, $expected): void {
     $this->assertEquals($expected, TestDiscovery::getPhpunitTestSuite($classname));
   }
 
-  public static function providerTestGetPhpunitTestSuite() {
+  public static function providerTestGetPhpunitTestSuite(): array {
     $data = [];
     $data['simpletest-web test'] = ['\Drupal\rest\Tests\NodeTest', FALSE];
     $data['module-unittest'] = [static::class, 'Unit'];
     $data['module-kernel test'] = ['\Drupal\KernelTests\Core\Theme\TwigMarkupInterfaceTest', 'Kernel'];
     $data['module-functional test'] = ['\Drupal\FunctionalTests\BrowserTestBaseTest', 'Functional'];
-    $data['module-functional javascript test'] = ['\Drupal\Tests\toolbar\FunctionalJavascript\ToolbarIntegrationTest', 'FunctionalJavascript'];
+    $data['module-functional javascript test'] = [
+      '\Drupal\Tests\toolbar\FunctionalJavascript\ToolbarIntegrationTest',
+      'FunctionalJavascript',
+    ];
     $data['core-unittest'] = ['\Drupal\Tests\ComposerIntegrationTest', 'Unit'];
     $data['core-unittest2'] = ['Drupal\Tests\Core\DrupalTest', 'Unit'];
     $data['core-script-test'] = ['Drupal\KernelTests\Scripts\TestSiteApplicationTest', 'Kernel'];
@@ -487,9 +537,8 @@ EOF;
 
   /**
    * Ensure that classes are not reflected when the docblock is empty.
-   *
-   * @legacy-covers ::getTestInfo
    */
+  #[IgnoreDeprecations]
   public function testGetTestInfoEmptyDocblock(): void {
     // If getTestInfo() performed reflection, it won't be able to find the
     // class we asked it to analyze, so it will throw a ReflectionException.
@@ -502,9 +551,8 @@ EOF;
 
   /**
    * Ensure TestDiscovery::scanDirectory() ignores certain abstract file types.
-   *
-   * @legacy-covers ::scanDirectory
    */
+  #[IgnoreDeprecations]
   public function testScanDirectoryNoAbstract(): void {
     $this->setupVfsWithTestClasses();
     $files = TestDiscovery::scanDirectory('Drupal\\Tests\\test_module\\Kernel\\', vfsStream::url('drupal/modules/test_module/tests/src/Kernel'));

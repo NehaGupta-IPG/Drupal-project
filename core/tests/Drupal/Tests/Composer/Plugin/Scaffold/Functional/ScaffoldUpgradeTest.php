@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Drupal\Tests\Composer\Plugin\Scaffold\Functional;
 
 use Composer\Util\Filesystem;
-use Drupal\Tests\Composer\Plugin\Scaffold\AssertUtilsTrait;
 use Drupal\Tests\Composer\Plugin\ExecTrait;
+use Drupal\Tests\Composer\Plugin\Scaffold\AssertUtilsTrait;
 use Drupal\Tests\Composer\Plugin\Scaffold\Fixtures;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -20,9 +21,9 @@ use PHPUnit\Framework\TestCase;
  * runtime errors. This test ensures that it is possible to upgrade from the
  * last available stable 8.8.x tag to the current Scaffold plugin code (e.g. in
  * the current patch-under-test).
- *
- * @group Scaffold
  */
+#[Group('Scaffold')]
+#[Group('#slow')]
 class ScaffoldUpgradeTest extends TestCase {
 
   use AssertUtilsTrait;
@@ -111,7 +112,7 @@ class ScaffoldUpgradeTest extends TestCase {
    * @return string
    *   Path to temporary git repository.
    */
-  protected function createTmpRepo($source, $destParent, $version): string {
+  protected function createTmpRepo(string $source, string $destParent, $version): string {
     $target = $destParent . '/' . basename($source);
     $filesystem = new Filesystem();
     $filesystem->copy($source, $target);

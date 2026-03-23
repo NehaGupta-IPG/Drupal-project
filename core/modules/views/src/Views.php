@@ -96,19 +96,36 @@ class Views {
    *
    * @return \Drupal\views\Plugin\ViewsPluginManager
    *   The Views plugin manager service.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   *   \Drupal::service('plugin.manager.views.{type}') for specific types or
+   *   \Drupal::service('views.plugin_managers')->get($type) for dynamic.
+   *
+   * @see https://www.drupal.org/node/3566982
    */
   public static function pluginManager($type) {
-    return \Drupal::service('plugin.manager.views.' . $type);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal::service(\'plugin.manager.views.{type}\') for specific plugin types or \Drupal::service(\'views.plugin_managers\')->get($type) for dynamic types. See https://www.drupal.org/node/3566982', E_USER_DEPRECATED);
+    return \Drupal::service('views.plugin_managers')->get($type);
   }
 
   /**
    * Returns the plugin manager for a certain views handler type.
    *
+   * @param string $type
+   *   The handler type, for example relationship, field, or filter.
+   *
    * @return \Drupal\views\Plugin\ViewsHandlerManager
    *   The Views plugin manager service.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   *   \Drupal::service('plugin.manager.views.{type}') for specific types or
+   *   \Drupal::service('views.plugin_managers')->get($type) for dynamic.
+   *
+   * @see https://www.drupal.org/node/3566982
    */
   public static function handlerManager($type) {
-    return \Drupal::service('plugin.manager.views.' . $type);
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use \Drupal::service(\'plugin.manager.views.{type}\') for specific handler types or \Drupal::service(\'views.plugin_managers\')->get($type) for dynamic types. See https://www.drupal.org/node/3566982', E_USER_DEPRECATED);
+    return \Drupal::service('views.plugin_managers')->get($type);
   }
 
   /**
@@ -144,7 +161,7 @@ class Views {
    *   If no plugins are found, an empty array is returned.
    */
   public static function fetchPluginNames($type, $key = NULL, array $base = []) {
-    $definitions = static::pluginManager($type)->getDefinitions();
+    $definitions = \Drupal::service('views.plugin_managers')->get($type)->getDefinitions();
     $plugins = [];
 
     foreach ($definitions as $id => $plugin) {
@@ -175,8 +192,9 @@ class Views {
    */
   public static function getPluginDefinitions() {
     $plugins = [];
+    $pluginManagers = \Drupal::service('views.plugin_managers');
     foreach (ViewExecutable::getPluginTypes() as $plugin_type) {
-      $plugins[$plugin_type] = static::pluginManager($plugin_type)->getDefinitions();
+      $plugins[$plugin_type] = $pluginManagers->get($plugin_type)->getDefinitions();
     }
 
     return $plugins;
@@ -212,7 +230,7 @@ class Views {
    */
   public static function getApplicableViews($type) {
     // Get all display plugins which provides the type.
-    $display_plugins = static::pluginManager('display')->getDefinitions();
+    $display_plugins = \Drupal::service('plugin.manager.views.display')->getDefinitions();
 
     $plugin_ids = [];
     foreach ($display_plugins as $id => $definition) {
@@ -349,10 +367,16 @@ class Views {
         foreach ($view->get('display') as $display_id => $display) {
           if (!($id == $exclude_view_name && $display_id == $exclude_view_display)) {
             if ($optgroup) {
-              $options[$id][$id . ':' . $display['id']] = t('@view : @display', ['@view' => $id, '@display' => $display['id']]);
+              $options[$id][$id . ':' . $display['id']] = t('@view : @display', [
+                '@view' => $id,
+                '@display' => $display['id'],
+              ]);
             }
             else {
-              $options[$id . ':' . $display['id']] = t('View: @view - Display: @display', ['@view' => $id, '@display' => $display['id']]);
+              $options[$id . ':' . $display['id']] = t('View: @view - Display: @display', [
+                '@view' => $id,
+                '@display' => $display['id'],
+              ]);
             }
           }
         }
@@ -436,13 +460,13 @@ class Views {
     if (!isset(static::$handlerTypes)) {
       static::$handlerTypes = [
         'field' => [
-          // Title
+          // Title.
           'title' => static::t('Fields'),
           // Lowercase title for mid-sentence.
           'ltitle' => static::t('fields'),
           // Singular title.
           'stitle' => static::t('Field'),
-          // Singular lowercase title for mid sentence
+          // Singular lowercase title for mid sentence.
           'lstitle' => static::t('field'),
           'plural' => 'fields',
         ],

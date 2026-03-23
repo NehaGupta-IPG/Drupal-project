@@ -5,14 +5,18 @@ declare(strict_types=1);
 namespace Drupal\KernelTests;
 
 use Drupal\Core\Database\Database;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @coversDefaultClass \Drupal\KernelTests\KernelTestBase
- *
- * @group PHPUnit
- * @group Test
- * @group KernelTests
+ * Tests Drupal\KernelTests\KernelTestBase.
  */
+#[CoversClass(KernelTestBase::class)]
+#[Group('PHPUnit')]
+#[Group('Test')]
+#[Group('KernelTests')]
+#[RunTestsInSeparateProcesses]
 class KernelTestBaseDatabaseDriverModuleTest extends KernelTestBase {
 
   /**
@@ -53,7 +57,9 @@ class KernelTestBaseDatabaseDriverModuleTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::bootEnvironment
+   * Tests database driver module enabled.
+   *
+   * @legacy-covers ::bootEnvironment
    */
   public function testDatabaseDriverModuleEnabled(): void {
     $driver = Database::getConnection()->driver();

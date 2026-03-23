@@ -5,23 +5,20 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Entity\Sql;
 
 use Drupal\Core\Database\Event\StatementEvent;
-use Drupal\Core\Entity\Sql\DefaultTableMapping;
 use Drupal\Core\Database\Log;
 use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\Sql\DefaultTableMapping;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that the deleteFromDedicatedTables() method only executes one DELETE query.
- *
- * @group Entity
  */
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class SqlContentEntityStorageTest extends KernelTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
 
   /**
    * Tests that only one SQL DELETE is executed on dedicated data tables.
@@ -102,10 +99,10 @@ class SqlContentEntityStorageTest extends KernelTestBase {
     $logger->end('default');
 
     // Filter queries to include only DELETE queries over each table.
-    $dedicatedTableDeleteQueries = array_filter($queries, static function ($query) {
+    $dedicatedTableDeleteQueries = array_filter($queries, static function (array $query): int|false {
       return preg_match('/^DELETE FROM ".*dedicated_table"/', $query['query']);
     });
-    $dedicatedRevisionTableDeleteQueries = array_filter($queries, static function ($query) {
+    $dedicatedRevisionTableDeleteQueries = array_filter($queries, static function (array $query): int|false {
       return preg_match('/^DELETE FROM ".*dedicated_revision_table"/', $query['query']);
     });
 

@@ -32,7 +32,6 @@ autop
 autoplace
 autoreply
 autosubmit
-avif
 backlink
 bakeware
 barchart
@@ -95,12 +94,10 @@ classmap
 classmaps
 classtype
 cldr
-clearfix
 closethick
 codesniffer
 colgroups
 colinodell
-colour
 colspans
 columnschange
 comida
@@ -113,7 +110,6 @@ controlgroup
 conv
 createrole
 createuser
-crema
 crossout
 crème
 csrftoken
@@ -139,7 +135,6 @@ desaturated
 desaturates
 desaturating
 destructable
-devel
 deviantart
 dflt
 dialogsave
@@ -190,7 +185,6 @@ fieldgroups
 fieldnames
 fieldsets
 filemime
-filetransfer
 findwith
 flickr
 flipfit
@@ -206,7 +200,6 @@ français
 fraîche
 frontpage
 fudgy
-fulltext
 gabilondo
 gids
 gloop
@@ -232,10 +225,8 @@ idekey
 iframeupload
 imageavif
 imagecache
-indexname
 inglés
 inited
-inlines
 inno
 instantiator
 interruptible
@@ -248,7 +239,6 @@ jessebeach
 jqueryui
 jsonlint
 justinrainbow
-keyevent
 keypresses
 kinberg
 kolkata
@@ -273,7 +263,6 @@ longblob
 longerthan
 longtext
 lrdd
-lspeak
 lstitle
 ltitle
 lzma
@@ -321,7 +310,6 @@ newcol
 newwin
 nids
 nightwatch
-nikic
 nntp
 nocase
 nodir
@@ -337,7 +325,6 @@ notsimpletest
 nourriture
 nplurals
 ntfs
-nyholm
 oembed
 onecol
 oneplusfourgrid
@@ -349,7 +336,6 @@ outdent
 overrider
 overrider's
 overriders
-pagecache
 paramconverter
 parseable
 parsererror
@@ -368,12 +354,9 @@ pickable
 pingback
 placeholdered
 placeholdering
-playsinline
 plusthick
 porterstemmer
-postcondition
 postorder
-precache
 preconfigured
 predelete
 prefixsqlite
@@ -384,7 +367,6 @@ prepopulates
 prepopulating
 prepopulation
 prerendered
-presave
 preuninstall
 prewarmable
 prewarmer
@@ -413,20 +395,20 @@ refinable
 reindexing
 renderables
 replyto
-resave
 resaved
 resaving
 restrictor
 restripe
 restriped
 restui
+reswap
+retarget
 revisionable
 revisioned
 revisionid
 revisioning
 rowspans
 rtsp
-ruleset
 sameorigin
 sandboxed
 sandboxing
@@ -436,7 +418,6 @@ schemaapi
 schemeless
 scorewords
 scriptable
-scrollbars
 seld
 selectbox
 sess
@@ -444,14 +425,12 @@ settingstray
 shorterthan
 shortlink
 singlebyte
-sirbrillig
 sitewide
 slatkin
 smacss
 smalldatetime
 smtps
-splitbutton
-splitbuttons
+spaze
 squaresmall
 squiz
 squizlabs
@@ -550,6 +529,7 @@ trgm
 truecolor
 twistie
 twocol
+ufffd
 uids
 unban
 uncacheable
@@ -575,7 +555,6 @@ upcasted
 upcasting
 updateprogress
 uploadprogress
-upscaling
 urandom
 userinfo
 versionable
@@ -587,7 +566,6 @@ webcal
 webflo
 webhosting
 webmention
-webmozart
 webroot
 webservers
 widthx

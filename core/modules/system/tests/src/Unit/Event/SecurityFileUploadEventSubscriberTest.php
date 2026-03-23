@@ -7,13 +7,15 @@ namespace Drupal\Tests\system\Unit\Event;
 use Drupal\Core\File\Event\FileUploadSanitizeNameEvent;
 use Drupal\system\EventSubscriber\SecurityFileUploadEventSubscriber;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * SecurityFileUploadEventSubscriber tests.
- *
- * @group system
- * @coversDefaultClass \Drupal\system\EventSubscriber\SecurityFileUploadEventSubscriber
  */
+#[CoversClass(SecurityFileUploadEventSubscriber::class)]
+#[Group('system')]
 class SecurityFileUploadEventSubscriberTest extends UnitTestCase {
 
   /**
@@ -27,11 +29,8 @@ class SecurityFileUploadEventSubscriberTest extends UnitTestCase {
    *   The expected filename if 'allow_insecure_uploads' is set to FALSE.
    * @param string|null $expected_filename_with_insecure_uploads
    *   The expected filename if 'allow_insecure_uploads' is set to TRUE.
-   *
-   * @dataProvider provideFilenames
-   *
-   * @covers ::sanitizeName
    */
+  #[DataProvider('provideFilenames')]
   public function testSanitizeName(string $filename, string $allowed_extensions, string $expected_filename, ?string $expected_filename_with_insecure_uploads = NULL): void {
     // Configure insecure uploads to be renamed.
     $config_factory = $this->getConfigFactoryStub([
@@ -106,11 +105,8 @@ class SecurityFileUploadEventSubscriberTest extends UnitTestCase {
    *   The original filename.
    * @param string $allowed_extensions
    *   The allowed extensions.
-   *
-   * @dataProvider provideFilenamesNoMunge
-   *
-   * @covers ::sanitizeName
    */
+  #[DataProvider('provideFilenamesNoMunge')]
   public function testSanitizeNameNoMunge(string $filename, string $allowed_extensions): void {
     $config_factory = $this->getConfigFactoryStub([
       'system.file' => [
