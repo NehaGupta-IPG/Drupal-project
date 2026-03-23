@@ -20,27 +20,6 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 class UserPermissionsForm extends FormBase {
 
   /**
-   * The permission handler.
-   *
-   * @var \Drupal\user\PermissionHandlerInterface
-   */
-  protected $permissionHandler;
-
-  /**
-   * The role storage.
-   *
-   * @var \Drupal\user\RoleStorageInterface
-   */
-  protected $roleStorage;
-
-  /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
    * The event dispatcher.
    *
    * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
@@ -50,21 +29,24 @@ class UserPermissionsForm extends FormBase {
   /**
    * Constructs a new UserPermissionsForm.
    *
-   * @param \Drupal\user\PermissionHandlerInterface $permission_handler
+   * @param \Drupal\user\PermissionHandlerInterface $permissionHandler
    *   The permission handler.
-   * @param \Drupal\user\RoleStorageInterface $role_storage
+   * @param \Drupal\user\RoleStorageInterface $roleStorage
    *   The role storage.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
    * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|null $event_dispatcher
    *   The event dispatcher.
    * @param \Drupal\Core\Extension\ModuleExtensionList|null $moduleExtensionList
    *   The module extension list.
    */
-  public function __construct(PermissionHandlerInterface $permission_handler, RoleStorageInterface $role_storage, ModuleHandlerInterface $module_handler, EventDispatcherInterface $event_dispatcher = NULL, protected ?ModuleExtensionList $moduleExtensionList = NULL) {
-    $this->permissionHandler = $permission_handler;
-    $this->roleStorage = $role_storage;
-    $this->moduleHandler = $module_handler;
+  public function __construct(
+    protected PermissionHandlerInterface $permissionHandler,
+    protected RoleStorageInterface $roleStorage,
+    protected ModuleHandlerInterface $moduleHandler,
+    EventDispatcherInterface $event_dispatcher = NULL,
+    protected ?ModuleExtensionList $moduleExtensionList = NULL,
+  ) {
     if ($this->moduleExtensionList === NULL) {
       @trigger_error('Calling ' . __METHOD__ . '() without the $moduleExtensionList argument is deprecated in drupal:10.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
       $this->moduleExtensionList = \Drupal::service('extension.list.module');
@@ -103,7 +85,7 @@ class UserPermissionsForm extends FormBase {
    *   An array of role objects.
    */
   protected function getRoles() {
-    return $this->roleStorage->loadMultiple();
+    return $this->roleStorage->loadMultipleOverrideFree();
   }
 
   /**
@@ -205,6 +187,7 @@ class UserPermissionsForm extends FormBase {
 
     $form['permissions'] = [
       '#type' => 'table',
+      '#empty' => $this->t('No permissions found.'),
       '#header' => [$this->t('Permission')],
       '#id' => 'permissions',
       '#attributes' => ['class' => ['permissions', 'js-permissions']],
@@ -219,7 +202,7 @@ class UserPermissionsForm extends FormBase {
 
     foreach ($this->permissionsByProvider() as $provider => $permissions) {
       // Module name.
-      $form['permissions'][$provider] = [
+      $form['permissions']['module_' . $provider] = [
         [
           '#wrapper_attributes' => [
             'colspan' => count($role_names) + 1,

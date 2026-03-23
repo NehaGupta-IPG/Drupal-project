@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\views_test_cacheable_metadata_calculation\Plugin\views\access;
 
 use Drupal\Core\Cache\Cache;
@@ -9,7 +11,6 @@ use Drupal\Core\State\StateInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\views\Attribute\ViewsAccess;
 use Drupal\views\Plugin\views\access\AccessPluginBase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -35,7 +36,7 @@ class CacheableMetadataCalculationTest extends AccessPluginBase implements Cache
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\State\StateInterface $state
@@ -44,18 +45,6 @@ class CacheableMetadataCalculationTest extends AccessPluginBase implements Cache
   public function __construct(array $configuration, $plugin_id, $plugin_definition, StateInterface $state) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->state = $state;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('state')
-    );
   }
 
   /**

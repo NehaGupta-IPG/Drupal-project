@@ -11,12 +11,12 @@ use Drupal\Core\Entity\EntityInterface;
 interface CommentStatisticsInterface {
 
   /**
-   * Returns an array of ranking information for hook_ranking().
+   * Returns an array of ranking information for hook_node_search_ranking().
    *
    * @return array
-   *   Array of ranking information as expected by hook_ranking().
+   *   Array of ranking information as expected by hook_node_search_ranking().
    *
-   * @see hook_ranking()
+   * @see hook_node_search_ranking()
    * @see comment_ranking()
    */
   public function getRankingInfo();
@@ -25,7 +25,7 @@ interface CommentStatisticsInterface {
    * Read comment statistics records for an array of entities.
    *
    * @param \Drupal\Core\Entity\EntityInterface[] $entities
-   *   Array of entities on which commenting is enabled, keyed by id
+   *   Array of entities on which commenting is enabled, keyed by id.
    * @param string $entity_type
    *   The entity type of the passed entities.
    * @param bool $accurate

@@ -2,6 +2,7 @@
 
 namespace Drupal\language;
 
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
@@ -116,8 +117,10 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
    *   The language configuration override service.
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The request stack object.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
+   *   The cache backend.
    */
-  public function __construct(LanguageDefault $default_language, ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, LanguageConfigFactoryOverrideInterface $config_override, RequestStack $request_stack) {
+  public function __construct(LanguageDefault $default_language, ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, LanguageConfigFactoryOverrideInterface $config_override, RequestStack $request_stack, protected CacheBackendInterface $cacheBackend) {
     $this->defaultLanguage = $default_language;
     $this->configFactory = $config_factory;
     $this->moduleHandler = $module_handler;
@@ -168,7 +171,10 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
    */
   protected function loadLanguageTypesConfiguration() {
     if (!$this->languageTypes) {
-      $this->languageTypes = $this->configFactory->get('language.types')->get() ?: ['configurable' => [], 'all' => parent::getLanguageTypes()];
+      $this->languageTypes = $this->configFactory->get('language.types')->get() ?: [
+        'configurable' => [],
+        'all' => parent::getLanguageTypes(),
+      ];
     }
     return $this->languageTypes;
   }
@@ -201,7 +207,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
     if (isset($values['all'])) {
       $config->set('all', $values['all']);
     }
-    $config->save(TRUE);
+    $config->save();
   }
 
   /**
@@ -246,6 +252,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
       $this->languageTypes = NULL;
       $this->languageTypesInfo = NULL;
       $this->languages = [];
+      $this->cacheBackend->delete('language_config_ids');
       if ($this->negotiator) {
         $this->negotiator->reset();
       }
@@ -305,7 +312,16 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
       // Having them in the array already ensures if this is invoked in the
       // middle of importing language configuration entities, the defaults are
       // always present.
-      $config_ids = $this->configFactory->listAll('language.entity.');
+      // To avoid running the query on every request, cache it in the fast
+      // chained bootstrap cache bin.
+      $cid = 'language_config_ids';
+      if ($cache = $this->cacheBackend->get($cid)) {
+        $config_ids = $cache->data;
+      }
+      else {
+        $config_ids = $this->configFactory->listAll('language.entity.');
+        $this->cacheBackend->set($cid, $config_ids);
+      }
       foreach ($this->configFactory->loadMultiple($config_ids) as $config) {
         $data = $config->get();
         $data['name'] = $data['label'];
@@ -423,7 +439,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
               try {
                 return $url instanceof Url && $url->access();
               }
-              catch (\Exception $e) {
+              catch (\Exception) {
                 return FALSE;
               }
             });
@@ -484,6 +500,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
         unset($predefined[$key]);
         continue;
       }
+      // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
       $predefined[$key] = new TranslatableMarkup($value[0]);
     }
     natcasesort($predefined);

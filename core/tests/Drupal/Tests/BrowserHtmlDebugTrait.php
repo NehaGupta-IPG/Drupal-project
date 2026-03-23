@@ -73,8 +73,8 @@ trait BrowserHtmlDebugTrait {
    * @return string
    *   The formatted HTML string.
    */
-  protected function formatHtmlOutputHeaders(array $headers) {
-    $flattened_headers = array_map(function ($header) {
+  protected function formatHtmlOutputHeaders(array $headers): string {
+    $flattened_headers = array_map(function (array $header) {
       if (is_array($header)) {
         return implode(';', array_map('trim', $header));
       }
@@ -157,10 +157,10 @@ trait BrowserHtmlDebugTrait {
    *   The callable handler that will do the logging.
    */
   protected function getResponseLogHandler() {
-    return function (callable $handler) {
+    return function (callable $handler): \Closure {
       return function (RequestInterface $request, array $options) use ($handler) {
         return $handler($request, $options)
-          ->then(function (ResponseInterface $response) use ($request) {
+          ->then(function (ResponseInterface $response) use ($request): ResponseInterface {
             if ($this->htmlOutputEnabled) {
 
               $caller = $this->getTestMethodCaller();

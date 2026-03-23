@@ -18,6 +18,9 @@ use Drupal\Core\Template\TwigEnvironment;
 use Drupal\Core\Template\TwigExtension;
 use Drupal\Core\Url;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Prophet;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
@@ -27,11 +30,9 @@ use Twig\Source;
 
 /**
  * Tests the twig extension.
- *
- * @group Template
- *
- * @coversDefaultClass \Drupal\Core\Template\TwigExtension
  */
+#[CoversClass(TwigExtension::class)]
+#[Group('Template')]
 class TwigExtensionTest extends UnitTestCase {
 
   /**
@@ -93,10 +94,9 @@ class TwigExtensionTest extends UnitTestCase {
 
   /**
    * Tests the escaping.
-   *
-   * @dataProvider providerTestEscaping
    */
-  public function testEscaping($template, $expected): void {
+  #[DataProvider('providerTestEscaping')]
+  public function testEscaping(string $template, bool $expected): void {
     $loader = new FilesystemLoader();
     $twig = new Environment($loader, [
       'debug' => TRUE,
@@ -121,7 +121,7 @@ class TwigExtensionTest extends UnitTestCase {
    *   An array of test data each containing of a twig template string and
    *   a boolean expecting whether the path will be safe.
    */
-  public static function providerTestEscaping() {
+  public static function providerTestEscaping(): array {
     return [
       ['{{ path("foo") }}', FALSE],
       ['{{ path("foo", {}) }}', FALSE],
@@ -172,7 +172,7 @@ class TwigExtensionTest extends UnitTestCase {
   public function testFormatDate(): void {
     $this->dateFormatter->expects($this->exactly(1))
       ->method('format')
-      ->willReturnCallback(function ($timestamp) {
+      ->willReturnCallback(function ($timestamp): string {
         return date('Y-m-d', $timestamp);
       });
 
@@ -225,7 +225,7 @@ class TwigExtensionTest extends UnitTestCase {
   /**
    * Tests the escaping of objects implementing MarkupInterface.
    *
-   * @covers ::escapeFilter
+   * @legacy-covers ::escapeFilter
    */
   public function testSafeStringEscaping(): void {
     $loader = new FilesystemLoader();
@@ -236,10 +236,12 @@ class TwigExtensionTest extends UnitTestCase {
       'optimizations' => 0,
     ]);
 
-    // By default, TwigExtension will attempt to cast objects to strings.
-    // Ensure objects that implement MarkupInterface are unchanged.
-    $safe_string = $this->createMock('\Drupal\Component\Render\MarkupInterface');
-    $this->assertSame($safe_string, $this->systemUnderTest->escapeFilter($twig, $safe_string, 'html', 'UTF-8', TRUE));
+    // TwigExtension should return objects that implement MarkupInterface cast
+    // to a string, but without any sanitization.
+    $html = '<div>Some text</div>';
+    $markup_object = Markup::create($html);
+
+    $this->assertSame($html, $this->systemUnderTest->escapeFilter($twig, $markup_object, 'html', 'UTF-8', TRUE));
 
     // Ensure objects that do not implement MarkupInterface are escaped.
     $string_object = new TwigExtensionTestString("<script>alert('here');</script>");
@@ -247,7 +249,7 @@ class TwigExtensionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::safeJoin
+   * Tests safe join.
    */
   public function testSafeJoin(): void {
     $this->renderer->expects($this->any())
@@ -255,7 +257,9 @@ class TwigExtensionTest extends UnitTestCase {
       ->with(['#markup' => '<strong>will be rendered</strong>', '#printed' => FALSE])
       ->willReturn('<strong>will be rendered</strong>');
 
-    $twig_environment = $this->prophesize(TwigEnvironment::class)->reveal();
+    $twig_environment = $this->prophesize(TwigEnvironment::class);
+    $twig_environment->getCharset()->willReturn('UTF-8');
+    $twig_environment = $twig_environment->reveal();
 
     // Simulate t().
     $markup = $this->prophesize(TranslatableMarkup::class);
@@ -286,8 +290,9 @@ class TwigExtensionTest extends UnitTestCase {
   }
 
   /**
-   * @dataProvider providerTestRenderVar
-   */
+ * Tests render var.
+ */
+  #[DataProvider('providerTestRenderVar')]
   public function testRenderVar($result, $input): void {
     $this->renderer->expects($this->any())
       ->method('render')
@@ -297,7 +302,7 @@ class TwigExtensionTest extends UnitTestCase {
     $this->assertEquals('Rendered output', $this->systemUnderTest->renderVar($input));
   }
 
-  public static function providerTestRenderVar() {
+  public static function providerTestRenderVar(): array {
     $data = [];
 
     $renderable = (new Prophet())->prophesize(RenderableInterface::class);
@@ -309,8 +314,10 @@ class TwigExtensionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::escapeFilter
-   * @covers ::bubbleArgMetadata
+   * Tests escape with generated link.
+   *
+   * @legacy-covers ::escapeFilter
+   * @legacy-covers ::bubbleArgMetadata
    */
   public function testEscapeWithGeneratedLink(): void {
     $loader = new FilesystemLoader();
@@ -342,8 +349,10 @@ class TwigExtensionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::renderVar
-   * @covers ::bubbleArgMetadata
+   * Tests render var with generated link.
+   *
+   * @legacy-covers ::renderVar
+   * @legacy-covers ::bubbleArgMetadata
    */
   public function testRenderVarWithGeneratedLink(): void {
     $link = new GeneratedLink();
@@ -366,10 +375,10 @@ class TwigExtensionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::renderVar
-   * @dataProvider providerTestRenderVarEarlyReturn
+   * Tests render var early return.
    */
-  public function testRenderVarEarlyReturn($expected, $input): void {
+  #[DataProvider('providerTestRenderVarEarlyReturn')]
+  public function testRenderVarEarlyReturn(string|int|float|bool $expected, float|int|string|bool|array|null $input): void {
     $result = $this->systemUnderTest->renderVar($input);
     $this->assertSame($expected, $result);
   }
@@ -377,7 +386,7 @@ class TwigExtensionTest extends UnitTestCase {
   /**
    * Data provider for ::testRenderVarEarlyReturn().
    */
-  public static function providerTestRenderVarEarlyReturn() {
+  public static function providerTestRenderVarEarlyReturn(): array {
     return [
       'null' => ['', NULL],
       'empty array' => ['', []],
@@ -394,8 +403,6 @@ class TwigExtensionTest extends UnitTestCase {
 
   /**
    * Tests creating attributes within a Twig template.
-   *
-   * @covers ::createAttribute
    */
   public function testCreateAttribute(): void {
     $name = '__string_template_test_1__';
@@ -423,7 +430,9 @@ class TwigExtensionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getLink
+   * Tests link with overridden attributes.
+   *
+   * @legacy-covers ::getLink
    */
   public function testLinkWithOverriddenAttributes(): void {
     $url = Url::fromRoute('<front>', [], ['attributes' => ['class' => ['foo']]]);
@@ -436,10 +445,10 @@ class TwigExtensionTest extends UnitTestCase {
   /**
    * Tests Twig 'add_suggestion' filter.
    *
-   * @covers ::suggestThemeHook
-   * @dataProvider providerTestTwigAddSuggestionFilter
+   * @legacy-covers ::suggestThemeHook
    */
-  public function testTwigAddSuggestionFilter($original_render_array, $suggestion, $expected_render_array): void {
+  #[DataProvider('providerTestTwigAddSuggestionFilter')]
+  public function testTwigAddSuggestionFilter(?array $original_render_array, string $suggestion, ?array $expected_render_array): void {
     $processed_render_array = $this->systemUnderTest->suggestThemeHook($original_render_array, $suggestion);
     $this->assertEquals($expected_render_array, $processed_render_array);
   }
@@ -448,6 +457,7 @@ class TwigExtensionTest extends UnitTestCase {
    * Provides data for ::testTwigAddSuggestionFilter().
    *
    * @return \Iterator
+   *   An iterator of test data.
    */
   public static function providerTestTwigAddSuggestionFilter(): \Iterator {
     yield 'suggestion should be added' => [
@@ -552,10 +562,10 @@ class TwigExtensionTest extends UnitTestCase {
   /**
    * Tests Twig 'add_class' filter.
    *
-   * @covers ::addClass
-   * @dataProvider providerTestTwigAddClass
+   * @legacy-covers ::addClass
    */
-  public function testTwigAddClass($element, $classes, $expected_result): void {
+  #[DataProvider('providerTestTwigAddClass')]
+  public function testTwigAddClass(array $element, string|array $classes, array $expected_result): void {
     $processed = $this->systemUnderTest->addClass($element, $classes);
     $this->assertEquals($expected_result, $processed);
   }
@@ -564,6 +574,7 @@ class TwigExtensionTest extends UnitTestCase {
    * Provides data for ::testTwigAddClass().
    *
    * @return \Iterator
+   *   An iterator of test data for ::testTwigAddClass().
    */
   public static function providerTestTwigAddClass(): \Iterator {
     yield 'should add a class on element' => [
@@ -602,10 +613,10 @@ class TwigExtensionTest extends UnitTestCase {
   /**
    * Tests Twig 'set_attribute' filter.
    *
-   * @covers ::setAttribute
-   * @dataProvider providerTestTwigSetAttribute
+   * @legacy-covers ::setAttribute
    */
-  public function testTwigSetAttribute($element, $key, $value, $expected_result): void {
+  #[DataProvider('providerTestTwigSetAttribute')]
+  public function testTwigSetAttribute(array $element, string $key, ?string $value, array $expected_result): void {
     $processed = $this->systemUnderTest->setAttribute($element, $key, $value);
     $this->assertEquals($expected_result, $processed);
   }
@@ -614,6 +625,7 @@ class TwigExtensionTest extends UnitTestCase {
    * A data provider for ::testTwigSetAttribute().
    *
    * @return \Iterator
+   *   An iterator of test data for ::testTwigSetAttribute().
    */
   public static function providerTestTwigSetAttribute(): \Iterator {
     yield 'should add attributes on element' => [
@@ -675,15 +687,23 @@ class TwigExtensionTest extends UnitTestCase {
 
 }
 
+/**
+ * A simple string holder for testing Twig extension.
+ */
 class TwigExtensionTestString {
 
+  /**
+   * The test string.
+   *
+   * @var string
+   */
   protected $string;
 
   public function __construct($string) {
     $this->string = $string;
   }
 
-  public function __toString() {
+  public function __toString(): string {
     return $this->string;
   }
 

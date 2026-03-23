@@ -16,7 +16,6 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Provides specific access control for the user entity type.
@@ -43,7 +42,7 @@ class UserSelection extends DefaultSelection {
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
+   *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -65,24 +64,6 @@ class UserSelection extends DefaultSelection {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager, $module_handler, $current_user, $entity_field_manager, $entity_type_bundle_info, $entity_repository);
 
     $this->connection = $connection;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('entity_type.manager'),
-      $container->get('module_handler'),
-      $container->get('current_user'),
-      $container->get('database'),
-      $container->get('entity_field.manager'),
-      $container->get('entity_type.bundle.info'),
-      $container->get('entity.repository')
-    );
   }
 
   /**

@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Core\Recipe;
 
-use Drupal\contact\Entity\ContactForm;
-use Drupal\shortcut\Entity\Shortcut;
+use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Tests\standard\Functional\StandardTest;
 use Drupal\user\RoleInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Standard recipe installation expectations.
- *
- * @group #slow
- * @group Recipe
  */
+#[Group('#slow')]
+#[Group('Recipe')]
+#[RunTestsInSeparateProcesses]
 class StandardRecipeTest extends StandardTest {
 
   use RecipeTestTrait;
@@ -36,8 +37,13 @@ class StandardRecipeTest extends StandardTest {
     $theme_installer->uninstall(['claro', 'olivero']);
 
     // Determine which modules to uninstall.
-    $uninstall = array_diff(array_keys(\Drupal::moduleHandler()->getModuleList()), ['user', 'system', 'path_alias', \Drupal::database()->getProvider()]);
-    foreach (['shortcut', 'field_config', 'filter_format', 'field_storage_config'] as $entity_type) {
+    // If the database module has dependencies, they are expected too.
+    $database_module_extension = \Drupal::service(ModuleExtensionList::class)->get(\Drupal::database()->getProvider());
+    $database_modules = $database_module_extension->requires ? array_keys($database_module_extension->requires) : [];
+    $database_modules[] = \Drupal::database()->getProvider();
+    $keep = array_merge(['user', 'system', 'path_alias'], $database_modules);
+    $uninstall = array_diff(array_keys(\Drupal::moduleHandler()->getModuleList()), $keep);
+    foreach (['field_config', 'filter_format', 'field_storage_config'] as $entity_type) {
       $storage = \Drupal::entityTypeManager()->getStorage($entity_type);
       $storage->delete($storage->loadMultiple());
     }
@@ -81,15 +87,6 @@ class StandardRecipeTest extends StandardTest {
       'link[0][uri]' => '<front>',
     ], 'Save');
 
-    // Standard expects to set the contact form's recipient email to the
-    // system's email address, but our feedback_contact_form recipe hard-codes
-    // it to another value.
-    // @todo This can be removed after https://drupal.org/i/3303126, which
-    //   should make it possible for a recipe to reuse an already-set config
-    //   value.
-    ContactForm::load('feedback')?->setRecipients(['simpletest@example.com'])
-      ->save();
-
     // Update sync directory config to have the same UUIDs so we can compare.
     /** @var \Drupal\Core\Config\StorageInterface $sync */
     $sync = \Drupal::service('config.storage.sync');
@@ -125,6 +122,7 @@ class StandardRecipeTest extends StandardTest {
 
     // Ensure we have truly rebuilt the standard profile using recipes.
     // Uncomment the code below to see the differences in a single file.
+    // phpcs:ignore Drupal.Commenting.InlineComment.InvalidEndChar, Drupal.Files.LineLength
     // $this->assertSame($sync->read('node.settings'), $active->read('node.settings'));
     $comparer = $this->configImporter()->getStorageComparer();
     $expected_list = $comparer->getEmptyChangelist();
@@ -132,9 +130,6 @@ class StandardRecipeTest extends StandardTest {
     // installed.
     $expected_list['update'] = ['core.extension'];
     $this->assertSame($expected_list, $comparer->getChangelist());
-
-    // Standard ships two shortcuts; ensure they exist.
-    $this->assertCount(2, Shortcut::loadMultiple());
 
     parent::testStandard();
   }
