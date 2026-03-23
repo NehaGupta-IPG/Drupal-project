@@ -74,6 +74,8 @@ class MenuUiContentTranslationTest extends BrowserTestBase {
 
     // Enable translation for page nodes and menu link content.
     static::enableBundleTranslation('node', 'page');
+    \Drupal::service('content_translation.manager')
+      ->setEnabled('menu_link_content', 'menu_link_content', TRUE);
     static::enableBundleTranslation('menu_link_content', 'menu_link_content');
   }
 
