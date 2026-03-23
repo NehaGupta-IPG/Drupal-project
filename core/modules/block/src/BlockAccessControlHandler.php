@@ -13,7 +13,6 @@ use Drupal\Core\Entity\EntityHandlerInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Plugin\Context\ContextHandlerInterface;
-use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
 use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -35,20 +34,12 @@ class BlockAccessControlHandler extends EntityAccessControlHandler implements En
   protected $contextHandler;
 
   /**
-   * The context manager service.
-   *
-   * @var \Drupal\Core\Plugin\Context\ContextRepositoryInterface
-   */
-  protected $contextRepository;
-
-  /**
    * {@inheritdoc}
    */
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
     return new static(
       $entity_type,
-      $container->get('context.handler'),
-      $container->get('context.repository')
+      $container->get('context.handler')
     );
   }
 
@@ -59,13 +50,10 @@ class BlockAccessControlHandler extends EntityAccessControlHandler implements En
    *   The entity type definition.
    * @param \Drupal\Core\Plugin\Context\ContextHandlerInterface $context_handler
    *   The ContextHandler for applying contexts to conditions properly.
-   * @param \Drupal\Core\Plugin\Context\ContextRepositoryInterface $context_repository
-   *   The lazy context repository service.
    */
-  public function __construct(EntityTypeInterface $entity_type, ContextHandlerInterface $context_handler, ContextRepositoryInterface $context_repository) {
+  public function __construct(EntityTypeInterface $entity_type, ContextHandlerInterface $context_handler) {
     parent::__construct($entity_type);
     $this->contextHandler = $context_handler;
-    $this->contextRepository = $context_repository;
   }
 
   /**
@@ -88,8 +76,7 @@ class BlockAccessControlHandler extends EntityAccessControlHandler implements En
       foreach ($entity->getVisibilityConditions() as $condition_id => $condition) {
         if ($condition instanceof ContextAwarePluginInterface) {
           try {
-            $contexts = $this->contextRepository->getRuntimeContexts(array_values($condition->getContextMapping()));
-            $this->contextHandler->applyContextMapping($condition, $contexts);
+            $this->contextHandler->applyRuntimeContext($condition);
           }
           catch (MissingValueContextException) {
             $missing_value = TRUE;
@@ -118,8 +105,7 @@ class BlockAccessControlHandler extends EntityAccessControlHandler implements En
         $block_plugin = $entity->getPlugin();
         try {
           if ($block_plugin instanceof ContextAwarePluginInterface) {
-            $contexts = $this->contextRepository->getRuntimeContexts(array_values($block_plugin->getContextMapping()));
-            $this->contextHandler->applyContextMapping($block_plugin, $contexts);
+            $this->contextHandler->applyRuntimeContext($block_plugin);
           }
           $access = $block_plugin->access($account, TRUE);
         }

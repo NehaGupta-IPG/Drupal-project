@@ -61,6 +61,9 @@ interface ContextHandlerInterface {
   /**
    * Prepares a plugin for evaluation.
    *
+   * This method is for more complex use cases, see ::applyRuntimeContext() for
+   * the more common approach.
+   *
    * @param \Drupal\Core\Plugin\ContextAwarePluginInterface $plugin
    *   A plugin about to be evaluated.
    * @param \Drupal\Core\Plugin\Context\ContextInterface[] $contexts
@@ -79,5 +82,13 @@ interface ContextHandlerInterface {
    *   no contexts are missing.
    */
   public function applyContextMapping(ContextAwarePluginInterface $plugin, $contexts, $mappings = []);
+
+  /**
+   * Applies all relevant runtime contexts to a plugin.
+   *
+   * @param \Drupal\Core\Plugin\ContextAwarePluginInterface $plugin
+   *   A context-aware plugin.
+   */
+  public function applyRuntimeContext(ContextAwarePluginInterface $plugin): void;
 
 }

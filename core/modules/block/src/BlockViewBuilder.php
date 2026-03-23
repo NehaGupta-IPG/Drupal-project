@@ -138,8 +138,7 @@ class BlockViewBuilder extends EntityViewBuilder implements TrustedCallbackInter
 
     // Inject runtime contexts.
     if ($plugin instanceof ContextAwarePluginInterface) {
-      $contexts = \Drupal::service('context.repository')->getRuntimeContexts($plugin->getContextMapping());
-      \Drupal::service('context.handler')->applyContextMapping($plugin, $contexts);
+      \Drupal::service('context.handler')->applyRuntimeContext($plugin);
     }
 
     // Create the render array for the block as a whole.

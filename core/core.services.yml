@@ -468,6 +468,7 @@ services:
   Drupal\Core\Config\TypedConfigManagerInterface: '@config.typed'
   context.handler:
     class: Drupal\Core\Plugin\Context\ContextHandler
+    arguments: ['@context.repository']
   Drupal\Core\Plugin\Context\ContextHandlerInterface: '@context.handler'
   context.repository:
     class: Drupal\Core\Plugin\Context\LazyContextRepository

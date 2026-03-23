@@ -13,6 +13,10 @@ use Drupal\Core\Plugin\ContextAwarePluginInterface;
  */
 class ContextHandler implements ContextHandlerInterface {
 
+  public function __construct(
+    protected ContextRepositoryInterface $contextRepository,
+  ) {}
+
   /**
    * {@inheritdoc}
    */
@@ -149,6 +153,14 @@ class ContextHandler implements ContextHandlerInterface {
     if ($missing_value) {
       throw new MissingValueContextException($missing_value);
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function applyRuntimeContext(ContextAwarePluginInterface $plugin): void {
+    $contexts = $this->contextRepository->getRuntimeContexts(array_values($plugin->getContextMapping()));
+    $this->applyContextMapping($plugin, $contexts);
   }
 
 }
