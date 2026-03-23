@@ -254,7 +254,7 @@ class CacheCollectorTest extends UnitTestCase {
   #[TestWith([FALSE, TRUE, FALSE])]
   #[TestWith([TRUE, FALSE, FALSE])]
   #[TestWith([FALSE, FALSE, FALSE])]
-  public function testUpdateCacheInvalidatedConflict($lock_acquired, $start_cache_item, $end_cache_item): void {
+  public function testUpdateCacheInvalidatedConflict(bool $lock_acquired, bool $start_cache_item, bool $end_cache_item): void {
     $this->setUpMockCacheBackend();
     $this->setUpMockLockBackend();
 
