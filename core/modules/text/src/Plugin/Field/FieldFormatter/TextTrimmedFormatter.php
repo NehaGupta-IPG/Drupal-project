@@ -6,6 +6,7 @@ use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Messenger\MessengerTrait;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\filter\Entity\FilterFormat;
@@ -29,6 +30,8 @@ use Drupal\text\TextSummary;
   ],
 )]
 class TextTrimmedFormatter extends FormatterBase implements TrustedCallbackInterface {
+
+  use MessengerTrait;
 
   /**
    * {@inheritdoc}
@@ -69,6 +72,7 @@ class TextTrimmedFormatter extends FormatterBase implements TrustedCallbackInter
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
+    $warning = FALSE;
 
     $render_as_summary = function (&$element) {
       // Make sure any default #pre_render callbacks are set on the element,
@@ -83,11 +87,11 @@ class TextTrimmedFormatter extends FormatterBase implements TrustedCallbackInter
     // The ProcessedText element already handles cache context & tag bubbling.
     // @see \Drupal\filter\Element\ProcessedText::preRenderText()
     foreach ($items as $delta => $item) {
-      if ($item->format) {
+      if ($item->format && !$warning) {
         $format = FilterFormat::load($item->format);
         if ((!$format || !$format->status())) {
           $this->addInvalidFormatWarning($items);
-          continue;
+          $warning = TRUE;
         }
       }
       $elements[$delta] = [
