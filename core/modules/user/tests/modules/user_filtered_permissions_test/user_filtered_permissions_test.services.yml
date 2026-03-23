@@ -1,0 +1,5 @@
+services:
+  user_filtered_permissions_test.permissions_list_filter:
+    class: Drupal\user_filtered_permissions_test\EventSubscriber\PermissionsListFilterSubscriber
+    tags:
+      - { name: 'event_subscriber' }

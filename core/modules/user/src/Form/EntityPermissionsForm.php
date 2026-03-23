@@ -8,9 +8,11 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\user\Event\PermissionsListFilterEvent;
 use Drupal\user\PermissionHandlerInterface;
 use Drupal\user\RoleStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Provides the permissions administration form for a bundle.
@@ -43,6 +45,13 @@ class EntityPermissionsForm extends UserPermissionsForm {
   protected $bundle;
 
   /**
+   * The event dispatcher.
+   *
+   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+   */
+  protected $eventDispatcher;
+
+  /**
    * Constructs a new EntityPermissionsForm.
    *
    * @param \Drupal\user\PermissionHandlerInterface $permission_handler
@@ -55,11 +64,23 @@ class EntityPermissionsForm extends UserPermissionsForm {
    *   The configuration entity manager.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $module_extension_list
+   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|null $event_dispatcher
+   *   The event dispatcher.
+   * @param \Drupal\Core\Extension\ModuleExtensionList|null $module_extension_list
    *   The module extension list.
    */
-  public function __construct(PermissionHandlerInterface $permission_handler, RoleStorageInterface $role_storage, ModuleHandlerInterface $module_handler, ConfigManagerInterface $config_manager, EntityTypeManagerInterface $entity_type_manager, ModuleExtensionList $module_extension_list) {
-    parent::__construct($permission_handler, $role_storage, $module_handler, $module_extension_list);
+  public function __construct(PermissionHandlerInterface $permission_handler, RoleStorageInterface $role_storage, ModuleHandlerInterface $module_handler, ConfigManagerInterface $config_manager, EntityTypeManagerInterface $entity_type_manager, ?EventDispatcherInterface $event_dispatcher = NULL, ?ModuleExtensionList $module_extension_list = NULL) {
+    if (is_null($event_dispatcher)) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $event_dispatcher argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
+      $event_dispatcher = \Drupal::service('event_dispatcher');
+    }
+    $this->eventDispatcher = $event_dispatcher;
+
+    if ($module_extension_list === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $module_extension_list argument is deprecated in drupal:10.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
+      $module_extension_list = \Drupal::service('extension.list.module');
+    }
+    parent::__construct($permission_handler, $role_storage, $module_handler, $event_dispatcher, $module_extension_list);
     $this->configManager = $config_manager;
     $this->entityTypeManager = $entity_type_manager;
   }
@@ -74,6 +95,7 @@ class EntityPermissionsForm extends UserPermissionsForm {
       $container->get('module_handler'),
       $container->get('config.manager'),
       $container->get('entity_type.manager'),
+      $container->get('event_dispatcher'),
       $container->get('extension.list.module'),
     );
   }
@@ -94,6 +116,9 @@ class EntityPermissionsForm extends UserPermissionsForm {
 
     // Find all the permissions that depend on $this->bundle.
     $permissions = $this->permissionHandler->getPermissions();
+    $event = new PermissionsListFilterEvent($permissions);
+    $this->eventDispatcher->dispatch($event);
+    $permissions = $event->getPermissions();
     $permissions_by_provider = [];
     foreach ($permissions as $permission_name => $permission) {
       $required_configs = $permission['dependencies']['config'] ?? [];

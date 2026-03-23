@@ -6,9 +6,11 @@ use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\user\Event\PermissionsListFilterEvent;
 use Drupal\user\PermissionHandlerInterface;
 use Drupal\user\RoleStorageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Provides the user permissions administration form.
@@ -16,6 +18,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @internal
  */
 class UserPermissionsForm extends FormBase {
+
+  /**
+   * The event dispatcher.
+   *
+   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+   */
+  protected $eventDispatcher;
 
   /**
    * Constructs a new UserPermissionsForm.
@@ -26,10 +35,27 @@ class UserPermissionsForm extends FormBase {
    *   The role storage.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   The module handler.
-   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
+   * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface|null $event_dispatcher
+   *   The event dispatcher.
+   * @param \Drupal\Core\Extension\ModuleExtensionList|null $moduleExtensionList
    *   The module extension list.
    */
-  public function __construct(protected PermissionHandlerInterface $permissionHandler, protected RoleStorageInterface $roleStorage, protected ModuleHandlerInterface $moduleHandler, protected ModuleExtensionList $moduleExtensionList) {
+  public function __construct(
+    protected PermissionHandlerInterface $permissionHandler,
+    protected RoleStorageInterface $roleStorage,
+    protected ModuleHandlerInterface $moduleHandler,
+    ?EventDispatcherInterface $event_dispatcher = NULL,
+    protected ?ModuleExtensionList $moduleExtensionList = NULL,
+  ) {
+    if ($this->moduleExtensionList === NULL) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $moduleExtensionList argument is deprecated in drupal:10.3.0 and will be required in drupal:12.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
+      $this->moduleExtensionList = \Drupal::service('extension.list.module');
+    }
+    if (is_null($event_dispatcher)) {
+      @trigger_error('Calling ' . __METHOD__ . '() without the $event_dispatcher argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
+      $event_dispatcher = \Drupal::service('event_dispatcher');
+    }
+    $this->eventDispatcher = $event_dispatcher;
   }
 
   /**
@@ -40,6 +66,7 @@ class UserPermissionsForm extends FormBase {
       $container->get('user.permissions'),
       $container->get('entity_type.manager')->getStorage('user_role'),
       $container->get('module_handler'),
+      $container->get('event_dispatcher'),
       $container->get('extension.list.module'),
     );
   }
@@ -70,6 +97,9 @@ class UserPermissionsForm extends FormBase {
    */
   protected function permissionsByProvider(): array {
     $permissions = $this->permissionHandler->getPermissions();
+    $event = new PermissionsListFilterEvent($permissions);
+    $this->eventDispatcher->dispatch($event);
+    $permissions = $event->getPermissions();
     $permissions_by_provider = [];
     foreach ($permissions as $permission_name => $permission) {
       $permissions_by_provider[$permission['provider']][$permission_name] = $permission;
@@ -78,17 +108,29 @@ class UserPermissionsForm extends FormBase {
     // Move the access content permission to the Node module if it is installed.
     // @todo Add an alter so that this section can be moved to the Node module.
     if ($this->moduleHandler->moduleExists('node')) {
-      // Insert 'access content' before the 'view own unpublished content' key
-      // in order to maintain the UI even though the permission is provided by
-      // the system module.
-      $keys = array_keys($permissions_by_provider['node']);
-      $offset = (int) array_search('view own unpublished content', $keys);
-      $permissions_by_provider['node'] = array_merge(
-        array_slice($permissions_by_provider['node'], 0, $offset),
-        ['access content' => $permissions_by_provider['system']['access content']],
-        array_slice($permissions_by_provider['node'], $offset)
-      );
-      unset($permissions_by_provider['system']['access content']);
+      // Insert 'access content' in node permissions. This maintains the UI even
+      // though the permission is provided by the system module.
+      if (isset($permissions_by_provider['system']['access content'])) {
+        // If the node permission 'view own unpublished content' is present,
+        // insert 'access content' before it.
+        if (isset($permissions_by_provider['node']['view own unpublished content'])) {
+          $keys = array_keys($permissions_by_provider['node']);
+          $offset = (int) array_search('view own unpublished content', $keys);
+          $permissions_by_provider['node'] = array_merge(
+            array_slice($permissions_by_provider['node'], 0, $offset),
+            ['access content' => $permissions_by_provider['system']['access content']],
+            array_slice($permissions_by_provider['node'], $offset)
+          );
+        }
+        else {
+          // If the list of node permissions is filtered so there's no 'view
+          // own unpublished content' key to position before, add the permission
+          // to the end of the node permissions list.
+          $permissions_by_provider['node']['access content'] = $permissions_by_provider['system']['access content'];
+          ksort($permissions_by_provider);
+        }
+        unset($permissions_by_provider['system']['access content']);
+      }
     }
 
     return $permissions_by_provider;

@@ -1,0 +1,5 @@
+name: 'User filtered permissions test'
+type: module
+description: 'For testing the PermissionsListFilter event'
+package: Testing
+version: VERSION
