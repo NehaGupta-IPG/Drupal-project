@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\config\Functional;
 
-use Drupal\Core\Archiver\ArchiveTar;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\Tests\BrowserTestBase;
@@ -68,8 +67,11 @@ class ConfigExportUITest extends BrowserTestBase {
     assert($file_system instanceof FileSystemInterface);
     $temp_directory = $file_system->getTempDirectory();
     $file_path = $temp_directory . '/config.tar.gz';
-    $archiver = new ArchiveTar($file_path);
-    $archive_contents = array_map(static fn(array $item): string => $item['filename'], $archiver->listContent());
+    $archiver = new \PharData($file_path);
+    $archive_contents = [];
+    foreach ($archiver as $item) {
+      $archive_contents[] = $item->getFilename();
+    }
     $this->assertNotEmpty($archive_contents, 'Downloaded archive file is not empty.');
 
     // Prepare the list of config files from active storage, see
@@ -80,12 +82,13 @@ class ConfigExportUITest extends BrowserTestBase {
       $config_files[] = $config_name . '.yml';
     }
     // Assert that the downloaded archive file contents are the same as the test
-    // site active store.
-    $this->assertSame($config_files, $archive_contents);
+    // site active store. PharData sorts entries alphabetically regardless of
+    // insertion order.
+    $this->assertEqualsCanonicalizing($config_files, $archive_contents);
 
     // Ensure the test configuration override is in effect but was not exported.
     $this->assertSame('Foo', \Drupal::config('system.maintenance')->get('message'));
-    $archiver->extractList(['system.maintenance.yml'], $temp_directory);
+    $archiver->extractTo($temp_directory, ['system.maintenance.yml'], TRUE);
     $file_contents = file_get_contents($temp_directory . '/system.maintenance.yml');
     $exported = Yaml::decode($file_contents);
     $this->assertNotSame('Foo', $exported['message']);

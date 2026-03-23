@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\FunctionalTests\Installer;
 
 use Drupal\Component\Serialization\Yaml;
-use Drupal\Core\Archiver\ArchiveTar;
 use Drupal\Core\Database\Database;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Installer\Form\SelectProfileForm;
@@ -44,10 +43,10 @@ abstract class InstallerExistingConfigTestBase extends InstallerTestBase {
    */
   protected function prepareEnvironment() {
     parent::prepareEnvironment();
-    $archiver = new ArchiveTar($this->getConfigTarball(), 'gz');
+    $archiver = new \PharData($this->getConfigTarball());
 
     if ($this->profile === NULL) {
-      $core_extension = Yaml::decode($archiver->extractInString('core.extension.yml'));
+      $core_extension = Yaml::decode($archiver['core.extension.yml']->getContent());
       $this->profile = $core_extension['profile'];
     }
 

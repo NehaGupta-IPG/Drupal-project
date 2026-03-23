@@ -2,7 +2,6 @@
 
 namespace Drupal\config\Controller;
 
-use Drupal\Core\Archiver\ArchiveTar;
 use Drupal\Core\Config\ConfigManagerInterface;
 use Drupal\Core\Config\ImportStorageTransformer;
 use Drupal\Core\Config\StorageInterface;
@@ -138,18 +137,22 @@ class ConfigController implements ContainerInjectionInterface {
       // Ignore failed deletes.
     }
 
-    $archiver = new ArchiveTar($this->fileSystem->getTempDirectory() . '/config.tar.gz', 'gz');
+    $tar_path = $this->fileSystem->getTempDirectory() . '/config.tar';
+    $archiver = new \PharData($tar_path);
     // Add all contents of the export storage to the archive.
     foreach ($this->exportStorage->listAll() as $name) {
-      $archiver->addString("$name.yml", Yaml::encode($this->exportStorage->read($name)));
+      $archiver->addFromString("$name.yml", Yaml::encode($this->exportStorage->read($name)));
     }
     // Get all  data from the remaining collections.
     foreach ($this->exportStorage->getAllCollectionNames() as $collection) {
       $collection_storage = $this->exportStorage->createCollection($collection);
       foreach ($collection_storage->listAll() as $name) {
-        $archiver->addString(str_replace('.', '/', $collection) . "/$name.yml", Yaml::encode($collection_storage->read($name)));
+        $archiver->addFromString(str_replace('.', '/', $collection) . "/$name.yml", Yaml::encode($collection_storage->read($name)));
       }
     }
+    // Compress to .gz and remove the intermediate .tar file.
+    $archiver->compress(\Phar::GZ);
+    @unlink($tar_path);
 
     $request = new Request(['file' => 'config.tar.gz']);
     return $this->fileDownloadController->download($request, 'temporary');

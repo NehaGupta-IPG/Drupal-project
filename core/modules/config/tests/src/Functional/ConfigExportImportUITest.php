@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\config\Functional;
 
-use Drupal\Core\Archiver\ArchiveTar;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Tests\BrowserTestBase;
@@ -239,7 +238,7 @@ class ConfigExportImportUITest extends BrowserTestBase {
     $this->drupalGet('admin/config/development/configuration/full/export');
     $this->submitForm([], 'Export');
     $this->tarball = $this->getSession()->getPage()->getContent();
-    $filename = \Drupal::service('file_system')->getTempDirectory() . '/' . $this->randomMachineName();
+    $filename = \Drupal::service('file_system')->getTempDirectory() . '/' . $this->randomMachineName() . '.tar.gz';
     file_put_contents($filename, $this->tarball);
 
     // Set up the active storage collections to test import.
@@ -269,12 +268,15 @@ class ConfigExportImportUITest extends BrowserTestBase {
     $this->assertFalse($test2_snapshot->read('config_test.another_create'), 'The config_test.another_create in collection.test2 does not exist in the snapshot storage.');
 
     // Create the tar that contains the expected content for the collections.
-    $tar = new ArchiveTar($filename, 'gz');
-    $content_list = $tar->listContent();
+    // Use the canonical absolute path so the phar:// URI prefix from
+    // getPathname() can be reliably stripped.
+    $absolute_filename = str_starts_with($filename, '/') ? $filename : DRUPAL_ROOT . '/' . $filename;
+    $tar = new \PharData($absolute_filename);
+    $phar_prefix = 'phar://' . $absolute_filename . '/';
     // Convert the list of files into something easy to search.
     $files = [];
-    foreach ($content_list as $file) {
-      $files[] = $file['filename'];
+    foreach (new \RecursiveIteratorIterator($tar) as $file) {
+      $files[] = substr($file->getPathname(), strlen($phar_prefix));
     }
     $this->assertContains('collection/test1/config_test.create.yml', $files, 'Config export contains collection/test1/config_test.create.yml.');
     $this->assertContains('collection/test2/config_test.another_create.yml', $files, 'Config export contains collection/test2/config_test.another_create.yml.');
