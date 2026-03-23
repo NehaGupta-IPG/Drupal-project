@@ -330,6 +330,8 @@
         break;
     }
 
+    strength = Math.min(strength, 100);
+
     // Check if password is the same as the username.
     if (password !== '' && password.toLowerCase() === username.toLowerCase()) {
       msg.push(passwordSettings.sameAsUsername);
