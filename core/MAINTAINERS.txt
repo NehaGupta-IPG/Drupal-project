@@ -287,6 +287,7 @@ Menu Link Content
 
 Menu UI
 - Stephen Mustgrave 'smustgrave' https://www.drupal.org/u/smustgrave
+- Max Pogonowski 'darvanen' https://www.drupal.org/u/darvanen
 
 Migrate
 - Benji Fisher 'benjifisher' https://www.drupal.org/u/benjifisher
@@ -403,7 +404,7 @@ Theme API
   - Jean Valverde 'mogtofu33' https://www.drupal.org/u/mogtofu33
 
 Token
-- ?
+- Max Pogonowski 'darvanen' https://www.drupal.org/u/darvanen
 
 Toolbar
 - Théodore Biadala 'nod_' https://www.drupal.org/u/nod_
