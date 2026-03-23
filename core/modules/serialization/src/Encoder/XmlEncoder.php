@@ -8,6 +8,8 @@ use Symfony\Component\Serializer\Encoder\XmlEncoder as BaseXmlEncoder;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerAwareTrait;
 
+// cspell:ignore FFFD
+
 /**
  * Adds XML support for serializer.
  *
@@ -120,8 +122,6 @@ class XmlEncoder implements SerializerAwareInterface, EncoderInterface, DecoderI
 
     return $data;
   }
-
-  // cspell:ignore FFFD
 
   /**
    * Strips characters that are not allowed in XML 1.0.
