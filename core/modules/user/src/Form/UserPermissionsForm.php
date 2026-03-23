@@ -44,7 +44,7 @@ class UserPermissionsForm extends FormBase {
     protected PermissionHandlerInterface $permissionHandler,
     protected RoleStorageInterface $roleStorage,
     protected ModuleHandlerInterface $moduleHandler,
-    EventDispatcherInterface $event_dispatcher = NULL,
+    ?EventDispatcherInterface $event_dispatcher = NULL,
     protected ?ModuleExtensionList $moduleExtensionList = NULL,
   ) {
     if ($this->moduleExtensionList === NULL) {
@@ -52,7 +52,7 @@ class UserPermissionsForm extends FormBase {
       $this->moduleExtensionList = \Drupal::service('extension.list.module');
     }
     if (is_null($event_dispatcher)) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $event_dispatcher argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $event_dispatcher argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
       $event_dispatcher = \Drupal::service('event_dispatcher');
     }
     $this->eventDispatcher = $event_dispatcher;

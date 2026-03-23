@@ -69,9 +69,9 @@ class EntityPermissionsForm extends UserPermissionsForm {
    * @param \Drupal\Core\Extension\ModuleExtensionList|null $module_extension_list
    *   The module extension list.
    */
-  public function __construct(PermissionHandlerInterface $permission_handler, RoleStorageInterface $role_storage, ModuleHandlerInterface $module_handler, ConfigManagerInterface $config_manager, EntityTypeManagerInterface $entity_type_manager, EventDispatcherInterface $event_dispatcher = NULL, ?ModuleExtensionList $module_extension_list = NULL) {
+  public function __construct(PermissionHandlerInterface $permission_handler, RoleStorageInterface $role_storage, ModuleHandlerInterface $module_handler, ConfigManagerInterface $config_manager, EntityTypeManagerInterface $entity_type_manager, ?EventDispatcherInterface $event_dispatcher = NULL, ?ModuleExtensionList $module_extension_list = NULL) {
     if (is_null($event_dispatcher)) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $event_dispatcher argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $event_dispatcher argument is deprecated in drupal:10.2.0 and will be required in drupal:11.0.0. See https://www.drupal.org/node/3310017', E_USER_DEPRECATED);
       $event_dispatcher = \Drupal::service('event_dispatcher');
     }
     $this->eventDispatcher = $event_dispatcher;

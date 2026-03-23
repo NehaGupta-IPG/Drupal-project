@@ -66,7 +66,7 @@ class UserPermissionsAdminTest extends BrowserTestBase {
   /**
    * Confirms that PermissionsListFilter can filter the permissions UI listing.
    */
-  public function testFilterPermissionsEvent() {
+  public function testFilterPermissionsEvent(): void {
     \Drupal::service('module_installer')->install(['user_permissions_test', 'node']);
     $this->drupalCreateContentType(['type' => 'page']);
     $this->drupalLogin($this->drupalCreateUser([

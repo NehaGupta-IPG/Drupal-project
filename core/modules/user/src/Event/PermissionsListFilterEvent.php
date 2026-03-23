@@ -4,6 +4,9 @@ namespace Drupal\user\Event;
 
 use Drupal\Component\EventDispatcher\Event;
 
+/**
+ * Event fired to filter the permissions list.
+ */
 class PermissionsListFilterEvent extends Event {
 
   /**

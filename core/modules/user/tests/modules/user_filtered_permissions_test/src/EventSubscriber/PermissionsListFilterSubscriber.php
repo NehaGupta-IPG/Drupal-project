@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\user_filtered_permissions_test\EventSubscriber;
 
 use Drupal\user\Event\PermissionsListFilterEvent;
