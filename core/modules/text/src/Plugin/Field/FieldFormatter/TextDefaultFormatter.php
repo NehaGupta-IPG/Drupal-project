@@ -5,7 +5,6 @@ namespace Drupal\text\Plugin\Field\FieldFormatter;
 use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Field\FieldItemListInterface;
-use Drupal\Core\Messenger\MessengerTrait;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\filter\Entity\FilterFormat;
 
@@ -22,8 +21,6 @@ use Drupal\filter\Entity\FilterFormat;
   ],
 )]
 class TextDefaultFormatter extends FormatterBase {
-
-  use MessengerTrait;
 
   /**
    * {@inheritdoc}

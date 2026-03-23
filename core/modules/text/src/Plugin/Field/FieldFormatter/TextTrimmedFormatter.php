@@ -6,7 +6,6 @@ use Drupal\Core\Field\Attribute\FieldFormatter;
 use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Messenger\MessengerTrait;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\filter\Entity\FilterFormat;
@@ -30,8 +29,6 @@ use Drupal\text\TextSummary;
   ],
 )]
 class TextTrimmedFormatter extends FormatterBase implements TrustedCallbackInterface {
-
-  use MessengerTrait;
 
   /**
    * {@inheritdoc}
