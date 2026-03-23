@@ -11,7 +11,6 @@ use Drupal\Core\Extension\ThemeHandler;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 
 /**
  * Tests Drupal\Core\Extension\ThemeHandler.
@@ -30,7 +29,7 @@ class ThemeHandlerTest extends UnitTestCase {
   /**
    * The theme listing service.
    *
-   * @var \Drupal\Core\Extension\ThemeExtensionList|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Extension\ThemeExtensionList|\PHPUnit\Framework\MockObject\Stub
    */
   protected $themeList;
 
@@ -56,46 +55,15 @@ class ThemeHandlerTest extends UnitTestCase {
         ],
       ],
     ]);
-    $this->themeList = $this->getMockBuilder(ThemeExtensionList::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+    $this->themeList = $this->createStub(ThemeExtensionList::class);
     $this->themeHandler = new StubThemeHandler($this->root, $this->configFactory, $this->themeList);
 
     $container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
-    $container->expects($this->any())
+    $container
       ->method('get')
       ->with('class_loader')
-      ->willReturn($this->createMock(ClassLoader::class));
+      ->willReturn($this->createStub(ClassLoader::class));
     \Drupal::setContainer($container);
-  }
-
-  /**
-   * Tests rebuilding the theme data.
-   *
-   * @see \Drupal\Core\Extension\ThemeHandler::rebuildThemeData()
-   */
-  #[IgnoreDeprecations]
-  public function testRebuildThemeData(): void {
-    $this->expectDeprecation("\Drupal\Core\Extension\ThemeHandlerInterface::rebuildThemeData() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use \Drupal::service('extension.list.theme')->reset()->getList() instead. See https://www.drupal.org/node/3413196");
-    $this->themeList->expects($this->once())
-      ->method('reset')
-      ->willReturnSelf();
-    $this->themeList->expects($this->once())
-      ->method('getList')
-      ->willReturn([
-        'stark' => new Extension($this->root, 'theme', 'core/themes/stark/stark.info.yml', 'stark.theme'),
-      ]);
-
-    $theme_data = $this->themeHandler->rebuildThemeData();
-    $this->assertCount(1, $theme_data);
-    $info = $theme_data['stark'];
-
-    // Ensure some basic properties.
-    $this->assertInstanceOf('Drupal\Core\Extension\Extension', $info);
-    $this->assertEquals('stark', $info->getName());
-    $this->assertEquals('core/themes/stark/stark.info.yml', $info->getPathname());
-    $this->assertEquals('core/themes/stark/stark.theme', $info->getExtensionPathname());
-
   }
 
   /**

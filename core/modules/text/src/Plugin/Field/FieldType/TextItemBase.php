@@ -165,7 +165,7 @@ abstract class TextItemBase extends FieldItemBase {
 
     if (empty($settings['max_length'])) {
       // Textarea handling.
-      $value = $random->paragraphs();
+      $value = $random->paragraphs(2);
     }
     else {
       // Textfield handling.

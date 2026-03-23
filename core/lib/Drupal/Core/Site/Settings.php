@@ -38,12 +38,7 @@ final class Settings {
    *
    * @see self::handleDeprecations()
    */
-  private static $deprecatedSettings = [
-    'state_cache' => [
-      'replacement' => '',
-      'message' => 'The "state_cache" setting is deprecated in drupal:11.0.0. This setting should be removed from the settings file, since its usage has been removed. See https://www.drupal.org/node/3177901.',
-    ],
-  ];
+  private static $deprecatedSettings = [];
 
   /**
    * Constructor.
@@ -129,7 +124,7 @@ final class Settings {
    *   The app root.
    * @param string $site_path
    *   The current site path.
-   * @param \Composer\Autoload\ClassLoader $class_loader
+   * @param \Composer\Autoload\ClassLoader|null $class_loader
    *   The class loader that is used for this request. Passed by reference and
    *   exposed to the local scope of settings.php, so as to allow it to be
    *   decorated.

@@ -25,8 +25,7 @@ install:
   - taxonomy
   - dblog
   - search
-  - shortcut
-  - toolbar
+  - navigation
   - field_ui
   - file
   - views
