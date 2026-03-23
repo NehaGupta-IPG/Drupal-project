@@ -110,12 +110,8 @@ class Update extends Query implements ConditionInterface {
 
   /**
    * Executes the UPDATE query.
-   *
-   * @return int|null
-   *   The number of rows matched by the update query. This includes rows that
-   *   actually didn't have to be updated because the values didn't change.
    */
-  public function execute() {
+  public function execute(): void {
 
     [$args, $update_values] = $this->getQueryArguments();
     $update_values += $args;
@@ -128,11 +124,11 @@ class Update extends Query implements ConditionInterface {
     $stmt = $this->connection->prepareStatement((string) $this, $this->queryOptions, TRUE);
     try {
       $stmt->execute($update_values, $this->queryOptions);
-      return $stmt->rowCount();
     }
     catch (\Exception $e) {
       $this->connection->exceptionHandler()->handleExecutionException($e, $stmt, $update_values, $this->queryOptions);
     }
+
   }
 
   /**
