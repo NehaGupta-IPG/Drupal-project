@@ -105,7 +105,7 @@ class TermDeleteRemoveReferenceTest extends KernelTestBase {
   /**
    * Retrieves the taxonomy index from the database.
    */
-  protected function getTaxonomyIndex(): void {
+  protected function getTaxonomyIndex(): array {
     return \Drupal::database()->select('taxonomy_index')
       ->fields('taxonomy_index')
       ->execute()
