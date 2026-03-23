@@ -714,7 +714,15 @@
     // Initialize the operator labels (e.g., "And" or "Or") that are displayed
     // next to the filters in each group, and bind a handler so that they change
     // based on the values of the operator dropdown within that group.
-    this.redrawOperatorLabels();
+    // Defer until after the current stack: when this form is loaded via AJAX
+    // into a dialog, attach runs before Drupal.dialog().showModal(), so the
+    // table is still inside a hidden container and jQuery's :visible selector
+    // (used in redrawOperatorLabels) matches no rows until the dialog is shown.
+    setTimeout(() => {
+      if (document.documentElement.contains(this.table[0])) {
+        this.redrawOperatorLabels();
+      }
+    }, 0);
     $(
       once(
         'views-rearrange-filter-handler',
