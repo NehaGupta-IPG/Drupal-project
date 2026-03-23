@@ -171,6 +171,7 @@ class AccountSettingsForm extends ConfigFormBase {
     $form['email'] = [
       '#type' => 'vertical_tabs',
       '#title' => $this->t('Emails'),
+      '#description' => $this->t('Removing all text from the body of an email will disable that email from being sent.'),
     ];
     // These email tokens are shared for all settings, so just define
     // the list once to help ensure they stay in sync.
