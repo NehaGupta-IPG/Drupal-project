@@ -18,7 +18,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  */
 #[Block(
   id: "local_tasks_block",
-  admin_label: new TranslatableMarkup("Tabs")
+  admin_label: new TranslatableMarkup("Tabs"),
+  category: new TranslatableMarkup("Menus"),
 )]
 class LocalTasksBlock extends BlockBase implements ContainerFactoryPluginInterface {
 

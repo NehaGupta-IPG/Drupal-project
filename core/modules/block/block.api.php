@@ -43,6 +43,7 @@ use Drupal\Core\Access\AccessResult;
  * #[Block(
  *   id: "my_block",
  *   admin_label: new TranslatableMarkup("My Block"),
+ *   category: new TranslatableMarkup("My Category"),
  * )]
  * class MyBlock extends BlockBase {
  *   public function build() {

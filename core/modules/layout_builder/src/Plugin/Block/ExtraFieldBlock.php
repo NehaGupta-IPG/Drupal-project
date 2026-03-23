@@ -30,6 +30,7 @@ use Drupal\layout_builder\Plugin\Derivative\ExtraFieldBlockDeriver;
  */
 #[Block(
   id: "extra_field_block",
+  category: new TranslatableMarkup("Layout Builder"),
   deriver: ExtraFieldBlockDeriver::class
 )]
 class ExtraFieldBlock extends BlockBase implements ContextAwarePluginInterface, ContainerFactoryPluginInterface {

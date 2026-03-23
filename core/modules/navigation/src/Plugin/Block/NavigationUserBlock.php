@@ -22,6 +22,7 @@ use Drupal\user\Entity\User;
 #[Block(
   id: 'navigation_user',
   admin_label: new TranslatableMarkup('User'),
+  category: new TranslatableMarkup('Navigation'),
 )]
 final class NavigationUserBlock extends BlockBase {
 

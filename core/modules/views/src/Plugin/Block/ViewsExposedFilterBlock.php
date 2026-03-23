@@ -14,6 +14,7 @@ use Drupal\views\Plugin\Derivative\ViewsExposedFilterBlock as ViewsExposedFilter
 #[Block(
   id: "views_exposed_filter_block",
   admin_label: new TranslatableMarkup("Views Exposed Filter Block"),
+  category: new TranslatableMarkup("Lists (Views)"),
   deriver: ViewsExposedFilterBlockDeriver::class
 )]
 class ViewsExposedFilterBlock extends ViewsBlockBase {

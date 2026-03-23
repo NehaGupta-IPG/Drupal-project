@@ -17,7 +17,8 @@ use Drupal\system\Form\ClearCacheForm;
  */
 #[Block(
   id: "system_clear_cache_block",
-  admin_label: new TranslatableMarkup("Clear cache")
+  admin_label: new TranslatableMarkup("Clear cache"),
+  category: new TranslatableMarkup("System"),
 )]
 class ClearCacheBlock extends BlockBase implements ContainerFactoryPluginInterface {
 

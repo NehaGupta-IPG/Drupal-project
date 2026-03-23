@@ -11,7 +11,8 @@ use Drupal\Core\StringTranslation\TranslatableMarkup;
  */
 #[Block(
   id: "system_powered_by_block",
-  admin_label: new TranslatableMarkup("Powered by Drupal")
+  admin_label: new TranslatableMarkup("Powered by Drupal"),
+  category: new TranslatableMarkup("System"),
 )]
 class SystemPoweredByBlock extends BlockBase {
 
