@@ -313,8 +313,10 @@ abstract class SqlBase extends PagerPluginBase implements CacheableDependencyInt
   }
 
   /**
-   * This function is the heart of this override class. If pager id is set to be unique, it stores pager ID in a
-   * shared tempstore, so it doesn't hand out duplicate pager IDs. Otherwise, id option is returned.
+   * Get the pager element ID.
+   *
+   * If pager ID is set to be unique, it stores pager ID in a shared tempstore,
+   * so it doesn't hand out duplicate pager IDs. Otherwise, id option is returned.
    */
   private function getPagerElement(): int {
     if (!$this->options['id_unique'] || $this->view === NULL || $this->view->dom_id === NULL) {
