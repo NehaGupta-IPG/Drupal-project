@@ -3,6 +3,7 @@
 namespace Drupal\Core\Menu\Form;
 
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Menu\MenuLinkManagerInterface;
@@ -59,9 +60,11 @@ class MenuLinkDefaultForm implements MenuLinkFormInterface, ContainerInjectionIn
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler;
+   *   The module handler.
+   * @param \Drupal\Core\Extension\ModuleExtensionList $moduleExtensionList
+   *   The module extension list.
    */
-  public function __construct(MenuLinkManagerInterface $menu_link_manager, MenuParentFormSelectorInterface $menu_parent_selector, TranslationInterface $string_translation, ModuleHandlerInterface $module_handler) {
+  public function __construct(MenuLinkManagerInterface $menu_link_manager, MenuParentFormSelectorInterface $menu_parent_selector, TranslationInterface $string_translation, ModuleHandlerInterface $module_handler, protected ModuleExtensionList $moduleExtensionList) {
     $this->menuLinkManager = $menu_link_manager;
     $this->menuParentSelector = $menu_parent_selector;
     $this->stringTranslation = $string_translation;
@@ -76,7 +79,8 @@ class MenuLinkDefaultForm implements MenuLinkFormInterface, ContainerInjectionIn
       $container->get('plugin.manager.menu.link'),
       $container->get('menu.parent_form_selector'),
       $container->get('string_translation'),
-      $container->get('module_handler')
+      $container->get('module_handler'),
+      $container->get('extension.list.module')
     );
   }
 
@@ -96,7 +100,7 @@ class MenuLinkDefaultForm implements MenuLinkFormInterface, ContainerInjectionIn
     $provider = $this->menuLink->getProvider();
     $form['info'] = [
       '#type' => 'item',
-      '#title' => $this->t('This link is provided by the @name module. The title and path cannot be edited.', ['@name' => $this->moduleHandler->getName($provider)]),
+      '#title' => $this->t('This link is provided by the @name module. The title and path cannot be edited.', ['@name' => $this->moduleExtensionList->getName($provider)]),
     ];
     $form['id'] = [
       '#type' => 'value',

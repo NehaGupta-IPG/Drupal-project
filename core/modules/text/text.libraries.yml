@@ -1,7 +1,7 @@
 drupal.text:
   version: VERSION
   js:
-    text.js: {}
+    js/text.js: {}
   dependencies:
     - core/jquery
     - core/once

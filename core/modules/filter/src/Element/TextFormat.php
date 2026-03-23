@@ -3,9 +3,9 @@
 namespace Drupal\filter\Element;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element\RenderElement;
+use Drupal\Core\Render\Attribute\RenderElement;
+use Drupal\Core\Render\Element\RenderElementBase;
 use Drupal\Core\Render\Element;
-use Drupal\Core\Url;
 
 /**
  * Provides a text format render element.
@@ -21,28 +21,26 @@ use Drupal\Core\Url;
  *
  * Usage Example:
  * @code
- * $form['body'] = array(
+ * $form['body'] = [
  *   '#type' => 'text_format',
  *   '#title' => 'Body',
  *   '#format' => 'full_html',
  *   '#default_value' => '<p>The quick brown fox jumped over the lazy dog.</p>',
- * );
+ * ];
  * @endcode
  *
  * @see \Drupal\Core\Render\Element\Textarea
- *
- * @RenderElement("text_format")
  */
-class TextFormat extends RenderElement {
+#[RenderElement('text_format')]
+class TextFormat extends RenderElementBase {
 
   /**
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#process' => [
-        [$class, 'processFormat'],
+        [static::class, 'processFormat'],
       ],
       '#base_type' => 'textarea',
       '#theme_wrappers' => ['text_format_wrapper'],
@@ -199,24 +197,10 @@ class TextFormat extends RenderElement {
       '#parents' => array_merge($element['#parents'], ['format']),
     ];
 
-    $element['format']['help'] = [
-      '#type' => 'container',
-      '#theme_wrappers' => [
-        'container__text_format_filter_help',
-      ],
-      'about' => [
-        '#type' => 'link',
-        '#title' => t('About text formats'),
-        '#url' => new Url('filter.tips_all'),
-        '#attributes' => ['target' => '_blank'],
-      ],
-      '#weight' => 0,
-    ];
-
     $all_formats = filter_formats();
-    $format_exists = isset($all_formats[$element['#format']]);
+    $format_exists = isset($element['#format'], $all_formats[$element['#format']]);
     $format_allowed = !isset($element['#allowed_formats']) || in_array($element['#format'], $element['#allowed_formats']);
-    $user_has_access = isset($formats[$element['#format']]);
+    $user_has_access = isset($element['#format'], $formats[$element['#format']]);
     $user_is_admin = $user->hasPermission('administer filters');
 
     // If the stored format does not exist or if it is not among the allowed
@@ -295,6 +279,7 @@ class TextFormat extends RenderElement {
    * Wraps the config factory.
    *
    * @return \Drupal\Core\Config\ConfigFactoryInterface
+   *   The configuration factory service.
    */
   protected static function configFactory() {
     return \Drupal::configFactory();
@@ -304,6 +289,7 @@ class TextFormat extends RenderElement {
    * Wraps the element info service.
    *
    * @return \Drupal\Core\Render\ElementInfoManagerInterface
+   *   The element info service.
    */
   protected static function elementInfo() {
     return \Drupal::service('element_info');

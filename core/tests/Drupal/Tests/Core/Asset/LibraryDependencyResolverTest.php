@@ -1,14 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Asset;
 
 use Drupal\Core\Asset\LibraryDependencyResolver;
+use Drupal\Core\Asset\LibraryDiscoveryCollector;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Asset\LibraryDependencyResolver
- * @group Asset
+ * Tests Drupal\Core\Asset\LibraryDependencyResolver.
  */
+#[CoversClass(LibraryDependencyResolver::class)]
+#[Group('Asset')]
 class LibraryDependencyResolverTest extends UnitTestCase {
 
   /**
@@ -26,13 +33,6 @@ class LibraryDependencyResolverTest extends UnitTestCase {
   protected $libraryDiscovery;
 
   /**
-   * The mocked module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
-   */
-  protected $moduleHandler;
-
-  /**
    * Test library data.
    *
    * @var array
@@ -41,9 +41,11 @@ class LibraryDependencyResolverTest extends UnitTestCase {
     'no_deps_a' => ['js' => [], 'css' => []],
     'no_deps_b' => ['js' => [], 'css' => []],
     'no_deps_c' => ['js' => [], 'css' => []],
+    'no_deps_d' => ['js' => [], 'css' => []],
     'deps_a' => ['js' => [], 'css' => [], 'dependencies' => ['test/no_deps_a']],
     'deps_b' => ['js' => [], 'css' => [], 'dependencies' => ['test/no_deps_a', 'test/no_deps_b']],
     'deps_c' => ['js' => [], 'css' => [], 'dependencies' => ['test/no_deps_b', 'test/no_deps_a']],
+    'deps_d' => ['js' => [], 'css' => [], 'dependencies' => ['test/no_deps_d']],
     'nested_deps_a' => ['js' => [], 'css' => [], 'dependencies' => ['test/deps_a']],
     'nested_deps_b' => ['js' => [], 'css' => [], 'dependencies' => ['test/nested_deps_a']],
     'nested_deps_c' => ['js' => [], 'css' => [], 'dependencies' => ['test/nested_deps_b']],
@@ -55,11 +57,11 @@ class LibraryDependencyResolverTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->libraryDiscovery = $this->getMockBuilder('Drupal\Core\Asset\LibraryDiscovery')
+    $this->libraryDiscovery = $this->getMockBuilder(LibraryDiscoveryCollector::class)
       ->disableOriginalConstructor()
       ->onlyMethods(['getLibrariesByExtension'])
       ->getMock();
-    $this->libraryDiscovery->expects($this->any())
+    $this->libraryDiscovery
       ->method('getLibrariesByExtension')
       ->with('test')
       ->willReturn($this->libraryData);
@@ -69,59 +71,245 @@ class LibraryDependencyResolverTest extends UnitTestCase {
   /**
    * Provides test data for ::testGetLibrariesWithDependencies().
    */
-  public function providerTestGetLibrariesWithDependencies() {
+  public static function providerTestGetLibrariesWithDependencies(): array {
     return [
       // Empty list of libraries.
       [[], []],
       // Without dependencies.
       [['test/no_deps_a'], ['test/no_deps_a']],
-      [['test/no_deps_a', 'test/no_deps_b'], ['test/no_deps_a', 'test/no_deps_b']],
-      [['test/no_deps_b', 'test/no_deps_a'], ['test/no_deps_b', 'test/no_deps_a']],
+      [
+        ['test/no_deps_a', 'test/no_deps_b'],
+        ['test/no_deps_a', 'test/no_deps_b'],
+      ],
+      [
+        ['test/no_deps_b', 'test/no_deps_a'],
+        ['test/no_deps_b', 'test/no_deps_a'],
+      ],
       // Single-level (direct) dependencies.
-      [['test/deps_a'], ['test/no_deps_a', 'test/deps_a']],
-      [['test/deps_b'], ['test/no_deps_a', 'test/no_deps_b', 'test/deps_b']],
-      [['test/deps_c'], ['test/no_deps_b', 'test/no_deps_a', 'test/deps_c']],
-      [['test/deps_a', 'test/deps_b'], ['test/no_deps_a', 'test/deps_a', 'test/no_deps_b', 'test/deps_b']],
-      [['test/deps_a', 'test/deps_c'], ['test/no_deps_a', 'test/deps_a', 'test/no_deps_b', 'test/deps_c']],
-      [['test/deps_a', 'test/deps_b', 'test/deps_c'], ['test/no_deps_a', 'test/deps_a', 'test/no_deps_b', 'test/deps_b', 'test/deps_c']],
-      [['test/deps_b', 'test/deps_a'], ['test/no_deps_a', 'test/no_deps_b', 'test/deps_b', 'test/deps_a']],
-      [['test/deps_b', 'test/deps_c'], ['test/no_deps_a', 'test/no_deps_b', 'test/deps_b', 'test/deps_c']],
-      [['test/deps_c', 'test/deps_b'], ['test/no_deps_b', 'test/no_deps_a', 'test/deps_c', 'test/deps_b']],
+      [
+        ['test/deps_a'],
+        ['test/no_deps_a', 'test/deps_a'],
+      ],
+      [
+        ['test/deps_b'],
+        ['test/no_deps_a', 'test/no_deps_b', 'test/deps_b'],
+      ],
+      [
+        ['test/deps_c'],
+        ['test/no_deps_b', 'test/no_deps_a', 'test/deps_c'],
+      ],
+      [
+        ['test/deps_a', 'test/deps_b'],
+        ['test/no_deps_a', 'test/deps_a', 'test/no_deps_b', 'test/deps_b'],
+      ],
+      [
+        ['test/deps_a', 'test/deps_c'],
+        ['test/no_deps_a', 'test/deps_a', 'test/no_deps_b', 'test/deps_c'],
+      ],
+      [
+        ['test/deps_a', 'test/deps_b', 'test/deps_c'],
+        [
+          'test/no_deps_a',
+          'test/deps_a',
+          'test/no_deps_b',
+          'test/deps_b',
+          'test/deps_c',
+        ],
+      ],
+      [
+        ['test/deps_b', 'test/deps_a'],
+        ['test/no_deps_a', 'test/no_deps_b', 'test/deps_b', 'test/deps_a'],
+      ],
+      [
+        ['test/deps_b', 'test/deps_c'],
+        ['test/no_deps_a', 'test/no_deps_b', 'test/deps_b', 'test/deps_c'],
+      ],
+      [
+        ['test/deps_c', 'test/deps_b'],
+        ['test/no_deps_b', 'test/no_deps_a', 'test/deps_c', 'test/deps_b'],
+      ],
       // Multi-level (indirect) dependencies.
-      [['test/nested_deps_a'], ['test/no_deps_a', 'test/deps_a', 'test/nested_deps_a']],
-      [['test/nested_deps_b'], ['test/no_deps_a', 'test/deps_a', 'test/nested_deps_a', 'test/nested_deps_b']],
-      [['test/nested_deps_c'], ['test/no_deps_a', 'test/deps_a', 'test/nested_deps_a', 'test/nested_deps_b', 'test/nested_deps_c']],
-      [['test/nested_deps_a', 'test/nested_deps_b'], ['test/no_deps_a', 'test/deps_a', 'test/nested_deps_a', 'test/nested_deps_b']],
-      [['test/nested_deps_b', 'test/nested_deps_a'], ['test/no_deps_a', 'test/deps_a', 'test/nested_deps_a', 'test/nested_deps_b']],
-      [['test/nested_deps_a', 'test/nested_deps_c'], ['test/no_deps_a', 'test/deps_a', 'test/nested_deps_a', 'test/nested_deps_b', 'test/nested_deps_c']],
-      [['test/nested_deps_b', 'test/nested_deps_c'], ['test/no_deps_a', 'test/deps_a', 'test/nested_deps_a', 'test/nested_deps_b', 'test/nested_deps_c']],
-      [['test/nested_deps_c', 'test/nested_deps_a'], ['test/no_deps_a', 'test/deps_a', 'test/nested_deps_a', 'test/nested_deps_b', 'test/nested_deps_c']],
-      [['test/nested_deps_a', 'test/nested_deps_b', 'test/nested_deps_c'], ['test/no_deps_a', 'test/deps_a', 'test/nested_deps_a', 'test/nested_deps_b', 'test/nested_deps_c']],
-      [['test/nested_deps_a', 'test/nested_deps_c', 'test/nested_deps_b'], ['test/no_deps_a', 'test/deps_a', 'test/nested_deps_a', 'test/nested_deps_b', 'test/nested_deps_c']],
-      [['test/nested_deps_b', 'test/nested_deps_a', 'test/nested_deps_c'], ['test/no_deps_a', 'test/deps_a', 'test/nested_deps_a', 'test/nested_deps_b', 'test/nested_deps_c']],
-      [['test/nested_deps_b', 'test/nested_deps_c', 'test/nested_deps_a'], ['test/no_deps_a', 'test/deps_a', 'test/nested_deps_a', 'test/nested_deps_b', 'test/nested_deps_c']],
-      [['test/nested_deps_c', 'test/nested_deps_a', 'test/nested_deps_b'], ['test/no_deps_a', 'test/deps_a', 'test/nested_deps_a', 'test/nested_deps_b', 'test/nested_deps_c']],
-      [['test/nested_deps_c', 'test/nested_deps_b', 'test/nested_deps_a'], ['test/no_deps_a', 'test/deps_a', 'test/nested_deps_a', 'test/nested_deps_b', 'test/nested_deps_c']],
+      [
+        ['test/nested_deps_a'],
+        ['test/no_deps_a', 'test/deps_a', 'test/nested_deps_a'],
+      ],
+      [
+        ['test/nested_deps_b'],
+        [
+          'test/no_deps_a',
+          'test/deps_a',
+          'test/nested_deps_a',
+          'test/nested_deps_b',
+        ],
+      ],
+      [
+        ['test/nested_deps_c'],
+        [
+          'test/no_deps_a',
+          'test/deps_a',
+          'test/nested_deps_a',
+          'test/nested_deps_b',
+          'test/nested_deps_c',
+        ],
+      ],
+      [
+        ['test/nested_deps_a', 'test/nested_deps_b'],
+        [
+          'test/no_deps_a',
+          'test/deps_a',
+          'test/nested_deps_a',
+          'test/nested_deps_b',
+        ],
+      ],
+      [
+        ['test/nested_deps_b', 'test/nested_deps_a'],
+        [
+          'test/no_deps_a',
+          'test/deps_a',
+          'test/nested_deps_a',
+          'test/nested_deps_b',
+        ],
+      ],
+      [
+        ['test/nested_deps_a', 'test/nested_deps_c'],
+        [
+          'test/no_deps_a',
+          'test/deps_a',
+          'test/nested_deps_a',
+          'test/nested_deps_b',
+          'test/nested_deps_c',
+        ],
+      ],
+      [
+        ['test/nested_deps_b', 'test/nested_deps_c'],
+        [
+          'test/no_deps_a',
+          'test/deps_a',
+          'test/nested_deps_a',
+          'test/nested_deps_b',
+          'test/nested_deps_c',
+        ],
+      ],
+      [
+        ['test/nested_deps_c', 'test/nested_deps_a'],
+        [
+          'test/no_deps_a',
+          'test/deps_a',
+          'test/nested_deps_a',
+          'test/nested_deps_b',
+          'test/nested_deps_c',
+        ],
+      ],
+      [
+        ['test/nested_deps_a', 'test/nested_deps_b', 'test/nested_deps_c'],
+        [
+          'test/no_deps_a',
+          'test/deps_a',
+          'test/nested_deps_a',
+          'test/nested_deps_b',
+          'test/nested_deps_c',
+        ],
+      ],
+      [
+        ['test/nested_deps_a', 'test/nested_deps_c', 'test/nested_deps_b'],
+        [
+          'test/no_deps_a',
+          'test/deps_a',
+          'test/nested_deps_a',
+          'test/nested_deps_b',
+          'test/nested_deps_c',
+        ],
+      ],
+      [
+        ['test/nested_deps_b', 'test/nested_deps_a', 'test/nested_deps_c'],
+        [
+          'test/no_deps_a',
+          'test/deps_a',
+          'test/nested_deps_a',
+          'test/nested_deps_b',
+          'test/nested_deps_c',
+        ],
+      ],
+      [
+        ['test/nested_deps_b', 'test/nested_deps_c', 'test/nested_deps_a'],
+        [
+          'test/no_deps_a',
+          'test/deps_a',
+          'test/nested_deps_a',
+          'test/nested_deps_b',
+          'test/nested_deps_c',
+        ],
+      ],
+      [
+        ['test/nested_deps_c', 'test/nested_deps_a', 'test/nested_deps_b'],
+        [
+          'test/no_deps_a',
+          'test/deps_a',
+          'test/nested_deps_a',
+          'test/nested_deps_b',
+          'test/nested_deps_c',
+        ],
+      ],
+      [
+        ['test/nested_deps_c', 'test/nested_deps_b', 'test/nested_deps_a'],
+        [
+          'test/no_deps_a',
+          'test/deps_a',
+          'test/nested_deps_a',
+          'test/nested_deps_b',
+          'test/nested_deps_c',
+        ],
+      ],
       // Complex dependencies, combining the above, with many intersections.
-      [['test/deps_c', 'test/nested_deps_b'], ['test/no_deps_b', 'test/no_deps_a', 'test/deps_c', 'test/deps_a', 'test/nested_deps_a', 'test/nested_deps_b']],
-      [['test/no_deps_a', 'test/deps_c', 'test/nested_deps_b'], ['test/no_deps_a', 'test/no_deps_b', 'test/deps_c', 'test/deps_a', 'test/nested_deps_a', 'test/nested_deps_b']],
-      [['test/nested_deps_b', 'test/deps_c', 'test/no_deps_c'], ['test/no_deps_a', 'test/deps_a', 'test/nested_deps_a', 'test/nested_deps_b', 'test/no_deps_b', 'test/deps_c', 'test/no_deps_c']],
+      [
+        ['test/deps_c', 'test/nested_deps_b'],
+        [
+          'test/no_deps_b',
+          'test/no_deps_a',
+          'test/deps_c',
+          'test/deps_a',
+          'test/nested_deps_a',
+          'test/nested_deps_b',
+        ],
+      ],
+      [
+        ['test/no_deps_a', 'test/deps_c', 'test/nested_deps_b'],
+        [
+          'test/no_deps_a',
+          'test/no_deps_b',
+          'test/deps_c',
+          'test/deps_a',
+          'test/nested_deps_a',
+          'test/nested_deps_b',
+        ],
+      ],
+      [
+        ['test/nested_deps_b', 'test/deps_c', 'test/no_deps_c'],
+        [
+          'test/no_deps_a',
+          'test/deps_a',
+          'test/nested_deps_a',
+          'test/nested_deps_b',
+          'test/no_deps_b',
+          'test/deps_c',
+          'test/no_deps_c',
+        ],
+      ],
     ];
   }
 
   /**
-   * @covers ::getLibrariesWithDependencies
-   *
-   * @dataProvider providerTestGetLibrariesWithDependencies
+   * Tests get libraries with dependencies.
    */
-  public function testGetLibrariesWithDependencies(array $libraries, array $expected) {
+  #[DataProvider('providerTestGetLibrariesWithDependencies')]
+  public function testGetLibrariesWithDependencies(array $libraries, array $expected): void {
     $this->assertEquals($expected, $this->libraryDependencyResolver->getLibrariesWithDependencies($libraries));
   }
 
   /**
    * Provides test data for ::testGetMinimalRepresentativeSubset().
    */
-  public function providerTestGetMinimalRepresentativeSubset() {
+  public static function providerTestGetMinimalRepresentativeSubset(): array {
     return [
       // Empty list of libraries.
       [[], []],
@@ -139,6 +327,8 @@ class LibraryDependencyResolverTest extends UnitTestCase {
       [['test/deps_b', 'test/deps_a'], ['test/deps_b', 'test/deps_a']],
       [['test/deps_b', 'test/deps_c'], ['test/deps_b', 'test/deps_c']],
       [['test/deps_c', 'test/deps_b'], ['test/deps_c', 'test/deps_b']],
+      [['test/deps_a', 'test/deps_d', 'test/no_deps_a'], ['test/deps_a', 'test/deps_d']],
+      [['test/deps_a', 'test/deps_d', 'test/no_deps_d'], ['test/deps_a', 'test/deps_d']],
       // Multi-level (indirect) dependencies.
       [['test/nested_deps_a'], ['test/nested_deps_a']],
       [['test/nested_deps_b'], ['test/nested_deps_b']],
@@ -162,18 +352,17 @@ class LibraryDependencyResolverTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::getMinimalRepresentativeSubset
-   *
-   * @dataProvider providerTestGetMinimalRepresentativeSubset
+   * Tests get minimal representative subset.
    */
-  public function testGetMinimalRepresentativeSubset(array $libraries, array $expected) {
+  #[DataProvider('providerTestGetMinimalRepresentativeSubset')]
+  public function testGetMinimalRepresentativeSubset(array $libraries, array $expected): void {
     $this->assertEquals($expected, $this->libraryDependencyResolver->getMinimalRepresentativeSubset($libraries));
   }
 
   /**
-   * @covers ::getMinimalRepresentativeSubset
+   * Tests get minimal representative subset invalid input.
    */
-  public function testGetMinimalRepresentativeSubsetInvalidInput() {
+  public function testGetMinimalRepresentativeSubsetInvalidInput(): void {
     $this->expectException(\AssertionError::class);
     $this->expectExceptionMessage('$libraries can\'t contain duplicate items.');
     $this->libraryDependencyResolver->getMinimalRepresentativeSubset(['test/no_deps_a', 'test/no_deps_a']);

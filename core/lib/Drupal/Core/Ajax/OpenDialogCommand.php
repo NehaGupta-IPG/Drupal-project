@@ -41,9 +41,9 @@ class OpenDialogCommand implements CommandInterface, CommandWithAttachedAssetsIn
    *
    * Any jQuery UI option can be used.
    *
-   * @see http://api.jqueryui.com/dialog.
-   *
    * @var array
+   *
+   * @see http://api.jqueryui.com/dialog.
    */
   protected $dialogOptions;
 
@@ -59,7 +59,7 @@ class OpenDialogCommand implements CommandInterface, CommandWithAttachedAssetsIn
    *
    * @param string $selector
    *   The selector of the dialog.
-   * @param string $title
+   * @param string|\Stringable|null $title
    *   The title of the dialog.
    * @param string|array $content
    *   The content that will be placed in the dialog, either a render array
@@ -72,9 +72,18 @@ class OpenDialogCommand implements CommandInterface, CommandWithAttachedAssetsIn
    *   on the content of the dialog. If left empty, the settings will be
    *   populated automatically from the current request.
    */
-  public function __construct($selector, $title, $content, array $dialog_options = [], $settings = NULL) {
+  public function __construct($selector, string|\Stringable|null $title, $content, array $dialog_options = [], $settings = NULL) {
     $title = PlainTextOutput::renderFromHtml($title);
     $dialog_options += ['title' => $title];
+
+    $classes = [];
+    if (isset($dialog_options['classes']['ui-dialog'])) {
+      $classes[] = $dialog_options['classes']['ui-dialog'];
+    }
+    if ($classes) {
+      $dialog_options['classes']['ui-dialog'] = implode(' ', $classes);
+    }
+
     $this->selector = $selector;
     $this->content = $content;
     $this->dialogOptions = $dialog_options;
@@ -85,6 +94,8 @@ class OpenDialogCommand implements CommandInterface, CommandWithAttachedAssetsIn
    * Returns the dialog options.
    *
    * @return array
+   *   An array of the dialog-specific options passed directly to jQuery UI
+   *   dialogs.
    */
   public function getDialogOptions() {
     return $this->dialogOptions;

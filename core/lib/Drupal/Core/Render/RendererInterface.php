@@ -59,7 +59,7 @@ interface RendererInterface {
    * @see \Drupal\Core\Render\RendererInterface::renderRoot()
    * @see \Drupal\Core\Render\RendererInterface::render()
    */
-  public function renderPlain(&$elements);
+  public function renderInIsolation(&$elements);
 
   /**
    * Renders final HTML for a placeholder.
@@ -233,24 +233,24 @@ interface RendererInterface {
    *   of overrides as the value in #theme_wrappers array.
    *   For example, if we have a render element as follows:
    *   @code
-   *   array(
+   *   [
    *     '#theme' => 'image',
-   *     '#attributes' => array('class' => array('foo')),
-   *     '#theme_wrappers' => array('container'),
-   *   );
+   *     '#attributes' => ['class' => ['foo']],
+   *     '#theme_wrappers' => ['container'],
+   *   ];
    *   @endcode
    *   and we need to pass the class 'bar' as an attribute for 'container', we
    *   can rewrite our element thus:
    *   @code
-   *   array(
+   *   [
    *     '#theme' => 'image',
-   *     '#attributes' => array('class' => array('foo')),
-   *     '#theme_wrappers' => array(
-   *       'container' => array(
-   *         '#attributes' => array('class' => array('bar')),
-   *       ),
-   *     ),
-   *   );
+   *     '#attributes' => ['class' => ['foo']],
+   *     '#theme_wrappers' => [
+   *       'container' => [
+   *         '#attributes' => ['class' => ['bar']],
+   *       ],
+   *     ],
+   *   ];
    *    @endcode
    * - If this element has an array of #post_render functions defined, they
    *   are called sequentially to modify the rendered #children. Unlike
@@ -311,16 +311,13 @@ interface RendererInterface {
    *
    * @param array $elements
    *   The structured array describing the data to be rendered.
-   * @param bool $is_root_call
-   *   (Internal use only.) Whether this is a recursive call or not. See
-   *   ::renderRoot().
    *
-   * @return \Drupal\Component\Render\MarkupInterface
+   * @return \Drupal\Component\Render\MarkupInterface|string
    *   The rendered HTML.
    *
    * @throws \LogicException
    *   When called outside of a render context (i.e. outside of a renderRoot(),
-   *   renderPlain() or executeInRenderContext() call).
+   *   renderInIsolation() or executeInRenderContext() call).
    * @throws \Exception
    *   If a #pre_render callback throws an exception, it is caught to mark the
    *   renderer as no longer being in a root render call, if any. Then the
@@ -332,7 +329,7 @@ interface RendererInterface {
    * @see \Drupal\Core\Render\AttachmentsResponseProcessorInterface::processAttachments()
    * @see \Drupal\Core\Render\RendererInterface::renderRoot()
    */
-  public function render(&$elements, $is_root_call = FALSE);
+  public function render(array &$elements);
 
   /**
    * Checks whether a render context is active.
@@ -350,7 +347,7 @@ interface RendererInterface {
    * Executes a callable within a render context.
    *
    * Only for very advanced use cases. Prefer using ::renderRoot() and
-   * ::renderPlain() instead.
+   * ::renderInIsolation() instead.
    *
    * All rendering must happen within a render context. Within a render context,
    * all bubbleable metadata is bubbled and hence tracked. Outside of a render

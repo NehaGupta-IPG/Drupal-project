@@ -1,18 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\content_translation\Kernel;
 
+use Drupal\content_translation\ContentTranslationHandler;
 use Drupal\Core\Form\FormState;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the content translation handler.
- *
- * @group content_translation
- *
- * @coversDefaultClass \Drupal\content_translation\ContentTranslationHandler
  */
+#[CoversClass(ContentTranslationHandler::class)]
+#[Group('content_translation')]
+#[RunTestsInSeparateProcesses]
 class ContentTranslationHandlerTest extends KernelTestBase {
 
   /**
@@ -96,12 +102,11 @@ class ContentTranslationHandlerTest extends KernelTestBase {
    * @param array $expected
    *   The expected altered element.
    *
-   * @dataProvider providerTestEntityFormSharedElements
-   *
-   * @covers ::entityFormSharedElements
-   * @covers ::addTranslatabilityClue
+   * @legacy-covers ::entityFormSharedElements
+   * @legacy-covers ::addTranslatabilityClue
    */
-  public function testEntityFormSharedElements(array $element, $default_translation_affected, $default_translation, $translation_form, array $expected) {
+  #[DataProvider('providerTestEntityFormSharedElements')]
+  public function testEntityFormSharedElements(array $element, $default_translation_affected, $default_translation, $translation_form, array $expected): void {
     $this->state->set('entity_test.translation', TRUE);
     $this->state->set('entity_test.untranslatable_fields.default_translation_affected', $default_translation_affected);
     $this->entityTypeBundleInfo->clearCachedBundles();
@@ -134,7 +139,7 @@ class ContentTranslationHandlerTest extends KernelTestBase {
    *   An array of test cases, each one containing the element to alter, the
    *   form state, and the expected altered element.
    */
-  public function providerTestEntityFormSharedElements() {
+  public static function providerTestEntityFormSharedElements() {
     $tests = [];
 
     $element = [];

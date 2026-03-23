@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\media\FunctionalJavascript;
 
 use Drupal\field\Entity\FieldConfig;
@@ -22,7 +24,7 @@ abstract class MediaSourceTestBase extends MediaJavascriptTestBase {
     \Drupal::configFactory()
       ->getEditable('media.settings')
       ->set('standalone_url', TRUE)
-      ->save(TRUE);
+      ->save();
 
     $this->container->get('router.builder')->rebuild();
   }

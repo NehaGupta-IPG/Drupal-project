@@ -70,31 +70,6 @@ interface ThemeHandlerInterface {
   public function reset();
 
   /**
-   * Scans and collects theme extension data and their engines.
-   *
-   * @return \Drupal\Core\Extension\Extension[]
-   *   An associative array of theme extensions.
-   */
-  public function rebuildThemeData();
-
-  /**
-   * Finds all the base themes for the specified theme.
-   *
-   * Themes can inherit templates and function implementations from earlier
-   * themes.
-   *
-   * @param \Drupal\Core\Extension\Extension[] $themes
-   *   An array of available themes.
-   * @param string $theme
-   *   The name of the theme whose base we are looking for.
-   *
-   * @return array
-   *   Returns an array of all of the theme's ancestors; the first element's
-   *   value will be NULL if an error occurred.
-   */
-  public function getBaseThemes(array $themes, $theme);
-
-  /**
    * Gets the human readable name of a given theme.
    *
    * @param string $theme
@@ -123,6 +98,8 @@ interface ThemeHandlerInterface {
    * directories.
    *
    * @return array
+   *   An associative array containing the directory path for all installed
+   *   themes. The array is keyed by the theme name.
    */
   public function getThemeDirectories();
 

@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace Drupal\file\Plugin\Validation\Constraint;
 
-use Symfony\Component\Validator\Constraint;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Validation\Attribute\Constraint;
+use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 
 /**
  * File extension dimensions constraint.
- *
- * @Constraint(
- *   id = "FileImageDimensions",
- *   label = @Translation("File Image Dimensions", context = "Validation"),
- *   type = "file"
- * )
  */
-class FileImageDimensionsConstraint extends Constraint {
+#[Constraint(
+  id: 'FileImageDimensions',
+  label: new TranslatableMarkup('File Image Dimensions', [], ['context' => 'Validation']),
+  type: 'file'
+)]
+class FileImageDimensionsConstraint extends SymfonyConstraint {
 
   /**
    * The minimum dimensions.
@@ -31,25 +32,19 @@ class FileImageDimensionsConstraint extends Constraint {
    */
   public string | int $maxDimensions = 0;
 
-  /**
-   * The resized image too small message.
-   *
-   * @var string
-   */
-  public string $messageResizedImageTooSmall = 'The resized image is too small. The minimum dimensions are %dimensions pixels and after resizing, the image size will be %widthx%height pixels.';
-
-  /**
-   * The image too small message.
-   *
-   * @var string
-   */
-  public string $messageImageTooSmall = 'The image is too small. The minimum dimensions are %dimensions pixels and the image size is %widthx%height pixels.';
-
-  /**
-   * The resize failed message.
-   *
-   * @var string
-   */
-  public string $messageResizeFailed = 'The image exceeds the maximum allowed dimensions and an attempt to resize it failed.';
+  public function __construct(
+    mixed $options = NULL,
+    string|int|null $minDimensions = NULL,
+    string|int|null $maxDimensions = NULL,
+    public string $messageResizedImageTooSmall = 'The resized image is too small. The minimum dimensions are %dimensions pixels and after resizing, the image size will be %widthx%height pixels.',
+    public string $messageImageTooSmall = 'The image is too small. The minimum dimensions are %dimensions pixels and the image size is %widthx%height pixels.',
+    public string $messageResizeFailed = 'The image exceeds the maximum allowed dimensions and an attempt to resize it failed.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct($options, $groups, $payload);
+    $this->minDimensions = $minDimensions ?? $this->minDimensions;
+    $this->maxDimensions = $maxDimensions ?? $this->maxDimensions;
+  }
 
 }

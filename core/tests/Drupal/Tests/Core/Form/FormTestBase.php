@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Form;
 
 use Drupal\Component\Utility\Html;
@@ -9,9 +11,13 @@ use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Form\FormValidator;
+use Drupal\Core\Utility\CallableResolver;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
 /**
  * Provides a base class for testing form functionality.
@@ -149,13 +155,15 @@ abstract class FormTestBase extends UnitTestCase {
   protected $themeManager;
 
   /**
+   * The callable resolver.
+   */
+  protected CallableResolver | Stub $callableResolver;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
-
-    // Add functions to the global namespace for testing.
-    require_once __DIR__ . '/fixtures/form_base_test.inc';
 
     $this->moduleHandler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
 
@@ -182,19 +190,26 @@ abstract class FormTestBase extends UnitTestCase {
     $this->account = $this->createMock('Drupal\Core\Session\AccountInterface');
     $this->themeManager = $this->createMock('Drupal\Core\Theme\ThemeManagerInterface');
     $this->request = Request::createFromGlobals();
+    $this->request->setSession(new Session(new MockArraySessionStorage()));
     $this->eventDispatcher = $this->createMock('Symfony\Contracts\EventDispatcher\EventDispatcherInterface');
     $this->requestStack = new RequestStack();
     $this->requestStack->push($this->request);
     $this->logger = $this->createMock('Drupal\Core\Logger\LoggerChannelInterface');
     $form_error_handler = $this->createMock('Drupal\Core\Form\FormErrorHandlerInterface');
-    $this->formValidator = new FormValidator($this->requestStack, $this->getStringTranslationStub(), $this->csrfToken, $this->logger, $form_error_handler);
+    $this->callableResolver = $this->createStub(CallableResolver::class);
+    $this->formValidator = new FormValidator($this->requestStack, $this->getStringTranslationStub(), $this->csrfToken, $this->logger, $form_error_handler, $this->callableResolver);
     $this->formSubmitter = $this->getMockBuilder('Drupal\Core\Form\FormSubmitter')
-      ->setConstructorArgs([$this->requestStack, $this->urlGenerator, $this->redirectResponseSubscriber])
+      ->setConstructorArgs([
+        $this->requestStack,
+        $this->urlGenerator,
+        $this->redirectResponseSubscriber,
+        $this->callableResolver,
+      ])
       ->onlyMethods(['batchGet'])
       ->getMock();
     $this->root = dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__)), 2);
 
-    $this->formBuilder = new FormBuilder($this->formValidator, $this->formSubmitter, $this->formCache, $this->moduleHandler, $this->eventDispatcher, $this->requestStack, $this->classResolver, $this->elementInfo, $this->themeManager, $this->csrfToken);
+    $this->formBuilder = new FormBuilder($this->formValidator, $this->formSubmitter, $this->formCache, $this->moduleHandler, $this->eventDispatcher, $this->requestStack, $this->classResolver, $this->elementInfo, $this->themeManager, $this->csrfToken, $this->callableResolver);
   }
 
   /**
@@ -203,6 +218,7 @@ abstract class FormTestBase extends UnitTestCase {
   protected function tearDown(): void {
     Html::resetSeenIds();
     (new FormState())->clearErrors();
+    parent::tearDown();
   }
 
   /**
@@ -220,7 +236,7 @@ abstract class FormTestBase extends UnitTestCase {
    * @return \PHPUnit\Framework\MockObject\MockObject|\Drupal\Core\Form\FormInterface
    *   The mocked form object.
    */
-  protected function getMockForm($form_id, $expected_form = NULL, $count = 1) {
+  protected function getMockForm($form_id, $expected_form = NULL, int $count = 1) {
     $form = $this->createMock('Drupal\Core\Form\FormInterface');
     $form->expects($this->once())
       ->method('getFormId')

@@ -1,21 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\Core\Database;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\InvalidQueryException;
 use Drupal\Core\Database\Query\Condition;
 use Drupal\Core\Database\Query\PlaceholderInterface;
 use Drupal\Tests\Core\Database\Stub\StubCondition;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
 use Drupal\Tests\Core\Database\Stub\StubPDO;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 
 /**
- * @coversDefaultClass \Drupal\Core\Database\Query\Condition
- *
- * @group Database
+ * Tests Drupal\Core\Database\Query\Condition.
  */
+#[CoversClass(Condition::class)]
+#[Group('Database')]
 class ConditionTest extends UnitTestCase {
 
   /**
@@ -25,7 +31,7 @@ class ConditionTest extends UnitTestCase {
    *   - Expected result for the string version of the condition.
    *   - The field name to input in the condition.
    */
-  public function providerSimpleCondition() {
+  public static function providerSimpleCondition(): array {
     return [
       ['name = :db_condition_placeholder_0', 'name'],
       ['name123 = :db_condition_placeholder_0', 'name-123'],
@@ -33,12 +39,14 @@ class ConditionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::compile
-   * @dataProvider providerSimpleCondition
+   * Tests simple condition.
+   *
+   * @legacy-covers ::compile
    */
-  public function testSimpleCondition($expected, $field_name) {
+  #[DataProvider('providerSimpleCondition')]
+  public function testSimpleCondition(string $expected, string $field_name): void {
     $connection = $this->prophesize(Connection::class);
-    $connection->escapeField($field_name)->will(function ($args) {
+    $connection->escapeField($field_name)->will(function ($args): string|array|null {
       return preg_replace('/[^A-Za-z0-9_.]+/', '', $args[0]);
     });
     $connection->mapConditionOperator('=')->willReturn(['operator' => '=']);
@@ -48,7 +56,7 @@ class ConditionTest extends UnitTestCase {
     $query_placeholder = $this->prophesize(PlaceholderInterface::class);
 
     $counter = 0;
-    $query_placeholder->nextPlaceholder()->will(function () use (&$counter) {
+    $query_placeholder->nextPlaceholder()->will(function () use (&$counter): int {
       return $counter++;
     });
     $query_placeholder->uniqueIdentifier()->willReturn(4);
@@ -63,9 +71,7 @@ class ConditionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::compile
-   *
-   * @dataProvider dataProviderTestCompileWithKnownOperators
+   * Tests compile with known operators.
    *
    * @param string $expected
    *   The expected generated SQL condition.
@@ -78,9 +84,10 @@ class ConditionTest extends UnitTestCase {
    * @param mixed $expected_arguments
    *   (optional) The expected set arguments.
    */
-  public function testCompileWithKnownOperators($expected, $field, $value, $operator, $expected_arguments = NULL) {
+  #[DataProvider('dataProviderTestCompileWithKnownOperators')]
+  public function testCompileWithKnownOperators($expected, $field, $value, $operator, $expected_arguments = NULL): void {
     $connection = $this->prophesize(Connection::class);
-    $connection->escapeField(Argument::any())->will(function ($args) {
+    $connection->escapeField(Argument::any())->will(function ($args): string|array|null {
       return preg_replace('/[^A-Za-z0-9_.]+/', '', $args[0]);
     });
     $connection->mapConditionOperator(Argument::any())->willReturn(NULL);
@@ -90,7 +97,7 @@ class ConditionTest extends UnitTestCase {
     $query_placeholder = $this->prophesize(PlaceholderInterface::class);
 
     $counter = 0;
-    $query_placeholder->nextPlaceholder()->will(function () use (&$counter) {
+    $query_placeholder->nextPlaceholder()->will(function () use (&$counter): int {
       return $counter++;
     });
     $query_placeholder->uniqueIdentifier()->willReturn(4);
@@ -110,8 +117,9 @@ class ConditionTest extends UnitTestCase {
    * Provides a list of known operations and the expected output.
    *
    * @return array
+   *   An array of known operations and the expected output.
    */
-  public function dataProviderTestCompileWithKnownOperators() {
+  public static function dataProviderTestCompileWithKnownOperators(): array {
     // Below are a list of commented out test cases, which should work but
     // aren't directly supported by core, but instead need manual handling with
     // prefix/suffix at the moment.
@@ -124,17 +132,51 @@ class ConditionTest extends UnitTestCase {
     $data[] = ['name <= :db_condition_placeholder_0', 'name', 'value', '<='];
     $data[] = ['name < :db_condition_placeholder_0', 'name', 'value', '<'];
     // $data[] = ['GREATEST (1, 2, 3)', '', [1, 2, 3], 'GREATEST'];
-    $data[] = ['name IN (:db_condition_placeholder_0, :db_condition_placeholder_1, :db_condition_placeholder_2)', 'name', ['1', '2', '3'], 'IN'];
-    $data[] = ['name NOT IN (:db_condition_placeholder_0, :db_condition_placeholder_1, :db_condition_placeholder_2)', 'name', ['1', '2', '3'], 'NOT IN'];
+    $data[] = [
+      'name IN (:db_condition_placeholder_0, :db_condition_placeholder_1, :db_condition_placeholder_2)',
+      'name',
+      ['1', '2', '3'],
+      'IN',
+    ];
+    $data[] = [
+      'name NOT IN (:db_condition_placeholder_0, :db_condition_placeholder_1, :db_condition_placeholder_2)',
+      'name',
+      ['1', '2', '3'],
+      'NOT IN',
+    ];
     // $data[] = ['INTERVAL (1, 2, 3)', '', [1, 2, 3], 'INTERVAL'];
     $data[] = ['name IS NULL', 'name', NULL, 'IS NULL'];
     $data[] = ['name IS NOT NULL', 'name', NULL, 'IS NOT NULL'];
     $data[] = ['name IS :db_condition_placeholder_0', 'name', 'TRUE', 'IS'];
     // $data[] = ['LEAST (1, 2, 3)', '', [1, 2, 3], 'LEAST'];
-    $data[] = ["name LIKE :db_condition_placeholder_0 ESCAPE '\\\\'", 'name', '%muh%', 'LIKE', [':db_condition_placeholder_0' => '%muh%']];
-    $data[] = ["name NOT LIKE :db_condition_placeholder_0 ESCAPE '\\\\'", 'name', '%muh%', 'NOT LIKE', [':db_condition_placeholder_0' => '%muh%']];
-    $data[] = ["name BETWEEN :db_condition_placeholder_0 AND :db_condition_placeholder_1", 'name', [1, 2], 'BETWEEN', [':db_condition_placeholder_0' => 1, ':db_condition_placeholder_1' => 2]];
-    $data[] = ["name NOT BETWEEN :db_condition_placeholder_0 AND :db_condition_placeholder_1", 'name', [1, 2], 'NOT BETWEEN', [':db_condition_placeholder_0' => 1, ':db_condition_placeholder_1' => 2]];
+    $data[] = [
+      "name LIKE :db_condition_placeholder_0 ESCAPE '\\\\'",
+      'name',
+      '%muh%',
+      'LIKE',
+      [':db_condition_placeholder_0' => '%muh%'],
+    ];
+    $data[] = [
+      "name NOT LIKE :db_condition_placeholder_0 ESCAPE '\\\\'",
+      'name',
+      '%muh%',
+      'NOT LIKE',
+      [':db_condition_placeholder_0' => '%muh%'],
+    ];
+    $data[] = [
+      "name BETWEEN :db_condition_placeholder_0 AND :db_condition_placeholder_1",
+      'name',
+      [1, 2],
+      'BETWEEN',
+      [':db_condition_placeholder_0' => 1, ':db_condition_placeholder_1' => 2],
+    ];
+    $data[] = [
+      "name NOT BETWEEN :db_condition_placeholder_0 AND :db_condition_placeholder_1",
+      'name',
+      [1, 2],
+      'NOT BETWEEN',
+      [':db_condition_placeholder_0' => 1, ':db_condition_placeholder_1' => 2],
+    ];
     // $data[] = ['STRCMP (name, :db_condition_placeholder_0)', '', ['test-string'], 'STRCMP', [':db_condition_placeholder_0' => 'test-string']];
     // $data[] = ['EXISTS', '', NULL, 'EXISTS'];
     // $data[] = ['name NOT EXISTS', 'name', NULL, 'NOT EXISTS'];
@@ -143,13 +185,12 @@ class ConditionTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::compile
-   *
-   * @dataProvider providerTestCompileWithSqlInjectionForOperator
+   * Tests compile with sql injection for operator.
    */
-  public function testCompileWithSqlInjectionForOperator($operator) {
+  #[DataProvider('providerTestCompileWithSqlInjectionForOperator')]
+  public function testCompileWithSqlInjectionForOperator($operator): void {
     $connection = $this->prophesize(Connection::class);
-    $connection->escapeField(Argument::any())->will(function ($args) {
+    $connection->escapeField(Argument::any())->will(function ($args): string|array|null {
       return preg_replace('/[^A-Za-z0-9_.]+/', '', $args[0]);
     });
     $connection->mapConditionOperator(Argument::any())->willReturn(NULL);
@@ -159,7 +200,7 @@ class ConditionTest extends UnitTestCase {
     $query_placeholder = $this->prophesize(PlaceholderInterface::class);
 
     $counter = 0;
-    $query_placeholder->nextPlaceholder()->will(function () use (&$counter) {
+    $query_placeholder->nextPlaceholder()->will(function () use (&$counter): int {
       return $counter++;
     });
     $query_placeholder->uniqueIdentifier()->willReturn(4);
@@ -167,11 +208,15 @@ class ConditionTest extends UnitTestCase {
 
     $condition = $connection->condition('AND');
     $condition->condition('name', 'value', $operator);
-    $this->expectError();
+    $this->expectException(InvalidQueryException::class);
+    $this->expectExceptionMessage('Invalid characters in query operator:');
     $condition->compile($connection, $query_placeholder);
   }
 
-  public function providerTestCompileWithSqlInjectionForOperator() {
+  /**
+   * Provides data for testing SQL injection.
+   */
+  public static function providerTestCompileWithSqlInjectionForOperator(): array {
     $data = [];
     $data[] = ["IS NOT NULL) ;INSERT INTO {test} (name) VALUES ('test12345678'); -- "];
     $data[] = ["IS NOT NULL) UNION ALL SELECT name, pass FROM {users_field_data} -- "];
@@ -184,7 +229,7 @@ class ConditionTest extends UnitTestCase {
   /**
    * Tests that the core Condition can be overridden.
    */
-  public function testContribCondition() {
+  public function testContribCondition(): void {
     $connection = new StubConnection($this->createMock(StubPDO::class), [
       'namespace' => 'Drupal\mock\Driver\Database\mock',
       'prefix' => '',

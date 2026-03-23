@@ -4,14 +4,12 @@ description: 'Install an example site that shows off some of Drupal’s capabili
 version: VERSION
 install:
   - node
-  - history
   - big_pipe
   - block
   - breakpoint
   - ckeditor5
   - config
   - contextual
-  - contact
   - layout_builder
   - layout_discovery
   - menu_link_content
@@ -29,10 +27,8 @@ install:
   - dynamic_page_cache
   - taxonomy
   - dblog
-  - sdc
   - search
-  - shortcut
-  - toolbar
+  - navigation
   - field_ui
   - file
   - views
@@ -45,6 +41,7 @@ install:
   - locale
   - config_translation
   - content_translation
+  - announcements_feed
 themes:
   - claro
   - umami
