@@ -4,6 +4,7 @@
  * @file
  */
 
+use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
 use Drupal\node\NodeTypeInterface;
@@ -21,7 +22,10 @@ function _menu_ui_node_save(NodeInterface $node, array $values): void {
   /** @var \Drupal\menu_link_content\MenuLinkContentInterface $entity */
   if (!empty($values['entity_id'])) {
     $entity = \Drupal::service('entity.repository')->getActive('menu_link_content', $values['entity_id']);
-    if ($entity->isTranslatable() && $node->isTranslatable()) {
+    if ($entity instanceof ContentEntityInterface
+      && $entity->isTranslatable()
+      && $node->isTranslatable()
+    ) {
       if (!$entity->hasTranslation($node->language()->getId())) {
         $entity = $entity->addTranslation($node->language()->getId(), $entity->toArray());
       }
