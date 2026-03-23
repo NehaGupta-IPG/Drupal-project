@@ -10,7 +10,7 @@ use Drupal\Core\Utility\Error;
  * This provides a file-based logging mechanism for test environments. Atomic
  * operations are ensured by using symlinks as locks.
  */
-final class TestLogger {
+final class TestErrorLogger {
 
   /**
    * The maximum time to wait for a lock in microseconds.
@@ -60,7 +60,7 @@ final class TestLogger {
     $log_file = static::getLogFile();
     $lock = static::acquireLock($log_file);
     try {
-      file_put_contents($log_file, rawurlencode(serialize($assertion)) . PHP_EOL, FILE_APPEND);
+      file_put_contents($log_file, rawurlencode(serialize($assertion)) . "\n", FILE_APPEND);
     }
     finally {
       static::releaseLock($lock);
@@ -93,7 +93,7 @@ final class TestLogger {
     finally {
       static::releaseLock($lock);
     }
-    foreach (explode(PHP_EOL, trim($content)) as $line) {
+    foreach (explode("\n", trim($content)) as $line) {
       $parameters = unserialize(rawurldecode($line), ['allowed_classes' => FALSE]);
       if (count($parameters) === 3) {
         if ($parameters[1] === 'User deprecated function') {

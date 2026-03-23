@@ -2,7 +2,7 @@
 
 namespace Drupal\Core\Test\HttpClientMiddleware;
 
-use Drupal\Core\Test\TestLogger;
+use Drupal\Core\Test\TestErrorLogger;
 use Drupal\Core\Utility\Error;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -62,7 +62,7 @@ class TestHttpClientMiddleware {
                 }
               }
             }
-            TestLogger::reTriggerErrors();
+            TestErrorLogger::reTriggerErrors();
             return $response;
           });
       };

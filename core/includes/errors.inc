@@ -10,7 +10,7 @@ use Drupal\Component\Utility\Xss;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Core\Render\Markup;
-use Drupal\Core\Test\TestLogger;
+use Drupal\Core\Test\TestErrorLogger;
 use Drupal\Core\Utility\Error;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -159,7 +159,7 @@ function _drupal_log_error($error, $fatal = FALSE): void {
   // When running inside the testing framework, we relay the errors
   // to the tested site by the way of HTTP headers.
   if (defined('DRUPAL_TEST_IN_CHILD_SITE') && DRUPAL_TEST_IN_CHILD_SITE && (!defined('SIMPLETEST_COLLECT_ERRORS') || SIMPLETEST_COLLECT_ERRORS)) {
-    TestLogger::writeError($error['@message'], $error['%type'], $error['%function'], $error['%file'], $error['%line']);
+    TestErrorLogger::writeError($error['@message'], $error['%type'], $error['%function'], $error['%file'], $error['%line']);
   }
 
   $response = new Response();
