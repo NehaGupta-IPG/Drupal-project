@@ -420,7 +420,15 @@ class ConfigInstaller implements ConfigInstallerInterface {
         // creation. Updates of such configuration are allowed.
         if ($this->getActiveStorages($collection)->exists($name)) {
           $entity = $entity_storage->load($id);
-          $entity = $entity_storage->updateFromStorageRecord($entity, $new_config->get());
+          try {
+            $entity = $entity_storage->updateFromStorageRecord($entity, $new_config->get());
+          }
+          catch (\LogicException $e) {
+            // Skip entities that cannot be updated from storage records, such
+            // as versioned config entities (e.g., canvas content templates)
+            // that detect version history wipes during recipe installation.
+            continue;
+          }
         }
         else {
           $entity = $entity_storage->createFromStorageRecord($new_config->get());
@@ -429,6 +437,14 @@ class ConfigInstaller implements ConfigInstallerInterface {
           $entity->save();
           if ($id !== $entity->id()) {
             throw new \LogicException(sprintf('The configuration name "%s" does not match the ID "%s"', $name, $entity->id()));
+          }
+          // Clear cached field definitions after saving field-related config
+          // entities. This ensures that subsequent config entities being
+          // created in the same loop iteration can discover newly created
+          // field storages and field instances. Without this, stale cached
+          // definitions cause FieldExceptions during Recipe installation.
+          if ($entity_type === 'field_storage_config' || $entity_type === 'field_config') {
+            \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
           }
         }
       }
