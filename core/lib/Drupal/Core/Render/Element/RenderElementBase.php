@@ -149,6 +149,9 @@ abstract class RenderElementBase extends PluginBase implements ElementInterface 
     if (isset($element['#parents']) && isset($element['#errors']) && !empty($element['#validated'])) {
       $element['#attributes']['class'][] = 'error';
       $element['#attributes']['aria-invalid'] = 'true';
+      if (isset($element['#id'])) {
+        $element['#attributes']['aria-errormessage'] = $element['#id'] . '--error-message';
+      }
     }
   }
 
