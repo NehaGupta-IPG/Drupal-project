@@ -34,6 +34,14 @@ test_htmx.attachments.wrapper:
     _permission: 'access content'
     _csrf_token: 'FALSE'
 
+test_htmx.attachments.body:
+  path: '/htmx-test-attachments/body'
+  defaults:
+    _title: 'Body testing'
+    _controller: '\Drupal\test_htmx\Controller\HtmxTestAttachmentsController::selectBody'
+  requirements:
+    _permission: 'access content'
+
 test_htmx.attachments.replace:
   path: '/htmx-test-attachments/replace'
   defaults:

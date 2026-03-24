@@ -535,12 +535,10 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    *
    * @see \Drupal\KernelTests\KernelTestBase::bootKernel()
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     // Keep the container object around for tests.
     $this->container = $container;
 
-    $container
-      ->register('datetime.time', 'Drupal\Component\Datetime\Time');
     $container
       ->register('flood', 'Drupal\Core\Flood\MemoryBackend')
       ->addArgument(new Reference('request_stack'));
@@ -675,7 +673,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * {@inheritdoc}
    */
   protected function tearDown(): void {
-    if ($this->container) {
+    if ($this->container?->get('request_stack')->getCurrentRequest() !== NULL) {
       // Clean up mock session started in DrupalKernel::preHandle().
       /** @var \Symfony\Component\HttpFoundation\Session\Session $session */
       $session = $this->container->get('request_stack')->getSession();
