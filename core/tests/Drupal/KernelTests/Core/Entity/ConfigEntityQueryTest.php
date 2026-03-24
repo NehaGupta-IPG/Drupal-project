@@ -835,8 +835,8 @@ class ConfigEntityQueryTest extends KernelTestBase {
     array $expected,
     string $direction,
   ): void {
-    $storage = $this->container->get('entity_type.manager')->getStorage('menu');
-    // Create menu config entities.
+    $storage = $this->container->get('entity_type.manager')->getStorage('config_query_test');
+    // Create config_query_test config entities.
     foreach ($values as $label) {
       $id = strtolower($label);
 
@@ -847,12 +847,12 @@ class ConfigEntityQueryTest extends KernelTestBase {
     }
 
     // Execute the config entity query.
-    $result = \Drupal::entityQuery('menu')
+    $result = \Drupal::entityQuery('config_query_test')
       ->sort('label', $direction)
       ->execute();
 
-    $menus = $storage->loadMultiple($result);
-    $actual = array_map(fn ($menu) => $menu->label(), $menus);
+    $test_config_entities = $storage->loadMultiple($result);
+    $actual = array_map(fn ($test_config_entity) => $test_config_entity->label(), $test_config_entities);
 
     $this->assertSame($expected, array_values($actual));
   }
