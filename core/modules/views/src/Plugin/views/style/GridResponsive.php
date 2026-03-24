@@ -111,7 +111,7 @@ class GridResponsive extends StylePluginBase {
    * @return string
    *   A space-delimited string of classes.
    */
-  public function getCustomClass($result_index, $type) {
+  public function getCustomClass(int $result_index, string $type) {
     $class = $this->options[$type . '_class_custom'];
     if ($this->usesFields() && $this->view->field) {
       $class = strip_tags($this->tokenizeValue($class, $result_index));
