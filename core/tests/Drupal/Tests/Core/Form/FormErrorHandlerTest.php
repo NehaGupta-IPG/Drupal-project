@@ -7,6 +7,7 @@ namespace Drupal\Tests\Core\Form;
 use Drupal\Core\Form\FormErrorHandler;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -33,6 +34,13 @@ class FormErrorHandlerTest extends UnitTestCase {
   protected $messenger;
 
   /**
+   * The renderer service.
+   *
+   * @var \Drupal\Core\Render\RendererInterface|\PHPUnit\Framework\MockObject\MockObject
+   */
+  protected $renderer;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -40,7 +48,10 @@ class FormErrorHandlerTest extends UnitTestCase {
 
     $this->messenger = $this->createMock(MessengerInterface::class);
 
+    $this->renderer = $this->createMock(RendererInterface::class);
+
     $this->formErrorHandler = $this->getMockBuilder('Drupal\Core\Form\FormErrorHandler')
+      ->setConstructorArgs([$this->renderer])
       ->onlyMethods(['messenger'])
       ->getMock();
 
@@ -73,6 +84,12 @@ class FormErrorHandlerTest extends UnitTestCase {
         }),
         'error',
       );
+
+    $this->renderer->expects($this->any())
+      ->method('renderPlain')
+      ->willReturnCallback(function ($message) {
+        return $message['message']['#markup'];
+      });
 
     $form = [
       '#parents' => [],
