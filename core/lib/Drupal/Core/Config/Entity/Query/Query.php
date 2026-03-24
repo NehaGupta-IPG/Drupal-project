@@ -89,7 +89,7 @@ class Query extends QueryBase implements QueryInterface {
 
     // Apply sort settings.
     foreach ($this->sort as $sort) {
-      $direction = $sort['direction'] == 'ASC' ? -1 : 1;
+      $direction = $sort['direction'] == 'ASC' ? 1 : -1;
       $field = $sort['field'];
       uasort($result, function ($a, $b) use ($field, $direction) {
         $properties = explode('.', $field);
@@ -99,8 +99,8 @@ class Query extends QueryBase implements QueryInterface {
             $b = $b[$property] ?? NULL;
           }
         }
-        $compare = (is_string($a) && is_string($b)) ? (strcasecmp($a, $b) < 0) : ($a <= $b);
-        return $compare ? $direction : -$direction;
+        $compare = (is_string($a) && is_string($b)) ? strcasecmp($a, $b): $a <=> $b;
+        return $direction * $compare;
       });
     }
 
