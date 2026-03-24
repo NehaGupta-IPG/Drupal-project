@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\System;
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -130,6 +131,7 @@ class ErrorHandlerTest extends BrowserTestBase {
       '%file' => $this->getModulePath('error_test') . '/error_test.module',
     ];
     $select = \Drupal::database()->select('bananas_are_awesome', 'b')->fields('b');
+    $this->expectException(DatabaseExceptionWrapper::class);
     $message = \Drupal::database()->prepareStatement((string) $select, [])->getQueryString();
     $message = str_replace(["\r", "\n"], ' ', $message);
     $error_pdo_exception = [
