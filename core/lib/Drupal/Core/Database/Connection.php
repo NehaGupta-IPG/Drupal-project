@@ -657,6 +657,8 @@ abstract class Connection {
     $options += $this->defaultOptions();
 
     $this->expandArguments($query, $args);
+    $this->duplicateArguments($query, $args);
+
     $statement = $this->prepareStatement($query, $options);
     try {
       $result = $statement->execute($args, $options);
@@ -732,6 +734,35 @@ abstract class Connection {
     }
 
     return $modified;
+  }
+
+  /**
+   * Duplicate placeholders that are used multiple times.
+   *
+   * This is required to support native prepares.
+   *
+   * @param string $query
+   *   The query string to modify.
+   * @param array $args
+   *   The arguments for the query.
+   */
+  protected function duplicateArguments(string &$query, array &$args): void {
+    // When ATTR_EMULATE_PREPARES is FALSE, each placeholder can only be used
+    // once in the query. So if they are used multiple times we need to
+    // duplicate them.
+    foreach ($args as $key => $value) {
+      $regex = '/' . preg_quote($key, '/') . '\b/';
+      preg_match_all($regex, $query, $matches);
+      $count = count($matches[0]);
+      if ($count > 1) {
+        unset($args[$key]);
+        for ($i = 1; $i <= $count; $i++) {
+          $newKey = $key . '_' . $i;
+          $query = preg_replace($regex, $newKey, $query, 1);
+          $args[$newKey] = $value;
+        }
+      }
+    }
   }
 
   /**
