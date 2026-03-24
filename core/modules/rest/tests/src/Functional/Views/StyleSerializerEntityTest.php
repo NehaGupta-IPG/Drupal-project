@@ -209,27 +209,20 @@ class StyleSerializerEntityTest extends ViewTestBase {
     $expected = $serializer->serialize($entities, 'xml');
     $actual_xml = $this->drupalGet('test/serialize/entity', ['query' => ['_format' => 'xml']]);
     $this->assertSame(trim($expected), $actual_xml);
-  }
 
-  /**
-   * Ensures control characters are stripped from XML REST export output.
-   */
-  public function testXmlRestExportStripsControlCharacters(): void {
+    // Test that XML output strips invalid XML 1.0 control characters.
     // Create an entity with control characters in a field that is exposed by
-    // the test view. The view sorts entities by ID in descending order, so
-    // this entity will appear in the XML output.
+    // the test view.
     $entity = EntityTest::create([
       'name' => "control\x01chars\x02",
       'user_id' => $this->adminUser->id(),
     ]);
     $entity->save();
 
+    // Re-load the view to pick up the new entity.
     $view = Views::getView('test_serializer_display_entity');
     $view->initDisplay();
     $this->executeView($view);
-
-    // Get the serializer service.
-    $serializer = $this->container->get('serializer');
 
     $entities = [];
     foreach ($view->result as $row) {
@@ -253,7 +246,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
     $this->assertStringNotContainsString("\x01", $expected);
     $this->assertStringNotContainsString("\x02", $expected);
 
-    // Now configure the REST export display to use XML only.
+    // Configure the REST export display to use XML only.
     $view->setDisplay('rest_export_1');
     $view->getDisplay()->setOption('style', [
       'type' => 'serializer',
@@ -273,7 +266,7 @@ class StyleSerializerEntityTest extends ViewTestBase {
     $this->assertStringNotContainsString("\x01", $actual_xml);
     $this->assertStringNotContainsString("\x02", $actual_xml);
 
-    // Finally, ensure the XML output is parseable by an XML parser.
+    // Ensure the XML output is parseable by an XML parser.
     libxml_use_internal_errors(TRUE);
     $xml_element = simplexml_load_string($actual_xml);
     $errors = libxml_get_errors();
