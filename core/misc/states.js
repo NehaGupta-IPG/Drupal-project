@@ -727,7 +727,7 @@
           $label.addClass('js-form-required form-required');
           if (!$label.find('.js-required').length) {
             $label.append(
-              `<span class="js-required hidden" aria-hidden="true">${Drupal.t(
+              `<span class="js-required hidden" aria-hidden="true"> ${Drupal.t(
                 '(required)',
               )}</span>`,
             );
