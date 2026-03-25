@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Database\Query;
 
+use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Database\Connection;
 
 /**
@@ -38,7 +39,7 @@ class SelectExtender implements SelectInterface {
   protected $placeholder = 0;
 
   public function __construct(SelectInterface $query, Connection $connection) {
-    $this->uniqueIdentifier = uniqid('', TRUE);
+    $this->uniqueIdentifier = Crypt::randomBytesBase64(16);
     $this->query = $query;
     $this->connection = $connection;
   }
@@ -493,7 +494,7 @@ class SelectExtender implements SelectInterface {
    * {@inheritdoc}
    */
   public function __clone() {
-    $this->uniqueIdentifier = uniqid('', TRUE);
+    $this->uniqueIdentifier = Crypt::randomBytesBase64(16);
 
     // We need to deep-clone the query we're wrapping, which in turn may
     // deep-clone other objects.  Exciting!

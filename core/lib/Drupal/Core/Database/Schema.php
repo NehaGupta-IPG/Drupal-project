@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Database;
 
+use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Database\Query\PlaceholderInterface;
 
 /**
@@ -44,7 +45,7 @@ abstract class Schema implements PlaceholderInterface {
   protected $uniqueIdentifier;
 
   public function __construct($connection) {
-    $this->uniqueIdentifier = uniqid('', TRUE);
+    $this->uniqueIdentifier = Crypt::randomBytesBase64(16);
     $this->connection = $connection;
   }
 
@@ -52,7 +53,7 @@ abstract class Schema implements PlaceholderInterface {
    * Implements the magic __clone function.
    */
   public function __clone() {
-    $this->uniqueIdentifier = uniqid('', TRUE);
+    $this->uniqueIdentifier = Crypt::randomBytesBase64(16);
   }
 
   /**

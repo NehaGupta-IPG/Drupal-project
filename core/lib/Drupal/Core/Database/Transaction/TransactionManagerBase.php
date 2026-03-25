@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Database\Transaction;
 
+use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Transaction;
 use Drupal\Core\Database\TransactionCommitFailedException;
@@ -268,7 +269,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     }
 
     // Define a unique ID for the transaction.
-    $id = uniqid('', TRUE);
+    $id = Crypt::randomBytesBase64(16);
 
     // Do the client-level processing.
     if ($this->stackDepth() === 0) {
