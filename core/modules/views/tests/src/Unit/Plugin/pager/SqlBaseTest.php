@@ -79,7 +79,7 @@ class SqlBaseTest extends UnitTestCase {
     $request = new Request([
       'items_per_page' => 'All',
     ]);
-    $this->view->expects($this->any())
+    $this->view->expects($this->once())
       ->method('getRequest')
       ->willReturn($request);
 
@@ -108,7 +108,7 @@ class SqlBaseTest extends UnitTestCase {
     $request = new Request([
       'items_per_page' => 'All',
     ]);
-    $this->view->expects($this->any())
+    $this->view->expects($this->once())
       ->method('getRequest')
       ->willReturn($request);
 
