@@ -251,10 +251,4 @@ class Map extends TypedData implements \IteratorAggregate, ComplexDataInterface 
     return $this;
   }
 
-  public function __destruct() {
-    unset($this->values);
-    unset($this->properties);
-    parent::__destruct();
-  }
-
 }

@@ -196,9 +196,4 @@ abstract class TypedData implements TypedDataInterface, PluginInspectionInterfac
     return $this->parent;
   }
 
-  public function __destruct() {
-    unset($this->parent);
-    unset($this->definition);
-  }
-
 }
