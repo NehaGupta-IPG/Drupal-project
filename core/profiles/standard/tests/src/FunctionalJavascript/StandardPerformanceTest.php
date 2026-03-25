@@ -134,13 +134,13 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 37,
-      'CacheGetCount' => 99,
+      'CacheGetCount' => 101,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 20,
         'data' => 5,
-        'discovery' => 39,
-        'bootstrap' => 10,
+        'discovery' => 40,
+        'bootstrap' => 11,
         'dynamic_page_cache' => 1,
         'render' => 13,
         'default' => 5,
@@ -216,7 +216,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 11,
-      'CacheGetCount' => 78,
+      'CacheGetCount' => 80,
       'CacheSetCount' => 18,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
@@ -277,7 +277,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 11,
-      'CacheGetCount' => 64,
+      'CacheGetCount' => 66,
       'CacheSetCount' => 15,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
@@ -322,13 +322,13 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 3,
-      'CacheGetCount' => 67,
+      'CacheGetCount' => 69,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 11,
         'data' => 5,
-        'discovery' => 21,
-        'bootstrap' => 8,
+        'discovery' => 22,
+        'bootstrap' => 9,
         'dynamic_page_cache' => 2,
         'render' => 14,
         'default' => 3,
@@ -437,7 +437,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'StylesheetBytes' => 1429,
       'StylesheetCount' => 1,
       'QueryCount' => 17,
-      'CacheGetCount' => 79,
+      'CacheGetCount' => 81,
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
       'CacheTagInvalidationCount' => 0,
@@ -534,7 +534,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 18,
-      'CacheGetCount' => 105,
+      'CacheGetCount' => 107,
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
       'CacheTagInvalidationCount' => 0,
@@ -583,12 +583,12 @@ class StandardPerformanceTest extends PerformanceTestBase {
 
     $expected = [
       'QueryCount' => 4,
-      'CacheGetCount' => 45,
+      'CacheGetCount' => 47,
       'CacheGetCountByBin' => [
         'config' => 10,
         'data' => 4,
-        'discovery' => 9,
-        'bootstrap' => 8,
+        'discovery' => 10,
+        'bootstrap' => 9,
         'dynamic_page_cache' => 1,
         'render' => 12,
         'menu' => 1,

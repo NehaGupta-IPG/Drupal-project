@@ -1,0 +1,3 @@
+imports:
+  whiz:
+    path: js/whiz.js

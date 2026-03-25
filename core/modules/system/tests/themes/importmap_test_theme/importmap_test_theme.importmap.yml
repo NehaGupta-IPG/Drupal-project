@@ -1,0 +1,7 @@
+imports:
+  baz:
+    path: js/baz.js
+scopes:
+  js/whiz:
+    baz:
+      path: js/whiz/baz.js

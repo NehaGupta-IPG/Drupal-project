@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * @file
+ * Contains main module functions.
+ */
+
+declare(strict_types=1);
+
+/**
+ * Implements hook_importmap_alter().
+ */
+function importmap_test_importmap_alter(array &$import_maps, string $extension): void {
+  if ($extension === 'importmap_test_theme') {
+    $import_maps['imports']['foo'] = '/absolute/js/foo.js';
+  }
+}

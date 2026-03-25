@@ -1,0 +1,5 @@
+name: Import maps test theme
+description: ''
+type: theme
+version: VERSION
+base theme: importmap_test_base_theme

@@ -1,0 +1,7 @@
+importmap_test.test:
+  path: '/importmap-test'
+  defaults:
+    _controller: '\Drupal\importmap_test\TestController'
+    _title: 'Importmap test'
+  requirements:
+    _access: 'TRUE'

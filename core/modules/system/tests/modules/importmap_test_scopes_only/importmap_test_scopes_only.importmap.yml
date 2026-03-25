@@ -1,0 +1,7 @@
+scopes:
+  js/bar:
+    whiz:
+      path: js/bar/whiz.js
+  /absolute/js/bar:
+    whiz:
+      path: /absolute/library/whiz.js

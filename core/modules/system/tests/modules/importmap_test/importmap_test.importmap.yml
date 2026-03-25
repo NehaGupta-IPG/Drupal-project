@@ -1,0 +1,7 @@
+imports:
+  bar:
+    path: js/bar.js
+scopes:
+  js/scope:
+    bar:
+      path: js/bar-scoped.js

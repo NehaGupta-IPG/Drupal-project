@@ -1,0 +1,7 @@
+imports:
+  wow:
+    path: js/wow.js
+  absolute:
+    path: /dist/absolute.js
+  url:
+    path: https://example.com/url.js
