@@ -2,7 +2,6 @@
 
 namespace Drupal\sqlite\Driver\Database\sqlite;
 
-use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\FilterArray;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\Connection as DatabaseConnection;
@@ -369,7 +368,7 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
    * {@inheritdoc}
    */
   public function queryTemporary($query, array $args = [], array $options = []) {
-    $tablename = 'db_temporary_' . Crypt::randomBytesBase64(16);
+    $tablename = 'db_temporary_' . uniqid();
 
     $this->query('CREATE TEMPORARY TABLE ' . $tablename . ' AS ' . $query, $args, $options);
 
