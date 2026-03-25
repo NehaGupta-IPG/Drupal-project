@@ -16,7 +16,7 @@ function removeInertFromActiveTray(browser) {
   browser.execute(function () {
     const tray = document.querySelector('.toolbar-tray.is-active');
     if (tray) {
-      tray.removeAttribute('inert');
+      tray.inert = false;
     }
   });
 }

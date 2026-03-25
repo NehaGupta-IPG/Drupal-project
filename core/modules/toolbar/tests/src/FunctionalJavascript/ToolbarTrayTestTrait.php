@@ -21,7 +21,7 @@ trait ToolbarTrayTestTrait {
    */
   protected function removeInertFromActiveTray(): void {
     $this->getSession()->executeScript(
-      "document.querySelector('.toolbar-tray.is-active')?.removeAttribute('inert')"
+      "(() => { const t = document.querySelector('.toolbar-tray.is-active'); if (t) t.inert = false; })()"
     );
   }
 
