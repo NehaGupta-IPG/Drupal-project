@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "Auto-merged! Run `composer update --lock` to regenerate",
+    "content-hash": "342decfc1ee58ca28f6dc91ca91e6bf2",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -10311,8 +10311,8 @@
     },
     "prefer-stable": true,
     "prefer-lowest": false,
-    "platform": [],
-    "platform-dev": [],
+    "platform": {},
+    "platform-dev": {},
     "platform-overrides": {
         "php": "8.5.0"
     },

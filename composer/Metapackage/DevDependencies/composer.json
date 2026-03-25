@@ -17,6 +17,7 @@
         "colinodell/psr-testlogger": "^1.2",
         "composer/composer": "^2.8.1",
         "drupal/coder": "^8.3.30",
+        "jangregor/phpstan-prophecy": "^2.2",
         "lullabot/mink-selenium2-driver": "^1.7.3",
         "lullabot/php-webdriver": "^2.0.7",
         "mglaman/phpstan-drupal": "^2.0.12",
@@ -37,7 +38,6 @@
         "symfony/dom-crawler": "^8.0",
         "symfony/error-handler": "^8.0",
         "symfony/lock": "^8.0",
-        "symfony/var-dumper": "^8.0",
-        "jangregor/phpstan-prophecy": "^2.2"
+        "symfony/var-dumper": "^8.0"
     }
 }
