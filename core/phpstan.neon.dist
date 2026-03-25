@@ -8,7 +8,7 @@ parameters:
 
   tmpDir: phpstan-tmp
 
-  level: 2
+  level: 3
 
   checkInternalClassCaseSensitivity: true
 
