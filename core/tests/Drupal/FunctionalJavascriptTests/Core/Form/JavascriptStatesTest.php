@@ -348,6 +348,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $select_visible_target = $page->findField('select_visible_when_textfield_trigger_filled');
     $this->assertNotEmpty($select_visible_target);
     $textfield_required_target = $page->findField('textfield_required_when_textfield_trigger_filled');
+    $textfield_required_target_label_required_text_xpath = '//label[@for="edit-textfield-required-when-textfield-trigger-filled"]//span[@aria-hidden="true" and @class="js-required hidden" and contains(text(), "(required)")]';
     $this->assertNotEmpty($textfield_required_target);
     $details = $this->assertSession()->elementExists('css', '#edit-details-expanded-when-textfield-trigger-filled');
     $textfield_in_details = $details->findField('textfield_in_details');
@@ -360,6 +361,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertFalse($select_visible_target->isVisible());
     $this->assertFalse($textfield_required_target->hasAttribute('required'));
     $this->assertFalse($textfield_required_target->hasAttribute('aria-required'));
+    $this->assertSession()->elementNotExists('xpath', $textfield_required_target_label_required_text_xpath);
     $this->assertFalse($details->hasAttribute('open'));
     $this->assertFalse($textfield_in_details->isVisible());
 
@@ -372,6 +374,7 @@ class JavascriptStatesTest extends WebDriverTestBase {
     $this->assertTrue($select_visible_target->isVisible());
     $this->assertEquals('required', $textfield_required_target->getAttribute('required'));
     $this->assertFalse($textfield_required_target->hasAttribute('aria-required'));
+    $this->assertSession()->elementExists('xpath', $textfield_required_target_label_required_text_xpath);
     $this->assertTrue($details->hasAttribute('open'));
     $this->assertTrue($textfield_in_details->isVisible());
   }
