@@ -18,14 +18,22 @@
       $context
         .find('[class*="comment-"][class*="-settings-form"]')
         .drupalSetSummary((context) => {
+          // Support both field API and base comment status input names.
+          // Comment fields added via the field API versus those "built-in"
+          // i.e., with the standard install profile have slightly different
+          // markup
           const checked = context.querySelector(
-            '[class*="js-form-item-comment"] input:checked',
+            'input[type="radio"][name^="field_comment"][name$="[status]"]:checked, input[type="radio"][name^="comment"][name$="[status]"]:checked',
           );
-          const label = checked
-            ? context.querySelector(`label[for="${checked.id}"]`)
-            : null;
-          return label != null ? Drupal.checkPlain(label.textContent) : '';
+
+          if (!checked) {
+            return '';
+          }
+
+          const label = context.querySelector(`label[for="${checked.id}"]`);
+          return label ? Drupal.checkPlain(label.textContent.trim()) : 'Empty';
         });
+
     },
   };
 })(jQuery, Drupal);
