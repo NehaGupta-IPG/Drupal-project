@@ -81,6 +81,11 @@ rules:
   - PHPStan\Rules\Classes\AccessPrivateConstantThroughStaticRule
 
 services:
+  -
+    class: Drupal\PHPStan\DeadCode\DrupalUsageProvider
+    tags:
+      - shipmonk.deadCode.memberUsageProvider
+
   errorFormatter.multiplex:
     class: Drupal\PHPStan\ErrorFormatter\MultiplexErrorFormatter
     arguments:

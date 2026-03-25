@@ -9,6 +9,7 @@
     "autoload": {
         "psr-4": {
             "Drupal\\PHPStan\\ErrorFormatter\\": "ErrorFormatter/",
+            "Drupal\\PHPStan\\DeadCode\\": "DeadCode/",
             "Drupal\\PHPStan\\Rules\\": "Rules/",
             "Drupal\\BuildTests\\": "../Drupal/BuildTests/",
             "Drupal\\FunctionalJavascriptTests\\": "../Drupal/FunctionalJavascriptTests",
