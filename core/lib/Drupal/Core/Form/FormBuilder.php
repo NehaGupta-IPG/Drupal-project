@@ -713,7 +713,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
    *   String representation of the type.
    *
    * @return bool
-   *   Is the type in the array?
+   *   Whether the type is in the list of targeted tags.
    */
   public function isComplexElement(string $type): bool {
     return in_array($type, [
