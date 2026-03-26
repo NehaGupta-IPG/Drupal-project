@@ -61,7 +61,8 @@ class EntityRevisionTranslationTest extends EntityKernelTestBase {
     // revision ID.
     $this->assertGreaterThan($old_rev_id, $translation->getRevisionId());
     // Verify that the entity from the storage has a newer revision ID.
-    $this->assertGreaterThan($old_rev_id, $this->reloadEntity($entity)->getRevisionId());
+    $entity_reloaded = $this->reloadEntity($entity);
+    $this->assertGreaterThan($old_rev_id, $entity_reloaded->getRevisionId());
   }
 
   /**

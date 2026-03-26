@@ -29,6 +29,7 @@ trait EntityTrait {
    * @return \Drupal\Core\Entity\EntityInterface
    *   The reloaded entity.
    */
+  #[\NoDiscard]
   protected function reloadEntity(EntityInterface $entity): EntityInterface {
     $controller = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
     $controller->resetCache([$entity->id()]);
