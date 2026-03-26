@@ -58,6 +58,7 @@ class ContentEntityDeleteForm extends ContentEntityConfirmFormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $this->getEntity();
+    $label = $entity->label();
     $message = $this->getDeletionMessage();
 
     // Make sure that deleting a translation does not delete the whole entity.
@@ -75,7 +76,7 @@ class ContentEntityDeleteForm extends ContentEntityConfirmFormBase {
     }
 
     $this->messenger()->addStatus($message);
-    $this->logDeletionMessage();
+    $this->logDeletionMessage($label);
   }
 
   /**
