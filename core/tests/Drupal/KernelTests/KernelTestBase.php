@@ -27,7 +27,6 @@ use Drupal\Tests\PhpUnitCompatibilityTrait;
 use Drupal\Tests\RandomGeneratorTrait;
 use Drupal\Tests\TestRequirementsTrait;
 use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
-use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 use Drupal\TestTools\Extension\Dump\DebugDump;
 use Drupal\TestTools\Extension\SchemaInspector;
 use org\bovigo\vfs\vfsStream;
@@ -105,7 +104,6 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   use TestRequirementsTrait;
   use PhpUnitCompatibilityTrait;
   use ProphecyTrait;
-  use ExpectDeprecationTrait;
 
   /**
    * The class loader.
@@ -527,12 +525,10 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    *
    * @see \Drupal\KernelTests\KernelTestBase::bootKernel()
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     // Keep the container object around for tests.
     $this->container = $container;
 
-    $container
-      ->register('datetime.time', 'Drupal\Component\Datetime\Time');
     $container
       ->register('flood', 'Drupal\Core\Flood\MemoryBackend')
       ->addArgument(new Reference('request_stack'));
@@ -667,7 +663,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * {@inheritdoc}
    */
   protected function tearDown(): void {
-    if ($this->container) {
+    if ($this->container?->get('request_stack')->getCurrentRequest() !== NULL) {
       // Clean up mock session started in DrupalKernel::preHandle().
       /** @var \Symfony\Component\HttpFoundation\Session\Session $session */
       $session = $this->container->get('request_stack')->getSession();
@@ -787,9 +783,6 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $schema = $this->container->get('database')->schema();
     $tables = (array) $tables;
     foreach ($tables as $table) {
-      if ($module === 'system' && $table === 'sequences') {
-        @trigger_error('Installing the table sequences with the method KernelTestBase::installSchema() is deprecated in drupal:10.2.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3349345', E_USER_DEPRECATED);
-      }
       if (empty($specification[$table])) {
         throw new \LogicException("$module module does not define a schema for table '$table'.");
       }

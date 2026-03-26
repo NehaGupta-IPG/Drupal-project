@@ -32,6 +32,7 @@ class DeprecatedAssetsTest extends KernelTestBase {
    */
   #[DataProvider('deprecatedLibrariesProvider')]
   public function testDeprecatedLibraries(string $extension, string $name, string $deprecation_suffix, string $expected_hashed_library_definition): void {
+    $this->markTestSkipped('There are currently no deprecated libraries.');
     /** @var \Drupal\Core\Asset\LibraryDiscoveryInterface $library_discovery */
     $library_discovery = $this->container->get('library.discovery');
 
@@ -39,7 +40,7 @@ class DeprecatedAssetsTest extends KernelTestBase {
     // this test.
     ini_set('serialize_precision', -1);
 
-    $this->expectDeprecation("The $extension/$name " . $deprecation_suffix);
+    $this->expectUserDeprecationMessage("The $extension/$name " . $deprecation_suffix);
     $library_definition = $library_discovery->getLibraryByName($extension, $name);
     $this->assertEquals($expected_hashed_library_definition, md5(serialize($library_definition)));
   }
@@ -64,11 +65,11 @@ class DeprecatedAssetsTest extends KernelTestBase {
    */
   public static function deprecatedLibrariesProvider(): array {
     return [
-      'Tests deprecation of library core/js-cookie' => [
+      'Tests deprecation of library example' => [
         'core',
-        'js-cookie',
-        'asset library is deprecated in Drupal 10.1.0 and will be removed in Drupal 11.0.0. There is no replacement. See https://www.drupal.org/node/3322720',
-        '5d6a84c6143d0fa766cabdb1ff0a270d',
+        'example',
+        'message',
+        'hash',
       ],
     ];
   }

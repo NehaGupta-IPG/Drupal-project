@@ -54,16 +54,6 @@ const SAVED_NEW = 1;
 const SAVED_UPDATED = 2;
 
 /**
- * Return status for saving which deleted an existing item.
- *
- * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
- *   There is no replacement.
- *
- * @see https://www.drupal.org/node/3328750
- */
-const SAVED_DELETED = 3;
-
-/**
  * The default aggregation group for CSS files added to the page.
  */
 const CSS_AGGREGATE_DEFAULT = 0;
@@ -440,9 +430,8 @@ function drupal_flush_all_caches($kernel = NULL): void {
   // Wipe the Twig PHP Storage cache.
   \Drupal::service('twig')->invalidate();
 
-  // Rebuild profile, profile, theme_engine and theme data.
+  // Rebuild profile and theme data.
   \Drupal::service('extension.list.profile')->reset();
-  \Drupal::service('extension.list.theme_engine')->reset();
   \Drupal::service('theme_handler')->refreshInfo();
   // In case the active theme gets requested later in the same request we need
   // to reset the theme manager.

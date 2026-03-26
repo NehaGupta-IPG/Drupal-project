@@ -55,7 +55,7 @@ class EntityFormTest extends UnitTestCase {
    * @legacy-covers ::getFormId
    */
   #[DataProvider('providerTestFormIds')]
-  public function testFormId($expected, $definition): void {
+  public function testFormId(string $expected, array $definition): void {
     $this->entityType->set('entity_keys', ['bundle' => $definition['bundle']]);
 
     $entity = $this->getMockBuilder(StubEntityBase::class)
@@ -63,10 +63,10 @@ class EntityFormTest extends UnitTestCase {
       ->onlyMethods(['getEntityType', 'bundle'])
       ->getMock();
 
-    $entity->expects($this->any())
+    $entity->expects($this->once())
       ->method('getEntityType')
       ->willReturn($this->entityType);
-    $entity->expects($this->any())
+    $entity
       ->method('bundle')
       ->willReturn($definition['bundle']);
 
