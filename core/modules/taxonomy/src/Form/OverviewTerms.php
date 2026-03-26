@@ -14,7 +14,6 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Pager\PagerManagerInterface;
 use Drupal\Core\Render\RendererInterface;
-use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\taxonomy\TermInterface;
 use Drupal\taxonomy\TermStorageInterface;
