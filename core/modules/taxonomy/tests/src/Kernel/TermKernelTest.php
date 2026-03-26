@@ -55,7 +55,7 @@ class TermKernelTest extends KernelTestBase {
     $vocabulary = $this->createVocabulary();
     $term = $this->createTerm($vocabulary);
     // Change the valid term to a non-numeric value.
-    $term = '0123';
+    $term->id() = '0123';
     // Try to save the invalid term.
     $term->save();
     $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties(['vid' => $vocabulary->id()]);
