@@ -72,7 +72,7 @@ class ElementsLabelsTest extends KernelTestBase {
     $this->assertSession()->elementExists('xpath', '//label[@for="edit-form-textfield-test-title-and-required" and @class="js-form-required form-required"]/following-sibling::input[@id="edit-form-textfield-test-title-and-required"]');
 
     // Verify that label contains a "(required)" text.
-    $this->assertSession()->elementExists('xpath', '//label[@for="edit-form-textfield-test-title-and-required" and @class="js-form-required form-required"]//span[@aria-hidden="true" and @class="hidden" and contains(text(), "(required)")]');
+    $this->assertSession()->elementExists('xpath', '//label[@for="edit-form-textfield-test-title-and-required" and @class="js-form-required form-required"]//span[@aria-hidden="true" and @class="hidden" and contains(text(), " (required)")]');
 
     // Verify that label tag with required marker precedes required textfield
     // with no title.
