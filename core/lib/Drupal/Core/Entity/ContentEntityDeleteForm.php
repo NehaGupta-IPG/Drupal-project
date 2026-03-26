@@ -109,14 +109,14 @@ class ContentEntityDeleteForm extends ContentEntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
-  protected function logDeletionMessage() {
+  protected function logDeletionMessage($label) {
     /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
     $entity = $this->getEntity();
 
     if (!$entity->isDefaultTranslation()) {
       $this->logger($entity->getEntityType()->getProvider())->info('The @entity-type %label @language translation has been deleted.', [
         '@entity-type' => $entity->getEntityType()->getSingularLabel(),
-        '%label'       => $entity->label(),
+        '%label'       => $label,
         '@language'    => $entity->language()->getName(),
       ]);
     }
