@@ -99,14 +99,14 @@ class Rss extends StylePluginBase {
    *   A render array.
    */
   protected function getChannelElements() {
-    $url = $this->view?->getUrl()->setAbsolute()->toString();
+    $url = $this->view->hasUrl() ? $this->view->getUrl()->setAbsolute()->toString() : '';
     return [
       [
         'namespace' => ['xmlns:atom' => 'http://www.w3.org/2005/Atom'],
         '#type' => 'html_tag',
         '#tag' => 'atom:link',
         '#attributes' => [
-          'href' => $url ?? '',
+          'href' => $url,
           'rel' => 'self',
           'type' => 'application/rss+xml',
         ],
