@@ -74,6 +74,21 @@ class TaxonomyIndexTidDepth extends TaxonomyIndexTid {
     if (!empty($this->relationship)) {
       $this->tableAlias = $this->relationship;
     }
+
+    if (!empty($this->options['vid'])) {
+      $def = [
+        'table' => 'taxonomy_term_field_data',
+        'field' => 'tid',
+        'left_table' => 'taxonomy_index',
+        'left_field' => 'tid',
+        'type' => 'INNER',
+      ];
+      $join = \Drupal::service('plugin.manager.views.join')
+        ->createInstance('standard', $def);
+      $join_index_term = $this->query->addRelationship('ind_data', $join, 'taxonomy_term_field_data');
+      $this->query->addWhere($this->options['group'], "$join_index_term.vid", $this->options['vid'], 'IN');
+    }
+
     // If no relationship, then use the alias of the base table.
     else {
       $this->tableAlias = $this->query->ensureTable($this->view->storage->get('base_table'));
