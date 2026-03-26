@@ -92,12 +92,13 @@ function _drupal_error_handler_real($error_level, $message, $filename, $line): v
       $seen[] = $message;
       $backtrace = debug_backtrace();
       $caller = Error::getLastCaller($backtrace);
-      _drupal_error_header(
+      TestErrorLogger::writeError(
         Markup::create(Xss::filterAdmin($message)),
         'User deprecated function',
         $caller['function'],
         $caller['file'],
-        $caller['line']
+        $caller['line'],
+        NULL,
       );
     }
   }
