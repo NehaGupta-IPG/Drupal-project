@@ -116,8 +116,30 @@ field_formatter:
         type: field.formatter.third_party.[%key]
 
 field_formatter.entity_view_display:
-  type: field_formatter
+  type: mapping
+  label: 'Field formatter'
   mapping:
+    type:
+      type: string
+      label: 'Format type machine name'
+      constraints:
+        PluginExists:
+          manager: plugin.manager.field.formatter
+          interface: 'Drupal\Core\Field\FormatterInterface'
+    label:
+      type: string
+      label: 'Label setting machine name'
+    settings:
+      type: field.formatter.settings.[%parent.type]
+      label: 'Settings'
+    third_party_settings:
+      # Third party settings are always optional: they're an optional extension
+      # point.
+      requiredKey: false
+      type: sequence
+      label: 'Third party settings'
+      sequence:
+        type: field.formatter.third_party.[%key]
     weight:
       type: weight
       label: 'Weight'
