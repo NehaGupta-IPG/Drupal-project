@@ -88,7 +88,7 @@ class AccountProxy implements AccountProxyInterface {
    * {@inheritdoc}
    */
   public function id() {
-    return (int) $this->id;
+    return $this->id !== NULL ? (int) $this->id : NULL;
   }
 
   /**

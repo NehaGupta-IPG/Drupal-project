@@ -130,7 +130,7 @@ class EntityTest extends ContentEntityBase implements EntityOwnerInterface {
    * {@inheritdoc}
    */
   public function getOwnerId() {
-    return (int) $this->get('user_id')->target_id;
+    return $this->get('user_id')->target_id !== NULL ? (int) $this->get('user_id')->target_id : NULL;
   }
 
   /**
