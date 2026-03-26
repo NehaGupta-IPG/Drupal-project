@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Runner\DeprecationCollector\Facade as DeprecationCollector;
 
 // cspell:ignore htkey
 
@@ -571,30 +572,18 @@ class BrowserTestBaseTest extends BrowserTestBase {
   }
 
   /**
-   * Tests that deprecation headers do not get duplicated.
+   * Tests that deprecation messages do not get duplicated.
    *
    * @see \Drupal\Core\Test\HttpClientMiddleware\TestHttpClientMiddleware::__invoke()
    */
   #[IgnoreDeprecations]
-  public function testDeprecationHeaders(): void {
+  public function testDeprecationDuplication(): void {
     $this->drupalGet('/test-deprecations');
 
-    $deprecation_messages = [];
-    foreach ($this->getSession()->getResponseHeaders() as $name => $values) {
-      if (preg_match('/^X-Drupal-Assertion-[0-9]+$/', $name, $matches)) {
-        foreach ($values as $value) {
-          $parameters = unserialize(urldecode($value));
-          if (count($parameters) === 3) {
-            if ($parameters[1] === 'User deprecated function') {
-              $deprecation_messages[] = (string) $parameters[0];
-            }
-          }
-        }
-      }
-    }
+    $deprecations = DeprecationCollector::deprecations();
 
-    $this->assertContains('Test deprecation message', $deprecation_messages);
-    $test_deprecation_messages = array_filter($deprecation_messages, function (string $message): bool {
+    $this->assertContains('Test deprecation message', $deprecations);
+    $test_deprecation_messages = array_filter($deprecations, function (string $message): bool {
       return $message === 'Test deprecation message';
     });
     $this->assertCount(1, $test_deprecation_messages);
