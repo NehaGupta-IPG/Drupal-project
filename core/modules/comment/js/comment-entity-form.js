@@ -33,7 +33,6 @@
           const label = context.querySelector(`label[for="${checked.id}"]`);
           return label ? Drupal.checkPlain(label.textContent.trim()) : 'Empty';
         });
-
     },
   };
 })(jQuery, Drupal);
