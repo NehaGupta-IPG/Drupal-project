@@ -262,7 +262,9 @@ class TermIndexTest extends TaxonomyTestBase {
     $node = $node_storage->load($node->id());
 
     $items = $node->get($this->fieldName1)->getValue();
-    $items[] = ['target_id' => '0123']; // Non-numeric
+
+    // Non-numeric target_id should be ignored.
+    $items[] = ['target_id' => '0123'];
 
     $node->set($this->fieldName1, $items);
     $node->save();
