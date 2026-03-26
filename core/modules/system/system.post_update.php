@@ -91,3 +91,12 @@ function system_post_update_clear_admin_compact_mode_config(): void {
   $config->clear('admin_compact_mode');
   $config->save();
 }
+
+/**
+ * Update the WEBP quality setting to default value.
+ */
+function system_post_update_webp_quality_default_value(): void {
+  $config = \Drupal::configFactory()->getEditable('system.image.gd');
+  $config->set('webp_lossless', FALSE)->save();
+  $config->set('webp_quality', 75)->save();
+}
