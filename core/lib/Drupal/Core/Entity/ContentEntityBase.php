@@ -359,6 +359,17 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   /**
    * {@inheritdoc}
    */
+  public function enforceIsNew($value = TRUE) {
+    // When entities are newly created such as via Entity::create(), ensure that
+    // all field references are hard references so that default values and etc.
+    // are persisted.
+    $this->createWeakReferences = FALSE;
+    return parent::enforceIsNew($value);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isDefaultRevision($new_value = NULL) {
     $current_value = $this->isDefaultRevision;
     // New entities should always ensure at least one default revision exists,
@@ -676,8 +687,6 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     $default = $langcode == LanguageInterface::LANGCODE_DEFAULT;
     if (!$default && !$definition->isTranslatable()) {
       $field = $this->getTranslatedField($name, LanguageInterface::LANGCODE_DEFAULT);
-      // Only assign objects as weak references, in rare cases, mostly tests,
-      // strings are set instead of field item list objects.
       if ($this->createWeakReferences) {
         $this->fieldWeakReferences[$name][LanguageInterface::LANGCODE_DEFAULT] = \WeakReference::create($field);
       }
