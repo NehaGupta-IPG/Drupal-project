@@ -40,3 +40,10 @@ error_test.trigger_renderer_exception:
     _controller: '\Drupal\error_test\Controller\ErrorTestController::triggerRendererException'
   requirements:
     _access: 'TRUE'
+
+error_test.send_content_exception:
+  path: '/error-test/send-content-exception'
+  defaults:
+    _controller: '\Drupal\error_test\Controller\ErrorTestController::sendContentException'
+  requirements:
+    _access: 'TRUE'

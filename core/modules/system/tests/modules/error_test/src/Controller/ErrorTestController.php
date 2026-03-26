@@ -6,6 +6,7 @@ namespace Drupal\error_test\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Database\Connection;
+use Drupal\error_test\Response\SendContentExceptionResponse;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -106,6 +107,13 @@ class ErrorTestController extends ControllerBase {
         },
       ],
     ];
+  }
+
+  /**
+   * Returns a response that throws an exception on sendContent().
+   */
+  public function sendContentException(): SendContentExceptionResponse {
+    return new SendContentExceptionResponse('This should not be sent');
   }
 
 }

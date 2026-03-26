@@ -654,6 +654,17 @@ class BrowserTestBaseTest extends BrowserTestBase {
   }
 
   /**
+   * Tests that an exception in sendContent() is caught by the test runner.
+   */
+  public function testSendContentException(): void {
+    \Drupal::service('module_installer')->install(['error_test']);
+    $this->rebuildContainer();
+    $this->expectException(\Exception::class);
+    $this->expectExceptionMessage('Exception in sendContent().');
+    $this->drupalGet('/error-test/send-content-exception');
+  }
+
+  /**
    * Tests an invalid scheme in SIMPLETEST_BASE_URL throws an exception.
    */
   public function testSimpleTestBaseUrlValidation(): void {
