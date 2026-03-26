@@ -67,10 +67,14 @@ final class SetPluginSettings implements ConfigActionPluginInterface, ContainerF
    *   An array with keys:
    *   - plugin: (string) The CKEditor 5 plugin ID whose settings to set.
    *   - settings: (array) The settings to apply to the plugin.
+   *   - strict: (bool, optional) If TRUE, an exception is thrown when the
+   *     plugin is not already present in the editor's settings. Defaults to
+   *     FALSE, which falls back to the plugin's default configuration.
    *
    * @throws \Drupal\Core\Config\Action\ConfigActionException
    *   Thrown if the editor is not using CKEditor 5, the value is invalid, the
-   *   plugin does not exist, or the plugin is not configurable.
+   *   plugin does not exist, the plugin is not configurable, or strict mode is
+   *   enabled and the plugin is not already configured in the editor.
    */
   public function apply(string $configName, mixed $value): void {
     $editor = $this->configManager->loadConfigEntityByName($configName);
@@ -86,6 +90,7 @@ final class SetPluginSettings implements ConfigActionPluginInterface, ContainerF
 
     $ck_plugin_id = $value['plugin'];
     $settings = $value['settings'];
+    $strict = $value['strict'] ?? FALSE;
 
     if (!is_string($ck_plugin_id)) {
       throw new ConfigActionException(sprintf('The %s config action requires "plugin" to be a string.', $this->pluginId));
@@ -107,6 +112,11 @@ final class SetPluginSettings implements ConfigActionPluginInterface, ContainerF
     }
 
     $editor_settings = $editor->getSettings();
+    $plugin_already_configured = array_key_exists($ck_plugin_id, $editor_settings['plugins']);
+
+    if ($strict && !$plugin_already_configured) {
+      throw new ConfigActionException(sprintf('The %s config action cannot set settings for "%s" because that plugin is not configured in the editor and strict mode is enabled.', $this->pluginId, $ck_plugin_id));
+    }
 
     // Merge the provided settings on top of existing or default settings.
     /** @var \Drupal\ckeditor5\Plugin\CKEditor5PluginConfigurableInterface $plugin_instance */

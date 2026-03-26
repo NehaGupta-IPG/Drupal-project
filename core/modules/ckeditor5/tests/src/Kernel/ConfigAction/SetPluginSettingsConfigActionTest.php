@@ -183,6 +183,87 @@ YAML;
   }
 
   /**
+   * Tests that settings can be applied to a plugin not yet in the editor config.
+   */
+  public function testSetPluginSettingsForUnconfiguredPlugin(): void {
+    // ckeditor5_heading is not in the editor's plugin settings in setUp().
+    $recipe = $this->createRecipe([
+      'name' => 'Set unconfigured plugin settings test',
+      'config' => [
+        'actions' => [
+          'editor.editor.filter_test' => [
+            'setPluginSettings' => [
+              'plugin' => 'ckeditor5_heading',
+              'settings' => [
+                'enabled_headings' => ['heading2', 'heading3'],
+              ],
+            ],
+          ],
+        ],
+      ],
+    ]);
+    RecipeRunner::processRecipe($recipe);
+
+    /** @var array{plugins: array<string, array<mixed>>} $settings */
+    $settings = Editor::load('filter_test')?->getSettings();
+    $this->assertSame(['heading2', 'heading3'], $settings['plugins']['ckeditor5_heading']['enabled_headings']);
+  }
+
+  /**
+   * Tests that strict mode throws when the plugin is not in the editor config.
+   */
+  public function testStrictModeThrowsForUnconfiguredPlugin(): void {
+    $recipe = $this->createRecipe([
+      'name' => 'Strict mode test',
+      'config' => [
+        'actions' => [
+          'editor.editor.filter_test' => [
+            'setPluginSettings' => [
+              'plugin' => 'ckeditor5_heading',
+              'settings' => [
+                'enabled_headings' => ['heading2'],
+              ],
+              'strict' => TRUE,
+            ],
+          ],
+        ],
+      ],
+    ]);
+
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessage('The editor:setPluginSettings config action cannot set settings for "ckeditor5_heading" because that plugin is not configured in the editor and strict mode is enabled.');
+    RecipeRunner::processRecipe($recipe);
+  }
+
+  /**
+   * Tests that strict mode succeeds when the plugin is already configured.
+   */
+  public function testStrictModeSucceedsForConfiguredPlugin(): void {
+    // ckeditor5_alignment is already in the editor's plugin settings in setUp().
+    $recipe = $this->createRecipe([
+      'name' => 'Strict mode success test',
+      'config' => [
+        'actions' => [
+          'editor.editor.filter_test' => [
+            'setPluginSettings' => [
+              'plugin' => 'ckeditor5_alignment',
+              'settings' => [
+                'enabled_alignments' => ['center', 'right'],
+              ],
+              'strict' => TRUE,
+            ],
+          ],
+        ],
+      ],
+    ]);
+    RecipeRunner::processRecipe($recipe);
+
+    /** @var array{plugins: array<string, array<mixed>>} $settings */
+    $settings = Editor::load('filter_test')?->getSettings();
+    $this->assertSame(['center', 'right'], $settings['plugins']['ckeditor5_alignment']['enabled_alignments']);
+  }
+
+  /**
    * Tests that an error is thrown for invalid value structure.
    */
   public function testInvalidValueStructure(): void {
