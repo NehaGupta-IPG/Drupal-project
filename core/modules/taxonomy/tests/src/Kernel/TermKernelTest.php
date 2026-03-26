@@ -48,7 +48,7 @@ class TermKernelTest extends KernelTestBase {
     $this->assertEmpty($terms, 'Vocabulary is empty after deletion');
   }
 
-    /**
+  /**
    * Tests that a non-numeric term is not indexed.
    */
   public function testTermNonNumeric(): void {
