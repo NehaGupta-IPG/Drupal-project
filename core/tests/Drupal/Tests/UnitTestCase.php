@@ -1,4 +1,4 @@
-s<?php
+<?php
 
 declare(strict_types=1);
 
@@ -12,10 +12,9 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\ImmutableConfig;
 use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\TestTools\Extension\Dump\DebugDump;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use PHPUnit\Framework\MockObject\Stub;
