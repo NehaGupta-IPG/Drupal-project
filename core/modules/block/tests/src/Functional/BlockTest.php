@@ -236,7 +236,7 @@ class BlockTest extends BlockTestBase {
       'id' => $block['id'],
       'region' => $block['region'],
     ], 'Save block');
-    $this->assertSession()->statusMessageContains('The ' . $block['settings[label]'] . ' block configuration has been saved.', 'status');
+    $this->assertSession()->statusMessageContains('The ' . $title . ' block configuration has been saved.', 'status');
     // Check to see if the block was created by checking its configuration.
     $instance = Block::load($block['id']);
 
