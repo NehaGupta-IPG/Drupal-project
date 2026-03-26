@@ -23,8 +23,8 @@ class MediaTestOembedHooks {
   }
 
   /**
-  * Implements hook_oembed_resource_data_alter().
-  */
+   * Implements hook_oembed_resource_data_alter().
+   */
   #[Hook('oembed_resource_data_alter')]
   public function oembedResourceDataAlter(array &$data, string $url): void {
     if (str_contains($url, 'twitter.com/oembed')) {
