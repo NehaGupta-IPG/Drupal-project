@@ -27,7 +27,6 @@ use Drupal\Tests\PhpUnitCompatibilityTrait;
 use Drupal\Tests\RandomGeneratorTrait;
 use Drupal\Tests\TestRequirementsTrait;
 use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
-use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 use Drupal\TestTools\Extension\Dump\DebugDump;
 use Drupal\TestTools\Extension\SchemaInspector;
 use org\bovigo\vfs\vfsStream;
@@ -105,7 +104,6 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   use TestRequirementsTrait;
   use PhpUnitCompatibilityTrait;
   use ProphecyTrait;
-  use ExpectDeprecationTrait;
 
   /**
    * {@inheritdoc}
@@ -539,8 +537,6 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     // Keep the container object around for tests.
     $this->container = $container;
 
-    $container
-      ->register('datetime.time', 'Drupal\Component\Datetime\Time');
     $container
       ->register('flood', 'Drupal\Core\Flood\MemoryBackend')
       ->addArgument(new Reference('request_stack'));
