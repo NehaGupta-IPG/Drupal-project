@@ -238,6 +238,50 @@ class TermIndexTest extends TaxonomyTestBase {
   }
 
   /**
+   * Tests that non-numeric target IDs are ignored in the taxonomy index.
+   */
+  public function testNonNumericTargetIdIsIgnored(): void {
+    $connection = Database::getConnection();
+    $node_storage = $this->container->get('entity_type.manager')->getStorage('node');
+
+    // Create a term.
+    $term = $this->createTerm($this->vocabulary);
+
+    // Create a node via UI with a valid term.
+    $edit = [];
+    $edit['title[0][value]'] = $this->randomMachineName();
+    $edit['body[0][value]'] = $this->randomMachineName();
+    $edit["{$this->fieldName1}[]"] = $term->id();
+
+    $this->drupalGet('node/add/article');
+    $this->submitForm($edit, 'Save');
+
+    $node = $this->drupalGetNodeByTitle($edit['title[0][value]']);
+
+    // Reload node and inject invalid target_id programmatically.
+    $node = $node_storage->load($node->id());
+
+    $items = $node->get($this->fieldName1)->getValue();
+    $items[] = ['target_id' => '0123']; // Non-numeric
+
+    $node->set($this->fieldName1, $items);
+    $node->save();
+
+    // Fetch indexed tids.
+    $tids = $connection->select('taxonomy_index', 'ti')
+      ->fields('ti', ['tid'])
+      ->condition('nid', $node->id())
+      ->execute()
+      ->fetchCol();
+
+    // Assert valid term exists.
+    $this->assertContains($term->id(), $tids, 'Valid term ID is indexed.');
+
+    // Assert invalid term is NOT indexed.
+    $this->assertNotContains('0123', $tids, 'Non-numeric target_id is not indexed.');
+  }
+
+  /**
    * Tests that there is a link to the parent term on the child term page.
    */
   public function testTaxonomyTermHierarchyBreadcrumbs(): void {
