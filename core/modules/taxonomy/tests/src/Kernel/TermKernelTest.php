@@ -48,6 +48,19 @@ class TermKernelTest extends KernelTestBase {
     $this->assertEmpty($terms, 'Vocabulary is empty after deletion');
   }
 
+    /**
+   * Tests that a non-numeric term is not indexed.
+   */
+  public function testTermNonNumeric(): void {
+    $vocabulary = $this->createVocabulary();
+    $valid_term = $this->createTerm($vocabulary);
+    $invalid_term = '0123';
+    // Save the invalid term.
+    $valid_term->save();
+    $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties(['vid' => $vocabulary->id()]);
+    $this->assertEmpty($terms, 'Vocabulary is empty after trying to save a non-numeric term.');
+  }
+
   /**
    * Deleting a parent of a term with multiple parents does not delete the term.
    */
