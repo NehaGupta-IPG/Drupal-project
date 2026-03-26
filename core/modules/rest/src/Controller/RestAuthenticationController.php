@@ -38,90 +38,34 @@ class RestAuthenticationController extends ControllerBase implements ContainerIn
   const LOGGED_OUT = '0';
 
   /**
-   * The user flood control service.
-   *
-   * @var \Drupal\user\UserFloodControl
-   */
-  protected $userFloodControl;
-
-  /**
-   * The entity type manager.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected $entityTypeManager;
-
-  /**
-   * The CSRF token generator.
-   *
-   * @var \Drupal\Core\Access\CsrfTokenGenerator
-   */
-  protected $csrfToken;
-
-  /**
-   * The user authentication.
-   *
-   * @var \Drupal\user\UserAuthenticationInterface
-   */
-  protected $userAuth;
-
-  /**
-   * The route provider.
-   *
-   * @var \Drupal\Core\Routing\RouteProviderInterface
-   */
-  protected $routeProvider;
-
-  /**
-   * The serializer.
-   *
-   * @var \Symfony\Component\Serializer\Serializer
-   */
-  protected $serializer;
-
-  /**
-   * The available serialization formats.
-   *
-   * @var array
-   */
-  protected $serializerFormats = [];
-
-  /**
-   * A logger instance.
-   *
-   * @var \Psr\Log\LoggerInterface
-   */
-  protected $logger;
-
-  /**
-   * Constructs a new UserAuthenticationController object.
-   *
-   * @param \Drupal\user\UserFloodControlInterface $user_flood_control
+   * @param \Drupal\user\UserFloodControlInterface $userFloodControl
    *   The user flood control service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Drupal\Core\Access\CsrfTokenGenerator $csrf_token
+   * @param \Drupal\Core\Access\CsrfTokenGenerator $csrfToken
    *   The CSRF token generator.
-   * @param \Drupal\user\UserAuthenticationInterface $user_auth
+   * @param \Drupal\user\UserAuthenticationInterface $userAuth
    *   The user authentication.
-   * @param \Drupal\Core\Routing\RouteProviderInterface $route_provider
+   * @param \Drupal\Core\Routing\RouteProviderInterface $routeProvider
    *   The route provider.
    * @param \Symfony\Component\Serializer\Serializer $serializer
    *   The serializer.
-   * @param array $serializer_formats
+   * @param array $serializerFormats
    *   The available serialization formats.
    * @param \Psr\Log\LoggerInterface $logger
    *   A logger instance.
    */
-  public function __construct(UserFloodControlInterface $user_flood_control, EntityTypeManagerInterface $entity_type_manager, CsrfTokenGenerator $csrf_token, UserAuthenticationInterface $user_auth, RouteProviderInterface $route_provider, Serializer $serializer, array $serializer_formats, LoggerInterface $logger) {
-    $this->userFloodControl = $user_flood_control;
+  public function __construct(
+    protected UserFloodControlInterface $userFloodControl,
+    EntityTypeManagerInterface $entity_type_manager,
+    protected CsrfTokenGenerator $csrfToken,
+    protected UserAuthenticationInterface $userAuth,
+    protected RouteProviderInterface $routeProvider,
+    protected Serializer $serializer,
+    protected array $serializerFormats,
+    protected LoggerInterface $logger,
+  ) {
     $this->entityTypeManager = $entity_type_manager;
-    $this->csrfToken = $csrf_token;
-    $this->userAuth = $user_auth;
-    $this->serializer = $serializer;
-    $this->serializerFormats = $serializer_formats;
-    $this->routeProvider = $route_provider;
-    $this->logger = $logger;
   }
 
   /**

@@ -272,7 +272,7 @@ class RestLoginHttpTest extends BrowserTestBase {
    * @return mixed
    *   The value for the key.
    */
-  protected function getResultValue(ResponseInterface $response, $key, $format) {
+  protected function getResultValue(ResponseInterface $response, string $key, string $format): mixed {
     $decoded = $this->serializer->decode((string) $response->getBody(), $format);
     if (is_array($decoded)) {
       return $decoded[$key];
@@ -338,8 +338,6 @@ class RestLoginHttpTest extends BrowserTestBase {
    *   The expected status code.
    * @param string $expected_body
    *   The expected response body.
-   *
-   * @internal
    */
   protected function assertHttpResponse(ResponseInterface $response, int $expected_code, string $expected_body): void {
     $this->assertEquals($expected_code, $response->getStatusCode());
@@ -357,8 +355,6 @@ class RestLoginHttpTest extends BrowserTestBase {
    *   The expected message encoded in response.
    * @param string $format
    *   The format that the response is encoded in.
-   *
-   * @internal
    */
   protected function assertHttpResponseWithMessage(ResponseInterface $response, int $expected_code, string $expected_message, string $format = 'json'): void {
     $this->assertEquals($expected_code, $response->getStatusCode());
@@ -445,7 +441,7 @@ class RestLoginHttpTest extends BrowserTestBase {
    * @return \Psr\Http\Message\ResponseInterface
    *   The HTTP response.
    */
-  protected function logoutRequest($format = 'json', $logout_token = ''): ResponseInterface {
+  protected function logoutRequest(string $format = 'json', string $logout_token = ''): ResponseInterface {
     /** @var \GuzzleHttp\Client $client */
     $client = $this->container->get('http_client');
     $user_logout_url = Url::fromRoute('rest.logout.http')
