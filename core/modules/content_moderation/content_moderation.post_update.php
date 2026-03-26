@@ -34,7 +34,7 @@ function content_moderation_post_update_add_index_content_moderation_state_field
 /**
  * Ensure moderation state change actions are available for all workflows.
  */
-function content_moderation_post_update_create_workflow_actions_X(array &$sandbox = []): void {
+function content_moderation_post_update_create_workflow_actions(array &$sandbox = []): void {
   \Drupal::classResolver(ConfigEntityUpdater::class)
     ->update($sandbox, 'workflow', function (WorkflowInterface $workflow): bool {
       return $workflow->getTypePlugin()->getPluginId() === 'content_moderation';
