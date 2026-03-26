@@ -270,7 +270,11 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
    *   JSON schema, with references resolved.
    */
   public function resolveJsonSchemaReferences(array $schema): array {
-    return $this->doResolveJsonSchemaReferences('', $schema, [], 0);
+    $schema = $this->doResolveJsonSchemaReferences('', $schema, [], 0);
+
+    // It looks heavy as a solution to convert objects to array recursively,
+    // but it is exactly what BaseConstraint::arrayToObjectRecursive() is doing.
+    return json_decode(json_encode($schema), TRUE);
   }
 
   /**
@@ -604,18 +608,16 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
     }
 
     // Recursively resolve nested objects.
-    foreach ($schema as $key => $value) {
+    foreach ($schema as $next_key => $value) {
       if (is_object($value)) {
-        if (isset($schema['type']) && $schema['type'] == 'object') {
+        if (isset($schema['type']) && $schema['type'] === 'object') {
           $required = $schema['required'] ?? [];
         }
-        $schema[$key] = $this->doResolveJsonSchemaReferences($key, (array) $value, $required, $depth);
+        $schema[$next_key] = $this->doResolveJsonSchemaReferences($next_key, (array) $value, $required, $depth);
       }
     }
 
-    // It looks heavy as a solution to convert objects to array recursively,
-    // but it is exactly what BaseConstraint::arrayToObjectRecursive() is doing.
-    return json_decode(json_encode($schema), TRUE);
+    return $schema;
   }
 
 }
