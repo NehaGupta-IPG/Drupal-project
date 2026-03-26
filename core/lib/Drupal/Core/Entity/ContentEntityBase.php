@@ -965,6 +965,8 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
     // Populate entity translation object cache so it will be available for all
     // translation objects.
     if (!isset($this->translations[$this->activeLangcode]['entity'])) {
+      // Ensure field references are persistent.
+      $this->createWeakReferences = FALSE;
       $this->translations[$this->activeLangcode]['entity'] = $this;
     }
 
