@@ -77,7 +77,7 @@ class ChainRequestPolicyTest extends UnitTestCase {
    * @legacy-covers ::check
    */
   #[DataProvider('providerChainExceptionOnInvalidReturnValue')]
-  public function testChainExceptionOnInvalidReturnValue($return_value): void {
+  public function testChainExceptionOnInvalidReturnValue(bool|int|\stdClass|array $return_value): void {
     $rule = $this->createMock('Drupal\Core\PageCache\RequestPolicyInterface');
     $rule->expects($this->once())
       ->method('check')
@@ -96,7 +96,7 @@ class ChainRequestPolicyTest extends UnitTestCase {
    * @return array
    *   Test input and expected result.
    */
-  public static function providerChainExceptionOnInvalidReturnValue() {
+  public static function providerChainExceptionOnInvalidReturnValue(): array {
     return [
       [FALSE],
       [0],
@@ -113,7 +113,7 @@ class ChainRequestPolicyTest extends UnitTestCase {
    * @legacy-covers ::check
    */
   #[DataProvider('providerAllowIfAnyRuleReturnedAllow')]
-  public function testAllowIfAnyRuleReturnedAllow($return_values): void {
+  public function testAllowIfAnyRuleReturnedAllow(array $return_values): void {
     foreach ($return_values as $return_value) {
       $rule = $this->createMock('Drupal\Core\PageCache\RequestPolicyInterface');
       $rule->expects($this->once())
@@ -134,7 +134,7 @@ class ChainRequestPolicyTest extends UnitTestCase {
    * @return array
    *   Test input and expected result.
    */
-  public static function providerAllowIfAnyRuleReturnedAllow() {
+  public static function providerAllowIfAnyRuleReturnedAllow(): array {
     return [
       [[RequestPolicyInterface::ALLOW]],
       [[NULL, RequestPolicyInterface::ALLOW]],

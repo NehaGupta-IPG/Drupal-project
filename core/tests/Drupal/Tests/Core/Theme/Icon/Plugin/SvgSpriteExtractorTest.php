@@ -38,7 +38,7 @@ class SvgSpriteExtractorTest extends UnitTestCase {
   /**
    * The IconFinder instance.
    *
-   * @var \Drupal\Core\Theme\Icon\IconFinder|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Theme\Icon\IconFinder|\PHPUnit\Framework\MockObject\Stub
    */
   private IconFinder $iconFinder;
 
@@ -47,7 +47,7 @@ class SvgSpriteExtractorTest extends UnitTestCase {
    */
   public function setUp():void {
     parent::setUp();
-    $this->iconFinder = $this->createMock(IconFinder::class);
+    $this->iconFinder = $this->createStub(IconFinder::class);
     $this->svgSpriteExtractorPlugin = new SvgSpriteExtractor(
       [
         'id' => $this->pluginId,
@@ -138,7 +138,10 @@ class SvgSpriteExtractorTest extends UnitTestCase {
         ],
       ],
       [
-        ['/path/source/foo.svg', '<svg><symbol id="!script"></symbol><symbol id="not valid"></symbol><symbol id="_foo-bar_"></symbol></svg>'],
+        [
+          '/path/source/foo.svg',
+          '<svg><symbol id="!script"></symbol><symbol id="not valid"></symbol><symbol id="_foo-bar_"></symbol></svg>',
+        ],
       ],
       ['_foo-bar_'],
     ];

@@ -25,14 +25,14 @@ class FieldInputValueNormalizerTraitTest extends UnitTestCase {
    * @legacy-covers ::normalizeValue
    */
   #[DataProvider('keyValueByDeltaTestCases')]
-  public function testKeyValueByDelta($input_value, $expected_value, $main_property_name = 'value'): void {
+  public function testKeyValueByDelta(int|string|array|null $input_value, array $expected_value, $main_property_name = 'value'): void {
     $this->assertEquals($expected_value, $this->normalizeValue($input_value, $main_property_name));
   }
 
   /**
    * Provides test cases for ::testKeyValueByDelta.
    */
-  public static function keyValueByDeltaTestCases() {
+  public static function keyValueByDeltaTestCases(): array {
     return [
       'Integer' => [
         1,

@@ -218,7 +218,7 @@ class DrupalKernelTest extends KernelTestBase {
    *   An array of test cases. Each test case is an array containing a single boolean value
    *   that represents the class_loader_auto_detect setting to be tested.
    */
-  public static function providerClassLoaderAutoDetect() {
+  public static function providerClassLoaderAutoDetect(): array {
     return [
       'TRUE' => [TRUE],
       'FALSE' => [FALSE],
@@ -239,7 +239,7 @@ class DrupalKernelTest extends KernelTestBase {
   #[DataProvider('providerClassLoaderAutoDetect')]
   #[PreserveGlobalState(FALSE)]
   #[RunInSeparateProcess]
-  public function testClassLoaderAutoDetect($value): void {
+  public function testClassLoaderAutoDetect(bool $value): void {
     // Create a virtual file system containing items that should be
     // excluded. Exception being modules directory.
     vfsStream::setup('root', NULL, [
@@ -276,8 +276,6 @@ class DrupalKernelTest extends KernelTestBase {
 
   /**
    * Tests reset container.
-   *
-   * @legacy-covers ::resetContainer
    */
   public function testResetContainer(): void {
     $modules_enabled = [
@@ -306,6 +304,16 @@ class DrupalKernelTest extends KernelTestBase {
     // Ensure persisted services are persisted.
     $request_stack = $container->get('request_stack');
 
+    $container->get('stream_wrapper_manager')->register();
+    $stream_wrappers = array_keys($container->get('stream_wrapper_manager')->getWrappers());
+    $this->assertSame([
+      'assets',
+      'public',
+      'temporary',
+      'module',
+      'theme',
+    ], $stream_wrappers);
+
     $kernel->resetContainer();
 
     // Ensure services are reset when ::resetContainer is called.
@@ -322,6 +330,9 @@ class DrupalKernelTest extends KernelTestBase {
 
     // Ensure persisted services are persisted.
     $this->assertSame($request_stack, $container->get('request_stack'));
+
+    // Ensure stream wrappers are registered.
+    $this->assertSame($stream_wrappers, array_keys($container->get('stream_wrapper_manager')->getWrappers()));
   }
 
   /**

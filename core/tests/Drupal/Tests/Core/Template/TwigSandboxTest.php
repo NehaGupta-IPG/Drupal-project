@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Template;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Template\Attribute\TwigAllowed;
 use Drupal\Core\Template\Loader\StringLoader;
@@ -48,10 +49,9 @@ class TwigSandboxTest extends UnitTestCase {
    * Tests that dangerous methods cannot be called in entity objects.
    */
   #[DataProvider('getTwigEntityDangerousMethods')]
-  public function testEntityDangerousMethods($template): void {
-    $entity = $this->createMock('Drupal\Core\Entity\EntityInterface');
+  public function testEntityDangerousMethods(string $template): void {
     $this->expectException(SecurityError::class);
-    $this->twig->render($template, ['entity' => $entity]);
+    $this->twig->render($template, ['entity' => $this->createStub(EntityInterface::class)]);
   }
 
   /**
@@ -60,7 +60,7 @@ class TwigSandboxTest extends UnitTestCase {
    * @return array
    *   An array of dangerous methods.
    */
-  public static function getTwigEntityDangerousMethods() {
+  public static function getTwigEntityDangerousMethods(): array {
     return [
       ['{{ entity.delete }}'],
       ['{{ entity.save }}'],

@@ -28,14 +28,14 @@ class TwigMarkupInterfaceTest extends KernelTestBase {
  * Tests markup interface empty.
  */
   #[DataProvider('providerTestMarkupInterfaceEmpty')]
-  public function testMarkupInterfaceEmpty($expected, $variable): void {
+  public function testMarkupInterfaceEmpty(string $expected, MarkupInterface|string $variable): void {
     $this->assertSame($expected, (string) $this->renderObjectWithTwig($variable));
   }
 
   /**
    * Provide test examples.
    */
-  public static function providerTestMarkupInterfaceEmpty() {
+  public static function providerTestMarkupInterfaceEmpty(): array {
     return [
       // The first argument to \Drupal\Core\StringTranslation\TranslatableMarkup
       // is not supposed to be an empty string.
@@ -115,7 +115,7 @@ class SafeMarkupTestMarkup implements MarkupInterface {
   /**
    * Overrides MarkupTrait::create() to allow creation with empty strings.
    */
-  public static function create($string) {
+  public static function create($string): static {
     $object = new static();
     $object->string = $string;
     return $object;
