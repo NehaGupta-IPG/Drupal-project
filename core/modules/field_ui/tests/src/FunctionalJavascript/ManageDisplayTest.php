@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests the Field UI "Manage display" and "Manage form display" screens.
  */
 #[Group('field_ui')]
+#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class ManageDisplayTest extends WebDriverTestBase {
 
@@ -180,7 +181,7 @@ class ManageDisplayTest extends WebDriverTestBase {
     // Submit the form and assert that
     // hook_field_formatter_settings_summary_alter() is called.
     $button_save->click();
-    $assert_session->responseContains('field_test_field_formatter_settings_summary_alter');
+    $assert_session->waitForText('field_test_field_formatter_settings_summary_alter');
 
     // Open the settings form for the test field.
     $field_test_settings->click();
@@ -350,7 +351,7 @@ class ManageDisplayTest extends WebDriverTestBase {
     $this->assertEquals($current_setting_value, $setting_value, 'The setting was updated.');
 
     // Assert that hook_field_widget_settings_summary_alter() is called.
-    $assert_session->responseContains('field_test_field_widget_settings_summary_alter');
+    $assert_session->waitForText('field_test_field_widget_settings_summary_alter');
 
     $field_test_settings->click();
     $assert_session->assertExpectedAjaxRequest(1);
