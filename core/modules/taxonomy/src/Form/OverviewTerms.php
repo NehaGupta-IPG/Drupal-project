@@ -14,6 +14,7 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Pager\PagerManagerInterface;
 use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\taxonomy\TermInterface;
 use Drupal\taxonomy\TermStorageInterface;
@@ -348,7 +349,7 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
     ];
     $form['filter']['submit'] = [
       '#type' => 'submit',
-      '#value' => t('Filter'),
+      '#value' => $this->t('Filter'),
       '#id' => 'filter-submit',
     ];
 
@@ -356,7 +357,7 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
     if ($this->termFilter) {
       $form['filter']['reset'] = [
         '#type' => 'submit',
-        '#value' => t('Reset'),
+        '#value' => $this->t('Reset'),
         '#id' => 'filter-reset',
       ];
     }
@@ -393,7 +394,7 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
         '#type' => 'html_tag',
         '#tag' => 'div',
         'child' => [
-          '#markup' => t('<span class="color-success">@indicator</span> indicates matching terms. Parents of matching terms are also shown.', [
+          '#markup' => $this->t('<span class="color-success">@indicator</span> indicates matching terms. Parents of matching terms are also shown.', [
             '@indicator' => self::MATCHING_TERM_INDICATOR,
           ]),
         ],
@@ -421,11 +422,11 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
           ],
         ];
         if (!empty($matchingTids) && in_array($term->id(), $matchingTids, FALSE)) {
-          $resultType['#attributes']['title'] = t('Matching term');
+          $resultType['#attributes']['title'] = $this->t('Matching term');
           $resultType['#attributes']['class'] = ['color-success'];
         }
         else {
-          $resultType['#attributes']['title'] = t('Non-matching term');
+          $resultType['#attributes']['title'] = $this->t('Non-matching term');
           $resultType['#attributes']['class'] = ['visually-hidden'];
         }
         $prefix[] = $resultType;
@@ -444,11 +445,11 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
       ];
       if ($this->termFilter) {
         if (!empty($matchingTids) && in_array($term->id(), $matchingTids, FALSE)) {
-          $form['terms'][$key]['term']['#attributes']['aria-label'] = t('Matching term: @name', ['@name' => $term->getName()]);
+          $form['terms'][$key]['term']['#attributes']['aria-label'] = $this->t('Matching term: @name', ['@name' => $term->getName()]);
           $form['terms'][$key]['term']['#attributes']['class'][] = 'color-success';
         }
         else {
-          $form['terms'][$key]['term']['#attributes']['aria-label'] = t('Non-matching term: @name', ['@name' => $term->getName()]);
+          $form['terms'][$key]['term']['#attributes']['aria-label'] = $this->t('Non-matching term: @name', ['@name' => $term->getName()]);
         }
       }
       $form['terms'][$key]['status'] = [
@@ -721,14 +722,13 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
   }
 
   /**
-   * Filter terms.
-   *
-   * Whether the term matches the filter.
+   * Filter a term, returning true if the term matches the filter or false.
    *
    * @param \stdClass $term
    *   The taxonomy term to compare against.
    *
    * @return bool
+   *   Whether the term matches the filter.
    */
   public function filter(\stdClass $term): bool {
     return stripos($term->name, $this->termFilter) !== FALSE;
