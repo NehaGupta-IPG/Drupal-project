@@ -53,10 +53,11 @@ class TermKernelTest extends KernelTestBase {
    */
   public function testTermNonNumeric(): void {
     $vocabulary = $this->createVocabulary();
-    $valid_term = $this->createTerm($vocabulary);
-    $invalid_term = '0123';
-    // Save the invalid term.
-    $valid_term->save();
+    $term = $this->createTerm($vocabulary);
+    // Change the valid term to a non-numeric value.
+    $term = '0123';
+    // Try to save the invalid term.
+    $term->save();
     $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties(['vid' => $vocabulary->id()]);
     $this->assertEmpty($terms, 'Vocabulary is empty after trying to save a non-numeric term.');
   }
