@@ -24,8 +24,7 @@ install:
   - big_pipe
   - taxonomy
   - dblog
-  - search
-  - toolbar
+  - navigation
   - field_ui
   - file
   - views
