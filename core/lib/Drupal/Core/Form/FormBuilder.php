@@ -156,6 +156,22 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
     'Drupal\Core\Render\Element\Weight::valueCallback',
   ];
 
+  /**
+   * Element types that are used for grouping elements.
+   *
+   * @var string[]
+   */
+  protected array $complexElementTypes = [
+    'actions',
+    'container',
+    'details',
+    'dropbutton',
+    'fieldgroup',
+    'fieldset',
+    'form',
+    'operations',
+  ];
+
   public function __construct(
     FormValidatorInterface $form_validator,
     FormSubmitterInterface $form_submitter,
@@ -692,6 +708,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
           if (isset($form_item['#required']) && (bool) $form_item['#required'] === TRUE) {
             $form[$form_note_identifier] = [
               '#type' => 'container',
+              '#attributes' => ['class' => ['asterisk-explanation']],
               '#markup' => new TranslatableMarkup('<strong>@strong-markup: </strong><label>@label-markup *.</label>', [
                 '@strong-markup' => new TranslatableMarkup('Note'),
                 '@label-markup' => new TranslatableMarkup('Required fields are marked with an asterisk'),
@@ -716,16 +733,7 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
    *   Whether the type is in the list of targeted tags.
    */
   public function isComplexElement(string $type): bool {
-    return in_array($type, [
-      'actions',
-      'container',
-      'details',
-      'dropbutton',
-      'fieldgroup',
-      'fieldset',
-      'form',
-      'operations',
-    ]);
+    return in_array($type, $this->complexElementTypes);
   }
 
   /**
