@@ -255,6 +255,39 @@ class ManageFieldsFunctionalTest extends ManageFieldsFunctionalTestBase {
   }
 
   /**
+   * Tests machine name validation message formatting for text fields.
+   */
+  public function testMachineNameValidationMessageFormatting(): void {
+    $bundle_path = 'admin/structure/types/manage/' . $this->contentType;
+    $invalid_machine_name_message = 'The machine-readable name must contain only lowercase letters, numbers, and underscores.';
+
+    // Label provided: no extra space before the colon.
+    $this->drupalGet("{$bundle_path}/fields/add-field");
+    $this->clickLink('Plain text');
+    $this->submitForm([], 'Continue');
+    $this->submitForm([
+      'label' => 'Invalid machine name field',
+      'field_name' => 'invalid.name',
+    ], 'Continue');
+    $this->assertSession()->pageTextContains('There was a problem creating field Invalid machine name field:');
+    $this->assertSession()->pageTextNotContains('There was a problem creating field Invalid machine name field :');
+    $this->assertSession()->pageTextContains($invalid_machine_name_message);
+
+    // Empty label: no extra space before the colon in the fallback message.
+    $this->drupalGet("{$bundle_path}/fields/add-field");
+    $this->clickLink('Plain text');
+    $this->submitForm([], 'Continue');
+    $this->submitForm([
+      'label' => '',
+      'field_name' => 'invalid.name',
+    ], 'Continue');
+    $this->assertSession()->pageTextContains('Label field is required.');
+    $this->assertSession()->pageTextContains('There was a problem creating field:');
+    $this->assertSession()->pageTextNotContains('There was a problem creating field :');
+    $this->assertSession()->pageTextContains($invalid_machine_name_message);
+  }
+
+  /**
    * Tests invalid field UI URLs and destinations.
    */
   public function testInvalidUrlsAndDestinations(): void {

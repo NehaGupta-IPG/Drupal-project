@@ -370,4 +370,46 @@ class ManageFieldsTest extends WebDriverTestBase {
     $this->assertSession()->pageTextContains('You need to select a field type.');
   }
 
+  /**
+   * Tests invalid machine-readable name error formatting.
+   */
+  public function testMachineNameValidationMessageFormatting(): void {
+    $page = $this->getSession()->getPage();
+    $assert_session = $this->assertSession();
+
+    $open_add_field_modal = function () use ($page): void {
+      $this->drupalGet('/admin/structure/types/manage/article/fields');
+      $page->clickLink('Create a new field');
+      $this->assertSession()->assertWaitOnAjaxRequest();
+      $this->clickLink('Plain text');
+      $this->assertSession()->assertWaitOnAjaxRequest();
+      $this->assertNotEmpty($text_plain = $page->find('xpath', '//*[text() = "Text (plain)"]')->getParent());
+      $text_plain->click();
+      $this->assertTrue($this->assertSession()->elementExists('css', '[name="field_options_wrapper"][value="string"]')->isSelected());
+    };
+
+    // Check message formatting when a label is present.
+    $open_add_field_modal();
+    $label = 'test_label';
+    $page->fillField('label', $label);
+    $page->fillField('field_name', 'invalid.name');
+    $buttons = $assert_session->elementExists('css', '.ui-dialog-buttonpane');
+    $buttons->pressButton('Continue');
+    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->pageTextContains("There was a problem creating field $label:");
+    $assert_session->pageTextNotContains("There was a problem creating field $label :");
+    $assert_session->pageTextContains('The machine-readable name must contain only lowercase letters, numbers, and underscores.');
+
+    // Check message formatting when the label is empty.
+    $open_add_field_modal();
+    $page->fillField('field_name', 'invalid.name');
+    $buttons = $assert_session->elementExists('css', '.ui-dialog-buttonpane');
+    $buttons->pressButton('Continue');
+    $assert_session->assertWaitOnAjaxRequest();
+    $assert_session->pageTextContains('Label field is required.');
+    $assert_session->pageTextContains('There was a problem creating field:');
+    $assert_session->pageTextNotContains('There was a problem creating field :');
+    $assert_session->pageTextContains('The machine-readable name must contain only lowercase letters, numbers, and underscores.');
+  }
+
 }
