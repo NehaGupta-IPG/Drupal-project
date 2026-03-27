@@ -7,6 +7,8 @@ namespace Drupal\Tests\Core\Entity;
 use Drupal\Core\Entity\EntityBase;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityResolverManager;
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -16,6 +18,8 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Routing\Route;
 
 /**
@@ -35,7 +39,7 @@ class EntityResolverManagerTest extends UnitTestCase {
   /**
    * The mocked entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $entityTypeManager;
 
@@ -49,7 +53,7 @@ class EntityResolverManagerTest extends UnitTestCase {
   /**
    * The mocked dependency injection container.
    *
-   * @var \Symfony\Component\DependencyInjection\ContainerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Symfony\Component\DependencyInjection\ContainerInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $container;
 
@@ -61,8 +65,8 @@ class EntityResolverManagerTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->entityTypeManager = $this->createMock('Drupal\Core\Entity\EntityTypeManagerInterface');
-    $this->container = $this->createMock('Symfony\Component\DependencyInjection\ContainerInterface');
+    $this->entityTypeManager = $this->createStub(EntityTypeManagerInterface::class);
+    $this->container = $this->createStub(ContainerInterface::class);
     $this->classResolver = $this->getClassResolverStub();
 
     $this->entityResolverManager = new EntityResolverManager($this->entityTypeManager, $this->classResolver);
@@ -77,7 +81,7 @@ class EntityResolverManagerTest extends UnitTestCase {
    * @legacy-covers ::getControllerClass
    */
   #[DataProvider('providerTestSetRouteOptionsWithStandardRoute')]
-  public function testSetRouteOptionsWithStandardRoute($controller): void {
+  public function testSetRouteOptionsWithStandardRoute(string $controller): void {
     $route = new Route('/example', [
       '_controller' => $controller,
     ]);
@@ -105,7 +109,7 @@ class EntityResolverManagerTest extends UnitTestCase {
    * @legacy-covers ::getControllerClass
    */
   #[DataProvider('providerTestSetRouteOptionsWithStandardRouteWithArgument')]
-  public function testSetRouteOptionsWithStandardRouteWithArgument($controller): void {
+  public function testSetRouteOptionsWithStandardRouteWithArgument(string $controller): void {
     $route = new Route('/example/{argument}', [
       '_controller' => $controller,
       'argument' => 'test',
@@ -134,7 +138,7 @@ class EntityResolverManagerTest extends UnitTestCase {
    * @legacy-covers ::getControllerClass
    */
   #[DataProvider('providerTestSetRouteOptionsWithContentController')]
-  public function testSetRouteOptionsWithContentController($controller): void {
+  public function testSetRouteOptionsWithContentController(string $controller): void {
     $route = new Route('/example/{argument}', [
       '_controller' => $controller,
       'argument' => 'test',
@@ -165,7 +169,7 @@ class EntityResolverManagerTest extends UnitTestCase {
    * @legacy-covers ::setParametersFromReflection
    */
   #[DataProvider('providerTestSetRouteOptionsWithEntityTypeNoUpcasting')]
-  public function testSetRouteOptionsWithEntityTypeNoUpcasting($controller): void {
+  public function testSetRouteOptionsWithEntityTypeNoUpcasting(string $controller): void {
     $this->setupEntityTypes();
 
     $route = new Route('/example/{entity_test}', [
@@ -197,7 +201,7 @@ class EntityResolverManagerTest extends UnitTestCase {
    * @legacy-covers ::setParametersFromReflection
    */
   #[DataProvider('providerTestSetRouteOptionsWithEntityTypeUpcasting')]
-  public function testSetRouteOptionsWithEntityTypeUpcasting($controller): void {
+  public function testSetRouteOptionsWithEntityTypeUpcasting(string $controller): void {
     $this->setupEntityTypes();
 
     $route = new Route('/example/{entity_test}', [
@@ -230,7 +234,7 @@ class EntityResolverManagerTest extends UnitTestCase {
    * @legacy-covers ::setParametersFromReflection
    */
   #[DataProvider('providerTestSetRouteOptionsWithUnionEntityType')]
-  public function testSetRouteOptionsWithUnionEntityType($controller): void {
+  public function testSetRouteOptionsWithUnionEntityType(string $controller): void {
     $this->setupEntityTypes();
 
     $route = new Route('/example/{entity_test}', [
@@ -475,29 +479,29 @@ class EntityResolverManagerTest extends UnitTestCase {
    * Creates the entity type manager mock returning entity type objects.
    */
   protected function setupEntityTypes(): void {
-    $definition = $this->createMock('Drupal\Core\Entity\EntityTypeInterface');
-    $definition->expects($this->any())
+    $definition = $this->createStub(EntityTypeInterface::class);
+    $definition
       ->method('getClass')
       ->willReturn('Drupal\Tests\Core\Entity\TestEntity');
-    $definition->expects($this->any())
+    $definition
       ->method('isRevisionable')
       ->willReturn(FALSE);
-    $revisionable_definition = $this->createMock('Drupal\Core\Entity\EntityTypeInterface');
-    $revisionable_definition->expects($this->any())
+    $revisionable_definition = $this->createStub(EntityTypeInterface::class);
+    $revisionable_definition
       ->method('getClass')
       ->willReturn('Drupal\Tests\Core\Entity\TestEntity');
-    $revisionable_definition->expects($this->any())
+    $revisionable_definition
       ->method('isRevisionable')
       ->willReturn(TRUE);
-    $this->entityTypeManager->expects($this->any())
+    $this->entityTypeManager
       ->method('getDefinitions')
       ->willReturn([
         'entity_test' => $definition,
         'entity_test_rev' => $revisionable_definition,
       ]);
-    $this->entityTypeManager->expects($this->any())
+    $this->entityTypeManager
       ->method('getDefinition')
-      ->willReturnCallback(function ($entity_type) use ($definition, $revisionable_definition) {
+      ->willReturnCallback(function ($entity_type) use ($definition, $revisionable_definition): ?MockObject {
         if ($entity_type == 'entity_test') {
           return $definition;
         }

@@ -522,7 +522,7 @@ class Ckeditor5Hooks {
   /**
    * AJAX callback handler for filter_format_form().
    *
-   * Used instead of editor_form_filter_admin_form_ajax from the editor module.
+   * Used instead of EditorHooks::editorFormFilterAdminFormAjax().
    *
    * @param array $form
    *   The form render array.
@@ -531,6 +531,8 @@ class Ckeditor5Hooks {
    *
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   The Ajax response.
+   *
+   * @see \Drupal\editor\Hook\EditorHooks::editorFormFilterAdminFormAjax()
    */
   public function updateCkeditor5HtmlFilter(array $form, FormStateInterface $form_state): AjaxResponse {
     $response = new AjaxResponse();
@@ -595,11 +597,16 @@ class Ckeditor5Hooks {
     // that switch, add an error class and attribute to the editor select,
     // otherwise remove.
     $ckeditor5_selected_but_errors = !$form_state->get('ckeditor5_is_active') && $form_state->get('ckeditor5_is_selected') && !empty($form_state->getErrors());
-    $response->addCommand(new InvokeCommand('[data-drupal-selector="edit-editor-editor"]', $ckeditor5_selected_but_errors ? 'addClass' : 'removeClass', ['error']));
-    $response->addCommand(new InvokeCommand('[data-drupal-selector="edit-editor-editor"]', $ckeditor5_selected_but_errors ? 'attr' : 'removeAttr', [
-      'data-error-switching-to-ckeditor5',
-      TRUE,
-    ]));
+    $response->addCommand(new InvokeCommand(
+      '[data-drupal-selector="edit-editor-editor"]',
+      $ckeditor5_selected_but_errors ? 'addClass' : 'removeClass',
+      ['error'],
+    ));
+    $response->addCommand(new InvokeCommand(
+      '[data-drupal-selector="edit-editor-editor"]',
+      $ckeditor5_selected_but_errors ? 'attr' : 'removeAttr',
+      ['data-error-switching-to-ckeditor5', TRUE],
+    ));
 
     /*
      * Recursively find #attach items in the form and add as attachments to the
