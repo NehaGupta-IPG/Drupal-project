@@ -1159,7 +1159,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       if ($test_prefix = drupal_valid_test_ua()) {
         $test_db = new TestDatabase($test_prefix);
         TestErrorLogger::setLogDirectory($test_db->getTestErrorLoggerDirectory());
-        if (isset($_SERVER['HTTP_X_DRUPAL_TEST_REQUEST_FROM_RUNNER']) && $_SERVER['HTTP_X_DRUPAL_TEST_REQUEST_FROM_RUNNER']) {
+        if ($_SERVER['HTTP_X_DRUPAL_TEST_REQUEST_FROM_RUNNER'] ?? FALSE) {
           TestErrorLogger::setLogFileName('main.log');
         }
         // Only code that interfaces directly with tests should rely on this

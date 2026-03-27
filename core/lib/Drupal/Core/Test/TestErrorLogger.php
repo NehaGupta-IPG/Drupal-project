@@ -52,6 +52,8 @@ final class TestErrorLogger {
   /**
    * Gets the path to the log file.
    *
+   * When a test spawns multiple php processes, e.g. for ajax requests, each of them will have its own unique log file.
+   *
    * If the log file name is not set, a unique random name will be generated.
    *
    * @return string

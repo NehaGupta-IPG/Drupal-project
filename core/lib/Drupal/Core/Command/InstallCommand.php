@@ -221,7 +221,7 @@ class InstallCommand extends Command {
       // Test sites need a log directory to write to in case the site under test
       // triggers an error.
       if (getenv('DRUPAL_DEV_SITE_PATH') === $site_path && !mkdir($site_path . '/logs', 0775)) {
-        throw new \RuntimeException("Failed to create directory $site_path");
+        throw new \RuntimeException("Failed to create directory $site_path/logs");
       }
     }
     if (!file_exists("{$site_path}/settings.php")) {

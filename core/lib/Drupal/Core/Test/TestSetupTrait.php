@@ -134,6 +134,9 @@ trait TestSetupTrait {
    * database queries use the database table prefix that has been generated
    * here.
    *
+   * @return \Drupal\Component\FileSystem\FileSystem\TestDatabase
+   *   An object with information about the test Drupal instance.
+   *
    * @see \Drupal\Tests\BrowserTestBase::prepareEnvironment()
    * @see drupal_valid_test_ua()
    */
