@@ -96,7 +96,7 @@ class User extends ContentEntityBase implements UserInterface {
    */
   public function id() {
     $id = parent::id();
-    return $id !== NULL ? (int) $id : NULL;
+    return is_string($id) ? (int) $id : $id;
   }
 
   /**

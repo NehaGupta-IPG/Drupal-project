@@ -84,7 +84,7 @@ class UserSession implements AccountInterface {
    * {@inheritdoc}
    */
   public function id() {
-    return $this->uid !== NULL ? (int) $this->uid : NULL;
+    return is_string($this->uid) ? (int) $this->uid : $this->uid;
   }
 
   /**

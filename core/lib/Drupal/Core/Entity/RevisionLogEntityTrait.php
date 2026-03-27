@@ -100,7 +100,7 @@ trait RevisionLogEntityTrait {
     // Casting to int to match AccountInterface::id() return type, preserving
     // NULL for unsaved entities.
     $target_id = $this->{$this->getEntityType()->getRevisionMetadataKey('revision_user')}->target_id;
-    return $target_id !== NULL ? (int) $target_id : NULL;
+    return is_string($target_id) ? (int) $target_id : $target_id;
   }
 
   /**

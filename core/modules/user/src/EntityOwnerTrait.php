@@ -47,7 +47,7 @@ trait EntityOwnerTrait {
    */
   public function getOwnerId() {
     $ownerId = $this->getEntityKey('owner');
-    return $ownerId !== NULL ? (int) $ownerId : NULL;
+    return is_string($ownerId) ? (int) $ownerId : $ownerId;
   }
 
   /**
