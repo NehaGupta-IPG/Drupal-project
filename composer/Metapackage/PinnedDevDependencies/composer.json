@@ -81,6 +81,7 @@
         "seld/jsonlint": "1.11.0",
         "seld/phar-utils": "1.2.1",
         "seld/signal-handler": "2.0.2",
+        "shipmonk/dead-code-detector": "0.15.1",
         "sirbrillig/phpcs-variable-analysis": "v2.13.0",
         "slevomat/coding-standard": "8.22.1",
         "spaze/phpstan-disallowed-calls": "v4.9.0",

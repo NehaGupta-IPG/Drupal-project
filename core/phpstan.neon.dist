@@ -67,6 +67,10 @@ parameters:
         message: 'any() will be deprecated in PHPUnit 12.5.0 and should not be used.'
         errorTip: 'See https://www.drupal.org/node/3573259.'
 
+  shipmonkDeadCode:
+    detect:
+      deadMethods: false
+
 rules:
   - Drupal\PHPStan\Rules\ComponentTestDoesNotExtendCoreTest
   - Drupal\PHPStan\Rules\TestClassClassMetadata
@@ -77,6 +81,11 @@ rules:
   - PHPStan\Rules\Classes\AccessPrivateConstantThroughStaticRule
 
 services:
+  -
+    class: Drupal\PHPStan\DeadCode\DrupalUsageProvider
+    tags:
+      - shipmonk.deadCode.memberUsageProvider
+
   errorFormatter.multiplex:
     class: Drupal\PHPStan\ErrorFormatter\MultiplexErrorFormatter
     arguments:

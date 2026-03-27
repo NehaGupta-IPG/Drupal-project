@@ -38,6 +38,7 @@
         "phpstan/phpstan": "^2.1.42",
         "phpstan/phpstan-phpunit": "^2.0.16",
         "phpunit/phpunit": "^11.5.50",
+        "shipmonk/dead-code-detector": "^0.15.1",
         "spaze/phpstan-disallowed-calls": "^4.9.0",
         "symfony/browser-kit": "^8.0",
         "symfony/css-selector": "^8.0",
@@ -123,6 +124,7 @@
     "autoload-dev": {
         "psr-4": {
             "Drupal\\PHPStan\\ErrorFormatter\\": "core/tests/PHPStan/ErrorFormatter",
+            "Drupal\\PHPStan\\DeadCode\\": "core/tests/PHPStan/DeadCode",
             "Drupal\\PHPStan\\Rules\\": "core/tests/PHPStan/Rules"
         }
     },
