@@ -14,9 +14,18 @@ use Drupal\Core\Utility\Error;
 final class TestErrorLogger {
 
   /**
-   * The maximum time to wait for a lock in microseconds.
+   * The name of the log file.
+   *
+   * @var string
    */
-  protected const MAX_LOCK_WAIT_TIME = 1000000;
+  protected static string $logFileName;
+
+  /**
+   * The directory where the log file will be created.
+   *
+   * @var string
+   */
+  protected static string $logDirectory;
 
   /**
    * Private constructor to prevent instantiation.
@@ -25,10 +34,59 @@ final class TestErrorLogger {
   }
 
   /**
+   * Sets the directory where the log file will be created.
+   *
+   * @param string $log_directory
+   *   The directory where the log file will be created.
+   */
+  public static function setLogDirectory(string $log_directory): void {
+    self::$logDirectory = $log_directory;
+  }
+
+  /**
+   * Sets the name of the log file.
+   *
+   * @param string $log_file_name
+   *   The name of the log file.
+   */
+  public static function setLogFileName(string $log_file_name): void {
+    self::$logFileName = $log_file_name;
+  }
+
+  /**
+   * Gets the path to the log file.
+   *
+   * If the log file name is not set, a unique random name will be generated.
+   *
+   * @return string
+   *   The path to the log file.
+   *
+   * @throws \RuntimeException
+   *   Thrown when the log file directory is not set.
+   */
+  public static function getLogFile(): string {
+    if (!isset(self::$logDirectory)) {
+      throw new \RuntimeException('Log directory not set.');
+    }
+    // If the log file name is not set, generate a unique random name that
+    // cannot be re-used by another process.
+    if (!isset(self::$logFileName)) {
+      do {
+        $log_name = mt_rand(10000000, 99999999) . '.log';
+        $fd = fopen(static::$logDirectory . '/' . $log_name, 'x');
+      } while ($fd === FALSE);
+
+      fwrite($fd, "");
+      fclose($fd);
+
+      static::setLogFileName($log_name);
+    }
+    return self::$logDirectory . '/' . self::$logFileName;
+  }
+
+  /**
    * Appends a serialized error to the log file.
    *
-   * @param \Drupal\Core\Test\TestDatabase $test_db
-   *   The test database object to provide the log file path.
    * @param string $message
    *   The error message.
    * @param string $type
@@ -43,7 +101,7 @@ final class TestErrorLogger {
    *   The exception that triggered the error, or NULL if the error was not
    *   triggered by an exception.
    */
-  public static function writeError(TestDatabase $test_db, string $message, string $type, string $function, string $file, int $line, ?\Throwable $exception): void {
+  public static function writeError(string $message, string $type, string $function, string $file, int $line, ?\Throwable $exception): void {
     if ($exception instanceof TestErrorLoggerIgnoreException || $exception === NULL && str_starts_with($message, TestErrorLoggerIgnoreException::class)) {
       return;
     }
@@ -56,14 +114,8 @@ final class TestErrorLogger {
         'line' => $line,
       ],
     ];
-    $log_file = $test_db->getTestErrorLoggerPath();
-    $lock = static::acquireLock($log_file);
-    try {
-      file_put_contents($log_file, rawurlencode(serialize($assertion)) . "\n", FILE_APPEND);
-    }
-    finally {
-      static::releaseLock($lock);
-    }
+    $log_file = static::getLogFile();
+    file_put_contents($log_file, rawurlencode(serialize($assertion)) . "\n", FILE_APPEND);
   }
 
   /**
@@ -73,28 +125,23 @@ final class TestErrorLogger {
    * by PHPUnit. All other error types throw an exception so they can be tested
    * by PHPUnit.
    *
-   * @param \Drupal\Core\Test\TestDatabase $test_db
-   *   The test database object to provide the log file path.
-   *
    * @throws \Exception
    *   If a non-deprecation error is found in the log.
    */
-  public static function reTriggerErrors(TestDatabase $test_db): void {
-    $log_file = $test_db->getTestErrorLoggerPath();
-    $lock = static::acquireLock($log_file);
-    try {
-      if (!file_exists($log_file)) {
-        return;
-      }
-      $content = file_get_contents($log_file);
-      unlink($log_file);
-      if ($content === '' || $content === FALSE) {
-        return;
-      }
+  public static function reTriggerErrors(): void {
+    if (!isset(static::$logDirectory, static::$logFileName)) {
+      throw new \Exception('Log directory or file name not set.');
     }
-    finally {
-      static::releaseLock($lock);
+    $log_file = static::$logDirectory . '/' . static::$logFileName;
+    if (!file_exists($log_file)) {
+      return;
     }
+    $content = file_get_contents($log_file);
+    unlink($log_file);
+    if (empty($content)) {
+      return;
+    }
+
     foreach (explode("\n", trim($content)) as $line) {
       $parameters = unserialize(rawurldecode($line), ['allowed_classes' => FALSE]);
       if (count($parameters) === 3) {
@@ -112,49 +159,6 @@ final class TestErrorLogger {
         throw new \Exception('Error thrown with the wrong amount of parameters.');
       }
     }
-  }
-
-  /**
-   * Acquires a symlink-based lock, waiting if necessary.
-   *
-   * Uses symlinks for atomic locking. If the lock is held by another process,
-   * this method will wait with exponential backoff up to a maximum of 1 second
-   * before throwing a \RuntimeException.
-   *
-   * @param string $log_file
-   *   The log file path. The lock symlink is derived by appending '.lock'.
-   *
-   * @return string
-   *   The path to the lock file.
-   *
-   * @throws \RuntimeException
-   *   If the lock cannot be acquired within 1 second.
-   */
-  private static function acquireLock(string $log_file): string {
-    $lock_file = $log_file . '.lock';
-    if (@symlink(__FILE__, $lock_file) !== FALSE) {
-      return $lock_file;
-    }
-    $delay = 10000;
-    $total = 0;
-    do {
-      usleep($delay);
-      if (@symlink(__FILE__, $lock_file) !== FALSE) {
-        return $lock_file;
-      }
-      $total += $delay;
-    } while ($total < self::MAX_LOCK_WAIT_TIME);
-    throw new \RuntimeException('Failed to acquire lock file: ' . $lock_file);
-  }
-
-  /**
-   * Releases the symlink-based lock.
-   *
-   * @param string $lock_file
-   *   The lock file path.
-   */
-  private static function releaseLock(string $lock_file): void {
-    unlink($lock_file);
   }
 
 }

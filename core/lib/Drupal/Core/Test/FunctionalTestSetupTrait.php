@@ -680,8 +680,12 @@ trait FunctionalTestSetupTrait {
     \Drupal::service('file_system')->prepareDirectory($this->siteDirectory, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
     // Tests need a writable directory for log files, see
     // \Drupal\Core\Test\TestErrorLogger.
-    $test_logger_dir = dirname($test_db->getTestErrorLoggerPath());
+    $test_logger_dir = $test_db->getTestErrorLoggerDirectory();
     \Drupal::service('file_system')->prepareDirectory($test_logger_dir, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
+
+    // Set up the TestErrorLogger for test runner.
+    TestErrorLogger::setLogDirectory($test_logger_dir);
+    TestErrorLogger::setLogFileName('main.log');
 
     // Prepare filesystem directory paths.
     $this->publicFilesDirectory = $this->siteDirectory . '/files';

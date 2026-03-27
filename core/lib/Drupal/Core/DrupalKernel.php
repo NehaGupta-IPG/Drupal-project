@@ -26,6 +26,7 @@ use Drupal\Core\Language\Language;
 use Drupal\Core\Security\RequestSanitizer;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Test\TestDatabase;
+use Drupal\Core\Test\TestErrorLogger;
 use Drupal\DrupalInstalled;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
@@ -1157,6 +1158,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if (!defined('DRUPAL_TEST_IN_CHILD_SITE')) {
       if ($test_prefix = drupal_valid_test_ua()) {
         $test_db = new TestDatabase($test_prefix);
+        TestErrorLogger::setLogDirectory($test_db->getTestErrorLoggerDirectory());
+        if (isset($_SERVER['HTTP_X_DRUPAL_TEST_REQUEST_FROM_RUNNER']) && $_SERVER['HTTP_X_DRUPAL_TEST_REQUEST_FROM_RUNNER']) {
+          TestErrorLogger::setLogFileName('main.log');
+        }
         // Only code that interfaces directly with tests should rely on this
         // constant; e.g., the error/exception handler conditionally adds
         // further error information into HTTP response headers that are

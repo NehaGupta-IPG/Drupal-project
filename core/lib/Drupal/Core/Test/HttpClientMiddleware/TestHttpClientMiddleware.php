@@ -2,7 +2,6 @@
 
 namespace Drupal\Core\Test\HttpClientMiddleware;
 
-use Drupal\Core\Test\TestDatabase;
 use Drupal\Core\Test\TestErrorLogger;
 use Drupal\Core\Utility\Error;
 use Psr\Http\Message\RequestInterface;
@@ -26,7 +25,10 @@ class TestHttpClientMiddleware {
     return function ($handler) {
       return function (RequestInterface $request, array $options) use ($handler) {
         if ($user_agent = drupal_generate_test_ua(drupal_valid_test_ua())) {
-          $request = $request->withHeader('User-Agent', $user_agent);
+          $request = $request
+            ->withHeader('User-Agent', $user_agent)
+            ->withHeader('X-Drupal-Test-Request-From-Runner', TRUE);
+
         }
         return $handler($request, $options)
           ->then(function (ResponseInterface $response) {
@@ -64,8 +66,7 @@ class TestHttpClientMiddleware {
               }
             }
 
-            $test_db = new TestDatabase(drupal_valid_test_ua());
-            TestErrorLogger::reTriggerErrors($test_db);
+            TestErrorLogger::reTriggerErrors();
             return $response;
           });
       };
