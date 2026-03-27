@@ -712,7 +712,7 @@ trait FunctionalTestSetupTrait {
 
     // Log fatal errors.
     ini_set('log_errors', 1);
-    ini_set('error_log', DRUPAL_ROOT . '/' . $test_db->getPhpErrorLogPath());
+    ini_set('error_log', DRUPAL_ROOT . '/' . $this->siteDirectory . '/error.log');
 
     // Change the database prefix.
     $this->changeDatabasePrefix();
