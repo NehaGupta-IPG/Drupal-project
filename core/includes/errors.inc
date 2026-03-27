@@ -375,7 +375,6 @@ function _drupal_get_error_level() {
  * @see https://www.drupal.org/node/3581815
  */
 function _drupal_error_header($message, $type, $function, $file, $line): void {
-  @trigger_error('_drupal_error_header() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Call \Drupal\Core\Test\TestErrorLogger::writeError() instead. See https://www.drupal.org/node/3581815', E_USER_DEPRECATED);
   // $number does not use drupal_static as it should not be reset
   // as it uniquely identifies each PHP error.
   static $number = 0;
