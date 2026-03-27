@@ -15,15 +15,11 @@ final class TestErrorLogger {
 
   /**
    * The name of the log file.
-   *
-   * @var string
    */
   protected static string $logFileName;
 
   /**
    * The directory where the log file will be created.
-   *
-   * @var string
    */
   protected static string $logDirectory;
 

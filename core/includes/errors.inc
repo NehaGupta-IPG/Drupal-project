@@ -158,7 +158,7 @@ function _drupal_log_error($error, $fatal = FALSE): void {
   unset($error['backtrace'], $error['exception'], $error['severity_level']);
 
   // When running inside the testing framework, we relay the errors
-  // to the tested site by the way of HTTP headers.
+  // to the test runner via files stored in the logs directory.
   if (defined('DRUPAL_TEST_IN_CHILD_SITE') && DRUPAL_TEST_IN_CHILD_SITE && (!defined('SIMPLETEST_COLLECT_ERRORS') || SIMPLETEST_COLLECT_ERRORS)) {
     TestErrorLogger::writeError($error['@message'], $error['%type'], $error['%function'], $error['%file'], $error['%line'], $exception);
   }
