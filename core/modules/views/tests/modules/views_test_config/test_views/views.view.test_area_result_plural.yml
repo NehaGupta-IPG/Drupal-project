@@ -50,8 +50,8 @@ display:
           group_type: group
           admin_label: ''
           empty: true
-          content: "SINGULAR start: @start | end: @end | total: @total | total formatted: @format_total | label: @label | per page: @per_page | current page: @current_page | current record count: @current_record_count | page count: @page_count"
-          content_plural: 'PLURAL start: @start | end: @end | total: @total | total formatted: @format_total | label: @label | per page: @per_page | current page: @current_page | current record count: @current_record_count | page count: @page_count'
+          content: "SINGULAR start: @start | end: @end | total: @total | label: @label | per page: @per_page | current page: @current_page | current record count: @current_record_count | page count: @page_count"
+          content_plural: 'PLURAL start: @start | end: @end | total: @total | label: @label | per page: @per_page | current page: @current_page | current record count: @current_record_count | page count: @page_count'
           plural_count_token: '@start'
           plugin_id: result_plural
     display_plugin: default
@@ -72,8 +72,8 @@ display:
           group_type: group
           admin_label: ''
           empty: false
-          content: "SINGULAR start: @start | end: @end | total: @total | total formatted: @format_total | label: @label | per page: @per_page | current page: @current_page | current record count: @current_record_count | page count: @page_count"
-          content_plural: 'PLURAL start: @start | end: @end | total: @total | total formatted: @format_total | label: @label | per page: @per_page | current page: @current_page | current record count: @current_record_count | page count: @page_count'
+          content: "SINGULAR start: @start | end: @end | total: @total | label: @label | per page: @per_page | current page: @current_page | current record count: @current_record_count | page count: @page_count"
+          content_plural: 'PLURAL start: @start | end: @end | total: @total | label: @label | per page: @per_page | current page: @current_page | current record count: @current_record_count | page count: @page_count'
           plural_count_token: '@start'
           plugin_id: result_plural
     display_plugin: page
