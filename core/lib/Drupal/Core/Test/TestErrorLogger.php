@@ -143,7 +143,6 @@ final class TestErrorLogger {
         return $lock_file;
       }
       $total += $delay;
-      $delay *= 2;
     } while ($total < self::MAX_LOCK_WAIT_TIME);
     throw new \RuntimeException('Failed to acquire lock file: ' . $lock_file);
   }
