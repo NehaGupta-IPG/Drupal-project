@@ -263,7 +263,7 @@ class UncaughtExceptionTest extends BrowserTestBase {
    * @internal
    */
   protected function assertErrorLogged(string $error_message): void {
-    $error_log_filename = DRUPAL_ROOT . '/' . $this->siteDirectory . '/logs/error.log';
+    $error_log_filename = DRUPAL_ROOT . '/' . $this->siteDirectory . '/error.log';
     $this->assertFileExists($error_log_filename);
 
     $content = file_get_contents($error_log_filename);

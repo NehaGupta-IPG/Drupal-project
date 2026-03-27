@@ -43,7 +43,7 @@ class TestDatabaseTest extends UnitTestCase {
     $test_db = new TestDatabase($db_prefix);
     $this->assertEquals($expected_db_prefix, $test_db->getDatabasePrefix());
     $this->assertEquals($expected_site_path, $test_db->getTestSitePath());
-    $this->assertEquals($expected_site_path . '/logs/error.log', $test_db->getPhpErrorLogPath());
+    $this->assertEquals($expected_site_path . '/error.log', $test_db->getPhpErrorLogPath());
   }
 
   /**
@@ -71,7 +71,8 @@ class TestDatabaseTest extends UnitTestCase {
 
     $this->assertEquals('test23', $test_db->getDatabasePrefix());
     $this->assertEquals('sites/simpletest/23', $test_db->getTestSitePath());
-    $this->assertEquals('sites/simpletest/23/logs/error.log', $test_db->getPhpErrorLogPath());
+    $this->assertEquals('sites/simpletest/23/error.log', $test_db->getPhpErrorLogPath());
+    $this->assertEquals('sites/simpletest/23/logs/test.log', $test_db->getTestErrorLoggerPath());
   }
 
 }
