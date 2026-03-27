@@ -671,14 +671,17 @@ trait FunctionalTestSetupTrait {
     $kernel = TestRunnerKernel::createFromRequest($request, $this->classLoader);
     $kernel->boot();
     $kernel->preHandle($request);
-    $this->prepareDatabasePrefix();
+    $test_db = $this->prepareDatabasePrefix();
 
     $this->originalSite = $kernel->findSitePath($request);
 
     // Create test directory ahead of installation so fatal errors and debug
     // information can be logged during installation process.
     \Drupal::service('file_system')->prepareDirectory($this->siteDirectory, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
-    mkdir($this->siteDirectory . '/logs');
+    // Tests need a writable directory for log files, see
+    // \Drupal\Core\Test\TestErrorLogger.
+    $test_logger_dir = dirname($test_db->getTestErrorLoggerPath());
+    \Drupal::service('file_system')->prepareDirectory($test_logger_dir, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
 
     // Prepare filesystem directory paths.
     $this->publicFilesDirectory = $this->siteDirectory . '/files';
@@ -705,7 +708,7 @@ trait FunctionalTestSetupTrait {
 
     // Log fatal errors.
     ini_set('log_errors', 1);
-    ini_set('error_log', DRUPAL_ROOT . '/' . $this->siteDirectory . '/logs/error.log');
+    ini_set('error_log', DRUPAL_ROOT . '/' . $test_db->getPhpErrorLogPath());
 
     // Change the database prefix.
     $this->changeDatabasePrefix();

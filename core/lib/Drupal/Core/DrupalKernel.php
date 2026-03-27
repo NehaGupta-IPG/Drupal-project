@@ -1165,7 +1165,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
         // Log fatal errors to the test site directory.
         ini_set('log_errors', 1);
-        ini_set('error_log', $app_root . '/' . $test_db->getTestSitePath() . '/logs/error.log');
+        ini_set('error_log', $app_root . '/' . $test_db->getPhpErrorLogPath());
 
         // Ensure that a rewritten settings.php is used if OPcache is on.
         ini_set('opcache.validate_timestamps', 'on');

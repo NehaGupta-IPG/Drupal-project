@@ -137,10 +137,11 @@ trait TestSetupTrait {
    * @see \Drupal\Tests\BrowserTestBase::prepareEnvironment()
    * @see drupal_valid_test_ua()
    */
-  protected function prepareDatabasePrefix(): void {
+  protected function prepareDatabasePrefix(): TestDatabase {
     $test_db = new TestDatabase();
     $this->siteDirectory = $test_db->getTestSitePath();
     $this->databasePrefix = $test_db->getDatabasePrefix();
+    return $test_db;
   }
 
   /**

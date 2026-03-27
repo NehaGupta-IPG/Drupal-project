@@ -219,7 +219,7 @@ class BigPipeTest extends BrowserTestBase {
     $this->assertSession()->responseNotContains(BigPipe::STOP_SIGNAL);
     $this->assertSession()->responseNotContains('</body>');
     // The exception is expected. Do not interpret it as a test failure.
-    unlink($this->root . '/' . $this->siteDirectory . '/logs/error.log');
+    unlink($this->root . '/' . $this->siteDirectory . '/error.log');
 
     // Tests the enforced redirect response exception handles redirecting to
     // a trusted redirect.
@@ -299,7 +299,7 @@ class BigPipeTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('You are not allowed to say llamas are not cool!');
     $this->assertSession()->responseNotContains('</body>');
     // The exception is expected. Do not interpret it as a test failure.
-    unlink($this->root . '/' . $this->siteDirectory . '/logs/error.log');
+    unlink($this->root . '/' . $this->siteDirectory . '/error.log');
   }
 
   /**

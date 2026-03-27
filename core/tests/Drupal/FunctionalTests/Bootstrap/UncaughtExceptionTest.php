@@ -237,7 +237,7 @@ class UncaughtExceptionTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains($this->expectedExceptionMessage);
 
     // Find fatal error logged to the error.log.
-    $errors = file(\Drupal::root() . '/' . $this->siteDirectory . '/logs/error.log');
+    $errors = file(\Drupal::root() . '/' . $this->siteDirectory . '/error.log');
     $this->assertCount(10, $errors, 'The error + the error that the logging service is broken has been written to the error log.');
     $this->assertStringContainsString('Failed to log error', $errors[0], 'The error handling logs when an error could not be logged to the logger.');
 
@@ -248,7 +248,7 @@ class UncaughtExceptionTest extends BrowserTestBase {
 
     // The exception is expected. Do not interpret it as a test failure. Not
     // using File API; a potential error must trigger a PHP warning.
-    unlink(\Drupal::root() . '/' . $this->siteDirectory . '/logs/error.log');
+    unlink(\Drupal::root() . '/' . $this->siteDirectory . '/error.log');
   }
 
   /**
@@ -295,7 +295,7 @@ class UncaughtExceptionTest extends BrowserTestBase {
   protected function assertNoErrorsLogged(): void {
     // Since PHP only creates the error.log file when an actual error is
     // triggered, it is sufficient to check whether the file exists.
-    $this->assertFileDoesNotExist(DRUPAL_ROOT . '/' . $this->siteDirectory . '/logs/error.log');
+    $this->assertFileDoesNotExist(DRUPAL_ROOT . '/' . $this->siteDirectory . '/error.log');
   }
 
 }

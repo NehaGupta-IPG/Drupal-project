@@ -155,7 +155,17 @@ class TestDatabase {
    *   The relative path to the test site PHP error log file.
    */
   public function getPhpErrorLogPath(): string {
-    return $this->getTestSitePath() . '/logs/error.log';
+    return $this->getTestSitePath() . '/error.log';
+  }
+
+  /**
+   * Gets the file path of the TestErrorLogger of the test.
+   *
+   * @return string
+   *   The relative path to the TestErrorLogger log file.
+   */
+  public function getTestErrorLoggerPath(): string {
+    return $this->getTestSitePath() . '/logs/test.log';
   }
 
 }

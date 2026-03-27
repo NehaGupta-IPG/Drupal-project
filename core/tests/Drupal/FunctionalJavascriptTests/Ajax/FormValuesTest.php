@@ -86,7 +86,7 @@ class FormValuesTest extends WebDriverTestBase {
     $session = $this->getSession();
 
     // Ensure the test error log is empty before these tests.
-    $this->assertFileDoesNotExist(DRUPAL_ROOT . '/' . $this->siteDirectory . '/logs/error.log');
+    $this->assertFileDoesNotExist(DRUPAL_ROOT . '/' . $this->siteDirectory . '/error.log');
 
     // We're going to do some invalid requests. The JavaScript errors thrown
     // whilst doing so are expected. Do not interpret them as a test failure.
@@ -106,10 +106,10 @@ class FormValuesTest extends WebDriverTestBase {
       $this->assertSession()->waitForElement('css', "select[name=\"$element_name\"]:enabled");
       // Not using File API, a potential error must trigger a PHP warning, which
       // should be logged in the error.log.
-      $this->assertFileExists(DRUPAL_ROOT . '/' . $this->siteDirectory . '/logs/error.log');
-      $this->assertStringContainsString('"The specified #ajax callback is empty or not callable."', file_get_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/logs/error.log'));
+      $this->assertFileExists(DRUPAL_ROOT . '/' . $this->siteDirectory . '/error.log');
+      $this->assertStringContainsString('"The specified #ajax callback is empty or not callable."', file_get_contents(DRUPAL_ROOT . '/' . $this->siteDirectory . '/error.log'));
       // Remove error.log, so we have a clean slate for the next request.
-      unlink(\Drupal::root() . '/' . $this->siteDirectory . '/logs/error.log');
+      unlink(\Drupal::root() . '/' . $this->siteDirectory . '/error.log');
     }
     // We need to reload the page to kill any unfinished AJAX calls before
     // tearDown() is called.

@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\Test\HttpClientMiddleware;
 
+use Drupal\Core\Test\TestDatabase;
 use Drupal\Core\Test\TestErrorLogger;
 use Drupal\Core\Utility\Error;
 use Psr\Http\Message\RequestInterface;
@@ -62,7 +63,9 @@ class TestHttpClientMiddleware {
                 }
               }
             }
-            TestErrorLogger::reTriggerErrors();
+
+            $test_db = new TestDatabase(drupal_valid_test_ua());
+            TestErrorLogger::reTriggerErrors($test_db);
             return $response;
           });
       };

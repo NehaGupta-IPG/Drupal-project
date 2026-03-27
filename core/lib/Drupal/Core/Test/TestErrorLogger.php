@@ -25,18 +25,10 @@ final class TestErrorLogger {
   }
 
   /**
-   * Gets the path to the log file.
-   *
-   * @return string
-   *   The log file path, derived from the error_log ini setting.
-   */
-  public static function getLogFile(): string {
-    return dirname(ini_get('error_log')) . '/test.log';
-  }
-
-  /**
    * Appends a serialized error to the log file.
    *
+   * @param \Drupal\Core\Test\TestDatabase $test_db
+   *   The test database object to provide the log file path.
    * @param string $message
    *   The error message.
    * @param string $type
@@ -51,7 +43,7 @@ final class TestErrorLogger {
    *   The exception that triggered the error, or NULL if the error was not
    *   triggered by an exception.
    */
-  public static function writeError(string $message, string $type, string $function, string $file, int $line, ?\Throwable $exception): void {
+  public static function writeError(TestDatabase $test_db, string $message, string $type, string $function, string $file, int $line, ?\Throwable $exception): void {
     if ($exception instanceof TestErrorLoggerIgnoreException || $exception === NULL && str_starts_with($message, TestErrorLoggerIgnoreException::class)) {
       return;
     }
@@ -64,7 +56,7 @@ final class TestErrorLogger {
         'line' => $line,
       ],
     ];
-    $log_file = static::getLogFile();
+    $log_file = $test_db->getTestErrorLoggerPath();
     $lock = static::acquireLock($log_file);
     try {
       file_put_contents($log_file, rawurlencode(serialize($assertion)) . "\n", FILE_APPEND);
@@ -81,11 +73,14 @@ final class TestErrorLogger {
    * by PHPUnit. All other error types throw an exception so they can be tested
    * by PHPUnit.
    *
+   * @param \Drupal\Core\Test\TestDatabase $test_db
+   *   The test database object to provide the log file path.
+   *
    * @throws \Exception
    *   If a non-deprecation error is found in the log.
    */
-  public static function reTriggerErrors(): void {
-    $log_file = static::getLogFile();
+  public static function reTriggerErrors(TestDatabase $test_db): void {
+    $log_file = $test_db->getTestErrorLoggerPath();
     $lock = static::acquireLock($log_file);
     try {
       if (!file_exists($log_file)) {
