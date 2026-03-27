@@ -12,7 +12,6 @@ use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\RemoveUnusedDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ReplaceAliasByActualDefinitionPass;
-use Symfony\Component\DependencyInjection\Compiler\ResolveHotPathPass;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -99,12 +98,6 @@ class NormalInstallerServiceProvider implements ServiceProviderInterface {
                $pass instanceof RemoveUnusedDefinitionsPass ||
                $pass instanceof AnalyzeServiceReferencesPass ||
                $pass instanceof ReplaceAliasByActualDefinitionPass);
-    }));
-    $pass_config->setAfterRemovingPasses(array_filter($pass_config->getAfterRemovingPasses(), function ($pass) {
-      // Remove ResolveHotPathPass as Drupal's container dumper does not support
-      // it.
-      // @see \Symfony\Component\DependencyInjection\Compiler\PassConfig
-      return !($pass instanceof ResolveHotPathPass);
     }));
   }
 
