@@ -92,7 +92,7 @@ class TestDiscoveryTest extends UnitTestCase {
         'groups' => ['browsertestbase'],
         'description' => 'Tests BrowserTestBase functionality.',
         'type' => 'PHPUnit-Functional',
-        'tests_count' => 21,
+        'tests_count' => 22,
       ],
       // Classname.
       'Drupal\FunctionalTests\BrowserTestBaseTest',
