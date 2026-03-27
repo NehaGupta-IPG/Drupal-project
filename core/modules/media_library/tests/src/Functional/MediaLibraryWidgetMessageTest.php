@@ -19,7 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('media_library')]
 #[RunTestsInSeparateProcesses]
-final class MediaLibraryWidgetTest extends UnitTestCase {
+final class MediaLibraryWidgetMessageTest extends UnitTestCase {
 
   /**
    * Tests the default no-media-types message for base fields.
