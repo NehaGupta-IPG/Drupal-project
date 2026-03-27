@@ -39,6 +39,7 @@ class Result extends AreaPluginBase {
         '@start -- ' . $this->t('The initial record number in the set.'),
         '@end -- ' . $this->t('The last record number in the set.'),
         '@total -- ' . $this->t('The total records in the set.'),
+        '@format_total -- ' . $this->t('The total records in the set (number formatted)'),
         '@label -- ' . $this->t('The human-readable name of the view.'),
         '@per_page -- ' . $this->t('The number of items per page.'),
         '@current_page -- ' . $this->t('The current page number.'),
@@ -60,7 +61,7 @@ class Result extends AreaPluginBase {
    * {@inheritdoc}
    */
   public function query() {
-    if (str_contains($this->options['content'], '@total')) {
+    if (str_contains($this->options['content'], '@total') || str_contains($this->options['content'], '@format_total')) {
       $this->view->get_total_rows = TRUE;
     }
   }
@@ -106,6 +107,7 @@ class Result extends AreaPluginBase {
     $replacements['@start'] = (string) $start;
     $replacements['@end'] = (string) $end;
     $replacements['@total'] = (string) $total;
+    $replacements['@format_total'] = number_format($total);
     $replacements['@label'] = $label;
     $replacements['@per_page'] = (string) $per_page;
     $replacements['@current_page'] = (string) $current_page;
