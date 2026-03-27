@@ -192,9 +192,9 @@
       // Use copy to keep the iterator consistent.
       const urlObjCopy = new URL(url, window.location.origin);
       const cleanKeys = {};
-      // Operate with element names to handle empty values.
-      $exposedForm.find('[name]').each((i, el) => {
-        cleanKeys[el.getAttribute('name').split('[')[0]] = true;
+      const formData = new FormData($exposedForm.get(0));
+      Array.from(formData.keys()).forEach((key) => {
+        cleanKeys[key.split('[')[0]] = true;
       });
       urlObjCopy.searchParams.forEach((value, key) => {
         if (cleanKeys[key.split('[')[0]]) {
