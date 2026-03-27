@@ -8,6 +8,7 @@ use Drupal\Core\DependencyInjection\Compiler\AuthenticationProviderPass;
 use Drupal\Core\DependencyInjection\Compiler\BackendCompilerPass;
 use Drupal\Core\DependencyInjection\Compiler\BackwardsCompatibilityClassLoaderPass;
 use Drupal\Core\DependencyInjection\Compiler\CorsCompilerPass;
+use Drupal\Core\DependencyInjection\Compiler\RemovePassesTrait;
 use Drupal\Core\DependencyInjection\Compiler\DeprecatedServicePass;
 use Drupal\Core\DependencyInjection\Compiler\DevelopmentSettingsPass;
 use Drupal\Core\Hook\HookCollectorPass;
@@ -60,6 +61,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * @ingroup container
  */
 class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierInterface {
+
+  use RemovePassesTrait;
 
   /**
    * {@inheritdoc}
@@ -137,25 +140,7 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
       ->addTag('module_install.uninstall_validator');
 
     // Remove Symfony compiler passes that Drupal does not use.
-    $passConfig = $container->getCompilerPassConfig();
-    $passConfig->setBeforeOptimizationPasses($this->filterPasses($passConfig->getBeforeOptimizationPasses()));
-    $passConfig->setOptimizationPasses($this->filterPasses($passConfig->getOptimizationPasses()));
-    $passConfig->setBeforeRemovingPasses($this->filterPasses($passConfig->getBeforeRemovingPasses()));
-    $passConfig->setRemovingPasses($this->filterPasses($passConfig->getRemovingPasses()));
-    $passConfig->setAfterRemovingPasses($this->filterPasses($passConfig->getAfterRemovingPasses()));
-  }
-
-  /**
-   * Filters out unused compiler passes by class name.
-   *
-   * @param \Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface[] $passes
-   *   The compiler passes to filter.
-   *
-   * @return \Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface[]
-   *   The filtered compiler passes.
-   */
-  protected function filterPasses(array $passes): array {
-    return array_values(array_filter($passes, fn($pass) => !in_array(get_class($pass), [
+    $this->removePasses($container, [
       // Drupal does not use Symfony's %env()% syntax in service definitions.
       RegisterEnvVarProcessorsPass::class,
       ValidateEnvPlaceholdersPass::class,
@@ -175,7 +160,7 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
       ResolveBindingsPass::class,
       // Drupal does not use the auto_alias feature.
       AutoAliasServicePass::class,
-    ], TRUE)));
+    ]);
   }
 
   /**

@@ -8,8 +8,19 @@ use Drupal\Core\Cache\NullBackendFactory;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\Lock\NullLockBackend;
+use Drupal\Core\DependencyInjection\Compiler\RemovePassesTrait;
+use Symfony\Component\DependencyInjection\Compiler\AliasDeprecatedPublicServicesPass;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
+use Symfony\Component\DependencyInjection\Compiler\CheckArgumentsValidityPass;
+use Symfony\Component\DependencyInjection\Compiler\CheckCircularReferencesPass;
+use Symfony\Component\DependencyInjection\Compiler\CheckDefinitionValidityPass;
+use Symfony\Component\DependencyInjection\Compiler\CheckExceptionOnInvalidReferenceBehaviorPass;
+use Symfony\Component\DependencyInjection\Compiler\CheckReferenceValidityPass;
+use Symfony\Component\DependencyInjection\Compiler\DefinitionErrorExceptionPass;
 use Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass;
+use Symfony\Component\DependencyInjection\Compiler\RemoveAbstractDefinitionsPass;
+use Symfony\Component\DependencyInjection\Compiler\RemoveBuildParametersPass;
+use Symfony\Component\DependencyInjection\Compiler\RemovePrivateAliasesPass;
 use Symfony\Component\DependencyInjection\Compiler\RemoveUnusedDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ReplaceAliasByActualDefinitionPass;
 use Symfony\Component\DependencyInjection\Definition;
@@ -29,6 +40,8 @@ use Symfony\Component\DependencyInjection\Reference;
  * @see \Drupal\Core\Installer\InstallerServiceProvider
  */
 class NormalInstallerServiceProvider implements ServiceProviderInterface {
+
+  use RemovePassesTrait;
 
   /**
    * {@inheritdoc}
@@ -88,17 +101,30 @@ class NormalInstallerServiceProvider implements ServiceProviderInterface {
         ->addTag('event_subscriber');
     }
 
-    $pass_config = $container->getCompilerPassConfig();
-    $pass_config->setRemovingPasses(array_filter($pass_config->getRemovingPasses(), function ($pass) {
-      // Remove InlineServiceDefinitionsPass, RemoveUnusedDefinitionsPass,
-      // AnalyzeServiceReferencesPass and ReplaceAliasByActualDefinitionPass as
-      // these are not necessary during installation.
-      // @see \Symfony\Component\DependencyInjection\Compiler\PassConfig
-      return !($pass instanceof InlineServiceDefinitionsPass ||
-               $pass instanceof RemoveUnusedDefinitionsPass ||
-               $pass instanceof AnalyzeServiceReferencesPass ||
-               $pass instanceof ReplaceAliasByActualDefinitionPass);
-    }));
+    // During installation the container is rebuilt multiple times and never
+    // dumped to disk, so many compiler passes are unnecessary.
+    $this->removePasses($container, [
+      // Removing passes: the container is never dumped, so removing unused
+      // services, private aliases, and abstract definitions is wasted work.
+      InlineServiceDefinitionsPass::class,
+      RemoveUnusedDefinitionsPass::class,
+      AnalyzeServiceReferencesPass::class,
+      ReplaceAliasByActualDefinitionPass::class,
+      RemovePrivateAliasesPass::class,
+      RemoveAbstractDefinitionsPass::class,
+      // Validation passes: any errors will be caught on the first production
+      // container build after installation completes.
+      CheckCircularReferencesPass::class,
+      CheckDefinitionValidityPass::class,
+      CheckReferenceValidityPass::class,
+      CheckArgumentsValidityPass::class,
+      CheckExceptionOnInvalidReferenceBehaviorPass::class,
+      DefinitionErrorExceptionPass::class,
+      // After-removing passes: the container is not dumped, so deprecation
+      // aliasing and build parameter cleanup are unnecessary.
+      AliasDeprecatedPublicServicesPass::class,
+      RemoveBuildParametersPass::class,
+    ]);
   }
 
 }
