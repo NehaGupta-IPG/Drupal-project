@@ -33,7 +33,17 @@ use Drupal\Core\PreWarm\PreWarmableInterface;
 use Drupal\Core\Queue\QueueFactoryInterface;
 use Drupal\Core\Site\Settings;
 use Psr\Log\LoggerAwareInterface;
+use Symfony\Component\DependencyInjection\Compiler\AutoAliasServicePass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\Compiler\RegisterEnvVarProcessorsPass;
+use Symfony\Component\DependencyInjection\Compiler\RegisterServiceSubscribersPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveAutowireInlineAttributesPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveDecoratorStackPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveHotPathPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveNoPreloadPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveServiceSubscribersPass;
+use Symfony\Component\DependencyInjection\Compiler\ValidateEnvPlaceholdersPass;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -125,6 +135,47 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
 
     $container->registerForAutoconfiguration(ModuleUninstallValidatorInterface::class)
       ->addTag('module_install.uninstall_validator');
+
+    // Remove Symfony compiler passes that Drupal does not use.
+    $passConfig = $container->getCompilerPassConfig();
+    $passConfig->setBeforeOptimizationPasses($this->filterPasses($passConfig->getBeforeOptimizationPasses()));
+    $passConfig->setOptimizationPasses($this->filterPasses($passConfig->getOptimizationPasses()));
+    $passConfig->setBeforeRemovingPasses($this->filterPasses($passConfig->getBeforeRemovingPasses()));
+    $passConfig->setRemovingPasses($this->filterPasses($passConfig->getRemovingPasses()));
+    $passConfig->setAfterRemovingPasses($this->filterPasses($passConfig->getAfterRemovingPasses()));
+  }
+
+  /**
+   * Filters out unused compiler passes by class name.
+   *
+   * @param \Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface[] $passes
+   *   The compiler passes to filter.
+   *
+   * @return \Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface[]
+   *   The filtered compiler passes.
+   */
+  protected function filterPasses(array $passes): array {
+    return array_values(array_filter($passes, fn($pass) => !in_array(get_class($pass), [
+      // Drupal does not use Symfony's %env()% syntax in service definitions.
+      RegisterEnvVarProcessorsPass::class,
+      ValidateEnvPlaceholdersPass::class,
+      // Drupal does not use #[AutowireInline] attributes.
+      ResolveAutowireInlineAttributesPass::class,
+      // Drupal does not use decorator stacks.
+      ResolveDecoratorStackPass::class,
+      // Drupal does not tag services with 'container.hot_path' or
+      // 'container.no_preload', and Drupal's container dumper does not use
+      // this metadata.
+      ResolveHotPathPass::class,
+      ResolveNoPreloadPass::class,
+      // Drupal does not implement ServiceSubscriberInterface.
+      RegisterServiceSubscribersPass::class,
+      ResolveServiceSubscribersPass::class,
+      // Drupal does not use 'bind' in service definitions.
+      ResolveBindingsPass::class,
+      // Drupal does not use the auto_alias feature.
+      AutoAliasServicePass::class,
+    ], TRUE)));
   }
 
   /**
