@@ -87,8 +87,7 @@ function _drupal_error_handler_real($error_level, $message, $filename, $line): v
   elseif (defined('DRUPAL_TEST_IN_CHILD_SITE') && DRUPAL_TEST_IN_CHILD_SITE && $error_level === E_USER_DEPRECATED && (!defined('SIMPLETEST_COLLECT_ERRORS') || SIMPLETEST_COLLECT_ERRORS)) {
     static $seen = [];
     if (array_search($message, $seen, TRUE) === FALSE) {
-      // Only report each deprecation once. Too many headers can break some
-      // Chrome and web driver testing.
+      // Only report each deprecation once.
       $seen[] = $message;
       $backtrace = debug_backtrace();
       $caller = Error::getLastCaller($backtrace);

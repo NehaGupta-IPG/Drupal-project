@@ -159,12 +159,14 @@ class TestDatabase {
   }
 
   /**
-   * Gets the path to the TestErrorLogger directory of the test.
+   * Gets the path to the logs directory for the test.
+   *
+   * This directory is guaranteed to exist and be writable.
    *
    * @return string
-   *   The relative path to the TestErrorLogger directory.
+   *   The relative path to the logs directory for the test.
    */
-  public function getTestErrorLoggerDirectory(): string {
+  public function getLogDirectory(): string {
     return $this->getTestSitePath() . '/logs';
   }
 
