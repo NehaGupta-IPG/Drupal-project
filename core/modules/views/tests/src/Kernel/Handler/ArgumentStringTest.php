@@ -92,7 +92,8 @@ class ArgumentStringTest extends ViewsKernelTestBase {
    * Test exclude value filter.
    */
   public function testExclude(): void {
-    foreach (['a', 'b', 'c'] as $char) {
+    $body_contents = ['a', 'b', 'c'];
+    foreach ($body_contents as $char) {
       // View needs to be reconstructed every time to force results
       // to reload with new arguments.
       $view = Views::getView('test_argument_string_exclude');
@@ -101,7 +102,10 @@ class ArgumentStringTest extends ViewsKernelTestBase {
         fn ($row) => $view->field['body']->getValue($row),
         $view->result
       );
-      $this->assertNotContains($char, $body_results);
+      $expected_results = array_values(
+        array_diff($body_contents, [$char])
+      );
+      $this->assertSame($expected_results, $body_results);
     }
   }
 
