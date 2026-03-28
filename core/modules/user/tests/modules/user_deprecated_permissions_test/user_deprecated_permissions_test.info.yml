@@ -1,0 +1,5 @@
+name: 'User deprecated permission tests'
+type: module
+description: 'Support module for deprecated user permission testing.'
+package: Testing
+version: VERSION

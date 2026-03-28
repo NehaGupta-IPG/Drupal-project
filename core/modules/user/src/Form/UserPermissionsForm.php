@@ -192,16 +192,23 @@ class UserPermissionsForm extends FormBase {
           'description' => '',
           'restrict access' => FALSE,
           'warning' => !empty($perm_item['restrict access']) ? $this->t('Warning: Give to trusted roles only; this permission has security implications.') : '',
+          'deprecated' => '',
         ];
+        // Replace permission placeholder in deprecation message.
+        $perm_item['deprecated'] = str_replace('%permission%', $perm, $perm_item['deprecated']);
+        if (strlen($perm_item['deprecated']) > 0) {
+          $form['permissions'][$perm]['#attributes']['class'][] = 'deprecated';
+        }
         $form['permissions'][$perm]['description'] = [
           '#type' => 'inline_template',
-          '#template' => '<div class="permission"><span class="title table-filter-text-source">{{ title }}</span>{% if description or warning %}<div class="description" data-admin-compact-collapsible>{% if warning %}<em class="permission-warning">{{ warning }}</em> {% endif %}{{ description }}</div>{% endif %}</div>',
+          '#template' => '<div class="permission"><span class="title table-filter-text-source">{{ title }}</span>{% if description or warning or deprecated %}<div class="description" data-admin-compact-collapsible>{% if warning %}<em class="permission-warning">{{ warning }}</em> {% endif %}{% if deprecated %}<em class="permission-warning permission-deprecated">{{ deprecated }}</em> {% endif %}{{ description }}</div>{% endif %}</div>',
           '#context' => [
             'title' => $perm_item['title'],
           ],
         ];
         $form['permissions'][$perm]['description']['#context']['description'] = $perm_item['description'];
         $form['permissions'][$perm]['description']['#context']['warning'] = $perm_item['warning'];
+        $form['permissions'][$perm]['description']['#context']['deprecated'] = $perm_item['deprecated'];
         foreach ($role_names as $rid => $name) {
           $form['permissions'][$perm][$rid] = [
             '#title' => $name . ': ' . $perm_item['title'],
@@ -218,6 +225,11 @@ class UserPermissionsForm extends FormBase {
           if ($admin_roles[$rid]) {
             $form['permissions'][$perm][$rid]['#disabled'] = TRUE;
             $form['permissions'][$perm][$rid]['#default_value'] = TRUE;
+          }
+          // Disable unchecked deprecated permission checkboxes.
+          if (strlen($perm_item['deprecated']) > 0 && !$form['permissions'][$perm][$rid]['#default_value']) {
+            $form['permissions'][$perm][$rid]['#disabled'] = TRUE;
+            $form['permissions'][$perm][$rid]['#default_value'] = FALSE;
           }
         }
       }

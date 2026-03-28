@@ -57,6 +57,8 @@ interface PermissionHandlerInterface {
    *     'provider' key.
    *   - provider: The provider name of the permission. This is set
    *     automatically to the module that provides the permission.yml file.
+   *   - deprecated: The deprecated key marks a permission as deprecated with a
+   *     custom message.
    *
    * @see \Drupal\Core\Config\Entity\ConfigDependencyManager
    */
