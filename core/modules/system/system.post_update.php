@@ -63,3 +63,12 @@ function system_removed_post_updates(): array {
     'system_post_update_delete_rss_config' => '12.0.0',
   ];
 }
+
+/**
+ * Set max-age for 4xx responses to null.
+ */
+function system_post_update_set_max_age_4xx() {
+  \Drupal::configFactory()->getEditable('system.performance')
+    ->set('cache.page.4xx_max_age', NULL)
+    ->save(TRUE);
+}

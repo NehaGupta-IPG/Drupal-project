@@ -200,6 +200,10 @@ system.performance:
             max_age:
               type: integer
               label: 'Max age'
+            4xx_max_age:
+              type: integer
+              nullable: true
+              label: 'Max age for 4xx responses'
     css:
       type: mapping
       label: 'CSS performance settings'

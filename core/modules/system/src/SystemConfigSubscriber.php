@@ -2,6 +2,7 @@
 
 namespace Drupal\system;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\ConfigCrudEvent;
 use Drupal\Core\Config\ConfigEvents;
 use Drupal\Core\Config\ConfigImporterEvent;
@@ -42,6 +43,9 @@ class SystemConfigSubscriber implements EventSubscriberInterface {
     $saved_config = $event->getConfig();
     if ($saved_config->getName() == 'system.theme' && ($event->isChanged('admin') || $event->isChanged('default'))) {
       $this->routerBuilder->setRebuildNeeded();
+    }
+    if ($saved_config->getName() === 'system.performance' && $event->isChanged('cache.page.4xx_max_age')) {
+      Cache::invalidateTags(['4xx-response']);
     }
   }
 

@@ -141,13 +141,18 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
 
     $is_cacheable = ($this->requestPolicy->check($request) === RequestPolicyInterface::ALLOW) && ($this->responsePolicy->check($response, $request) !== ResponsePolicyInterface::DENY);
 
+    $client_error_max_age = $this->config->get('cache.page.4xx_max_age');
+    $max_age = $response->isClientError() && isset($client_error_max_age)
+      ? $client_error_max_age
+        : $this->config->get('cache.page.max_age');
+
     // Add headers necessary to specify whether the response should be cached by
     // proxies and/or the browser.
-    if ($is_cacheable && $this->config->get('cache.page.max_age') > 0) {
+    if ($is_cacheable  && $max_age > 0) {
       if (!$this->isCacheControlCustomized($response)) {
         // Only add the default Cache-Control header if the controller did not
         // specify one on the response.
-        $this->setResponseCacheable($response, $request);
+        $this->setResponseCacheable($response, $request, $max_age);
       }
     }
     else {
@@ -222,8 +227,10 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
    *   A response object.
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   A request object.
+   * @param int $max_age
+   *   The value for the max-age Cache-Control header
    */
-  protected function setResponseCacheable(Response $response, Request $request) {
+  protected function setResponseCacheable(Response $response, Request $request, $max_age) {
     // HTTP/1.0 proxies do not support the Vary header, so prevent any caching
     // by sending an Expires date in the past. HTTP/1.1 clients ignore the
     // Expires header if a Cache-Control: max-age directive is specified (see
@@ -232,7 +239,6 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
       $this->setExpiresNoCache($response);
     }
 
-    $max_age = $this->config->get('cache.page.max_age');
     $response->headers->set('Cache-Control', 'public, max-age=' . $max_age);
 
     // In order to support HTTP cache-revalidation, ensure that there is a
