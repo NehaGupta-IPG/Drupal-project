@@ -650,7 +650,7 @@ class AccessManagerTest extends UnitTestCase {
     $this->routeProvider->expects($this->atLeastOnce())
       ->method('getRouteByName')
       ->willReturnMap($map);
-    $argumentsResolverFactory = $this->createMock(AccessArgumentsResolverFactoryInterface::class);
+    $argumentsResolverFactory = $this->createStub(AccessArgumentsResolverFactoryInterface::class);
     $paramConverter = $this->createMock(ParamConverterManagerInterface::class);
     $accessManager = new AccessManager(
       $this->routeProvider,
