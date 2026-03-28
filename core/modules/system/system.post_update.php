@@ -67,8 +67,8 @@ function system_removed_post_updates(): array {
 /**
  * Set max-age for 4xx responses to null.
  */
-function system_post_update_set_max_age_4xx() {
+function system_post_update_set_max_age_4xx(): void {
   \Drupal::configFactory()->getEditable('system.performance')
     ->set('cache.page.4xx_max_age', NULL)
-    ->save(TRUE);
+    ->save();
 }

@@ -148,7 +148,7 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
 
     // Add headers necessary to specify whether the response should be cached by
     // proxies and/or the browser.
-    if ($is_cacheable  && $max_age > 0) {
+    if ($is_cacheable && $max_age > 0) {
       if (!$this->isCacheControlCustomized($response)) {
         // Only add the default Cache-Control header if the controller did not
         // specify one on the response.
@@ -228,7 +228,7 @@ class FinishResponseSubscriber implements EventSubscriberInterface {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   A request object.
    * @param int $max_age
-   *   The value for the max-age Cache-Control header
+   *   The value for the max-age Cache-Control header.
    */
   protected function setResponseCacheable(Response $response, Request $request, $max_age) {
     // HTTP/1.0 proxies do not support the Vary header, so prevent any caching
