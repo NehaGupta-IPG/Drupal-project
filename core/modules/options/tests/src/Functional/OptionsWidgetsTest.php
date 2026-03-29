@@ -8,6 +8,7 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\options_test\OptionsAllowedValues;
 use Drupal\Tests\field\Functional\FieldTestBase;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
@@ -61,6 +62,16 @@ class OptionsWidgetsTest extends FieldTestBase {
    * @var \Drupal\field\Entity\FieldStorageConfig
    */
   protected $float;
+
+  /**
+   * A field storage with string values to use in this test class.
+   *
+   * This field storage uses an allowed_values_function instead of a static
+   * list.
+   *
+   * @var \Drupal\field\Entity\FieldStorageConfig
+   */
+  protected $stringAllowedValuesFunction;
 
   /**
    * {@inheritdoc}
@@ -121,6 +132,15 @@ class OptionsWidgetsTest extends FieldTestBase {
       ],
     ]);
     $this->float->save();
+
+    // Field storage with list of string values and allowed values function.
+    $this->stringAllowedValuesFunction = FieldStorageConfig::create([
+      'field_name' => 'string_allowed_values_function',
+      'entity_type' => 'entity_test',
+      'type' => 'list_string',
+      'cardinality' => 1,
+    ]);
+    $this->stringAllowedValuesFunction->save();
 
     // Create a web user.
     $this->drupalLogin($this->drupalCreateUser([
@@ -810,6 +830,31 @@ class OptionsWidgetsTest extends FieldTestBase {
     $this->assertSession()->optionExists('card_1', 1);
     $this->assertSession()->optionNotExists('card_4', 0);
     $this->assertSession()->optionExists('card_4', 1);
+  }
+
+  /**
+   * Tests displaying the allowed values function.
+   */
+  public function testAllowedValuesFunctionDisplay(): void {
+    // Create an instance of the 'string value' field.
+    $field = FieldConfig::create([
+      'field_storage' => $this->stringAllowedValuesFunction,
+      'bundle' => 'entity_test',
+      'required' => TRUE,
+    ]);
+    $field->save();
+
+    $this->drupalLogin($this->drupalCreateUser([
+      'administer entity_test fields',
+    ]));
+
+    $this->drupalGet('entity_test/structure/entity_test/fields/entity_test.entity_test.string_allowed_values_function');
+
+    $element = $this->getSession()->getPage()->find('css', '#edit-field-storage-subform-settings-allowed-values-function');
+    $this->assertNotNull($element);
+
+    $allowed_values_function = implode('::', [OptionsAllowedValues::class, 'simpleValues']);
+    $this->assertStringContainsString($allowed_values_function, $element->getHtml());
   }
 
 }
