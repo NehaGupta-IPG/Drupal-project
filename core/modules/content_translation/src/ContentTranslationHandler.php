@@ -619,7 +619,7 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
 
     // Elements which can have a #title attribute according to FAPI Reference.
     if (!isset($suffix)) {
-      $suffix = ' (' . t('all languages') . ')';
+      $suffix = ' (' . $this->t('all languages') . ')';
       $fapi_title_elements = array_flip([
         'checkbox',
         'checkboxes',

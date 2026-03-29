@@ -18,11 +18,6 @@ class ContentTestTranslationUITest extends ContentTranslationUITestBase {
   /**
    * {@inheritdoc}
    */
-  protected $testHTMLEscapeForAllLanguages = TRUE;
-
-  /**
-   * {@inheritdoc}
-   */
   protected $defaultCacheContexts = [
     'languages:language_interface',
     'theme',
