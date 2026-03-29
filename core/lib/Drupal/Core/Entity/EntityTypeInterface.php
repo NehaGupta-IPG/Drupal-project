@@ -471,6 +471,16 @@ interface EntityTypeInterface extends PluginDefinitionInterface {
   public function setLinkTemplate($key, $path);
 
   /**
+   * Removes a single link template.
+   *
+   * @param string $key
+   *   The name of a link.
+   *
+   * @return $this
+   */
+  public function removeLinkTemplate($key);
+
+  /**
    * Gets the name of the entity type which provides bundles.
    *
    * @return string|null
