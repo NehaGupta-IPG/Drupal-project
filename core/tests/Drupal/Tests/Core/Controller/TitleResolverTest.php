@@ -285,6 +285,22 @@ class TitleResolverTest extends UnitTestCase {
     ];
   }
 
+  /**
+   * Tests a null title.
+   *
+   * @see \Drupal\Core\Controller\TitleResolver::getTitle()
+   */
+  public function testNullTitle(): void {
+    // Route with _title set to null.
+    $request = new Request();
+    $route = new Route('/test-route', ['_title' => NULL]);
+    // Expect a warning to be triggered when _title is null.
+    $this->addWarning("The route _title is null. An empty string is used instead.");
+    $title = $this->titleResolver->getTitle($request, $route);
+    // Assert that the returned title is an empty string.
+    $this->assertNotNull($title);
+  }
+
 }
 
 /**
