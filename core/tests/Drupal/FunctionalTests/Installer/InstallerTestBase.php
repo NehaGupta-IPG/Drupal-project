@@ -20,6 +20,8 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 
+// cspell:ignore curlopt returntransfer
+
 /**
  * Base class for testing the interactive installer.
  */
@@ -282,6 +284,16 @@ abstract class InstallerTestBase extends BrowserTestBase {
    * Final installer step: Configure site.
    */
   protected function setUpSite() {
+    // Prematurely request some random page through the production front
+    // controller. This triggers DrupalKernel to build and dump a container
+    // before the site is setup completely.
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $this->baseUrl . 'trigger-premature-container-build');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+    curl_setopt($ch, CURLOPT_USERAGENT, drupal_generate_test_ua($this->databasePrefix));
+    curl_exec($ch);
+    curl_close($ch);
+
     $edit = $this->translatePostValues($this->parameters['forms']['install_configure_form']);
     $this->submitForm($edit, $this->translations['Save and continue']);
     // If we've got to this point the site is installed using the regular
