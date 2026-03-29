@@ -24,6 +24,9 @@ class NonDefaultConfigSaveUpdateTest extends UpdatePathTestBase {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz',
       __DIR__ . '/../../../../../system/tests/fixtures/update/drupal.config-non-default-language.php',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-history.php',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-contact.php',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-ban.php',
     ];
   }
 
