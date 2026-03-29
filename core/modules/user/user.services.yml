@@ -48,7 +48,6 @@ services:
   # The deprecated way to retrieve permissions.
   user.legacy_permissions:
     class: Drupal\user\PermissionHandler
-    arguments: ['@module_handler', '@string_translation', '@callable_resolver', '@extension.list.module']
 
   # The service to obtain a PermissionsParser object.
   user_permissions_parser.repository_factory:
@@ -59,7 +58,6 @@ services:
   # The new way to retrieve permissions.
   user.permissions:
     class: Drupal\user\Service\PermissionsRepositoryHandler
-    arguments: ['@user_permissions_parser.repository_factory']
 
   # Internal use, to discover permissions parser plugins.
   plugin.manager.permissions_parser:
