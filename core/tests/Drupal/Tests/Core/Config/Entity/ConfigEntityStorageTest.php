@@ -577,7 +577,7 @@ class ConfigEntityStorageTest extends UnitTestCase {
    * @legacy-covers ::save
    */
   public function testSaveWithOverrides(): void {
-    $entity = $this->getMockEntity(['id' => 'foo'], ['hasOverrides']);
+    $entity = $this->createConfiguredMock(StubConfigEntity::class, ['id' => 'foo']);
     $entity->expects($this->once())
       ->method('hasOverrides')
       ->willReturn(TRUE);
