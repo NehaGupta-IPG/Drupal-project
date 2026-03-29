@@ -13,6 +13,7 @@ use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 
 /**
@@ -46,6 +47,12 @@ class UserThemeHooks {
           'link_options' => [],
         ],
         'initial preprocess' => static::class . ':preprocessUsername',
+      ],
+      'user_permission_info' => [
+        'initial preprocess' => static::class . ':preprocessUserPermissionInfo',
+        'variables' => [
+          'permission' => [],
+        ],
       ],
     ];
   }
@@ -149,6 +156,25 @@ class UserThemeHooks {
       }
     }
     $metadata->applyTo($variables);
+  }
+
+  /**
+   * Prepares variables for user permission info templates.
+   *
+   * Default template: user-permission-info.html.twig.
+   *
+   * @param array $variables
+   *   An associative array containing:
+   *   - permission: An array of information about the permission.
+   */
+  public function preprocessUserPermissionInfo(array &$variables): void {
+    $permission = $variables['permission'];
+
+    $variables['title'] = $permission['title'];
+    $variables['description'] = $permission['description'] ?? '';
+    $variables['warning'] = $permission['warning'] ?? '';
+    $variables['deprecated'] = $permission['deprecated'] ?? '';
+    $variables['wrapper_attributes'] = new Attribute();
   }
 
   /**

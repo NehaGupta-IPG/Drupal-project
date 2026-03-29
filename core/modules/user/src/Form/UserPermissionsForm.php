@@ -200,15 +200,17 @@ class UserPermissionsForm extends FormBase {
           $form['permissions'][$perm]['#attributes']['class'][] = 'deprecated';
         }
         $form['permissions'][$perm]['description'] = [
-          '#type' => 'inline_template',
-          '#template' => '<div class="permission"><span class="title table-filter-text-source">{{ title }}</span>{% if description or warning or deprecated %}<div class="description" data-admin-compact-collapsible>{% if warning %}<em class="permission-warning">{{ warning }}</em> {% endif %}{% if deprecated %}<em class="permission-warning permission-deprecated">{{ deprecated }}</em> {% endif %}{{ description }}</div>{% endif %}</div>',
-          '#context' => [
+          '#theme' => 'user_permission_info',
+          '#permission' => [
             'title' => $perm_item['title'],
           ],
         ];
-        $form['permissions'][$perm]['description']['#context']['description'] = $perm_item['description'];
-        $form['permissions'][$perm]['description']['#context']['warning'] = $perm_item['warning'];
-        $form['permissions'][$perm]['description']['#context']['deprecated'] = $perm_item['deprecated'];
+        // Show the permission description.
+        if (!$hide_descriptions) {
+          $form['permissions'][$perm]['description']['#permission']['description'] = $perm_item['description'];
+          $form['permissions'][$perm]['description']['#permission']['warning'] = $perm_item['warning'];
+          $form['permissions'][$perm]['description']['#permission']['deprecated'] = $perm_item['deprecated'];
+        }
         foreach ($role_names as $rid => $name) {
           $form['permissions'][$perm][$rid] = [
             '#title' => $name . ': ' . $perm_item['title'],
