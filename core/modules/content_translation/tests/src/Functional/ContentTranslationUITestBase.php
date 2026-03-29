@@ -36,13 +36,6 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
   protected $testLanguageSelector = TRUE;
 
   /**
-   * Flag to determine if "all languages" rendering is tested.
-   *
-   * @var bool
-   */
-  protected $testHTMLEscapeForAllLanguages = FALSE;
-
-  /**
    * Default cache contexts expected on a non-translated entity.
    *
    * Cache contexts will not be checked if this list is empty.
@@ -119,12 +112,6 @@ abstract class ContentTranslationUITestBase extends ContentTranslationTestBase {
     ], ['language' => $language]);
     $this->drupalGet($add_url);
     $this->submitForm($this->getEditValues($values, $langcode), $this->getFormSubmitActionForNewTranslation($entity, $langcode));
-
-    // Assert that HTML is not escaped unexpectedly.
-    if ($this->testHTMLEscapeForAllLanguages) {
-      $this->assertSession()->responseNotContains('&lt;span class=&quot;translation-entity-all-languages&quot;&gt;(all languages)&lt;/span&gt;');
-      $this->assertSession()->responseContains('<span class="translation-entity-all-languages">(all languages)</span>');
-    }
 
     // Ensure that the content language cache context is not yet added to the
     // page.
