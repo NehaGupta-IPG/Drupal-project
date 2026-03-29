@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\user\Functional;
 
-use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
