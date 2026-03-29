@@ -8,13 +8,13 @@
  * - pagination_heading_level: The heading level to use for the pager.
  * - items: List of pager items.
  *
- * @see template_preprocess_views_mini_pager()
+ * @see \Drupal\views\Hook\ViewsThemeHooks::preprocessViewsMiniPager()
  *
  * @ingroup themeable
  */
 #}
 {% if items.previous or items.next %}
-  <nav role="navigation" aria-labelledby="{{ heading_id }}">
+  <nav aria-labelledby="{{ heading_id }}">
     <{{ pagination_heading_level }} id="{{ heading_id }}" class="visually-hidden">{{ 'Pagination'|t }}</{{ pagination_heading_level }}>
     <ul class="js-pager__items">
       {% if items.previous %}

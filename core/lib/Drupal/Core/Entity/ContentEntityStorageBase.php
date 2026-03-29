@@ -1197,9 +1197,7 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
    *   The sanitized list of entity key values.
    */
   protected function cleanIds(array $ids, $entity_key = 'id') {
-    $definitions = $this->entityFieldManager->getActiveFieldStorageDefinitions($this->entityTypeId);
-    $field_name = $this->entityType->getKey($entity_key);
-    if ($field_name && $definitions[$field_name]->getType() == 'integer') {
+    if ($entity_key === 'revision' || $this->entityType->hasIntegerId()) {
       $ids = array_filter($ids, function ($id) {
         return is_numeric($id) && $id == (int) $id;
       });
@@ -1308,17 +1306,18 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
       return;
     }
     $items = [];
-    $cache_tags = ['entity_field_info'];
     foreach ($entities as $entity) {
       // When an entity is cleared from the entity cache via ::resetCache()
       // we must clear the related revisions from the revision cache, as well.
       // To make this possible, we add a tag with the entity's ID to the
       // revision's cache entry.
       // @see \Drupal\Core\Entity\ContentEntityStorageBase::resetCache()
-      $cache_tags[] = "{$this->entityTypeId}:{$entity->id()}:revisions";
       $items[$this->buildRevisionCacheId($entity->getRevisionId())] = [
         'data' => $entity,
-        'tags' => $cache_tags,
+        'tags' => [
+          'entity_field_info',
+          "{$this->entityTypeId}:{$entity->id()}:revisions",
+        ],
       ];
     }
     $this->cacheBackend->setMultiple($items);
@@ -1478,25 +1477,6 @@ abstract class ContentEntityStorageBase extends EntityStorageBase implements Con
         $this->cacheBackend->deleteAll();
       }
     }
-  }
-
-  /**
-   * Warns about deprecated/removed properties.
-   *
-   * @param string $name
-   *   The property to get the value of.
-   *
-   * @return mixed
-   *   The value of the deprecated/removed $name property.
-   */
-  public function __get(string $name) {
-    if ($name === 'latestRevisionIds') {
-      @trigger_error('Getting the static cache of latest revision IDs is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. You can retrieve it from the \'entity.memory_cache\' service instead. See https://www.drupal.org/node/3535160', E_USER_DEPRECATED);
-      return [];
-    }
-
-    trigger_error('Undefined property ' . __CLASS__ . "::\${$name}", E_USER_WARNING);
-    return NULL;
   }
 
   /**

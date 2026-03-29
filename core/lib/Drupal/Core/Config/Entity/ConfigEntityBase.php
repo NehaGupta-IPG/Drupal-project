@@ -104,6 +104,11 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    * Trust supplied data and not use configuration schema on save.
    *
    * @var bool
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no
+   *   replacement.
+   *
+   * @see https://www.drupal.org/node/3348180
    */
   protected $trustedData = FALSE;
 
@@ -347,6 +352,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
       // If the data is trusted we need to ensure that the dependencies are
       // sorted as per their schema. If the save is not trusted then the
       // configuration will be sorted by StorableConfigBase.
+      // @phpstan-ignore-next-line
       if ($this->trustedData) {
         $mapping = ['config' => 0, 'content' => 1, 'module' => 2, 'theme' => 3, 'enforced' => 4];
         $dependency_sort = function ($dependencies) use ($mapping) {
@@ -632,6 +638,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    * {@inheritdoc}
    */
   public function trustData() {
+    @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3348180', E_USER_DEPRECATED);
     $this->trustedData = TRUE;
     return $this;
   }
@@ -640,6 +647,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    * {@inheritdoc}
    */
   public function hasTrustedData() {
+    // @phpstan-ignore-next-line
     return $this->trustedData;
   }
 
@@ -655,6 +663,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    */
   public function save() {
     $return = parent::save();
+    // @phpstan-ignore-next-line
     $this->trustedData = FALSE;
     return $return;
   }
