@@ -116,7 +116,7 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
    * @param \Drupal\Core\Entity\EntityTypeInterface[]|\Prophecy\Prophecy\ProphecyInterface[] $definitions
    *   (optional) An array of entity type definitions.
    */
-  protected function setUpEntityTypeDefinitions($definitions = []): void {
+  protected function setUpEntityTypeDefinitions(array $definitions = []): void {
     foreach ($definitions as $key => $entity_type) {
       // \Drupal\Core\Entity\EntityTypeInterface::getLinkTemplates() is called
       // by \Drupal\Core\Entity\EntityTypeManager::processDefinition() so it
@@ -146,8 +146,6 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
 
   /**
    * Tests the clearCachedBundles() method.
-   *
-   * @legacy-covers ::clearCachedBundles
    */
   public function testClearCachedBundles(): void {
     $this->setUpEntityTypeDefinitions();
@@ -161,11 +159,9 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
 
   /**
    * Tests the getBundleInfo() method.
-   *
-   * @legacy-covers ::getBundleInfo
    */
   #[DataProvider('providerTestGetBundleInfo')]
-  public function testGetBundleInfo($entity_type_id, $expected): void {
+  public function testGetBundleInfo(string $entity_type_id, array $expected): void {
     $this->moduleHandler->invokeAll('entity_bundle_info')->willReturn([]);
     $this->moduleHandler->alter('entity_bundle_info', Argument::type('array'))->willReturn(NULL);
 
@@ -192,7 +188,7 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
    * @return array
    *   Test data.
    */
-  public static function providerTestGetBundleInfo() {
+  public static function providerTestGetBundleInfo(): array {
     return [
       [
         'apple',
@@ -212,8 +208,6 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
 
   /**
    * Tests the getAllBundleInfo() method.
-   *
-   * @legacy-covers ::getAllBundleInfo
    */
   public function testGetAllBundleInfo(): void {
     $this->moduleHandler->invokeAll('entity_bundle_info')->willReturn([]);
@@ -234,8 +228,11 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
 
     $cacheBackend = $this->cacheBackend;
     $this->cacheBackend->get('entity_bundle_info:en')->willReturn(FALSE);
-    $this->cacheBackend->set('entity_bundle_info:en', Argument::any(), Cache::PERMANENT, ['entity_types', 'entity_bundles'])
-      ->will(function () use ($cacheBackend) {
+    $this->cacheBackend->set('entity_bundle_info:en', Argument::any(), Cache::PERMANENT, [
+      'entity_types',
+      'entity_bundles',
+    ])
+      ->will(function () use ($cacheBackend): void {
         $cacheBackend->get('entity_bundle_info:en')
           ->willReturn((object) ['data' => 'cached data'])
           ->shouldBeCalled();
@@ -272,8 +269,6 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
 
   /**
    * Tests get all bundle info with entity bundle info.
-   *
-   * @legacy-covers ::getAllBundleInfo
    */
   public function testGetAllBundleInfoWithEntityBundleInfo(): void {
     // Ensure that EntityTypeBundleInfo::getAllBundleInfo() does not add
@@ -319,8 +314,6 @@ class EntityTypeBundleInfoTest extends UnitTestCase {
 
   /**
    * Tests the getBundleLabels() method.
-   *
-   * @legacy-covers ::getBundleLabels
    */
   #[DataProvider('providerTestGetBundleLabels')]
   public function testGetBundleLabels(string $entity_type_id, array $expected): void {

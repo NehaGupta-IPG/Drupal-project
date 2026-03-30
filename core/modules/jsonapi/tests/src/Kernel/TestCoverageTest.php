@@ -38,6 +38,7 @@ class TestCoverageTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installConfig('system');
     $all_modules = \Drupal::service('extension.list.module')->getList();
     $stable_core_modules = array_filter($all_modules, function ($module) {
       // Filter out contrib, hidden, testing, experimental, and deprecated
@@ -47,7 +48,8 @@ class TestCoverageTest extends KernelTestBase {
         && $module->status == FALSE
         && $module->info['package'] !== 'Testing'
         && $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] !== ExtensionLifecycle::EXPERIMENTAL
-        && $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] !== ExtensionLifecycle::DEPRECATED;
+        && $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] !== ExtensionLifecycle::DEPRECATED
+        && $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] !== ExtensionLifecycle::OBSOLETE;
     });
 
     $this->container->get('module_installer')->install(array_keys($stable_core_modules));

@@ -30,8 +30,6 @@ class ControllerBaseTest extends KernelTestBase {
 
   /**
    * Tests create.
-   *
-   * @legacy-covers ::create
    */
   public function testCreate(): void {
     /** @var \Drupal\system_test\Controller\SystemTestController $controller */
@@ -53,19 +51,15 @@ class ControllerBaseTest extends KernelTestBase {
 
   /**
    * Tests create exception.
-   *
-   * @legacy-covers ::create
    */
   public function testCreateException(): void {
     $this->expectException(AutowiringFailedException::class);
-    $this->expectExceptionMessage('Cannot autowire service "Drupal\Core\Lock\LockBackendInterface": argument "$lock" of method "Drupal\system_test\Controller\BrokenSystemTestController::_construct()", you should configure its value explicitly.');
+    $this->expectExceptionMessage('Cannot autowire service "Drupal\Core\Lock\LockBackendInterface": argument "$lock" of method "Drupal\system_test\Controller\BrokenSystemTestController::__construct()". Check that either the argument type is correct or the Autowire attribute is passed a valid identifier. Otherwise configure its value explicitly if possible.');
     $this->container->get('class_resolver')->getInstanceFromDefinition(BrokenSystemTestController::class);
   }
 
   /**
    * Tests create optional.
-   *
-   * @legacy-covers ::create
    */
   public function testCreateOptional(): void {
     $service = $this->container->get('class_resolver')->getInstanceFromDefinition(OptionalServiceSystemTestController::class);

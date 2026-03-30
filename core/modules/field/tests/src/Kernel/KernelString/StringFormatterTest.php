@@ -30,10 +30,8 @@ class StringFormatterTest extends KernelTestBase {
    */
   protected static $modules = [
     'field',
-    'text',
     'entity_test',
     'system',
-    'filter',
     'user',
   ];
 
@@ -174,6 +172,7 @@ class StringFormatterTest extends KernelTestBase {
     /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
     $storage = $this->entityTypeManager->getStorage('entity_test_rev');
     $entity_new_revision = $storage->loadRevision($old_revision_id);
+    $this->assertInstanceOf(EntityTestRev::class, $entity_new_revision);
 
     $this->renderEntityFields($entity, $this->display);
     $this->assertLink($value2, 0);

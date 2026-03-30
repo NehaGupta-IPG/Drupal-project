@@ -92,35 +92,135 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
       'query' => [],
     ];
     // Nothing to do.
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => []];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => [],
+    ];
     // Matching path, plus all matching variations.
     $attributes = [
       'data-drupal-link-system-path' => 'my-front-page',
     ];
-    $situations[] = ['context' => $context, 'is active' => TRUE, 'attributes' => $attributes + ['aria-current' => 'page']];
-    $situations[] = ['context' => $context, 'is active' => TRUE, 'attributes' => $attributes + ['hreflang' => 'en', 'aria-current' => 'page']];
+    $situations[] = [
+      'context' => $context,
+      'is active' => TRUE,
+      'attributes' => $attributes + ['aria-current' => 'page'],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => TRUE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'en',
+        'aria-current' => 'page',
+      ],
+    ];
     // Matching path, plus all non-matching variations.
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'nl']];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['data-drupal-link-query' => '{"foo":"bar"}']];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['data-drupal-link-query' => ""]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['data-drupal-link-query' => TRUE]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'en', 'data-drupal-link-query' => '{"foo":"bar"}']];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'en', 'data-drupal-link-query' => ""]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'en', 'data-drupal-link-query' => TRUE]];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-language' => 'nl'],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-link-query' => '{"foo":"bar"}'],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-link-query' => ""],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-link-query' => TRUE],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'en',
+        'data-drupal-link-query' => '{"foo":"bar"}',
+      ],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'en',
+        'data-drupal-link-query' => "",
+      ],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'en',
+        'data-drupal-link-query' => TRUE,
+      ],
+    ];
     // Special matching path, plus all variations.
     $attributes = [
       'data-drupal-link-system-path' => '<front>',
     ];
-    $situations[] = ['context' => $context, 'is active' => TRUE, 'attributes' => $attributes + ['aria-current' => 'page']];
-    $situations[] = ['context' => $context, 'is active' => TRUE, 'attributes' => $attributes + ['hreflang' => 'en', 'aria-current' => 'page']];
+    $situations[] = [
+      'context' => $context,
+      'is active' => TRUE,
+      'attributes' => $attributes + ['aria-current' => 'page'],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => TRUE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'en',
+        'aria-current' => 'page',
+      ],
+    ];
     // Special matching path, plus all non-matching variations.
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'nl']];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['data-drupal-link-query' => '{"foo":"bar"}']];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['data-drupal-link-query' => ""]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['data-drupal-link-query' => TRUE]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'en', 'data-drupal-link-query' => '{"foo":"bar"}']];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'en', 'data-drupal-link-query' => ""]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'en', 'data-drupal-link-query' => TRUE]];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-language' => 'nl'],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-link-query' => '{"foo":"bar"}'],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-link-query' => ""],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-link-query' => TRUE],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'en',
+        'data-drupal-link-query' => '{"foo":"bar"}',
+      ],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'en',
+        'data-drupal-link-query' => "",
+      ],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'en',
+        'data-drupal-link-query' => TRUE,
+      ],
+    ];
 
     // Situations with context: non-front page, Dutch, no query.
     $context = [
@@ -134,28 +234,117 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
     $attributes = [
       'data-drupal-link-system-path' => 'llama',
     ];
-    $situations[] = ['context' => $context, 'is active' => TRUE, 'attributes' => $attributes + ['aria-current' => 'page']];
-    $situations[] = ['context' => $context, 'is active' => TRUE, 'attributes' => $attributes + ['hreflang' => 'nl', 'aria-current' => 'page']];
+    $situations[] = [
+      'context' => $context,
+      'is active' => TRUE,
+      'attributes' => $attributes + ['aria-current' => 'page'],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => TRUE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'nl',
+        'aria-current' => 'page',
+      ],
+    ];
     // Matching path, plus all non-matching variations.
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'en']];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['data-drupal-link-query' => '{"foo":"bar"}']];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['data-drupal-link-query' => ""]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['data-drupal-link-query' => TRUE]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'nl', 'data-drupal-link-query' => '{"foo":"bar"}']];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'nl', 'data-drupal-link-query' => ""]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'nl', 'data-drupal-link-query' => TRUE]];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-language' => 'en'],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-link-query' => '{"foo":"bar"}'],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-link-query' => ""],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-link-query' => TRUE],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'nl',
+        'data-drupal-link-query' => '{"foo":"bar"}',
+      ],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'nl',
+        'data-drupal-link-query' => "",
+      ],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'nl',
+        'data-drupal-link-query' => TRUE,
+      ],
+    ];
     // Special non-matching path, plus all variations.
     $attributes = [
       'data-drupal-link-system-path' => '<front>',
     ];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'en']];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['data-drupal-link-query' => '{"foo":"bar"}']];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['data-drupal-link-query' => ""]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['data-drupal-link-query' => TRUE]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'nl', 'data-drupal-link-query' => '{"foo":"bar"}']];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'nl', 'data-drupal-link-query' => ""]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'nl', 'data-drupal-link-query' => TRUE]];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes,
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-language' => 'en'],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-link-query' => '{"foo":"bar"}'],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-link-query' => ""],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-link-query' => TRUE],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'nl',
+        'data-drupal-link-query' => '{"foo":"bar"}',
+      ],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'nl',
+        'data-drupal-link-query' => "",
+      ],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'nl',
+        'data-drupal-link-query' => TRUE,
+      ],
+    ];
 
     // Situations with context: non-front page, Dutch, with query.
     $context = [
@@ -169,21 +358,83 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
     $attributes = [
       'data-drupal-link-system-path' => 'llama',
     ];
-    $situations[] = ['context' => $context, 'is active' => TRUE, 'attributes' => $attributes + ['aria-current' => 'page', 'data-drupal-link-query' => Json::encode(['foo' => 'bar'])]];
-    $situations[] = ['context' => $context, 'is active' => TRUE, 'attributes' => $attributes + ['hreflang' => 'nl', 'aria-current' => 'page', 'data-drupal-link-query' => Json::encode(['foo' => 'bar'])]];
+    $situations[] = [
+      'context' => $context,
+      'is active' => TRUE,
+      'attributes' => $attributes + [
+        'aria-current' => 'page',
+        'data-drupal-link-query' => Json::encode(['foo' => 'bar']),
+      ],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => TRUE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'nl',
+        'aria-current' => 'page',
+        'data-drupal-link-query' => Json::encode(['foo' => 'bar']),
+      ],
+    ];
     // Matching path, plus all non-matching variations.
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'en', 'data-drupal-link-query' => Json::encode(['foo' => 'bar'])]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'nl', 'data-drupal-link-query' => ""]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'nl', 'data-drupal-link-query' => TRUE]];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'en',
+        'data-drupal-link-query' => Json::encode(['foo' => 'bar']),
+      ],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'nl',
+        'data-drupal-link-query' => "",
+      ],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'nl',
+        'data-drupal-link-query' => TRUE,
+      ],
+    ];
     // Special non-matching path, plus all variations.
     $attributes = [
       'data-drupal-link-system-path' => '<front>',
     ];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'nl']];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'en']];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'nl', 'data-drupal-link-query' => ""]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'nl', 'data-drupal-link-query' => TRUE]];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes,
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-language' => 'nl'],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-language' => 'en'],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'nl',
+        'data-drupal-link-query' => "",
+      ],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'nl',
+        'data-drupal-link-query' => TRUE,
+      ],
+    ];
 
     // Situations with context: non-front page, Dutch, with query.
     $context = [
@@ -197,25 +448,103 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
     $attributes = [
       'data-drupal-link-system-path' => 'llama',
     ];
-    $situations[] = ['context' => $context, 'is active' => TRUE, 'attributes' => $attributes + ['aria-current' => 'page', 'data-drupal-link-query' => Json::encode(['foo' => 'bar'])]];
-    $situations[] = ['context' => $context, 'is active' => TRUE, 'attributes' => $attributes + ['hreflang' => 'nl', 'aria-current' => 'page', 'data-drupal-link-query' => Json::encode(['foo' => 'bar'])]];
+    $situations[] = [
+      'context' => $context,
+      'is active' => TRUE,
+      'attributes' => $attributes + [
+        'aria-current' => 'page',
+        'data-drupal-link-query' => Json::encode(['foo' => 'bar']),
+      ],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => TRUE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'nl',
+        'aria-current' => 'page',
+        'data-drupal-link-query' => Json::encode(['foo' => 'bar']),
+      ],
+    ];
     // Matching path, plus all non-matching variations.
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'en', 'data-drupal-link-query' => Json::encode(['foo' => 'bar'])]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['data-drupal-link-query' => ""]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['data-drupal-link-query' => TRUE]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'nl', 'data-drupal-link-query' => ""]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'nl', 'data-drupal-link-query' => TRUE]];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'en',
+        'data-drupal-link-query' => Json::encode(['foo' => 'bar']),
+      ],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-link-query' => ""],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-link-query' => TRUE],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'nl',
+        'data-drupal-link-query' => "",
+      ],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'nl',
+        'data-drupal-link-query' => TRUE,
+      ],
+    ];
     // Special non-matching path, plus all variations.
     $attributes = [
       'data-drupal-link-system-path' => '<front>',
     ];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'nl']];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'en']];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['data-drupal-link-query' => ""]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['data-drupal-link-query' => TRUE]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'nl', 'data-drupal-link-query' => ""]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'nl', 'data-drupal-link-query' => TRUE]];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes,
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-language' => 'nl'],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-language' => 'en'],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-link-query' => ""],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-link-query' => TRUE],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'nl',
+        'data-drupal-link-query' => "",
+      ],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'nl',
+        'data-drupal-link-query' => TRUE,
+      ],
+    ];
 
     // Situations with context: front page, English, query.
     $context = [
@@ -229,26 +558,114 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
     $attributes = [
       'data-drupal-link-system-path' => 'my-front-page',
     ];
-    $situations[] = ['context' => $context, 'is active' => TRUE, 'attributes' => $attributes + ['aria-current' => 'page', 'data-drupal-link-query' => Json::encode(['foo' => 'bar'])]];
-    $situations[] = ['context' => $context, 'is active' => TRUE, 'attributes' => $attributes + ['hreflang' => 'en', 'aria-current' => 'page', 'data-drupal-link-query' => Json::encode(['foo' => 'bar'])]];
+    $situations[] = [
+      'context' => $context,
+      'is active' => TRUE,
+      'attributes' => $attributes + [
+        'aria-current' => 'page',
+        'data-drupal-link-query' => Json::encode(['foo' => 'bar']),
+      ],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => TRUE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'en',
+        'aria-current' => 'page',
+        'data-drupal-link-query' => Json::encode(['foo' => 'bar']),
+      ],
+    ];
     // Matching path, plus all non-matching variations.
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'nl', 'data-drupal-link-query' => Json::encode(['foo' => 'bar'])]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['data-drupal-link-query' => ""]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['data-drupal-link-query' => TRUE]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'en', 'data-drupal-link-query' => ""]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'en', 'data-drupal-link-query' => TRUE]];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'nl',
+        'data-drupal-link-query' => Json::encode(['foo' => 'bar']),
+      ],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-link-query' => ""],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-link-query' => TRUE],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'en',
+        'data-drupal-link-query' => "",
+      ],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'en',
+        'data-drupal-link-query' => TRUE,
+      ],
+    ];
     // Special matching path, plus all variations.
     $attributes = [
       'data-drupal-link-system-path' => '<front>',
     ];
-    $situations[] = ['context' => $context, 'is active' => TRUE, 'attributes' => $attributes + ['aria-current' => 'page', 'data-drupal-link-query' => Json::encode(['foo' => 'bar'])]];
-    $situations[] = ['context' => $context, 'is active' => TRUE, 'attributes' => $attributes + ['hreflang' => 'en', 'aria-current' => 'page', 'data-drupal-link-query' => Json::encode(['foo' => 'bar'])]];
+    $situations[] = [
+      'context' => $context,
+      'is active' => TRUE,
+      'attributes' => $attributes + [
+        'aria-current' => 'page',
+        'data-drupal-link-query' => Json::encode(['foo' => 'bar']),
+      ],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => TRUE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'en',
+        'aria-current' => 'page',
+        'data-drupal-link-query' => Json::encode(['foo' => 'bar']),
+      ],
+    ];
     // Special matching path, plus all non-matching variations.
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'nl', 'data-drupal-link-query' => Json::encode(['foo' => 'bar'])]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['data-drupal-link-query' => ""]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['data-drupal-link-query' => TRUE]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'en', 'data-drupal-link-query' => ""]];
-    $situations[] = ['context' => $context, 'is active' => FALSE, 'attributes' => $attributes + ['hreflang' => 'en', 'data-drupal-link-query' => TRUE]];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'nl',
+        'data-drupal-link-query' => Json::encode(['foo' => 'bar']),
+      ],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-link-query' => ""],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + ['data-drupal-link-query' => TRUE],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'en',
+        'data-drupal-link-query' => "",
+      ],
+    ];
+    $situations[] = [
+      'context' => $context,
+      'is active' => FALSE,
+      'attributes' => $attributes + [
+        'data-drupal-language' => 'en',
+        'data-drupal-link-query' => TRUE,
+      ],
+    ];
 
     // Query with unsorted keys must match when the attribute is in sorted form.
     $context = [
@@ -261,7 +678,11 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
       'data-drupal-link-system-path' => 'my-front-page',
       'data-drupal-link-query' => Json::encode(['baz' => 'qux', 'foo' => 'bar']),
     ];
-    $situations[] = ['context' => $context, 'is active' => TRUE, 'attributes' => $attributes + ['aria-current' => 'page']];
+    $situations[] = [
+      'context' => $context,
+      'is active' => TRUE,
+      'attributes' => $attributes + ['aria-current' => 'page'],
+    ];
 
     // Loop over the surrounding HTML variations.
     $data = [];
@@ -275,13 +696,19 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
         for ($c = 0; $c < count($contents); $c++) {
           $tag_content = $contents[$c];
 
-          $create_markup = function (Attribute $attributes) use ($html_prefix, $html_suffix, $tag, $tag_content) {
+          $create_markup = function (Attribute $attributes) use ($html_prefix, $html_suffix, $tag, $tag_content): string {
             return $html_prefix . '<' . $tag . $attributes . '>' . $tag_content . '</' . $tag . '>' . $html_suffix;
           };
 
           // Loop over the situations.
           for ($s = 0; $s < count($situations); $s++) {
             $situation = $situations[$s];
+
+            // Attribute hreflang allowed only in a tag.
+            if ($tag === 'a' && !empty($situation['attributes']['data-drupal-language'])) {
+              $situation['attributes']['hreflang'] = $situation['attributes']['data-drupal-language'];
+              unset($situation['attributes']['data-drupal-language']);
+            }
 
             // Build the source markup.
             $source_markup = $create_markup(new Attribute($situation['attributes']));
@@ -303,7 +730,14 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
               $target_markup = $create_markup(new Attribute($active_attributes));
             }
 
-            $data[] = [$source_markup, $situation['context']['path'], $situation['context']['front'], $situation['context']['language'], $situation['context']['query'], $target_markup];
+            $data[] = [
+              $source_markup,
+              $situation['context']['path'],
+              $situation['context']['front'],
+              $situation['context']['language'],
+              $situation['context']['query'],
+              $target_markup,
+            ];
           }
         }
       }
@@ -401,8 +835,6 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
    *   The query string for the current URL.
    * @param string $expected_html_markup
    *   The expected updated HTML markup.
-   *
-   * @legacy-covers ::setLinkActiveClass
    */
   #[DataProvider('providerTestSetLinkActiveClass')]
   public function testSetLinkActiveClass($html_markup, $current_path, $is_front, $url_language, array $query, $expected_html_markup): void {
@@ -484,7 +916,7 @@ class ActiveLinkResponseFilterTest extends UnitTestCase {
 
     // Test StreamedResponse is ignored. Calling setContent() would throw a
     // logic exception.
-    $response = new StreamedResponse(function () {
+    $response = new StreamedResponse(function (): void {
       echo 'Success!';
     }, 200, ['Content-Type' => 'text/html']);
     $subscriber->onResponse(new ResponseEvent(

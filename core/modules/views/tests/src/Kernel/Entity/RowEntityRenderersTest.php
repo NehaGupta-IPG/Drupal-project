@@ -29,8 +29,6 @@ class RowEntityRenderersTest extends ViewsKernelTestBase {
    */
   protected static $modules = [
     'field',
-    'filter',
-    'text',
     'node',
     'language',
     'views_test_language',
@@ -54,25 +52,11 @@ class RowEntityRenderersTest extends ViewsKernelTestBase {
   protected $langcodes;
 
   /**
-   * An array of titles for each node per language.
-   *
-   * @var array
-   */
-  protected $expected;
-
-  /**
    * The author of the test content.
    *
    * @var \Drupal\user\UserInterface
    */
   protected $testAuthor;
-
-  /**
-   * An array of IDs of the test content.
-   *
-   * @var array[]
-   */
-  protected $testIds;
 
   /**
    * @var array

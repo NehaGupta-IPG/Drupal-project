@@ -24,8 +24,6 @@ class FilteredPluginManagerTraitTest extends UnitTestCase {
 
   /**
    * Tests get filtered definitions.
-   *
-   * @legacy-covers ::getFilteredDefinitions
    */
   #[DataProvider('providerTestGetFilteredDefinitions')]
   public function testGetFilteredDefinitions($contexts, $expected): void {
@@ -62,7 +60,7 @@ class FilteredPluginManagerTraitTest extends UnitTestCase {
   /**
    * Provides test data for ::testGetFilteredDefinitions().
    */
-  public static function providerTestGetFilteredDefinitions() {
+  public static function providerTestGetFilteredDefinitions(): array {
     $data = [];
     $data['populated context'] = [
       ['context1' => 'fake context'],
@@ -101,21 +99,21 @@ class TestFilteredPluginManager extends PluginManagerBase implements FilteredPlu
   /**
    * The module handler.
    *
-   * @var Drupal\Core\Extension\ModuleHandlerInterface
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
    * The theme manager.
    *
-   * @var Drupal\Core\Theme\ThemeManagerInterface
+   * @var \Drupal\Core\Theme\ThemeManagerInterface
    */
   protected $themeManager;
 
   /**
    * The context handler.
    *
-   * @var Drupal\Core\Plugin\Context\ContextHandlerInterface
+   * @var \Drupal\Core\Plugin\Context\ContextHandlerInterface
    */
   protected $contextHandler;
 

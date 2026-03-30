@@ -10,11 +10,11 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore dummydb
+
 /**
  * Tests for database URL to/from database connection array conversions.
  *
@@ -33,7 +33,7 @@ class UrlConversionTest extends UnitTestCase {
    * @legacy-covers ::convertDbUrlToConnectionInfo
    */
   #[DataProvider('providerConvertDbUrlToConnectionInfo')]
-  public function testDbUrlToConnectionConversion($url, $database_array, $include_test_drivers): void {
+  public function testDbUrlToConnectionConversion(string $url, array $database_array, bool $include_test_drivers): void {
     $result = Database::convertDbUrlToConnectionInfo($url, $include_test_drivers);
     $this->assertEquals($database_array, $result);
   }
@@ -46,7 +46,7 @@ class UrlConversionTest extends UnitTestCase {
    *   - url: The full URL string to be tested.
    *   - database_array: An array containing the expected results.
    */
-  public static function providerConvertDbUrlToConnectionInfo() {
+  public static function providerConvertDbUrlToConnectionInfo(): array {
     return [
       'MySql without prefix' => [
         'mysql://test_user:test_pass@test_host:3306/test_database',
@@ -281,7 +281,7 @@ class UrlConversionTest extends UnitTestCase {
    * Tests ::convertDbUrlToConnectionInfo() exception for invalid arguments.
    */
   #[DataProvider('providerInvalidArgumentsUrlConversion')]
-  public function testGetInvalidArgumentExceptionInUrlConversion($url, $expected_exception_message): void {
+  public function testGetInvalidArgumentExceptionInUrlConversion(string $url, string $expected_exception_message): void {
     $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage($expected_exception_message);
     Database::convertDbUrlToConnectionInfo($url);
@@ -295,7 +295,7 @@ class UrlConversionTest extends UnitTestCase {
    *   - An invalid URL string.
    *   - The expected exception message.
    */
-  public static function providerInvalidArgumentsUrlConversion() {
+  public static function providerInvalidArgumentsUrlConversion(): array {
     return [
       ['foo', "Missing scheme in URL 'foo'"],
       ['foo/bar/baz', "Missing scheme in URL 'foo/bar/baz'"],
@@ -328,11 +328,9 @@ class UrlConversionTest extends UnitTestCase {
 
   /**
    * Tests get connection info as url.
-   *
-   * @legacy-covers ::getConnectionInfoAsUrl
    */
   #[DataProvider('providerGetConnectionInfoAsUrl')]
-  public function testGetConnectionInfoAsUrl(array $info, $expected_url): void {
+  public function testGetConnectionInfoAsUrl(array $info, string $expected_url): void {
     Database::addConnectionInfo('default', 'default', $info);
     $url = Database::getConnectionInfoAsUrl();
     $this->assertEquals($expected_url, $url);
@@ -347,7 +345,7 @@ class UrlConversionTest extends UnitTestCase {
    *     database, username, password, prefix, host, port, namespace and driver.
    *   - The expected URL after conversion.
    */
-  public static function providerGetConnectionInfoAsUrl() {
+  public static function providerGetConnectionInfoAsUrl(): array {
     $info1 = [
       'database' => 'test_database',
       'username' => 'test_user',
@@ -482,7 +480,7 @@ class UrlConversionTest extends UnitTestCase {
    * @legacy-covers ::getConnectionInfoAsUrl
    */
   #[DataProvider('providerInvalidArgumentGetConnectionInfoAsUrl')]
-  public function testGetInvalidArgumentGetConnectionInfoAsUrl(array $connection_options, $expected_exception_message): void {
+  public function testGetInvalidArgumentGetConnectionInfoAsUrl(array $connection_options, string $expected_exception_message): void {
     Database::addConnectionInfo('default', 'default', $connection_options);
     $this->expectException(\InvalidArgumentException::class);
     $this->expectExceptionMessage($expected_exception_message);
@@ -498,7 +496,7 @@ class UrlConversionTest extends UnitTestCase {
    *     database, username, password, prefix, host, port, namespace and driver.
    *   - The expected exception message.
    */
-  public static function providerInvalidArgumentGetConnectionInfoAsUrl() {
+  public static function providerInvalidArgumentGetConnectionInfoAsUrl(): array {
     return [
       'Missing database key' => [
         [
@@ -533,17 +531,6 @@ class UrlConversionTest extends UnitTestCase {
     $this->expectException(UnknownExtensionException::class);
     $this->expectExceptionMessage("The database_driver Drupal\\driver_test\\Driver\\Database\\driver_test_mysql does not exist.");
     Database::convertDbUrlToConnectionInfo($url, TRUE);
-  }
-
-  /**
-   * Tests deprecation of root parameter.
-   *
-   * @legacy-covers ::convertDbUrlToConnectionInfo
-   */
-  #[IgnoreDeprecations]
-  public function testDeprecationOfRootParameter(): void {
-    $this->expectDeprecation('Passing a string $root value to Drupal\\Core\\Database\\Database::convertDbUrlToConnectionInfo() is deprecated in drupal:11.3.0 and will be removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3511287');
-    Database::convertDbUrlToConnectionInfo('sqlite://localhost/test_database', $this->root, TRUE);
   }
 
 }
