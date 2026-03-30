@@ -1087,7 +1087,7 @@ default:
     - if [ ! -f core/.phpcscache ]; then exit 1; fi
     - if [ ! -f core/.twigcsfixercache ]; then exit 1; fi
 
-build docs:
+Build documentation:
   stage: 📚 Documentation
   image: python:latest
   script:
@@ -1100,11 +1100,11 @@ build docs:
       - public
     expire_in: 1 week
 
-preview docs:
+Preview documentation:
   stage: 📚 Documentation
   image: alpine:latest
   needs:
-    - build docs
+    - Build documentation
   script:
     - echo "Docs preview available at $CI_PAGES_URL"
   rules:
@@ -1114,11 +1114,11 @@ preview docs:
   pages:
     path_prefix: 'preview-$CI_MERGE_REQUEST_IID'
 
-publish docs:
+Publish documentation:
   stage: 📚 Documentation
   image: alpine:latest
   needs:
-    - build docs
+    - Build documentation
   script:
     - echo "Docs published at $CI_PAGES_URL"
   rules:
