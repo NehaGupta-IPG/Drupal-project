@@ -8,7 +8,10 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
 use Drupal\Core\Hook\Attribute\Hook;
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\Core\Url;
+use Drupal\user\PermissionHandlerInterface;
 
 /**
  * Requirements for the User module.
@@ -20,7 +23,10 @@ class UserRequirements {
   public function __construct(
     protected readonly EntityTypeManagerInterface $entityTypeManager,
     protected readonly Connection $connection,
-  ) {}
+    protected readonly PermissionHandlerInterface $permissionHandler,
+    protected readonly AccountProxyInterface $currentUser,
+  ) {
+  }
 
   /**
    * Implements hook_runtime_requirements().
@@ -61,6 +67,46 @@ class UserRequirements {
         ]),
         'severity' => RequirementSeverity::Warning,
       ];
+    }
+
+    // Load all permissions.
+    $permissions = $this->permissionHandler->getPermissions();
+
+    // Find all deprecated permissions.
+    $deprecated_permissions = [];
+    /** @var array<string, array{title: string, deprecated?: string, ...}> $permissions */
+    foreach ($permissions as $name => $permission) {
+      if (isset($permission['deprecated']) && (strlen($permission['deprecated']) > 0)) {
+        $deprecated_permissions[$name] = $permission;
+      }
+    }
+
+    $used_deprecated_permissions = [];
+    if (count($deprecated_permissions) > 0) {
+      $role_storage = $this->entityTypeManager->getStorage('user_role');
+      $roles = $role_storage->loadMultiple();
+
+      foreach ($deprecated_permissions as $name => $permission) {
+        $permission_in_use = array_any($roles, fn($role) => $role->hasPermission($name));
+        if ($permission_in_use) {
+          $used_deprecated_permissions[] = $permission['title'];
+        }
+      }
+    }
+
+    if (count($used_deprecated_permissions) > 0) {
+      $requirements['deprecated_permissions'] = [
+        'title' => $this->t('Deprecated permissions'),
+        'severity' => RequirementSeverity::Warning,
+      ];
+
+      $requirements['deprecated_permissions']['description'] = $this->t('The following permissions are deprecated but are assigned to one or more roles: %permissions.', ['%permissions' => implode(', ', $used_deprecated_permissions)]);
+      if ($this->currentUser->hasPermission('administer permissions')) {
+        $requirements['deprecated_permissions']['description'] = $this->t('The following permissions are deprecated but are assigned to one or more roles: %permissions. To unassign these permissions visit the <a href=":url">permissions form</a>.', [
+          '%permissions' => implode(', ', $used_deprecated_permissions),
+          ':url' => Url::fromRoute('user.admin_permissions')->toString(),
+        ]);
+      }
     }
 
     return $requirements;
