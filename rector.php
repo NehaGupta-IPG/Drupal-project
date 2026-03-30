@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Rector\PHPUnit\Set\PHPUnitSetList;
 use Rector\TypeDeclaration\Rector\ClassMethod;
 use Rector\TypeDeclaration\Rector\Class_\TypedPropertyFromCreateMockAssignRector;
 use Rector\TypeDeclaration\Rector\Class_\TypedPropertyFromDocblockSetUpDefinedRector;
@@ -20,7 +21,10 @@ return Rector\Config\RectorConfig::configure()
     '*/*ixture*/*',
     '*/Annotation/Doctrine/*',
   ])
-  ->withPreparedSets(typeDeclarations: true)
+  ->withSets([
+    PHPUnitSetList::PHPUNIT_120,
+  ])
+//  ->withPreparedSets(typeDeclarations: true)
 /*  ->withSkip([
     TypedPropertyFromCreateMockAssignRector::class,
     TypedPropertyFromDocblockSetUpDefinedRector::class,
