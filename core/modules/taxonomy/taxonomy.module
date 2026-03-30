@@ -110,7 +110,6 @@ function taxonomy_build_node_index($node): void {
     // Insert index entries for all the node's terms.
     if (!empty($tid_all)) {
       $connection = \Drupal::database();
-
       // Validate that the terms actually exist in the taxonomy_term_data table
       // to prevent orphan entries in the index.
       $query = $connection->select('taxonomy_term_data', 'td');
@@ -119,7 +118,6 @@ function taxonomy_build_node_index($node): void {
         ->condition('tid', $tid_all, 'IN')
         ->execute()
         ->fetchCol();
-
       foreach ($valid_tids as $tid) {
         $connection->merge('taxonomy_index')
           ->keys(['nid' => $node->id(), 'tid' => $tid, 'status' => $node->isPublished()])
