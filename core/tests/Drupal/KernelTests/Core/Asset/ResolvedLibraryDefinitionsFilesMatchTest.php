@@ -18,7 +18,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * applied.
  */
 #[Group('Asset')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
 
@@ -68,7 +67,6 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
   protected $allThemes = [
     'claro',
     'olivero',
-    'stable9',
     'stark',
   ];
 
