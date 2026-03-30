@@ -1098,6 +1098,14 @@ Build documentation:
     paths:
       - docs/site
     expire_in: 1 week
+  rules:
+    - when: always # TEMPORARY, FOR TESTING
+    # Run if a merge request changed the docs.
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes: ['docs/src/**/*']
+    # Run if we have committed to the default branch.
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: on_success
 
 Preview documentation:
   stage: 📚 Documentation
@@ -1106,11 +1114,6 @@ Preview documentation:
     - Build documentation
   script:
     - echo "Docs preview available at $CI_PAGES_URL"
-  rules:
-    - when: always # TEMPORARY, FOR TESTING
-    # Only run if a merge request changed the docs.
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes: ['docs/src/**/*']
   pages:
     publish: docs/site
     path_prefix: 'preview-$CI_MERGE_REQUEST_IID'
@@ -1122,9 +1125,7 @@ Publish documentation:
     - Build documentation
   script:
     - echo "Docs published at $CI_PAGES_URL"
-  rules:
-    # Only run if we have committed to the default branch.
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      when: on_success
   pages:
     publish: docs/site
+  rules:
+    - when: never # TEMPORARY, FOR TESTING
