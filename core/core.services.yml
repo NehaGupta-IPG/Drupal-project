@@ -73,6 +73,11 @@ parameters:
       - json
     theme:
       - json
+  # Can be argon2i, argon2id or 2y (bcrypt). Setting to NULL (~) will use PASSWORD_DEFAULT.
+  # See https://www.php.net/password_hash
+  password.algorithm: argon2id
+  # Options passed to password_hash. See https://www.php.net/password_hash
+  password.options: []
 services:
   _defaults:
     autoconfigure: true
@@ -1187,6 +1192,7 @@ services:
   Drupal\Core\Path\PathValidatorInterface: '@path.validator'
   password:
     class: Drupal\Core\Password\PhpPassword
+    arguments: ['%password.algorithm%', '%password.options%']
   Drupal\Core\Password\PasswordInterface: '@password'
   password_generator:
     class: Drupal\Core\Password\DefaultPasswordGenerator
@@ -1289,7 +1295,7 @@ services:
   # Main content view subscriber plus the renderers it uses.
   main_content_view_subscriber:
     class: Drupal\Core\EventSubscriber\MainContentViewSubscriber
-    arguments: ['@class_resolver', '@current_route_match', '%main_content_renderers%']
+    autowire: true
   renderer_non_html:
     class: Drupal\Core\EventSubscriber\RenderArrayNonHtmlSubscriber
   main_content_renderer.html:
@@ -1718,7 +1724,7 @@ services:
   Drupal\Core\Session\WriteSafeSessionHandlerInterface: '@session_handler.write_safe'
   session_manager:
     class: Drupal\Core\Session\SessionManager
-    arguments: ['@request_stack', '@session_handler', '@session_manager.metadata_bag', '@session_configuration', '@datetime.time', '@Drupal\Core\Session\UserSessionRepositoryInterface']
+    arguments: ['@request_stack', '@session_handler', '@session_manager.metadata_bag', '@session_configuration', '@datetime.time']
   Drupal\Core\Session\SessionManagerInterface: '@session_manager'
   session_manager.metadata_bag:
     class: Drupal\Core\Session\MetadataBag
@@ -1801,6 +1807,9 @@ services:
     arguments: ['@plugin.manager.sdc', '@Drupal\Core\Theme\Component\ComponentValidator']
     tags:
       - { name: twig.extension, priority: 101 }
+  Twig\Extra\Html\HtmlExtension:
+    tags:
+      - { name: twig.extension, priority: 101 }
   Drupal\Core\Template\IconsTwigExtension:
     arguments: ['@plugin.manager.icon_pack']
     tags:
@@ -1848,16 +1857,12 @@ services:
   Drupal\Core\File\HtaccessWriterInterface: '@file.htaccess_writer'
   file.mime_type.guesser:
     class: Drupal\Core\File\MimeType\MimeTypeGuesser
-    arguments: ['@stream_wrapper_manager']
-    tags:
-      - { name: service_collector, tag: mime_type_guesser, call: addMimeTypeGuesser }
-    lazy: true
+    arguments: ['@stream_wrapper_manager', !tagged_iterator mime_type_guesser]
   file.mime_type.guesser.extension:
     class: Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser
     arguments: ['@Drupal\Core\File\MimeType\MimeTypeMapInterface']
     tags:
       - { name: mime_type_guesser }
-    lazy: true
   Drupal\Core\File\MimeType\MimeTypeMapFactory:
     autowire: true
     public: false
@@ -1975,7 +1980,6 @@ services:
   Drupal\Core\Template\Loader\ComponentLoader:
     arguments:
       - '@plugin.manager.sdc'
-      - '@logger.channel.default'
     tags:
       - { name: twig.loader, priority: 5 }
   Drupal\Core\EventSubscriber\CsrfExceptionSubscriber: ~
@@ -1997,7 +2001,7 @@ services:
     class: Drupal\Core\Theme\Icon\IconExtractorPluginManager
     parent: default_plugin_manager
     arguments: ['@plugin_form.factory']
-  Drupal\Core\Theme\Icon\IconExtractorInterface: '@plugin.manager.icon_extractor'
+  Drupal\Core\Theme\Icon\IconExtractorPluginManager: '@plugin.manager.icon_extractor'
   Drupal\Core\Theme\Icon\IconFinder:
     autowire: true
     arguments:
