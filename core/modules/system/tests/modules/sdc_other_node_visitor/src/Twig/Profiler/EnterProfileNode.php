@@ -1,13 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\sdc_other_node_visitor\Twig\Profiler;
 
+use Twig\Attribute\YieldReady;
 use Twig\Compiler;
 use Twig\Node\Node;
 
 /**
  * Represents a profile enter node.
  */
+#[YieldReady]
 class EnterProfileNode extends Node {
 
   public function __construct(string $extensionName, string $varName) {

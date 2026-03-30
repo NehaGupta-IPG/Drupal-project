@@ -9,15 +9,15 @@ use Drupal\Core\Render\Attribute\RenderElement;
  *
  * Usage example:
  * @code
- * $form['author'] = array(
+ * $form['author'] = [
  *   '#type' => 'fieldset',
  *   '#title' => $this->t('Author'),
- * );
+ * ];
  *
- * $form['author']['name'] = array(
+ * $form['author']['name'] = [
  *   '#type' => 'textfield',
  *   '#title' => $this->t('Name'),
- * );
+ * ];
  * @endcode
  *
  * @see \Drupal\Core\Render\Element\Fieldgroup
@@ -30,14 +30,13 @@ class Fieldset extends RenderElementBase {
    * {@inheritdoc}
    */
   public function getInfo() {
-    $class = static::class;
     return [
       '#process' => [
-        [$class, 'processGroup'],
-        [$class, 'processAjaxForm'],
+        [static::class, 'processGroup'],
+        [static::class, 'processAjaxForm'],
       ],
       '#pre_render' => [
-        [$class, 'preRenderGroup'],
+        [static::class, 'preRenderGroup'],
       ],
       '#value' => NULL,
       '#theme_wrappers' => ['fieldset'],

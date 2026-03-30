@@ -13,7 +13,7 @@ use Drupal\Core\Theme\ThemeManagerInterface;
 /**
  * A CacheCollector implementation for building library extension info.
  */
-class LibraryDiscoveryCollector extends CacheCollector {
+class LibraryDiscoveryCollector extends CacheCollector implements LibraryDiscoveryInterface {
 
   /**
    * The library discovery parser.
@@ -124,7 +124,7 @@ class LibraryDiscoveryCollector extends CacheCollector {
    *   The name of the extension for which library definitions will be extended.
    * @param string $library_name
    *   The name of the library whose definitions is to be extended.
-   * @param $library_definition
+   * @param array $library_definition
    *   The library definition to be extended.
    *
    * @return array
@@ -133,11 +133,12 @@ class LibraryDiscoveryCollector extends CacheCollector {
    * @throws \Drupal\Core\Asset\Exception\InvalidLibrariesExtendSpecificationException
    */
   protected function applyLibrariesExtend($extension, $library_name, $library_definition) {
-    $libraries_extend = $this->themeManager->getActiveTheme()->getLibrariesExtend();
+    $active_theme = $this->themeManager->getActiveTheme();
+    $libraries_extend = $active_theme->getLibrariesExtend();
     if (!empty($libraries_extend["$extension/$library_name"])) {
       foreach ($libraries_extend["$extension/$library_name"] as $library_extend_name) {
         if (isset($library_definition['deprecated'])) {
-          $extend_message = sprintf('Theme "%s" is extending a deprecated library.', $extension);
+          $extend_message = sprintf('Theme "%s" is extending a deprecated library.', $active_theme->getName());
           $library_deprecation = str_replace('%library_id%', "$extension/$library_name", $library_definition['deprecated']);
           // phpcs:ignore Drupal.Semantics.FunctionTriggerError
           @trigger_error("$extend_message $library_deprecation", E_USER_DEPRECATED);
@@ -157,6 +158,28 @@ class LibraryDiscoveryCollector extends CacheCollector {
       }
     }
     return $library_definition;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getLibrariesByExtension($extension) {
+    return $this->get($extension);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getLibraryByName($extension, $name) {
+    $libraries = $this->getLibrariesByExtension($extension);
+    if (!isset($libraries[$name])) {
+      return FALSE;
+    }
+    if (isset($libraries[$name]['deprecated'])) {
+      // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+      @trigger_error(str_replace('%library_id%', "$extension/$name", $libraries[$name]['deprecated']), E_USER_DEPRECATED);
+    }
+    return $libraries[$name];
   }
 
   /**

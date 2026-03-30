@@ -9,6 +9,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\WorkspaceDynamicSafeFormInterface;
 use Drupal\layout_builder\LayoutTempstoreRepositoryInterface;
 use Drupal\layout_builder\OverridesSectionStorageInterface;
 use Drupal\layout_builder\Plugin\SectionStorage\OverridesSectionStorage;
@@ -21,10 +22,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @internal
  *   Form classes are internal.
  */
-class OverridesEntityForm extends ContentEntityForm {
+class OverridesEntityForm extends ContentEntityForm implements WorkspaceDynamicSafeFormInterface {
 
   use PreviewToggleTrait;
   use LayoutBuilderEntityFormTrait;
+  use WorkspaceSafeFormTrait;
 
   /**
    * Layout tempstore repository.
@@ -82,13 +84,21 @@ class OverridesEntityForm extends ContentEntityForm {
       'settings' => [],
     ]);
 
+    if ($this->showRevisionUi()) {
+      $entity_type = $this->entity->getEntityType();
+      $revision_log_message_form_item = $entity_type->getRevisionMetadataKey('revision_log_message');
+      $log_field_definition = $this->entity->getFieldDefinition($revision_log_message_form_item);
+      $log_field_revision_message_form_data = $log_field_definition->getDisplayOptions('form');
+      $form_display->setComponent($revision_log_message_form_item, $log_field_revision_message_form_data);
+    }
+
     $this->setFormDisplay($form_display, $form_state);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, SectionStorageInterface $section_storage = NULL) {
+  public function buildForm(array $form, FormStateInterface $form_state, ?SectionStorageInterface $section_storage = NULL) {
     $this->sectionStorage = $section_storage;
     $form = parent::buildForm($form, $form_state);
     $form['#attributes']['class'][] = 'layout-builder-form';

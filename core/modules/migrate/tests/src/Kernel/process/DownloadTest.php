@@ -1,26 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\Tests\migrate\Kernel\process;
 
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\KernelTests\Core\File\FileTestBase;
 use Drupal\migrate\MigrateException;
-use Drupal\migrate\Plugin\migrate\process\Download;
 use Drupal\migrate\MigrateExecutableInterface;
+use Drupal\migrate\Plugin\migrate\process\Download;
 use Drupal\migrate\Row;
 use GuzzleHttp\Client;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the download process plugin.
- *
- * @group migrate
  */
+#[Group('migrate')]
+#[RunTestsInSeparateProcesses]
 class DownloadTest extends FileTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
 
   /**
    * {@inheritdoc}
@@ -33,7 +32,7 @@ class DownloadTest extends FileTestBase {
   /**
    * Tests a download that overwrites an existing local file.
    */
-  public function testOverwritingDownload() {
+  public function testOverwritingDownload(): void {
     // Create a pre-existing file at the destination.
     $destination_uri = $this->createUri('existing_file.txt');
 
@@ -46,7 +45,7 @@ class DownloadTest extends FileTestBase {
   /**
    * Tests a download that renames the downloaded file if there's a collision.
    */
-  public function testNonDestructiveDownload() {
+  public function testNonDestructiveDownload(): void {
     // Create a pre-existing file at the destination.
     $destination_uri = $this->createUri('another_existing_file.txt');
 
@@ -59,7 +58,7 @@ class DownloadTest extends FileTestBase {
   /**
    * Tests that an exception is thrown if the destination URI is not writable.
    */
-  public function testWriteProtectedDestination() {
+  public function testWriteProtectedDestination(): void {
     // Create a pre-existing file at the destination.
     $destination_uri = $this->createUri('not-writable.txt');
 
@@ -81,7 +80,7 @@ class DownloadTest extends FileTestBase {
       $fix_permissions();
       $this->fail('MigrateException was not thrown for non-writable destination URI.');
     }
-    catch (MigrateException $e) {
+    catch (MigrateException) {
       $this->assertTrue(TRUE, 'MigrateException was thrown for non-writable destination URI.');
       $fix_permissions();
     }
@@ -100,14 +99,14 @@ class DownloadTest extends FileTestBase {
    */
   protected function doTransform($destination_uri, $configuration = []) {
     // Prepare a mock HTTP client.
-    $this->container->set('http_client', $this->createMock(Client::class));
+    $this->container->set('http_client', $this->createStub(Client::class));
 
     // Instantiate the plugin statically so it can pull dependencies out of
     // the container.
     $plugin = Download::create($this->container, $configuration, 'download', []);
 
     // Execute the transformation.
-    $executable = $this->createMock(MigrateExecutableInterface::class);
+    $executable = $this->createStub(MigrateExecutableInterface::class);
     $row = new Row([], []);
 
     // Return the downloaded file's local URI.

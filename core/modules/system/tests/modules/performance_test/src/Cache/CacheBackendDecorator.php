@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\performance_test\Cache;
 
@@ -27,8 +27,6 @@ class CacheBackendDecorator implements CacheBackendInterface, CacheTagsInvalidat
    *   The stop microtime.
    * @param string $operation
    *   The type of operation being logged.
-   *
-   * @return void
    */
   protected function logCacheOperation(string|array $cids, float $start, float $stop, string $operation): void {
     $this->performanceDataCollector->addCacheOperation([
@@ -142,16 +140,6 @@ class CacheBackendDecorator implements CacheBackendInterface, CacheTagsInvalidat
     if ($this->cacheBackend instanceof CacheTagsInvalidatorInterface) {
       $this->cacheBackend->invalidateTags($tags);
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function invalidateAll() {
-    $start = microtime(TRUE);
-    $this->cacheBackend->invalidateAll();
-    $stop = microtime(TRUE);
-    $this->logCacheOperation([], $start, $stop, 'invalidateAll');
   }
 
   /**

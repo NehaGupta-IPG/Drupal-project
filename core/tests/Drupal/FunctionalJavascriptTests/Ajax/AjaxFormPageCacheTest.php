@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\FunctionalJavascriptTests\Ajax;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Performs tests on AJAX forms in cached pages.
- *
- * @group Ajax
  */
+#[Group('Ajax')]
+#[RunTestsInSeparateProcesses]
 class AjaxFormPageCacheTest extends WebDriverTestBase {
 
   /**
@@ -46,7 +48,7 @@ class AjaxFormPageCacheTest extends WebDriverTestBase {
   /**
    * Create a simple form, then submit the form via AJAX to change to it.
    */
-  public function testSimpleAJAXFormValue() {
+  public function testSimpleAJAXFormValue(): void {
     $this->drupalGet('ajax_forms_test_get_form');
     $build_id_initial = $this->getFormBuildId();
 
@@ -116,7 +118,7 @@ class AjaxFormPageCacheTest extends WebDriverTestBase {
    *
    * @see \Drupal\system\Tests\Ajax\ElementValidationTest::testAjaxElementValidation()
    */
-  public function testAjaxElementValidation() {
+  public function testAjaxElementValidation(): void {
     $this->drupalGet('ajax_validation_test');
     // Changing the value of the textfield will trigger an AJAX
     // request/response.

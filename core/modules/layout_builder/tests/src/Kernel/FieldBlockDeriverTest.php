@@ -6,12 +6,16 @@ namespace Drupal\Tests\layout_builder\Kernel;
 
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests field block plugin derivatives.
- *
- * @group layout_builder
  */
+#[Group('layout_builder')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class FieldBlockDeriverTest extends EntityKernelTestBase {
 
   /**
@@ -19,7 +23,6 @@ class FieldBlockDeriverTest extends EntityKernelTestBase {
    */
   protected static $modules = [
     'layout_builder',
-    'layout_discovery',
   ];
 
   /**
@@ -57,9 +60,7 @@ class FieldBlockDeriverTest extends EntityKernelTestBase {
     $this->assertNotContains('extra_field_block:user:user:member_for', $plugins);
 
     // Exposing all field blocks adds them for the user entity type.
-    \Drupal::configFactory()->getEditable('layout_builder.settings')
-      ->set('expose_all_field_blocks', TRUE)
-      ->save();
+    \Drupal::service('module_installer')->install(['layout_builder_expose_all_field_blocks']);
     $plugins = $this->getBlockPluginIds();
     $this->assertContains('field_block:user:user:name', $plugins);
     $this->assertContains('extra_field_block:user:user:member_for', $plugins);

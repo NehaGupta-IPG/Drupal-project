@@ -62,14 +62,6 @@ interface RendererInterface {
   public function renderInIsolation(&$elements);
 
   /**
-   * @deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Use
-   *   \Drupal\Core\Render\RendererInterface::renderInIsolation() instead.
-   *
-   * @see https://www.drupal.org/node/3407994
-   */
-  public function renderPlain(&$elements);
-
-  /**
    * Renders final HTML for a placeholder.
    *
    * Renders the placeholder in isolation.
@@ -241,24 +233,24 @@ interface RendererInterface {
    *   of overrides as the value in #theme_wrappers array.
    *   For example, if we have a render element as follows:
    *   @code
-   *   array(
+   *   [
    *     '#theme' => 'image',
-   *     '#attributes' => array('class' => array('foo')),
-   *     '#theme_wrappers' => array('container'),
-   *   );
+   *     '#attributes' => ['class' => ['foo']],
+   *     '#theme_wrappers' => ['container'],
+   *   ];
    *   @endcode
    *   and we need to pass the class 'bar' as an attribute for 'container', we
    *   can rewrite our element thus:
    *   @code
-   *   array(
+   *   [
    *     '#theme' => 'image',
-   *     '#attributes' => array('class' => array('foo')),
-   *     '#theme_wrappers' => array(
-   *       'container' => array(
-   *         '#attributes' => array('class' => array('bar')),
-   *       ),
-   *     ),
-   *   );
+   *     '#attributes' => ['class' => ['foo']],
+   *     '#theme_wrappers' => [
+   *       'container' => [
+   *         '#attributes' => ['class' => ['bar']],
+   *       ],
+   *     ],
+   *   ];
    *    @endcode
    * - If this element has an array of #post_render functions defined, they
    *   are called sequentially to modify the rendered #children. Unlike
@@ -319,11 +311,8 @@ interface RendererInterface {
    *
    * @param array $elements
    *   The structured array describing the data to be rendered.
-   * @param bool $is_root_call
-   *   (Internal use only.) Whether this is a recursive call or not. See
-   *   ::renderRoot().
    *
-   * @return \Drupal\Component\Render\MarkupInterface
+   * @return \Drupal\Component\Render\MarkupInterface|string
    *   The rendered HTML.
    *
    * @throws \LogicException
@@ -340,7 +329,7 @@ interface RendererInterface {
    * @see \Drupal\Core\Render\AttachmentsResponseProcessorInterface::processAttachments()
    * @see \Drupal\Core\Render\RendererInterface::renderRoot()
    */
-  public function render(&$elements, $is_root_call = FALSE);
+  public function render(array &$elements);
 
   /**
    * Checks whether a render context is active.

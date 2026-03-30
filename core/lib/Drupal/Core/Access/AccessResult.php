@@ -87,7 +87,7 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
    *   The condition to evaluate.
    * @param string|null $reason
    *   (optional) The reason why access is forbidden. Intended for developers,
-   *   hence not translatable
+   *   hence not translatable.
    *
    * @return \Drupal\Core\Access\AccessResult
    *   If $condition is TRUE, isForbidden() will be TRUE, otherwise isNeutral()
@@ -98,7 +98,7 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
   }
 
   /**
-   * Creates an allowed access result if the permission is present, neutral otherwise.
+   * Creates an access result if the permission is present, neutral otherwise.
    *
    * Checks the permission and adds a 'user.permissions' cache context.
    *
@@ -121,7 +121,7 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
   }
 
   /**
-   * Creates an allowed access result if the permissions are present, neutral otherwise.
+   * Creates an access result if the permissions are present, neutral otherwise.
    *
    * Checks the permission and adds a 'user.permissions' cache contexts.
    *
@@ -131,7 +131,7 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
    *   The permissions to check.
    * @param string $conjunction
    *   (optional) 'AND' if all permissions are required, 'OR' in case just one.
-   *   Defaults to 'AND'
+   *   Defaults to 'AND'.
    *
    * @return \Drupal\Core\Access\AccessResult
    *   If the account has the permissions, isAllowed() will be TRUE, otherwise
@@ -279,6 +279,7 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
   /**
    * {@inheritdoc}
    */
+  #[\NoDiscard]
   public function orIf(AccessResultInterface $other) {
     $merge_other = FALSE;
     // $other's cacheability metadata is merged if $merge_other gets set to TRUE
@@ -319,7 +320,7 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
     }
     else {
       $result = static::neutral();
-      if (!$this->isNeutral() || ($this->getCacheMaxAge() === 0 && $other->isNeutral()) || ($this->getCacheMaxAge() !== 0 && $other instanceof CacheableDependencyInterface && $other->getCacheMaxAge() !== 0)) {
+      if ($this->getCacheMaxAge() === 0  || ($other instanceof CacheableDependencyInterface && $other->getCacheMaxAge() !== 0)) {
         $merge_other = TRUE;
       }
 
@@ -340,6 +341,7 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
   /**
    * {@inheritdoc}
    */
+  #[\NoDiscard]
   public function andIf(AccessResultInterface $other) {
     // The other access result's cacheability metadata is merged if $merge_other
     // gets set to TRUE. It gets set to TRUE in one case: if the other access
@@ -406,14 +408,17 @@ abstract class AccessResult implements AccessResultInterface, RefinableCacheable
    * @return $this
    */
   public function inheritCacheability(AccessResultInterface $other) {
-    $this->addCacheableDependency($other);
     if ($other instanceof CacheableDependencyInterface) {
+      $this->addCacheableDependency($other);
       if ($this->getCacheMaxAge() !== 0 && $other->getCacheMaxAge() !== 0) {
         $this->setCacheMaxAge(Cache::mergeMaxAges($this->getCacheMaxAge(), $other->getCacheMaxAge()));
       }
       else {
         $this->setCacheMaxAge($other->getCacheMaxAge());
       }
+    }
+    else {
+      $this->setCacheMaxAge(0);
     }
     return $this;
   }

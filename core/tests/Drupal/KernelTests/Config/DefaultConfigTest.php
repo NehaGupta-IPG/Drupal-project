@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Config;
 
 use Drupal\Core\Config\Entity\ConfigEntityDependency;
@@ -10,22 +12,20 @@ use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\KernelTests\AssertConfigTrait;
 use Drupal\KernelTests\FileSystemModuleDiscoveryDataProviderTrait;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that the installed config matches the default config.
- *
- * @group Config
- * @group #slow
  */
+#[Group('Config')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class DefaultConfigTest extends KernelTestBase {
 
   use AssertConfigTrait;
   use FileSystemModuleDiscoveryDataProviderTrait;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $timeLimit = 500;
 
   /**
    * {@inheritdoc}
@@ -46,19 +46,17 @@ class DefaultConfigTest extends KernelTestBase {
 
   /**
    * Tests if installed config is equal to the exported config.
-   *
-   * @dataProvider moduleListDataProvider
    */
+  #[DataProvider('moduleListDataProvider')]
   public function testModuleConfig(string $module): void {
     $this->assertExtensionConfig($module, 'module');
   }
 
   /**
    * Tests if installed config is equal to the exported config.
-   *
-   * @dataProvider themeListDataProvider
    */
-  public function testThemeConfig($theme) {
+  #[DataProvider('themeListDataProvider')]
+  public function testThemeConfig(string $theme): void {
     $this->assertExtensionConfig($theme, 'theme');
   }
 
@@ -84,7 +82,7 @@ class DefaultConfigTest extends KernelTestBase {
         $file_name = DRUPAL_ROOT . '/core/modules/system/tests/modules/' . $name . '/' . $name . '.info.yml';
         break;
 
-      default;
+      default:
         $file_name = DRUPAL_ROOT . '/core/' . $type . 's/' . $name . '/' . $name . '.info.yml';
     }
 
@@ -143,10 +141,10 @@ class DefaultConfigTest extends KernelTestBase {
    *   An array of theme names to test, with both key and value being the name
    *   of the theme.
    */
-  public static function themeListDataProvider() {
+  public static function themeListDataProvider(): array {
     $prefix = dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'themes';
     $theme_dirs = array_keys(iterator_to_array(new \FilesystemIterator($prefix)));
-    $theme_names = array_map(function ($path) use ($prefix) {
+    $theme_names = array_map(function (string $path) use ($prefix): string {
       return str_replace($prefix . DIRECTORY_SEPARATOR, '', $path);
     }, $theme_dirs);
     $themes_keyed = array_combine($theme_names, $theme_names);
@@ -157,7 +155,7 @@ class DefaultConfigTest extends KernelTestBase {
     // Add a deprecated theme with config.
     $themes_keyed['test_deprecated_theme'] = 'test_deprecated_theme';
 
-    return array_map(function ($theme) {
+    return array_map(function ($theme): array {
       return [$theme];
     }, $themes_keyed);
   }
@@ -190,7 +188,7 @@ class DefaultConfigTest extends KernelTestBase {
    * @param string $type
    *   The extension type to test.
    */
-  protected function doTestsOnConfigStorage(StorageInterface $default_config_storage, $extension, string $type = 'module') {
+  protected function doTestsOnConfigStorage(StorageInterface $default_config_storage, $extension, string $type = 'module'): void {
     /** @var \Drupal\Core\Config\ConfigManagerInterface $config_manager */
     $config_manager = $this->container->get('config.manager');
 

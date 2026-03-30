@@ -91,7 +91,7 @@ class ContextDefinition implements ContextDefinitionInterface {
    *
    * @param string $data_type
    *   The required data type.
-   * @param string|null $label
+   * @param string|null|\Stringable $label
    *   The label of this context definition for the UI.
    * @param bool $required
    *   Whether the context definition is required.
@@ -236,7 +236,7 @@ class ContextDefinition implements ContextDefinitionInterface {
   /**
    * {@inheritdoc}
    */
-  public function addConstraint($constraint_name, $options = NULL) {
+  public function addConstraint(string $constraint_name, ?array $options = NULL): static {
     $this->constraints[$constraint_name] = $options;
     return $this;
   }

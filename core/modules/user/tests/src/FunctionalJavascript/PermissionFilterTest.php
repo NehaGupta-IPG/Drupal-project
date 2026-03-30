@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\user\FunctionalJavascript;
 
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the JavaScript functionality of the permission filter.
- *
- * @group user
  */
+#[Group('user')]
+#[RunTestsInSeparateProcesses]
 class PermissionFilterTest extends WebDriverTestBase {
 
   /**
@@ -38,7 +40,7 @@ class PermissionFilterTest extends WebDriverTestBase {
   /**
    * Tests that filter results announcement has correct pluralization.
    */
-  public function testPermissionFilter() {
+  public function testPermissionFilter(): void {
     // Find the permission filter field.
     $this->drupalGet('admin/people/permissions');
     $assertSession = $this->assertSession();

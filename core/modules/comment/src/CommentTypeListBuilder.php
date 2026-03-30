@@ -2,6 +2,7 @@
 
 namespace Drupal\comment;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -44,10 +45,12 @@ class CommentTypeListBuilder extends ConfigEntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  public function getDefaultOperations(EntityInterface $entity) {
-    $operations = parent::getDefaultOperations($entity);
-    // Place the edit operation after the operations added by field_ui.module
-    // which have the weights 15, 20, 25.
+  protected function getDefaultOperations(EntityInterface $entity/* , ?CacheableMetadata $cacheability = NULL */) {
+    $args = func_get_args();
+    $cacheability = $args[1] ?? new CacheableMetadata();
+    $operations = parent::getDefaultOperations($entity, $cacheability);
+    // Place the edit operation after the operations added by
+    // FieldUiHooks::entityOperation() which have the weights 15, 20, 25.
     if (isset($operations['edit'])) {
       $operations['edit']['weight'] = 30;
     }
@@ -58,9 +61,9 @@ class CommentTypeListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header['type'] = t('Comment type');
-    $header['description'] = t('Description');
-    $header['target'] = t('Target entity type');
+    $header['type'] = $this->t('Comment type');
+    $header['description'] = $this->t('Description');
+    $header['target'] = $this->t('Target entity type');
     return $header + parent::buildHeader();
   }
 

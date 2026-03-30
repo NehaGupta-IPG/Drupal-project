@@ -21,7 +21,7 @@ class ContainerBuilder extends SymfonyContainerBuilder implements ContainerInter
   /**
    * {@inheritdoc}
    */
-  public function __construct(ParameterBagInterface $parameterBag = NULL) {
+  public function __construct(?ParameterBagInterface $parameterBag = NULL) {
     parent::__construct($parameterBag);
     $this->setResourceTracking(FALSE);
   }
@@ -37,7 +37,7 @@ class ContainerBuilder extends SymfonyContainerBuilder implements ContainerInter
    *   ContainerBuilder class should be fixed to allow setting synthetic
    *   services in a frozen builder.
    */
-  public function set($id, $service): void {
+  public function set(string $id, ?object $service): void {
     SymfonyContainer::set($id, $service);
   }
 
@@ -65,7 +65,7 @@ class ContainerBuilder extends SymfonyContainerBuilder implements ContainerInter
   /**
    * {@inheritdoc}
    */
-  public function setParameter($name, $value): void {
+  public function setParameter(string $name, array|bool|string|int|float|\UnitEnum|null $value): void {
     if (strtolower($name) !== $name) {
       throw new \InvalidArgumentException("Parameter names must be lowercase: $name");
     }

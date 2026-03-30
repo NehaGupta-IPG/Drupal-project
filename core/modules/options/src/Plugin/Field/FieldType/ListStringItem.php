@@ -2,6 +2,7 @@
 
 namespace Drupal\options\Plugin\Field\FieldType;
 
+use Drupal\Core\Field\Attribute\FieldType;
 use Drupal\Core\Field\FieldFilteredMarkup;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -11,20 +12,21 @@ use Drupal\Core\TypedData\DataDefinition;
 
 /**
  * Plugin implementation of the 'list_string' field type.
- *
- * @FieldType(
- *   id = "list_string",
- *   label = @Translation("List (text)"),
- *   description = {
- *     @Translation("Values stored are text values"),
- *     @Translation("For example, 'US States': IL => Illinois, IA => Iowa, IN => Indiana"),
- *   },
- *   category = "selection_list",
- *   weight = -50,
- *   default_widget = "options_select",
- *   default_formatter = "list_default",
- * )
  */
+#[FieldType(
+  id: "list_string",
+  label: new TranslatableMarkup("Text"),
+  description: [
+    new TranslatableMarkup("Values are text strings"),
+    new TranslatableMarkup("Example: Apple ('apple'), Mango ('mango'), Black Cherry ('black_cherry')"),
+    new TranslatableMarkup("Example: Portrait ('1:2'), Square ('1:1'), Landscape ('4:3')"),
+    new TranslatableMarkup("Example: Most ('0.9'), Half ('0.5'), Some ('0.3')"),
+  ],
+  category: "selection_list",
+  weight: -50,
+  default_widget: "options_select",
+  default_formatter: "list_default",
+)]
 class ListStringItem extends ListItemBase {
 
   /**
@@ -74,6 +76,7 @@ class ListStringItem extends ListItemBase {
     if (mb_strlen($option) > 255) {
       return new TranslatableMarkup('Allowed values list: each key must be a string at most 255 characters long.');
     }
+    return NULL;
   }
 
   /**
@@ -92,6 +95,9 @@ class ListStringItem extends ListItemBase {
     // Improve user experience by using an automatically generated machine name.
     foreach (Element::children($element['allowed_values']['table']) as $delta => $row) {
       $element['allowed_values']['table'][$delta]['item']['key']['#type'] = 'machine_name';
+      // ListItemBase::storageSettingsForm() will set the default value to an
+      // integer if the key is a decimal integer string, so cast it back here.
+      $element['allowed_values']['table'][$delta]['item']['key']['#default_value'] = (string) $element['allowed_values']['table'][$delta]['item']['key']['#default_value'];
       $element['allowed_values']['table'][$delta]['item']['key']['#machine_name'] = [
         'exists' => [static::class, 'exists'],
       ];

@@ -7,12 +7,14 @@ namespace Drupal\Tests\locale\Functional;
 use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\language\Entity\ConfigurableLanguage;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests locale translation download.
- *
- * @group locale
  */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocaleTranslationDownloadTest extends LocaleUpdateBase {
 
   /**
@@ -39,15 +41,17 @@ class LocaleTranslationDownloadTest extends LocaleUpdateBase {
     // Let the translations:// stream wrapper point to a virtual file system to
     // make it independent from the test environment.
     $this->translationsStream = vfsStream::setup('translations');
-    \Drupal::configFactory()->getEditable('locale.settings')
-      ->set('translation.path', $this->translationsStream->url())
-      ->save();
+    $settings['settings']['locale_translation_path'] = (object) [
+      'value' => $this->translationsStream->url(),
+      'required' => TRUE,
+    ];
+    $this->writeSettings($settings);
   }
 
   /**
    * Tests translation download from remote sources.
    */
-  public function testUpdateImportSourceRemote() {
+  public function testUpdateImportSourceRemote(): void {
 
     // Provide remote and 'previously' downloaded translation file.
     $this->setTranslationFiles();

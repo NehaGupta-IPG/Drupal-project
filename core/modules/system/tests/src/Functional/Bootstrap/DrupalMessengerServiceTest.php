@@ -7,18 +7,18 @@ namespace Drupal\Tests\system\Functional\Bootstrap;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Messenger service.
- *
- * @group Bootstrap
  */
+#[Group('Bootstrap')]
+#[RunTestsInSeparateProcesses]
 class DrupalMessengerServiceTest extends BrowserTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system_test'];
 
@@ -30,7 +30,7 @@ class DrupalMessengerServiceTest extends BrowserTestBase {
   /**
    * Tests Messenger service.
    */
-  public function testDrupalMessengerService() {
+  public function testDrupalMessengerService(): void {
     // The page at system_test.messenger_service route sets two messages and
     // then removes the first before it is displayed.
     $this->drupalGet(Url::fromRoute('system_test.messenger_service'));
@@ -55,7 +55,8 @@ class DrupalMessengerServiceTest extends BrowserTestBase {
 
     // Ensure messages survive a container rebuild.
     $assert = $this->assertSession();
-    $this->drupalLogin($this->rootUser);
+    $this->drupalLogin($this->drupalCreateUser(['administer modules']));
+
     $edit = [];
     $edit["modules[help][enable]"] = TRUE;
     $this->drupalGet('admin/modules');
@@ -114,7 +115,7 @@ class DrupalMessengerServiceTest extends BrowserTestBase {
     try {
       $this->assertSession()->statusMessageContains('This message is not real');
     }
-    catch (AssertionFailedError $e) {
+    catch (AssertionFailedError) {
       $expected_failure_occurred = TRUE;
     }
     $this->assertTrue($expected_failure_occurred, 'WebAssert::statusMessageContains() did not fail when it should have failed.');
@@ -123,7 +124,7 @@ class DrupalMessengerServiceTest extends BrowserTestBase {
     try {
       $this->assertSession()->statusMessageNotContains('markup');
     }
-    catch (AssertionFailedError $e) {
+    catch (AssertionFailedError) {
       $expected_failure_occurred = TRUE;
     }
     $this->assertTrue($expected_failure_occurred, 'WebAssert::statusMessageNotContains() did not fail when it should have failed.');
@@ -132,7 +133,7 @@ class DrupalMessengerServiceTest extends BrowserTestBase {
     try {
       $this->assertSession()->statusMessageExists('error');
     }
-    catch (AssertionFailedError $e) {
+    catch (AssertionFailedError) {
       $expected_failure_occurred = TRUE;
     }
     $this->assertTrue($expected_failure_occurred, 'WebAssert::statusMessageExists() did not fail when it should have failed.');
@@ -141,7 +142,7 @@ class DrupalMessengerServiceTest extends BrowserTestBase {
     try {
       $this->assertSession()->statusMessageNotExists();
     }
-    catch (AssertionFailedError $e) {
+    catch (AssertionFailedError) {
       $expected_failure_occurred = TRUE;
     }
     $this->assertTrue($expected_failure_occurred, 'WebAssert::statusMessageNotExists() did not fail when it should have failed.');
