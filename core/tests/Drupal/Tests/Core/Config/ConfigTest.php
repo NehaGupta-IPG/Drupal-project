@@ -76,11 +76,9 @@ class ConfigTest extends UnitTestCase {
 
   /**
    * Tests set name.
-   *
-   * @legacy-covers ::setName
    */
   #[DataProvider('setNameProvider')]
-  public function testSetName($name): void {
+  public function testSetName(string $name): void {
     // Set the name.
     $this->config->setName($name);
 
@@ -97,7 +95,7 @@ class ConfigTest extends UnitTestCase {
    *
    * @see \Drupal\Tests\Core\Config\ConfigTest::testSetName()
    */
-  public static function setNameProvider() {
+  public static function setNameProvider(): array {
     return [
       // Valid name with dot.
       [
@@ -112,8 +110,6 @@ class ConfigTest extends UnitTestCase {
 
   /**
    * Tests is new.
-   *
-   * @legacy-covers ::isNew
    */
   public function testIsNew(): void {
     // Config should be new by default.
@@ -126,11 +122,9 @@ class ConfigTest extends UnitTestCase {
 
   /**
    * Tests set data.
-   *
-   * @legacy-covers ::setData
    */
   #[DataProvider('nestedDataProvider')]
-  public function testSetData($data): void {
+  public function testSetData(array $data): void {
     $this->config->setData($data);
     $this->assertEquals($data, $this->config->getRawData());
     $this->assertConfigDataEquals($data);
@@ -138,11 +132,9 @@ class ConfigTest extends UnitTestCase {
 
   /**
    * Tests save new.
-   *
-   * @legacy-covers ::save
    */
   #[DataProvider('nestedDataProvider')]
-  public function testSaveNew($data): void {
+  public function testSaveNew(array $data): void {
     $this->cacheTagsInvalidator->expects($this->never())
       ->method('invalidateTags');
 
@@ -166,11 +158,9 @@ class ConfigTest extends UnitTestCase {
 
   /**
    * Tests save existing.
-   *
-   * @legacy-covers ::save
    */
   #[DataProvider('nestedDataProvider')]
-  public function testSaveExisting($data): void {
+  public function testSaveExisting(array $data): void {
     $this->cacheTagsInvalidator->expects($this->once())
       ->method('invalidateTags')
       ->with(['config:config.test']);
@@ -196,7 +186,7 @@ class ConfigTest extends UnitTestCase {
    * @legacy-covers ::hasOverrides
    */
   #[DataProvider('overrideDataProvider')]
-  public function testOverrideData($data, $module_data, $setting_data): void {
+  public function testOverrideData(array $data, array $module_data, array $setting_data): void {
     // Set initial data.
     $this->config->setData($data);
 
@@ -264,11 +254,9 @@ class ConfigTest extends UnitTestCase {
 
   /**
    * Tests set value.
-   *
-   * @legacy-covers ::set
    */
   #[DataProvider('nestedDataProvider')]
-  public function testSetValue($data): void {
+  public function testSetValue(array $data): void {
     foreach ($data as $key => $value) {
       $this->config->set($key, $value);
     }
@@ -277,8 +265,6 @@ class ConfigTest extends UnitTestCase {
 
   /**
    * Tests set validation.
-   *
-   * @legacy-covers ::set
    */
   public function testSetValidation(): void {
     $this->expectException(ConfigValueException::class);
@@ -286,27 +272,23 @@ class ConfigTest extends UnitTestCase {
   }
 
   /**
-   * Tests set illegal offset value.
-   *
-   * @legacy-covers ::set
+   * Tests set invalid offset value.
    */
-  public function testSetIllegalOffsetValue(): void {
+  public function testSetInvalidOffsetValue(): void {
     // Set a single value.
     $this->config->set('testData', 1);
 
     // Attempt to treat the single value as a nested item.
     $this->expectException(\LogicException::class);
-    $this->expectExceptionMessage('Cannot create key "illegalOffset" on non-array value.');
-    $this->config->set('testData.illegalOffset', 1);
+    $this->expectExceptionMessage('Cannot create key "invalidOffset" on non-array value.');
+    $this->config->set('testData.invalidOffset', 1);
   }
 
   /**
    * Tests init with data.
-   *
-   * @legacy-covers ::initWithData
    */
   #[DataProvider('nestedDataProvider')]
-  public function testInitWithData($data): void {
+  public function testInitWithData(array $data): void {
     $config = $this->config->initWithData($data);
 
     // Should return the Config object.
@@ -327,11 +309,9 @@ class ConfigTest extends UnitTestCase {
 
   /**
    * Tests clear.
-   *
-   * @legacy-covers ::clear
    */
   #[DataProvider('simpleDataProvider')]
-  public function testClear($data): void {
+  public function testClear(array $data): void {
     foreach ($data as $key => $value) {
       // Check that values are cleared.
       $this->config->set($key, $value);
@@ -347,7 +327,7 @@ class ConfigTest extends UnitTestCase {
    * @legacy-covers ::clear
    */
   #[DataProvider('nestedDataProvider')]
-  public function testNestedClear($data): void {
+  public function testNestedClear(array $data): void {
     foreach ($data as $key => $value) {
       // Check that values are cleared.
       $this->config->set($key, $value);
@@ -363,11 +343,9 @@ class ConfigTest extends UnitTestCase {
 
   /**
    * Tests delete.
-   *
-   * @legacy-covers ::delete
    */
   #[DataProvider('overrideDataProvider')]
-  public function testDelete($data, $module_data): void {
+  public function testDelete(array $data, array $module_data, array $setting_data): void {
     $this->cacheTagsInvalidator->expects($this->once())
       ->method('invalidateTags')
       ->with(['config:config.test']);
@@ -410,11 +388,9 @@ class ConfigTest extends UnitTestCase {
 
   /**
    * Tests merge.
-   *
-   * @legacy-covers ::merge
    */
   #[DataProvider('mergeDataProvider')]
-  public function testMerge($data, $data_to_merge, $merged_data): void {
+  public function testMerge(array $data, array $data_to_merge, array $merged_data): void {
     // Set initial data.
     $this->config->setData($data);
 
@@ -430,7 +406,7 @@ class ConfigTest extends UnitTestCase {
    *
    * @see \Drupal\Tests\Core\Config\ConfigTest::testMerge()
    */
-  public static function mergeDataProvider() {
+  public static function mergeDataProvider(): array {
     return [
       [
         // Data.
@@ -445,11 +421,9 @@ class ConfigTest extends UnitTestCase {
 
   /**
    * Tests validate name exception.
-   *
-   * @legacy-covers ::validateName
    */
   #[DataProvider('validateNameProvider')]
-  public function testValidateNameException($name, $exception_message): void {
+  public function testValidateNameException($name, string $exception_message): void {
     $this->expectException('\Drupal\Core\Config\ConfigNameException');
     $this->expectExceptionMessage($exception_message);
     $this->config->validateName($name);
@@ -457,8 +431,6 @@ class ConfigTest extends UnitTestCase {
 
   /**
    * Tests get cache tags.
-   *
-   * @legacy-covers ::getCacheTags
    */
   public function testGetCacheTags(): void {
     $this->assertSame(['config:' . $this->config->getName()], $this->config->getCacheTags());
@@ -469,7 +441,7 @@ class ConfigTest extends UnitTestCase {
    *
    * @see \Drupal\Tests\Core\Config\ConfigTest::testValidateNameException()
    */
-  public static function validateNameProvider() {
+  public static function validateNameProvider(): array {
     $return = [
       // Name missing namespace (dot).
       [
@@ -499,7 +471,7 @@ class ConfigTest extends UnitTestCase {
    * @see \Drupal\Tests\Core\Config\ConfigTest::testOverrideData()
    * @see \Drupal\Tests\Core\Config\ConfigTest::testDelete()
    */
-  public static function overrideDataProvider() {
+  public static function overrideDataProvider(): array {
     $test_cases = [
       [
         // Original data.
@@ -573,7 +545,7 @@ class ConfigTest extends UnitTestCase {
    *
    * @see \Drupal\Tests\Core\Config\ConfigTest::testClear()
    */
-  public static function simpleDataProvider() {
+  public static function simpleDataProvider(): array {
     return [
       [
         [
@@ -594,7 +566,7 @@ class ConfigTest extends UnitTestCase {
    * @see \Drupal\Tests\Core\Config\ConfigTest::testInitWithData()
    * @see \Drupal\Tests\Core\Config\ConfigTest::testNestedClear()
    */
-  public static function nestedDataProvider() {
+  public static function nestedDataProvider(): array {
     return [
       [
         [

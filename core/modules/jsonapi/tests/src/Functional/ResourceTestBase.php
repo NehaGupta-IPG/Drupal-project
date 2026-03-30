@@ -71,6 +71,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     'basic_auth',
     'rest_test',
     'jsonapi_test_field_access',
+    'jsonapi_response_validator',
     'text',
   ];
 
@@ -432,11 +433,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $id_key = $duplicate->getEntityType()->getKey('id');
     $needs_manual_id = $duplicate instanceof ConfigEntityInterface && $id_key;
 
-    if ($duplicate instanceof FieldableEntityInterface && $id_key) {
-      $id_field = $duplicate->getFieldDefinition($id_key);
-      if ($id_field->getType() !== 'integer') {
-        $needs_manual_id = TRUE;
-      }
+    if (!$duplicate->getEntityType()->hasIntegerId()) {
+      $needs_manual_id = TRUE;
     }
 
     if ($needs_manual_id) {
@@ -604,6 +602,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       'url.query_args',
       // Drupal defaults.
       'url.site',
+      'user.permissions',
     ];
     // If the entity type is revisionable, add a resource version cache context.
     $cache_contexts = Cache::mergeContexts($cache_contexts, $entity_type->isRevisionable() ? ['url.query_args:resourceVersion'] : []);
@@ -677,7 +676,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     foreach ($permissions as $permission) {
       $role->revokePermission($permission);
     }
-    $role->trustData()->save();
+    $role->save();
   }
 
   /**
@@ -825,7 +824,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   The error response to assert.
    * @param string|false $pointer
    *   The expected JSON Pointer to the associated entity in the request
-   *   document. See http://jsonapi.org/format/#error-objects.
+   *   document. See https://jsonapi.org/format/#error-objects.
    * @param string[]|false $expected_cache_tags
    *   (optional) The expected cache tags in the X-Drupal-Cache-Tags response
    *   header, or FALSE if that header should be absent. Defaults to FALSE.
@@ -972,7 +971,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
           'status' => '400',
           'detail' => "The following query parameters violate the JSON:API spec: 'foo'.",
           'links' => [
-            'info' => ['href' => 'http://jsonapi.org/format/#query-parameters'],
+            'info' => ['href' => 'https://jsonapi.org/format/#query-parameters'],
             'via' => ['href' => $url_reserved_custom_query_parameter->toString()],
           ],
         ],
@@ -983,7 +982,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $expected_document,
       $response,
       ['4xx-response', 'http_response'],
-      ['url.query_args', 'url.site'],
+      ['url.query_args', 'url.site', 'user.permissions'],
       'UNCACHEABLE (request policy)',
       TRUE,
     );
@@ -1097,6 +1096,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       [
         'url.query_args',
         'url.site',
+        'user.permissions',
       ],
       'UNCACHEABLE (request policy)',
       'UNCACHEABLE (poor cacheability)',
@@ -1118,6 +1118,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       [
         'url.query_args',
         'url.site',
+        'user.permissions',
       ],
       'UNCACHEABLE (request policy)',
       'UNCACHEABLE (poor cacheability)',
@@ -1378,7 +1379,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->doTestRelationshipGet($request_options);
 
     // Test POST.
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
     $this->doTestRelationshipMutation($request_options);
     // Grant entity-level edit access.
     $this->setUpAuthorization('PATCH');
@@ -2012,11 +2013,11 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->doTestPostIndividual();
     $this->entity = $this->resaveEntity($this->entity, $this->account);
     $this->revokePermissions();
-    $this->config('jsonapi.settings')->set('read_only', TRUE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', TRUE)->save();
     $this->doTestPatchIndividual();
     $this->entity = $this->resaveEntity($this->entity, $this->account);
     $this->revokePermissions();
-    $this->config('jsonapi.settings')->set('read_only', TRUE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', TRUE)->save();
     $this->doTestDeleteIndividual();
   }
 
@@ -2060,7 +2061,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->assertSame([''], $response->getHeader('Allow'));
     }
 
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
 
     // DX: 415 when no Content-Type request header.
     $response = $this->request('POST', $url, $request_options);
@@ -2288,7 +2289,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->assertResourceErrorResponse(405, sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromUri('base:/admin/config/services/jsonapi')->setAbsolute()->toString(TRUE)->getGeneratedUrl()), $url, $response);
     $this->assertSame(['GET'], $response->getHeader('Allow'));
 
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
 
     // DX: 415 when no Content-Type request header.
     $response = $this->request('PATCH', $url, $request_options);
@@ -2590,7 +2591,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->assertResourceErrorResponse(405, sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromUri('base:/admin/config/services/jsonapi')->setAbsolute()->toString(TRUE)->getGeneratedUrl()), $url, $response);
     $this->assertSame(['GET'], $response->getHeader('Allow'));
 
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
 
     // DX: 403 when unauthorized.
     $response = $this->request('DELETE', $url, $request_options);
@@ -3086,6 +3087,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       'url.path',
       'url.query_args',
       'url.site',
+      'user.permissions',
     ];
     $this->assertResourceErrorResponse(501, 'JSON:API does not support filtering on revisions other than the latest version because a secure Drupal core API does not yet exist to do so.', $rel_working_copy_collection_url_filtered, $actual_response, FALSE, ['http_response'], $filtered_collection_expected_cache_contexts);
     // Fetch the collection URL using an invalid version identifier.
@@ -3094,6 +3096,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       'url.path',
       'url.query_args',
       'url.site',
+      'user.permissions',
     ];
     $this->assertResourceErrorResponse(
       400,
@@ -3299,7 +3302,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->assertResourceResponse(200, $expected_document, $actual_response, $expected_cache_tags, $expected_cacheability->getCacheContexts(), NULL, TRUE);
     }
 
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
 
     // Ensures that PATCH and DELETE on individual resources with a
     // `resourceVersion` query parameter is not supported.
@@ -3596,8 +3599,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @todo Remove this after https://www.drupal.org/project/drupal/issues/3038706 lands.
    */
   protected function entityLoadUnchanged($id) {
-    $this->entityStorage->resetCache();
-    return $this->entityStorage->loadUnchanged($id);
+    $entity_storage = \Drupal::service('entity_type.manager')->getStorage(static::$entityTypeId);
+    $entity_storage->resetCache();
+    return $entity_storage->loadUnchanged($id);
   }
 
   /**

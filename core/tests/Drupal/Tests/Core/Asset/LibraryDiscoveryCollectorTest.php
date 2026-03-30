@@ -112,8 +112,6 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
 
   /**
    * Tests the resolve cache miss function.
-   *
-   * @legacy-covers ::resolveCacheMiss
    */
   public function testResolveCacheMiss(): void {
     $this->activeTheme = $this->getMockBuilder(ActiveTheme::class)
@@ -138,8 +136,6 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
 
   /**
    * Tests the destruct method.
-   *
-   * @legacy-covers ::destruct
    */
   public function testDestruct(): void {
     $this->activeTheme = $this->getMockBuilder(ActiveTheme::class)
@@ -230,7 +226,7 @@ class LibraryDiscoveryCollectorTest extends UnitTestCase {
    */
   #[IgnoreDeprecations]
   public function testLibrariesExtendDeprecated(): void {
-    $this->expectDeprecation('Theme "test" is extending a deprecated library. The "test/test_4" asset library is deprecated in drupal:X.0.0 and is removed from drupal:Y.0.0. Use the test_3 library instead. See https://www.example.com');
+    $this->expectUserDeprecationMessage('Theme "test" is extending a deprecated library. The "test/test_4" asset library is deprecated in drupal:X.0.0 and is removed from drupal:Y.0.0. Use the test_3 library instead. See https://www.example.com');
     $this->activeTheme = $this->getMockBuilder(ActiveTheme::class)
       ->disableOriginalConstructor()
       ->getMock();

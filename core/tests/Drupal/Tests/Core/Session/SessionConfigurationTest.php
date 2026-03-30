@@ -9,6 +9,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -24,8 +25,8 @@ class SessionConfigurationTest extends UnitTestCase {
    * @return \Drupal\Core\Session\SessionConfiguration|\PHPUnit\Framework\MockObject\MockObject
    *   A mock object of SessionConfiguration with specific methods overridden.
    */
-  protected function createSessionConfiguration($options = []) {
-    return $this->getMockBuilder('Drupal\Core\Session\SessionConfiguration')
+  protected function createSessionConfiguration($options = []): SessionConfiguration&MockObject {
+    return $this->getMockBuilder(SessionConfiguration::class)
       ->onlyMethods(['drupalValidTestUa'])
       ->setConstructorArgs([$options])
       ->getMock();
@@ -37,7 +38,7 @@ class SessionConfigurationTest extends UnitTestCase {
    * @legacy-covers ::getOptions
    */
   #[DataProvider('providerTestGeneratedCookieDomain')]
-  public function testGeneratedCookieDomain($uri, $expected_domain): void {
+  public function testGeneratedCookieDomain(string $uri, string $expected_domain): void {
     $config = $this->createSessionConfiguration();
 
     $request = Request::create($uri);
@@ -52,7 +53,7 @@ class SessionConfigurationTest extends UnitTestCase {
    * @return array
    *   Test data
    */
-  public static function providerTestGeneratedCookieDomain() {
+  public static function providerTestGeneratedCookieDomain(): array {
     return [
       ['http://example.com/path/index.php', '.example.com'],
       ['http://www.example.com/path/index.php', '.www.example.com'],
@@ -75,7 +76,7 @@ class SessionConfigurationTest extends UnitTestCase {
    * @legacy-covers ::getOptions
    */
   #[DataProvider('providerTestEnforcedCookieDomain')]
-  public function testEnforcedCookieDomain($uri, $expected_domain): void {
+  public function testEnforcedCookieDomain(string $uri, string $expected_domain): void {
     $config = $this->createSessionConfiguration(['cookie_domain' => '.example.com']);
 
     $request = Request::create($uri);
@@ -90,7 +91,7 @@ class SessionConfigurationTest extends UnitTestCase {
    * @return array
    *   Test data
    */
-  public static function providerTestEnforcedCookieDomain() {
+  public static function providerTestEnforcedCookieDomain(): array {
     return [
       ['http://example.com/path/index.php', '.example.com'],
       ['http://www.example.com/path/index.php', '.example.com'],
@@ -112,7 +113,7 @@ class SessionConfigurationTest extends UnitTestCase {
    * @legacy-covers ::getOptions
    */
   #[DataProvider('providerTestCookieSecure')]
-  public function testCookieSecure($uri, $expected_secure): void {
+  public function testCookieSecure(string $uri, bool $expected_secure): void {
     $config = $this->createSessionConfiguration();
 
     $request = Request::create($uri);
@@ -139,7 +140,7 @@ class SessionConfigurationTest extends UnitTestCase {
    * @legacy-covers ::getOptions
    */
   #[DataProvider('providerTestCookieSecure')]
-  public function testCookieSecureNotOverridable($uri, $expected_secure): void {
+  public function testCookieSecureNotOverridable(string $uri, bool $expected_secure): void {
     $config = $this->createSessionConfiguration(['cookie_secure' => FALSE]);
 
     $request = Request::create($uri);
@@ -154,7 +155,7 @@ class SessionConfigurationTest extends UnitTestCase {
    * @return array
    *   Test data
    */
-  public static function providerTestCookieSecure() {
+  public static function providerTestCookieSecure(): array {
     return [
       ['http://example.com/path/index.php', FALSE],
       ['https://www.example.com/path/index.php', TRUE],
@@ -171,7 +172,7 @@ class SessionConfigurationTest extends UnitTestCase {
    * @legacy-covers ::getOptions
    */
   #[DataProvider('providerTestGeneratedSessionName')]
-  public function testGeneratedSessionName($uri, $expected_name): void {
+  public function testGeneratedSessionName(string $uri, $expected_name): void {
     $config = $this->createSessionConfiguration();
 
     $request = Request::create($uri);
@@ -186,7 +187,7 @@ class SessionConfigurationTest extends UnitTestCase {
    * @return array
    *   Test data
    */
-  public static function providerTestGeneratedSessionName() {
+  public static function providerTestGeneratedSessionName(): array {
     $data = [
       ['http://example.com/path/index.php', 'SESS', 'example.com'],
       ['http://www.example.com/path/index.php', 'SESS', 'www.example.com'],
@@ -207,7 +208,7 @@ class SessionConfigurationTest extends UnitTestCase {
       ['https://[::1]:8443/path/index.php', 'SSESS', '[::1]'],
     ];
 
-    return array_map(function ($record) {
+    return array_map(function (array $record): array {
       return [$record[0], $record[1] . substr(hash('sha256', $record[2]), 0, 32)];
     }, $data);
   }
@@ -218,7 +219,7 @@ class SessionConfigurationTest extends UnitTestCase {
    * @legacy-covers ::getOptions
    */
   #[DataProvider('providerTestEnforcedSessionName')]
-  public function testEnforcedSessionNameViaCookieDomain($uri, $expected_name): void {
+  public function testEnforcedSessionNameViaCookieDomain(string $uri, $expected_name): void {
     $config = $this->createSessionConfiguration(['cookie_domain' => '.example.com']);
 
     $request = Request::create($uri);
@@ -233,7 +234,7 @@ class SessionConfigurationTest extends UnitTestCase {
    * @return array
    *   Test data
    */
-  public static function providerTestEnforcedSessionName() {
+  public static function providerTestEnforcedSessionName(): array {
     $data = [
       ['http://example.com/path/index.php', 'SESS', '.example.com'],
       ['http://www.example.com/path/index.php', 'SESS', '.example.com'],
@@ -254,7 +255,7 @@ class SessionConfigurationTest extends UnitTestCase {
       ['https://[::1]:8443/path/index.php', 'SSESS', '.example.com'],
     ];
 
-    return array_map(function ($record) {
+    return array_map(function (array $record): array {
       return [$record[0], $record[1] . substr(hash('sha256', $record[2]), 0, 32)];
     }, $data);
   }

@@ -199,7 +199,12 @@ abstract class FormTestBase extends UnitTestCase {
     $this->callableResolver = $this->createStub(CallableResolver::class);
     $this->formValidator = new FormValidator($this->requestStack, $this->getStringTranslationStub(), $this->csrfToken, $this->logger, $form_error_handler, $this->callableResolver);
     $this->formSubmitter = $this->getMockBuilder('Drupal\Core\Form\FormSubmitter')
-      ->setConstructorArgs([$this->requestStack, $this->urlGenerator, $this->redirectResponseSubscriber, $this->callableResolver])
+      ->setConstructorArgs([
+        $this->requestStack,
+        $this->urlGenerator,
+        $this->redirectResponseSubscriber,
+        $this->callableResolver,
+      ])
       ->onlyMethods(['batchGet'])
       ->getMock();
     $this->root = dirname(substr(__DIR__, 0, -strlen(__NAMESPACE__)), 2);
@@ -213,6 +218,7 @@ abstract class FormTestBase extends UnitTestCase {
   protected function tearDown(): void {
     Html::resetSeenIds();
     (new FormState())->clearErrors();
+    parent::tearDown();
   }
 
   /**
@@ -230,7 +236,7 @@ abstract class FormTestBase extends UnitTestCase {
    * @return \PHPUnit\Framework\MockObject\MockObject|\Drupal\Core\Form\FormInterface
    *   The mocked form object.
    */
-  protected function getMockForm($form_id, $expected_form = NULL, $count = 1) {
+  protected function getMockForm($form_id, $expected_form = NULL, int $count = 1) {
     $form = $this->createMock('Drupal\Core\Form\FormInterface');
     $form->expects($this->once())
       ->method('getFormId')

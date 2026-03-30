@@ -213,7 +213,7 @@ class RouteBuilderTest extends UnitTestCase {
     $container->set('test_module.route_service', new TestRouteSubscriber());
     $this->controllerResolver->expects($this->any())
       ->method('getControllerFromDefinition')
-      ->willReturnCallback(function ($controller) use ($container) {
+      ->willReturnCallback(function ($controller) use ($container): array {
         $count = substr_count($controller, ':');
         if ($count == 1) {
           [$service, $method] = explode(':', $controller, 2);
@@ -360,13 +360,13 @@ class TestRouteBuilder extends RouteBuilder {
  */
 class TestRouteSubscriber {
 
-  public function routesFromArray() {
+  public function routesFromArray(): array {
     return [
       'test_route.1' => new Route('/test-route/1'),
     ];
   }
 
-  public function routesFromCollection() {
+  public function routesFromCollection(): RouteCollection {
     $collection = new RouteCollection();
     $collection->add('test_route.2', new Route('/test-route/2'));
     return $collection;

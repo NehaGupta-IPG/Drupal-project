@@ -268,7 +268,7 @@ JS;
    */
   protected function assertWaitPageContains(string $expected): void {
     $page = $this->getSession()->getPage();
-    $this->assertTrue($page->waitFor(10, function () use ($page, $expected) {
+    $this->assertTrue($page->waitFor(10, function () use ($page, $expected): bool {
       // Clear content from empty styles and "processed" classes after effect.
       $content = str_replace([' class="processed"', ' processed', ' style=""'], '', $page->getContent());
       return stripos($content, $expected) !== FALSE;
@@ -359,6 +359,14 @@ JS;
     $this->assertSession()->assertWaitOnAjaxRequest();
     $has_focus_id = $this->getSession()->evaluateScript('document.activeElement.id');
     $this->assertEquals('edit-textfield-3', $has_focus_id);
+
+    $this->assertNotNull($email_field1 = $this->assertSession()->elementExists('css', '#edit-email-field-1'));
+    // Test email field with 'blur' event listener.
+    $email_field1->setValue('user@example.com');
+    $email_field1->focus();
+    $this->assertSession()->assertWaitOnAjaxRequest();
+    $has_focus_id = $this->getSession()->evaluateScript('document.activeElement.id');
+    $this->assertEquals('edit-email-field-1', $has_focus_id);
   }
 
 }

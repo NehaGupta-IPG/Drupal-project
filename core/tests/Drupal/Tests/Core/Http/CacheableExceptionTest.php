@@ -49,7 +49,7 @@ class CacheableExceptionTest extends UnitTestCase {
  * Tests exceptions.
  */
   #[DataProvider('providerTestExceptions')]
-  public function testExceptions($status_code, $class, $argument = NULL, $expected_headers = []): void {
+  public function testExceptions(int $status_code, string $class, string|int|array|null $argument = NULL, array $expected_headers = []): void {
     $cacheable_metadata = (new CacheableMetadata())->setCacheContexts(['route']);
     $message = "$class test message";
     $previous = new class('Error of PHP 7+') extends \Error {};
@@ -67,7 +67,7 @@ class CacheableExceptionTest extends UnitTestCase {
     $this->assertSame(123, $exception->getCode());
   }
 
-  public static function providerTestExceptions() {
+  public static function providerTestExceptions(): array {
     return [
       [400, CacheableBadRequestHttpException::class],
       [401, CacheableUnauthorizedHttpException::class, 'test challenge', ['WWW-Authenticate' => 'test challenge']],

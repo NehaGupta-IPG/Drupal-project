@@ -77,7 +77,7 @@ class ElementInfoManagerTest extends UnitTestCase {
    * @legacy-covers ::buildInfo
    */
   #[DataProvider('providerTestGetInfoElementPlugin')]
-  public function testGetInfoElementPlugin($plugin_class, $expected_info): void {
+  public function testGetInfoElementPlugin(string $plugin_class, $expected_info): void {
     $this->moduleHandler->expects($this->once())
       ->method('alter')
       ->with('element_info', $this->anything())
@@ -91,7 +91,13 @@ class ElementInfoManagerTest extends UnitTestCase {
       ]);
 
     $element_info = $this->getMockBuilder('Drupal\Core\Render\ElementInfoManager')
-      ->setConstructorArgs([new \ArrayObject(), $this->cache, $this->themeHandler, $this->moduleHandler, $this->themeManager])
+      ->setConstructorArgs([
+        new \ArrayObject(),
+        $this->cache,
+        $this->themeHandler,
+        $this->moduleHandler,
+        $this->themeManager,
+      ])
       ->onlyMethods(['getDefinitions', 'createInstance'])
       ->getMock();
 
@@ -118,7 +124,7 @@ class ElementInfoManagerTest extends UnitTestCase {
    * @return array
    *   An array of test data for testGetInfoElementPlugin().
    */
-  public static function providerTestGetInfoElementPlugin() {
+  public static function providerTestGetInfoElementPlugin(): array {
     $data = [];
     $data[] = [
       'Drupal\Core\Render\Element\ElementInterface',
@@ -144,8 +150,6 @@ class ElementInfoManagerTest extends UnitTestCase {
 
   /**
    * Tests get info property.
-   *
-   * @legacy-covers ::getInfoProperty
    */
   public function testGetInfoProperty(): void {
     $this->themeManager

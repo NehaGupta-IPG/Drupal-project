@@ -55,7 +55,12 @@ class EntityRouteHelper {
   }
 
   public function getContentEntityFromRoute(): ?ContentEntityInterface {
-    $path = $this->routeMatch->getRouteObject()->getPath();
+    $route = $this->routeMatch->getRouteObject();
+    if (!$route) {
+      return NULL;
+    }
+
+    $path = $route->getPath();
     if (!$entity_type = $this->getContentEntityPaths()[$path] ?? NULL) {
       return NULL;
     }
@@ -88,7 +93,10 @@ class EntityRouteHelper {
     }
 
     $this->contentEntityPaths = $this->doGetContentEntityPaths();
-    $this->cacheBackend->set(static::ENTITY_ROUTE_CID, $this->contentEntityPaths, CacheBackendInterface::CACHE_PERMANENT, ['entity_types', 'routes']);
+    $this->cacheBackend->set(static::ENTITY_ROUTE_CID, $this->contentEntityPaths, CacheBackendInterface::CACHE_PERMANENT, [
+      'entity_types',
+      'routes',
+    ]);
 
     return $this->contentEntityPaths;
   }

@@ -117,19 +117,15 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
    *   The language configuration override service.
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The request stack object.
-   * @param \Drupal\Core\Cache\CacheBackendInterface|null $cacheBackend
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
    *   The cache backend.
    */
-  public function __construct(LanguageDefault $default_language, ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, LanguageConfigFactoryOverrideInterface $config_override, RequestStack $request_stack, protected ?CacheBackendInterface $cacheBackend = NULL) {
+  public function __construct(LanguageDefault $default_language, ConfigFactoryInterface $config_factory, ModuleHandlerInterface $module_handler, LanguageConfigFactoryOverrideInterface $config_override, RequestStack $request_stack, protected CacheBackendInterface $cacheBackend) {
     $this->defaultLanguage = $default_language;
     $this->configFactory = $config_factory;
     $this->moduleHandler = $module_handler;
     $this->configFactoryOverride = $config_override;
     $this->requestStack = $request_stack;
-    if (!$cacheBackend) {
-      @trigger_error('Calling ' . __CLASS__ . ' constructor without the $cacheBackend argument is deprecated in drupal:11.2.0 and it will be required in drupal:12.0.0. See https://www.drupal.org/project/drupal/issues/3497341', E_USER_DEPRECATED);
-      $this->cacheBackend = \Drupal::cache('bootstrap');
-    }
   }
 
   /**
@@ -175,7 +171,10 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
    */
   protected function loadLanguageTypesConfiguration() {
     if (!$this->languageTypes) {
-      $this->languageTypes = $this->configFactory->get('language.types')->get() ?: ['configurable' => [], 'all' => parent::getLanguageTypes()];
+      $this->languageTypes = $this->configFactory->get('language.types')->get() ?: [
+        'configurable' => [],
+        'all' => parent::getLanguageTypes(),
+      ];
     }
     return $this->languageTypes;
   }
@@ -208,7 +207,7 @@ class ConfigurableLanguageManager extends LanguageManager implements Configurabl
     if (isset($values['all'])) {
       $config->set('all', $values['all']);
     }
-    $config->save(TRUE);
+    $config->save();
   }
 
   /**
