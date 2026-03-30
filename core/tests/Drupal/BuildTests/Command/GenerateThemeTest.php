@@ -19,6 +19,7 @@ use Symfony\Component\Process\Process;
  * Tests the generate-theme commands.
  */
 #[Group('Command')]
+#[Group('#slow')]
 #[RequiresPhpExtension('pdo_sqlite')]
 class GenerateThemeTest extends QuickStartTestBase {
 
@@ -121,14 +122,14 @@ class GenerateThemeTest extends QuickStartTestBase {
     // Ensure that a new theme cannot be generated when the destination
     // directory already exists.
     $theme_path_absolute = $this->getWorkspaceDirectory() . "/$theme_path_relative";
-    $this->assertFileExists($theme_path_absolute . '/test_custom_theme.theme');
-    unlink($theme_path_absolute . '/test_custom_theme.theme');
+    $this->assertFileExists($theme_path_absolute . '/src/Hook/TestCustomThemeHooks.php');
+    unlink($theme_path_absolute . '/src/Hook/TestCustomThemeHooks.php');
     $process = $this->generateThemeFromStarterkit();
     $result = $process->run();
     $this->assertStringContainsString('Theme could not be generated because the destination directory', $process->getErrorOutput());
     $this->assertStringContainsString($theme_path_relative, $process->getErrorOutput());
     $this->assertSame(1, $result);
-    $this->assertFileDoesNotExist($theme_path_absolute . '/test_custom_theme.theme');
+    $this->assertFileDoesNotExist($theme_path_absolute . '/src/Hook/TestCustomThemeHooks.php');
   }
 
   /**
@@ -171,8 +172,8 @@ YAML
     $this->assertSame(0, $exit_code);
 
     // Confirm new .theme file.
-    $dot_theme_file = $this->getWorkspaceDirectory() . '/themes/generated_from_another_theme/generated_from_another_theme.theme';
-    $this->assertStringContainsString('function generated_from_another_theme_preprocess_image_widget(array &$variables): void {', file_get_contents($dot_theme_file));
+    $dot_theme_file = $this->getWorkspaceDirectory() . '/themes/generated_from_another_theme/src/Hook/GeneratedFromAnotherThemeHooks.php';
+    $this->assertStringContainsString('public function preprocessImageWidget(array &$variables): void {', file_get_contents($dot_theme_file));
   }
 
   /**
@@ -395,7 +396,6 @@ SH;
     $theme_path_absolute = $this->getWorkspaceDirectory() . '/themes/test_custom_theme';
     self::assertDirectoryExists($theme_path_absolute);
     self::assertFileDoesNotExist($theme_path_absolute . '/src/StarterKit.php');
-    self::assertDirectoryDoesNotExist($theme_path_absolute . '/src');
   }
 
   public function testNoEditMissingFilesWarning(): void {
@@ -597,6 +597,51 @@ EDITED, file_get_contents($theme_path_absolute . '/src/TestCustomThemePreRender.
     // Verify that the .gitignore file is present in the generated theme.
     $theme_path_absolute = $this->getWorkspaceDirectory() . '/themes/test_custom_theme';
     self::assertFileExists($theme_path_absolute . '/.gitignore');
+  }
+
+  public function testIgnoredDotFiles(): void {
+    $this->writeStarterkitConfig([
+      'ignore' => [
+        '/.npmrc',
+      ],
+    ]);
+
+    file_put_contents($this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/.npmrc', '*.map');
+    $tester = $this->runCommand(
+      [
+        'machine-name' => 'test_custom_theme',
+        '--name' => 'Test custom starterkit theme',
+        '--description' => 'Custom theme generated from a starterkit theme',
+      ]
+    );
+
+    $tester->assertCommandIsSuccessful($tester->getErrorOutput());
+    $this->assertThemeExists('themes/test_custom_theme');
+
+    // Verify that the .npmrc file is not present in the generated theme.
+    $theme_path_absolute = $this->getWorkspaceDirectory() . '/themes/test_custom_theme';
+    self::assertFileDoesNotExist($theme_path_absolute . '/.npmrc');
+  }
+
+  public function testExcludedGitFolder(): void {
+    $path = $this->getWorkspaceDirectory() . '/core/themes/starterkit_theme/.git';
+    mkdir($path);
+    file_put_contents($path . '/config', '*.map');
+
+    $tester = $this->runCommand(
+      [
+        'machine-name' => 'test_custom_theme',
+        '--name' => 'Test custom starterkit theme',
+        '--description' => 'Custom theme generated from a starterkit theme',
+      ]
+    );
+
+    $tester->assertCommandIsSuccessful($tester->getErrorOutput());
+    $this->assertThemeExists('themes/test_custom_theme');
+
+    // Verify that the .git folder is not present in the generated theme.
+    $theme_path_absolute = $this->getWorkspaceDirectory() . '/themes/test_custom_theme';
+    self::assertFileDoesNotExist($theme_path_absolute . '/.git');
   }
 
   private function writeStarterkitConfig(array $config): void {

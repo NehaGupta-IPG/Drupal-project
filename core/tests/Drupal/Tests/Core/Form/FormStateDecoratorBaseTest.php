@@ -60,8 +60,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set form state.
-   *
-   * @legacy-covers ::setFormState
    */
   public function testSetFormState(): void {
     $form_state_additions = [
@@ -76,11 +74,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set always process.
-   *
-   * @legacy-covers ::setAlwaysProcess
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testSetAlwaysProcess($always_process): void {
+  public function testSetAlwaysProcess(bool $always_process): void {
     $this->decoratedFormState->setAlwaysProcess($always_process)
       ->shouldBeCalled();
 
@@ -89,11 +85,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests get always process.
-   *
-   * @legacy-covers ::getAlwaysProcess
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testGetAlwaysProcess($always_process): void {
+  public function testGetAlwaysProcess(bool $always_process): void {
     $this->decoratedFormState->getAlwaysProcess()
       ->willReturn($always_process)
       ->shouldBeCalled();
@@ -103,8 +97,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set buttons.
-   *
-   * @legacy-covers ::setButtons
    */
   public function testSetButtons(): void {
     $buttons = [
@@ -119,8 +111,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests get buttons.
-   *
-   * @legacy-covers ::getButtons
    */
   public function testGetButtons(): void {
     $buttons = [
@@ -136,11 +126,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set cached.
-   *
-   * @legacy-covers ::setCached
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testSetCached($cache): void {
+  public function testSetCached(bool $cache): void {
     $this->decoratedFormState->setCached($cache)
       ->shouldBeCalled();
 
@@ -149,11 +137,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests is cached.
-   *
-   * @legacy-covers ::isCached
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testIsCached($cache): void {
+  public function testIsCached(bool $cache): void {
     $this->decoratedFormState->isCached()
       ->willReturn($cache)
       ->shouldBeCalled();
@@ -162,11 +148,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set cached with logic exception.
-   *
-   * @legacy-covers ::setCached
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testSetCachedWithLogicException($cache): void {
+  public function testSetCachedWithLogicException(bool $cache): void {
     $this->decoratedFormState->setCached($cache)
       ->willThrow(\LogicException::class);
     $this->expectException(\LogicException::class);
@@ -175,8 +159,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests disable cache.
-   *
-   * @legacy-covers ::disableCache
    */
   public function testDisableCache(): void {
     $this->decoratedFormState->disableCache()
@@ -187,8 +169,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set executed.
-   *
-   * @legacy-covers ::setExecuted
    */
   public function testSetExecuted(): void {
     $this->decoratedFormState->setExecuted()
@@ -203,11 +183,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    * @param bool $executed
    *   Any valid value for \Drupal\Core\Form\FormStateInterface::isExecuted()'s
    *   return value.
-   *
-   * @legacy-covers ::isExecuted
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testIsExecuted($executed): void {
+  public function testIsExecuted(bool $executed): void {
     $this->decoratedFormState->isExecuted()
       ->willReturn($executed)
       ->shouldBeCalled();
@@ -217,8 +195,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set groups.
-   *
-   * @legacy-covers ::setGroups
    */
   public function testSetGroups(): void {
     $groups = [
@@ -233,8 +209,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests get groups.
-   *
-   * @legacy-covers ::getGroups
    */
   public function testGetGroups(): void {
     $groups = [
@@ -255,11 +229,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set has file element.
-   *
-   * @legacy-covers ::setHasFileElement
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testSetHasFileElement($has_file_element): void {
+  public function testSetHasFileElement(bool $has_file_element): void {
     $this->decoratedFormState->setHasFileElement($has_file_element)
       ->shouldBeCalled();
 
@@ -268,11 +240,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests has file element.
-   *
-   * @legacy-covers ::hasFileElement
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testHasFileElement($has_file_element): void {
+  public function testHasFileElement(bool $has_file_element): void {
     $this->decoratedFormState->hasFileElement()
       ->willReturn($has_file_element)
       ->shouldBeCalled();
@@ -282,11 +252,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set limit validation errors.
-   *
-   * @legacy-covers ::setLimitValidationErrors
    */
   #[DataProvider('providerLimitValidationErrors')]
-  public function testSetLimitValidationErrors($limit_validation_errors): void {
+  public function testSetLimitValidationErrors(?array $limit_validation_errors): void {
     $this->decoratedFormState->setLimitValidationErrors($limit_validation_errors)
       ->shouldBeCalled();
 
@@ -295,11 +263,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests get limit validation errors.
-   *
-   * @legacy-covers ::getLimitValidationErrors
    */
   #[DataProvider('providerLimitValidationErrors')]
-  public function testGetLimitValidationErrors($limit_validation_errors): void {
+  public function testGetLimitValidationErrors(?array $limit_validation_errors): void {
     $this->decoratedFormState->getLimitValidationErrors()
       ->willReturn($limit_validation_errors)
       ->shouldBeCalled();
@@ -323,11 +289,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set method.
-   *
-   * @legacy-covers ::setMethod
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testSetMethod($method): void {
+  public function testSetMethod(bool $method): void {
     $this->decoratedFormState->setMethod($method)
       ->shouldBeCalled();
 
@@ -336,11 +300,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests is method type.
-   *
-   * @legacy-covers ::isMethodType
    */
   #[DataProvider('providerIsMethodType')]
-  public function testIsMethodType($expected_return_value, $method_type): void {
+  public function testIsMethodType(bool $expected_return_value, string $method_type): void {
     $this->decoratedFormState->isMethodType($method_type)
       ->willReturn($expected_return_value)
       ->shouldBeCalled();
@@ -362,11 +324,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set request method.
-   *
-   * @legacy-covers ::setRequestMethod
    */
   #[DataProvider('providerSetRequestMethod')]
-  public function testSetRequestMethod($method): void {
+  public function testSetRequestMethod(string $method): void {
     $this->decoratedFormState->setRequestMethod($method)
       ->shouldBeCalled();
 
@@ -385,11 +345,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set validation enforced.
-   *
-   * @legacy-covers ::setValidationEnforced
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testSetValidationEnforced($must_validate): void {
+  public function testSetValidationEnforced(bool $must_validate): void {
     $this->decoratedFormState->setValidationEnforced($must_validate)
       ->shouldBeCalled();
 
@@ -398,11 +356,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests is validation enforced.
-   *
-   * @legacy-covers ::isValidationEnforced
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testIsValidationEnforced($must_validate): void {
+  public function testIsValidationEnforced(bool $must_validate): void {
     $this->decoratedFormState->isValidationEnforced()
       ->willReturn($must_validate)
       ->shouldBeCalled();
@@ -412,11 +368,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests disable redirect.
-   *
-   * @legacy-covers ::disableRedirect
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testDisableRedirect($no_redirect): void {
+  public function testDisableRedirect(bool $no_redirect): void {
     $this->decoratedFormState->disableRedirect($no_redirect)
       ->shouldBeCalled();
 
@@ -425,11 +379,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests is redirect disabled.
-   *
-   * @legacy-covers ::isRedirectDisabled
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testIsRedirectDisabled($no_redirect): void {
+  public function testIsRedirectDisabled(bool $no_redirect): void {
     $this->decoratedFormState->isRedirectDisabled()
       ->willReturn($no_redirect)
       ->shouldBeCalled();
@@ -439,11 +391,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set process input.
-   *
-   * @legacy-covers ::setProcessInput
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testSetProcessInput($process_input): void {
+  public function testSetProcessInput(bool $process_input): void {
     $this->decoratedFormState->setProcessInput($process_input)
       ->shouldBeCalled();
 
@@ -452,11 +402,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests is processing input.
-   *
-   * @legacy-covers ::isProcessingInput
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testIsProcessingInput($process_input): void {
+  public function testIsProcessingInput(bool $process_input): void {
     $this->decoratedFormState->isProcessingInput()
       ->willReturn($process_input)
       ->shouldBeCalled();
@@ -466,11 +414,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set programmed.
-   *
-   * @legacy-covers ::setProgrammed
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testSetProgrammed($programmed): void {
+  public function testSetProgrammed(bool $programmed): void {
     $this->decoratedFormState->setProgrammed($programmed)
       ->shouldBeCalled();
 
@@ -479,11 +425,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests is programmed.
-   *
-   * @legacy-covers ::isProgrammed
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testIsProgrammed($programmed): void {
+  public function testIsProgrammed(bool $programmed): void {
     $this->decoratedFormState->isProgrammed()
       ->willReturn($programmed)
       ->shouldBeCalled();
@@ -493,11 +437,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set programmed bypass access check.
-   *
-   * @legacy-covers ::setProgrammedBypassAccessCheck
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testSetProgrammedBypassAccessCheck($programmed_bypass_access_check): void {
+  public function testSetProgrammedBypassAccessCheck(bool $programmed_bypass_access_check): void {
     $this->decoratedFormState->setProgrammedBypassAccessCheck($programmed_bypass_access_check)
       ->shouldBeCalled();
 
@@ -506,11 +448,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests is bypassing programmed access checks.
-   *
-   * @legacy-covers ::isBypassingProgrammedAccessChecks
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testIsBypassingProgrammedAccessChecks($programmed_bypass_access_check): void {
+  public function testIsBypassingProgrammedAccessChecks(bool $programmed_bypass_access_check): void {
     $this->decoratedFormState->isBypassingProgrammedAccessChecks()
       ->willReturn($programmed_bypass_access_check)
       ->shouldBeCalled();
@@ -520,8 +460,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set rebuild info.
-   *
-   * @legacy-covers ::setRebuildInfo
    */
   public function testSetRebuildInfo(): void {
     $rebuild_info = [
@@ -536,8 +474,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests get rebuild info.
-   *
-   * @legacy-covers ::getRebuildInfo
    */
   public function testGetRebuildInfo(): void {
     $rebuild_info = [
@@ -553,8 +489,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests add rebuild info.
-   *
-   * @legacy-covers ::addRebuildInfo
    */
   public function testAddRebuildInfo(): void {
     $property = 'FOO';
@@ -567,8 +501,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set storage.
-   *
-   * @legacy-covers ::setStorage
    */
   public function testSetStorage(): void {
     $storage = [
@@ -583,8 +515,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests get storage.
-   *
-   * @legacy-covers ::getStorage
    */
   public function testGetStorage(): void {
     $storage = [
@@ -605,8 +535,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set submit handlers.
-   *
-   * @legacy-covers ::setSubmitHandlers
    */
   public function testSetSubmitHandlers(): void {
     $submit_handlers = [
@@ -621,8 +549,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests get submit handlers.
-   *
-   * @legacy-covers ::getSubmitHandlers
    */
   public function testGetSubmitHandlers(): void {
     $submit_handlers = [
@@ -638,8 +564,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set submitted.
-   *
-   * @legacy-covers ::setSubmitted
    */
   public function testSetSubmitted(): void {
     $this->decoratedFormState->setSubmitted()
@@ -655,11 +579,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    *   Any valid value for
    *   \Drupal\Core\Form\FormStateInterface::isSubmitted()'s return
    *   value.
-   *
-   * @legacy-covers ::isSubmitted
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testIsSubmitted($submitted): void {
+  public function testIsSubmitted(bool $submitted): void {
     $this->decoratedFormState->isSubmitted()
       ->willReturn($submitted);
 
@@ -668,8 +590,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set temporary.
-   *
-   * @legacy-covers ::setTemporary
    */
   public function testSetTemporary(): void {
     $temporary = [
@@ -684,8 +604,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests get temporary.
-   *
-   * @legacy-covers ::getTemporary
    */
   public function testGetTemporary(): void {
     $temporary = [
@@ -710,11 +628,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    *   Any valid value for
    *   \Drupal\Core\Form\FormStateInterface::setTemporaryValue()'s $value
    *   argument.
-   *
-   * @legacy-covers ::setTemporaryValue
    */
   #[DataProvider('providerSetTemporaryValue')]
-  public function testSetTemporaryValue($key, $value): void {
+  public function testSetTemporaryValue(string $key, ?string $value): void {
     $this->decoratedFormState->setTemporaryValue($key, $value)
       ->shouldBeCalled();
 
@@ -734,7 +650,7 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
   /**
    * Tests get temporary value.
    *
-   * @param string $key
+   * @param string|array $key
    *   Any valid value for
    *   \Drupal\Core\Form\FormStateInterface::getTemporaryValue()'s $key
    *   argument.
@@ -742,11 +658,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    *   (optional) Any valid value for
    *   \Drupal\Core\Form\FormStateInterface::getTemporaryValue()'s return
    *   value.
-   *
-   * @legacy-covers ::getTemporaryValue
    */
   #[DataProvider('providerGetTemporaryValue')]
-  public function testGetTemporaryValue($key, $value = NULL): void {
+  public function testGetTemporaryValue(string|array $key, mixed $value = NULL): void {
     // Use PHPUnit for mocking, because Prophecy cannot mock methods that return
     // by reference. See \Prophecy\Doubler\Generator\Node::getCode().
     $decorated_form_state = $this->createMock(FormStateInterface::class);
@@ -765,8 +679,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    */
   public static function providerGetTemporaryValue(): array {
     return [
-      [TRUE, 'FOO', 'BAR'],
-      [TRUE, 'FOO', NULL],
+      ['FOO', 'BAR'],
+      ['FOO', NULL],
+      [['foo', 'bar'], 'qux'],
     ];
   }
 
@@ -781,11 +696,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    *   Any valid value for
    *   \Drupal\Core\Form\FormStateInterface::hasTemporaryValue()'s $key
    *   argument.
-   *
-   * @legacy-covers ::hasTemporaryValue
    */
   #[DataProvider('providerHasTemporaryValue')]
-  public function testHasTemporaryValue($exists, $key): void {
+  public function testHasTemporaryValue(bool $exists, string $key): void {
     $this->decoratedFormState->hasTemporaryValue($key)
       ->willReturn($exists)
       ->shouldBeCalled();
@@ -805,8 +718,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set triggering element.
-   *
-   * @legacy-covers ::setTriggeringElement
    */
   public function testSetTriggeringElement(): void {
     $triggering_element = [
@@ -821,8 +732,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests get triggering element.
-   *
-   * @legacy-covers ::getTriggeringElement
    */
   public function testGetTriggeringElement(): void {
     $triggering_element = [
@@ -843,8 +752,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set validate handlers.
-   *
-   * @legacy-covers ::setValidateHandlers
    */
   public function testSetValidateHandlers(): void {
     $validate_handlers = [
@@ -859,8 +766,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests get validate handlers.
-   *
-   * @legacy-covers ::getValidateHandlers
    */
   public function testGetValidateHandlers(): void {
     $validate_handlers = [
@@ -881,11 +786,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    *   Any valid value for
    *   \Drupal\Core\Form\FormStateInterface::setValidationComplete()'s $complete
    *   argument.
-   *
-   * @legacy-covers ::setValidationComplete
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testSetValidationComplete($complete): void {
+  public function testSetValidationComplete(bool $complete): void {
     $this->decoratedFormState->setValidationComplete($complete)
       ->shouldBeCalled();
 
@@ -899,11 +802,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    *   Any valid value for
    *   \Drupal\Core\Form\FormStateInterface::isValidationComplete()'s return
    *   value.
-   *
-   * @legacy-covers ::isValidationComplete
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testIsValidationComplete($complete): void {
+  public function testIsValidationComplete(bool $complete): void {
     $this->decoratedFormState->isValidationComplete()
       ->willReturn($complete)
       ->shouldBeCalled();
@@ -926,11 +827,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    * @param string|null $name
    *   Any valid value for \Drupal\Core\Form\FormStateInterface::loadInclude()'s
    *   $name argument.
-   *
-   * @legacy-covers ::loadInclude
    */
   #[DataProvider('providerLoadInclude')]
-  public function testLoadInclude($expected, $module, $type, $name): void {
+  public function testLoadInclude(string|bool $expected, string $module, string $type, string $name): void {
     $this->decoratedFormState->loadInclude($module, $type, $name)
       ->willReturn($expected)
       ->shouldBeCalled();
@@ -955,8 +854,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests get cacheable array.
-   *
-   * @legacy-covers ::getCacheableArray
    */
   public function testGetCacheableArray(): void {
     $cacheable_array = [
@@ -972,8 +869,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set complete form.
-   *
-   * @legacy-covers ::setCompleteForm
    */
   public function testSetCompleteForm(): void {
     $complete_form = [
@@ -988,8 +883,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests get complete form.
-   *
-   * @legacy-covers ::getCompleteForm
    */
   public function testGetCompleteForm(): void {
     $complete_form = [
@@ -1018,11 +911,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    * @param mixed $value
    *   Any valid value for \Drupal\Core\Form\FormStateInterface::set()'s $value
    *   argument.
-   *
-   * @legacy-covers ::set
    */
   #[DataProvider('providerSet')]
-  public function testSet($key, $value): void {
+  public function testSet(string $key, ?string $value): void {
     $this->decoratedFormState->set($key, $value)
       ->shouldBeCalled();
 
@@ -1048,11 +939,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    * @param mixed $value
    *   (optional) Any valid value for
    *   \Drupal\Core\Form\FormStateInterface::get()'s return value.
-   *
-   * @legacy-covers ::get
    */
   #[DataProvider('providerGet')]
-  public function testGet($key, $value = NULL): void {
+  public function testGet(string $key, ?string $value = NULL): void {
 
     // Use PHPUnit for mocking, because Prophecy cannot mock methods that return
     // by reference. See \Prophecy\Doubler\Generator\Node::getCode().
@@ -1086,11 +975,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    * @param string $key
    *   Any valid value for \Drupal\Core\Form\FormStateInterface::has()'s $key
    *   argument.
-   *
-   * @legacy-covers ::has
    */
   #[DataProvider('providerHas')]
-  public function testHas($exists, $key): void {
+  public function testHas(bool $exists, string $key): void {
     $this->decoratedFormState->has($key)
       ->willReturn($exists)
       ->shouldBeCalled();
@@ -1110,8 +997,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set build info.
-   *
-   * @legacy-covers ::setBuildInfo
    */
   public function testSetBuildInfo(): void {
     $build_info = [
@@ -1126,8 +1011,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests get build info.
-   *
-   * @legacy-covers ::getBuildInfo
    */
   public function testGetBuildInfo(): void {
     $build_info = [
@@ -1143,8 +1026,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests add build info.
-   *
-   * @legacy-covers ::addBuildInfo
    */
   public function testAddBuildInfo(): void {
     $property = 'FOO';
@@ -1158,8 +1039,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set user input.
-   *
-   * @legacy-covers ::setUserInput
    */
   public function testSetUserInput(): void {
     $user_input = [
@@ -1174,8 +1053,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests get user input.
-   *
-   * @legacy-covers ::getUserInput
    */
   public function testGetUserInput(): void {
     $user_input = [
@@ -1196,8 +1073,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests get values.
-   *
-   * @legacy-covers ::getValues
    */
   public function testGetValues(): void {
     $values = [
@@ -1218,8 +1093,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests get value.
-   *
-   * @legacy-covers ::getValue
    */
   public function testGetValue(): void {
     $key = 'FOO';
@@ -1240,8 +1113,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set values.
-   *
-   * @legacy-covers ::setValues
    */
   public function testSetValues(): void {
     $values = [
@@ -1257,8 +1128,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set value.
-   *
-   * @legacy-covers ::setValue
    */
   public function testSetValue(): void {
     $key = 'FOO';
@@ -1272,8 +1141,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests unset value.
-   *
-   * @legacy-covers ::unsetValue
    */
   public function testUnsetValue(): void {
     $key = 'FOO';
@@ -1286,8 +1153,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests has value.
-   *
-   * @legacy-covers ::hasValue
    */
   public function testHasValue(): void {
     $key = ['foo', 'bar'];
@@ -1302,8 +1167,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests is value empty.
-   *
-   * @legacy-covers ::isValueEmpty
    */
   public function testIsValueEmpty(): void {
     $key = ['foo', 'bar'];
@@ -1318,8 +1181,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set value for element.
-   *
-   * @legacy-covers ::setValueForElement
    */
   public function testSetValueForElement(): void {
     $element = [
@@ -1335,11 +1196,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set response.
-   *
-   * @legacy-covers ::setResponse
    */
   public function testSetResponse(): void {
-    $response = $this->createMock(Response::class);
+    $response = $this->createStub(Response::class);
 
     $this->decoratedFormState->setResponse($response)
       ->shouldBeCalled();
@@ -1349,11 +1208,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests get response.
-   *
-   * @legacy-covers ::getResponse
    */
   public function testGetResponse(): void {
-    $response = $this->createMock(Response::class);
+    $response = $this->createStub(Response::class);
 
     $this->decoratedFormState->getResponse()
       ->willReturn($response)
@@ -1364,8 +1221,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set redirect.
-   *
-   * @legacy-covers ::setRedirect
    */
   public function testSetRedirect(): void {
     $route_name = 'foo';
@@ -1384,8 +1239,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set redirect url.
-   *
-   * @legacy-covers ::setRedirectUrl
    */
   public function testSetRedirectUrl(): void {
     $url = new Url('foo');
@@ -1402,11 +1255,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    * @param bool $expected
    *   Any valid value for \Drupal\Core\Form\FormStateInterface::getRedirect()'s
    *   return value.
-   *
-   * @legacy-covers ::getRedirect
    */
   #[DataProvider('providerGetRedirect')]
-  public function testGetRedirect($expected): void {
+  public function testGetRedirect(bool|Url|RedirectResponse|null $expected): void {
     $this->decoratedFormState->getRedirect()
       ->willReturn($expected)
       ->shouldBeCalled();
@@ -1428,8 +1279,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set error by name.
-   *
-   * @legacy-covers ::setErrorByName
    */
   public function testSetErrorByName(): void {
     $name = 'foo';
@@ -1443,8 +1292,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set error.
-   *
-   * @legacy-covers ::setError
    */
   public function testSetError(): void {
     $element = [
@@ -1460,8 +1307,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests clear errors.
-   *
-   * @legacy-covers ::clearErrors
    */
   public function testClearErrors(): void {
     $this->decoratedFormState->clearErrors()
@@ -1472,8 +1317,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests get error.
-   *
-   * @legacy-covers ::getError
    */
   public function testGetError(): void {
     $element = [
@@ -1490,8 +1333,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests get errors.
-   *
-   * @legacy-covers ::getErrors
    */
   public function testGetErrors(): void {
     $errors = [
@@ -1510,11 +1351,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
    * @param bool $rebuild
    *   Any valid value for \Drupal\Core\Form\FormStateInterface::setRebuild()'s
    *   $rebuild argument.
-   *
-   * @legacy-covers ::setRebuild
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testSetRebuild($rebuild): void {
+  public function testSetRebuild(bool $rebuild): void {
     $this->decoratedFormState->setRebuild($rebuild)
       ->shouldBeCalled();
 
@@ -1523,11 +1362,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests is rebuilding.
-   *
-   * @legacy-covers ::isRebuilding
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testIsRebuilding($rebuild): void {
+  public function testIsRebuilding(bool $rebuild): void {
     $this->decoratedFormState->isRebuilding()
       ->willReturn($rebuild)
       ->shouldBeCalled();
@@ -1537,11 +1374,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set invalid token.
-   *
-   * @legacy-covers ::setInvalidToken
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testSetInvalidToken($expected): void {
+  public function testSetInvalidToken(bool $expected): void {
     $this->decoratedFormState->setInvalidToken($expected)
       ->shouldBeCalled();
 
@@ -1550,11 +1385,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests has invalid token.
-   *
-   * @legacy-covers ::hasInvalidToken
    */
   #[DataProvider('providerSingleBooleanArgument')]
-  public function testHasInvalidToken($expected): void {
+  public function testHasInvalidToken(bool $expected): void {
     $this->decoratedFormState->hasInvalidToken()
       ->willReturn($expected)
       ->shouldBeCalled();
@@ -1564,11 +1397,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests prepare callback.
-   *
-   * @legacy-covers ::prepareCallback
    */
   #[DataProvider('providerPrepareCallback')]
-  public function testPrepareCallback($unprepared_callback, callable $prepared_callback): void {
+  public function testPrepareCallback(string|\Closure|array $unprepared_callback, callable $prepared_callback): void {
     $this->decoratedFormState->prepareCallback(Argument::is($unprepared_callback))
       ->willReturn($prepared_callback)
       ->shouldBeCalled();
@@ -1601,11 +1432,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set form object.
-   *
-   * @legacy-covers ::setFormObject
    */
   public function testSetFormObject(): void {
-    $form = $this->createMock(FormInterface::class);
+    $form = $this->createStub(FormInterface::class);
 
     $this->decoratedFormState->setFormObject($form)
       ->shouldBeCalled();
@@ -1615,11 +1444,9 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests get form object.
-   *
-   * @legacy-covers ::getFormObject
    */
   public function testGetFormObject(): void {
-    $form = $this->createMock(FormInterface::class);
+    $form = $this->createStub(FormInterface::class);
 
     $this->decoratedFormState->getFormObject()
       ->willReturn($form)
@@ -1630,8 +1457,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests set clean value keys.
-   *
-   * @legacy-covers ::setCleanValueKeys
    */
   public function testSetCleanValueKeys(): void {
     $keys = ['BAR'];
@@ -1644,8 +1469,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests get clean value keys.
-   *
-   * @legacy-covers ::getCleanValueKeys
    */
   public function testGetCleanValueKeys(): void {
     $keys = ['BAR'];
@@ -1659,8 +1482,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests add clean value key.
-   *
-   * @legacy-covers ::addCleanValueKey
    */
   public function testAddCleanValueKey(): void {
     $key = 'BAR';
@@ -1673,8 +1494,6 @@ class FormStateDecoratorBaseTest extends UnitTestCase {
 
   /**
    * Tests clean values.
-   *
-   * @legacy-covers ::cleanValues
    */
   public function testCleanValues(): void {
     $this->decoratedFormState->cleanValues()
