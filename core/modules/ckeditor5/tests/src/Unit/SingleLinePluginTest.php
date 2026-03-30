@@ -58,14 +58,14 @@ class SingleLinePluginTest extends UnitTestCase {
       ],
     ]);
 
-    $plugin_manager = $this->createMock(CKEditor5PluginManagerInterface::class);
+    $plugin_manager = $this->createStub(CKEditor5PluginManagerInterface::class);
     $plugin_manager->method('getEnabledDefinitions')
       ->willReturn([
         'ckeditor5_list' => $definition_block,
         'ckeditor5_bold' => $definition_inline,
       ]);
 
-    $editor = $this->createMock(EditorInterface::class);
+    $editor = $this->createStub(EditorInterface::class);
 
     $plugin = new SingleLine([], 'ckeditor5_singleLine', $definition_block);
     // Inject mocked plugin manager.
