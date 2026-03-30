@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\workspaces\Kernel;
 
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\entity_test\Entity\EntityTestMulRevPub;
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\Tests\EntityTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\workspaces\Entity\Workspace;
 use Drupal\workspaces\Plugin\Validation\Constraint\EntityWorkspaceConflictConstraintValidator;
@@ -23,7 +23,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class EntityWorkspaceConflictConstraintValidatorTest extends KernelTestBase {
 
-  use EntityTrait;
   use UserCreationTrait;
   use WorkspaceTestTrait;
 
@@ -135,6 +134,21 @@ class EntityWorkspaceConflictConstraintValidatorTest extends KernelTestBase {
     $violations = $entity->validate();
     $this->assertCount(1, $violations);
     $this->assertSame($expected_message, (string) $violations->get(0)->getMessage());
+  }
+
+  /**
+   * Reloads the given entity from the storage and returns it.
+   *
+   * @param \Drupal\Core\Entity\EntityInterface $entity
+   *   The entity to be reloaded.
+   *
+   * @return \Drupal\Core\Entity\EntityInterface
+   *   The reloaded entity.
+   */
+  protected function reloadEntity(EntityInterface $entity): EntityInterface {
+    $storage = $this->entityTypeManager->getStorage($entity->getEntityTypeId());
+    $storage->resetCache([$entity->id()]);
+    return $storage->load($entity->id());
   }
 
 }
