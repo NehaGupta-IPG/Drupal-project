@@ -23,11 +23,11 @@ return Rector\Config\RectorConfig::configure()
   ])
   ->withSets([
     PHPUnitSetList::PHPUNIT_70,
-    PHPUnitSetList::PHPUNIT_80,
-    PHPUnitSetList::PHPUNIT_90,
-    PHPUnitSetList::PHPUNIT_100,
-    PHPUnitSetList::PHPUNIT_110,
-    PHPUnitSetList::PHPUNIT_120,
+#    PHPUnitSetList::PHPUNIT_80,
+#    PHPUnitSetList::PHPUNIT_90,
+#    PHPUnitSetList::PHPUNIT_100,
+#    PHPUnitSetList::PHPUNIT_110,
+#    PHPUnitSetList::PHPUNIT_120,
     PHPUnitSetList::PHPUNIT_CODE_QUALITY,
   ])
 //  ->withPreparedSets(typeDeclarations: true)
