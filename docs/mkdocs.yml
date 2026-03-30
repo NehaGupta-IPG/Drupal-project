@@ -5,4 +5,3 @@ site_url: 'https://project.pages.drupalcode.org/drupal/'
 repo_url: 'https://git.drupalcode.org/project/drupal'
 theme:
   name: material
-site_dir: public

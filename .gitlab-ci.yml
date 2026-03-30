@@ -1094,10 +1094,9 @@ Build documentation:
     - cd docs
     - pip install -r requirements.txt
     - mkdocs build
-    - mv ./public ..
   artifacts:
     paths:
-      - public
+      - docs/site
     expire_in: 1 week
 
 Preview documentation:
@@ -1112,6 +1111,7 @@ Preview documentation:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes: ['docs/src/**/*']
   pages:
+    publish: docs/site
     path_prefix: 'preview-$CI_MERGE_REQUEST_IID'
 
 Publish documentation:
@@ -1124,4 +1124,5 @@ Publish documentation:
   rules:
     # Only run if we have committed to the default branch.
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  pages: true
+  pages:
+    publish: docs/site
