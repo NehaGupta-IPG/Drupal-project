@@ -1107,6 +1107,7 @@ Preview documentation:
   script:
     - echo "Docs preview available at $CI_PAGES_URL"
   rules:
+    - when: always # TEMPORARY, FOR TESTING
     # Only run if a merge request changed the docs.
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       changes: ['docs/src/**/*']
@@ -1124,5 +1125,6 @@ Publish documentation:
   rules:
     # Only run if we have committed to the default branch.
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: on_success
   pages:
     publish: docs/site
