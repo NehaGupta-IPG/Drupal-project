@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\node\Functional;
+namespace Drupal\Tests\search\Functional;
 
 use Drupal\Tests\content_translation\Functional\ContentTranslationTestBase;
 use Drupal\Tests\language\Traits\LanguageTestTrait;
