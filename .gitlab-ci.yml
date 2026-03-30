@@ -101,6 +101,7 @@ stages:
   - 🪄 Lint
   - ⚡️ Tests
   - 🗜️ Additional tests
+  - 📚 Documentation
 
 #############
 # Defaults  #
@@ -1085,3 +1086,42 @@ default:
     - if [ ! -f core/.stylelintcache ]; then exit 1; fi
     - if [ ! -f core/.phpcscache ]; then exit 1; fi
     - if [ ! -f core/.twigcsfixercache ]; then exit 1; fi
+
+build docs:
+  stage: 📚 Documentation
+  image: python:latest
+  script:
+    - cd docs
+    - pip install -r requirements.txt
+    - mkdocs build
+    - mv ./public ..
+  artifacts:
+    paths:
+      - public
+    expire_in: 1 week
+
+preview docs:
+  stage: 📚 Documentation
+  image: alpine:latest
+  needs:
+    - build docs
+  script:
+    - echo "Docs preview available at $CI_PAGES_URL"
+  rules:
+    # Only run if a merge request changed the docs.
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes: ['docs/src/**/*']
+  pages:
+    path_prefix: 'preview-$CI_MERGE_REQUEST_IID'
+
+publish docs:
+  stage: 📚 Documentation
+  image: alpine:latest
+  needs:
+    - build docs
+  script:
+    - echo "Docs published at $CI_PAGES_URL"
+  rules:
+    # Only run if we have committed to the default branch.
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  pages: true
