@@ -1,0 +1,4 @@
+# Don't commit the Python virtual environment.
+/venv
+# Don't commit the fully built site.
+/public
