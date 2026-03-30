@@ -43,7 +43,6 @@ services:
   user.auth:
     class: Drupal\user\UserAuthentication
   Drupal\user\UserAuthenticationInterface: '@user.auth'
-  Drupal\user\UserAuthInterface: '@user.auth'
 
   # The deprecated way to retrieve permissions.
   user.legacy_permissions:
