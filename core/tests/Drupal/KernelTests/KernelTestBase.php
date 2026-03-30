@@ -27,7 +27,6 @@ use Drupal\Tests\PhpUnitCompatibilityTrait;
 use Drupal\Tests\RandomGeneratorTrait;
 use Drupal\Tests\TestRequirementsTrait;
 use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
-use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 use Drupal\TestTools\Extension\Dump\DebugDump;
 use Drupal\TestTools\Extension\SchemaInspector;
 use org\bovigo\vfs\vfsStream;
@@ -105,15 +104,6 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   use TestRequirementsTrait;
   use PhpUnitCompatibilityTrait;
   use ProphecyTrait;
-  use ExpectDeprecationTrait;
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __construct(string $name) {
-    parent::__construct($name);
-    $this->setRunTestInSeparateProcess(TRUE);
-  }
 
   /**
    * The class loader.
@@ -540,8 +530,6 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $this->container = $container;
 
     $container
-      ->register('datetime.time', 'Drupal\Component\Datetime\Time');
-    $container
       ->register('flood', 'Drupal\Core\Flood\MemoryBackend')
       ->addArgument(new Reference('request_stack'));
     $container
@@ -601,10 +589,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
       ->addTag('event_subscriber');
 
     // Relax the password hashing cost in tests to avoid performance issues.
-    if ($container->hasDefinition('password')) {
-      $container->getDefinition('password')
-        ->setArguments([PASSWORD_BCRYPT, ['cost' => 4]]);
-    }
+    $container->setParameter('password.algorithm', PASSWORD_BCRYPT);
+    $container->setParameter('password.options', ['cost' => 4]);
 
     // Add the on demand rebuild route provider service.
     $route_provider_service_name = 'router.route_provider';
