@@ -99,14 +99,25 @@ class DatabaseFileUsageBackend extends FileUsageBase {
    * {@inheritdoc}
    */
   public function listUsage(FileInterface $file) {
+    $result = $this->listUsageMultiple([$file->id()]);
+    return $result[$file->id()] ?? [];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function listUsageMultiple(array $file_ids) {
+    if (empty($file_ids)) {
+      return [];
+    }
     $result = $this->connection->select($this->tableName, 'f')
-      ->fields('f', ['module', 'type', 'id', 'count'])
-      ->condition('fid', $file->id())
+      ->fields('f', ['fid', 'module', 'type', 'id', 'count'])
+      ->condition('fid', $file_ids, 'IN')
       ->condition('count', 0, '>')
       ->execute();
     $references = [];
     foreach ($result as $usage) {
-      $references[$usage->module][$usage->type][$usage->id] = $usage->count;
+      $references[$usage->fid][$usage->module][$usage->type][$usage->id] = $usage->count;
     }
     return $references;
   }

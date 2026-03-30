@@ -31,4 +31,11 @@ class TestFileUsage extends FileUsageBase {
     return [];
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function listUsageMultiple(array $file_ids) {
+    return [];
+  }
+
 }

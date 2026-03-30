@@ -65,6 +65,15 @@ class FileViewsData extends EntityViewsData {
     $data['file_managed']['uid']['relationship']['title'] = $this->t('User who uploaded');
     $data['file_managed']['uid']['relationship']['label'] = $this->t('User who uploaded');
 
+    // Add file usage field to the file_managed table.
+    $data['file_managed']['file_usage'] = [
+      'title' => $this->t('Usage count'),
+      'help' => $this->t('The number of times this file is used.'),
+      'field' => [
+        'id' => 'file_usage',
+      ],
+    ];
+
     $data['file_usage']['table']['group'] = $this->t('File Usage');
 
     // Provide field-type-things to several base tables; on the core files table

@@ -67,4 +67,30 @@ interface FileUsageInterface {
    */
   public function listUsage(FileInterface $file);
 
+  /**
+   * Determines where multiple files are used.
+   *
+   * @param int[] $file_ids
+   *   An array of file IDs.
+   *
+   * @return array
+   *   A nested array with usage data. The first level is keyed by file ID,
+   *   the second by module name, the third by object type, and the fourth by
+   *   the object ID. The value of the fourth level contains the usage count.
+   *   Files with no usage will not have an entry in the returned array.
+   *   Example structure:
+   *   @code
+   *   [
+   *     1 => [
+   *       'node' => [
+   *         'node' => [
+   *           '42' => 1,
+   *         ],
+   *       ],
+   *     ],
+   *   ]
+   *   @endcode
+   */
+  public function listUsageMultiple(array $file_ids);
+
 }
