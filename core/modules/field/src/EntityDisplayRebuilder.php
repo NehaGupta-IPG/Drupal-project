@@ -82,14 +82,22 @@ class EntityDisplayRebuilder implements ContainerInjectionInterface {
     $view_mode_ids = array_map(function ($view_mode) use ($entity_type_id, $bundle) {
       return "$entity_type_id.$bundle.$view_mode";
     }, array_keys($view_modes));
-    foreach ($this->entityTypeManager->getStorage('entity_view_display')->loadMultipleOverrideFree($view_mode_ids) as $display) {
+
+    /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $storage */
+    $storage = $this->entityTypeManager->getStorage('entity_view_display');
+
+    foreach ($storage->loadMultipleOverrideFree($view_mode_ids) as $display) {
       $display->save();
     }
     // Save form mode displays.
     $form_mode_ids = array_map(function ($form_mode) use ($entity_type_id, $bundle) {
       return "$entity_type_id.$bundle.$form_mode";
     }, array_keys($form_modes));
-    foreach ($this->entityTypeManager->getStorage('entity_form_display')->loadMultipleOverrideFree($form_mode_ids) as $display) {
+
+    /** @var \Drupal\Core\Config\Entity\ConfigEntityStorageInterface $storage */
+    $storage = $this->entityTypeManager->getStorage('entity_form_display');
+
+    foreach ($storage->loadMultipleOverrideFree($form_mode_ids) as $display) {
       $display->save();
     }
   }

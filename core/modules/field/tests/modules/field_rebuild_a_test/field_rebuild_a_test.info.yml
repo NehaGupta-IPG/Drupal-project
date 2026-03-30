@@ -1,0 +1,11 @@
+name: Module A
+description: Module A
+type: module
+core_version_requirement: ^10 | ^11 | ^12
+version: 4.x-dev
+package: Testing
+dependencies:
+  - drupal:node
+  - drupal:field
+'interface translation project': field_rebuild_a_test
+'interface translation server pattern': core/modules/field/tests/modules/%project/translations/%project.%language.po

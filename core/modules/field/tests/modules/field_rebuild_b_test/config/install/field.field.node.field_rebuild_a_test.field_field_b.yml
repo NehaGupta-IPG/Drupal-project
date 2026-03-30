@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_field_b
+    - node.type.field_rebuild_a_test
+id: node.field_rebuild_a_test.field_field_b
+field_name: field_field_b
+entity_type: node
+bundle: field_rebuild_a_test
+label: 'Field B'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

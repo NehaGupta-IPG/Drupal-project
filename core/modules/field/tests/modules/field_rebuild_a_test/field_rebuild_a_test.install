@@ -1,0 +1,43 @@
+<?php
+
+function field_rebuild_a_test_uninstall() {
+  // Erst alle FieldConfigs löschen (die Instanzen im Bundle)
+  if ($field = \Drupal\field\Entity\FieldConfig::loadByName('node', 'field_rebuild_a_test', 'field_field_a')) {
+    $field->delete();
+  }
+
+  // Dann die FieldStorageConfig (die Definition)
+  if ($storage = \Drupal\field\Entity\FieldStorageConfig::loadByName('node', 'field_field_a')) {
+    $storage->delete();
+  }
+
+  // Optional: auch den Content-Type löschen, wenn er nur für dieses Modul da ist
+  if ($node_type = \Drupal\node\Entity\NodeType::load('field_rebuild_a_test')) {
+    $node_type->delete();
+  }
+
+  // Lösche alle abhängigen Konfigurationen sauber
+  $configs_to_delete = [
+    'core.entity_form_display.node.field_rebuild_a_test.default',
+    'core.entity_view_display.node.field_rebuild_a_test.default',
+    'core.entity_view_display.node.field_rebuild_a_test.teaser',
+    'field.field.node.field_rebuild_a_test.field_field_a',
+    'field.storage.node.field_field_a',
+    'node.type.field_rebuild_a_test',
+  ];
+
+  foreach ($configs_to_delete as $config_id) {
+    \Drupal::configFactory()->getEditable($config_id)->delete();
+  }
+
+  $field_configs = \Drupal::entityTypeManager()
+    ->getStorage('field_config')
+    ->loadByProperties([
+      'entity_type' => 'node',
+      'bundle' => 'field_rebuild_a_test',
+    ]);
+
+  foreach ($field_configs as $field_config) {
+    $field_config->delete();
+  }
+}

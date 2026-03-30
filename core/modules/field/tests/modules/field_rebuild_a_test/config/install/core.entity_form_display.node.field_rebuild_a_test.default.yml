@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - text
+id: node.field_rebuild_a_test.default
+targetEntityType: node
+bundle: field_rebuild_a_test
+mode: default
+content:
+  field_test_install:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: { }
+hidden: { }
+third_party_settings:
+  field_rebuild_a_test:
+    label: Slytherin's distinguished scissors

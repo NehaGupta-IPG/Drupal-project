@@ -1,0 +1,10 @@
+name: Module B
+description: Module B
+type: module
+core_version_requirement: ^10 | ^11 | ^12
+version: 4.x-dev
+package: Testing
+dependencies:
+  - 'field_rebuild_a_test:field_rebuild_a_test'
+'interface translation project': field_rebuild_b_test
+'interface translation server pattern': core/modules/field/tests/modules/%project/translations/%project.%language.po
