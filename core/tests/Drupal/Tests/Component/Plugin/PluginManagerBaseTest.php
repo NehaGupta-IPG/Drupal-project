@@ -9,6 +9,7 @@ use Drupal\Component\Plugin\Mapper\MapperInterface;
 use Drupal\Component\Plugin\PluginManagerBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 
@@ -40,7 +41,7 @@ class PluginManagerBaseTest extends TestCase {
   /**
    * Generates a mocked FactoryInterface object with known properties.
    */
-  public function getMockFactoryInterface($expects_count) {
+  public function getMockFactoryInterface(int $expects_count): MockObject {
     $mock_factory = $this->createMock('Drupal\Component\Plugin\Factory\FactoryInterface');
     $mock_factory->expects($this->exactly($expects_count))
       ->method('createInstance')
@@ -50,8 +51,6 @@ class PluginManagerBaseTest extends TestCase {
 
   /**
    * Tests createInstance() with no fallback methods.
-   *
-   * @legacy-covers ::createInstance
    */
   public function testCreateInstance(): void {
     $manager = new StubPluginManagerBase();
@@ -69,8 +68,6 @@ class PluginManagerBaseTest extends TestCase {
 
   /**
    * Tests createInstance() with a fallback method.
-   *
-   * @legacy-covers ::createInstance
    */
   public function testCreateInstanceFallback(): void {
     // We use our special stub class which extends PluginManagerBase and also
@@ -96,7 +93,7 @@ class PluginManagerBaseTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::getInstance
+   * Tests get instance.
    */
   public function testGetInstance(): void {
     $options = [
@@ -113,7 +110,7 @@ class PluginManagerBaseTest extends TestCase {
   }
 
   /**
-   * @legacy-covers ::getInstance
+   * Tests get instance without mapper should throw exception.
    */
   public function testGetInstanceWithoutMapperShouldThrowException(): void {
     $options = [

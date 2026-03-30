@@ -39,11 +39,9 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get.
-   *
-   * @legacy-covers ::get
    */
   #[DataProvider('providerTestGet')]
-  public function testGet(array $definition, $key, $expected): void {
+  public function testGet(array $definition, string $key, ?string $expected): void {
     $entity_type = $this->setUpEntityType($definition);
     $this->assertSame($expected, $entity_type->get($key));
   }
@@ -55,7 +53,7 @@ class EntityTypeTest extends UnitTestCase {
    * @legacy-covers ::get
    */
   #[DataProvider('providerTestSet')]
-  public function testSet($key, $value): void {
+  public function testSet(string $key, ?string $value): void {
     $entity_type = $this->setUpEntityType([]);
     $this->assertInstanceOf('Drupal\Core\Entity\EntityTypeInterface', $entity_type->set($key, $value));
     $this->assertSame($value, $entity_type->get($key));
@@ -66,7 +64,7 @@ class EntityTypeTest extends UnitTestCase {
    * Tests the getKeys() method.
    */
   #[DataProvider('providerTestGetKeys')]
-  public function testGetKeys($entity_keys, $expected): void {
+  public function testGetKeys(array $entity_keys, array $expected): void {
     $entity_type = $this->setUpEntityType(['entity_keys' => $entity_keys]);
     $expected += [
       'default_langcode' => 'default_langcode',
@@ -79,7 +77,7 @@ class EntityTypeTest extends UnitTestCase {
    * Tests the getKey() method.
    */
   #[DataProvider('providerTestGetKeys')]
-  public function testGetKey($entity_keys, $expected): void {
+  public function testGetKey(array $entity_keys, array $expected): void {
     $entity_type = $this->setUpEntityType(['entity_keys' => $entity_keys]);
     $this->assertSame($expected['bundle'], $entity_type->getKey('bundle'));
     $this->assertFalse($entity_type->getKey('bananas'));
@@ -89,7 +87,7 @@ class EntityTypeTest extends UnitTestCase {
    * Tests the hasKey() method.
    */
   #[DataProvider('providerTestGetKeys')]
-  public function testHasKey($entity_keys, $expected): void {
+  public function testHasKey(array $entity_keys, array $expected): void {
     $entity_type = $this->setUpEntityType(['entity_keys' => $entity_keys]);
     $this->assertSame(!empty($expected['bundle']), $entity_type->hasKey('bundle'));
     $this->assertSame(!empty($expected['id']), $entity_type->hasKey('id'));
@@ -282,8 +280,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get original class unchanged.
-   *
-   * @legacy-covers ::getOriginalClass
    */
   public function testGetOriginalClassUnchanged(): void {
     $class = $this->randomMachineName();
@@ -365,8 +361,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests id.
-   *
-   * @legacy-covers ::id
    */
   public function testId(): void {
     $id = $this->randomMachineName(32);
@@ -376,8 +370,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get label.
-   *
-   * @legacy-covers ::getLabel
    */
   public function testGetLabel(): void {
     // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
@@ -392,8 +384,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get group label.
-   *
-   * @legacy-covers ::getGroupLabel
    */
   public function testGetGroupLabel(): void {
     // phpcs:ignore Drupal.Semantics.FunctionT.NotLiteralString
@@ -412,8 +402,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get collection label.
-   *
-   * @legacy-covers ::getCollectionLabel
    */
   public function testGetCollectionLabel(): void {
     $translatable_label = new TranslatableMarkup('Entity test collection', [], [], $this->getStringTranslationStub());
@@ -424,8 +412,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get singular label.
-   *
-   * @legacy-covers ::getSingularLabel
    */
   public function testGetSingularLabel(): void {
     $translatable_label = new TranslatableMarkup('entity test singular', [], [], $this->getStringTranslationStub());
@@ -436,8 +422,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get singular label default.
-   *
-   * @legacy-covers ::getSingularLabel
    */
   public function testGetSingularLabelDefault(): void {
     $entity_type = $this->setUpEntityType(['label' => 'Entity test Singular']);
@@ -447,8 +431,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get plural label.
-   *
-   * @legacy-covers ::getPluralLabel
    */
   public function testGetPluralLabel(): void {
     $translatable_label = new TranslatableMarkup('entity test plural', [], [], $this->getStringTranslationStub());
@@ -459,8 +441,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get plural label default.
-   *
-   * @legacy-covers ::getPluralLabel
    */
   public function testGetPluralLabelDefault(): void {
     $entity_type = $this->setUpEntityType(['label' => 'Entity test Plural']);
@@ -470,8 +450,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get count label.
-   *
-   * @legacy-covers ::getCountLabel
    */
   public function testGetCountLabel(): void {
     $entity_type = $this->setUpEntityType([
@@ -500,8 +478,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests get count label default.
-   *
-   * @legacy-covers ::getCountLabel
    */
   public function testGetCountLabelDefault(): void {
     $entity_type = $this->setUpEntityType(['label' => 'Entity test Plural']);
@@ -514,11 +490,9 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests the ::getBundleLabel() method.
-   *
-   * @legacy-covers ::getBundleLabel
    */
   #[DataProvider('providerTestGetBundleLabel')]
-  public function testGetBundleLabel($definition, $expected): void {
+  public function testGetBundleLabel(array $definition, string $expected): void {
     $entity_type = $this->setUpEntityType($definition);
     $entity_type->setStringTranslation($this->getStringTranslationStub());
     $this->assertEquals($expected, $entity_type->getBundleLabel());
@@ -536,8 +510,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests set link template with invalid path.
-   *
-   * @legacy-covers ::setLinkTemplate
    */
   public function testSetLinkTemplateWithInvalidPath(): void {
     $entity_type = $this->setUpEntityType(['id' => $this->randomMachineName()]);
@@ -581,8 +553,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests entity class implements.
-   *
-   * @legacy-covers ::entityClassImplements
    */
   public function testEntityClassImplements(): void {
     $entity_type = $this->setUpEntityType(['class' => EntityFormMode::class]);
@@ -592,8 +562,6 @@ class EntityTypeTest extends UnitTestCase {
 
   /**
    * Tests the ::getBundleListCacheTags() method.
-   *
-   * @legacy-covers ::getBundleListCacheTags
    */
   public function testGetBundleListCacheTags(): void {
     $entity_type = $this->setUpEntityType(['entity_keys' => ['id' => 'id']]);

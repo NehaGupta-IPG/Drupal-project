@@ -6,11 +6,12 @@ namespace Drupal\Tests\Core\Entity;
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageBase;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Tests Drupal\Core\Entity\EntityStorageBase.
@@ -25,12 +26,12 @@ class EntityStorageBaseTest extends UnitTestCase {
    * @param string $id
    *   ID value for this entity.
    *
-   * @return \Drupal\Core\Entity\EntityInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @return \Drupal\Core\Entity\EntityInterface|\PHPUnit\Framework\MockObject\Stub
    *   The mocked entity.
    */
-  public function generateEntityInterface(string $id): EntityInterface&MockObject {
-    $mock_entity = $this->createMock(EntityInterface::class);
-    $mock_entity->expects($this->any())
+  public function generateEntityInterface(string $id): EntityInterface&Stub {
+    $mock_entity = $this->createStub(EntityInterface::class);
+    $mock_entity
       ->method('id')
       ->willReturn($id);
     return $mock_entity;
@@ -49,8 +50,6 @@ class EntityStorageBaseTest extends UnitTestCase {
 
   /**
    * Tests load.
-   *
-   * @legacy-covers ::load
    */
   #[DataProvider('providerLoad')]
   public function testLoad(string|null $expected, array $entity_fixture, string $query): void {
@@ -105,8 +104,6 @@ class EntityStorageBaseTest extends UnitTestCase {
    * Test loadMultiple().
    *
    * Does not cover statically-cached results.
-   *
-   * @legacy-covers ::loadMultiple
    */
   #[DataProvider('providerLoadMultiple')]
   public function testLoadMultiple(array $expected, array $load_multiple, array|null $query): void {
@@ -126,9 +123,9 @@ class EntityStorageBaseTest extends UnitTestCase {
       ->willReturn($load_multiple);
 
     // Make our EntityTypeInterface mock so that we can turn off static caching.
-    $mock_entity_type = $this->createMock('\Drupal\Core\Entity\EntityTypeInterface');
+    $mock_entity_type = $this->createStub(EntityTypeInterface::class);
     // Disallow caching.
-    $mock_entity_type->expects($this->any())
+    $mock_entity_type
       ->method('isStaticallyCacheable')
       ->willReturn(FALSE);
     // Add the EntityTypeInterface to the storage object.
