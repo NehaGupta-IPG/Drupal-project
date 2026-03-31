@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Ajax\PrependCommand;
 use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\Ajax\ScrollTopCommand;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
@@ -14,14 +15,13 @@ use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Routing\RedirectDestinationInterface;
-use Drupal\Core\Ajax\ScrollTopCommand;
 use Drupal\views\Ajax\SetBrowserUrl;
 use Drupal\views\Ajax\ViewAjaxResponse;
 use Drupal\views\ViewExecutableFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Defines a controller to load a view via AJAX.
@@ -155,6 +155,16 @@ class ViewAjaxController implements ContainerInjectionInterface {
         // Reuse the same DOM id so it matches that in drupalSettings.
         $view->dom_id = $dom_id;
 
+        // Populate request attributes temporarily with ajax_page_state theme
+        // and theme_token for theme negotiation.
+        $theme_keys = [
+          'theme' => TRUE,
+          'theme_token' => TRUE,
+        ];
+        if (is_array($existing_page_state) &&
+          ($temp_attributes = array_intersect_key($existing_page_state, $theme_keys))) {
+          $request->attributes->set('ajax_page_state', $temp_attributes);
+        }
         $preview = $view->preview($display_id, $args);
         if ($target_url) {
           $response->addCommand(new SetBrowserUrl($target_url->toString()));
@@ -166,15 +176,43 @@ class ViewAjaxController implements ContainerInjectionInterface {
           $response->setAttachments($preview['#attached']);
         }
 
+        // Ensure exposed filters in blocks are updated during AJAX requests.
+        // When a view has its exposed filters placed in a block (rather
+        // than inline with the view), we need to replace those blocks during
+        // AJAX updates to maintain consistency.
+        if ($view->display_handler->usesExposedFormInBlock()) {
+          $exposed_form_block_render_array = $view->display_handler->viewExposedFormBlocks();
+          // Only act if the form is exposed in a block.
+          if ($exposed_form_block_render_array !== NULL) {
+            /** @var \Drupal\views\Plugin\views\exposed_form\ExposedFormPluginInterface $exposed_form_plugin */
+            $exposed_form_plugin = $view->display_handler->getPlugin('exposed_form');
+            $exposed_form_data_attribute_value = $exposed_form_block_render_array['#attributes'][$exposed_form_plugin::DATA_ATTRIBUTE_EXPOSED_FORM_IDENTIFIER];
+
+            // When an exposed form is placed in a block, the block element
+            // inherits certain attributes from the form during the initial page
+            // render. We need to remove these attributes from our replacement
+            // content to prevent duplication and UI issues.
+            // The BlockViewBuilder has already applied these attributes to the
+            // block container in the DOM, so we don't need to include them
+            // again in our replacement content.
+            // @see \Drupal\block\BlockViewBuilder::preRender()
+            foreach (['#attributes', '#contextual_links'] as $property) {
+              if (isset($exposed_form_block_render_array[$property])) {
+                unset($exposed_form_block_render_array[$property]);
+              }
+            }
+            $exposed_form = $this->renderer->render($exposed_form_block_render_array);
+            $response->addCommand(new ReplaceCommand('[' . $exposed_form_plugin::DATA_ATTRIBUTE_EXPOSED_FORM_IDENTIFIER . '=' . $exposed_form_data_attribute_value . '] form', $exposed_form));
+          }
+        }
+
         return $response;
       }
-      else {
-        throw new AccessDeniedHttpException();
-      }
+
+      throw new AccessDeniedHttpException();
     }
-    else {
-      throw new NotFoundHttpException();
-    }
+
+    throw new NotFoundHttpException();
   }
 
 }
