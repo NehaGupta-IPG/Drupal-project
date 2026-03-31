@@ -555,7 +555,7 @@ abstract class EntityBase implements EntityInterface {
    * @param bool $update
    *   TRUE if the entity has been updated, or FALSE if it has been inserted.
    */
-  protected function invalidateTagsOnSave($update) {
+  protected function invalidateTagsOnSave($update): void {
     // An entity was created or updated: invalidate its list cache tags. (An
     // updated entity may start to appear in a listing because it now meets that
     // listing's filtering requirements. A newly created entity may start to
@@ -580,7 +580,7 @@ abstract class EntityBase implements EntityInterface {
    * @param \Drupal\Core\Entity\EntityInterface[] $entities
    *   An array of entities.
    */
-  protected static function invalidateTagsOnDelete(EntityTypeInterface $entity_type, array $entities) {
+  protected static function invalidateTagsOnDelete(EntityTypeInterface $entity_type, array $entities): void {
     $tags = $entity_type->getListCacheTags();
     foreach ($entities as $entity) {
       // An entity was deleted: invalidate its own cache tag, but also its list

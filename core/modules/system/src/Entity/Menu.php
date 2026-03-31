@@ -137,7 +137,7 @@ class Menu extends ConfigEntityBase implements MenuInterface {
   /**
    * {@inheritdoc}
    */
-  protected function invalidateTagsOnSave($update) {
+  protected function invalidateTagsOnSave($update): void {
     parent::invalidateTagsOnSave($update);
     // The menu API doesn't require one to use Menu config entities. Hence the
     // Menu config entity should not use config-specific cache tags, but generic
@@ -152,7 +152,7 @@ class Menu extends ConfigEntityBase implements MenuInterface {
   /**
    * {@inheritdoc}
    */
-  protected static function invalidateTagsOnDelete(EntityTypeInterface $entity_type, array $entities) {
+  protected static function invalidateTagsOnDelete(EntityTypeInterface $entity_type, array $entities): void {
     parent::invalidateTagsOnDelete($entity_type, $entities);
     foreach ($entities as $key => $value) {
       Cache::invalidateTags($entities[$key]->getCacheTags());

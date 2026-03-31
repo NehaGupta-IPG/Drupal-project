@@ -512,7 +512,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    * Override to never invalidate the entity's cache tag; the config system
    * already invalidates it.
    */
-  protected function invalidateTagsOnSave($update) {
+  protected function invalidateTagsOnSave($update): void {
     Cache::invalidateTags($this->getListCacheTagsToInvalidate());
   }
 
@@ -522,7 +522,7 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
    * Override to never invalidate the individual entities' cache tags; the
    * config system already invalidates them.
    */
-  protected static function invalidateTagsOnDelete(EntityTypeInterface $entity_type, array $entities) {
+  protected static function invalidateTagsOnDelete(EntityTypeInterface $entity_type, array $entities): void {
     $tags = $entity_type->getListCacheTags();
     foreach ($entities as $entity) {
       $tags = Cache::mergeTags($tags, $entity->getListCacheTagsToInvalidate());
