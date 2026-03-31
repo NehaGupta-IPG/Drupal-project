@@ -14,7 +14,6 @@ use Drupal\Core\DependencyInjection\ClassResolverInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\StringTranslation\PluralTranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\TestTools\Extension\Dump\DebugDump;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use PHPUnit\Framework\MockObject\Stub;
@@ -148,8 +147,8 @@ abstract class UnitTestCase extends TestCase {
    * @return \Drupal\Core\StringTranslation\TranslationInterface|\PHPUnit\Framework\MockObject\Stub
    *   A stub translation object.
    */
-  public function getStringTranslationStub(): TranslationInterface&Stub {
-    $translation = $this->createStub(TranslationInterface::class);
+  public function getStringTranslationStub() {
+    $translation = $this->createStub('Drupal\Core\StringTranslation\TranslationInterface');
     $translation
       ->method('translate')
       ->willReturnCallback(function ($string, array $args = [], array $options = []) use ($translation): TranslatableMarkup {
