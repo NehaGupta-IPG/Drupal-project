@@ -84,7 +84,7 @@ class MenuActiveTrail extends CacheCollector implements MenuActiveTrailInterface
       $this->tags[] = 'menu_link_content_list';
     }
     else {
-      $this->tags[] = 'config:system.menu.' . $menu_name;
+      $this->tags[] = 'menu:' . $menu_name;
     }
     $this->persist($menu_name);
 

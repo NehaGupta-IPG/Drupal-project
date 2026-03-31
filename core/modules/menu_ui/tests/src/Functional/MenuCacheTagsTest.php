@@ -68,7 +68,7 @@ class MenuCacheTagsTest extends PageCacheTagsTestBase {
       'http_response',
       'rendered',
       'config:block_list',
-      'config:system.menu.llama',
+      'menu:llama',
       // The cache contexts associated with the (in)accessible menu links are
       // bubbled.
       'config:user.role.anonymous',
@@ -114,6 +114,10 @@ class MenuCacheTagsTest extends PageCacheTagsTestBase {
 
     // Verify a cache hit.
     $this->verifyPageCache($url, 'HIT', $expected_tags);
+
+    // Verify that default cache tag doesn't invalidate the menu.
+    Cache::invalidateTags(['menu:llama']);
+    $this->verifyPageCache($url, 'HIT');
 
     // Verify that after deleting the menu, there is a cache miss.
     $menu->delete();

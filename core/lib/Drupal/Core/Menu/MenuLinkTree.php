@@ -149,7 +149,7 @@ class MenuLinkTree implements MenuLinkTreeInterface {
       $build['#menu_name'] = $menu_name;
       $build['#items'] = $items;
       // Set cache tag.
-      $build['#cache']['tags'][] = 'config:system.menu.' . $menu_name;
+      $build['#cache']['tags'][] = 'menu:' . $menu_name;
     }
 
     return $build;
