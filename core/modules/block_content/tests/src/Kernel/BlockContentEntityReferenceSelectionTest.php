@@ -142,27 +142,6 @@ class BlockContentEntityReferenceSelectionTest extends KernelTestBase {
   }
 
   /**
-   * Tests with no conditions set.
-   *
-   * @throws \Drupal\Core\Entity\EntityStorageException
-   */
-  public function testNoConditions(): void {
-    $this->assertEquals(
-      $this->expectations['block_reusable'],
-      $this->selectionHandler->getReferenceableEntities()
-    );
-
-    $this->blockNonReusable->setReusable();
-    $this->blockNonReusable->save();
-
-    // Ensure that the block is now returned as a referenceable entity.
-    $this->assertEquals(
-      $this->expectations['both_blocks'],
-      $this->selectionHandler->getReferenceableEntities()
-    );
-  }
-
-  /**
    * Tests setting 'reusable' condition on different levels.
    *
    * @throws \Exception

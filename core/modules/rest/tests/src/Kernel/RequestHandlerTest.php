@@ -39,13 +39,6 @@ class RequestHandlerTest extends KernelTestBase {
   protected static $modules = ['serialization', 'rest'];
 
   /**
-   * The entity storage.
-   *
-   * @var \Prophecy\Prophecy\ObjectProphecy
-   */
-  protected $entityStorage;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -59,8 +52,6 @@ class RequestHandlerTest extends KernelTestBase {
 
   /**
    * Tests handle.
-   *
-   * @legacy-covers ::handle
    */
   public function testHandle(): void {
     $request = new Request([], [], [], [], [], ['CONTENT_TYPE' => 'application/json'], Json::encode(['this is an array']));

@@ -94,17 +94,30 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
       throw new InvalidPluginDefinitionException($plugin_id, sprintf('The "%s" layout definition must extend %s', $plugin_id, LayoutDefinition::class));
     }
 
-    // Add the module or theme path to the 'path'.
+    if (empty($definition->getLabel())) {
+      throw new InvalidPluginDefinitionException($plugin_id, sprintf('The "%s" layout definition must have a label.', $plugin_id));
+    }
+
+    // Ensure that every plugin has a category.
     $provider = $definition->getProvider();
     if ($this->moduleHandler->moduleExists($provider)) {
-      $base_path = $this->moduleHandler->getModule($provider)->getPath();
+      $extension = $this->moduleHandler->getModule($provider);
     }
     elseif ($this->themeHandler->themeExists($provider)) {
-      $base_path = $this->themeHandler->getTheme($provider)->getPath();
+      $extension = $this->themeHandler->getTheme($provider);
     }
     else {
-      $base_path = '';
+      $extension = NULL;
     }
+    if (empty($definition->getCategory())) {
+      // Default to the human-readable name if the provider is a module or
+      // theme; otherwise the provider machine name is used.
+      $category = $extension ? $extension->getName() : $provider;
+      $definition->setCategory($category);
+    }
+
+    // Add the module or theme path to the 'path'.
+    $base_path = $extension ? $extension->getPath() : '';
 
     $path = $definition->getPath();
     $path = !empty($path) ? $base_path . '/' . $path : $base_path;
@@ -200,7 +213,7 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
    * @return \Drupal\Core\Layout\LayoutDefinition[]
    *   An array of plugin definitions, sorted by category and label.
    */
-  public function getSortedDefinitions(?array $definitions = NULL, $label_key = 'label') {
+  public function getSortedDefinitions(?array $definitions = NULL, string $label_key = 'label') {
     // Sort the plugins first by category, then by label.
     $definitions = $definitions ?? $this->getDefinitions();
     uasort($definitions, function (LayoutDefinition $a, LayoutDefinition $b) {
@@ -219,7 +232,7 @@ class LayoutPluginManager extends DefaultPluginManager implements LayoutPluginMa
    *   Keys are category names, and values are arrays of which the keys are
    *   plugin IDs and the values are plugin definitions.
    */
-  public function getGroupedDefinitions(?array $definitions = NULL, $label_key = 'label') {
+  public function getGroupedDefinitions(?array $definitions = NULL, string $label_key = 'label') {
     $definitions = $this->getSortedDefinitions($definitions ?? $this->getDefinitions(), $label_key);
     $grouped_definitions = [];
     foreach ($definitions as $id => $definition) {

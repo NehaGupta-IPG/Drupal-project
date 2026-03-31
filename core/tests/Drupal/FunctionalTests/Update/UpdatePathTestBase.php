@@ -6,13 +6,13 @@ namespace Drupal\FunctionalTests\Update;
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\Html;
-use Drupal\Core\Site\Settings;
-use Drupal\Tests\BrowserTestBase;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
+use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\UpdatePathTestTrait;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
@@ -93,7 +93,7 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
    * then needed to set various things such as the config directories and the
    * container that would normally be done via the installer.
    */
-  public function installDrupal() {
+  public function installDrupal(): void {
     // Set the update URL. This must be set here rather than in
     // self::__construct() or the old URL generator will leak additional test
     // sites. Additionally, we need to prevent the path alias processor from
@@ -123,6 +123,16 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
     $this->container = \Drupal::getContainer();
 
     $this->replaceUser1();
+
+    // Ensure the locale.settings:translation.path config is set to the dynamic
+    // files folder.
+    // @todo remove this part when BC support for the config is removed.
+    $config = $this->config('locale.settings');
+    if (!$config->isNew() && $config->get('translation.path')) {
+      $translation_path_config = $this->publicFilesDirectory . '/translations';
+      \Drupal::service('file_system')->prepareDirectory($translation_path_config, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
+      $config->set('translation.path', $translation_path_config)->save();
+    }
 
     require_once $this->root . '/core/includes/update.inc';
   }
@@ -270,7 +280,7 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
       ->fetchAllKeyed(0, 1);
     // For the purpose of fetching the notices and displaying more helpful error
     // messages, let's override the error handler temporarily.
-    set_error_handler(function ($severity, $message, $filename, $lineno) {
+    set_error_handler(function ($severity, $message, $filename, $lineno): void {
       throw new \ErrorException($message, 0, $severity, $filename, $lineno);
     });
     foreach ($result as $route_name => $route) {
