@@ -488,7 +488,7 @@ default:
   variables:
     TESTSUITE: PHPUnit-Functional
     CONCURRENCY: "20"
-    KUBERNETES_CPU_REQUEST: "12"
+    KUBERNETES_CPU_REQUEST: "14"
   services:
     - <<: *with-database
 
