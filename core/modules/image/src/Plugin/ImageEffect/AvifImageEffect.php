@@ -61,6 +61,16 @@ class AvifImageEffect extends ConvertImageEffect {
   /**
    * {@inheritdoc}
    */
+  public function getSummary() {
+    $summary = parent::getSummary();
+    $summary['#markup'] = $this->t('(Fallback: @extension)', ['@extension' => mb_strtoupper($this->configuration['extension'])]);
+
+    return $summary;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getDerivativeExtension($extension) {
     return $this->isAvifSupported() ? 'avif' : $this->configuration['extension'];
   }
