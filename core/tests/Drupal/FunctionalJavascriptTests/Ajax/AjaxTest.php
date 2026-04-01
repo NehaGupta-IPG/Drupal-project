@@ -292,7 +292,7 @@ JS;
       // Click on the AJAX link.
       $this->clickLink('Ajax Exception');
       $this->assertSession()
-        ->statusMessageContainsAfterWait("Oops, something went wrong. Check your browser's developer console for more details.", 'error');
+        ->statusMessageContainsAfterWait('Something went wrong (error 500). Please try again.', 'error');
 
       if ($theme === 'default_admin') {
         // Check that the message can be closed.

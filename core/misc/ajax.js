@@ -185,10 +185,13 @@
     if (!Drupal.AjaxError.messages) {
       Drupal.AjaxError.messages = new Drupal.Message();
     }
+    const errorLabel = xmlhttp.status
+      ? Drupal.t('error @status', { '@status': xmlhttp.status })
+      : Drupal.t('network error');
     Drupal.AjaxError.messages.add(
-      Drupal.t(
-        "Oops, something went wrong. Check your browser's developer console for more details.",
-      ),
+      Drupal.t('Something went wrong (@error). Please try again.', {
+        '@error': errorLabel,
+      }),
       {
         type: 'error',
       },
