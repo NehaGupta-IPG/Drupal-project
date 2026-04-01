@@ -148,7 +148,7 @@ class IncludeResolver {
 
           // Support entity reference fields that don't have the referenced
           // target type stored in settings.
-          $references[$field_item->entity->getEntityTypeId()][] = $field_item->get($field_item::mainPropertyName())->getValue();
+          $references[$field_item->entity->getEntityTypeId()][] = $field_item->entity->id();
         }
       }
       foreach ($references as $target_type => $ids) {

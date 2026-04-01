@@ -77,6 +77,43 @@ class JsonApiRelationshipTest extends JsonApiFunctionalTestBase {
   }
 
   /**
+   * Tests that include resolver locates entities for non entity ID references.
+   */
+  public function testGetIncludeUUIDPropertyReferenceField(): void {
+    $user = $this->drupalCreateUser([
+      'administer entity_test content',
+      'view test entity',
+    ]);
+
+    $storage = $this->container->get('entity_type.manager')
+      ->getStorage($this->entityTypeId);
+    $childEntity = $storage->create(['type' => $this->bundle]);
+    $childEntity->save();
+    $parentEntity = $storage->create([
+      'type' => $this->bundle,
+      $this->fieldName => ['entity' => $childEntity],
+    ]);
+    $parentEntity->save();
+
+    $url = Url::fromUri(sprintf(
+      'internal:/jsonapi/%s/%s/%s?include=%s',
+      $this->entityTypeId,
+      $this->bundle,
+      $parentEntity->uuid(),
+      $this->fieldName,
+    ));
+    $response = $this->request('GET', $url, [
+      RequestOptions::HEADERS => ['Accept' => 'application/vnd.api+json'],
+      RequestOptions::AUTH => [$user->getAccountName(), $user->pass_raw],
+    ]);
+    $this->assertSame(200, $response->getStatusCode(), (string) $response->getBody());
+    $document = $this->getDocumentFromResponse($response);
+    $this->assertArrayHasKey('included', $document);
+    $included_ids = array_column($document['included'], 'id');
+    $this->assertContains($childEntity->uuid(), $included_ids);
+  }
+
+  /**
    * Test relationships without target_id as main property.
    *
    * @see https://www.drupal.org/project/drupal/issues/3476224
