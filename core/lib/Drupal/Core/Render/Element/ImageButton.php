@@ -33,33 +33,9 @@ class ImageButton extends Submit {
   public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
     if ($input !== FALSE) {
       if (!empty($input)) {
-        // If we're dealing with Mozilla or Opera, we're lucky. It will
-        // return a proper value, and we can get on with things.
         return $element['#return_value'];
       }
-      else {
-        // Unfortunately, in IE we never get back a proper value for THIS
-        // form element. Instead, we get back two split values: one for the
-        // X and one for the Y coordinates on which the user clicked the
-        // button. We'll find this element in the #post data, and search
-        // in the same spot for its name, with '_x'.
-        $input = $form_state->getUserInput();
-        foreach (explode('[', $element['#name']) as $element_name) {
-          // Chop off the ] that may exist.
-          if (str_ends_with($element_name, ']')) {
-            $element_name = substr($element_name, 0, -1);
-          }
-
-          if (!isset($input[$element_name])) {
-            if (isset($input[$element_name . '_x'])) {
-              return $element['#return_value'];
-            }
-            return NULL;
-          }
-          $input = $input[$element_name];
-        }
-        return $element['#return_value'];
-      }
+      return NULL;
     }
   }
 
