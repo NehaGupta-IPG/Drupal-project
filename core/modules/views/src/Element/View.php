@@ -83,14 +83,6 @@ class View extends RenderElementBase {
           $element['#title'] = &$element['view_build']['#title'];
         }
 
-        if (empty($view->display_handler->getPluginDefinition()['returns_response'])) {
-          // views_add_contextual_links() needs the following information in
-          // order to be attached to the view.
-          $element['#view_id'] = $view->storage->id();
-          $element['#view_display_show_admin_links'] = $view->getShowAdminLinks();
-          $element['#view_display_plugin_id'] = $view->display_handler->getPluginId();
-          views_add_contextual_links($element, 'view', $view->current_display);
-        }
       }
       if (empty($view->display_handler->getPluginDefinition()['returns_response'])) {
         $element['#attributes']['class'][] = 'views-element-container';

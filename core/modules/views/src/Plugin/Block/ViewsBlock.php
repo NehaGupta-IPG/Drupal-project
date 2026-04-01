@@ -55,9 +55,6 @@ class ViewsBlock extends ViewsBlockBase {
     // entry for the view output by passing FALSE, because we're going to cache
     // the whole block instead.
     if ($output = $this->view->buildRenderable($this->displayID, array_values($args), FALSE)) {
-      // Before returning the block output, convert it to a renderable array
-      // with contextual links.
-      $this->addContextualLinks($output);
 
       // Block module expects to get a final render array, without another
       // top-level #pre_render callback. So, here we make sure that Views'

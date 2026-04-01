@@ -145,13 +145,16 @@
       }
 
       // Collect the IDs for all contextual links placeholders.
-      const ids = [];
+      var ids = [];
       $placeholders.each(function () {
         ids.push({
           id: $(this).attr('data-contextual-id'),
           token: $(this).attr('data-contextual-token'),
         });
       });
+
+      // Remove duplicates from the IDs array.
+      ids = _.uniq(ids);
 
       const uncachedIDs = [];
       const uncachedTokens = [];
