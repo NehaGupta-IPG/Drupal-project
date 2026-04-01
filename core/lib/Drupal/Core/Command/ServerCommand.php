@@ -61,6 +61,9 @@ class ServerCommand extends Command {
   protected function execute(InputInterface $input, OutputInterface $output): int {
     $io = new SymfonyStyle($input, $output);
 
+    // Change the directory to the Drupal root.
+    chdir(dirname(__DIR__, 5));
+
     $host = $input->getOption('host');
     $port = $input->getOption('port');
     if (!$port) {

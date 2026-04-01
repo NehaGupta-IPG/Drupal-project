@@ -259,6 +259,52 @@ class QuickStartTest extends BuildTestBase {
   }
 
   /**
+   * Tests the server command works when not run from the Drupal root.
+   */
+  public function testServerFromNonRootDirectory(): void {
+    $sqlite = (new \PDO('sqlite::memory:'))->query('select sqlite_version()')->fetch()[0];
+    if (version_compare($sqlite, Tasks::SQLITE_MINIMUM_VERSION) < 0) {
+      $this->markTestSkipped();
+    }
+
+    // Install a site first.
+    $install_command = [
+      $this->php,
+      'core/scripts/drupal',
+      'install',
+      'minimal',
+      "--password='secret'",
+      "--site-name='Test site {$this->testDb->getDatabasePrefix()}'",
+    ];
+    $install_process = new Process($install_command, NULL, ['DRUPAL_DEV_SITE_PATH' => $this->testDb->getTestSitePath()]);
+    $install_process->setTimeout(500);
+    $install_process->run();
+    $this->assertSame(0, $install_process->getExitCode());
+
+    // Run the server command from a non-root directory.
+    $server_command = [
+      $this->php,
+      $this->root . '/core/scripts/drupal',
+      'server',
+      '--suppress-login',
+    ];
+    $server_process = new Process($server_command, sys_get_temp_dir(), ['DRUPAL_DEV_SITE_PATH' => $this->testDb->getTestSitePath()]);
+    $server_process->start();
+    $port = FALSE;
+    $server_process->waitUntil(function ($type, $output) use (&$port) {
+      if (preg_match('/127.0.0.1:(\d+)/', $output, $match)) {
+        $port = $match[1];
+        return TRUE;
+      }
+    });
+    $this->assertEquals('', $server_process->getErrorOutput());
+    $this->assertNotFalse($port, "Web server running on port $port");
+
+    // Stop the web server.
+    $server_process->stop();
+  }
+
+  /**
    * Deletes all files and directories in the specified path recursively.
    *
    * Note this method has no dependencies on Drupal core to ensure that the
