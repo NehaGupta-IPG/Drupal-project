@@ -6,6 +6,7 @@ namespace Drupal\FunctionalTests\Routing;
 
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
@@ -28,7 +29,11 @@ class LazyRouteProviderInstallTest extends BrowserTestBase {
   /**
    * Tests that the lazy route provider is used during a module install.
    */
+  #[IgnoreDeprecations]
   public function testInstallation(): void {
+    // @todo Remove this deprecation and enable autoconfiguration in Drupal 13.
+    $this->expectUserDeprecationMessage('Automatically tagging plugin managers with "plugin_manager_cache_clear" is deprecated in drupal:11.4.0 and will be removed from drupal:13.0.0. Use autoconfiguration or manually tag the "plugin.manager.lazy_route_provider_install_test" service. See https://www.drupal.org/node/9999999');
+
     $this->container->get('module_installer')->install(['router_test']);
     // Note that on DrupalCI the test site is installed in a sub directory so
     // we cannot use ::assertEquals().
