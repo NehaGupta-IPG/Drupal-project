@@ -54,31 +54,48 @@ class BlockContentRevisionRevertTest extends BlockContentTestBase {
     $this->drupalGet($entity->toUrl('revision-revert-form'));
     $this->assertSession()->statusCodeEquals(403);
 
-    // Create a new non default revision.
+    // Create two new non default revisions.
     $entity
       ->setRevisionCreationTime((new \DateTimeImmutable('11 January 2009 5pm'))->getTimestamp())
       ->setRevisionTranslationAffected(TRUE)
       ->setNewRevision();
     $entity->isDefaultRevision(FALSE);
     $entity->save();
-    $nonDefaultRevisionId = $entity->getRevisionId();
+    $firstNonDefaultRevisionId = $entity->getRevisionId();
 
-    // Reload the default entity.
-    $revision = \Drupal::entityTypeManager()->getStorage('block_content')
-      ->loadRevision($revisionId);
-    // Cannot revert default revision.
-    $this->drupalGet($revision->toUrl('revision-revert-form'));
+    $entity
+      ->setRevisionCreationTime((new \DateTimeImmutable('11 January 2009 6pm'))->getTimestamp())
+      ->setRevisionTranslationAffected(TRUE)
+      ->setNewRevision();
+    $entity->isDefaultRevision(FALSE);
+    $entity->save();
+    $latestRevisionId = $entity->getRevisionId();
+
+    // Can't revert the latest revision.
+    $latestRevision = \Drupal::entityTypeManager()->getStorage('block_content')
+      ->loadRevision($latestRevisionId);
+    $this->drupalGet($latestRevision->toUrl('revision-revert-form'));
     $this->assertSession()->statusCodeEquals(403);
-    $this->assertFalse($revision->access('revert', $this->adminUser, FALSE));
+    $this->assertFalse($latestRevision->access('revert', $this->adminUser, FALSE));
 
-    // Reload the non default entity.
-    $revision2 = \Drupal::entityTypeManager()->getStorage('block_content')
-      ->loadRevision($nonDefaultRevisionId);
-    $this->drupalGet($revision2->toUrl('revision-revert-form'));
+    // Can revert to the non-latest non-default revision.
+    $firstNonDefaultRevision = \Drupal::entityTypeManager()->getStorage('block_content')
+      ->loadRevision($firstNonDefaultRevisionId);
+    $this->drupalGet($firstNonDefaultRevision->toUrl('revision-revert-form'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertTrue($firstNonDefaultRevision->access('revert', $this->adminUser, FALSE));
     $this->assertSession()->pageTextContains('Are you sure you want to revert to the revision from Sun, 11 Jan 2009 - 17:00?');
     $this->assertSession()->buttonExists('Revert');
     $this->assertSession()->linkExists('Cancel');
-    $this->assertTrue($revision2->access('revert', $this->adminUser, FALSE));
+
+    // Can revert to the default revision now that it is not the latest.
+    $defaultRevision = \Drupal::entityTypeManager()->getStorage('block_content')
+      ->loadRevision($revisionId);
+    $this->drupalGet($defaultRevision->toUrl('revision-revert-form'));
+    $this->assertSession()->pageTextContains('Are you sure you want to revert to the revision from Sun, 11 Jan 2009 - 16:00?');
+    $this->assertSession()->buttonExists('Revert');
+    $this->assertSession()->linkExists('Cancel');
+    $this->assertTrue($defaultRevision->access('revert', $this->adminUser, FALSE));
 
     $countRevisions = static function (): int {
       return (int) \Drupal::entityTypeManager()->getStorage('block_content')
@@ -90,14 +107,26 @@ class BlockContentRevisionRevertTest extends BlockContentTestBase {
     };
 
     $count = $countRevisions();
+
+    // Revert to the non-latest non-default revision.
+    $this->drupalGet($firstNonDefaultRevision->toUrl('revision-revert-form'));
     $this->submitForm([], 'Revert');
     $this->assertEquals($count + 1, $countRevisions());
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->addressEquals(sprintf('admin/content/block/%s/revisions', $entity->id()));
     $this->assertSession()->pageTextContains(sprintf('basic %s has been reverted to the revision from Sun, 11 Jan 2009 - 17:00.', $entity->label()));
-    // Three rows, from the top: the newly reverted revision, the revision from
-    // 5pm, and the revision from 4pm.
-    $this->assertSession()->elementsCount('css', 'table tbody tr', 3);
+    // Four rows expected: The new reverted revision, and the three created revisions.
+    $this->assertSession()->elementsCount('css', 'table tbody tr', 4);
+
+    // Revert to the default revision.
+    $this->drupalGet($defaultRevision->toUrl('revision-revert-form'));
+    $this->submitForm([], 'Revert');
+    $this->assertEquals($count + 2, $countRevisions());
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->addressEquals(sprintf('admin/content/block/%s/revisions', $entity->id()));
+    $this->assertSession()->pageTextContains(sprintf('basic %s has been reverted to the revision from Sun, 11 Jan 2009 - 16:00.', $entity->label()));
+    // Five rows expected: The two new reverted revision, and the three created revisions.
+    $this->assertSession()->elementsCount('css', 'table tbody tr', 5);
   }
 
 }
