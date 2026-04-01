@@ -172,11 +172,9 @@ class NodeRevisionsUiTest extends NodeTestBase {
     $this->drupalGet($node->toUrl('version-history'));
 
     // Verify that the latest affected revision having been a default revision
-    // is displayed as the current one.
-    $this->assertSession()->linkByHrefNotExists('/node/' . $node_id . '/revisions/1/revert');
-    // The site may be installed in a subdirectory, so check if the URL is
-    // contained in the retrieved one.
-    $this->assertSession()->elementAttributeContains('xpath', '//tr[contains(@class, "revision-current")]/td/a[1]', 'href', '/node/1');
+    // is displayed as the current one. The site may be installed in a
+    // subdirectory, so check if the URL is contained in the retrieved one.
+    $this->assertSession()->elementAttributeContains('xpath', '//tr[contains(@class, "revision-current")]/td[2]//a[1]', 'href', '/node/1/revisions/1/revert');
 
     // Verify that the default revision can be an older revision than the latest
     // one.
