@@ -128,11 +128,14 @@ class RevisionRevertFormTest extends BrowserTestBase {
   }
 
   /**
-   * Ensures that forward revisions can be reverted.
+   * Ensures that forward revisions except the latest can be reverted.
    *
    * @legacy-covers \Drupal\Core\Entity\EntityAccessControlHandler::checkAccess
    */
   protected function testAccessRevertLatestForwardRevision(): void {
+    /** @var \Drupal\Core\Entity\RevisionableStorageInterface $storage */
+    $storage = \Drupal::entityTypeManager()->getStorage('entity_test_revpub');
+
     /** @var \Drupal\entity_test\Entity\EntityTestRev $entity */
     $entity = EntityTestRevPub::create();
     $entity->setName('revert');
@@ -145,10 +148,22 @@ class RevisionRevertFormTest extends BrowserTestBase {
     $entity->setUnpublished();
     $entity->setNewRevision();
     $entity->save();
+    $nonLatestForwardRevisionId = $entity->getRevisionId();
+
+    $entity->isDefaultRevision(FALSE);
+    $entity->setUnpublished();
+    $entity->setNewRevision();
+    $entity->save();
+
+    $nonLatestForwardRevision = $storage->loadRevision($nonLatestForwardRevisionId);
+
+    $this->drupalGet($nonLatestForwardRevision->toUrl('revision-revert-form'));
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertTrue($nonLatestForwardRevision->access('revert', $this->rootUser, FALSE));
 
     $this->drupalGet($entity->toUrl('revision-revert-form'));
-    $this->assertSession()->statusCodeEquals(200);
-    $this->assertTrue($entity->access('revert', $this->rootUser, FALSE));
+    $this->assertSession()->statusCodeEquals(403);
+    $this->assertFalse($entity->access('revert', $this->rootUser, FALSE));
   }
 
   /**
