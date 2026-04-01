@@ -39,16 +39,12 @@ class ManyToOneHelper {
     $this->handler = $handler;
   }
 
-  /**
-   *
-   */
+
   public static function defineOptions(&$options) {
     $options['reduce_duplicates'] = ['default' => FALSE];
   }
 
-  /**
-   *
-   */
+
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     $form['reduce_duplicates'] = [
       '#type' => 'checkbox',
@@ -129,9 +125,7 @@ class ManyToOneHelper {
     return $alias;
   }
 
-  /**
-   *
-   */
+
   public function getJoin() {
     return $this->handler->getJoin();
   }
@@ -284,9 +278,7 @@ class ManyToOneHelper {
     return $this->handler->query->placeholder($this->handler->options['table'] . '_' . $this->handler->options['field']);
   }
 
-  /**
-   *
-   */
+
   public function addFilter() {
     if (empty($this->handler->value)) {
       return;
