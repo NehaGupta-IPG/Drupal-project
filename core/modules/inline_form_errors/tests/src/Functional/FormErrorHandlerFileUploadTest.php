@@ -58,7 +58,7 @@ class FormErrorHandlerFileUploadTest extends BrowserTestBase {
       'entity_type' => 'node',
       'bundle' => 'page',
       'required' => TRUE,
-      'settings' => ['file_extensions' => 'png gif jpg jpeg webp'],
+      'settings' => ['file_extensions' => 'png gif jpg jpeg webp avif'],
     ])->save();
 
     EntityFormDisplay::create([

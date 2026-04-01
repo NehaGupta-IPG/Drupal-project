@@ -79,7 +79,7 @@ class ImageItem extends FileItem {
    */
   public static function defaultFieldSettings() {
     $settings = [
-      'file_extensions' => 'png gif jpg jpeg webp',
+      'file_extensions' => 'png gif jpg jpeg webp avif',
       'alt_field' => 1,
       'alt_field_required' => 1,
       'title_field' => 0,
