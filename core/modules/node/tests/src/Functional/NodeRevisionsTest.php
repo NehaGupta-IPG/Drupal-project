@@ -477,13 +477,15 @@ class NodeRevisionsTest extends NodeTestBase {
   }
 
   /**
-   * Tests the Set as current revision link.
+   * Tests reverting to a non-latest revision.
    *
    * This operation appears on the revision list when there is a more recent
    * revision than the current revision.
    */
-  public function testSetAsCurrentRevision(): void {
+  public function testRevisionRevert(): void {
     $node = $this->drupalCreateNode();
+    $firstRevisionId = $node->getRevisionId();
+
     // Create a non-default revision.
     $node->setNewRevision();
     $node->isDefaultRevision(FALSE);
@@ -492,8 +494,21 @@ class NodeRevisionsTest extends NodeTestBase {
     $node->save();
 
     $this->drupalGet($node->toUrl('version-history'));
-    $this->assertSession()->linkExists('Set as current revision');
-    $this->clickLink('Set as current revision');
+
+    // There should be no link to revert to the latest revision.
+    $latestRevisionRevertUrl = Url::fromRoute('node.revision_revert_confirm', [
+      'node' => $node->id(),
+      'node_revision' => $node->getRevisionId(),
+    ]);
+    $this->assertSession()->linkByHrefNotExistsExact($latestRevisionRevertUrl->toString());
+
+    // There should be a link to revert to the non-latest revision.
+    $firstRevisionRevertUrl = Url::fromRoute('node.revision_revert_confirm', [
+      'node' => $node->id(),
+      'node_revision' => $firstRevisionId,
+    ]);
+    $this->assertSession()->linkByHrefExistsExact($firstRevisionRevertUrl->toString());
+    $this->clickLink('Revert');
     $this->submitForm([], 'Revert');
 
     $this->assertSession()->pageTextContains(sprintf('Basic page %s has been reverted', $node->label()));
