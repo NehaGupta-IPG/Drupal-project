@@ -13,6 +13,7 @@ use Drupal\Core\Url;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Provides content for dialog tests.
@@ -444,6 +445,47 @@ class AjaxTestController {
       '#type' => 'link',
       '#url' => Url::fromRoute('ajax_test.throw_exception'),
       '#title' => 'Ajax Exception',
+      '#attributes' => [
+        'class' => ['use-ajax'],
+      ],
+      '#attached' => [
+        'library' => [
+          'core/drupal.ajax',
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * Returns an empty response with the given HTTP status code.
+   *
+   * @param int $code
+   *   HTTP status code between 100 and 599.
+   *
+   * @return \Symfony\Component\HttpFoundation\Response
+   *   The response.
+   */
+  public function httpStatus(int $code) {
+    if ($code < 100 || $code > 599) {
+      throw new NotFoundHttpException();
+    }
+    return new Response('', $code);
+  }
+
+  /**
+   * Provides an Ajax link that targets a bare HTTP error response.
+   *
+   * @param int $code
+   *   HTTP status code for the Ajax request target.
+   *
+   * @return array
+   *   The Ajax link render array.
+   */
+  public function httpStatusLink(int $code) {
+    return [
+      '#type' => 'link',
+      '#url' => Url::fromRoute('ajax_test.http_status', ['code' => $code]),
+      '#title' => 'Ajax HTTP status',
       '#attributes' => [
         'class' => ['use-ajax'],
       ],

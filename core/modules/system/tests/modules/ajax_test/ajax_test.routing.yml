@@ -137,6 +137,22 @@ ajax_test.throw_exception:
   requirements:
     _access: 'TRUE'
 
+ajax_test.http_status:
+  path: '/ajax-test/http-status/{code}'
+  defaults:
+    _controller: '\Drupal\ajax_test\Controller\AjaxTestController::httpStatus'
+  requirements:
+    _access: 'TRUE'
+    code: '\d+'
+
+ajax_test.http_status_link:
+  path: '/ajax-test/http-status-link/{code}'
+  defaults:
+    _controller: '\Drupal\ajax_test\Controller\AjaxTestController::httpStatusLink'
+  requirements:
+    _access: 'TRUE'
+    code: '\d+'
+
 ajax_test.http_methods:
   path: '/ajax-test/http-methods'
   defaults:

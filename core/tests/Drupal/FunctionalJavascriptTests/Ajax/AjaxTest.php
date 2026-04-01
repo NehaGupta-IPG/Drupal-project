@@ -269,9 +269,43 @@ JS;
   }
 
   /**
-   * Tests that Ajax errors are visible in the UI.
+   * Tests Ajax error messages for HTTP failures and network errors.
    */
-  public function testUiAjaxException(): void {
+  public function testUiAjaxErrorUserFacingMessages(): void {
+    $this->failOnJavascriptConsoleErrors = FALSE;
+
+    // Test various server error codes.
+    $httpCases = [
+      500 => 'Something went wrong (error 500). Please try again.',
+      503 => 'Something went wrong (error 503). Please try again.',
+      418 => 'Something went wrong (error 418). Please try again.',
+    ];
+    foreach ($httpCases as $code => $expectedMessage) {
+      $this->drupalGet('ajax-test/http-status-link/' . $code);
+      $this->clickLink('Ajax HTTP status');
+      $this->assertSession()->statusMessageContainsAfterWait($expectedMessage, 'error');
+      $this->getSession()->executeScript('window.drupalActiveXhrCount = 0;');
+    }
+
+    // Test network error.
+    $this->drupalGet('ajax-test/exception-link');
+    $this->getSession()->executeScript(<<<'JS'
+(function () {
+  const xhr = { status: 0, statusText: '', responseText: '', readyState: 0 };
+  new Drupal.AjaxError(xhr, '/ajax-test/fake', null);
+})();
+JS);
+    $this->assertSession()->statusMessageContainsAfterWait(
+      'Something went wrong (network error). Please try again.',
+      'error',
+    );
+    $this->getSession()->executeScript('window.drupalActiveXhrCount = 0;');
+  }
+
+  /**
+   * Tests that Ajax error messages appear across default themes and can close.
+   */
+  public function testUiAjaxErrorMessageThemes(): void {
     $themes = [
       'default_admin',
       'stark',
@@ -284,13 +318,12 @@ JS;
       $theme_config->save();
       \Drupal::service('router.builder')->rebuildIfNeeded();
 
-      $this->drupalGet('ajax-test/exception-link');
+      $this->drupalGet('ajax-test/http-status-link/500');
       $page = $this->getSession()->getPage();
       // We don't want the test to error out because of an expected Javascript
       // console error.
       $this->failOnJavascriptConsoleErrors = FALSE;
-      // Click on the AJAX link.
-      $this->clickLink('Ajax Exception');
+      $this->clickLink('Ajax HTTP status');
       $this->assertSession()
         ->statusMessageContainsAfterWait('Something went wrong (error 500). Please try again.', 'error');
 
@@ -302,9 +335,7 @@ JS;
       }
     }
 
-    // This is needed to avoid an unfinished AJAX request error from tearDown()
-    // because this test intentionally does not complete all AJAX requests.
-    $this->getSession()->executeScript("delete window.drupalActiveXhrCount");
+    $this->getSession()->executeScript('window.drupalActiveXhrCount = 0;');
   }
 
   /**
