@@ -43,7 +43,6 @@ class StringArgument extends ArgumentPluginBase {
     }
   }
 
-
   protected function defineOptions() {
     $options = parent::defineOptions();
 
@@ -356,7 +355,6 @@ class StringArgument extends ArgumentPluginBase {
     }
   }
 
-
   public function summaryArgument($data) {
     $value = $this->caseTransform($data->{$this->base_alias}, $this->options['path_case']);
     if (!empty($this->options['transform_dash'])) {
@@ -371,7 +369,6 @@ class StringArgument extends ArgumentPluginBase {
   public function getSortName() {
     return $this->t('Alphabetical', [], ['context' => 'Sort order']);
   }
-
 
   public function title() {
     // Support case-insensitive title comparisons for PostgreSQL by converting
@@ -410,7 +407,6 @@ class StringArgument extends ArgumentPluginBase {
   public function titleQuery() {
     return $this->value;
   }
-
 
   public function summaryName($data) {
     return $this->caseTransform(parent::summaryName($data), $this->options['case']);
