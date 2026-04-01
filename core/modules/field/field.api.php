@@ -279,7 +279,6 @@ function hook_field_widget_single_element_WIDGET_TYPE_form_alter(array &$element
  *   - widget: The widget plugin instance.
  *   - items: The field values, as a
  *     \Drupal\Core\Field\FieldItemListInterface object.
- *   - delta: The order of this item in the array of subelements (0, 1, 2, etc).
  *   - default: A boolean indicating whether the form is being shown as a dummy
  *     form to set default values.
  *
@@ -311,7 +310,6 @@ function hook_field_widget_complete_form_alter(&$field_widget_complete_form, For
  *   - widget: The widget plugin instance.
  *   - items: The field values, as a
  *     \Drupal\Core\Field\FieldItemListInterface object.
- *   - delta: The order of this item in the array of subelements (0, 1, 2, etc).
  *   - default: A boolean indicating whether the form is being shown as a dummy
  *     form to set default values.
  *
