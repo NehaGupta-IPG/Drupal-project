@@ -39,10 +39,16 @@ class ManyToOneHelper {
     $this->handler = $handler;
   }
 
+  /**
+   *
+   */
   public static function defineOptions(&$options) {
     $options['reduce_duplicates'] = ['default' => FALSE];
   }
 
+  /**
+   *
+   */
   public function buildOptionsForm(&$form, FormStateInterface $form_state) {
     $form['reduce_duplicates'] = [
       '#type' => 'checkbox',
@@ -89,7 +95,7 @@ class ManyToOneHelper {
     // to create a new relationship to use.
     $relationship = $this->handler->relationship;
 
-    // Determine the primary table to seek
+    // Determine the primary table to seek.
     if (empty($this->handler->query->relationships[$relationship])) {
       $base_table = $this->handler->view->storage->get('base_table');
     }
@@ -123,6 +129,9 @@ class ManyToOneHelper {
     return $alias;
   }
 
+  /**
+   *
+   */
   public function getJoin() {
     return $this->handler->getJoin();
   }
@@ -137,7 +146,7 @@ class ManyToOneHelper {
     $field = $this->handler->relationship . '_' . $this->handler->table . '.' . $this->handler->field;
     $join = $this->getJoin();
 
-    // Shortcuts
+    // Shortcuts.
     $options = $this->handler->options;
     $view = $this->handler->view;
     $query = $this->handler->query;
@@ -275,6 +284,9 @@ class ManyToOneHelper {
     return $this->handler->query->placeholder($this->handler->options['table'] . '_' . $this->handler->options['field']);
   }
 
+  /**
+   *
+   */
   public function addFilter() {
     if (empty($this->handler->value)) {
       return;
@@ -304,8 +316,18 @@ class ManyToOneHelper {
         $operator = 'IN';
       }
       else {
-        $value = is_array($value) ? array_pop($value) : $value;
-        $operator = '=';
+        if (!empty($options['value_operator'])) {
+          $value = is_array($value) ? array_pop($value) : $value;
+          $info = $this->handler->valueOperators()[$options['value_operator']];
+          $operator = $info['operator'];
+          if (!empty($info['method'])) {
+            $value = $this->handler->{$info['method']}($value);
+          }
+        }
+        else {
+          $value = is_array($value) ? array_pop($value) : $value;
+          $operator = '=';
+        }
       }
       $add_condition = FALSE;
     }
