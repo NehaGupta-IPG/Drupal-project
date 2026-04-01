@@ -29,6 +29,7 @@ use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Component\Plugin\Discovery\CachedDiscoveryInterface;
 use Drupal\Core\Extension\ModuleUninstallValidatorInterface;
 use Drupal\Core\Hook\ThemeHookCollectorPass;
+use Drupal\Core\Plugin\PluginManagerPass;
 use Drupal\Core\PreWarm\PreWarmableInterface;
 use Drupal\Core\Queue\QueueFactoryInterface;
 use Drupal\Core\Site\Settings;
@@ -102,6 +103,9 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
     $container->addCompilerPass(new ListCacheBinsPass());
     $container->addCompilerPass(new CacheContextsPass());
     $container->addCompilerPass(new AuthenticationProviderPass());
+
+    // Register plugin managers.
+    $container->addCompilerPass(new PluginManagerPass());
 
     $container->addCompilerPass(new DeprecatedServicePass());
 
