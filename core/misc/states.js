@@ -729,7 +729,7 @@
           .closest('.js-form-item, .js-form-wrapper')
           .find(label);
         // Avoids duplicate required markers on initialization.
-        if (!$label.hasClass('js-form-required').length) {
+        if (!$label.hasClass('js-form-required')) {
           $label.addClass(`js-form-required ${requiredClass}`);
         }
       } else {
