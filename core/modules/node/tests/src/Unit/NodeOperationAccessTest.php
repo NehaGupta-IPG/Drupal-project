@@ -55,8 +55,8 @@ class NodeOperationAccessTest extends UnitTestCase {
    *   Whether the node should be default revision, or NULL if not to expect it
    *   to be called.
    * @param bool|null $isLatestRevision
-   *  Whether the node should be the latest revision, or NULL if not to expect it
-   *  to be called.
+   *   Whether the node should be the latest revision, or NULL if not to expect it
+   *   to be called.
    */
   #[DataProvider('providerTestRevisionOperations')]
   public function testRevisionOperations($operation, array $hasPermissionMap, $assertAccess, $isDefaultRevision = NULL, $isLatestRevision = NULL): void {
