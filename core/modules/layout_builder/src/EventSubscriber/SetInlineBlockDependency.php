@@ -129,6 +129,11 @@ class SetInlineBlockDependency implements EventSubscriberInterface {
       // dependency. It may be used by another module besides layout builder.
       return NULL;
     }
+    if (empty($layout_entity_info->layout_entity_type)) {
+      // Orphaned inline block records may have an empty layout_entity_type,
+      // for example when the parent entity was deleted after cloning.
+      return NULL;
+    }
     $layout_entity_storage = $this->entityTypeManager->getStorage($layout_entity_info->layout_entity_type);
     $layout_entity = $layout_entity_storage->load($layout_entity_info->layout_entity_id);
     if ($this->isLayoutCompatibleEntity($layout_entity)) {
