@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\update\Functional;
+namespace Drupal\Tests\update\Kernel;
 
 use Drupal\Core\Url;
 use Drupal\Core\Utility\ProjectInfo;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\update\Functional\UpdateTestTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\update\UpdateManagerInterface;
 use PHPUnit\Framework\Attributes\Group;
