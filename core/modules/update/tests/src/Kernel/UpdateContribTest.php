@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\update\Functional;
 
+use Drupal\Core\Url;
 use Drupal\Core\Utility\ProjectInfo;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\user\Traits\UserCreationTrait;
@@ -81,6 +82,30 @@ class UpdateContribTest extends KernelTestBase {
 
     $available = update_get_available();
     $this->assertFalse(isset($available['aaa_update_test']['fetch_status']), 'Results are cached even if no releases are available.');
+  }
+
+  /**
+   * Refreshes the update status based on the desired available update scenario.
+   *
+   * @param array $xml_map
+   *   Array that maps project names to availability scenarios to fetch. The key
+   *   '#all' is used if a project-specific mapping is not defined.
+   * @param string $url
+   *   (optional) A string containing the URL to fetch update data from.
+   *   Defaults to 'update-test'.
+   *
+   * @see \Drupal\update_test\Controller\UpdateTestController::updateTest()
+   */
+  protected function refreshUpdateStatus($xml_map, $url = 'update-test') {
+    // Tell the Update Status module to fetch from the URL provided by
+    // update_test module.
+    $this->config('update.settings')->set('fetch.url', Url::fromUri('base:' . $url, ['absolute' => TRUE])->toString())->save();
+    // Save the map for UpdateTestController::updateTest() to use.
+    $this->mockReleaseHistory($xml_map);
+    // Manually check the update status.
+    $this->drupalGet('admin/reports/updates');
+    $this->clickLink('Check manually');
+    // $this->checkForMetaRefresh();
   }
 
   /**
