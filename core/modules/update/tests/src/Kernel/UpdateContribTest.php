@@ -39,6 +39,7 @@ class UpdateContribTest extends KernelTestBase {
     'system',
     'user',
     'update',
+    'update_test',
     'aaa_update_test',
     'bbb_update_test',
     'ccc_update_test',
@@ -49,6 +50,9 @@ class UpdateContribTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
+
+    $this->installConfig(['update']);
+    $this->installConfig(['update_test']);
 
     $this->installEntitySchema('user');
 
