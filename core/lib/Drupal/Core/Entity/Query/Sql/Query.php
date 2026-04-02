@@ -286,8 +286,16 @@ class Query extends QueryBase implements QueryInterface {
 
     $page = $this->pager['page'];
     $limit = $this->pager['limit'];
+    $on_last_page = $result_count < $limit;
+    $out_of_range = $page > 0 && $result_count === 0;
 
-    if ($result_count < $limit && !($page > 0 && $result_count === 0)) {
+    // When the data query returns fewer rows than the page limit, we are on
+    // the last page and already know the total, so the COUNT query can be
+    // skipped. The exception is when no results are returned on any page
+    // after the first, which means the requested page is beyond the result
+    // set. The COUNT query is still needed so the pager can show the correct
+    // total.
+    if ($on_last_page && !$out_of_range) {
       $total = ($page * $limit) + $result_count;
     }
     else {
