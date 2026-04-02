@@ -1,14 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\KernelTests\Core\DependencyInjection;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests autoconfiguration of services.
- *
- * @group DependencyInjection
  */
+#[Group('DependencyInjection')]
+#[RunTestsInSeparateProcesses]
 class BindAndNamedArgumentsTest extends KernelTestBase {
 
   /**
