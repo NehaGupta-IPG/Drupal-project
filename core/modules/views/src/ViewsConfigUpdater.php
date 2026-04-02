@@ -84,6 +84,9 @@ class ViewsConfigUpdater {
       if ($this->processRssViewModeUpdate($view)) {
         $changed = TRUE;
       }
+      if ($this->addGroupingLabelElement($handler, $handler_type, $view)) {
+        $changed = TRUE;
+      }
       return $changed;
     });
   }
@@ -455,6 +458,55 @@ class ViewsConfigUpdater {
 
     if ($changed) {
       $view->set('display', $displays);
+    }
+
+    return $changed;
+  }
+
+  /**
+   * Perform grouping label element update.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The View being updated.
+   */
+  public function updateGroupingLabelElement(ViewEntityInterface $view): bool {
+    return $this->processDisplayHandlers($view, FALSE, function (&$handler, $handler_type) use ($view) {
+      $changed = FALSE;
+      if ($this->addGroupingLabelElement($handler, $handler_type, $view)) {
+        $changed = TRUE;
+      }
+      return $changed;
+    });
+  }
+
+  /**
+   * Add Grouping Label to views without one.
+   *
+   * @param array $handler
+   *   A display handler.
+   * @param string $handler_type
+   *   The handler type.
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The View being updated.
+   *
+   * @return bool
+   *   Whether the handler was updated.
+   */
+  public function addGroupingLabelElement(array &$handler, string $handler_type, ViewEntityInterface $view): bool {
+    $changed = FALSE;
+
+    // For each existing view display add the grouping label element.
+    $displays = $view->get('display');
+    foreach ($displays as $display) {
+      $display->get($handler_type);
+      if (($handler_type === 'style')
+        && isset($handler['plugin_id'], $handler['type'])
+        && $handler['plugin_id'] === 'style'
+        && ($handler['type'] === 'Grid' || $handler['type'] === 'HtmlList' || $handler['type'] === 'GridResponsive' || $handler['type'] === 'DefaultStyle')
+        && !isset($handler['style']['grouping_label_element'])) {
+        $handler['style']['grouping_label_element'] = NULL;
+        $changed = TRUE;
+      }
     }
 
     return $changed;

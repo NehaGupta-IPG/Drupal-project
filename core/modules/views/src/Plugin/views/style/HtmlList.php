@@ -26,6 +26,13 @@ class HtmlList extends StylePluginBase {
   protected $usesRowPlugin = TRUE;
 
   /**
+   * Should grouping fields use a wrapping element tag.
+   *
+   * @var bool
+   */
+  protected bool $usesGroupingLabelElement = TRUE;
+
+  /**
    * Does the style plugin support custom css class for the rows.
    *
    * @var bool

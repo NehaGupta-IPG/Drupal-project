@@ -129,3 +129,15 @@ function views_post_update_block_items_per_page(?array &$sandbox = NULL): void {
 function views_post_update_add_date_default_arguments(): void {
   // Empty update to cause a cache rebuild so that schema additions are read.
 }
+
+/**
+ * Post update configured views for grouping label being set.
+ */
+function views_post_update_views_add_grouping_label_element(?array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::classResolver(ViewsConfigUpdater::class);
+  $view_config_updater->setDeprecationsEnabled(FALSE);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
+    return $view_config_updater->updateGroupingLabelElement($view);
+  });
+}
