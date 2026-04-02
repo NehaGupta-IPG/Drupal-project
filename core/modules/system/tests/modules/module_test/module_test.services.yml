@@ -1,4 +1,6 @@
 services:
+  _defaults:
+    autoconfigure: true
   # Tests module uninstall
   plugin.manager.module_test.cache_clear_test:
     class: Drupal\module_test\PluginManagerCacheClearer
