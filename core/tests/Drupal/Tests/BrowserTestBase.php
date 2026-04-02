@@ -76,7 +76,6 @@ abstract class BrowserTestBase extends TestCase {
     createUser as drupalCreateUser;
   }
   use XdebugRequestTrait;
-  use PhpUnitCompatibilityTrait;
   use ExtensionListTestTrait;
 
   /**
@@ -171,14 +170,6 @@ abstract class BrowserTestBase extends TestCase {
    * @var array
    */
   protected $originalShutdownCallbacks = [];
-
-  /**
-   * {@inheritdoc}
-   */
-  public function __construct(string $name) {
-    parent::__construct($name);
-    $this->setRunTestInSeparateProcess(TRUE);
-  }
 
   /**
    * Registers the dumper CLI handler when the DebugDump extension is enabled.
