@@ -187,25 +187,26 @@
     }
     let errorMessage;
     if (xmlhttp.status >= 400) {
-      errorMessage = Drupal.t('Something went wrong (error @status). Try again later.', {
-        '@status': xmlhttp.status,
-      });
-    }
-    else if (!xmlhttp.status) {
+      errorMessage = Drupal.t(
+        'Something went wrong (error @status). Try again later.',
+        {
+          '@status': xmlhttp.status,
+        },
+      );
+    } else if (!xmlhttp.status) {
       // Status 0 means the request did not complete (network error, CORS
       // block, aborted request, etc).
-      errorMessage = Drupal.t('Something went wrong (network error). Try again later.');
-    }
-    else {
+      errorMessage = Drupal.t(
+        'Something went wrong (network error). Try again later.',
+      );
+    } else {
       // Non-error status codes (e.g. 200 with invalid response body) should
       // not display a misleading error code.
       errorMessage = Drupal.t('Something went wrong. Try again later.');
     }
-    Drupal.AjaxError.messages.add(errorMessage,
-      {
-        type: 'error',
-      },
-    );
+    Drupal.AjaxError.messages.add(errorMessage, {
+      type: 'error',
+    });
   };
 
   Drupal.AjaxError.prototype = new Error();
