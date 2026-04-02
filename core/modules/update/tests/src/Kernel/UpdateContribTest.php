@@ -32,15 +32,12 @@ class UpdateContribTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
+    'system',
+    'update',
     'aaa_update_test',
     'bbb_update_test',
     'ccc_update_test',
   ];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected $defaultTheme = 'stark';
 
   /**
    * {@inheritdoc}
