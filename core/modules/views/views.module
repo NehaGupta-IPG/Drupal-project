@@ -128,7 +128,8 @@ function views_theme($existing, $type, $theme, $path) {
     'variables' => ['view' => NULL, 'field' => NULL, 'row' => NULL],
   ];
   $hooks['views_view_grouping'] = $base + [
-    'variables' => ['view' => NULL, 'grouping' => NULL, 'grouping_level' => NULL, 'grouping_label_element' => NULL, 'rows' => NULL, 'title' => NULL],
+    'variables' => ['view' => NULL, 'grouping' => NULL, 'grouping_level' => NULL, 'grouping_label_element' => NULL,
+                    'rows' => NULL, 'title' => NULL],
   ];
 
   // Only display, pager, row, and style plugins can provide theme hooks.
