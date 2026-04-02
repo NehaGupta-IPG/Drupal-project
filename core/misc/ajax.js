@@ -189,9 +189,13 @@
       ? Drupal.t('error @status', { '@status': xmlhttp.status })
       : Drupal.t('network error');
     Drupal.AjaxError.messages.add(
-      Drupal.t('Something went wrong (@error). Please try again.', {
-        '@error': errorLabel,
-      }),
+      Drupal.t(
+        // cspell:disable-next-line
+        'Something went wrong (@error). Please try again. If the problem continues, the service may be temporarily unavailable.',
+        {
+          '@error': errorLabel,
+        },
+      ),
       {
         type: 'error',
       },

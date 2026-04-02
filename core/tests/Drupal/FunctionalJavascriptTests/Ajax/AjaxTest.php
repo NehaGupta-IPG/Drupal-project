@@ -276,9 +276,11 @@ JS;
 
     // Test various server error codes.
     $httpCases = [
-      500 => 'Something went wrong (error 500). Please try again.',
-      503 => 'Something went wrong (error 503). Please try again.',
-      418 => 'Something went wrong (error 418). Please try again.',
+      // cspell:disable
+      500 => 'Something went wrong (error 500). Please try again. If the problem continues, the service may be temporarily unavailable.',
+      503 => 'Something went wrong (error 503). Please try again. If the problem continues, the service may be temporarily unavailable.',
+      418 => 'Something went wrong (error 418). Please try again. If the problem continues, the service may be temporarily unavailable.',
+      // cspell:enable
     ];
     foreach ($httpCases as $code => $expectedMessage) {
       $this->drupalGet('ajax-test/http-status-link/' . $code);
@@ -296,7 +298,8 @@ JS;
 })();
 JS);
     $this->assertSession()->statusMessageContainsAfterWait(
-      'Something went wrong (network error). Please try again.',
+      // cspell:disable-next-line
+      'Something went wrong (network error). Please try again. If the problem continues, the service may be temporarily unavailable.',
       'error',
     );
     $this->getSession()->executeScript('window.drupalActiveXhrCount = 0;');
@@ -325,7 +328,8 @@ JS);
       $this->failOnJavascriptConsoleErrors = FALSE;
       $this->clickLink('Ajax HTTP status');
       $this->assertSession()
-        ->statusMessageContainsAfterWait('Something went wrong (error 500). Please try again.', 'error');
+        // cspell:disable-next-line
+        ->statusMessageContainsAfterWait('Something went wrong (error 500). Please try again. If the problem continues, the service may be temporarily unavailable.', 'error');
 
       if ($theme === 'default_admin') {
         // Check that the message can be closed.
