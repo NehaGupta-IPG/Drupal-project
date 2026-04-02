@@ -276,11 +276,9 @@ JS;
 
     // Test various server error codes.
     $httpCases = [
-      // cspell:disable
-      500 => 'Something went wrong (error 500). Please try again. If the problem continues, the service may be temporarily unavailable.',
-      503 => 'Something went wrong (error 503). Please try again. If the problem continues, the service may be temporarily unavailable.',
-      418 => 'Something went wrong (error 418). Please try again. If the problem continues, the service may be temporarily unavailable.',
-      // cspell:enable
+      500 => 'Something went wrong (error 500). Try again later.',
+      503 => 'Something went wrong (error 503). Try again later.',
+      418 => 'Something went wrong (error 418). Try again later.',
     ];
     foreach ($httpCases as $code => $expectedMessage) {
       $this->drupalGet('ajax-test/http-status-link/' . $code);
@@ -298,8 +296,7 @@ JS;
 })();
 JS);
     $this->assertSession()->statusMessageContainsAfterWait(
-      // cspell:disable-next-line
-      'Something went wrong (network error). Please try again. If the problem continues, the service may be temporarily unavailable.',
+      'Something went wrong (network error). Try again later.',
       'error',
     );
     $this->getSession()->executeScript('window.drupalActiveXhrCount = 0;');
@@ -328,8 +325,7 @@ JS);
       $this->failOnJavascriptConsoleErrors = FALSE;
       $this->clickLink('Ajax HTTP status');
       $this->assertSession()
-        // cspell:disable-next-line
-        ->statusMessageContainsAfterWait('Something went wrong (error 500). Please try again. If the problem continues, the service may be temporarily unavailable.', 'error');
+        ->statusMessageContainsAfterWait('Something went wrong (error 500). Try again later.', 'error');
 
       if ($theme === 'default_admin') {
         // Check that the message can be closed.
@@ -339,6 +335,8 @@ JS);
       }
     }
 
+    // This is needed to avoid an unfinished AJAX request error from tearDown()
+    // because this test intentionally does not complete all AJAX requests.
     $this->getSession()->executeScript('window.drupalActiveXhrCount = 0;');
   }
 

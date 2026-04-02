@@ -464,8 +464,11 @@ class AjaxTestController {
    *
    * @return \Symfony\Component\HttpFoundation\Response
    *   The response.
+   *
+   * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+   *   If the code is outside the valid HTTP status code range.
    */
-  public function httpStatus(int $code) {
+  public function httpStatus(int $code): Response {
     if ($code < 100 || $code > 599) {
       throw new NotFoundHttpException();
     }
@@ -481,7 +484,7 @@ class AjaxTestController {
    * @return array
    *   The Ajax link render array.
    */
-  public function httpStatusLink(int $code) {
+  public function httpStatusLink(int $code): array {
     return [
       '#type' => 'link',
       '#url' => Url::fromRoute('ajax_test.http_status', ['code' => $code]),

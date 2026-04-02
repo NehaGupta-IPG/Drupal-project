@@ -185,17 +185,23 @@
     if (!Drupal.AjaxError.messages) {
       Drupal.AjaxError.messages = new Drupal.Message();
     }
-    const errorLabel = xmlhttp.status
-      ? Drupal.t('error @status', { '@status': xmlhttp.status })
-      : Drupal.t('network error');
-    Drupal.AjaxError.messages.add(
-      Drupal.t(
-        // cspell:disable-next-line
-        'Something went wrong (@error). Please try again. If the problem continues, the service may be temporarily unavailable.',
-        {
-          '@error': errorLabel,
-        },
-      ),
+    let errorMessage;
+    if (xmlhttp.status >= 400) {
+      errorMessage = Drupal.t('Something went wrong (error @status). Try again later.', {
+        '@status': xmlhttp.status,
+      });
+    }
+    else if (!xmlhttp.status) {
+      // Status 0 means the request did not complete (network error, CORS
+      // block, aborted request, etc).
+      errorMessage = Drupal.t('Something went wrong (network error). Try again later.');
+    }
+    else {
+      // Non-error status codes (e.g. 200 with invalid response body) should
+      // not display a misleading error code.
+      errorMessage = Drupal.t('Something went wrong. Try again later.');
+    }
+    Drupal.AjaxError.messages.add(errorMessage,
       {
         type: 'error',
       },
