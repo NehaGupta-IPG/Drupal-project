@@ -6,6 +6,7 @@ namespace Drupal\Tests\update\Functional;
 
 use Drupal\Core\Utility\ProjectInfo;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\update\UpdateManagerInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -17,6 +18,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 #[RunTestsInSeparateProcesses]
 class UpdateContribTest extends KernelTestBase {
   use UpdateTestTrait;
+  use UserCreationTrait;
 
   /**
    * {@inheritdoc}
@@ -33,6 +35,7 @@ class UpdateContribTest extends KernelTestBase {
    */
   protected static $modules = [
     'system',
+    'user',
     'update',
     'aaa_update_test',
     'bbb_update_test',
@@ -44,8 +47,11 @@ class UpdateContribTest extends KernelTestBase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $admin_user = $this->drupalCreateUser(['administer site configuration']);
-    $this->drupalLogin($admin_user);
+
+    $this->installEntitySchema('user');
+
+    $admin_user = $this->createUser(['administer site configuration']);
+    $this->setCurrentUser($admin_user);
   }
 
   /**
