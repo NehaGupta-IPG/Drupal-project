@@ -9,6 +9,7 @@ use Drupal\Core\Menu\MenuLinkInterface;
 use Drupal\Core\Breadcrumb\Breadcrumb;
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\node\NodeInterface;
 use Drupal\system\MenuInterface;
 use Drupal\system\Entity\Menu;
 use Drupal\Core\Form\FormStateInterface;
@@ -118,6 +119,22 @@ class MenuUiHooks {
       // If the node has no corresponding menu link, users needs to permission
       // to create one.
       return $this->entityTypeManager->getAccessControlHandler('menu_link_content')->createAccess(NULL, NULL, [], TRUE);
+    }
+  }
+
+  /**
+   * Implements hook_form_FORM_ID_alter() for \Drupal\content_moderation\Form\EntityModerationForm.
+   *
+   * Submit menu ui submit handler to the content moderation form.
+   *
+   * @see menu_ui_form_content_moderation_entity_moderation_form_submit()
+   */
+  #[Hook('form_content_moderation_entity_moderation_form_alter')]
+  public function formContentModerationEntityModerationFormAlter(&$form, FormStateInterface $form_state) : void {
+    /** @var \Drupal\Core\Entity\ContentEntityInterface $entity */
+    $entity = $form_state->get('entity');
+    if ($entity instanceof NodeInterface) {
+      $form['#submit'][] = 'menu_ui_form_content_moderation_entity_moderation_form_submit';
     }
   }
 
