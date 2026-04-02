@@ -300,6 +300,21 @@ JS);
       'error',
     );
     $this->getSession()->executeScript('window.drupalActiveXhrCount = 0;');
+
+    // Test non-error status code (e.g. 200 with invalid response body).
+    // Should not display a misleading error code.
+    $this->drupalGet('ajax-test/exception-link');
+    $this->getSession()->executeScript(<<<'JS'
+(function () {
+  const xhr = { status: 200, statusText: 'OK', responseText: 'invalid', readyState: 4 };
+  new Drupal.AjaxError(xhr, '/ajax-test/fake', null);
+})();
+JS);
+    $this->assertSession()->statusMessageContainsAfterWait(
+      'Something went wrong. Try again later.',
+      'error',
+    );
+    $this->getSession()->executeScript('window.drupalActiveXhrCount = 0;');
   }
 
   /**
