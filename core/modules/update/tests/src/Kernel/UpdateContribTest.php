@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\update\Functional;
 
 use Drupal\Core\Utility\ProjectInfo;
+use Drupal\KernelTests\KernelTestBase;
 use Drupal\update\UpdateManagerInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -14,7 +15,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('update')]
 #[RunTestsInSeparateProcesses]
-class UpdateContribTest extends UpdateTestBase {
+class UpdateContribTest extends KernelTestBase {
   use UpdateTestTrait;
 
   /**
