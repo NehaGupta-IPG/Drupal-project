@@ -233,8 +233,6 @@ class DisplayPageTest extends ViewsKernelTestBase {
     $view->newDisplay('page', 'Page', 'empty_row');
     $view->save();
 
-    \Drupal::service('router.builder')->rebuild();
-
     $styles = [
       'default' => '//div[@class="views-row"]',
       // Olivero does not use the 'views-col' class.
