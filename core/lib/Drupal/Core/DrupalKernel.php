@@ -571,9 +571,36 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * {@inheritdoc}
    */
   public function getCachedContainerDefinition() {
-    $cache = $this->bootstrapContainer->get('cache.container')->get($this->getContainerCacheKey());
+    $apcu_key = $this->getContainerApcuKey();
+    $container_cid = $this->getContainerCacheKey();
+    if ($apcu_key) {
+      $success = FALSE;
+      $apcu_entry = $this->containerApcuFetch($apcu_key, $success);
+      // Validate the APCu entry against the last write timestamp from the
+      // consistent backend, following the same pattern as ChainedFastBackend.
+      // This ensures that when another server invalidates the container, this
+      // server detects it on the next request via the shared timestamp.
+      if ($success && is_array($apcu_entry) && isset($apcu_entry['data'], $apcu_entry['created'])) {
+        $timestamp_cid = 'last_write_timestamp_' . $container_cid;
+        $timestamp_cache = $this->bootstrapContainer->get('cache.container')->get($timestamp_cid);
+        $last_write = $timestamp_cache ? $timestamp_cache->data : 0;
+        if ($last_write && $apcu_entry['created'] >= $last_write) {
+          return $apcu_entry['data'];
+        }
+      }
+    }
+
+    // Fall back to the consistent backend.
+    $cache = $this->bootstrapContainer->get('cache.container')->get($container_cid);
 
     if ($cache) {
+      // Backfill APCu with the data and a creation timestamp.
+      if ($apcu_key) {
+        $this->containerApcuStore($apcu_key, [
+          'data' => $cache->data,
+          'created' => round(microtime(TRUE), 3),
+        ]);
+      }
       return $cache->data;
     }
 
@@ -969,6 +996,54 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       serialize(Settings::get('container_yamls')),
     ];
     return implode(':', $parts);
+  }
+
+  /**
+   * Builds the APCu key for the cached container definition.
+   *
+   * @return string|null
+   *   The APCu key or NULL if APCu is unavailable.
+   */
+  protected function getContainerApcuKey(): ?string {
+    // APCu must be installed and enabled. apcu_enabled() returns FALSE when
+    // the extension is missing, apc.enabled=0, or apc.enable_cli=0 in CLI.
+    if (!function_exists('apcu_enabled') || !apcu_enabled()) {
+      return NULL;
+    }
+    // The site path is part of the APCu key to prevent collisions in
+    // multisite setups. It is not available before initializeSettings()
+    // runs during kernel boot, so we skip APCu in that early phase and
+    // let the persistent backend handle it.
+    if (!$this->sitePath) {
+      return NULL;
+    }
+
+    return implode(':', [
+      Settings::getApcuPrefix('container_definition', $this->root),
+      $this->sitePath,
+      $this->getContainerCacheKey(),
+    ]);
+  }
+
+  /**
+   * Wraps apcu_fetch() to allow easier overrides in tests.
+   */
+  protected function containerApcuFetch(string $key, ?bool &$success = NULL) {
+    return apcu_fetch($key, $success);
+  }
+
+  /**
+   * Wraps apcu_store() to allow easier overrides in tests.
+   */
+  protected function containerApcuStore(string $key, $value): bool {
+    return (bool) apcu_store($key, $value);
+  }
+
+  /**
+   * Wraps apcu_delete() to allow easier overrides in tests.
+   */
+  protected function containerApcuDelete(string $key): bool {
+    return (bool) apcu_delete($key);
   }
 
   /**
@@ -1400,6 +1475,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     // Also remove the container definition from the cache backend.
     $this->bootstrapContainer->get('cache.container')->deleteAll();
+    if ($apcu_key = $this->getContainerApcuKey()) {
+      $this->containerApcuDelete($apcu_key);
+    }
   }
 
   /**
@@ -1586,7 +1664,20 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   protected function cacheDrupalContainer(array $container_definition) {
     $saved = TRUE;
     try {
-      $this->bootstrapContainer->get('cache.container')->set($this->getContainerCacheKey(), $container_definition);
+      $cache_container = $this->bootstrapContainer->get('cache.container');
+      $container_cid = $this->getContainerCacheKey();
+      $cache_container->set($container_cid, $container_definition);
+      // Write a timestamp so other servers can detect this write via
+      // the consistent backend, following the ChainedFastBackend pattern.
+      $now = round(microtime(TRUE), 3);
+      $timestamp_cid = 'last_write_timestamp_' . $container_cid;
+      $cache_container->set($timestamp_cid, $now);
+      if ($apcu_key = $this->getContainerApcuKey()) {
+        $this->containerApcuStore($apcu_key, [
+          'data' => $container_definition,
+          'created' => $now,
+        ]);
+      }
     }
     catch (\Exception) {
       // There is no way to get from the Cache API if the cache set was
