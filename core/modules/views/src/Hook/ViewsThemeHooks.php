@@ -86,6 +86,7 @@ class ViewsThemeHooks {
         'options' => NULL,
         'rows' => NULL,
         'title' => NULL,
+        'grouping_label_element' => NULL,
       ],
       'row' => [
         'view' => NULL,
@@ -117,6 +118,7 @@ class ViewsThemeHooks {
         'view' => NULL,
         'grouping' => NULL,
         'grouping_level' => NULL,
+        'grouping_label_element' => NULL,
         'rows' => NULL,
         'title' => NULL,
       ],
