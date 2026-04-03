@@ -20,26 +20,6 @@ use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 class TestClientFactory extends ClientFactory {
 
   /**
-   * The test HTTP handler.
-   *
-   * @var callable
-   */
-  protected $httpHandler;
-
-  /**
-   * Sets the test HTTP handler.
-   *
-   * Test classes should call this method to set the callable that handles HTTP
-   * requests.
-   *
-   * @param callable $http_handler
-   *   The handler callable, for example, a method on the test class.
-   */
-  public function setHttpHandler(callable $http_handler): void {
-    $this->httpHandler = $http_handler;
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function fromOptions(array $config = []) {
@@ -62,7 +42,6 @@ class TestClientFactory extends ClientFactory {
    */
   public function httpHandler(GuzzleRequest $request) {
     $path = $request->getUri()->getPath();
-    $uri  = (string) $request->getUri();
 
     // Can't use the Symfony PSR-7 Bridge to convert, as the Guzzle
     // request is an outgoing request, and the HTTP kernel wants an
@@ -74,8 +53,6 @@ class TestClientFactory extends ClientFactory {
     $response = $http_kernel->handle($symfony_request);
 
     Assert::assertEquals(SymfonyResponse::HTTP_OK, $response->getStatusCode());
-
-    $content = $response->getContent();
 
     // Convert the Symfony response to a Guzzle response.
     $psr17_factory = new HttpFactory();

@@ -65,9 +65,6 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
 
     $admin_user = $this->createUser(['administer site configuration']);
     $this->setCurrentUser($admin_user);
-
-    $http_client_factory = $this->container->get('http_client_factory');
-    $http_client_factory->setHttpHandler([$this, 'httpHandler']);
   }
 
   /**
@@ -78,10 +75,6 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
     // @see static::httpHandler()
     $service_definition = $container->getDefinition('http_client_factory');
     $service_definition->setClass(TestClientFactory::class);
-  }
-
-  public function httpHandler(GuzzleRequest $request) {
-    dump($request);
   }
 
   /**
