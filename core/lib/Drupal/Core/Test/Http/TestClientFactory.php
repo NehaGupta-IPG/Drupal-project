@@ -48,7 +48,6 @@ class TestClientFactory extends ClientFactory {
     // incoming request, and these have different interfaces in PSR-7.
     $symfony_request = SymfonyRequest::create($path);
 
-    // The container property is not set here apparently!
     $http_kernel = \Drupal::service('http_kernel');
     $response = $http_kernel->handle($symfony_request);
 
