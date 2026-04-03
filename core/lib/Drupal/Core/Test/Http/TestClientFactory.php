@@ -4,7 +4,13 @@ namespace Drupal\Core\Test\Http;
 
 use Drupal\Core\Http\ClientFactory;
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Request as GuzzleRequest;
+use GuzzleHttp\Psr7\Response as GuzzleResponse;
+use GuzzleHttp\Psr7\HttpFactory;
+use PHPUnit\Framework\Assert;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 
 class TestClientFactory extends ClientFactory {
 
@@ -49,9 +55,29 @@ class TestClientFactory extends ClientFactory {
    * @param \GuzzleHttp\Psr7\Request $request
    *   The Guzzle request.
    */
-  public function httpHandler(Request $request) {
-    assert(isset($this->httpHandler), 'TestClientFactory::setHttpHandler must be called before Guzzle HTTP requests are made.');
-    return ($this->httpHandler)($request);
+  public function httpHandler(GuzzleRequest $request) {
+    $path = $request->getUri()->getPath();
+    $uri  = (string) $request->getUri();
+
+    // Can't use the Symfony PSR-7 Bridge to convert, as the Guzzle
+    // request is an outgoing request, and the HTTP kernel wants an
+    // incoming request, and these have different interfaces in PSR-7.
+    $symfony_request = SymfonyRequest::create($path);
+
+    // The container property is not set here apparently!
+    $http_kernel = \Drupal::service('http_kernel');
+    $response = $http_kernel->handle($symfony_request);
+
+    Assert::assertEquals(SymfonyResponse::HTTP_OK, $response->getStatusCode());
+
+    $content = $response->getContent();
+
+    // Convert the Symfony response to a Guzzle response.
+    $psr17_factory = new HttpFactory();
+    $psr_http_factory = new PsrHttpFactory($psr17_factory, $psr17_factory, $psr17_factory, $psr17_factory);
+    $guzzle_response = $psr_http_factory->createResponse($response);
+
+    return $guzzle_response;
   }
 
 }
