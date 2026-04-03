@@ -72,7 +72,6 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
    */
   public function alter(ContainerBuilder $container) {
     // Switch the http_client_factory service to the test version.
-    // @see static::httpHandler()
     $service_definition = $container->getDefinition('http_client_factory');
     $service_definition->setClass(TestClientFactory::class);
   }
@@ -129,6 +128,8 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
 
     // Fetch the update data.
     $this->container->get('update.manager')->refreshUpdateData();
+
+    // Process the queue items that UpdateManager has just created.
     $queue = $this->container->get('queue')->get('update_fetch_tasks');
     while ($item = $queue->claimItem()) {
       $this->container->get('update.processor')->processFetchTask($item->data);
