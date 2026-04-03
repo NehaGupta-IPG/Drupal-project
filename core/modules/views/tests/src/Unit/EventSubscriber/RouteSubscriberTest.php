@@ -112,8 +112,8 @@ class RouteSubscriberTest extends UnitTestCase {
     $display_1->expects($this->once())
       ->method('collectRoutes')
       ->willReturnCallback(function () use ($collection) {
-        $collection->add('views.test_id.page_1', new Route('test_route', ['_controller' => 'Drupal\views\Routing\ViewPageController']));
-        return ['test_id.page_1' => 'views.test_id.page_1'];
+        $collection->add('view.test_id.page_1', new Route('test_route', ['_controller' => 'Drupal\views\Routing\ViewPageController']));
+        return ['test_id.page_1' => 'view.test_id.page_1'];
       });
     $display_1->expects($this->once())
       ->method('alterRoutes')
@@ -122,8 +122,8 @@ class RouteSubscriberTest extends UnitTestCase {
     $display_2->expects($this->once())
       ->method('collectRoutes')
       ->willReturnCallback(function () use ($collection) {
-        $collection->add('views.test_id.page_2', new Route('test_route', ['_controller' => 'Drupal\views\Routing\ViewPageController']));
-        return ['test_id.page_2' => 'views.test_id.page_2'];
+        $collection->add('view.test_id.page_2', new Route('test_route', ['_controller' => 'Drupal\views\Routing\ViewPageController']));
+        return ['test_id.page_2' => 'view.test_id.page_2'];
       });
     $display_2->expects($this->once())
       ->method('alterRoutes')
@@ -138,10 +138,10 @@ class RouteSubscriberTest extends UnitTestCase {
 
     $this->state->expects($this->once())
       ->method('set')
-      ->with('views.view_route_names', ['test_id.page_1' => 'test_route', 'test_id.page_2' => 'views.test_id.page_2']);
+      ->with('views.view_route_names', ['test_id.page_1' => 'test_route', 'test_id.page_2' => 'view.test_id.page_2']);
 
     $collection = $route_event->getRouteCollection();
-    $this->assertEquals(['test_route', 'test_route_2', 'views.test_id.page_2'], array_keys($collection->all()));
+    $this->assertEquals(['test_route', 'test_route_2', 'view.test_id.page_2'], array_keys($collection->all()));
 
     $this->routeSubscriber->routeRebuildFinished();
   }
