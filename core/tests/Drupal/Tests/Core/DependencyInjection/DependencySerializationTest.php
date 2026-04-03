@@ -24,6 +24,8 @@ class DependencySerializationTest extends UnitTestCase {
    *
    * @legacy-covers ::__sleep
    * @legacy-covers ::__wakeup
+   * @legacy-covers ::__serialize
+   * @legacy-covers ::__unserialize
    */
   public function testSerialization(): void {
     // Create a pseudo service and dependency injected object.
@@ -32,7 +34,7 @@ class DependencySerializationTest extends UnitTestCase {
     $container->set('test_service', $service);
     $this->assertSame($container, $container->get('service_container'));
 
-    $dependencySerialization = new DependencySerializationTestDummy($service);
+    $dependencySerialization = new DependencySerializationTestDummy($service, 123);
     $dependencySerialization->setContainer($container);
 
     $string = serialize($dependencySerialization);
@@ -41,6 +43,7 @@ class DependencySerializationTest extends UnitTestCase {
 
     $this->assertTrue($container->has(ReverseContainer::class));
     $this->assertSame($service, $dependencySerialization->service);
+    $this->assertSame(123, $dependencySerialization->scalar);
     $this->assertSame($container, $dependencySerialization->container);
     $this->assertEmpty($dependencySerialization->getServiceIds());
   }
@@ -69,13 +72,23 @@ class DependencySerializationTestDummy {
   public $container;
 
   /**
+   * A scalar value that must survive round trips.
+   *
+   * @var int
+   */
+  public $scalar;
+
+  /**
    * Constructs a new TestClass object.
    *
    * @param object $service
    *   A test service.
+   * @param int $scalar
+   *   A scalar value.
    */
-  public function __construct(\stdClass $service) {
+  public function __construct(\stdClass $service, int $scalar) {
     $this->service = $service;
+    $this->scalar = $scalar;
   }
 
   /**

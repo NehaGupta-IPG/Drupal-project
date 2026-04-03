@@ -548,6 +548,7 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
    * Tests sleep with plugin collections.
    *
    * @legacy-covers ::__sleep
+   * @legacy-covers ::__serialize
    */
   public function testSleepWithPluginCollections(): void {
     $instance_id = 'the_instance_id';
@@ -581,14 +582,54 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
     $this->assertSame($expected_plugin_config, $entity->get('the_plugin_collection_config'));
 
     // Ensure the plugin collection and manager is not stored.
-    $vars = $entity->__sleep();
+    $data = $entity->__serialize();
+    $vars = array_keys($data);
     $this->assertNotContains('pluginCollection', $vars);
     $this->assertNotContains('pluginManager', $vars);
-    $this->assertSame(['pluginManager' => 'plugin.manager.foo'], $entity->get('_serviceIds'));
+    $this->assertArrayHasKey('_serviceIds', $data);
+    $this->assertSame(['pluginManager' => 'plugin.manager.foo'], $data['_serviceIds']);
 
     $expected_plugin_config = [$instance_id => ['id' => $instance_id, 'foo' => 'new_value']];
     // Ensure the updated values are stored in the entity.
     $this->assertSame($expected_plugin_config, $entity->get('the_plugin_collection_config'));
+  }
+
+  /**
+   * Tests serialization with plugin collections.
+   */
+  public function testSerializationWithPluginCollections(): void {
+    $instance_id = $this->randomMachineName();
+    $instance = new TestConfigurablePlugin([], $instance_id, []);
+
+    $plugin_manager = $this->prophesize(PluginManagerInterface::class);
+    $plugin_manager->createInstance($instance_id, Argument::any())->willReturn($instance);
+    $plugin_manager_service = $plugin_manager->reveal();
+
+    $container = TestKernel::setContainerWithKernel();
+    $container->set('plugin.manager.foo', $plugin_manager_service);
+
+    $entity_values = [
+      'the_plugin_collection_config' => [
+        $instance_id => [
+          'id' => $instance_id,
+          'foo' => 'original_value',
+        ],
+      ],
+    ];
+    $entity = new TestConfigEntityWithPluginCollections($entity_values, $this->entityTypeId);
+    $entity->setPluginManager($plugin_manager_service);
+
+    $instance->setConfiguration(['id' => $instance_id, 'foo' => 'new_value']);
+
+    $serialized = serialize($entity);
+    $this->assertStringNotContainsString(DefaultLazyPluginCollection::class, $serialized);
+
+    /** @var \Drupal\Tests\Core\Config\Entity\TestConfigEntityWithPluginCollections $unserialized */
+    $unserialized = unserialize($serialized);
+    $expected_plugin_config = [$instance_id => ['id' => $instance_id, 'foo' => 'new_value']];
+    $this->assertSame($expected_plugin_config, $unserialized->get('the_plugin_collection_config'));
+    $this->assertSame($plugin_manager_service, $unserialized->get('pluginManager'));
+    $this->assertInstanceOf(DefaultLazyPluginCollection::class, $unserialized->getPluginCollections()['the_plugin_collection_config']);
   }
 
   /**

@@ -11,6 +11,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -275,7 +276,11 @@ class DrupalDateTimeTest extends UnitTestCase {
 
   /**
    * Test to avoid serialization of formatTranslationCache.
+   *
+   * @legacy-covers ::__sleep
+   * @legacy-covers ::__serialize
    */
+  #[IgnoreDeprecations]
   public function testSleep(): void {
     $tz = new \DateTimeZone(date_default_timezone_get());
     $date = new DrupalDateTime('now', $tz, ['langcode' => 'en']);
@@ -283,10 +288,10 @@ class DrupalDateTimeTest extends UnitTestCase {
     // Override timestamp before serialize.
     $date->setTimestamp(12345678);
 
-    $vars = $date->__sleep();
-    $this->assertContains('langcode', $vars);
-    $this->assertContains('dateTimeObject', $vars);
-    $this->assertNotContains('formatTranslationCache', $vars);
+    $data = $date->__serialize();
+    $this->assertArrayHasKey('langcode', $data);
+    $this->assertArrayHasKey('dateTimeObject', $data);
+    $this->assertArrayNotHasKey('formatTranslationCache', $data);
 
     $unserialized_date = unserialize(serialize($date));
     $this->assertSame(12345678, $unserialized_date->getTimestamp());

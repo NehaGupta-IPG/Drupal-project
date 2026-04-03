@@ -97,7 +97,7 @@ class MediaSourceFileTest extends MediaSourceTestBase {
     $result = $assert_session->waitForButton('Remove');
     $this->assertNotEmpty($result);
     $page->pressButton('Save');
-    $assert_session->elementAttributeContains('css', 'img', 'src', 'text--plain.png');
+    $this->assertNotEmpty($assert_session->waitForElementVisible('css', 'img[src*="text--plain.png"]'));
 
     // Check if the mapped name is automatically updated.
     $new_filename = $this->randomMachineName() . '.txt';

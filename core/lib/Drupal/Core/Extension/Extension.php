@@ -184,22 +184,53 @@ class Extension {
    * Magic method implementation to serialize the extension object.
    *
    * @return array
-   *   The names of all variables that should be serialized.
+   *   The data that should be serialized.
    */
-  public function __sleep(): array {
+  public function __serialize(): array {
     // @todo \Drupal\Core\Extension\ThemeExtensionList is adding custom
     //   properties to the Extension object.
     $properties = get_object_vars($this);
     // Don't serialize the app root, since this could change if the install is
     // moved. Don't serialize splFileInfo because it can not be.
     unset($properties['splFileInfo'], $properties['root']);
-    return array_keys($properties);
+    return $properties;
+  }
+
+  /**
+   * Magic method implementation to unserialize the extension object.
+   *
+   * @param array<mixed> $data
+   *   The serialized data.
+   */
+  public function __unserialize(array $data): void {
+    foreach ($data as $key => $value) {
+      $this->$key = $value;
+    }
+
+    $this->restoreRoot();
+  }
+
+  /**
+   * Magic method implementation to serialize the extension object.
+   *
+   * @return array
+   *   The names of all variables that should be serialized.
+   */
+  public function __sleep(): array {
+    return array_keys($this->__serialize());
   }
 
   /**
    * Magic method implementation to unserialize the extension object.
    */
   public function __wakeup(): void {
+    $this->restoreRoot();
+  }
+
+  /**
+   * Restores the app root after unserialization.
+   */
+  private function restoreRoot(): void {
     // Get the app root from the container. While compiling the container we
     // have to discover all the extension service files in
     // \Drupal\Core\DrupalKernel::initializeServiceProviders(). This results in

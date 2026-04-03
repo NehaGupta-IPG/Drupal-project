@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\StringTranslation;
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Tests\UnitTestCase;
@@ -83,6 +84,22 @@ class TranslatableMarkupTest extends UnitTestCase {
 
     $this->assertEquals(E_USER_WARNING, $this->lastErrorNumber);
     $this->assertMatchesRegularExpression('/Exception thrown while calling __toString on a .*MockObject_TranslatableMarkup_.* object in .*TranslatableMarkupTest.php on line [0-9]+: Yes you may./', $this->lastErrorMessage);
+  }
+
+  /**
+   * Tests serialization.
+   */
+  public function testSerialization(): void {
+    $container = new ContainerBuilder();
+    $container->set('string_translation', $this->getStringTranslationStub());
+    \Drupal::setContainer($container);
+
+    $markup = new TranslatableMarkup('Hello @name', ['@name' => 'Drupal'], ['context' => 'greeting']);
+    $serialized_markup = unserialize(serialize($markup));
+
+    $this->assertSame('Hello Drupal', $serialized_markup->render());
+    $this->assertSame(['@name' => 'Drupal'], $serialized_markup->getArguments());
+    $this->assertSame('greeting', $serialized_markup->getOption('context'));
   }
 
   /**

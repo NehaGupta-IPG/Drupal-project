@@ -23,7 +23,8 @@ abstract class EntityBase implements EntityInterface {
   use RefinableCacheableDependencyTrait;
 
   use DependencySerializationTrait {
-    __sleep as traitSleep;
+    __serialize as traitSerialize;
+    __unserialize as traitUnserialize;
   }
 
   /**
@@ -670,9 +671,17 @@ abstract class EntityBase implements EntityInterface {
   /**
    * {@inheritdoc}
    */
-  public function __sleep(): array {
+  public function __serialize(): array {
     $this->typedData = NULL;
-    return $this->traitSleep();
+    return $this->traitSerialize();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function __unserialize(array $data): void {
+    $this->typedData = NULL;
+    $this->traitUnserialize($data);
   }
 
   /**

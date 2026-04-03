@@ -1303,9 +1303,18 @@ class TransactionTest extends DatabaseTestBase {
     // The Gadget Chain itself may trigger a deprecation before the Exception
     // that prevents the payload from executing is thrown, so we ignore
     // deprecations for this test.
-    $this->expectException(\BadMethodCallException::class);
-    $this->expectExceptionMessage('Cannot unserialize Drupal\Core\Database\Transaction');
-    unserialize($payload);
+    try {
+      unserialize($payload);
+      $this->fail('No exception was thrown');
+    }
+    catch (\Throwable $e) {
+      // In PHP 8.5+, the connection can reject unserialization before the
+      // Transaction class has a chance to throw.
+      $this->assertContains(get_class($e), [
+        \BadMethodCallException::class,
+        \LogicException::class,
+      ]);
+    }
   }
 
 }

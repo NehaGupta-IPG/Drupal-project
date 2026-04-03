@@ -548,6 +548,25 @@ abstract class ContentEntityBase extends EntityBase implements \IteratorAggregat
   /**
    * {@inheritdoc}
    */
+  public function __serialize(): array {
+    // Preserve legacy __sleep() behavior by serializing only normalized field
+    // values and dropping runtime caches that can become stale across requests.
+    foreach ($this->fields as $name => $fields) {
+      foreach ($fields as $langcode => $field) {
+        $this->values[$name][$langcode] = $field->getValue();
+      }
+    }
+    $this->fields = [];
+    $this->fieldDefinitions = NULL;
+    $this->languages = NULL;
+    $this->clearTranslationCache();
+
+    return parent::__serialize();
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function __sleep(): array {
     // Get the values of instantiated field objects, only serialize the values.
     foreach ($this->fields as $name => $fields) {

@@ -198,6 +198,56 @@ class TranslatableMarkup extends FormattableMarkup {
   }
 
   /**
+   * Magic __serialize() method to avoid serializing the string translator.
+   */
+  public function __serialize(): array {
+    return [
+      'string' => $this->string,
+      'arguments' => $this->arguments,
+      'options' => $this->options,
+    ];
+  }
+
+  /**
+   * Magic __unserialize() method to restore the object properties.
+   *
+   * @param array<mixed> $data
+   *   The serialized data.
+   */
+  public function __unserialize(array $data): void {
+    // Support both __serialize()-style keys and legacy property-mangled keys
+    // that can appear when unserializing payloads generated before migration.
+    $this->string = $this->getSerializedValue($data, 'string', '');
+    $this->arguments = $this->getSerializedValue($data, 'arguments', []);
+    $this->options = $this->getSerializedValue($data, 'options', []);
+  }
+
+  /**
+   * Retrieves a value from serialized data supporting legacy key formats.
+   *
+   * @param array<mixed> $data
+   *   Serialized data payload.
+   * @param string $key
+   *   Expected key name.
+   * @param mixed $default
+   *   Fallback value.
+   *
+   * @return mixed
+   *   The found value or fallback.
+   */
+  protected function getSerializedValue(array $data, string $key, mixed $default): mixed {
+    if (array_key_exists($key, $data)) {
+      return $data[$key];
+    }
+    foreach ($data as $candidate_key => $value) {
+      if (is_string($candidate_key) && str_ends_with($candidate_key, "\x00$key")) {
+        return $value;
+      }
+    }
+    return $default;
+  }
+
+  /**
    * Magic __sleep() method to avoid serializing the string translator.
    */
   public function __sleep(): array {

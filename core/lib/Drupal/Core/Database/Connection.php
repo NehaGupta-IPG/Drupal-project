@@ -1301,8 +1301,29 @@ abstract class Connection {
   /**
    * Prevents the database connection from being serialized.
    */
-  public function __sleep(): array {
+  public function __serialize(): array {
     throw new \LogicException('The database connection is not serializable. This probably means you are serializing an object that has an indirect reference to the database connection. Adjust your code so that is not necessary. Alternatively, look at DependencySerializationTrait as a temporary solution.');
+  }
+
+  /**
+   * Prevents the database connection from being unserialized.
+   *
+   * @param array<mixed> $data
+   *   The serialized data.
+   */
+  public function __unserialize(array $data): void {
+    throw new \LogicException('The database connection is not serializable. This probably means you are serializing an object that has an indirect reference to the database connection. Adjust your code so that is not necessary. Alternatively, look at DependencySerializationTrait as a temporary solution.');
+  }
+
+  /**
+   * Prevents the database connection from being serialized.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+   *   __serialize() instead.
+   * @see https://www.drupal.org/node/3578423
+   */
+  public function __sleep(): array {
+    return array_keys(get_object_vars($this));
   }
 
   /**

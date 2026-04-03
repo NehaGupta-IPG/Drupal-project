@@ -2,10 +2,12 @@
 
 namespace Drupal\Core\Config\Entity;
 
+use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Config\Action\Attribute\ActionMethod;
 use Drupal\Core\Config\Schema\SchemaIncompleteException;
+use Drupal\Core\DependencyInjection\ContainerNotInitializedException;
 use Drupal\Core\Entity\EntityBase;
 use Drupal\Core\Config\ConfigDuplicateUUIDException;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -356,7 +358,24 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
   /**
    * {@inheritdoc}
    */
-  public function __sleep(): array {
+  public function __serialize(): array {
+    $keys_to_unset = $this->getPluginCollectionKeysToUnset();
+    $vars = $this->addCurrentScopeSerializationData(parent::__serialize());
+
+    if (!empty($keys_to_unset)) {
+      $vars = array_diff_key($vars, $keys_to_unset);
+    }
+
+    return $vars;
+  }
+
+  /**
+   * Returns plugin collection properties that must not be serialized.
+   *
+   * @return array
+   *   The keyed plugin collection properties to unset.
+   */
+  private function getPluginCollectionKeysToUnset(): array {
     $keys_to_unset = [];
     if ($this instanceof EntityWithPluginCollectionInterface) {
       // Get the plugin collections first, so that the properties are
@@ -368,17 +387,62 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
         $this->set($plugin_config_key, $plugin_collection->getConfiguration());
         // If the plugin collections are stored as properties on the entity,
         // mark them to be unset.
-        $keys_to_unset += array_filter($vars, function ($value) use ($plugin_collection) {
+        $keys_to_unset += array_filter($vars, static function ($value) use ($plugin_collection) {
           return $plugin_collection === $value;
         });
       }
     }
 
-    $vars = parent::__sleep();
+    return $keys_to_unset;
+  }
 
-    if (!empty($keys_to_unset)) {
-      $vars = array_diff($vars, array_keys($keys_to_unset));
+  /**
+   * Adds values that are only visible from the ConfigEntityBase scope.
+   *
+   * This ensures protected properties defined by concrete config entities are
+   * preserved, including service-backed properties that EntityBase itself
+   * cannot see.
+   *
+   * @param array $vars
+   *   The serialized data collected by the parent scope.
+   *
+   * @return array
+   *   The completed serialized data.
+   */
+  private function addCurrentScopeSerializationData(array $vars): array {
+    $current_scope_vars = array_diff_key(get_object_vars($this), $vars);
+    if (empty($current_scope_vars)) {
+      return $vars;
     }
+
+    $service_ids = $vars['_serviceIds'];
+    $entity_storages = $vars['_entityStorages'];
+
+    try {
+      $container = \Drupal::getContainer();
+      $reverse_container = $container->get(ReverseContainer::class);
+      foreach ($current_scope_vars as $key => $value) {
+        if (!is_object($value) || $value instanceof TranslatableMarkup) {
+          $vars[$key] = $value;
+          continue;
+        }
+        if ($value instanceof EntityStorageInterface) {
+          $entity_storages[$key] = $value->getEntityTypeId();
+          continue;
+        }
+        if ($service_id = $reverse_container->getId($value)) {
+          $service_ids[$key] = $service_id;
+          continue;
+        }
+        $vars[$key] = $value;
+      }
+    }
+    catch (ContainerNotInitializedException) {
+      $vars += $current_scope_vars;
+    }
+
+    $vars['_serviceIds'] = $service_ids;
+    $vars['_entityStorages'] = $entity_storages;
     return $vars;
   }
 

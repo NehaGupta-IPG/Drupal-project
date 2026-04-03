@@ -6,6 +6,7 @@ namespace Drupal\Tests\taxonomy\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\TermStorage;
 use Drupal\Tests\taxonomy\Traits\TaxonomyTestTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
@@ -152,6 +153,40 @@ class TermKernelTest extends KernelTestBase {
   }
 
   /**
+   * Tests that term storage serialization drops static caches.
+   */
+  public function testTermStorageSerialization(): void {
+    $vocabulary = $this->createVocabulary();
+    $parent_term = $this->createTerm($vocabulary);
+    $child_term = $this->createTerm($vocabulary);
+    $child_term->parent = [$parent_term->id()];
+    $child_term->save();
+
+    $storage = $this->container->get('entity_type.manager')->getStorage('taxonomy_term');
+    $this->assertInstanceOf(TermStorage::class, $storage);
+
+    $storage->loadTree($vocabulary->id());
+    $storage->loadAllParents($child_term->id());
+    $storage->getVocabularyHierarchyType($vocabulary->id());
+
+    $this->assertNotEmpty($this->getStorageProperty($storage, 'treeChildren'));
+    $this->assertNotEmpty($this->getStorageProperty($storage, 'ancestors'));
+    $this->assertNotEmpty($this->getStorageProperty($storage, 'trees'));
+    $this->assertNotEmpty($this->getStorageProperty($storage, 'vocabularyHierarchyType'));
+
+    /** @var \Drupal\taxonomy\TermStorage $unserialized_storage */
+    $unserialized_storage = unserialize(serialize($storage));
+
+    $this->assertSame([], $this->getStorageProperty($unserialized_storage, 'treeChildren'));
+    $this->assertSame([], $this->getStorageProperty($unserialized_storage, 'treeParents'));
+    $this->assertSame([], $this->getStorageProperty($unserialized_storage, 'treeTerms'));
+    $this->assertSame([], $this->getStorageProperty($unserialized_storage, 'trees'));
+    $this->assertSame([], $this->getStorageProperty($unserialized_storage, 'ancestors'));
+    $this->assertSame([], $this->getStorageProperty($unserialized_storage, 'vocabularyHierarchyType'));
+    $this->assertCount(2, $unserialized_storage->loadTree($vocabulary->id()));
+  }
+
+  /**
    * Tests that a Term is renderable when unsaved (preview).
    */
   public function testTermPreview(): void {
@@ -205,6 +240,13 @@ class TermKernelTest extends KernelTestBase {
     $vocabulary_fields = \Drupal::service('entity_field.manager')->getFieldDefinitions('taxonomy_term', $vocabulary->id());
     $parent_target_bundles = $vocabulary_fields['parent']->getSetting('handler_settings')['target_bundles'];
     $this->assertSame([$vocabulary->id() => $vocabulary->id()], $parent_target_bundles);
+  }
+
+  /**
+   * Returns a protected storage property for assertions.
+   */
+  private function getStorageProperty(TermStorage $storage, string $property): mixed {
+    return (new \ReflectionProperty($storage, $property))->getValue($storage);
   }
 
 }
