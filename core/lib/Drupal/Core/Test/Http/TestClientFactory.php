@@ -23,10 +23,7 @@ class TestClientFactory extends ClientFactory {
    * {@inheritdoc}
    */
   public function fromOptions(array $config = []) {
-    // Return a Guzzle client with a mocked handler. We need to give a method on
-    // this class as the handler, rather than $this->httpHandler, because this
-    // service is setup before a test class has a chance to call
-    // static::setHandler().
+    // Return a Guzzle client with a mocked handler.
     $mocked_client = new Client([
       'handler' => [$this, 'httpHandler'],
     ]);
