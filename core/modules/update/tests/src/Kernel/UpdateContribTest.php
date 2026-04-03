@@ -191,6 +191,8 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
         'aaa_update_test' => '1_0',
       ]
     );
+
+    $this->drupalGet('admin/reports/updates');
     $this->assertSession()->linkNotExists('AAA Update test');
     $this->assertSession()->linkByHrefNotExists('https://example.com/project/aaa_update_test');
 
@@ -204,6 +206,8 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
         'aaa_update_test' => '1_0',
       ]
     );
+
+    $this->drupalGet('admin/reports/updates');
     $this->assertSession()->linkExists('AAA Update test');
     $this->assertSession()->linkByHrefExists('https://example.com/project/aaa_update_test');
   }
