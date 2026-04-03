@@ -139,6 +139,20 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
   }
 
   /**
+   * Runs a series of assertions that are applicable to all update statuses.
+   */
+  protected function standardTests() {
+    $this->assertSession()->responseContains('<h3>Drupal core</h3>');
+    // Verify that the link to the Drupal project appears.
+    $this->assertSession()->linkExists('Drupal');
+    $this->assertSession()->linkByHrefExists('https://example.com/project/drupal');
+    $this->assertSession()->pageTextNotContains('No available releases found');
+    $this->assertSession()->pageTextContains('Last checked:');
+    // No download URLs should be present.
+    $this->assertSession()->responseNotContains('.tar.gz');
+  }
+
+  /**
    * Tests the basic functionality of a contrib module on the status report.
    */
   public function testUpdateContribBasic(): void {
@@ -157,6 +171,8 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
         'aaa_update_test' => '1_0',
       ]
     );
+
+    $this->drupalGet('admin/reports/updates');
     $this->standardTests();
     $this->assertSession()->pageTextContains('Up to date');
     $this->assertSession()->responseContains('<h3>Modules</h3>');
