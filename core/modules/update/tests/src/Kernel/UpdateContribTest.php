@@ -302,6 +302,8 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
           'drupal' => '8.0.0',
           'aaa_update_test' => str_replace('.', '_', $version) . $extra_version,
         ]);
+
+        $this->drupalGet('admin/reports/updates');
         $this->standardTests();
         $assert_session->pageTextNotContains('Security update required!');
         // The XML test fixtures for this method all contain the '8.x-3.0'
@@ -415,6 +417,9 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
     foreach ([TRUE, FALSE] as $check_disabled) {
       $update_settings->set('check.disabled_extensions', $check_disabled)->save();
       $this->refreshUpdateStatus($xml_mapping);
+
+      $this->drupalGet('admin/reports/updates');
+
       // In neither case should we see the "Themes" heading for installed
       // themes.
       // Use regex pattern because we need to match 'Themes' case sensitively.
