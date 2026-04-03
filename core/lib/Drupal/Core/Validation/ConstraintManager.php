@@ -12,9 +12,11 @@ use Drupal\Core\Validation\Plugin\Validation\Constraint\EmailConstraint;
 use Symfony\Component\Validator\Constraints\Blank;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Choice;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\IdenticalTo;
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\PositiveOrZero;
 
 /**
  * Constraint plugin manager.
@@ -70,21 +72,18 @@ class ConstraintManager extends DefaultPluginManager {
    *
    * @param string $name
    *   The name or plugin id of the constraint.
-   * @param mixed $options
+   * @param array<string, mixed>|null $options
    *   The options to pass to the constraint class. Required and supported
    *   options depend on the constraint class.
    *
-   * @return \Symfony\Component\Validator\Constraint
+   * @return \Symfony\Component\Validator\Constraint|object|\Drupal\Core\Plugin\ContainerFactoryPluginInterface
    *   A validation constraint plugin.
    */
-  public function create($name, $options) {
-    if (!is_array($options)) {
-      // Plugins need an array as configuration, so make sure we have one.
-      // The constraint classes support passing the options as part of the
-      // 'value' key also.
-      $options = isset($options) ? ['value' => $options] : [];
+  public function create(string $name, ?array $options) {
+    if ($options && array_is_list($options)) {
+      throw new \InvalidArgumentException('$options must be an associative array or NULL.');
     }
-    return $this->createInstance($name, $options);
+    return $this->createInstance($name, $options ?? []);
   }
 
   /**
@@ -118,10 +117,20 @@ class ConstraintManager extends DefaultPluginManager {
       'class' => Choice::class,
       'type' => FALSE,
     ]);
+    $this->getDiscovery()->setDefinition('File', [
+      'label' => new TranslatableMarkup('File'),
+      'class' => File::class,
+      'type' => ['string'],
+    ]);
     $this->getDiscovery()->setDefinition('Image', [
       'label' => new TranslatableMarkup('Image'),
       'class' => Image::class,
       'type' => ['string'],
+    ]);
+    $this->getDiscovery()->setDefinition('PositiveOrZero', [
+      'label' => new TranslatableMarkup('Positive or zero'),
+      'class' => PositiveOrZero::class,
+      'type' => ['integer'],
     ]);
     $this->getDiscovery()->setDefinition('IdenticalTo', [
       'label' => new TranslatableMarkup('IdenticalTo'),

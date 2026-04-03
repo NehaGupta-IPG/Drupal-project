@@ -7,28 +7,31 @@ namespace Drupal\KernelTests\Core\DrupalKernel;
 use Composer\Autoload\ClassLoader;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\DrupalKernelInterface;
-use Drupal\Core\Utility\Error;
 use Drupal\KernelTests\KernelTestBase;
 use org\bovigo\vfs\vfsStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Prophecy\Argument;
 use Symfony\Component\HttpFoundation\Request;
 
 // cspell:ignore äöüßαβγδεζηθικλμνξοσὠ
-
 /**
  * Tests DIC compilation to disk.
- *
- * @group DrupalKernel
- * @coversDefaultClass \Drupal\Core\DrupalKernel
  */
+#[CoversClass(DrupalKernel::class)]
+#[Group('DrupalKernel')]
+#[RunTestsInSeparateProcesses]
 class DrupalKernelTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected function tearDown(): void {
-    $currentErrorHandler = Error::currentErrorHandler();
-    if (is_string($currentErrorHandler) && $currentErrorHandler === '_drupal_error_handler') {
+    if (get_error_handler() === '_drupal_error_handler') {
       restore_error_handler();
     }
     parent::tearDown();
@@ -144,7 +147,14 @@ class DrupalKernelTest extends KernelTestBase {
     // Check that the location of the new module is registered.
     $modules = $container->getParameter('container.modules');
     $module_extension_list = $container->get('extension.list.module');
-    $this->assertEquals(['type' => 'module', 'pathname' => $module_extension_list->getPathname('service_provider_test'), 'filename' => NULL], $modules['service_provider_test']);
+    $this->assertEquals(
+      [
+        'type' => 'module',
+        'pathname' => $module_extension_list->getPathname('service_provider_test'),
+        'filename' => NULL,
+      ],
+      $modules['service_provider_test']
+    );
 
     // Check that the container itself is not among the persist IDs because it
     // does not make sense to persist the container itself.
@@ -208,7 +218,7 @@ class DrupalKernelTest extends KernelTestBase {
    *   An array of test cases. Each test case is an array containing a single boolean value
    *   that represents the class_loader_auto_detect setting to be tested.
    */
-  public static function providerClassLoaderAutoDetect() {
+  public static function providerClassLoaderAutoDetect(): array {
     return [
       'TRUE' => [TRUE],
       'FALSE' => [FALSE],
@@ -224,12 +234,12 @@ class DrupalKernelTest extends KernelTestBase {
    * @param bool $value
    *   The value to set class_loader_auto_detect to.
    *
-   * @runInSeparateProcess
-   * @preserveGlobalState disabled
-   * @covers ::boot
-   * @dataProvider providerClassLoaderAutoDetect
+   * @legacy-covers ::boot
    */
-  public function testClassLoaderAutoDetect($value): void {
+  #[DataProvider('providerClassLoaderAutoDetect')]
+  #[PreserveGlobalState(FALSE)]
+  #[RunInSeparateProcess]
+  public function testClassLoaderAutoDetect(bool $value): void {
     // Create a virtual file system containing items that should be
     // excluded. Exception being modules directory.
     vfsStream::setup('root', NULL, [
@@ -250,7 +260,7 @@ class DrupalKernelTest extends KernelTestBase {
     $classloader = $this->prophesize(ClassLoader::class);
 
     // Assert that we call the setApcuPrefix on the classloader if
-    // class_loader_auto_detect is set to TRUE;
+    // class_loader_auto_detect is set to TRUE.
     if ($value) {
       $classloader->setApcuPrefix(Argument::type('string'))->shouldBeCalled();
     }
@@ -265,7 +275,7 @@ class DrupalKernelTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::resetContainer
+   * Tests reset container.
    */
   public function testResetContainer(): void {
     $modules_enabled = [
@@ -294,6 +304,16 @@ class DrupalKernelTest extends KernelTestBase {
     // Ensure persisted services are persisted.
     $request_stack = $container->get('request_stack');
 
+    $container->get('stream_wrapper_manager')->register();
+    $stream_wrappers = array_keys($container->get('stream_wrapper_manager')->getWrappers());
+    $this->assertSame([
+      'assets',
+      'public',
+      'temporary',
+      'module',
+      'theme',
+    ], $stream_wrappers);
+
     $kernel->resetContainer();
 
     // Ensure services are reset when ::resetContainer is called.
@@ -310,6 +330,9 @@ class DrupalKernelTest extends KernelTestBase {
 
     // Ensure persisted services are persisted.
     $this->assertSame($request_stack, $container->get('request_stack'));
+
+    // Ensure stream wrappers are registered.
+    $this->assertSame($stream_wrappers, array_keys($container->get('stream_wrapper_manager')->getWrappers()));
   }
 
   /**

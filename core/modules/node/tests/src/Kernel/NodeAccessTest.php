@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Kernel;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+
 /**
  * Tests basic node_access functionality.
- *
- * @group node
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class NodeAccessTest extends NodeAccessTestBase {
 
   /**

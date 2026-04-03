@@ -53,62 +53,6 @@ class DateTimePlus {
   const RFC7231 = 'D, d M Y H:i:s \G\M\T';
 
   /**
-   * An array of possible date parts.
-   *
-   * @var string[]
-   */
-  protected static $dateParts = [
-    'year',
-    'month',
-    'day',
-    'hour',
-    'minute',
-    'second',
-  ];
-
-  /**
-   * The value of the time value passed to the constructor.
-   *
-   * @var string
-   */
-  protected $inputTimeRaw = '';
-
-  /**
-   * The prepared time, without timezone, for this date.
-   *
-   * @var string
-   */
-  protected $inputTimeAdjusted = '';
-
-  /**
-   * The value of the timezone passed to the constructor.
-   *
-   * @var string
-   */
-  protected $inputTimeZoneRaw = '';
-
-  /**
-   * The prepared timezone object used to construct this date.
-   *
-   * @var string
-   */
-  protected $inputTimeZoneAdjusted = '';
-
-  /**
-   * The value of the format passed to the constructor.
-   *
-   * @var string
-   */
-  protected $inputFormatRaw = '';
-
-  /**
-   * The prepared format, if provided.
-   *
-   * @var string
-   */
-  protected $inputFormatAdjusted = '';
-
-  /**
    * The value of the language code passed to the constructor.
    *
    * @var string|null
@@ -519,7 +463,7 @@ class DateTimePlus {
    *   otherwise.
    */
   public function hasErrors() {
-    return (boolean) count($this->errors);
+    return (bool) count($this->errors);
   }
 
   /**
@@ -623,15 +567,21 @@ class DateTimePlus {
    * @return bool
    *   TRUE if the datetime parts contain valid values, otherwise FALSE.
    */
-  public static function checkArray($array) {
-    $valid_date = FALSE;
+  protected static function checkArray($array) {
     $valid_time = TRUE;
     // Check for a valid date using checkdate(). Only values that
     // meet that test are valid. An empty value, either a string or a 0, is not
     // a valid value.
-    if (!empty($array['year']) && !empty($array['month']) && !empty($array['day'])) {
-      $valid_date = checkdate($array['month'], $array['day'], $array['year']);
+    foreach (['year', 'month', 'day'] as $key) {
+      if (
+        empty($array[$key])
+        || filter_var($array[$key], FILTER_VALIDATE_INT) === FALSE
+      ) {
+        return FALSE;
+      }
     }
+    $valid_date = checkdate($array['month'], $array['day'], $array['year']);
+
     // Testing for valid time is reversed. Missing time is OK,
     // but incorrect values are not.
     foreach (['hour', 'minute', 'second'] as $key) {

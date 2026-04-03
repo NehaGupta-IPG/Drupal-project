@@ -6,11 +6,16 @@ namespace Drupal\Tests\block\Functional;
 
 use Drupal\block\Entity\Block;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\CoversFunction;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * @covers block_post_update_make_weight_integer
- * @group block
+ * Tests Block Weight Update.
  */
+#[Group('block')]
+#[CoversFunction('block_post_update_make_weight_integer')]
+#[RunTestsInSeparateProcesses]
 class BlockWeightUpdateTest extends UpdatePathTestBase {
 
   /**
@@ -19,6 +24,9 @@ class BlockWeightUpdateTest extends UpdatePathTestBase {
   protected function setDatabaseDumpFiles() {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../system/tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz',
+      __DIR__ . '/../../../../system/tests/fixtures/update/uninstall-history.php',
+      __DIR__ . '/../../../../system/tests/fixtures/update/uninstall-ban.php',
+      __DIR__ . '/../../../../system/tests/fixtures/update/uninstall-contact.php',
     ];
   }
 
