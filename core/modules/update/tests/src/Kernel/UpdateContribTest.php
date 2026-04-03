@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\update\Kernel;
 
+use Behat\Mink\Element\NodeElement;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Core\Test\Http\TestClientFactory;
@@ -270,6 +271,8 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
       'update_test_base_theme' => '1_1-sec',
     ];
     $this->refreshUpdateStatus($xml_mapping);
+
+    $this->drupalGet('admin/reports/updates');
     $this->assertSession()->pageTextContains('Security update required!');
     $this->updateProject = 'update_test_base_theme';
     $this->assertVersionUpdateLinks('Security update', '8.x-1.1');
@@ -943,6 +946,45 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
       $this->assertSame('Not compatible', $details_summary_element->getText());
     }
     $this->assertFalse($update_element->hasLink('Download'));
+  }
+
+  /**
+   * Asserts that an update version has the correct links.
+   *
+   * @param string $label
+   *   The label for the update.
+   * @param string $version
+   *   The project version.
+   * @param int $index
+   *   (optional) The index of the link.
+   */
+  protected function assertVersionUpdateLinks($label, $version, int $index = 0) {
+    $update_element = $this->findUpdateElementByLabel($label, $index);
+    // In the release notes URL the periods are replaced with dashes.
+    $url_version = str_replace('.', '-', $version);
+
+    $this->assertEquals($update_element->findLink($version)->getAttribute('href'), "https://example.com/{$this->updateProject}-$url_version-release");
+    $this->assertStringNotContainsString("https://example.com/{$this->updateProject}-$version.tar.gz", $update_element->getOuterHtml());
+    $this->assertEquals($update_element->findLink('Release notes')->getAttribute('href'), "https://example.com/{$this->updateProject}-$url_version-release");
+  }
+
+  /**
+   * Finds an update page element by label.
+   *
+   * @param string $label
+   *   The label for the update, for example "Recommended version:" or
+   *   "Latest version:".
+   * @param int $index
+   *   (optional) The index of the element.
+   *
+   * @return \Behat\Mink\Element\NodeElement
+   *   The update element.
+   */
+  protected function findUpdateElementByLabel($label, int $index = 0): NodeElement {
+    $update_elements = $this->getSession()->getPage()
+      ->findAll('css', $this->updateTableLocator . " .project-update__version:contains(\"$label\")");
+    $this->assertGreaterThanOrEqual($index, count($update_elements));
+    return $update_elements[$index];
   }
 
 }
