@@ -208,6 +208,8 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
       ],
     ]);
     $this->refreshUpdateStatus(['drupal' => '8.0.0', '#all' => '1_0']);
+
+    $this->drupalGet('admin/reports/updates');
     $this->standardTests();
     // We're expecting the report to say all projects are up to date.
     $this->assertSession()->pageTextContains('Up to date');
