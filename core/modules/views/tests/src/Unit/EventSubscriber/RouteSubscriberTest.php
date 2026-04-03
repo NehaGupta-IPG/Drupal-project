@@ -76,10 +76,10 @@ class RouteSubscriberTest extends UnitTestCase {
 
     $display_1->expects($this->once())
       ->method('collectRoutes')
-      ->willReturn(['test_id.page_1' => 'views.test_id.page_1']);
+      ->willReturn(['test_id.page_1' => 'view.test_id.page_1']);
     $display_2->expects($this->once())
       ->method('collectRoutes')
-      ->willReturn(['test_id.page_2' => 'views.test_id.page_2']);
+      ->willReturn(['test_id.page_2' => 'view.test_id.page_2']);
 
     $this->routeSubscriber->routes();
 
@@ -87,7 +87,7 @@ class RouteSubscriberTest extends UnitTestCase {
       ->method('set')
       ->with(
         'views.view_route_names',
-        ['test_id.page_1' => 'views.test_id.page_1', 'test_id.page_2' => 'views.test_id.page_2']);
+        ['test_id.page_1' => 'view.test_id.page_1', 'test_id.page_2' => 'view.test_id.page_2']);
     $this->routeSubscriber->routeRebuildFinished();
   }
 
