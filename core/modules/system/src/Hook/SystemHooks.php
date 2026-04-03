@@ -2,7 +2,6 @@
 
 namespace Drupal\system\Hook;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
 use Drupal\Core\StreamWrapper\LocalStream;
 use Drupal\Core\Site\Settings;
@@ -381,32 +380,6 @@ class SystemHooks {
   }
 
   /**
-   * Implements hook_library_info_alter().
-   */
-  #[Hook('library_info_alter')]
-  public function libraryInfoAlter(&$libraries, $extension): void {
-    // If Claro is the admin theme but not the active theme, grant Claro the
-    // ability to override the toolbar library with its own assets.
-    if ($extension === 'toolbar' && _system_is_claro_admin_and_not_active()) {
-      require_once DRUPAL_ROOT . '/core/themes/claro/claro.theme';
-      claro_system_module_invoked_library_info_alter($libraries, $extension);
-    }
-  }
-
-  /**
-   * Implements hook_theme_registry_alter().
-   */
-  #[Hook('theme_registry_alter')]
-  public function themeRegistryAlter(array &$theme_registry): void {
-    // If Claro is the admin theme but not the active theme, use Claro's toolbar
-    // templates.
-    if (_system_is_claro_admin_and_not_active()) {
-      require_once DRUPAL_ROOT . '/core/themes/claro/claro.theme';
-      claro_system_module_invoked_theme_registry_alter($theme_registry);
-    }
-  }
-
-  /**
    * Implements hook_page_top().
    */
   #[Hook('page_top')]
@@ -485,30 +458,6 @@ class SystemHooks {
       }
     }
     return NULL;
-  }
-
-  /**
-   * Implements hook_archiver_info_alter().
-   */
-  #[Hook('archiver_info_alter')]
-  public function archiverInfoAlter(&$info): void {
-    if (!class_exists(\ZipArchive::class)) {
-      // PHP Zip extension is missing.
-      unset($info['Zip']);
-    }
-  }
-
-  /**
-   * Implements hook_entity_form_mode_presave().
-   *
-   * Transforms empty description into null.
-   */
-  #[Hook('entity_form_mode_presave')]
-  public function systemEntityFormModePresave(EntityInterface $entity): void {
-    if ($entity->get('description') !== NULL && trim($entity->get('description')) === '') {
-      @trigger_error("Setting description to an empty string is deprecated in drupal:11.2.0 and it must be null in drupal:12.0.0. See https://www.drupal.org/node/3452144", E_USER_DEPRECATED);
-      $entity->set('description', NULL);
-    }
   }
 
 }

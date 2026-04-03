@@ -6,8 +6,9 @@ namespace Drupal\FunctionalJavascriptTests;
 
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Tests\BrowserTestBase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Tests\WebAssert;
 use PHPUnit\Framework\Attributes\PostCondition;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Runs a browser test using a driver that supports JavaScript.
@@ -131,7 +132,7 @@ abstract class WebDriverTestBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function getMinkDriverArgs() {
+  protected function getMinkDriverArgs(): string|false {
     if ($this->minkDefaultDriverClass === DrupalSelenium2Driver::class) {
       return getenv('MINK_DRIVER_ARGS_WEBDRIVER') ?: parent::getMinkDriverArgs();
     }
@@ -153,7 +154,7 @@ abstract class WebDriverTestBase extends BrowserTestBase {
    *
    * @see \Behat\Mink\Driver\DriverInterface::evaluateScript()
    */
-  protected function assertJsCondition($condition, $timeout = 10000, $message = '') {
+  protected function assertJsCondition(string $condition, int $timeout = 10000, $message = '') {
     $message = $message ?: "JavaScript condition met:\n" . $condition;
     $result = $this->getSession()->getDriver()->wait($timeout, $condition);
     $this->assertTrue($result, $message);
@@ -192,14 +193,14 @@ abstract class WebDriverTestBase extends BrowserTestBase {
    * @return \Drupal\FunctionalJavascriptTests\WebDriverWebAssert
    *   A new web-assert option for asserting the presence of elements with.
    */
-  public function assertSession($name = NULL) {
+  public function assertSession($name = NULL): WebAssert {
     return new WebDriverWebAssert($this->getSession($name), $this->baseUrl);
   }
 
   /**
    * {@inheritdoc}
    */
-  protected function drupalGet($path, array $options = [], array $headers = []) {
+  protected function drupalGet($path, array $options = [], array $headers = []): string {
     $result = parent::drupalGet($path, $options, $headers);
 
     // Wait for all requests to finish.
@@ -243,7 +244,7 @@ EndOfScript;
   /**
    * {@inheritdoc}
    */
-  protected function getHtmlOutputHeaders() {
+  protected function getHtmlOutputHeaders(): string {
     // The webdriver API does not support fetching headers.
     return '';
   }
