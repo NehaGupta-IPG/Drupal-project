@@ -5,6 +5,7 @@ namespace Drupal\Core\Test\Http;
 use Drupal\Core\Http\ClientFactory;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request as GuzzleRequest;
+use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use GuzzleHttp\Psr7\HttpFactory;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
@@ -37,7 +38,7 @@ class TestClientFactory extends ClientFactory {
    * @param \GuzzleHttp\Psr7\Request $request
    *   The Guzzle request.
    */
-  public function httpHandler(GuzzleRequest $request) {
+  public function httpHandler(GuzzleRequest $request): GuzzleResponse {
     $path = $request->getUri()->getPath();
 
     // Can't use the Symfony PSR-7 Bridge to convert, as the Guzzle
