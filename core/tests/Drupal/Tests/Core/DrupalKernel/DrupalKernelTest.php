@@ -481,7 +481,7 @@ class StubCacheBackend implements CacheBackendInterface {
   /**
    * {@inheritdoc}
    */
-  public function set($cid, $data, $expire = CacheBackendInterface::CACHE_PERMANENT, array $tags = []) {
+  public function set($cid, $data, $expire = CacheBackendInterface::CACHE_PERMANENT, array $tags = []): void {
     $this->setCids[] = $cid;
     $this->items[$cid] = $data;
   }
@@ -489,7 +489,7 @@ class StubCacheBackend implements CacheBackendInterface {
   /**
    * {@inheritdoc}
    */
-  public function setMultiple(array $items) {
+  public function setMultiple(array $items): void {
     foreach ($items as $cid => $item) {
       $this->set($cid, $item['data'], $item['expire'] ?? CacheBackendInterface::CACHE_PERMANENT, $item['tags'] ?? []);
     }
@@ -498,14 +498,14 @@ class StubCacheBackend implements CacheBackendInterface {
   /**
    * {@inheritdoc}
    */
-  public function delete($cid) {
+  public function delete($cid): void {
     unset($this->items[$cid]);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function deleteMultiple(array $cids) {
+  public function deleteMultiple(array $cids): void {
     foreach ($cids as $cid) {
       $this->delete($cid);
     }
@@ -514,7 +514,7 @@ class StubCacheBackend implements CacheBackendInterface {
   /**
    * {@inheritdoc}
    */
-  public function deleteAll() {
+  public function deleteAll(): void {
     $this->deleteAllCount++;
     $this->items = [];
   }
@@ -522,35 +522,35 @@ class StubCacheBackend implements CacheBackendInterface {
   /**
    * {@inheritdoc}
    */
-  public function invalidate($cid) {
+  public function invalidate($cid): void {
     // No-op for the stub.
   }
 
   /**
    * {@inheritdoc}
    */
-  public function invalidateMultiple(array $cids) {
+  public function invalidateMultiple(array $cids): void {
     // No-op for the stub.
   }
 
   /**
    * {@inheritdoc}
    */
-  public function invalidateTags(array $tags) {
+  public function invalidateTags(array $tags): void {
     // No-op for the stub.
   }
 
   /**
    * {@inheritdoc}
    */
-  public function garbageCollection() {
+  public function garbageCollection(): void {
     // No-op for the stub.
   }
 
   /**
    * {@inheritdoc}
    */
-  public function removeBin() {
+  public function removeBin(): void {
     $this->items = [];
   }
 
@@ -632,7 +632,7 @@ class DrupalKernelApcuTestKernel extends DrupalKernel {
   /**
    * {@inheritdoc}
    */
-  protected function containerApcuFetch(string $key, ?bool &$success = NULL) {
+  protected function containerApcuFetch(string $key, ?bool &$success = NULL): mixed {
     if (isset($this->apcuStorage[$key])) {
       $success = TRUE;
       return $this->apcuStorage[$key]['value'];
@@ -644,7 +644,7 @@ class DrupalKernelApcuTestKernel extends DrupalKernel {
   /**
    * {@inheritdoc}
    */
-  protected function containerApcuStore(string $key, $value): bool {
+  protected function containerApcuStore(string $key, mixed $value): bool {
     $this->apcuStorage[$key] = [
       'value' => $value,
     ];

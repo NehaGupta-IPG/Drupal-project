@@ -1028,14 +1028,14 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   /**
    * Wraps apcu_fetch() to allow easier overrides in tests.
    */
-  protected function containerApcuFetch(string $key, ?bool &$success = NULL) {
+  protected function containerApcuFetch(string $key, ?bool &$success = NULL): mixed {
     return apcu_fetch($key, $success);
   }
 
   /**
    * Wraps apcu_store() to allow easier overrides in tests.
    */
-  protected function containerApcuStore(string $key, $value): bool {
+  protected function containerApcuStore(string $key, mixed $value): bool {
     return (bool) apcu_store($key, $value);
   }
 
