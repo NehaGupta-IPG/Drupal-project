@@ -33,8 +33,7 @@ class LocaleSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config('locale.settings');
-
+    
     $form['update_default_config_langcodes'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Update default configuration when new modules or themes are installed.'),
