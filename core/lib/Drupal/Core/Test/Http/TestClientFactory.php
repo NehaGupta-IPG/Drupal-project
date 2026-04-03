@@ -5,13 +5,18 @@ namespace Drupal\Core\Test\Http;
 use Drupal\Core\Http\ClientFactory;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request as GuzzleRequest;
-use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use GuzzleHttp\Psr7\HttpFactory;
 use PHPUnit\Framework\Assert;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
 
+/**
+ * Test HTTP client factory which sends HTTP requests back into the site.
+ *
+ * This allows tests to set up mocked versions of external sites to return test
+ * data.
+ */
 class TestClientFactory extends ClientFactory {
 
   /**
