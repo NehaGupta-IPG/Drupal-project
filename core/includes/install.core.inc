@@ -44,6 +44,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Route;
+use Drupal\user\Entity\User;
 
 /**
  * Do not run the task during the current installation request.
@@ -560,8 +561,7 @@ function install_begin_request($class_loader, &$install_state): void {
       && $install_configure_form_key !== FALSE
       && $current_key < $install_configure_form_key
       && class_exists('\Drupal\user\Entity\User')
-      // phpcs:ignore
-      && $user1 = \Drupal\user\Entity\User::load(1)
+      && $user1 = User::load(1)
     ) {
 
       // If the user does not complete the configuration page and refreshes,
