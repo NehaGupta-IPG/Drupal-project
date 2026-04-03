@@ -881,6 +881,9 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
     // Save the map for UpdateTestController::updateTest() to use.
     $this->mockReleaseHistory($xml_map);
 
+    // Reset the update manager, so it re-fetches the list of extensions.
+    $this->container->get('update.manager')->reset();
+
     // Fetch the update data.
     $this->container->get('update.manager')->refreshUpdateData();
 
