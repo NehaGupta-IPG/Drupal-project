@@ -589,6 +589,18 @@ class RouteProviderTest extends KernelTestBase {
     $this->assertEquals([], $cache->data['query']);
     $this->assertCount(3, $cache->data['routes']);
 
+    // A path with a URL encoded trailing space.
+    $path = '/path/add/one%20';
+    $request = Request::create($path, 'GET');
+    $provider->getRouteCollectionForRequest($request);
+
+    $cache = $this->cache->get('route:[language]=en:[query_parameters]=:/path/add/one');
+    $this->assertEquals('/path/add/one', $cache->data['path']);
+    $this->assertEquals([], $cache->data['query']);
+    $this->assertCount(3, $cache->data['routes']);
+    $cache = $this->cache->get('route:[language]=en:[query_parameters]=:/path/add/one%20');
+    $this->assertFalse($cache);
+
     // A path with query parameters.
     $path = '/path/add/one?foo=bar';
     $request = Request::create($path, 'GET');
