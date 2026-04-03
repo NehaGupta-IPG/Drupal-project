@@ -122,7 +122,7 @@ class QuickStartTest extends BuildTestBase {
     $this->assertStringContainsString('Congratulations, you installed Drupal!', $process->getErrorOutput());
     // Ensure the command does not trigger any PHP deprecations.
     $this->assertStringNotContainsString('Deprecated', $process->getErrorOutput());
-    $this->assertNotFalse($port, "Web server running on port $port");
+    $this->assertNotFalse($port);
 
     // Give the server a couple of seconds to be ready.
     sleep(2);
@@ -190,7 +190,7 @@ class QuickStartTest extends BuildTestBase {
     });
     $this->assertEquals('', $server_process->getErrorOutput());
     $this->assertStringContainsString("127.0.0.1:$port/user/reset/1/", $server_process->getOutput());
-    $this->assertNotFalse($port, "Web server running on port $port");
+    $this->assertNotFalse($port);
 
     // Give the server a couple of seconds to be ready.
     sleep(2);
@@ -304,7 +304,7 @@ class QuickStartTest extends BuildTestBase {
       }
     });
     $this->assertEquals('', $server_process->getErrorOutput());
-    $this->assertNotFalse($port, "Web server running on port $port");
+    $this->assertNotFalse($port);
 
     // Stop the web server.
     $server_process->stop();
