@@ -99,6 +99,8 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
     $this->refreshUpdateStatus(['drupal' => '8.0.0', 'aaa_update_test' => 'no-releases']);
     // Cannot use $this->standardTests() because we need to check for the
     // 'No available releases found' string.
+
+    $this->drupalGet('admin/reports/updates');
     $this->assertSession()->responseContains('<h3>Drupal core</h3>');
     $this->assertSession()->linkExists('Drupal');
     $this->assertSession()->linkByHrefExists('https://example.com/project/drupal');
