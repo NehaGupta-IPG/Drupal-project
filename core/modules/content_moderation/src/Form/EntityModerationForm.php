@@ -7,6 +7,7 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\content_moderation\ContentModerationWorkspaceProvider;
 use Drupal\content_moderation\ModerationInformationInterface;
 use Drupal\content_moderation\StateTransitionValidationInterface;
 use Drupal\Core\Form\WorkspaceSafeFormInterface;
@@ -20,42 +21,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class EntityModerationForm extends FormBase implements WorkspaceSafeFormInterface {
 
-  /**
-   * The moderation information service.
-   *
-   * @var \Drupal\content_moderation\ModerationInformationInterface
-   */
-  protected $moderationInfo;
-
-  /**
-   * The time service.
-   *
-   * @var \Drupal\Component\Datetime\TimeInterface
-   */
-  protected $time;
-
-  /**
-   * The moderation state transition validation service.
-   *
-   * @var \Drupal\content_moderation\StateTransitionValidationInterface
-   */
-  protected $validation;
-
-  /**
-   * EntityModerationForm constructor.
-   *
-   * @param \Drupal\content_moderation\ModerationInformationInterface $moderation_info
-   *   The moderation information service.
-   * @param \Drupal\content_moderation\StateTransitionValidationInterface $validation
-   *   The moderation state transition validation service.
-   * @param \Drupal\Component\Datetime\TimeInterface $time
-   *   The time service.
-   */
-  public function __construct(ModerationInformationInterface $moderation_info, StateTransitionValidationInterface $validation, TimeInterface $time) {
-    $this->moderationInfo = $moderation_info;
-    $this->validation = $validation;
-    $this->time = $time;
-  }
+  public function __construct(
+    protected ModerationInformationInterface $moderationInfo,
+    protected StateTransitionValidationInterface $validation,
+    protected TimeInterface $time,
+    protected ContentModerationWorkspaceProvider $workspaceProvider,
+  ) {}
 
   /**
    * {@inheritdoc}
@@ -64,7 +35,8 @@ class EntityModerationForm extends FormBase implements WorkspaceSafeFormInterfac
     return new static(
       $container->get('content_moderation.moderation_information'),
       $container->get('content_moderation.state_transition_validation'),
-      $container->get('datetime.time')
+      $container->get('datetime.time'),
+      $container->get('Drupal\content_moderation\ContentModerationWorkspaceProvider')
     );
   }
 
@@ -127,6 +99,16 @@ class EntityModerationForm extends FormBase implements WorkspaceSafeFormInterfac
       '#type' => 'submit',
       '#value' => $this->t('Apply'),
     ];
+
+    $moderation_workspace = $this->workspaceProvider
+      ->getModerationWorkspace($entity->getEntityTypeId(), $entity->id(), $entity->get('langcode')->value);
+
+    if ($moderation_workspace) {
+      $form['active_workspace_id'] = [
+        '#type' => 'hidden',
+        '#value' => $moderation_workspace->id(),
+      ];
+    }
 
     $form['#theme'] = ['entity_moderation_form'];
     $form['#attached']['library'][] = 'content_moderation/content_moderation';
