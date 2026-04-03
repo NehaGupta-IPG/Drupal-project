@@ -89,6 +89,8 @@ class QuickStartTest extends BuildTestBase {
    * Tests the quick-start command.
    */
   public function testQuickStartCommand(): void {
+    // SQLite below the minimum version lacks features like JSON support,
+    // which causes the install to fail, so skip the test.
     $sqlite = (new \PDO('sqlite::memory:'))->query('select sqlite_version()')->fetch()[0];
     if (version_compare($sqlite, Tasks::SQLITE_MINIMUM_VERSION) < 0) {
       $this->markTestSkipped();
@@ -145,6 +147,8 @@ class QuickStartTest extends BuildTestBase {
    * Tests the quick-start commands.
    */
   public function testQuickStartInstallAndServerCommands(): void {
+    // SQLite below the minimum version lacks features like JSON support,
+    // which causes the install to fail, so skip the test.
     $sqlite = (new \PDO('sqlite::memory:'))->query('select sqlite_version()')->fetch()[0];
     if (version_compare($sqlite, Tasks::SQLITE_MINIMUM_VERSION) < 0) {
       $this->markTestSkipped();
@@ -262,6 +266,8 @@ class QuickStartTest extends BuildTestBase {
    * Tests the server command works when not run from the Drupal root.
    */
   public function testServerFromNonRootDirectory(): void {
+    // SQLite below the minimum version lacks features like JSON support,
+    // which causes the install to fail, so skip the test.
     $sqlite = (new \PDO('sqlite::memory:'))->query('select sqlite_version()')->fetch()[0];
     if (version_compare($sqlite, Tasks::SQLITE_MINIMUM_VERSION) < 0) {
       $this->markTestSkipped();
