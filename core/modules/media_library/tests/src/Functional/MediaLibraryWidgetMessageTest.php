@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\Tests\media_library\Unit\Plugin\Field\FieldWidget;
+namespace Drupal\Tests\media_library\Functional;
 
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
