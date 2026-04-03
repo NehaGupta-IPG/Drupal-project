@@ -106,49 +106,6 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
   }
 
   /**
-   * Refreshes the update status based on the desired available update scenario.
-   *
-   * @param array $xml_map
-   *   Array that maps project names to availability scenarios to fetch. The key
-   *   '#all' is used if a project-specific mapping is not defined.
-   * @param string $url
-   *   (optional) A string containing the URL to fetch update data from.
-   *   Defaults to 'update-test'.
-   *
-   * @see \Drupal\update_test\Controller\UpdateTestController::updateTest()
-   */
-  protected function refreshUpdateStatus($xml_map, $url = 'update-test') {
-    // Tell the Update Status module to fetch from the URL provided by
-    // update_test module.
-    $this->config('update.settings')->set('fetch.url', Url::fromUri('base:' . $url, ['absolute' => TRUE])->toString())->save();
-    // Save the map for UpdateTestController::updateTest() to use.
-    $this->mockReleaseHistory($xml_map);
-
-    // Fetch the update data.
-    $this->container->get('update.manager')->refreshUpdateData();
-
-    // Process the queue items that UpdateManager has just created.
-    $queue = $this->container->get('queue')->get('update_fetch_tasks');
-    while ($item = $queue->claimItem()) {
-      $this->container->get('update.processor')->processFetchTask($item->data);
-    }
-  }
-
-  /**
-   * Runs a series of assertions that are applicable to all update statuses.
-   */
-  protected function standardTests() {
-    $this->assertSession()->responseContains('<h3>Drupal core</h3>');
-    // Verify that the link to the Drupal project appears.
-    $this->assertSession()->linkExists('Drupal');
-    $this->assertSession()->linkByHrefExists('https://example.com/project/drupal');
-    $this->assertSession()->pageTextNotContains('No available releases found');
-    $this->assertSession()->pageTextContains('Last checked:');
-    // No download URLs should be present.
-    $this->assertSession()->responseNotContains('.tar.gz');
-  }
-
-  /**
    * Tests the basic functionality of a contrib module on the status report.
    */
   public function testUpdateContribBasic(): void {
@@ -903,6 +860,49 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
       $this->standardTests();
       $this->assertSession()->elementTextContains('css', $this->updateTableLocator, $version_info['expected']);
     }
+  }
+
+  /**
+   * Refreshes the update status based on the desired available update scenario.
+   *
+   * @param array $xml_map
+   *   Array that maps project names to availability scenarios to fetch. The key
+   *   '#all' is used if a project-specific mapping is not defined.
+   * @param string $url
+   *   (optional) A string containing the URL to fetch update data from.
+   *   Defaults to 'update-test'.
+   *
+   * @see \Drupal\update_test\Controller\UpdateTestController::updateTest()
+   */
+  protected function refreshUpdateStatus($xml_map, $url = 'update-test') {
+    // Tell the Update Status module to fetch from the URL provided by
+    // update_test module.
+    $this->config('update.settings')->set('fetch.url', Url::fromUri('base:' . $url, ['absolute' => TRUE])->toString())->save();
+    // Save the map for UpdateTestController::updateTest() to use.
+    $this->mockReleaseHistory($xml_map);
+
+    // Fetch the update data.
+    $this->container->get('update.manager')->refreshUpdateData();
+
+    // Process the queue items that UpdateManager has just created.
+    $queue = $this->container->get('queue')->get('update_fetch_tasks');
+    while ($item = $queue->claimItem()) {
+      $this->container->get('update.processor')->processFetchTask($item->data);
+    }
+  }
+
+  /**
+   * Runs a series of assertions that are applicable to all update statuses.
+   */
+  protected function standardTests() {
+    $this->assertSession()->responseContains('<h3>Drupal core</h3>');
+    // Verify that the link to the Drupal project appears.
+    $this->assertSession()->linkExists('Drupal');
+    $this->assertSession()->linkByHrefExists('https://example.com/project/drupal');
+    $this->assertSession()->pageTextNotContains('No available releases found');
+    $this->assertSession()->pageTextContains('Last checked:');
+    // No download URLs should be present.
+    $this->assertSession()->responseNotContains('.tar.gz');
   }
 
   /**
