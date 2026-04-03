@@ -4,21 +4,28 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\update\Kernel;
 
+use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\DependencyInjection\ServiceModifierInterface;
+use Drupal\Core\Test\Http\TestClientFactory;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\ProjectInfo;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\update\Functional\UpdateTestTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\update\UpdateManagerInterface;
+use GuzzleHttp\Psr7\Request as GuzzleRequest;
+use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Tests how Update Status handles contributed modules and themes.
  */
 #[Group('update')]
 #[RunTestsInSeparateProcesses]
-class UpdateContribTest extends KernelTestBase {
+class UpdateContribTest extends KernelTestBase implements ServiceModifierInterface {
   use UpdateTestTrait;
   use UserCreationTrait;
 
@@ -58,6 +65,23 @@ class UpdateContribTest extends KernelTestBase {
 
     $admin_user = $this->createUser(['administer site configuration']);
     $this->setCurrentUser($admin_user);
+
+    $http_client_factory = $this->container->get('http_client_factory');
+    $http_client_factory->setHttpHandler([$this, 'httpHandler']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function alter(ContainerBuilder $container) {
+    // Switch the http_client_factory service to the test version.
+    // @see static::httpHandler()
+    $service_definition = $container->getDefinition('http_client_factory');
+    $service_definition->setClass(TestClientFactory::class);
+  }
+
+  public function httpHandler(GuzzleRequest $request) {
+    dump($request);
   }
 
   /**
