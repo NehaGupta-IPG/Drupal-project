@@ -13,12 +13,8 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\update\Functional\UpdateTestTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\update\UpdateManagerInterface;
-use GuzzleHttp\Psr7\Request as GuzzleRequest;
-use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Tests how Update Status handles contributed modules and themes.
