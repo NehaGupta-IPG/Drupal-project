@@ -561,9 +561,15 @@ function install_begin_request($class_loader, &$install_state): void {
       && $install_configure_form_key !== FALSE
       && $current_key < $install_configure_form_key
       && class_exists('\Drupal\user\Entity\User')
-      && User::load(1)
+      && $user1 = User::load(1)
     ) {
-      throw new AlreadyInstalledException(\Drupal::service('string_translation'));
+
+      // If the user does not complete the configuration page and refreshes,
+      // the password will not yet be set. The user should still be able to
+      // complete the install.
+      if (!empty($user1->getPassword())) {
+        throw new AlreadyInstalledException(\Drupal::service('string_translation'));
+      }
     }
   }
 
