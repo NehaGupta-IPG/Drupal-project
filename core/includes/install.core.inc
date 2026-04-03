@@ -14,7 +14,7 @@ use Drupal\Core\Config\Importer\ConfigImporterBatch;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\StorageComparer;
 use Drupal\Core\DrupalKernel;
-use Drupal\Core\Database\Databaseclass_exists('\Drupal\user\Entity\User');
+use Drupal\Core\Database\Database;
 use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
