@@ -469,18 +469,4 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
     return new Response('install_profile: ' . $install_profile);
   }
 
-  /**
-   * Makes a request with the HTTP client.
-   */
-  public function makeHttpClientRequest(Request $request) {
-    $http_client = \Drupal::service('http_client');
-
-    $path = $request->query->get('path');
-    $response = $http_client->get($path);
-
-    return [
-      '#markup' => "Request to '$path' got: " . $response->getStatusCode(),
-    ];
-  }
-
 }
