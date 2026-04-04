@@ -545,11 +545,11 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
    * update, then assert if we see the appropriate warnings on the right pages.
    */
   public function testHookUpdateStatusAlter(): void {
-    $update_admin_user = $this->drupalCreateUser([
+    $admin_user = $this->createUser([
       'administer site configuration',
       'administer software updates',
     ]);
-    $this->drupalLogin($update_admin_user);
+    $this->setCurrentUser($admin_user);
 
     $this->mockInstalledExtensionsInfo([
       'aaa_update_test' => [
@@ -572,6 +572,8 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
         'aaa_update_test' => '1_0',
       ]
     );
+
+    $this->drupalGet('admin/reports/updates');
     $this->assertSession()->responseContains('<h3>Modules</h3>');
     $this->assertSession()->pageTextContains('Security update required!');
     $this->assertSession()->linkExists('AAA Update test');
