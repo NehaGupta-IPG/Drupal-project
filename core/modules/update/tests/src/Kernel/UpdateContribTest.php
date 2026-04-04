@@ -476,6 +476,8 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
    * Makes sure that if we fetch from a broken URL, sane things happen.
    */
   public function testUpdateBrokenFetchURL(): void {
+    // See issue! This will remain a Browser test.
+    $this->markTestSkipped();
     $this->mockInstalledExtensionsInfo([
       'aaa_update_test' => [
         'project' => 'aaa_update_test',
