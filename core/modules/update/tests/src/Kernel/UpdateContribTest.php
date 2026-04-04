@@ -522,9 +522,6 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
       'ccc_update_test' => '1_0',
     ];
 
-    // argh we can't control expectations for all 4!!!
-    $this->container->get('http_client_factory')->setExpectedHttpStatus('/release-history/bbb_update_test/current', Response::HTTP_NOT_FOUND);
-
     $this->refreshUpdateStatus($xml_mapping);
 
     $this->drupalGet('admin/reports/updates');

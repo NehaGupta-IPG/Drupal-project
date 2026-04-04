@@ -34,7 +34,7 @@ class TestClientFactory extends ClientFactory {
    *
    * @param string $path
    *   The path for the expectation.
-   * @param integer $status
+   * @param int $status
    *   The expected HTTP status.
    */
   public function setExpectedHttpStatus(string $path, int $status) {
