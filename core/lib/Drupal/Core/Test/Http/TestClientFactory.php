@@ -20,8 +20,23 @@ use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
  */
 class TestClientFactory extends ClientFactory {
 
+  /**
+   * Expected HTTP response statuses.
+   */
   protected array $expectedHttpStatuses = [];
 
+  /**
+   * Sets an expected HTTP response status for a future request.
+   *
+   * This will fail the test if the actual response status does not match.
+   *
+   * If this is not called for a path, the response is expected to be 200.
+   *
+   * @param string $path
+   *   The path for the expectation.
+   * @param integer $status
+   *   The expected HTTP status.
+   */
   public function setExpectedHttpStatus(string $path, int $status) {
     $this->expectedHttpStatuses[$path] = $status;
   }
@@ -46,7 +61,6 @@ class TestClientFactory extends ClientFactory {
    */
   public function httpHandler(GuzzleRequest $request): GuzzleResponse {
     $path = $request->getUri()->getPath();
-    // dump($path);
 
     // Can't use the Symfony PSR-7 Bridge to convert, as the Guzzle
     // request is an outgoing request, and the HTTP kernel wants an
@@ -57,8 +71,7 @@ class TestClientFactory extends ClientFactory {
     $response = $http_kernel->handle($symfony_request);
 
     $expected_status = $this->expectedHttpStatuses[$path] ?? SymfonyResponse::HTTP_OK;
-    // dump($expected_status);
-    // Assert::assertEquals($expected_status, $response->getStatusCode());
+    Assert::assertEquals($expected_status, $response->getStatusCode());
 
     // Convert the Symfony response to a Guzzle response.
     $psr17_factory = new HttpFactory();

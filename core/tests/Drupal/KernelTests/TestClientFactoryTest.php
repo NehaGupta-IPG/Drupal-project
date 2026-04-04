@@ -47,6 +47,7 @@ class TestClientFactoryTest extends KernelTestBase implements ServiceModifierInt
     $response = $http_client->get('/system-test/main-content-handling');
     $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
 
+    $this->container->get('http_client_factory')->setExpectedHttpStatus('/does-not-exist', Response::HTTP_NOT_FOUND);
     $response = $http_client->get('/does-not-exist');
     $this->assertEquals(Response::HTTP_NOT_FOUND, $response->getStatusCode());
   }
