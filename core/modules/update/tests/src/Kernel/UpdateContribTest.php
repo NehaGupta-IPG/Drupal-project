@@ -33,7 +33,9 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
   protected $updateTableLocator = 'table.update:nth-of-type(2)';
 
   /**
-   * {@inheritdoc}
+   * The project that is being tested.
+   *
+   * @var string
    */
   protected $updateProject = 'aaa_update_test';
 
