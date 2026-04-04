@@ -253,3 +253,10 @@ system_test.install_profile:
     _controller: '\Drupal\system_test\Controller\SystemTestController::getInstallProfile'
   requirements:
     _access: 'TRUE'
+
+system_test.http_client_request:
+  path: '/system-test/http-client-request'
+  defaults:
+    _controller: '\Drupal\system_test\Controller\SystemTestController::makeHttpClientRequest'
+  requirements:
+    _access: 'TRUE'
