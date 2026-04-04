@@ -718,7 +718,7 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
    *   - 8.x-1.1
    *   - 8.x-1.0
    */
-  public static function securityUpdateAvailabilityProvider() {
+  public static function securityUpdateAvailabilityProvider(): array {
     return [
       // Security releases available for module major release 1.
       // No releases for next major.
@@ -914,7 +914,7 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
    *
    * @see \Drupal\update_test\Controller\UpdateTestController::updateTest()
    */
-  protected function refreshUpdateStatus($xml_map, $url = 'update-test') {
+  protected function refreshUpdateStatus($xml_map, $url = 'update-test'): void {
     // Tell the Update Status module to fetch from the URL provided by
     // update_test module.
     $this->config('update.settings')->set('fetch.url', Url::fromUri('base:' . $url, ['absolute' => TRUE])->toString())->save();
@@ -937,7 +937,7 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
   /**
    * Runs a series of assertions that are applicable to all update statuses.
    */
-  protected function standardTests() {
+  protected function standardTests(): void {
     $this->assertSession()->responseContains('<h3>Drupal core</h3>');
     // Verify that the link to the Drupal project appears.
     $this->assertSession()->linkExists('Drupal');
@@ -993,7 +993,7 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
    * @param int $index
    *   (optional) The index of the link.
    */
-  protected function assertVersionUpdateLinks($label, $version, int $index = 0) {
+  protected function assertVersionUpdateLinks($label, $version, int $index = 0): void {
     $update_element = $this->findUpdateElementByLabel($label, $index);
     // In the release notes URL the periods are replaced with dashes.
     $url_version = str_replace('.', '-', $version);
@@ -1015,7 +1015,7 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
    * @param string $update_element_css_locator
    *   The CSS locator for the page element that contains the security updates.
    */
-  protected function assertSecurityUpdates($project_path_part, array $expected_security_releases, $expected_update_message_type, $update_element_css_locator) {
+  protected function assertSecurityUpdates($project_path_part, array $expected_security_releases, $expected_update_message_type, $update_element_css_locator): void {
     $assert_session = $this->assertSession();
     $page = $this->getSession()->getPage();
     $this->standardTests();
@@ -1077,7 +1077,7 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
    *   The expected label for the newer version (for example 'Recommended
    *   version:' or 'Also available:').
    */
-  protected function confirmRevokedStatus($revoked_version, $newer_version, $new_version_label) {
+  protected function confirmRevokedStatus($revoked_version, $newer_version, $new_version_label): void {
     $this->drupalGet('admin/reports/updates');
     $this->assertUpdateTableTextContains('Revoked!');
     $this->assertUpdateTableTextContains($revoked_version);
@@ -1097,7 +1097,7 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
    *   (optional) The expected label for the newer version. For example
    *   'Recommended version:' or 'Also available:'.
    */
-  protected function confirmUnsupportedStatus(string $unsupported_version, ?string $newer_version = NULL, ?string $new_version_label = NULL) {
+  protected function confirmUnsupportedStatus(string $unsupported_version, ?string $newer_version = NULL, ?string $new_version_label = NULL): void {
     $this->drupalGet('admin/reports/updates');
     $this->assertUpdateTableTextContains('Not supported!');
     $this->assertUpdateTableTextContains($unsupported_version);
@@ -1121,7 +1121,7 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
    *
    * @see \Behat\Mink\WebAssert::elementTextContains()
    */
-  protected function assertUpdateTableTextContains($text) {
+  protected function assertUpdateTableTextContains($text): void {
     $this->assertSession()
       ->elementTextContains('css', $this->updateTableLocator, $text);
   }
@@ -1132,7 +1132,7 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
    * @param string $text
    *   The expected text.
    */
-  protected function assertUpdateTableTextNotContains($text) {
+  protected function assertUpdateTableTextNotContains($text): void {
     $this->assertSession()->elementTextNotContains('css', $this->updateTableLocator, $text);
   }
 
@@ -1144,7 +1144,7 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
    *
    * @see \Behat\Mink\WebAssert::elementContains()
    */
-  protected function assertUpdateTableElementContains($text) {
+  protected function assertUpdateTableElementContains($text): void {
     $this->assertSession()
       ->elementContains('css', $this->updateTableLocator, $text);
   }

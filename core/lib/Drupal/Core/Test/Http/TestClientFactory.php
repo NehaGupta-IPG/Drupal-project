@@ -37,7 +37,7 @@ class TestClientFactory extends ClientFactory {
    * @param int $status
    *   The expected HTTP status.
    */
-  public function setExpectedHttpStatus(string $path, int $status) {
+  public function setExpectedHttpStatus(string $path, int $status): void {
     $this->expectedHttpStatuses[$path] = $status;
   }
 
