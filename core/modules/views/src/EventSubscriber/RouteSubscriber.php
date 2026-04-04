@@ -149,7 +149,7 @@ class RouteSubscriber extends RouteSubscriberBase {
             foreach ($view_route_names as $id_display => $route_name) {
               $view_route_name = $this->viewsDisplayPairs[$id_display];
               unset($this->viewsDisplayPairs[$id_display]);
-              $collection->remove("views.$view_route_name");
+              $collection->remove("view.$view_route_name");
             }
           }
         }
