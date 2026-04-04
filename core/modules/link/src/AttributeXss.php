@@ -164,11 +164,11 @@ final class AttributeXss {
     foreach ($attributes as $name => $value) {
       // The attribute name should be a single attribute, but there is the
       // possibility that the name is corrupt. Core's XSS::attributes can
-      // cleanly handle sanitizing 'selected href="http://example.com" so we
+      // cleanly handle sanitizing 'selected href="https://example.com" so we
       // provide an allowance for cases where the attribute array is malformed.
       // For example given a name of 'selected href' and a value of
-      // http://example.com we split this into two separate attributes, with the
-      // value assigned to the last attribute name.
+      // https://example.com we split this into two separate attributes, with
+      // the value assigned to the last attribute name.
       // Explode the attribute name if a space exists.
       $names = \array_filter(\explode(' ', $name));
       if (\count($names) === 0) {

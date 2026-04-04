@@ -52,7 +52,7 @@
  * on a remote translation server.
  * @code
  * 'interface translation project': example_module
- * 'interface translation server pattern': http://example.com/files/translations/%core/%project/%project-%version.%language.po
+ * 'interface translation server pattern': https://example.com/files/translations/%core/%project/%project-%version.%language.po
  * @endcode
  *
  * Custom themes, features and distributions can implement these .info.yml file
@@ -118,7 +118,7 @@ function hook_locale_translation_projects_alter(&$projects) {
   // The translations are located at a custom translation sever.
   $projects['existing_project'] = [
     'info' => [
-      'interface translation server pattern' => 'http://example.com/files/translations/%core/%project/%project-%version.%language.po',
+      'interface translation server pattern' => 'https://example.com/files/translations/%core/%project/%project-%version.%language.po',
     ],
     // An optional key to change the order in which translation files are
     // processed. By default, the projects are sorted alphabetically by key.
