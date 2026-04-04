@@ -45,6 +45,10 @@ class TestClientFactoryTest extends KernelTestBase implements ServiceModifierInt
     // Make a request to the route which itself makes an HTTP request.
     $this->drupalGet('system-test/http-client-request', ['query' => ['path' => '/system-test/main-content-handling']]);
     $this->assertSession()->pageTextContains(Response::HTTP_OK);
+
+    // ARGH! This doesn't work! HtmxContentViewSubscriber crashes!
+    $this->drupalGet('system-test/http-client-request', ['query' => ['path' => '/does-not-exist']]);
+    $this->assertSession()->pageTextContains(Response::HTTP_NOT_FOUND);
   }
 
 }
