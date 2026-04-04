@@ -42,13 +42,13 @@ class TestClientFactoryTest extends KernelTestBase implements ServiceModifierInt
    * Tests the mocked Guzzle client.
    */
   public function testGuzzleRequests(): void {
-    // Make a request to the route which itself makes an HTTP request.
-    $this->drupalGet('system-test/http-client-request', ['query' => ['path' => '/system-test/main-content-handling']]);
-    $this->assertSession()->pageTextContains(Response::HTTP_OK);
+    $http_client = $this->container->get('http_client');
 
-    // ARGH! This doesn't work! HtmxContentViewSubscriber crashes!
-    $this->drupalGet('system-test/http-client-request', ['query' => ['path' => '/does-not-exist']]);
-    $this->assertSession()->pageTextContains(Response::HTTP_NOT_FOUND);
+    $response = $http_client->get('/system-test/main-content-handling');
+    $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
+
+    $response = $http_client->get('/does-not-exist');
+    $this->assertEquals(Response::HTTP_NOT_FOUND, $response->getStatusCode());
   }
 
 }
