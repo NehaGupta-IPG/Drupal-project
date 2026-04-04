@@ -62,9 +62,9 @@ class TestClientFactory extends ClientFactory {
   public function httpHandler(GuzzleRequest $request): GuzzleResponse {
     $path = $request->getUri()->getPath();
 
-    // Can't use the Symfony PSR-7 Bridge to convert, as the Guzzle
-    // request is an outgoing request, and the HTTP kernel wants an
-    // incoming request, and these have different interfaces in PSR-7.
+    // Can't use the Symfony PSR-7 Bridge to convert, as the Guzzle request is
+    // an outgoing request, and the HTTP kernel wants an incoming request, and
+    // these have different interfaces in PSR-7.
     $symfony_request = SymfonyRequest::create($path);
 
     $http_kernel = \Drupal::service('http_kernel');
