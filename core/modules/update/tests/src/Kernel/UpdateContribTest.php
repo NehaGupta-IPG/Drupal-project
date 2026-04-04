@@ -495,7 +495,6 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
     ]);
     $this->mockDefaultExtensionsInfo(['version' => '8.0.0']);
     // Ensure that the update information is correct before testing.
-    $this->drupalGet('admin/reports/updates');
 
     $xml_mapping = [
       'drupal' => '8.0.0',
@@ -509,6 +508,7 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
 
     $this->refreshUpdateStatus($xml_mapping);
 
+    $this->drupalGet('admin/reports/updates');
     $this->assertSession()->pageTextContains('Up to date');
     // We're expecting the report to say most projects are up to date, so we
     // hope that 'Up to date' is not unique.
