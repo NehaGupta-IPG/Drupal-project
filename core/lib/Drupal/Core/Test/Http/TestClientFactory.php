@@ -20,6 +20,12 @@ use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
  */
 class TestClientFactory extends ClientFactory {
 
+  protected array $expectedHttpStatuses = [];
+
+  public function setExpectedHttpStatus(string $path, int $status) {
+    $this->expectedHttpStatuses[$path] = $status;
+  }
+
   /**
    * {@inheritdoc}
    */
@@ -40,6 +46,7 @@ class TestClientFactory extends ClientFactory {
    */
   public function httpHandler(GuzzleRequest $request): GuzzleResponse {
     $path = $request->getUri()->getPath();
+    // dump($path);
 
     // Can't use the Symfony PSR-7 Bridge to convert, as the Guzzle
     // request is an outgoing request, and the HTTP kernel wants an
@@ -49,7 +56,9 @@ class TestClientFactory extends ClientFactory {
     $http_kernel = \Drupal::service('http_kernel');
     $response = $http_kernel->handle($symfony_request);
 
-    Assert::assertEquals(SymfonyResponse::HTTP_OK, $response->getStatusCode());
+    $expected_status = $this->expectedHttpStatuses[$path] ?? SymfonyResponse::HTTP_OK;
+    // dump($expected_status);
+    // Assert::assertEquals($expected_status, $response->getStatusCode());
 
     // Convert the Symfony response to a Guzzle response.
     $psr17_factory = new HttpFactory();

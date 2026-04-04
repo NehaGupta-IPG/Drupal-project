@@ -16,6 +16,7 @@ use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\update\UpdateManagerInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Tests how Update Status handles contributed modules and themes.
@@ -502,6 +503,10 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
       'bbb_update_test' => 'does-not-exist',
       'ccc_update_test' => '1_0',
     ];
+
+    // argh we can't control expectations for all 4!!!
+    $this->container->get('http_client_factory')->setExpectedHttpStatus('/release-history/bbb_update_test/current', Response::HTTP_NOT_FOUND);
+
     $this->refreshUpdateStatus($xml_mapping);
 
     $this->assertSession()->pageTextContains('Up to date');
