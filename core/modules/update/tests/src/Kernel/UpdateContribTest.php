@@ -898,6 +898,8 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
         'drupal' => '8.0.0',
         $this->updateProject => '1_0-supported',
       ]);
+
+      $this->drupalGet('admin/reports/updates');
       $this->standardTests();
       $this->assertSession()->elementTextContains('css', $this->updateTableLocator, $version_info['expected']);
     }
@@ -1065,6 +1067,89 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
         $this->fail('Unexpected value for $expected_update_message_type: ' . $expected_update_message_type);
       }
     }
+  }
+
+  /**
+   * Confirms messages are correct when a release has been unpublished/revoked.
+   *
+   * @param string $revoked_version
+   *   The revoked version that is currently installed.
+   * @param string $newer_version
+   *   The expected newer version to recommend.
+   * @param string $new_version_label
+   *   The expected label for the newer version (for example 'Recommended
+   *   version:' or 'Also available:').
+   */
+  protected function confirmRevokedStatus($revoked_version, $newer_version, $new_version_label) {
+    $this->drupalGet('admin/reports/updates');
+    $this->assertUpdateTableTextContains('Revoked!');
+    $this->assertUpdateTableTextContains($revoked_version);
+    $this->assertUpdateTableElementContains('error.svg');
+    $this->assertUpdateTableTextContains('Release revoked: Your currently installed release has been revoked, and is no longer available for download. Uninstalling everything included in this release or upgrading is strongly recommended!');
+    $this->assertVersionUpdateLinks($new_version_label, $newer_version);
+  }
+
+  /**
+   * Confirms messages are correct when a release has been marked unsupported.
+   *
+   * @param string $unsupported_version
+   *   The unsupported version that is currently installed.
+   * @param string|null $newer_version
+   *   (optional) The expected newer version to recommend.
+   * @param string|null $new_version_label
+   *   (optional) The expected label for the newer version. For example
+   *   'Recommended version:' or 'Also available:'.
+   */
+  protected function confirmUnsupportedStatus(string $unsupported_version, ?string $newer_version = NULL, ?string $new_version_label = NULL) {
+    $this->drupalGet('admin/reports/updates');
+    $this->assertUpdateTableTextContains('Not supported!');
+    $this->assertUpdateTableTextContains($unsupported_version);
+    $this->assertUpdateTableElementContains('error.svg');
+    if ($newer_version === NULL) {
+      $this->assertUpdateTableTextContains('Release not supported: Your currently installed release is now unsupported, is no longer available for download and no update is available. Uninstalling everything included in this release is strongly recommended!');
+      $this->assertUpdateTableTextNotContains('Recommended version');
+    }
+    else {
+      $this->assertNotEmpty($newer_version);
+      $this->assertUpdateTableTextContains('Release not supported: Your currently installed release is now unsupported, and is no longer available for download. Uninstalling everything included in this release or upgrading is strongly recommended!');
+      $this->assertVersionUpdateLinks($new_version_label, $newer_version);
+    }
+  }
+
+  /**
+   * Asserts that the update table text contains the specified text.
+   *
+   * @param string $text
+   *   The expected text.
+   *
+   * @see \Behat\Mink\WebAssert::elementTextContains()
+   */
+  protected function assertUpdateTableTextContains($text) {
+    $this->assertSession()
+      ->elementTextContains('css', $this->updateTableLocator, $text);
+  }
+
+  /**
+   * Asserts that the update table text does not contain the specified text.
+   *
+   * @param string $text
+   *   The expected text.
+   */
+  protected function assertUpdateTableTextNotContains($text) {
+    $this->assertSession()->elementTextNotContains('css', $this->updateTableLocator, $text);
+  }
+
+  /**
+   * Asserts that the update table element HTML contains the specified text.
+   *
+   * @param string $text
+   *   The expected text.
+   *
+   * @see \Behat\Mink\WebAssert::elementContains()
+   */
+  protected function assertUpdateTableElementContains($text) {
+    $this->assertSession()
+      ->elementContains('css', $this->updateTableLocator, $text);
   }
 
   /**
