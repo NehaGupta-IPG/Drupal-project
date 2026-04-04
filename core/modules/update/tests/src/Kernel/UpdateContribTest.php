@@ -38,6 +38,21 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
   protected $updateProject = 'aaa_update_test';
 
   /**
+   * Denotes a security update will be required in the test case.
+   */
+  const SECURITY_UPDATE_REQUIRED = 'SECURITY_UPDATE_REQUIRED';
+
+  /**
+   * Denotes an update will be available in the test case.
+   */
+  const UPDATE_AVAILABLE = 'UPDATE_AVAILABLE';
+
+  /**
+   * Denotes no update will be available in the test case.
+   */
+  const UPDATE_NONE = 'UPDATE_NONE';
+
+  /**
    * {@inheritdoc}
    */
   protected static $modules = [
