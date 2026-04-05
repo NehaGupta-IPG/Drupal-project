@@ -211,10 +211,6 @@ class OptimizedPhpArrayDumper extends Dumper {
       $service['class'] = $definition->getClass();
     }
 
-    if (!$definition->isPublic()) {
-      $service['public'] = FALSE;
-    }
-
     if ($definition->getFile()) {
       $service['file'] = $definition->getFile();
     }
@@ -223,17 +219,8 @@ class OptimizedPhpArrayDumper extends Dumper {
       $service['synthetic'] = TRUE;
     }
 
-    if ($definition->isLazy()) {
-      $service['lazy'] = TRUE;
-    }
-
     if ($definition->getArguments()) {
-      $arguments = $definition->getArguments();
-      $service['arguments'] = $this->dumpCollection($arguments);
-      $service['arguments_count'] = count($arguments);
-    }
-    else {
-      $service['arguments_count'] = 0;
+      $service['arguments'] = $this->dumpCollection($definition->getArguments());
     }
 
     if ($definition->getProperties()) {
@@ -294,42 +281,18 @@ class OptimizedPhpArrayDumper extends Dumper {
    *
    * @param mixed $collection
    *   A collection to process.
-   * @param bool &$resolve
-   *   Used for passing the information to the caller whether the given
-   *   collection needed to be resolved or not. This is used for optimizing
-   *   deep arrays that don't need to be traversed.
    *
-   * @return object|array
+   * @return array
    *   The collection in a suitable format.
    */
-  protected function dumpCollection($collection, &$resolve = FALSE) {
+  protected function dumpCollection($collection) {
     $code = [];
 
     foreach ($collection as $key => $value) {
-      if (is_array($value)) {
-        $resolve_collection = FALSE;
-        $code[$key] = $this->dumpCollection($value, $resolve_collection);
-
-        if ($resolve_collection) {
-          $resolve = TRUE;
-        }
-      }
-      else {
-        $code[$key] = $this->dumpValue($value);
-        if (is_object($code[$key])) {
-          $resolve = TRUE;
-        }
-      }
+      $code[$key] = is_array($value) ? $this->dumpCollection($value) : $this->dumpValue($value);
     }
 
-    if (!$resolve) {
-      return $collection;
-    }
-
-    return (object) [
-      'type' => 'collection',
-      'value' => $code,
-    ];
+    return $code;
   }
 
   /**
@@ -398,6 +361,12 @@ class OptimizedPhpArrayDumper extends Dumper {
       }
 
       return $code;
+    }
+    // Literal strings starting with '@' or '&' must be wrapped in raw to
+    // avoid collision with the service-reference or service-closure prefix
+    // encodings.
+    elseif (is_string($value) && isset($value[0]) && ($value[0] === '@' || $value[0] === '&')) {
+      return (object) ['type' => 'raw', 'value' => $value];
     }
     elseif ($value instanceof Reference) {
       return $this->getReferenceCall((string) $value, $value);
@@ -498,6 +467,9 @@ class OptimizedPhpArrayDumper extends Dumper {
    *   A suitable representation of the service reference.
    */
   protected function getServiceCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
+    if ($invalid_behavior === ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
+      return '@' . $id;
+    }
     return (object) [
       'type' => 'service',
       'id' => $id,
@@ -515,10 +487,7 @@ class OptimizedPhpArrayDumper extends Dumper {
    *   A suitable representation of the parameter reference.
    */
   protected function getParameterCall($name) {
-    return (object) [
-      'type' => 'parameter',
-      'name' => $name,
-    ];
+    return '%' . $name;
   }
 
   /**
@@ -543,6 +512,9 @@ class OptimizedPhpArrayDumper extends Dumper {
    *   A suitable representation of the service closure reference.
    */
   protected function getServiceClosureCall(string $id, int $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
+    if ($invalid_behavior === ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
+      return '&' . $id;
+    }
     return (object) [
       'type' => 'service_closure',
       'id' => $id,

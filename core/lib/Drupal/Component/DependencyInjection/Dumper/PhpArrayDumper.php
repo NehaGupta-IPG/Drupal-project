@@ -29,24 +29,6 @@ class PhpArrayDumper extends OptimizedPhpArrayDumper {
   /**
    * {@inheritdoc}
    */
-  protected function dumpCollection($collection, &$resolve = FALSE) {
-    $code = [];
-
-    foreach ($collection as $key => $value) {
-      if (is_array($value)) {
-        $code[$key] = $this->dumpCollection($value);
-      }
-      else {
-        $code[$key] = $this->dumpValue($value);
-      }
-    }
-
-    return $code;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function getServiceCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
     if ($invalid_behavior !== ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
       return '@?' . $id;
