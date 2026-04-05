@@ -53,7 +53,7 @@ class PhpArrayContainerTest extends ContainerTest {
    * for service closures, so we override the parent helper to produce that
    * instead of the prefix-encoded '&id' form.
    */
-  protected function getServiceClosureCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE) {
+  protected function getServiceClosureCall($id, $invalid_behavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): object {
     return (object) [
       'type' => 'service_closure',
       'id' => $id,
