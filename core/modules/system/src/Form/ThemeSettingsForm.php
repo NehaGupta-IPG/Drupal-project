@@ -403,6 +403,28 @@ class ThemeSettingsForm extends ConfigFormBase {
         $this->themeManager->resetActiveTheme();
       }
     }
+    else {
+      // Include files for all themes if visiting the default theme settings.
+      foreach ($themes as $theme) {
+        // Include the theme-settings.php file.
+        $theme_path = $theme->getPath();
+        $theme_settings_file = $theme_path . '/theme-settings.php';
+        $theme_file = $theme_path . '/' . $theme->getName() . '.theme';
+        $filenames = [$theme_settings_file, $theme_file];
+        foreach ($filenames as $filename) {
+          if (file_exists($filename)) {
+            require_once $filename;
+
+            // The file must be required for the cached form too.
+            $files = $form_state->getBuildInfo()['files'];
+            if (!in_array($filename, $files)) {
+              $files[] = $filename;
+            }
+            $form_state->addBuildInfo('files', $files);
+          }
+        }
+      }
+    }
 
     return $form;
   }
