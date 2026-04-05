@@ -7,7 +7,7 @@ use Drupal\Core\Block\BlockManagerInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 
 /**
  * Returns autocomplete responses for block categories.
@@ -43,14 +43,13 @@ class CategoryAutocompleteController implements ContainerInjectionInterface {
   /**
    * Retrieves suggestions for block category autocompletion.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The current request.
+   * @param string $typed_category
+   *   The partial category string typed by the user for which to find matches.
    *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   A JSON response containing autocomplete suggestions.
    */
-  public function autocomplete(Request $request) {
-    $typed_category = $request->query->get('q');
+  public function autocomplete(#[MapQueryParameter('q')] string $typed_category) {
     $matches = [];
     foreach ($this->blockManager->getCategories() as $category) {
       if (stripos($category, $typed_category) === 0) {

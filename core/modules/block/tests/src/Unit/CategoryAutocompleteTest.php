@@ -11,7 +11,6 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Tests Drupal\block\Controller\CategoryAutocompleteController.
@@ -56,7 +55,7 @@ class CategoryAutocompleteTest extends UnitTestCase {
     $suggestions = array_map(function ($suggestion) {
       return ['value' => $suggestion, 'label' => Html::escape($suggestion)];
     }, $suggestions);
-    $result = $this->autocompleteController->autocomplete(new Request(['q' => $string]));
+    $result = $this->autocompleteController->autocomplete($string);
     $this->assertSame($suggestions, json_decode($result->getContent(), TRUE));
   }
 

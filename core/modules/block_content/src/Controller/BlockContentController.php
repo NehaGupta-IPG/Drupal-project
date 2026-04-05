@@ -7,7 +7,7 @@ use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 
 /**
  * Controller routines for custom block routes.
@@ -68,18 +68,21 @@ class BlockContentController extends ControllerBase {
    *
    * @param \Drupal\block_content\BlockContentTypeInterface $block_content_type
    *   The block type to add.
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The current request object.
+   * @param string|null $theme
+   *   (optional) The theme to which the block will be added.
    *
    * @return array
    *   A form array as expected by
    *   \Drupal\Core\Render\RendererInterface::render().
    */
-  public function addForm(BlockContentTypeInterface $block_content_type, Request $request) {
+  public function addForm(
+    BlockContentTypeInterface $block_content_type,
+    #[MapQueryParameter] ?string $theme,
+  ) {
     $block = $this->blockContentStorage->create([
       'type' => $block_content_type->id(),
     ]);
-    if (($theme = $request->query->get('theme')) && in_array($theme, array_keys($this->themeHandler->listInfo()))) {
+    if ($theme && in_array($theme, array_keys($this->themeHandler->listInfo()))) {
       // We have navigated to this page from the block library and will keep
       // track of the theme for redirecting the user to the configuration page
       // for the newly created block in the given theme.

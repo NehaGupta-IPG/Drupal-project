@@ -45,9 +45,7 @@ class TagTest extends ViewsKernelTestBase {
 
     // Make sure just ten results are returned.
     $controller = ViewsUIController::create($this->container);
-    $request = $this->container->get('request_stack')->getCurrentRequest();
-    $request->query->set('q', 'autocomplete_tag_test');
-    $result = $controller->autocompleteTag($request);
+    $result = $controller->autocompleteTag('autocomplete_tag_test');
     $matches = (array) json_decode($result->getContent(), TRUE);
     $this->assertCount(10, $matches, 'Make sure the maximum amount of tag results is 10.');
 
@@ -60,8 +58,7 @@ class TagTest extends ViewsKernelTestBase {
     }
 
     // Make sure that matching by a certain prefix works.
-    $request->query->set('q', 'autocomplete_tag_test_even');
-    $result = $controller->autocompleteTag($request);
+    $result = $controller->autocompleteTag('autocomplete_tag_test_even');
     $matches = (array) json_decode($result->getContent(), TRUE);
     $this->assertCount(8, $matches, 'Make sure that only a subset is returned.');
     foreach ($matches as $tag) {
@@ -69,8 +66,7 @@ class TagTest extends ViewsKernelTestBase {
     }
 
     // Make sure an invalid result doesn't return anything.
-    $request->query->set('q', $this->randomMachineName());
-    $result = $controller->autocompleteTag($request);
+    $result = $controller->autocompleteTag($this->randomMachineName());
     $matches = (array) json_decode($result->getContent());
     $this->assertCount(0, $matches, "Make sure an invalid tag doesn't return anything.");
   }
@@ -81,15 +77,13 @@ class TagTest extends ViewsKernelTestBase {
   #[DataProvider('providerViewsUiAutocompleteIndividualTags')]
   public function testViewsUiAutocompleteIndividualTags($expected_tag, $search_string): void {
     $controller = ViewsUIController::create($this->container);
-    $request = $this->container->get('request_stack')->getCurrentRequest();
     $tag = 'comma, 你好, Foo bar';
     View::create([
       'tag' => $tag,
       'id' => $this->randomMachineName(),
       'label' => 'Test',
     ])->save();
-    $request->query->set('q', $search_string);
-    $result = $controller->autocompleteTag($request);
+    $result = $controller->autocompleteTag($search_string);
     $matches = (array) json_decode($result->getContent());
     $this->assertCount(1, $matches);
     $this->assertSame($expected_tag, $matches[0]->value);

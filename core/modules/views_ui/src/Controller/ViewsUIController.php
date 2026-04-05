@@ -11,8 +11,9 @@ use Drupal\views\ViewEntityInterface;
 use Drupal\views\Views;
 use Drupal\views_ui\ViewUI;
 use Drupal\views\ViewsData;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Component\Utility\Html;
@@ -168,12 +169,14 @@ class ViewsUIController extends ControllerBase {
    * Like other autocomplete functions, this function inspects the 'q' query
    * parameter for the string to use to search for suggestions.
    *
+   * @param string $input
+   *   The string to use to search for suggestions.
+   *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   A JSON response containing the autocomplete suggestions for Views tags.
    */
-  public function autocompleteTag(Request $request) {
+  public function autocompleteTag(#[MapQueryParameter('q')] string $input) {
     $matches = [];
-    $string = $request->query->get('q');
     // Get matches from default views.
     $views = $this->entityTypeManager()->getStorage('view')->loadMultiple();
     // Keep track of previously processed tags so they can be skipped.
@@ -183,7 +186,7 @@ class ViewsUIController extends ControllerBase {
       foreach (Tags::explode($view_tag) as $tag) {
         if ($tag && !in_array($tag, $tags, TRUE)) {
           $tags[] = $tag;
-          if (mb_stripos($tag, $string) !== FALSE) {
+          if (mb_stripos($tag, $input) !== FALSE) {
             $matches[] = ['value' => $tag, 'label' => Html::escape($tag)];
             if (count($matches) >= 10) {
               break 2;

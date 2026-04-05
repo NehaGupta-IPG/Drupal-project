@@ -7,6 +7,7 @@ namespace Drupal\media_test_embed\Controller;
 use Drupal\filter\FilterFormatInterface;
 use Drupal\media\Controller\MediaFilterController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -17,11 +18,16 @@ class TestMediaFilterController extends MediaFilterController {
   /**
    * {@inheritdoc}
    */
-  public function preview(Request $request, FilterFormatInterface $filter_format) {
+  public function preview(
+    Request $request,
+    FilterFormatInterface $filter_format,
+    #[MapQueryParameter] string $text,
+    #[MapQueryParameter] string $uuid,
+  ) {
     if (\Drupal::state()->get('test_media_filter_controller_throw_error', FALSE)) {
       throw new NotFoundHttpException();
     }
-    return parent::preview($request, $filter_format);
+    return parent::preview($request, $filter_format, $text, $uuid);
   }
 
 }

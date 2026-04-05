@@ -14,8 +14,8 @@ use Drupal\editor\Entity\Editor;
 use Drupal\image\Plugin\Field\FieldType\ImageItem;
 use Drupal\media\MediaInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -69,8 +69,8 @@ class CKEditor5MediaController extends ControllerBase {
   /**
    * Returns JSON response containing metadata about media entity.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The current request object.
+   * @param string $uuid
+   *   The media entity UUID from the query string.
    *
    * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   A JSON object including the response.
@@ -80,9 +80,8 @@ class CKEditor5MediaController extends ControllerBase {
    * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
    *   Thrown when no media with the provided UUID exists.
    */
-  public function mediaEntityMetadata(Request $request) {
-    $uuid = $request->query->get('uuid');
-    if (!$uuid || !Uuid::isValid($uuid)) {
+  public function mediaEntityMetadata(#[MapQueryParameter] string $uuid) {
+    if (!Uuid::isValid($uuid)) {
       throw new BadRequestHttpException();
     }
     // Access is enforced on route level.

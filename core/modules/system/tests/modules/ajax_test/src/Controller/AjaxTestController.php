@@ -10,7 +10,7 @@ use Drupal\Core\Ajax\AlertCommand;
 use Drupal\Core\Ajax\CloseDialogCommand;
 use Drupal\Core\Ajax\HtmlCommand;
 use Drupal\Core\Url;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 
 /**
  * Provides content for dialog tests.
@@ -216,18 +216,13 @@ class AjaxTestController {
   /**
    * Returns an AjaxResponse with alert command.
    *
-   * @param \Symfony\Component\HttpFoundation\Request $request
-   *   The current request object.
+   * @param string $message
+   *   The alert message from the query string.
    *
    * @return \Drupal\Core\Ajax\AjaxResponse
    *   The JSON response object.
    */
-  public function renderError(Request $request) {
-    $message = '';
-    $query = $request->query;
-    if ($query->has('message')) {
-      $message = $query->get('message');
-    }
+  public function renderError(#[MapQueryParameter] string $message) {
     $response = new AjaxResponse();
     $response->addCommand(new AlertCommand($message));
     return $response;

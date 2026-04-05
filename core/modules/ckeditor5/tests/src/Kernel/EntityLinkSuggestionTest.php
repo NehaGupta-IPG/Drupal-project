@@ -21,8 +21,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Tests entity link suggestions.
@@ -367,21 +365,11 @@ class EntityLinkSuggestionTest extends KernelTestBase {
    */
   #[DataProvider('providerEntityLinkSuggestions')]
   public function testEntityLinkSuggestions(string $search, string $host_entity_type_id, string $host_entity_langcode, array $expected): void {
-    // Set the given configuration for the entity link suggestions plugin.
-    $editor = Editor::load('test_format');
-
     // Whatever configuration it is, it must be valid.
     $this->assertExpectedCkeditor5Violations();
 
     $controller = EntityLinkSuggestionsController::create($this->container);
-
-    $request = Request::create("/irrelevant-in-kernel-test");
-    $request->query->set('q', $search);
-    $request->query->set('hostEntityTypeId', $host_entity_type_id);
-    $request->query->set('hostEntityLangcode', $host_entity_langcode);
-    $response = $controller->suggestions($request, $editor);
-    $this->assertInstanceOf(JsonResponse::class, $response);
-
+    $response = $controller->suggestions($search, $host_entity_type_id, $host_entity_langcode);
     $data = json_decode($response->getContent(), TRUE);
 
     // Perform assertions on the response data.
