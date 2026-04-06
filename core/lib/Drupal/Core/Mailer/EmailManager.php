@@ -19,7 +19,6 @@ use Drupal\Core\Render\RenderableInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Theme\Registry;
-use Drupal\mailer\Hook\MailerThemeHooks;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
@@ -83,7 +82,6 @@ class EmailManager extends DefaultPluginManager {
     ModuleHandlerInterface $module_handler,
     RendererInterface $renderer,
     MailerInterface $mailer,
-    Registry $themeRegistry,
     #[Autowire(service: 'cache.discovery')]
     CacheBackendInterface $cache_backend) {
     parent::__construct('Plugin/Email', $namespaces, $module_handler, EmailPluginInterface::class, EmailAttribute::class);
@@ -91,7 +89,6 @@ class EmailManager extends DefaultPluginManager {
     $this->moduleHandler = $module_handler;
     $this->renderer = $renderer;
     $this->mailer = $mailer;
-    $this->themeRegistry = $themeRegistry;
     $this->alterInfo('email_info');
     $this->setCacheBackend($cache_backend, 'email_plugins');
   }
@@ -119,40 +116,6 @@ class EmailManager extends DefaultPluginManager {
 
     if (empty($definition['module'])) {
       $definition['module'] = $definition['provider'];
-    }
-
-    $this->determineEmailBodyTemplates($definition, $plugin_id);
-  }
-
-  /**
-   * Set the email body templates if not already defined in the plugin definition.
-   * @param array $definition
-   * @param string $plugin_id
-   * @return void
-   */
-  protected function determineEmailBodyTemplates(array &$definition, string $plugin_id): void {
-    if (empty($definition['html_body_template'])) {
-      $definition['html_body_template'] = 'email-body-html-' . str_replace('.', '-', $plugin_id);
-    }
-    if (empty($definition['text_body_template'])) {
-      $definition['text_body_template'] = 'email-body-text-' . str_replace('.', '-', $plugin_id);
-    }
-    $module = $this->moduleHandler->getModule($definition['module']);
-    if ($module !== NULL && !empty($definition['html_body_template'])) {
-      $template_parts = explode('/', $definition['html_body_template']);
-      $template = array_pop($template_parts);
-      $template_path = $module->getPath() . '/emails/' . implode('/', $template_parts);
-      $definition['html_body_template'] = $template;
-      $definition['html_body_template_hook'] = strtr($template, '-', '_');
-      $definition['html_body_template_path'] = $template_path;
-    }
-    if ($module !== NULL && !empty($definition['text_body_template'])) {
-      $template_parts = explode('/', $definition['text_body_template']);
-      $template = array_pop($template_parts);
-      $template_path = $module->getPath() . '/emails/' . implode('/', $template_parts);
-      $definition['text_body_template'] = $template;
-      $definition['text_body_template_hook'] = strtr($template, '-', '_');
-      $definition['text_body_template_path'] = $template_path;
     }
   }
 
@@ -234,38 +197,6 @@ class EmailManager extends DefaultPluginManager {
       return FALSE;
     }
     return TRUE;
-  }
-
-  public function getThemeImplementations() {
-    $hooks = [];
-    $hooks['email_body_html'] = [
-      'render element' => 'elements',
-      'initial preprocess' => MailerThemeHooks::class . ':preprocessEmail',
-    ];
-    $hooks['email_body_text'] = [
-      'render element' => 'elements',
-      'initial preprocess' => MailerThemeHooks::class . ':preprocessEmail',
-    ];
-    $definitions = $this->getDefinitions();
-    foreach ($definitions as $definition) {
-      if ($template = $definition['html_body_template'] ?? NULL) {
-        $hooks[$definition['html_body_template_hook']] = [
-          'render element' => 'elements',
-          'base hook' => 'email_body_html',
-          'template' => $template,
-          'path' => $definition['html_body_template_path'] ?? NULL,
-        ];
-      }
-      if ($template = $definition['text_body_template'] ?? NULL) {
-        $hooks[$definition['text_body_template_hook']] = [
-          'render element' => 'elements',
-          'base hook' => 'email_body_text',
-          'template' => $template,
-          'path' => $definition['text_body_template_path'] ?? NULL,
-        ];
-      }
-    }
-    return $hooks;
   }
 
 }

@@ -63,11 +63,11 @@ class EmailPluginDefault extends PluginBase implements EmailPluginInterface {
   }
 
   public function getHtmlBodyTemplate(): ?string {
-    return strtr($this->pluginDefinition['html_body_template'], '-', '_');
+    return $this->pluginDefinition['html_body_template'];
   }
 
   public function getTextBodyTemplate(): ?string {
-    return strtr($this->pluginDefinition['text_body_template'], '-', '_');
+    return $this->pluginDefinition['text_body_template'];
   }
 
   public function htmlBody(): RenderableInterface|array|null {
