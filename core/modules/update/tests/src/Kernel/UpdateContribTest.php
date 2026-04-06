@@ -16,7 +16,6 @@ use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\update\UpdateManagerInterface;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Tests how Update Status handles contributed modules and themes.
