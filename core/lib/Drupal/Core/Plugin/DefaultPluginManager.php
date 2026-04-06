@@ -261,15 +261,13 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
    *   List of definitions to store in cache.
    */
   protected function setCachedDefinitions($definitions) {
-    $cache_tags = $this->getCacheTags();
-    $max_age = $this->getCacheMaxAge();
+    $cache_tags = $this->cacheTags;
 
     $discovery = $this->getDiscovery();
     if ($discovery instanceof CacheableDependencyInterface) {
       $cache_tags = Cache::mergeTags($cache_tags, $discovery->getCacheTags());
-      $max_age = Cache::mergeMaxAges($max_age, $discovery->getCacheMaxAge());
     }
-    $this->cacheSet($this->cacheKey, $definitions, $max_age, $cache_tags);
+    $this->cacheSet($this->cacheKey, $definitions, Cache::PERMANENT, $cache_tags);
     $this->definitions = $definitions;
   }
 
