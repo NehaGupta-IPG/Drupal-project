@@ -75,7 +75,6 @@ class RouteSubscriber extends RouteSubscriberBase {
    */
   public static function getSubscribedEvents(): array {
     $events = parent::getSubscribedEvents();
-    $events[RoutingEvents::FINISHED] = ['routeRebuildFinished'];
     // Run after Drupal\Core\EventSubscriber\MenuRouterRebuildSubscriber
     // so altered routes are set.
     $events[RoutingEvents::FINISHED] = ['routeRebuildFinished', 101];
