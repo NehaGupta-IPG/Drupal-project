@@ -2015,8 +2015,56 @@ function install_check_translations($langcode, $server_pattern): array {
     '%language' => $langcode,
   ];
 
+  // If the translations directory does not exist, throw an error.
+  if (!$translations_directory_exists) {
+    $requirements['translations directory exists'] = [
+      'title'       => t('Translations directory'),
+      'value'       => t('The translations directory does not exist.'),
+      'severity'    => RequirementSeverity::Error,
+      'description' => t('The installer requires that you create a translations directory as part of the installation process. Create the directory %translations_directory . More details about installing Drupal are available in <a href=":install_txt">INSTALL.txt</a>.', [
+        '%translations_directory' => $translations_directory,
+        ':install_txt' => base_path() . 'core/INSTALL.txt',
+      ]),
+    ];
+  }
+  else {
+    $requirements['translations directory exists'] = [
+      'title'       => t('Translations directory'),
+      'value'       => t('The directory %translations_directory exists.', ['%translations_directory' => $translations_directory]),
+    ];
+    // If the translations directory is not readable, throw an error.
+    if (!$readable) {
+      $requirements['translations directory readable'] = [
+        'title'       => t('Translations directory'),
+        'value'       => t('The translations directory is not readable.'),
+        'severity'    => RequirementSeverity::Error,
+        'description' => t('The installer requires read permissions to %translations_directory at all times. The <a href=":handbook_url">webhosting issues</a> documentation section offers help on this and other topics.', [
+          '%translations_directory' => $translations_directory,
+          ':handbook_url' => 'https://www.drupal.org/server-permissions',
+        ]),
+      ];
+    }
+    // If translations directory is not writable, throw an error.
+    if (!$writable) {
+      $requirements['translations directory writable'] = [
+        'title'       => t('Translations directory'),
+        'value'       => t('The translations directory is not writable.'),
+        'severity'    => RequirementSeverity::Error,
+        'description' => t('The installer requires write permissions to %translations_directory during the installation process. The <a href=":handbook_url">webhosting issues</a> documentation section offers help on this and other topics.', [
+          '%translations_directory' => $translations_directory,
+          ':handbook_url' => 'https://www.drupal.org/server-permissions',
+        ]),
+      ];
+    }
+    else {
+      $requirements['translations directory writable'] = [
+        'title'       => t('Translations directory'),
+        'value'       => t('The translations directory is writable.'),
+      ];
+    }
+  }
+
   if ($server_pattern === NULL) {
-    $translation_available = FALSE;
     $requirements['online'] = [
       'title' => t('Internet'),
       'value' => t('The translation downloading is disabled.'),
@@ -2082,77 +2130,26 @@ function install_check_translations($langcode, $server_pattern): array {
         ];
       }
     }
-  }
 
-  // If the translations directory does not exist, throw an error.
-  if (!$translations_directory_exists) {
-    $requirements['translations directory exists'] = [
-      'title'       => t('Translations directory'),
-      'value'       => t('The translations directory does not exist.'),
-      'severity'    => RequirementSeverity::Error,
-      'description' => t('The installer requires that you create a translations directory as part of the installation process. Create the directory %translations_directory . More details about installing Drupal are available in <a href=":install_txt">INSTALL.txt</a>.', [
-        '%translations_directory' => $translations_directory,
-        ':install_txt' => base_path() . 'core/INSTALL.txt',
-      ]),
-    ];
-  }
-  else {
-    $requirements['translations directory exists'] = [
-      'title'       => t('Translations directory'),
-      'value'       => t('The directory %translations_directory exists.', ['%translations_directory' => $translations_directory]),
-    ];
-    // If the translations directory is not readable, throw an error.
-    if (!$readable) {
-      $requirements['translations directory readable'] = [
-        'title'       => t('Translations directory'),
-        'value'       => t('The translations directory is not readable.'),
-        'severity'    => RequirementSeverity::Error,
-        'description' => t('The installer requires read permissions to %translations_directory at all times. The <a href=":handbook_url">webhosting issues</a> documentation section offers help on this and other topics.', [
-          '%translations_directory' => $translations_directory,
-          ':handbook_url' => 'https://www.drupal.org/server-permissions',
-        ]),
-      ];
-    }
-    // If translations directory is not writable, throw an error.
-    if (!$writable) {
-      $requirements['translations directory writable'] = [
-        'title'       => t('Translations directory'),
-        'value'       => t('The translations directory is not writable.'),
-        'severity'    => RequirementSeverity::Error,
-        'description' => t('The installer requires write permissions to %translations_directory during the installation process. The <a href=":handbook_url">webhosting issues</a> documentation section offers help on this and other topics.', [
-          '%translations_directory' => $translations_directory,
-          ':handbook_url' => 'https://www.drupal.org/server-permissions',
-        ]),
-      ];
-    }
-    else {
-      $requirements['translations directory writable'] = [
-        'title'       => t('Translations directory'),
-        'value'       => t('The translations directory is writable.'),
-      ];
-    }
-  }
+    if (
+      $translations_directory_exists &&
+      $readable &&
+      $writable &&
+      $translation_available
+    ) {
+      $translation_downloaded = install_retrieve_file($translation_url, $translations_directory);
 
-  if (
-    $translations_directory_exists &&
-    $readable &&
-    $writable &&
-    $translation_available &&
-    isset($translation_url) &&
-    isset($language)
-  ) {
-    $translation_downloaded = install_retrieve_file($translation_url, $translations_directory);
-
-    if (!$translation_downloaded) {
-      $requirements['translation downloaded'] = [
-        'title'       => t('Translation'),
-        'value'       => t('The %language translation could not be downloaded.', ['%language' => $language]),
-        'severity'    => RequirementSeverity::Error,
-        'description' => t('The %language translation file could not be downloaded. <a href=":url">Choose a different language</a> or select English and translate your website later.', [
-          '%language' => $language,
-          ':url' => $_SERVER['SCRIPT_NAME'],
-        ]),
-      ];
+      if (!$translation_downloaded) {
+        $requirements['translation downloaded'] = [
+          'title'       => t('Translation'),
+          'value'       => t('The %language translation could not be downloaded.', ['%language' => $language]),
+          'severity'    => RequirementSeverity::Error,
+          'description' => t('The %language translation file could not be downloaded. <a href=":url">Choose a different language</a> or select English and translate your website later.', [
+            '%language' => $language,
+            ':url' => $_SERVER['SCRIPT_NAME'],
+          ]),
+        ];
+      }
     }
   }
 
