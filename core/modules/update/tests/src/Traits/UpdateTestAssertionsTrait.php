@@ -31,6 +31,26 @@ trait UpdateTestAssertionsTrait {
   }
 
   /**
+   * Asserts that an update version has the correct links.
+   *
+   * @param string $label
+   *   The label for the update.
+   * @param string $version
+   *   The project version.
+   * @param int $index
+   *   (optional) The index of the link.
+   */
+  protected function assertVersionUpdateLinks($label, string $version, int $index = 0) {
+    $update_element = $this->findUpdateElementByLabel($label, $index);
+    // In the release notes URL the periods are replaced with dashes.
+    $url_version = str_replace('.', '-', $version);
+
+    $this->assertEquals($update_element->findLink($version)->getAttribute('href'), "https://example.com/{$this->updateProject}-$url_version-release");
+    $this->assertStringNotContainsString("https://example.com/{$this->updateProject}-$version.tar.gz", $update_element->getOuterHtml());
+    $this->assertEquals($update_element->findLink('Release notes')->getAttribute('href'), "https://example.com/{$this->updateProject}-$url_version-release");
+  }
+
+  /**
    * Asserts the expected security updates are displayed correctly on the page.
    *
    * @param string $project_path_part

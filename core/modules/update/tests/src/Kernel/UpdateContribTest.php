@@ -985,26 +985,6 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
   }
 
   /**
-   * Asserts that an update version has the correct links.
-   *
-   * @param string $label
-   *   The label for the update.
-   * @param string $version
-   *   The project version.
-   * @param int $index
-   *   (optional) The index of the link.
-   */
-  protected function assertVersionUpdateLinks($label, $version, int $index = 0): void {
-    $update_element = $this->findUpdateElementByLabel($label, $index);
-    // In the release notes URL the periods are replaced with dashes.
-    $url_version = str_replace('.', '-', $version);
-
-    $this->assertEquals($update_element->findLink($version)->getAttribute('href'), "https://example.com/{$this->updateProject}-$url_version-release");
-    $this->assertStringNotContainsString("https://example.com/{$this->updateProject}-$version.tar.gz", $update_element->getOuterHtml());
-    $this->assertEquals($update_element->findLink('Release notes')->getAttribute('href'), "https://example.com/{$this->updateProject}-$url_version-release");
-  }
-
-  /**
    * Confirms messages are correct when a release has been unpublished/revoked.
    *
    * @param string $revoked_version
