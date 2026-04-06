@@ -195,7 +195,7 @@ class Comment extends EditorialContentEntityBase implements CommentInterface {
   /**
    * {@inheritdoc}
    */
-  public function preSaveRevision(EntityStorageInterface $storage, \stdClass $record) {
+  public function preSaveRevision(EntityStorageInterface $storage, \stdClass $record): void {
     parent::preSaveRevision($storage, $record);
 
     if (!$this->isNewRevision() && $this->getOriginal() && (!isset($record->revision_log_message) || $record->revision_log_message === '')) {

@@ -394,7 +394,8 @@ class CommentHooks {
           ->accessCheck(FALSE)
           ->condition('uid', $account->id());
         $vids = array_keys($query->execute());
-        $comment_bulk_update->process($vids, ['uid' => 0, 'revision_user' => 0, 'name' => \Drupal::config('user.settings')->get('anonymous')], NULL, TRUE, TRUE);
+        $values = ['uid' => 0, 'revision_user' => 0, 'name' => \Drupal::config('user.settings')->get('anonymous')];
+        $comment_bulk_update->process($vids, $values, NULL, TRUE, TRUE);
         break;
     }
   }

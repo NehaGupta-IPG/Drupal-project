@@ -22,8 +22,7 @@ class CommentBulkUpdate {
   ) {}
 
   /**
-   * Updates all comments in the passed-in array with the passed-in field
-   * values.
+   * Updates all comments in the passed-in array with the field values.
    *
    * IMPORTANT NOTE: This function is intended to work when called from a form
    * submission handler. Calling it outside of the form submission process may

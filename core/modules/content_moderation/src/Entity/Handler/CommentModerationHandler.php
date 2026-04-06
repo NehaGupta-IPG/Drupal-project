@@ -14,7 +14,7 @@ class CommentModerationHandler extends ModerationHandler {
   /**
    * {@inheritdoc}
    */
-  public function enforceRevisionsEntityFormAlter(array &$form, FormStateInterface $form_state, $form_id) {
+  public function enforceRevisionsEntityFormAlter(array &$form, FormStateInterface $form_state, $form_id): void {
     $form['revision']['#disabled'] = TRUE;
     $form['revision']['#default_value'] = TRUE;
     $form['revision']['#description'] = $this->t('Revisions are required.');
@@ -23,7 +23,7 @@ class CommentModerationHandler extends ModerationHandler {
   /**
    * {@inheritdoc}
    */
-  public function enforceRevisionsBundleFormAlter(array &$form, FormStateInterface $form_state, $form_id) {
+  public function enforceRevisionsBundleFormAlter(array &$form, FormStateInterface $form_state, $form_id): void {
     // Force the revision checkbox on.
     $form['workflow']['options']['revision']['#value'] = 'revision';
     $form['workflow']['options']['revision']['#disabled'] = TRUE;
