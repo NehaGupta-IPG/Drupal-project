@@ -10,6 +10,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\DataDefinition;
 use Drupal\field\FieldConfigInterface;
 use Drupal\filter\FilterFormatInterface;
+use Drupal\filter\FilterFormatRepositoryInterface;
 
 /**
  * Base class for 'text' configurable field types.
@@ -176,7 +177,7 @@ abstract class TextItemBase extends FieldItemBase {
     $values = [
       'value' => $value,
       'summary' => $value,
-      'format' => filter_fallback_format(),
+      'format' => \Drupal::service(FilterFormatRepositoryInterface::class)->getFallbackFormatId(),
     ];
     return $values;
   }
