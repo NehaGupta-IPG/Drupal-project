@@ -8,6 +8,7 @@ use Drupal\Core\DependencyInjection\Compiler\AuthenticationProviderPass;
 use Drupal\Core\DependencyInjection\Compiler\BackendCompilerPass;
 use Drupal\Core\DependencyInjection\Compiler\BackwardsCompatibilityClassLoaderPass;
 use Drupal\Core\DependencyInjection\Compiler\CorsCompilerPass;
+use Drupal\Core\DependencyInjection\Compiler\RemovePassesTrait;
 use Drupal\Core\DependencyInjection\Compiler\DeprecatedServicePass;
 use Drupal\Core\DependencyInjection\Compiler\DevelopmentSettingsPass;
 use Drupal\Core\Hook\HookCollectorPass;
@@ -33,7 +34,17 @@ use Drupal\Core\PreWarm\PreWarmableInterface;
 use Drupal\Core\Queue\QueueFactoryInterface;
 use Drupal\Core\Site\Settings;
 use Psr\Log\LoggerAwareInterface;
+use Symfony\Component\DependencyInjection\Compiler\AutoAliasServicePass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\Compiler\RegisterEnvVarProcessorsPass;
+use Symfony\Component\DependencyInjection\Compiler\RegisterServiceSubscribersPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveAutowireInlineAttributesPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveDecoratorStackPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveHotPathPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveNoPreloadPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveServiceSubscribersPass;
+use Symfony\Component\DependencyInjection\Compiler\ValidateEnvPlaceholdersPass;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -50,6 +61,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * @ingroup container
  */
 class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierInterface {
+
+  use RemovePassesTrait;
 
   /**
    * {@inheritdoc}
@@ -125,6 +138,29 @@ class CoreServiceProvider implements ServiceProviderInterface, ServiceModifierIn
 
     $container->registerForAutoconfiguration(ModuleUninstallValidatorInterface::class)
       ->addTag('module_install.uninstall_validator');
+
+    // Remove Symfony compiler passes that Drupal does not use.
+    $this->removePasses($container, [
+      // Drupal does not use Symfony's %env()% syntax in service definitions.
+      RegisterEnvVarProcessorsPass::class,
+      ValidateEnvPlaceholdersPass::class,
+      // Drupal does not use #[AutowireInline] attributes.
+      ResolveAutowireInlineAttributesPass::class,
+      // Drupal does not use decorator stacks.
+      ResolveDecoratorStackPass::class,
+      // Drupal does not tag services with 'container.hot_path' or
+      // 'container.no_preload', and Drupal's container dumper does not use
+      // this metadata.
+      ResolveHotPathPass::class,
+      ResolveNoPreloadPass::class,
+      // Drupal does not implement ServiceSubscriberInterface.
+      RegisterServiceSubscribersPass::class,
+      ResolveServiceSubscribersPass::class,
+      // Drupal does not use 'bind' in service definitions.
+      ResolveBindingsPass::class,
+      // Drupal does not use the auto_alias feature.
+      AutoAliasServicePass::class,
+    ]);
   }
 
   /**
