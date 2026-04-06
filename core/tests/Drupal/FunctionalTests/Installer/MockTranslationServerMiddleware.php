@@ -77,7 +77,7 @@ class MockTranslationServerMiddleware {
   /**
    * HTTP middleware callback.
    */
-  public function __invoke() {
+  public function __invoke(): \Closure {
     return static function (callable $handler) {
       return static function (RequestInterface $request, array $options) use ($handler) {
         $uri = (string) $request->getUri();
