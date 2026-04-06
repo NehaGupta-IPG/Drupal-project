@@ -950,41 +950,6 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
   }
 
   /**
-   * Asserts that a core compatibility message is correct for an update.
-   *
-   * @param string $version
-   *   The version of the update.
-   * @param string $expected_range
-   *   The expected core compatibility range.
-   * @param string $expected_release_title
-   *   The expected release title.
-   * @param bool $is_compatible
-   *   If the update is compatible with the installed version of Drupal.
-   *
-   * @internal
-   */
-  protected function assertCoreCompatibilityMessage(string $version, string $expected_range, string $expected_release_title, bool $is_compatible = TRUE): void {
-    $update_element = $this->findUpdateElementByLabel($expected_release_title);
-    $this->assertTrue($update_element->hasLink($version));
-    $compatibility_details = $update_element->find('css', '.project-update__compatibility-details details');
-    $this->assertStringContainsString("Requires Drupal core: $expected_range", $compatibility_details->getText());
-    $details_summary_element = $compatibility_details->find('css', 'summary');
-    if ($is_compatible) {
-      // If an update is compatible with the installed version of Drupal core,
-      // the details element should be closed by default.
-      $this->assertFalse($compatibility_details->hasAttribute('open'));
-      $this->assertSame('Compatible', $details_summary_element->getText());
-    }
-    else {
-      // If an update is not compatible with the installed version of Drupal
-      // core, the details element should be open by default.
-      $this->assertTrue($compatibility_details->hasAttribute('open'));
-      $this->assertSame('Not compatible', $details_summary_element->getText());
-    }
-    $this->assertFalse($update_element->hasLink('Download'));
-  }
-
-  /**
    * Confirms messages are correct when a release has been unpublished/revoked.
    *
    * @param string $revoked_version
