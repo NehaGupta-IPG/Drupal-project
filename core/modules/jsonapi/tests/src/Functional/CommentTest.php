@@ -51,6 +51,11 @@ class CommentTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
+  protected static $resourceTypeIsVersionable = TRUE;
+
+  /**
+   * {@inheritdoc}
+   */
   protected $defaultTheme = 'stark';
 
   /**
@@ -109,6 +114,14 @@ class CommentTest extends ResourceTestBase {
   /**
    * {@inheritdoc}
    */
+  protected function setUpRevisionAuthorization($method): void {
+    parent::setUpRevisionAuthorization($method);
+    $this->grantPermissionsToTestedRole(['administer comments']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function createEntity() {
     // Create a "bar" bundle for the "entity_test" entity type and create.
     $bundle = 'bar';
@@ -139,7 +152,8 @@ class CommentTest extends ResourceTestBase {
       ->setOwnerId($this->account->id())
       ->setPublished()
       ->setCreatedTime(123456789)
-      ->setChangedTime(123456789);
+      ->setChangedTime(123456789)
+      ->setRevisionCreationTime(123456789);
     $comment->save();
 
     return $comment;
@@ -149,8 +163,12 @@ class CommentTest extends ResourceTestBase {
    * {@inheritdoc}
    */
   protected function getExpectedDocument(): array {
-    $self_url = Url::fromUri('base:/jsonapi/comment/comment/' . $this->entity->uuid())->setAbsolute()->toString(TRUE)->getGeneratedUrl();
     $author = User::load($this->entity->getOwnerId());
+    $base_url = Url::fromUri('base:/jsonapi/comment/comment/' . $this->entity->uuid())->setAbsolute();
+    $self_url = clone $base_url;
+    $version_identifier = 'id:' . $this->entity->getRevisionId();
+    $self_url = $self_url->setOption('query', ['resourceVersion' => $version_identifier]);
+    $version_query_string = '?resourceVersion=' . urlencode($version_identifier);
     return [
       'jsonapi' => [
         'meta' => [
@@ -161,13 +179,13 @@ class CommentTest extends ResourceTestBase {
         'version' => JsonApiSpec::SUPPORTED_SPECIFICATION_VERSION,
       ],
       'links' => [
-        'self' => ['href' => $self_url],
+        'self' => ['href' => $base_url->toString()],
       ],
       'data' => [
         'id' => $this->entity->uuid(),
         'type' => 'comment--comment',
         'links' => [
-          'self' => ['href' => $self_url],
+          'self' => ['href' => $self_url->toString()],
         ],
         'attributes' => [
           'created' => '1973-11-29T21:33:09+00:00',
@@ -183,10 +201,15 @@ class CommentTest extends ResourceTestBase {
           'homepage' => NULL,
           'langcode' => 'en',
           'name' => NULL,
+          'mail' => NULL,
           'status' => TRUE,
           'subject' => 'Llama',
           'thread' => '01/',
+          'revision_created' => '1973-11-29T21:33:09+00:00',
+          // @todo Attempt to remove this in https://www.drupal.org/project/drupal/issues/2933518.
+          'revision_translation_affected' => TRUE,
           'drupal_internal__cid' => (int) $this->entity->id(),
+          'drupal_internal__revision_id' => (int) $this->entity->getRevisionId(),
         ],
         'relationships' => [
           'uid' => [
@@ -198,8 +221,8 @@ class CommentTest extends ResourceTestBase {
               'type' => 'user--user',
             ],
             'links' => [
-              'related' => ['href' => $self_url . '/uid'],
-              'self' => ['href' => $self_url . '/relationships/uid'],
+              'related' => ['href' => $base_url->toString() . '/uid' . $version_query_string],
+              'self' => ['href' => $base_url->toString() . '/relationships/uid' . $version_query_string],
             ],
           ],
           'comment_type' => [
@@ -211,8 +234,8 @@ class CommentTest extends ResourceTestBase {
               'type' => 'comment_type--comment_type',
             ],
             'links' => [
-              'related' => ['href' => $self_url . '/comment_type'],
-              'self' => ['href' => $self_url . '/relationships/comment_type'],
+              'related' => ['href' => $base_url->toString() . '/comment_type' . $version_query_string],
+              'self' => ['href' => $base_url->toString() . '/relationships/comment_type' . $version_query_string],
             ],
           ],
           'entity_id' => [
@@ -224,15 +247,32 @@ class CommentTest extends ResourceTestBase {
               'type' => 'entity_test--bar',
             ],
             'links' => [
-              'related' => ['href' => $self_url . '/entity_id'],
-              'self' => ['href' => $self_url . '/relationships/entity_id'],
+              'related' => ['href' => $base_url->toString() . '/entity_id' . $version_query_string],
+              'self' => ['href' => $base_url->toString() . '/relationships/entity_id' . $version_query_string],
             ],
           ],
           'pid' => [
             'data' => NULL,
             'links' => [
-              'related' => ['href' => $self_url . '/pid'],
-              'self' => ['href' => $self_url . '/relationships/pid'],
+              'related' => ['href' => $base_url->toString() . '/pid' . $version_query_string],
+              'self' => ['href' => $base_url->toString() . '/relationships/pid' . $version_query_string],
+            ],
+          ],
+          'revision_user' => [
+            'data' => [
+              'id' => $author->uuid(),
+              'meta' => [
+                'drupal_internal__target_id' => (int) $author->id(),
+              ],
+              'type' => 'user--user',
+            ],
+            'links' => [
+              'related' => [
+                'href' => $base_url->toString() . '/revision_user' . $version_query_string,
+              ],
+              'self' => [
+                'href' => $base_url->toString() . '/relationships/revision_user' . $version_query_string,
+              ],
             ],
           ],
         ],

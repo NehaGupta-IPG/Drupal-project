@@ -11,14 +11,15 @@ use Drupal\comment\CommentViewBuilder;
 use Drupal\comment\CommentViewsData;
 use Drupal\comment\Form\DeleteForm;
 use Drupal\Core\Entity\Attribute\ContentEntityType;
+use Drupal\Core\Entity\EditorialContentEntityBase;
 use Drupal\Core\Entity\EntityListBuilder;
+use Drupal\Core\Entity\Form\RevisionDeleteForm;
+use Drupal\Core\Entity\Form\RevisionRevertForm;
+use Drupal\Core\Entity\Routing\RevisionHtmlRouteProvider;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Component\Utility\Number;
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\comment\CommentInterface;
-use Drupal\Core\Entity\EntityChangedTrait;
-use Drupal\Core\Entity\EntityPublishedTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -36,6 +37,7 @@ use Drupal\user\EntityOwnerTrait;
   label_plural: new TranslatableMarkup('comments'),
   entity_keys: [
     'id' => 'cid',
+    'revision' => 'revision_id',
     'bundle' => 'comment_type',
     'label' => 'subject',
     'langcode' => 'langcode',
@@ -53,6 +55,11 @@ use Drupal\user\EntityOwnerTrait;
     'form' => [
       'default' => CommentForm::class,
       'delete' => DeleteForm::class,
+      'revision-delete' => RevisionDeleteForm::class,
+      'revision-revert' => RevisionRevertForm::class,
+    ],
+    'route_provider' => [
+      'revision' => RevisionHtmlRouteProvider::class,
     ],
     'translation' => CommentTranslationHandler::class,
   ],
@@ -62,12 +69,19 @@ use Drupal\user\EntityOwnerTrait;
     'delete-multiple-form' => '/admin/content/comment/delete',
     'edit-form' => '/comment/{comment}/edit',
     'create' => '/comment',
+    'revision' => '/comment/{comment}/revision/{comment_revision}/view',
+    'revision-delete-form' => '/comment/{comment}/revision/{comment_revision}/delete',
+    'revision-revert-form' => '/comment/{comment}/revision/{comment_revision}/revert',
+    'version-history' => '/comment/{comment}/revisions',
   ],
   bundle_entity_type: 'comment_type',
   bundle_label: new TranslatableMarkup('Comment type'),
   base_table: 'comment',
   data_table: 'comment_field_data',
+  revision_table: 'comment_revision',
+  revision_data_table: 'comment_field_revision',
   translatable: TRUE,
+  show_revision_ui: TRUE,
   label_count: [
     'singular' => '@count comment',
     'plural' => '@count comments',
@@ -76,12 +90,15 @@ use Drupal\user\EntityOwnerTrait;
   constraints: [
     'CommentName' => [],
   ],
+  revision_metadata_keys: [
+    'revision_user' => 'revision_user',
+    'revision_created' => 'revision_created',
+    'revision_log_message' => 'revision_log_message',
+  ],
 )]
-class Comment extends ContentEntityBase implements CommentInterface {
+class Comment extends EditorialContentEntityBase implements CommentInterface {
 
-  use EntityChangedTrait;
   use EntityOwnerTrait;
-  use EntityPublishedTrait;
 
   /**
    * The thread for which a lock was acquired.
@@ -162,6 +179,31 @@ class Comment extends ContentEntityBase implements CommentInterface {
     if (!$this->getOwner()->isAnonymous()) {
       $this->set('name', NULL);
       $this->set('mail', NULL);
+    }
+
+    // If no revision author has been set explicitly, make the comment owner the
+    // revision author.
+    if (!$this->getRevisionUser()) {
+      $this->setRevisionUserId($this->getOwnerId());
+    }
+    // Preserve the default revision value during synchronization.
+    if ($this->isSyncing()) {
+      $this->isDefaultRevision($this->wasDefaultRevision());
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preSaveRevision(EntityStorageInterface $storage, \stdClass $record) {
+    parent::preSaveRevision($storage, $record);
+
+    if (!$this->isNewRevision() && $this->getOriginal() && (!isset($record->revision_log_message) || $record->revision_log_message === '')) {
+      // If we are updating an existing comment without adding a new revision,
+      // we need to make sure $entity->revision_log is reset whenever it is
+      // empty. Therefore, this code allows us to avoid clobbering an existing
+      // log entry with an empty one.
+      $record->revision_log_message = $this->getOriginal()->revision_log_message->value;
     }
   }
 
@@ -262,6 +304,7 @@ class Comment extends ContentEntityBase implements CommentInterface {
     $fields['subject'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Subject'))
       ->setTranslatable(TRUE)
+      ->setRevisionable(TRUE)
       ->setSetting('max_length', 64)
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
@@ -271,24 +314,28 @@ class Comment extends ContentEntityBase implements CommentInterface {
       ->setDisplayConfigurable('form', TRUE);
 
     $fields['uid']
-      ->setDescription(t('The user ID of the comment author.'));
+      ->setDescription(t('The user ID of the comment author.'))
+      ->setRevisionable(TRUE);
 
     $fields['name'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Name'))
       ->setDescription(t("The comment author's name."))
       ->setTranslatable(TRUE)
+      ->setRevisionable(TRUE)
       ->setSetting('max_length', 60)
       ->setDefaultValue('');
 
     $fields['mail'] = BaseFieldDefinition::create('email')
       ->setLabel(t('Email'))
       ->setDescription(t("The comment author's email address."))
-      ->setTranslatable(TRUE);
+      ->setTranslatable(TRUE)
+      ->setRevisionable(TRUE);
 
     $fields['homepage'] = BaseFieldDefinition::create('uri')
       ->setLabel(t('Homepage'))
       ->setDescription(t("The comment author's home page address."))
       ->setTranslatable(TRUE)
+      ->setRevisionable(TRUE)
       // URIs are not length limited by RFC 2616, but we can only store 255
       // characters in our comment DB schema.
       ->setSetting('max_length', 255);
@@ -297,18 +344,21 @@ class Comment extends ContentEntityBase implements CommentInterface {
       ->setLabel(t('Hostname'))
       ->setDescription(t("The comment author's hostname."))
       ->setTranslatable(TRUE)
+      ->setRevisionable(TRUE)
       ->setSetting('max_length', 128)
       ->setDefaultValueCallback(static::class . '::getDefaultHostname');
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
       ->setDescription(t('The time that the comment was created.'))
-      ->setTranslatable(TRUE);
+      ->setTranslatable(TRUE)
+      ->setRevisionable(TRUE);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
       ->setDescription(t('The time that the comment was last edited.'))
-      ->setTranslatable(TRUE);
+      ->setTranslatable(TRUE)
+      ->setRevisionable(TRUE);
 
     $fields['thread'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Thread place'))

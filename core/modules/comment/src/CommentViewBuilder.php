@@ -156,6 +156,7 @@ class CommentViewBuilder extends EntityViewBuilder {
               $view_mode,
               $entity->language()->getId(),
               !empty($entity->in_preview),
+              $entity->isDefaultRevision() ? NULL : $entity->getLoadedRevisionId(),
             ],
           ],
           '#create_placeholder' => TRUE,

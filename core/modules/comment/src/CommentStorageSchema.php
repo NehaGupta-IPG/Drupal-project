@@ -49,6 +49,18 @@ class CommentStorageSchema extends SqlContentEntityStorageSchema {
     $schema = parent::getSharedTableFieldSchema($storage_definition, $table_name, $column_mapping);
     $field_name = $storage_definition->getName();
 
+    if ($table_name == 'comment_revision') {
+      switch ($field_name) {
+        case 'langcode':
+          $this->addSharedTableFieldIndex($storage_definition, $schema, TRUE);
+          break;
+
+        case 'revision_user':
+          $this->addSharedTableFieldForeignKey($storage_definition, $schema, 'users', 'uid');
+          break;
+      }
+    }
+
     if ($table_name == 'comment_field_data') {
       // Remove unneeded indexes.
       unset($schema['indexes']['comment_field__pid__target_id']);

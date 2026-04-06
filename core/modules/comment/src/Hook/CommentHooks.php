@@ -376,30 +376,25 @@ class CommentHooks {
    */
   #[Hook('user_cancel')]
   public function userCancel($edit, UserInterface $account, $method): void {
+    /** @var \Drupal\comment\CommentBulkUpdate $comment_bulk_update */
+    $comment_bulk_update = \Drupal::service('Drupal\comment\CommentBulkUpdate');
+
     switch ($method) {
       case 'user_cancel_block_unpublish':
-        $comments = \Drupal::entityTypeManager()->getStorage('comment')->loadByProperties(['uid' => $account->id()]);
-        foreach ($comments as $comment) {
-          $comment->setUnpublished();
-          $comment->save();
-        }
+        $cids = \Drupal::entityTypeManager()->getStorage('comment')->getQuery()
+          ->accessCheck(FALSE)
+          ->condition('uid', $account->id())
+          ->execute();
+        $comment_bulk_update->process($cids, ['status' => 0], NULL, TRUE);
         break;
 
       case 'user_cancel_reassign':
-        /** @var \Drupal\comment\CommentInterface[] $comments */
-        $comments = \Drupal::entityTypeManager()->getStorage('comment')->loadByProperties(['uid' => $account->id()]);
-        foreach ($comments as $comment) {
-          $langcodes = array_keys($comment->getTranslationLanguages());
-          // For efficiency manually set the original comment before applying
-          // any changes.
-          $comment->setOriginal(clone $comment);
-          foreach ($langcodes as $langcode) {
-            $comment_translated = $comment->getTranslation($langcode);
-            $comment_translated->setOwnerId(0);
-            $comment_translated->setAuthorName(\Drupal::config('user.settings')->get('anonymous'));
-          }
-          $comment->save();
-        }
+        $query = \Drupal::entityTypeManager()->getStorage('comment')->getQuery()
+          ->allRevisions()
+          ->accessCheck(FALSE)
+          ->condition('uid', $account->id());
+        $vids = array_keys($query->execute());
+        $comment_bulk_update->process($vids, ['uid' => 0, 'revision_user' => 0, 'name' => \Drupal::config('user.settings')->get('anonymous')], NULL, TRUE, TRUE);
         break;
     }
   }

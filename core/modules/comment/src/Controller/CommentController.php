@@ -86,7 +86,19 @@ class CommentController extends ControllerBase {
    *   A redirect response to the comment's permalink after approval.
    */
   public function commentApprove(CommentInterface $comment) {
-    $comment->setPublished();
+    if ($this->moduleHandler()->moduleExists('content_moderation')) {
+      /** @var \Drupal\content_moderation\ModerationInformationInterface $moderation_info */
+      $moderation_info = \Drupal::service('content_moderation.moderation_information');
+      if ($moderation_info->isModeratedEntity($comment)) {
+        $comment->set('moderation_state', 'published');
+      }
+      else {
+        $comment->setPublished();
+      }
+    }
+    else {
+      $comment->setPublished();
+    }
     $comment->save();
 
     $this->messenger()->addStatus($this->t('Comment approved.'));

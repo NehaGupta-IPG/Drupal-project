@@ -130,7 +130,9 @@ abstract class CommentResourceTestBase extends EntityResourceTestBase {
       ->setOwnerId(static::$auth ? $this->account->id() : 0)
       ->setPublished()
       ->setCreatedTime(123456789)
-      ->setChangedTime(123456789);
+      ->setChangedTime(123456789)
+      ->setRevisionUserId(static::$auth ? $this->account->id() : 0)
+      ->setRevisionCreationTime(123456789);
     $comment->save();
 
     return $comment;
@@ -143,6 +145,9 @@ abstract class CommentResourceTestBase extends EntityResourceTestBase {
     $author = User::load($this->entity->getOwnerId());
     return [
       'cid' => [
+        ['value' => 1],
+      ],
+      'revision_id' => [
         ['value' => 1],
       ],
       'uuid' => [
@@ -195,6 +200,14 @@ abstract class CommentResourceTestBase extends EntityResourceTestBase {
           'url' => base_path() . 'user/' . $author->id(),
         ],
       ],
+      'revision_user' => [
+        [
+          'target_id' => (int) $author->id(),
+          'target_type' => 'user',
+          'target_uuid' => $author->uuid(),
+          'url' => base_path() . 'user/' . $author->id(),
+        ],
+      ],
       'pid' => [],
       'entity_type' => [
         [
@@ -219,6 +232,19 @@ abstract class CommentResourceTestBase extends EntityResourceTestBase {
       'thread' => [
         [
           'value' => '01/',
+        ],
+      ],
+      'revision_created' => [
+        [
+          'value' => (new \DateTime())->setTimestamp((int) $this->entity->getRevisionCreationTime())
+            ->setTimezone(new \DateTimeZone('UTC'))
+            ->format(\DateTime::RFC3339),
+          'format' => \DateTime::RFC3339,
+        ],
+      ],
+      'revision_translation_affected' => [
+        [
+          'value' => TRUE,
         ],
       ],
       'comment_body' => [

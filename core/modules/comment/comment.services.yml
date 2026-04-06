@@ -29,3 +29,6 @@ services:
   comment.link_builder:
     class: Drupal\comment\CommentLinkBuilder
   Drupal\comment\CommentLinkBuilderInterface: '@comment.link_builder'
+
+  Drupal\comment\CommentBulkUpdate:
+    autowire: true

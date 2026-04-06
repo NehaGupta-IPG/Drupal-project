@@ -65,6 +65,7 @@ abstract class CommentTypeResourceTestBase extends ConfigEntityResourceTestBase 
       'langcode' => 'en',
       'status' => TRUE,
       'target_entity_type_id' => 'node',
+      'new_revision' => FALSE,
       'uuid' => $this->entity->uuid(),
     ];
   }

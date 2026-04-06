@@ -54,6 +54,7 @@ trait CommentTestTrait {
         'id' => $comment_type_id,
         'label' => Unicode::ucfirst($comment_type_id),
         'target_entity_type_id' => $entity_type,
+        'new_revision' => FALSE,
         'description' => 'Default comment field',
       ])->save();
     }

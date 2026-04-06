@@ -129,11 +129,14 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
    *   The language in which the comment entity is being viewed.
    * @param bool $is_in_preview
    *   Whether the comment is currently being previewed.
+   * @param int|string $revision_id
+   *   (optional) The identifier of the comment revision to be loaded. If none
+   *   is provided, the default revision will be loaded.
    *
    * @return array
    *   A renderable array representing the comment links.
    */
-  public function renderLinks($comment_entity_id, $view_mode, $langcode, $is_in_preview) {
+  public function renderLinks($comment_entity_id, $view_mode, $langcode, $is_in_preview, $revision_id = NULL) {
     $links = [
       '#theme' => 'links__comment',
       '#pre_render' => [[Link::class, 'preRenderLinks']],
@@ -141,8 +144,10 @@ class CommentLazyBuilders implements TrustedCallbackInterface {
     ];
 
     if (!$is_in_preview) {
-      /** @var \Drupal\comment\CommentInterface $entity */
-      $entity = $this->entityTypeManager->getStorage('comment')->load($comment_entity_id);
+      $storage = $this->entityTypeManager->getStorage('comment');
+      /** @var \Drupal\comment\CommentInterface $revision */
+      $revision = !isset($revision_id) ? $storage->load($comment_entity_id) : $storage->loadRevision($revision_id);
+      $entity = $revision->getTranslation($langcode);
       if ($commented_entity = $entity->getCommentedEntity()) {
         $links['comment'] = $this->buildLinks($entity, $commented_entity);
       }
