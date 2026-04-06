@@ -4,9 +4,14 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Plugin;
 
+use Drupal\Component\Plugin\Attribute\Plugin;
 use Drupal\Component\Plugin\Definition\PluginDefinition;
+use Drupal\Component\Plugin\Discovery\StaticDiscovery;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Component\Plugin\Exception\PluginNotFoundException;
+use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
@@ -16,6 +21,8 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Constraint\IsType;
+use PHPUnit\Framework\NativeType;
 
 /**
  * Tests the DefaultPluginManager.
@@ -467,6 +474,59 @@ class DefaultPluginManagerTest extends UnitTestCase {
     return $data;
   }
 
+  /**
+   * Tests that caching respects tags returned by the discovery object.
+   */
+  public function testCacheTagsFromDiscovery(): void {
+    $cache_backend = $this->createMock(CacheBackendInterface::class);
+    $cache_backend->expects($this->once())
+      ->method('set')
+      ->with('the_plugins', new IsType(NativeType::Array), Cache::PERMANENT, [
+        'from_manager',
+        'plugin1',
+        'plugin2',
+      ]);
+
+    $manager = new DefaultPluginManager(
+      'Plugin/Whatever',
+      new \ArrayObject(),
+      $this->createStub(ModuleHandlerInterface::class),
+      'WhateverInterface',
+      Plugin::class,
+    );
+    $discovery = new class () extends StaticDiscovery implements CacheableDependencyInterface {
+
+      /**
+       * {@inheritdoc}
+       */
+      public function getCacheContexts(): array {
+        return ['nonsense'];
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      public function getCacheTags(): array {
+        return array_keys($this->definitions);
+      }
+
+      /**
+       * {@inheritdoc}
+       */
+      public function getCacheMaxAge(): int {
+        // This should be ignored by the plugin manager.
+        return 42;
+      }
+
+    };
+    $discovery->setDefinition('plugin1', []);
+    $discovery->setDefinition('plugin2', []);
+    $property = new \ReflectionProperty($manager, 'discovery');
+    $property->setValue($manager, $discovery);
+    $manager->setCacheBackend($cache_backend, 'the_plugins', ['from_manager']);
+    $manager->getDefinitions();
+  }
+
 }
 
 /**
@@ -512,6 +572,7 @@ class TestPluginForm implements PluginFormInterface {
   }
 
 }
+
 
 /**
  * Stub class for plugin definition.

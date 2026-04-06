@@ -10,6 +10,9 @@ use Drupal\Core\Cache\CacheableDependencyTrait;
 /**
  * Injects dependencies into derivers if they use ContainerDeriverInterface.
  *
+ * This decorator will collect cache tags returned by derivers, but ignore cache
+ * contexts or max ages.
+ *
  * @see \Drupal\Core\Plugin\Discovery\ContainerDeriverInterface
  */
 class ContainerDerivativeDiscoveryDecorator extends DerivativeDiscoveryDecorator implements CacheableDependencyInterface {
