@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\update\Kernel;
 
-use Behat\Mink\Element\NodeElement;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Core\Test\Http\TestClientFactory;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\ProjectInfo;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Tests\update\Traits\UpdateTestAssertionsTrait;
 use Drupal\Tests\update\Functional\UpdateTestTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\update\UpdateManagerInterface;
@@ -25,6 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
 #[RunTestsInSeparateProcesses]
 class UpdateContribTest extends KernelTestBase implements ServiceModifierInterface {
   use UpdateTestTrait;
+  use UpdateTestAssertionsTrait;
   use UserCreationTrait;
 
   /**
@@ -1111,61 +1112,6 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
       $this->assertUpdateTableTextContains('Release not supported: Your currently installed release is now unsupported, and is no longer available for download. Uninstalling everything included in this release or upgrading is strongly recommended!');
       $this->assertVersionUpdateLinks($new_version_label, $newer_version);
     }
-  }
-
-  /**
-   * Asserts that the update table text contains the specified text.
-   *
-   * @param string $text
-   *   The expected text.
-   *
-   * @see \Behat\Mink\WebAssert::elementTextContains()
-   */
-  protected function assertUpdateTableTextContains($text): void {
-    $this->assertSession()
-      ->elementTextContains('css', $this->updateTableLocator, $text);
-  }
-
-  /**
-   * Asserts that the update table text does not contain the specified text.
-   *
-   * @param string $text
-   *   The expected text.
-   */
-  protected function assertUpdateTableTextNotContains($text): void {
-    $this->assertSession()->elementTextNotContains('css', $this->updateTableLocator, $text);
-  }
-
-  /**
-   * Asserts that the update table element HTML contains the specified text.
-   *
-   * @param string $text
-   *   The expected text.
-   *
-   * @see \Behat\Mink\WebAssert::elementContains()
-   */
-  protected function assertUpdateTableElementContains($text): void {
-    $this->assertSession()
-      ->elementContains('css', $this->updateTableLocator, $text);
-  }
-
-  /**
-   * Finds an update page element by label.
-   *
-   * @param string $label
-   *   The label for the update, for example "Recommended version:" or
-   *   "Latest version:".
-   * @param int $index
-   *   (optional) The index of the element.
-   *
-   * @return \Behat\Mink\Element\NodeElement
-   *   The update element.
-   */
-  protected function findUpdateElementByLabel($label, int $index = 0): NodeElement {
-    $update_elements = $this->getSession()->getPage()
-      ->findAll('css', $this->updateTableLocator . " .project-update__version:contains(\"$label\")");
-    $this->assertGreaterThanOrEqual($index, count($update_elements));
-    return $update_elements[$index];
   }
 
 }
