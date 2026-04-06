@@ -3,8 +3,9 @@
 namespace Drupal\Core\Plugin\Discovery;
 
 use Drupal\Component\Plugin\Discovery\DerivativeDiscoveryDecorator;
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
-use Drupal\Core\Cache\CacheableMetadata;
+use Drupal\Core\Cache\CacheableDependencyTrait;
 
 /**
  * Injects dependencies into derivers if they use ContainerDeriverInterface.
@@ -13,36 +14,7 @@ use Drupal\Core\Cache\CacheableMetadata;
  */
 class ContainerDerivativeDiscoveryDecorator extends DerivativeDiscoveryDecorator implements CacheableDependencyInterface {
 
-  /**
-   * Cacheability metadata collected from the derivers.
-   */
-  protected CacheableMetadata $cacheability;
-
-  public function __construct(mixed ...$arguments) {
-    parent::__construct(...$arguments);
-    $this->cacheability = new CacheableMetadata();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheContexts(): array {
-    return $this->cacheability->getCacheContexts();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheTags(): array {
-    return $this->cacheability->getCacheTags();
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCacheMaxAge(): int {
-    return $this->cacheability->getCacheMaxAge();
-  }
+  use CacheableDependencyTrait;
 
   /**
    * {@inheritdoc}
@@ -62,7 +34,7 @@ class ContainerDerivativeDiscoveryDecorator extends DerivativeDiscoveryDecorator
         }
 
         if ($deriver instanceof CacheableDependencyInterface) {
-          $this->cacheability->addCacheableDependency($deriver);
+          $this->cacheTags = Cache::mergeTags($this->cacheTags, $deriver->getCacheTags());
         }
         $this->derivers[$base_plugin_id] = $deriver;
       }
