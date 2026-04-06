@@ -1791,10 +1791,8 @@ function install_import_translations(&$install_state) {
   // should import translations.
   $batch_builder = (new BatchBuilder())
     ->setFile(\Drupal::service('extension.path.resolver')->getPath('module', 'locale') . '/locale.batch.inc');
-  if ($install_state['download_translation']) {
-    foreach (install_download_additional_translations_operations($install_state) as $operation) {
-      $batch_builder->addOperation($operation[0], $operation[1]);
-    }
+  foreach (install_download_additional_translations_operations($install_state) as $operation) {
+    $batch_builder->addOperation($operation[0], $operation[1]);
   }
   $languages = \Drupal::languageManager()->getLanguages();
   if (count($languages) > 1 || !isset($languages['en'])) {
