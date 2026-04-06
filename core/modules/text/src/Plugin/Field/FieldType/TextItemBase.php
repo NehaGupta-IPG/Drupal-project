@@ -79,7 +79,7 @@ abstract class TextItemBase extends FieldItemBase {
       ->setLabel(t('Text'))
       ->setRequired(TRUE);
 
-    $filter_format_type = \Drupal::moduleHandler()->moduleExists('filter') ? 'filter_format' : '';
+    $filter_format_type = \Drupal::moduleHandler()->moduleExists('filter') ? 'filter_format' : 'string';
     $properties['format'] = DataDefinition::create($filter_format_type)
       ->setLabel(t('Text format'))
       ->setSetting('allowed_formats', $field_definition->getSetting('allowed_formats'));
