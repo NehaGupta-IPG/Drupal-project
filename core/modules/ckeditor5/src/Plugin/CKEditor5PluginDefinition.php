@@ -253,7 +253,7 @@ final class CKEditor5PluginDefinition extends PluginDefinition implements Plugin
   /**
    * Validates the given configuration array.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The configuration to validate.
    *
    * @return string|null

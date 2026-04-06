@@ -63,7 +63,7 @@ class MigrateSourceTest extends MigrateTestCase {
   /**
    * Gets the source plugin to test.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   (optional) The source configuration. Defaults to an empty array.
    * @param array $migrate_config
    *   (optional) The migration configuration to be used in

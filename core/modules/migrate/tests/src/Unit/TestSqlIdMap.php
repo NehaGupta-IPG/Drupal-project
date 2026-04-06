@@ -21,7 +21,7 @@ class TestSqlIdMap extends Sql implements \Iterator {
    *
    * @param \Drupal\Core\Database\Connection $database
    *   The database.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The configuration.
    * @param string $plugin_id
    *   The plugin ID for the migration process to do.

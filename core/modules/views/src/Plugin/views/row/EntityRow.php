@@ -76,7 +76,7 @@ class EntityRow extends RowPluginBase {
   /**
    * Constructs a new EntityRow object.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
    *   The plugin ID for the plugin instance.

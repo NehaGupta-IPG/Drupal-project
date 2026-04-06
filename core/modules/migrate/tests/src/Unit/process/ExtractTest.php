@@ -68,7 +68,7 @@ class ExtractTest extends MigrateProcessTestCase {
    *
    * @param array $value
    *   The process plugin input value.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The plugin configuration.
    * @param string|null $expected
    *   The expected transformed value.

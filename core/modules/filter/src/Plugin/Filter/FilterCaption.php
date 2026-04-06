@@ -36,7 +36,7 @@ class FilterCaption extends FilterBase implements ContainerFactoryPluginInterfac
   /**
    * Constructs a new FilterCaption.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   Configuration.
    * @param string $plugin_id
    *   Plugin ID.

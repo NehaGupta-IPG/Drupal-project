@@ -90,7 +90,7 @@ class PageDisplayVariantSelectionEvent extends Event implements RefinableCacheab
   /**
    * Set the configuration for the selected page display variant.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The configuration for the selected page display variant.
    *
    * @return $this

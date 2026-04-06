@@ -131,7 +131,7 @@ class WidgetPluginManager extends DefaultPluginManager {
    *
    * @param string $field_type
    *   The field type.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   An array of widget configuration.
    *
    * @return array

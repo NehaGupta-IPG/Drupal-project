@@ -46,7 +46,7 @@ class MTimeProtectedFastFileStorage extends FileStorage {
   /**
    * Constructs this MTimeProtectedFastFileStorage object.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   An associated array, containing at least these keys (the rest are
    *   ignored):
    *   - directory: The directory where the files should be stored.

@@ -17,7 +17,7 @@ interface TypedDataManagerInterface extends PluginManagerInterface, CachedDiscov
    *
    * @param string $data_type
    *   The data type, for which a typed object should be instantiated.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The plugin configuration array, i.e. an array with the following keys:
    *   - data_definition: The data definition object, i.e. an instance of
    *     \Drupal\Core\TypedData\DataDefinitionInterface.

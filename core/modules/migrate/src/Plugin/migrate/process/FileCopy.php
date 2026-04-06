@@ -76,7 +76,7 @@ class FileCopy extends FileProcessBase implements ContainerFactoryPluginInterfac
   /**
    * Constructs a file_copy process plugin.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The plugin configuration.
    * @param string $plugin_id
    *   The plugin ID.

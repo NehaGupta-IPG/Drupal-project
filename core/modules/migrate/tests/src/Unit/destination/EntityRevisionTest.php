@@ -189,7 +189,7 @@ class EntityRevisionTest extends UnitTestCase {
   /**
    * Helper method to create an entity revision destination with mock services.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   Configuration for the destination.
    * @param string $plugin_id
    *   The plugin id.

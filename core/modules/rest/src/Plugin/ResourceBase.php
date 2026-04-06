@@ -43,7 +43,7 @@ abstract class ResourceBase extends PluginBase implements ContainerFactoryPlugin
   /**
    * Constructs a Drupal\rest\Plugin\ResourceBase object.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
    *   The plugin ID for the plugin instance.

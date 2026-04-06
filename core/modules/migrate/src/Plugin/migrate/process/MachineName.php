@@ -79,7 +79,7 @@ class MachineName extends ProcessPluginBase implements ContainerFactoryPluginInt
   /**
    * Constructs a MachineName plugin.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The plugin configuration.
    * @param string $plugin_id
    *   The plugin ID.

@@ -19,7 +19,7 @@ class FileStorage implements PhpStorageInterface {
   /**
    * Constructs this FileStorage object.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   An associative array, containing at least these two keys:
    *   - directory: The directory where the files should be stored.
    *   - bin: The storage bin. Multiple storage objects can be instantiated with

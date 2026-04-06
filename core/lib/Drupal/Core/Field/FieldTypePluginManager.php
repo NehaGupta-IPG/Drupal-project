@@ -64,7 +64,7 @@ class FieldTypePluginManager extends DefaultPluginManager implements FieldTypePl
    *
    * @param string $field_type
    *   The field type, for which a field item should be created.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The plugin configuration array, i.e. an array with the following keys:
    *   - field_definition: The field definition object, i.e. an instance of
    *     Drupal\Core\Field\FieldDefinitionInterface.

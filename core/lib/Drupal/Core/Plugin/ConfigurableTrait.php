@@ -54,7 +54,7 @@ trait ConfigurableTrait {
    * configuration. If the same configuration key exists in both configurations,
    * then the value in the provided configuration will override the default.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   An associative array containing the plugin's configuration.
    *
    * @return $this

@@ -40,7 +40,7 @@ class WorkspaceSwitcherBlock extends BlockBase implements ContainerFactoryPlugin
   /**
    * Constructs a new WorkspaceSwitcherBlock instance.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The plugin configuration.
    * @param string $plugin_id
    *   The plugin ID.

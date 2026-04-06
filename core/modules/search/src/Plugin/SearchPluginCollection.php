@@ -24,7 +24,7 @@ class SearchPluginCollection extends DefaultSingleLazyPluginCollection {
    *   The manager to be used for instantiating plugins.
    * @param string $instance_id
    *   The ID of the plugin instance.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   An array of configuration.
    * @param string $search_page_id
    *   The unique ID of the search page using this plugin.

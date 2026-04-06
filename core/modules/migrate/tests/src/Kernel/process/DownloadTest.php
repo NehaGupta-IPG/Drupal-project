@@ -91,7 +91,7 @@ class DownloadTest extends FileTestBase {
    *
    * @param string $destination_uri
    *   The destination URI to download to.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   (optional) Configuration for the download plugin.
    *
    * @return string

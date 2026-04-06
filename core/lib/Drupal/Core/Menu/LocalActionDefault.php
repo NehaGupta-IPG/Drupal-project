@@ -29,7 +29,7 @@ class LocalActionDefault extends PluginBase implements LocalActionInterface, Con
   /**
    * Constructs a LocalActionDefault object.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
    *   The plugin ID for the plugin instance.

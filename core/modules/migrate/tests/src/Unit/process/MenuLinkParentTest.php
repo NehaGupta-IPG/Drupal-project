@@ -83,7 +83,7 @@ class MenuLinkParentTest extends MigrateProcessTestCase {
   /**
    * Tests that an exception is thrown for invalid options.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The plugin configuration being tested.
    * @param bool $is_valid
    *   TRUE if the configuration is valid, FALSE if not.
@@ -277,7 +277,7 @@ class MenuLinkParentTest extends MigrateProcessTestCase {
    *
    * @param int $plid
    *   The ID of the parent menu link.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The plugin configuration being tested.
    * @param string $expected_result
    *   The expected value(s) of the migration process plugin.

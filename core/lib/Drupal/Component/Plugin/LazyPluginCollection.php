@@ -42,7 +42,7 @@ abstract class LazyPluginCollection implements \IteratorAggregate, \Countable {
   /**
    * Sets the configuration for all plugins in this collection.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   An array of up-to-date plugin configuration.
    *
    * @return $this

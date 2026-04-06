@@ -61,7 +61,7 @@ class RequestPath extends ConditionPluginBase implements ContainerFactoryPluginI
    *   The request stack.
    * @param \Drupal\Core\Path\CurrentPathStack $current_path
    *   The current path.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
    *   The plugin ID for the plugin instance.

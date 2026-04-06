@@ -241,7 +241,7 @@ class FileCopyTest extends FileTestBase {
    *   Source path to copy from.
    * @param string $destination_path
    *   The destination path to copy to.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   Process plugin configuration settings.
    *
    * @return string

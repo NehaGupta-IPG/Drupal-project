@@ -108,7 +108,7 @@ abstract class MigrateSourceTestBase extends KernelTestBase {
   /**
    * Instantiates the source plugin under test.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The source plugin configuration.
    *
    * @return \Drupal\migrate\Plugin\MigrateSourceInterface|object
@@ -151,7 +151,7 @@ abstract class MigrateSourceTestBase extends KernelTestBase {
    *   (optional) How many rows the source plugin is expected to return.
    *   Defaults to count($expected_data). If set to a non-null, non-numeric
    *   value (like FALSE or 'nope'), the source plugin will not be counted.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   (optional) Configuration for the source plugin.
    * @param mixed $high_water
    *   (optional) The value of the high water field.

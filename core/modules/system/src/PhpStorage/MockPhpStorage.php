@@ -17,7 +17,7 @@ class MockPhpStorage {
   /**
    * Constructs a MockPhpStorage object.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The storage configuration.
    */
   public function __construct(array $configuration) {

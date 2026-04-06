@@ -186,7 +186,7 @@ class LinkUriTest extends KernelTestBase {
    *
    * @param string $value
    *   The value to pass to LinkUri::transform().
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The plugin configuration.
    *
    * @return string

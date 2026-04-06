@@ -113,7 +113,7 @@ abstract class PluginBase extends ComponentPluginBase implements ContainerFactor
   /**
    * Constructs a PluginBase object.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
    *   The plugin ID for the plugin instance.

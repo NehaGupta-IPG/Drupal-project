@@ -23,7 +23,7 @@ class FileCopyTest extends MigrateProcessTestCase {
   /**
    * Tests that the plugin constructor correctly sets the configuration.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The plugin configuration.
    * @param \Drupal\Core\File\FileExists $expected
    *   The expected value of the plugin configuration.
@@ -49,7 +49,7 @@ class FileCopyTest extends MigrateProcessTestCase {
   /**
    * Creates a TestFileCopy process plugin.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The plugin configuration.
    * @param \Drupal\Core\File\FileExists $expected
    *   The expected value of the plugin configuration.

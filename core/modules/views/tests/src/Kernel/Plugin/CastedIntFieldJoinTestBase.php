@@ -179,7 +179,7 @@ abstract class CastedIntFieldJoinTestBase extends DriverSpecificKernelTestBase {
    *
    * @param \Drupal\views\ViewExecutable $view
    *   The view used in this test.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The join plugin configuration.
    * @param string $table_alias
    *   The table alias to use for the join.

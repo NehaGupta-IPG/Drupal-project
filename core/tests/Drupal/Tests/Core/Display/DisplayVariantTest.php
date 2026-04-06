@@ -21,7 +21,7 @@ class DisplayVariantTest extends UnitTestCase {
   /**
    * Sets up a display variant plugin for testing.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   An array of plugin configuration.
    * @param array $definition
    *   The plugin definition array.

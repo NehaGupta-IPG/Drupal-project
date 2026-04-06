@@ -132,7 +132,7 @@ class FormatterPluginManager extends DefaultPluginManager {
    *
    * @param string $field_type
    *   The field type.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   An array of formatter configuration.
    *
    * @return array

@@ -91,7 +91,7 @@ abstract class PluginManagerBase implements PluginManagerInterface {
    *
    * @param string $plugin_id
    *   The ID of the missing requested plugin.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   An array of configuration relevant to the plugin instance.
    *
    * @return object
@@ -117,7 +117,7 @@ abstract class PluginManagerBase implements PluginManagerInterface {
    *
    * @param string $plugin_id
    *   The ID of the missing requested plugin.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   An array of configuration relevant to the plugin instance.
    *
    * phpcs:ignore Drupal.Commenting.FunctionComment.InvalidNoReturn

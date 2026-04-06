@@ -146,7 +146,7 @@ class QueryBatchTest extends KernelTestBase {
    *   The result rows the plugin is expected to return.
    * @param int $num_rows
    *   How many rows the source plugin is expected to return.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   Configuration for the source plugin specifying the batch size.
    * @param int $expected_batch_size
    *   The expected batch size, will be set to zero for invalid batch sizes.
@@ -203,7 +203,7 @@ class QueryBatchTest extends KernelTestBase {
   /**
    * Instantiates the source plugin under test.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The source plugin configuration.
    *
    * @return \Drupal\migrate\Plugin\MigrateSourceInterface|object
