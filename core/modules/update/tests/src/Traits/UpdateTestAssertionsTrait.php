@@ -31,6 +31,69 @@ trait UpdateTestAssertionsTrait {
   }
 
   /**
+   * Asserts the expected security updates are displayed correctly on the page.
+   *
+   * @param string $project_path_part
+   *   The project path part needed for the release link.
+   * @param string[] $expected_security_releases
+   *   The security releases, if any, that the status report should recommend.
+   * @param string $expected_update_message_type
+   *   The type of update message expected.
+   * @param string $update_element_css_locator
+   *   The CSS locator for the page element that contains the security updates.
+   */
+  protected function assertSecurityUpdates($project_path_part, array $expected_security_releases, string $expected_update_message_type, $update_element_css_locator) {
+    $assert_session = $this->assertSession();
+    $page = $this->getSession()->getPage();
+    $this->standardTests();
+    $assert_session->elementTextNotContains('css', $update_element_css_locator, 'Not supported');
+    $all_security_release_urls = array_map(function (NodeElement $link) {
+      return $link->getAttribute('href');
+    }, $page->findAll('css', "$update_element_css_locator .version-security a[href$='-release']"));
+    if ($expected_security_releases) {
+      $expected_release_urls = [];
+      if ($expected_update_message_type === static::SECURITY_UPDATE_REQUIRED) {
+        $assert_session->elementTextNotContains('css', $update_element_css_locator, 'Update available');
+        $assert_session->elementTextContains('css', $update_element_css_locator, 'Security update required!');
+        // Verify that the error icon is found.
+        $assert_session->responseContains('error.svg');
+      }
+      else {
+        $assert_session->elementTextContains('css', $update_element_css_locator, 'Update available');
+        $assert_session->elementTextNotContains('css', $update_element_css_locator, 'Security update required!');
+      }
+      $assert_session->elementTextNotContains('css', $update_element_css_locator, 'Up to date');
+      foreach ($expected_security_releases as $expected_security_release) {
+        $expected_url_version = str_replace('.', '-', $expected_security_release);
+        $release_url = "https://example.com/$project_path_part-$expected_url_version-release";
+        $assert_session->responseNotContains("https://example.com/$project_path_part-$expected_url_version.tar.gz");
+        $expected_release_urls[] = $release_url;
+        // Ensure the expected links are security links.
+        $this->assertContains($release_url, $all_security_release_urls, "Release $release_url is a security release link.");
+        $assert_session->linkByHrefExists($release_url);
+      }
+      // Ensure no other links are shown as security releases.
+      $this->assertEquals([], array_diff($all_security_release_urls, $expected_release_urls));
+    }
+    else {
+      // Ensure there were no security links.
+      $this->assertEquals([], $all_security_release_urls);
+      $assert_session->pageTextNotContains('Security update required!');
+      if ($expected_update_message_type === static::UPDATE_AVAILABLE) {
+        $assert_session->elementTextContains('css', $update_element_css_locator, 'Update available');
+        $assert_session->elementTextNotContains('css', $update_element_css_locator, 'Up to date');
+      }
+      elseif ($expected_update_message_type === static::UPDATE_NONE) {
+        $assert_session->elementTextNotContains('css', $update_element_css_locator, 'Update available');
+        $assert_session->elementTextContains('css', $update_element_css_locator, 'Up to date');
+      }
+      else {
+        $this->fail('Unexpected value for $expected_update_message_type: ' . $expected_update_message_type);
+      }
+    }
+  }
+
+  /**
    * Asserts that the update table text contains the specified text.
    *
    * @param string $text
