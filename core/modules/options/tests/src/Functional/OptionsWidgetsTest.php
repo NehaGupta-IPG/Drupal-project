@@ -133,15 +133,6 @@ class OptionsWidgetsTest extends FieldTestBase {
     ]);
     $this->float->save();
 
-    // Field storage with list of string values and allowed values function.
-    $this->stringAllowedValuesFunction = FieldStorageConfig::create([
-      'field_name' => 'string_allowed_values_function',
-      'entity_type' => 'entity_test',
-      'type' => 'list_string',
-      'cardinality' => 1,
-    ]);
-    $this->stringAllowedValuesFunction->save();
-
     // Create a web user.
     $this->drupalLogin($this->drupalCreateUser([
       'view test entity',
@@ -836,9 +827,18 @@ class OptionsWidgetsTest extends FieldTestBase {
    * Tests displaying the allowed values function.
    */
   public function testAllowedValuesFunctionDisplay(): void {
+    // Field storage with list of string values and allowed values function.
+    $field_storage_config = FieldStorageConfig::create([
+      'field_name' => 'string_allowed_values_function',
+      'entity_type' => 'entity_test',
+      'type' => 'list_string',
+      'cardinality' => 1,
+    ]);
+    $field_storage_config->save();
+
     // Create an instance of the 'string value' field.
     $field = FieldConfig::create([
-      'field_storage' => $this->stringAllowedValuesFunction,
+      'field_storage' => $field_storage_config,
       'bundle' => 'entity_test',
       'required' => TRUE,
     ]);
