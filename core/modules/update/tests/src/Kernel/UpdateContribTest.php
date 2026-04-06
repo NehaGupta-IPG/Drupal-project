@@ -966,5 +966,4 @@ class UpdateContribTest extends KernelTestBase implements ServiceModifierInterfa
     }
   }
 
-
 }
