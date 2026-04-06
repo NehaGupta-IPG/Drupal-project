@@ -521,8 +521,8 @@ class DefaultPluginManagerTest extends UnitTestCase {
     };
     $discovery->setDefinition('plugin1', []);
     $discovery->setDefinition('plugin2', []);
-    $property = new \ReflectionProperty($manager, 'discovery');
-    $property->setValue($manager, $discovery);
+    new \ReflectionProperty($manager, 'discovery')
+      ->setValue($manager, $discovery);
     $manager->setCacheBackend($cache_backend, 'the_plugins', ['from_manager']);
     $manager->getDefinitions();
   }
@@ -572,7 +572,6 @@ class TestPluginForm implements PluginFormInterface {
   }
 
 }
-
 
 /**
  * Stub class for plugin definition.
