@@ -97,7 +97,7 @@ class DataType extends Plugin {
    *
    * @var array
    *
-   * @see \Drupal\Core\TypedData\TypedDataManager::getConstraints().
+   * @see \Drupal\Core\TypedData\TypedDataManagerInterface::getDefaultConstraints()
    */
   public $constraints;
 
