@@ -2133,7 +2133,14 @@ function install_check_translations($langcode, $server_pattern): array {
     }
   }
 
-  if ($translations_directory_exists && $readable && $writable && $translation_available) {
+  if (
+    $translations_directory_exists &&
+    $readable &&
+    $writable &&
+    $translation_available &&
+    isset($translation_url) &&
+    isset($language)
+  ) {
     $translation_downloaded = install_retrieve_file($translation_url, $translations_directory);
 
     if (!$translation_downloaded) {
