@@ -696,7 +696,7 @@ class MenuTreeStorage implements MenuTreeStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function loadByRoutes(array $routes, $menu_name = NULL) {
+  public function loadByRoutes(array $routes, ?string $menu_name = NULL): array {
     $query = $this->connection->select($this->table, NULL, $this->options);
     $query->fields($this->table, $this->definitionFields());
     $or_group = $query->orConditionGroup();
