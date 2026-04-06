@@ -16,6 +16,21 @@ namespace Drupal\Tests\update\Functional;
 trait UpdateTestTrait {
 
   /**
+   * Denotes a security update will be required in the test case.
+   */
+  const SECURITY_UPDATE_REQUIRED = 'SECURITY_UPDATE_REQUIRED';
+
+  /**
+   * Denotes an update will be available in the test case.
+   */
+  const UPDATE_AVAILABLE = 'UPDATE_AVAILABLE';
+
+  /**
+   * Denotes no update will be available in the test case.
+   */
+  const UPDATE_NONE = 'UPDATE_NONE';
+
+  /**
    * Sets information about installed extensions.
    *
    * @param array<string, array<string, string|bool>> $installed_extensions
