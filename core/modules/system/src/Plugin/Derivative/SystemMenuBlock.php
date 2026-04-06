@@ -50,13 +50,9 @@ class SystemMenuBlock extends DeriverBase implements ContainerDeriverInterface, 
    * {@inheritdoc}
    */
   public function getCacheTags(): array {
-    return Cache::mergeTags(
-      $this->menuStorage->getEntityType()->getListCacheTags(),
-      ...array_map(
-        fn (MenuInterface $menu): array => $menu->getCacheTags(),
-        $this->menuStorage->loadMultiple(),
-      ),
-    );
+    // The list cache tags always get invalidated when a menu is added, changed
+    // or deleted, so this is the best way to keep the block definitions synced.
+    return $this->menuStorage->getEntityType()->getListCacheTags();
   }
 
   /**
