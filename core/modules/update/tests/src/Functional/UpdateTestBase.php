@@ -88,20 +88,6 @@ abstract class UpdateTestBase extends BrowserTestBase {
   }
 
   /**
-   * Runs a series of assertions that are applicable to all update statuses.
-   */
-  protected function standardTests() {
-    $this->assertSession()->responseContains('<h3>Drupal core</h3>');
-    // Verify that the link to the Drupal project appears.
-    $this->assertSession()->linkExists('Drupal');
-    $this->assertSession()->linkByHrefExists('https://example.com/project/drupal');
-    $this->assertSession()->pageTextNotContains('No available releases found');
-    $this->assertSession()->pageTextContains('Last checked:');
-    // No download URLs should be present.
-    $this->assertSession()->responseNotContains('.tar.gz');
-  }
-
-  /**
    * Confirms messages are correct when a release has been unpublished/revoked.
    *
    * @param string $revoked_version

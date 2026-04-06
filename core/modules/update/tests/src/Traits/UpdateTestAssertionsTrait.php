@@ -31,6 +31,20 @@ trait UpdateTestAssertionsTrait {
   }
 
   /**
+   * Runs a series of assertions that are applicable to all update statuses.
+   */
+  protected function standardTests(): void {
+    $this->assertSession()->responseContains('<h3>Drupal core</h3>');
+    // Verify that the link to the Drupal project appears.
+    $this->assertSession()->linkExists('Drupal');
+    $this->assertSession()->linkByHrefExists('https://example.com/project/drupal');
+    $this->assertSession()->pageTextNotContains('No available releases found');
+    $this->assertSession()->pageTextContains('Last checked:');
+    // No download URLs should be present.
+    $this->assertSession()->responseNotContains('.tar.gz');
+  }
+
+  /**
    * Asserts that a core compatibility message is correct for an update.
    *
    * @param string $version
