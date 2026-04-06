@@ -49,7 +49,7 @@ class BlockManager extends DefaultPluginManager implements BlockManagerInterface
     parent::__construct('Plugin/Block', $namespaces, $module_handler, BlockPluginInterface::class, Block::class, 'Drupal\Core\Block\Annotation\Block');
 
     $this->alterInfo($this->getType());
-    $this->setCacheBackend($cache_backend, 'block_plugins');
+    $this->setCacheBackend($cache_backend, 'block_plugins', ['block_plugins']);
     $this->logger = $logger;
   }
 
