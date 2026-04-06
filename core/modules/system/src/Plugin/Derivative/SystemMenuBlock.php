@@ -3,6 +3,8 @@
 namespace Drupal\system\Plugin\Derivative;
 
 use Drupal\Component\Plugin\Derivative\DeriverBase;
+use Drupal\Core\Cache\CacheableDependencyInterface;
+use Drupal\Core\Cache\CacheableDependencyTrait;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Plugin\Discovery\ContainerDeriverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -12,7 +14,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @see \Drupal\system\Plugin\Block\SystemMenuBlock
  */
-class SystemMenuBlock extends DeriverBase implements ContainerDeriverInterface {
+class SystemMenuBlock extends DeriverBase implements ContainerDeriverInterface, CacheableDependencyInterface {
+
+  use CacheableDependencyTrait;
 
   /**
    * The menu storage.
@@ -38,6 +42,13 @@ class SystemMenuBlock extends DeriverBase implements ContainerDeriverInterface {
     return new static(
       $container->get('entity_type.manager')->getStorage('menu')
     );
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags(): array {
+    return $this->menuStorage->getEntityType()->getListCacheTags();
   }
 
   /**
