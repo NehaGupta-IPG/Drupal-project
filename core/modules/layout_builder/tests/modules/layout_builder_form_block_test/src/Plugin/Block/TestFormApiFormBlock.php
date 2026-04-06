@@ -39,7 +39,7 @@ class TestFormApiFormBlock extends BlockBase implements ContainerFactoryPluginIn
    *   values keyed by context names.
    * @param string $plugin_id
    *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
+   * @param \Drupal\Component\Plugin\Definition\PluginDefinitionInterface|mixed[] $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
    *   The form builder service.

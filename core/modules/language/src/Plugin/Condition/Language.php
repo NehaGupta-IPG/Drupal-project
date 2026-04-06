@@ -46,7 +46,7 @@ class Language extends ConditionPluginBase implements ContainerFactoryPluginInte
    *   values keyed by context names.
    * @param string $plugin_id
    *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
+   * @param \Drupal\Component\Plugin\Definition\PluginDefinitionInterface|mixed[] $plugin_definition
    *   The plugin implementation definition.
    */
   public function __construct(LanguageManagerInterface $language_manager, array $configuration, $plugin_id, $plugin_definition) {

@@ -101,7 +101,7 @@ class ConfigNamesMapper extends PluginBase implements ConfigMapperInterface, Con
    *
    * @param string $plugin_id
    *   The config mapper plugin ID.
-   * @param mixed $plugin_definition
+   * @param \Drupal\Component\Plugin\Definition\PluginDefinitionInterface|mixed[] $plugin_definition
    *   An array of plugin information with the following keys:
    *   - title: The title of the mapper, used for generating page titles.
    *   - base_route_name: The route name of the base route this mapper is

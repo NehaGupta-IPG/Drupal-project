@@ -27,7 +27,7 @@ class CurrentUser extends ArgumentDefaultPluginBase implements CacheableDependen
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
    *   The plugin_id for the plugin instance.
-   * @param mixed $plugin_definition
+   * @param \Drupal\Component\Plugin\Definition\PluginDefinitionInterface|mixed[] $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Session\AccountInterface $currentUser
    *   The current user.

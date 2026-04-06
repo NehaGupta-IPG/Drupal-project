@@ -58,7 +58,7 @@ class ModerationStateWidget extends OptionsSelectWidget {
    *
    * @param string $plugin_id
    *   Plugin id.
-   * @param mixed $plugin_definition
+   * @param \Drupal\Component\Plugin\Definition\PluginDefinitionInterface|mixed[] $plugin_definition
    *   Plugin definition.
    * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
    *   Field definition.

@@ -40,7 +40,7 @@ class EntityExists extends ProcessPluginBase implements ContainerFactoryPluginIn
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
    *   The plugin ID.
-   * @param mixed $plugin_definition
+   * @param \Drupal\Component\Plugin\Definition\PluginDefinitionInterface|mixed[] $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Entity\EntityStorageInterface $storage
    *   The entity storage.

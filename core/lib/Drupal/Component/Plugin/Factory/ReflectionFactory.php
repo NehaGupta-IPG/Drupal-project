@@ -41,7 +41,7 @@ class ReflectionFactory extends DefaultFactory {
    *   The reflector object being used to inspect the plugin class.
    * @param string $plugin_id
    *   The identifier of the plugin implementation.
-   * @param mixed $plugin_definition
+   * @param \Drupal\Component\Plugin\Definition\PluginDefinitionInterface|mixed[] $plugin_definition
    *   The definition associated with the plugin ID.
    * @param array $configuration
    *   An array of configuration that may be passed to the instance.
