@@ -86,8 +86,8 @@ class InstallerDownloadTranslationMockedTest extends BrowserTestBase {
   public function testInstallTranslationDownload(
     bool $has_local_translation,
     bool $download_translation,
-    int  $expected_head_requests,
-    int  $expected_get_requests,
+    int $expected_head_requests,
+    int $expected_get_requests,
     bool $expected_translation_file_exists,
   ): void {
     $this->assertSame($expected_head_requests, MockTranslationServerMiddleware::getHeadRequestCount());
