@@ -83,7 +83,7 @@ class ComponentPluginManager extends DefaultPluginManager implements Categorizin
     // like LinkRelationTypeManager.
     $this->moduleHandler = $module_handler;
     $this->factory = new ContainerFactory($this);
-    $this->setCacheBackend($cacheBackend, 'component_plugins');
+    $this->setCacheBackend($cacheBackend, 'component_plugins', ['component_plugins']);
     // Note that we are intentionally skipping
     // $this->alterInfo('component_info'); We want to ensure that everything
     // related to a component is in the single directory. If the alteration of a
