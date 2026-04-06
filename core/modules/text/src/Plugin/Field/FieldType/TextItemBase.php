@@ -108,7 +108,16 @@ abstract class TextItemBase extends FieldItemBase {
    */
   public function isEmpty() {
     $value = $this->get('value')->getValue();
-    return $value === NULL || $value === '';
+    // If there's a text value, it's not empty.
+    if ($value !== NULL && $value !== '') {
+      return FALSE;
+    }
+    // If a format is explicitly set, consider it not empty.
+    $format = $this->get('format')->getValue();
+    if ($format !== NULL && $format !== '') {
+      return FALSE;
+    }
+    return TRUE;
   }
 
   /**

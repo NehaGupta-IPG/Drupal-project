@@ -407,4 +407,61 @@ class TextFieldTest extends StringFieldTest {
     $this->assertStringContainsString($value, (string) $rendered_entity);
   }
 
+  /**
+   * Tests setting the default value.
+   */
+  public function testDefaultValue(): void {
+    // Create one text format.
+    $format1 = FilterFormat::create([
+      'format' => $this->randomMachineName(),
+      'name' => $this->randomMachineName(),
+      'weight' => 0,
+    ]);
+    $format1->save();
+
+    // Create a second text format.
+    $format2 = FilterFormat::create([
+      'format' => $this->randomMachineName(),
+      'name' => $this->randomMachineName(),
+      'weight' => 1,
+    ]);
+    $format2->save();
+
+    $roles = $this->webUser->getRoles();
+    $rid = $roles[0];
+    user_role_grant_permissions($rid, [
+      $format1->getPermissionName(),
+      $format2->getPermissionName(),
+    ]);
+
+    $field_name = $this->randomMachineName();
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'entity_test',
+      'type' => 'text_long',
+    ]);
+    $field_storage->save();
+    $field = FieldConfig::create([
+      'field_storage' => $field_storage,
+      'bundle' => 'entity_test',
+      'label' => $this->randomMachineName() . '_label',
+      'settings' => ['allowed_formats' => []],
+    ]);
+    $field->save();
+
+    /** @var \Drupal\Core\Entity\EntityDisplayRepositoryInterface $entity_display_repository */
+    $entity_display_repository = $this->container->get('entity_display.repository');
+    $entity_display_repository->getFormDisplay('entity_test', 'entity_test', 'default')
+      ->setComponent($field_name, [
+        'type' => 'text_textarea',
+      ])
+      ->save();
+
+    $field->setDefaultValue([['value' => '', 'format' => $format2->id()]])->save();
+
+    $this->drupalLogin($this->webUser);
+    $this->drupalGet('entity_test/add');
+    $this->assertTrue($this->assertSession()->optionExists("{$field_name}[0][format]", $format2->id())->isSelected());
+  }
+
 }
