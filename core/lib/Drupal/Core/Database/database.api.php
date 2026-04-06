@@ -472,19 +472,38 @@ use Drupal\Core\Database\Query\SelectInterface;
  * Structured (aka dynamic) queries that have tags associated may be altered by
  * any module before the query is executed.
  *
+ * Note that the $query parameter is typed as AlterableInterface because both
+ * database SELECT queries (SelectInterface) and entity queries
+ * (Entity\Query\QueryInterface) pass through this hook. AlterableInterface
+ * only guarantees tag and metadata introspection methods. To perform actual
+ * query alterations such as adding conditions, joins, or range limits, check
+ * the type of the query object before acting:
+ *
+ * @code
+ * if ($query instanceof \Drupal\Core\Database\Query\SelectInterface) {
+ *   // Safe to call SelectInterface methods, e.g. addJoin(), condition(), etc.
+ * }
+ * @endcode
+ *
  * @param \Drupal\Core\Database\Query\AlterableInterface $query
- *   A Query object describing the composite parts of a SQL query.
+ *   A query object describing the composite parts of a query. In practice
+ *   this will be a \Drupal\Core\Database\Query\SelectInterface for database
+ *   queries or a \Drupal\Core\Entity\Query\QueryInterface for entity queries.
  *
  * @see hook_query_TAG_alter()
  * @see node_query_node_access_alter()
- * @see AlterableInterface
- * @see SelectInterface
+ * @see \Drupal\Core\Database\Query\AlterableInterface
+ * @see \Drupal\Core\Database\Query\SelectInterface
+ * @see \Drupal\Core\Entity\Query\QueryInterface
  *
  * @ingroup database
  */
 function hook_query_alter(Drupal\Core\Database\Query\AlterableInterface $query) {
   if ($query->hasTag('micro_limit')) {
-    $query->range(0, 2);
+    // Check the query type before calling methods not on AlterableInterface.
+    if ($query instanceof \Drupal\Core\Database\Query\SelectInterface) {
+      $query->range(0, 2);
+    }
   }
 }
 
