@@ -117,6 +117,12 @@ class EmailManager extends DefaultPluginManager {
     if (empty($definition['module'])) {
       $definition['module'] = $definition['provider'];
     }
+
+    if (empty($definition['key'])) {
+      $definition['key'] = str_contains($definition['id'], '.')
+        ? substr($definition['id'], strpos($definition['id'], '.') + 1)
+        : $definition['id'];
+    }
   }
 
   protected function build(EmailPluginInterface $email): Email {
