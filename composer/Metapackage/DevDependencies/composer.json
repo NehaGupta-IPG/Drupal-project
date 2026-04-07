@@ -30,7 +30,7 @@
         "phpstan/extension-installer": "^1.4.3",
         "phpstan/phpstan": "^2.1.42",
         "phpstan/phpstan-phpunit": "^2.0.16",
-        "phpunit/phpunit": "^12.5.14 || ^13.0.5",
+        "phpunit/phpunit": "^12.5.14 || ^13.1",
         "spaze/phpstan-disallowed-calls": "^4.9.0",
         "symfony/browser-kit": "^8.0",
         "symfony/css-selector": "^8.0",
