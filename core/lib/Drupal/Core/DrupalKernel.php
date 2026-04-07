@@ -6,9 +6,7 @@ use Composer\Autoload\ClassLoader;
 use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Component\EventDispatcher\Event;
 use Drupal\Component\FileCache\FileCacheFactory;
-use Drupal\Component\Serialization\PhpSerialize;
 use Drupal\Component\Utility\UrlHelper;
-use Drupal\Core\Cache\DatabaseBackend;
 use Drupal\Core\ClassLoader\BackwardsCompatibilityClassLoader;
 use Drupal\Core\Config\BootstrapConfigStorageFactory;
 use Drupal\Core\Config\NullStorage;
@@ -58,58 +56,6 @@ use Symfony\Component\HttpKernel\TerminableInterface;
  */
 class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   use InstallerRedirectTrait;
-
-  /**
-   * Holds the class used for dumping the container to a PHP array.
-   *
-   * In combination with swapping the container class this is useful to e.g.
-   * dump to the human-readable PHP array format to debug the container
-   * definition in an easier way.
-   *
-   * @var string
-   */
-  protected $phpArrayDumperClass = '\Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper';
-
-  /**
-   * Holds the default bootstrap container definition.
-   *
-   * @var array
-   */
-  protected $defaultBootstrapContainerDefinition = [
-    'parameters' => [],
-    'services' => [
-      'database' => [
-        'class' => 'Drupal\Core\Database\Connection',
-        'factory' => 'Drupal\Core\Database\Database::getConnection',
-        'arguments' => ['default'],
-      ],
-      'request_stack' => [
-        'class' => 'Symfony\Component\HttpFoundation\RequestStack',
-      ],
-      'datetime.time' => [
-        'class' => 'Drupal\Component\Datetime\Time',
-        'arguments' => ['@request_stack'],
-      ],
-      'cache.container' => [
-        'class' => 'Drupal\Core\Cache\DatabaseBackend',
-        'arguments' => [
-          '@database',
-          '@cache_tags_provider.container',
-          'container',
-          '@serialization.phpserialize',
-          '@datetime.time',
-          DatabaseBackend::MAXIMUM_NONE,
-        ],
-      ],
-      'cache_tags_provider.container' => [
-        'class' => 'Drupal\Core\Cache\DatabaseCacheTagsChecksum',
-        'arguments' => ['@database'],
-      ],
-      'serialization.phpserialize' => [
-        'class' => PhpSerialize::class,
-      ],
-    ],
-  ];
 
   /**
    * Holds the class used for instantiating the bootstrap container.
@@ -568,19 +514,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   public function getContainer() {
     return $this->container;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getCachedContainerDefinition() {
-    $cache = $this->bootstrapContainer->get('cache.container')->get($this->getContainerCacheKey());
-
-    if ($cache) {
-      return $cache->data;
-    }
-
-    return NULL;
   }
 
   /**
@@ -1659,30 +1592,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   protected function getContainerBuilder() {
     return new ContainerBuilder(new ParameterBag($this->getKernelParameters()));
-  }
-
-  /**
-   * Stores the container definition in a cache.
-   *
-   * @param array $container_definition
-   *   The container definition to cache.
-   *
-   * @return bool
-   *   TRUE if the container was successfully cached.
-   */
-  protected function cacheDrupalContainer(array $container_definition) {
-    $saved = TRUE;
-    try {
-      $this->bootstrapContainer->get('cache.container')->set($this->getContainerCacheKey(), $container_definition);
-    }
-    catch (\Exception) {
-      // There is no way to get from the Cache API if the cache set was
-      // successful or not, hence an Exception is caught and the caller informed
-      // about the error condition.
-      $saved = FALSE;
-    }
-
-    return $saved;
   }
 
   /**
