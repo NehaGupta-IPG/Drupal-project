@@ -36,7 +36,7 @@ use Drupal\Component\Utility\Html as HtmlUtility;
  *     - The children of each row represent column cells and must be render
  *        arrays (for example, form or render elements).
  *     - Cell attributes can be applied using each cell element's
- *       #wrapper_attributes property, which are rendered on the <td> 
+ *       #wrapper_attributes property, which are rendered on the <td>
  *       element.
  *     - Row-level attributes can be applied using #attributes on the row
  *       <tr> element.
