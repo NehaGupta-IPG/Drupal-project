@@ -1020,18 +1020,20 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     }
 
     $container = NULL;
-    $containerClass = 'DrupalContainer_' . substr(hash('sha256', $this->getContainerCacheKey()), 0, 32);
 
     // If the module list hasn't already been set in updateModules and we are
-    // not forcing a rebuild, then try and load the container from disk.
+    // not forcing a rebuild, then try and load the container from storage.
     if ($this->allowDumping) {
-      $filename = $containerClass . '.php';
+      $cacheKey = $this->getContainerCacheKey();
+      $containerClass = 'DrupalContainer_' . hash('xxh128', $cacheKey);
       $phpStorage = PhpStorageFactory::get('service_container');
 
       if (empty($this->moduleList) && !$this->containerNeedsRebuild) {
-        $phpStorage->load($filename);
-        if (class_exists($containerClass, FALSE)) {
-          $container = new $containerClass();
+        if ($hash = $this->bootstrapContainer->get('cache.container')->get($cacheKey)?->data) {
+          $phpStorage->load($containerClass . '.php');
+          if (class_exists($containerClass, FALSE) && $containerClass::CONTAINER_HASH === $hash) {
+            $container = new $containerClass();
+          }
         }
       }
     }
@@ -1052,16 +1054,21 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
           'base_class' => 'Container',
         ]);
 
-        $phpStorage->save($filename, $code);
-        $phpStorage->load($filename);
+        // Store a hash of the container for invalidation.
+        $hash = hash('xxh128', $code);
+        $code = str_replace(
+          "class $containerClass extends Container\n{",
+          "class $containerClass extends Container\n{\n    public const CONTAINER_HASH = '$hash';",
+          $code,
+        );
+
+        $phpStorage->save($containerClass . '.php', $code);
+        $phpStorage->load($containerClass . '.php');
         if (class_exists($containerClass, FALSE)) {
           $container = new $containerClass();
         }
 
-        // Store a sentinel in the database so other servers can detect when
-        // the container has been rebuilt.
-        $this->bootstrapContainer->get('cache.container')
-          ->set($this->getContainerCacheKey(), TRUE);
+        $this->bootstrapContainer->get('cache.container')->set($cacheKey, $hash);
       }
     }
 
@@ -1444,7 +1451,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       return;
     }
 
-    // Also remove the sentinel from the database cache backend.
+    // Delete the timestamp to force a recompile on next request.
     $this->bootstrapContainer->get('cache.container')->deleteAll();
   }
 
