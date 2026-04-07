@@ -86,7 +86,7 @@ abstract class OptionsWidgetBase extends WidgetBase {
         }
       }
 
-      if (isset($entity)) {
+      if (!empty($entity)) {
         $storage = $form_state->getStorage();
         $parent_group = (isset($storage['group'])) ? $storage['group'] : NULL;
         $entity_data = [

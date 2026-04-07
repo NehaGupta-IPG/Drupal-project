@@ -195,9 +195,9 @@ class EntityAutocomplete extends Textfield {
         }
       }
 
-      if (isset($entity)) {
+      if (!empty($entity)) {
         $storage = $form_state->getStorage();
-        $parent_group = (isset($storage['group'])) ? $storage['group'] : NULL;
+        $parent_group = $storage['group'] ?? NULL;
         $selection_settings['entity_info'] = [
           'type' => $entity->getEntityTypeId(),
           'id' => $entity->id(),
@@ -231,9 +231,9 @@ class EntityAutocomplete extends Textfield {
         }
       }
 
-      if (isset($entity)) {
+      if (!empty($entity)) {
         $storage = $form_state->getStorage();
-        $parent_group = (isset($storage['group'])) ? $storage['group'] : NULL;
+        $parent_group = $storage['group'] ?? NULL;
         $selection_settings['entity_info'] = [
           'type' => $entity->getEntityTypeId(),
           'id' => $entity->id(),
