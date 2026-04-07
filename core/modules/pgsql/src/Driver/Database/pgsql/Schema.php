@@ -688,7 +688,7 @@ EOD;
         ->execute();
     }
     if ($fix_null) {
-      $this->executeDdlStatement("ALTER TABLE {" . $table . "} ALTER $field SET NOT NULL");
+      $this->executeDdlStatement('ALTER TABLE {' . $table . '} ALTER COLUMN ' . $this->connection->escapeField($field) . ' SET NOT NULL');
     }
     if (isset($new_keys)) {
       // Make sure to drop the existing primary key before adding a new one.
