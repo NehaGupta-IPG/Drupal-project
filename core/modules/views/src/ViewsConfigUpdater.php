@@ -506,19 +506,16 @@ class ViewsConfigUpdater {
    */
   public function addGroupingLabelElement(array &$handler, string $handler_type, ViewEntityInterface $view): bool {
     $changed = FALSE;
-
-    // For each existing view display add the grouping label element.
-    $displays = $view->get('display');
-    foreach ($displays as $display) {
-      $display->get($handler_type);
-      if (($handler_type === 'style')
-        && isset($handler['plugin_id'], $handler['type'])
-        && $handler['plugin_id'] === 'style'
-        && ($handler['type'] === 'Grid' || $handler['type'] === 'HtmlList' || $handler['type'] === 'GridResponsive' || $handler['type'] === 'DefaultStyle')
-        && !isset($handler['style']['grouping_label_element'])) {
-        $handler['style']['grouping_label_element'] = NULL;
-        $changed = TRUE;
-      }
+    // Only add grouping_label_element if this is a style handler of the correct type and it is missing.
+    if (
+      $handler_type === 'style'
+      && isset($handler['plugin_id'], $handler['type'])
+      && $handler['plugin_id'] === 'style'
+      && in_array($handler['type'], ['Grid', 'HtmlList', 'GridResponsive', 'DefaultStyle'], true)
+      && (!isset($handler['style']['grouping_label_element']))
+    ) {
+      $handler['style']['grouping_label_element'] = NULL;
+      $changed = TRUE;
     }
 
     return $changed;
