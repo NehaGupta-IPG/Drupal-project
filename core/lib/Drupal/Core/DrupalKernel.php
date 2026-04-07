@@ -1029,7 +1029,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $phpStorage = PhpStorageFactory::get('service_container');
 
       if (empty($this->moduleList) && !$this->containerNeedsRebuild) {
-        if ($hash = $this->bootstrapContainer->get('cache.container')->get($cacheKey)?->data) {
+        $sentinel = $this->bootstrapContainer->get('cache.container')->get($cacheKey);
+        if ($sentinel && $hash = $sentinel->data) {
           $phpStorage->load($containerClass . '.php');
           if (class_exists($containerClass, FALSE) && $containerClass::CONTAINER_HASH === $hash) {
             $container = new $containerClass();
@@ -1068,7 +1069,12 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
           $container = new $containerClass();
         }
 
-        $this->bootstrapContainer->get('cache.container')->set($cacheKey, $hash);
+        try {
+          $this->bootstrapContainer->get('cache.container')->set($cacheKey, $hash);
+        }
+        catch (\Exception) {
+          // The cache table may not exist yet (e.g., during install).
+        }
       }
     }
 
