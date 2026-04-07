@@ -1026,7 +1026,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // not forcing a rebuild, then try and load the container from storage.
     if ($this->allowDumping) {
       $cacheKey = $this->getContainerCacheKey();
-      $containerClass = 'DrupalContainer_' . hash('xxh128', $cacheKey);
       try {
         $phpStorage = PhpStorageFactory::get('service_container');
       }
@@ -1038,8 +1037,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       if (isset($phpStorage) && empty($this->moduleList) && !$this->containerNeedsRebuild) {
         $sentinel = $this->bootstrapContainer->get('cache.container')->get($cacheKey);
         if ($sentinel && $hash = $sentinel->data) {
-          $phpStorage->load($containerClass . '.php');
-          if (class_exists($containerClass, FALSE) && $containerClass::CONTAINER_HASH === $hash) {
+          $containerClass = 'DrupalContainer_' . $hash;
+          if (!class_exists($containerClass, FALSE)) {
+            $phpStorage->load($containerClass . '.php');
+          }
+          if (class_exists($containerClass, FALSE)) {
             $container = new $containerClass();
           }
         }
@@ -1058,26 +1060,24 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
         $dumper = new PhpDumper($container);
         $code = $dumper->dump([
-          'class' => $containerClass,
+          'class' => 'DrupalContainer',
           'base_class' => DumpedContainer::class,
         ]);
-
-        // Store a hash of the container for invalidation.
         $hash = hash('xxh128', $code);
-        $code = str_replace(
-          "class $containerClass extends \\" . DumpedContainer::class . "\n{",
-          "class $containerClass extends \\" . DumpedContainer::class . "\n{\n    public const CONTAINER_HASH = '$hash';",
-          $code,
-        );
+        $containerClass = 'DrupalContainer_' . $hash;
+        $filename = $containerClass . '.php';
 
-        $phpStorage->save($containerClass . '.php', $code);
-
-        // Only load the container if the class isn't already defined. During
-        // module install the same container may be built multiple times.
         if (!class_exists($containerClass, FALSE)) {
-          $phpStorage->load($containerClass . '.php');
-          $container = new $containerClass();
+          $code = str_replace(
+            "class DrupalContainer extends \\" . DumpedContainer::class . "\n{",
+            "class $containerClass extends \\" . DumpedContainer::class . "\n{",
+            $code,
+          );
+          $phpStorage->save($filename, $code);
+          $phpStorage->load($filename);
         }
+
+        $container = new $containerClass();
 
         try {
           $this->bootstrapContainer->get('cache.container')->set($cacheKey, $hash);
