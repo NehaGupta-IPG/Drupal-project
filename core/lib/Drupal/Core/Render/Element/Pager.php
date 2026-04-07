@@ -20,9 +20,7 @@ use Drupal\Core\Render\Attribute\RenderElement;
  *   append to the pager.
  * - #quantity: The maximum number of numbered page links to create (defaults
  *   to 9).
- * - #tags: (optional) An array of labels for the controls in the pages. Array
- *   keys 0, 1, 2, 3, 4 correspond to "first", "previous", "page numbers",
- *   "next", and "last" controls respectively.
+ * - #tags: (optional) An array of labels for the controls in the pages.
  * - #route_name: (optional) The name of the route to use for pager links.
  *   Defaults to '<none>', which generates links using the current route. Must
  *   be provided together with #route_parameters if a non-current route is
