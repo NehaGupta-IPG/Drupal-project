@@ -19,6 +19,7 @@ use Drupal\Core\Utility\Token;
 use Drupal\views\Render\ViewsRenderPipelineMarkup;
 use Drupal\views\Views;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Plugin implementation of the 'selection' entity_reference.

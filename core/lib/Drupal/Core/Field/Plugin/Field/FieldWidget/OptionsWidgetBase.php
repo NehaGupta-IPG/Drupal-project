@@ -73,7 +73,7 @@ abstract class OptionsWidgetBase extends WidgetBase {
     // Put entity into settings.
     $form_object = $form_state->getFormObject();
     if ($form_object instanceof EntityForm) {
-      $entity = $form_object->getEntity();
+      $entity = $form_object->getEntity() ;
 
       // $complete_form['order_items']['widget']['entities'][0]['form']['inline_entity_form']['field_licensed_used_by']['widget'][0]['target_id']
       $ref = $form;
@@ -86,7 +86,7 @@ abstract class OptionsWidgetBase extends WidgetBase {
         }
       }
 
-      if (!empty($entity)) {
+      if ($entity !== NULL) {
         $storage = $form_state->getStorage();
         $parent_group = (isset($storage['group'])) ? $storage['group'] : NULL;
         $entity_data = [

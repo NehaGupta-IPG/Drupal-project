@@ -185,7 +185,7 @@ class EntityAutocomplete extends Textfield {
     $form_object = $form_state->getFormObject();
 
     if ($form_object instanceof EntityForm) {
-      $entity = $form_object->getEntity();
+      $entity = $form_object->getEntity() ?? NULL;
 
       $ref = $complete_form;
       foreach ($element['#array_parents'] as $parent_key) {
@@ -195,7 +195,7 @@ class EntityAutocomplete extends Textfield {
         }
       }
 
-      if (!empty($entity)) {
+      if ($entity !== NULL) {
         $storage = $form_state->getStorage();
         $parent_group = $storage['group'] ?? NULL;
         $selection_settings['entity_info'] = [
@@ -231,7 +231,7 @@ class EntityAutocomplete extends Textfield {
         }
       }
 
-      if (!empty($entity)) {
+      if ($entity !== NULL) {
         $storage = $form_state->getStorage();
         $parent_group = $storage['group'] ?? NULL;
         $selection_settings['entity_info'] = [
