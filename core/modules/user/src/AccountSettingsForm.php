@@ -175,6 +175,9 @@ class AccountSettingsForm extends ConfigFormBase {
     ];
     // These email tokens are shared for all settings, so just define
     // the list once to help ensure they stay in sync.
+    // This help text is shared for all email body fields.
+    $email_body_help = $this->t('If the body is left empty, this email will not be sent.');
+
     $email_token_help = $this->t('Available variables are: [site:name], [site:url], [user:display-name], [user:account-name], [user:mail], [site:login-url], [site:url-brief], [user:edit-url], [user:one-time-login-url], [user:cancel-url].');
 
     $form['email_admin_created'] = [
@@ -196,6 +199,7 @@ class AccountSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Body'),
       '#config_target' => 'user.mail:register_admin_created.body',
       '#rows' => 15,
+      '#description' => $email_body_help,
     ];
 
     $form['email_pending_approval'] = [
@@ -217,6 +221,7 @@ class AccountSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Body'),
       '#config_target' => 'user.mail:register_pending_approval.body',
       '#rows' => 8,
+      '#description' => $email_body_help,
     ];
 
     $form['email_pending_approval_admin'] = [
@@ -238,6 +243,7 @@ class AccountSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Body'),
       '#config_target' => 'user.mail:register_pending_approval_admin.body',
       '#rows' => 8,
+      '#description' => $email_body_help,
     ];
 
     $form['email_no_approval_required'] = [
@@ -259,6 +265,7 @@ class AccountSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Body'),
       '#config_target' => 'user.mail:register_no_approval_required.body',
       '#rows' => 15,
+      '#description' => $email_body_help,
     ];
 
     $form['email_password_reset'] = [
@@ -280,6 +287,7 @@ class AccountSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Body'),
       '#config_target' => 'user.mail:password_reset.body',
       '#rows' => 12,
+      '#description' => $email_body_help,
     ];
 
     $form['email_activated'] = [
@@ -318,6 +326,7 @@ class AccountSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Body'),
       '#config_target' => 'user.mail:status_activated.body',
       '#rows' => 15,
+      '#description' => $email_body_help,
     ];
 
     $form['email_blocked'] = [
@@ -356,6 +365,7 @@ class AccountSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Body'),
       '#config_target' => 'user.mail:status_blocked.body',
       '#rows' => 3,
+      '#description' => $email_body_help,
     ];
 
     $form['email_cancel_confirm'] = [
@@ -376,6 +386,7 @@ class AccountSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Body'),
       '#config_target' => 'user.mail:cancel_confirm.body',
       '#rows' => 3,
+      '#description' => $email_body_help,
     ];
 
     $form['email_canceled'] = [
@@ -414,6 +425,7 @@ class AccountSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Body'),
       '#config_target' => 'user.mail:status_canceled.body',
       '#rows' => 3,
+      '#description' => $email_body_help,
     ];
 
     return $form;
