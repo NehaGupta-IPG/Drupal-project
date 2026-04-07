@@ -13,6 +13,7 @@ use Drupal\Core\ClassLoader\BackwardsCompatibilityClassLoader;
 use Drupal\Core\Config\BootstrapConfigStorageFactory;
 use Drupal\Core\Config\NullStorage;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\DependencyInjection\Dumper\FileLoaderStub;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
 use Drupal\Core\DependencyInjection\YamlFileLoader;
@@ -27,7 +28,9 @@ use Drupal\Core\Security\RequestSanitizer;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Test\TestDatabase;
 use Drupal\DrupalInstalled;
+use Drupal\Core\PhpStorage\PhpStorageFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -1025,38 +1028,51 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $source_storage = $this->container->get('config.installer')->getSourceStorage();
     }
 
+    $container = NULL;
+    $containerClass = 'DrupalContainer_' . substr(hash('sha256', $this->getContainerCacheKey()), 0, 32);
+
     // If the module list hasn't already been set in updateModules and we are
-    // not forcing a rebuild, then try and load the container from the cache.
-    if (empty($this->moduleList) && !$this->containerNeedsRebuild) {
-      $container_definition = $this->getCachedContainerDefinition();
+    // not forcing a rebuild, then try and load the container from disk.
+    if ($this->allowDumping) {
+      $filename = $containerClass . '.php';
+      $phpStorage = PhpStorageFactory::get('service_container');
+
+      if (empty($this->moduleList) && !$this->containerNeedsRebuild) {
+        $phpStorage->load($filename);
+        if (class_exists($containerClass, FALSE)) {
+          $container = new $containerClass();
+        }
+      }
     }
 
-    // If there is no cached container definition, build a new container from
-    // scratch.
-    if (!isset($container_definition)) {
+    // If no compiled container was loaded, build a new one from scratch.
+    if (!$container) {
       $container = $this->compileContainer();
 
-      // Only dump the container if dumping is allowed. This is useful for
-      // KernelTestBase, which never wants to use the real container, but always
-      // the container builder.
       if ($this->allowDumping) {
-        $dumper = new $this->phpArrayDumperClass($container);
-        $container_definition = $dumper->getArray();
+        // Ensure FileLoader::ANONYMOUS_ID_REGEXP is available for PhpDumper.
+        if (!class_exists('Symfony\Component\DependencyInjection\Loader\FileLoader', FALSE)) {
+          class_alias(FileLoaderStub::class, 'Symfony\Component\DependencyInjection\Loader\FileLoader');
+        }
+
+        $dumper = new PhpDumper($container);
+        $code = $dumper->dump([
+          'class' => $containerClass,
+          'base_class' => 'Container',
+        ]);
+
+        $phpStorage->save($filename, $code);
+        $phpStorage->load($filename);
+        if (class_exists($containerClass, FALSE)) {
+          $container = new $containerClass();
+        }
+
+        $this->containerNeedsDumping = TRUE;
       }
     }
 
     // The container was rebuilt successfully.
     $this->containerNeedsRebuild = FALSE;
-
-    // Only create a new class if we have a container definition.
-    if (isset($container_definition)) {
-      // Drupal provides two dynamic parameters to access specific paths that
-      // are determined from the request.
-      $container_definition['parameters']['app.root'] = $this->getAppRoot();
-      $container_definition['parameters']['site.path'] = $this->getSitePath();
-      $class = Settings::get('container_base_class', '\Drupal\Core\DependencyInjection\Container');
-      $container = new $class($container_definition);
-    }
 
     $this->attachSynthetic($container);
 
@@ -1107,9 +1123,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       $this->container->get('event_dispatcher')->dispatch(new Event(), self::CONTAINER_INITIALIZE_SUBREQUEST_FINISHED);
     }
 
-    // If needs dumping flag was set, dump the container.
-    if ($this->containerNeedsDumping && !$this->cacheDrupalContainer($container_definition)) {
-      $this->container->get('logger.factory')->get('DrupalKernel')->error('Container cannot be saved to cache.');
+    // If the container was freshly compiled, store a sentinel in the database
+    // cache. This is used for cross-server invalidation detection, not for
+    // storing the container itself.
+    if ($this->containerNeedsDumping) {
+      $this->bootstrapContainer->get('cache.container')->set($this->getContainerCacheKey(), ['class' => $containerClass]);
     }
 
     // Override of Symfony's MIME type guesser singleton.
@@ -1429,6 +1447,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // An invalidated container needs a rebuild.
     $this->containerNeedsRebuild = TRUE;
 
+    // Delete compiled container PHP files from PhpStorage.
+    PhpStorageFactory::get('service_container')->deleteAll();
+
     // If we have not yet booted, settings or bootstrap services might not yet
     // be available. In that case the container will not be loaded from cache
     // due to the above setting when the Kernel is booted.
@@ -1436,7 +1457,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       return;
     }
 
-    // Also remove the container definition from the cache backend.
+    // Also remove the sentinel from the database cache backend.
     $this->bootstrapContainer->get('cache.container')->deleteAll();
   }
 
