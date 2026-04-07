@@ -1058,10 +1058,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
           class_alias(FileLoaderStub::class, 'Symfony\Component\DependencyInjection\Loader\FileLoader');
         }
 
+        $baseClass = ltrim(Settings::get('container_base_class', DumpedContainer::class), '\\');
         $dumper = new PhpDumper($container);
         $code = $dumper->dump([
           'class' => 'DrupalContainer',
-          'base_class' => DumpedContainer::class,
+          'base_class' => $baseClass,
         ]);
         $hash = hash('xxh128', $code);
         $containerClass = 'DrupalContainer_' . $hash;
@@ -1069,8 +1070,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
         if (!class_exists($containerClass, FALSE)) {
           $code = str_replace(
-            "class DrupalContainer extends \\" . DumpedContainer::class . "\n{",
-            "class $containerClass extends \\" . DumpedContainer::class . "\n{",
+            "class DrupalContainer extends \\$baseClass\n{",
+            "class $containerClass extends \\$baseClass\n{",
             $code,
           );
           $phpStorage->save($filename, $code);

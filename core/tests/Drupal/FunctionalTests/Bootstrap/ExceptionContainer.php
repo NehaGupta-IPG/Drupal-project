@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Bootstrap;
 
-use Drupal\Core\DependencyInjection\Container;
+use Drupal\Core\DependencyInjection\DumpedContainer;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Base container which throws an exception.
  */
-class ExceptionContainer extends Container {
+class ExceptionContainer extends DumpedContainer {
 
   /**
    * {@inheritdoc}
