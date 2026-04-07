@@ -1039,7 +1039,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         $sentinel = $this->bootstrapContainer->get('cache.container')->get($cacheKey);
         if ($sentinel && $hash = $sentinel->data) {
           $phpStorage->load($containerClass . '.php');
-          if ($containerClass::CONTAINER_HASH === $hash) {
+          if (class_exists($containerClass, FALSE) && $containerClass::CONTAINER_HASH === $hash) {
             $container = new $containerClass();
           }
         }
