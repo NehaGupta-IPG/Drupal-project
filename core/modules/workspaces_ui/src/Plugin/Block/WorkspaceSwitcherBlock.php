@@ -44,7 +44,7 @@ class WorkspaceSwitcherBlock extends BlockBase implements ContainerFactoryPlugin
    *   The plugin configuration.
    * @param string $plugin_id
    *   The plugin ID.
-   * @param mixed $plugin_definition
+   * @param \Drupal\Component\Plugin\Definition\PluginDefinitionInterface|mixed[] $plugin_definition
    *   The plugin definition.
    * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
    *   The form builder.

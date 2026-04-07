@@ -40,7 +40,7 @@ class FilterCaption extends FilterBase implements ContainerFactoryPluginInterfac
    *   Configuration.
    * @param string $plugin_id
    *   Plugin ID.
-   * @param mixed $plugin_definition
+   * @param \Drupal\Component\Plugin\Definition\PluginDefinitionInterface|mixed[] $plugin_definition
    *   Definition.
    * @param \Drupal\filter\FilterPluginManager $filter_manager
    *   Filter plugin manager.

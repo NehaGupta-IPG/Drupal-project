@@ -54,7 +54,7 @@ class ConfigEntityMapper extends ConfigNamesMapper implements ConfigEntityMapper
    *
    * @param string $plugin_id
    *   The config mapper plugin ID.
-   * @param mixed $plugin_definition
+   * @param \Drupal\Component\Plugin\Definition\PluginDefinitionInterface|mixed[] $plugin_definition
    *   An array of plugin information as documented in
    *   ConfigNamesMapper::__construct() with the following additional keys:
    *   - entity_type: The name of the entity type this mapper belongs to.

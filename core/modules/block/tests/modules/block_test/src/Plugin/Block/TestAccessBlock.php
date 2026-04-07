@@ -33,7 +33,7 @@ class TestAccessBlock extends BlockBase implements ContainerFactoryPluginInterfa
    *   values keyed by context names.
    * @param string $plugin_id
    *   The plugin ID for the plugin instance.
-   * @param mixed $plugin_definition
+   * @param \Drupal\Component\Plugin\Definition\PluginDefinitionInterface|mixed[] $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\KeyValueStore\KeyValueStoreInterface $keyValue
    *   The key value store.

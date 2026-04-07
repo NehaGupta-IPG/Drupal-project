@@ -356,7 +356,7 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
   /**
    * Extracts the provider from a plugin definition.
    *
-   * @param mixed $plugin_definition
+   * @param \Drupal\Component\Plugin\Definition\PluginDefinitionInterface|mixed[] $plugin_definition
    *   The plugin definition. Usually either an array or an instance of
    *   \Drupal\Component\Plugin\Definition\PluginDefinitionInterface.
    *

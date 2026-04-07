@@ -50,7 +50,7 @@ abstract class FormatterBase extends PluginSettingsBase implements FormatterInte
    *
    * @param string $plugin_id
    *   The plugin ID for the formatter.
-   * @param mixed $plugin_definition
+   * @param \Drupal\Component\Plugin\Definition\PluginDefinitionInterface|mixed[] $plugin_definition
    *   The plugin implementation definition.
    * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
    *   The definition of the field to which the formatter is associated.
