@@ -13,6 +13,7 @@ use Drupal\Core\ClassLoader\BackwardsCompatibilityClassLoader;
 use Drupal\Core\Config\BootstrapConfigStorageFactory;
 use Drupal\Core\Config\NullStorage;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\DependencyInjection\DumpedContainer;
 use Drupal\Core\DependencyInjection\Dumper\FileLoaderStub;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
@@ -1038,7 +1039,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         $sentinel = $this->bootstrapContainer->get('cache.container')->get($cacheKey);
         if ($sentinel && $hash = $sentinel->data) {
           $phpStorage->load($containerClass . '.php');
-          if (class_exists($containerClass, FALSE) && $containerClass::CONTAINER_HASH === $hash) {
+          if ($containerClass::CONTAINER_HASH === $hash) {
             $container = new $containerClass();
           }
         }
@@ -1058,20 +1059,23 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         $dumper = new PhpDumper($container);
         $code = $dumper->dump([
           'class' => $containerClass,
-          'base_class' => 'Container',
+          'base_class' => DumpedContainer::class,
         ]);
 
         // Store a hash of the container for invalidation.
         $hash = hash('xxh128', $code);
         $code = str_replace(
-          "class $containerClass extends Container\n{",
-          "class $containerClass extends Container\n{\n    public const CONTAINER_HASH = '$hash';",
+          "class $containerClass extends \\" . DumpedContainer::class . "\n{",
+          "class $containerClass extends \\" . DumpedContainer::class . "\n{\n    public const CONTAINER_HASH = '$hash';",
           $code,
         );
 
         $phpStorage->save($containerClass . '.php', $code);
-        $phpStorage->load($containerClass . '.php');
-        if (class_exists($containerClass, FALSE)) {
+
+        // Only load the container if the class isn't already defined. During
+        // module install the same container may be built multiple times.
+        if (!class_exists($containerClass, FALSE)) {
+          $phpStorage->load($containerClass . '.php');
           $container = new $containerClass();
         }
 
