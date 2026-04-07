@@ -12,6 +12,7 @@ use Drupal\Core\Cache\DatabaseBackend;
 use Drupal\Core\ClassLoader\BackwardsCompatibilityClassLoader;
 use Drupal\Core\Config\BootstrapConfigStorageFactory;
 use Drupal\Core\Config\NullStorage;
+use Drupal\Core\DependencyInjection\BootstrapContainer;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\DumpedContainer;
 use Drupal\Core\DependencyInjection\Dumper\FileLoaderStub;
@@ -515,7 +516,12 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     FileCacheFactory::setConfiguration($configuration);
     FileCacheFactory::setPrefix(Settings::getApcuPrefix('file_cache', $this->root));
 
-    $this->bootstrapContainer = new $this->bootstrapContainerClass(Settings::get('bootstrap_container_definition', $this->defaultBootstrapContainerDefinition));
+    if ($containerDefinition = Settings::get('bootstrap_container_definition')) {
+      $this->bootstrapContainer = new $this->bootstrapContainerClass($containerDefinition);
+    }
+    else {
+      $this->bootstrapContainer = new BootstrapContainer();
+    }
 
     // Initialize the container.
     $this->initializeContainer();
