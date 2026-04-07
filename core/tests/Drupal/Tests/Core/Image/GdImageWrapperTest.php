@@ -80,8 +80,13 @@ class GdImageWrapperTest extends UnitTestCase {
    */
   protected function getToolkitMock(array $stubs = []): GDToolkit&MockObject {
     $mock_builder = $this->getMockBuilder(GDToolkit::class);
-    $stubs = array_merge(['getPluginId', 'save'], $stubs);
-    $toolkit = $mock_builder
+    // ::buildConfigurationForm() is added as a stub method to prevent PHPUnit
+    // 12.5+ from issuing notices that these toolkit mock objects have no
+    // expectations configured. If for any reason ::buildConfigurationForm()
+    // must be tested in this class, then the never() expectation below can be
+    // changed to another unused method on the GDToolkit class.
+    $stubs = array_merge(['getPluginId', 'save', 'buildConfigurationForm'], $stubs);
+    $mock = $mock_builder
       ->setConstructorArgs([
         [],
         '',
@@ -94,7 +99,10 @@ class GdImageWrapperTest extends UnitTestCase {
       ])
       ->onlyMethods($stubs)
       ->getMock();
-    return $toolkit;
+    $mock->expects($this->never())
+      ->method('buildConfigurationForm');
+
+    return $mock;
   }
 
   /**
@@ -209,9 +217,12 @@ class GdImageWrapperTest extends UnitTestCase {
   protected function getTestImageForOperationWithToolkitInjectionToOperation(string $class_name, bool $expectsBackfillImageAccess = TRUE): GdImageWrapper {
     $this->toolkit = $this->getToolkitMock(['getToolkitOperation']);
     $this->toolkitOperation = $this->getToolkitOperationMock($class_name, $this->toolkit, TRUE);
-    $this->toolkit->expects($this->never())
-      ->method('getPluginId');
-    $this->toolkit->expects($this->atLeastOnce())
+
+    $this->toolkit
+      ->method('getPluginId')
+      ->willReturn('gd');
+
+    $this->toolkit
       ->method('getToolkitOperation')
       ->willReturn($this->toolkitOperation);
     $this->image = new GdImageWrapper($this->getImageFactoryMock($this->toolkit), 'gd', $this->source);
