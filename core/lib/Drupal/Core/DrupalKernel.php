@@ -213,13 +213,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   protected $containerNeedsRebuild = FALSE;
 
   /**
-   * Whether the container needs to be dumped once booting is complete.
-   *
-   * @var bool
-   */
-  protected $containerNeedsDumping;
-
-  /**
    * List of discovered services.yml path names.
    *
    * This is a nested array whose top-level keys are 'app' and 'site', denoting
@@ -664,7 +657,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         // @see install_begin_request()
         if ($extensions === FALSE && !InstallerKernel::installationAttempted()) {
           $this->allowDumping = FALSE;
-          $this->containerNeedsDumping = FALSE;
           $GLOBALS['conf']['container_service_providers']['InstallerServiceProvider'] = 'Drupal\Core\Installer\InstallerServiceProvider';
         }
         $this->moduleList = $extensions['module'] ?? [];
@@ -990,7 +982,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *   An initialized container object.
    */
   protected function initializeContainer() {
-    $this->containerNeedsDumping = FALSE;
     $session_started = FALSE;
     $all_messages = [];
     $config_is_syncing = FALSE;
@@ -1067,7 +1058,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
           $container = new $containerClass();
         }
 
-        $this->containerNeedsDumping = TRUE;
+        // Store a sentinel in the database so other servers can detect when
+        // the container has been rebuilt.
+        $this->bootstrapContainer->get('cache.container')
+          ->set($this->getContainerCacheKey(), TRUE);
       }
     }
 
@@ -1121,13 +1115,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // subrequest.
     if (!empty($subrequest)) {
       $this->container->get('event_dispatcher')->dispatch(new Event(), self::CONTAINER_INITIALIZE_SUBREQUEST_FINISHED);
-    }
-
-    // If the container was freshly compiled, store a sentinel in the database
-    // cache. This is used for cross-server invalidation detection, not for
-    // storing the container itself.
-    if ($this->containerNeedsDumping) {
-      $this->bootstrapContainer->get('cache.container')->set($this->getContainerCacheKey(), ['class' => $containerClass]);
     }
 
     // Override of Symfony's MIME type guesser singleton.
@@ -1500,13 +1487,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *   The compiled service container
    */
   protected function compileContainer() {
-    // We are forcing a container build so it is reasonable to assume that the
-    // calling method knows something about the system has changed requiring the
-    // container to be dumped to the filesystem.
-    if ($this->allowDumping) {
-      $this->containerNeedsDumping = TRUE;
-    }
-
     $this->initializeServiceProviders();
     $container = $this->getContainerBuilder();
     $container->set('kernel', $this);
