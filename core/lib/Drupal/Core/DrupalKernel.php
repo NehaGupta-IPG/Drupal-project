@@ -1026,9 +1026,15 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if ($this->allowDumping) {
       $cacheKey = $this->getContainerCacheKey();
       $containerClass = 'DrupalContainer_' . hash('xxh128', $cacheKey);
-      $phpStorage = PhpStorageFactory::get('service_container');
+      try {
+        $phpStorage = PhpStorageFactory::get('service_container');
+      }
+      catch (\RuntimeException) {
+        // PhpStorageFactory requires hash_salt which may not be available
+        // yet (e.g., during install or in minimal test environments).
+      }
 
-      if (empty($this->moduleList) && !$this->containerNeedsRebuild) {
+      if (isset($phpStorage) && empty($this->moduleList) && !$this->containerNeedsRebuild) {
         $sentinel = $this->bootstrapContainer->get('cache.container')->get($cacheKey);
         if ($sentinel && $hash = $sentinel->data) {
           $phpStorage->load($containerClass . '.php');
@@ -1043,7 +1049,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if (!$container) {
       $container = $this->compileContainer();
 
-      if ($this->allowDumping) {
+      if ($this->allowDumping && isset($phpStorage)) {
         // Ensure FileLoader::ANONYMOUS_ID_REGEXP is available for PhpDumper.
         if (!class_exists('Symfony\Component\DependencyInjection\Loader\FileLoader', FALSE)) {
           class_alias(FileLoaderStub::class, 'Symfony\Component\DependencyInjection\Loader\FileLoader');
