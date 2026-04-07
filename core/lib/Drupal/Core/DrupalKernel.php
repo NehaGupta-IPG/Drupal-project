@@ -5,12 +5,11 @@ namespace Drupal\Core;
 use Composer\Autoload\ClassLoader;
 use Drupal\Component\EventDispatcher\Event;
 use Drupal\Component\FileCache\FileCacheFactory;
-use Drupal\Component\Serialization\PhpSerialize;
 use Drupal\Component\Utility\UrlHelper;
-use Drupal\Core\Cache\DatabaseBackend;
 use Drupal\Core\ClassLoader\BackwardsCompatibilityClassLoader;
 use Drupal\Core\Config\BootstrapConfigStorageFactory;
 use Drupal\Core\Config\NullStorage;
+use Drupal\Core\DependencyInjection\BootstrapContainer;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
@@ -64,47 +63,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * @var string
    */
   protected $phpArrayDumperClass = '\Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper';
-
-  /**
-   * Holds the default bootstrap container definition.
-   *
-   * @var array
-   */
-  protected $defaultBootstrapContainerDefinition = [
-    'parameters' => [],
-    'services' => [
-      'database' => [
-        'class' => 'Drupal\Core\Database\Connection',
-        'factory' => 'Drupal\Core\Database\Database::getConnection',
-        'arguments' => ['default'],
-      ],
-      'request_stack' => [
-        'class' => 'Symfony\Component\HttpFoundation\RequestStack',
-      ],
-      'datetime.time' => [
-        'class' => 'Drupal\Component\Datetime\Time',
-        'arguments' => ['@request_stack'],
-      ],
-      'cache.container' => [
-        'class' => 'Drupal\Core\Cache\DatabaseBackend',
-        'arguments' => [
-          '@database',
-          '@cache_tags_provider.container',
-          'container',
-          '@serialization.phpserialize',
-          '@datetime.time',
-          DatabaseBackend::MAXIMUM_NONE,
-        ],
-      ],
-      'cache_tags_provider.container' => [
-        'class' => 'Drupal\Core\Cache\DatabaseCacheTagsChecksum',
-        'arguments' => ['@database'],
-      ],
-      'serialization.phpserialize' => [
-        'class' => PhpSerialize::class,
-      ],
-    ],
-  ];
 
   /**
    * Holds the class used for instantiating the bootstrap container.
@@ -518,7 +476,12 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     FileCacheFactory::setConfiguration($configuration);
     FileCacheFactory::setPrefix(Settings::getApcuPrefix('file_cache', $this->root));
 
-    $this->bootstrapContainer = new $this->bootstrapContainerClass(Settings::get('bootstrap_container_definition', $this->defaultBootstrapContainerDefinition));
+    if ($containerDefinition = Settings::get('bootstrap_container_definition')) {
+      $this->bootstrapContainer = new $this->bootstrapContainerClass($containerDefinition);
+    }
+    else {
+      $this->bootstrapContainer = new BootstrapContainer();
+    }
 
     // Initialize the container.
     $this->initializeContainer();
