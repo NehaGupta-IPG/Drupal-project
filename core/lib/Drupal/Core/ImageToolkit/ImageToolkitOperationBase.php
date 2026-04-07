@@ -241,9 +241,9 @@ abstract class ImageToolkitOperationBase extends PluginBase implements ImageTool
       $arguments = $this->validateArguments($arguments);
       return $this->execute($arguments);
     }
-    // @phpstan-ignore arguments.count
+    // @phpstan-ignore arguments.count,argument.type
     $arguments = $this->validateArguments($image, $arguments);
-    // @phpstan-ignore arguments.count
+    // @phpstan-ignore arguments.count,argument.type
     return $this->execute($image, $arguments);
   }
 
