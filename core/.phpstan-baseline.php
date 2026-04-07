@@ -3482,6 +3482,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Database/Query/Delete.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$type of method Drupal\\\\Core\\\\Database\\\\Query\\\\Select\\:\\:addJoin\\(\\) expects string, null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Database/Query/Select.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Variable \\$affected_rows might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 1,
@@ -20396,6 +20402,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/mysql/src/Driver/Database/mysql/Insert.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$required of static method Drupal\\\\Component\\\\Utility\\\\Environment\\:\\:checkMemoryLimit\\(\\) expects string, \\(float\\|int\\) given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/mysql/tests/src/Kernel/mysql/LargeQueryTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Variable \\$string_ascii_check might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 1,
@@ -21360,6 +21372,18 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/path_alias/tests/src/Unit/AliasManagerTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$locale of function setlocale expects array\\|string\\|null, int given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/pgsql/src/Driver/Database/pgsql/Connection.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$table_alias of method Drupal\\\\Core\\\\Database\\\\Query\\\\Select\\:\\:addField\\(\\) expects string, null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/pgsql/src/Driver/Database/pgsql/Select.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$table_field might not be defined\\.$#',
@@ -38013,6 +38037,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Controller/ControllerResolverTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#3 \\$identifier_quotes of class Drupal\\\\Tests\\\\Core\\\\Database\\\\Stub\\\\StubConnection constructor expects array\\<string\\>\\|null, array\\<int, int\\|string\\> given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Database/ConnectionTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\DependencyInjection\\\\Compiler\\\\InvalidConsumer\\:\\:addHandler\\(\\) has no return type specified\\.$#',
