@@ -171,11 +171,14 @@ class ImageThemeHooks {
       $variables['image']['#title'] = $item->title;
     }
 
-    if (($entity = $item->entity) && empty($item->uri)) {
+    // Safely access entity and uri properties,
+    // avoiding undefined property warnings.
+    $entity = $item->entity ?? NULL;
+    if ($entity && empty($item->uri)) {
       $variables['image']['#uri'] = $entity->getFileUri();
     }
     else {
-      $variables['image']['#uri'] = $item->uri;
+      $variables['image']['#uri'] = $item->uri ?? '';
     }
 
     foreach (['width', 'height', 'alt'] as $key) {
