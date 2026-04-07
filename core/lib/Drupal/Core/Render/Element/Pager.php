@@ -20,16 +20,23 @@ use Drupal\Core\Render\Attribute\RenderElement;
  *   append to the pager.
  * - #quantity: The maximum number of numbered page links to create (defaults
  *   to 9).
- * - #tags: (optional) An array of labels for the controls in the pages.
- * - #route_name: (optional) The name of the route to be used to build pager
- *   links. Defaults to '<none>', which will make links relative to the current
- *   URL. This makes the page more effectively cacheable.
- *
- * @code
- * $build['pager'] = [
- *   '#type' => 'pager',
- * ];
- * @endcode
+ * - #tags: (optional) An array of labels for the controls in the pages. Array
+ *   keys 0, 1, 2, 3, 4 correspond to "first", "previous", "page numbers",
+ *   "next", and "last" controls respectively.
+ * - #route_name: (optional) The name of the route to use for pager links.
+ *   Defaults to '<none>', which generates links using the current route. Must
+ *   be provided together with #route_parameters if a non-current route is
+ *   used.
+ * - #route_parameters: (optional) An associative array of route parameters to
+ *   use when generating pager links. Only used when #route_name is also set.
+ *   Example:
+ *   @code
+ *   $build['pager'] = [
+ *     '#type' => 'pager',
+ *     '#route_name' => 'my_module.my_route',
+ *     '#route_parameters' => ['node' => $node->id()],
+ *   ];
+ *   @endcode
  */
 #[RenderElement('pager')]
 class Pager extends RenderElementBase {
