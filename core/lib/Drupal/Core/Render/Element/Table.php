@@ -17,7 +17,8 @@ use Drupal\Component\Utility\Html as HtmlUtility;
  * - #header: An array of table header labels.
  * - #rows: An array of table rows. Each row may be provided in one of the
  *   following formats:
- *   - An indexed array of cell values.
+ *   - An indexed array of values, keyed by position (0, 1, 2, ...), where
+ *     each value represents a column cell ordered relative to #header.
  *   - An associative array keyed by column identifiers (for example,
  *     matching keys used in #header). Each value represents a cell and
  *     may be:
@@ -34,8 +35,9 @@ use Drupal\Component\Utility\Html as HtmlUtility;
  *     - Each child element represents a table row.
  *     - The children of each row represent column cells and must be render
  *        arrays (for example, form or render elements).
- *     - Cell attributes can be applied using the element's
- *       #wrapper_attributes, which are rendered on the <td> element.
+ *     - Cell attributes can be applied using each cell element's
+ *       #wrapper_attributes property, which are rendered on the <td> 
+ *       element.
  *     - Row-level attributes can be applied using #attributes on the row
  *       <tr> element.
  *   The #rows property is populated automatically by preRenderTable().
