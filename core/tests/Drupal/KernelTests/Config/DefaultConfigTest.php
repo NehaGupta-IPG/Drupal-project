@@ -20,17 +20,11 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests that the installed config matches the default config.
  */
 #[Group('Config')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class DefaultConfigTest extends KernelTestBase {
 
   use AssertConfigTrait;
   use FileSystemModuleDiscoveryDataProviderTrait;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $timeLimit = 500;
 
   /**
    * {@inheritdoc}
