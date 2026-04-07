@@ -4,21 +4,28 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Routing;
 
+use Drupal\Core\Access\CheckProviderInterface;
+use Drupal\Core\Controller\ControllerResolverInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Discovery\YamlDiscovery;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Routing\MatcherDumperInterface;
 use Drupal\Core\Routing\RouteBuilder;
 use Drupal\Core\Routing\RouteBuildEvent;
 use Drupal\Core\Routing\RouteCompiler;
 use Drupal\Core\Routing\RoutingEvents;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Prophecy\Argument;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * @coversDefaultClass \Drupal\Core\Routing\RouteBuilder
- * @group Routing
+ * Tests Drupal\Core\Routing\RouteBuilder.
  */
+#[CoversClass(RouteBuilder::class)]
+#[Group('Routing')]
 class RouteBuilderTest extends UnitTestCase {
 
   /**
@@ -31,7 +38,7 @@ class RouteBuilderTest extends UnitTestCase {
   /**
    * The mocked matcher dumper.
    *
-   * @var \Drupal\Core\Routing\MatcherDumperInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Routing\MatcherDumperInterface
    */
   protected $dumper;
 
@@ -66,12 +73,12 @@ class RouteBuilderTest extends UnitTestCase {
   /**
    * The controller resolver.
    *
-   * @var \Drupal\Core\Controller\ControllerResolverInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Controller\ControllerResolverInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $controllerResolver;
 
   /**
-   * @var \Drupal\Core\Access\CheckProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Access\CheckProviderInterface
    */
   protected $checkProvider;
 
@@ -81,19 +88,37 @@ class RouteBuilderTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->dumper = $this->createMock('Drupal\Core\Routing\MatcherDumperInterface');
+    $this->dumper = $this->createStub(MatcherDumperInterface::class);
     $this->lock = $this->createMock('Drupal\Core\Lock\LockBackendInterface');
     $this->dispatcher = $this->prophesize('\Symfony\Contracts\EventDispatcher\EventDispatcherInterface');
     $this->dispatcher->dispatch(Argument::cetera(), Argument::cetera())->willReturnArgument(0);
-    $this->moduleHandler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
-    $this->controllerResolver = $this->createMock('Drupal\Core\Controller\ControllerResolverInterface');
+    $this->moduleHandler = $this->createStub(ModuleHandlerInterface::class);
+    $this->controllerResolver = $this->createStub(ControllerResolverInterface::class);
     $this->yamlDiscovery = $this->getMockBuilder('\Drupal\Core\Discovery\YamlDiscovery')
       ->disableOriginalConstructor()
       ->getMock();
-    $this->checkProvider = $this->createMock('\Drupal\Core\Access\CheckProviderInterface');
+    $this->checkProvider = $this->createStub(CheckProviderInterface::class);
 
     $this->routeBuilder = new TestRouteBuilder($this->dumper, $this->lock, $this->dispatcher->reveal(), $this->moduleHandler, $this->controllerResolver, $this->checkProvider);
     $this->routeBuilder->setYamlDiscovery($this->yamlDiscovery);
+  }
+
+  /**
+   * Reinitializes the matcher dumper as a mock object.
+   */
+  protected function setUpMockMatcherDumper(): void {
+    $this->dumper = $this->createMock(MatcherDumperInterface::class);
+    $reflection = new \ReflectionProperty($this->routeBuilder, 'dumper');
+    $reflection->setValue($this->routeBuilder, $this->dumper);
+  }
+
+  /**
+   * Reinitializes the check provider as a mock object.
+   */
+  protected function setUpMockCheckProvider(): void {
+    $this->checkProvider = $this->createMock(CheckProviderInterface::class);
+    $reflection = new \ReflectionProperty($this->routeBuilder, 'checkProvider');
+    $reflection->setValue($this->routeBuilder, $this->checkProvider);
   }
 
   /**
@@ -109,7 +134,7 @@ class RouteBuilderTest extends UnitTestCase {
       ->method('release')
       ->with('router_rebuild');
 
-    $this->yamlDiscovery->expects($this->any())
+    $this->yamlDiscovery->expects($this->once())
       ->method('findAll')
       ->willReturn([]);
 
@@ -144,6 +169,9 @@ class RouteBuilderTest extends UnitTestCase {
    * @see \Drupal\Core\Routing\RouteBuilder::rebuild()
    */
   public function testRebuildWithStaticModuleRoutes(): void {
+    $this->setUpMockCheckProvider();
+    $this->setUpMockMatcherDumper();
+
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('router_rebuild')
@@ -190,6 +218,9 @@ class RouteBuilderTest extends UnitTestCase {
    * @see \Drupal\Core\Routing\RouteBuilder::rebuild()
    */
   public function testRebuildWithProviderBasedRoutes(): void {
+    $this->setUpMockCheckProvider();
+    $this->setUpMockMatcherDumper();
+
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('router_rebuild')
@@ -208,9 +239,9 @@ class RouteBuilderTest extends UnitTestCase {
 
     $container = new ContainerBuilder();
     $container->set('test_module.route_service', new TestRouteSubscriber());
-    $this->controllerResolver->expects($this->any())
+    $this->controllerResolver
       ->method('getControllerFromDefinition')
-      ->willReturnCallback(function ($controller) use ($container) {
+      ->willReturnCallback(function ($controller) use ($container): array {
         $count = substr_count($controller, ':');
         if ($count == 1) {
           [$service, $method] = explode(':', $controller, 2);
@@ -264,7 +295,7 @@ class RouteBuilderTest extends UnitTestCase {
       ->method('release')
       ->with('router_rebuild');
 
-    $this->yamlDiscovery->expects($this->any())
+    $this->yamlDiscovery->expects($this->once())
       ->method('findAll')
       ->willReturn([]);
 
@@ -357,13 +388,13 @@ class TestRouteBuilder extends RouteBuilder {
  */
 class TestRouteSubscriber {
 
-  public function routesFromArray() {
+  public function routesFromArray(): array {
     return [
       'test_route.1' => new Route('/test-route/1'),
     ];
   }
 
-  public function routesFromCollection() {
+  public function routesFromCollection(): RouteCollection {
     $collection = new RouteCollection();
     $collection->add('test_route.2', new Route('/test-route/2'));
     return $collection;

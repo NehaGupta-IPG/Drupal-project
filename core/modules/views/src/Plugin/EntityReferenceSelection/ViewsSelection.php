@@ -18,7 +18,6 @@ use Drupal\Core\Url;
 use Drupal\Core\Utility\Token;
 use Drupal\views\Render\ViewsRenderPipelineMarkup;
 use Drupal\views\Views;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 
 /**

@@ -9,32 +9,21 @@ use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\file\Upload\FileUploadHandler;
 use Drupal\file\Upload\UploadedFileInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Validator\ConstraintViolationList;
 
 /**
  * Tests the file upload handler.
- *
- * @group file
  */
+#[Group('file')]
+#[RunTestsInSeparateProcesses]
 class FileUploadHandlerTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = ['file', 'file_validator_test'];
-
-  /**
-   * The file upload handler under test.
-   */
-  protected FileUploadHandler $fileUploadHandler;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-    $this->fileUploadHandler = $this->container->get('file.upload_handler');
-  }
 
   /**
    * Test the lock acquire exception.
