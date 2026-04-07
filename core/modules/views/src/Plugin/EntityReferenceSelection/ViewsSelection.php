@@ -264,9 +264,9 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
    * @param array|null $ids
    *   Array of entity IDs. Defaults to NULL.
    * @param bool $bubble_cacheable_metadata
-   *   If TRUE the cacheability metadata emitted during token replacement will be
-   *   bubbled to the render context. If FALSE then the it will not in order to
-   *   prevent leaked cacheability metadata during early rendering.
+   *   If TRUE the cacheability metadata emitted during token replacement will 
+   *   be bubbled to the render context. If FALSE then the it will not in order
+   *   to prevent leaked cacheability metadata during early rendering.
    *
    * @return array
    *   The results.
@@ -377,9 +377,9 @@ class ViewsSelection extends SelectionPluginBase implements ContainerFactoryPlug
    * @param array $args
    *   An array of arguments that may contain tokens.
    * @param bool $bubble_cacheable_metadata
-   *   If TRUE the cacheability metadata emitted during token replacement will be
-   *   bubbled to the render context. If FALSE then the it will not in order to
-   *   prevent leaked cacheability metadata during early rendering.
+   *   If TRUE the cacheability metadata emitted during token replacement will
+   *   be bubbled to the render context. If FALSE then the it will not in order
+   *   to prevent leaked cacheability metadata during early rendering.
    *
    * @return array
    *   The arguments to be sent to the View.

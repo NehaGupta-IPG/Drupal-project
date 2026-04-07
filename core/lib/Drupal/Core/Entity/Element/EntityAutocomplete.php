@@ -185,42 +185,6 @@ class EntityAutocomplete extends Textfield {
     $form_object = $form_state->getFormObject();
 
     if ($form_object instanceof EntityForm) {
-      $entity = $form_object->getEntity() ?? NULL;
-
-      $ref = $complete_form;
-      foreach ($element['#array_parents'] as $parent_key) {
-        $ref = $ref[$parent_key];
-        if (!empty($ref['#entity'])) {
-          $entity = $ref['#entity'];
-        }
-      }
-
-      if ($entity !== NULL) {
-        $storage = $form_state->getStorage();
-        $parent_group = $storage['group'] ?? NULL;
-        $selection_settings['entity_info'] = [
-          'type' => $entity->getEntityTypeId(),
-          'id' => $entity->id(),
-          'parent_group' => $parent_group,
-        ];
-      }
-    }
-
-    // A view with arguments? Might provide multiple entities via relationships.
-    if ($form_object instanceof ViewsForm) {
-      $view = $form_state->getBuildInfo()['args'][0];
-      $selection_settings['parent_view'] = [
-        'id' => $view->id(),
-        'display' => $view->current_display,
-        'args' => $view->args,
-        'delta' => $element['#field_parents'][1],
-      ];
-    }
-
-    // Put entity into settings.
-    $form_object = $form_state->getFormObject();
-
-    if ($form_object instanceof EntityForm) {
       $entity = $form_object->getEntity();
 
       $ref = $complete_form;
