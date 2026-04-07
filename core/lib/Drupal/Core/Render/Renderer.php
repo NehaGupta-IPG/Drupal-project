@@ -697,8 +697,7 @@ class Renderer implements RendererInterface {
    * Placeholders may have:
    * - #lazy_builder callback, to build a render array to be rendered into
    *   markup that can replace the placeholder
-   * - #cache: to cache the result of the placeholder
-   *
+   * - #cache: to cache the result of the placeholder   *
    * Also merges the bubbleable metadata resulting from the rendering of the
    * contents of the placeholders. Hence $elements will be contain the entirety
    * of bubbleable metadata.
@@ -730,7 +729,6 @@ class Renderer implements RendererInterface {
     // to this one special case, with this hard-coded solution.
     // @see \Drupal\Core\Render\Element\StatusMessages
     // @see https://www.drupal.org/node/2712935#comment-11368923
-
     // First render all placeholders except 'status messages' placeholders.
     $message_placeholders = [];
     $fibers = [];
