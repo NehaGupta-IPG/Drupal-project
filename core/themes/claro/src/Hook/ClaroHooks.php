@@ -1632,4 +1632,11 @@ class ClaroHooks {
     }
   }
 
+  #[Hook('preprocess_views_view')]
+  public function preprocessViewsView(array &$variables): void {
+    if ($variables['view']->id() === 'media') {
+      $variables['view']->element['#attached']['library'][] = 'claro/media_library.theme';
+    }
+  }
+
 }

@@ -173,4 +173,11 @@ readonly class ViewsHooks {
     }
   }
 
+  #[Hook('preprocess_views_view')]
+  public function preprocessViewsView(array &$variables): void {
+    if ($variables['view']->id() === 'media') {
+      $variables['view']->element['#attached']['library'][] = 'default_admin/media_library.theme';
+    }
+  }
+
 }
