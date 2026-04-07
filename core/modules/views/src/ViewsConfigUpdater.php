@@ -506,12 +506,13 @@ class ViewsConfigUpdater {
    */
   public function addGroupingLabelElement(array &$handler, string $handler_type, ViewEntityInterface $view): bool {
     $changed = FALSE;
-    // Only add grouping_label_element if this is a style handler of the correct type and it is missing.
+    // Only add grouping_label_element if this is a style handler of the
+    // correct type and it is missing.
     if (
       $handler_type === 'style'
       && isset($handler['plugin_id'], $handler['type'])
       && $handler['plugin_id'] === 'style'
-      && in_array($handler['type'], ['Grid', 'HtmlList', 'GridResponsive', 'DefaultStyle'], true)
+      && in_array($handler['type'], ['Grid', 'HtmlList', 'GridResponsive', 'DefaultStyle'], TRUE)
       && (!isset($handler['style']['grouping_label_element']))
     ) {
       $handler['style']['grouping_label_element'] = NULL;
