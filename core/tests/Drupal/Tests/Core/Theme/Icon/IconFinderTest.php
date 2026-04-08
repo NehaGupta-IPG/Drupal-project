@@ -840,7 +840,7 @@ class IconFinderTest extends UnitTestCase {
       'windows path' => [
         'C:\\foo.svg',
         FALSE,
-      ]
+      ],
     ];
   }
 
