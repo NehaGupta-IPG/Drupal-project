@@ -17,6 +17,7 @@ use Drupal\node\NodeGrantDatabaseStorageInterface;
 use Drupal\node\NodeInterface;
 use Drupal\node\NodeStorageInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -59,6 +60,7 @@ class NodeOperationAccessTest extends UnitTestCase {
    *   to be called.
    */
   #[DataProvider('providerTestRevisionOperations')]
+  #[AllowMockObjectsWithoutExpectations]
   public function testRevisionOperations($operation, array $hasPermissionMap, $assertAccess, $isDefaultRevision = NULL, $isLatestRevision = NULL): void {
     $account = $this->createStub(AccountInterface::class);
     $account->method('hasPermission')
@@ -107,7 +109,7 @@ class NodeOperationAccessTest extends UnitTestCase {
 
     if (!is_null($isLatestRevision)) {
       $node->expects($this->atLeastOnce())
-        ->method('isLatestRevision')
+        ->method('isLatestTranslationAffectedRevision')
         ->willReturn($isLatestRevision);
     }
 

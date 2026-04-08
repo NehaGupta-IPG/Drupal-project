@@ -55,6 +55,7 @@ class RevisionLinkTest extends NodeTestBase {
     $first_revision = $nodes[1]->getRevisionId();
     // Create revision of the node.
     $nodes[1]->setNewRevision();
+    $nodes[1]->body->value = '<p>New body</p>';
     $nodes[1]->save();
     $second_revision = $nodes[1]->getRevisionId();
 
