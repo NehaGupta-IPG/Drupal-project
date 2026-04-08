@@ -150,16 +150,15 @@ class WorkspaceTrackerTest extends KernelTestBase {
     // The latest revisions from 'dev' are now tracked in 'stage'.
     $expected_latest_revisions['stage'] = $expected_latest_revisions['dev'];
 
-    // Two revisions (8 and 9) were created for 'Test article 6', but only the
-    // latest one (9) is being merged into 'stage'.
-    $expected_all_revisions['stage'] = [3, 4, 5, 6, 7, 9];
+    // All revisions from 'dev', including intermediate ones, are now tracked
+    // in 'stage'.
+    $expected_all_revisions['stage'] = [3, 4, 5, 6, 7, 8, 9];
 
-    // Revision 7 was both an initial and latest revision in 'dev', so it is now
-    // considered an initial revision in 'stage'.
-    $expected_initial_revisions['stage'] = [4, 5, 7];
+    // The initial revisions from 'dev' are now tracked in 'stage'.
+    $expected_initial_revisions['stage'] = [4, 5, 7, 8];
 
-    // Which leaves revision 8 as the only remaining initial revision in 'dev'.
-    $expected_initial_revisions['dev'] = [8];
+    // 'dev' no longer has any of its own revisions after the merge.
+    $expected_initial_revisions['dev'] = [];
 
     $this->assertWorkspaceAssociations($entity_type_id, $expected_latest_revisions, $expected_all_revisions, $expected_initial_revisions);
 

@@ -448,10 +448,10 @@ class WorkspaceIntegrationTest extends KernelTestBase {
     // the workspace-specific revision.
     $this->assertEquals(6, $node->getRevisionId());
 
-    // Delete revision '6' and check that the workspace association does not
-    // track it anymore.
+    // Delete revision '6' and check that the workspace association falls back
+    // to the initial revision.
     $this->entityTypeManager->getStorage('node')->deleteRevision(6);
-    $expected_workspace_association = ['stage' => []];
+    $expected_workspace_association = ['stage' => [5]];
     $this->assertWorkspaceAssociation($expected_workspace_association, 'node');
   }
 

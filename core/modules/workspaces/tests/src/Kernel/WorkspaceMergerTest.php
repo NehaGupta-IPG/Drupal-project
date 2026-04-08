@@ -155,13 +155,13 @@ class WorkspaceMergerTest extends KernelTestBase {
     $this->assertEmpty($workspace_merger->getDifferringRevisionIdsOnTarget());
     $this->assertEquals(0, $workspace_merger->getNumberOfChangesOnTarget());
 
-    // Check that there is only one node in Local 1 that's not available in Dev,
-    // revision 7 created above for the fourth test article.
+    // Check that Local 1 has two revisions not available in Dev: revisions 6
+    // and 7 created above for the fourth test article.
     $expected = [
-      'node' => [7 => 4],
+      'node' => [6 => 4, 7 => 4],
     ];
     $this->assertEquals($expected, $workspace_merger->getDifferringRevisionIdsOnSource());
-    $this->assertEquals(1, $workspace_merger->getNumberOfChangesOnSource());
+    $this->assertEquals(2, $workspace_merger->getNumberOfChangesOnSource());
 
     // Merge the contents of Local 1 into Dev, and check that Dev, Local 1 and
     // Local 2 have the same content.
@@ -188,16 +188,18 @@ class WorkspaceMergerTest extends KernelTestBase {
     $this->assertEmpty($workspace_merger->getDifferringRevisionIdsOnTarget());
     $this->assertEquals(0, $workspace_merger->getNumberOfChangesOnTarget());
 
-    // Check that the difference between Local 1 and Stage are the two revisions
-    // for 'Test article 3 - dev' and 'Test article 4 - local_1'.
+    // Check that the difference between Local 1 and Stage includes all
+    // revisions for 'Test article 3 - dev' and 'Test article 4 - local_1'.
     $expected = [
       'node' => [
+        4 => 3,
         5 => 3,
+        6 => 4,
         7 => 4,
       ],
     ];
     $this->assertEquals($expected, $workspace_merger->getDifferringRevisionIdsOnSource());
-    $this->assertEquals(2, $workspace_merger->getNumberOfChangesOnSource());
+    $this->assertEquals(4, $workspace_merger->getNumberOfChangesOnSource());
 
     // Check that Local 1 can not be merged directly into Stage, since it can
     // only be merged into its direct parent.

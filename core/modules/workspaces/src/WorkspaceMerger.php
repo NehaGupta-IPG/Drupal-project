@@ -38,13 +38,17 @@ class WorkspaceMerger implements WorkspaceMergerInterface {
       $step_size = Settings::get('entity_update_batch_size', 50);
       $counter = 0;
 
-      foreach ($this->getDifferringRevisionIdsOnSource() as $entity_type_id => $revision_difference) {
+      $differring_revisions = $this->getDifferringRevisionIdsOnSource();
+
+      // Clear all tracked entities of the source workspace and re-initialize
+      // it from the target so it retains the inherited entries.
+      $this->workspaceTracker->deleteTrackedEntities($this->sourceWorkspace->id());
+      $this->workspaceTracker->initializeWorkspace($this->sourceWorkspace);
+
+      foreach ($differring_revisions as $entity_type_id => $revision_difference) {
         $entity_type = $this->entityTypeManager->getDefinition($entity_type_id);
         $revisions_on_source = $this->entityTypeManager->getStorage($entity_type_id)
           ->loadMultipleRevisions(array_keys($revision_difference));
-
-        // Clear the tracked entities of the source workspace.
-        $this->workspaceTracker->deleteTrackedEntities($this->sourceWorkspace->id(), $entity_type_id, $revision_difference, array_keys($revision_difference));
 
         /** @var \Drupal\Core\Entity\ContentEntityInterface $revision */
         foreach ($revisions_on_source as $revision) {
@@ -132,16 +136,14 @@ class WorkspaceMerger implements WorkspaceMergerInterface {
     $source_revision_difference = [];
 
     $tracked_entities_on_source = $this->workspaceTracker->getTrackedEntities($this->sourceWorkspace->id());
-    $tracked_entities_on_target = $this->workspaceTracker->getTrackedEntities($this->targetWorkspace->id());
-    foreach ($tracked_entities_on_source as $entity_type_id => $tracked_revisions) {
-      // Now we compare the revision IDs which are tracked by the source
-      // workspace to those that are tracked by the target workspace, and the
-      // difference between these two arrays gives us all the entities which
-      // have a different revision ID on the source.
-      if (!isset($tracked_entities_on_target[$entity_type_id])) {
-        $source_revision_difference[$entity_type_id] = $tracked_revisions;
-      }
-      elseif ($revision_difference = array_diff_key($tracked_revisions, $tracked_entities_on_target[$entity_type_id])) {
+    foreach (array_keys($tracked_entities_on_source) as $entity_type_id) {
+      // Compare all revision IDs tracked by the source workspace to those
+      // tracked by the target workspace. This includes intermediate revisions,
+      // not just the latest ones, so they can be moved to the target during a
+      // merge operation.
+      $all_revisions_on_source = $this->workspaceTracker->getAllTrackedRevisions($this->sourceWorkspace->id(), $entity_type_id);
+      $all_revisions_on_target = $this->workspaceTracker->getAllTrackedRevisions($this->targetWorkspace->id(), $entity_type_id);
+      if ($revision_difference = array_diff_key($all_revisions_on_source, $all_revisions_on_target)) {
         $source_revision_difference[$entity_type_id] = $revision_difference;
       }
     }
