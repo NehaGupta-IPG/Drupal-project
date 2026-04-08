@@ -624,8 +624,7 @@
       if (
         Object.hasOwn(Drupal.ckeditor5, 'saveCallback') &&
         Drupal.ckeditor5.saveCallback != null &&
-        Object.hasOwn(Drupal.ckeditor5.saveCallback, 'has') &&
-        Drupal.ckeditor5.saveCallback.has('set') &&
+        Drupal.ckeditor5.saveCallback instanceof Map &&
         Object.hasOwn(dialogSettings, 'selector')
       ) {
         Drupal.ckeditor5.saveCallback.set(
@@ -705,7 +704,7 @@
   $(window).on('editor:dialogsave', (e, values, selector) => {
     if (Drupal.ckeditor5.saveCallback) {
       if (
-        Object.hasOwn(Drupal.ckeditor5.saveCallback, 'has') &&
+        Drupal.ckeditor5.saveCallback instanceof Map &&
         Drupal.ckeditor5.saveCallback.has(selector)
       ) {
         Drupal.ckeditor5.saveCallback.get(selector)(values);
@@ -721,11 +720,10 @@
     const options = dialogSettings.options || {};
     const selector = options.selector || '#drupal-modal';
     if (Drupal.ckeditor5.saveCallback) {
-      if (
-        Object.hasOwn(Drupal.ckeditor5.saveCallback, 'has') &&
-        Drupal.ckeditor5.saveCallback.has(selector)
-      ) {
-        Drupal.ckeditor5.saveCallback.delete(selector);
+      if (Drupal.ckeditor5.saveCallback instanceof Map) {
+        if (Drupal.ckeditor5.saveCallback.has(selector)) {
+          Drupal.ckeditor5.saveCallback.delete(selector);
+        }
       } else {
         Drupal.ckeditor5.saveCallback = null;
       }
