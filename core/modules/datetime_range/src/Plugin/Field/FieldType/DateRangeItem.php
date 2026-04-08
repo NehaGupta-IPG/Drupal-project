@@ -88,6 +88,16 @@ class DateRangeItem extends DateTimeItem {
     $element = parent::storageSettingsForm($form, $form_state, $has_data);
 
     $element['datetime_type']['#options'][static::DATETIME_TYPE_ALLDAY] = $this->t('All Day');
+    $datetime_descriptions = [
+      $this->t('Date and time: store both date and time.'),
+      $this->t('Date only: store only the date without time.'),
+      $this->t('All day: treat the range as a full-day event starting at midnight.'),
+    ];
+
+    $element['datetime_type']['#description'] = [
+      '#theme' => 'item_list',
+      '#items' => $datetime_descriptions,
+    ];
 
     return $element;
   }
