@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\action_bulk_test\Plugin\Action;
 
 use Drupal\Core\Access\AccessResult;
@@ -30,7 +32,7 @@ class TestAction extends ActionBase {
   /**
    * {@inheritdoc}
    */
-  public function execute(): void {
+  public function execute(?object $object = NULL): void {
   }
 
 }

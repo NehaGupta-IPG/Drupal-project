@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Theme;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests deprecating variables passed to twig templates.
@@ -12,22 +15,20 @@ use Drupal\KernelTests\KernelTestBase;
  * @see \Drupal\Core\Template\TwigExtension::checkDeprecations()
  * @see \Drupal\Core\Template\TwigNodeVisitorCheckDeprecations
  * @see \Drupal\Core\Template\TwigNodeCheckDeprecations
- * @group Twig
- * @group legacy
- * @group #slow
  */
+#[Group('Twig')]
+#[RunTestsInSeparateProcesses]
 class TwigDeprecationsTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = ['system', 'theme_test'];
 
   /**
    * Test deprecating variables at definition in hook_theme().
    */
+  #[IgnoreDeprecations]
   public function testHookThemeDeprecations(): void {
     $element = [
       '#theme' => 'theme_test_deprecations_hook_theme',
@@ -36,7 +37,7 @@ class TwigDeprecationsTest extends KernelTestBase {
     ];
     // Both 'foo' and 'bar' are deprecated in theme_test_hook_theme(),
     // but 'bar' is not used in theme-test-deprecations-hook-theme.html.twig.
-    $this->expectDeprecation($this->getDeprecationMessage('foo'));
+    $this->expectUserDeprecationMessage($this->getDeprecationMessage('foo'));
     $this->assertEquals('foo', $this->container->get('renderer')->renderRoot($element));
   }
 
@@ -62,19 +63,21 @@ class TwigDeprecationsTest extends KernelTestBase {
   /**
    * Test deprecation of single variable triggers error.
    */
+  #[IgnoreDeprecations]
   public function testSingleDeprecation(): void {
     $preprocess = [
       'deprecations' => [
         'foo' => $this->getDeprecationMessage('foo'),
       ],
     ];
-    $this->expectDeprecation($this->getDeprecationMessage('foo'));
+    $this->expectUserDeprecationMessage($this->getDeprecationMessage('foo'));
     $this->assertRendered('foo|set_var|bar', $preprocess);
   }
 
   /**
    * Test deprecation of empty variable triggers error.
    */
+  #[IgnoreDeprecations]
   public function testEmptyDeprecation(): void {
     $preprocess = [
       'foo' => '',
@@ -82,13 +85,14 @@ class TwigDeprecationsTest extends KernelTestBase {
         'foo' => $this->getDeprecationMessage('foo'),
       ],
     ];
-    $this->expectDeprecation($this->getDeprecationMessage('foo'));
+    $this->expectUserDeprecationMessage($this->getDeprecationMessage('foo'));
     $this->assertRendered('|set_var|bar', $preprocess);
   }
 
   /**
    * Test deprecation of multiple variables triggers errors.
    */
+  #[IgnoreDeprecations]
   public function testMultipleDeprecations(): void {
     $preprocess = [
       'deprecations' => [
@@ -96,8 +100,8 @@ class TwigDeprecationsTest extends KernelTestBase {
         'bar' => $this->getDeprecationMessage('bar'),
       ],
     ];
-    $this->expectDeprecation($this->getDeprecationMessage('foo'));
-    $this->expectDeprecation($this->getDeprecationMessage('bar'));
+    $this->expectUserDeprecationMessage($this->getDeprecationMessage('foo'));
+    $this->expectUserDeprecationMessage($this->getDeprecationMessage('bar'));
     $this->assertRendered('foo|set_var|bar', $preprocess);
   }
 
@@ -118,6 +122,7 @@ class TwigDeprecationsTest extends KernelTestBase {
   /**
    * Test deprecation of variables in parent does not leak to child.
    */
+  #[IgnoreDeprecations]
   public function testParentVariableDeprecation(): void {
     // 'foo' is used before the child template is processed, so this test
     // shows that processing the child does not lead to parent usage being

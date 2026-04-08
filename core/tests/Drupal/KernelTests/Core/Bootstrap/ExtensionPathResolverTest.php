@@ -9,21 +9,24 @@ use Drupal\Core\Extension\Exception\UnknownExtensionTypeException;
 use Drupal\Core\Extension\ExtensionPathResolver;
 use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ProfileExtensionList;
-use Drupal\Core\Extension\ThemeEngineExtensionList;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that extension path resolver works correctly.
- *
- * @coversDefaultClass \Drupal\Core\Extension\ExtensionPathResolver
- *
- * @group Bootstrap
  */
+#[CoversClass(ExtensionPathResolver::class)]
+#[Group('Bootstrap')]
+#[RunTestsInSeparateProcesses]
 class ExtensionPathResolverTest extends KernelTestBase {
 
   /**
-   * @covers ::getPathname
+   * Tests extension path resolving.
+   *
+   * @legacy-covers ::getPathname
    */
   public function testExtensionPathResolving(): void {
     // Retrieving the location of a module.
@@ -35,18 +38,16 @@ class ExtensionPathResolverTest extends KernelTestBase {
     $this->assertSame('core/themes/stark/stark.info.yml', \Drupal::service('extension.list.theme')
       ->getPathname('stark'));
 
-    // Retrieving the location of a theme engine.
-    $this->assertSame('core/themes/engines/twig/twig.info.yml', \Drupal::service('extension.list.theme_engine')
-      ->getPathname('twig'));
-
     // Retrieving the location of a profile. Profiles are a special case with
     // a fixed location and naming.
-    $this->assertSame('core/profiles/testing/testing.info.yml', \Drupal::service('extension.list.profile')
+    $this->assertSame('core/profiles/tests/testing/testing.info.yml', \Drupal::service('extension.list.profile')
       ->getPathname('testing'));
   }
 
   /**
-   * @covers ::getPath
+   * Tests extension path resolving path.
+   *
+   * @legacy-covers ::getPath
    */
   public function testExtensionPathResolvingPath(): void {
     $this->assertSame('core/modules/system/tests/modules/driver_test', \Drupal::service('extension.list.module')
@@ -54,7 +55,9 @@ class ExtensionPathResolverTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::getPathname
+   * Tests extension path resolving with non existing module.
+   *
+   * @legacy-covers ::getPathname
    */
   public function testExtensionPathResolvingWithNonExistingModule(): void {
     $this->expectException(UnknownExtensionException::class);
@@ -64,7 +67,9 @@ class ExtensionPathResolverTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::getPathname
+   * Tests extension path resolving with non existing theme.
+   *
+   * @legacy-covers ::getPathname
    */
   public function testExtensionPathResolvingWithNonExistingTheme(): void {
     $this->expectException(UnknownExtensionException::class);
@@ -74,7 +79,9 @@ class ExtensionPathResolverTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::getPathname
+   * Tests extension path resolving with non existing profile.
+   *
+   * @legacy-covers ::getPathname
    */
   public function testExtensionPathResolvingWithNonExistingProfile(): void {
     $this->expectException(UnknownExtensionException::class);
@@ -84,28 +91,16 @@ class ExtensionPathResolverTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::getPathname
-   */
-  public function testExtensionPathResolvingWithNonExistingThemeEngine(): void {
-    $this->expectException(UnknownExtensionException::class);
-    $this->expectExceptionMessage('The theme_engine there_is_an_theme_engine_for_you does not exist');
-    $this->assertNull(\Drupal::service('extension.list.theme_engine')
-      ->getPathname('there_is_an_theme_engine_for_you'), 'Searching for an item that does not exist returns NULL.');
-  }
-
-  /**
    * Tests the getPath() method with an unknown extension.
    */
   public function testUnknownExtension(): void {
     $module_extension_list = $this->prophesize(ModuleExtensionList::class);
     $profile_extension_list = $this->prophesize(ProfileExtensionList::class);
     $theme_extension_list = $this->prophesize(ThemeExtensionList::class);
-    $theme_engine_extension_list = $this->prophesize(ThemeEngineExtensionList::class);
     $resolver = new ExtensionPathResolver(
       $module_extension_list->reveal(),
       $profile_extension_list->reveal(),
       $theme_extension_list->reveal(),
-      $theme_engine_extension_list->reveal()
     );
 
     $this->expectException(UnknownExtensionTypeException::class);

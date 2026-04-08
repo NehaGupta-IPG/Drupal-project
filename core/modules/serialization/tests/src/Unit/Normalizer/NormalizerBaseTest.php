@@ -4,19 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\serialization\Unit\Normalizer;
 
-use Drupal\Tests\UnitTestCase;
 use Drupal\serialization\Normalizer\NormalizerBase;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\serialization\Normalizer\NormalizerBase
- * @group serialization
+ * Tests Drupal\serialization\Normalizer\NormalizerBase.
  */
+#[CoversClass(NormalizerBase::class)]
+#[Group('serialization')]
 class NormalizerBaseTest extends UnitTestCase {
 
   /**
    * Tests the supportsNormalization method.
-   *
-   * @dataProvider providerTestSupportsNormalization
    *
    * @param bool $expected_return
    *   The expected boolean return value from supportNormalization.
@@ -25,8 +27,9 @@ class NormalizerBaseTest extends UnitTestCase {
    * @param string $supported_types
    *   (optional) The supported interface or class to set on the normalizer.
    */
+  #[DataProvider('providerTestSupportsNormalization')]
   public function testSupportsNormalization($expected_return, $data, $supported_types = NULL): void {
-    $normalizer_base = $this->getMockForAbstractClass('Drupal\Tests\serialization\Unit\Normalizer\TestNormalizerBase');
+    $normalizer_base = new TestNormalizerBase();
 
     if (isset($supported_types)) {
       $normalizer_base->setSupportedTypes($supported_types);
@@ -61,9 +64,9 @@ class NormalizerBaseTest extends UnitTestCase {
 }
 
 /**
- * Test class for NormalizerBase.
+ * Testable class for NormalizerBase.
  */
-abstract class TestNormalizerBase extends NormalizerBase {
+class TestNormalizerBase extends NormalizerBase {
 
   /**
    * The interface or class that this Normalizer supports.
@@ -87,6 +90,13 @@ abstract class TestNormalizerBase extends NormalizerBase {
    */
   public function getSupportedTypes(?string $format): array {
     return $this->supportedTypes;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function normalize($object, $format = NULL, array $context = []): array|string|int|float|bool|\ArrayObject|NULL {
+    return NULL;
   }
 
 }

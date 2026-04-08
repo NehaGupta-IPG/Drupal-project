@@ -15,23 +15,21 @@ use Drupal\Core\TypedData\Type\IntegerInterface;
 use Drupal\Core\TypedData\Type\StringInterface;
 use Drupal\image\ImageEffectInterface;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests schema for configuration objects.
- *
- * @group config
  */
+#[Group('config')]
+#[RunTestsInSeparateProcesses]
 class ConfigSchemaTest extends KernelTestBase {
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
   protected static $modules = [
     'system',
-    'language',
-    'field',
     'image',
     'config_test',
     'config_schema_test',
@@ -81,7 +79,7 @@ class ConfigSchemaTest extends KernelTestBase {
     $expected['definition_class'] = '\Drupal\Core\TypedData\MapDataDefinition';
     $expected['unwrap_for_canonical_representation'] = TRUE;
     $expected['constraints'] = [
-      'ValidKeys' => '<infer>',
+      'ValidKeys' => ['allowedKeys' => '<infer>'],
       'LangcodeRequiredIfTranslatableValues' => NULL,
     ];
     $this->assertEquals($expected, $definition, 'Retrieved the right metadata for configuration with only some schema.');
@@ -134,7 +132,7 @@ class ConfigSchemaTest extends KernelTestBase {
     $expected['definition_class'] = '\Drupal\Core\TypedData\MapDataDefinition';
     $expected['unwrap_for_canonical_representation'] = TRUE;
     $expected['constraints'] = [
-      'ValidKeys' => '<infer>',
+      'ValidKeys' => ['allowedKeys' => '<infer>'],
       'FullyValidatable' => NULL,
       'LangcodeRequiredIfTranslatableValues' => NULL,
     ];
@@ -171,7 +169,7 @@ class ConfigSchemaTest extends KernelTestBase {
     $expected['type'] = 'config_schema_test.ignore';
     $expected['unwrap_for_canonical_representation'] = TRUE;
     $expected['constraints'] = [
-      'ValidKeys' => '<infer>',
+      'ValidKeys' => ['allowedKeys' => '<infer>'],
       'LangcodeRequiredIfTranslatableValues' => NULL,
     ];
 
@@ -228,7 +226,7 @@ class ConfigSchemaTest extends KernelTestBase {
     $expected['mapping']['_core']['requiredKey'] = FALSE;
     $expected['type'] = 'image.style.*';
     $expected['constraints'] = [
-      'ValidKeys' => '<infer>',
+      'ValidKeys' => ['allowedKeys' => '<infer>'],
       'FullyValidatable' => NULL,
     ];
 
@@ -254,7 +252,7 @@ class ConfigSchemaTest extends KernelTestBase {
     $expected['mapping']['upscale']['label'] = 'Upscale';
     $expected['type'] = 'image.effect.image_scale';
     $expected['constraints'] = [
-      'ValidKeys' => '<infer>',
+      'ValidKeys' => ['allowedKeys' => '<infer>'],
       'FullyValidatable' => NULL,
     ];
 
@@ -263,7 +261,8 @@ class ConfigSchemaTest extends KernelTestBase {
     // Most complex case, get metadata for actual configuration element.
     $effects = \Drupal::service('config.typed')->get('image.style.medium')->get('effects');
     $definition = $effects->get('bddf0d06-42f9-4c75-a700-a33cafa25ea0')->get('data')->getDataDefinition()->toArray();
-    // This should be the schema for image.effect.image_scale, reuse previous one.
+    // This should be the schema for image.effect.image_scale, reuse previous
+    // one.
     $expected['type'] = 'image.effect.image_scale';
     $expected['mapping']['width']['requiredKey'] = TRUE;
     $expected['mapping']['height']['requiredKey'] = TRUE;
@@ -285,12 +284,13 @@ class ConfigSchemaTest extends KernelTestBase {
       'integer' => ['type' => 'integer', 'requiredKey' => TRUE],
       'string' => ['type' => 'string', 'requiredKey' => TRUE],
     ];
-    $expected['constraints'] = ['ValidKeys' => '<infer>'];
+    $expected['constraints'] = ['ValidKeys' => ['allowedKeys' => '<infer>']];
     $this->assertEquals($expected, $definition, 'Retrieved the right metadata for config_test.dynamic.third_party:third_party_settings.config_schema_test');
 
     // More complex, several level deep test.
     $definition = \Drupal::service('config.typed')->getDefinition('config_schema_test.some_schema.some_module.section_one.subsection');
-    // This should be the schema of config_schema_test.some_schema.some_module.*.*.
+    // This should be the schema of
+    // config_schema_test.some_schema.some_module.*.*.
     $expected = [];
     $expected['label'] = 'Schema multiple filesystem marker test';
     $expected['class'] = Mapping::class;
@@ -306,7 +306,7 @@ class ConfigSchemaTest extends KernelTestBase {
     $expected['definition_class'] = '\Drupal\Core\TypedData\MapDataDefinition';
     $expected['unwrap_for_canonical_representation'] = TRUE;
     $expected['constraints'] = [
-      'ValidKeys' => '<infer>',
+      'ValidKeys' => ['allowedKeys' => '<infer>'],
       'LangcodeRequiredIfTranslatableValues' => NULL,
     ];
 
@@ -459,9 +459,13 @@ class ConfigSchemaTest extends KernelTestBase {
     ];
 
     // Save config which has a schema that enforces types.
-    $this->config('config_schema_test.schema_data_types')
+    $config_object = $this->config('config_schema_test.schema_data_types');
+    $config_object
       ->setData($untyped_to_typed)
       ->save();
+    // Ensure the schemaWrapper property is reset after saving to prevent a
+    // memory leak.
+    $this->assertNull((new \ReflectionObject($config_object))->getProperty('schemaWrapper')->getValue($config_object));
     $this->assertSame($typed_values, $this->config('config_schema_test.schema_data_types')->get());
 
     // Save config which does not have a schema that enforces types.
@@ -590,7 +594,7 @@ class ConfigSchemaTest extends KernelTestBase {
     $expected['mapping']['test_description']['label'] = 'Description';
     $expected['type'] = 'config_schema_test.wildcard_fallback.*';
     $expected['constraints'] = [
-      'ValidKeys' => '<infer>',
+      'ValidKeys' => ['allowedKeys' => '<infer>'],
       'LangcodeRequiredIfTranslatableValues' => NULL,
     ];
 
@@ -857,6 +861,20 @@ class ConfigSchemaTest extends KernelTestBase {
       'type' => 'string',
       'requiredKey' => TRUE,
     ], $definition['mapping']['breed']);
+  }
+
+  /**
+   * Tests exception is thrown for the root object.
+   */
+  public function testLangcodeRequiredIfTranslatableValuesConstraintError(): void {
+    $config = \Drupal::configFactory()->getEditable('config_test.foo');
+
+    $this->expectException(\LogicException::class);
+    $this->expectExceptionMessage('The LangcodeRequiredIfTranslatableValues constraint is applied to \'config_test.foo::broken_langcode_required\'. This constraint can only operate on the root object being validated.');
+
+    $config
+      ->set('broken_langcode_required.foo', 'bar')
+      ->save();
   }
 
 }

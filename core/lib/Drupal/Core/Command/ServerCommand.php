@@ -46,7 +46,7 @@ class ServerCommand extends Command {
   /**
    * {@inheritdoc}
    */
-  protected function configure() {
+  protected function configure(): void {
     $this->setDescription('Starts up a webserver for a site.')
       ->addOption('host', NULL, InputOption::VALUE_OPTIONAL, 'Provide a host for the server to run on.', '127.0.0.1')
       ->addOption('port', NULL, InputOption::VALUE_OPTIONAL, 'Provide a port for the server to run on. Will be determined automatically if none supplied.')
@@ -73,7 +73,7 @@ class ServerCommand extends Command {
     try {
       $kernel = $this->boot();
     }
-    catch (ConnectionNotDefinedException $e) {
+    catch (ConnectionNotDefinedException) {
       $io->getErrorStyle()->error("No installation found. Use the 'install' command.");
       return 1;
     }
@@ -245,8 +245,8 @@ class ServerCommand extends Command {
     $server = proc_open($process->getCommandLine(), $descriptors, $pipes, $kernel->getAppRoot());
     if (is_resource($server)) {
       if ($io->isVerbose()) {
-        // Write a blank line so that server output and the useful information are
-        // visually separated.
+        // Write a blank line so that server output and the useful information
+        // are visually separated.
         $io->writeln('');
       }
       $server_status = proc_get_status($server);

@@ -6,20 +6,15 @@ namespace Drupal\KernelTests\Core\KeyValueStore;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\KeyValueStore\KeyValueFactory;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the key-value database storage.
- *
- * @group KeyValueStore
  */
+#[Group('KeyValueStore')]
+#[RunTestsInSeparateProcesses]
 class DatabaseStorageExpirableTest extends StorageTestBase {
-
-  /**
-   * Modules to enable.
-   *
-   * @var array
-   */
-  protected static $modules = ['system'];
 
   /**
    * {@inheritdoc}
@@ -32,7 +27,7 @@ class DatabaseStorageExpirableTest extends StorageTestBase {
   /**
    * {@inheritdoc}
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     parent::register($container);
 
     $parameter[KeyValueFactory::DEFAULT_SETTING] = 'keyvalue.expirable.database';
@@ -147,7 +142,7 @@ class DatabaseStorageExpirableTest extends StorageTestBase {
       -3 * $day
     );
     $stores[0]->setWithExpireIfNotExists('yesterday', "you'd forgiven me", -1 * $day);
-    $stores[0]->setWithExpire('still', "'til we say we're sorry", 2 * $day);
+    $stores[0]->setWithExpire('still', "'til we say we care", 2 * $day);
 
     // Ensure only non-expired items are retrieved.
     $all = $stores[0]->getAll();

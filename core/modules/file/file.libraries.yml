@@ -1,7 +1,7 @@
 drupal.file:
   version: VERSION
   js:
-    file.js: {}
+    js/file.js: {}
   dependencies:
     - core/jquery
     - core/once
