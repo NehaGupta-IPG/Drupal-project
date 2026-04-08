@@ -80,7 +80,7 @@ class EntityAccessControlHandler extends EntityHandlerBase implements EntityAcce
       if ($operation === 'delete revision' && $entity->isDefaultRevision()) {
         return $return_as_object ? AccessResult::forbidden() : FALSE;
       }
-      // Prevert reverting to the latest revision.
+      // Prevent reverting to the latest revision.
       if ($operation === 'revert') {
         $is_latest_revision = $entity instanceof TranslatableRevisionableInterface ?
           $entity->isLatestTranslationAffectedRevision() :
