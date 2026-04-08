@@ -477,10 +477,7 @@ class NodeRevisionsTest extends NodeTestBase {
   }
 
   /**
-   * Tests reverting to a non-latest revision.
-   *
-   * This operation appears on the revision list when there is a more recent
-   * revision than the current revision.
+   * Tests reverting to non-latest revisions.
    */
   public function testRevisionRevert(): void {
     $node = $this->drupalCreateNode();
@@ -496,11 +493,11 @@ class NodeRevisionsTest extends NodeTestBase {
     $this->drupalGet($node->toUrl('version-history'));
 
     // There should be no link to revert to the latest revision.
-    $latestRevisionRevertUrl = Url::fromRoute('node.revision_revert_confirm', [
+    $secondRevisionRevertUrl = Url::fromRoute('node.revision_revert_confirm', [
       'node' => $node->id(),
       'node_revision' => $node->getRevisionId(),
     ]);
-    $this->assertSession()->linkByHrefNotExistsExact($latestRevisionRevertUrl->toString());
+    $this->assertSession()->linkByHrefNotExistsExact($secondRevisionRevertUrl->toString());
 
     // There should be a link to revert to the non-latest revision.
     $firstRevisionRevertUrl = Url::fromRoute('node.revision_revert_confirm', [
@@ -514,15 +511,25 @@ class NodeRevisionsTest extends NodeTestBase {
     $this->assertSession()->pageTextContains(sprintf('Basic page %s has been reverted', $node->label()));
 
     // Reverting the non-default revision should create a new revision and set
-    // it as the default, meaning there should be 3 revisions displayed and no
-    // Set as current revision link.
+    // it as the default, meaning there should be 3 revisions displayed.
     $this->assertSession()->elementsCount('css', '.node-revision-table tbody tr', 3);
-    $this->assertSession()->linkNotExists('Set as current revision');
     $this->assertSession()->pageTextContains('Copy of the revision from');
+
     // The first row (the revision we just reverted to) should be displayed as
     // the current revision.
     $firstRowSecondColumnText = $this->getSession()->getPage()->find('xpath', '//tbody/tr[1]/td[2]/em')->getText();
     $this->assertEquals('Current revision', $firstRowSecondColumnText);
+
+    // There should be no link to revert to the third revision created by reverting.
+    $thirdRevisionId = \Drupal::entityTypeManager()->getStorage('node')->getLatestRevisionId($node->id());
+    $thirdRevisionRevertUrl = Url::fromRoute('node.revision_revert_confirm', [
+      'node' => $node->id(),
+      'node_revision' => $thirdRevisionId,
+    ]);
+    $this->assertSession()->linkByHrefNotExistsExact($thirdRevisionRevertUrl->toString());
+
+    // There should be a link to revert to the second revision now.
+    $this->assertSession()->linkByHrefExistsExact($secondRevisionRevertUrl->toString());
   }
 
 }
