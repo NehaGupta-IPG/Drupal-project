@@ -843,45 +843,4 @@ class IconFinderTest extends UnitTestCase {
     $this->assertFalse($this->iconFinder->getFileContents($uri));
   }
 
-  /**
-   * Tests that Windows drive-letter paths are treated as local files.
-   */
-  public function testGetFileContentsWithWindowsPath(): void {
-    $expected = '<svg xmlns="http://www.w3.org/2000/svg"><path/></svg>';
-
-    if (DIRECTORY_SEPARATOR === '\\') {
-      $path = tempnam(sys_get_temp_dir(), 'icon');
-      $this->assertNotFalse($path);
-      file_put_contents($path, $expected);
-
-      try {
-        $this->assertSame($expected, $this->iconFinder->getFileContents(str_replace('\\', '/', $path)));
-      }
-      finally {
-        unlink($path);
-      }
-
-      return;
-    }
-
-    $current_directory = getcwd();
-    $this->assertNotFalse($current_directory);
-
-    $temporary_directory = sys_get_temp_dir() . '/icon-finder-' . uniqid('', TRUE);
-    mkdir($temporary_directory);
-    chdir($temporary_directory);
-    mkdir('C:');
-    file_put_contents('C:/icon.svg', $expected);
-
-    try {
-      $this->assertSame($expected, $this->iconFinder->getFileContents('C:/icon.svg'));
-    }
-    finally {
-      unlink('C:/icon.svg');
-      rmdir('C:');
-      chdir($current_directory);
-      rmdir($temporary_directory);
-    }
-  }
-
 }

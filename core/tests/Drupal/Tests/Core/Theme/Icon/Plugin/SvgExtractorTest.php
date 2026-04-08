@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Theme\Icon\Plugin;
 
+use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Theme\Icon\IconDefinition;
 use Drupal\Core\Theme\Icon\IconDefinitionInterface;
@@ -15,6 +16,7 @@ use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use Psr\Log\LoggerInterface;
 
 /**
  * Tests Drupal\Core\Theme\Plugin\IconExtractor\SvgExtractor.
@@ -300,6 +302,67 @@ class SvgExtractorTest extends UnitTestCase {
       $this->assertSame($icon['source'], $icon_loaded->getSource());
       $this->assertSame($icon['group'] ?? NULL, $icon_loaded->getGroup());
     }
+  }
+
+  /**
+   * Test the SvgExtractor::loadIcon() method with Windows local paths.
+   */
+  public function testLoadIconSvgWithWindowsLocalPath(): void {
+    $svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M1 1"/></svg>';
+    $icon = [
+      'icon_id' => 'foo',
+      'source' => 'source/foo.svg',
+    ];
+    $fileUrlGenerator = $this->createMock(FileUrlGeneratorInterface::class);
+    $logger = $this->createMock(LoggerInterface::class);
+    $extractor = new SvgExtractor(
+      [
+        'id' => $this->pluginId,
+        'config' => ['sources' => ['foo/bar/{icon_id}.svg']],
+        'template' => '_foo_',
+        'relative_path' => 'modules/my_module',
+      ],
+      $this->pluginId,
+      [],
+      new IconFinder($fileUrlGenerator, $logger, DRUPAL_ROOT),
+    );
+
+    if (DIRECTORY_SEPARATOR === '\\') {
+      $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('icon', TRUE) . '.svg';
+      file_put_contents($path, $svg);
+      $icon['absolute_path'] = str_replace('\\', '/', $path);
+
+      try {
+        $loaded = $extractor->loadIcon($icon);
+      }
+      finally {
+        unlink($path);
+      }
+    }
+    else {
+      $cwd = getcwd();
+      $this->assertNotFalse($cwd);
+
+      $dir = sys_get_temp_dir() . '/svg-extractor-' . uniqid('', TRUE);
+      mkdir($dir);
+      chdir($dir);
+      mkdir('C:');
+      $icon['absolute_path'] = 'C:/icon.svg';
+      file_put_contents($icon['absolute_path'], $svg);
+
+      try {
+        $loaded = $extractor->loadIcon($icon);
+      }
+      finally {
+        unlink($icon['absolute_path']);
+        rmdir('C:');
+        chdir($cwd);
+        rmdir($dir);
+      }
+    }
+
+    $this->assertInstanceOf(IconDefinitionInterface::class, $loaded);
+    $this->assertEquals('<path d="M1 1"/>', $loaded->getAllData()['content']);
   }
 
   /**
