@@ -836,6 +836,10 @@ class IconFinderTest extends UnitTestCase {
       'valid windows file ' => [
         str_replace('/', '\\\\', DRUPAL_ROOT) . '\\\\' . str_replace('/', '\\\\', self::TEST_ICONS_PATH) . '\\\\icons\\\\flat\\\\foo.svg',
         TRUE,
+      ],
+      'windows path' => [
+        'C:\\foo.svg',
+        FALSE,
       ]
     ];
   }
