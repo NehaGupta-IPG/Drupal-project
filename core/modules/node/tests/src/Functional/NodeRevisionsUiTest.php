@@ -179,13 +179,13 @@ class NodeRevisionsUiTest extends NodeTestBase {
     // Verify that the default revision can be an older revision than the latest
     // one.
     // Assert that the revisions with translations changes are shown.
-    $this->assertSession()->linkByHrefExists('/node/' . $node_id . '/revisions/4/revert');
+    $this->assertSession()->linkByHrefExists('/node/' . $node_id . '/revisions/4/view');
 
     // Assert that the revisions without translations changes are filtered out:
     // 2, 3 and 5.
-    $this->assertSession()->linkByHrefNotExists('/node/' . $node_id . '/revisions/2/revert');
-    $this->assertSession()->linkByHrefNotExists('/node/' . $node_id . '/revisions/3/revert');
-    $this->assertSession()->linkByHrefNotExists('/node/' . $node_id . '/revisions/5/revert');
+    $this->assertSession()->linkByHrefNotExists('/node/' . $node_id . '/revisions/2/view');
+    $this->assertSession()->linkByHrefNotExists('/node/' . $node_id . '/revisions/3/view');
+    $this->assertSession()->linkByHrefNotExists('/node/' . $node_id . '/revisions/5/view');
   }
 
   /**
