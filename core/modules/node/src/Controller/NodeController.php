@@ -148,7 +148,7 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
 
     foreach ($this->getRevisionIds($node, $node_storage) as $vid) {
       /** @var \Drupal\node\NodeInterface $revision */
-      $revision = $node_storage->loadRevision($vid);
+      $revision = $node_storage->loadRevision($vid)->getTranslation($langcode);
       $username = [
         '#theme' => 'username',
         '#account' => $revision->getRevisionUser(),
