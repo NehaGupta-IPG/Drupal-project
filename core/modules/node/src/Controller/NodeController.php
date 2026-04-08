@@ -173,8 +173,12 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
         ]))->toString();
       }
 
-      $row = [];
-      $column = [
+      $row = [
+        'data' => [],
+        'class' => $is_current_revision ? ['revision-current'] : [],
+      ];
+
+      $row['data'][] = [
         'data' => [
           '#type' => 'inline_template',
           '#template' => '{% trans %}{{ date }} by {{ username }}{% endtrans %}{% if message %}<p class="revision-log">{{ message }}</p>{% endif %}',
@@ -189,10 +193,8 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
           ],
         ],
       ];
-      $row[] = $column;
 
       $links = [];
-
       if ($revision->access('revert revision')) {
         $links['revert'] = [
           'title' => $this->t('Revert'),
@@ -216,20 +218,13 @@ class NodeController extends ControllerBase implements ContainerInjectionInterfa
         ];
       }
 
-      $row[] = [
+      $row['data'][] = [
         'data' => [
           '#type' => 'operations',
           '#links' => $links,
           '#prefix' => $is_current_revision ? $this->t('<em>Current revision</em>') : '',
         ],
       ];
-
-      if ($is_current_revision) {
-        $row = [
-          'data' => $row,
-          'class' => ['revision-current'],
-        ];
-      }
 
       $rows[] = $row;
     }
