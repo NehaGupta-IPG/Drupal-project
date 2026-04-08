@@ -43,6 +43,10 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
    * An array of languages.
    */
   protected array $languages;
+
+  /**
+   * Request stack service mock.
+   */
   protected $requestStack;
 
   /**
