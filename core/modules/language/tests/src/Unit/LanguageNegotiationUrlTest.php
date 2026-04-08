@@ -46,6 +46,8 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
 
   /**
    * Request stack service mock.
+   *
+   * @var \Symfony\Component\HttpFoundation\RequestStack
    */
   protected $requestStack;
 
