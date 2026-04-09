@@ -90,7 +90,7 @@ class UserSelection extends DefaultSelection {
       '#type' => 'checkbox',
       '#title' => $this->t('Include blocked users'),
       '#default_value' => !empty($configuration['include_blocked']),
-      '#description' => $this->t('If this option is not set, only users with the <em>administer users</em> permission may reference blocked users.'),
+      '#description' => $this->t('If enabled, users with the <em>administer users</em> permission may reference blocked users.'),
     ];
 
     $form['include_anonymous'] = [
