@@ -335,7 +335,6 @@ class DrupalKernelTest extends KernelTestBase {
     // Ensure persisted services are persisted.
     $request_stack = $container->get('request_stack');
 
-    $container->get('stream_wrapper_manager')->register();
     $stream_wrappers = array_keys($container->get('stream_wrapper_manager')->getWrappers());
     $this->assertSame([
       'assets',

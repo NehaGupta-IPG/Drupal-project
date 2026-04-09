@@ -22,7 +22,9 @@ class StreamWrapperManager implements StreamWrapperManagerInterface {
   public function __construct(
     #[AutowireLocator('stream_wrapper', indexAttribute: 'scheme')]
     protected readonly ServiceLocator $container,
-  ) {}
+  ) {
+    $this->register();
+  }
 
   /**
    * Contains collected stream wrappers.
