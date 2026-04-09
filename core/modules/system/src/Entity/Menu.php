@@ -2,10 +2,12 @@
 
 namespace Drupal\system\Entity;
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\Attribute\ConfigEntityType;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\system\MenuAccessControlHandler;
 use Drupal\system\MenuInterface;
 use Drupal\system\MenuStorage;
@@ -119,6 +121,41 @@ class Menu extends ConfigEntityBase implements MenuInterface {
     // Invalidate the block cache to update menu-based derivatives.
     if (\Drupal::moduleHandler()->moduleExists('block')) {
       \Drupal::service('plugin.manager.block')->clearCachedDefinitions();
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getCacheTags() {
+    // Override the default cache tags to use the cache tags that are not
+    // coupled to Menu config entities (i.e. this class), to not force other
+    // parts of the menu system to couple themselves to Menu config entities.
+    return ['menu:' . $this->id()];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function invalidateTagsOnSave($update): void {
+    parent::invalidateTagsOnSave($update);
+    // The menu API doesn't require one to use Menu config entities. Hence the
+    // Menu config entity should not use config-specific cache tags, but generic
+    // ones instead. Drupal\Core\Config\Entity\ConfigEntityBase explicitly
+    // overrides the default implementation and does not invalidate the specific
+    // cache tag, this adds that again.
+    if ($update) {
+      Cache::invalidateTags($this->getCacheTags());
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected static function invalidateTagsOnDelete(EntityTypeInterface $entity_type, array $entities): void {
+    parent::invalidateTagsOnDelete($entity_type, $entities);
+    foreach ($entities as $key => $value) {
+      Cache::invalidateTags($entities[$key]->getCacheTags());
     }
   }
 

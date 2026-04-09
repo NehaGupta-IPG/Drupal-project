@@ -150,8 +150,8 @@ class PageCacheTagsIntegrationTest extends BrowserTestBase {
       'user:' . $author_1->id(),
       'config:filter.format.basic_html',
       'config:search.settings',
-      'config:system.menu.account',
-      'config:system.menu.main',
+      'menu:account',
+      'menu:main',
       'config:system.site',
       // FinishResponseSubscriber adds this cache tag to responses that have the
       // 'user.permissions' cache context for anonymous users.
@@ -173,8 +173,8 @@ class PageCacheTagsIntegrationTest extends BrowserTestBase {
       'user:' . $author_2->id(),
       'config:filter.format.full_html',
       'config:search.settings',
-      'config:system.menu.account',
-      'config:system.menu.main',
+      'menu:account',
+      'menu:main',
       'config:system.site',
       'comment_list',
       'node_list',

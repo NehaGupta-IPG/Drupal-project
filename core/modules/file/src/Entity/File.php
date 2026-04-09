@@ -291,7 +291,7 @@ class File extends ContentEntityBase implements FileInterface {
   /**
    * {@inheritdoc}
    */
-  protected function invalidateTagsOnSave($update) {
+  protected function invalidateTagsOnSave($update): void {
     $tags = $this->getListCacheTagsToInvalidate();
     // Always invalidate the 404 or 403 response cache because while files do
     // not have a canonical URL as such, they may be served via routes such as
