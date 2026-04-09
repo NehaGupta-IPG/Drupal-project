@@ -173,7 +173,7 @@ class UserSelection extends DefaultSelection {
 
     // Adding the permission check is sadly insufficient for users: core
     // requires us to also know about the concept of 'blocked' and 'active'.
-    if (!$configuration['include_blocked'] && !$this->currentUser->hasPermission('administer users')) {
+    if (!$configuration['include_blocked'] || !$this->currentUser->hasPermission('administer users')) {
       $query->condition('status', 1);
     }
     return $query;
