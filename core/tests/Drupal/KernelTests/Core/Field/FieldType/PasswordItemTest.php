@@ -138,8 +138,6 @@ class PasswordItemTest extends FieldKernelTestBase {
     $entity->test_field = $this->randomString();
     $entity->save();
 
-    $hashed_password = $entity->test_field->value;
-
     $entity->test_field = '';
     $this->expectException(EntityStorageException::class);
     $this->expectExceptionMessage('Passwords cannot be empty.');
