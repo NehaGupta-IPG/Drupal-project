@@ -44,7 +44,7 @@ class PasswordItem extends StringItem {
 
     // An empty string is *never* allowed as a password, regardless of whether
     // it is pre-hashed (a password hash is not empty by definition).
-    if ($this->value === '') {
+    if (trim($this->value) === '') {
       throw new EntityMalformedException('Passwords cannot be empty.');
     }
 
@@ -57,7 +57,7 @@ class PasswordItem extends StringItem {
       // original password.
       $this->value = $entity->getOriginal()->{$this->getFieldDefinition()->getName()}->value;
     }
-    elseif ($entity->isNew() || (strlen(trim($this->value)) > 0 && $this->value != $entity->getOriginal()->{$this->getFieldDefinition()->getName()}->value)) {
+    elseif ($entity->isNew() || $this->value != $entity->getOriginal()->{$this->getFieldDefinition()->getName()}->value) {
       // Allow alternate password hashing schemes.
       $this->value = \Drupal::service('password')->hash(trim($this->value));
       // Abort if the hashing failed and returned FALSE.
