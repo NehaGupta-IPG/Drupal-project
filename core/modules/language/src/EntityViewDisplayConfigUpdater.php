@@ -41,15 +41,24 @@ class EntityViewDisplayConfigUpdater {
     if ($entityViewDisplay->getTargetEntityTypeId() !== 'node') {
       return FALSE;
     }
+
+    $langcode = $entityViewDisplay->getComponent('langcode');
     if ($entityViewDisplay->getComponent('langcode') === NULL) {
       return FALSE;
     }
-    $langcode['label'] = 'above';
-    // Set to show it as plain text.
-    $langcode['settings'] = [
-      'link_to_entity' => FALSE,
-      'native_language' => FALSE,
-    ];
+
+    if (empty($langcode['label'])) {
+      $langcode['label'] = 'above';
+    }
+
+    if (empty($langcode['settings'])) {
+      // Set to show it as plain text.
+      $langcode['settings'] = [
+        'link_to_entity' => FALSE,
+        'native_language' => FALSE,
+      ];
+    }
+
     $entityViewDisplay->setComponent('langcode', $langcode);
     return TRUE;
   }
