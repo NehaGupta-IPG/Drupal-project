@@ -321,9 +321,6 @@ trait BlockPluginTrait {
         }
       }
     }
-    if (!$update_methods) {
-      return $this;
-    }
 
     ksort($update_methods);
     foreach ($update_methods as $schema => $method) {
