@@ -73,6 +73,8 @@ class TextareaWithSummaryWidget extends TextareaWidget {
 
     $display_summary = $items[$delta]->summary || $this->getFieldSetting('display_summary');
     $required = empty($form['#type']) && $this->getFieldSetting('required_summary');
+    $required = empty($form['#type']) && $this->getFieldSetting('required_summary')
+    && !$form_state->get('default_value_widget');
 
     $element['summary'] = [
       '#type' => $display_summary ? 'textarea' : 'value',
