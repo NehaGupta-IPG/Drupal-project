@@ -4,7 +4,14 @@
  * Default theme implementation for the navigation top bar.
  *
  * Available variables:
+ * - element: The top bar render element.
  * - local_tasks: The local tasks for the current route.
+ * - tools: The tools region of the top bar.
+ * - context: The context region of the top bar.
+ * - actions: The actions region of the top bar.
+ * - gin_breadcrumbs: Gin breadcrumbs output.
+ * - gin_local_actions: Gin local actions output.
+ * - gin_form_actions: Gin form actions output.
  *
  * @ingroup themeable
  */
@@ -13,7 +20,9 @@
 {% if local_tasks %}
   {% set attributes = attributes.setAttribute('data-offset-top', '') %}
 {% endif %}
-<div {{ attributes.addClass('top-bar gin--navigation-top-bar').setAttribute('data-drupal-admin-styles', '') }}>
+<aside {{ attributes .addClass('top-bar', 'gin--navigation-top-bar') .setAttribute('data-drupal-admin-styles', '') .setAttribute('aria-labelledby', 'top-bar__title') }}>
+  <h3 id="top-bar__title" class="visually-hidden">{{ 'Administrative top bar'|t }}</h3>
+
   <div class="top-bar__content">
     {{ include('@navigation/toolbar-button.html.twig', {
       attributes: create_attribute({'aria-expanded': 'false', 'aria-controls': 'admin-toolbar'}),
@@ -32,9 +41,11 @@
 
       {{- tools -}}
     </div>
+
     <div class="top-bar__context">
       {{- context -}}
     </div>
+
     <div class="top-bar__actions">
       {% if default_admin_local_actions %}
         <ul class="local-actions">
@@ -49,4 +60,4 @@
       {{- actions -}}
     </div>
   </div>
-</div>
+</aside>
