@@ -4,6 +4,7 @@ namespace Drupal\Core\Test;
 
 use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\File\FileSystemInterface;
 use Drupal\TestTools\Extension\DeprecationBridge\DeprecationHandler;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Process\PhpExecutableFinder;
@@ -52,10 +53,15 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container): static {
-    return new static(
+    $fileSystem = $container->get('file_system');
+    $filePath = 'public://simpletest';
+    $instance = new static(
       (string) $container->getParameter('app.root'),
-      (string) $container->get('file_system')->realpath('public://simpletest')
+      (string) $fileSystem->realpath($filePath),
     );
+    $filePath .= '/otr';
+    $fileSystem->prepareDirectory($filePath, FileSystemInterface::CREATE_DIRECTORY | FileSystemInterface::MODIFY_PERMISSIONS);
+    return $instance;
   }
 
   /**
@@ -198,7 +204,7 @@ class PhpUnitTestRunner implements ContainerInjectionInterface {
    * @internal
    */
   private function otrLogFilePath(int $test_id): string {
-    return $this->workingDirectory . 'otr/test-' . $test_id . '.xml';
+    return $this->workingDirectory . '/otr/test-' . $test_id . '.xml';
   }
 
   /**
