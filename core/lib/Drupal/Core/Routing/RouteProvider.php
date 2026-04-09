@@ -89,12 +89,16 @@ class RouteProvider implements CacheableRouteProviderInterface, PreloadableRoute
       // Incoming path processors may also set query parameters.
       $query_parameters = $request->query->all();
       $routes = $this->getRoutesByPath(rtrim($path, '/'));
-      $cache_value = [
-        'path' => $path,
-        'query' => $query_parameters,
-        'routes' => $routes->count() === 0 ? FALSE : $routes,
-      ];
-      $this->cache->set($cid, $cache_value, CacheBackendInterface::CACHE_PERMANENT, ['route_match']);
+      // Disable caching for routes that are seemingly broken/not found.
+      if ($routes->all() || $routes->getResources()) {
+        $cache_value = [
+          'path' => $path,
+          'query' => $query_parameters,
+          'routes' => $routes->count() === 0 ? FALSE : $routes,
+        ];
+        $this->cache->set($cid, $cache_value, CacheBackendInterface::CACHE_PERMANENT, ['route_match']);
+      }
+
       return $routes;
     }
   }
