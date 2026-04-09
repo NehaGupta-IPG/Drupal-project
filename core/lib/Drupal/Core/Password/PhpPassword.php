@@ -45,12 +45,16 @@ class PhpPassword implements PasswordInterface {
    * {@inheritdoc}
    */
   public function check(#[\SensitiveParameter] $password, #[\SensitiveParameter] $hash) {
-    // Prevent DoS attacks by refusing to check large passwords.
-    if (strlen($password) > static::PASSWORD_MAX_LENGTH) {
+    // Ensure empty string passwords never get verified.
+    if ($password === '' || $password === NULL) {
       return FALSE;
     }
-    // Newly created accounts may have empty passwords.
+    // Newly created accounts may have no hash to compare against.
     if ($hash === NULL || $hash === '') {
+      return FALSE;
+    }
+    // Prevent DoS attacks by refusing to check large passwords.
+    if (strlen($password) > static::PASSWORD_MAX_LENGTH) {
       return FALSE;
     }
 
