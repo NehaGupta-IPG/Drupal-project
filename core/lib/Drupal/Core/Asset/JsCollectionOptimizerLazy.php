@@ -183,7 +183,7 @@ class JsCollectionOptimizerLazy implements AssetCollectionGroupOptimizerInterfac
       $data .= ";\n";
     }
     // Remove unwanted JS code that causes issues.
-    return $this->optimizer->clean($data);
+    return $this->optimizer->clean($data) ?? $data;
   }
 
 }
