@@ -15,7 +15,7 @@ use Drupal\filter\Plugin\FilterInterface;
 #[Filter(
   id: "filter_align",
   title: new TranslatableMarkup("Align images"),
-  description: new TranslatableMarkup("Uses a <code>data-align</code> attribute on <code>&lt;img&gt;</code> tags to align images."),
+  description: new TranslatableMarkup("Uses a <code>data-align</code> attribute on <code>&lt;img&gt;</code> tags and embedded media to align images."),
   type: FilterInterface::TYPE_TRANSFORM_REVERSIBLE,
 )]
 class FilterAlign extends FilterBase {
