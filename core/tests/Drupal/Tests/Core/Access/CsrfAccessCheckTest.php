@@ -122,7 +122,7 @@ class CsrfAccessCheckTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::access
+   * @legacy-covers  ::access
    */
   public function testCsrfTokenInvalid(): void {
     $this->sessionConfiguration->expects($this->once())
