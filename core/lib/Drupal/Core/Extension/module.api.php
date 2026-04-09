@@ -786,6 +786,7 @@ function hook_install_tasks_alter(&$tasks, $install_state) {
  * @see https://www.drupal.org/node/2535316
  */
 // phpcs:enable
+// phpcs:ignore Drupal.Commenting.FunctionComment.Missing, Drupal.Commenting.FunctionComment.MissingReturnComment
 function hook_update_N(&$sandbox) {
   // For non-batch updates, the signature can simply be:
   // "function hook_update_N() {".
@@ -852,7 +853,8 @@ function hook_update_N(&$sandbox) {
  * a THEME.post_update.php file.
  *
  * These updates are executed after all hook_update_N() implementations. At this
- * stage Drupal is already fully repaired so you can use any API as you wish.
+ * stage Drupal is already fully bootstrapped so you can use any API as you
+ * wish.
  *
  * NAME can be arbitrary machine names. In contrast to hook_update_N() the
  * alphanumeric naming of functions in the file is the only thing which ensures
@@ -861,6 +863,12 @@ function hook_update_N(&$sandbox) {
  *
  * Drupal also ensures to not execute the same hook_post_update_NAME() function
  * twice.
+ *
+ * Post update hooks are not executed at module install time. During install
+ * they are skipped and added to an internal "already executed" list in the
+ * key_value database table, making them appear as if they have been executed
+ * properly. For tasks that need to run at module installation time, use
+ * hook_install() instead.
  *
  * @section sec_bulk Batch updates
  * If running your update all at once could possibly cause PHP to time out, use
@@ -896,6 +904,7 @@ function hook_update_N(&$sandbox) {
  * @see hook_removed_post_updates()
  */
 // phpcs:enable
+// phpcs:ignore Drupal.Commenting.FunctionComment.Missing
 function hook_post_update_NAME(&$sandbox) {
   // Example of updating some content.
   $node = \Drupal\node\Entity\Node::load(123);
@@ -916,6 +925,8 @@ function hook_post_update_NAME(&$sandbox) {
 /**
  * Return an array of removed hook_post_update_NAME() function names.
  *
+ * Only procedural implementations are supported for this hook.
+ *
  * This should be used to indicate post-update functions that have existed in
  * some previous version of the module, but are no longer available.
  *
@@ -932,13 +943,16 @@ function hook_post_update_NAME(&$sandbox) {
 function hook_removed_post_updates(): array {
   return [
     'my_module_post_update_foo' => '8.x-2.0',
-    'my_module_post_update_bar' => '8.x-3.0',
-    'my_module_post_update_baz' => '8.x-3.0',
+    'my_module_post_update_bar' => '3.0.0',
+    'my_module_post_update_baz' => '4.0.0',
+    'my_module_post_update_qux' => '4.0.0',
   ];
 }
 
 /**
  * Return an array of information about module update dependencies.
+ *
+ * Only procedural implementations are supported for this hook.
  *
  * This can be used to indicate update functions from other modules that your
  * module's update functions depend on, or vice versa. It is used by the update

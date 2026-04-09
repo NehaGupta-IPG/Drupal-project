@@ -8,12 +8,15 @@ use Drupal\comment\Entity\CommentType;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\KernelTests\Core\Entity\EntityKernelTestBase;
 use Drupal\user\UserInterface;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Performs kernel tests on the deprecation of the comment_uri method.
- *
- * @group comment
  */
+#[Group('comment')]
+#[RunTestsInSeparateProcesses]
 class CommentUriDeprecationTest extends EntityKernelTestBase {
   use CommentTestTrait;
 
@@ -66,9 +69,8 @@ class CommentUriDeprecationTest extends EntityKernelTestBase {
 
   /**
    * Tests the deprecation of comment_uri() method.
-   *
-   * @group legacy
    */
+  #[IgnoreDeprecations]
   public function testCommentUriMethod(): void {
 
     // Create a node with a comment and make it unpublished.
@@ -89,7 +91,7 @@ class CommentUriDeprecationTest extends EntityKernelTestBase {
     $comment->save();
 
     $comment_uri = comment_uri($comment);
-    $this->expectDeprecation('comment_uri() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\comment\Entity\Comment::permalink() instead. See https://www.drupal.org/node/3384294');
+    $this->expectUserDeprecationMessage('comment_uri() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Use \Drupal\comment\Entity\Comment::permalink() instead. See https://www.drupal.org/node/3384294');
 
     $this->assertEquals('/comment/1#comment-1', $comment_uri->toString());
 

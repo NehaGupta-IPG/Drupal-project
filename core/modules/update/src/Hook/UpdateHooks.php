@@ -66,7 +66,9 @@ class UpdateHooks {
         case 'update.status':
         case 'update.settings':
         case 'system.status':
+        case 'system.modules_uninstall':
         case 'system.theme_install':
+        case 'system.theme_uninstall':
         case 'system.batch_page.html':
           return;
 
@@ -201,9 +203,15 @@ class UpdateHooks {
     $language = \Drupal::languageManager()->getLanguage($langcode);
     $message['subject'] .= $this->t('New release(s) available for @site_name', ['@site_name' => \Drupal::config('system.site')->get('name')], ['langcode' => $langcode]);
     foreach ($params as $msg_type => $msg_reason) {
-      $message['body'][] = _update_message_text($msg_type, $msg_reason, $langcode);
+      $message['body'][] = _update_message_text($msg_type, $msg_reason, $langcode, TRUE);
     }
-    $message['body'][] = $this->t('See the available updates page for more information:', [], ['langcode' => $langcode]) . "\n" . Url::fromRoute('update.status', [], ['absolute' => TRUE, 'language' => $language])->toString();
+    $message['body'][] = $this->t('See the available updates page for more information:',
+      [],
+      ['langcode' => $langcode]
+    ) . "\n" . Url::fromRoute('update.status', [], [
+      'absolute' => TRUE,
+      'language' => $language,
+    ])->toString();
     $settings_url = Url::fromRoute('update.settings', [], ['absolute' => TRUE])->toString();
     if (\Drupal::config('update.settings')->get('notification.threshold') == 'all') {
       $message['body'][] = $this->t('Your site is currently configured to send these emails when any updates are available. To get notified only for security updates, @url.', ['@url' => $settings_url]);
@@ -246,7 +254,11 @@ class UpdateHooks {
     $incompatible = [];
     /** @var \Drupal\Core\File\FileSystemInterface $file_system */
     $file_system = \Drupal::service('file_system');
-    $files = $file_system->scanDirectory("{$directory}/{$project}", '/.*\.info.yml$/', ['key' => 'name', 'min_depth' => 0]);
+    $files = $file_system->scanDirectory(
+      "{$directory}/{$project}",
+      '/.*\.info.yml$/',
+      ['key' => 'name', 'min_depth' => 0],
+    );
     foreach ($files as $file) {
       // Get the .info.yml file for the module or theme this file belongs to.
       $info = \Drupal::service('info_parser')->parse($file->uri);
@@ -260,12 +272,12 @@ class UpdateHooks {
       }
     }
     if (empty($files)) {
-      $errors[] = $this->t('%archive_file does not contain any .info.yml files.', ['%archive_file' => $file_system->basename($archive_file)]);
+      $errors[] = $this->t('%archive_file does not contain any .info.yml files.', ['%archive_file' => basename($archive_file)]);
     }
     elseif (!$compatible_project) {
       $errors[] = \Drupal::translation()->formatPlural(count($incompatible), '%archive_file contains a version of %names that is not compatible with Drupal @version.', '%archive_file contains versions of modules or themes that are not compatible with Drupal @version: %names', [
         '@version' => \Drupal::VERSION,
-        '%archive_file' => $file_system->basename($archive_file),
+        '%archive_file' => basename($archive_file),
         '%names' => implode(', ', $incompatible),
       ]);
     }

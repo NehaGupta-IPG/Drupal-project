@@ -1,4 +1,5 @@
 parameters:
+  node.skip_procedural_hook_scan: true
   node.moved_classes:
     'Drupal\node\NodeForm':
       class: 'Drupal\node\Form\NodeForm'
@@ -35,7 +36,6 @@ services:
     arguments: ['@tempstore.private']
     tags:
       - { name: paramconverter }
-    lazy: true
   cache_context.user.node_grants:
     class: Drupal\node\Cache\NodeAccessGrantsCacheContext
     arguments: ['@current_user', '@entity_type.manager']
@@ -48,4 +48,6 @@ services:
       - { name: 'context_provider' }
   node.view_all_nodes_memory_cache:
     class: Drupal\Core\Cache\MemoryCache\MemoryCache
+    autowire: true
+  Drupal\node\NodeBulkUpdate:
     autowire: true

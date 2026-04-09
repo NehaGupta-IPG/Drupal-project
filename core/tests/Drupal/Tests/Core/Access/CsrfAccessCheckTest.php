@@ -5,19 +5,22 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Access;
 
 use Drupal\Core\Access\AccessResult;
+use Drupal\Core\Access\CsrfAccessCheck;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\SessionConfigurationInterface;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
-use Drupal\Core\Access\CsrfAccessCheck;
-use Drupal\Tests\UnitTestCase;
 
 /**
- * @coversDefaultClass \Drupal\Core\Access\CsrfAccessCheck
- * @group Access
+ * Tests Drupal\Core\Access\CsrfAccessCheck.
  */
+#[CoversClass(CsrfAccessCheck::class)]
+#[Group('Access')]
 class CsrfAccessCheckTest extends UnitTestCase {
 
   /**
@@ -36,14 +39,14 @@ class CsrfAccessCheckTest extends UnitTestCase {
   protected RouteMatchInterface $routeMatch;
 
   /**
-   * The mock parameter bag.
+   * The stub parameter bag.
    */
   protected ParameterBagInterface $parameterBag;
 
   /**
    * The session configuration.
    *
-   * @var \Drupal\Core\Session\SessionConfigurationInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Session\SessionConfigurationInterface|\PHPUnit_Framework_MockObject_MockObject
    */
   protected $sessionConfiguration;
 
@@ -57,7 +60,7 @@ class CsrfAccessCheckTest extends UnitTestCase {
       ->disableOriginalConstructor()
       ->getMock();
 
-    $this->parameterBag = $this->createMock(ParameterBagInterface::class);
+    $this->parameterBag = $this->createStub(ParameterBagInterface::class);
 
     $this->routeMatch = $this->createMock(RouteMatchInterface::class);
 
@@ -93,20 +96,18 @@ class CsrfAccessCheckTest extends UnitTestCase {
   }
 
   /**
+   * Tests csrf token invalid.
+   *
+   * @legacy-covers ::access
    * Tests the access() method for anonymous users.
    */
-  public function testAccessTokenAnonymousPass(): void {
+  public function testAccessTokenAnonymousPass() {
     $this->sessionConfiguration->expects($this->once())
       ->method('hasSession')
       ->willReturn(FALSE);
-
-    $this->parameterBag
-      ->method('all')
-      ->willReturn(['node' => 42]);
-
     $this->routeMatch->expects($this->once())
       ->method('getRawParameters')
-      ->willReturn($this->parameterBag);
+      ->will($this->returnValue(['node' => 42]));
 
     $route = new Route('/test-path/{node}', [], ['_csrf_token' => 'TRUE']);
     $request = Request::create('/test-path/42?token=test_query');
@@ -128,10 +129,6 @@ class CsrfAccessCheckTest extends UnitTestCase {
       ->with('test_query', 'test-path')
       ->willReturn(FALSE);
 
-    $this->parameterBag
-      ->method('all')
-      ->willReturn([]);
-
     $this->sessionConfiguration->expects($this->once())
       ->method('hasSession')
       ->willReturn(TRUE);
@@ -147,13 +144,11 @@ class CsrfAccessCheckTest extends UnitTestCase {
   }
 
   /**
-   * @covers ::access
+   * Tests csrf token missing.
+   *
+   * @legacy-covers ::access
    */
   public function testCsrfTokenMissing(): void {
-    $this->sessionConfiguration->expects($this->once())
-      ->method('hasSession')
-      ->willReturn(TRUE);
-
     $this->csrfToken->expects($this->once())
       ->method('validate')
       ->with('', 'test-path')

@@ -21,9 +21,7 @@ use Drupal\Core\Render\Attribute\FormElement;
  * machine name form element.
  *
  * Properties:
- *
- * @property $machine_name
- *   An associative array containing:
+ * - #machine_name: An associative array containing:
  *   - exists: A callable to invoke for checking whether a submitted machine
  *     name value already exists. The arguments passed to the callback will be:
  *     - The submitted value.
@@ -41,7 +39,8 @@ use Drupal\Core\Render\Attribute\FormElement;
  *     name').
  *   - replace_pattern: (optional) A regular expression (without delimiters)
  *     matching disallowed characters in the machine name. Defaults to
- *     '[^a-z0-9_]+'.
+ *     '[^a-z0-9_]+'. If a different replace_pattern is used, the machine
+ *      name element's '#description' should be updated accordingly.
  *   - replace: (optional) A character to replace disallowed characters in the
  *     machine name via JavaScript. Defaults to '_' (underscore). When using a
  *     different character, 'replace_pattern' needs to be set accordingly.
@@ -51,11 +50,9 @@ use Drupal\Core\Render\Attribute\FormElement;
  *     form element rather than in the suffix of the source element. The source
  *     element must appear in the form structure before this element. Defaults
  *     to FALSE.
- * @property $maxlength
- *   (optional) Maximum allowed length of the machine name. Defaults
+ * - #maxlength: (optional) Maximum allowed length of the machine name. Defaults
  *   to 64.
- * @property $disabled
- *   (optional) Should be set to TRUE if an existing machine name
+ * - #disabled: (optional) Should be set to TRUE if an existing machine name
  *   must not be changed after initial creation.
  *
  * Usage example:
