@@ -906,8 +906,6 @@ services:
   Drupal\Core\Menu\StaticMenuLinkOverridesInterface: '@menu_link.static.overrides'
   request_stack:
     class: Symfony\Component\HttpFoundation\RequestStack
-    tags:
-      - { name: persist }
   Symfony\Component\HttpFoundation\RequestStack: '@request_stack'
   current_route_match:
     class: Drupal\Core\Routing\CurrentRouteMatch
@@ -1091,8 +1089,6 @@ services:
     lazy: true
   router.request_context:
     class: Drupal\Core\Routing\RequestContext
-    tags:
-      - { name: persist }
     calls:
       - [fromRequestStack, ['@request_stack']]
   Drupal\Core\Routing\RequestContext: '@router.request_context'
