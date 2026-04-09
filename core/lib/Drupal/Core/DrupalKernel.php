@@ -1249,18 +1249,24 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     $all_messages = $this->container->get('messenger')->all();
 
-    // Persist the request stack instance so in-flight requests are preserved.
+    // Persist initialized synthetic services (which cannot be automatically
+    // re-instantiated) and the request stack (so in-flight requests survive).
+    $persisted_services = [];
+    foreach ($this->container->getParameter('persist_ids') as $id) {
+      if ($this->container->initialized($id)) {
+        $persisted_services[$id] = $this->container->get($id);
+      }
+    }
     if ($this->container->initialized('request_stack')) {
-      $request_stack = $this->container->get('request_stack');
+      $persisted_services['request_stack'] = $this->container->get('request_stack');
     }
 
     // Perform the container swap or reset.
     $work();
 
-    $this->container->set('kernel', $this);
-    $this->container->set('class_loader', $this->classLoader);
-    if (isset($request_stack)) {
-      $this->container->set('request_stack', $request_stack);
+    // Reattach persisted services.
+    foreach ($persisted_services as $id => $service) {
+      $this->container->set($id, $service);
     }
 
     if ($session_started) {
@@ -1440,6 +1446,16 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         $provider->register($container);
       }
     }
+
+    // Identify synthetic services whose instances must be persisted across
+    // container rebuilds, since they cannot be automatically re-instantiated.
+    $persist_ids = [];
+    foreach ($container->getDefinitions() as $id => $definition) {
+      if ($id !== 'service_container' && $definition->isSynthetic()) {
+        $persist_ids[] = $id;
+      }
+    }
+    $container->setParameter('persist_ids', $persist_ids);
 
     $container->setParameter('app.root', $this->getAppRoot());
     $container->setParameter('site.path', $this->getSitePath());
