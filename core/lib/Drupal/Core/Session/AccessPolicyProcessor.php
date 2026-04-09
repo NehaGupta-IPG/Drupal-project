@@ -114,8 +114,11 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
     // always switch back to the original account after the return statement or
     // if an exception was thrown.
     try {
+      $static_initial_cacheability = clone $initial_cacheability;
+      $static_initial_cacheability->addCacheContexts(['user']);
+
       // Retrieve the permissions from the static cache if available.
-      if ($static_cache = $this->variationStatic->get($cache_keys, $initial_cacheability)) {
+      if ($static_cache = $this->variationStatic->get($cache_keys, $static_initial_cacheability)) {
         return $static_cache->data;
       }
 
@@ -181,7 +184,8 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
       // conversion every time we call for the calculated permissions from a
       // warm static cache.
       $calculated_permissions = new CalculatedPermissions($calculated_permissions);
-      $this->variationStatic->set($cache_keys, $calculated_permissions, $cacheability, $initial_cacheability);
+      $cacheability->addCacheContexts(['user']);
+      $this->variationStatic->set($cache_keys, $calculated_permissions, $cacheability, $static_initial_cacheability);
 
       // Return the permissions as an immutable value object.
       return $calculated_permissions;
