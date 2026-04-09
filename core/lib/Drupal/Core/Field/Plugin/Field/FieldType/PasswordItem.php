@@ -43,8 +43,9 @@ class PasswordItem extends StringItem {
     $entity = $this->getEntity();
 
     // An empty string is *never* allowed as a password, regardless of whether
-    // it is pre-hashed (a password hash is not empty by definition).
-    if (trim($this->value) === '') {
+    // it is pre-hashed (a password hash is not empty by definition). NULL is
+    // allowed, since it signifies
+    if (isset($this->value) && trim($this->value) === '') {
       throw new EntityMalformedException('Passwords cannot be empty.');
     }
 
