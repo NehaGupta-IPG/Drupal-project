@@ -30,7 +30,10 @@ class UserSaveTest extends KernelTestBase {
     $this->installEntitySchema('user');
 
     /** @var \Drupal\user\Entity\User $user */
-    $user = User::create(['name' => $this->randomMachineName()]);
+    $user = User::create([
+      'name' => $this->randomMachineName(),
+      'pass' => $this->randomString(),
+    ]);
     $user->save();
     $user->setExistingPassword('existing password');
     $this->assertNotNull($user->pass->existing);
