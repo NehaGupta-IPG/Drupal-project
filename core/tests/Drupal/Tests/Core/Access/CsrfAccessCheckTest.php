@@ -105,9 +105,14 @@ class CsrfAccessCheckTest extends UnitTestCase {
     $this->sessionConfiguration->expects($this->once())
       ->method('hasSession')
       ->willReturn(FALSE);
+
+    $this->parameterBag
+      ->method('all')
+      ->willReturn(['node' => 42]);
+
     $this->routeMatch->expects($this->once())
       ->method('getRawParameters')
-      ->will($this->returnValue(['node' => 42]));
+      ->willReturn($this->parameterBag);
 
     $route = new Route('/test-path/{node}', [], ['_csrf_token' => 'TRUE']);
     $request = Request::create('/test-path/42?token=test_query');
@@ -129,9 +134,9 @@ class CsrfAccessCheckTest extends UnitTestCase {
       ->with('test_query', 'test-path')
       ->willReturn(FALSE);
 
-    $this->sessionConfiguration->expects($this->once())
-      ->method('hasSession')
-      ->willReturn(TRUE);
+    $this->parameterBag
+      ->method('all')
+      ->willReturn([]);
 
     $this->routeMatch->expects($this->once())
       ->method('getRawParameters')
@@ -149,6 +154,10 @@ class CsrfAccessCheckTest extends UnitTestCase {
    * @legacy-covers ::access
    */
   public function testCsrfTokenMissing(): void {
+    $this->sessionConfiguration->expects($this->once())
+      ->method('hasSession')
+      ->willReturn(TRUE);
+
     $this->csrfToken->expects($this->once())
       ->method('validate')
       ->with('', 'test-path')
