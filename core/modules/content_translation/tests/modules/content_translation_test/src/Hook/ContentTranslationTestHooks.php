@@ -26,6 +26,7 @@ class ContentTranslationTestHooks {
     if ($entity_type->id() === 'entity_test_mul' && $bundle === 'entity_test_mul') {
       $fields['ct_test_bundle_field'] = BaseFieldDefinition::create('string')
         ->setLabel('Bundle-only field')
+        ->setComputed(TRUE)
         ->setTranslatable(TRUE);
       return $fields;
     }
