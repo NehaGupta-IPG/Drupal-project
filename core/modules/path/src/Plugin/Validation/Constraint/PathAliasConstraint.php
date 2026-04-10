@@ -15,9 +15,13 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class PathAliasConstraint extends SymfonyConstraint {
 
-  /**
-   * The default violation message.
-   */
-  public $message = 'You can only change the URL alias for the <em>published</em> version of this content.';
+  public function __construct(
+    mixed $options = NULL,
+    public $message = 'You can only change the URL alias for the <em>published</em> version of this content.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct($options, $groups, $payload);
+  }
 
 }

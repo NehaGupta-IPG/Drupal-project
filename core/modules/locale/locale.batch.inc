@@ -8,6 +8,7 @@ use Drupal\Core\File\Exception\FileException;
 use Drupal\Core\File\Exception\InvalidStreamWrapperException;
 use Drupal\Core\File\FileExists;
 use Drupal\Core\Url;
+use Drupal\locale\LocaleSource;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -18,9 +19,6 @@ use Psr\Http\Message\UriInterface;
 /**
  * Load the common translation API.
  */
-// @todo Combine functions differently in files to avoid unnecessary includes.
-// Follow-up issue: https://www.drupal.org/node/1834298.
-require_once __DIR__ . '/locale.translation.inc';
 
 /**
  * Implements callback_batch_operation().
@@ -36,7 +34,7 @@ require_once __DIR__ . '/locale.translation.inc';
  * @param array|\ArrayAccess $context
  *   The batch context.
  */
-function locale_translation_batch_version_check(string $project, string $langcode, array|\ArrayAccess &$context) {
+function locale_translation_batch_version_check(string $project, string $langcode, array|\ArrayAccess &$context): void {
   $locale_project = \Drupal::service('locale.project')->get($project);
 
   if (empty($locale_project)) {
@@ -78,7 +76,7 @@ function locale_translation_batch_version_check(string $project, string $langcod
  * @param array|\ArrayAccess $context
  *   The batch context.
  */
-function locale_translation_batch_status_check($project, $langcode, array $options, &$context) {
+function locale_translation_batch_status_check($project, $langcode, array $options, &$context): void {
   $failure = $checked = FALSE;
   $options += [
     'finish_feedback' => TRUE,
@@ -89,7 +87,7 @@ function locale_translation_batch_status_check($project, $langcode, array $optio
 
   // Check the status of local translation files.
   if (isset($source->files[LOCALE_TRANSLATION_LOCAL])) {
-    if ($file = locale_translation_source_check_file($source)) {
+    if ($file = \Drupal::service(LocaleSource::class)->sourceCheckFile($source)) {
       locale_translation_status_save($source->name, $source->langcode, LOCALE_TRANSLATION_LOCAL, $file);
     }
     $checked = TRUE;
@@ -98,7 +96,15 @@ function locale_translation_batch_status_check($project, $langcode, array $optio
   // Check the status of remote translation files.
   if ($options['use_remote'] && isset($source->files[LOCALE_TRANSLATION_REMOTE])) {
     $remote_file = $source->files[LOCALE_TRANSLATION_REMOTE];
-    if ($result = locale_translation_http_check($remote_file->uri)) {
+    if ($langcode === 'en') {
+      // drupal.org does not support english as translation.
+      $uri = \Drupal::service(LocaleSource::class)->buildServerPattern($source, strtr(\Drupal::TRANSLATION_DEFAULT_SERVER_PATTERN, ['%language' => $langcode]));
+      if ($uri === $remote_file->uri) {
+        $failure = TRUE;
+      }
+    }
+
+    if (!$failure && $result = locale_translation_http_check($remote_file->uri)) {
       // Update the file object with the result data. In case of a redirect we
       // store the resulting uri.
       if (isset($result['last_modified'])) {
@@ -124,7 +130,10 @@ function locale_translation_batch_status_check($project, $langcode, array $optio
   if ($failure && !$checked) {
     $context['results']['failed_files'][] = $source->name;
   }
-  $context['message'] = t('Checked %langcode translation for %project.', ['%langcode' => $langcode, '%project' => $source->project]);
+  $context['message'] = t('Checked %langcode translation for %project.', [
+    '%langcode' => $langcode,
+    '%project' => $source->project,
+  ]);
 }
 
 /**
@@ -137,7 +146,7 @@ function locale_translation_batch_status_check($project, $langcode, array $optio
  * @param array $results
  *   Batch results.
  */
-function locale_translation_batch_status_finished($success, $results) {
+function locale_translation_batch_status_finished($success, $results): void {
   if ($success) {
     if (isset($results['failed_files'])) {
       if (\Drupal::moduleHandler()->moduleExists('dblog') && \Drupal::currentUser()->hasPermission('access site reports')) {
@@ -171,8 +180,8 @@ function locale_translation_batch_status_finished($success, $results) {
  * Downloads a remote gettext file into the translations directory. When
  * successfully the translation status is updated.
  *
- * @param object $project
- *   Source object of the translatable project.
+ * @param string $project
+ *   The name of the project to import translations.
  * @param string $langcode
  *   Language code.
  * @param array $context
@@ -180,13 +189,16 @@ function locale_translation_batch_status_finished($success, $results) {
  *
  * @see locale_translation_batch_fetch_import()
  */
-function locale_translation_batch_fetch_download($project, $langcode, &$context) {
+function locale_translation_batch_fetch_download($project, $langcode, &$context): void {
   $sources = locale_translation_get_status([$project], [$langcode]);
   if (isset($sources[$project][$langcode])) {
     $source = $sources[$project][$langcode];
     if (isset($source->type) && $source->type == LOCALE_TRANSLATION_REMOTE) {
       if ($file = locale_translation_download_source($source->files[LOCALE_TRANSLATION_REMOTE], 'translations://')) {
-        $context['message'] = t('Downloaded %langcode translation for %project.', ['%langcode' => $langcode, '%project' => $source->project]);
+        $context['message'] = t('Downloaded %langcode translation for %project.', [
+          '%langcode' => $langcode,
+          '%project' => $source->project,
+        ]);
         locale_translation_status_save($source->name, $source->langcode, LOCALE_TRANSLATION_LOCAL, $file);
       }
       else {
@@ -202,8 +214,8 @@ function locale_translation_batch_fetch_download($project, $langcode, &$context)
  * Imports a gettext file from the translation directory. When successfully the
  * translation status is updated.
  *
- * @param object $project
- *   Source object of the translatable project.
+ * @param string $project
+ *   The name of the project to import translations.
  * @param string $langcode
  *   Language code.
  * @param array $options
@@ -211,10 +223,10 @@ function locale_translation_batch_fetch_download($project, $langcode, &$context)
  * @param array $context
  *   The batch context.
  *
- * @see locale_translate_batch_import_files()
+ * @see locale_translate_batch_build()
  * @see locale_translation_batch_fetch_download()
  */
-function locale_translation_batch_fetch_import($project, $langcode, $options, &$context) {
+function locale_translation_batch_fetch_import($project, $langcode, $options, &$context): void {
   $sources = locale_translation_get_status([$project], [$langcode]);
   if (isset($sources[$project][$langcode])) {
     $source = $sources[$project][$langcode];
@@ -223,7 +235,10 @@ function locale_translation_batch_fetch_import($project, $langcode, $options, &$
         $file = $source->files[LOCALE_TRANSLATION_LOCAL];
         \Drupal::moduleHandler()->loadInclude('locale', 'inc', 'locale.bulk');
         $options += [
-          'message' => t('Importing %langcode translation for %project.', ['%langcode' => $langcode, '%project' => $source->project]),
+          'message' => t('Importing %langcode translation for %project.', [
+            '%langcode' => $langcode,
+            '%project' => $source->project,
+          ]),
         ];
         // Import the translation file. For large files the batch operations is
         // progressive and will be called repeatedly until finished.
@@ -233,13 +248,25 @@ function locale_translation_batch_fetch_import($project, $langcode, $options, &$
         if (isset($context['finished']) && $context['finished'] == 1) {
           // The import is successful.
           if (isset($context['results']['files'][$file->uri])) {
-            $context['message'] = t('Imported %langcode translation for %project.', ['%langcode' => $langcode, '%project' => $source->project]);
+            $context['message'] = t('Imported %langcode translation for %project.', [
+              '%langcode' => $langcode,
+              '%project' => $source->project,
+            ]);
 
             // Save the data of imported source into the {locale_file} table and
             // update the current translation status.
             locale_translation_status_save($project, $langcode, LOCALE_TRANSLATION_CURRENT, $source->files[LOCALE_TRANSLATION_LOCAL]);
           }
         }
+      }
+      elseif ($source->type == LOCALE_TRANSLATION_CURRENT) {
+        /*
+         * This can happen if the locale_translation_batch_fetch_import
+         * batch was interrupted
+         * and the translation was imported by another batch.
+         */
+        $context['message'] = t('Ignoring already imported translation for %project.', ['%project' => $source->project]);
+        $context['finished'] = 1;
       }
     }
   }
@@ -255,12 +282,12 @@ function locale_translation_batch_fetch_import($project, $langcode, $options, &$
  * @param array $results
  *   Batch results.
  */
-function locale_translation_batch_fetch_finished($success, $results) {
+function locale_translation_batch_fetch_finished($success, $results): void {
   \Drupal::moduleHandler()->loadInclude('locale', 'inc', 'locale.bulk');
   if ($success) {
     \Drupal::state()->set('locale.translation_last_checked', \Drupal::time()->getRequestTime());
   }
-  return locale_translate_batch_finished($success, $results);
+  locale_translate_batch_finished($success, $results);
 }
 
 /**
@@ -309,7 +336,10 @@ function locale_translation_http_check($uri) {
         $logger->notice('Translation file not found: @uri.', ['@uri' => $uri]);
         return TRUE;
       }
-      $logger->notice('HTTP request to @url failed with error: @error.', ['@url' => $uri, '@error' => $response->getStatusCode() . ' ' . $response->getReasonPhrase()]);
+      $logger->notice('HTTP request to @url failed with error: @error.', [
+        '@url' => $uri,
+        '@error' => $response->getStatusCode() . ' ' . $response->getReasonPhrase(),
+      ]);
     }
   }
   // We need to handle ConnectException separately because in Guzzle 7 it
@@ -343,13 +373,14 @@ function locale_translation_download_source($source_file, $directory = 'temporar
     $data = (string) \Drupal::httpClient()->get($source_file->uri)->getBody();
     /** @var \Drupal\Core\File\FileSystemInterface $fileSystem */
     $fileSystem = \Drupal::service('file_system');
-    $filename = $fileSystem->basename($source_file->uri);
+    $filename = basename($source_file->uri);
     if ($uri = $fileSystem->saveData($data, $directory . $filename, FileExists::Replace)) {
       $file = clone($source_file);
       $file->type = LOCALE_TRANSLATION_LOCAL;
       $file->uri = $uri;
       $file->directory = $directory;
       $file->timestamp = filemtime($uri);
+      $file->hash = hash_file(LocaleSource::LOCAL_FILE_HASH_ALGO, $uri);
       return $file;
     }
   }

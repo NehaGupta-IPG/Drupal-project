@@ -35,7 +35,10 @@ class Date extends NumericFilter {
         '#title' => $this->t('Value type'),
         '#options' => [
           'date' => $this->t('A date in any machine readable format. CCYY-MM-DD HH:MM:SS is preferred.'),
-          'offset' => $this->t('An offset from the current time such as "@example1" or "@example2"', ['@example1' => '+1 day', '@example2' => '-2 hours -30 minutes']),
+          'offset' => $this->t('An offset from the current time such as "@example1" or "@example2"', [
+            '@example1' => '+1 day',
+            '@example2' => '-2 hours -30 minutes',
+          ]),
         ],
         '#default_value' => !empty($this->value['type']) ? $this->value['type'] : 'date',
       ];
@@ -54,7 +57,13 @@ class Date extends NumericFilter {
       return;
     }
 
-    $this->validateValidTime($form['value'], $form_state, $form_state->getValue(['options', 'operator']), $form_state->getValue(['options', 'value']));
+    $this->validateValidTime($form['value'],
+      $form_state,
+      $form_state->getValue([
+        'options',
+        'operator',
+      ]),
+      $form_state->getValue(['options', 'value']));
   }
 
   /**
@@ -190,8 +199,9 @@ class Date extends NumericFilter {
       // Keep sign.
       $b = '***CURRENT_TIME***' . sprintf('%+d', $b);
     }
-    // This is safe because we are manually scrubbing the values.
-    // It is necessary to do it this way because $a and $b are formulas when using an offset.
+    // This is safe because we are manually scrubbing the values. It is
+    // necessary to do it this way because $a and $b are formulas when using an
+    // offset.
     $operator = strtoupper($this->operator);
     $this->query->addWhereExpression($this->options['group'], "$field $operator $a AND $b");
   }
@@ -205,8 +215,8 @@ class Date extends NumericFilter {
       // Keep sign.
       $value = '***CURRENT_TIME***' . sprintf('%+d', $value);
     }
-    // This is safe because we are manually scrubbing the value.
-    // It is necessary to do it this way because $value is a formula when using an offset.
+    // This is safe because we are manually scrubbing the value. It is necessary
+    // to do it this way because $value is a formula when using an offset.
     $this->query->addWhereExpression($this->options['group'], "$field $this->operator $value");
   }
 

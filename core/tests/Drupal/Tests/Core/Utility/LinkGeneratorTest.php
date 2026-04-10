@@ -7,20 +7,29 @@ namespace Drupal\Tests\Core\Utility;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\GeneratedButton;
 use Drupal\Core\GeneratedNoLink;
 use Drupal\Core\GeneratedUrl;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Link;
+use Drupal\Core\Path\PathValidatorInterface;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Routing\UrlGenerator;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\LinkGenerator;
+use Drupal\Core\Utility\UnroutedUrlAssemblerInterface;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Utility\LinkGenerator
- * @group Utility
+ * Tests Drupal\Core\Utility\LinkGenerator.
  */
+#[CoversClass(LinkGenerator::class)]
+#[Group('Utility')]
 class LinkGeneratorTest extends UnitTestCase {
 
   /**
@@ -33,33 +42,21 @@ class LinkGeneratorTest extends UnitTestCase {
   /**
    * The mocked URL generator.
    *
-   * @var \PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Routing\UrlGenerator
    */
   protected $urlGenerator;
 
   /**
    * The mocked module handler.
    *
-   * @var \PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
   protected $moduleHandler;
 
   /**
-   * The mocked renderer service.
-   *
-   * @var \PHPUnit\Framework\MockObject\MockObject|\Drupal\Core\Render\RendererInterface
-   */
-  protected $renderer;
-
-  /**
-   * The mocked URL Assembler service.
-   *
-   * @var \PHPUnit\Framework\MockObject\MockObject|\Drupal\Core\Utility\UnroutedUrlAssemblerInterface
-   */
-  protected $urlAssembler;
-
-  /**
    * Contains the LinkGenerator default options.
+   *
+   * @var array
    */
   protected $defaultOptions = [
     'query' => [],
@@ -74,13 +71,31 @@ class LinkGeneratorTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->urlGenerator = $this->getMockBuilder('\Drupal\Core\Routing\UrlGenerator')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->moduleHandler = $this->createMock('Drupal\Core\Extension\ModuleHandlerInterface');
-    $this->renderer = $this->createMock('\Drupal\Core\Render\RendererInterface');
-    $this->linkGenerator = new LinkGenerator($this->urlGenerator, $this->moduleHandler, $this->renderer);
-    $this->urlAssembler = $this->createMock('\Drupal\Core\Utility\UnroutedUrlAssemblerInterface');
+    $this->urlGenerator = $this->createStub(UrlGenerator::class);
+    $this->moduleHandler = $this->createStub(ModuleHandlerInterface::class);
+    $this->linkGenerator = new LinkGenerator(
+      $this->urlGenerator,
+      $this->moduleHandler,
+      $this->createStub(RendererInterface::class),
+    );
+  }
+
+  /**
+   * Reinitializes the module handler as a mock object.
+   */
+  protected function setUpMockModuleHandler(): void {
+    $this->moduleHandler = $this->createMock(ModuleHandlerInterface::class);
+    $reflection = new \ReflectionProperty($this->linkGenerator, 'moduleHandler');
+    $reflection->setValue($this->linkGenerator, $this->moduleHandler);
+  }
+
+  /**
+   * Reinitializes the URL generator as a mock object.
+   */
+  protected function setUpMockUrlGenerator(): void {
+    $this->urlGenerator = $this->createMock(UrlGenerator::class);
+    $reflection = new \ReflectionProperty($this->linkGenerator, 'urlGenerator');
+    $reflection->setValue($this->linkGenerator, $this->urlGenerator);
   }
 
   /**
@@ -91,7 +106,7 @@ class LinkGeneratorTest extends UnitTestCase {
    * @return array
    *   Returns some test data.
    */
-  public static function providerTestGenerateHrefs() {
+  public static function providerTestGenerateHrefs(): array {
     return [
       // Test that the URL returned by the URL generator is used.
       ['test_route_1', [], FALSE, '/test-route-1'],
@@ -107,10 +122,12 @@ class LinkGeneratorTest extends UnitTestCase {
    *
    * @see \Drupal\Core\Utility\LinkGenerator::generate()
    * @see \Drupal\Tests\Core\Utility\LinkGeneratorTest::providerTestGenerate()
-   *
-   * @dataProvider providerTestGenerateHrefs
    */
-  public function testGenerateHrefs($route_name, array $parameters, $absolute, $expected_url): void {
+  #[DataProvider('providerTestGenerateHrefs')]
+  public function testGenerateHrefs(string $route_name, array $parameters, bool $absolute, string $expected_url): void {
+    $this->setUpMockModuleHandler();
+    $this->setUpMockUrlGenerator();
+
     $this->urlGenerator->expects($this->once())
       ->method('generateFromRoute')
       ->with($route_name, $parameters, ['absolute' => $absolute] + $this->defaultOptions)
@@ -128,10 +145,11 @@ class LinkGeneratorTest extends UnitTestCase {
 
   /**
    * Tests the generate() method with a route.
-   *
-   * @covers ::generate
    */
   public function testGenerate(): void {
+    $this->setUpMockModuleHandler();
+    $this->setUpMockUrlGenerator();
+
     $this->urlGenerator->expects($this->once())
       ->method('generateFromRoute')
       ->with('test_route_1', [], ['fragment' => 'the-fragment'] + $this->defaultOptions)
@@ -139,7 +157,7 @@ class LinkGeneratorTest extends UnitTestCase {
 
     $this->moduleHandler->expects($this->once())
       ->method('alter')
-      ->with('link', $this->isType('array'));
+      ->with('link', $this->isArray());
 
     $url = new Url('test_route_1', [], ['fragment' => 'the-fragment']);
     $url->setUrlGenerator($this->urlGenerator);
@@ -158,15 +176,16 @@ class LinkGeneratorTest extends UnitTestCase {
    *
    * The set_active_class option is set to TRUE to ensure we do not get the
    * active class and the data-drupal-link-system-path attribute.
-   *
-   * @covers ::generate
    */
   public function testGenerateNoLink(): void {
+    $this->setUpMockModuleHandler();
+    $this->setUpMockUrlGenerator();
+
     $this->urlGenerator->expects($this->never())
       ->method('generateFromRoute');
     $this->moduleHandler->expects($this->exactly(2))
       ->method('alter')
-      ->with('link', $this->isType('array'));
+      ->with('link', $this->isArray());
 
     $url = Url::fromRoute('<nolink>');
     $url->setUrlGenerator($this->urlGenerator);
@@ -190,10 +209,11 @@ class LinkGeneratorTest extends UnitTestCase {
    *
    * The set_active_class option is set to TRUE to ensure we do not get the
    * active class and the data-drupal-link-system-path attribute.
-   *
-   * @covers ::generate
    */
   public function testGenerateNone(): void {
+    $this->setUpMockModuleHandler();
+    $this->setUpMockUrlGenerator();
+
     $this->urlGenerator->expects($this->once())
       ->method('generateFromRoute')
       ->with('<none>', [], ['set_active_class' => TRUE] + $this->defaultOptions)
@@ -201,7 +221,7 @@ class LinkGeneratorTest extends UnitTestCase {
 
     $this->moduleHandler->expects($this->once())
       ->method('alter')
-      ->with('link', $this->isType('array'));
+      ->with('link', $this->isArray());
 
     $url = Url::fromRoute('<none>');
     $url->setUrlGenerator($this->urlGenerator);
@@ -213,15 +233,16 @@ class LinkGeneratorTest extends UnitTestCase {
 
   /**
    * Tests the generate() method with the <button> route.
-   *
-   * @covers ::generate
    */
   public function testGenerateButton(): void {
+    $this->setUpMockModuleHandler();
+    $this->setUpMockUrlGenerator();
+
     $this->urlGenerator->expects($this->never())
       ->method('generateFromRoute');
     $this->moduleHandler->expects($this->exactly(2))
       ->method('alter')
-      ->with('link', $this->isType('array'));
+      ->with('link', $this->isArray());
 
     $url = Url::fromRoute('<button>');
     $url->setUrlGenerator($this->urlGenerator);
@@ -244,27 +265,28 @@ class LinkGeneratorTest extends UnitTestCase {
    *
    * The set_active_class option is set to TRUE to ensure this does not cause
    * an error together with an external URL.
-   *
-   * @covers ::generate
    */
   public function testGenerateExternal(): void {
-    $this->urlAssembler->expects($this->once())
+    $this->setUpMockModuleHandler();
+
+    $urlAssembler = $this->createMock(UnroutedUrlAssemblerInterface::class);
+    $urlAssembler->expects($this->once())
       ->method('assemble')
       ->with('https://www.drupal.org', ['set_active_class' => TRUE, 'external' => TRUE] + $this->defaultOptions)
       ->willReturnArgument(0);
 
     $this->moduleHandler->expects($this->once())
       ->method('alter')
-      ->with('link', $this->isType('array'));
+      ->with('link', $this->isArray());
 
-    $this->urlAssembler->expects($this->once())
+    $urlAssembler->expects($this->once())
       ->method('assemble')
       ->with('https://www.drupal.org', ['set_active_class' => TRUE, 'external' => TRUE] + $this->defaultOptions)
       ->willReturnArgument(0);
 
     $url = Url::fromUri('https://www.drupal.org');
     $url->setUrlGenerator($this->urlGenerator);
-    $url->setUnroutedUrlAssembler($this->urlAssembler);
+    $url->setUnroutedUrlAssembler($urlAssembler);
     $url->setOption('set_active_class', TRUE);
 
     $result = $this->linkGenerator->generate('Drupal', $url);
@@ -278,16 +300,15 @@ class LinkGeneratorTest extends UnitTestCase {
 
   /**
    * Tests the generate() method with a URL containing double quotes.
-   *
-   * @covers ::generate
    */
   public function testGenerateUrlWithQuotes(): void {
-    $this->urlAssembler->expects($this->once())
+    $urlAssembler = $this->createMock(UnroutedUrlAssemblerInterface::class);
+    $urlAssembler->expects($this->once())
       ->method('assemble')
       ->with('base:example', ['query' => ['foo' => '"bar"', 'zoo' => 'baz']] + $this->defaultOptions)
       ->willReturn((new GeneratedUrl())->setGeneratedUrl('/example?foo=%22bar%22&zoo=baz'));
 
-    $path_validator = $this->createMock('Drupal\Core\Path\PathValidatorInterface');
+    $path_validator = $this->createStub(PathValidatorInterface::class);
     $container_builder = new ContainerBuilder();
     $container_builder->set('path.validator', $path_validator);
     \Drupal::setContainer($container_builder);
@@ -295,7 +316,7 @@ class LinkGeneratorTest extends UnitTestCase {
     $path = '/example?foo="bar"&zoo=baz';
     $url = Url::fromUserInput($path);
     $url->setUrlGenerator($this->urlGenerator);
-    $url->setUnroutedUrlAssembler($this->urlAssembler);
+    $url->setUnroutedUrlAssembler($urlAssembler);
 
     $result = $this->linkGenerator->generate('Drupal', $url);
 
@@ -313,6 +334,8 @@ class LinkGeneratorTest extends UnitTestCase {
    * @see \Drupal\Core\Utility\LinkGenerator::generate()
    */
   public function testGenerateAttributes(): void {
+    $this->setUpMockUrlGenerator();
+
     $this->urlGenerator->expects($this->once())
       ->method('generateFromRoute')
       ->with('test_route_1', [], $this->defaultOptions)
@@ -338,6 +361,8 @@ class LinkGeneratorTest extends UnitTestCase {
    * @see \Drupal\Core\Utility\LinkGenerator::generate()
    */
   public function testGenerateQuery(): void {
+    $this->setUpMockUrlGenerator();
+
     $this->urlGenerator->expects($this->once())
       ->method('generateFromRoute')
       ->with('test_route_1', [], ['query' => ['test' => 'value']] + $this->defaultOptions)
@@ -361,6 +386,8 @@ class LinkGeneratorTest extends UnitTestCase {
    * @see \Drupal\Core\Utility\LinkGenerator::generate()
    */
   public function testGenerateParametersAsQuery(): void {
+    $this->setUpMockUrlGenerator();
+
     $this->urlGenerator->expects($this->once())
       ->method('generateFromRoute')
       ->with('test_route_1', ['test' => 'value'], $this->defaultOptions)
@@ -382,6 +409,8 @@ class LinkGeneratorTest extends UnitTestCase {
    * @see \Drupal\Core\Utility\LinkGenerator::generate()
    */
   public function testGenerateOptions(): void {
+    $this->setUpMockUrlGenerator();
+
     $this->urlGenerator->expects($this->once())
       ->method('generateFromRoute')
       ->with('test_route_1', [], ['key' => 'value'] + $this->defaultOptions)
@@ -404,6 +433,8 @@ class LinkGeneratorTest extends UnitTestCase {
    * @see \Drupal\Core\Utility\LinkGenerator::generate()
    */
   public function testGenerateXss(): void {
+    $this->setUpMockUrlGenerator();
+
     $this->urlGenerator->expects($this->once())
       ->method('generateFromRoute')
       ->with('test_route_4', [], $this->defaultOptions)
@@ -422,6 +453,8 @@ class LinkGeneratorTest extends UnitTestCase {
    * @see \Drupal\Core\Utility\LinkGenerator::generate()
    */
   public function testGenerateWithHtml(): void {
+    $this->setUpMockUrlGenerator();
+
     $this->urlGenerator->expects($this->exactly(2))
       ->method('generateFromRoute')
       ->with('test_route_5', [], $this->defaultOptions)
@@ -461,9 +494,12 @@ class LinkGeneratorTest extends UnitTestCase {
    * @see \Drupal\Core\Utility\LinkGenerator::generate()
    */
   public function testGenerateActive(): void {
+    $this->setUpMockModuleHandler();
+    $this->setUpMockUrlGenerator();
+
     $this->urlGenerator->expects($this->exactly(5))
       ->method('generateFromRoute')
-      ->willReturnCallback(function ($name, $parameters = [], $options = [], $collect_bubbleable_metadata = FALSE) {
+      ->willReturnCallback(function ($name, array $parameters = [], $options = [], $collect_bubbleable_metadata = FALSE) {
         switch ($name) {
           case 'test_route_1':
             return (new GeneratedUrl())->setGeneratedUrl('/test-route-1');
@@ -553,7 +589,7 @@ class LinkGeneratorTest extends UnitTestCase {
    */
   public function testGenerateBubbleableMetadata(): void {
     $options = ['query' => [], 'language' => NULL, 'set_active_class' => FALSE, 'absolute' => FALSE];
-    $this->urlGenerator->expects($this->any())
+    $this->urlGenerator
       ->method('generateFromRoute')
       ->willReturnMap([
         [
@@ -579,12 +615,12 @@ class LinkGeneratorTest extends UnitTestCase {
 
   /**
    * Tests altering the URL object using hook_link_alter().
-   *
-   * @covers ::generate
    */
   public function testGenerateWithAlterHook(): void {
+    $this->setUpMockModuleHandler();
+
     $options = ['query' => [], 'language' => NULL, 'set_active_class' => FALSE, 'absolute' => FALSE];
-    $this->urlGenerator->expects($this->any())
+    $this->urlGenerator
       ->method('generateFromRoute')
       ->willReturnMap([
         [
@@ -608,7 +644,7 @@ class LinkGeneratorTest extends UnitTestCase {
 
     $this->moduleHandler->expects($this->atLeastOnce())
       ->method('alter')
-      ->willReturnCallback(function ($hook, &$options) {
+      ->willReturnCallback(function ($hook, array &$options): void {
         $options['url'] = (new Url('test_route_1'))->setUrlGenerator($this->urlGenerator);
       });
 
@@ -622,7 +658,7 @@ class LinkGeneratorTest extends UnitTestCase {
    * This is a regression test for https://www.drupal.org/node/2842399.
    */
   public function testGenerateTwice(): void {
-    $this->urlGenerator->expects($this->any())
+    $this->urlGenerator
       ->method('generateFromRoute')
       ->willReturn((new GeneratedUrl())->setGeneratedUrl('/'));
 

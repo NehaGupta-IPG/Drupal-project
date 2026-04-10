@@ -123,7 +123,7 @@ class ConfigImporter {
   protected $themeHandler;
 
   /**
-   * Flag set to import system.theme during processing theme install and uninstalls.
+   * Indicates if a system theme is in processing theme install and uninstalls.
    *
    * @var bool
    */
@@ -186,15 +186,16 @@ class ConfigImporter {
    * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
    *   The configuration manager.
    * @param \Drupal\Core\Lock\LockBackendInterface $lock
-   *   The lock backend to ensure multiple imports do not occur at the same time.
+   *   The lock backend to ensure multiple imports do not occur at the same
+   *   time.
    * @param \Drupal\Core\Config\TypedConfigManagerInterface $typed_config
    *   The typed configuration manager.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler
+   *   The module handler.
    * @param \Drupal\Core\Extension\ModuleInstallerInterface $module_installer
    *   The module installer.
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
-   *   The theme handler
+   *   The theme handler.
    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
    *   The string translation service.
    * @param \Drupal\Core\Extension\ModuleExtensionList $extension_list_module
@@ -410,17 +411,17 @@ class ConfigImporter {
     // sorted in reverse alphabetical order, to ensure the order is exactly
     // opposite from installation. For example, this module list:
     // @code
-    // array(
+    // [
     //   'actions' => 0,
-    //   'ban' => 0,
+    //   'block' => 0,
     //   'options' => -2,
     //   'text' => -1,
-    // );
+    // ];
     // @endcode
     // Will result in the following sort order:
     // 1. -2   options
     // 2. -1   text
-    // 3.  0 0 ban
+    // 3.  0 0 block
     // 4.  0 1 actions
     // @todo Move this sorting functionality to the extension system.
     array_multisort(array_values($module_list), SORT_ASC, array_keys($module_list), SORT_DESC, $module_list);
@@ -674,10 +675,17 @@ class ConfigImporter {
         $this->processConfiguration($operation['collection'], $operation['op'], $operation['name']);
       }
       if ($operation['collection'] == StorageInterface::DEFAULT_COLLECTION) {
-        $context['message'] = $this->t('Synchronizing configuration: @op @name.', ['@op' => $operation['op'], '@name' => $operation['name']]);
+        $context['message'] = $this->t('Synchronizing configuration: @op @name.', [
+          '@op' => $operation['op'],
+          '@name' => $operation['name'],
+        ]);
       }
       else {
-        $context['message'] = $this->t('Synchronizing configuration: @op @name in @collection.', ['@op' => $operation['op'], '@name' => $operation['name'], '@collection' => $operation['collection']]);
+        $context['message'] = $this->t('Synchronizing configuration: @op @name in @collection.', [
+          '@op' => $operation['op'],
+          '@name' => $operation['name'],
+          '@collection' => $operation['collection'],
+        ]);
       }
       $processed_count = 0;
       foreach ($this->storageComparer->getAllCollectionNames() as $collection) {
@@ -746,7 +754,7 @@ class ConfigImporter {
    * installs are processed with modules coming before themes. This order is
    * necessary because themes can depend on modules.
    *
-   * @return array|bool
+   * @return array|false
    *   An array containing the next operation and extension name to perform it
    *   on. If there is nothing left to do returns FALSE;
    */
@@ -776,7 +784,7 @@ class ConfigImporter {
   /**
    * Gets the next configuration operation to perform.
    *
-   * @return array|bool
+   * @return array|false
    *   An array containing the next operation and configuration name to perform
    *   it on. If there is nothing left to do returns FALSE;
    */
@@ -818,11 +826,19 @@ class ConfigImporter {
         $old_entity_type_id = $this->configManager->getEntityTypeIdByName($names['old_name']);
         $new_entity_type_id = $this->configManager->getEntityTypeIdByName($names['new_name']);
         if ($old_entity_type_id != $new_entity_type_id) {
-          $this->logError($this->t('Entity type mismatch on rename. @old_type not equal to @new_type for existing configuration @old_name and staged configuration @new_name.', ['@old_type' => $old_entity_type_id, '@new_type' => $new_entity_type_id, '@old_name' => $names['old_name'], '@new_name' => $names['new_name']]));
+          $this->logError($this->t('Entity type mismatch on rename. @old_type not equal to @new_type for existing configuration @old_name and staged configuration @new_name.', [
+            '@old_type' => $old_entity_type_id,
+            '@new_type' => $new_entity_type_id,
+            '@old_name' => $names['old_name'],
+            '@new_name' => $names['new_name'],
+          ]));
         }
         // Has to be a configuration entity.
         if (!$old_entity_type_id) {
-          $this->logError($this->t('Rename operation for simple configuration. Existing configuration @old_name and staged configuration @new_name.', ['@old_name' => $names['old_name'], '@new_name' => $names['new_name']]));
+          $this->logError($this->t('Rename operation for simple configuration. Existing configuration @old_name and staged configuration @new_name.', [
+            '@old_name' => $names['old_name'],
+            '@new_name' => $names['new_name'],
+          ]));
         }
       }
       $this->eventDispatcher->dispatch(new ConfigImporterEvent($this), ConfigEvents::IMPORT_VALIDATE);
@@ -863,7 +879,11 @@ class ConfigImporter {
       }
     }
     catch (\Exception $e) {
-      $this->logError($this->t('Unexpected error during import with operation @op for @name: @message', ['@op' => $op, '@name' => $name, '@message' => $e->getMessage()]));
+      $this->logError($this->t('Unexpected error during import with operation @op for @name: @message', [
+        '@op' => $op,
+        '@name' => $name,
+        '@message' => $e->getMessage(),
+      ]));
       // Error for that operation was logged, mark it as processed so that
       // the import can continue.
       $this->setProcessedConfiguration($collection, $op, $name);
@@ -887,10 +907,7 @@ class ConfigImporter {
     \Drupal::service('config.installer')
       ->setSourceStorage($this->storageComparer->getSourceStorage());
     if ($type == 'module') {
-      $this->moduleInstaller->$op($names, FALSE);
-      // Installing a module can cause a kernel boot therefore inject all the
-      // services again.
-      $this->reInjectMe();
+      $this->callAndReInjectIfNeeded(fn () => $this->moduleInstaller->$op($names, FALSE));
       // During a module install or uninstall the container is rebuilt and the
       // module handler is called. This causes the container's instance of the
       // module handler not to have loaded all the enabled modules.
@@ -906,7 +923,7 @@ class ConfigImporter {
         $this->configManager->getConfigFactory()->reset('system.theme');
         $this->processedSystemTheme = TRUE;
       }
-      \Drupal::service('theme_installer')->$op($names);
+      $this->callAndReInjectIfNeeded(fn () => \Drupal::service('theme_installer')->$op($names));
     }
     $this->setProcessedExtension($type, $op, $names);
   }
@@ -1012,14 +1029,20 @@ class ConfigImporter {
     if ($old_data = $this->storageComparer->getTargetStorage($collection)->read($name)) {
       $config->initWithData($old_data);
     }
-    if ($op == 'delete') {
-      $config->delete();
-    }
-    else {
-      $data = $this->storageComparer->getSourceStorage($collection)->read($name);
-      $config->setData($data ? $data : []);
-      $config->save();
-    }
+
+    // Ensure the new services are used if config change causes a container
+    // rebuild.
+    $this->callAndReInjectIfNeeded(function () use ($config, $op, $collection, $name) {
+      if ($op == 'delete') {
+        $config->delete();
+      }
+      else {
+        $data = $this->storageComparer->getSourceStorage($collection)
+          ->read($name);
+        $config->setData($data ?: []);
+        $config->save();
+      }
+    });
     $this->setProcessedConfiguration($collection, $op, $name);
   }
 
@@ -1135,22 +1158,33 @@ class ConfigImporter {
   }
 
   /**
-   * Gets all the service dependencies from \Drupal.
+   * Executes a callable and re-injects services if the container was rebuilt.
    *
-   * Since the ConfigImporter handles module installation the kernel and the
-   * container can be rebuilt and altered during processing. It is necessary to
-   * keep the services used by the importer in sync.
+   * Operations like module and theme installs can trigger a container rebuild.
+   * This method detects when that happens and automatically refreshes the
+   * services used by this importer.
+   *
+   * @param callable $callable
+   *   The callable to execute.
    */
-  protected function reInjectMe() {
-    // When rebuilding the container,
-    // \Drupal\Core\DrupalKernel::initializeContainer() saves the hashes of the
-    // old container and passes them to the new one. So __sleep() will
-    // recognize the old services and then __wakeup() will restore them from
-    // the new container.
-    $this->__sleep();
-    $this->__wakeup();
-    $this->storageComparer->__sleep();
-    $this->storageComparer->__wakeup();
+  protected function callAndReInjectIfNeeded(callable $callable): void {
+    $container_id = spl_object_id(\Drupal::getContainer());
+    try {
+      $callable();
+    }
+    finally {
+      if ($container_id !== spl_object_id(\Drupal::getContainer())) {
+        // When rebuilding the container,
+        // \Drupal\Core\DrupalKernel::initializeContainer() saves the hashes of
+        // the old container and passes them to the new one. So __sleep() will
+        // recognize the old services and then __wakeup() will restore them from
+        // the new container.
+        $this->__sleep();
+        $this->__wakeup();
+        $this->storageComparer->__sleep();
+        $this->storageComparer->__wakeup();
+      }
+    }
   }
 
 }

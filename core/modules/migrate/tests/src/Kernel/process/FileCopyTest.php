@@ -7,19 +7,22 @@ namespace Drupal\Tests\migrate\Kernel\process;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\KernelTests\Core\File\FileTestBase;
 use Drupal\migrate\MigrateException;
-use Drupal\migrate\Plugin\migrate\process\FileCopy;
 use Drupal\migrate\MigrateExecutableInterface;
+use Drupal\migrate\Plugin\migrate\process\FileCopy;
 use Drupal\migrate\Plugin\MigrateProcessInterface;
 use Drupal\migrate\Row;
 use GuzzleHttp\Client;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the file_copy process plugin.
- *
- * @coversDefaultClass \Drupal\migrate\Plugin\migrate\process\FileCopy
- *
- * @group migrate
  */
+#[CoversClass(FileCopy::class)]
+#[Group('migrate')]
+#[RunTestsInSeparateProcesses]
 class FileCopyTest extends FileTestBase {
 
   /**
@@ -79,13 +82,12 @@ class FileCopyTest extends FileTestBase {
   /**
    * Tests successful file reuse.
    *
-   * @dataProvider providerSuccessfulReuse
-   *
    * @param string $source_path
    *   Source path to copy from.
    * @param string $destination_path
    *   The destination path to copy to.
    */
+  #[DataProvider('providerSuccessfulReuse')]
   public function testSuccessfulReuse($source_path, $destination_path): void {
     $file_reuse = $this->doTransform($source_path, $destination_path);
     clearstatcache(TRUE, $destination_path);
@@ -172,7 +174,7 @@ class FileCopyTest extends FileTestBase {
   /**
    * Tests that non-writable destination throw an exception.
    *
-   * @covers ::transform
+   * @legacy-covers ::transform
    */
   public function testNonWritableDestination(): void {
     $source = $this->createUri('file.txt', NULL, 'temporary');
@@ -226,7 +228,7 @@ class FileCopyTest extends FileTestBase {
 
     $plugin->transform(
       ['http://drupal.org/favicon.ico', '/destination/path'],
-      $this->createMock(MigrateExecutableInterface::class),
+      $this->createStub(MigrateExecutableInterface::class),
       new Row([], []),
       $this->randomMachineName()
     );
@@ -247,7 +249,7 @@ class FileCopyTest extends FileTestBase {
    */
   protected function doTransform($source_path, $destination_path, $configuration = []) {
     // Prepare a mock HTTP client.
-    $this->container->set('http_client', $this->createMock(Client::class));
+    $this->container->set('http_client', $this->createStub(Client::class));
 
     $plugin = FileCopy::create($this->container, $configuration, 'file_copy', []);
     $executable = $this->prophesize(MigrateExecutableInterface::class)->reveal();

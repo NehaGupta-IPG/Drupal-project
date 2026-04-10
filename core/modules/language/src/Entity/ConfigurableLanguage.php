@@ -156,7 +156,8 @@ class ConfigurableLanguage extends ConfigEntityBase implements ConfigurableLangu
       $language_manager::rebuildServices();
     }
     if (!$update) {
-      // Install any available language configuration overrides for the language.
+      // Install any available language configuration overrides for the
+      // language.
       \Drupal::service('language.config_factory_override')->installLanguageOverrides($this->id());
     }
 
@@ -165,7 +166,7 @@ class ConfigurableLanguage extends ConfigEntityBase implements ConfigurableLangu
       $config = \Drupal::configFactory()->getEditable('language.negotiation');
       $domains = $config->get('url.domains');
       $domains[$this->id()] = '';
-      $config->set('url.domains', $domains)->save(TRUE);
+      $config->set('url.domains', $domains)->save();
     }
   }
 
@@ -206,7 +207,7 @@ class ConfigurableLanguage extends ConfigEntityBase implements ConfigurableLangu
     $config = \Drupal::configFactory()->getEditable('language.negotiation');
     $config->clear('url.prefixes.' . $entity->id());
     $config->clear('url.domains.' . $entity->id());
-    $config->save(TRUE);
+    $config->save();
   }
 
   /**

@@ -10,66 +10,8 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\file\FileInterface;
 use Drupal\locale\Gettext;
-
-/**
- * Prepare a batch to import all translations.
- *
- * @param array $options
- *   An array with options that can have the following elements:
- *   - 'langcode': The language code. Optional, defaults to NULL, which means
- *     that the language will be detected from the name of the files.
- *   - 'overwrite_options': Overwrite options array as defined in
- *     Drupal\locale\PoDatabaseWriter. Optional, defaults to an empty array.
- *   - 'customized': Flag indicating whether the strings imported from $file
- *     are customized translations or come from a community source. Use
- *     LOCALE_CUSTOMIZED or LOCALE_NOT_CUSTOMIZED. Optional, defaults to
- *     LOCALE_NOT_CUSTOMIZED.
- *   - 'finish_feedback': Whether or not to give feedback to the user when the
- *     batch is finished. Optional, defaults to TRUE.
- * @param bool $force
- *   (optional) Import all available files, even if they were imported before.
- *
- * @return array|bool
- *   The batch structure, or FALSE if no files are used to build the batch.
- *
- * @todo Integrate with update status to identify projects needed and integrate
- *   l10n_update functionality to feed in translation files alike.
- *   https://www.drupal.org/node/1191488
- */
-function locale_translate_batch_import_files(array $options, $force = FALSE) {
-  $options += [
-    'overwrite_options' => [],
-    'customized' => LOCALE_NOT_CUSTOMIZED,
-    'finish_feedback' => TRUE,
-  ];
-
-  if (!empty($options['langcode'])) {
-    $langcodes = [$options['langcode']];
-  }
-  else {
-    // If langcode was not provided, make sure to only import files for the
-    // languages we have added.
-    $langcodes = array_keys(\Drupal::languageManager()->getLanguages());
-  }
-
-  $files = locale_translate_get_interface_translation_files([], $langcodes);
-
-  if (!$force) {
-    $result = \Drupal::database()->select('locale_file', 'lf')
-      ->fields('lf', ['langcode', 'uri', 'timestamp'])
-      ->condition('langcode', $langcodes)
-      ->execute()
-      ->fetchAllAssoc('uri');
-    foreach ($result as $uri => $info) {
-      if (isset($files[$uri]) && filemtime($uri) <= $info->timestamp) {
-        // The file is already imported and not changed since the last import.
-        // Remove it from file list and don't import it again.
-        unset($files[$uri]);
-      }
-    }
-  }
-  return locale_translate_batch_build($files, $options);
-}
+use Drupal\locale\LocaleSource;
+use Drupal\locale\StreamWrapper\TranslationsStream;
 
 /**
  * Get interface translation files present in the translations directory.
@@ -84,17 +26,17 @@ function locale_translate_batch_import_files(array $options, $force = FALSE) {
  * @return array
  *   An array of interface translation files keyed by their URI.
  */
-function locale_translate_get_interface_translation_files(array $projects = [], array $langcodes = []) {
+function locale_translate_get_interface_translation_files(array $projects = [], array $langcodes = []): array {
   \Drupal::moduleHandler()->loadInclude('locale', 'inc', 'locale.compare');
   $files = [];
-  $projects = $projects ? $projects : array_keys(locale_translation_get_projects());
-  $langcodes = $langcodes ? $langcodes : array_keys(locale_translatable_language_list());
+  $projects = $projects ?: array_keys(\Drupal::service('locale.project')->getProjects());
+  $langcodes = $langcodes ?: array_keys(locale_translatable_language_list());
 
   // Scan the translations directory for files matching a name pattern
   // containing a project name and language code: {project}.{langcode}.po or
   // {project}-{version}.{langcode}.po.
   // Only files of known projects and languages will be returned.
-  $directory = \Drupal::config('locale.settings')->get('translation.path');
+  $directory = TranslationsStream::basePath();
   $result = [];
   if (is_dir($directory)) {
     $result = \Drupal::service('file_system')->scanDirectory($directory, '![a-z_]+(\-[0-9a-z\.\-\+]+|)\.[^\./]+\.po$!', ['recurse' => FALSE]);
@@ -187,7 +129,7 @@ function locale_translate_batch_build(array $files, array $options) {
  * @param array|\ArrayAccess $context
  *   Contains a list of files imported.
  */
-function locale_translate_batch_import($file, array $options, &$context) {
+function locale_translate_batch_import($file, array $options, &$context): void {
   // Merge the default values in the $options array.
   $options += [
     'overwrite_options' => [],
@@ -219,10 +161,16 @@ function locale_translate_batch_import($file, array $options, &$context) {
         // https://www.drupal.org/node/1089472.
         $context['finished'] = min(0.95, $report['seek'] / filesize($file->uri));
         if (isset($options['message'])) {
-          $context['message'] = t('@message (@percent%).', ['@message' => $options['message'], '@percent' => (int) ($context['finished'] * 100)]);
+          $context['message'] = t('@message (@percent%).', [
+            '@message' => $options['message'],
+            '@percent' => (int) ($context['finished'] * 100),
+          ]);
         }
         else {
-          $context['message'] = t('Importing translation file: %filename (@percent%).', ['%filename' => $file->filename, '@percent' => (int) ($context['finished'] * 100)]);
+          $context['message'] = t('Importing translation file: %filename (@percent%).', [
+            '%filename' => $file->filename,
+            '@percent' => (int) ($context['finished'] * 100),
+          ]);
         }
       }
       else {
@@ -270,7 +218,7 @@ function locale_translate_batch_import($file, array $options, &$context) {
  * @param array|\ArrayAccess $context
  *   Contains a list of imported files.
  */
-function locale_translate_batch_import_save($context) {
+function locale_translate_batch_import_save($context): void {
   if (isset($context['results']['files'])) {
     $request_time = \Drupal::time()->getRequestTime();
     foreach ($context['results']['files'] as $file) {
@@ -296,7 +244,7 @@ function locale_translate_batch_import_save($context) {
  * @param array|\ArrayAccess $context
  *   Contains a list of strings updated and information about the progress.
  */
-function locale_translate_batch_refresh(&$context) {
+function locale_translate_batch_refresh(&$context): void {
   if (!isset($context['sandbox']['refresh'])) {
     $strings = $langcodes = [];
     if (isset($context['results']['stats'])) {
@@ -364,7 +312,7 @@ function locale_translate_batch_refresh(&$context) {
  * @param array $results
  *   Batch results.
  */
-function locale_translate_batch_finished($success, array $results) {
+function locale_translate_batch_finished($success, array $results): void {
   $logger = \Drupal::logger('locale');
   if ($success) {
     $additions = $updates = $deletes = $skips = 0;
@@ -402,7 +350,11 @@ function locale_translate_batch_finished($success, array $results) {
         '@count translation files imported. %number translations were added, %update translations were updated and %delete translations were removed.',
         ['%number' => $additions, '%update' => $updates, '%delete' => $deletes]
       ));
-      $logger->notice('Translations imported: %number added, %update updated, %delete removed.', ['%number' => $additions, '%update' => $updates, '%delete' => $deletes]);
+      $logger->notice('Translations imported: %number added, %update updated, %delete removed.', [
+        '%number' => $additions,
+        '%update' => $updates,
+        '%delete' => $deletes,
+      ]);
 
       if ($skips) {
         if (\Drupal::moduleHandler()->moduleExists('dblog') && \Drupal::currentUser()->hasPermission('access site reports')) {
@@ -412,7 +364,10 @@ function locale_translate_batch_finished($success, array $results) {
           $message = \Drupal::translation()->formatPlural($skips, 'One translation string was skipped because of disallowed or malformed HTML. See the log for details.', '@count translation strings were skipped because of disallowed or malformed HTML. See the log for details.');
         }
         \Drupal::messenger()->addWarning($message);
-        $logger->warning('@count disallowed HTML string(s) in files: @files.', ['@count' => $skips, '@files' => implode(',', $skipped_files)]);
+        $logger->warning('@count disallowed HTML string(s) in files: @files.', [
+          '@count' => $skips,
+          '@files' => implode(',', $skipped_files),
+        ]);
       }
     }
   }
@@ -423,7 +378,7 @@ function locale_translate_batch_finished($success, array $results) {
 }
 
 /**
- * Creates a file object and populates the timestamp property.
+ * Creates a file object and populates the timestamp and hash properties.
  *
  * @param string $filepath
  *   The filepath of a file to import.
@@ -433,9 +388,10 @@ function locale_translate_batch_finished($success, array $results) {
  */
 function locale_translate_file_create($filepath) {
   $file = new stdClass();
-  $file->filename = \Drupal::service('file_system')->basename($filepath);
+  $file->filename = basename($filepath);
   $file->uri = $filepath;
   $file->timestamp = filemtime($file->uri);
+  $file->hash = hash_file(LocaleSource::LOCAL_FILE_HASH_ALGO, $file->uri);
   return $file;
 }
 
@@ -466,7 +422,8 @@ function locale_translate_file_attach_properties($file, array $options = []) {
   }
 
   // Extract project, version and language code from the file name. Supported:
-  // {project}-{version}.{langcode}.po, {prefix}.{langcode}.po or {langcode}.po
+  // "{project}-{version}.{langcode}.po", "{prefix}.{langcode}.po" or
+  // "{langcode}.po".
   preg_match('!
     (                       # project OR project and version OR empty (group 1)
       ([a-z_]+)             # project name (group 2)
@@ -545,7 +502,7 @@ function locale_translate_delete_translation_files(array $projects = [], array $
  *   The batch definition.
  */
 function locale_config_batch_update_components(array $options, array $langcodes = [], array $components = [], bool $update_default_config_langcodes = FALSE) {
-  $langcodes = $langcodes ? $langcodes : array_keys(\Drupal::languageManager()->getLanguages());
+  $langcodes = $langcodes ?: array_keys(\Drupal::languageManager()->getLanguages());
   if ($langcodes && $names = \Drupal::service('locale.config_manager')->getComponentNames($components)) {
     // If the component list is empty we need to ensure that all configuration
     // in the default collection is using the site's default langcode.
@@ -619,24 +576,6 @@ function locale_config_batch_update_default_config_langcodes(&$context): void {
 /**
  * Implements callback_batch_operation().
  *
- * Updates default configuration when new modules or themes are installed.
- *
- * @param array|\ArrayAccess $context
- *   The batch context.
- *
- * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use
- * locale_config_batch_update_default_config_langcodes(&$context) instead.
- *
- * @see https://www.drupal.org/node/3475054
- */
-function locale_config_batch_set_config_langcodes(&$context): void {
-  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use locale_config_batch_update_default_config_langcodes() instead. See https://www.drupal.org/node/3475054', E_USER_DEPRECATED);
-  locale_config_batch_update_default_config_langcodes($context);
-}
-
-/**
- * Implements callback_batch_operation().
- *
  * Performs configuration translation refresh.
  *
  * @param array $names
@@ -662,28 +601,6 @@ function locale_config_batch_update_config_translations(array $names, array $lan
 }
 
 /**
- * Implements callback_batch_operation().
- *
- * Performs configuration translation refresh.
- *
- * @param array $names
- *   An array of names of configuration objects to update.
- * @param array $langcodes
- *   (optional) Array of language codes to update. Defaults to all languages.
- * @param array|\ArrayAccess $context
- *   Contains a list of files imported.
- *
- * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use
- * locale_config_batch_update_config_translations($names, $langcodes, $context) instead.
- *
- * @see https://www.drupal.org/node/3475054
- */
-function locale_config_batch_refresh_name(array $names, array $langcodes, &$context): void {
-  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Use locale_config_batch_update_config_translations() instead. See https://www.drupal.org/node/3475054', E_USER_DEPRECATED);
-  locale_config_batch_update_config_translations($names, $langcodes, $context);
-}
-
-/**
  * Implements callback_batch_finished().
  *
  * Finishes callback of system page locale import batch.
@@ -695,7 +612,7 @@ function locale_config_batch_refresh_name(array $names, array $langcodes, &$cont
  *
  * @see locale_config_batch_build()
  */
-function locale_config_batch_finished($success, array $results) {
+function locale_config_batch_finished($success, array $results): void {
   if ($success) {
     $configuration = $results['stats']['config'] ?? 0;
     if ($configuration) {

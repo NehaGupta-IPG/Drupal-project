@@ -17,9 +17,7 @@ use Drupal\Core\Routing\LocalRedirectResponse;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -177,6 +175,19 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   }
 
   /**
+   * Controller to return the HTTP method for testing.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request.
+   *
+   * @return \Symfony\Component\HttpFoundation\Response
+   *   The response.
+   */
+  public function getMethod(Request $request): Response {
+    return new Response($request->getMethod());
+  }
+
+  /**
    * Controller to return $_GET['destination'] for testing.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
@@ -287,17 +298,6 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
   }
 
   /**
-   * Initialize authorize.php during testing.
-   *
-   * @see system_authorized_init()
-   */
-  public function authorizeInit($page_title) {
-    $authorize_url = Url::fromUri('base:core/authorize.php', ['absolute' => TRUE])->toString();
-    system_authorized_init('system_test_authorize_run', __DIR__ . '/../../system_test.module', [], $page_title);
-    return new RedirectResponse($authorize_url);
-  }
-
-  /**
    * Sets a header.
    */
   public function setHeader(Request $request) {
@@ -305,7 +305,10 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
     $response = new CacheableResponse();
     $response->headers->set($query['name'], $query['value']);
     $response->getCacheableMetadata()->addCacheContexts(['url.query_args:name', 'url.query_args:value']);
-    $response->setContent((string) $this->t('The following header was set: %name: %value', ['%name' => $query['name'], '%value' => $query['value']]));
+    $response->setContent((string) $this->t('The following header was set: %name: %value', [
+      '%name' => $query['name'],
+      '%value' => $query['value'],
+    ]));
 
     return $response;
   }
@@ -354,6 +357,7 @@ class SystemTestController extends ControllerBase implements TrustedCallbackInte
    *   Any string for the {foo} slug.
    *
    * @return string
+   *   The value of title.
    */
   public function configureTitle($foo) {
     return 'Bar.' . $foo;
