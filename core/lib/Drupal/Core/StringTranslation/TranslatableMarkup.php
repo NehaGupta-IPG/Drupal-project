@@ -3,7 +3,9 @@
 namespace Drupal\Core\StringTranslation;
 
 use Drupal\Component\Render\FormattableMarkup;
+use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\ToStringTrait;
+use Drupal\Component\Utility\Xss;
 
 /**
  * Provides translatable markup class.
@@ -13,6 +15,11 @@ use Drupal\Component\Utility\ToStringTrait;
  * let the rendering system do the cast as late as possible in the rendering
  * process, so that this object itself can be put, untranslated, into render
  * caches and thus the cache can be shared between different language contexts.
+ *
+ * In addition, the constructor of this class contains an assert that verifies
+ * that strings are locale-safe. Non-locale-safe strings cannot be translated
+ * in the UI or imported in translation PO files. See locale_string_is_safe()
+ * for more information.
  *
  * @see \Drupal\Component\Render\FormattableMarkup
  * @see \Drupal\Core\StringTranslation\TranslationManager::translateString()
@@ -52,13 +59,15 @@ class TranslatableMarkup extends FormattableMarkup {
    * directly.
    *
    * Calling the trait's t() method or instantiating a new TranslatableMarkup
-   * object serves two purposes:
+   * object serves three purposes:
    * - At run-time it translates user-visible text into the appropriate
    *   language.
    * - Static analyzers detect calls to t() and new TranslatableMarkup, and add
    *   the first argument (the string to be translated) to the database of
    *   strings that need translation. These strings are expected to be in
    *   English, so the first argument should always be in English.
+   * - An assert verifies that the string is locale-safe; see
+   *   locale_string_is_safe() for more information.
    * To allow the site to be localized, it is important that all human-readable
    * text that will be displayed on the site or sent to a user is made available
    * in one of the ways supported by the
@@ -131,6 +140,8 @@ class TranslatableMarkup extends FormattableMarkup {
       $message = $string instanceof TranslatableMarkup ? '$string ("' . $string->getUntranslatedString() . '") must be a string.' : '$string ("' . (string) $string . '") must be a string.';
       throw new \InvalidArgumentException($message);
     }
+    assert($this->validateString($string), $string . ' is not locale-safe');
+
     parent::__construct($string, $arguments);
     $this->options = $options;
     $this->stringTranslation = $string_translation;
@@ -226,6 +237,79 @@ class TranslatableMarkup extends FormattableMarkup {
    */
   public function count(): int {
     return mb_strlen($this->render());
+  }
+
+  /**
+   * Verifies that the string is locale-safe.
+   *
+   * This is a copy of locale_string_is_safe().
+   *
+   * @param string $string
+   *   Translatable string to validate.
+   *
+   * @return bool
+   *   TRUE if the string is valid, and FALSE if it isn't.
+   *
+   * @see locale_string_is_safe()
+   */
+  protected function validateString($string): bool {
+    $string = preg_replace('/\[[a-z0-9_-]+(:[a-z0-9_-]+)+\]/i', '', $string);
+
+    return Html::decodeEntities($string) == Html::decodeEntities(Xss::filter($string, [
+      'a',
+      'abbr',
+      'acronym',
+      'address',
+      'b',
+      'bdo',
+      'big',
+      'blockquote',
+      'br',
+      'caption',
+      'cite',
+      'code',
+      'col',
+      'colgroup',
+      'dd',
+      'del',
+      'dfn',
+      'dl',
+      'dt',
+      'em',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'hr',
+      'i',
+      'ins',
+      'kbd',
+      'li',
+      'ol',
+      'p',
+      'pre',
+      'q',
+      'samp',
+      'small',
+      'span',
+      'strong',
+      'sub',
+      'sup',
+      'table',
+      'tbody',
+      'td',
+      'tfoot',
+      'th',
+      'thead',
+      'tr',
+      'tt',
+      'ul',
+      'var',
+      'wbr',
+    ]));
+
   }
 
 }

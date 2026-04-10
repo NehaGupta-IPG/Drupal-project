@@ -396,7 +396,7 @@ class BreadcrumbTest extends BrowserTestBase {
 
     // Ensure that the breadcrumb is safe against XSS.
     $this->drupalGet('menu-test/breadcrumb1/breadcrumb2/breadcrumb3');
-    $this->assertSession()->responseContains('<script>alert(12);</script>');
+    $this->assertSession()->assertEscaped('<script>alert(12);</script>');
     $this->assertSession()->assertEscaped('<script>alert(123);</script>');
 
     // Assert that the breadcrumb cacheability is respected after not applying.

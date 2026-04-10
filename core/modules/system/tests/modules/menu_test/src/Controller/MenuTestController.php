@@ -79,6 +79,20 @@ class MenuTestController extends ControllerBase {
   }
 
   /**
+   * A title callback method with unsafe HTML.
+   *
+   * Use a title callback here so we can return untranslated, unsafe HTML.
+   * Translated strings (such as those in routing.yml files) cannot contain
+   * unsafe HTML.
+   *
+   * @return string
+   *   An untranslated route title that has a script tag in it.
+   */
+  public function titleCallbackXss(): string {
+    return '<script>alert(12);</script>';
+  }
+
+  /**
    * Page callback: Tests the theme negotiation functionality.
    *
    * @param bool $inherited
