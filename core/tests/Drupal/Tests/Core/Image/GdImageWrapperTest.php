@@ -6,7 +6,6 @@ namespace Drupal\Tests\Core\Image;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\File\FileSystemInterface;
-use Drupal\Core\Image\ImageFactory;
 use Drupal\Core\ImageToolkit\ImageToolkitOperationManagerInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Drupal\image_test\Plugin\ImageToolkit\Operation\gd\StatefulCrop;
