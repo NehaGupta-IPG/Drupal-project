@@ -119,8 +119,10 @@ class AccessPolicyProcessor implements AccessPolicyProcessorInterface {
     // if an exception was thrown.
     try {
       // For static cache, add the user ID and filter out user cache contexts
-      // as they are no longer needed then. Downside is that the user cache
-      // tag needs to be added.
+      // as they are no longer needed. The user cache tag has to be added here
+      // so that changes to the user such as adding or removing a role
+      // invalidate the static cache, forcing any access policy checks after the
+      // change to rely on the latest state.
       $static_cache_keys = array_merge($cache_keys, ['user:' . $account->id()]);
       $static_initial_cacheability = clone $initial_cacheability;
       $static_initial_cacheability->addCacheTags(['user:' . $account->id()]);
