@@ -106,17 +106,6 @@ class GdImageWrapperTest extends UnitTestCase {
   }
 
   /**
-   * Mocks the ImageFactory.
-   */
-  protected function getImageFactoryMock(?GDToolkit $toolkit = NULL): ImageFactory&MockObject {
-    $mock = $this->createMock(ImageFactory::class);
-    $mock->expects($this->atLeastOnce())
-      ->method('getToolkit')
-      ->willReturn($toolkit ?? $this->getToolkitMock());
-    return $mock;
-  }
-
-  /**
    * Mocks a toolkit operation.
    *
    * @param class-string $class_name
@@ -153,28 +142,38 @@ class GdImageWrapperTest extends UnitTestCase {
    * @param bool $load_expected
    *   (optional) Whether the load() method is expected to be called. Defaults
    *   to TRUE.
+   * @param bool $get_plugin_id_expected
+   *   (optional) Whether the getPluginId() method is expected to be called.
+   *   Defaults to FALSE.
    * @param list<string> $stubs
    *   (optional) Array containing toolkit methods to be replaced with stubs.
    *
    * @return \Drupal\system\Image\GdImageWrapper
    *   An image object.
    */
-  protected function getTestImage(bool $load_expected = TRUE, array $stubs = []): GdImageWrapper {
+  protected function getTestImage(bool $load_expected = TRUE, bool $get_plugin_id_expected = FALSE, array $stubs = []): GdImageWrapper {
     if (!$load_expected && !in_array('load', $stubs)) {
       $stubs = array_merge(['load'], $stubs);
     }
 
     $this->toolkit = $this->getToolkitMock($stubs);
 
-    $this->toolkit->expects($this->never())
-      ->method('getPluginId');
+    if (!$get_plugin_id_expected) {
+      $this->toolkit->expects($this->never())
+        ->method('getPluginId');
+    }
+    else {
+      $this->toolkit->expects($this->atLeastOnce())
+        ->method('getPluginId')
+        ->willReturn('gd');
+    }
 
     if (!$load_expected) {
       $this->toolkit->expects($this->never())
         ->method('load');
     }
 
-    $this->image = new GdImageWrapper($this->getImageFactoryMock($this->toolkit), 'gd', $this->source);
+    $this->image = new GdImageWrapper($this->toolkit, $this->source);
 
     $this->toolkit->expects($this->never())
       ->method(PropertyHook::get('backfillImage'));
@@ -199,7 +198,7 @@ class GdImageWrapperTest extends UnitTestCase {
     $this->toolkit->expects($this->atLeastOnce())
       ->method('getToolkitOperation')
       ->willReturn($this->toolkitOperation);
-    $this->image = new GdImageWrapper($this->getImageFactoryMock($this->toolkit), 'gd', $this->source);
+    $this->image = new GdImageWrapper($this->toolkit, $this->source);
     return $this->image;
   }
 
@@ -225,7 +224,7 @@ class GdImageWrapperTest extends UnitTestCase {
     $this->toolkit
       ->method('getToolkitOperation')
       ->willReturn($this->toolkitOperation);
-    $this->image = new GdImageWrapper($this->getImageFactoryMock($this->toolkit), 'gd', $this->source);
+    $this->image = new GdImageWrapper($this->toolkit, $this->source);
     $this->toolkit->expects($expectsBackfillImageAccess ? $this->atLeastOnce() : $this->never())
       ->method(PropertyHook::get('backfillImage'))
       ->willReturn($this->image);
@@ -285,7 +284,7 @@ class GdImageWrapperTest extends UnitTestCase {
    * Tests \Drupal\Core\Image\Image::getToolkitId().
    */
   public function testGetToolkitId(): void {
-    $this->getTestImage(FALSE);
+    $this->getTestImage(FALSE, TRUE);
     $this->assertEquals('gd', $this->image->getToolkitId());
   }
 
@@ -300,7 +299,7 @@ class GdImageWrapperTest extends UnitTestCase {
       ->method('save')
       ->willReturn(TRUE);
 
-    $image = new GdImageWrapper($this->getImageFactoryMock($toolkit), 'gd', $this->image->getSource());
+    $image = new GdImageWrapper($toolkit, $this->image->getSource());
 
     $file_system = $this->prophesize(FileSystemInterface::class);
     $file_system->chmod($this->image->getSource())
@@ -342,7 +341,7 @@ class GdImageWrapperTest extends UnitTestCase {
       ->method('save')
       ->willReturn(TRUE);
 
-    $image = new GdImageWrapper($this->getImageFactoryMock($toolkit), 'gd', $this->image->getSource());
+    $image = new GdImageWrapper($toolkit, $this->image->getSource());
 
     $file_system = $this->prophesize(FileSystemInterface::class);
     $file_system->chmod($this->image->getSource())
@@ -364,7 +363,7 @@ class GdImageWrapperTest extends UnitTestCase {
    * Tests \Drupal\Core\Image\Image::parseFile().
    */
   public function testParseFileFails(): void {
-    $image = new GdImageWrapper($this->getImageFactoryMock(), 'gd', 'magic-foobar.png');
+    $image = new GdImageWrapper($this->getToolkitMock(), 'magic-foobar.png');
     $this->assertFalse($image->isValid());
     $this->assertFalse($image->save());
   }
