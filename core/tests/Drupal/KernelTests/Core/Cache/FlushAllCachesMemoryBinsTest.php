@@ -7,20 +7,19 @@ namespace Drupal\KernelTests\Core\Cache;
 use Drupal\Core\Cache\Cache;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunInSeparateProcesses;
 
 /**
  * Tests that drupal_flush_all_caches() flushes memory cache bins.
- *
- * Regression test for https://www.drupal.org/project/drupal/issues/XXXXXXX
+ * Regression: https://www.drupal.org/project/drupal/issues/XXXXXXX
  *
  * In long-running PHP processes (Drush daemons, Swoole, RoadRunner, PHP-PM,
  * ReactPHP, MCP servers), memory bins survive across requests. Without this
  * fix, a cache clear leaves stale data in memory bins for the lifetime of
  * the process.
- *
- * @group Cache
  */
 #[Group('Cache')]
+#[RunInSeparateProcesses]
 class FlushAllCachesMemoryBinsTest extends KernelTestBase {
 
   /**
