@@ -100,7 +100,7 @@ class ImageStyleDownloadController extends FileDownloadController implements Ima
     // Check if token is valid.
     $token_is_valid = $this->checkToken($request, $image_uri, $scheme, $target, $image_style);
 
-    // Throw 404 if generation isn't authorized
+    // Throw 404 if generation isn't authorized.
     $this->authorizedDerivativeGeneration($image_style, $scheme, $target, $token_is_valid);
 
     $derivative_uri = $image_style->buildUri($image_uri);
@@ -128,7 +128,12 @@ class ImageStyleDownloadController extends FileDownloadController implements Ima
         $image_uri = $converted_image_uri;
       }
       else {
-        $this->logger->notice('Source image at %source_image_path not found while trying to generate derivative image at %derivative_path.', ['%source_image_path' => $image_uri, '%derivative_path' => $derivative_uri]);
+        $this->logger->notice('Source image at %source_image_path not found while trying to generate derivative image at %derivative_path.',
+          [
+            '%source_image_path' => $image_uri,
+            '%derivative_path' => $derivative_uri,
+          ]
+        );
         return new Response($this->t('Error generating image, missing source file.'), 404);
       }
     }
