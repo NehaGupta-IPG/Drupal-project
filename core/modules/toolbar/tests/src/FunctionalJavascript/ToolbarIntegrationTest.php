@@ -93,7 +93,7 @@ class ToolbarIntegrationTest extends WebDriverTestBase {
     $assert_session->elementsCount('css', '.toolbar-tray', 2);
 
     // The admin tray is empty due to the user having no permissions to access
-    // any items it  would provide. In those instances, the tab will have the
+    // any items it would provide. In those instances, the tab will have the
     // `.toolbar-tab--inert` class, so it and the child elements can be hidden.
     $admin_tab = $assert_session->elementExists('css', '.toolbar-tab.toolbar-tab--inert #toolbar-item-administration.toolbar-item');
     $admin_tray = $assert_session->elementExists('css', '.toolbar-tab.toolbar-tab--inert #toolbar-item-administration-tray.toolbar-tray');
