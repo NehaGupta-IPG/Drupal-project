@@ -8,6 +8,7 @@ use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests that the asset files for all core libraries exist.
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
  */
 #[Group('Asset')]
 #[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
 
   /**
@@ -66,7 +68,6 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
   protected $allThemes = [
     'claro',
     'olivero',
-    'stable9',
     'stark',
   ];
 
@@ -100,6 +101,8 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installConfig('system');
+
     // Install all core themes.
     sort($this->allThemes);
     $this->container->get('theme_installer')->install($this->allThemes);
@@ -124,7 +127,8 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
         || $module->status == TRUE
         || $module->info['package'] == 'Testing'
         || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::EXPERIMENTAL
-        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED) {
+        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED
+        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::OBSOLETE) {
         return FALSE;
       }
       return TRUE;
@@ -167,6 +171,9 @@ class ResolvedLibraryDefinitionsFilesMatchTest extends KernelTestBase {
    */
   #[IgnoreDeprecations]
   public function testCoreLibraryCompletenessDeprecated(): void {
+    // Install the 'path_alias' entity schema because the path alias path
+    // processor requires it.
+    $this->installEntitySchema('path_alias');
     // Find and install deprecated modules to test.
     $all_modules = $this->container->get('extension.list.module')->getList();
     $deprecated_modules_to_test = array_filter($all_modules, function ($module) {

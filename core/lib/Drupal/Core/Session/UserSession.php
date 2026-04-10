@@ -43,7 +43,7 @@ class UserSession implements AccountInterface {
    *
    * @var string
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $preferred_langcode;
 
   /**
@@ -51,7 +51,7 @@ class UserSession implements AccountInterface {
    *
    * @var string
    */
-  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName, Drupal.Commenting.VariableComment.Missing
+  // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
   protected $preferred_admin_langcode;
 
   /**
@@ -108,9 +108,6 @@ class UserSession implements AccountInterface {
    *
    * @return bool
    *   Returns TRUE if the user has the role, otherwise FALSE.
-   *
-   * @todo in Drupal 11, add method to Drupal\Core\Session\AccountInterface.
-   * @see https://www.drupal.org/node/3228209
    */
   public function hasRole(string $rid): bool {
     return in_array($rid, $this->getRoles(), TRUE);

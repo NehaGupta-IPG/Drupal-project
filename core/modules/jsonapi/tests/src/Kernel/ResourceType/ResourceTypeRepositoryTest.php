@@ -12,6 +12,7 @@ use Drupal\Tests\jsonapi\Kernel\JsonapiKernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Drupal\jsonapi\ResourceType\ResourceTypeRepository.
@@ -20,13 +21,13 @@ use PHPUnit\Framework\Attributes\Group;
  */
 #[CoversClass(ResourceTypeRepository::class)]
 #[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'file',
     'field',
     'node',
     'serialization',
@@ -71,8 +72,6 @@ class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
 
   /**
    * Tests all.
-   *
-   * @legacy-covers ::all
    */
   public function testAll(): void {
     // Make sure that there are resources being created.
@@ -87,8 +86,6 @@ class ResourceTypeRepositoryTest extends JsonapiKernelTestBase {
 
   /**
    * Tests get.
-   *
-   * @legacy-covers ::get
    */
   #[DataProvider('getProvider')]
   public function testGet($entity_type_id, $bundle, $entity_class): void {

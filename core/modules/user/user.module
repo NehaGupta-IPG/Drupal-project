@@ -6,7 +6,6 @@
 
 use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Batch\BatchBuilder;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Site\Settings;
@@ -38,9 +37,14 @@ function user_picture_enabled() {
  *   A fully-loaded $user object upon successful user load or FALSE if user
  *   cannot be loaded.
  *
- * @see \Drupal\user\Entity\User::loadMultiple()
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0.
+ *   Use \Drupal::entityTypeManager()->getStorage('user')->loadByProperties()
+ *   instead.
+ *
+ * @see https://www.drupal.org/node/3555936
  */
 function user_load_by_mail($mail) {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use entityTypeManager()->getStorage("user")->loadByProperties() instead. See https://www.drupal.org/node/3555936', E_USER_DEPRECATED);
   $users = \Drupal::entityTypeManager()->getStorage('user')
     ->loadByProperties(['mail' => $mail]);
   return $users ? reset($users) : FALSE;
@@ -56,9 +60,14 @@ function user_load_by_mail($mail) {
  *   A fully-loaded $user object upon successful user load or FALSE if user
  *   cannot be loaded.
  *
- * @see \Drupal\user\Entity\User::loadMultiple()
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0.
+ *   Use \Drupal::entityTypeManager()->getStorage('user')->loadByProperties()
+ *   instead.
+ *
+ * @see https://www.drupal.org/node/3555936
  */
 function user_load_by_name($name) {
+  @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use entityTypeManager()->getStorage("user")->loadByProperties() instead. See https://www.drupal.org/node/3555936', E_USER_DEPRECATED);
   $users = \Drupal::entityTypeManager()->getStorage('user')
     ->loadByProperties(['name' => $name]);
   return $users ? reset($users) : FALSE;
@@ -523,7 +532,7 @@ function user_role_grant_permissions($rid, array $permissions = []): void {
     foreach ($permissions as $permission) {
       $role->grantPermission($permission);
     }
-    $role->trustData()->save();
+    $role->save();
   }
 }
 
@@ -545,7 +554,7 @@ function user_role_revoke_permissions($rid, array $permissions = []): void {
   foreach ($permissions as $permission) {
     $role->revokePermission($permission);
   }
-  $role->trustData()->save();
+  $role->save();
 }
 
 /**
@@ -613,38 +622,16 @@ function _user_mail_notify($op, AccountInterface $account) {
  * This #process handler is automatically invoked for 'password_confirm' form
  * elements to add the JavaScript and string translations for dynamic password
  * validation.
+ *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use
+ *   UserThemeHooks::processPasswordConfirm() instead.
+ *
+ * @see https://www.drupal.org/node/3582107
+ * @see Drupal\user\Hook\UserThemeHooks::processPasswordConfirm()
  */
 function user_form_process_password_confirm($element) {
-  $password_settings = [
-    'confirmTitle' => t('Passwords match:'),
-    'confirmSuccess' => t('yes'),
-    'confirmFailure' => t('no'),
-    'showStrengthIndicator' => FALSE,
-  ];
-
-  if (\Drupal::config('user.settings')->get('password_strength')) {
-    $password_settings['showStrengthIndicator'] = TRUE;
-    $password_settings += [
-      'strengthTitle' => t('Password strength:'),
-      'hasWeaknesses' => t('Recommendations to make your password stronger:'),
-      'tooShort' => t('Make it at least 12 characters'),
-      'addLowerCase' => t('Add lowercase letters'),
-      'addUpperCase' => t('Add uppercase letters'),
-      'addNumbers' => t('Add numbers'),
-      'addPunctuation' => t('Add punctuation'),
-      'sameAsUsername' => t('Make it different from your username'),
-      'weak' => t('Weak'),
-      'fair' => t('Fair'),
-      'good' => t('Good'),
-      'strong' => t('Strong'),
-      'username' => \Drupal::currentUser()->getAccountName(),
-    ];
-  }
-
-  $element['#attached']['library'][] = 'user/drupal.user';
-  $element['#attached']['drupalSettings']['password'] = $password_settings;
-
-  return $element;
+  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use UserThemeHooks::processPasswordConfirm() instead. See https://www.drupal.org/node/3582107', E_USER_DEPRECATED);
+  return \Drupal::service(UserThemeHooks::class)->processPasswordConfirm($element);
 }
 
 /**
@@ -711,15 +698,4 @@ function user_logout(): void {
 function template_preprocess_user(&$variables): void {
   @trigger_error(__FUNCTION__ . '() is deprecated in drupal:11.3.0 and is removed from drupal:12.0.0. Initial template_preprocess functions are registered directly in hook_theme(). See https://www.drupal.org/node/3504125', E_USER_DEPRECATED);
   \Drupal::service(UserThemeHooks::class)->preprocessUser($variables);
-}
-
-/**
- * Additional submit handler for \Drupal\system\Form\RegionalForm.
- */
-function user_form_system_regional_settings_submit($form, FormStateInterface $form_state): void {
-  \Drupal::configFactory()->getEditable('system.date')
-    ->set('timezone.user.configurable', $form_state->getValue('configurable_timezones'))
-    ->set('timezone.user.warn', $form_state->getValue('empty_timezone_message'))
-    ->set('timezone.user.default', $form_state->getValue('user_default_timezone'))
-    ->save();
 }

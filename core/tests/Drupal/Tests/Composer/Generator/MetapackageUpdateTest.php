@@ -22,7 +22,7 @@ class MetapackageUpdateTest extends TestCase {
   /**
    * Provides test data for testUpdated.
    */
-  public static function updatedTestData() {
+  public static function updatedTestData(): array {
     return [
       [
         DrupalCoreRecommendedBuilder::class,
@@ -33,6 +33,7 @@ class MetapackageUpdateTest extends TestCase {
         'composer/Metapackage/DevDependencies',
       ],
       [
+        // @phpstan-ignore classConstant.deprecatedClass
         DrupalPinnedDevDependenciesBuilder::class,
         'composer/Metapackage/PinnedDevDependencies',
       ],

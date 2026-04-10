@@ -18,7 +18,6 @@ use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Template\Attribute;
 use Drupal\Core\Url;
 use Drupal\Core\Utility\TableSort;
-use Drupal\views\Views;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -121,12 +120,13 @@ class ViewsThemeHooks {
         'rows' => NULL,
         'title' => NULL,
       ],
+      'initial preprocess' => static::class . ':preprocessViewsViewGrouping',
     ];
     // Only display, pager, row, and style plugins can provide theme hooks.
     $plugin_types = ['display', 'pager', 'row', 'style', 'exposed_form'];
     $plugins = [];
     foreach ($plugin_types as $plugin_type) {
-      $plugins[$plugin_type] = Views::pluginManager($plugin_type)->getDefinitions();
+      $plugins[$plugin_type] = \Drupal::service('views.plugin_managers')->get($plugin_type)->getDefinitions();
     }
     // Register theme functions for all style plugins. It provides a basic auto
     // implementation of template files by using the plugin
@@ -724,7 +724,7 @@ class ViewsThemeHooks {
         }
         // Add a CSS align class to each field if one was set.
         if (!empty($options['info'][$field]['align'])) {
-          $variables['header'][$field]['attributes']->addClass(Html::cleanCssIdentifier($options['info'][$field]['align']));
+          $variables['header'][$field]['attributes']->addClass(Html::cleanCssIdentifier(str_replace('views-', 'text-', $options['info'][$field]['align'])));
         }
         // Add a header label wrapper if one was selected.
         if ($variables['header'][$field]['content']) {

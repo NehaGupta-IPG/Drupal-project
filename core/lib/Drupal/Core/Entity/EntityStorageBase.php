@@ -4,6 +4,7 @@ namespace Drupal\Core\Entity;
 
 use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Cache\MemoryCache\MemoryCacheInterface;
+use Drupal\Core\Utility\FiberResumeType;
 
 /**
  * A base entity storage class.
@@ -294,23 +295,20 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
         // of entities to load, so that another call can load everything at
         // once.
         $this->entityIdsToLoad = array_unique(array_merge($this->entityIdsToLoad, $ids));
-        $fiber->suspend();
+        $fiber->suspend(FiberResumeType::Immediate);
 
-        // At this point the entityIdsToLoad property will either have been
-        // reset within another Fiber, or will contain the IDs passed in as
-        // well as any others waiting to be loaded.
-        if ($this->entityIdsToLoad) {
-          $ids = $this->entityIdsToLoad;
+        // If all the IDs we need to return have already been loaded into the
+        // static cache, ignore any additionally requested entities here since
+        // deferring these may allow them to be loaded with more other entities
+        // later.
+        $entities += $this->getFromStaticCache($ids);
+        $ids = array_diff($ids, array_keys($entities));
 
-          // Reset the entityIdsToLoad property so that any further calls start
-          // with a blank slate (apart from the entity static cache).
+        // Otherwise load additional entities now.
+        if ($ids && $this->entityIdsToLoad) {
+          $ids = array_unique(array_merge($ids, $this->entityIdsToLoad));
           $this->entityIdsToLoad = [];
         }
-        $entities += $this->getFromStaticCache($ids);
-
-        // If any entities were in the static cache remove them from the
-        // remaining IDs.
-        $ids = array_diff($ids, array_keys($entities));
       }
     }
 
@@ -453,7 +451,11 @@ abstract class EntityStorageBase extends EntityHandlerBase implements EntityStor
       $entity_class = $this->getEntityClass();
       /** @var \Drupal\Core\Entity\EntityInterface $entity */
       $entity = new $entity_class($record, $this->entityTypeId);
-      $entities[$entity->id()] = $entity;
+      $entity_id = $entity->id();
+      if ($entity_id === NULL) {
+        throw new EntityMalformedException('The entity does not have an ID.');
+      }
+      $entities[$entity_id] = $entity;
     }
     return $entities;
   }

@@ -8,6 +8,7 @@ use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
 use Drupal\image\Entity\ImageStyle;
+use Drupal\image\ImageDerivativeUtilities;
 use Drupal\image\ImageStyleInterface;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\TestFileCreationTrait;
@@ -72,7 +73,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     $this->drupalGet('admin/config/media/image-styles/add');
     $this->submitForm($edit, 'Create new style');
     $this->assertSession()->statusMessageContains("Style {$style_label} was created.", 'status');
-    $options = image_style_options();
+    $options = \Drupal::service(ImageDerivativeUtilities::class)->styleOptions();
     $this->assertArrayHasKey($style_name, $options);
   }
 
@@ -536,7 +537,7 @@ class ImageAdminStylesTest extends ImageFieldTestBase {
     $style->save();
 
     // Build the derivative preview image file with the Image Style.
-    // @see template_preprocess_image_style_preview()
+    // @see \Drupal\image\Hook\ImageThemeHooks::preprocessImageStylePreview()
     $preview_file = $style->buildUri($original_path);
     $style->createDerivative($original_path, $preview_file);
 

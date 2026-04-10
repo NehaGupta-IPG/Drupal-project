@@ -19,9 +19,6 @@ default:
   title:
     -
       value: 'A happy little workspace'
-  created:
-    -
-      value: 1751155670
   promote:
     -
       value: false
@@ -48,4 +45,3 @@ default:
     -
       value: 'This page lives in a workspace! How neat!'
       format: plain_text
-      summary: ''

@@ -11,6 +11,7 @@ use Drupal\Core\Database\StatementPrefetchIterator;
 use Drupal\Tests\system\Functional\Database\FakeRecord;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Database system's various fetch capabilities.
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
  * We get timeout errors if we try to run too many tests at once.
  */
 #[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class FetchTest extends DatabaseTestBase {
 
   /**
@@ -399,7 +401,7 @@ class FetchTest extends DatabaseTestBase {
       $this->markTestSkipped('This test is for StatementPrefetchIterator statements only.');
     }
 
-    $this->expectDeprecation('Drupal\Core\Database\StatementPrefetchIterator::fetchColumn() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ::fetchField() instead. See https://www.drupal.org/node/3490312');
+    $this->expectUserDeprecationMessage('Drupal\Core\Database\StatementPrefetchIterator::fetchColumn() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use ::fetchField() instead. See https://www.drupal.org/node/3490312');
     $statement->fetchColumn();
   }
 

@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\field\Kernel;
 
+use Drupal\entity_test\Entity\EntityTestRev;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field_test\FieldTestHelper;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests storage-related Field Attach API functions.
@@ -16,6 +18,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @todo move this to the Entity module
  */
 #[Group('field')]
+#[RunTestsInSeparateProcesses]
 class FieldAttachStorageTest extends FieldKernelTestBase {
 
   /**
@@ -212,6 +215,7 @@ class FieldAttachStorageTest extends FieldKernelTestBase {
     $entity_init = $this->container->get('entity_type.manager')
       ->getStorage($entity_type)
       ->create(['id' => 1, 'revision_id' => 1]);
+    $this->assertInstanceOf(EntityTestRev::class, $entity_init);
     $default = FieldTestHelper::defaultValue($entity_init, $this->fieldTestData->field);
     $this->assertEquals($default, $entity_init->{$this->fieldTestData->field_name}->getValue(), 'Default field value correctly populated.');
 

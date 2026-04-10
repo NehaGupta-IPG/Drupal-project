@@ -19,6 +19,7 @@ use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\field\Traits\BodyFieldCreationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests Add To All Bundles Config Action.
@@ -26,6 +27,7 @@ use PHPUnit\Framework\Attributes\Group;
 #[Group('Recipe')]
 #[Group('field')]
 #[CoversClass(AddToAllBundles::class)]
+#[RunTestsInSeparateProcesses]
 class AddToAllBundlesConfigActionTest extends KernelTestBase {
 
   use BodyFieldCreationTrait;
@@ -38,7 +40,6 @@ class AddToAllBundlesConfigActionTest extends KernelTestBase {
     'field',
     'entity_test',
     'entity_test_with_storage',
-    'system',
     'text',
     'user',
   ];
@@ -146,6 +147,28 @@ class AddToAllBundlesConfigActionTest extends KernelTestBase {
     $this->assertInstanceOf(FieldConfig::class, $field);
     $this->assertSame('Body field label', $field->label());
     $this->assertSame('Set by config actions.', $field->getDescription());
+  }
+
+  /**
+   * Tests that the action fails when the label property is not set.
+   */
+  public function testMissingLabel(): void {
+    $contents = <<<YAML
+name: Instantiate field on all bundles
+config:
+  import:
+    entity_test_with_storage:
+      - field.storage.entity_test.body
+  actions:
+    field.storage.entity_test.body:
+      addToAllBundles:
+        description: Set by config actions.
+YAML;
+    $recipe = $this->createRecipe($contents);
+
+    $this->expectException(ConfigActionException::class);
+    $this->expectExceptionMessage('The `label` property must be set for entity_test.entity_test.body.');
+    RecipeRunner::processRecipe($recipe);
   }
 
   /**

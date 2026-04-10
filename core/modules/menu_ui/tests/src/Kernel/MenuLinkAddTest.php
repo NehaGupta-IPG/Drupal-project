@@ -10,12 +10,14 @@ use Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd;
 use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests \Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd deprecation.
  */
 #[Group('menu_ui')]
 #[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class MenuLinkAddTest extends KernelTestBase {
 
   use ContentTypeCreationTrait;
@@ -35,7 +37,7 @@ class MenuLinkAddTest extends KernelTestBase {
     /** @var \Drupal\Core\Menu\LocalActionManagerInterface $local_action_manager */
     $local_action_manager = $this->container->get('plugin.manager.menu.local_action');
 
-    $this->expectDeprecation('Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Menu\LocalActionWithDestination instead. See https://www.drupal.org/node/3490245');
+    $this->expectUserDeprecationMessage('Drupal\menu_ui\Plugin\Menu\LocalAction\MenuLinkAdd is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\Menu\LocalActionWithDestination instead. See https://www.drupal.org/node/3490245');
     $instance = $local_action_manager->createInstance('entity.menu.add_link_form_deprecated');
     $this->assertInstanceOf(MenuLinkAdd::class, $instance);
   }

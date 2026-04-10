@@ -8,12 +8,16 @@ use Drupal\contact\Plugin\migrate\source\ContactSettings;
 use Drupal\Tests\migrate\Kernel\MigrateSqlSourceTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests D6 contact settings source plugin.
  */
 #[CoversClass(ContactSettings::class)]
 #[Group('contact')]
+#[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class ContactSettingsTest extends MigrateSqlSourceTestBase {
 
   /**

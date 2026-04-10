@@ -9,11 +9,13 @@ use Drupal\user\UserInterface;
 use Drupal\user\UserNameValidator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Verify that user validity checks behave as designed.
  */
 #[Group('user')]
+#[RunTestsInSeparateProcesses]
 class UserNameValidatorTest extends KernelTestBase {
 
   /**
@@ -81,11 +83,11 @@ class UserNameValidatorTest extends KernelTestBase {
       'ends with space' => ['foo ', 'The username cannot end with a space.'],
       'contains 2 spaces' => ['foo  bar', 'The username cannot contain multiple spaces in a row.'],
       'empty string' => ['', 'You must enter a username.'],
-      'invalid chars' => ['foo/', 'The username contains an illegal character.'],
+      'invalid chars' => ['foo/', 'The username contains an invalid character.'],
       // NULL.
-      'contains chr(0)' => ['foo' . chr(0) . 'bar', 'The username contains an illegal character.'],
+      'contains chr(0)' => ['foo' . chr(0) . 'bar', 'The username contains an invalid character.'],
       // CR.
-      'contains chr(13)' => ['foo' . chr(13) . 'bar', 'The username contains an illegal character.'],
+      'contains chr(13)' => ['foo' . chr(13) . 'bar', 'The username contains an invalid character.'],
       'excessively long' => [str_repeat('x', UserInterface::USERNAME_MAX_LENGTH + 1),
         'The username xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx is too long: it must be 60 characters or less.',
       ],

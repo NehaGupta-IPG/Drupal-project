@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Core\Recipe;
 
-use Drupal\contact\Entity\ContactForm;
 use Drupal\FunctionalTests\Installer\InstallerTestBase;
-use Drupal\shortcut\Entity\Shortcut;
 use Drupal\Tests\standard\Traits\StandardTestTrait;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -37,6 +35,12 @@ class StandardRecipeInstallTest extends InstallerTestBase {
     // Skip permissions hardening so we can write a services file later.
     $this->settings['settings']['skip_permissions_hardening'] = (object) [
       'value' => TRUE,
+      'required' => TRUE,
+    ];
+    // Do not compress css so we can detect claro correctly. See
+    // \Drupal\Tests\RequirementsPageTrait::assertRequirementSummaries().
+    $this->settings['config']['system.performance']['css']['preprocess'] = (object) [
+      'value' => FALSE,
       'required' => TRUE,
     ];
 
@@ -75,18 +79,6 @@ class StandardRecipeInstallTest extends InstallerTestBase {
       'link[0][uri]' => '<front>',
     ], 'Save');
 
-    // Standard expects to set the contact form's recipient email to the
-    // system's email address, but our feedback_contact_form recipe hard-codes
-    // it to another value.
-    // @todo This can be removed after https://drupal.org/i/3303126, which
-    //   should make it possible for a recipe to reuse an already-set config
-    //   value.
-    ContactForm::load('feedback')?->setRecipients(['simpletest@example.com'])
-      ->save();
-
-    // Standard ships two shortcuts; ensure they exist.
-    $this->assertCount(2, Shortcut::loadMultiple());
-
     // The installer logs you in.
     $this->drupalLogout();
 
@@ -98,6 +90,13 @@ class StandardRecipeInstallTest extends InstallerTestBase {
    */
   protected function setUpProfile(): void {
     // Noop. This form is skipped due the parameters set on the URL.
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUpRequirementsProblem(): void {
+    // Recipe installation is not affected by requirements.
   }
 
   protected function installDefaultThemeFromClassProperty(ContainerInterface $container): void {

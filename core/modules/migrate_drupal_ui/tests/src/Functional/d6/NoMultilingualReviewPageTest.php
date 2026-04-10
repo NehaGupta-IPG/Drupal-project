@@ -6,6 +6,7 @@ namespace Drupal\Tests\migrate_drupal_ui\Functional\d6;
 
 use Drupal\Tests\migrate_drupal_ui\Functional\NoMultilingualReviewPageTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore multigroup nodeaccess
@@ -16,6 +17,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('migrate_drupal_6')]
 #[Group('migrate_drupal_ui')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class NoMultilingualReviewPageTest extends NoMultilingualReviewPageTestBase {
 
@@ -57,7 +59,6 @@ class NoMultilingualReviewPageTest extends NoMultilingualReviewPageTestBase {
       'Blog API',
       'Calendar Signup',
       'Comment',
-      'Contact',
       'Content',
       'Content Copy',
       'Content Multigroup',
@@ -102,7 +103,6 @@ class NoMultilingualReviewPageTest extends NoMultilingualReviewPageTestBase {
       'Ping',
       'Poll',
       'Profile',
-      'Search',
       'Syslog',
       'System',
       'Taxonomy',
@@ -140,6 +140,7 @@ class NoMultilingualReviewPageTest extends NoMultilingualReviewPageTestBase {
       'Book',
       'CCK translation',
       'Color',
+      'Contact',
       'Content type translation',
       'Devel',
       'Devel generate',
@@ -152,6 +153,7 @@ class NoMultilingualReviewPageTest extends NoMultilingualReviewPageTestBase {
       'Option Widgets',
       'Poll aggregate',
       'Profile translation',
+      'Search',
       'Statistics',
       'String translation',
       'Synchronize translations',

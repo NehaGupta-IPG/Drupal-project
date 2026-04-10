@@ -7,11 +7,13 @@ namespace Drupal\KernelTests\Core\Cache;
 use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Cache\DatabaseBackend;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Unit test of the database backend using the generic cache unit test base.
  */
 #[Group('Cache')]
+#[RunTestsInSeparateProcesses]
 class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
 
   /**
@@ -27,7 +29,7 @@ class DatabaseBackendTest extends GenericCacheBackendUnitTestBase {
    * @return \Drupal\Core\Cache\DatabaseBackend
    *   A new DatabaseBackend object.
    */
-  protected function createCacheBackend($bin) {
+  protected function createCacheBackend($bin): DatabaseBackend {
     return new DatabaseBackend(
       $this->container->get('database'),
       $this->container->get('cache_tags.invalidator.checksum'),

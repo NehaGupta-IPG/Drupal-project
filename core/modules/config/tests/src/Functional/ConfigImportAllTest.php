@@ -72,7 +72,8 @@ class ConfigImportAllTest extends ModuleTestBase {
         || !empty($module->info['hidden'])
         || $module->status == TRUE
         || $module->info['package'] == 'Testing'
-        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED) {
+        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::DEPRECATED
+        || $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] === ExtensionLifecycle::OBSOLETE) {
         return FALSE;
       }
       return TRUE;
@@ -99,7 +100,8 @@ class ConfigImportAllTest extends ModuleTestBase {
     // example, if a comment field exists then Comment cannot be uninstalled.
     $entity_type_manager = \Drupal::entityTypeManager();
     foreach ($entity_type_manager->getDefinitions() as $entity_type) {
-      if (($entity_type instanceof ContentEntityTypeInterface || in_array($entity_type->id(), ['field_storage_config', 'filter_format'], TRUE))
+      if (($entity_type instanceof ContentEntityTypeInterface
+          || in_array($entity_type->id(), ['field_storage_config', 'filter_format'], TRUE))
         && !in_array($entity_type->getProvider(), ['system', 'user'], TRUE)) {
         $storage = $entity_type_manager->getStorage($entity_type->id());
         $storage->delete($storage->loadMultiple());

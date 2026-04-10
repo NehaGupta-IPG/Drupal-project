@@ -57,8 +57,7 @@ final class Exporter implements LoggerAwareInterface {
     $field_definitions = $entity->getFieldDefinitions();
     // Ignore serial (integer) entity IDs by default, along with a number of
     // other keys that aren't useful for default content.
-    $id_key = $entity->getEntityType()->getKey('id');
-    if ($id_key && $field_definitions[$id_key]->getType() === 'integer') {
+    if ($entity->getEntityType()->hasIntegerId()) {
       $event->setEntityKeyExportable('id', FALSE);
     }
     $event->setEntityKeyExportable('uuid', FALSE);
@@ -69,10 +68,12 @@ final class Exporter implements LoggerAwareInterface {
     $event->setEntityKeyExportable('revision_default', FALSE);
     $event->setEntityKeyExportable('revision_created', FALSE);
 
-    // Default content has no history, so it doesn't make much sense to export
-    // `changed` fields.
+    // Ignore fields that don't make sense in default content:
+    // - `changed` fields aren't needed because default content has no history.
+    // - `created` fields aren't needed because default content should be
+    //   "created" upon import.
     foreach ($field_definitions as $name => $definition) {
-      if ($definition->getType() === 'changed') {
+      if (in_array($definition->getType(), ['changed', 'created'], TRUE)) {
         $event->setExportable($name, FALSE);
       }
     }
@@ -303,12 +304,11 @@ final class Exporter implements LoggerAwareInterface {
       // Mark the referenced entity as a dependency of the one we're exporting.
       $metadata->addDependency($entity);
 
-      $entity_type = $entity->getEntityType();
       // If the referenced entity ID is numeric, refer to it by UUID, which is
       // portable. If the ID isn't numeric, assume it's meant to be consistent
       // (like a config entity ID) and leave the reference as-is. Workspaces
       // are an example of an entity type that should be treated this way.
-      if ($entity_type->hasKey('id') && $entity->getFieldDefinition($entity_type->getKey('id'))->getType() === 'integer') {
+      if ($entity->getEntityType()->hasIntegerId()) {
         $values['entity'] = $entity->uuid();
         unset($values['target_id']);
       }

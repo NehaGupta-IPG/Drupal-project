@@ -9,6 +9,7 @@ use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore garply tarz
 /**
@@ -21,6 +22,7 @@ use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 #[CoversClass(ExtensionMimeTypeGuesser::class)]
 #[Group('File')]
 #[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class ExtensionMimeTypeGuesserLegacyTest extends KernelTestBase {
 
   /**
@@ -30,8 +32,6 @@ class ExtensionMimeTypeGuesserLegacyTest extends KernelTestBase {
 
   /**
    * Tests mapping of mimetypes from filenames.
-   *
-   * @legacy-covers ::guessMimeType
    */
   public function testGuessMimeType(): void {
     $prefixes = ['public://', 'private://', 'temporary://', 'dummy-remote://'];
@@ -61,7 +61,7 @@ class ExtensionMimeTypeGuesserLegacyTest extends KernelTestBase {
       'foobar..zip' => 'application/zip',
     ];
 
-    $this->expectDeprecation(
+    $this->expectUserDeprecationMessage(
       'The deprecated alter hook hook_file_mimetype_mapping_alter() is implemented in these locations: Drupal\file_deprecated_test\Hook\FileDeprecatedTestThemeHooks::fileMimetypeMappingAlter. This hook is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Implement a \Drupal\Core\File\Event\MimeTypeMapLoadedEvent listener instead. See https://www.drupal.org/node/3494040'
     );
 
@@ -103,7 +103,7 @@ class ExtensionMimeTypeGuesserLegacyTest extends KernelTestBase {
       ],
     ];
 
-    $this->expectDeprecation(
+    $this->expectUserDeprecationMessage(
       'Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser::setMapping() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. Use \Drupal\Core\File\MimeType\MimeTypeMapInterface::addMapping() instead or define your own MimeTypeMapInterface implementation. See https://www.drupal.org/node/3494040'
     );
     $extension_guesser->setMapping($mapping);

@@ -8,12 +8,14 @@ use Drupal\KernelTests\KernelTestBase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Checks the status and definition contents of deprecated libraries.
  */
 #[Group('Asset')]
 #[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class DeprecatedAssetsTest extends KernelTestBase {
 
   /**
@@ -37,7 +39,7 @@ class DeprecatedAssetsTest extends KernelTestBase {
     // this test.
     ini_set('serialize_precision', -1);
 
-    $this->expectDeprecation("The $extension/$name " . $deprecation_suffix);
+    $this->expectUserDeprecationMessage("The $extension/$name " . $deprecation_suffix);
     $library_definition = $library_discovery->getLibraryByName($extension, $name);
     $this->assertEquals($expected_hashed_library_definition, md5(serialize($library_definition)));
   }

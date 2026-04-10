@@ -8,6 +8,7 @@ use Drupal\node\Entity\Node;
 use Drupal\Tests\migrate_drupal_ui\Functional\MigrateUpgradeExecuteTestBase;
 use Drupal\user\Entity\User;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore Filefield Multiupload Imagefield
@@ -18,6 +19,7 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  */
 #[Group('migrate_drupal_ui')]
 #[Group('#slow')]
+#[IgnoreDeprecations]
 #[RunTestsInSeparateProcesses]
 class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
 
@@ -26,11 +28,13 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
    */
   protected static $modules = [
     'config_translation',
+    'contact',
     'content_translation',
     'datetime_range',
     'language',
     'migrate_drupal_ui',
     'telephone',
+    'shortcut',
   ];
 
   /**
@@ -58,7 +62,7 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
 
     $this->loadFixture($this->getModulePath('migrate_drupal') . '/tests/fixtures/drupal7.php');
 
-    $this->expectedLoggedErrors = 27;
+    $this->expectedLoggedErrors = 29;
     // If saving the logs, then set the admin user.
     if ($this->outputLogs) {
       $this->migratedAdminUserName = 'admin';
@@ -77,7 +81,7 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
    */
   protected function getEntityCounts(): array {
     return [
-      'block' => 26,
+      'block' => 24,
       'block_content' => 1,
       'block_content_type' => 1,
       'comment' => 4,
@@ -87,7 +91,7 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
       // Module 'language' comes with 'en', 'und', 'zxx'. Migration adds 'is'
       // and 'fr'.
       'configurable_language' => 5,
-      'contact_form' => 3,
+      'contact_form' => 2,
       'contact_message' => 0,
       'editor' => 2,
       'field_config' => 90,
@@ -98,11 +102,10 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
       'language_content_settings' => 24,
       'node' => 7,
       'node_type' => 8,
-      'search_page' => 3,
-      'shortcut' => 6,
+      'shortcut' => 4,
       'shortcut_set' => 2,
       'action' => 24,
-      'menu' => 7,
+      'menu' => 9,
       'taxonomy_term' => 25,
       'taxonomy_vocabulary' => 8,
       'path_alias' => 8,
@@ -113,7 +116,7 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
       'date_format' => 12,
       'entity_form_display' => 23,
       'entity_form_mode' => 1,
-      'entity_view_display' => 33,
+      'entity_view_display' => 32,
       'entity_view_mode' => 11,
       'base_field_override' => 2,
     ];
@@ -170,7 +173,6 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
       'Options',
       'Path',
       'Phone',
-      'Search',
       'Shortcut',
       'String translation',
       'Synchronize translations',
@@ -209,6 +211,7 @@ class Upgrade7Test extends MigrateUpgradeExecuteTestBase {
       'Forum',
       'RDF',
       'References',
+      'Search',
       'Statistics',
       'Translation sets',
       'Variable realm',

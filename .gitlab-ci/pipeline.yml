@@ -27,10 +27,6 @@ default:
       [[ $_TARGET_DB == pgsql* ]] && export SIMPLETEST_DB=pgsql://$POSTGRES_USER:$POSTGRES_PASSWORD@database/$POSTGRES_DB?module=pgsql
     - echo "SIMPLETEST_DB = $SIMPLETEST_DB"
     - export PHPUNIT_CONFIGURATION_FILE_PATH=$CI_PROJECT_DIR/core
-    - |
-      [[ $TESTSUITE == PHPUnit-Build ]] && export PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION=true
-      [[ $TESTSUITE == PHPUnit-Functional ]] && export PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION=true
-      [[ $TESTSUITE == PHPUnit-FunctionalJavascript ]] && export PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION=true
     - $CI_PROJECT_DIR/.gitlab-ci/scripts/server-setup.sh
   after_script:
     - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
@@ -54,13 +50,6 @@ default:
     - pipeline: $PARENT_PIPELINE_ID
       job: '🧹 PHP Coding standards (PHPCS)'
 
-.with-composer-and-yarn: &with-composer-and-yarn
-  needs:
-    - pipeline: $PARENT_PIPELINE_ID
-      job: '🧹 PHP Coding standards (PHPCS)'
-    - pipeline: $PARENT_PIPELINE_ID
-      job: '📔 Spell-checking'
-
 variables:
   FF_NETWORK_PER_BUILD: 1
   FF_USE_FASTZIP: 1
@@ -75,9 +64,10 @@ variables:
   POSTGRES_PASSWORD: drupaltestbotpw
   MINK_DRIVER_ARGS_WEBDRIVER: '["chrome", {"browserName":"chrome", "goog:chromeOptions":{"w3c": true, "args":["--no-sandbox","--ignore-certificate-errors", "--allow-insecure-localhost", "--headless", "--dns-prefetch-disable"]}}, "http://selenium:4444"]'
   MINK_DRIVER_ARGS_WEBDRIVER_CHROMEDRIVER_NON_W3C: '["chrome", {"browserName":"chrome","goog:chromeOptions":{"args":["--disable-dev-shm-usage","--disable-gpu","--headless","--dns-prefetch-disable"]}}, "http://localhost:9515"]'
+  SELENIUM_JAVA_OPTS: "-Dwebdriver.chrome.logfile=/builds/chromedriver.log"
   CI_PARALLEL_NODE_INDEX: $CI_NODE_INDEX
   CI_PARALLEL_NODE_TOTAL: $CI_NODE_TOTAL
-  PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: false
+  PHPUNIT_FAIL_ON_PHPUNIT_DEPRECATION: true
 
 .with-database: &with-database
   name: $_CONFIG_DOCKERHUB_ROOT/$_TARGET_DB:production
@@ -97,7 +87,7 @@ variables:
   name: selenium/standalone-chrome:127.0
   alias: selenium
   variables:
-    JAVA_OPTS: "-Dwebdriver.chrome.logfile=/builds/chromedriver.log"
+    JAVA_OPTS: $SELENIUM_JAVA_OPTS
     SE_NODE_OVERRIDE_MAX_SESSIONS: "true"
     SE_NODE_MAX_SESSIONS: "16"
     SE_SESSION_RETRY_INTERVAL: "1"
@@ -109,7 +99,7 @@ variables:
   script:
     - sudo -u www-data -E -H composer run-script drupal-phpunit-upgrade-check
     # Need to pass this along directly.
-    - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --phpunit-configuration $PHPUNIT_CONFIGURATION_FILE_PATH --debug-discovery --color --keep-results --types "$TESTSUITE" --concurrency "$CONCURRENCY" --repeat "1" --sqlite "./sites/default/files/tests.sqlite" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html --all --ci-parallel-node-index $CI_PARALLEL_NODE_INDEX --ci-parallel-node-total $CI_PARALLEL_NODE_TOTAL
+    - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --phpunit-configuration $PHPUNIT_CONFIGURATION_FILE_PATH --debug-discovery --color --keep-results --types "$TESTSUITE" --concurrency "$CONCURRENCY" --repeat "1" --sqlite ":memory:" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html --all --ci-parallel-node-index $CI_PARALLEL_NODE_INDEX --ci-parallel-node-total $CI_PARALLEL_NODE_TOTAL
 
 .run-repeat-class-test: &run-repeat-class-test
   script:
@@ -121,7 +111,7 @@ variables:
         echo '   "Key" to "REPEAT_TEST_CLASS" and "Value" to "Drupal\Tests\ckeditor5\FunctionalJavascript\MediaLinkabilityTest"';
         exit 1;
       else
-        sudo -u www-data -E -H php ./core/scripts/run-tests.sh --phpunit-configuration $PHPUNIT_CONFIGURATION_FILE_PATH --color --keep-results --concurrency "$CONCURRENCY" --repeat "$REPEAT_COUNT" --sqlite "./sites/default/files/tests.sqlite" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html --class $REPEAT_TEST_CLASS
+        sudo -u www-data -E -H php ./core/scripts/run-tests.sh --phpunit-configuration $PHPUNIT_CONFIGURATION_FILE_PATH --color --keep-results --concurrency "$CONCURRENCY" --repeat "$REPEAT_COUNT" --sqlite ":memory:" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html --class $REPEAT_TEST_CLASS
       fi
 
 ################
@@ -133,16 +123,6 @@ variables:
 #
 # Documentation: https://docs.gitlab.com/ee/ci/jobs/
 ################
-
-'🩹 Test-only changes':
-  <<: [ *with-composer, *default-job-settings ]
-  when: manual
-  allow_failure: true
-  services:
-    - <<: *with-database
-    - <<: *with-selenium-chrome
-  script:
-    - $CI_PROJECT_DIR/.gitlab-ci/scripts/test-only.sh
 
 '🖱️️️ PHPUnit Functional Javascript':
   <<: [ *with-composer, *run-tests, *default-job-settings ]
@@ -190,10 +170,12 @@ variables:
     - <<: *with-database
 
 '🦉️️️ Nightwatch':
-  <<: [ *with-composer-and-yarn, *default-job-settings ]
+  <<: [ *with-composer, *default-job-settings ]
   retry: 1
   variables:
     KUBERNETES_CPU_REQUEST: "16"
+    YARN_ENABLE_GLOBAL_CACHE: false
+    YARN_ENABLE_MIRROR: false
   services:
     - <<: *with-database
     - <<: *with-selenium-chrome
@@ -215,6 +197,8 @@ variables:
     - chown -R www-data:www-data ./sites /var/www
     - cd core
     - corepack enable
+    - yarn install
+    - echo -e "Node version $(node --version)\nYarn version $(yarn --version)"
     - sudo -u www-data -E -H yarn run test:nightwatch --workers=3
   after_script:
     - cp /builds/chromedriver.log ./
@@ -226,6 +210,14 @@ variables:
     paths:
       - ./nightwatch_output
       - '*.log'
+  cache:
+    key:
+      files:
+        - ./core/package.json
+        - ./core/yarn.lock
+    paths:
+      - ./core/.yarn/cache
+    policy: pull
 
 '🖱️️️ PHPUnit Functional Javascript (non W3C legacy)':
   <<: [ *with-composer, *default-job-settings ]
@@ -241,7 +233,7 @@ variables:
   script:
     - sudo -u www-data -E -H composer run-script drupal-phpunit-upgrade-check
     # Run a small subset of tests to prove non W3C testing still works.
-    - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --phpunit-configuration $PHPUNIT_CONFIGURATION_FILE_PATH --debug-discovery --color --keep-results --types "$TESTSUITE" --concurrency "$CONCURRENCY" --repeat "1" --sqlite "./sites/default/files/tests.sqlite" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html javascript
+    - sudo -u www-data -E -H php ./core/scripts/run-tests.sh --suppress-deprecations --phpunit-configuration $PHPUNIT_CONFIGURATION_FILE_PATH --debug-discovery --color --keep-results --types "$TESTSUITE" --concurrency "$CONCURRENCY" --repeat "1" --sqlite ":memory:" --dburl $SIMPLETEST_DB --url $SIMPLETEST_BASE_URL --verbose --non-html javascript
 
   after_script:
     - sed -i "s#$CI_PROJECT_DIR/##" ./sites/default/files/simpletest/phpunit-*.xml || true
@@ -266,12 +258,12 @@ variables:
       allow_failure: true
   variables:
     KUBERNETES_CPU_REQUEST: "24"
-    MINK_DRIVER_ARGS_WEBDRIVER: '["chrome", {"browserName":"chrome","goog:chromeOptions":{"args":["--disable-dev-shm-usage","--disable-gpu","--headless","--no-sandbox"]}}, "http://chrome:9515"]'
+    SELENIUM_JAVA_OPTS: "-Dwebdriver.chrome.logfile=/builds/chromedriver-selenium.log"
   tags:
     - performance-test-runner
   services:
     - <<: *with-database
-    - <<: *with-chrome
+    - <<: *with-selenium-chrome
   script:
     #  Determine DB driver.
     - |
@@ -284,4 +276,6 @@ variables:
     - mkdir -p ./sites/simpletest ./sites/default/files ./build/logs/junit /var/www/.composer
     - chown -R www-data:www-data ./sites ./build/logs/junit ./vendor /var/www/
     - sudo -u www-data git config --global --add safe.directory $CI_PROJECT_DIR
-    - sudo SIMPLETEST_BASE_URL="http://$HOSTNAME/subdirectory" -u www-data -E -H ./vendor/bin/phpunit -c core --group OpenTelemetry --log-junit=./sites/default/files/simpletest/phpunit-performance.xml
+    - sudo SIMPLETEST_BASE_URL="http://$HOSTNAME/subdirectory" -u www-data -E -H ./vendor/bin/phpunit --display-all-issues -c core --group OpenTelemetry --log-junit=./sites/default/files/simpletest/phpunit-performance.xml
+  after_script:
+    - cp /builds/chromedriver-selenium.log ./
