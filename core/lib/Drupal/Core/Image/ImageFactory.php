@@ -78,10 +78,8 @@ class ImageFactory {
   public function get($source = NULL, $toolkit_id = NULL) {
     $toolkit = $this->getToolkit($toolkit_id);
     // @todo in drupal:43.0.0, only allow toolkits defining their image class.
-    if ($image_class = $toolkit->getPluginDefinition()['imageClass'] ?? NULL) {
-      return new $image_class($this, $toolkit->getPluginId(), $source);
-    }
-    return new Image($toolkit, $source, $this);
+    $image_class = $toolkit->getPluginDefinition()['imageClass'] ?? Image::class;
+    return new $image_class($toolkit, $source);
   }
 
   /**

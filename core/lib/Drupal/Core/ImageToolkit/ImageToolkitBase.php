@@ -31,7 +31,7 @@ abstract class ImageToolkitBase extends PluginBase implements ImageToolkitInterf
    *
    * @see https://www.drupal.org/node/7654123
    */
-  protected bool $isClone = FALSE;
+  public protected(set) bool $isClone = FALSE;
 
   /**
    * BC layer.

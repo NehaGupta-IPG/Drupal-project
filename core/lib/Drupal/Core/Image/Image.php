@@ -23,15 +23,8 @@ class Image implements ImageInterface {
 
   /**
    * An image toolkit object.
-   *
-   * @var \Drupal\Core\ImageToolkit\ImageToolkitInterface
-   *
-   * @deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play
-   *    whack-a-mole instead.
-   *
-   * @see https://www.drupal.org/node/7654123
    */
-  protected $toolkit;
+  protected ImageToolkitInterface $toolkit;
 
   /**
    * File size in bytes.
@@ -39,18 +32,6 @@ class Image implements ImageInterface {
    * @var int
    */
   protected $fileSize;
-
-  /**
-   * The image factory.
-   *
-   * @todo make the prop non-nullable.
-   */
-  protected readonly ?ImageFactory $imageFactory;
-
-  /**
-   * The image toolkit id.
-   */
-  protected readonly string $toolkitId;
 
   /**
    * BC layer.
@@ -62,7 +43,7 @@ class Image implements ImageInterface {
    */
   public function __sleep(): array {
     $ret = get_object_vars($this);
-    unset($ret['imageFactory'], $ret['toolkit']);
+    unset($ret['toolkit']);
     return array_keys($ret);
   }
 
@@ -74,22 +55,18 @@ class Image implements ImageInterface {
    * @param string|null $source
    *   (optional) The path to an image file, or NULL to construct the object
    *   with no image source.
-   * @param \Drupal\Core\Image\ImageFactory|null $imageFactory
-   *   The image factory.
    */
-  public function __construct(ImageToolkitInterface $toolkit, $source = NULL, ?ImageFactory $imageFactory = NULL) {
-    // @phpstan-ignore property.deprecated
+  public function __construct(
+    ImageToolkitInterface $toolkit,
+    ?string $source = NULL,
+  ) {
     $this->toolkit = $toolkit;
-    // @phpstan-ignore-next-line
     $this->toolkit->backfillImage = $this;
-    $this->toolkitId = $toolkit->getPluginId();
-    $this->imageFactory = $imageFactory;
     if ($source) {
       $this->source = $source;
       // @phpstan-ignore-next-line
       $this->toolkit->setSource($this->source);
       // Defer image file validity check to the toolkit.
-      // @phpstan-ignore property.deprecated
       if ($this->toolkit->parseFile($this)) {
         $this->fileSize = filesize($this->source);
       }
@@ -100,24 +77,21 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function isValid() {
-    // @phpstan-ignore property.deprecated,property.deprecated
-    return isset($this->toolkit) ? $this->toolkit->isValid($this) : $this->toolkit()->isValid($this);
+    return $this->toolkit()->isValid($this);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getHeight() {
-    // @phpstan-ignore property.deprecated,property.deprecated
-    return isset($this->toolkit) ? $this->toolkit->getHeight($this) : $this->toolkit()->getHeight($this);
+    return $this->toolkit()->getHeight($this);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getWidth() {
-    // @phpstan-ignore property.deprecated,property.deprecated
-    return isset($this->toolkit) ? $this->toolkit->getWidth($this) : $this->toolkit()->getWidth($this);
+    return $this->toolkit()->getWidth($this);
   }
 
   /**
@@ -131,8 +105,7 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function getMimeType() {
-    // @phpstan-ignore property.deprecated,property.deprecated
-    return isset($this->toolkit) ? $this->toolkit->getMimeType($this) : $this->toolkit()->getMimeType($this);
+    return $this->toolkit()->getMimeType($this);
   }
 
   /**
@@ -154,7 +127,7 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function getToolkitId() {
-    return $this->toolkitId;
+    return $this->toolkit()->getPluginId();
   }
 
   /**
@@ -162,15 +135,9 @@ class Image implements ImageInterface {
    */
   public function getToolkit() {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:42.1.0 and is removed from drupal:43.0.0. Play whack-a-mole instead. See https://www.drupal.org/node/7654123', E_USER_DEPRECATED);
-    if (!isset($this->toolkit)) {
-      $toolkit = $this->toolkit();
-      if ($toolkit->isStateful) {
-        $this->toolkit = $toolkit;
-      }
-      else {
-        $this->toolkit = clone $toolkit;
-        $this->toolkit->backfillImage = $this;
-      }
+    if ($this->toolkit()->isStateful && !$this->toolkit()->isClone) {
+      $this->toolkit = clone $this->toolkit;
+      $this->toolkit->backfillImage = $this;
     }
     return $this->toolkit;
   }
@@ -179,7 +146,7 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function toolkit(): ImageToolkitInterface {
-    return $this->imageFactory->getToolkit($this->getToolkitId());
+    return $this->toolkit;
   }
 
   /**
@@ -192,8 +159,7 @@ class Image implements ImageInterface {
     }
 
     $destination = $destination ?: $this->getSource();
-    // @phpstan-ignore property.deprecated,property.deprecated
-    if ($return = isset($this->toolkit) ? $this->toolkit->save($destination, $this) : $this->toolkit()->save($destination, $this)) {
+    if ($return = $this->toolkit()->save($destination, $this)) {
       // Clear the cached file size and refresh the image information.
       clearstatcache(TRUE, $destination);
       $this->fileSize = filesize($destination);
@@ -210,8 +176,7 @@ class Image implements ImageInterface {
    * {@inheritdoc}
    */
   public function apply($operation, array $arguments = []) {
-    // @phpstan-ignore property.deprecated,property.deprecated
-    return isset($this->toolkit) ? $this->toolkit->apply($operation, $arguments, $this) : $this->toolkit()->apply($operation, $arguments, $this);
+    return $this->toolkit()->apply($operation, $arguments, $this);
   }
 
   /**
