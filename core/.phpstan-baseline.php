@@ -18608,12 +18608,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/media/src/Controller/MediaFilterController.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\media\\\\Controller\\\\MediaFilterController\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/src/Controller/MediaFilterController.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\media\\\\Controller\\\\OEmbedIframeController\\:\\:create\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -22670,6 +22664,18 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/search/tests/src/Functional/Update/SearchBlockPageIdUpdatePathTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\search\\\\Functional\\\\views\\\\ViewsIntegrationTest\\:\\:cronRun\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/search/tests/src/Functional/views/ViewsIntegrationTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\search\\\\Functional\\\\views\\\\ViewsMultilingualTest\\:\\:cronRun\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/search/tests/src/Functional/views/ViewsMultilingualTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\search\\\\Kernel\\\\SearchMatchTest\\:\\:getText\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -23688,6 +23694,12 @@ $ignoreErrors[] = [
 	'identifier' => 'isset.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/src/Form/ThemeSettingsForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\system\\\\Form\\\\ThemeUninstallConfirmForm\\:\\:addDependencyListsToForm\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/src/Form/ThemeUninstallConfirmForm.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$pdo_message might not be defined\\.$#',
@@ -35024,18 +35036,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/tests/src/Functional/Plugin/PagerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\SearchIntegrationTest\\:\\:cronRun\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Functional/SearchIntegrationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\SearchMultilingualTest\\:\\:cronRun\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Functional/SearchMultilingualTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$link might not be defined\\.$#',
