@@ -12,14 +12,6 @@ use Drupal\Core\State\StateInterface;
  */
 class BasicAuthTestController {
 
-  /**
-   * Constructs a new BasicAuthTestController object.
-   *
-   * @param \Drupal\Core\State\StateInterface $state
-   *   The state storage service.
-   * @param \Drupal\Core\PageCache\ResponsePolicy\ResponsePolicyInterface $pageCacheKillSwitch
-   *   The page cache kill switch service.
-   */
   public function __construct(
     private StateInterface $state,
     private ResponsePolicyInterface $pageCacheKillSwitch,

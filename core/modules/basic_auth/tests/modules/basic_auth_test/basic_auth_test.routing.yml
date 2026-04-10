@@ -1,7 +1,7 @@
 basic_auth_test.state.modify:
   path: '/basic_auth_test/state/modify'
   defaults:
-    _controller: 'basic_auth_test.controller:modifyState'
+    _controller: '\Drupal\basic_auth_test\BasicAuthTestController::modifyState'
   options:
     _auth:
       - basic_auth
@@ -11,6 +11,6 @@ basic_auth_test.state.modify:
 basic_auth_test.state.read:
   path: '/basic_auth_test/state/read'
   defaults:
-    _controller: 'basic_auth_test.controller:readState'
+    _controller: '\Drupal\basic_auth_test\BasicAuthTestController::readState'
   requirements:
     _access: 'TRUE'
