@@ -109,7 +109,7 @@ class Image implements ImageInterface {
   }
 
   /**
-   * @todo add to interface.
+   * {@inheritdoc}
    */
   public function setSource(string $source): static {
     $this->source = $source;

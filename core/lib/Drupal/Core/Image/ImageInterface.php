@@ -51,6 +51,16 @@ interface ImageInterface {
   public function getMimeType();
 
   /**
+   * Sets the source path of the image file.
+   *
+   * @param string $source
+   *   The source path of the image file.
+   *
+   * @return static
+   */
+  public function setSource(string $source): static;
+
+  /**
    * Retrieves the source path of the image file.
    *
    * @return string
