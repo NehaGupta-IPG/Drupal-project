@@ -397,6 +397,15 @@ class Row {
    */
   public function setIdMap(array $id_map) {
     $this->idMap = $id_map;
+    if (!array_key_exists('original_hash', $this->idMap)) {
+      $this->idMap['original_hash'] = '';
+    }
+    if (!array_key_exists('hash', $this->idMap)) {
+      $this->idMap['hash'] = '';
+    }
+    if (!array_key_exists('source_row_status', $this->idMap)) {
+      $this->idMap['source_row_status'] = NULL;
+    }
   }
 
   /**

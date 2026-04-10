@@ -8,6 +8,10 @@ use Drupal\migrate_high_water_test\Plugin\migrate\source\HighWaterTest;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Drupal\Core\Database\Connection;
+use Drupal\migrate\Plugin\migrate\id_map\Sql;
+use Drupal\migrate\Plugin\MigrateIdMapInterface;
+use Prophecy\Argument;
 
 /**
  * Tests the high water handling.
@@ -23,6 +27,44 @@ class HighWaterNotJoinableTest extends MigrateSqlSourceTestBase {
   protected static $modules = [
     'migrate_high_water_test',
   ];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() : void {
+    parent::setUp();
+
+    // Ensure that \Drupal\migrate\Plugin\migrate\source\SqlBase::mapJoinable()
+    // considers the ID map plugin not joinable.
+    $connection = $this->prophesize(Connection::class);
+    $connection->getConnectionOptions()->willReturn([
+      'driver' => 'foo',
+      'database' => 'bar',
+    ]);
+
+    $id_map = $this->prophesize(Sql::class);
+    $id_map->getDatabase()->willReturn(
+      $connection->reveal()
+    );
+    // Pretend the row with source ID 1 has already been imported; this is
+    // reflected in the high water mark. We consider none of the other rows
+    // imported, so those will return the empty array.
+    $id_map->getRowBySource(Argument::exact(['id' => '1']))->willReturn([
+      'source_row_status' => MigrateIdMapInterface::STATUS_IMPORTED,
+    ]);
+    $id_map->getRowBySource(Argument::any())->willReturn([]);
+    // ::saveIdMapping() gets called when MigrateSourceTestBase::testSource()
+    // re-iterates over all rows while intentionally triggering a skip exception
+    // using migrate_skip_all_rows_test_migrate_prepare_row().
+    $id_map->saveIdMapping(
+      Argument::any(),
+      Argument::any(),
+      Argument::exact(MigrateIdMapInterface::STATUS_IGNORED)
+    )->willReturn();
+    $this->migration->getIdMap()->willReturn(
+      $id_map->reveal()
+    );
+  }
 
   /**
    * {@inheritdoc}

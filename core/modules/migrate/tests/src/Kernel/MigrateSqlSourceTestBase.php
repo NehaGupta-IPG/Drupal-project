@@ -40,7 +40,7 @@ abstract class MigrateSqlSourceTestBase extends MigrateSourceTestBase {
     // Create an in-memory SQLite database. Plugins can interact with it like
     // any other database, and it will cease to exist when the connection is
     // closed.
-    $connection_options = ['database' => ':memory:'];
+    $connection_options = ['driver' => 'sqlite', 'database' => ':memory:'];
     $pdo = Connection::open($connection_options);
     $connection = new Connection($pdo, $connection_options);
 
@@ -89,6 +89,10 @@ abstract class MigrateSqlSourceTestBase extends MigrateSourceTestBase {
   #[DataProvider('providerSource')]
   #[RequiresPhpExtension('pdo_sqlite')]
   public function testSource(array $source_data, array $expected_data, $expected_count = NULL, array $configuration = [], $high_water = NULL, $expected_cache_key = NULL): void {
+    if ($high_water) {
+      \Drupal::keyValue('migrate:high_water')->set($this->migration->reveal()->id(), $high_water);
+    }
+
     $plugin = $this->getPlugin($configuration);
 
     // Since we don't yet inject the database connection, we need to use a
