@@ -605,7 +605,15 @@ function _filter_autop($text) {
       // whitespace.
       $chunk = preg_replace('|<p>\s*</p>\n?|', '', $chunk);
       $chunk = preg_replace('!<p>\s*(</?' . $block . '[^>]*>)!', "$1", $chunk);
-      $chunk = preg_replace('!(</?' . $block . '[^>]*>)\s*</p>!', "$1", $chunk);
+      // Do not strip a paragraph's closing tag that legitimately appears before
+      // a list item boundary. Exclude <li> from this rule to keep paragraphs
+      // inside list items well-formed.
+      $chunk = preg_replace('~(</?(?!(?:li)\b)' . $block . '[^>]*>)\s*</p>~', "$1", $chunk);
+      // Ensure paragraphs are closed before closing list items, not after them.
+      $chunk = preg_replace('!</li>\s*</p>!i', '</p></li>', $chunk);
+      // Ensure the first paragraph inside an <li> has opening <p> if it ends
+      // with </p>.
+      $chunk = preg_replace('~<li(\b[^>]*)>(\s*)(?!<p>)((?:(?!</li>).)*?)</p>~is', '<li$1>$2<p>$3</p>', $chunk);
       // Make line breaks.
       $chunk = preg_replace('|(?<!<br />)\s*\n|', "<br />\n", $chunk);
       $chunk = preg_replace('!(</?' . $block . '[^>]*>)\s*<br />!', "$1", $chunk);
