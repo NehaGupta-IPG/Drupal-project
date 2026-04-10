@@ -13,6 +13,12 @@
   min-width: 50px;
 }
 
+.ck .drupal-media.drupal-media-inline {
+  display: inline-block;
+  clear: initial;
+  margin: 0;
+}
+
 .ck .drupal-media [data-drupal-media-preview] {
   pointer-events: none;
 }

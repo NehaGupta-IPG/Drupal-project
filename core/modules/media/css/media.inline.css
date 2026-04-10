@@ -1,0 +1,8 @@
+/**
+ * @file
+ * Default styling for media that is embedded inline inside text, lists, etc.
+ */
+
+.media-embedded-inline {
+  display: inline-block;
+}
