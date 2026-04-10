@@ -66,7 +66,7 @@ class ThemeNegotiator implements ThemeNegotiatorInterface {
 
       if ($negotiator->applies($route_match)) {
         $theme = $negotiator->determineActiveTheme($route_match);
-        if ($theme !== NULL && $this->themeAccess->checkAccess($theme)) {
+        if ($theme !== NULL) {
           return $theme;
         }
       }
