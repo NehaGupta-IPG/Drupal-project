@@ -86,7 +86,7 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     //
     // @todo Exceptions should not be used for code flow control. However, the
     //   Form API does not integrate with the HTTP Kernel based architecture of
-    //   Drupal 8. In order to resolve this issue properly it is necessary to
+    //   Drupal. In order to resolve this issue properly it is necessary to
     //   completely separate form submission from rendering.
     //   @see https://www.drupal.org/node/2367555
     try {
@@ -111,6 +111,8 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
         'html_response_attachment_placeholders',
         'placeholders',
         'drupalSettings',
+        'page_top',
+        'page_bottom',
       ]
     );
     if (!empty($unsupported_types)) {
@@ -127,7 +129,7 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
       // Take Ajax page state into account, to allow for something like
       // Turbolinks to be implemented without altering core.
       // @see https://github.com/rails/turbolinks/
-      $ajax_page_state = $this->requestStack->getCurrentRequest()->get('ajax_page_state');
+      $ajax_page_state = $this->requestStack->getCurrentRequest()->attributes->get('ajax_page_state');
       $assets->setAlreadyLoadedLibraries(isset($ajax_page_state) ? explode(',', $ajax_page_state['libraries']) : []);
       $variables = $this->processAssetLibraries($assets, $attachment_placeholders);
       // $variables now contains the markup to load the asset libraries. Update

@@ -11,7 +11,6 @@ use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Render\Attribute\RenderElement;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Element\RenderElementBase;
-use Drupal\Core\Render\ElementInfoManagerInterface;
 use Drupal\Core\Security\Attribute\TrustedCallback;
 use Drupal\Core\Url;
 use Drupal\layout_builder\Context\LayoutBuilderContextTrait;
@@ -19,7 +18,6 @@ use Drupal\layout_builder\Event\PrepareLayoutEvent;
 use Drupal\layout_builder\LayoutBuilderEvents;
 use Drupal\layout_builder\LayoutBuilderHighlightTrait;
 use Drupal\layout_builder\SectionStorageInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -53,25 +51,10 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
    *   The plugin implementation definition.
    * @param \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher service.
-   * @param \Drupal\Core\Render\ElementInfoManagerInterface|null $elementInfoManager
-   *   The element info manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, ?ElementInfoManagerInterface $elementInfoManager = NULL) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $elementInfoManager);
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->eventDispatcher = $event_dispatcher;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('event_dispatcher'),
-      $container->get('plugin.manager.element_info')
-    );
   }
 
   /**
@@ -260,7 +243,10 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
         $title = $this->t('Add section <span class="visually-hidden">at start of layout</span>');
       }
       else {
-        $title = $this->t('Add section <span class="visually-hidden">between @first and @second</span>', ['@first' => $delta, '@second' => $delta + 1]);
+        $title = $this->t('Add section <span class="visually-hidden">between @first and @second</span>', [
+          '@first' => $delta,
+          '@second' => $delta + 1,
+        ]);
       }
     }
 
@@ -350,7 +336,10 @@ class LayoutBuilder extends RenderElementBase implements ContainerFactoryPluginI
       $build[$region]['layout_builder_add_block']['link'] = [
         '#type' => 'link',
         // Add one to the current delta since it is zero-indexed.
-        '#title' => $this->t('Add block <span class="visually-hidden">in @section, @region region</span>', ['@section' => $section_label, '@region' => $region_labels[$region]]),
+        '#title' => $this->t('Add block <span class="visually-hidden">in @section, @region region</span>', [
+          '@section' => $section_label,
+          '@region' => $region_labels[$region],
+        ]),
         '#url' => Url::fromRoute('layout_builder.choose_block',
           [
             'section_storage_type' => $storage_type,

@@ -45,7 +45,6 @@ global-styling:
       css/components/site-header.css: {}
       css/components/skip-link.css: {}
       css/components/pager.css: {}
-      css/components/table.css: {}
       css/components/text-content.css: {}
       css/components/wide-content.css: {}
 
@@ -291,3 +290,9 @@ tags:
   css:
     theme:
       css/components/tags.css: {}
+
+olivero.table:
+  version: VERSION
+  css:
+    component:
+      css/components/table.css: {}

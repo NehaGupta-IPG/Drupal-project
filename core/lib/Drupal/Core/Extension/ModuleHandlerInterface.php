@@ -76,34 +76,6 @@ interface ModuleHandlerInterface {
   public function setModuleList(array $module_list = []);
 
   /**
-   * Adds a module to the list of currently active modules.
-   *
-   * @param string $name
-   *   The module name; e.g., 'node'.
-   * @param string $path
-   *   The module path; e.g., 'core/modules/node'.
-   *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
-   * There is no direct replacement.
-   * @see https://www.drupal.org/node/3491200
-   */
-  public function addModule($name, $path);
-
-  /**
-   * Adds an installation profile to the list of currently active modules.
-   *
-   * @param string $name
-   *   The profile name; e.g., 'standard'.
-   * @param string $path
-   *   The profile path; e.g., 'core/profiles/standard'.
-   *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
-   * There is no direct replacement.
-   * @see https://www.drupal.org/node/3491200
-   */
-  public function addProfile($name, $path);
-
-  /**
    * Determines which modules require and are required by each module.
    *
    * @param array<string, \Drupal\Core\Extension\Extension> $modules
@@ -141,6 +113,11 @@ interface ModuleHandlerInterface {
    * @param string $name
    *   (optional) The base file name (without the $type extension). If omitted,
    *   each module's name is used; i.e., "$module.$type" by default.
+   *
+   * @deprecated in drupal:11.3.0 and is removed from drupal:13.0.0. There is no
+   *   replacement.
+   *
+   * @see https://www.drupal.org/node/3536432
    */
   public function loadAllIncludes($type, $name = NULL);
 
@@ -149,10 +126,8 @@ interface ModuleHandlerInterface {
    *
    * Examples:
    * @code
-   *   // Load node.admin.inc from the node module.
-   *   $this->loadInclude('node', 'inc', 'node.admin');
-   *   // Load content_types.inc from the node module.
-   *   $this->loadInclude('node', 'inc', 'content_types');
+   *   // Load system.post_update.php from the System module.
+   *   $this->loadInclude('system', 'php', 'post_update');
    * @endcode
    *
    * @param string $module
@@ -167,33 +142,6 @@ interface ModuleHandlerInterface {
    *   The name of the included file, if successful; FALSE otherwise.
    */
   public function loadInclude($module, $type, $name = NULL);
-
-  /**
-   * Retrieves a list of hooks that are declared through hook_hook_info().
-   *
-   * @return array<string, array{group: string}>
-   *   An associative array whose keys are hook names and whose values are an
-   *   associative array containing a group name. The structure of the array
-   *   is the same as the return value of hook_hook_info().
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Not
-   * needed any more.
-   *
-   * @see https://www.drupal.org/node/3442349
-   *
-   * @see hook_hook_info()
-   */
-  public function getHookInfo();
-
-  /**
-   * Does not do anything.
-   *
-   * @deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Not
-   * needed any more.
-   *
-   * @see https://www.drupal.org/node/3442349
-   */
-  public function writeCache();
 
   /**
    * Resets the cached list of hook implementations.
@@ -416,22 +364,5 @@ interface ModuleHandlerInterface {
    *   the extension machine name.
    */
   public function getModuleDirectories();
-
-  /**
-   * Gets the human readable name of a given module.
-   *
-   * @param string $module
-   *   The machine name of the module which title should be shown.
-   *
-   * @return string
-   *   Returns the human readable name of the module or the machine name passed
-   *   in if no matching module is found.
-   *
-   * @deprecated in drupal:10.3.0 and is removed from drupal:12.0.0.
-   *   Use \Drupal::service('extension.list.module')->getName($module) instead.
-   *
-   * @see https://www.drupal.org/node/3310017
-   */
-  public function getName($module);
 
 }

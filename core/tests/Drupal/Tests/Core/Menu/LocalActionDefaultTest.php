@@ -5,14 +5,18 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Menu;
 
 use Drupal\Core\Menu\LocalActionDefault;
+use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * @coversDefaultClass \Drupal\Core\Menu\LocalActionDefault
- * @group Menu
+ * Tests Drupal\Core\Menu\LocalActionDefault.
  */
+#[CoversClass(LocalActionDefault::class)]
+#[Group('Menu')]
 class LocalActionDefaultTest extends UnitTestCase {
 
   /**
@@ -53,27 +57,19 @@ class LocalActionDefaultTest extends UnitTestCase {
   protected $stringTranslation;
 
   /**
-   * The mocked route provider.
-   *
-   * @var \Drupal\Core\Routing\RouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-   */
-  protected $routeProvider;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
 
     $this->stringTranslation = $this->createMock('Drupal\Core\StringTranslation\TranslationInterface');
-    $this->routeProvider = $this->createMock('Drupal\Core\Routing\RouteProviderInterface');
   }
 
   /**
    * Setups the local action default.
    */
   protected function setupLocalActionDefault(): void {
-    $this->localActionDefault = new LocalActionDefault($this->config, $this->pluginId, $this->pluginDefinition, $this->routeProvider);
+    $this->localActionDefault = new LocalActionDefault($this->config, $this->pluginId, $this->pluginDefinition, $this->createStub(RouteProviderInterface::class));
   }
 
   /**

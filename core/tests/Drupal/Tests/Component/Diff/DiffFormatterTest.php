@@ -24,7 +24,7 @@ class DiffFormatterTest extends TestCase {
    *   - First array of text to diff.
    *   - Second array of text to diff.
    */
-  public static function provideTestDiff() {
+  public static function provideTestDiff(): array {
     return [
       'empty' => ['', [], []],
       'add' => [
@@ -51,7 +51,7 @@ class DiffFormatterTest extends TestCase {
    * @legacy-covers ::format
    */
   #[DataProvider('provideTestDiff')]
-  public function testDiff($expected, $from, $to): void {
+  public function testDiff(string $expected, array $from, array $to): void {
     $diff = new Diff($from, $to);
     $formatter = new DiffFormatter();
     $output = $formatter->format($diff);

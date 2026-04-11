@@ -6,11 +6,13 @@ namespace Drupal\Tests\system\FunctionalJavascript;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the off-canvas dialog functionality.
  */
 #[Group('system')]
+#[RunTestsInSeparateProcesses]
 class OffCanvasTest extends OffCanvasTestBase {
 
   /**
@@ -96,7 +98,7 @@ class OffCanvasTest extends OffCanvasTestBase {
     $page->clickLink('Display more links!');
     $this->waitForOffCanvasToOpen();
     $web_assert->linkExists('Off_canvas link!');
-    // Click off-canvas link inside off-canvas dialog
+    // Click off-canvas link inside off-canvas dialog.
     $page->clickLink('Off_canvas link!');
     $this->waitForOffCanvasToOpen();
     $web_assert->elementTextContains('css', '.ui-dialog[aria-describedby="drupal-off-canvas"]', 'Thing 2 says hello');
@@ -109,7 +111,7 @@ class OffCanvasTest extends OffCanvasTestBase {
     $page->clickLink('Display more links!');
     $this->waitForOffCanvasToOpen();
     $web_assert->linkExists('Off_canvas link!');
-    // Click off-canvas link inside off-canvas dialog
+    // Click off-canvas link inside off-canvas dialog.
     $page->clickLink('Off_canvas link!');
     $this->waitForOffCanvasToOpen();
     $web_assert->elementTextContains('css', '.ui-dialog[aria-describedby="drupal-off-canvas"]', 'Thing 2 says hello');
@@ -152,6 +154,8 @@ class OffCanvasTest extends OffCanvasTestBase {
   }
 
   /**
+   * Asserts that the off-canvas dialog opens and renders expected content.
+   *
    * @param int $link_index
    *   The index of the link to test.
    * @param string $position
