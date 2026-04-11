@@ -32,19 +32,11 @@ class FileRepositoryTest extends FileManagedUnitTestBase {
   protected $fileRepository;
 
   /**
-   * The file system service.
-   *
-   * @var \Drupal\Core\File\FileSystemInterface
-   */
-  protected $fileSystem;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
     $this->fileRepository = $this->container->get('file.repository');
-    $this->fileSystem = $this->container->get('file_system');
   }
 
   /**
@@ -205,8 +197,6 @@ class FileRepositoryTest extends FileManagedUnitTestBase {
 
   /**
    * Tests loading a file by URI.
-   *
-   * @legacy-covers ::loadByUri
    */
   public function testLoadByUri(): void {
     $source = $this->createFile();
@@ -216,8 +206,6 @@ class FileRepositoryTest extends FileManagedUnitTestBase {
 
   /**
    * Tests loading a file by case-sensitive URI.
-   *
-   * @legacy-covers ::loadByUri
    */
   public function testLoadByUriCaseSensitive(): void {
     $source = $this->createFile('FooBar.txt');

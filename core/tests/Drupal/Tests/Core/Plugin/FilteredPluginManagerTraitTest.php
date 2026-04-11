@@ -24,8 +24,6 @@ class FilteredPluginManagerTraitTest extends UnitTestCase {
 
   /**
    * Tests get filtered definitions.
-   *
-   * @legacy-covers ::getFilteredDefinitions
    */
   #[DataProvider('providerTestGetFilteredDefinitions')]
   public function testGetFilteredDefinitions($contexts, $expected): void {
@@ -62,7 +60,7 @@ class FilteredPluginManagerTraitTest extends UnitTestCase {
   /**
    * Provides test data for ::testGetFilteredDefinitions().
    */
-  public static function providerTestGetFilteredDefinitions() {
+  public static function providerTestGetFilteredDefinitions(): array {
     $data = [];
     $data['populated context'] = [
       ['context1' => 'fake context'],

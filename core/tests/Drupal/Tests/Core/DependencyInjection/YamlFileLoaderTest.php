@@ -94,7 +94,7 @@ YAML;
  * Tests exceptions.
  */
   #[DataProvider('providerTestExceptions')]
-  public function testExceptions($yml, $message): void {
+  public function testExceptions(string $yml, string $message): void {
     vfsStream::setup('drupal', NULL, [
       'modules' => [
         'example' => [
@@ -111,7 +111,7 @@ YAML;
     $yaml_file_loader->load('vfs://drupal/modules/example/example.yml');
   }
 
-  public static function providerTestExceptions() {
+  public static function providerTestExceptions(): array {
     return [
       '_defaults must be an array' => [<<<YAML
 services:

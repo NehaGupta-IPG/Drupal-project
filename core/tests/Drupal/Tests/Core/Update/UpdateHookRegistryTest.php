@@ -14,7 +14,7 @@ use PHPUnit\Framework\Attributes\Group;
 /**
  * Simulates a hook_update_N function.
  */
-function under_test_update_3000() {
+function under_test_update_3000(): void {
 
 }
 
@@ -23,14 +23,14 @@ function under_test_update_3000() {
  *
  * When filtered this will be rejected.
  */
-function bad_3() {
+function bad_3(): void {
 
 }
 
 /**
  * Simulates a hook_update_N function.
  */
-function under_test_update_1() {
+function under_test_update_1(): void {
 
 }
 
@@ -39,14 +39,14 @@ function under_test_update_1() {
  *
  * When filtered this will be rejected.
  */
-function failed_22_update() {
+function failed_22_update(): void {
 
 }
 
 /**
  * Simulates a hook_update_N function.
  */
-function under_test_update_20() {
+function under_test_update_20(): void {
 
 }
 
@@ -55,7 +55,7 @@ function under_test_update_20() {
  *
  * When filtered this will be rejected.
  */
-function under_test_update_1234_failed() {
+function under_test_update_1234_failed(): void {
 
 }
 
@@ -67,17 +67,17 @@ function under_test_update_1234_failed() {
 class UpdateHookRegistryTest extends UnitTestCase {
 
   /**
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $keyValueStore;
 
   /**
-   * @var \Drupal\Core\KeyValueStore\KeyValueFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\KeyValueStore\KeyValueFactoryInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $keyValueFactory;
 
   /**
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface|\PHPUnit\Framework\MockObject\MockObject
+   * @var \Drupal\Core\KeyValueStore\KeyValueStoreInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected KeyValueStoreInterface $equivalentUpdatesStore;
 
@@ -86,9 +86,9 @@ class UpdateHookRegistryTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->keyValueFactory = $this->createMock(KeyValueFactoryInterface::class);
-    $this->keyValueStore = $this->createMock(KeyValueStoreInterface::class);
-    $this->equivalentUpdatesStore = $this->createMock(KeyValueStoreInterface::class);
+    $this->keyValueFactory = $this->createStub(KeyValueFactoryInterface::class);
+    $this->keyValueStore = $this->createStub(KeyValueStoreInterface::class);
+    $this->equivalentUpdatesStore = $this->createStub(KeyValueStoreInterface::class);
 
     $this->keyValueFactory
       ->method('get')
@@ -132,22 +132,22 @@ class UpdateHookRegistryTest extends UnitTestCase {
 
     $this->keyValueStore
       ->method('getAll')
-      ->willReturnCallback(static function () use (&$versions) {
+      ->willReturnCallback(static function () use (&$versions): array {
         return $versions;
       });
     $this->keyValueStore
       ->method('get')
-      ->willReturnCallback(static function ($key) use (&$versions) {
+      ->willReturnCallback(static function ($key) use (&$versions): int {
         return $versions[$key];
       });
     $this->keyValueStore
       ->method('delete')
-      ->willReturnCallback(static function ($key) use (&$versions) {
+      ->willReturnCallback(static function ($key) use (&$versions): void {
         $versions[$key] = UpdateHookRegistry::SCHEMA_UNINSTALLED;
       });
     $this->keyValueStore
       ->method('set')
-      ->willReturnCallback(static function ($key, $value) use (&$versions) {
+      ->willReturnCallback(static function ($key, $value) use (&$versions): void {
         $versions[$key] = $value;
       });
 
