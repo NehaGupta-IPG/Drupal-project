@@ -143,7 +143,9 @@ class Select extends QuerySelect {
    * {@inheritdoc}
    */
   public function execute() {
-    $this->connection->addSavepoint();
+    if ($this->connection->wrapWithSavepoint()) {
+      $this->connection->addSavepoint();
+    }
     try {
       $result = parent::execute();
     }

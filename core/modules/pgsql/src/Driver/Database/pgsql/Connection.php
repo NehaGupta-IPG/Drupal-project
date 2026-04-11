@@ -211,19 +211,8 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
       }
     }
 
-    // We need to wrap queries with a savepoint if:
-    // - Currently in a transaction.
-    // - A 'mimic_implicit_commit' does not exist already.
-    // - The query is not a savepoint query.
-    $wrap_with_savepoint = $this->inTransaction() &&
-      !$this->transactionManager()->has('mimic_implicit_commit') &&
-      !(is_string($query) && (
-        stripos($query, 'ROLLBACK TO SAVEPOINT ') === 0 ||
-        stripos($query, 'RELEASE SAVEPOINT ') === 0 ||
-        stripos($query, 'SAVEPOINT ') === 0
-      )
-    );
-    if ($wrap_with_savepoint) {
+    // Wrap in a savepoint if required.
+    if ($this->wrapWithSavepoint($query)) {
       // Create a savepoint so we can rollback a failed query. This is so we can
       // mimic MySQL and SQLite transactions which don't fail if a single query
       // fails. This is important for tables that are created on demand. For
@@ -243,6 +232,33 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     }
 
     return $return;
+  }
+
+  /**
+   * Determine if the query being executed needs to be wrapped in a savepoint.
+   *
+   * We need to wrap queries with a savepoint if:
+   * - Currently in a transaction.
+   * - A 'mimic_implicit_commit' does not exist already.
+   * - The query is not a savepoint query.
+   *
+   * @param string|null $query
+   *   The query to evaluate, null if being passed from another source,
+   *   such as pgsql/Select.
+   *
+   * @return bool
+   *   Triggers wrapping with savepoint.
+   */
+  public function wrapWithSavepoint(?string $query = NULL): bool {
+    $wrap_with_savepoint = $this->inTransaction() &&
+      !$this->transactionManager()->has('mimic_implicit_commit') &&
+      !(is_string($query) && (
+        stripos($query, 'ROLLBACK TO SAVEPOINT ') === 0 ||
+        stripos($query, 'RELEASE SAVEPOINT ') === 0 ||
+        stripos($query, 'SAVEPOINT ') === 0
+      )
+      );
+    return $wrap_with_savepoint;
   }
 
   /**

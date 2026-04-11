@@ -147,7 +147,9 @@ class Schema extends DatabaseSchema {
         'blob_fields' => [],
         'sequences' => [],
       ];
-      $this->connection->addSavepoint();
+      if ($this->connection->wrapWithSavepoint()) {
+        $this->connection->addSavepoint();
+      }
 
       try {
         // The bytea columns and sequences for a table can be found in
