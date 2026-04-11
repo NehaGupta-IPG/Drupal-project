@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\package_manager\Build;
 
+use Behat\Mink\Mink;
 use Composer\Autoload\ClassLoader;
 use Composer\InstalledVersions;
 use Drupal\BuildTests\QuickStart\QuickStartTestBase;
@@ -144,7 +145,7 @@ abstract class TemplateProjectTestBase extends QuickStartTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function instantiateServer($port, $working_dir = NULL) {
+  protected function instantiateServer($port, $working_dir = NULL): Process {
     $working_dir = $working_dir ?: $this->webRoot;
     $finder = new PhpExecutableFinder();
     $working_path = $this->getWorkingPath($working_dir);
@@ -200,7 +201,7 @@ END;
   /**
    * {@inheritdoc}
    */
-  public function visit($request_uri = '/', $working_dir = NULL) {
+  public function visit($request_uri = '/', $working_dir = NULL): Mink {
     return parent::visit($request_uri, $working_dir ?: $this->webRoot);
   }
 
@@ -327,7 +328,7 @@ END;
     $this->webRoot = 'project/' . $data['extra']['drupal-scaffold']['locations']['web-root'];
 
     // Install Drupal.
-    $this->installQuickStart('standard');
+    $this->installQuickStart('minimal');
     $this->formLogin($this->adminUsername, $this->adminPassword);
 
     // When checking for updates, we need to be able to make sub-requests, but
@@ -357,6 +358,7 @@ END;
 
     // Install helpful modules.
     $this->installModules([
+      'automated_cron',
       'package_manager_test_api',
       'package_manager_test_event_logger',
       'package_manager_test_release_history',
