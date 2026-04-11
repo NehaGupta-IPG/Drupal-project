@@ -27,9 +27,7 @@ install:
   - dynamic_page_cache
   - taxonomy
   - dblog
-  - search
-  - shortcut
-  - toolbar
+  - navigation
   - field_ui
   - file
   - views
