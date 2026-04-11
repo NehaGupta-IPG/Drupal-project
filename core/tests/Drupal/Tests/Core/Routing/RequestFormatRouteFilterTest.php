@@ -26,11 +26,9 @@ class RequestFormatRouteFilterTest extends UnitTestCase {
 
   /**
    * Tests filter.
-   *
-   * @legacy-covers ::filter
    */
   #[DataProvider('filterProvider')]
-  public function testFilter(RouteCollection $collection, $request_format, array $expected_filtered_collection): void {
+  public function testFilter(RouteCollection $collection, ?string $request_format, array $expected_filtered_collection): void {
     $route_filter = new RequestFormatRouteFilter();
 
     $request = new Request();
@@ -41,7 +39,7 @@ class RequestFormatRouteFilterTest extends UnitTestCase {
     $this->assertSame($expected_filtered_collection, array_keys($collection->all()));
   }
 
-  public static function filterProvider() {
+  public static function filterProvider(): array {
     $route_without_format = new Route('/test');
     $route_with_format = new Route('/test');
     $route_with_format->setRequirement('_format', 'json');
@@ -59,10 +57,22 @@ class RequestFormatRouteFilterTest extends UnitTestCase {
     return [
       'nothing requested' => [clone $collection, '', ['test_0']],
       'xml requested' => [clone $collection, 'xml', ['test_2', 'test_0']],
-      'json requested' => [clone $collection, 'json', ['test_1', 'test_2', 'test_0']],
+      'json requested' => [
+        clone $collection,
+        'json',
+        ['test_1', 'test_2', 'test_0'],
+      ],
       'html format requested' => [clone $collection, 'html', ['test_0']],
-      'no format requested, defaults to html' => [clone $collection, NULL, ['test_0']],
-      'no format requested, single route match with single format, defaults to that format' => [clone $sole_route_match_single_format, NULL, ['sole_route_single_format']],
+      'no format requested, defaults to html' => [
+        clone $collection,
+        NULL,
+        ['test_0'],
+      ],
+      'no format requested, single route match with single format, defaults to that format' => [
+        clone $sole_route_match_single_format,
+        NULL,
+        ['sole_route_single_format'],
+      ],
     ];
   }
 

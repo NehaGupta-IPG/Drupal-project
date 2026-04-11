@@ -124,8 +124,6 @@ class LruMemoryCacheTest extends UnitTestCase {
 
   /**
    * Tests setting items with numeric keys in the LRU memory cache.
-   *
-   * @legacy-covers ::set
    */
   public function testSetNumericKeys(): void {
     $lru_cache = $this->getLruMemoryCache(3);
@@ -157,8 +155,6 @@ class LruMemoryCacheTest extends UnitTestCase {
 
   /**
    * Tests setting multiple items in the LRU memory cache.
-   *
-   * @legacy-covers ::setMultiple
    */
   public function testSetMultiple(): void {
     $lru_cache = $this->getLruMemoryCache(3);
@@ -383,8 +379,8 @@ class LruMemoryCacheTest extends UnitTestCase {
    *   The LRU cache.
    */
   private function getLruMemoryCache(int $slots): LruMemoryCache {
-    $time_mock = $this->createMock(TimeInterface::class);
-    $time_mock->expects($this->any())
+    $time_mock = $this->createStub(TimeInterface::class);
+    $time_mock
       ->method('getRequestTime')
       ->willReturnCallback('time');
     return new LruMemoryCache(
