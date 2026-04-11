@@ -6,13 +6,13 @@ namespace Drupal\Tests\Component\Serialization;
 
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Component\Serialization\PhpSerialize;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Unit test for the PhpSerialize class.
- *
- * @group serialization
  */
+#[Group('serialization')]
 class PhpSerializeTest extends TestCase {
 
   /**
