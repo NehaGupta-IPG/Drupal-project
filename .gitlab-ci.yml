@@ -560,16 +560,6 @@ default:
 # Variant trigger jobs
 ################
 
-# Without ext-intl.
-'DEFAULT: PHP 8.3 MySQL 8.0 without ext-intl':
-  <<: [ *default-stage, *run-on-mr ]
-  variables:
-    _TARGET_PHP: "8.3-ubuntu"
-    _TARGET_DB: "mysql-8"
-    _TARGET_DB_DRIVER: "mysql"
-    _TARGET_DB_DRIVER_MODULE: "mysql"
-    PHPDISMOD_INTL: true
-
 # Re-run the pipeline, but with Composer updates.
 'Updated dependencies':
   <<: *recursive-trigger
