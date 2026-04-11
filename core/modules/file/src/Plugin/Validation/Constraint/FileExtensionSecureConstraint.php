@@ -18,11 +18,13 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class FileExtensionSecureConstraint extends SymfonyConstraint {
 
-  /**
-   * The error message.
-   *
-   * @var string
-   */
-  public string $message = 'For security reasons, your upload has been rejected.';
+  public function __construct(
+    mixed $options = NULL,
+    public string $message = 'For security reasons, your upload has been rejected.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct($options, $groups, $payload);
+  }
 
 }

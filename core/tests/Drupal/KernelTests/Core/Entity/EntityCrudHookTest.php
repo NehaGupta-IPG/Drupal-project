@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\block\Entity\Block;
+use Drupal\comment\CommentingStatus;
 use Drupal\comment\Entity\Comment;
-use Drupal\comment\Plugin\Field\FieldType\CommentItemInterface;
 use Drupal\comment\Tests\CommentTestTrait;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Hook\Attribute\Hook;
@@ -159,7 +159,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
       'type' => 'article',
       'name' => 'Article',
     ])->save();
-    $this->addDefaultCommentField('node', 'article', 'comment', CommentItemInterface::OPEN);
+    $this->addDefaultCommentField('node', 'article', 'comment', CommentingStatus::Open);
 
     $node = Node::create([
       'uid' => $account->id(),
@@ -766,7 +766,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    * Implements hook_entity_preload().
    */
   #[Hook('entity_preload')]
-  public function entityPreload(array $entities, $type): void {
+  public function entityPreload(array $entities, string $type): void {
     $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_entity_preload called for type ' . $type;
   }
 
@@ -774,7 +774,7 @@ class EntityCrudHookTest extends EntityKernelTestBase {
    * Implements hook_entity_load().
    */
   #[Hook('entity_load')]
-  public function entityLoad(array $entities, $type): void {
+  public function entityLoad(array $entities, string $type): void {
     $GLOBALS['entity_crud_hook_test'][] = 'entity_crud_hook_test_entity_load called for type ' . $type;
   }
 

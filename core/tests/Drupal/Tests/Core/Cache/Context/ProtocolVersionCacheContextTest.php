@@ -21,11 +21,9 @@ class ProtocolVersionCacheContextTest extends UnitTestCase {
 
   /**
    * Tests get context.
-   *
-   * @legacy-covers ::getContext
    */
   #[DataProvider('providerTestGetContext')]
-  public function testGetContext($protocol, $context): void {
+  public function testGetContext(string $protocol, string $context): void {
     $request_stack = new RequestStack();
     $request = Request::create('/');
     $request->server->set('SERVER_PROTOCOL', $protocol);
@@ -37,7 +35,7 @@ class ProtocolVersionCacheContextTest extends UnitTestCase {
   /**
    * Provides a list of query arguments and expected cache contexts.
    */
-  public static function providerTestGetContext() {
+  public static function providerTestGetContext(): array {
     return [
       ['HTTP/1.0', 'HTTP/1.0'],
       ['HTTP/1.1', 'HTTP/1.1'],

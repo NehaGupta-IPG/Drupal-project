@@ -19,18 +19,22 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 class FileExtensionConstraint extends SymfonyConstraint {
 
   /**
-   * The error message.
-   *
-   * @var string
-   */
-  public string $message = 'Only files with the following extensions are allowed: %files-allowed.';
-
-  /**
    * The allowed file extensions.
    *
    * @var string
    */
   public string $extensions;
+
+  public function __construct(
+    mixed $options = NULL,
+    ?string $extensions = NULL,
+    public string $message = 'Only files with the following extensions are allowed: %files-allowed.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct($options, $groups, $payload);
+    $this->extensions = $extensions ?? $this->extensions;
+  }
 
   /**
    * {@inheritdoc}

@@ -2,8 +2,9 @@
 
 namespace Drupal\comment\Plugin\Field\FieldType;
 
+use Drupal\comment\AnonymousContact;
 use Drupal\comment\CommentFieldItemList;
-use Drupal\comment\CommentInterface;
+use Drupal\comment\CommentingStatus;
 use Drupal\comment\CommentManagerInterface;
 use Drupal\comment\CommentPreviewMode;
 use Drupal\comment\Entity\CommentType;
@@ -23,7 +24,7 @@ use Drupal\Core\Url;
 #[FieldType(
   id: "comment",
   label: new TranslatableMarkup("Comments"),
-  description: new TranslatableMarkup("This field manages configuration and presentation of comments on an entity."),
+  description: new TranslatableMarkup("Enable and configure how comments look and behave"),
   default_widget: "comment_default",
   default_formatter: "comment_default",
   list_class: CommentFieldItemList::class,
@@ -48,7 +49,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
       'default_mode' => CommentManagerInterface::COMMENT_MODE_THREADED,
       'per_page' => 50,
       'form_location' => CommentItemInterface::FORM_BELOW,
-      'anonymous' => CommentInterface::ANONYMOUS_MAYNOT_CONTACT,
+      'anonymous' => AnonymousContact::Forbidden->value,
       'preview' => CommentPreviewMode::Optional->value,
     ] + parent::defaultFieldSettings();
   }
@@ -128,11 +129,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
       '#type' => 'select',
       '#title' => $this->t('Anonymous commenting'),
       '#default_value' => $settings['anonymous'],
-      '#options' => [
-        CommentInterface::ANONYMOUS_MAYNOT_CONTACT => $this->t('Anonymous posters may not enter their contact information'),
-        CommentInterface::ANONYMOUS_MAY_CONTACT => $this->t('Anonymous posters may leave their contact information'),
-        CommentInterface::ANONYMOUS_MUST_CONTACT => $this->t('Anonymous posters must leave their contact information'),
-      ],
+      '#options' => AnonymousContact::asOptions(),
       '#access' => $anonymous_user->hasPermission('post comments'),
     ];
     $element['form_location'] = [
@@ -161,9 +158,8 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
    * {@inheritdoc}
    */
   public function isEmpty() {
-    // There is always a value for this field, it is one of
-    // CommentItemInterface::OPEN, CommentItemInterface::CLOSED or
-    // CommentItemInterface::HIDDEN.
+    // There is always a value for this field, it is one of the values of the
+    // \Drupal\comment\CommentingStatus enum.
     return FALSE;
   }
 
@@ -199,11 +195,7 @@ class CommentItem extends FieldItemBase implements CommentItemInterface {
    * {@inheritdoc}
    */
   public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
-    $statuses = [
-      CommentItemInterface::HIDDEN,
-      CommentItemInterface::CLOSED,
-      CommentItemInterface::OPEN,
-    ];
+    $statuses = array_column(CommentingStatus::cases(), 'value');
     return [
       'status' => $statuses[mt_rand(0, count($statuses) - 1)],
     ];

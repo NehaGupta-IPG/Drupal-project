@@ -66,8 +66,6 @@ class EntityRepositoryTest extends UnitTestCase {
 
   /**
    * Tests the getTranslationFromContext() method.
-   *
-   * @legacy-covers ::getTranslationFromContext
    */
   public function testGetTranslationFromContext(): void {
     $language = new Language(['id' => 'en']);
@@ -75,7 +73,7 @@ class EntityRepositoryTest extends UnitTestCase {
       ->willReturn($language)
       ->shouldBeCalledTimes(1);
     $this->languageManager->getFallbackCandidates(Argument::type('array'))
-      ->will(function ($args) {
+      ->will(function ($args): array {
         $context = $args[0];
         $candidates = [];
         if (!empty($context['langcode'])) {
@@ -93,7 +91,10 @@ class EntityRepositoryTest extends UnitTestCase {
     $entity->hasTranslation(LanguageInterface::LANGCODE_DEFAULT)->willReturn(FALSE);
     $entity->hasTranslation('custom_langcode')->willReturn(TRUE);
     $entity->getTranslation('custom_langcode')->willReturn($translated_entity->reveal());
-    $entity->getTranslationLanguages()->willReturn([new Language(['id' => 'en']), new Language(['id' => 'custom_langcode'])]);
+    $entity->getTranslationLanguages()->willReturn([
+      new Language(['id' => 'en']),
+      new Language(['id' => 'custom_langcode']),
+    ]);
     $entity->addCacheContexts(['languages:language_content'])->shouldBeCalled();
 
     $this->assertSame($entity->reveal(), $this->entityRepository->getTranslationFromContext($entity->reveal()));
