@@ -430,7 +430,7 @@ trait FunctionalTestSetupTrait {
    *   The container.
    */
   protected function initKernel(Request $request) {
-    $this->kernel = DrupalKernel::createFromRequest($request, $this->classLoader, 'testing', TRUE);
+    $this->kernel = DrupalKernel::createFromRequest($request, $this->classLoader, 'prod', TRUE);
     $this->kernel->boot();
     // Add our request to the stack and route context.
     $request->attributes->set(RouteObjectInterface::ROUTE_OBJECT, new Route('<none>'));
