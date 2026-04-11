@@ -224,7 +224,11 @@ class Connection extends DatabaseConnection implements SupportsTemporaryTablesIn
     if (
       $this->inTransaction() &&
       !$this->transactionManager()->has('mimic_implicit_commit') &&
-      !(is_string($query) && (stripos($query, 'ROLLBACK TO SAVEPOINT ') === 0 || stripos($query, 'RELEASE SAVEPOINT ') === 0 || stripos($query, 'SAVEPOINT ') === 0))
+      !(is_string($query) && (
+        stripos($query, 'ROLLBACK TO SAVEPOINT ') === 0 ||
+        stripos($query, 'RELEASE SAVEPOINT ') === 0 ||
+        stripos($query, 'SAVEPOINT ') === 0
+      ))
     ) {
       // Create a savepoint so we can rollback a failed query. This is so we can
       // mimic MySQL and SQLite transactions which don't fail if a single query

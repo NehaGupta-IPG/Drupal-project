@@ -997,7 +997,7 @@ class TransactionTest extends DatabaseTestBase {
     $this->assertFalse($this->connection->inTransaction());
     $this->assertRowPresent('row');
     // Trying to release the inner (savepoint) Transaction object is a no-op
-    // at this point since the root transaction was fully committed already: we
+    // at this point since the root transaction was fully committed already; we
     // do not raise any error in this case.
     $savepoint2->commitOrRelease();
   }
