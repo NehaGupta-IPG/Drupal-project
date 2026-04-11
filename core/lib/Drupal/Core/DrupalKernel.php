@@ -1467,6 +1467,26 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     // Set the class loader which was registered as a synthetic service.
     $container->set('class_loader', $this->classLoader);
+
+    // In testing environments, restore persisted and synthetic services on the
+    // old container. Code that still holds a reference to the old container
+    // (e.g., services resolved via constructor injection before a container
+    // rebuild) would fail when trying to resolve dependencies that depend on
+    // synthetic services like 'kernel' or 'keyvalue', or persisted services
+    // like 'request_stack'.
+    if ($this->environment === 'testing' && isset($this->container)) {
+      $this->persistServices($this->container, $persist);
+      // For ContainerBuilder (kernel tests), also restore any additional
+      // synthetic services set by the test infrastructure on the new container.
+      if ($this->container instanceof ContainerBuilder) {
+        foreach ($this->container->getDefinitions() as $id => $definition) {
+          if ($definition->isSynthetic() && $container->initialized($id)) {
+            $this->container->set($id, $container->get($id));
+          }
+        }
+      }
+    }
+
     return $container;
   }
 
