@@ -57,8 +57,7 @@ class SearchPageRepositoryTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $language_manager = $this->createMock('\Drupal\Core\Language\LanguageManagerInterface');
-    $language_manager->expects($this->exactly(1))
-      ->method('getCurrentLanguage')
+    $language_manager->method('getCurrentLanguage')
       ->with()
       ->willReturn(new Language(['id' => 'en']));
     $container = new ContainerBuilder();
