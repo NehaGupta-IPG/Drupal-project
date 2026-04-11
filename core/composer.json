@@ -126,8 +126,7 @@
         "preferred-install": "dist"
     },
     "suggest": {
-        "ext-intl": "Needed to extend symfony/polyfill-intl-icu capability with the sorting of non-english languages.",
-        "ext-zip": "Needed to extend the plugin.manager.archiver service capability with the handling of files in the ZIP format."
+        "ext-intl": "Needed to extend symfony/polyfill-intl-icu capability with the sorting of non-english languages."
     },
     "extra": {
         "branch-alias": {
