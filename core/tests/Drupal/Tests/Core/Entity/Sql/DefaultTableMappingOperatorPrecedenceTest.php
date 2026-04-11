@@ -39,7 +39,7 @@ class DefaultTableMappingOperatorPrecedenceTest extends UnitTestCase {
    * - Result: "test123" instead of "test123entity_id_revision"
    */
   public function testRevisionTableWithNullValue(): void {
-    $entity_type = $this->createMock(ContentEntityTypeInterface::class);
+    $entity_type = $this->createStub(ContentEntityTypeInterface::class);
     $entity_type->method('id')->willReturn('test_entity');
     $entity_type->method('getBaseTable')->willReturn('test_entity');
     $entity_type->method('isRevisionable')->willReturn(TRUE);
@@ -56,7 +56,7 @@ class DefaultTableMappingOperatorPrecedenceTest extends UnitTestCase {
    * Tests that revision table name is correctly constructed with empty string.
    */
   public function testRevisionTableWithEmptyString(): void {
-    $entity_type = $this->createMock(ContentEntityTypeInterface::class);
+    $entity_type = $this->createStub(ContentEntityTypeInterface::class);
     $entity_type->method('id')->willReturn('test_entity');
     $entity_type->method('getBaseTable')->willReturn('test_entity');
     $entity_type->method('isRevisionable')->willReturn(TRUE);
@@ -73,7 +73,7 @@ class DefaultTableMappingOperatorPrecedenceTest extends UnitTestCase {
    * Tests that data table name is correctly constructed when NULL.
    */
   public function testDataTableWithNullValue(): void {
-    $entity_type = $this->createMock(ContentEntityTypeInterface::class);
+    $entity_type = $this->createStub(ContentEntityTypeInterface::class);
     $entity_type->method('id')->willReturn('test_entity');
     $entity_type->method('getBaseTable')->willReturn('test_entity');
     $entity_type->method('isRevisionable')->willReturn(FALSE);
@@ -90,7 +90,7 @@ class DefaultTableMappingOperatorPrecedenceTest extends UnitTestCase {
    * Tests that base table name is correctly constructed when NULL.
    */
   public function testBaseTableWithNullValue(): void {
-    $entity_type = $this->createMock(ContentEntityTypeInterface::class);
+    $entity_type = $this->createStub(ContentEntityTypeInterface::class);
     $entity_type->method('id')->willReturn('test_entity');
     $entity_type->method('getBaseTable')->willReturn(NULL);
     $entity_type->method('isRevisionable')->willReturn(FALSE);
@@ -106,7 +106,7 @@ class DefaultTableMappingOperatorPrecedenceTest extends UnitTestCase {
    * Tests that revision data table is correctly constructed when NULL.
    */
   public function testRevisionDataTableWithNullValue(): void {
-    $entity_type = $this->createMock(ContentEntityTypeInterface::class);
+    $entity_type = $this->createStub(ContentEntityTypeInterface::class);
     $entity_type->method('id')->willReturn('test_entity');
     $entity_type->method('getBaseTable')->willReturn('test_entity');
     $entity_type->method('isRevisionable')->willReturn(TRUE);
