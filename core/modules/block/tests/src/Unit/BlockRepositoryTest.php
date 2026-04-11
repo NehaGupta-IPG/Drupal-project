@@ -8,6 +8,7 @@ use Drupal\block\BlockRepository;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Language\Language;
 use Drupal\Core\Plugin\Context\ContextHandlerInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -70,7 +71,7 @@ class BlockRepositoryTest extends UnitTestCase {
       ]);
 
     $language_manager = $this->createMock('\Drupal\Core\Language\LanguageManagerInterface');
-    $language_manager->expects($this->any())
+    $language_manager->expects($this->exactly(1))
       ->method('getCurrentLanguage')
       ->with()
       ->willReturn(new Language(['id' => 'en']));

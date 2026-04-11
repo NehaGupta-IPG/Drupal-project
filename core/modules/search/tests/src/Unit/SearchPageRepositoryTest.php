@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\search\Unit;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Language\Language;
@@ -56,7 +57,7 @@ class SearchPageRepositoryTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
     $language_manager = $this->createMock('\Drupal\Core\Language\LanguageManagerInterface');
-    $language_manager->expects($this->any())
+    $language_manager->expects($this->exactly(1))
       ->method('getCurrentLanguage')
       ->with()
       ->willReturn(new Language(['id' => 'en']));
