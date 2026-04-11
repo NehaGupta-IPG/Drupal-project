@@ -2,6 +2,8 @@
 
 namespace Drupal\locale\StreamWrapper;
 
+use Drupal\Core\File\FileSystemInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\Core\StreamWrapper\PrivateStream;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
@@ -40,7 +42,27 @@ class TranslationsStream extends PrivateStream {
    * {@inheritdoc}
    */
   public function getDirectoryPath() {
-    return \Drupal::config('locale.settings')->get('translation.path');
+    return static::basePath();
+  }
+
+  /**
+   * Returns the base path for translations://.
+   *
+   * @return string|null
+   *   The base path for translations://.
+   */
+  public static function basePath() {
+    if ($config_path = \Drupal::config('locale.settings')->get('translation.path')) {
+      return $config_path;
+    }
+    $file_system = \Drupal::service(FileSystemInterface::class);
+    $path = Settings::get('locale_translation_path', 'public://translations');
+    // Stream wrappers such as public:// must be resolved explicitly, fall back
+    // to the original path where realpath() fails.
+    if ($realpath = $file_system->realpath($path)) {
+      return $realpath;
+    }
+    return $path;
   }
 
 }

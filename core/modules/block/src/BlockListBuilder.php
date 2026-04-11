@@ -4,6 +4,7 @@ namespace Drupal\block;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Serialization\Json;
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
@@ -356,8 +357,8 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
   /**
    * {@inheritdoc}
    */
-  protected function getDefaultOperations(EntityInterface $entity/* , ?CacheableMetadata $cacheability = NULL */) {
-    $operations = parent::getDefaultOperations($entity);
+  protected function getDefaultOperations(EntityInterface $entity, CacheableMetadata $cacheability) {
+    $operations = parent::getDefaultOperations($entity, $cacheability);
 
     if (isset($operations['edit'])) {
       $operations['edit']['title'] = $this->t('Configure');
@@ -384,7 +385,7 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface 
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $blocks = $form_state->getValue('blocks');
-    $entities = $this->storage->loadMultiple(array_keys($blocks));
+    $entities = $this->storage->loadMultipleOverrideFree(array_keys($blocks));
     /** @var \Drupal\block\BlockInterface[] $entities */
     foreach ($entities as $entity_id => $entity) {
       $entity_values = $form_state->getValue(['blocks', $entity_id]);

@@ -14,7 +14,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Tests the core Drupal\views\Plugin\views\filter\StringFilter handler.
  */
 #[Group('views')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class FilterStringTest extends ViewsKernelTestBase {
 
@@ -364,7 +363,7 @@ class FilterStringTest extends ViewsKernelTestBase {
     $view = Views::getView('test_view');
     $view->setDisplay();
 
-    // Change the filtering to a sting containing only illegal characters.
+    // Change the filtering to a sting containing only invalid characters.
     $view->displayHandlers->get('default')->overrideOption('filters', [
       'description' => [
         'id' => 'description',
