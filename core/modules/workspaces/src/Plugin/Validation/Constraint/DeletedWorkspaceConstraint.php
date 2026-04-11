@@ -15,11 +15,13 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class DeletedWorkspaceConstraint extends SymfonyConstraint {
 
-  /**
-   * The default violation message.
-   *
-   * @var string
-   */
-  public $message = 'A workspace with this ID has been deleted but data still exists for it.';
+  public function __construct(
+    mixed $options = NULL,
+    public $message = 'A workspace with this ID has been deleted but data still exists for it.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct($options, $groups, $payload);
+  }
 
 }

@@ -37,8 +37,6 @@ class LazyContextRepositoryTest extends UnitTestCase {
 
   /**
    * Tests get runtime contexts single.
-   *
-   * @legacy-covers ::getRuntimeContexts
    */
   public function testGetRuntimeContextsSingle(): void {
     $contexts = $this->setupContextAndProvider('test_provider', ['test_context']);
@@ -119,8 +117,6 @@ class LazyContextRepositoryTest extends UnitTestCase {
 
   /**
    * Tests get available contexts.
-   *
-   * @legacy-covers ::getAvailableContexts
    */
   public function testGetAvailableContexts(): void {
     $contexts0 = $this->setupContextAndProvider('test_provider0', ['test0_context0', 'test0_context1']);
@@ -151,7 +147,7 @@ class LazyContextRepositoryTest extends UnitTestCase {
    * @return array
    *   An array of set up contexts.
    */
-  protected function setupContextAndProvider($service_id, array $unqualified_context_ids, array $expected_unqualified_context_ids = []): array {
+  protected function setupContextAndProvider(string $service_id, array $unqualified_context_ids, array $expected_unqualified_context_ids = []): array {
     $contexts = [];
     for ($i = 0; $i < count($unqualified_context_ids); $i++) {
       $contexts[] = new Context(new ContextDefinition('example'));
