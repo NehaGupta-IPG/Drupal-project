@@ -9,6 +9,7 @@ use Drupal\ckeditor5\LanguageMapper;
 use Drupal\ckeditor5\Plugin\CKEditor5Plugin\Heading;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginDefinition;
 use Drupal\ckeditor5\Plugin\CKEditor5PluginManagerInterface;
+use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Drupal\Component\Serialization\Json;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Cache\CacheBackendInterface;
@@ -577,7 +578,12 @@ class CKEditor5 extends EditorBase implements ContainerFactoryPluginInterface {
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
     $json = $form_state->getValue(['toolbar', 'items']);
-    $toolbar_items = Json::decode($json);
+    try {
+      $toolbar_items = Json::decode($json);
+    }
+    catch (InvalidDataTypeException) {
+      $toolbar_items = NULL;
+    }
 
     // This basic validation must live in the form logic because it can only
     // occur in a form context.
