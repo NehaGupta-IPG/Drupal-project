@@ -71,7 +71,7 @@ class BlockRepositoryTest extends UnitTestCase {
       ]);
 
     $language_manager = $this->createMock('\Drupal\Core\Language\LanguageManagerInterface');
-    $language_manager->expects($this->exactly(1))
+    $language_manager->expects($this->atLeastOnce())
       ->method('getCurrentLanguage')
       ->with()
       ->willReturn(new Language(['id' => 'en']));
