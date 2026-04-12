@@ -788,7 +788,10 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * Begins a transaction on the client connection.
    *
    * @return bool
-   *   Returns TRUE on success or FALSE on failure.
+   *   Returns TRUE on success.
+   *
+   * @throws \Drupal\Core\Database\TransactionException
+   *   When the database operation failed.
    */
   abstract protected function beginClientTransaction(): bool;
 
@@ -802,11 +805,19 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    *   The name of the savepoint.
    *
    * @return bool
-   *   Returns TRUE on success or FALSE on failure.
+   *   Returns TRUE on success.
+   *
+   * @throws \Drupal\Core\Database\TransactionException
+   *   When the database operation failed.
    */
   protected function addClientSavepoint(string $name): bool {
-    $this->connection->query('SAVEPOINT ' . $name);
-    return TRUE;
+    try {
+      $this->connection->query('SAVEPOINT ' . $name);
+      return TRUE;
+    }
+    catch (\Exception $e) {
+      throw new TransactionException('Failed creation of savepoint '  . $name, $e->getCode(), $e);
+    }
   }
 
   /**
@@ -819,14 +830,21 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    *   The name of the savepoint.
    *
    * @return bool
-   *   Returns TRUE on success or FALSE on failure.
+   *   Returns TRUE on success.
    *
    * @throws \Drupal\Core\Database\TransactionNoActiveException
    *   When there is no client transaction active.
+   * @throws \Drupal\Core\Database\TransactionException
+   *   When the database operation failed.
    */
   protected function rollbackClientSavepoint(string $name): bool {
-    $this->connection->query('ROLLBACK TO SAVEPOINT ' . $name);
-    return TRUE;
+    try {
+      $this->connection->query('ROLLBACK TO SAVEPOINT ' . $name);
+      return TRUE;
+    }
+    catch (\Exception $e) {
+      throw new TransactionException('Failed rollback of savepoint '  . $name, $e->getCode(), $e);
+    }
   }
 
   /**
@@ -839,24 +857,33 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    *   The name of the savepoint.
    *
    * @return bool
-   *   Returns TRUE on success or FALSE on failure.
+   *   Returns TRUE on success.
    *
    * @throws \Drupal\Core\Database\TransactionNoActiveException
    *   When there is no client transaction active.
+   * @throws \Drupal\Core\Database\TransactionException
+   *   When the database operation failed.
    */
   protected function releaseClientSavepoint(string $name): bool {
-    $this->connection->query('RELEASE SAVEPOINT ' . $name);
-    return TRUE;
+    try {
+      $this->connection->query('RELEASE SAVEPOINT ' . $name);
+      return TRUE;
+    }
+    catch (\Exception $e) {
+      throw new TransactionException('Failed release of savepoint '  . $name, $e->getCode(), $e);
+    }
   }
 
   /**
    * Rolls back a client transaction.
    *
    * @return bool
-   *   Returns TRUE on success or FALSE on failure.
+   *   Returns TRUE on success.
    *
    * @throws \Drupal\Core\Database\TransactionNoActiveException
    *   When there is no client transaction active.
+   * @throws \Drupal\Core\Database\TransactionException
+   *   When the database operation failed.
    */
   abstract protected function rollbackClientTransaction(): bool;
 
@@ -864,10 +891,12 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * Commits a client transaction.
    *
    * @return bool
-   *   Returns TRUE on success or FALSE on failure.
+   *   Returns TRUE on success.
    *
    * @throws \Drupal\Core\Database\TransactionNoActiveException
    *   When there is no client transaction active.
+   * @throws \Drupal\Core\Database\TransactionCommitFailedException
+   *   When the database commit failed.
    */
   abstract protected function commitClientTransaction(): bool;
 

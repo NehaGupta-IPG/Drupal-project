@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\mysql\Driver\Database\mysql;
 
 use Drupal\Core\Database\Transaction\TransactionManagerBase;
+use Drupal\Core\Database\TransactionCommitFailedException;
+use Drupal\Core\Database\TransactionException;
 use Drupal\Core\Database\TransactionNoActiveException;
 
 /**
@@ -21,7 +23,12 @@ class TransactionManager extends TransactionManagerBase {
    * {@inheritdoc}
    */
   protected function beginClientTransaction(): bool {
-    return $this->connection->getClientConnection()->beginTransaction();
+    try {
+      return $this->connection->getClientConnection()->beginTransaction();
+    }
+    catch (\Exception $e) {
+      throw new TransactionException('Failed creation of transaction', $e->getCode(), $e);
+    }
   }
 
   /**
@@ -48,7 +55,12 @@ class TransactionManager extends TransactionManagerBase {
    * {@inheritdoc}
    */
   protected function commitClientTransaction(): bool {
-    return $this->connection->getClientConnection()->commit();
+    try {
+      return $this->connection->getClientConnection()->commit();
+    }
+    catch (\Exception $e) {
+      throw new TransactionCommitFailedException('Failed commit of transaction', $e->getCode(), $e);
+    }
   }
 
   /**
@@ -58,7 +70,12 @@ class TransactionManager extends TransactionManagerBase {
     if (!$this->connection->getClientConnection()->inTransaction()) {
       throw new TransactionNoActiveException();
     }
-    return $this->connection->getClientConnection()->rollBack();
+    try {
+      return $this->connection->getClientConnection()->rollBack();
+    }
+    catch (\Exception $e) {
+      throw new TransactionException('Failed rollback of transaction', $e->getCode(), $e);
+    }
   }
 
 }

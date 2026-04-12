@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\pgsql\Driver\Database\pgsql;
 
 use Drupal\Core\Database\Transaction\TransactionManagerBase;
+use Drupal\Core\Database\TransactionCommitFailedException;
+use Drupal\Core\Database\TransactionException;
 
 /**
  * PostgreSql implementation of TransactionManagerInterface.
@@ -15,21 +17,36 @@ class TransactionManager extends TransactionManagerBase {
    * {@inheritdoc}
    */
   protected function beginClientTransaction(): bool {
-    return $this->connection->getClientConnection()->beginTransaction();
+    try {
+      return $this->connection->getClientConnection()->beginTransaction();
+    }
+    catch (\Exception $e) {
+      throw new TransactionException('Failed creation of transaction', $e->getCode(), $e);
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   protected function rollbackClientTransaction(): bool {
-    return $this->connection->getClientConnection()->rollBack();
+    try {
+      return $this->connection->getClientConnection()->rollBack();
+    }
+    catch (\Exception $e) {
+      throw new TransactionException('Failed rollback of transaction', $e->getCode(), $e);
+    }
   }
 
   /**
    * {@inheritdoc}
    */
   protected function commitClientTransaction(): bool {
-    return $this->connection->getClientConnection()->commit();
+    try {
+      return $this->connection->getClientConnection()->commit();
+    }
+    catch (\Exception $e) {
+      throw new TransactionCommitFailedException('Failed commit of transaction', $e->getCode(), $e);
+    }
   }
 
 }
