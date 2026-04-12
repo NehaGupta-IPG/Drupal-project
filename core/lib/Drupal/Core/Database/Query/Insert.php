@@ -73,13 +73,13 @@ class Insert extends Query implements \Countable {
 
     $last_insert_id = 0;
     $stmt = $this->connection->prepareStatement((string) $this, $this->queryOptions);
+    $transaction = $this->connection->startTransaction();
     try {
       // Per https://en.wikipedia.org/wiki/Insert_%28SQL%29#Multirow_inserts,
       // not all databases implement SQL-92's standard syntax for multi-row
       // inserts. Therefore, in the degenerate case, execute a separate query
       // for each row, all within a single transaction for atomicity and
       // performance.
-      $transaction = $this->connection->startTransaction();
       foreach ($this->insertValues as $insert_values) {
         $stmt->execute($insert_values, $this->queryOptions);
         $last_insert_id = $this->connection->lastInsertId();
@@ -87,18 +87,14 @@ class Insert extends Query implements \Countable {
       $transaction->commitOrRelease();
     }
     catch (\Exception $e) {
-      if (isset($transaction)) {
-        // One of the INSERTs failed, rollback the whole batch.
-        $transaction->rollBack();
-      }
+      // One of the INSERTs failed, rollback the whole batch.
+      $transaction->rollBack();
       // Rethrow the exception for the calling code.
       throw $e;
     }
 
     // Re-initialize the values array so that we can re-use this query.
     $this->insertValues = [];
-
-    // Transaction commits here where $transaction looses scope.
 
     return $last_insert_id;
   }

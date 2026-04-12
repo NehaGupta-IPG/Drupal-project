@@ -764,14 +764,13 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
         }
       }
 
+      if ($this->database->supportsTransactionalDDL()) {
+        // If the database supports transactional DDL, we can go ahead and
+        // rely on it. If not, we will have to rollback manually if something
+        // fails.
+        $transaction = $this->database->startTransaction();
+      }
       try {
-        if ($this->database->supportsTransactionalDDL()) {
-          // If the database supports transactional DDL, we can go ahead and
-          // rely on it. If not, we will have to rollback manually if something
-          // fails.
-          $transaction = $this->database->startTransaction();
-        }
-
         // Copy the data from the base table.
         $this->database->insert($dedicated_table_name)
           ->from($this->getSelectQueryForFieldStorageDeletion($field_table_name, $shared_table_field_columns, $dedicated_table_field_columns))
@@ -795,10 +794,8 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
         }
       }
       catch (\Exception $e) {
-        if ($this->database->supportsTransactionalDDL()) {
-          if (isset($transaction)) {
-            $transaction->rollBack();
-          }
+        if (isset($transaction)) {
+          $transaction->rollBack();
         }
         else {
           // Delete the dedicated tables.
@@ -1735,13 +1732,13 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
   protected function updateDedicatedTableSchema(FieldStorageDefinitionInterface $storage_definition, FieldStorageDefinitionInterface $original) {
     if (!$this->storage->countFieldData($original, TRUE)) {
       // There is no data. Re-create the tables completely.
+      if ($this->database->supportsTransactionalDDL()) {
+        // If the database supports transactional DDL, we can go ahead and
+        // rely on it. If not, we will have to rollback manually if something
+        // fails.
+        $transaction = $this->database->startTransaction();
+      }
       try {
-        if ($this->database->supportsTransactionalDDL()) {
-          // If the database supports transactional DDL, we can go ahead and
-          // rely on it. If not, we will have to rollback manually if something
-          // fails.
-          $transaction = $this->database->startTransaction();
-        }
         // Since there is no data we may be switching from a shared table schema
         // to a dedicated table schema, hence we should use the proper API.
         $this->performFieldSchemaOperation('delete', $original);
@@ -1752,10 +1749,8 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
         }
       }
       catch (\Exception $e) {
-        if ($this->database->supportsTransactionalDDL()) {
-          if (isset($transaction)) {
-            $transaction->rollBack();
-          }
+        if (isset($transaction)) {
+          $transaction->rollBack();
         }
         else {
           // Recreate tables.
@@ -1833,13 +1828,13 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
    */
   protected function updateSharedTableSchema(FieldStorageDefinitionInterface $storage_definition, FieldStorageDefinitionInterface $original) {
     if (!$this->storage->countFieldData($original, TRUE)) {
+      if ($this->database->supportsTransactionalDDL()) {
+        // If the database supports transactional DDL, we can go ahead and
+        // rely on it. If not, we will have to rollback manually if something
+        // fails.
+        $transaction = $this->database->startTransaction();
+      }
       try {
-        if ($this->database->supportsTransactionalDDL()) {
-          // If the database supports transactional DDL, we can go ahead and
-          // rely on it. If not, we will have to rollback manually if something
-          // fails.
-          $transaction = $this->database->startTransaction();
-        }
         // Since there is no data we may be switching from a dedicated table
         // to a schema table schema, hence we should use the proper API.
         $this->performFieldSchemaOperation('delete', $original);
@@ -1850,10 +1845,8 @@ class SqlContentEntityStorageSchema implements DynamicallyFieldableEntityStorage
         }
       }
       catch (\Exception $e) {
-        if ($this->database->supportsTransactionalDDL()) {
-          if (isset($transaction)) {
-            $transaction->rollBack();
-          }
+        if (isset($transaction)) {
+          $transaction->rollBack();
         }
         else {
           // Recreate original schema.

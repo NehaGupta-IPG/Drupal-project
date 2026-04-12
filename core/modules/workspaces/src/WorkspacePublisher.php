@@ -56,8 +56,8 @@ class WorkspacePublisher implements WorkspacePublisherInterface {
       throw new WorkspacePublishException((string) $event->getPublishingStoppedReason());
     }
 
+    $transaction = $this->database->startTransaction();
     try {
-      $transaction = $this->database->startTransaction();
       $this->workspaceManager->executeOutsideWorkspace(function () use ($tracked_entities) {
         $max_execution_time = ini_get('max_execution_time');
         $step_size = Settings::get('entity_update_batch_size', 50);
@@ -103,9 +103,7 @@ class WorkspacePublisher implements WorkspacePublisherInterface {
       $transaction->commitOrRelease();
     }
     catch (\Exception $e) {
-      if (isset($transaction)) {
-        $transaction->rollBack();
-      }
+      $transaction->rollBack();
       Error::logException($this->logger, $e);
       throw $e;
     }
