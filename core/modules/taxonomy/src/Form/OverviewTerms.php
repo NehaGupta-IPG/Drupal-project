@@ -55,10 +55,10 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
   public function __construct(
     ModuleHandlerInterface $module_handler,
     EntityTypeManagerInterface $entity_type_manager,
-    private readonly RendererInterface $renderer,
-    private readonly EntityRepositoryInterface $entityRepository,
-    private readonly PagerManagerInterface $pagerManager,
-    private readonly LanguageManagerInterface $languageManager,
+    protected RendererInterface $renderer,
+    protected EntityRepositoryInterface $entityRepository,
+    protected PagerManagerInterface $pagerManager,
+    protected LanguageManagerInterface $languageManager,
   ) {
     $this->setModuleHandler($module_handler);
     $this->setEntityTypeManager($entity_type_manager);
