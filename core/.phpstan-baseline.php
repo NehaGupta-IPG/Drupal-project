@@ -68,6 +68,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/../composer/Plugin/Scaffold/Operations/AppendOp.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$code of class RuntimeException constructor expects int, array given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/../composer/Plugin/Scaffold/Operations/ReplaceOp.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Composer\\\\Plugin\\\\Scaffold\\\\Operations\\\\ScaffoldFileCollection\\:\\:filterFiles\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -158,6 +164,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/includes/form.inc',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$set_id of function _batch_populate_queue expects string, int\\<0, max\\> given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/includes/form.inc',
+];
+$ignoreErrors[] = [
 	'message' => '#^Variable \\$new_set_index might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 1,
@@ -210,6 +222,18 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/includes/update.inc',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$callback of function set_error_handler expects \\(callable\\(int, string, string, int\\)\\: bool\\)\\|null, \'_drupal_error…\' given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/includes/utility.inc',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$callback of function set_error_handler expects \\(callable\\(int, string, string, int\\)\\: bool\\)\\|null, \'_drupal_error…\' given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/install.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\:\\:setContainer\\(\\) has no return type specified\\.$#',
@@ -321,12 +345,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Component\\\\Datetime\\\\DateTimePlus\\:\\:__callStatic\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Component/Datetime/DateTimePlus.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Component\\\\Datetime\\\\DateTimePlus\\:\\:_die\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Component/Datetime/DateTimePlus.php',
@@ -1556,6 +1574,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Asset/LibraryDiscoveryCollector.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$cid of method Drupal\\\\Core\\\\Cache\\\\CacheCollector\\:\\:__construct\\(\\) expects string, null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Asset/LibraryDiscoveryCollector.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Asset\\\\LibraryDiscoveryParser\\:\\:isValidUri\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -1694,12 +1718,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Block/BlockBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Block\\\\BlockBase\\:\\:traitBuildConfigurationForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Block/BlockBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Block\\\\BlockBase\\:\\:traitSubmitConfigurationForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -1719,12 +1737,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Block\\\\BlockManager\\:\\:processDefinitionCategory\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Block/BlockManager.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Block\\\\BlockManager\\:\\:traitGetSortedDefinitions\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Block/BlockManager.php',
@@ -2828,12 +2840,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Config/ConfigImporter.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\ConfigImporter\\:\\:reInjectMe\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Config/ConfigImporter.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\ConfigImporter\\:\\:setProcessedConfiguration\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -2878,6 +2884,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\ConfigInstaller\\:\\:installOptionalConfig\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Config/ConfigInstaller.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$dependency of method Drupal\\\\Core\\\\Config\\\\ConfigInstaller\\:\\:installOptionalConfig\\(\\) expects array, string given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Config/ConfigInstaller.php',
 ];
@@ -3068,6 +3080,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Config/Entity/ConfigEntityStorage.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$entity of method Drupal\\\\Core\\\\Config\\\\Entity\\\\ConfigEntityStorage\\:\\:updateFromStorageRecord\\(\\) expects Drupal\\\\Core\\\\Config\\\\Entity\\\\ConfigEntityInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Config/Entity/ConfigEntityStorage.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\Entity\\\\ConfigEntityType\\:\\:checkStorageClass\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -3083,6 +3101,12 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\Entity\\\\ConfigEntityUpdater\\:\\:doOne\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Config/Entity/ConfigEntityUpdater.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$entity of method Drupal\\\\Core\\\\Config\\\\Entity\\\\ConfigEntityUpdater\\:\\:doOne\\(\\) expects Drupal\\\\Core\\\\Config\\\\Entity\\\\ConfigEntityInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 2,
 	'path' => __DIR__ . '/lib/Drupal/Core/Config/Entity/ConfigEntityUpdater.php',
 ];
 $ignoreErrors[] = [
@@ -3158,6 +3182,30 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Config/Entity/Query/QueryFactory.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$entity_type of method Drupal\\\\Core\\\\Config\\\\Entity\\\\Query\\\\QueryFactory\\:\\:deleteConfigKeyStore\\(\\) expects Drupal\\\\Core\\\\Config\\\\Entity\\\\ConfigEntityTypeInterface, Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Config/Entity/Query/QueryFactory.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$entity_type of method Drupal\\\\Core\\\\Config\\\\Entity\\\\Query\\\\QueryFactory\\:\\:updateConfigKeyStore\\(\\) expects Drupal\\\\Core\\\\Config\\\\Entity\\\\ConfigEntityTypeInterface, Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Config/Entity/Query/QueryFactory.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$config of method Drupal\\\\Core\\\\Config\\\\Entity\\\\Query\\\\QueryFactory\\:\\:deleteConfigKeyStore\\(\\) expects Drupal\\\\Core\\\\Config\\\\Config, Drupal\\\\Core\\\\Config\\\\StorableConfigBase given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Config/Entity/Query/QueryFactory.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$config of method Drupal\\\\Core\\\\Config\\\\Entity\\\\Query\\\\QueryFactory\\:\\:updateConfigKeyStore\\(\\) expects Drupal\\\\Core\\\\Config\\\\Config, Drupal\\\\Core\\\\Config\\\\StorableConfigBase given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Config/Entity/Query/QueryFactory.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\ExportStorageManager\\:\\:replaceStorageContents\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -3208,6 +3256,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Config\\\\Plugin\\\\Validation\\\\Constraint\\\\ConfigExistsConstraintValidator\\:\\:create\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Config/Plugin/Validation/Constraint/ConfigExistsConstraintValidator.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$data of static method Drupal\\\\Core\\\\Config\\\\Schema\\\\TypeResolver\\:\\:resolveDynamicTypeName\\(\\) expects array, object\\|null given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Config/Plugin/Validation/Constraint/ConfigExistsConstraintValidator.php',
 ];
@@ -3578,6 +3632,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Database/Query/Select.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$type of method Drupal\\\\Core\\\\Database\\\\Query\\\\Select\\:\\:addJoin\\(\\) expects string, null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Database/Query/Select.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Database\\\\Query\\\\SelectExtender\\:\\:__call\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -3720,6 +3780,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Datetime/Entity/DateFormat.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$storage of method Drupal\\\\Core\\\\DefaultContent\\\\ContentExportCommand\\:\\:loadEntities\\(\\) expects Drupal\\\\Core\\\\Entity\\\\ContentEntityStorageInterface, Drupal\\\\Core\\\\Entity\\\\EntityStorageInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/DefaultContent/ContentExportCommand.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\DependencyInjection\\\\Compiler\\\\TaggedHandlersPass\\:\\:processServiceCollectorPass\\(\\) has no return type specified\\.$#',
@@ -3968,6 +4034,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/DrupalKernel.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$callback of function set_error_handler expects \\(callable\\(int, string, string, int\\)\\: bool\\)\\|null, \'_drupal_error…\' given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/DrupalKernel.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Variable \\$container might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 2,
@@ -4155,18 +4227,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Entity\\\\ContentEntityDeleteForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/ContentEntityDeleteForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Entity\\\\ContentEntityDeleteForm\\:\\:traitGetCancelUrl\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Entity/ContentEntityDeleteForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Entity\\\\ContentEntityDeleteForm\\:\\:traitGetQuestion\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/ContentEntityDeleteForm.php',
@@ -4438,6 +4498,18 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Entity\\\\ContentEntityStorageBase\\:\\:setStaticCache\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Entity/ContentEntityStorageBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$entity of method Drupal\\\\Core\\\\Entity\\\\ContentEntityStorageBase\\:\\:initFieldValues\\(\\) expects Drupal\\\\Core\\\\Entity\\\\ContentEntityInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Entity/ContentEntityStorageBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$entity of method Drupal\\\\Core\\\\Entity\\\\ContentEntityStorageBase\\:\\:purgeFieldItems\\(\\) expects Drupal\\\\Core\\\\Entity\\\\ContentEntityInterface, Drupal\\\\Core\\\\Entity\\\\FieldableEntityInterface given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/ContentEntityStorageBase.php',
 ];
@@ -5750,6 +5822,18 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$entity of method Drupal\\\\Core\\\\Entity\\\\Sql\\\\SqlContentEntityStorage\\:\\:mapToStorageRecord\\(\\) expects Drupal\\\\Core\\\\Entity\\\\ContentEntityInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$entity_type of method Drupal\\\\Core\\\\Entity\\\\Sql\\\\SqlContentEntityStorage\\:\\:getCustomTableMapping\\(\\) expects Drupal\\\\Core\\\\Entity\\\\ContentEntityTypeInterface, Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 2,
+	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorage.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Variable \\$transaction in isset\\(\\) always exists and is not nullable\\.$#',
 	'identifier' => 'isset.variable',
 	'count' => 2,
@@ -5974,6 +6058,24 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Entity\\\\Sql\\\\SqlContentEntityStorageSchema\\:\\:updateSharedTableSchema\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorageSchema.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$entity_type of method Drupal\\\\Core\\\\Entity\\\\Sql\\\\SqlContentEntityStorageSchema\\:\\:getEntitySchema\\(\\) expects Drupal\\\\Core\\\\Entity\\\\ContentEntityTypeInterface, Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 4,
+	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorageSchema.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$entity_type of method Drupal\\\\Core\\\\Entity\\\\Sql\\\\SqlContentEntityStorageSchema\\:\\:getEntitySchemaData\\(\\) expects Drupal\\\\Core\\\\Entity\\\\ContentEntityTypeInterface, Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 2,
+	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorageSchema.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$entity_type of method Drupal\\\\Core\\\\Entity\\\\Sql\\\\SqlContentEntityStorageSchema\\:\\:getDedicatedTableSchema\\(\\) expects Drupal\\\\Core\\\\Entity\\\\ContentEntityTypeInterface\\|null, Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Entity/Sql/SqlContentEntityStorageSchema.php',
 ];
@@ -6884,12 +6986,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Field/FieldStorageDefinitionListenerInterface.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Field\\\\FieldTypePluginManager\\:\\:getGroupedDefinitionsTrait\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Field/FieldTypePluginManager.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Field\\\\FieldTypePluginManager\\:\\:processDefinition\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -6940,6 +7036,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Field\\\\Plugin\\\\Field\\\\FieldType\\\\DecimalItem\\:\\:preSave\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Field/Plugin/Field/FieldType/DecimalItem.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$num of function round expects float\\|int, string given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Field/Plugin/Field/FieldType/DecimalItem.php',
 ];
@@ -8276,6 +8378,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Menu/MenuActiveTrail.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$cid of method Drupal\\\\Core\\\\Cache\\\\CacheCollector\\:\\:__construct\\(\\) expects string, null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Menu/MenuActiveTrail.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Menu\\\\MenuLinkBase\\:\\:deleteLink\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -8432,6 +8540,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Menu/MenuTreeStorage.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$menu_name of method Drupal\\\\Core\\\\Menu\\\\MenuTreeStorage\\:\\:loadLinks\\(\\) expects string, null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Menu/MenuTreeStorage.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Variable \\$transaction in isset\\(\\) always exists and is not nullable\\.$#',
 	'identifier' => 'isset.variable',
 	'count' => 1,
@@ -8460,6 +8574,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Menu/Plugin/Block/LocalTasksBlock.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$data of static method Drupal\\\\Core\\\\Config\\\\Schema\\\\TypeResolver\\:\\:resolveDynamicTypeName\\(\\) expects array, object\\|null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Menu/Plugin/Validation/Constraint/MenuLinkDepthConstraintValidator.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Menu\\\\StaticMenuLinkOverrides\\:\\:deleteMultipleOverrides\\(\\) has no return type specified\\.$#',
@@ -8564,24 +8684,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Path/Plugin/Validation/Constraint/ValidPathConstraintValidator.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\PathProcessor\\\\PathProcessorManager\\:\\:addInbound\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/PathProcessor/PathProcessorManager.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\PathProcessor\\\\PathProcessorManager\\:\\:addOutbound\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/PathProcessor/PathProcessorManager.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\PathProcessor\\\\PathProcessorManager\\:\\:sortProcessors\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/PathProcessor/PathProcessorManager.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Plugin\\\\CachedDiscoveryClearer\\:\\:clearCachedDefinitions\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -8608,6 +8710,24 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Plugin\\\\Context\\\\ContextHandler\\:\\:applyContextMapping\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Plugin/Context/ContextHandler.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$callback of function array_filter expects \\(callable\\(Drupal\\\\Component\\\\Plugin\\\\Context\\\\ContextInterface\\)\\: bool\\)\\|null, Closure\\(Drupal\\\\Core\\\\Plugin\\\\Context\\\\ContextInterface\\)\\: bool given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Plugin/Context/ContextHandler.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$definition of method Drupal\\\\Core\\\\Plugin\\\\Context\\\\ContextHandler\\:\\:getMatchingContexts\\(\\) expects Drupal\\\\Core\\\\Plugin\\\\Context\\\\ContextDefinitionInterface, Drupal\\\\Core\\\\TypedData\\\\DataDefinitionInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Plugin/Context/ContextHandler.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$requirements of method Drupal\\\\Core\\\\Plugin\\\\Context\\\\ContextHandler\\:\\:checkRequirements\\(\\) expects array\\<Drupal\\\\Core\\\\TypedData\\\\DataDefinitionInterface\\>, array\\<Drupal\\\\Component\\\\Plugin\\\\Context\\\\ContextDefinitionInterface\\> given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Plugin/Context/ContextHandler.php',
 ];
@@ -8732,6 +8852,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Plugin/Discovery/DirectoryWithMetadataDiscovery.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#3 \\$flags of class RecursiveIteratorIterator constructor expects 0\\|16, 4096 given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Plugin/Discovery/DirectoryWithMetadataDiscovery.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Plugin\\\\Discovery\\\\InfoHookDecorator\\:\\:__call\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -8808,12 +8934,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/ProxyClass/Batch/BatchStorage.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\ProxyClass\\\\File\\\\MimeType\\\\MimeTypeGuesser\\:\\:addMimeTypeGuesser\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/ProxyClass/File/MimeType/MimeTypeGuesser.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\ProxyClass\\\\Lock\\\\DatabaseLockBackend\\:\\:release\\(\\) has no return type specified\\.$#',
@@ -9006,6 +9126,18 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Queue/QueueWorkerManager.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$definition of method Drupal\\\\Core\\\\Recipe\\\\InputConfigurator\\:\\:getDefaultValue\\(\\) expects Drupal\\\\Core\\\\TypedData\\\\DataDefinition, Drupal\\\\Core\\\\TypedData\\\\DataDefinitionInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Recipe/InputConfigurator.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#6 \\$install_profile of class Drupal\\\\Core\\\\Recipe\\\\RecipeConfigInstaller constructor expects string, null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Recipe/RecipeRunner.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Render\\\\BubbleableMetadata\\:\\:applyTo\\(\\) has no return type specified\\.$#',
@@ -9260,19 +9392,7 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/RouteProcessor/RouteProcessorCurrent.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\RouteProcessor\\\\RouteProcessorManager\\:\\:addOutbound\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/RouteProcessor/RouteProcessorManager.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\RouteProcessor\\\\RouteProcessorManager\\:\\:processOutbound\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/RouteProcessor/RouteProcessorManager.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\RouteProcessor\\\\RouteProcessorManager\\:\\:sortProcessors\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/RouteProcessor/RouteProcessorManager.php',
@@ -9728,12 +9848,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/StreamWrapper/StreamWrapperManagerInterface.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup\\:\\:_die\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/StringTranslation/TranslatableMarkup.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\StringTranslation\\\\TranslationManager\\:\\:reset\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -9788,10 +9902,28 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Template/Attribute.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$value of method Drupal\\\\Core\\\\Template\\\\Attribute\\:\\:offsetSet\\(\\) expects Drupal\\\\Core\\\\Template\\\\AttributeValueBase, array given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 2,
+	'path' => __DIR__ . '/lib/Drupal/Core/Template/Attribute.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$value of method Drupal\\\\Core\\\\Template\\\\Attribute\\:\\:offsetSet\\(\\) expects Drupal\\\\Core\\\\Template\\\\AttributeValueBase, array\\|string given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Template/Attribute.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Template\\\\AttributeValueBase\\:\\:value\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Template/AttributeValueBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$expr of class Drupal\\\\Core\\\\Template\\\\TwigSimpleCheckToStringNode constructor expects Twig\\\\Node\\\\Expression\\\\AbstractExpression, Twig\\\\Node\\\\Node given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Template/RemoveCheckToStringNodeVisitor.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Constructor of class Drupal\\\\Core\\\\Template\\\\TwigEnvironment has an unused parameter \\$root\\.$#',
@@ -9813,12 +9945,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Template\\\\TwigExtension\\:\\:bubbleArgMetadata\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/lib/Drupal/Core/Template/TwigExtension.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Core\\\\Template\\\\TwigExtension\\:\\:getName\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Template/TwigExtension.php',
@@ -9858,6 +9984,18 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Test/PerformanceTestRecorder.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$array of function uksort contains unresolvable type\\.$#',
+	'identifier' => 'argument.unresolvableType',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Test/PhpUnitTestDiscovery.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$class_loader of class Drupal\\\\Core\\\\DrupalKernel constructor expects Composer\\\\Autoload\\\\ClassLoader, null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Test/TestKernel.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Constructor of class Drupal\\\\Core\\\\Test\\\\TestRunnerKernel has an unused parameter \\$allow_dumping\\.$#',
@@ -10418,8 +10556,20 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/lib/Drupal/Core/Validation/Plugin/Validation/Constraint/EntityBundleExistsConstraintValidator.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$data of static method Drupal\\\\Core\\\\Config\\\\Schema\\\\TypeResolver\\:\\:resolveDynamicTypeName\\(\\) expects array, object\\|null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Validation/Plugin/Validation/Constraint/EntityBundleExistsConstraintValidator.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Core\\\\Validation\\\\Plugin\\\\Validation\\\\Constraint\\\\UniqueFieldValueValidator\\:\\:create\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/lib/Drupal/Core/Validation/Plugin/Validation/Constraint/UniqueFieldValueValidator.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$array of function key expects array\\|object, string given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/lib/Drupal/Core/Validation/Plugin/Validation/Constraint/UniqueFieldValueValidator.php',
 ];
@@ -10434,6 +10584,24 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/basic_auth/tests/modules/basic_auth_test/src/BasicAuthTestController.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$username of method Drupal\\\\Tests\\\\basic_auth\\\\Functional\\\\BasicAuthTest\\:\\:basicAuthGet\\(\\) expects string, null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/basic_auth/tests/src/Functional/BasicAuthTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#3 \\$password of method Drupal\\\\Tests\\\\basic_auth\\\\Functional\\\\BasicAuthTest\\:\\:basicAuthGet\\(\\) expects string, null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/basic_auth/tests/src/Functional/BasicAuthTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$value of class Symfony\\\\Component\\\\HttpFoundation\\\\Cookie constructor expects string\\|null, true given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/big_pipe/src/Controller/BigPipeController.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\big_pipe\\\\EventSubscriber\\\\HtmlResponseBigPipeSubscriber\\:\\:onRespond\\(\\) has no return type specified\\.$#',
@@ -10592,6 +10760,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/block/src/BlockAccessControlHandler.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$access of method Drupal\\\\block\\\\BlockAccessControlHandler\\:\\:mergeCacheabilityFromConditions\\(\\) expects Drupal\\\\Core\\\\Access\\\\AccessResult, Drupal\\\\Core\\\\Access\\\\AccessResultInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/block/src/BlockAccessControlHandler.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\block\\\\BlockForm\\:\\:form\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -10694,6 +10868,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/block/src/Form/BlockDeleteForm.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$callback of function uasort expects callable\\(Drupal\\\\Core\\\\Entity\\\\EntityInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface\\)\\: int, Closure\\(Drupal\\\\block\\\\BlockInterface, Drupal\\\\block\\\\BlockInterface\\)\\: int\\<\\-1, 1\\> given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/block/src/Plugin/ConfigAction/PlaceBlock.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\block_test\\\\BlockRenderAlterContent\\:\\:preRender\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -10776,60 +10956,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/block/tests/src/Functional/BlockWeightUpdateTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block\\\\Functional\\\\Rest\\\\BlockJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block/tests/src/Functional/Rest/BlockJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block\\\\Functional\\\\Rest\\\\BlockJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block/tests/src/Functional/Rest/BlockJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block\\\\Functional\\\\Rest\\\\BlockJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block/tests/src/Functional/Rest/BlockJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block\\\\Functional\\\\Rest\\\\BlockJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block/tests/src/Functional/Rest/BlockJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block\\\\Functional\\\\Rest\\\\BlockResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block/tests/src/Functional/Rest/BlockResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block\\\\Functional\\\\Rest\\\\BlockXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block/tests/src/Functional/Rest/BlockXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block\\\\Functional\\\\Rest\\\\BlockXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block/tests/src/Functional/Rest/BlockXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block\\\\Functional\\\\Rest\\\\BlockXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block/tests/src/Functional/Rest/BlockXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block\\\\Functional\\\\Rest\\\\BlockXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block/tests/src/Functional/Rest/BlockXmlBasicAuthTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\block\\\\Functional\\\\Views\\\\DisplayBlockTest\\:\\:assertBlockAppears\\(\\) has no return type specified\\.$#',
@@ -10958,6 +11084,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/block_content/src/Plugin/Block/BlockContentBlock.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$callback of function array_filter expects \\(callable\\(Drupal\\\\Core\\\\Entity\\\\EntityInterface\\)\\: bool\\)\\|null, Closure\\(Drupal\\\\block_content\\\\BlockContentInterface\\)\\: bool given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/block_content/src/Plugin/EntityReferenceSelection/BlockContentSelection.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\block_content\\\\Routing\\\\RouteSubscriber\\:\\:alterRoutes\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -11034,114 +11166,6 @@ $ignoreErrors[] = [
 	'identifier' => 'empty.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/PageEditTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block_content\\\\Functional\\\\Rest\\\\BlockContentJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/Rest/BlockContentJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block_content\\\\Functional\\\\Rest\\\\BlockContentJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/Rest/BlockContentJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block_content\\\\Functional\\\\Rest\\\\BlockContentJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/Rest/BlockContentJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block_content\\\\Functional\\\\Rest\\\\BlockContentJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/Rest/BlockContentJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block_content\\\\Functional\\\\Rest\\\\BlockContentResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/Rest/BlockContentResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block_content\\\\Functional\\\\Rest\\\\BlockContentTypeJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/Rest/BlockContentTypeJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block_content\\\\Functional\\\\Rest\\\\BlockContentTypeJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/Rest/BlockContentTypeJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block_content\\\\Functional\\\\Rest\\\\BlockContentTypeJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/Rest/BlockContentTypeJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block_content\\\\Functional\\\\Rest\\\\BlockContentTypeJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/Rest/BlockContentTypeJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block_content\\\\Functional\\\\Rest\\\\BlockContentTypeResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/Rest/BlockContentTypeResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block_content\\\\Functional\\\\Rest\\\\BlockContentTypeXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/Rest/BlockContentTypeXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block_content\\\\Functional\\\\Rest\\\\BlockContentTypeXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/Rest/BlockContentTypeXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block_content\\\\Functional\\\\Rest\\\\BlockContentTypeXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/Rest/BlockContentTypeXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block_content\\\\Functional\\\\Rest\\\\BlockContentTypeXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/Rest/BlockContentTypeXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block_content\\\\Functional\\\\Rest\\\\BlockContentXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/Rest/BlockContentXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block_content\\\\Functional\\\\Rest\\\\BlockContentXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/Rest/BlockContentXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block_content\\\\Functional\\\\Rest\\\\BlockContentXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/Rest/BlockContentXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\block_content\\\\Functional\\\\Rest\\\\BlockContentXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/block_content/tests/src/Functional/Rest/BlockContentXmlBasicAuthTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\block_content\\\\Kernel\\\\BlockContentEntityReferenceSelectionTest\\:\\:fieldConditionProvider\\(\\) has no return type specified\\.$#',
@@ -11378,6 +11402,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/ckeditor5/src/Plugin/Editor/CKEditor5.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$editor_form_state of method Drupal\\\\ckeditor5\\\\Plugin\\\\Editor\\\\CKEditor5\\:\\:getEventualEditorWithPrimedFilterFormat\\(\\) expects Drupal\\\\Core\\\\Form\\\\SubformStateInterface, Drupal\\\\Core\\\\Form\\\\FormStateInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 4,
+	'path' => __DIR__ . '/modules/ckeditor5/src/Plugin/Editor/CKEditor5.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\ckeditor5\\\\Plugin\\\\Validation\\\\Constraint\\\\CKEditor5MediaAndFilterSettingsInSyncConstraintValidator\\:\\:create\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -11546,10 +11576,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/ckeditor5/tests/src/Kernel/CKEditor5PluginManagerTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\ckeditor5\\\\Unit\\\\CKEditor5Test\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/ckeditor5/tests/src/Unit/CKEditor5Test.php',
+	'message' => '#^Parameter \\#2 \\$baseDir of static method org\\\\bovigo\\\\vfs\\\\vfsStream\\:\\:create\\(\\) expects org\\\\bovigo\\\\vfs\\\\vfsStreamDirectory\\|null, org\\\\bovigo\\\\vfs\\\\vfsStreamContent given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/ckeditor5/tests/src/Kernel/CKEditor5PluginManagerTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\comment\\\\CommentForm\\:\\:flagViolations\\(\\) has no return type specified\\.$#',
@@ -11572,6 +11602,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\comment\\\\CommentForm\\:\\:save\\(\\) should return int but return statement is missing\\.$#',
 	'identifier' => 'return.missing',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/comment/src/CommentForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$comment of method Drupal\\\\comment\\\\CommentForm\\:\\:getStatusMessage\\(\\) expects Drupal\\\\comment\\\\CommentInterface, Drupal\\\\Core\\\\Entity\\\\ContentEntityInterface\\|Drupal\\\\Core\\\\Entity\\\\RevisionLogInterface given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/comment/src/CommentForm.php',
 ];
@@ -11918,114 +11954,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/comment/tests/src/Functional/CommentTranslationUITest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Functional\\\\Rest\\\\CommentJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/tests/src/Functional/Rest/CommentJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Functional\\\\Rest\\\\CommentJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/tests/src/Functional/Rest/CommentJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Functional\\\\Rest\\\\CommentJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/tests/src/Functional/Rest/CommentJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Functional\\\\Rest\\\\CommentJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/tests/src/Functional/Rest/CommentJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Functional\\\\Rest\\\\CommentResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/tests/src/Functional/Rest/CommentResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Functional\\\\Rest\\\\CommentTypeJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/tests/src/Functional/Rest/CommentTypeJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Functional\\\\Rest\\\\CommentTypeJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/tests/src/Functional/Rest/CommentTypeJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Functional\\\\Rest\\\\CommentTypeJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/tests/src/Functional/Rest/CommentTypeJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Functional\\\\Rest\\\\CommentTypeJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/tests/src/Functional/Rest/CommentTypeJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Functional\\\\Rest\\\\CommentTypeResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/tests/src/Functional/Rest/CommentTypeResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Functional\\\\Rest\\\\CommentTypeXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/tests/src/Functional/Rest/CommentTypeXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Functional\\\\Rest\\\\CommentTypeXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/tests/src/Functional/Rest/CommentTypeXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Functional\\\\Rest\\\\CommentTypeXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/tests/src/Functional/Rest/CommentTypeXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Functional\\\\Rest\\\\CommentTypeXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/tests/src/Functional/Rest/CommentTypeXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Functional\\\\Rest\\\\CommentXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/tests/src/Functional/Rest/CommentXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Functional\\\\Rest\\\\CommentXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/tests/src/Functional/Rest/CommentXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Functional\\\\Rest\\\\CommentXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/tests/src/Functional/Rest/CommentXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Functional\\\\Rest\\\\CommentXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/comment/tests/src/Functional/Rest/CommentXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\comment\\\\Kernel\\\\CommentOrphanTest\\:\\:providerTestOrphan\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -12282,60 +12210,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/config/tests/config_test/src/SchemaListenerController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\config_test\\\\Functional\\\\Rest\\\\ConfigTestJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/config/tests/config_test/tests/src/Functional/Rest/ConfigTestJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\config_test\\\\Functional\\\\Rest\\\\ConfigTestJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/config/tests/config_test/tests/src/Functional/Rest/ConfigTestJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\config_test\\\\Functional\\\\Rest\\\\ConfigTestJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/config/tests/config_test/tests/src/Functional/Rest/ConfigTestJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\config_test\\\\Functional\\\\Rest\\\\ConfigTestJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/config/tests/config_test/tests/src/Functional/Rest/ConfigTestJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\config_test\\\\Functional\\\\Rest\\\\ConfigTestResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/config/tests/config_test/tests/src/Functional/Rest/ConfigTestResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\config_test\\\\Functional\\\\Rest\\\\ConfigTestXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/config/tests/config_test/tests/src/Functional/Rest/ConfigTestXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\config_test\\\\Functional\\\\Rest\\\\ConfigTestXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/config/tests/config_test/tests/src/Functional/Rest/ConfigTestXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\config_test\\\\Functional\\\\Rest\\\\ConfigTestXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/config/tests/config_test/tests/src/Functional/Rest/ConfigTestXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\config_test\\\\Functional\\\\Rest\\\\ConfigTestXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/config/tests/config_test/tests/src/Functional/Rest/ConfigTestXmlBasicAuthTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\config_transformer_test\\\\EventSubscriber\\:\\:onExportTransform\\(\\) has no return type specified\\.$#',
@@ -12650,6 +12524,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/content_moderation/src/EntityOperations.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$content_moderation_state of static method Drupal\\\\content_moderation\\\\Entity\\\\ContentModerationState\\:\\:updateOrCreateFromEntity\\(\\) expects Drupal\\\\content_moderation\\\\Entity\\\\ContentModerationState, Drupal\\\\content_moderation\\\\Entity\\\\ContentModerationStateInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/content_moderation/src/EntityOperations.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\content_moderation\\\\EntityTypeInfo\\:\\:bundleFormRedirect\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -12680,10 +12560,22 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/content_moderation/src/EntityTypeInfo.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$type of method Drupal\\\\content_moderation\\\\EntityTypeInfo\\:\\:addModerationToEntityType\\(\\) expects Drupal\\\\Core\\\\Entity\\\\ContentEntityTypeInterface, Drupal\\\\Core\\\\Entity\\\\EntityTypeInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/content_moderation/src/EntityTypeInfo.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\content_moderation\\\\EventSubscriber\\\\ConfigImportSubscriber\\:\\:onConfigImporterValidate\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/content_moderation/src/EventSubscriber/ConfigImportSubscriber.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$callback of function array_map expects \\(callable\\(Drupal\\\\workflows\\\\StateInterface\\)\\: mixed\\)\\|null, Closure\\(Drupal\\\\content_moderation\\\\ContentModerationState\\)\\: \\(string\\|null\\) given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/content_moderation/src/EventSubscriber/WorkspaceSubscriber.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\content_moderation\\\\Form\\\\ContentModerationConfigureEntityTypesForm\\:\\:getTitle\\(\\) has no return type specified\\.$#',
@@ -12770,14 +12662,14 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/content_moderation/src/Plugin/Field/ModerationStateFieldItemList.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\content_moderation\\\\Plugin\\\\Field\\\\ModerationStateFieldItemList\\:\\:traitGet\\(\\) has no return type specified\\.$#',
+	'message' => '#^Method Drupal\\\\content_moderation\\\\Plugin\\\\Field\\\\ModerationStateFieldItemList\\:\\:updateModeratedEntity\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/content_moderation/src/Plugin/Field/ModerationStateFieldItemList.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\content_moderation\\\\Plugin\\\\Field\\\\ModerationStateFieldItemList\\:\\:updateModeratedEntity\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
+	'message' => '#^Parameter \\#1 \\$entity of method Drupal\\\\content_moderation\\\\Plugin\\\\Field\\\\ModerationStateFieldItemList\\:\\:loadContentModerationStateRevision\\(\\) expects Drupal\\\\Core\\\\Entity\\\\ContentEntityInterface, Drupal\\\\Core\\\\Entity\\\\FieldableEntityInterface given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/content_moderation/src/Plugin/Field/ModerationStateFieldItemList.php',
 ];
@@ -12854,6 +12746,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/content_moderation/src/Routing/ContentModerationRouteSubscriber.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$callback of function array_filter expects \\(callable\\(Drupal\\\\workflows\\\\TransitionInterface\\)\\: bool\\)\\|null, Closure\\(Drupal\\\\workflows\\\\Transition\\)\\: bool given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/content_moderation/src/StateTransitionValidation.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\content_moderation\\\\Functional\\\\ModerationStateTestBase\\:\\:createContentTypeFromUi\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -12906,6 +12804,18 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/content_moderation/tests/src/Kernel/ContentModerationStateTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$revision_id of method Drupal\\\\Tests\\\\content_moderation\\\\Kernel\\\\ContentModerationStateTest\\:\\:reloadEntity\\(\\) expects bool\\|int, string given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/content_moderation/tests/src/Kernel/ContentModerationStateTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$entity of method Drupal\\\\Tests\\\\content_moderation\\\\Kernel\\\\ContentModerationSyncingTest\\:\\:getAllRevisionNames\\(\\) expects Drupal\\\\entity_test\\\\Entity\\\\EntityTestMulRevPub, Drupal\\\\block_content\\\\Entity\\\\BlockContent\\|null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/content_moderation/tests/src/Kernel/ContentModerationSyncingTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\content_moderation\\\\Kernel\\\\EntityStateChangeValidationTest\\:\\:transitionAccessValidationTestCases\\(\\) has no return type specified\\.$#',
@@ -12966,6 +12876,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/content_moderation/tests/src/Unit/LatestRevisionCheckTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$bundle_info of class Drupal\\\\content_moderation\\\\ModerationInformation constructor expects Drupal\\\\Core\\\\Entity\\\\EntityTypeBundleInfoInterface, Drupal\\\\Core\\\\Entity\\\\EntityTypeManagerInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 4,
+	'path' => __DIR__ . '/modules/content_moderation/tests/src/Unit/ModerationInformationTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\content_moderation\\\\Unit\\\\StateTransitionValidationTest\\:\\:userTransitionsProvider\\(\\) has no return type specified\\.$#',
@@ -13094,6 +13010,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/content_translation/src/Controller/ContentTranslationController.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$entity of method Drupal\\\\content_translation\\\\Controller\\\\ContentTranslationController\\:\\:prepareTranslation\\(\\) expects Drupal\\\\Core\\\\Entity\\\\ContentEntityInterface, Drupal\\\\Core\\\\Entity\\\\RevisionableInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/content_translation/src/Controller/ContentTranslationController.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Variable \\$source_name might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 1,
@@ -13142,6 +13064,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/content_translation/tests/src/Functional/ContentTranslationLanguageChangeTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$entity of method Drupal\\\\Tests\\\\content_translation\\\\Functional\\\\ContentTranslationPendingRevisionTestBase\\:\\:getEditUrl\\(\\) expects Drupal\\\\Core\\\\Entity\\\\ContentEntityInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface\\|null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/content_translation/tests/src/Functional/ContentTranslationOutdatedRevisionTranslationTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\content_translation\\\\Functional\\\\ContentTranslationPendingRevisionTestBase\\:\\:enableContentModeration\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -13164,6 +13092,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/content_translation/tests/src/Functional/ContentTranslationPendingRevisionTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$entity of method Drupal\\\\Tests\\\\content_translation\\\\Functional\\\\ContentTranslationPendingRevisionTestBase\\:\\:loadRevisionTranslation\\(\\) expects Drupal\\\\Core\\\\Entity\\\\ContentEntityInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface\\|null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 9,
+	'path' => __DIR__ . '/modules/content_translation/tests/src/Functional/ContentTranslationRevisionTranslationDeletionTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\content_translation\\\\Functional\\\\ContentTranslationTestBase\\:\\:enableTranslation\\(\\) has no return type specified\\.$#',
@@ -13283,6 +13217,12 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\content_translation\\\\Functional\\\\ContentTranslationUITestBase\\:\\:getNewEntityValues\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
+	'path' => __DIR__ . '/modules/content_translation/tests/src/Functional/ContentTranslationUITestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$translation of method Drupal\\\\Tests\\\\content_translation\\\\Functional\\\\ContentTranslationUITestBase\\:\\:getValue\\(\\) expects Drupal\\\\Core\\\\Entity\\\\EntityInterface, Drupal\\\\Core\\\\TypedData\\\\TranslatableInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 2,
 	'path' => __DIR__ . '/modules/content_translation/tests/src/Functional/ContentTranslationUITestBase.php',
 ];
 $ignoreErrors[] = [
@@ -13406,30 +13346,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/datetime/tests/src/Functional/DateTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\datetime\\\\Functional\\\\EntityResource\\\\EntityTest\\\\EntityTestDateOnlyTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/datetime/tests/src/Functional/EntityResource/EntityTest/EntityTestDateOnlyTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\datetime\\\\Functional\\\\EntityResource\\\\EntityTest\\\\EntityTestDateOnlyTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/datetime/tests/src/Functional/EntityResource/EntityTest/EntityTestDateOnlyTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\datetime\\\\Functional\\\\EntityResource\\\\EntityTest\\\\EntityTestDatetimeTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/datetime/tests/src/Functional/EntityResource/EntityTest/EntityTestDatetimeTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\datetime\\\\Functional\\\\EntityResource\\\\EntityTest\\\\EntityTestDatetimeTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/datetime/tests/src/Functional/EntityResource/EntityTest/EntityTestDatetimeTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\datetime\\\\Kernel\\\\DateTimeFormInjectionTest\\:\\:validateForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -13478,16 +13394,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/datetime_range/src/Plugin/Field/FieldWidget/DateRangeWidgetBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\datetime_range\\\\Functional\\\\EntityResource\\\\EntityTest\\\\EntityTestDateRangeTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
+	'message' => '#^Parameter \\#2 \\$query of method Drupal\\\\dblog\\\\Controller\\\\DbLogController\\:\\:addFilterToQuery\\(\\) expects Drupal\\\\Core\\\\Database\\\\Query\\\\SelectInterface, Drupal\\\\Core\\\\Database\\\\Query\\\\ExtendableInterface given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/datetime_range/tests/src/Functional/EntityResource/EntityTest/EntityTestDateRangeTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\datetime_range\\\\Functional\\\\EntityResource\\\\EntityTest\\\\EntityTestDateRangeTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/datetime_range/tests/src/Functional/EntityResource/EntityTest/EntityTestDateRangeTest.php',
+	'path' => __DIR__ . '/modules/dblog/src/Controller/DbLogController.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\dblog\\\\Form\\\\DblogClearLogConfirmForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
@@ -13564,6 +13474,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\dblog\\\\Functional\\\\DbLogTest\\:\\:generateLogEntries\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/dblog/tests/src/Functional/DbLogTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$severity of method Drupal\\\\Tests\\\\dblog\\\\Functional\\\\DbLogTest\\:\\:filterLogsEntries\\(\\) expects string\\|null, int\\<0, max\\> given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/dblog/tests/src/Functional/DbLogTest.php',
 ];
@@ -13646,58 +13562,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/editor/tests/modules/editor_test/src/Plugin/Editor/UnicornEditor.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\editor\\\\Functional\\\\Rest\\\\EditorJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
+	'message' => '#^Parameter \\#1 \\$expected of method PHPUnit\\\\Framework\\\\Assert\\:\\:assertSame\\(\\) contains unresolvable type\\.$#',
+	'identifier' => 'argument.unresolvableType',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/editor/tests/src/Functional/Rest/EditorJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\editor\\\\Functional\\\\Rest\\\\EditorJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/editor/tests/src/Functional/Rest/EditorJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\editor\\\\Functional\\\\Rest\\\\EditorJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/editor/tests/src/Functional/Rest/EditorJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\editor\\\\Functional\\\\Rest\\\\EditorJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/editor/tests/src/Functional/Rest/EditorJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\editor\\\\Functional\\\\Rest\\\\EditorResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/editor/tests/src/Functional/Rest/EditorResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\editor\\\\Functional\\\\Rest\\\\EditorXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/editor/tests/src/Functional/Rest/EditorXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\editor\\\\Functional\\\\Rest\\\\EditorXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/editor/tests/src/Functional/Rest/EditorXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\editor\\\\Functional\\\\Rest\\\\EditorXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/editor/tests/src/Functional/Rest/EditorXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\editor\\\\Functional\\\\Rest\\\\EditorXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/editor/tests/src/Functional/Rest/EditorXmlBasicAuthTest.php',
+	'path' => __DIR__ . '/modules/editor/tests/src/Kernel/EditorManagerTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\editor\\\\Unit\\\\EditorXssFilter\\\\StandardTest\\:\\:providerTestFilterXss\\(\\) has no return type specified\\.$#',
@@ -13904,114 +13772,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/field/tests/src/Functional/ReEnableModuleFieldTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\Rest\\\\FieldConfigJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Functional/Rest/FieldConfigJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\Rest\\\\FieldConfigJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Functional/Rest/FieldConfigJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\Rest\\\\FieldConfigJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Functional/Rest/FieldConfigJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\Rest\\\\FieldConfigJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Functional/Rest/FieldConfigJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\Rest\\\\FieldConfigResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Functional/Rest/FieldConfigResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\Rest\\\\FieldConfigXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Functional/Rest/FieldConfigXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\Rest\\\\FieldConfigXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Functional/Rest/FieldConfigXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\Rest\\\\FieldConfigXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Functional/Rest/FieldConfigXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\Rest\\\\FieldConfigXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Functional/Rest/FieldConfigXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\Rest\\\\FieldStorageConfigJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Functional/Rest/FieldStorageConfigJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\Rest\\\\FieldStorageConfigJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Functional/Rest/FieldStorageConfigJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\Rest\\\\FieldStorageConfigJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Functional/Rest/FieldStorageConfigJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\Rest\\\\FieldStorageConfigJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Functional/Rest/FieldStorageConfigJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\Rest\\\\FieldStorageConfigResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Functional/Rest/FieldStorageConfigResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\Rest\\\\FieldStorageConfigXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Functional/Rest/FieldStorageConfigXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\Rest\\\\FieldStorageConfigXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Functional/Rest/FieldStorageConfigXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\Rest\\\\FieldStorageConfigXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Functional/Rest/FieldStorageConfigXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\Rest\\\\FieldStorageConfigXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/field/tests/src/Functional/Rest/FieldStorageConfigXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Functional\\\\Views\\\\FieldTestBase\\:\\:setUpFieldStorages\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -14024,10 +13784,22 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/field/tests/src/Functional/Views/FieldTestBase.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$expected of method PHPUnit\\\\Framework\\\\Assert\\:\\:assertSameSize\\(\\) expects Countable\\|iterable, string given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/field/tests/src/Kernel/BulkDeleteTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Variable \\$values might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/field/tests/src/Kernel/FieldAttachStorageTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#3 \\$field_definition of method Drupal\\\\Tests\\\\field\\\\Kernel\\\\FieldDefinitionIntegrityTest\\:\\:checkDisplayOption\\(\\) expects Drupal\\\\Core\\\\Field\\\\BaseFieldDefinition, Drupal\\\\Core\\\\Field\\\\FieldDefinitionInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/field/tests/src/Kernel/FieldDefinitionIntegrityTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Kernel\\\\FieldKernelTestBase\\:\\:assertFieldValues\\(\\) has no return type specified\\.$#',
@@ -14046,6 +13818,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/field/tests/src/Kernel/FieldKernelTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$element of static method Drupal\\\\Core\\\\Field\\\\Plugin\\\\Field\\\\FieldType\\\\NumericItemBase\\:\\:validateMinAndMaxConfig\\(\\) expects array\\<array\\>, array\\<string, float\\|int\\|list\\<list\\<string\\>\\>\\|string\\> given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/field/tests/src/Kernel/Number/NumberItemTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\field\\\\Unit\\\\DependencyFieldItem\\:\\:calculateDependencies\\(\\) has no return type specified\\.$#',
@@ -14246,6 +14024,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/field_ui/src/Form/FieldConfigEditForm.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$field_config of method Drupal\\\\field_ui\\\\Form\\\\FieldConfigEditForm\\:\\:getTypedData\\(\\) expects Drupal\\\\field\\\\FieldConfigInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/field_ui/src/Form/FieldConfigEditForm.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\field_ui\\\\Form\\\\FieldStorageAddForm\\:\\:rebuildWithOptions\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -14438,6 +14222,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/file/src/EventSubscriber/FileEventSubscriber.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#4 \\$field_type of function file_get_file_references expects string, null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/file/src/FileAccessControlHandler.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\file\\\\FileInterface\\:\\:setFileUri\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -14514,6 +14304,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/file/src/FileUsage/FileUsageInterface.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#4 \\$field_type of function file_get_file_references expects string, null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/file/src/Hook/FileDownloadHook.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$rows in empty\\(\\) always exists and is not falsy\\.$#',
@@ -14750,6 +14546,18 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileFieldTestBase.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$string of static method Drupal\\\\Component\\\\Serialization\\\\Json\\:\\:decode\\(\\) expects string, Psr\\\\Http\\\\Message\\\\StreamInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileFieldWidgetTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#4 \\$new_revision of method Drupal\\\\Tests\\\\file\\\\Functional\\\\FileFieldTestBase\\:\\:uploadNodeFile\\(\\) expects bool, int given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileFieldWidgetTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\FileManagedTestBase\\:\\:assertDifferentFile\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -14786,76 +14594,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileManagedTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\FileUploadJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileUploadJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\FileUploadJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/src/Functional/FileUploadJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\Rest\\\\FileJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/src/Functional/Rest/FileJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\Rest\\\\FileJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/src/Functional/Rest/FileJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\Rest\\\\FileJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/src/Functional/Rest/FileJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\Rest\\\\FileJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/src/Functional/Rest/FileJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\Rest\\\\FileResourceTestBase\\:\\:makeCurrentUserFileOwner\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/file/tests/src/Functional/Rest/FileResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\Rest\\\\FileResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/src/Functional/Rest/FileResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\Rest\\\\FileXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/src/Functional/Rest/FileXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\Rest\\\\FileXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/src/Functional/Rest/FileXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\Rest\\\\FileXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/src/Functional/Rest/FileXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\Functional\\\\Rest\\\\FileXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/file/tests/src/Functional/Rest/FileXmlBasicAuthTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\file\\\\FunctionalJavascript\\\\FileFieldValidateTest\\:\\:attachFileField\\(\\) has no return type specified\\.$#',
@@ -15134,6 +14876,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/filter/src/Form/FilterDisableForm.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$logger of static method Drupal\\\\Core\\\\Utility\\\\Error\\:\\:logException\\(\\) expects Psr\\\\Log\\\\LoggerInterface, string given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/filter/src/Plugin/Filter/EntityLinks.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\filter\\\\Plugin\\\\Filter\\\\FilterHtml\\:\\:filterElementAttributes\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -15142,6 +14890,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\filter\\\\Plugin\\\\Filter\\\\FilterHtml\\:\\:setConfiguration\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/filter/src/Plugin/Filter/FilterHtml.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$element of method Drupal\\\\filter\\\\Plugin\\\\Filter\\\\FilterHtml\\:\\:filterElementAttributes\\(\\) expects DOMElement, DOMNameSpaceNode\\|DOMNode given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/filter/src/Plugin/Filter/FilterHtml.php',
 ];
@@ -15162,72 +14916,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/filter/tests/filter_test/src/Form/FilterTestFormatForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\filter\\\\Functional\\\\Rest\\\\FilterFormatJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/tests/src/Functional/Rest/FilterFormatJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\filter\\\\Functional\\\\Rest\\\\FilterFormatJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/tests/src/Functional/Rest/FilterFormatJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\filter\\\\Functional\\\\Rest\\\\FilterFormatJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/tests/src/Functional/Rest/FilterFormatJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\filter\\\\Functional\\\\Rest\\\\FilterFormatJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/tests/src/Functional/Rest/FilterFormatJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\filter\\\\Functional\\\\Rest\\\\FilterFormatResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/tests/src/Functional/Rest/FilterFormatResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\filter\\\\Functional\\\\Rest\\\\FilterFormatXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/tests/src/Functional/Rest/FilterFormatXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\filter\\\\Functional\\\\Rest\\\\FilterFormatXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/tests/src/Functional/Rest/FilterFormatXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\filter\\\\Functional\\\\Rest\\\\FilterFormatXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/tests/src/Functional/Rest/FilterFormatXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\filter\\\\Functional\\\\Rest\\\\FilterFormatXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/tests/src/Functional/Rest/FilterFormatXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\filter\\\\Kernel\\\\EntityLinksTest\\:\\:assertPathAliasExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/tests/src/Kernel/EntityLinksTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\filter\\\\Kernel\\\\EntityLinksTest\\:\\:assertPathAliasNotExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/filter/tests/src/Kernel/EntityLinksTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\filter\\\\Kernel\\\\TextFormatElementFormTest\\:\\:submitForm\\(\\) has no return type specified\\.$#',
@@ -15336,6 +15024,12 @@ $ignoreErrors[] = [
 	'identifier' => 'empty.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/help/tests/src/Functional/HelpTopicTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$module_handler of class Drupal\\\\help\\\\HelpTopicTwigLoader constructor expects Drupal\\\\Core\\\\Extension\\\\ModuleHandlerInterface, Drupal\\\\Core\\\\Extension\\\\ThemeHandlerInterface\\|Prophecy\\\\Prophecy\\\\ObjectProphecy given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/help/tests/src/Unit/HelpTopicTwigLoaderTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\help\\\\Unit\\\\HelpTopicTwigTest\\:\\:getTwigMock\\(\\) has no return type specified\\.$#',
@@ -15614,6 +15308,18 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/image/src/Plugin/ImageEffect/RotateImageEffect.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$min of function rand expects int, float given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/image/src/Plugin/ImageEffect/RotateImageEffect.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$max of function rand expects int, float given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/image/src/Plugin/ImageEffect/RotateImageEffect.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\image\\\\Plugin\\\\ImageEffect\\\\ScaleImageEffect\\:\\:submitConfigurationForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -15698,6 +15404,18 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/image/tests/src/Functional/ImageFieldTestBase.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$min_resolution of method Drupal\\\\Tests\\\\image\\\\Functional\\\\ImageFieldValidateTest\\:\\:getFieldSettings\\(\\) expects array\\<int\\>, array\\<string, int\\|null\\> given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/image/tests/src/Functional/ImageFieldValidateTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$max_resolution of method Drupal\\\\Tests\\\\image\\\\Functional\\\\ImageFieldValidateTest\\:\\:getFieldSettings\\(\\) expects array\\<int\\>, array\\<string, int\\|null\\> given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/image/tests/src/Functional/ImageFieldValidateTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Variable \\$image_that_is_too_small_file might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 2,
@@ -15722,60 +15440,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/image/tests/src/Functional/ImageStyleFlushTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\image\\\\Functional\\\\Rest\\\\ImageStyleJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/image/tests/src/Functional/Rest/ImageStyleJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\image\\\\Functional\\\\Rest\\\\ImageStyleJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/image/tests/src/Functional/Rest/ImageStyleJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\image\\\\Functional\\\\Rest\\\\ImageStyleJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/image/tests/src/Functional/Rest/ImageStyleJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\image\\\\Functional\\\\Rest\\\\ImageStyleJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/image/tests/src/Functional/Rest/ImageStyleJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\image\\\\Functional\\\\Rest\\\\ImageStyleResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/image/tests/src/Functional/Rest/ImageStyleResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\image\\\\Functional\\\\Rest\\\\ImageStyleXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/image/tests/src/Functional/Rest/ImageStyleXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\image\\\\Functional\\\\Rest\\\\ImageStyleXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/image/tests/src/Functional/Rest/ImageStyleXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\image\\\\Functional\\\\Rest\\\\ImageStyleXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/image/tests/src/Functional/Rest/ImageStyleXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\image\\\\Functional\\\\Rest\\\\ImageStyleXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/image/tests/src/Functional/Rest/ImageStyleXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\image\\\\FunctionalJavascript\\\\ImageFieldTestBase\\:\\:createImageField\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -15791,6 +15455,12 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\image\\\\Unit\\\\ImageStyleTest\\:\\:fileDefaultScheme\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
+	'path' => __DIR__ . '/modules/image/tests/src/Unit/ImageStyleTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$image_effect of method Drupal\\\\Tests\\\\image\\\\Unit\\\\ImageStyleTest\\:\\:getImageStyleMock\\(\\) expects Drupal\\\\image\\\\ImageEffectInterface&PHPUnit\\\\Framework\\\\MockObject\\\\MockObject, Drupal\\\\image\\\\ImageEffectBase&PHPUnit\\\\Framework\\\\MockObject\\\\Stub given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 5,
 	'path' => __DIR__ . '/modules/image/tests/src/Unit/ImageStyleTest.php',
 ];
 $ignoreErrors[] = [
@@ -15860,6 +15530,18 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/jsonapi/src/Access/TemporaryQueryGuard.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$callback of function array_map expects \\(callable\\(Drupal\\\\Core\\\\TypedData\\\\ComplexDataDefinitionInterface\\)\\: mixed\\)\\|null, Closure\\(Drupal\\\\Core\\\\Field\\\\TypedData\\\\FieldItemDataDefinitionInterface\\)\\: mixed given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/src/Context/FieldResolver.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$definitions of method Drupal\\\\jsonapi\\\\Context\\\\FieldResolver\\:\\:getRelatableResourceTypes\\(\\) expects array\\<Drupal\\\\Core\\\\Field\\\\TypedData\\\\FieldItemDataDefinitionInterface\\>, array\\<Drupal\\\\Core\\\\TypedData\\\\ComplexDataDefinitionInterface\\> given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/src/Context/FieldResolver.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Variable \\$reason in empty\\(\\) always exists and is not falsy\\.$#',
 	'identifier' => 'empty.variable',
 	'count' => 1,
@@ -15887,6 +15569,60 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\jsonapi\\\\Controller\\\\EntityResource\\:\\:validate\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/src/Controller/EntityResource.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$entity of method Drupal\\\\jsonapi\\\\Controller\\\\EntityResource\\:\\:entityExists\\(\\) expects Drupal\\\\Core\\\\Entity\\\\EntityInterface, array given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/src/Controller/EntityResource.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$entity of static method Drupal\\\\jsonapi\\\\Controller\\\\EntityResource\\:\\:validate\\(\\) expects Drupal\\\\Core\\\\Entity\\\\EntityInterface, array given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/src/Controller/EntityResource.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$received_resource_identifiers of static method Drupal\\\\jsonapi\\\\Controller\\\\EntityResource\\:\\:relationshipResponseRequiresBody\\(\\) expects array, Drupal\\\\Core\\\\Field\\\\EntityReferenceFieldItemListInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/src/Controller/EntityResource.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$entity of static method Drupal\\\\jsonapi\\\\JsonApiResource\\\\ResourceObject\\:\\:createFromEntity\\(\\) expects Drupal\\\\Core\\\\Entity\\\\EntityInterface, array given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/src/Controller/EntityResource.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$includes of method Drupal\\\\jsonapi\\\\Controller\\\\EntityResource\\:\\:respondWithCollection\\(\\) expects Drupal\\\\jsonapi\\\\JsonApiResource\\\\IncludedData, Drupal\\\\jsonapi\\\\JsonApiResource\\\\Data given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/src/Controller/EntityResource.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$origin of method Drupal\\\\jsonapi\\\\Controller\\\\EntityResource\\:\\:updateEntityField\\(\\) expects Drupal\\\\Core\\\\Entity\\\\EntityInterface, array given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/src/Controller/EntityResource.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$resource_identifiers of method Drupal\\\\jsonapi\\\\Controller\\\\EntityResource\\:\\:doPatchIndividualRelationship\\(\\) expects array\\<Drupal\\\\jsonapi\\\\JsonApiResource\\\\ResourceIdentifier\\>, Drupal\\\\Core\\\\Field\\\\EntityReferenceFieldItemListInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/src/Controller/EntityResource.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$resource_identifiers of method Drupal\\\\jsonapi\\\\Controller\\\\EntityResource\\:\\:doPatchMultipleRelationship\\(\\) expects array\\<Drupal\\\\jsonapi\\\\JsonApiResource\\\\ResourceIdentifier\\>, Drupal\\\\Core\\\\Field\\\\EntityReferenceFieldItemListInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/src/Controller/EntityResource.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#3 \\$includes of method Drupal\\\\jsonapi\\\\Controller\\\\EntityResource\\:\\:buildWrappedResponse\\(\\) expects Drupal\\\\jsonapi\\\\JsonApiResource\\\\IncludedData, Drupal\\\\jsonapi\\\\JsonApiResource\\\\Data given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 5,
 	'path' => __DIR__ . '/modules/jsonapi/src/Controller/EntityResource.php',
 ];
 $ignoreErrors[] = [
@@ -16010,6 +15746,24 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/jsonapi/src/JsonApiResource/LabelOnlyResourceObject.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$array of function array_reduce expects array\\<Drupal\\\\jsonapi\\\\JsonApiResource\\\\Link\\>, Drupal\\\\jsonapi\\\\JsonApiResource\\\\Link given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/jsonapi/src/JsonApiResource/LinkCollection.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$links of class Drupal\\\\jsonapi\\\\JsonApiResource\\\\LinkCollection constructor expects array\\<Drupal\\\\jsonapi\\\\JsonApiResource\\\\Link\\>, array\\<string, list\\<Drupal\\\\jsonapi\\\\JsonApiResource\\\\Link\\>\\> given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/src/JsonApiResource/LinkCollection.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#3 \\$deserialization_target_class of class Drupal\\\\jsonapi\\\\ResourceType\\\\ResourceType constructor expects class\\-string, string given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/src/JsonApiResource/ResourceIdentifier.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\jsonapi\\\\JsonapiServiceProvider\\:\\:alter\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -16106,8 +15860,20 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/jsonapi/src/Normalizer/JsonApiDocumentTopLevelNormalizer.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$callback of function array_map expects \\(callable\\(Drupal\\\\jsonapi\\\\JsonApiResource\\\\ResourceIdentifierInterface\\)\\: mixed\\)\\|null, Closure\\(Symfony\\\\Component\\\\HttpKernel\\\\Exception\\\\HttpExceptionInterface\\)\\: mixed given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/src/Normalizer/JsonApiDocumentTopLevelNormalizer.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\jsonapi\\\\Normalizer\\\\LinkCollectionNormalizer\\:\\:normalize\\(\\) return type with generic class ArrayObject does not specify its types\\: TKey, TValue$#',
 	'identifier' => 'missingType.generics',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/src/Normalizer/LinkCollectionNormalizer.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$value of function count expects array\\|Countable, Drupal\\\\jsonapi\\\\JsonApiResource\\\\Link given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/jsonapi/src/Normalizer/LinkCollectionNormalizer.php',
 ];
@@ -16168,6 +15934,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\jsonapi\\\\ResourceType\\\\ResourceType\\:\\:setRelatableResourceTypes\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/src/ResourceType/ResourceType.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$callback of function array_filter expects \\(callable\\(string\\)\\: bool\\)\\|null, Closure\\(Drupal\\\\jsonapi\\\\ResourceType\\\\ResourceTypeField\\)\\: bool given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/jsonapi/src/ResourceType/ResourceType.php',
 ];
@@ -16250,6 +16022,18 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/jsonapi/src/Serializer/Serializer.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$route_name of static method Drupal\\\\Tests\\\\jsonapi_response_validator\\\\Unit\\\\EventSubscriber\\\\ResourceResponseValidatorTest\\:\\:createRequest\\(\\) expects string, bool given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/tests/modules/jsonapi_response_validator/tests/src/Unit/EventSubscriber/ResourceResponseValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$resource_type of static method Drupal\\\\Tests\\\\jsonapi_response_validator\\\\Unit\\\\EventSubscriber\\\\ResourceResponseValidatorTest\\:\\:createRequest\\(\\) expects Drupal\\\\jsonapi\\\\ResourceType\\\\ResourceType, string given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/tests/modules/jsonapi_response_validator/tests/src/Unit/EventSubscriber/ResourceResponseValidatorTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\jsonapi_test_data_type\\\\Normalizer\\\\StringNormalizer\\:\\:normalize\\(\\) return type with generic class ArrayObject does not specify its types\\: TKey, TValue$#',
 	'identifier' => 'missingType.generics',
 	'count' => 1,
@@ -16290,6 +16074,18 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/jsonapi/tests/modules/jsonapi_test_resource_type_building/src/EventSubscriber/ResourceTypeBuildEventSubscriber.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$view_permission of method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\BlockContentTest\\:\\:doTestCollectionFilterAccessForPublishableEntities\\(\\) expects string, null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/BlockContentTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$file_contents of method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\FileUploadTest\\:\\:fileRequest\\(\\) expects string, null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/FileUploadTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\InternalEntitiesTest\\:\\:jsonapiGet\\(\\) has no return type specified\\.$#',
@@ -16424,6 +16220,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$string of static method Drupal\\\\Component\\\\Serialization\\\\Json\\:\\:decode\\(\\) expects string, Psr\\\\Http\\\\Message\\\\StreamInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Variable \\$created_entity might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 1,
@@ -16442,22 +16244,28 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/ResourceTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\RestJsonApiUnsupportedTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/RestJsonApiUnsupportedTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\RestJsonApiUnsupportedTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/RestJsonApiUnsupportedTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\TermTest\\:\\:providerTestGetIndividualTermWithParent\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/TermTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$string of static method Drupal\\\\Component\\\\Serialization\\\\Json\\:\\:decode\\(\\) expects string, Psr\\\\Http\\\\Message\\\\StreamInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/TermTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$account of method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\UserTest\\:\\:sendDeleteRequestForUser\\(\\) expects Drupal\\\\user\\\\UserInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 4,
+	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/UserTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$entity of method Drupal\\\\Tests\\\\jsonapi\\\\Functional\\\\ResourceTestBase\\:\\:normalize\\(\\) expects Drupal\\\\Core\\\\Entity\\\\EntityInterface, Drupal\\\\Core\\\\Session\\\\AccountInterface\\|null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/tests/src/Functional/UserTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Kernel\\\\Context\\\\FieldResolverTest\\:\\:resolveInternalEntityQueryPathErrorProvider\\(\\) has no return type specified\\.$#',
@@ -16498,6 +16306,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\jsonapi\\\\Kernel\\\\Normalizer\\\\LinkCollectionNormalizerTest\\:\\:getNormalizer\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/jsonapi/tests/src/Kernel/Normalizer/LinkCollectionNormalizerTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#3 \\$deserialization_target_class of class Drupal\\\\jsonapi\\\\ResourceType\\\\ResourceType constructor expects class\\-string, string given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/jsonapi/tests/src/Kernel/Normalizer/LinkCollectionNormalizerTest.php',
 ];
@@ -16636,6 +16450,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\language\\\\Config\\\\LanguageConfigFactoryOverride\\:\\:onConfigSave\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/language/src/Config/LanguageConfigFactoryOverride.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$config of method Drupal\\\\Core\\\\Config\\\\ConfigFactoryOverrideBase\\:\\:filterOverride\\(\\) expects Drupal\\\\Core\\\\Config\\\\Config, Drupal\\\\Core\\\\Config\\\\StorableConfigBase given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/language/src/Config/LanguageConfigFactoryOverride.php',
 ];
@@ -16916,6 +16736,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/language/src/HttpKernel/PathProcessorLanguage.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$entity of method Drupal\\\\Core\\\\Entity\\\\EntityAccessControlHandler\\:\\:checkAccess\\(\\) expects Drupal\\\\Core\\\\Entity\\\\EntityInterface, Drupal\\\\Core\\\\Language\\\\LanguageInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/language/src/LanguageAccessControlHandler.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\language\\\\LanguageListBuilder\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -17138,114 +16964,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/language/tests/src/Functional/LanguageSelectorTranslatableTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\language\\\\Functional\\\\Rest\\\\ConfigurableLanguageJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/language/tests/src/Functional/Rest/ConfigurableLanguageJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\language\\\\Functional\\\\Rest\\\\ConfigurableLanguageJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/language/tests/src/Functional/Rest/ConfigurableLanguageJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\language\\\\Functional\\\\Rest\\\\ConfigurableLanguageJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/language/tests/src/Functional/Rest/ConfigurableLanguageJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\language\\\\Functional\\\\Rest\\\\ConfigurableLanguageJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/language/tests/src/Functional/Rest/ConfigurableLanguageJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\language\\\\Functional\\\\Rest\\\\ConfigurableLanguageResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/language/tests/src/Functional/Rest/ConfigurableLanguageResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\language\\\\Functional\\\\Rest\\\\ConfigurableLanguageXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/language/tests/src/Functional/Rest/ConfigurableLanguageXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\language\\\\Functional\\\\Rest\\\\ConfigurableLanguageXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/language/tests/src/Functional/Rest/ConfigurableLanguageXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\language\\\\Functional\\\\Rest\\\\ConfigurableLanguageXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/language/tests/src/Functional/Rest/ConfigurableLanguageXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\language\\\\Functional\\\\Rest\\\\ConfigurableLanguageXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/language/tests/src/Functional/Rest/ConfigurableLanguageXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\language\\\\Functional\\\\Rest\\\\ContentLanguageSettingsJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/language/tests/src/Functional/Rest/ContentLanguageSettingsJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\language\\\\Functional\\\\Rest\\\\ContentLanguageSettingsJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/language/tests/src/Functional/Rest/ContentLanguageSettingsJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\language\\\\Functional\\\\Rest\\\\ContentLanguageSettingsJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/language/tests/src/Functional/Rest/ContentLanguageSettingsJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\language\\\\Functional\\\\Rest\\\\ContentLanguageSettingsJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/language/tests/src/Functional/Rest/ContentLanguageSettingsJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\language\\\\Functional\\\\Rest\\\\ContentLanguageSettingsResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/language/tests/src/Functional/Rest/ContentLanguageSettingsResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\language\\\\Functional\\\\Rest\\\\ContentLanguageSettingsXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/language/tests/src/Functional/Rest/ContentLanguageSettingsXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\language\\\\Functional\\\\Rest\\\\ContentLanguageSettingsXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/language/tests/src/Functional/Rest/ContentLanguageSettingsXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\language\\\\Functional\\\\Rest\\\\ContentLanguageSettingsXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/language/tests/src/Functional/Rest/ContentLanguageSettingsXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\language\\\\Functional\\\\Rest\\\\ContentLanguageSettingsXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/language/tests/src/Functional/Rest/ContentLanguageSettingsXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\language\\\\Kernel\\\\Views\\\\LanguageTestBase\\:\\:dataSet\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -17420,6 +17138,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/layout_builder/src/Form/ConfigureBlockFormBase.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$block of method Drupal\\\\layout_builder\\\\Form\\\\ConfigureBlockFormBase\\:\\:getPluginForm\\(\\) expects Drupal\\\\Core\\\\Block\\\\BlockPluginInterface, Drupal\\\\Component\\\\Plugin\\\\PluginInspectionInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/layout_builder/src/Form/ConfigureBlockFormBase.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\layout_builder\\\\Form\\\\ConfigureSectionForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -17494,6 +17218,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\layout_builder\\\\Form\\\\OverridesEntityForm\\:\\:redirectOnSubmit\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/layout_builder/src/Form/OverridesEntityForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$section_storage of method Drupal\\\\layout_builder\\\\Form\\\\OverridesEntityForm\\:\\:buildMessage\\(\\) expects Drupal\\\\layout_builder\\\\OverridesSectionStorageInterface, Drupal\\\\layout_builder\\\\SectionStorageInterface\\|null given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/layout_builder/src/Form/OverridesEntityForm.php',
 ];
@@ -17708,8 +17438,20 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/layout_builder/src/Plugin/SectionStorage/DefaultsSectionStorage.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$definition of method Drupal\\\\layout_builder\\\\Plugin\\\\SectionStorage\\\\SectionStorageBase\\:\\:buildLayoutRoutes\\(\\) expects Drupal\\\\layout_builder\\\\SectionStorage\\\\SectionStorageDefinition, array\\|Drupal\\\\Component\\\\Plugin\\\\Definition\\\\PluginDefinitionInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/layout_builder/src/Plugin/SectionStorage/DefaultsSectionStorage.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\layout_builder\\\\Plugin\\\\SectionStorage\\\\OverridesSectionStorage\\:\\:buildRoutes\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/layout_builder/src/Plugin/SectionStorage/OverridesSectionStorage.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$definition of method Drupal\\\\layout_builder\\\\Plugin\\\\SectionStorage\\\\SectionStorageBase\\:\\:buildLayoutRoutes\\(\\) expects Drupal\\\\layout_builder\\\\SectionStorage\\\\SectionStorageDefinition, array\\|Drupal\\\\Component\\\\Plugin\\\\Definition\\\\PluginDefinitionInterface given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/layout_builder/src/Plugin/SectionStorage/OverridesSectionStorage.php',
 ];
@@ -17810,6 +17552,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/layout_builder/tests/modules/layout_builder_test/src/Plugin/SectionStorage/SimpleConfigSectionStorage.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$definition of method Drupal\\\\layout_builder_test\\\\Plugin\\\\SectionStorage\\\\SimpleConfigSectionStorage\\:\\:buildLayoutRoutes\\(\\) expects Drupal\\\\layout_builder\\\\SectionStorage\\\\SectionStorageDefinition, array\\|Drupal\\\\Component\\\\Plugin\\\\Definition\\\\PluginDefinitionInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/layout_builder/tests/modules/layout_builder_test/src/Plugin/SectionStorage/SimpleConfigSectionStorage.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\layout_builder_test\\\\Plugin\\\\SectionStorage\\\\TestStateBasedSectionStorage\\:\\:buildRoutes\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -17864,76 +17612,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/layout_builder/tests/src/Functional/LayoutSectionTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\Functional\\\\Rest\\\\LayoutBuilderEntityViewDisplayJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
+	'message' => '#^Parameter \\#2 \\$expected_content of method Drupal\\\\Tests\\\\layout_builder\\\\Functional\\\\LayoutSectionTest\\:\\:assertLayoutSection\\(\\) expects array\\|string, null given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Functional/Rest/LayoutBuilderEntityViewDisplayJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\Functional\\\\Rest\\\\LayoutBuilderEntityViewDisplayJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Functional/Rest/LayoutBuilderEntityViewDisplayJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\Functional\\\\Rest\\\\LayoutBuilderEntityViewDisplayJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Functional/Rest/LayoutBuilderEntityViewDisplayJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\Functional\\\\Rest\\\\LayoutBuilderEntityViewDisplayJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Functional/Rest/LayoutBuilderEntityViewDisplayJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\Functional\\\\Rest\\\\LayoutBuilderEntityViewDisplayXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Functional/Rest/LayoutBuilderEntityViewDisplayXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\Functional\\\\Rest\\\\LayoutBuilderEntityViewDisplayXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Functional/Rest/LayoutBuilderEntityViewDisplayXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\Functional\\\\Rest\\\\LayoutBuilderEntityViewDisplayXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Functional/Rest/LayoutBuilderEntityViewDisplayXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\Functional\\\\Rest\\\\LayoutBuilderEntityViewDisplayXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Functional/Rest/LayoutBuilderEntityViewDisplayXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\Functional\\\\Rest\\\\LayoutRestTestBase\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Functional/Rest/LayoutRestTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\Functional\\\\Rest\\\\LayoutRestTestBase\\:\\:assertNormalizationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Functional/Rest/LayoutRestTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\Functional\\\\Rest\\\\LayoutRestTestBase\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Functional/Rest/LayoutRestTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\Functional\\\\Rest\\\\LayoutRestTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/layout_builder/tests/src/Functional/Rest/LayoutRestTestBase.php',
+	'path' => __DIR__ . '/modules/layout_builder/tests/src/Functional/LayoutSectionTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\FunctionalJavascript\\\\BlockFormMessagesTest\\:\\:clickContextualLink\\(\\) has no return type specified\\.$#',
@@ -18056,6 +17738,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/layout_builder/tests/src/FunctionalJavascript/LayoutBuilderDisableInteractionsTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$exception of static method Drupal\\\\FunctionalJavascriptTests\\\\JSWebAssert\\:\\:isExceptionNotClickable\\(\\) expects WebDriver\\\\Exception, Exception given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/layout_builder/tests/src/FunctionalJavascript/LayoutBuilderDisableInteractionsTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\FunctionalJavascript\\\\LayoutBuilderTest\\:\\:sortableAfter\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -18160,6 +17848,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\layout_builder\\\\Kernel\\\\LayoutEntityHelperTraitTest\\:\\:providerTestOriginalEntityUsesDefaultStorage\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/layout_builder/tests/src/Kernel/LayoutEntityHelperTraitTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$array of function array_keys expects array, Drupal\\\\layout_builder\\\\SectionStorageInterface\\|null given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/layout_builder/tests/src/Kernel/LayoutEntityHelperTraitTest.php',
 ];
@@ -18276,36 +17970,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/link/src/Plugin/Validation/Constraint/LinkAccessConstraintValidator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\link\\\\Functional\\\\LinkFieldTest\\:\\:assertPathAliasExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/link/tests/src/Functional/LinkFieldTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\link\\\\Functional\\\\LinkFieldTest\\:\\:assertPathAliasNotExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/link/tests/src/Functional/LinkFieldTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\link\\\\Functional\\\\LinkFieldUITest\\:\\:providerTestFieldUI\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/link/tests/src/Functional/LinkFieldUITest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\link\\\\FunctionalJavascript\\\\LinkFieldFormStatesTest\\:\\:linkFieldFormStatesData\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/link/tests/src/FunctionalJavascript/LinkFieldFormStatesTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\link\\\\Unit\\\\Plugin\\\\Validation\\\\Constraint\\\\LinkExternalProtocolsConstraintValidatorTest\\:\\:providerValidate\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/link/tests/src/Unit/Plugin/Validation/Constraint/LinkExternalProtocolsConstraintValidatorTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Function locale_config_batch_update_components\\(\\) should return array but return statement is missing\\.$#',
@@ -18818,18 +18482,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/locale/tests/src/Functional/LocaleImportFunctionalTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\locale\\\\Functional\\\\LocalePathTest\\:\\:assertPathAliasExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/locale/tests/src/Functional/LocalePathTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\locale\\\\Functional\\\\LocalePathTest\\:\\:assertPathAliasNotExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/locale/tests/src/Functional/LocalePathTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\locale\\\\Functional\\\\LocalePluralFormatTest\\:\\:getPoFileWithBrokenPlural\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -18850,6 +18502,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\locale\\\\Functional\\\\LocalePluralFormatTest\\:\\:getPoFileWithSimplePlural\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/locale/tests/src/Functional/LocalePluralFormatTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$translated_string of static method Drupal\\\\Core\\\\StringTranslation\\\\PluralTranslatableMarkup\\:\\:createFromTranslatedString\\(\\) expects string, Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/locale/tests/src/Functional/LocalePluralFormatTest.php',
 ];
@@ -18896,6 +18554,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/locale/tests/src/Functional/LocaleUpdateCronTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$language_manager of class Drupal\\\\locale\\\\LocaleDefaultConfigStorage constructor expects Drupal\\\\language\\\\ConfigurableLanguageManagerInterface, Drupal\\\\Core\\\\Language\\\\LanguageManagerInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/locale/tests/src/Kernel/LocaleDefaultConfigStorageTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\locale\\\\Unit\\\\LocaleLookupTest\\:\\:getCidProvider\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -18921,12 +18585,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\media\\\\Controller\\\\MediaFilterController\\:\\:checkCsrf\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/src/Controller/MediaFilterController.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\media\\\\Controller\\\\MediaFilterController\\:\\:create\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/media/src/Controller/MediaFilterController.php',
@@ -19304,118 +18962,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/media/tests/src/Functional/ResourceFetcherTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\Rest\\\\MediaJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/Rest/MediaJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\Rest\\\\MediaJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/Rest/MediaJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\Rest\\\\MediaJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/Rest/MediaJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\Rest\\\\MediaJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/Rest/MediaJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\Rest\\\\MediaResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/Rest/MediaResourceTestBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\Rest\\\\MediaResourceTestBase\\:\\:uploadFile\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/media/tests/src/Functional/Rest/MediaResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\Rest\\\\MediaTypeJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/Rest/MediaTypeJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\Rest\\\\MediaTypeJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/Rest/MediaTypeJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\Rest\\\\MediaTypeJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/Rest/MediaTypeJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\Rest\\\\MediaTypeJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/Rest/MediaTypeJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\Rest\\\\MediaTypeResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/Rest/MediaTypeResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\Rest\\\\MediaTypeXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/Rest/MediaTypeXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\Rest\\\\MediaTypeXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/Rest/MediaTypeXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\Rest\\\\MediaTypeXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/Rest/MediaTypeXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\Rest\\\\MediaTypeXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/Rest/MediaTypeXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\Rest\\\\MediaXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/Rest/MediaXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\Rest\\\\MediaXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/Rest/MediaXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\Rest\\\\MediaXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/Rest/MediaXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\Rest\\\\MediaXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/media/tests/src/Functional/Rest/MediaXmlBasicAuthTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Functional\\\\UrlResolverTest\\:\\:hijackProviderEndpoints\\(\\) has no return type specified\\.$#',
@@ -19544,6 +19094,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/media/tests/src/Kernel/MediaEmbedFilterTranslationTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$expected of method PHPUnit\\\\Framework\\\\Assert\\:\\:assertSame\\(\\) contains unresolvable type\\.$#',
+	'identifier' => 'argument.unresolvableType',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/media/tests/src/Kernel/MediaSourceTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\media\\\\Unit\\\\ResourceTest\\:\\:setDimensionsTestCases\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -19636,6 +19192,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\media_library\\\\MediaLibraryState\\:\\:validateRequiredParameters\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/media_library/src/MediaLibraryState.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#4 \\$remaining_slots of static method Drupal\\\\media_library\\\\MediaLibraryState\\:\\:create\\(\\) expects int, string\\|null given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/media_library/src/MediaLibraryState.php',
 ];
@@ -19928,76 +19490,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/menu_link_content/tests/menu_link_content_dynamic_route/src/Routes.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\menu_link_content\\\\Functional\\\\Rest\\\\MenuLinkContentJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_link_content/tests/src/Functional/Rest/MenuLinkContentJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\menu_link_content\\\\Functional\\\\Rest\\\\MenuLinkContentJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_link_content/tests/src/Functional/Rest/MenuLinkContentJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\menu_link_content\\\\Functional\\\\Rest\\\\MenuLinkContentJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_link_content/tests/src/Functional/Rest/MenuLinkContentJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\menu_link_content\\\\Functional\\\\Rest\\\\MenuLinkContentJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_link_content/tests/src/Functional/Rest/MenuLinkContentJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\menu_link_content\\\\Functional\\\\Rest\\\\MenuLinkContentResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_link_content/tests/src/Functional/Rest/MenuLinkContentResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\menu_link_content\\\\Functional\\\\Rest\\\\MenuLinkContentXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_link_content/tests/src/Functional/Rest/MenuLinkContentXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\menu_link_content\\\\Functional\\\\Rest\\\\MenuLinkContentXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_link_content/tests/src/Functional/Rest/MenuLinkContentXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\menu_link_content\\\\Functional\\\\Rest\\\\MenuLinkContentXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_link_content/tests/src/Functional/Rest/MenuLinkContentXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\menu_link_content\\\\Functional\\\\Rest\\\\MenuLinkContentXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_link_content/tests/src/Functional/Rest/MenuLinkContentXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\menu_link_content\\\\Kernel\\\\MenuLinksTest\\:\\:createLinkHierarchy\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/menu_link_content/tests/src/Kernel/MenuLinksTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\menu_link_content\\\\Kernel\\\\PathAliasMenuLinkContentTest\\:\\:assertPathAliasExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_link_content/tests/src/Kernel/PathAliasMenuLinkContentTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\menu_link_content\\\\Kernel\\\\PathAliasMenuLinkContentTest\\:\\:assertPathAliasNotExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/menu_link_content/tests/src/Kernel/PathAliasMenuLinkContentTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\menu_ui\\\\Form\\\\MenuDeleteForm\\:\\:logDeletionMessage\\(\\) has no return type specified\\.$#',
@@ -20072,6 +19568,18 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/menu_ui/tests/src/Functional/MenuUiTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$item of method Drupal\\\\Tests\\\\menu_ui\\\\Functional\\\\MenuUiTest\\:\\:deleteMenuLink\\(\\) expects Drupal\\\\menu_link_content\\\\Entity\\\\MenuLinkContent, Drupal\\\\menu_link_content\\\\MenuLinkContentInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/menu_ui/tests/src/Functional/MenuUiTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$item of method Drupal\\\\Tests\\\\menu_ui\\\\Functional\\\\MenuUiTest\\:\\:verifyMenuLink\\(\\) expects Drupal\\\\menu_link_content\\\\Entity\\\\MenuLinkContent, Drupal\\\\menu_link_content\\\\MenuLinkContentInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/menu_ui/tests/src/Functional/MenuUiTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\menu_ui\\\\FunctionalJavascript\\\\MenuUiJavascriptTest\\:\\:assertMenuLink\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -20106,6 +19614,12 @@ $ignoreErrors[] = [
 	'identifier' => 'class.notFound',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/migrate/src/Audit/IdAuditor.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$query of method Drupal\\\\migrate\\\\Controller\\\\MigrateMessageController\\:\\:addFilterToQuery\\(\\) expects Drupal\\\\Core\\\\Database\\\\Query\\\\SelectInterface, Drupal\\\\Core\\\\Database\\\\Query\\\\ExtendableInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/migrate/src/Controller/MigrateMessageController.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\migrate\\\\Event\\\\EventBase\\:\\:logMessage\\(\\) has no return type specified\\.$#',
@@ -20214,6 +19728,18 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/migrate/src/MigrateMessageInterface.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$finder of static method Drupal\\\\migrate\\\\Plugin\\\\Discovery\\\\StaticReflectionParser\\:\\:getParentParser\\(\\) expects Doctrine\\\\Common\\\\Reflection\\\\ClassFinderInterface, Drupal\\\\Component\\\\ClassFinder\\\\ClassFinderInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/migrate/src/Plugin/Discovery/AnnotatedClassDiscoveryAutomatedProviders.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$finder of static method Drupal\\\\migrate\\\\Plugin\\\\Discovery\\\\StaticReflectionParser\\:\\:getParentParser\\(\\) expects Doctrine\\\\Common\\\\Reflection\\\\ClassFinderInterface, Drupal\\\\Component\\\\ClassFinder\\\\ClassFinderInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/migrate/src/Plugin/Discovery/AttributeDiscoveryWithAnnotationsAutomatedProviders.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\migrate\\\\Plugin\\\\MigrateDestinationInterface\\:\\:rollback\\(\\) has no return type specified\\.$#',
@@ -20660,6 +20186,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/process/MigrationLookup.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$save_to_map of class Drupal\\\\migrate\\\\MigrateSkipRowException constructor expects bool, int given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/migrate/src/Plugin/migrate/process/MigrationLookup.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\migrate\\\\Plugin\\\\migrate\\\\source\\\\SourcePluginBase\\:\\:fetchNextRow\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -20766,6 +20298,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/migrate/tests/src/Kernel/MigrateDumpAlterInterface.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$entity_id of method Drupal\\\\Tests\\\\migrate\\\\Kernel\\\\MigrateEntityContentBaseTest\\:\\:validateStub\\(\\) expects string, int\\<min, \\-1\\>\\|int\\<1, max\\> given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/migrate/tests/src/Kernel/MigrateEntityContentBaseTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Cannot unset property Drupal\\\\Tests\\\\migrate\\\\Kernel\\\\MigrateTestBase\\:\\:\\$migrateMessages because it might have hooks in a subclass\\.$#',
@@ -21194,16 +20732,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/mysql/src/Driver/Database/mysql/Schema.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\mysql\\\\Kernel\\\\mysql\\\\DbDumpTest\\:\\:assertPathAliasExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
+	'message' => '#^Parameter \\#1 \\$required of static method Drupal\\\\Component\\\\Utility\\\\Environment\\:\\:checkMemoryLimit\\(\\) expects string, \\(float\\|int\\) given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
-	'path' => __DIR__ . '/modules/mysql/tests/src/Kernel/mysql/DbDumpTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\mysql\\\\Kernel\\\\mysql\\\\DbDumpTest\\:\\:assertPathAliasNotExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/mysql/tests/src/Kernel/mysql/DbDumpTest.php',
+	'path' => __DIR__ . '/modules/mysql/tests/src/Kernel/mysql/LargeQueryTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$string_ascii_check might not be defined\\.$#',
@@ -21218,10 +20750,22 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/mysql/tests/src/Kernel/mysql/SchemaTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$required of static method Drupal\\\\Component\\\\Utility\\\\Environment\\:\\:checkMemoryLimit\\(\\) expects string, \\(float\\|int\\) given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/mysqli/tests/src/Kernel/mysqli/LargeQueryTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\navigation\\\\Form\\\\LayoutForm\\:\\:redirectOnSubmit\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/navigation/src/Form/LayoutForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$file of method Drupal\\\\navigation\\\\Form\\\\SettingsForm\\:\\:adjustLogoDimensions\\(\\) expects Drupal\\\\file\\\\Entity\\\\File, array\\|Drupal\\\\file\\\\FileInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/navigation/src/Form/SettingsForm.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\navigation\\\\Plugin\\\\SectionStorage\\\\NavigationSectionStorage\\:\\:buildLayoutRoutes\\(\\) has no return type specified\\.$#',
@@ -21232,6 +20776,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\navigation\\\\Plugin\\\\SectionStorage\\\\NavigationSectionStorage\\:\\:setContext\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/navigation/src/Plugin/SectionStorage/NavigationSectionStorage.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$definition of method Drupal\\\\navigation\\\\Plugin\\\\SectionStorage\\\\NavigationSectionStorage\\:\\:buildLayoutRoutes\\(\\) expects Drupal\\\\layout_builder\\\\SectionStorage\\\\SectionStorageDefinition, array\\|Drupal\\\\Component\\\\Plugin\\\\Definition\\\\PluginDefinitionInterface given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/navigation/src/Plugin/SectionStorage/NavigationSectionStorage.php',
 ];
@@ -21608,6 +21158,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/node/src/Plugin/Search/NodeSearch.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$query of method Drupal\\\\node\\\\Plugin\\\\Search\\\\NodeSearch\\:\\:addNodeRankings\\(\\) expects Drupal\\\\Core\\\\Database\\\\Query\\\\SelectExtender, Drupal\\\\Core\\\\Database\\\\Query\\\\ExtendableInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/src/Plugin/Search/NodeSearch.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\node\\\\Plugin\\\\views\\\\argument\\\\Type\\:\\:node_type\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -21788,6 +21344,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/node/tests/src/Functional/NodeTranslationUITest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$node of method Drupal\\\\Tests\\\\node\\\\Functional\\\\NodeTranslationUITest\\:\\:doTestAlternateHreflangLinks\\(\\) expects Drupal\\\\node\\\\Entity\\\\Node, Drupal\\\\Core\\\\Entity\\\\EntityInterface\\|null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/tests/src/Functional/NodeTranslationUITest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\NodeTypeTest\\:\\:assertBreadcrumb\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -21812,114 +21374,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/node/tests/src/Functional/NodeTypeTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Rest\\\\NodeJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Rest/NodeJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Rest\\\\NodeJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Rest/NodeJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Rest\\\\NodeJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Rest/NodeJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Rest\\\\NodeJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Rest/NodeJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Rest\\\\NodeResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Rest/NodeResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Rest\\\\NodeTypeJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Rest/NodeTypeJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Rest\\\\NodeTypeJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Rest/NodeTypeJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Rest\\\\NodeTypeJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Rest/NodeTypeJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Rest\\\\NodeTypeJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Rest/NodeTypeJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Rest\\\\NodeTypeResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Rest/NodeTypeResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Rest\\\\NodeTypeXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Rest/NodeTypeXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Rest\\\\NodeTypeXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Rest/NodeTypeXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Rest\\\\NodeTypeXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Rest/NodeTypeXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Rest\\\\NodeTypeXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Rest/NodeTypeXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Rest\\\\NodeXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Rest/NodeXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Rest\\\\NodeXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Rest/NodeXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Rest\\\\NodeXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Rest/NodeXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\Functional\\\\Rest\\\\NodeXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/node/tests/src/Functional/Rest/NodeXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\node\\\\FunctionalJavascript\\\\ContextualLinksTest\\:\\:clickContextualLink\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -21942,6 +21396,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/node/tests/src/Kernel/NodeAccessTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$expected of method PHPUnit\\\\Framework\\\\Assert\\:\\:assertSame\\(\\) contains unresolvable type\\.$#',
+	'identifier' => 'argument.unresolvableType',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/node/tests/src/Kernel/NodeTokenReplaceTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Function _options_values_in_use\\(\\) has no return type specified\\.$#',
@@ -22052,6 +21512,24 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/options/tests/src/Kernel/Views/OptionsTestBase.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$callback of function array_map expects \\(callable\\(Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup\\)\\: mixed\\)\\|null, Closure\\(string, array\\=, array\\=\\)\\: Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/package_manager/src/Validator/SandboxDatabaseUpdatesValidator.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$stage of method Drupal\\\\Tests\\\\package_manager\\\\Kernel\\\\PackageManagerKernelTestBase\\:\\:assertStatusCheckResults\\(\\) expects Drupal\\\\Tests\\\\package_manager\\\\Kernel\\\\TestSandboxManager\\|null, Drupal\\\\package_manager\\\\SandboxManagerBase given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 4,
+	'path' => __DIR__ . '/modules/package_manager/tests/src/Kernel/LockFileValidatorTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$expected of method PHPUnit\\\\Framework\\\\Assert\\:\\:assertSame\\(\\) contains unresolvable type\\.$#',
+	'identifier' => 'argument.unresolvableType',
+	'count' => 3,
+	'path' => __DIR__ . '/modules/package_manager/tests/src/Unit/ProcessOutputCallbackTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\page_cache\\\\StackMiddleware\\\\PageCache\\:\\:set\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -22074,6 +21552,12 @@ $ignoreErrors[] = [
 	'identifier' => 'return.missing',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/path/src/PathAliasForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$entity of method Drupal\\\\Core\\\\Entity\\\\EntityListBuilder\\:\\:buildOperations\\(\\) expects Drupal\\\\Core\\\\Entity\\\\EntityInterface, Drupal\\\\Core\\\\Path\\\\Entity\\\\PathAlias given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/path/src/PathAliasListBuilder.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\path\\\\Plugin\\\\Field\\\\FieldType\\\\PathFieldItemList\\:\\:computeValue\\(\\) has no return type specified\\.$#',
@@ -22122,18 +21606,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/path/src/Plugin/Validation/Constraint/PathAliasConstraintValidator.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\path\\\\Functional\\\\PathTestBase\\:\\:assertPathAliasExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path/tests/src/Functional/PathTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\path\\\\Functional\\\\PathTestBase\\:\\:assertPathAliasNotExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path/tests/src/Functional/PathTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\path_alias\\\\AliasManager\\:\\:cacheClear\\(\\) has no return type specified\\.$#',
@@ -22220,100 +21692,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/path_alias/src/Entity/PathAlias.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\path_alias\\\\Functional\\\\Rest\\\\PathAliasJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path_alias/tests/src/Functional/Rest/PathAliasJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\path_alias\\\\Functional\\\\Rest\\\\PathAliasJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path_alias/tests/src/Functional/Rest/PathAliasJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\path_alias\\\\Functional\\\\Rest\\\\PathAliasJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path_alias/tests/src/Functional/Rest/PathAliasJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\path_alias\\\\Functional\\\\Rest\\\\PathAliasJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path_alias/tests/src/Functional/Rest/PathAliasJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\path_alias\\\\Functional\\\\Rest\\\\PathAliasResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path_alias/tests/src/Functional/Rest/PathAliasResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\path_alias\\\\Functional\\\\Rest\\\\PathAliasXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path_alias/tests/src/Functional/Rest/PathAliasXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\path_alias\\\\Functional\\\\Rest\\\\PathAliasXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path_alias/tests/src/Functional/Rest/PathAliasXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\path_alias\\\\Functional\\\\Rest\\\\PathAliasXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path_alias/tests/src/Functional/Rest/PathAliasXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\path_alias\\\\Functional\\\\Rest\\\\PathAliasXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path_alias/tests/src/Functional/Rest/PathAliasXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\path_alias\\\\Functional\\\\UrlAlterFunctionalTest\\:\\:assertPathAliasExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path_alias/tests/src/Functional/UrlAlterFunctionalTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\path_alias\\\\Functional\\\\UrlAlterFunctionalTest\\:\\:assertPathAliasNotExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path_alias/tests/src/Functional/UrlAlterFunctionalTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\path_alias\\\\Kernel\\\\AliasTest\\:\\:assertPathAliasExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path_alias/tests/src/Kernel/AliasTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\path_alias\\\\Kernel\\\\AliasTest\\:\\:assertPathAliasNotExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path_alias/tests/src/Kernel/AliasTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\path_alias\\\\Kernel\\\\AliasTest\\:\\:testPrefixListCacheDeletionMidRequest\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/path_alias/tests/src/Kernel/AliasTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\path_alias\\\\Kernel\\\\EntityAliasTest\\:\\:assertPathAliasExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path_alias/tests/src/Kernel/EntityAliasTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\path_alias\\\\Kernel\\\\EntityAliasTest\\:\\:assertPathAliasNotExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/path_alias/tests/src/Kernel/EntityAliasTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\path_alias\\\\Unit\\\\AliasManagerTest\\:\\:testGetAliasByPathPrefixList\\(\\) has no return type specified\\.$#',
@@ -22349,6 +21731,12 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\pgsql\\\\Driver\\\\Database\\\\pgsql\\\\Connection\\:\\:setPrefix\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
+	'path' => __DIR__ . '/modules/pgsql/src/Driver/Database/pgsql/Connection.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$locale of function setlocale expects array\\|string\\|null, int given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 2,
 	'path' => __DIR__ . '/modules/pgsql/src/Driver/Database/pgsql/Connection.php',
 ];
 $ignoreErrors[] = [
@@ -22472,6 +21860,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/pgsql/src/Driver/Database/pgsql/Schema.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$table_alias of method Drupal\\\\Core\\\\Database\\\\Query\\\\Select\\:\\:addField\\(\\) expects string, null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/pgsql/src/Driver/Database/pgsql/Select.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Variable \\$table_field might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 1,
@@ -22496,6 +21890,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/phpass/tests/src/Unit/PasswordVerifyTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$callback of function uasort expects callable\\(Drupal\\\\Core\\\\Entity\\\\EntityInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface\\)\\: int, \'\\\\\\\\Drupal\\\\\\\\responsive…\' given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/responsive_image/src/Plugin/Field/FieldFormatter/ResponsiveImageFormatter.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Variable \\$responsive_image_styles in empty\\(\\) always exists and is not falsy\\.$#',
 	'identifier' => 'empty.variable',
 	'count' => 1,
@@ -22518,60 +21918,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/responsive_image/src/ResponsiveImageStyleForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\responsive_image\\\\Functional\\\\Rest\\\\ResponsiveImageStyleJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/responsive_image/tests/src/Functional/Rest/ResponsiveImageStyleJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\responsive_image\\\\Functional\\\\Rest\\\\ResponsiveImageStyleJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/responsive_image/tests/src/Functional/Rest/ResponsiveImageStyleJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\responsive_image\\\\Functional\\\\Rest\\\\ResponsiveImageStyleJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/responsive_image/tests/src/Functional/Rest/ResponsiveImageStyleJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\responsive_image\\\\Functional\\\\Rest\\\\ResponsiveImageStyleJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/responsive_image/tests/src/Functional/Rest/ResponsiveImageStyleJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\responsive_image\\\\Functional\\\\Rest\\\\ResponsiveImageStyleResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/responsive_image/tests/src/Functional/Rest/ResponsiveImageStyleResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\responsive_image\\\\Functional\\\\Rest\\\\ResponsiveImageStyleXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/responsive_image/tests/src/Functional/Rest/ResponsiveImageStyleXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\responsive_image\\\\Functional\\\\Rest\\\\ResponsiveImageStyleXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/responsive_image/tests/src/Functional/Rest/ResponsiveImageStyleXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\responsive_image\\\\Functional\\\\Rest\\\\ResponsiveImageStyleXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/responsive_image/tests/src/Functional/Rest/ResponsiveImageStyleXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\responsive_image\\\\Functional\\\\Rest\\\\ResponsiveImageStyleXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/responsive_image/tests/src/Functional/Rest/ResponsiveImageStyleXmlBasicAuthTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\rest\\\\Entity\\\\ConfigDependencies\\:\\:create\\(\\) has no return type specified\\.$#',
@@ -22784,12 +22130,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/rest/tests/src/Functional/EntityResource/EntityResourceTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\EntityResource\\\\EntityResourceTestBase\\:\\:assertNormalizationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/EntityResource/EntityResourceTestBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\EntityResource\\\\EntityResourceTestBase\\:\\:assertPatchProtectedFieldNamesStructure\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -22814,70 +22154,16 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/rest/tests/src/Functional/EntityResource/EntityResourceTestBase.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$expected of method PHPUnit\\\\Framework\\\\Assert\\:\\:assertSame\\(\\) contains unresolvable type\\.$#',
+	'identifier' => 'argument.unresolvableType',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/rest/tests/src/Functional/EntityResource/EntityResourceTestBase.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Variable \\$created_entity might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 4,
 	'path' => __DIR__ . '/modules/rest/tests/src/Functional/EntityResource/EntityResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\EntityResource\\\\ModeratedNode\\\\ModeratedNodeJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/EntityResource/ModeratedNode/ModeratedNodeJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\EntityResource\\\\ModeratedNode\\\\ModeratedNodeJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/EntityResource/ModeratedNode/ModeratedNodeJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\EntityResource\\\\ModeratedNode\\\\ModeratedNodeJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/EntityResource/ModeratedNode/ModeratedNodeJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\EntityResource\\\\ModeratedNode\\\\ModeratedNodeJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/EntityResource/ModeratedNode/ModeratedNodeJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\EntityResource\\\\ModeratedNode\\\\ModeratedNodeResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/EntityResource/ModeratedNode/ModeratedNodeResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\EntityResource\\\\ModeratedNode\\\\ModeratedNodeXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/EntityResource/ModeratedNode/ModeratedNodeXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\EntityResource\\\\ModeratedNode\\\\ModeratedNodeXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/EntityResource/ModeratedNode/ModeratedNodeXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\EntityResource\\\\ModeratedNode\\\\ModeratedNodeXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/EntityResource/ModeratedNode/ModeratedNodeXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\EntityResource\\\\ModeratedNode\\\\ModeratedNodeXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/EntityResource/ModeratedNode/ModeratedNodeXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\FileUploadResourceTestBase\\:\\:assertNormalizationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/FileUploadResourceTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\FileUploadResourceTestBase\\:\\:assertResponseData\\(\\) has no return type specified\\.$#',
@@ -22886,22 +22172,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/rest/tests/src/Functional/FileUploadResourceTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\FileUploadResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
+	'message' => '#^Parameter \\#2 \\$file_contents of method Drupal\\\\Tests\\\\rest\\\\Functional\\\\FileUploadResourceTestBase\\:\\:fileRequest\\(\\) expects string, null given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/rest/tests/src/Functional/FileUploadResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\ResourceTestBase\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\ResourceTestBase\\:\\:assertNormalizationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/ResourceTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\ResourceTestBase\\:\\:assertResourceErrorResponse\\(\\) has no return type specified\\.$#',
@@ -22911,12 +22185,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\ResourceTestBase\\:\\:assertResourceResponse\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\ResourceTestBase\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/rest/tests/src/Functional/ResourceTestBase.php',
@@ -22940,12 +22208,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/rest/tests/src/Functional/ResourceTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\ResourceTestBase\\:\\:initAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\ResourceTestBase\\:\\:provisionResource\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -22962,66 +22224,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/rest/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\ResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/ResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\Rest\\\\RestResourceConfigJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/Rest/RestResourceConfigJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\Rest\\\\RestResourceConfigJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/Rest/RestResourceConfigJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\Rest\\\\RestResourceConfigJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/Rest/RestResourceConfigJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\Rest\\\\RestResourceConfigJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/Rest/RestResourceConfigJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\Rest\\\\RestResourceConfigResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/Rest/RestResourceConfigResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\Rest\\\\RestResourceConfigXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/Rest/RestResourceConfigXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\Rest\\\\RestResourceConfigXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/Rest/RestResourceConfigXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\Rest\\\\RestResourceConfigXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/Rest/RestResourceConfigXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Functional\\\\Rest\\\\RestResourceConfigXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/rest/tests/src/Functional/Rest/RestResourceConfigXmlBasicAuthTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\rest\\\\Kernel\\\\StubRequestHandlerResourcePlugin\\:\\:delete\\(\\) has no return type specified\\.$#',
@@ -23378,6 +22580,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/search/src/SearchQuery.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$field of method Drupal\\\\Core\\\\Database\\\\Query\\\\SelectExtender\\:\\:condition\\(\\) expects Drupal\\\\Core\\\\Database\\\\Query\\\\ConditionInterface\\|string, array\\<Drupal\\\\Core\\\\Database\\\\Query\\\\ConditionInterface\\> given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/search/src/SearchQuery.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\search\\\\ViewsSearchQuery\\:\\:conditionReplaceString\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -23400,60 +22608,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/search/tests/modules/search_extra_type/src/Plugin/Search/SearchExtraTypeSearch.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\search\\\\Functional\\\\Rest\\\\SearchPageJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/search/tests/src/Functional/Rest/SearchPageJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\search\\\\Functional\\\\Rest\\\\SearchPageJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/search/tests/src/Functional/Rest/SearchPageJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\search\\\\Functional\\\\Rest\\\\SearchPageJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/search/tests/src/Functional/Rest/SearchPageJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\search\\\\Functional\\\\Rest\\\\SearchPageJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/search/tests/src/Functional/Rest/SearchPageJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\search\\\\Functional\\\\Rest\\\\SearchPageResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/search/tests/src/Functional/Rest/SearchPageResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\search\\\\Functional\\\\Rest\\\\SearchPageXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/search/tests/src/Functional/Rest/SearchPageXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\search\\\\Functional\\\\Rest\\\\SearchPageXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/search/tests/src/Functional/Rest/SearchPageXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\search\\\\Functional\\\\Rest\\\\SearchPageXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/search/tests/src/Functional/Rest/SearchPageXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\search\\\\Functional\\\\Rest\\\\SearchPageXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/search/tests/src/Functional/Rest/SearchPageXmlBasicAuthTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\search\\\\Functional\\\\SearchCommentTest\\:\\:cronRun\\(\\) has no return type specified\\.$#',
@@ -23490,6 +22644,18 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/search/tests/src/Functional/Update/SearchBlockPageIdUpdatePathTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\search\\\\Functional\\\\views\\\\ViewsIntegrationTest\\:\\:cronRun\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/search/tests/src/Functional/views/ViewsIntegrationTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\Tests\\\\search\\\\Functional\\\\views\\\\ViewsMultilingualTest\\:\\:cronRun\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/search/tests/src/Functional/views/ViewsMultilingualTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\search\\\\Kernel\\\\SearchMatchTest\\:\\:getText\\(\\) has no return type specified\\.$#',
@@ -23786,6 +22952,48 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/settings_tray/src/Block/BlockEntitySettingTrayForm.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemBrandingOffCanvasForm\\:\\:create\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemBrandingOffCanvasForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemBrandingOffCanvasForm\\:\\:submitConfigurationForm\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemBrandingOffCanvasForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemBrandingOffCanvasForm\\:\\:validateConfigurationForm\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemBrandingOffCanvasForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemMenuOffCanvasForm\\:\\:create\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemMenuOffCanvasForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemMenuOffCanvasForm\\:\\:setPlugin\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemMenuOffCanvasForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemMenuOffCanvasForm\\:\\:submitConfigurationForm\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemMenuOffCanvasForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\settings_tray\\\\Form\\\\SystemMenuOffCanvasForm\\:\\:validateConfigurationForm\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/settings_tray/src/Form/SystemMenuOffCanvasForm.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\settings_tray_test\\\\Form\\\\SettingsTrayFormAnnotationIsClassBlockForm\\:\\:submitConfigurationForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -23954,114 +23162,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/shortcut/src/ShortcutSetStorageInterface.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\Rest\\\\ShortcutJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\Rest\\\\ShortcutJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\Rest\\\\ShortcutJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\Rest\\\\ShortcutJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\Rest\\\\ShortcutResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\Rest\\\\ShortcutSetJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutSetJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\Rest\\\\ShortcutSetJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutSetJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\Rest\\\\ShortcutSetJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutSetJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\Rest\\\\ShortcutSetJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutSetJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\Rest\\\\ShortcutSetResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutSetResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\Rest\\\\ShortcutSetXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutSetXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\Rest\\\\ShortcutSetXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutSetXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\Rest\\\\ShortcutSetXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutSetXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\Rest\\\\ShortcutSetXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutSetXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\Rest\\\\ShortcutXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\Rest\\\\ShortcutXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\Rest\\\\ShortcutXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\Rest\\\\ShortcutXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/Rest/ShortcutXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\ShortcutLinksTest\\:\\:assertBlockAppears\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -24069,18 +23169,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\ShortcutLinksTest\\:\\:assertNoBlockAppears\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/ShortcutLinksTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\ShortcutLinksTest\\:\\:assertPathAliasExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/ShortcutLinksTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\shortcut\\\\Functional\\\\ShortcutLinksTest\\:\\:assertPathAliasNotExists\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/shortcut/tests/src/Functional/ShortcutLinksTest.php',
@@ -24320,6 +23408,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/src/Controller/DbUpdateController.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$severity of method Drupal\\\\system\\\\Controller\\\\DbUpdateController\\:\\:requirements\\(\\) expects int, Drupal\\\\Core\\\\Extension\\\\Requirement\\\\RequirementSeverity\\:\\:Error\\|Drupal\\\\Core\\\\Extension\\\\Requirement\\\\RequirementSeverity\\:\\:Warning given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/src/Controller/DbUpdateController.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\system\\\\Controller\\\\LinksetController\\:\\:processCustomLinkAttributes\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -24554,48 +23648,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/src/Form/SiteMaintenanceModeForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\system\\\\Form\\\\SystemBrandingOffCanvasForm\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Form/SystemBrandingOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\system\\\\Form\\\\SystemBrandingOffCanvasForm\\:\\:submitConfigurationForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Form/SystemBrandingOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\system\\\\Form\\\\SystemBrandingOffCanvasForm\\:\\:validateConfigurationForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Form/SystemBrandingOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\system\\\\Form\\\\SystemMenuOffCanvasForm\\:\\:create\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Form/SystemMenuOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\system\\\\Form\\\\SystemMenuOffCanvasForm\\:\\:setPlugin\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Form/SystemMenuOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\system\\\\Form\\\\SystemMenuOffCanvasForm\\:\\:submitConfigurationForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Form/SystemMenuOffCanvasForm.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\system\\\\Form\\\\SystemMenuOffCanvasForm\\:\\:validateConfigurationForm\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/src/Form/SystemMenuOffCanvasForm.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\system\\\\Form\\\\ThemeAdminForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -24624,6 +23676,12 @@ $ignoreErrors[] = [
 	'identifier' => 'isset.variable',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/src/Form/ThemeSettingsForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\system\\\\Form\\\\ThemeUninstallConfirmForm\\:\\:addDependencyListsToForm\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/src/Form/ThemeUninstallConfirmForm.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$pdo_message might not be defined\\.$#',
@@ -24700,6 +23758,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\system\\\\Plugin\\\\ImageToolkit\\\\GDToolkit\\:\\:submitConfigurationForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/src/Plugin/ImageToolkit/GDToolkit.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$callback of function array_filter expects \\(callable\\(1\\|2\\|4\\|32\\|256\\)\\: bool\\)\\|null, Closure\\(mixed\\)\\: int given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/src/Plugin/ImageToolkit/GDToolkit.php',
 ];
@@ -25162,6 +24226,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/modules/dialog_renderer_test/src/Form/TestForm.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$content of class Drupal\\\\Core\\\\Ajax\\\\OpenModalDialogCommand constructor expects array\\|string, Drupal\\\\Component\\\\Render\\\\MarkupInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/tests/modules/dialog_renderer_test/src/Render/MainContent/WideModalRenderer.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\display_variant_test\\\\EventSubscriber\\\\TestPageDisplayVariantSubscriber\\:\\:onSelectPageDisplayVariant\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -25504,244 +24574,28 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/src/Plugin/Field/FieldType/FieldTestItem.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$definition of method Drupal\\\\Core\\\\Field\\\\FieldItemBase\\:\\:__construct\\(\\) expects Drupal\\\\Core\\\\TypedData\\\\ComplexDataDefinitionInterface, Drupal\\\\Core\\\\TypedData\\\\DataDefinitionInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/src/Plugin/Field/FieldType/FieldTestItem.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$values of method Drupal\\\\Core\\\\Field\\\\FieldItemBase\\:\\:setValue\\(\\) expects array\\|null, string given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/src/Plugin/Field/FieldType/FieldTestItem.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\entity_test\\\\TypedData\\\\ComputedString\\:\\:getCastedValue\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/src/TypedData/ComputedString.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestBundleJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestBundleJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestBundleJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestBundleJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestBundleJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestBundleJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestBundleJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestBundleJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestBundleResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestBundleResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestBundleXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestBundleXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestBundleXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestBundleXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestBundleXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestBundleXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestBundleXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestBundleXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestComputedFieldNormalizerTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestComputedFieldNormalizerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestComputedFieldNormalizerTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestComputedFieldNormalizerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestComputedFieldNormalizerTest\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestComputedFieldNormalizerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestJsonInternalPropertyNormalizerTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestJsonInternalPropertyNormalizerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestJsonInternalPropertyNormalizerTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestJsonInternalPropertyNormalizerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestLabelJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestLabelJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestLabelJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestLabelJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestLabelJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestLabelJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestLabelJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestLabelJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestLabelResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestLabelResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestLabelXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestLabelXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestLabelXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestLabelXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestLabelXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestLabelXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestLabelXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestLabelXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestMapFieldJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestMapFieldJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestMapFieldJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestMapFieldJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestMapFieldResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestMapFieldResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestTextItemNormalizerTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestTextItemNormalizerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestTextItemNormalizerTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestTextItemNormalizerTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestTextItemNormalizerTest\\:\\:providerTestGetWithFormat\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestTextItemNormalizerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestTextItemNormalizerTest\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestTextItemNormalizerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\entity_test\\\\Functional\\\\Rest\\\\EntityTestXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/modules/entity_test/tests/src/Functional/Rest/EntityTestXmlBasicAuthTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\entity_test_bundle_class\\\\Entity\\\\EntityTestBundleClass\\:\\:postCreate\\(\\) has no return type specified\\.$#',
@@ -27568,118 +26422,16 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/src/Functional/Render/HtmlResponseAttachmentsTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\Rest\\\\ActionJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/src/Functional/Rest/ActionJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\Rest\\\\ActionJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/src/Functional/Rest/ActionJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\Rest\\\\ActionJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/src/Functional/Rest/ActionJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\Rest\\\\ActionJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/src/Functional/Rest/ActionJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\Rest\\\\ActionResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/src/Functional/Rest/ActionResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\Rest\\\\ActionXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/src/Functional/Rest/ActionXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\Rest\\\\ActionXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/src/Functional/Rest/ActionXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\Rest\\\\ActionXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/src/Functional/Rest/ActionXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\Rest\\\\ActionXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/src/Functional/Rest/ActionXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\Rest\\\\MenuJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/src/Functional/Rest/MenuJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\Rest\\\\MenuJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/src/Functional/Rest/MenuJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\Rest\\\\MenuJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/src/Functional/Rest/MenuJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\Rest\\\\MenuJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/src/Functional/Rest/MenuJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\Rest\\\\MenuResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/src/Functional/Rest/MenuResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\Rest\\\\MenuXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/src/Functional/Rest/MenuXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\Rest\\\\MenuXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/src/Functional/Rest/MenuXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\Rest\\\\MenuXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/src/Functional/Rest/MenuXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\Rest\\\\MenuXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/system/tests/src/Functional/Rest/MenuXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\SecurityAdvisories\\\\SecurityAdvisoryTest\\:\\:cronRun\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/system/tests/src/Functional/SecurityAdvisories/SecurityAdvisoryTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#3 \\$password of method Drupal\\\\Tests\\\\system\\\\Functional\\\\Session\\\\SessionAuthenticationTest\\:\\:basicAuthGet\\(\\) expects string, Drupal\\\\Core\\\\Field\\\\FieldItemListInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 4,
+	'path' => __DIR__ . '/modules/system/tests/src/Functional/Session/SessionAuthenticationTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\System\\\\CronRunTest\\:\\:cronRun\\(\\) has no return type specified\\.$#',
@@ -27704,6 +26456,12 @@ $ignoreErrors[] = [
 	'identifier' => 'variable.undefined',
 	'count' => 2,
 	'path' => __DIR__ . '/modules/system/tests/src/Functional/Theme/ThemeUiTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$update_url of method Drupal\\\\Tests\\\\system\\\\Functional\\\\UpdateSystem\\\\UpdatePathWithBrokenRoutingTest\\:\\:runUpdates\\(\\) expects string\\|null, Drupal\\\\Core\\\\Url given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/tests/src/Functional/UpdateSystem/UpdatePathWithBrokenRoutingTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Functional\\\\UpdateSystem\\\\UpdateScriptTest\\:\\:getSystemSchema\\(\\) has no return type specified\\.$#',
@@ -27796,6 +26554,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/system/tests/src/Kernel/Form/FormElementMaxlengthTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$string of static method Drupal\\\\Component\\\\Utility\\\\Xss\\:\\:filter\\(\\) expects string, int given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/system/tests/src/Kernel/Token/TokenReplaceKernelTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\system\\\\Unit\\\\Menu\\\\MenuLinkTreeTest\\:\\:providerTestBuildCacheability\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -27872,6 +26636,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/taxonomy/src/Form/VocabularyResetForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$node of method Drupal\\\\taxonomy\\\\Hook\\\\TaxonomyHooks\\:\\:buildNodeIndex\\(\\) expects Drupal\\\\node\\\\NodeInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/taxonomy/src/Hook/TaxonomyHooks.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\taxonomy\\\\Plugin\\\\Validation\\\\Constraint\\\\TaxonomyTermHierarchyConstraintValidator\\:\\:create\\(\\) has no return type specified\\.$#',
@@ -28120,6 +26890,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/taxonomy/src/TermForm.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$term of method Drupal\\\\taxonomy\\\\TermForm\\:\\:getParentIds\\(\\) expects Drupal\\\\taxonomy\\\\TermInterface, Drupal\\\\Core\\\\Entity\\\\ContentEntityInterface\\|Drupal\\\\Core\\\\Entity\\\\RevisionLogInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/src/TermForm.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\taxonomy\\\\TermStorage\\:\\:resetCache\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -28128,6 +26904,18 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\taxonomy\\\\TermStorage\\:\\:resetWeights\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/src/TermStorage.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$term of method Drupal\\\\taxonomy\\\\TermStorage\\:\\:getParents\\(\\) expects Drupal\\\\taxonomy\\\\TermInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/taxonomy/src/TermStorage.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$term of method Drupal\\\\taxonomy\\\\TermStorage\\:\\:getParents\\(\\) expects Drupal\\\\taxonomy\\\\TermInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface\\|null given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/taxonomy/src/TermStorage.php',
 ];
@@ -28192,118 +26980,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/taxonomy/taxonomy.module',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Rest\\\\TermJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Rest/TermJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Rest\\\\TermJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Rest/TermJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Rest\\\\TermJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Rest/TermJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Rest\\\\TermJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Rest/TermJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Rest\\\\TermResourceTestBase\\:\\:providerTestGetTermWithParent\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Rest/TermResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Rest\\\\TermResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Rest/TermResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Rest\\\\TermXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Rest/TermXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Rest\\\\TermXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Rest/TermXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Rest\\\\TermXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Rest/TermXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Rest\\\\TermXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Rest/TermXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Rest\\\\VocabularyJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Rest/VocabularyJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Rest\\\\VocabularyJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Rest/VocabularyJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Rest\\\\VocabularyJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Rest/VocabularyJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Rest\\\\VocabularyJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Rest/VocabularyJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Rest\\\\VocabularyResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Rest/VocabularyResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Rest\\\\VocabularyXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Rest/VocabularyXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Rest\\\\VocabularyXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Rest/VocabularyXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Rest\\\\VocabularyXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Rest/VocabularyXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\Rest\\\\VocabularyXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/taxonomy/tests/src/Functional/Rest/VocabularyXmlBasicAuthTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\taxonomy\\\\Functional\\\\TermTest\\:\\:assertBreadcrumb\\(\\) has no return type specified\\.$#',
@@ -28786,6 +27466,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/user/src/Entity/Role.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$callback of function uasort expects callable\\(Drupal\\\\Core\\\\Entity\\\\EntityInterface, Drupal\\\\Core\\\\Entity\\\\EntityInterface\\)\\: int, array\\{class\\-string\\<static\\(Drupal\\\\user\\\\Entity\\\\Role\\)\\>, \'sort\'\\} given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/src/Entity/Role.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\user\\\\Entity\\\\User\\:\\:postDelete\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -29260,6 +27946,18 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/user/src/RegisterForm.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$account of function user_login_finalize expects Drupal\\\\user\\\\UserInterface, Drupal\\\\Core\\\\Entity\\\\ContentEntityInterface\\|Drupal\\\\Core\\\\Entity\\\\RevisionLogInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/user/src/RegisterForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$account of function _user_mail_notify expects Drupal\\\\Core\\\\Session\\\\AccountInterface, Drupal\\\\Core\\\\Entity\\\\ContentEntityInterface\\|Drupal\\\\Core\\\\Entity\\\\RevisionLogInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 3,
+	'path' => __DIR__ . '/modules/user/src/RegisterForm.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\user\\\\RoleForm\\:\\:form\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -29374,118 +28072,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/user/tests/modules/user_language_test/src/Form/UserLanguageTestForm.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\Rest\\\\RoleJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/tests/src/Functional/Rest/RoleJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\Rest\\\\RoleJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/tests/src/Functional/Rest/RoleJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\Rest\\\\RoleJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/tests/src/Functional/Rest/RoleJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\Rest\\\\RoleJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/tests/src/Functional/Rest/RoleJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\Rest\\\\RoleResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/tests/src/Functional/Rest/RoleResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\Rest\\\\RoleXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/tests/src/Functional/Rest/RoleXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\Rest\\\\RoleXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/tests/src/Functional/Rest/RoleXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\Rest\\\\RoleXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/tests/src/Functional/Rest/RoleXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\Rest\\\\RoleXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/tests/src/Functional/Rest/RoleXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\Rest\\\\UserJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/tests/src/Functional/Rest/UserJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\Rest\\\\UserJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/tests/src/Functional/Rest/UserJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\Rest\\\\UserJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/tests/src/Functional/Rest/UserJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\Rest\\\\UserJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/tests/src/Functional/Rest/UserJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\Rest\\\\UserResourceTestBase\\:\\:assertRpcLogin\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/user/tests/src/Functional/Rest/UserResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\Rest\\\\UserResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/tests/src/Functional/Rest/UserResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\Rest\\\\UserXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/tests/src/Functional/Rest/UserXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\Rest\\\\UserXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/tests/src/Functional/Rest/UserXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\Rest\\\\UserXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/tests/src/Functional/Rest/UserXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\Rest\\\\UserXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/user/tests/src/Functional/Rest/UserXmlBasicAuthTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\UserAdminTest\\:\\:assertMailPattern\\(\\) has no return type specified\\.$#',
@@ -29524,6 +28114,18 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/user/tests/src/Functional/UserLoginHttpTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$name of method Drupal\\\\Tests\\\\user\\\\Functional\\\\UserLoginHttpTest\\:\\:loginRequest\\(\\) expects string, null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/user/tests/src/Functional/UserLoginHttpTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$pass of method Drupal\\\\Tests\\\\user\\\\Functional\\\\UserLoginHttpTest\\:\\:loginRequest\\(\\) expects string, null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 2,
+	'path' => __DIR__ . '/modules/user/tests/src/Functional/UserLoginHttpTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Variable \\$name in isset\\(\\) always exists and is not nullable\\.$#',
 	'identifier' => 'isset.variable',
 	'count' => 1,
@@ -29545,6 +28147,12 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\user\\\\Functional\\\\UserLoginTest\\:\\:assertMailString\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
+	'path' => __DIR__ . '/modules/user/tests/src/Functional/UserLoginTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$account of method Drupal\\\\Tests\\\\user\\\\Functional\\\\UserLoginTest\\:\\:assertFailedLogin\\(\\) expects Drupal\\\\user\\\\Entity\\\\User, Drupal\\\\user\\\\UserInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 8,
 	'path' => __DIR__ . '/modules/user/tests/src/Functional/UserLoginTest.php',
 ];
 $ignoreErrors[] = [
@@ -34312,6 +32920,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/src/Plugin/views/join/CastedIntFieldJoin.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#3 \\$table of method Drupal\\\\views\\\\Plugin\\\\views\\\\join\\\\JoinPluginBase\\:\\:joinAddExtra\\(\\) expects array, string given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views/src/Plugin/views/join/CastedIntFieldJoin.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\join\\\\FieldOrLanguageJoin\\:\\:joinAddExtra\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -34326,6 +32940,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views\\\\Plugin\\\\views\\\\join\\\\JoinPluginBase\\:\\:joinAddExtra\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views/src/Plugin/views/join/JoinPluginBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#3 \\$table of method Drupal\\\\views\\\\Plugin\\\\views\\\\join\\\\JoinPluginBase\\:\\:joinAddExtra\\(\\) expects array, string given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/src/Plugin/views/join/JoinPluginBase.php',
 ];
@@ -36382,27 +35002,9 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/tests/src/Functional/Handler/HandlerTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\Plugin\\\\DisplayFeedTest\\:\\:assertPathAliasExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Functional/Plugin/DisplayFeedTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\Plugin\\\\DisplayFeedTest\\:\\:assertPathAliasNotExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Functional/Plugin/DisplayFeedTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\Plugin\\\\DisplayFeedTranslationTest\\:\\:assertPathAliasExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Functional/Plugin/DisplayFeedTranslationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\Plugin\\\\DisplayFeedTranslationTest\\:\\:assertPathAliasNotExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
+	'message' => '#^Parameter \\#2 \\$node of method Drupal\\\\Tests\\\\views\\\\Functional\\\\Plugin\\\\DisplayFeedTranslationTest\\:\\:checkFeedResults\\(\\) expects Drupal\\\\node\\\\Entity\\\\Node, Drupal\\\\node\\\\NodeInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 2,
 	'path' => __DIR__ . '/modules/views/tests/src/Functional/Plugin/DisplayFeedTranslationTest.php',
 ];
 $ignoreErrors[] = [
@@ -36416,72 +35018,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/tests/src/Functional/Plugin/PagerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\Rest\\\\ViewJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Functional/Rest/ViewJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\Rest\\\\ViewJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Functional/Rest/ViewJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\Rest\\\\ViewJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Functional/Rest/ViewJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\Rest\\\\ViewJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Functional/Rest/ViewJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\Rest\\\\ViewResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Functional/Rest/ViewResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\Rest\\\\ViewXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Functional/Rest/ViewXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\Rest\\\\ViewXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Functional/Rest/ViewXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\Rest\\\\ViewXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Functional/Rest/ViewXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\Rest\\\\ViewXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Functional/Rest/ViewXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\SearchIntegrationTest\\:\\:cronRun\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Functional/SearchIntegrationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Functional\\\\SearchMultilingualTest\\:\\:cronRun\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Functional/SearchMultilingualTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$link might not be defined\\.$#',
@@ -36596,6 +35132,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Handler/FieldDateTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$name of method Drupal\\\\Tests\\\\views\\\\Kernel\\\\Handler\\\\FieldEntityLinkTest\\:\\:createUser\\(\\) expects string\\|null, false given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Handler/FieldEntityLinkTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\Handler\\\\FieldFieldAccessTestBase\\:\\:assertFieldAccess\\(\\) has no return type specified\\.$#',
@@ -36796,24 +35338,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Plugin/SqlQueryTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$rand1 might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Plugin/StyleTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$rand2 might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Plugin/StyleTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$rand3 might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/views/tests/src/Kernel/Plugin/StyleTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Kernel\\\\Plugin\\\\StyleTestBase\\:\\:storeViewPreview\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -36856,106 +35380,16 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/tests/src/Kernel/ViewsKernelTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\views\\\\Unit\\\\Controller\\\\ViewAjaxControllerTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 9,
-	'path' => __DIR__ . '/modules/views/tests/src/Unit/Controller/ViewAjaxControllerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\views\\\\Unit\\\\EventSubscriber\\\\RouteSubscriberTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 6,
-	'path' => __DIR__ . '/modules/views/tests/src/Unit/EventSubscriber/RouteSubscriberTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Unit\\\\EventSubscriber\\\\TestRouteSubscriber\\:\\:getApplicableViews\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/tests/src/Unit/EventSubscriber/RouteSubscriberTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\views\\\\Unit\\\\Plugin\\\\Block\\\\ViewsBlockTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 11,
-	'path' => __DIR__ . '/modules/views/tests/src/Unit/Plugin/Block/ViewsBlockTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\views\\\\Unit\\\\Plugin\\\\Derivative\\\\ViewsLocalTaskTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 16,
-	'path' => __DIR__ . '/modules/views/tests/src/Unit/Plugin/Derivative/ViewsLocalTaskTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\views\\\\Unit\\\\Plugin\\\\HandlerBaseTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 4,
-	'path' => __DIR__ . '/modules/views/tests/src/Unit/Plugin/HandlerBaseTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Unit\\\\Plugin\\\\HandlerBaseTest\\:\\:setupDisplay\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Unit/Plugin/HandlerBaseTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Unit\\\\Plugin\\\\HandlerBaseTest\\:\\:setupExecutableAndView\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Unit/Plugin/HandlerBaseTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Unit\\\\Plugin\\\\HandlerBaseTest\\:\\:setupViewsData\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Unit/Plugin/HandlerBaseTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\views\\\\Unit\\\\Plugin\\\\area\\\\EntityTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 6,
-	'path' => __DIR__ . '/modules/views/tests/src/Unit/Plugin/area/EntityTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\views\\\\Unit\\\\Plugin\\\\area\\\\ViewTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 6,
-	'path' => __DIR__ . '/modules/views/tests/src/Unit/Plugin/area/ViewTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\views\\\\Unit\\\\Plugin\\\\argument_default\\\\RawTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/views/tests/src/Unit/Plugin/argument_default/RawTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\views\\\\Unit\\\\Plugin\\\\argument_validator\\\\EntityTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 13,
-	'path' => __DIR__ . '/modules/views/tests/src/Unit/Plugin/argument_validator/EntityTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\views\\\\Unit\\\\Plugin\\\\display\\\\PathPluginBaseTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 7,
-	'path' => __DIR__ . '/modules/views/tests/src/Unit/Plugin/display/PathPluginBaseTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\views\\\\Unit\\\\Plugin\\\\field\\\\FieldPluginBaseTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 9,
-	'path' => __DIR__ . '/modules/views/tests/src/Unit/Plugin/field/FieldPluginBaseTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Function Drupal\\\\views\\\\Plugin\\\\views\\\\field\\\\base_path\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/tests/src/Unit/Plugin/field/FieldPluginBaseTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\views\\\\Unit\\\\Plugin\\\\field\\\\FieldTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 25,
-	'path' => __DIR__ . '/modules/views/tests/src/Unit/Plugin/field/FieldTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Unit\\\\Plugin\\\\field\\\\FieldTest\\:\\:providerTestPrepareItemsByDelta\\(\\) has no return type specified\\.$#',
@@ -36994,36 +35428,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/tests/src/Unit/Plugin/pager/PagerPluginBaseTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\views\\\\Unit\\\\Plugin\\\\pager\\\\SqlBaseTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Unit/Plugin/pager/SqlBaseTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\views\\\\Unit\\\\Plugin\\\\views\\\\display\\\\BlockTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Unit/Plugin/views/display/BlockTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\views\\\\Unit\\\\Plugin\\\\views\\\\field\\\\BulkFormTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 4,
-	'path' => __DIR__ . '/modules/views/tests/src/Unit/Plugin/views/field/BulkFormTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\views\\\\Unit\\\\Plugin\\\\views\\\\field\\\\EntityOperationsUnitTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 3,
-	'path' => __DIR__ . '/modules/views/tests/src/Unit/Plugin/views/field/EntityOperationsUnitTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\views\\\\Unit\\\\Plugin\\\\views\\\\field\\\\LinkBaseTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 2,
-	'path' => __DIR__ . '/modules/views/tests/src/Unit/Plugin/views/field/LinkBaseTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Unit\\\\Plugin\\\\views\\\\query\\\\MysqlDateSqlTest\\:\\:providerTestGetDateFormat\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -37048,22 +35452,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views/tests/src/Unit/PluginBaseTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\views\\\\Unit\\\\ViewExecutableTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 25,
-	'path' => __DIR__ . '/modules/views/tests/src/Unit/ViewExecutableTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Cannot unset property Drupal\\\\views\\\\ViewExecutable\\:\\:\\$display_handler because it might have hooks in a subclass\\.$#',
 	'identifier' => 'unset.possiblyHookedProperty',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/tests/src/Unit/ViewExecutableTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\views\\\\Unit\\\\ViewsDataTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Unit/ViewsDataTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Unit\\\\ViewsDataTest\\:\\:providerTestGetEmptyKey\\(\\) has no return type specified\\.$#',
@@ -37076,12 +35468,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views/tests/src/Unit/ViewsDataTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\views\\\\Unit\\\\ViewsTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/views/tests/src/Unit/ViewsTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\views\\\\Unit\\\\WizardPluginBaseTest\\:\\:providerTestGetSelected\\(\\) has no return type specified\\.$#',
@@ -37244,6 +35630,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views_ui/src/Form/BreakLockForm.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#3 \\$title of method Drupal\\\\views_ui\\\\Hook\\\\ViewsUiThemeHooks\\:\\:viewPreviewSectionHandlerLinks\\(\\) expects string\\|Stringable\\|false, true given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 5,
+	'path' => __DIR__ . '/modules/views_ui/src/Hook/ViewsUiThemeHooks.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views_ui\\\\ViewAddForm\\:\\:cancel\\(\\) has no return type specified\\.$#',
@@ -37422,6 +35814,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\views_ui\\\\ViewFormBase\\:\\:prepareEntity\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/views_ui/src/ViewFormBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$view of method Drupal\\\\views_ui\\\\ViewFormBase\\:\\:getDisplayTabs\\(\\) expects Drupal\\\\views_ui\\\\ViewUI, Drupal\\\\Core\\\\Entity\\\\EntityInterface given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/views_ui/src/ViewFormBase.php',
 ];
@@ -37648,12 +36046,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/views_ui/tests/src/FunctionalJavascript/PreviewTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\views_ui\\\\Unit\\\\ViewListBuilderTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 3,
-	'path' => __DIR__ . '/modules/views_ui/tests/src/Unit/ViewListBuilderTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workflows\\\\Entity\\\\Workflow\\:\\:preSave\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -37876,60 +36268,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/workflows/tests/modules/workflow_type_test/src/Plugin/WorkflowType/WorkflowCustomAccessType.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\workflows\\\\Functional\\\\Rest\\\\WorkflowJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workflows/tests/src/Functional/Rest/WorkflowJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\workflows\\\\Functional\\\\Rest\\\\WorkflowJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workflows/tests/src/Functional/Rest/WorkflowJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\workflows\\\\Functional\\\\Rest\\\\WorkflowJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workflows/tests/src/Functional/Rest/WorkflowJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\workflows\\\\Functional\\\\Rest\\\\WorkflowJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workflows/tests/src/Functional/Rest/WorkflowJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\workflows\\\\Functional\\\\Rest\\\\WorkflowResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workflows/tests/src/Functional/Rest/WorkflowResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\workflows\\\\Functional\\\\Rest\\\\WorkflowXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workflows/tests/src/Functional/Rest/WorkflowXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\workflows\\\\Functional\\\\Rest\\\\WorkflowXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workflows/tests/src/Functional/Rest/WorkflowXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\workflows\\\\Functional\\\\Rest\\\\WorkflowXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workflows/tests/src/Functional/Rest/WorkflowXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\workflows\\\\Functional\\\\Rest\\\\WorkflowXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workflows/tests/src/Functional/Rest/WorkflowXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\workflows\\\\Unit\\\\WorkflowStateTransitionOperationsAccessCheckTest\\:\\:accessTestCases\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -37939,6 +36277,12 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\workflows\\\\Unit\\\\WorkflowStateTransitionOperationsAccessCheckTest\\:\\:invalidOperationNameTestCases\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
+	'path' => __DIR__ . '/modules/workflows/tests/src/Unit/WorkflowStateTransitionOperationsAccessCheckTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$route_name of class Drupal\\\\Core\\\\Routing\\\\RouteMatch constructor expects string, null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 4,
 	'path' => __DIR__ . '/modules/workflows/tests/src/Unit/WorkflowStateTransitionOperationsAccessCheckTest.php',
 ];
 $ignoreErrors[] = [
@@ -37958,18 +36302,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workspaces/src/Entity/Workspace.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\EntityQuery\\\\Query\\:\\:traitPrepare\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/EntityQuery/Query.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\workspaces\\\\EntityQuery\\\\QueryAggregate\\:\\:traitPrepare\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/src/EntityQuery/QueryAggregate.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\workspaces\\\\EventSubscriber\\\\EntitySchemaSubscriber\\:\\:addRevisionMetadataField\\(\\) has no return type specified\\.$#',
@@ -38186,60 +36518,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/modules/workspaces/tests/src/Functional/PathWorkspacesTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\workspaces\\\\Functional\\\\Rest\\\\WorkspaceJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/tests/src/Functional/Rest/WorkspaceJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\workspaces\\\\Functional\\\\Rest\\\\WorkspaceJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/tests/src/Functional/Rest/WorkspaceJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\workspaces\\\\Functional\\\\Rest\\\\WorkspaceJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/tests/src/Functional/Rest/WorkspaceJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\workspaces\\\\Functional\\\\Rest\\\\WorkspaceJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/tests/src/Functional/Rest/WorkspaceJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\workspaces\\\\Functional\\\\Rest\\\\WorkspaceResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/tests/src/Functional/Rest/WorkspaceResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\workspaces\\\\Functional\\\\Rest\\\\WorkspaceXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/tests/src/Functional/Rest/WorkspaceXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\workspaces\\\\Functional\\\\Rest\\\\WorkspaceXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/tests/src/Functional/Rest/WorkspaceXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\workspaces\\\\Functional\\\\Rest\\\\WorkspaceXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/tests/src/Functional/Rest/WorkspaceXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\workspaces\\\\Functional\\\\Rest\\\\WorkspaceXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/workspaces/tests/src/Functional/Rest/WorkspaceXmlBasicAuthTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\workspaces\\\\Functional\\\\WorkspaceBypassTest\\:\\:isLabelInContentOverview\\(\\) has no return type specified\\.$#',
@@ -38758,18 +37036,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/FunctionalJavascriptTests/WebDriverTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\BrowserTestBaseTest\\:\\:assertPathAliasExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/BrowserTestBaseTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\BrowserTestBaseTest\\:\\:assertPathAliasNotExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/BrowserTestBaseTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\FunctionalTests\\\\BrowserTestBaseTest\\:\\:cronRun\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -38804,18 +37070,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Installer/InstallerExistingConfigSyncDirectoryMultilingualTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Installer\\\\InstallerExistingConfigTestBase\\:\\:prepareEnvironment\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Installer/InstallerExistingConfigTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Installer\\\\InstallerExistingConfigTestBase\\:\\:setUpProfile\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Installer/InstallerExistingConfigTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Installer\\\\InstallerSiteConfigProfileTest\\:\\:setUpSite\\(\\) has no return type specified\\.$#',
@@ -38890,354 +37144,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/MailCaptureTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\BaseFieldOverrideJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/BaseFieldOverrideJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\BaseFieldOverrideJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/BaseFieldOverrideJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\BaseFieldOverrideJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/BaseFieldOverrideJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\BaseFieldOverrideJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/BaseFieldOverrideJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\BaseFieldOverrideResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/BaseFieldOverrideResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\BaseFieldOverrideXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/BaseFieldOverrideXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\BaseFieldOverrideXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/BaseFieldOverrideXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\BaseFieldOverrideXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/BaseFieldOverrideXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\BaseFieldOverrideXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/BaseFieldOverrideXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\DateFormatJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/DateFormatJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\DateFormatJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/DateFormatJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\DateFormatJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/DateFormatJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\DateFormatJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/DateFormatJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\DateFormatResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/DateFormatResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\DateFormatXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/DateFormatXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\DateFormatXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/DateFormatXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\DateFormatXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/DateFormatXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\DateFormatXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/DateFormatXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityFormDisplayJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityFormDisplayJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityFormDisplayJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityFormDisplayJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityFormDisplayJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityFormDisplayJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityFormDisplayJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityFormDisplayJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityFormDisplayResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityFormDisplayResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityFormDisplayXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityFormDisplayXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityFormDisplayXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityFormDisplayXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityFormDisplayXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityFormDisplayXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityFormDisplayXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityFormDisplayXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityFormModeJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityFormModeJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityFormModeJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityFormModeJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityFormModeJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityFormModeJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityFormModeJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityFormModeJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityFormModeResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityFormModeResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityFormModeXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityFormModeXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityFormModeXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityFormModeXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityFormModeXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityFormModeXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityFormModeXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityFormModeXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityViewDisplayJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityViewDisplayJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityViewDisplayJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityViewDisplayJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityViewDisplayJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityViewDisplayJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityViewDisplayJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityViewDisplayJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityViewDisplayResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityViewDisplayResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityViewDisplayXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityViewDisplayXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityViewDisplayXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityViewDisplayXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityViewDisplayXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityViewDisplayXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityViewDisplayXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityViewDisplayXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityViewModeJsonAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityViewModeJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityViewModeJsonAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityViewModeJsonAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityViewModeJsonBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityViewModeJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityViewModeJsonBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityViewModeJsonBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityViewModeResourceTestBase\\:\\:setUpAuthorization\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityViewModeResourceTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityViewModeXmlAnonTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityViewModeXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityViewModeXmlAnonTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityViewModeXmlAnonTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityViewModeXmlBasicAuthTest\\:\\:assertAuthenticationEdgeCases\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityViewModeXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Rest\\\\EntityViewModeXmlBasicAuthTest\\:\\:assertResponseWhenMissingAuthentication\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Rest/EntityViewModeXmlBasicAuthTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Routing\\\\PathEncodedTest\\:\\:assertPathAliasExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Routing/PathEncodedTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Routing\\\\PathEncodedTest\\:\\:assertPathAliasNotExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Routing/PathEncodedTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Routing\\\\RouteCachingNonPathLanguageNegotiationTest\\:\\:assertPathAliasExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Routing/RouteCachingNonPathLanguageNegotiationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Routing\\\\RouteCachingNonPathLanguageNegotiationTest\\:\\:assertPathAliasNotExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/FunctionalTests/Routing/RouteCachingNonPathLanguageNegotiationTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\FunctionalTests\\\\Update\\\\UpdatePathTestBase\\:\\:doInstall\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -39304,6 +37210,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Action/EmailActionTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$library_definitions of method Drupal\\\\KernelTests\\\\Core\\\\Asset\\\\ResolvedLibraryDefinitionsFilesMatchTest\\:\\:verifyLibraryFilesExist\\(\\) expects array\\<array\\>, array\\<Drupal\\\\Core\\\\Extension\\\\Extension\\> given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 2,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Asset/ResolvedLibraryDefinitionsFilesMatchTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Variable \\$found might not be defined\\.$#',
 	'identifier' => 'variable.undefined',
 	'count' => 1,
@@ -39355,6 +37267,12 @@ $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Config\\\\Storage\\\\ConfigStorageTestBase\\:\\:update\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Config/Storage/ConfigStorageTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$expected of method PHPUnit\\\\Framework\\\\Assert\\:\\:assertSame\\(\\) contains unresolvable type\\.$#',
+	'identifier' => 'argument.unresolvableType',
+	'count' => 3,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Config/Storage/ConfigStorageTestBase.php',
 ];
 $ignoreErrors[] = [
@@ -39478,6 +37396,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Datetime/Element/TimezoneTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$expected of method PHPUnit\\\\Framework\\\\Assert\\:\\:assertSame\\(\\) contains unresolvable type\\.$#',
+	'identifier' => 'argument.unresolvableType',
+	'count' => 16,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/DrupalKernel/DrupalKernelRequestStackTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Element\\\\PathElementFormTest\\:\\:submitForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -39490,10 +37414,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Element/PathElementFormTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$title might not be defined\\.$#',
-	'identifier' => 'variable.undefined',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/CreateSampleEntityTest.php',
+	'message' => '#^Parameter \\#1 \\$base_field_definition of static method Drupal\\\\Core\\\\Field\\\\Entity\\\\BaseFieldOverride\\:\\:createFromBaseFieldDefinition\\(\\) expects Drupal\\\\Core\\\\Field\\\\BaseFieldDefinition, Drupal\\\\Core\\\\Field\\\\FieldDefinitionInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/BaseFieldOverrideValidationTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Entity\\\\Element\\\\EntityAutocompleteElementFormTest\\:\\:submitForm\\(\\) has no return type specified\\.$#',
@@ -39536,6 +37460,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityLanguageTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$array of function sort expects TArray of array\\<T\\>, null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 3,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Entity/EntityTranslationTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Variable \\$e might not be defined\\.$#',
@@ -39598,46 +37528,16 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Form/TriggeringElementProgrammedTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\KernelTests\\\\Core\\\\Installer\\\\InstallerRedirectTraitTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 3,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Installer/InstallerRedirectTraitTest.php',
+	'message' => '#^Parameter \\#1 \\$callback of function set_error_handler expects \\(callable\\(int, string, string, int\\)\\: bool\\)\\|null, Closure\\(\\)\\: void given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Image/GdToolkitPngImageManipulationTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\KeyValueStore\\\\StorageTestBase\\:\\:createStorage\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/KeyValueStore/StorageTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Plugin\\\\Context\\\\TestConfigurableContextAwarePlugin\\:\\:getCacheContexts\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Plugin/Context/ContextAwarePluginTraitTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Plugin\\\\Context\\\\TestConfigurableContextAwarePlugin\\:\\:getCacheMaxAge\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Plugin/Context/ContextAwarePluginTraitTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Plugin\\\\Context\\\\TestConfigurableContextAwarePlugin\\:\\:getCacheTags\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Plugin/Context/ContextAwarePluginTraitTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Plugin\\\\Context\\\\TestConfigurableContextAwarePlugin\\:\\:setConfiguration\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Plugin/Context/ContextAwarePluginTraitTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Plugin\\\\Context\\\\TestConfigurableContextAwarePlugin\\:\\:setContext\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Plugin/Context/ContextAwarePluginTraitTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Plugin\\\\Context\\\\TestContextAwarePlugin\\:\\:getCacheContexts\\(\\) has no return type specified\\.$#',
@@ -39700,10 +37600,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Queue/QueueSerializationTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\KernelTests\\\\Core\\\\Recipe\\\\InputTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 3,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Recipe/InputTest.php',
+	'message' => '#^Parameter \\#2 \\$baseDir of static method org\\\\bovigo\\\\vfs\\\\vfsStream\\:\\:copyFromFileSystem\\(\\) expects org\\\\bovigo\\\\vfs\\\\vfsStreamDirectory\\|null, org\\\\bovigo\\\\vfs\\\\vfsStreamContent given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Recipe/ConfigConfiguratorTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Render\\\\Element\\\\ActionsTest\\:\\:submitForm\\(\\) has no return type specified\\.$#',
@@ -39730,30 +37630,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Render/Element/MachineNameTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Routing\\\\ContentNegotiationRoutingTest\\:\\:assertPathAliasExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Routing/ContentNegotiationRoutingTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Routing\\\\ContentNegotiationRoutingTest\\:\\:assertPathAliasNotExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Routing/ContentNegotiationRoutingTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Routing\\\\RouteProviderTest\\:\\:assertPathAliasExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Routing/RouteProviderTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Routing\\\\RouteProviderTest\\:\\:assertPathAliasNotExists\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/Routing/RouteProviderTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\Core\\\\Test\\\\AssertMailTraitTest\\:\\:assertMailPattern\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -39770,36 +37646,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/Core/TypedData/TypedDataTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:__construct\\(\\) overrides @final method PHPUnit\\\\Framework\\\\TestCase\\:\\:__construct\\(\\)\\.$#',
-	'identifier' => 'method.parentMethodFinalByPhpDoc',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/KernelTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:assertNoTitle\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/KernelTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:assertOption\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/KernelTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:assertOptionByText\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/KernelTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:assertOptionWithDrupalSelector\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/KernelTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\KernelTestBase\\:\\:assertThemeOutput\\(\\) has no return type specified\\.$#',
@@ -39934,21 +37780,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/KernelTests/KernelTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Usage of deprecated trait Drupal\\\\TestTools\\\\Extension\\\\DeprecationBridge\\\\ExpectDeprecationTrait in class Drupal\\\\KernelTests\\\\KernelTestBase\\:
-in drupal\\:11\\.4\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use
-  \\$this\\-\\>expectUserDeprecationMessage\\(\\) or
-  \\$this\\-\\>expectUserDeprecationMessageMatches\\(\\) instead\\.$#',
-	'identifier' => 'traitUse.deprecatedTrait',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/KernelTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Variable \\$value in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/KernelTests/KernelTestBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\KernelTests\\\\RouteProvider\\:\\:getCandidateOutlines\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -40051,12 +37882,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/TestSite/Commands/TestSiteInstallCommand.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\TestSite\\\\Commands\\\\TestSiteInstallCommand\\:\\:installParameters\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/TestSite/Commands/TestSiteInstallCommand.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\TestSite\\\\Commands\\\\TestSiteInstallCommand\\:\\:prepareEnvironment\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -40130,12 +37955,6 @@ Client\\:\\:getConfig will be removed in guzzlehttp/guzzle\\:8\\.0\\.$#',
 	'path' => __DIR__ . '/tests/Drupal/Tests/BrowserTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\BrowserTestBase\\:\\:__construct\\(\\) overrides @final method PHPUnit\\\\Framework\\\\TestCase\\:\\:__construct\\(\\)\\.$#',
-	'identifier' => 'method.parentMethodFinalByPhpDoc',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/BrowserTestBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\BrowserTestBase\\:\\:cleanupEnvironment\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -40185,18 +38004,6 @@ $ignoreErrors[] = [
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\BrowserTestBase\\:\\:getTextContent\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/BrowserTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\BrowserTestBase\\:\\:htmlOutput\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/BrowserTestBase.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\BrowserTestBase\\:\\:initBrowserOutputFile\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/BrowserTestBase.php',
@@ -40322,15 +38129,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/BrowserTestBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Usage of deprecated trait Drupal\\\\TestTools\\\\Extension\\\\DeprecationBridge\\\\ExpectDeprecationTrait in class Drupal\\\\Tests\\\\BrowserTestBase\\:
-in drupal\\:11\\.4\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use
-  \\$this\\-\\>expectUserDeprecationMessage\\(\\) or
-  \\$this\\-\\>expectUserDeprecationMessageMatches\\(\\) instead\\.$#',
-	'identifier' => 'traitUse.deprecatedTrait',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/BrowserTestBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Component\\\\Annotation\\\\AnnotationBaseStub\\:\\:get\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -40353,6 +38151,18 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Component/Annotation/Doctrine/Fixtures/ClassWithValidAnnotationTarget.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$expected of method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\) expects class\\-string\\<\\\\Drupal\\\\Component\\\\DateTimePlus\\>, string given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Component/Datetime/DateTimePlusTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$settings of static method Drupal\\\\Component\\\\Datetime\\\\DateTimePlus\\:\\:createFromDateTime\\(\\) expects array, null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Component/Datetime/DateTimePlusTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Component\\\\DependencyInjection\\\\ContainerTest\\:\\:getCollection\\(\\) has no return type specified\\.$#',
@@ -40463,10 +38273,28 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Component/DependencyInjection/PhpArrayContainerTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$prefix of static method Drupal\\\\Component\\\\FileCache\\\\FileCacheFactory\\:\\:setPrefix\\(\\) expects string, null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Component/FileCache/FileCacheFactoryTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$callback of function set_error_handler expects \\(callable\\(int, string, string, int\\)\\: bool\\)\\|null, Closure\\(int, string\\)\\: void given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Component/PhpStorage/FileStorageTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Component\\\\PhpStorage\\\\PhpStorageTestBase\\:\\:additionalAssertCRUD\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Component/PhpStorage/PhpStorageTestBase.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\$deriver of class Drupal\\\\Tests\\\\Component\\\\Plugin\\\\Attribute\\\\PluginStub constructor expects class\\-string\\|null, string given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Component/Plugin/Attribute/PluginTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Component\\\\Plugin\\\\Discovery\\\\DiscoveryCachedTraitMockableClass\\:\\:getDefinition\\(\\) has no return type specified\\.$#',
@@ -40625,6 +38453,18 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Component/ProxyBuilder/ProxyBuilderTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$callback of function set_error_handler expects \\(callable\\(int, string, string, int\\)\\: bool\\)\\|null, array\\{\\$this\\(Drupal\\\\Tests\\\\Component\\\\Render\\\\FormattableMarkupTest\\), \'errorHandler\'\\} given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Component/Render/FormattableMarkupTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#3 \\$flags of static method Drupal\\\\Component\\\\Serialization\\\\YamlPecl\\:\\:applyBooleanCallbacks\\(\\) expects int, null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Component/Serialization/YamlPeclTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Component\\\\Serialization\\\\YamlTestBase\\:\\:providerBoolTest\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -40651,6 +38491,12 @@ $ignoreErrors[] = [
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Component\\\\Utility\\\\TestStaticMethodClass\\:\\:access\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Component/Utility/ArgumentsResolverTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#2 \\$objects of class Drupal\\\\Component\\\\Utility\\\\ArgumentsResolver constructor expects array\\<object\\>, array\\<string, string\\> given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Component/Utility/ArgumentsResolverTest.php',
 ];
@@ -40715,40 +38561,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Composer/Plugin/Scaffold/Functional/ScaffoldUpgradeTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Composer\\\\Plugin\\\\VendorHardening\\\\VendorHardeningPluginTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Composer/Plugin/VendorHardening/VendorHardeningPluginTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Access\\\\AccessManagerTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 9,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Access/AccessManagerTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Access\\\\TestAccessCheckInterface\\:\\:access\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Access/AccessManagerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Access\\\\AccessResultTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 5,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Access/AccessResultTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Access\\\\CsrfTokenGeneratorTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 3,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Access/CsrfTokenGeneratorTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Access\\\\CustomAccessCheckTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Access/CustomAccessCheckTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Access\\\\TestController\\:\\:accessAllow\\(\\) has no return type specified\\.$#',
@@ -40775,12 +38591,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Access/CustomAccessCheckTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Access\\\\RouteProcessorCsrfTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 3,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Access/RouteProcessorCsrfTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Asset\\\\TestLibraryDiscoveryParser\\:\\:fileValidUri\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -40797,6 +38607,12 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Batch/BatchBuilderTest.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$container of class Drupal\\\\Core\\\\Cache\\\\Context\\\\CacheContextsManager constructor expects Symfony\\\\Component\\\\DependencyInjection\\\\ContainerInterface, PHPUnit\\\\Framework\\\\MockObject\\\\Stub given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 5,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Cache/Context/CacheContextsManagerTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Config\\\\Checkpoint\\\\CheckpointStorageTest\\:\\:replaceStorageContents\\(\\) has no return type specified\\.$#',
@@ -40835,18 +38651,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Config/ConfigFactoryOverrideBaseTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Config\\\\Entity\\\\ConfigEntityBaseUnitTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 16,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Config/Entity/ConfigEntityBaseUnitTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Config\\\\Entity\\\\EntityDisplayModeBaseUnitTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Config/Entity/EntityDisplayModeBaseUnitTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Config\\\\ReadOnlyStorageTest\\:\\:replaceStorageContents\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -40859,16 +38663,22 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Config/StorageCopyTraitTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$storage of static method Drupal\\\\Tests\\\\Core\\\\Config\\\\StorageCopyTraitTest\\:\\:toArray\\(\\) expects Drupal\\\\Core\\\\Config\\\\MemoryStorage, Drupal\\\\Core\\\\Config\\\\StorageInterface given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Config/StorageCopyTraitTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Controller\\\\MockContainerInjection\\:\\:getResult\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Controller/ControllerResolverTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Database\\\\DriverModuleMissingDependenciesTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 3,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Database/DriverModuleMissingDependenciesTest.php',
+	'message' => '#^Parameter \\#3 \\$identifier_quotes of class Drupal\\\\Tests\\\\Core\\\\Database\\\\Stub\\\\StubConnection constructor expects array\\<string\\>\\|null, array\\<int, int\\|string\\> given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Database/ConnectionTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Database\\\\Stub\\\\StubConnection\\:\\:createDatabase\\(\\) has no return type specified\\.$#',
@@ -40911,24 +38721,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Database/Stub/StubSchema.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Datetime\\\\DateHelperTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Datetime/DateHelperTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Datetime\\\\DateTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 6,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Datetime/DateTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Datetime\\\\DrupalDateTimeTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Datetime/DrupalDateTimeTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\DependencyInjection\\\\Compiler\\\\InvalidConsumer\\:\\:addHandler\\(\\) has no return type specified\\.$#',
@@ -40985,82 +38777,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/DependencyInjection/DependencySerializationTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Enhancer\\\\ParamConversionEnhancerTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Enhancer/ParamConversionEnhancerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Entity\\\\Access\\\\EntityCreateAccessCustomCidTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 4,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/Access/EntityCreateAccessCustomCidTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Entity\\\\Access\\\\EntityFormDisplayAccessControlHandlerTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 15,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/Access/EntityFormDisplayAccessControlHandlerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Entity\\\\Access\\\\EntityViewDisplayAccessControlHandlerTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/Access/EntityViewDisplayAccessControlHandlerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Entity\\\\BaseFieldDefinitionTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 6,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/BaseFieldDefinitionTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Entity\\\\ContentEntityBaseUnitTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 18,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/ContentEntityBaseUnitTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Entity\\\\EntityCreateAccessCheckTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 3,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityCreateAccessCheckTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Entity\\\\EntityFieldManagerTest\\:\\:setUpEntityWithFieldDefinition\\(\\) return type with generic interface Prophecy\\\\Prophecy\\\\ProphecyInterface does not specify its types\\: T$#',
 	'identifier' => 'missingType.generics',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityFieldManagerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Entity\\\\EntityFormBuilderTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityFormBuilderTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Entity\\\\EntityFormTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityFormTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Entity\\\\EntityLinkTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 3,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityLinkTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Entity\\\\EntityListBuilderTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 9,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityListBuilderTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Entity\\\\EntityResolverManagerTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 6,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityResolverManagerTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Entity\\\\BasicControllerClass\\:\\:exampleControllerMethod\\(\\) has no return type specified\\.$#',
@@ -41111,94 +38831,16 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityResolverManagerTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Entity\\\\EntityStorageBaseTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityStorageBaseTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Entity\\\\EntityUnitTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 5,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityUnitTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Entity\\\\EntityUrlTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityUrlTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Entity\\\\FieldDefinitionTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
+	'message' => '#^Parameter \\#1 \\$mock of method Drupal\\\\Tests\\\\UnitTestCase\\:\\:setupMockIterator\\(\\) expects Iterator&PHPUnit\\\\Framework\\\\MockObject\\\\Stub, Drupal\\\\Core\\\\Field\\\\FieldItemListInterface&PHPUnit\\\\Framework\\\\MockObject\\\\Stub given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/FieldDefinitionTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Entity\\\\KeyValueStore\\\\KeyValueEntityStorageTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 5,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/KeyValueStore/KeyValueEntityStorageTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Entity\\\\Query\\\\Sql\\\\QueryTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/Query/Sql/QueryTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Entity\\\\Sql\\\\DefaultTableMappingTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 19,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/Sql/DefaultTableMappingTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Entity\\\\Sql\\\\SqlContentEntityStorageSchemaTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 44,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/Sql/SqlContentEntityStorageSchemaTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Entity\\\\Sql\\\\SqlContentEntityStorageTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 47,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/Sql/SqlContentEntityStorageTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Entity\\\\TypedData\\\\EntityAdapterUnitTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 13,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/TypedData/EntityAdapterUnitTest.php',
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Entity/EntityViewBuilderTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\EventSubscriber\\\\ActiveLinkResponseFilterTest\\:\\:providerTestSetLinkActiveClass\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/EventSubscriber/ActiveLinkResponseFilterTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\EventSubscriber\\\\CustomPageExceptionHtmlSubscriberTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 6,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/EventSubscriber/CustomPageExceptionHtmlSubscriberTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\EventSubscriber\\\\ModuleRouteSubscriberTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/EventSubscriber/ModuleRouteSubscriberTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\EventSubscriber\\\\PsrResponseSubscriberTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/EventSubscriber/PsrResponseSubscriberTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\EventSubscriber\\\\RedirectResponseSubscriberTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/EventSubscriber/RedirectResponseSubscriberTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Function module_handler_test_hook\\(\\) has no return type specified\\.$#',
@@ -41225,28 +38867,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Extension/modules/module_handler_test_all2/module_handler_test_all2.module',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Form\\\\ConfigFormBaseTraitTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Form/ConfigFormBaseTraitTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Form\\\\ConfiguredTrait\\:\\:getEditableConfigNames\\(\\) should return array but return statement is missing\\.$#',
 	'identifier' => 'return.missing',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Form/ConfigFormBaseTraitTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Form\\\\ConfirmFormHelperTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 4,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Form/ConfirmFormHelperTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Form\\\\FormBuilderTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 3,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Form/FormBuilderTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Form\\\\TestForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
@@ -41259,12 +38883,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Form/FormBuilderTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Form\\\\FormCacheTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Form/FormCacheTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Form\\\\PrepareCallbackTestForm\\:\\:submitForm\\(\\) has no return type specified\\.$#',
@@ -41327,18 +38945,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Form/FormStateValuesTraitTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Form\\\\FormSubmitterTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Form/FormSubmitterTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Form\\\\FormTestBase\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Form/FormTestBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Form\\\\FormTestBase\\:\\:assertFormElement\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -41363,6 +38969,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Form/FormValidatorTest.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$expected of method PHPUnit\\\\Framework\\\\Assert\\:\\:assertSame\\(\\) contains unresolvable type\\.$#',
+	'identifier' => 'argument.unresolvableType',
+	'count' => 1,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Form/SubformStateTest.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConfig\\(\\) of class GuzzleHttp\\\\Client\\:
 Client\\:\\:getConfig will be removed in guzzlehttp/guzzle\\:8\\.0\\.$#',
 	'identifier' => 'method.deprecated',
@@ -41370,28 +38982,16 @@ Client\\:\\:getConfig will be removed in guzzlehttp/guzzle\\:8\\.0\\.$#',
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Http/ClientFactoryTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Image\\\\ImageTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 3,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Image/ImageTest.php',
+	'message' => '#^Parameter \\#1 \\$mock_plugin of method Drupal\\\\Tests\\\\Core\\\\Menu\\\\LocalTaskManagerTest\\:\\:getLocalTasksForRouteResult\\(\\) expects PHPUnit\\\\Framework\\\\MockObject\\\\MockObject, Drupal\\\\Core\\\\Menu\\\\LocalTaskInterface&PHPUnit\\\\Framework\\\\MockObject\\\\Stub given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 4,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Menu/LocalTaskManagerTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\ParamConverter\\\\EntityConverterTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 16,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/ParamConverter/EntityConverterTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\ParamConverter\\\\ParamConverterManagerTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 3,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/ParamConverter/ParamConverterManagerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Plugin\\\\CategorizingPluginManagerTraitTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Plugin/CategorizingPluginManagerTraitTest.php',
+	'message' => '#^Parameter \\#1 \\$mock_plugin of method Drupal\\\\Tests\\\\Core\\\\Menu\\\\LocalTaskManagerTest\\:\\:setupFactory\\(\\) expects PHPUnit\\\\Framework\\\\MockObject\\\\MockObject, Drupal\\\\Core\\\\Menu\\\\LocalTaskInterface&PHPUnit\\\\Framework\\\\MockObject\\\\Stub given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 4,
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Menu/LocalTaskManagerTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Plugin\\\\CategorizingPluginManager\\:\\:processDefinitionCategory\\(\\) has no return type specified\\.$#',
@@ -41406,30 +39006,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Plugin/CategorizingPluginManagerTraitTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Plugin\\\\Context\\\\ContextTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Plugin/Context/ContextTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Plugin\\\\ContextHandlerTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Plugin/ContextHandlerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Plugin\\\\DefaultLazyPluginCollectionTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Plugin/DefaultLazyPluginCollectionTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Plugin\\\\DefaultPluginManagerTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Plugin/DefaultPluginManagerTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Plugin\\\\TestPluginForm\\:\\:submitConfigurationForm\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -41440,18 +39016,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Plugin/DefaultPluginManagerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Plugin\\\\DefaultSingleLazyPluginCollectionTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 3,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Plugin/DefaultSingleLazyPluginCollectionTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Plugin\\\\Discovery\\\\DerivativeDiscoveryDecoratorTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 8,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Plugin/Discovery/DerivativeDiscoveryDecoratorTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Constructor of class Drupal\\\\Tests\\\\Core\\\\Plugin\\\\Discovery\\\\TestContainerDerivativeDiscovery has an unused parameter \\$example_service\\.$#',
@@ -41490,12 +39054,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Plugin/FilteredPluginManagerTraitTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Plugin\\\\LazyPluginCollectionTestBase\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Plugin/LazyPluginCollectionTestBase.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Plugin\\\\LazyPluginCollectionTestBase\\:\\:setupPluginCollection\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -41524,12 +39082,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Plugin/PluginDependencyTraitTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Plugin\\\\PluginExistsConstraintTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Plugin/PluginExistsConstraintTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Plugin\\\\TestClass\\:\\:submitConfigurationForm\\(\\) has no return type specified\\.$#',
@@ -41562,30 +39114,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/ProxyBuilder/ProxyBuilderTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Render\\\\ElementInfoManagerTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Render/ElementInfoManagerTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Render\\\\MetadataBubblingUrlGeneratorTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Render/MetadataBubblingUrlGeneratorTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Render\\\\Plugin\\\\DisplayVariant\\\\SimplePageVariantTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Render/Plugin/DisplayVariant/SimplePageVariantTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Render\\\\RendererBubblingTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 4,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Render/RendererBubblingTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Render\\\\BubblingTest\\:\\:bubblingNestedPreRenderCached\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -41596,12 +39124,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Render/RendererBubblingTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Render\\\\RendererCallbackTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Render/RendererCallbackTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Function Drupal\\\\Tests\\\\Core\\\\Render\\\\callback\\(\\) has no return type specified\\.$#',
@@ -41622,12 +39144,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Render/RendererCallbackTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Render\\\\RendererPlaceholdersTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 5,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Render/RendererPlaceholdersTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Render\\\\TestAccessClass\\:\\:accessResultAllowed\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
@@ -41638,12 +39154,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Render/RendererTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Render\\\\RendererTestBase\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 4,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Render/RendererTestBase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Render\\\\RendererTestBase\\:\\:assertRenderCacheItem\\(\\) has no return type specified\\.$#',
@@ -41676,70 +39186,34 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Routing/AccessAwareRouterTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Routing\\\\RedirectDestinationTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
+	'message' => '#^Parameter \\#1 \\$callback of function set_error_handler expects \\(callable\\(int, string, string, int\\)\\: bool\\)\\|null, array\\{\\$this\\(Drupal\\\\Tests\\\\Core\\\\Security\\\\RequestSanitizerTest\\), \'errorHandler\'\\} given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Routing/RedirectDestinationTest.php',
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Security/RequestSanitizerTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Routing\\\\RouteBuilderTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 3,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Routing/RouteBuilderTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Routing\\\\RoutePreloaderTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Routing/RoutePreloaderTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Routing\\\\RouterTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
+	'message' => '#^Parameter \\#1 \\$string of class Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup constructor expects string, Drupal\\\\Component\\\\Render\\\\FormattableMarkup given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Routing/RouterTest.php',
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/StringTranslation/TranslatableMarkupTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Routing\\\\UrlGeneratorTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 4,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Routing/UrlGeneratorTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\TempStore\\\\PrivateTempStoreTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
+	'message' => '#^Parameter \\#1 \\$string of class Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup constructor expects string, Drupal\\\\Core\\\\StringTranslation\\\\TranslatableMarkup given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/TempStore/PrivateTempStoreTest.php',
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/StringTranslation/TranslatableMarkupTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Template\\\\TwigExtensionTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Template/TwigExtensionTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Test\\\\AssertContentTraitTest\\:\\:assertNoTitle\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
+	'message' => '#^Parameter \\#1 \\$a of static method Drupal\\\\Core\\\\Template\\\\AttributeHelper\\:\\:mergeCollections\\(\\) expects array\\|Drupal\\\\Core\\\\Template\\\\Attribute, string given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Test/AssertContentTraitTest.php',
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Template/AttributeHelperTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Test\\\\AssertContentTraitTest\\:\\:assertOption\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
+	'message' => '#^Parameter \\#2 \\$b of static method Drupal\\\\Core\\\\Template\\\\AttributeHelper\\:\\:mergeCollections\\(\\) expects array\\|Drupal\\\\Core\\\\Template\\\\Attribute, string given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Test/AssertContentTraitTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Test\\\\AssertContentTraitTest\\:\\:assertOptionByText\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Test/AssertContentTraitTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Test\\\\AssertContentTraitTest\\:\\:assertOptionWithDrupalSelector\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Test/AssertContentTraitTest.php',
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Template/AttributeHelperTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Test\\\\AssertContentTraitTest\\:\\:assertThemeOutput\\(\\) has no return type specified\\.$#',
@@ -41790,32 +39264,14 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Test/AssertContentTraitTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Variable \\$value in isset\\(\\) always exists and is not nullable\\.$#',
-	'identifier' => 'isset.variable',
+	'message' => '#^Parameter \\#1 \\$constraint of method JsonSchema\\\\Constraints\\\\BaseConstraint\\:\\:addError\\(\\) expects JsonSchema\\\\ConstraintError, string given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Test/AssertContentTraitTest.php',
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Theme/Component/ComponentValidatorTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Test\\\\BrowserTestBaseTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Test/BrowserTestBaseTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Test\\\\TestDiscoveryTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Test/TestDiscoveryTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Test\\\\WebAssertTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 2,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Test/WebAssertTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Theme\\\\Icon\\\\IconFinderTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
+	'message' => '#^Parameter \\#1 \\$callback of function set_error_handler expects \\(callable\\(int, string, string, int\\)\\: bool\\)\\|null, Closure\\(int, string\\)\\: void given\\.$#',
+	'identifier' => 'argument.type',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Theme/Icon/IconFinderTest.php',
 ];
@@ -41824,30 +39280,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Theme/RegistryTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Theme\\\\ThemeNegotiatorTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 3,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Theme/ThemeNegotiatorTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Transliteration\\\\PhpTransliterationTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Transliteration/PhpTransliterationTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\TypedData\\\\RecursiveContextualValidatorTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/TypedData/RecursiveContextualValidatorTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\UnroutedUrlTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/UnroutedUrlTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Path in include_once\\(\\) "vfs\\://drupal/sites/default/modules/module_a/module_a\\.post_update\\.php" is not a file or it does not exist\\.$#',
@@ -41862,34 +39294,10 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Update/UpdateRegistryTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\UrlTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 3,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/UrlTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Utility\\\\LinkGeneratorTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 3,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Utility/LinkGeneratorTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Utility\\\\TokenTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 6,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Utility/TokenTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Validation\\\\Plugin\\\\Validation\\\\Constraint\\\\PrimitiveTypeConstraintValidatorTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
+	'message' => '#^Parameter \\#1 \\$expected of method PHPUnit\\\\Framework\\\\Assert\\:\\:assertSame\\(\\) contains unresolvable type\\.$#',
+	'identifier' => 'argument.unresolvableType',
 	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Validation/Plugin/Validation/Constraint/PrimitiveTypeConstraintValidatorTest.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Calling PHPUnit\\\\Framework\\\\TestCase\\:\\:any\\(\\) \\(as Drupal\\\\Tests\\\\Core\\\\Validation\\\\Plugin\\\\Validation\\\\Constraint\\\\SerializedConstraintValidatorTest\\:\\:any\\(\\)\\) is forbidden, any\\(\\) will be deprecated in PHPUnit 12\\.5\\.0 and should not be used\\.$#',
-	'identifier' => 'disallowed.method',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Validation/Plugin/Validation/Constraint/SerializedConstraintValidatorTest.php',
+	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Utility/PhpRequirementsTest.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Call to deprecated method getConfig\\(\\) of interface GuzzleHttp\\\\ClientInterface\\:
@@ -41903,15 +39311,6 @@ $ignoreErrors[] = [
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/tests/Drupal/Tests/DrupalTestBrowser.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Usage of deprecated trait Drupal\\\\TestTools\\\\Extension\\\\DeprecationBridge\\\\ExpectDeprecationTrait in class Drupal\\\\Tests\\\\UnitTestCase\\:
-in drupal\\:11\\.4\\.0 and is removed from drupal\\:12\\.0\\.0\\. Use
-  \\$this\\-\\>expectUserDeprecationMessage\\(\\) or
-  \\$this\\-\\>expectUserDeprecationMessageMatches\\(\\) instead\\.$#',
-	'identifier' => 'traitUse.deprecatedTrait',
-	'count' => 1,
-	'path' => __DIR__ . '/tests/Drupal/Tests/UnitTestCase.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\WebAssert\\:\\:assert\\(\\) has no return type specified\\.$#',
@@ -41956,10 +39355,28 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/themes/claro/src/ClaroPreRender.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$array of function array_key_first expects array, Drupal\\\\Core\\\\Template\\\\AttributeValueBase\\|null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/themes/claro/src/Hook/ClaroHooks.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Parameter \\#1 \\$array of function array_key_first expects array, Drupal\\\\Core\\\\Template\\\\AttributeValueBase\\|null given\\.$#',
+	'identifier' => 'argument.type',
+	'count' => 1,
+	'path' => __DIR__ . '/themes/default_admin/src/Hook/PreprocessHooks.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\olivero\\\\OliveroPreRender\\:\\:textFormat\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
 	'path' => __DIR__ . '/themes/olivero/src/OliveroPreRender.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Missing call to parent\\:\\:setUp\\(\\) method\\.$#',
+	'identifier' => 'phpunit.callParent',
+	'count' => 1,
+	'path' => __DIR__ . '/themes/stable9/tests/Kernel/Stable9LibraryOverrideTest.php',
 ];
 
 return ['parameters' => ['ignoreErrors' => $ignoreErrors]];

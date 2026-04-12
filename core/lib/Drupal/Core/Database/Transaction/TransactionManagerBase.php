@@ -439,6 +439,12 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       return;
     }
 
+    // If the client transaction was already committed, there's no longer
+    // anything to do on an explicit commit/savepoint release.
+    if ($this->getConnectionTransactionState() === ClientConnectionTransactionState::Committed) {
+      return;
+    }
+
     // If there is no $id to commit, or if $id does not correspond to the one
     // in the stack for that $name, the commit is out of order.
     if (!isset($this->stack()[$id]) || $this->stack()[$id]->name !== $name) {
@@ -570,7 +576,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     // If the transaction was voided, we cannot rollback. Fail silently but
     // trigger a user warning.
     if ($this->getConnectionTransactionState() === ClientConnectionTransactionState::Voided) {
-      $this->connectionTransactionState = ClientConnectionTransactionState::RollbackFailed;
+      $this->setConnectionTransactionState(ClientConnectionTransactionState::RollbackFailed);
       $message = 'Transaction::rollBack() failed because of a prior execution of a DDL statement.';
       if ($this->connection->isEventEnabled(TransactionRollbackFailureEvent::class)) {
         $this->connection->dispatchEvent(new TransactionRollbackFailureEvent(
