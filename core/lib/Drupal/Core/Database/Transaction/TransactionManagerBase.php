@@ -292,7 +292,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * {@inheritdoc}
    */
   public function currentTransactionName(): ?string {
-    return $this->inTransaction() ? end($this->stack)->name : NULL;
+    return $this->inTransaction() ? array_last($this->stack)->name : NULL;
   }
 
   /**
