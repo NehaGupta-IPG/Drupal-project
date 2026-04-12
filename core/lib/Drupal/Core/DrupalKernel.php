@@ -991,7 +991,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   protected function initializeContainer() {
     $this->containerNeedsDumping = FALSE;
-    $session_started = FALSE;
     $all_messages = [];
     $config_is_syncing = FALSE;
     $source_storage = NULL;
@@ -1007,7 +1006,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       if ($this->container->initialized('session')) {
         $session = $this->container->get('session');
         if ($session->isStarted()) {
-          $session_started = TRUE;
           $session->save();
         }
         unset($session);
@@ -1042,7 +1040,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $this->containerNeedsRebuild = FALSE;
 
     // Only create a new class if we have a container definition.
-    $container = null;
+    $container = NULL;
     if (isset($container_definition)) {
       // Drupal provides two dynamic parameters to access specific paths that
       // are determined from the request.
@@ -1428,7 +1426,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    * and the session.
    *
    * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-   *   Container object
+   *   Container object.
    */
   protected function restoreServiceState(ContainerInterface $container) {
     if (!isset($this->container)) {
