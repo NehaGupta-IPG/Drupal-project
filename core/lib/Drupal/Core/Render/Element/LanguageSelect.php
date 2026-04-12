@@ -22,7 +22,6 @@ use Drupal\Core\Render\Attribute\FormElement;
  * ];
  * @endcode
  *
- *
  * @see language_element_info_alter()
  */
 #[FormElement('language_select')]
