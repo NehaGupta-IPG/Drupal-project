@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * Drupal\Core\Render\HtmlResponse object. Then use its getContent(),
  * getStatusCode(), and/or the headers property to access the result.
  *
- * @see template_preprocess_html()
+ * @see \Drupal\Core\Theme\ThemePreprocess::preprocessHtml()
  * @see \Drupal\Core\Render\AttachmentsResponseProcessorInterface
  * @see \Drupal\Core\Render\BareHtmlPageRenderer
  * @see \Drupal\Core\Render\HtmlResponse
@@ -86,7 +86,7 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     //
     // @todo Exceptions should not be used for code flow control. However, the
     //   Form API does not integrate with the HTTP Kernel based architecture of
-    //   Drupal 8. In order to resolve this issue properly it is necessary to
+    //   Drupal. In order to resolve this issue properly it is necessary to
     //   completely separate form submission from rendering.
     //   @see https://www.drupal.org/node/2367555
     try {
@@ -102,7 +102,18 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
     // Send a message back if the render array has unsupported #attached types.
     $unsupported_types = array_diff(
       array_keys($attached),
-      ['html_head', 'feed', 'html_head_link', 'http_header', 'library', 'html_response_attachment_placeholders', 'placeholders', 'drupalSettings']
+      [
+        'html_head',
+        'feed',
+        'html_head_link',
+        'http_header',
+        'library',
+        'html_response_attachment_placeholders',
+        'placeholders',
+        'drupalSettings',
+        'page_top',
+        'page_bottom',
+      ]
     );
     if (!empty($unsupported_types)) {
       throw new \LogicException(sprintf('You are not allowed to use %s in #attached.', implode(', ', $unsupported_types)));
@@ -118,7 +129,7 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
       // Take Ajax page state into account, to allow for something like
       // Turbolinks to be implemented without altering core.
       // @see https://github.com/rails/turbolinks/
-      $ajax_page_state = $this->requestStack->getCurrentRequest()->get('ajax_page_state');
+      $ajax_page_state = $this->requestStack->getCurrentRequest()->attributes->get('ajax_page_state');
       $assets->setAlreadyLoadedLibraries(isset($ajax_page_state) ? explode(',', $ajax_page_state['libraries']) : []);
       $variables = $this->processAssetLibraries($assets, $attachment_placeholders);
       // $variables now contains the markup to load the asset libraries. Update
@@ -141,9 +152,9 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
           );
           unset($attached['feed']);
         }
-        // 'html_head_link' is a special case of 'html_head' which can be present
-        // as a head element, but also as a Link: HTTP header depending on
-        // settings in the render array. Processing it can add to both the
+        // 'html_head_link' is a special case of 'html_head' which can be
+        // present as a head element, but also as a Link: HTTP header depending
+        // on settings in the render array. Processing it can add to both the
         // 'html_head' and 'http_header' keys of '#attached', so we must address
         // it before 'html_head'.
         if (!empty($attached['html_head_link'])) {
@@ -328,7 +339,7 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
    *   - The header value.
    *   - (optional) Whether to replace a current value with the new one, or add
    *     it to the others. If the value is not replaced, it will be appended,
-   *     resulting in a header like this: 'Header: value1,value2'
+   *     resulting in a header like this: 'Header: value1,value2'.
    */
   protected function setHeaders(HtmlResponse $response, array $headers) {
     foreach ($headers as $values) {

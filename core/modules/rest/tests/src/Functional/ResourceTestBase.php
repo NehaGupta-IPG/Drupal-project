@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\rest\Functional;
 
+use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Url;
 use Drupal\rest\RestResourceConfigInterface;
 use Drupal\Tests\ApiRequestTrait;
@@ -149,7 +150,11 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @param string[] $methods
    *   The allowed methods for this resource.
    */
-  protected function provisionResource($formats = [], $authentication = [], array $methods = ['GET', 'POST', 'PATCH', 'DELETE']) {
+  protected function provisionResource(
+    $formats = [],
+    $authentication = [],
+    array $methods = ['GET', 'POST', 'PATCH', 'DELETE'],
+  ) {
     $this->resourceConfigStorage->create([
       'id' => static::$resourceConfigId,
       'granularity' => RestResourceConfigInterface::RESOURCE_GRANULARITY,
@@ -211,6 +216,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @param string $method
    *   The HTTP method for which to set up authentication.
    *
+   * @return void
+   *   Returns nothing.
+   *
    * @see ::grantPermissionsToAnonymousRole()
    * @see ::grantPermissionsToAuthenticatedRole()
    */
@@ -223,6 +231,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   HTTP method.
    * @param \Psr\Http\Message\ResponseInterface $response
    *   The response to assert.
+   *
+   * @return void
+   *   Returns nothing.
    */
   abstract protected function assertResponseWhenMissingAuthentication($method, ResponseInterface $response);
 
@@ -231,14 +242,17 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * (Should be called before sending a well-formed request.)
    *
-   * @see \GuzzleHttp\ClientInterface::request()
-   *
    * @param string $method
    *   HTTP method.
    * @param \Drupal\Core\Url $url
    *   URL to request.
    * @param array $request_options
    *   Request options to apply.
+   *
+   * @return void
+   *   Returns nothing.
+   *
+   * @see \GuzzleHttp\ClientInterface::request()
    */
   abstract protected function assertNormalizationEdgeCases($method, Url $url, array $request_options);
 
@@ -247,14 +261,17 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *
    * (Should be called before sending a well-formed request.)
    *
-   * @see \GuzzleHttp\ClientInterface::request()
-   *
    * @param string $method
    *   HTTP method.
    * @param \Drupal\Core\Url $url
    *   URL to request.
    * @param array $request_options
    *   Request options to apply.
+   *
+   * @return void
+   *   Returns nothing.
+   *
+   * @see \GuzzleHttp\ClientInterface::request()
    */
   abstract protected function assertAuthenticationEdgeCases($method, Url $url, array $request_options);
 
@@ -270,6 +287,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * Initializes authentication.
    *
    * E.g. for cookie authentication, we first need to get a cookie.
+   *
+   * @return void
+   *   Returns nothing.
    */
   protected function initAuthentication() {}
 
@@ -358,7 +378,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       // sets it to 'text/html' by default. We also cannot detect the presence
       // of Apache either here in the CLI. For now having this documented here
       // is all we can do.
-      // $this->assertFalse($response->hasHeader('Content-Type'));
+      // "$this->assertFalse($response->hasHeader('Content-Type'));".
       $this->assertSame('', (string) $response->getBody());
     }
     else {
@@ -386,8 +406,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->assertTrue($response->hasHeader('X-Drupal-Cache'));
       $this->assertSame($expected_page_cache_header_value, $response->getHeader('X-Drupal-Cache')[0]);
     }
-    else {
-      $this->assertFalse($response->hasHeader('X-Drupal-Cache'));
+    elseif ($response->hasHeader('X-Drupal-Cache')) {
+      $this->assertMatchesRegularExpression('#^UNCACHEABLE \((no cacheability|(request|response) policy)\)$#', $response->getHeader('X-Drupal-Cache')[0]);
     }
 
     // Expected Dynamic Page Cache header value: X-Drupal-Dynamic-Cache header.
@@ -395,8 +415,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->assertTrue($response->hasHeader('X-Drupal-Dynamic-Cache'));
       $this->assertSame($expected_dynamic_page_cache_header_value, $response->getHeader('X-Drupal-Dynamic-Cache')[0]);
     }
-    else {
-      $this->assertFalse($response->hasHeader('X-Drupal-Dynamic-Cache'));
+    elseif ($response->hasHeader('X-Drupal-Dynamic-Cache')) {
+      $this->assertMatchesRegularExpression('#^UNCACHEABLE \(((no|poor) cacheability|(request|response) policy)\)$#', $response->getHeader('X-Drupal-Dynamic-Cache')[0]);
     }
   }
 
@@ -437,15 +457,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   An array to sort.
    */
   protected static function recursiveKSort(array &$array) {
-    // First, sort the main array.
-    ksort($array);
-
-    // Then check for child arrays.
-    foreach ($array as $key => &$value) {
-      if (is_array($value)) {
-        static::recursiveKSort($value);
-      }
-    }
+    SortArray::sortByKeyRecursive($array);
   }
 
 }

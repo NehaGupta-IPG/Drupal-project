@@ -9,12 +9,15 @@ use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\jsonapi\Functional\ConfigEntityResourceTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Checks that all core content/config entity types have JSON:API test coverage.
- *
- * @group jsonapi
  */
+#[Group('jsonapi')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class TestCoverageTest extends KernelTestBase {
 
   /**
@@ -35,6 +38,7 @@ class TestCoverageTest extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    $this->installConfig('system');
     $all_modules = \Drupal::service('extension.list.module')->getList();
     $stable_core_modules = array_filter($all_modules, function ($module) {
       // Filter out contrib, hidden, testing, experimental, and deprecated
@@ -44,7 +48,8 @@ class TestCoverageTest extends KernelTestBase {
         && $module->status == FALSE
         && $module->info['package'] !== 'Testing'
         && $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] !== ExtensionLifecycle::EXPERIMENTAL
-        && $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] !== ExtensionLifecycle::DEPRECATED;
+        && $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] !== ExtensionLifecycle::DEPRECATED
+        && $module->info[ExtensionLifecycle::LIFECYCLE_IDENTIFIER] !== ExtensionLifecycle::OBSOLETE;
     });
 
     $this->container->get('module_installer')->install(array_keys($stable_core_modules));

@@ -75,15 +75,15 @@ class SelectExtender implements SelectInterface {
   /**
    * {@inheritdoc}
    */
-  public function hasAllTags() {
-    return call_user_func_array([$this->query, 'hasAllTags'], func_get_args());
+  public function hasAllTags(string ...$tags) {
+    return call_user_func_array([$this->query, 'hasAllTags'], $tags);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function hasAnyTag() {
-    return call_user_func_array([$this->query, 'hasAnyTag'], func_get_args());
+  public function hasAnyTag(string ...$tags) {
+    return call_user_func_array([$this->query, 'hasAnyTag'], $tags);
   }
 
   /**
@@ -503,11 +503,11 @@ class SelectExtender implements SelectInterface {
   /**
    * Magic override for undefined methods.
    *
-   * If one extender extends another extender, then methods in the inner extender
-   * will not be exposed on the outer extender.  That's because we cannot know
-   * in advance what those methods will be, so we cannot provide wrapping
-   * implementations as we do above.  Instead, we use this slower catch-all method
-   * to handle any additional methods.
+   * If one extender extends another extender, then methods in the inner
+   * extender will not be exposed on the outer extender.  That's because we
+   * cannot know in advance what those methods will be, so we cannot provide
+   * wrapping implementations as we do above.  Instead, we use this slower
+   * catch-all method to handle any additional methods.
    */
   public function __call($method, $args) {
     $return = call_user_func_array([$this->query, $method], $args);

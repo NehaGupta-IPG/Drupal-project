@@ -227,7 +227,10 @@ class LibraryDiscoveryParser {
             $options['group'] = JS_LIBRARY;
           }
           elseif ($type == 'css') {
-            $options['group'] = $extension_type == 'theme' ? CSS_AGGREGATE_THEME : CSS_AGGREGATE_DEFAULT;
+            // Component stylesheets should be added in the "theme" aggregate
+            // group to load them alongside the theme.
+            // @see \Drupal\Core\Plugin\Component::getLibraryName
+            $options['group'] = ($extension_type == 'theme' || str_starts_with($id, 'components.')) ? CSS_AGGREGATE_THEME : CSS_AGGREGATE_DEFAULT;
           }
           // By default, all library assets are files.
           if (!isset($options['type'])) {
@@ -261,7 +264,7 @@ class LibraryDiscoveryParser {
             elseif ($this->streamWrapperManager->isValidUri($source)) {
               $options['data'] = $source;
             }
-            // A regular URI (e.g., http://example.com/example.js) without
+            // A regular URI (e.g., https://example.com/example.js) without
             // 'external' explicitly specified, which may happen if, e.g.
             // libraries-override is used.
             elseif ($this->isValidUri($source)) {
@@ -430,7 +433,7 @@ class LibraryDiscoveryParser {
    *   The extension name.
    * @param array $overrides
    *   The library overrides.
-   * @param Drupal\Core\Theme\ActiveTheme $active_theme
+   * @param \Drupal\Core\Theme\ActiveTheme $active_theme
    *   The active theme.
    *
    * @return array
@@ -527,7 +530,7 @@ class LibraryDiscoveryParser {
         // Process libraries overrides.
         if (isset($libraries_overrides["$extension/$library_name"])) {
           if (isset($library['deprecated'])) {
-            $override_message = sprintf('Theme "%s" is overriding a deprecated library.', $extension);
+            $override_message = sprintf('Theme "%s" is overriding a deprecated library.', $active_theme->getName());
             $library_deprecation = str_replace('%library_id%', "$extension/$library_name", $library['deprecated']);
             // phpcs:ignore Drupal.Semantics.FunctionTriggerError
             @trigger_error("$override_message $library_deprecation", E_USER_DEPRECATED);
@@ -538,7 +541,7 @@ class LibraryDiscoveryParser {
             // A string or boolean definition implies an override (or removal)
             // for the whole library. Use the override key to specify that this
             // library will be overridden when it is called.
-            // @see \Drupal\Core\Asset\LibraryDiscovery::getLibraryByName()
+            // @see \Drupal\Core\Asset\LibraryDiscoveryCollector::getLibraryByName()
             if ($override_definition) {
               $libraries[$library_name]['override'] = $override_definition;
             }
@@ -634,8 +637,8 @@ class LibraryDiscoveryParser {
   protected function resolveThemeAssetPath($theme_path, $overriding_asset) {
     if ($overriding_asset[0] !== '/' && !$this->isValidUri($overriding_asset)) {
       // The destination is not an absolute path and it's not a URI (e.g.
-      // public://generated_js/example.js or http://example.com/js/my_js.js), so
-      // it's relative to the theme.
+      // public://generated_js/example.js or https://example.com/js/my_js.js),
+      // so it's relative to the theme.
       return '/' . $theme_path . '/' . $overriding_asset;
     }
     return $overriding_asset;

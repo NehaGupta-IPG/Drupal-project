@@ -4,15 +4,22 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\node\Functional\Views;
 
+use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\node\Entity\NodeType;
+use Drupal\Tests\node\Traits\NodeAccessTrait;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the node_access filter handler.
  *
- * @group node
  * @see \Drupal\node\Plugin\views\filter\Access
  */
+#[Group('node')]
+#[RunTestsInSeparateProcesses]
 class FilterNodeAccessTest extends NodeTestBase {
+
+  use NodeAccessTrait;
 
   /**
    * An array of users.
@@ -46,7 +53,7 @@ class FilterNodeAccessTest extends NodeTestBase {
 
     $this->drupalCreateContentType(['type' => 'article', 'name' => 'Article']);
 
-    node_access_test_add_field(NodeType::load('article'));
+    $this->addPrivateField(NodeType::load('article'));
 
     node_access_rebuild();
     \Drupal::state()->set('node_access_test.private', TRUE);
@@ -67,7 +74,7 @@ class FilterNodeAccessTest extends NodeTestBase {
           'body' => [
             [
               'value' => $type . ' node',
-              'format' => filter_default_format(),
+              'format' => \Drupal::service(FilterFormatRepositoryInterface::class)->getDefaultFormat()->id(),
             ],
           ],
           'title' => "$type Article created by " . $web_user->getAccountName(),
