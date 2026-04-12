@@ -50,13 +50,6 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
   protected ?string $termFilter;
 
   /**
-   * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface
-   */
-  protected $languageManager;
-
-  /**
    * Constructs an OverviewTerms object.
    */
   public function __construct(
@@ -65,7 +58,7 @@ class OverviewTerms extends EntityForm implements WorkspaceSafeFormInterface {
     private readonly RendererInterface $renderer,
     private readonly EntityRepositoryInterface $entityRepository,
     private readonly PagerManagerInterface $pagerManager,
-    private readonly LanguageManagerInterface $language_manager,
+    private readonly LanguageManagerInterface $languageManager,
   ) {
     $this->setModuleHandler($module_handler);
     $this->setEntityTypeManager($entity_type_manager);
