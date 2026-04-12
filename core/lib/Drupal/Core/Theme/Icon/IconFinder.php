@@ -113,7 +113,8 @@ class IconFinder implements ContainerInjectionInterface, IconFinderInterface {
    */
   public function getFileContents(string $uri): string|bool {
     $url = parse_url($uri);
-    if (isset($url['scheme']) || isset($url['host'])) {
+    // parse_url() treats Windows drive-letter paths as URLs.
+    if (preg_match('/^[A-Za-z]:[\\\\\\/]/', $uri) !== 1 && (isset($url['scheme']) || isset($url['host']))) {
       return FALSE;
     }
     if (!file_exists($uri)) {
