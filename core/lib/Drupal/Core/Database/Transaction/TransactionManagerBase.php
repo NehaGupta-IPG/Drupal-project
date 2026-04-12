@@ -816,7 +816,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       return TRUE;
     }
     catch (\Exception $e) {
-      throw new TransactionException('Failed creation of savepoint '  . $name, $e->getCode(), $e);
+      throw new TransactionException('Failed creation of savepoint ' . $name, $e->getCode(), $e);
     }
   }
 
@@ -843,7 +843,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       return TRUE;
     }
     catch (\Exception $e) {
-      throw new TransactionException('Failed rollback of savepoint '  . $name, $e->getCode(), $e);
+      throw new TransactionException('Failed rollback of savepoint ' . $name, $e->getCode(), $e);
     }
   }
 
@@ -870,7 +870,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       return TRUE;
     }
     catch (\Exception $e) {
-      throw new TransactionException('Failed release of savepoint '  . $name, $e->getCode(), $e);
+      throw new TransactionException('Failed release of savepoint ' . $name, $e->getCode(), $e);
     }
   }
 

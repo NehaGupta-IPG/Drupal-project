@@ -33,7 +33,7 @@ class TransactionManager extends TransactionManagerBase {
       return $this->connection->getClientConnection()->savepoint($name);
     }
     catch (\Exception $e) {
-      throw new TransactionException('Failed creation of savepoint '  . $name, $e->getCode(), $e);
+      throw new TransactionException('Failed creation of savepoint ' . $name, $e->getCode(), $e);
     }
   }
 
@@ -48,7 +48,7 @@ class TransactionManager extends TransactionManagerBase {
       return (bool) $this->connection->getClientConnection()->query('ROLLBACK TO SAVEPOINT ' . $name);
     }
     catch (\Exception $e) {
-      throw new TransactionException('Failed rollback of savepoint '  . $name, $e->getCode(), $e);
+      throw new TransactionException('Failed rollback of savepoint ' . $name, $e->getCode(), $e);
     }
   }
 
@@ -60,7 +60,7 @@ class TransactionManager extends TransactionManagerBase {
       return $this->connection->getClientConnection()->release_savepoint($name);
     }
     catch (\Exception $e) {
-      throw new TransactionException('Failed release of savepoint '  . $name, $e->getCode(), $e);
+      throw new TransactionException('Failed release of savepoint ' . $name, $e->getCode(), $e);
     }
   }
 

@@ -29,21 +29,21 @@ class StubTransactionManager extends TransactionManagerBase {
    * {@inheritdoc}
    */
   protected function addClientSavepoint(string $name): bool {
-    return $this->success ? TRUE : throw new TransactionException('Failed creation of savepoint '  . $name);
+    return $this->success ? TRUE : throw new TransactionException('Failed creation of savepoint ' . $name);
   }
 
   /**
    * {@inheritdoc}
    */
   protected function rollbackClientSavepoint(string $name): bool {
-    return $this->success ? TRUE : throw new TransactionException('Failed rollback of savepoint '  . $name);
+    return $this->success ? TRUE : throw new TransactionException('Failed rollback of savepoint ' . $name);
   }
 
   /**
    * {@inheritdoc}
    */
   protected function releaseClientSavepoint(string $name): bool {
-    return $this->success ? TRUE : throw new TransactionException('Failed release of savepoint '  . $name);
+    return $this->success ? TRUE : throw new TransactionException('Failed release of savepoint ' . $name);
   }
 
   /**
