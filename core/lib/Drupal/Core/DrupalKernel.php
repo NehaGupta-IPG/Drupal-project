@@ -1060,7 +1060,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // new session into the main request if one was present before.
     if (($request_stack = $this->container->get('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE))) {
       if ($request = $request_stack->getMainRequest()) {
-        $subrequest = TRUE;
         $request->setSession($this->container->get('session'));
       }
     }
