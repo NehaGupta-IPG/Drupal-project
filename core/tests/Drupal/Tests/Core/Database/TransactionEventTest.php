@@ -46,7 +46,7 @@ class TransactionEventTest extends UnitTestCase {
    */
   protected function setUp(): void {
     parent::setUp();
-    $this->connection = new StubConnection($this->createMock(StubPDO::class), []);
+    $this->connection = new StubConnection($this->createStub(StubPDO::class), []);
     $this->connection->enableEvents(TransactionEvent::all());
 
     $container = new Container();
