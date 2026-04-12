@@ -16,8 +16,8 @@ use Drupal\Core\Render\Attribute\FormElement;
  * - #convert_path: (optional) Indicates if the value is to be converted, and
  *   if so, how. There are 3 possible values; CONVERT_NONE indicates no
  *   conversion, CONVERT_ROUTE converts the value to a route name and parameter
- *   pair and CONVERT_URL converts the \Drupal\Core\Url value object. Defaults to
- *   CONVERT_ROUTE.
+ *   pair and CONVERT_URL converts the \Drupal\Core\Url value object. Defaults
+ *   to CONVERT_ROUTE.
  * - #validate_path: (optional) A boolean which indicated if the element should
  *   be validated. Defaults to TRUE.
  *
