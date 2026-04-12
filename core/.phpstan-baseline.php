@@ -38609,12 +38609,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Batch/BatchBuilderTest.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Parameter \\#1 \\$container of class Drupal\\\\Core\\\\Cache\\\\Context\\\\CacheContextsManager constructor expects Symfony\\\\Component\\\\DependencyInjection\\\\ContainerInterface, PHPUnit\\\\Framework\\\\MockObject\\\\Stub given\\.$#',
-	'identifier' => 'argument.type',
-	'count' => 5,
-	'path' => __DIR__ . '/tests/Drupal/Tests/Core/Cache/Context/CacheContextsManagerTest.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\Core\\\\Config\\\\Checkpoint\\\\CheckpointStorageTest\\:\\:replaceStorageContents\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,

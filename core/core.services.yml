@@ -235,7 +235,7 @@ services:
   Drupal\Core\Cache\VariationCacheFactory: '@variation_cache_factory'
   cache_contexts_manager:
     class: Drupal\Core\Cache\Context\CacheContextsManager
-    arguments: ['@service_container', '%cache_contexts%' ]
+    autowire: true
   Drupal\Core\Cache\Context\CacheContextsManager: '@cache_contexts_manager'
   cache_tags.invalidator:
     class: Drupal\Core\Cache\CacheTagsInvalidator

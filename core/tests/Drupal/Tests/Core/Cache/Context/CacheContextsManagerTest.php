@@ -8,14 +8,11 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\Context\CacheContextInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\Cache\Context\CalculatedCacheContextInterface;
-use Drupal\Core\DependencyInjection\Container as DrupalContainer;
-use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\Stub;
-use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 // cspell:ignore cnenzrgre
 /**
@@ -30,17 +27,18 @@ class CacheContextsManagerTest extends UnitTestCase {
    */
   #[DataProvider('providerTestOptimizeTokens')]
   public function testOptimizeTokens(array $context_tokens, array $optimized_context_tokens, int $expected_container_calls): void {
-    $container = $this->createMock(DrupalContainer::class);
+    $inner = new ServiceLocator([
+      'a' => fn() => new FooCacheContext(),
+      'a.b' => fn() => new FooCacheContext(),
+      'a.b.c' => fn() => new BazCacheContext(),
+      'x' => fn() => new BazCacheContext(),
+      'a.b.no-optimize' => fn() => new NoOptimizeCacheContext(),
+    ]);
+    $container = $this->createMock(ServiceLocator::class);
     $container->expects($this->exactly($expected_container_calls))
       ->method('get')
-      ->willReturnCallback(fn($service_id) => match ($service_id) {
-        'cache_context.a' => new FooCacheContext(),
-        'cache_context.a.b' => new FooCacheContext(),
-        'cache_context.a.b.c' => new BazCacheContext(),
-        'cache_context.x' => new BazCacheContext(),
-        'cache_context.a.b.no-optimize' => new NoOptimizeCacheContext(),
-      });
-    $cache_contexts_manager = new CacheContextsManager($container, $this->getContextsFixture());
+      ->willReturnCallback(fn(string $id) => $inner->get($id));
+    $cache_contexts_manager = new CacheContextsManager($container);
 
     $this->assertSame($optimized_context_tokens, $cache_contexts_manager->optimizeTokens($context_tokens));
   }
@@ -88,8 +86,8 @@ class CacheContextsManagerTest extends UnitTestCase {
    * Tests convert tokens to keys.
    */
   public function testConvertTokensToKeys(): void {
-    $container = $this->getMockContainer();
-    $cache_contexts_manager = new CacheContextsManager($container, $this->getContextsFixture());
+    $container = $this->getServiceLocator();
+    $cache_contexts_manager = new CacheContextsManager($container);
 
     $new_keys = $cache_contexts_manager->convertTokensToKeys([
       'foo',
@@ -111,8 +109,8 @@ class CacheContextsManagerTest extends UnitTestCase {
    * @legacy-covers ::convertTokensToKeys
    */
   public function testInvalidContext(): void {
-    $container = $this->getMockContainer();
-    $cache_contexts_manager = new CacheContextsManager($container, $this->getContextsFixture());
+    $container = $this->getServiceLocator();
+    $cache_contexts_manager = new CacheContextsManager($container);
 
     $this->expectException(\AssertionError::class);
     $cache_contexts_manager->convertTokensToKeys(["non-cache-context"]);
@@ -125,8 +123,8 @@ class CacheContextsManagerTest extends UnitTestCase {
    */
   #[DataProvider('providerTestInvalidCalculatedContext')]
   public function testInvalidCalculatedContext(string $context_token): void {
-    $container = $this->getMockContainer();
-    $cache_contexts_manager = new CacheContextsManager($container, $this->getContextsFixture());
+    $container = $this->getServiceLocator();
+    $cache_contexts_manager = new CacheContextsManager($container);
 
     $this->expectException(\Exception::class);
     $cache_contexts_manager->convertTokensToKeys([$context_token]);
@@ -143,40 +141,30 @@ class CacheContextsManagerTest extends UnitTestCase {
   }
 
   public function testAvailableContextStrings(): void {
-    $cache_contexts_manager = new CacheContextsManager($this->getMockContainer(), $this->getContextsFixture());
+    $cache_contexts_manager = new CacheContextsManager($this->getServiceLocator());
     $contexts = $cache_contexts_manager->getAll();
-    $this->assertEquals(["foo", "baz"], $contexts);
+    $this->assertEqualsCanonicalizing(["foo", "baz"], $contexts);
   }
 
   public function testAvailableContextLabels(): void {
-    $container = $this->getMockContainer();
-    $cache_contexts_manager = new CacheContextsManager($container, $this->getContextsFixture());
+    $container = $this->getServiceLocator();
+    $cache_contexts_manager = new CacheContextsManager($container);
     $labels = $cache_contexts_manager->getLabels();
     $expected = ["foo" => "Foo"];
     $this->assertEquals($expected, $labels);
   }
 
-  protected function getContextsFixture(): array {
-    return ['foo', 'baz'];
-  }
-
-  protected function getMockContainer(): Stub {
-    $container = $this->createStub(DrupalContainer::class);
-    $container
-      ->method('get')
-      ->willReturnMap([
-        [
-          'cache_context.foo',
-          Container::EXCEPTION_ON_INVALID_REFERENCE,
-          new FooCacheContext(),
-        ],
-        [
-          'cache_context.baz',
-          Container::EXCEPTION_ON_INVALID_REFERENCE,
-          new BazCacheContext(),
-        ],
-      ]);
-    return $container;
+  /**
+   * Creates a service locator with cache context services.
+   *
+   * @return \Symfony\Component\DependencyInjection\ServiceLocator<\Drupal\Core\Cache\Context\CacheContextInterface>
+   *   A service locator containing cache context services.
+   */
+  protected function getServiceLocator(): ServiceLocator {
+    return new ServiceLocator([
+      'foo' => fn() => new FooCacheContext(),
+      'baz' => fn() => new BazCacheContext(),
+    ]);
   }
 
   /**
@@ -219,8 +207,12 @@ class CacheContextsManagerTest extends UnitTestCase {
    */
   #[DataProvider('validateTokensProvider')]
   public function testValidateContexts(array $contexts, bool|string $expected_exception_message): void {
-    $container = new ContainerBuilder();
-    $cache_contexts_manager = new CacheContextsManager($container, ['foo', 'foo.bar', 'baz']);
+    $container = new ServiceLocator([
+      'foo' => fn() => new FooCacheContext(),
+      'foo.bar' => fn() => new FooCacheContext(),
+      'baz' => fn() => new BazCacheContext(),
+    ]);
+    $cache_contexts_manager = new CacheContextsManager($container);
     if ($expected_exception_message !== FALSE) {
       $this->expectException('LogicException');
       $this->expectExceptionMessage($expected_exception_message);

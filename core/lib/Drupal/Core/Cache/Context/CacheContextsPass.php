@@ -6,22 +6,34 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
 /**
- * Adds cache_contexts parameter to the container.
+ * Ensures cache context tags have an 'id' attribute for the service locator.
  */
 class CacheContextsPass implements CompilerPassInterface {
 
   /**
-   * Implements CompilerPassInterface::process().
-   *
-   * Collects the cache contexts into the cache_contexts parameter.
+   * {@inheritdoc}
    */
   public function process(ContainerBuilder $container): void {
     $cache_contexts = [];
-    foreach (array_keys($container->findTaggedServiceIds('cache.context')) as $id) {
-      if (!str_starts_with($id, 'cache_context.')) {
-        throw new \InvalidArgumentException(sprintf('The service "%s" has an invalid service ID: cache context service IDs must use the "cache_context." prefix. (The suffix is the cache context ID developers may use.)', $id));
+    foreach ($container->findTaggedServiceIds('cache.context') as $service_id => $tags) {
+      $definition = $container->getDefinition($service_id);
+      $new_tags = [];
+
+      foreach ($tags as $attributes) {
+        if (!isset($attributes['id'])) {
+          if (!str_starts_with($service_id, 'cache_context.')) {
+            throw new \InvalidArgumentException(sprintf('The service "%s" has an invalid service ID. Specify an "id" attribute on the tag.', $service_id));
+          }
+          $attributes['id'] = substr($service_id, 14);
+        }
+        $cache_contexts[] = $attributes['id'];
+        $new_tags[] = $attributes;
       }
-      $cache_contexts[] = substr($id, 14);
+
+      $definition->clearTag('cache.context');
+      foreach ($new_tags as $attributes) {
+        $definition->addTag('cache.context', $attributes);
+      }
     }
 
     // Validate.
@@ -35,8 +47,6 @@ class CacheContextsPass implements CompilerPassInterface {
         }
       }
     }
-
-    $container->setParameter('cache_contexts', $cache_contexts);
   }
 
 }
