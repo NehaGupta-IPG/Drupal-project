@@ -4,7 +4,6 @@ namespace Drupal\migrate\Plugin\migrate\process;
 
 use Drupal\Core\File\FileExists;
 use Drupal\migrate\MigrateException;
-use Drupal\migrate\MigrateSkipProcessException;
 use Drupal\migrate\MigrateSkipRowException;
 use Drupal\migrate\ProcessPluginBase;
 
