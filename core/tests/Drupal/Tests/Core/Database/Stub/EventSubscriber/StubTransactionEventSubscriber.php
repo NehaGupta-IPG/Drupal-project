@@ -16,6 +16,7 @@ use Drupal\Core\Database\Event\TransactionRollbackFailureEvent;
 use Drupal\Core\Database\Event\TransactionRollbackToSavepointEvent;
 use Drupal\Core\Database\Event\TransactionRollbackToSavepointFailureEvent;
 use Drupal\Core\Database\Event\TransactionSavepointEvent;
+use Drupal\Core\Database\Event\TransactionSavepointFailureEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -44,6 +45,7 @@ class StubTransactionEventSubscriber implements EventSubscriberInterface {
       TransactionRollbackToSavepointEvent::class => 'onTransactionEvent',
       TransactionRollbackToSavepointFailureEvent::class => 'onTransactionEvent',
       TransactionSavepointEvent::class => 'onTransactionEvent',
+      TransactionSavepointFailureEvent::class => 'onTransactionEvent',
     ];
   }
 

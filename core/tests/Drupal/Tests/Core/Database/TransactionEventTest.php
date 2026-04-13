@@ -17,6 +17,7 @@ use Drupal\Core\Database\Event\TransactionRollbackFailureEvent;
 use Drupal\Core\Database\Event\TransactionRollbackToSavepointEvent;
 use Drupal\Core\Database\Event\TransactionRollbackToSavepointFailureEvent;
 use Drupal\Core\Database\Event\TransactionSavepointEvent;
+use Drupal\Core\Database\Event\TransactionSavepointFailureEvent;
 use Drupal\Core\Database\Transaction\ClientConnectionTransactionState;
 use Drupal\Core\Database\Transaction\CommitType;
 use Drupal\Core\Database\TransactionCommitFailedException;
@@ -103,6 +104,26 @@ class TransactionEventTest extends UnitTestCase {
     $this->assertCount(2, $this->subscriber->lastEvent->stackItems);
     $savepoint->commitOrRelease();
     $tx->commitOrRelease();
+  }
+
+  /**
+   * Tests failure when starting a savepoint.
+   */
+  public function testSavepointStartFailure(): void {
+    // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+    $tx = $this->connection->startTransaction();
+    $this->connection->transactionManager()->success = FALSE;
+    try {
+      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+      $savepoint = $this->connection->startTransaction('foo');
+    }
+    catch (TransactionException) {
+      // Expected, do nothing.
+    }
+    $this->assertSame(TransactionSavepointFailureEvent::class, get_class($this->subscriber->lastEvent));
+    $this->assertSame('foo', $this->subscriber->lastEvent->name);
+    $this->assertSame(ClientConnectionTransactionState::Idle, $this->subscriber->lastEvent->transactionState);
+    $this->assertCount(0, $this->subscriber->lastEvent->stackItems);
   }
 
   /**

@@ -18,6 +18,7 @@ use Drupal\Core\Database\Event\TransactionRollbackFailureEvent;
 use Drupal\Core\Database\Event\TransactionRollbackToSavepointEvent;
 use Drupal\Core\Database\Event\TransactionRollbackToSavepointFailureEvent;
 use Drupal\Core\Database\Event\TransactionSavepointEvent;
+use Drupal\Core\Database\Event\TransactionSavepointFailureEvent;
 use Drupal\Core\Database\Transaction;
 use Drupal\Core\Database\TransactionCommitFailedException;
 use Drupal\Core\Database\TransactionException;
@@ -377,7 +378,20 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
         }
       }
       catch (TransactionException $e) {
+        $this->setConnectionTransactionState(ClientConnectionTransactionState::Idle);
         $this->voidClientTransaction();
+        if ($this->connection->isEventEnabled(TransactionSavepointFailureEvent::class)) {
+          $this->connection->dispatchEvent(new TransactionSavepointFailureEvent(
+            $this->connection->getKey(),
+            $this->connection->getTarget(),
+            $id,
+            $name,
+            $this->getConnectionTransactionState(),
+            $this->stackItemsAsArray(),
+            get_class($e),
+            $e->getMessage(),
+          ));
+        }
         throw $e;
       }
     }
