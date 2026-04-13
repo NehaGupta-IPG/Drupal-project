@@ -10,7 +10,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
- * Tests the Node Translation UI.
+ * Tests search index rebuild on translated content deletion.
  */
 #[Group('search')]
 #[RunTestsInSeparateProcesses]
@@ -27,11 +27,8 @@ class SearchNodeTranslationUITest extends ContentTranslationTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-    'block',
-    'language',
     'content_translation',
     'node',
-    'field_ui',
     'search',
   ];
 
