@@ -342,6 +342,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
         }
       }
       catch (TransactionException $e) {
+        $this->setConnectionTransactionState(ClientConnectionTransactionState::Idle);
         if ($this->connection->isEventEnabled(TransactionBeginFailureEvent::class)) {
           $this->connection->dispatchEvent(new TransactionBeginFailureEvent(
             $this->connection->getKey(),

@@ -9,7 +9,7 @@ namespace Drupal\Core\Database\Transaction;
  */
 enum ClientConnectionTransactionState {
 
-  // Initial state, prior to any ransaction started.
+  // Initial state, prior to any transaction started.
   case Idle;
 
   // Transaction states.

@@ -92,7 +92,7 @@ class TransactionEventTest extends UnitTestCase {
   }
 
   /**
-   * Tests starting a savepint.
+   * Tests starting a savepoint.
    */
   public function testSavepointStart(): void {
     $tx = $this->connection->startTransaction();
