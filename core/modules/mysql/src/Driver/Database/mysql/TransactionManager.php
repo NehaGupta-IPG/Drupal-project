@@ -27,7 +27,7 @@ class TransactionManager extends TransactionManagerBase {
       return $this->connection->getClientConnection()->beginTransaction();
     }
     catch (\Exception $e) {
-      throw new TransactionException('Failed creation of transaction', $e->getCode(), $e);
+      throw new TransactionException('Failed start of transaction', $e->getCode(), $e);
     }
   }
 

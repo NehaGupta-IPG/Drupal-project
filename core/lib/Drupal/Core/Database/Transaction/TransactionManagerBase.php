@@ -343,17 +343,23 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       // If we're already in a Drupal transaction then we want to create a
       // database savepoint, rather than try to begin another database
       // transaction.
-      $this->addClientSavepoint($name);
-      $this->addStackItem($id, new StackItem($name, StackItemType::Savepoint));
-      if ($this->connection->isEventEnabled(TransactionSavepointEvent::class)) {
-        $this->connection->dispatchEvent(new TransactionSavepointEvent(
-          $this->connection->getKey(),
-          $this->connection->getTarget(),
-          $id,
-          $name,
-          $this->getConnectionTransactionState(),
-          $this->stackItemsAsArray(),
-        ));
+      try {
+        $this->addClientSavepoint($name);
+        $this->addStackItem($id, new StackItem($name, StackItemType::Savepoint));
+        if ($this->connection->isEventEnabled(TransactionSavepointEvent::class)) {
+          $this->connection->dispatchEvent(new TransactionSavepointEvent(
+            $this->connection->getKey(),
+            $this->connection->getTarget(),
+            $id,
+            $name,
+            $this->getConnectionTransactionState(),
+            $this->stackItemsAsArray(),
+          ));
+        }
+      }
+      catch (TransactionException $e) {
+        $this->voidClientTransaction();
+        throw $e;
       }
     }
 
@@ -509,7 +515,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
           ));
         }
       }
-      catch (\Exception $e) {
+      catch (TransactionCommitFailedException $e) {
         $this->setConnectionTransactionState(ClientConnectionTransactionState::CommitFailed);
         $this->voidClientTransaction();
         if ($this->connection->isEventEnabled(TransactionReleaseSavepointFailureEvent::class)) {
@@ -525,6 +531,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
             $commitType,
           ));
         }
+        throw $e;
       }
     }
     elseif ($this->stackDepth() === 1 && $this->stack()[$id]->type === StackItemType::Root) {
@@ -625,7 +632,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
             ));
           }
         }
-        catch (\Exception $e) {
+        catch (TransactionException $e) {
           $this->setConnectionTransactionState(ClientConnectionTransactionState::RollbackFailed);
           $this->voidClientTransaction();
           if ($this->connection->isEventEnabled(TransactionRollbackToSavepointFailureEvent::class)) {
@@ -640,6 +647,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
               $e->getMessage(),
             ));
           }
+          throw $e;
         }
       }
       elseif ($this->stackDepth() === 1 && $this->stack()[$id]->type === StackItemType::Root) {
@@ -661,7 +669,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
             ));
           }
         }
-        catch (\Exception $e) {
+        catch (TransactionException $e) {
           $this->voidClientTransaction();
           if ($this->connection->isEventEnabled(TransactionRollbackFailureEvent::class)) {
             $this->connection->dispatchEvent(new TransactionRollbackFailureEvent(
@@ -675,6 +683,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
               $e->getMessage(),
             ));
           }
+          throw $e;
         }
       }
       else {
@@ -816,7 +825,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       return TRUE;
     }
     catch (\Exception $e) {
-      throw new TransactionException('Failed creation of savepoint ' . $name, $e->getCode(), $e);
+      throw new TransactionException('Failed start of savepoint ' . $name, $e->getCode(), $e);
     }
   }
 
@@ -870,7 +879,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       return TRUE;
     }
     catch (\Exception $e) {
-      throw new TransactionException('Failed release of savepoint ' . $name, $e->getCode(), $e);
+      throw new TransactionCommitFailedException('Failed release of savepoint ' . $name, $e->getCode(), $e);
     }
   }
 

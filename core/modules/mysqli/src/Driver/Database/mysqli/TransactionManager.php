@@ -21,7 +21,7 @@ class TransactionManager extends TransactionManagerBase {
       return $this->connection->getClientConnection()->begin_transaction();
     }
     catch (\Exception $e) {
-      throw new TransactionException('Failed creation of transaction', $e->getCode(), $e);
+      throw new TransactionException('Failed start of transaction', $e->getCode(), $e);
     }
   }
 
@@ -33,7 +33,7 @@ class TransactionManager extends TransactionManagerBase {
       return $this->connection->getClientConnection()->savepoint($name);
     }
     catch (\Exception $e) {
-      throw new TransactionException('Failed creation of savepoint ' . $name, $e->getCode(), $e);
+      throw new TransactionException('Failed start of savepoint ' . $name, $e->getCode(), $e);
     }
   }
 
@@ -60,7 +60,7 @@ class TransactionManager extends TransactionManagerBase {
       return $this->connection->getClientConnection()->release_savepoint($name);
     }
     catch (\Exception $e) {
-      throw new TransactionException('Failed release of savepoint ' . $name, $e->getCode(), $e);
+      throw new TransactionCommitFailedException('Failed release of savepoint ' . $name, $e->getCode(), $e);
     }
   }
 
