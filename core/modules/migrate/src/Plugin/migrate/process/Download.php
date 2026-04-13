@@ -18,6 +18,11 @@ use GuzzleHttp\ClientInterface;
  * - destination URI, e.g. 'public://images/foo.img'
  *
  * Available configuration keys:
+ * - source_exception: (optional) Error behavior when a file cannot be
+ *   downloaded successfully:
+ *   - 'error': (default) Raise an error and stop the migration.
+ *   - 'skip process': Prevents further processing of the input property.
+ *   - 'skip row': Skips the entire row.
  * - file_exists: (optional) Replace behavior when the destination file already
  *   exists:
  *   - 'replace' - (default) Replace the existing file.
@@ -148,7 +153,8 @@ class Download extends FileProcessBase implements ContainerFactoryPluginInterfac
       // failed.
       $this->fileSystem->delete($final_destination);
 
-      throw new MigrateException("{$e->getMessage()} ($source)");
+      $exception_class = $this->configuration['source_exception'];
+      throw new $exception_class("{$e->getMessage()} ($source)");
     }
 
     if (is_resource($destination_stream)) {
