@@ -9,6 +9,7 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\PathProcessor\PathProcessorDecode;
 use Drupal\Core\PathProcessor\PathProcessorFront;
 use Drupal\Core\PathProcessor\PathProcessorManager;
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Drupal\language\EventSubscriber\ConfigSubscriber;
@@ -18,6 +19,7 @@ use Drupal\language\Plugin\LanguageNegotiation\LanguageNegotiationUrl;
 use Drupal\path_alias\AliasManager;
 use Drupal\path_alias\PathProcessor\AliasPathProcessor;
 use Drupal\Tests\UnitTestCase;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -40,6 +42,13 @@ class PathProcessorTest extends UnitTestCase {
    * @var \Drupal\language\ConfigurableLanguageManagerInterface|\PHPUnit\Framework\MockObject\Stub
    */
   protected $languageManager;
+
+  /**
+   * The container.
+   *
+   * @var \Symfony\Component\DependencyInjection\ContainerBuilder
+   */
+  private $container;
 
   /**
    * {@inheritdoc}
@@ -68,6 +77,10 @@ class PathProcessorTest extends UnitTestCase {
       ->willReturn([LanguageInterface::TYPE_INTERFACE]);
 
     $this->languageManager = $language_manager;
+    $this->container = new ContainerBuilder();
+    $this->container->set('language_manager', $this->languageManager);
+    $this->container->set('current_user', $this->prophesize(AccountProxyInterface::class)->reveal());
+    \Drupal::setContainer($this->container);
   }
 
   /**
@@ -117,9 +130,8 @@ class PathProcessorTest extends UnitTestCase {
           'weight' => 9,
         ],
       ]);
-    $method = new LanguageNegotiationUrl();
-    $method->setConfig($config_factory_stub);
-    $method->setLanguageManager($this->languageManager);
+    $this->container->set('config.factory', $config_factory_stub);
+    $method = LanguageNegotiationUrl::create($this->container, [], '', []);
     $negotiator
       ->method('getNegotiationMethodInstance')
       ->willReturn($method);

@@ -18,6 +18,11 @@ interface LanguageNegotiationMethodInterface {
    * @param \Drupal\language\ConfigurableLanguageManagerInterface $language_manager
    *   The language manager to be used to retrieve the language list and the
    *   already negotiated languages.
+   *
+   * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use
+   *   Drupal\Core\Plugin\ContainerFactoryPluginInterface instead.
+   *
+   * @see https://www.drupal.org/node/2712789
    */
   public function setLanguageManager(ConfigurableLanguageManagerInterface $language_manager);
 
@@ -26,6 +31,11 @@ interface LanguageNegotiationMethodInterface {
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config
    *   The configuration factory.
+   *
+   * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use
+   *   Drupal\Core\Plugin\ContainerFactoryPluginInterface instead.
+   *
+   * @see https://www.drupal.org/node/2712789
    */
   public function setConfig(ConfigFactoryInterface $config);
 
@@ -34,6 +44,11 @@ interface LanguageNegotiationMethodInterface {
    *
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current active user.
+   *
+   * @deprecated in drupal:10.1.0 and is removed from drupal:11.0.0. Use
+   *   Drupal\Core\Plugin\ContainerFactoryPluginInterface instead.
+   *
+   * @see https://www.drupal.org/node/2712789
    */
   public function setCurrentUser(AccountInterface $current_user);
 

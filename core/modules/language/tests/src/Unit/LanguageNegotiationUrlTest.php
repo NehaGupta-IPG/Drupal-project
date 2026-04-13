@@ -79,6 +79,8 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
     $cache_contexts_manager->method('assertValidTokens')->willReturn(TRUE);
     $container = new ContainerBuilder();
     $container->set('cache_contexts_manager', $cache_contexts_manager);
+    $container->set('current_user', $this->user);
+    $container->set('language_manager', $this->languageManager);
     \Drupal::setContainer($container);
   }
 
@@ -108,6 +110,12 @@ class LanguageNegotiationUrlTest extends UnitTestCase {
     $method->setLanguageManager($this->languageManager);
     $method->setConfig($config);
     $method->setCurrentUser($this->user);
+    $container = \Drupal::getContainer();
+    $container->set('config.factory', $config);
+    $method = LanguageNegotiationUrl::create($container, [], '', []);
+    $container = \Drupal::getContainer();
+    $container->set('config.factory', $config);
+    $method = LanguageNegotiationUrl::create($container, [], '', []);
     $this->assertEquals($expected_langcode, $method->getLangcode($request));
 
     $cacheability = new BubbleableMetadata();
