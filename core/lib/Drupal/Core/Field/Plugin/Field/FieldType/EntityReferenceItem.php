@@ -173,8 +173,8 @@ class EntityReferenceItem extends EntityReferenceItemBase implements OptionsProv
     $integer_key = FALSE;
     if ($target_type_info->entityClassImplements(FieldableEntityInterface::class)) {
       $field_definitions = \Drupal::service('entity_field.manager')->getBaseFieldDefinitions($target_type);
-      $id_definition = $field_definitions[$target_type_info->getKeys()['id']];
-      $integer_key = $id_definition->getType() === 'integer';
+      $target_field_schema = $field_definitions[$target_type_info->getKeys()['id']]->getSchema();
+      $integer_key = $target_field_schema['columns']['value']['type'] === 'int';
     }
     if ($integer_key) {
       $columns = [
