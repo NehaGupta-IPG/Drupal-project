@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Field\Entity;
 
 use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Field\Entity\BaseFieldOverride;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\KernelTests\KernelTestBase;
@@ -96,6 +97,7 @@ class BaseFieldOverrideLanguageOverrideTest extends KernelTestBase {
     $baseFieldDefinitions = $this->entityFieldManager->getBaseFieldDefinitions($this->testEntityTypeId);
     $this->assertArrayHasKey($this->testFieldName, $baseFieldDefinitions);
     $baseFieldDefinition = $baseFieldDefinitions[$this->testFieldName];
+    $this->assertInstanceOf(BaseFieldDefinition::class, $baseFieldDefinition);
 
     $baseFieldOverride = BaseFieldOverride::createFromBaseFieldDefinition($baseFieldDefinition, $this->testBundle);
     $baseFieldOverride->setLabel('Overridden name in English')->save();
