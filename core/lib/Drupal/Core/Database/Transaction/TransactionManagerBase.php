@@ -330,7 +330,6 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
         $this->isAutoCommitted = FALSE;
       }
       $this->processPostTransactionCallbacks();
-      $this->setConnectionTransactionState(ClientConnectionTransactionState::Idle);
       $this->rootId = NULL;
       unset($this->voidedItems[$id]);
       return;
@@ -352,7 +351,6 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     $this->removeStackItem($id);
     if ($this->rootId === $id) {
       $this->processPostTransactionCallbacks();
-      $this->setConnectionTransactionState(ClientConnectionTransactionState::Idle);
       $this->rootId = NULL;
     }
   }
