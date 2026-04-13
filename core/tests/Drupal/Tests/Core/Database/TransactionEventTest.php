@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Database;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\Database\Event\TransactionBeginEvent;
+use Drupal\Core\Database\Event\TransactionBeginFailureEvent;
 use Drupal\Core\Database\Event\TransactionCommitEvent;
 use Drupal\Core\Database\Event\TransactionCommitFailureEvent;
 use Drupal\Core\Database\Event\TransactionEvent;
@@ -14,6 +16,7 @@ use Drupal\Core\Database\Event\TransactionRollbackEvent;
 use Drupal\Core\Database\Event\TransactionRollbackFailureEvent;
 use Drupal\Core\Database\Event\TransactionRollbackToSavepointEvent;
 use Drupal\Core\Database\Event\TransactionRollbackToSavepointFailureEvent;
+use Drupal\Core\Database\Event\TransactionSavepointEvent;
 use Drupal\Core\Database\Transaction\ClientConnectionTransactionState;
 use Drupal\Core\Database\Transaction\CommitType;
 use Drupal\Core\Database\TransactionCommitFailedException;
@@ -56,6 +59,50 @@ class TransactionEventTest extends UnitTestCase {
     $dispatcher->addSubscriber($this->subscriber);
     $container->set('event_dispatcher', $dispatcher);
     \Drupal::setContainer($container);
+  }
+
+  /**
+   * Tests starting a transaction.
+   */
+  public function testTransactionStart(): void {
+    $tx = $this->connection->startTransaction();
+    $this->assertSame(TransactionBeginEvent::class, get_class($this->subscriber->lastEvent));
+    $this->assertSame('drupal_transaction', $this->subscriber->lastEvent->name);
+    $this->assertSame(ClientConnectionTransactionState::Active, $this->subscriber->lastEvent->transactionState);
+    $this->assertCount(1, $this->subscriber->lastEvent->stackItems);
+    $tx->commitOrRelease();
+  }
+
+  /**
+   * Tests failure when starting a transaction.
+   */
+  public function testTransactionStartFailure(): void {
+    $this->connection->transactionManager()->success = FALSE;
+    try {
+      // phpcs:ignore DrupalPractice.CodeAnalysis.VariableAnalysis.UnusedVariable
+      $tx = $this->connection->startTransaction();
+    }
+    catch (TransactionException) {
+      // Expected, do nothing.
+    }
+    $this->assertSame(TransactionBeginFailureEvent::class, get_class($this->subscriber->lastEvent));
+    $this->assertSame('drupal_transaction', $this->subscriber->lastEvent->name);
+    $this->assertSame(ClientConnectionTransactionState::Idle, $this->subscriber->lastEvent->transactionState);
+    $this->assertCount(0, $this->subscriber->lastEvent->stackItems);
+  }
+
+  /**
+   * Tests starting a savepint.
+   */
+  public function testSavepointStart(): void {
+    $tx = $this->connection->startTransaction();
+    $savepoint = $this->connection->startTransaction('foo');
+    $this->assertSame(TransactionSavepointEvent::class, get_class($this->subscriber->lastEvent));
+    $this->assertSame('foo', $this->subscriber->lastEvent->name);
+    $this->assertSame(ClientConnectionTransactionState::Active, $this->subscriber->lastEvent->transactionState);
+    $this->assertCount(2, $this->subscriber->lastEvent->stackItems);
+    $savepoint->commitOrRelease();
+    $tx->commitOrRelease();
   }
 
   /**

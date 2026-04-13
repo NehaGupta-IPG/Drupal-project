@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Database\Stub\EventSubscriber;
 
 use Drupal\Core\Database\Event\TransactionBeginEvent;
+use Drupal\Core\Database\Event\TransactionBeginFailureEvent;
 use Drupal\Core\Database\Event\TransactionCommitEvent;
 use Drupal\Core\Database\Event\TransactionCommitFailureEvent;
 use Drupal\Core\Database\Event\TransactionEventBase;
@@ -33,6 +34,7 @@ class StubTransactionEventSubscriber implements EventSubscriberInterface {
   public static function getSubscribedEvents(): array {
     return [
       TransactionBeginEvent::class => 'onTransactionEvent',
+      TransactionBeginFailureEvent::class => 'onTransactionEvent',
       TransactionCommitEvent::class => 'onTransactionEvent',
       TransactionCommitFailureEvent::class => 'onTransactionEvent',
       TransactionReleaseSavepointEvent::class => 'onTransactionEvent',

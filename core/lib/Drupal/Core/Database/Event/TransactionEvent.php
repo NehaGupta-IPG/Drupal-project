@@ -10,6 +10,7 @@ namespace Drupal\Core\Database\Event;
 enum TransactionEvent: string {
 
   case Begin = TransactionBeginEvent::class;
+  case BeginFailure = TransactionBeginFailureEvent::class;
   case Commit = TransactionCommitEvent::class;
   case CommitFailure = TransactionCommitFailureEvent::class;
   case ReleaseSavepoint = TransactionReleaseSavepointEvent::class;

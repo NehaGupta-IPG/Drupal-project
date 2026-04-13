@@ -7,6 +7,7 @@ namespace Drupal\Core\Database\Transaction;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\Event\TransactionAutoCommitEvent;
 use Drupal\Core\Database\Event\TransactionBeginEvent;
+use Drupal\Core\Database\Event\TransactionBeginFailureEvent;
 use Drupal\Core\Database\Event\TransactionCommitEvent;
 use Drupal\Core\Database\Event\TransactionCommitFailureEvent;
 use Drupal\Core\Database\Event\TransactionEvent;
@@ -112,7 +113,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * best determined through calls to methods in this class. The actual
    * state on the database server could be different.
    */
-  private ClientConnectionTransactionState $connectionTransactionState;
+  private ClientConnectionTransactionState $connectionTransactionState = ClientConnectionTransactionState::Idle;
 
   /**
    * Whether the root transaction was auto-committed.
@@ -319,24 +320,41 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
 
     // Do the client-level processing.
     if ($this->stackDepth() === 0) {
-      $this->beginClientTransaction();
-      $this->setConnectionTransactionState(ClientConnectionTransactionState::Active);
-      $this->addStackItem($id, new StackItem($name, StackItemType::Root));
-      // Only set ::rootId if there's not one set already, which may happen in
-      // case of broken transactions.
-      if ($this->rootId === NULL) {
-        $this->rootId = $id;
-        $this->isAutoCommitted = FALSE;
+      try {
+        $this->beginClientTransaction();
+        $this->setConnectionTransactionState(ClientConnectionTransactionState::Active);
+        $this->addStackItem($id, new StackItem($name, StackItemType::Root));
+        // Only set ::rootId if there's not one set already, which may happen in
+        // case of broken transactions.
+        if ($this->rootId === NULL) {
+          $this->rootId = $id;
+          $this->isAutoCommitted = FALSE;
+        }
+        if ($this->connection->isEventEnabled(TransactionBeginEvent::class)) {
+          $this->connection->dispatchEvent(new TransactionBeginEvent(
+            $this->connection->getKey(),
+            $this->connection->getTarget(),
+            $id,
+            $name,
+            $this->getConnectionTransactionState(),
+            $this->stackItemsAsArray(),
+          ));
+        }
       }
-      if ($this->connection->isEventEnabled(TransactionBeginEvent::class)) {
-        $this->connection->dispatchEvent(new TransactionBeginEvent(
-          $this->connection->getKey(),
-          $this->connection->getTarget(),
-          $id,
-          $name,
-          $this->getConnectionTransactionState(),
-          $this->stackItemsAsArray(),
-        ));
+      catch (TransactionException $e) {
+        if ($this->connection->isEventEnabled(TransactionBeginFailureEvent::class)) {
+          $this->connection->dispatchEvent(new TransactionBeginFailureEvent(
+            $this->connection->getKey(),
+            $this->connection->getTarget(),
+            $id,
+            $name,
+            $this->getConnectionTransactionState(),
+            $this->stackItemsAsArray(),
+            get_class($e),
+            $e->getMessage(),
+          ));
+        }
+        throw $e;
       }
     }
     else {
