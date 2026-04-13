@@ -11,6 +11,11 @@ class UserSession implements AccountInterface {
   /**
    * User ID.
    *
+   * This is intended to always be an integer, but this is not technically
+   * guaranteed. It could be a numeric string returned from a database query, or
+   * it could be a faulty value that was passed to the constructor or that was
+   * assigned directly in a subclass.
+   *
    * @var int
    */
   protected $uid = 0;
@@ -84,7 +89,11 @@ class UserSession implements AccountInterface {
    * {@inheritdoc}
    */
   public function id() {
-    return is_string($this->uid) ? (int) $this->uid : $this->uid;
+    // Cast integer-like strings to integer.
+    if (is_string($this->uid) && (string) (int) $this->uid === $this->uid) {
+      return (int) $this->uid;
+    }
+    return $this->uid;
   }
 
   /**
