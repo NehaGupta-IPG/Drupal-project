@@ -21,13 +21,13 @@ return Rector\Config\RectorConfig::configure()
     '*/*ixture*/*',
     '*/Annotation/Doctrine/*',
   ])
-  ->withSets([
+/*  ->withSets([
 #    PHPUnitSetList::PHPUNIT_100,
     PHPUnitSetList::PHPUNIT_110,
     PHPUnitSetList::PHPUNIT_120,
 #    PHPUnitSetList::PHPUNIT_CODE_QUALITY,
-  ])
-//  ->withPreparedSets(typeDeclarations: true)
+  ])*/
+  ->withPreparedSets(typeDeclarations: true)
 /*  ->withSkip([
     TypedPropertyFromCreateMockAssignRector::class,
     TypedPropertyFromDocblockSetUpDefinedRector::class,
