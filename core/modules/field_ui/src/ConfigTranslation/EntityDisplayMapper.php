@@ -3,6 +3,7 @@
 namespace Drupal\field_ui\ConfigTranslation;
 
 use Drupal\config_translation\ConfigEntityMapper;
+use Drupal\Core\Config\Entity\ConfigEntityInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
@@ -95,7 +96,7 @@ class EntityDisplayMapper extends ConfigEntityMapper {
       ->getStorage($this->entityType)
       ->load("{$this->pluginDefinition['base_entity_type']}.{$bundle}.{$mode}");
 
-    if ($entity) {
+    if ($entity instanceof ConfigEntityInterface) {
       $route_match->getParameters()->set($this->entityType, $entity);
 
       $this->setEntity($entity);
