@@ -68,6 +68,10 @@ class TelephoneLinkFormatter extends FormatterBase {
     $title_setting = $this->getSetting('title');
 
     foreach ($items as $delta => $item) {
+      $value = trim($item->value);
+      if ($value === '') {
+       continue;
+      }
       // If the telephone number is 5 or less digits, parse_url() will think
       // it's a port number rather than a phone number which causes the link
       // formatter to throw an InvalidArgumentException. Avoid this by inserting
@@ -88,9 +92,10 @@ class TelephoneLinkFormatter extends FormatterBase {
         '#type' => 'link',
         // Use custom title if available, otherwise use the telephone number
         // itself as title.
-        '#title' => $title_setting ?: $item->value,
+        '#title' => $value,
         // Prepend 'tel:' to the telephone number.
-        '#url' => Url::fromUri('tel:' . rawurlencode($phone_number)),
+        '#url' => Url::fromUri('tel:' . rawurlencode($value)),
+
         '#options' => ['external' => TRUE],
       ];
 

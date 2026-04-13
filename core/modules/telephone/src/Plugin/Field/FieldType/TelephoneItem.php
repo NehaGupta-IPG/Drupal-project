@@ -56,7 +56,7 @@ class TelephoneItem extends FieldItemBase {
    */
   public function isEmpty() {
     $value = $this->get('value')->getValue();
-    return $value === NULL || $value === '';
+    return $value === NULL || trim($value) === '';
   }
 
   /**
