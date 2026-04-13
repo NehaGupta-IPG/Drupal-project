@@ -17,6 +17,7 @@ use Drupal\Core\Database\Event\TransactionRollbackToSavepointFailureEvent;
 use Drupal\Core\Database\Transaction\ClientConnectionTransactionState;
 use Drupal\Core\Database\Transaction\CommitType;
 use Drupal\Core\Database\TransactionCommitFailedException;
+use Drupal\Core\Database\TransactionException;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Tests\Core\Database\Stub\EventSubscriber\StubTransactionEventSubscriber;
 use Drupal\Tests\Core\Database\Stub\StubConnection;
@@ -124,7 +125,12 @@ class TransactionEventTest extends UnitTestCase {
     $tx = $this->connection->startTransaction();
     $savepoint = $this->connection->startTransaction('foo');
     $this->connection->transactionManager()->success = FALSE;
-    $savepoint->commitOrRelease();
+    try {
+      $savepoint->commitOrRelease();
+    }
+    catch (TransactionCommitFailedException) {
+      // Expected, do nothing.
+    }
     $this->assertSame(TransactionReleaseSavepointFailureEvent::class, get_class($this->subscriber->lastEvent));
     $this->assertSame('foo', $this->subscriber->lastEvent->name);
     $this->assertSame(ClientConnectionTransactionState::CommitFailed, $this->subscriber->lastEvent->transactionState);
@@ -151,7 +157,12 @@ class TransactionEventTest extends UnitTestCase {
   public function testTransactionRollbackFailure(): void {
     $tx = $this->connection->startTransaction();
     $this->connection->transactionManager()->success = FALSE;
-    $tx->rollback();
+    try {
+      $tx->rollback();
+    }
+    catch (TransactionException) {
+      // Expected, do nothing.
+    }
     $this->assertSame(TransactionRollbackFailureEvent::class, get_class($this->subscriber->lastEvent));
     $this->assertSame('drupal_transaction', $this->subscriber->lastEvent->name);
     $this->assertSame(ClientConnectionTransactionState::RollbackFailed, $this->subscriber->lastEvent->transactionState);
@@ -179,7 +190,12 @@ class TransactionEventTest extends UnitTestCase {
     $tx = $this->connection->startTransaction();
     $savepoint = $this->connection->startTransaction('foo');
     $this->connection->transactionManager()->success = FALSE;
-    $savepoint->rollback();
+    try {
+      $savepoint->rollback();
+    }
+    catch (TransactionException) {
+      // Expected, do nothing.
+    }
     $this->assertSame(TransactionRollbackToSavepointFailureEvent::class, get_class($this->subscriber->lastEvent));
     $this->assertSame('foo', $this->subscriber->lastEvent->name);
     $this->assertSame(ClientConnectionTransactionState::RollbackFailed, $this->subscriber->lastEvent->transactionState);

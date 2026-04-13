@@ -552,7 +552,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
           ));
         }
       }
-      catch (\Exception $e) {
+      catch (TransactionCommitFailedException $e) {
         $this->voidClientTransaction();
         if ($this->connection->isEventEnabled(TransactionCommitFailureEvent::class)) {
           $this->connection->dispatchEvent(new TransactionCommitFailureEvent(
@@ -757,10 +757,14 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * Processes the root transaction rollback.
    */
   protected function processRootRollback(): void {
-    $clientRollback = $this->rollbackClientTransaction();
-    if (!$clientRollback) {
+    try {
+      if (!$this->rollbackClientTransaction()) {
+        throw new TransactionException('Transaction rollback failed');
+      }
+    }
+    catch (TransactionException $e) {
       $this->setConnectionTransactionState(ClientConnectionTransactionState::RollbackFailed);
-      throw new TransactionException('Transaction rollback failed');
+      throw $e;
     }
     $this->setConnectionTransactionState(ClientConnectionTransactionState::RolledBack);
   }
@@ -772,10 +776,14 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    *   If the commit of the root transaction failed.
    */
   protected function processRootCommit(): void {
-    $clientCommit = $this->commitClientTransaction();
-    if (!$clientCommit) {
+    try {
+      if (!$this->commitClientTransaction()) {
+        throw new TransactionCommitFailedException('Transaction commit failed');
+      }
+    }
+    catch (TransactionCommitFailedException $e) {
       $this->setConnectionTransactionState(ClientConnectionTransactionState::CommitFailed);
-      throw new TransactionCommitFailedException('Transaction commit failed');
+      throw $e;
     }
     $this->setConnectionTransactionState(ClientConnectionTransactionState::Committed);
   }
