@@ -329,8 +329,9 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
       if ($this->isAutoCommitted) {
         $this->isAutoCommitted = FALSE;
       }
-      $this->processPostTransactionCallbacks();
+      $this->setConnectionTransactionState(ClientConnectionTransactionState::Idle);
       $this->rootId = NULL;
+      $this->processPostTransactionCallbacks();
       unset($this->voidedItems[$id]);
       return;
     }
@@ -350,8 +351,9 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
     $this->commit($name, $id, CommitType::ImplicitOnDestruct);
     $this->removeStackItem($id);
     if ($this->rootId === $id) {
-      $this->processPostTransactionCallbacks();
+      $this->setConnectionTransactionState(ClientConnectionTransactionState::Idle);
       $this->rootId = NULL;
+      $this->processPostTransactionCallbacks();
     }
   }
 
@@ -360,8 +362,7 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    */
   public function unpile(string $name, string $id): void {
     // If the transaction was voided, we cannot unpile. Skip but trigger a user
-    // warning if requested. If an autocommit happened, emit the
-    // TransactionCommitEvent.
+    // warning if requested.
     if ($this->getConnectionTransactionState() === ClientConnectionTransactionState::Voided) {
       if ($this->triggerWarningWhenUnpilingOnVoidTransaction) {
         trigger_error('Transaction::commitOrRelease() was not processed because a prior execution of a DDL statement already committed the transaction.', E_USER_WARNING);
@@ -756,18 +757,6 @@ abstract class TransactionManagerBase implements TransactionManagerInterface {
    * {@inheritdoc}
    */
   public function handleAutomaticCommit(): void {
-    if ($this->connection->isEventEnabled(TransactionAutoCommitEvent::class)) {
-      $i = array_key_first($this->stack);
-      assert($this->stack[$i]->type === StackItemType::Root);
-      $this->connection->dispatchEvent(new TransactionAutoCommitEvent(
-        $this->connection->getKey(),
-        $this->connection->getTarget(),
-        $i,
-        $this->stack[$i]->name,
-        $this->getConnectionTransactionState(),
-        $this->stackItemsAsArray(),
-      ));
-    }
     $this->voidClientTransaction();
     $this->isAutoCommitted = TRUE;
   }
