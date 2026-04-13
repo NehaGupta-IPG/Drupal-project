@@ -153,7 +153,7 @@ class Download extends FileProcessBase implements ContainerFactoryPluginInterfac
       // failed.
       $this->fileSystem->delete($final_destination);
 
-      if ($this->configuration['skip process']) {
+      if ($this->configuration['source_exception'] === 'skip process') {
         $this->stopPipeline = TRUE;
         return NULL;
       }
