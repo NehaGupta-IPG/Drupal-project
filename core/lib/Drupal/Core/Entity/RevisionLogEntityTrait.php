@@ -97,10 +97,7 @@ trait RevisionLogEntityTrait {
    * Implements \Drupal\Core\Entity\RevisionLogInterface::getRevisionUserId().
    */
   public function getRevisionUserId() {
-    // Casting to int to match AccountInterface::id() return type, preserving
-    // NULL for unsaved entities.
-    $target_id = $this->{$this->getEntityType()->getRevisionMetadataKey('revision_user')}->target_id;
-    return is_string($target_id) ? (int) $target_id : $target_id;
+    return $this->{$this->getEntityType()->getRevisionMetadataKey('revision_user')}->target_id;
   }
 
   /**
