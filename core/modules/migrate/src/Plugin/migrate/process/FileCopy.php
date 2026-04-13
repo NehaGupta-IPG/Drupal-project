@@ -137,6 +137,10 @@ class FileCopy extends FileProcessBase implements ContainerFactoryPluginInterfac
 
     // Ensure the source file exists, if it's a local URI or path.
     if (!file_exists($source)) {
+      if ($this->configuration['skip process']) {
+        $this->stopPipeline = TRUE;
+        return NULL;
+      }
       $exception_class = $this->configuration['source_exception'];
       throw new $exception_class("File '$source' does not exist");
     }

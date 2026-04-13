@@ -40,7 +40,7 @@ abstract class FileProcessBase extends ProcessPluginBase {
     if (array_key_exists('source_exception', $configuration)) {
       switch ($configuration['source_exception']) {
         case 'skip process':
-          $configuration['source_exception'] = MigrateSkipProcessException::class;
+          // Exceptions are no longer used to stop the process pipeline.
           break;
 
         case 'skip row':
