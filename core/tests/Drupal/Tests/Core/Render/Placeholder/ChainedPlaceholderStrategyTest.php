@@ -25,7 +25,7 @@ class ChainedPlaceholderStrategyTest extends UnitTestCase {
    * @legacy-covers ::processPlaceholders
    */
   #[DataProvider('providerProcessPlaceholders')]
-  public function testProcessPlaceholders($strategies, $placeholders, $result): void {
+  public function testProcessPlaceholders($strategies, array $placeholders, $result): void {
     $chained_placeholder_strategy = new ChainedPlaceholderStrategy();
 
     foreach ($strategies as $strategy) {
@@ -130,8 +130,6 @@ class ChainedPlaceholderStrategyTest extends UnitTestCase {
 
   /**
    * Tests process placeholders no strategies.
-   *
-   * @legacy-covers ::processPlaceholders
    */
   public function testProcessPlaceholdersNoStrategies(): void {
     // Placeholders but no strategies defined.
@@ -147,8 +145,6 @@ class ChainedPlaceholderStrategyTest extends UnitTestCase {
 
   /**
    * Tests process placeholders with rogue placeholder strategy.
-   *
-   * @legacy-covers ::processPlaceholders
    */
   public function testProcessPlaceholdersWithRoguePlaceholderStrategy(): void {
     // Placeholders but no strategies defined.
