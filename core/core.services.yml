@@ -13,11 +13,6 @@ parameters:
   core.moved_classes:
     'Drupal\Core\StringTranslation\TranslationWrapper':
       class: 'Drupal\Core\StringTranslation\TranslatableMarkup'
-    'Doctrine\Common\Annotations\AnnotationException':
-      class: 'Drupal\Component\Annotation\Doctrine\AnnotationException'
-      deprecation_version: drupal:11.3.0
-      removed_version: drupal:12.0.0
-      change_record: https://www.drupal.org/node/3551049
   session.storage.options:
     gc_probability: 1
     gc_divisor: 100
@@ -78,6 +73,11 @@ parameters:
       - json
     theme:
       - json
+  # Can be argon2i, argon2id or 2y (bcrypt). Setting to NULL (~) will use PASSWORD_DEFAULT.
+  # See https://www.php.net/password_hash
+  password.algorithm: argon2id
+  # Options passed to password_hash. See https://www.php.net/password_hash
+  password.options: []
 services:
   _defaults:
     autoconfigure: true
@@ -689,10 +689,6 @@ services:
     class: Drupal\Core\Extension\ModuleInstaller
     autowire: true
   Drupal\Core\Extension\ModuleInstallerInterface: '@module_installer'
-  module_installer.uninstall_validators:
-    class: \IteratorIterator
-    arguments: [!tagged_iterator module_install.uninstall_validator]
-    deprecated: The "%service_id%" service is deprecated in drupal:11.1.0 and is removed from drupal:12.0.0. Inject "!tagged_iterator module_install.uninstall_validator" instead. See https://www.drupal.org/node/3432595
   extension.list.module:
     class: Drupal\Core\Extension\ModuleExtensionList
     arguments: ['%app.root%', 'module', '@cache.default', '@info_parser', '@module_handler', '@state', '@config.factory', '@extension.list.profile', '%install_profile%', '%container.modules%']
@@ -703,19 +699,15 @@ services:
   Drupal\Core\Extension\ProfileExtensionList: '@extension.list.profile'
   extension.list.theme:
     class: Drupal\Core\Extension\ThemeExtensionList
-    arguments: ['%app.root%', 'theme', '@cache.bootstrap', '@info_parser', '@module_handler', '@state', '@config.factory', '@extension.list.theme_engine', '%install_profile%']
+    autowire: true
   Drupal\Core\Extension\ThemeExtensionList: '@extension.list.theme'
-  extension.list.theme_engine:
-    class: Drupal\Core\Extension\ThemeEngineExtensionList
-    arguments: ['%app.root%', 'theme_engine', '@cache.default', '@info_parser', '@module_handler', '@state', '%install_profile%']
-  Drupal\Core\Extension\ThemeEngineExtensionList: '@extension.list.theme_engine'
   extension.list.database_driver:
     class: Drupal\Core\Extension\DatabaseDriverList
     arguments: ['%app.root%', 'database_driver', '@cache.default']
   Drupal\Core\Extension\DatabaseDriverList: '@extension.list.database_driver'
   extension.path.resolver:
     class: Drupal\Core\Extension\ExtensionPathResolver
-    arguments: ['@extension.list.module', '@extension.list.profile', '@extension.list.theme', '@extension.list.theme_engine']
+    arguments: ['@extension.list.module', '@extension.list.profile', '@extension.list.theme']
   Drupal\Core\Extension\ExtensionPathResolver: '@extension.path.resolver'
   content_uninstall_validator:
     class: Drupal\Core\Entity\ContentUninstallValidator
@@ -901,7 +893,6 @@ services:
     tags:
       - { name: paramconverter }
     arguments: ['@plugin.manager.menu.link']
-    lazy: true
   menu.tree_storage:
     class: Drupal\Core\Menu\MenuTreeStorage
     arguments: ['@database', '@cache.menu', '@cache_tags.invalidator', 'menu_tree']
@@ -1201,6 +1192,7 @@ services:
   Drupal\Core\Path\PathValidatorInterface: '@path.validator'
   password:
     class: Drupal\Core\Password\PhpPassword
+    arguments: ['%password.algorithm%', '%password.options%']
   Drupal\Core\Password\PasswordInterface: '@password'
   password_generator:
     class: Drupal\Core\Password\DefaultPasswordGenerator
@@ -1230,8 +1222,7 @@ services:
       - { name: route_filter, priority: 5 }
   paramconverter_manager:
     class: Drupal\Core\ParamConverter\ParamConverterManager
-    tags:
-      - { name: service_collector, tag: paramconverter, call: addConverter }
+    autowire: true
   Drupal\Core\ParamConverter\ParamConverterManagerInterface: '@paramconverter_manager'
   paramconverter_subscriber:
     class: Drupal\Core\EventSubscriber\ParamConverterSubscriber
@@ -1252,7 +1243,6 @@ services:
       # Use a higher priority than EntityConverter, see the class for details.
       - { name: paramconverter, priority: 5 }
     arguments: ['@entity_type.manager', '@config.factory', '@router.admin_context', '@entity.repository']
-    lazy: true
   route_subscriber.module:
     class: Drupal\Core\EventSubscriber\ModuleRouteSubscriber
     arguments: ['@module_handler']
@@ -1305,7 +1295,7 @@ services:
   # Main content view subscriber plus the renderers it uses.
   main_content_view_subscriber:
     class: Drupal\Core\EventSubscriber\MainContentViewSubscriber
-    arguments: ['@class_resolver', '@current_route_match', '%main_content_renderers%']
+    autowire: true
   renderer_non_html:
     class: Drupal\Core\EventSubscriber\RenderArrayNonHtmlSubscriber
   main_content_renderer.html:
@@ -1496,14 +1486,11 @@ services:
     class: Drupal\Core\EventSubscriber\EnforcedFormResponseSubscriber
   route_processor_manager:
     class: Drupal\Core\RouteProcessor\RouteProcessorManager
-    tags:
-      - { name: service_collector, tag: route_processor_outbound, call: addOutbound }
+    autowire: true
   Drupal\Core\RouteProcessor\OutboundRouteProcessorInterface: '@route_processor_manager'
   path_processor_manager:
     class: Drupal\Core\PathProcessor\PathProcessorManager
-    tags:
-      - { name: service_collector, tag: path_processor_inbound, call: addInbound }
-      - { name: service_collector, tag: path_processor_outbound, call: addOutbound }
+    autowire: true
   Drupal\Core\PathProcessor\InboundPathProcessorInterface: '@path_processor_manager'
   Drupal\Core\PathProcessor\OutboundPathProcessorInterface: '@path_processor_manager'
   path_processor_decode:
@@ -1548,6 +1535,7 @@ services:
   Drupal\Core\Render\ElementInfoManagerInterface: '@plugin.manager.element_info'
   stream_wrapper_manager:
     class: Drupal\Core\StreamWrapper\StreamWrapperManager
+    autowire: true
   Drupal\Core\StreamWrapper\StreamWrapperManagerInterface: '@stream_wrapper_manager'
   stream_wrapper.assets:
     class: Drupal\Core\StreamWrapper\AssetsStream
@@ -1714,6 +1702,11 @@ services:
     class: Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag
     public: false
   Symfony\Component\HttpFoundation\Session\Attribute\AttributeBagInterface: '@session.attribute_bag'
+  Drupal\Core\Session\UserSessionRepositoryInterface:
+    class: Drupal\Core\Session\UserSessionRepository
+    autowire: true
+    tags:
+      - { name: backend_overridable }
   session_handler:
     alias: session_handler.storage
   session_handler.storage:
@@ -1728,11 +1721,7 @@ services:
   Drupal\Core\Session\WriteSafeSessionHandlerInterface: '@session_handler.write_safe'
   session_manager:
     class: Drupal\Core\Session\SessionManager
-    arguments: ['@request_stack', '@database', '@session_manager.metadata_bag', '@session_configuration', '@datetime.time', '@session_handler']
-    tags:
-      - { name: backend_overridable }
-    calls:
-      - [setWriteSafeHandler, ['@session_handler.write_safe']]
+    arguments: ['@request_stack', '@session_handler', '@session_manager.metadata_bag', '@session_configuration', '@datetime.time']
   Drupal\Core\Session\SessionManagerInterface: '@session_manager'
   session_manager.metadata_bag:
     class: Drupal\Core\Session\MetadataBag
@@ -1815,6 +1804,9 @@ services:
     arguments: ['@plugin.manager.sdc', '@Drupal\Core\Theme\Component\ComponentValidator']
     tags:
       - { name: twig.extension, priority: 101 }
+  Twig\Extra\Html\HtmlExtension:
+    tags:
+      - { name: twig.extension, priority: 101 }
   Drupal\Core\Template\IconsTwigExtension:
     arguments: ['@plugin.manager.icon_pack']
     tags:
@@ -1862,23 +1854,17 @@ services:
   Drupal\Core\File\HtaccessWriterInterface: '@file.htaccess_writer'
   file.mime_type.guesser:
     class: Drupal\Core\File\MimeType\MimeTypeGuesser
-    arguments: ['@stream_wrapper_manager']
-    tags:
-      - { name: service_collector, tag: mime_type_guesser, call: addMimeTypeGuesser }
-    lazy: true
+    arguments: ['@stream_wrapper_manager', !tagged_iterator mime_type_guesser]
   file.mime_type.guesser.extension:
     class: Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser
     arguments: ['@Drupal\Core\File\MimeType\MimeTypeMapInterface']
     tags:
       - { name: mime_type_guesser }
-    lazy: true
   Drupal\Core\File\MimeType\MimeTypeMapFactory:
     autowire: true
     public: false
   Drupal\Core\File\MimeType\MimeTypeMapInterface:
     factory: ['@Drupal\Core\File\MimeType\MimeTypeMapFactory', create]
-  Drupal\Core\File\EventSubscriber\LegacyMimeTypeMapLoadedSubscriber:
-    autowire: true
   # Currently needs to be public as it is called by
   # \Drupal\Core\Render\Element\StatusMessages.
   # @todo Consider making this service private again after
@@ -1991,7 +1977,6 @@ services:
   Drupal\Core\Template\Loader\ComponentLoader:
     arguments:
       - '@plugin.manager.sdc'
-      - '@logger.channel.default'
     tags:
       - { name: twig.loader, priority: 5 }
   Drupal\Core\EventSubscriber\CsrfExceptionSubscriber: ~
@@ -2013,7 +1998,7 @@ services:
     class: Drupal\Core\Theme\Icon\IconExtractorPluginManager
     parent: default_plugin_manager
     arguments: ['@plugin_form.factory']
-  Drupal\Core\Theme\Icon\IconExtractorInterface: '@plugin.manager.icon_extractor'
+  Drupal\Core\Theme\Icon\IconExtractorPluginManager: '@plugin.manager.icon_extractor'
   Drupal\Core\Theme\Icon\IconFinder:
     autowire: true
     arguments:

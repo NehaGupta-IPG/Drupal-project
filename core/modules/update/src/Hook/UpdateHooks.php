@@ -66,7 +66,9 @@ class UpdateHooks {
         case 'update.status':
         case 'update.settings':
         case 'system.status':
+        case 'system.modules_uninstall':
         case 'system.theme_install':
+        case 'system.theme_uninstall':
         case 'system.batch_page.html':
           return;
 
@@ -201,7 +203,7 @@ class UpdateHooks {
     $language = \Drupal::languageManager()->getLanguage($langcode);
     $message['subject'] .= $this->t('New release(s) available for @site_name', ['@site_name' => \Drupal::config('system.site')->get('name')], ['langcode' => $langcode]);
     foreach ($params as $msg_type => $msg_reason) {
-      $message['body'][] = _update_message_text($msg_type, $msg_reason, $langcode);
+      $message['body'][] = _update_message_text($msg_type, $msg_reason, $langcode, TRUE);
     }
     $message['body'][] = $this->t('See the available updates page for more information:',
       [],

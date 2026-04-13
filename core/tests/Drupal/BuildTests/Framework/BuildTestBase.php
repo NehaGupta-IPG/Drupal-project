@@ -9,9 +9,8 @@ use Behat\Mink\Mink;
 use Behat\Mink\Session;
 use Composer\InstalledVersions;
 use Drupal\Component\FileSystem\FileSystem as DrupalFilesystem;
-use Drupal\Tests\DrupalTestCaseTrait;
 use Drupal\Tests\DrupalTestBrowser;
-use Drupal\Tests\PhpUnitCompatibilityTrait;
+use Drupal\Tests\DrupalTestCaseTrait;
 use Drupal\TestTools\Extension\RequiresComposerTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
@@ -64,18 +63,15 @@ abstract class BuildTestBase extends TestCase {
 
   use DrupalTestCaseTrait;
   use RequiresComposerTrait;
-  use PhpUnitCompatibilityTrait;
 
   /**
    * The working directory where this test will manipulate files.
    *
    * Use getWorkspaceDirectory() to access this information.
    *
-   * @var string
-   *
    * @see self::getWorkspaceDirectory()
    */
-  private $workspaceDir;
+  private string $workspaceDir;
 
   /**
    * The process that's running the HTTP server.
@@ -111,19 +107,15 @@ abstract class BuildTestBase extends TestCase {
    * Our native host name, used by PHP when it starts up the server.
    *
    * Requests should always be made to 'localhost', and not this IP address.
-   *
-   * @var string
    */
-  private static $hostName = '127.0.0.1';
+  private static string $hostName = '127.0.0.1';
 
   /**
    * Port that will be tested.
    *
    * Generated internally. Use getPortNumber().
-   *
-   * @var int
    */
-  private $hostPort;
+  private ?int $hostPort = NULL;
 
   /**
    * A list of ports used by the test.
@@ -134,23 +126,19 @@ abstract class BuildTestBase extends TestCase {
    *
    * @var \Symfony\Component\Lock\LockInterface[]
    */
-  private $portLocks = [];
+  private array $portLocks = [];
 
   /**
    * The Mink session manager.
-   *
-   * @var \Behat\Mink\Mink
    */
-  private $mink;
+  private ?Mink $mink = NULL;
 
   /**
    * The most recent command process.
    *
-   * @var \Symfony\Component\Process\Process
-   *
    * @see ::executeCommand()
    */
-  private $commandProcess;
+  private ?Process $commandProcess = NULL;
 
   /**
    * The PHP executable finder.
@@ -270,7 +258,7 @@ abstract class BuildTestBase extends TestCase {
    * @param string $expected
    *   Text we expect to find in the error output of the command.
    */
-  public function assertErrorOutputContains($expected): void {
+  public function assertErrorOutputContains(string $expected): void {
     $this->assertStringContainsString($expected, $this->commandProcess->getErrorOutput());
   }
 
@@ -280,7 +268,7 @@ abstract class BuildTestBase extends TestCase {
    * @param string $expected
    *   Text we expect not to find in the error output of the command.
    */
-  public function assertErrorOutputNotContains($expected): void {
+  public function assertErrorOutputNotContains(string $expected): void {
     $this->assertStringNotContainsString($expected, $this->commandProcess->getErrorOutput());
   }
 
@@ -290,7 +278,7 @@ abstract class BuildTestBase extends TestCase {
    * @param string $expected
    *   Text we expect to find in the output of the command.
    */
-  public function assertCommandOutputContains($expected): void {
+  public function assertCommandOutputContains(string $expected): void {
     $this->assertStringContainsString($expected, $this->commandProcess->getOutput());
   }
 
@@ -332,7 +320,7 @@ abstract class BuildTestBase extends TestCase {
    * @return \Symfony\Component\Process\Process
    *   The process object.
    */
-  public function executeCommand($command_line, $working_dir = NULL) {
+  public function executeCommand(string $command_line, $working_dir = NULL) {
     $this->commandProcess = Process::fromShellCommandline($command_line);
     $this->commandProcess->setWorkingDirectory($this->getWorkingPath($working_dir))
       ->setTimeout(360)
@@ -370,7 +358,7 @@ abstract class BuildTestBase extends TestCase {
    * @throws \InvalidArgumentException
    *   Thrown when $request_uri does not start with a slash.
    */
-  public function visit($request_uri = '/', $working_dir = NULL) {
+  public function visit(string $request_uri = '/', $working_dir = NULL): Mink {
     if ($request_uri[0] !== '/') {
       throw new \InvalidArgumentException('URI: ' . $request_uri . ' must be relative. Example: /some/path?foo=bar');
     }
@@ -427,7 +415,7 @@ abstract class BuildTestBase extends TestCase {
    * @throws \RuntimeException
    *   Thrown if we were unable to start a web server.
    */
-  protected function instantiateServer($port, $working_dir = NULL) {
+  protected function instantiateServer($port, $working_dir = NULL): Process {
     $finder = new PhpExecutableFinder();
     $working_path = $this->getWorkingPath($working_dir);
     $server = [

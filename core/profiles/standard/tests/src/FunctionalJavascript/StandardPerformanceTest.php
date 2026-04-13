@@ -62,6 +62,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->testCacheInvalidation();
     $this->testLogin();
     $this->testLoginBlock();
+    $this->testAdmin();
   }
 
   /**
@@ -116,7 +117,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'SELECT "menu_tree"."menu_name" AS "menu_name", "menu_tree"."route_name" AS "route_name", "menu_tree"."route_parameters" AS "route_parameters", "menu_tree"."url" AS "url", "menu_tree"."title" AS "title", "menu_tree"."description" AS "description", "menu_tree"."parent" AS "parent", "menu_tree"."weight" AS "weight", "menu_tree"."options" AS "options", "menu_tree"."expanded" AS "expanded", "menu_tree"."enabled" AS "enabled", "menu_tree"."provider" AS "provider", "menu_tree"."metadata" AS "metadata", "menu_tree"."class" AS "class", "menu_tree"."form_class" AS "form_class", "menu_tree"."id" AS "id" FROM "menu_tree" "menu_tree" WHERE ("route_name" = "view.frontpage.page_1") AND ("route_param_key" = "view_id=frontpage&display_id=page_1") AND ("menu_name" = "main") ORDER BY "depth" ASC, "weight" ASC, "id" ASC',
       'SELECT "menu_tree"."menu_name" AS "menu_name", "menu_tree"."route_name" AS "route_name", "menu_tree"."route_parameters" AS "route_parameters", "menu_tree"."url" AS "url", "menu_tree"."title" AS "title", "menu_tree"."description" AS "description", "menu_tree"."parent" AS "parent", "menu_tree"."weight" AS "weight", "menu_tree"."options" AS "options", "menu_tree"."expanded" AS "expanded", "menu_tree"."enabled" AS "enabled", "menu_tree"."provider" AS "provider", "menu_tree"."metadata" AS "metadata", "menu_tree"."class" AS "class", "menu_tree"."form_class" AS "form_class", "menu_tree"."id" AS "id" FROM "menu_tree" "menu_tree" WHERE ("route_name" = "<front>") AND ("route_param_key" = "") AND ("menu_name" = "main") ORDER BY "depth" ASC, "weight" ASC, "id" ASC',
       'SELECT "menu_tree"."p1" AS "p1", "menu_tree"."p2" AS "p2", "menu_tree"."p3" AS "p3", "menu_tree"."p4" AS "p4", "menu_tree"."p5" AS "p5", "menu_tree"."p6" AS "p6", "menu_tree"."p7" AS "p7", "menu_tree"."p8" AS "p8", "menu_tree"."p9" AS "p9" FROM "menu_tree" "menu_tree" WHERE "id" = "standard.front_page"',
-      'SELECT "menu_tree"."id" AS "id" FROM "menu_tree" "menu_tree" WHERE "mlid" IN ("6") ORDER BY "depth" DESC',
+      'SELECT "menu_tree"."id" AS "id" FROM "menu_tree" "menu_tree" WHERE "mlid" IN ("5") ORDER BY "depth" DESC',
       'SELECT "menu_tree"."menu_name" AS "menu_name", "menu_tree"."route_name" AS "route_name", "menu_tree"."route_parameters" AS "route_parameters", "menu_tree"."url" AS "url", "menu_tree"."title" AS "title", "menu_tree"."description" AS "description", "menu_tree"."parent" AS "parent", "menu_tree"."weight" AS "weight", "menu_tree"."options" AS "options", "menu_tree"."expanded" AS "expanded", "menu_tree"."enabled" AS "enabled", "menu_tree"."provider" AS "provider", "menu_tree"."metadata" AS "metadata", "menu_tree"."class" AS "class", "menu_tree"."form_class" AS "form_class", "menu_tree"."id" AS "id" FROM "menu_tree" "menu_tree" WHERE ("route_name" = "view.frontpage.page_1") AND ("route_param_key" = "view_id=frontpage&display_id=page_1") AND ("menu_name" = "account") ORDER BY "depth" ASC, "weight" ASC, "id" ASC',
       'SELECT "menu_tree"."menu_name" AS "menu_name", "menu_tree"."route_name" AS "route_name", "menu_tree"."route_parameters" AS "route_parameters", "menu_tree"."url" AS "url", "menu_tree"."title" AS "title", "menu_tree"."description" AS "description", "menu_tree"."parent" AS "parent", "menu_tree"."weight" AS "weight", "menu_tree"."options" AS "options", "menu_tree"."expanded" AS "expanded", "menu_tree"."enabled" AS "enabled", "menu_tree"."provider" AS "provider", "menu_tree"."metadata" AS "metadata", "menu_tree"."class" AS "class", "menu_tree"."form_class" AS "form_class", "menu_tree"."id" AS "id" FROM "menu_tree" "menu_tree" WHERE ("route_name" = "<front>") AND ("route_param_key" = "") AND ("menu_name" = "account") ORDER BY "depth" ASC, "weight" ASC, "id" ASC',
       'SELECT "menu_tree".* FROM "menu_tree" "menu_tree" WHERE ("menu_name" = "main") AND ("depth" <= 2) ORDER BY "p1" ASC, "p2" ASC, "p3" ASC, "p4" ASC, "p5" ASC, "p6" ASC, "p7" ASC, "p8" ASC, "p9" ASC',
@@ -133,15 +134,15 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 37,
-      'CacheGetCount' => 99,
+      'CacheGetCount' => 96,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 20,
-        'data' => 5,
+        'data' => 4,
         'discovery' => 39,
         'bootstrap' => 10,
         'dynamic_page_cache' => 1,
-        'render' => 13,
+        'render' => 11,
         'default' => 5,
         'entity' => 2,
         'menu' => 3,
@@ -149,7 +150,7 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'CacheSetCount' => 43,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 10,
+      'CacheTagLookupQueryCount' => 9,
       'CacheTagGroupedLookups' => [
         [
           'route_match',
@@ -170,10 +171,6 @@ class StandardPerformanceTest extends PerformanceTestBase {
         [
           'config:block_list',
           'config:system.site',
-        ],
-        [
-          'CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form',
-          'config:search.settings',
         ],
         ['config:system.menu.account'],
         ['config:system.menu.main'],
@@ -215,11 +212,11 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 11,
-      'CacheGetCount' => 78,
+      'CacheGetCount' => 72,
       'CacheSetCount' => 18,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 8,
+      'CacheTagLookupQueryCount' => 7,
       'CacheTagGroupedLookups' => [
         [
           'route_match',
@@ -238,10 +235,6 @@ class StandardPerformanceTest extends PerformanceTestBase {
         [
           'config:block_list',
           'config:system.site',
-        ],
-        [
-          'CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form',
-          'config:search.settings',
         ],
         ['config:system.menu.main'],
         ['config:system.menu.account'],
@@ -276,11 +269,11 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 11,
-      'CacheGetCount' => 64,
+      'CacheGetCount' => 58,
       'CacheSetCount' => 15,
       'CacheDeleteCount' => 0,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 7,
+      'CacheTagLookupQueryCount' => 6,
       'StylesheetCount' => 1,
       'StylesheetBytes' => 1150,
     ];
@@ -321,15 +314,15 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
       'QueryCount' => 3,
-      'CacheGetCount' => 67,
+      'CacheGetCount' => 64,
       'CacheGetCountByBin' => [
         'page' => 1,
         'config' => 11,
-        'data' => 5,
+        'data' => 4,
         'discovery' => 21,
         'bootstrap' => 8,
         'dynamic_page_cache' => 2,
-        'render' => 14,
+        'render' => 12,
         'default' => 3,
         'entity' => 1,
         'menu' => 1,
@@ -346,10 +339,8 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'CacheTagLookupQueryCount' => 3,
       'CacheTagGroupedLookups' => [
         [
-          'CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form',
           'config:block_list',
           'config:filter.format.restricted_html',
-          'config:search.settings',
           'config:system.menu.account',
           'config:system.menu.main',
           'config:system.site',
@@ -436,11 +427,11 @@ class StandardPerformanceTest extends PerformanceTestBase {
       'StylesheetBytes' => 1429,
       'StylesheetCount' => 1,
       'QueryCount' => 17,
-      'CacheGetCount' => 79,
+      'CacheGetCount' => 74,
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
       'CacheTagInvalidationCount' => 0,
-      'CacheTagLookupQueryCount' => 7,
+      'CacheTagLookupQueryCount' => 6,
       'CacheTagGroupedLookups' => [
         // Form submission and login.
         [
@@ -472,10 +463,6 @@ class StandardPerformanceTest extends PerformanceTestBase {
         [
           'config:block_list',
           'config:system.site',
-        ],
-        [
-          'CACHE_MISS_IF_UNCACHEABLE_HTTP_METHOD:form',
-          'config:search.settings',
         ],
         ['config:system.menu.account', 'config:system.menu.main'],
         [
@@ -511,7 +498,6 @@ class StandardPerformanceTest extends PerformanceTestBase {
 
     $expected_queries = [
       'SELECT "name", "value" FROM "key_value" WHERE "name" IN ( "theme:stark" ) AND "collection" = "config.entity.key_store.block"',
-      'SELECT "config"."name" AS "name" FROM "config" "config" WHERE ("collection" = "") AND ("name" LIKE "search.page.%" ESCAPE ' . "'\\\\'" . ') ORDER BY "collection" ASC, "name" ASC',
       'SELECT "name", "value" FROM "key_value_expire" WHERE "expire" > "NOW" AND "name" IN ( "KEY" ) AND "collection" = "form"',
       'SELECT COUNT(*) AS "expression" FROM (SELECT 1 AS "expression" FROM "flood" "f" WHERE ("event" = "user.failed_login_ip") AND ("identifier" = "CLIENT_IP") AND ("timestamp" > "TIMESTAMP")) "subquery"',
       'SELECT "base_table"."uid" AS "uid", "base_table"."uid" AS "base_table_uid" FROM "users" "base_table" INNER JOIN "users_field_data" "users_field_data" ON "users_field_data"."uid" = "base_table"."uid" WHERE ("users_field_data"."name" IN ("ACCOUNT_NAME")) AND ("users_field_data"."default_langcode" IN (1))',
@@ -532,14 +518,83 @@ class StandardPerformanceTest extends PerformanceTestBase {
     $recorded_queries = $performance_data->getQueries();
     $this->assertSame($expected_queries, $recorded_queries);
     $expected = [
-      'QueryCount' => 18,
-      'CacheGetCount' => 105,
+      'QueryCount' => 17,
+      'CacheGetCount' => 101,
       'CacheSetCount' => 1,
       'CacheDeleteCount' => 1,
       'CacheTagInvalidationCount' => 0,
       'CacheTagLookupQueryCount' => 10,
     ];
     $this->assertMetrics($expected, $performance_data);
+  }
+
+  /**
+   * Tests performance of a logged-in admin user with the navigation toolbar.
+   */
+  protected function testAdmin(): void {
+    $admin_user = $this->drupalCreateUser();
+    $admin_user->addRole('administrator');
+    $admin_user->save();
+
+    // Ensure no user is logged in and clear the render cache bin before
+    // starting the warm-up, since prior sub-tests may leave an active session
+    // and stale render cache entries.
+    $this->drupalLogout();
+    \Drupal::cache('render')->deleteAll();
+
+    $this->drupalLogin($admin_user);
+    // Request the front page twice to ensure all cache collectors are fully
+    // warmed. The exact contents of cache collectors depends on the order in
+    // which requests complete so this ensures that the second request completes
+    // after asset aggregates are served.
+    $this->drupalGet('');
+    sleep(1);
+    $this->drupalGet('');
+    // Flush the dynamic page cache to simulate visiting a page that is not
+    // already fully cached.
+    \Drupal::cache('dynamic_page_cache')->deleteAll();
+    $performance_data = $this->collectPerformanceData(function () {
+      $this->drupalGet('');
+    }, 'testAdmin');
+
+    $expected_queries = [
+      'SELECT "session" FROM "sessions" WHERE "sid" = "SESSION_ID" LIMIT 0, 1',
+      'SELECT * FROM "users_field_data" "u" WHERE "u"."uid" = "3" AND "u"."default_langcode" = 1',
+      'SELECT "roles_target_id" FROM "user__roles" WHERE "entity_id" = "3"',
+      'SELECT "name", "value" FROM "key_value" WHERE "name" IN ( "theme:stark" ) AND "collection" = "config.entity.key_store.block"',
+    ];
+    $recorded_queries = $performance_data->getQueries();
+    $this->assertSame($expected_queries, $recorded_queries);
+
+    $expected = [
+      'QueryCount' => 4,
+      'CacheGetCount' => 43,
+      'CacheGetCountByBin' => [
+        'config' => 10,
+        'data' => 4,
+        'discovery' => 9,
+        'bootstrap' => 8,
+        'dynamic_page_cache' => 1,
+        'render' => 10,
+        'menu' => 1,
+      ],
+      'CacheSetCount' => 2,
+      'CacheSetCountByBin' => [
+        'dynamic_page_cache' => 2,
+      ],
+      'CacheDeleteCount' => 0,
+      'CacheTagInvalidationCount' => 0,
+      'CacheTagLookupQueryCount' => 6,
+      'ScriptCount' => 3,
+      'ScriptBytes' => 141352,
+      'StylesheetCount' => 2,
+      'StylesheetBytes' => 42533,
+    ];
+    $this->assertMetrics($expected, $performance_data);
+
+    // The navigation toolbar must be cached under low-cardinality contexts,
+    // not per-user, to ensure it scales for authenticated admins.
+    $this->assertIsObject(\Drupal::cache('render')->get('navigation:navigation:[languages:language_interface]=en:[theme]=stark:[user.permissions]=is-admin'));
   }
 
   /**

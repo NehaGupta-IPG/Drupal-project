@@ -77,9 +77,7 @@ class EntityDisplayModeListBuilder extends ConfigEntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  public function getOperations(EntityInterface $entity/* , ?CacheableMetadata $cacheability = NULL */) {
-    $args = func_get_args();
-    $cacheability = $args[1] ?? new CacheableMetadata();
+  public function getOperations(EntityInterface $entity, ?CacheableMetadata $cacheability = NULL) {
     // Make the edit form render in a dialog, like the add form.
     // The edit form also contains an option to delete the view mode, which
     // also spawns a dialog. Rather than have nested dialogs, we allow the
@@ -152,7 +150,10 @@ class EntityDisplayModeListBuilder extends ConfigEntityListBuilder {
         'data' => [
           '#type' => 'link',
           '#url' => Url::fromRoute($short_type == 'view' ? 'entity.entity_view_mode.add_form' : 'entity.entity_form_mode.add_form', ['entity_type_id' => $entity_type]),
-          '#title' => $this->t('Add %label for @entity-type', ['@entity-type' => $this->entityTypes[$entity_type]->getLabel(), '%label' => $this->entityType->getSingularLabel()]),
+          '#title' => $this->t('Add %label for @entity-type', [
+            '@entity-type' => $this->entityTypes[$entity_type]->getLabel(),
+            '%label' => $this->entityType->getSingularLabel(),
+          ]),
           '#button_type' => 'primary',
           '#attributes' => [
             'class' => ['button', 'use-ajax', 'button--small'],

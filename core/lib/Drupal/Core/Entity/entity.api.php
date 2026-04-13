@@ -872,6 +872,9 @@ function hook_entity_view_mode_info_alter(&$view_modes) {
 /**
  * Describe the bundles for entity types.
  *
+ * Bundles can also be defined with the \Drupal\Core\Entity\Attribute\Bundle
+ * attribute applied to a bundle class.
+ *
  * @return array
  *   An associative array of all entity bundles, keyed by the entity
  *   type name, and then the bundle name, with the following keys:
@@ -886,6 +889,7 @@ function hook_entity_view_mode_info_alter(&$view_modes) {
  *
  * @see \Drupal\Core\Entity\EntityTypeBundleInfo::getBundleInfo()
  * @see hook_entity_bundle_info_alter()
+ * @see \Drupal\Core\Entity\Attribute\Bundle
  */
 function hook_entity_bundle_info(): array {
   $bundles['user']['user']['label'] = t('User');
@@ -950,7 +954,9 @@ function hook_entity_bundle_delete($entity_type_id, $bundle): void {
 /**
  * Acts when creating a new entity.
  *
- * This hook runs after a new entity object has just been instantiated.
+ * This hook runs after a new entity object has been instantiated, but before
+ * it is stored in the database. To react to an entity being stored for the
+ * first time, use hook_entity_insert().
  *
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity object.
@@ -965,7 +971,9 @@ function hook_entity_create(\Drupal\Core\Entity\EntityInterface $entity): void {
 /**
  * Acts when creating a new entity of a specific type.
  *
- * This hook runs after a new entity object has just been instantiated.
+ * This hook runs after a new entity object has been instantiated, but before
+ * it is stored in the database. To react to an entity being stored for the
+ * first time, use hook_entity_insert().
  *
  * @param \Drupal\Core\Entity\EntityInterface $entity
  *   The entity object.
