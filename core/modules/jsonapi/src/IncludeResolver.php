@@ -5,6 +5,7 @@ namespace Drupal\jsonapi;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Field\EntityReferenceFieldItemListInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\TypedData\DataReferenceDefinitionInterface;
 use Drupal\jsonapi\Access\EntityAccessChecker;
@@ -137,16 +138,21 @@ class IncludeResolver {
           $includes = IncludedData::merge($includes, new IncludedData([$exception]));
           continue;
         }
-        foreach ($field_list as $field_item) {
-          if (!($field_item->getDataDefinition()->getPropertyDefinition('entity') instanceof DataReferenceDefinitionInterface)) {
-            continue;
-          }
+        if ($field_list instanceof EntityReferenceFieldItemListInterface) {
+          $references = $field_list->referencedEntities();
+        }
+        else {
+          foreach ($field_list as $field_item) {
+            if (!($field_item->getDataDefinition()->getPropertyDefinition('entity') instanceof DataReferenceDefinitionInterface)) {
+              continue;
+            }
 
-          if (!($field_item->entity instanceof EntityInterface)) {
-            continue;
-          }
+            if (!($field_item->entity instanceof EntityInterface)) {
+              continue;
+            }
 
-          $references[] = $field_item->entity;
+            $references[] = $field_item->entity;
+          }
         }
       }
       $access_checked_entities = array_map(function (EntityInterface $entity) {
