@@ -210,6 +210,7 @@ class Shortcut extends ContentEntityBase implements ShortcutInterface {
    *
    * @return int
    *   The comparison result for uasort().
+   *
    * @see https://www.drupal.org/project/drupal/issues/2265487
    */
   public static function sort(ShortcutInterface $a, ShortcutInterface $b) {
