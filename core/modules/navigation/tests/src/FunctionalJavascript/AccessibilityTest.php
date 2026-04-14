@@ -31,11 +31,13 @@ class AccessibilityTest extends AccessibilityTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static array $testCases = [
-    'Claro page' => [
-      '/user/1/edit',
-      TRUE,
-    ],
-  ];
+  public static function provider(): array {
+    return [
+      'Claro page' => [
+        '/user/1/edit',
+        TRUE,
+      ],
+    ];
+  }
 
 }

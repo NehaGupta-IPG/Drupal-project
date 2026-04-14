@@ -19,39 +19,40 @@ class AccessibilityTest extends AccessibilityTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static array $testCases = [
-    'User Edit' => [
-      '/user/1/edit',
-      TRUE,
-    ],
-    'Create Article' => [
-      '/node/add/article',
-      TRUE,
-    ],
-    'Create Page' => [
-      '/node/add/page',
-      TRUE,
-    ],
-    'Content Page' => [
-      '/admin/content',
-      TRUE,
-    ],
-    'Structure Page' => [
-      '/admin/structure',
-      TRUE,
-    ],
-    'Add content type' => [
-      '/admin/structure/types/add',
-      TRUE,
-    ],
-    'Add vocabulary' => [
-      '/admin/structure/taxonomy/add',
-      TRUE,
-    ],
+  public static function provider(): array {
+    return [
+      'User Edit' => [
+        '/user/1/edit',
+        TRUE,
+      ],
+      'Create Article' => [
+        '/node/add/article',
+        TRUE,
+      ],
+      'Create Page' => [
+        '/node/add/page',
+        TRUE,
+      ],
+      'Content Page' => [
+        '/admin/content',
+        TRUE,
+      ],
+      'Structure Page' => [
+        '/admin/structure',
+        TRUE,
+      ],
+      'Add content type' => [
+        '/admin/structure/types/add',
+        TRUE,
+      ],
+      'Add vocabulary' => [
+        '/admin/structure/taxonomy/add',
+        TRUE,
+      ],
       // @todo remove the skipped rules below in https://drupal.org/i/3318394.
-    'Structure | Block' => [
-      '/admin/structure/block',
-      TRUE,
+      'Structure | Block' => [
+        '/admin/structure/block',
+        TRUE,
         [
           'rules' => [
             'color-contrast' => ['enabled' => FALSE],
@@ -59,11 +60,11 @@ class AccessibilityTest extends AccessibilityTestBase {
             'region' => ['enabled' => FALSE],
           ],
         ],
-    ],
+      ],
       // Tests long breadcrumb for https://drupal.org/i/3223147.
-    'Manage text format, mobile' => [
-      '/admin/config/content/formats/manage/restricted_html',
-      TRUE,
+      'Manage text format, mobile' => [
+        '/admin/config/content/formats/manage/restricted_html',
+        TRUE,
         [
           // This is the only way to add WCAG 2.2 tags to defaults.
           // See https://github.com/dequelabs/axe-core/issues/4717.
@@ -80,15 +81,16 @@ class AccessibilityTest extends AccessibilityTestBase {
             ],
           ],
         ],
-      'browser_options' => [
-        'resize_window' => [
+        'browser_options' => [
+          'resize_window' => [
             // Minimum window size seems to be 500px.
-          'width' => 500,
+            'width' => 500,
             // Height used by Lighthouse for mobile.
-          'height' => 823,
+            'height' => 823,
+          ],
         ],
       ],
-    ],
-  ];
+    ];
+  }
 
 }

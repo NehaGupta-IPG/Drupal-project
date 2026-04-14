@@ -25,13 +25,6 @@ abstract class AccessibilityTestBase extends WebDriverTestBase {
   protected $profile = 'nightwatch_a11y_testing';
 
   /**
-   * Test cases to be returned by the data provider.
-   *
-   * @see ::testPages()
-   */
-  protected static array $testCases = [];
-
-  /**
    * Test some pages.
    *
    * @param string $uri
@@ -74,8 +67,6 @@ abstract class AccessibilityTestBase extends WebDriverTestBase {
   /**
    * Data provider for testPages.
    */
-  public static function provider(): array {
-    return static::$testCases;
-  }
+  abstract public static function provider(): array;
 
 }
