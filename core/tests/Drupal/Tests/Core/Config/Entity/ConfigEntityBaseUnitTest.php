@@ -149,9 +149,8 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
     $this->languageManager
       ->method('getLanguage')
       ->willReturn(new Language(['id' => 'en']));
-    $this->languageManager->expects($this->atLeastOnce())
+    $this->languageManager
       ->method('getCurrentLanguage')
-      ->with()
       ->willReturn(new Language(['id' => 'en']));
 
     $this->cacheTagsInvalidator = $this->createStub(CacheTagsInvalidatorInterface::class);
