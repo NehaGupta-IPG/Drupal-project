@@ -23,13 +23,6 @@ class AccessibilityTest extends AccessibilityTestBase {
 
   /**
    * {@inheritdoc}
-   *
-   * @todo Remove this class property after https://drupal.org/i/3584314/.
-   */
-  protected $failOnJavascriptConsoleErrors = FALSE;
-
-  /**
-   * {@inheritdoc}
    */
   public static function provider(): array {
     return [

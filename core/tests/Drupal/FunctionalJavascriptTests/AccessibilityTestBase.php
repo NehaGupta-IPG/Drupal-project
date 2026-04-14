@@ -25,6 +25,13 @@ abstract class AccessibilityTestBase extends WebDriverTestBase {
   protected $profile = 'nightwatch_a11y_testing';
 
   /**
+   * {@inheritdoc}
+   *
+   * @todo Remove this class property after https://drupal.org/i/3584314/.
+   */
+  protected $failOnJavascriptConsoleErrors = FALSE;
+
+  /**
    * Test some pages.
    *
    * @param string $uri
