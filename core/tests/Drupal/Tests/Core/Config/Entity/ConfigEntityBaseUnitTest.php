@@ -149,7 +149,8 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
     $this->languageManager
       ->method('getLanguage')
       ->willReturn(new Language(['id' => 'en']));
-    $this->languageManager->method('getCurrentLanguage')
+    $this->languageManager->expects($this->atLeastOnce())
+      ->method('getCurrentLanguage')
       ->with()
       ->willReturn(new Language(['id' => 'en']));
 
