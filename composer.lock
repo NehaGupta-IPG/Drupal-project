@@ -365,16 +365,10 @@
         {
             "name": "drupal/core",
             "version": "dev-main",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/drupal/core.git",
-                "reference": "2798c86dc1a6e0c7261bb3ec6e0051f265768358"
-            },
             "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/drupal/core/zipball/2798c86dc1a6e0c7261bb3ec6e0051f265768358",
-                "reference": "2798c86dc1a6e0c7261bb3ec6e0051f265768358",
-                "shasum": ""
+                "type": "path",
+                "url": "core",
+                "reference": "57bcca0ee7f6772c98052a6c7515df8418560402"
             },
             "require": {
                 "asm89/stack-cors": "^2.3",
@@ -466,36 +460,33 @@
                 },
                 "drupal-scaffold": {
                     "file-mapping": {
-                        "[web-root]/.htaccess": "assets/scaffold/files/htaccess",
-                        "[web-root]/README.md": "assets/scaffold/files/drupal.README.md",
-                        "[web-root]/index.php": "assets/scaffold/files/index.php",
+                        "[project-root]/.editorconfig": "assets/scaffold/files/editorconfig",
+                        "[project-root]/.gitattributes": "assets/scaffold/files/gitattributes",
+                        "[project-root]/recipes/README.txt": "assets/scaffold/files/recipes.README.txt",
                         "[web-root]/.csslintrc": "assets/scaffold/files/csslintrc",
-                        "[web-root]/robots.txt": "assets/scaffold/files/robots.txt",
-                        "[web-root]/update.php": "assets/scaffold/files/update.php",
-                        "[web-root]/INSTALL.txt": "assets/scaffold/files/drupal.INSTALL.txt",
                         "[web-root]/.eslintignore": "assets/scaffold/files/eslintignore",
                         "[web-root]/.eslintrc.json": "assets/scaffold/files/eslintrc.json",
                         "[web-root]/.ht.router.php": "assets/scaffold/files/ht.router.php",
-                        "[web-root]/sites/README.txt": "assets/scaffold/files/sites.README.txt",
-                        "[project-root]/.editorconfig": "assets/scaffold/files/editorconfig",
+                        "[web-root]/.htaccess": "assets/scaffold/files/htaccess",
                         "[web-root]/example.gitignore": "assets/scaffold/files/example.gitignore",
-                        "[web-root]/themes/README.txt": "assets/scaffold/files/themes.README.txt",
-                        "[project-root]/.gitattributes": "assets/scaffold/files/gitattributes",
-                        "[web-root]/modules/README.txt": "assets/scaffold/files/modules.README.txt",
-                        "[web-root]/profiles/README.txt": "assets/scaffold/files/profiles.README.txt",
-                        "[project-root]/recipes/README.txt": "assets/scaffold/files/recipes.README.txt",
-                        "[web-root]/sites/example.sites.php": "assets/scaffold/files/example.sites.php",
+                        "[web-root]/index.php": "assets/scaffold/files/index.php",
+                        "[web-root]/INSTALL.txt": "assets/scaffold/files/drupal.INSTALL.txt",
+                        "[web-root]/README.md": "assets/scaffold/files/drupal.README.md",
+                        "[web-root]/robots.txt": "assets/scaffold/files/robots.txt",
+                        "[web-root]/update.php": "assets/scaffold/files/update.php",
+                        "[web-root]/sites/README.txt": "assets/scaffold/files/sites.README.txt",
                         "[web-root]/sites/development.services.yml": "assets/scaffold/files/development.services.yml",
                         "[web-root]/sites/example.settings.local.php": "assets/scaffold/files/example.settings.local.php",
+                        "[web-root]/sites/example.sites.php": "assets/scaffold/files/example.sites.php",
                         "[web-root]/sites/default/default.services.yml": "assets/scaffold/files/default.services.yml",
-                        "[web-root]/sites/default/default.settings.php": "assets/scaffold/files/default.settings.php"
+                        "[web-root]/sites/default/default.settings.php": "assets/scaffold/files/default.settings.php",
+                        "[web-root]/modules/README.txt": "assets/scaffold/files/modules.README.txt",
+                        "[web-root]/profiles/README.txt": "assets/scaffold/files/profiles.README.txt",
+                        "[web-root]/themes/README.txt": "assets/scaffold/files/themes.README.txt"
                     }
                 }
             },
             "autoload": {
-                "files": [
-                    "includes/bootstrap.inc"
-                ],
                 "psr-4": {
                     "Drupal\\Core\\": "lib/Drupal/Core",
                     "Drupal\\Component\\": "lib/Drupal/Component"
@@ -523,37 +514,37 @@
                     "lib/Drupal/Core/Installer/InstallerRedirectTrait.php",
                     "lib/Drupal/Core/Site/Settings.php",
                     "lib/Drupal/Component/Datetime/Time.php"
+                ],
+                "files": [
+                    "includes/bootstrap.inc"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "scripts": {
+                "pre-autoload-dump": [
+                    "Drupal\\Composer\\Plugin\\Scaffold\\Plugin::preAutoloadDump"
+                ]
+            },
             "license": [
                 "GPL-2.0-or-later"
             ],
             "description": "Drupal is an open source content management platform powering millions of websites and applications.",
-            "support": {
-                "source": "https://github.com/drupal/core/tree/main"
-            },
             "funding": [
                 {
-                    "url": "https://www.drupal.org/composer-fund",
-                    "type": "other"
+                    "type": "other",
+                    "url": "https://www.drupal.org/composer-fund"
                 }
             ],
-            "time": "2026-04-12T20:29:23+00:00"
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "drupal/core-composer-scaffold",
             "version": "dev-main",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/drupal/core-composer-scaffold.git",
-                "reference": "b2a218509c61c7c748aa05d996c9bc8673680175"
-            },
             "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/drupal/core-composer-scaffold/zipball/b2a218509c61c7c748aa05d996c9bc8673680175",
-                "reference": "b2a218509c61c7c748aa05d996c9bc8673680175",
-                "shasum": ""
+                "type": "path",
+                "url": "composer/Plugin/Scaffold",
+                "reference": "0fdec1a8ed622a9ed92bb80730a5337c390cc7fb"
             },
             "require": {
                 "composer-plugin-api": "^2",
@@ -577,7 +568,6 @@
                     "Drupal\\Composer\\Plugin\\Scaffold\\": ""
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "GPL-2.0-or-later"
             ],
@@ -586,24 +576,17 @@
             "keywords": [
                 "drupal"
             ],
-            "support": {
-                "source": "https://github.com/drupal/core-composer-scaffold/tree/main"
-            },
-            "time": "2026-02-16T16:52:09+00:00"
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "drupal/core-project-message",
             "version": "dev-main",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/drupal/core-project-message.git",
-                "reference": "4daf6f25f7399e7e92768352ee33d5f2987a8e76"
-            },
             "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/drupal/core-project-message/zipball/4daf6f25f7399e7e92768352ee33d5f2987a8e76",
-                "reference": "4daf6f25f7399e7e92768352ee33d5f2987a8e76",
-                "shasum": ""
+                "type": "path",
+                "url": "composer/Plugin/ProjectMessage",
+                "reference": "569e7bfe4490e7e05d20a039956ef6e2d6c06968"
             },
             "require": {
                 "composer-plugin-api": "^2",
@@ -621,7 +604,6 @@
                     "Drupal\\Composer\\Plugin\\ProjectMessage\\": "."
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "GPL-2.0-or-later"
             ],
@@ -630,24 +612,17 @@
             "keywords": [
                 "drupal"
             ],
-            "support": {
-                "source": "https://github.com/drupal/core-project-message/tree/main"
-            },
-            "time": "2026-01-14T10:51:35+00:00"
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "drupal/core-recipe-unpack",
             "version": "dev-main",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/drupal/core-recipe-unpack.git",
-                "reference": "92aad4f04b9d6d043e9a7725989994d71402ccca"
-            },
             "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/drupal/core-recipe-unpack/zipball/92aad4f04b9d6d043e9a7725989994d71402ccca",
-                "reference": "92aad4f04b9d6d043e9a7725989994d71402ccca",
-                "shasum": ""
+                "type": "path",
+                "url": "composer/Plugin/RecipeUnpack",
+                "reference": "5a9effb8344fadff1820e394b4bd820f23472328"
             },
             "require": {
                 "composer-plugin-api": "^2",
@@ -668,7 +643,6 @@
                     "Drupal\\Composer\\Plugin\\RecipeUnpack\\": ""
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "GPL-2.0-or-later"
             ],
@@ -677,24 +651,17 @@
             "keywords": [
                 "drupal"
             ],
-            "support": {
-                "source": "https://github.com/drupal/core-recipe-unpack/tree/main"
-            },
-            "time": "2026-01-14T10:51:35+00:00"
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "drupal/core-vendor-hardening",
             "version": "dev-main",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/drupal/core-vendor-hardening.git",
-                "reference": "baf4221caf58fca86dfff7897baad9e4a3973880"
-            },
             "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/drupal/core-vendor-hardening/zipball/baf4221caf58fca86dfff7897baad9e4a3973880",
-                "reference": "baf4221caf58fca86dfff7897baad9e4a3973880",
-                "shasum": ""
+                "type": "path",
+                "url": "composer/Plugin/VendorHardening",
+                "reference": "3e006d6d544e6c59a60b09f0d2608f906b60fe8a"
             },
             "require": {
                 "composer-plugin-api": "^2",
@@ -712,7 +679,6 @@
                     "Drupal\\Composer\\Plugin\\VendorHardening\\": "."
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "GPL-2.0-or-later"
             ],
@@ -721,10 +687,9 @@
             "keywords": [
                 "drupal"
             ],
-            "support": {
-                "source": "https://github.com/drupal/core-vendor-hardening/tree/main"
-            },
-            "time": "2026-03-27T21:22:03+00:00"
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "egulias/email-validator",
@@ -3395,7 +3360,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-09-09T11:45:10+00:00"
+            "time": "2025-06-27T09:58:17+00:00"
         },
         {
             "name": "symfony/polyfill-intl-idn",
@@ -3482,27 +3447,27 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-06-27T09:58:17+00:00"
+            "time": "2024-09-10T14:38:51+00:00"
         },
         {
             "name": "symfony/polyfill-intl-normalizer",
-            "version": "v1.32.0",
+            "version": "v1.33.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-normalizer.git",
-                "reference": "d80a05e9904d2c2b9b95929f3e4b5d3a8f418d78"
+                "reference": "3833d7255cc303546435cb650316bff708a1c75c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-intl-normalizer/zipball/d80a05e9904d2c2b9b95929f3e4b5d3a8f418d78",
-                "reference": "d80a05e9904d2c2b9b95929f3e4b5d3a8f418d78",
+                "url": "https://api.github.com/repos/symfony/polyfill-intl-normalizer/zipball/3833d7255cc303546435cb650316bff708a1c75c",
+                "reference": "3833d7255cc303546435cb650316bff708a1c75c",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.2"
             },
             "suggest": {
-                "ext-intl": "For best performance and support of other locales than \"en\""
+                "ext-intl": "For best performance"
             },
             "type": "library",
             "extra": {
@@ -3516,13 +3481,10 @@
                     "bootstrap.php"
                 ],
                 "psr-4": {
-                    "Symfony\\Polyfill\\Intl\\Icu\\": ""
+                    "Symfony\\Polyfill\\Intl\\Normalizer\\": ""
                 },
                 "classmap": [
                     "Resources/stubs"
-                ],
-                "exclude-from-classmap": [
-                    "/Tests/"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -3539,18 +3501,18 @@
                     "homepage": "https://symfony.com/contributors"
                 }
             ],
-            "description": "Symfony polyfill for intl's ICU-related data and classes",
+            "description": "Symfony polyfill for intl's Normalizer class and related functions",
             "homepage": "https://symfony.com",
             "keywords": [
                 "compatibility",
-                "icu",
                 "intl",
+                "normalizer",
                 "polyfill",
                 "portable",
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-intl-normalizer/tree/v1.32.0"
+                "source": "https://github.com/symfony/polyfill-intl-normalizer/tree/v1.33.0"
             },
             "funding": [
                 {
@@ -3574,24 +3536,27 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.32.0",
+            "version": "v1.33.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "9614ac4d8061dc257ecc64cba1b140873dce8ad3"
+                "reference": "6d857f4d76bd4b343eac26d6b539585d2bc56493"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/9614ac4d8061dc257ecc64cba1b140873dce8ad3",
-                "reference": "9614ac4d8061dc257ecc64cba1b140873dce8ad3",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/6d857f4d76bd4b343eac26d6b539585d2bc56493",
+                "reference": "6d857f4d76bd4b343eac26d6b539585d2bc56493",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.2",
-                "symfony/polyfill-intl-normalizer": "^1.10"
+                "ext-iconv": "*",
+                "php": ">=7.2"
+            },
+            "provide": {
+                "ext-mbstring": "*"
             },
             "suggest": {
-                "ext-intl": "For best performance"
+                "ext-mbstring": "For best performance"
             },
             "type": "library",
             "extra": {
@@ -3605,7 +3570,7 @@
                     "bootstrap.php"
                 ],
                 "psr-4": {
-                    "Symfony\\Polyfill\\Intl\\Idn\\": ""
+                    "Symfony\\Polyfill\\Mbstring\\": ""
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -3614,30 +3579,25 @@
             ],
             "authors": [
                 {
-                    "name": "Laurent Bassin",
-                    "email": "laurent@bassin.info"
-                },
-                {
-                    "name": "Trevor Rowbotham",
-                    "email": "trevor.rowbotham@pm.me"
+                    "name": "Nicolas Grekas",
+                    "email": "p@tchwork.com"
                 },
                 {
                     "name": "Symfony Community",
                     "homepage": "https://symfony.com/contributors"
                 }
             ],
-            "description": "Symfony polyfill for intl's idn_to_ascii and idn_to_utf8 functions",
+            "description": "Symfony polyfill for the Mbstring extension",
             "homepage": "https://symfony.com",
             "keywords": [
                 "compatibility",
-                "idn",
-                "intl",
+                "mbstring",
                 "polyfill",
                 "portable",
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.32.0"
+                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.33.0"
             },
             "funding": [
                 {
