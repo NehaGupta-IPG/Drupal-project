@@ -27,7 +27,7 @@ abstract class AccessibilityTestBase extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    *
-   * @todo Remove this class property after https://drupal.org/i/3584314/.
+   * @todo Remove this class property after https://drupal.org/i/3584694.
    */
   protected $failOnJavascriptConsoleErrors = FALSE;
 
