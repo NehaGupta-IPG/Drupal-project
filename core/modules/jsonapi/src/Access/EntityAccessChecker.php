@@ -2,13 +2,10 @@
 
 namespace Drupal\jsonapi\Access;
 
-use Drupal\content_moderation\Access\LatestRevisionCheck;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Access\AccessResultReasonInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
-use Drupal\Core\Entity\RevisionableInterface;
-use Drupal\Core\Routing\RouteMatch;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\jsonapi\Exception\EntityAccessDeniedHttpException;
 use Drupal\jsonapi\JsonApiResource\LabelOnlyResourceObject;
@@ -146,4 +143,5 @@ class EntityAccessChecker {
     }
     return $access;
   }
+
 }

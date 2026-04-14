@@ -15464,12 +15464,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/inline_form_errors/src/RenderElementHelper.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\jsonapi\\\\Access\\\\EntityAccessChecker\\:\\:setLatestRevisionCheck\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/jsonapi/src/Access/EntityAccessChecker.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\jsonapi\\\\Access\\\\TemporaryQueryGuard\\:\\:addConditionFieldPrefix\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,
