@@ -58,6 +58,7 @@ abstract class WorkspaceProviderBase implements WorkspaceProviderInterface {
         break;
 
       case 'view all revisions':
+      case 'view revision':
         $permission_operation = 'view';
         break;
 
