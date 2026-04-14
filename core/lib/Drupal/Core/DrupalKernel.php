@@ -522,19 +522,10 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     if ($bootstrap_definition === NULL) {
       $bootstrap_definition = $this->defaultBootstrapContainerDefinition;
       // When APCu is available, wrap cache.container in a ChainedFastBackend
-      // with an ApcuBackend as the fast layer. This avoids fetching and
-      // unserializing the container definition from the database on every
-      // request. The consistent backend is still used to validate the fast
-      // entries via a last-write timestamp per bin, which keeps this correct
-      // for multi-server setups where each server has its own APCu. Sites
-      // that override bootstrap_container_definition are expected to
-      // configure their own fast backend if desired.
-      //
-      // The fast backend is skipped during installation: many cache
-      // invalidations and writes happen as modules are enabled, which makes
-      // ChainedFastBackend perform badly (every write bumps the last-write
-      // timestamp, so the fast backend is constantly skipped). This matches
-      // the logic in ChainedFastBackendFactory.
+      // to avoid fetching the container definition from the database on
+      // every request. Skipped during installation (same as
+      // ChainedFastBackendFactory) and when sites override
+      // bootstrap_container_definition.
       if (function_exists('apcu_enabled') && apcu_enabled() && !InstallerKernel::installationAttempted()) {
         $bootstrap_definition['services']['cache.container.consistent'] = $bootstrap_definition['services']['cache.container'];
         $bootstrap_definition['services']['cache.container.fast'] = [
@@ -1437,8 +1428,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     }
 
     // Also remove the container definition from the cache backend.
-    // When cache.container is wrapped in a ChainedFastBackend, this also
-    // invalidates the APCu fast backend via the shared last-write timestamp.
     $this->bootstrapContainer->get('cache.container')->deleteAll();
   }
 
