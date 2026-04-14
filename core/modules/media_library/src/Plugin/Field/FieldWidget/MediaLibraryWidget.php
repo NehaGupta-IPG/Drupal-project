@@ -628,8 +628,15 @@ class MediaLibraryWidget extends WidgetBase implements TrustedCallbackInterface 
   protected function getNoMediaTypesAvailableMessage() {
     $default_message = $this->t('There are no allowed media types configured for this field. Contact the site administrator.');
 
-    // Ignore base fields.
+    // For base fields: or there are no media types, or the base fields don't
+    // have the necessary settings, so only can be fixed via code.
     if (!$this->fieldDefinition instanceof FieldConfigInterface) {
+      if ($this->currentUser->hasPermission('administer media types')) {
+        $url = Url::fromRoute('entity.media_type.add_form');
+        return $this->t('There are no allowed media types configured for this field. You might want to <a href=":url">create one</a>.', [
+          ':url' => $url->toString(),
+        ]);
+      }
       return $default_message;
     }
     $entity_type_id = $this->fieldDefinition->getTargetEntityTypeId();
