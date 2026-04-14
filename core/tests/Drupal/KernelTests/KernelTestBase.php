@@ -20,10 +20,11 @@ use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Test\EventSubscriber\FieldStorageCreateCheckSubscriber;
 use Drupal\Core\Test\TestDatabase;
+use Drupal\Tests\BrowserHtmlDebugTrait;
 use Drupal\Tests\ConfigTestTrait;
 use Drupal\Tests\DrupalTestCaseTrait;
 use Drupal\Tests\ExtensionListTestTrait;
-use Drupal\Tests\PhpUnitCompatibilityTrait;
+use Drupal\Tests\HttpKernelUiHelperTrait;
 use Drupal\Tests\RandomGeneratorTrait;
 use Drupal\Tests\TestRequirementsTrait;
 use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
@@ -102,8 +103,9 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   use ConfigTestTrait;
   use ExtensionListTestTrait;
   use TestRequirementsTrait;
-  use PhpUnitCompatibilityTrait;
   use ProphecyTrait;
+  use BrowserHtmlDebugTrait;
+  use HttpKernelUiHelperTrait;
 
   /**
    * The class loader.
@@ -226,7 +228,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    */
   protected function setUp(): void {
     if ($this->valueObjectForEvents()->metadata()->isRunTestsInSeparateProcesses()->isEmpty()) {
-      @trigger_error('Kernel test classes must specify the #[RunTestsInSeparateProcesses] attribute, not doing so is deprecated in drupal:11.3.0 and will throw an exception in drupal:12.0.0. See https://www.drupal.org/node/3548485', E_USER_DEPRECATED);
+      throw new \Exception('Kernel test classes must specify the #[RunTestsInSeparateProcesses] attribute');
     }
 
     parent::setUp();
@@ -585,7 +587,6 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
       ->register('testing.field_storage_create_check', FieldStorageCreateCheckSubscriber::class)
       ->addArgument(new Reference('database'))
       ->addArgument(new Reference('entity_type.manager'))
-      ->addArgument($is_core_test)
       ->addTag('event_subscriber');
 
     // Relax the password hashing cost in tests to avoid performance issues.
