@@ -55,11 +55,13 @@ abstract class AccessibilityTestBase extends WebDriverTestBase {
 
     $this->drupalGet($uri);
 
-    // Missing modules or routes could cause a 404, which means the
-    // wrong page is being tested and will likely result in
+    // Missing modules or routes and access issues can cause a 403 or 404,
+    // which means the wrong page is being tested and will likely result in
     // falsely-passing tests.
     $this->assertSession()
       ->responseNotContains('Page not found');
+    $this->assertSession()
+      ->responseNotContains('Access denied');
 
     if (!empty($browser_options['resize_window'])) {
       $this->getSession()->resizeWindow(
