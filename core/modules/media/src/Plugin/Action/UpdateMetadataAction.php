@@ -3,19 +3,20 @@
 namespace Drupal\media\Plugin\Action;
 
 use Drupal\Core\Action\ActionBase;
+use Drupal\Core\Action\Attribute\Action;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Updates metadata (including the thumbnail) of a media entity.
- *
- * @Action(
- *   id = "media_update_metadata",
- *   action_label = @Translation("Update metadata")
- * )
  */
+#[Action(
+  id: 'media_update_metadata',
+  label: new TranslatableMarkup('Update metadata'),
+)]
 class UpdateMetadataAction extends ActionBase implements ContainerFactoryPluginInterface {
 
   /**
