@@ -9,8 +9,6 @@ namespace Drupal\container_env_test;
  */
 class TestService {
 
-  const EXAMPLE = 1;
-
   /**
    * Constructs a new TestService instance.
    */
