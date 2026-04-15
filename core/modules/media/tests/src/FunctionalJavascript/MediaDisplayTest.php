@@ -12,11 +12,13 @@ use Drupal\media\Entity\Media;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Basic display tests for Media.
  */
 #[Group('media')]
+#[RunTestsInSeparateProcesses]
 class MediaDisplayTest extends MediaJavascriptTestBase {
 
   /**
@@ -42,7 +44,7 @@ class MediaDisplayTest extends MediaJavascriptTestBase {
     \Drupal::configFactory()
       ->getEditable('media.settings')
       ->set('standalone_url', TRUE)
-      ->save(TRUE);
+      ->save();
 
     $this->container->get('router.builder')->rebuild();
   }

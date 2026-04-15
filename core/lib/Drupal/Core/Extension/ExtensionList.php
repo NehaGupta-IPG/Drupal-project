@@ -178,9 +178,6 @@ abstract class ExtensionList {
       // early installer.
     }
 
-    // @todo In the long run it would be great to add the reset, but the early
-    //   installer fails due to that. https://www.drupal.org/node/2719315 could
-    //   help to resolve with that.
     return $this;
   }
 
@@ -475,7 +472,7 @@ abstract class ExtensionList {
    * only returned if the file exists.
    *
    * This function plays a key role in allowing Drupal's extensions (modules,
-   * themes, profiles, theme_engines, etc.) to be located in different places
+   * themes, profiles, etc.) to be located in different places
    * depending on a site's configuration. For example, a module 'foo' may
    * legally be located in any of these four places:
    *

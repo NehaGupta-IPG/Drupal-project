@@ -9,12 +9,14 @@ use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\layout_builder\Entity\LayoutBuilderEntityViewDisplay;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the JavaScript functionality of the block add filter.
  */
 #[Group('layout_builder')]
 #[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class BlockFilterTest extends WebDriverTestBase {
 
   /**
@@ -55,6 +57,8 @@ class BlockFilterTest extends WebDriverTestBase {
    * Tests block filter.
    */
   public function testBlockFilter(): void {
+    // @todo skipped due to random test failures, re-enable in https://www.drupal.org/project/drupal/issues/3028968.
+    $this->markTestSkipped();
     $assert_session = $this->assertSession();
     $session = $this->getSession();
     $page = $session->getPage();
@@ -116,7 +120,7 @@ class BlockFilterTest extends WebDriverTestBase {
     $visible_categories = $this->filterVisibleElements($categories);
     $this->assertCount(3, $visible_categories);
 
-    // Test blocks reappear after being filtered by repeating search for "a"
+    // Test blocks reappear after being filtered by repeating search for "a".
     $filter->setValue('a');
     $this->assertAnnounceContains('All available blocks are listed.');
 

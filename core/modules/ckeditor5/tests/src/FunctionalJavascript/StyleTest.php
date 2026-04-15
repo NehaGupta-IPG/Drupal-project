@@ -12,6 +12,7 @@ use Drupal\Tests\ckeditor5\Traits\CKEditor5TestTrait;
 // cspell:ignore sourceediting
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 
 /**
@@ -21,6 +22,7 @@ use Symfony\Component\Validator\ConstraintViolationInterface;
  */
 #[CoversClass(Style::class)]
 #[Group('ckeditor5')]
+#[RunTestsInSeparateProcesses]
 class StyleTest extends CKEditor5TestBase {
 
   use CKEditor5TestTrait;
@@ -407,7 +409,7 @@ JS;
     // Close the dropdown.
     $style_dropdown->click();
 
-    // Select the <ul> and check the available styles
+    // Select the <ul> and check the available styles.
     $this->selectTextInsideElement('ul');
     $this->assertSame('Styles', $style_dropdown->getText());
     $style_dropdown->click();
@@ -448,7 +450,7 @@ JS;
     $this->assertTrue($buttons[8]->hasClass('ck-off'));
     $this->assertSame('Items', $style_dropdown->getText());
 
-    // Select the <ol> and check the available styles
+    // Select the <ol> and check the available styles.
     $this->selectTextInsideElement('ol');
     $this->assertSame('Styles', $style_dropdown->getText());
     $style_dropdown->click();
@@ -489,7 +491,7 @@ JS;
     $this->assertTrue($buttons[8]->hasClass('ck-off'));
     $this->assertSame('Steps', $style_dropdown->getText());
 
-    // Select the table and check the available styles
+    // Select the table and check the available styles.
     $this->selectTextInsideElement('table td');
     $this->assertSame('Styles', $style_dropdown->getText());
     $style_dropdown->click();

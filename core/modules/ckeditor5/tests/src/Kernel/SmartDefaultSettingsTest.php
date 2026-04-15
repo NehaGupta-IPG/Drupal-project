@@ -7,22 +7,31 @@ namespace Drupal\Tests\ckeditor5\Kernel;
 // cspell:ignore arta codesnippet
 
 use Drupal\ckeditor5\HTMLRestrictions;
+use Drupal\ckeditor5\SmartDefaultSettings;
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\Entity\EntityViewMode;
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Logger\LogMessageParserInterface;
 use Drupal\editor\Entity\Editor;
 use Drupal\filter\Entity\FilterFormat;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\Tests\SchemaCheckTestTrait;
+use PHPUnit\Framework\Attributes\CoversMethod;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\ErrorHandler\BufferingLogger;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * @covers \Drupal\ckeditor5\SmartDefaultSettings::computeSmartDefaultSettings
- * @group ckeditor5
+ * Tests Smart Default Settings.
+ *
  * @internal
  */
+#[Group('ckeditor5')]
+#[CoversMethod(SmartDefaultSettings::class, 'computeSmartDefaultSettings')]
+#[RunTestsInSeparateProcesses]
 class SmartDefaultSettingsTest extends KernelTestBase {
 
   use SchemaCheckTestTrait;
@@ -61,13 +70,6 @@ class SmartDefaultSettingsTest extends KernelTestBase {
   protected $smartDefaultSettings;
 
   /**
-   * The database connection used.
-   *
-   * @var \Drupal\Core\Database\Connection
-   */
-  protected $database;
-
-  /**
    * The service name for a logger implementation that collects anything logged.
    *
    * @var string
@@ -91,11 +93,8 @@ class SmartDefaultSettingsTest extends KernelTestBase {
     'user',
     // For being able to test media_embed + Media button in CKE5.
     'media',
-    'media_library',
-    'views',
     'help',
     'editor_test',
-    'ckeditor_test',
   ];
 
   /**
@@ -383,6 +382,18 @@ class SmartDefaultSettingsTest extends KernelTestBase {
   }
 
   /**
+   * Implements hook_editor_info_alter().
+   *
+   * @see ::test()
+   */
+  #[Hook('editor_info_alter')]
+  public function editorInfoAlter(array &$editors): void {
+    // Drupal 9 used to have an editor called ckeditor. Copy the Unicorn editor
+    // to it to be able to test upgrading to CKEditor 5.
+    $editors['ckeditor'] = $editors['unicorn'];
+  }
+
+  /**
    * Tests the CKEditor 5 default settings conversion.
    *
    * @param string $format_id
@@ -410,8 +421,9 @@ class SmartDefaultSettingsTest extends KernelTestBase {
    *   All expected media and filter settings violations for the given text
    *   format.
    *
-   * @dataProvider provider
+   * @see ::editorInfoAlter()
    */
+  #[DataProvider('provider')]
   public function test(string $format_id, array $filters_to_drop, array $expected_ckeditor5_settings, string $expected_superset, array $expected_fundamental_compatibility_violations, array $expected_db_logs, array $expected_messages, ?array $expected_post_filter_drop_fundamental_compatibility_violations = NULL, ?array $expected_post_update_text_editor_violations = NULL): void {
     $text_format = FilterFormat::load($format_id);
     $text_editor = Editor::load($format_id);

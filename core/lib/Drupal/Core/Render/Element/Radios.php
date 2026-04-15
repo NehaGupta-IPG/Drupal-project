@@ -10,9 +10,7 @@ use Drupal\Component\Utility\Html as HtmlUtility;
  * Provides a form element for a set of radio buttons.
  *
  * Properties:
- *
- * @property $options
- *   An associative array, where the keys are the returned values for
+ * - #options: An associative array, where the keys are the returned values for
  *   each radio button, and the values are the labels next to each radio button.
  *
  * Usage example:
@@ -62,6 +60,13 @@ class Radios extends FormElementBase {
   public static function processRadios(&$element, FormStateInterface $form_state, &$complete_form) {
     if (count($element['#options']) > 0) {
       $weight = 0;
+      $child_attributes = $element['#attributes'];
+      // Prevent child elements from inheriting an aria-describedby attribute.
+      // The individual children won't have descriptions and the attribute will
+      // be invalid.
+      if (isset($child_attributes['aria-describedby'])) {
+        unset($child_attributes['aria-describedby']);
+      }
       foreach ($element['#options'] as $key => $choice) {
         // Maintain order of options as defined in #options, in case the element
         // defines custom option sub-elements, but does not define all option
@@ -81,7 +86,7 @@ class Radios extends FormElementBase {
           // Use default or FALSE. A value of FALSE means that the radio button
           // is not 'checked'.
           '#default_value' => $element['#default_value'] ?? FALSE,
-          '#attributes' => $element['#attributes'],
+          '#attributes' => $child_attributes,
           '#parents' => $element['#parents'],
           '#id' => HtmlUtility::getUniqueId('edit-' . implode('-', $parents_for_id)),
           '#ajax' => $element['#ajax'] ?? NULL,

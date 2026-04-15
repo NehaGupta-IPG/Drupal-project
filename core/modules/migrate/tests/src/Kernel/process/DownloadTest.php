@@ -7,22 +7,19 @@ namespace Drupal\Tests\migrate\Kernel\process;
 use Drupal\Core\StreamWrapper\StreamWrapperInterface;
 use Drupal\KernelTests\Core\File\FileTestBase;
 use Drupal\migrate\MigrateException;
-use Drupal\migrate\Plugin\migrate\process\Download;
 use Drupal\migrate\MigrateExecutableInterface;
+use Drupal\migrate\Plugin\migrate\process\Download;
 use Drupal\migrate\Row;
 use GuzzleHttp\Client;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the download process plugin.
- *
- * @group migrate
  */
+#[Group('migrate')]
+#[RunTestsInSeparateProcesses]
 class DownloadTest extends FileTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
 
   /**
    * {@inheritdoc}
@@ -102,14 +99,14 @@ class DownloadTest extends FileTestBase {
    */
   protected function doTransform($destination_uri, $configuration = []) {
     // Prepare a mock HTTP client.
-    $this->container->set('http_client', $this->createMock(Client::class));
+    $this->container->set('http_client', $this->createStub(Client::class));
 
     // Instantiate the plugin statically so it can pull dependencies out of
     // the container.
     $plugin = Download::create($this->container, $configuration, 'download', []);
 
     // Execute the transformation.
-    $executable = $this->createMock(MigrateExecutableInterface::class);
+    $executable = $this->createStub(MigrateExecutableInterface::class);
     $row = new Row([], []);
 
     // Return the downloaded file's local URI.
