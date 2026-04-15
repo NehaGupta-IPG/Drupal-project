@@ -8,7 +8,6 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Form\FormErrorHandler;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Messenger\MessengerInterface;
-use Drupal\Core\Render\RendererInterface;
 use Drupal\Tests\UnitTestCase;
 use Prophecy\Argument;
 use PHPUnit\Framework\Attributes\CoversClass;
