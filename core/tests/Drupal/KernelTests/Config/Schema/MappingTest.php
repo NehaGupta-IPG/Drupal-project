@@ -442,7 +442,7 @@ class MappingTest extends KernelTestBase {
           'negate',
           'context_mapping',
           // @deprecated The "theme" configuration key is deprecated in
-          // drupal:11.3.0 and will be removed in drupal:13.0.0.
+          // drupal:12.0.0 and will be removed in drupal:13.0.0.
           // @see https://www.drupal.org/node/3523553.
           'theme',
           'themes',
@@ -482,7 +482,7 @@ class MappingTest extends KernelTestBase {
         ],
         'condition.plugin.current_theme' => [
           // @deprecated The "theme" configuration key is deprecated in
-          // drupal:11.3.0 and will be removed in drupal:13.0.0.
+          // drupal:12.0.0 and will be removed in drupal:13.0.0.
           // @see https://www.drupal.org/node/3523553.
           'theme',
           'themes',

@@ -24,7 +24,6 @@ class CurrentThemeConditionTest extends KernelTestBase {
   /**
    * Tests the current theme condition.
    */
-  #[IgnoreDeprecations]
   public function testCurrentTheme(): void {
     \Drupal::service('theme_installer')->install(['starterkit_theme', 'test_base_theme', 'test_subtheme']);
 
@@ -47,17 +46,10 @@ class CurrentThemeConditionTest extends KernelTestBase {
     /** @var \Drupal\Core\Condition\ConditionInterface $condition_any_negated */
     $condition_any_negated = $manager->createInstance('current_theme');
     $condition_any_negated->setConfiguration(['themes' => [], 'negate' => TRUE]);
-    // Check whether the deprecated config works as expected
-    /** @var \Drupal\Core\Condition\ConditionInterface $condition_deprecated_config */
-    $condition_deprecated_config = $manager->createInstance('current_theme');
-    $condition_deprecated_config->setConfiguration(['theme' => 'starterkit_theme']);
 
     // The expected theme has not been set up yet.
     $this->assertFalse($condition->execute());
     $this->assertTrue($condition_negated->execute());
-
-    // Check whether the deprecated config still functions as expected:
-    $this->assertFalse($condition_deprecated_config->execute());
 
     // Set the expected theme to be used.
     $this->config('system.theme')->set('default', 'starterkit_theme')->save();
@@ -69,7 +61,6 @@ class CurrentThemeConditionTest extends KernelTestBase {
     $this->assertEquals('The current theme is not one of the following: Theme test subtheme, Starterkit theme', $condition_multiple_negated->summary());
     $this->assertEquals('The current theme is one of the following: Theme test base theme, Stable 9, Theme test subtheme, Starterkit theme', $condition_any->summary());
     $this->assertEquals('The current theme is not one of the following: Theme test base theme, Stable 9, Theme test subtheme, Starterkit theme', $condition_any_negated->summary());
-    $this->assertEquals('The current theme is: Starterkit theme', $condition_deprecated_config->summary());
 
     $this->assertTrue($condition->execute());
     $this->assertFalse($condition_negated->execute());
@@ -77,9 +68,6 @@ class CurrentThemeConditionTest extends KernelTestBase {
     // The multiple condition should also apply:
     $this->assertTrue($condition_multiple->execute());
     $this->assertFalse($condition_multiple_negated->execute());
-
-    // Check whether the deprecated config still functions as expected:
-    $this->assertTrue($condition_deprecated_config->execute());
 
     // Also when setting the other expected theme:
     $this->config('system.theme')->set('default', 'test_subtheme')->save();
@@ -110,6 +98,38 @@ class CurrentThemeConditionTest extends KernelTestBase {
 
     $this->assertTrue($condition_any->execute());
     $this->assertFalse($condition_any_negated->execute());
+  }
+
+  /**
+   * Tests the old deprecated current theme defintion.
+   *
+   * Tests whether the old current theme condition 'theme' configuration key
+   * still works as expected and throws the defined deprecation message.
+   */
+  #[IgnoreDeprecations]
+  public function testCurrentThemeDeprecated(): void {
+    \Drupal::service('theme_installer')->install(['starterkit_theme', 'test_base_theme']);
+
+    $manager = \Drupal::service('plugin.manager.condition');
+
+    // Check whether the deprecated config works as expected
+    /** @var \Drupal\Core\Condition\ConditionInterface $condition_deprecated_config */
+    $condition_deprecated_config = $manager->createInstance('current_theme');
+    $condition_deprecated_config->setConfiguration(['theme' => 'starterkit_theme']);
+
+    $this->expectUserDeprecationMessage("The 'theme' condition.plugin config schema is deprecated in drupal:12.0.0 and is removed from drupal:13.0.0. Use the 'themes' config schema instead. See https://www.drupal.org/node/3523553.");
+
+    // Check whether the deprecated config still functions as expected:
+    $this->assertFalse($condition_deprecated_config->execute());
+
+    // Set the expected theme to be used.
+    $this->config('system.theme')->set('default', 'starterkit_theme')->save();
+    \Drupal::theme()->resetActiveTheme();
+
+    $this->assertEquals('The current theme is: Starterkit theme', $condition_deprecated_config->summary());
+
+    // Check whether the deprecated config still functions as expected:
+    $this->assertTrue($condition_deprecated_config->execute());
   }
 
 }
