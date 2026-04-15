@@ -139,7 +139,7 @@ class IncludeResolver {
           continue;
         }
         if ($field_list instanceof EntityReferenceFieldItemListInterface) {
-          $references = $field_list->referencedEntities();
+          $references = array_merge($references, $field_list->referencedEntities());
         }
         else {
           foreach ($field_list as $field_item) {
