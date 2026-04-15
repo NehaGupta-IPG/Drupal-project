@@ -1316,17 +1316,17 @@ function hook_theme($existing, $type, $theme, $path): array {
  * For example:
  * @code
  * $theme_registry['entity_add_list'] = [
+ *   'variables' => [
+ *     'bundles' => [],
+ *     'add_bundle_message' => NULL,
+ *   ],
  *   'template' => 'entity-add-list',
- *   'path' => 'core/themes/claro/templates',
+ *   'initial preprocess' => 'Drupal\\system\\Hook\\SystemThemeHooks:preprocessEntityAddList',
  *   'type' => 'theme_engine',
  *   'theme path' => 'core/themes/claro',
- *   'variables' => [
- *     'bundles' => NULL,
- *   ],
- *   'initial preprocess => '\Drupal\system\Hook\SystemThemeHooks::preprocessEntityAddList',
+ *   'path' => 'core/themes/claro/templates',
  *   'preprocess functions' => [
- *     2 => 'contextual_preprocess',
- *     3 => 'claro_preprocess_entity_add_list',
+ *     0 => 'claro_preprocess_entity_add_list',
  *   ],
  * ];
  * @endcode
@@ -1370,6 +1370,21 @@ function hook_theme_registry_alter(&$theme_registry) {
  */
 function hook_template_preprocess_default_variables_alter(&$variables) {
   $variables['is_admin'] = \Drupal::currentUser()->hasPermission('access administration pages');
+}
+
+/**
+ * Alter icon pack definitions.
+ *
+ * Allows modules to modify icon pack definitions.
+ *
+ * @param array $icon_packs
+ *   The array of icon pack definitions, keyed by icon pack ID.
+ */
+function hook_icon_pack_alter(array &$icon_packs): void {
+  // Example: Change the label of an icon pack.
+  if (isset($icon_packs['navigation'])) {
+    $icon_packs['navigation']['label'] = 'Custom navigation icons';
+  }
 }
 
 /**

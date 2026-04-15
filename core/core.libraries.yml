@@ -392,7 +392,7 @@ drupal.ajax:
     misc/ajax.js: {}
   css:
     component:
-      misc/components/ajax-progress.module.css: { weight: -10 }
+      misc/components/ajax-progress.module.css: {}
 
   drupalSettings:
     # These placeholder values will be set by system_js_settings_alter().
@@ -523,7 +523,6 @@ drupal.debounce:
 drupal.dialog:
   version: VERSION
   js:
-    misc/dialog/dialog-deprecation.js: {}
     misc/dialog/dialog.js: {}
     misc/dialog/dialog.position.js: {}
     misc/dialog/dialog.jquery-ui.js: {}
@@ -605,16 +604,7 @@ drupal.fieldgroup:
   version: VERSION
   css:
     component:
-      misc/components/fieldgroup.module.css: { weight: -10 }
-  moved_files:
-    system/base:
-      deprecation_version: 11.2.0
-      removed_version: 12.0.0
-      deprecation_link: https://www.drupal.org/node/3432346
-      css:
-        component:
-          css/components/fieldgroup.module.css:
-            base: core/misc/components/fieldgroup.module.css
+      misc/components/fieldgroup.module.css: {}
 
 drupal.form:
   version: VERSION
@@ -649,16 +639,7 @@ drupal.item-list:
   version: VERSION
   css:
     component:
-      misc/components/item-list.module.css: { weight: -10 }
-  moved_files:
-    system/base:
-      deprecation_version: 11.3.0
-      removed_version: 12.0.0
-      deprecation_link: https://www.drupal.org/node/3530832
-      css:
-        component:
-          css/components/item-list.module.css:
-            base: misc/components/item-list.module.css
+      misc/components/item-list.module.css: {}
 
 drupal.machine-name:
   version: VERSION
@@ -686,7 +667,7 @@ drupal.progress:
     misc/progress.js: {}
   css:
     component:
-      misc/components/progress.module.css: { weight: -10 }
+      misc/components/progress.module.css: {}
 
   dependencies:
     - core/drupal
@@ -697,31 +678,13 @@ drupal.textarea-resize:
   version: VERSION
   css:
     component:
-      misc/components/resize.module.css: { weight: -10 }
-  moved_files:
-    system/base:
-      deprecation_version: 11.2.0
-      removed_version: 12.0.0
-      deprecation_link: https://www.drupal.org/node/3432346
-      css:
-        component:
-          css/components/resize.module.css:
-            component: misc/components/resize.module.css
+      misc/components/resize.module.css: {}
 
 drupal.reset-appearance:
   version: VERSION
   css:
     component:
-      misc/components/reset-appearance.module.css: { weight: -10 }
-  moved_files:
-    system/base:
-      deprecation_version: 11.3.0
-      removed_version: 12.0.0
-      deprecation_link: https://www.drupal.org/node/3432346
-      css:
-        component:
-          css/components/reset-appearance.module.css:
-            component: misc/components/reset-appearance.module.css
+      misc/components/reset-appearance.module.css: {}
 
 drupal.states:
   version: VERSION
@@ -748,8 +711,8 @@ drupal.tabledrag:
     misc/tabledrag.js: { weight: -1 }
   css:
     component:
-      misc/components/tabledrag.module.css: { weight: -10 }
-      misc/components/tree-child.module.css: { weight: -10 }
+      misc/components/tabledrag.module.css: {}
+      misc/components/tree-child.module.css: {}
 
   dependencies:
     - core/jquery
@@ -770,7 +733,7 @@ drupal.tableheader:
   version: VERSION
   css:
     component:
-      misc/components/sticky-header.module.css: { weight: -10 }
+      misc/components/sticky-header.module.css: {}
 
 drupal.tableresponsive:
   version: VERSION
@@ -795,16 +758,7 @@ drupal.tablesort:
   version: VERSION
   css:
     component:
-      misc/components/tablesort.module.css: { weight: -10 }
-  moved_files:
-    system/base:
-      deprecation_version: 11.2.0
-      removed_version: 12.0.0
-      deprecation_link: https://www.drupal.org/node/3432346
-      css:
-        component:
-          css/components/tablesort.module.css:
-            base: misc/components/tablesort.module.css
+      misc/components/tablesort.module.css: {}
 
 drupal.time-diff:
   version: VERSION
@@ -959,10 +913,10 @@ internal.underscore:
   #  - https://www.drupal.org/project/drupal/issues/3204011
   #  - https://www.drupal.org/project/drupal/issues/3204015
   remote: https://github.com/jashkenas/underscore
-  version: "1.13.7"
+  version: "1.13.8"
   license:
     name: MIT
-    url: https://raw.githubusercontent.com/jashkenas/underscore/1.13.7/LICENSE
+    url: https://raw.githubusercontent.com/jashkenas/underscore/1.13.8/LICENSE
     gpl-compatible: true
   js:
     assets/vendor/underscore/underscore-min.js: { weight: -20, minified: true }
@@ -998,17 +952,6 @@ drupal.dialog.off_canvas:
     - core/drupal.dialog
     - core/drupal.dialog.ajax
     - core/drupal.touchevents-test
-
-js-cookie:
-  remote: https://github.com/js-cookie/js-cookie
-  version: "3.0.5"
-  license:
-    name: MIT
-    url: https://raw.githubusercontent.com/js-cookie/js-cookie/v3.0.5/LICENSE
-    gpl-compatible: true
-  js:
-    assets/vendor/js-cookie/js.cookie.min.js: {}
-  deprecated: The %library_id% asset library is deprecated in Drupal 10.1.0 and will be removed in Drupal 11.0.0. There is no replacement. See https://www.drupal.org/node/3322720
 
 drupal.fieldListKeyboardNavigation:
   version: VERSION

@@ -587,6 +587,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
                     $cacheability->addCacheableDependency(CacheableMetadata::createFromObject($property));
                   }
                 }
+                $cacheability->addCacheableDependency(CacheableMetadata::createFromObject($field_item_list));
               }
             }
           }
@@ -676,7 +677,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     foreach ($permissions as $permission) {
       $role->revokePermission($permission);
     }
-    $role->trustData()->save();
+    $role->save();
   }
 
   /**
@@ -1099,7 +1100,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
         'user.permissions',
       ],
       'UNCACHEABLE (request policy)',
-      'UNCACHEABLE (poor cacheability)',
+      'UNCACHEABLE (404)',
     );
 
     // DX: when Accept request header is missing, still 404, same response.
@@ -1121,7 +1122,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
         'user.permissions',
       ],
       'UNCACHEABLE (request policy)',
-      'UNCACHEABLE (poor cacheability)',
+      'UNCACHEABLE (404)',
     );
   }
 
@@ -1379,7 +1380,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->doTestRelationshipGet($request_options);
 
     // Test POST.
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
     $this->doTestRelationshipMutation($request_options);
     // Grant entity-level edit access.
     $this->setUpAuthorization('PATCH');
@@ -1433,7 +1434,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
         NULL,
         $actual_response->getStatusCode() === 200
           ? $expected_dynamic_page_cache_header_value
-          : ($expected_dynamic_page_cache_header_value === 'MISS' ? FALSE : $expected_dynamic_page_cache_header_value)
+          : "UNCACHEABLE ({$expected_resource_response->getStatusCode()})"
       );
     }
   }
@@ -1469,7 +1470,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
         $expected_cacheability->getCacheTags(),
         $expected_cacheability->getCacheContexts(),
         NULL,
-        $expected_dynamic_page_cache_header_value === 'MISS' && !$expected_resource_response->isSuccessful() ? FALSE : $expected_dynamic_page_cache_header_value
+        !$expected_resource_response->isSuccessful() ? "UNCACHEABLE ({$expected_resource_response->getStatusCode()})" : $expected_dynamic_page_cache_header_value
       );
     }
   }
@@ -2013,11 +2014,11 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->doTestPostIndividual();
     $this->entity = $this->resaveEntity($this->entity, $this->account);
     $this->revokePermissions();
-    $this->config('jsonapi.settings')->set('read_only', TRUE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', TRUE)->save();
     $this->doTestPatchIndividual();
     $this->entity = $this->resaveEntity($this->entity, $this->account);
     $this->revokePermissions();
-    $this->config('jsonapi.settings')->set('read_only', TRUE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', TRUE)->save();
     $this->doTestDeleteIndividual();
   }
 
@@ -2061,7 +2062,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->assertSame([''], $response->getHeader('Allow'));
     }
 
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
 
     // DX: 415 when no Content-Type request header.
     $response = $this->request('POST', $url, $request_options);
@@ -2289,7 +2290,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->assertResourceErrorResponse(405, sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromUri('base:/admin/config/services/jsonapi')->setAbsolute()->toString(TRUE)->getGeneratedUrl()), $url, $response);
     $this->assertSame(['GET'], $response->getHeader('Allow'));
 
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
 
     // DX: 415 when no Content-Type request header.
     $response = $this->request('PATCH', $url, $request_options);
@@ -2591,7 +2592,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
     $this->assertResourceErrorResponse(405, sprintf("JSON:API is configured to accept only read operations. Site administrators can configure this at %s.", Url::fromUri('base:/admin/config/services/jsonapi')->setAbsolute()->toString(TRUE)->getGeneratedUrl()), $url, $response);
     $this->assertSame(['GET'], $response->getHeader('Allow'));
 
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
 
     // DX: 403 when unauthorized.
     $response = $this->request('DELETE', $url, $request_options);
@@ -3089,7 +3090,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       'url.site',
       'user.permissions',
     ];
-    $this->assertResourceErrorResponse(501, 'JSON:API does not support filtering on revisions other than the latest version because a secure Drupal core API does not yet exist to do so.', $rel_working_copy_collection_url_filtered, $actual_response, FALSE, ['http_response'], $filtered_collection_expected_cache_contexts);
+    $this->assertResourceErrorResponse(501, 'JSON:API does not support filtering on revisions other than the latest version because a secure Drupal core API does not yet exist to do so.', $rel_working_copy_collection_url_filtered, $actual_response, FALSE, ['http_response'], $filtered_collection_expected_cache_contexts, NULL, 'UNCACHEABLE (501)');
     // Fetch the collection URL using an invalid version identifier.
     $actual_response = $this->request('GET', $rel_invalid_collection_url, $request_options);
     $invalid_version_expected_cache_contexts = [
@@ -3106,6 +3107,8 @@ abstract class ResourceTestBase extends BrowserTestBase {
       FALSE,
       ['4xx-response', 'http_response'],
       $invalid_version_expected_cache_contexts,
+      NULL,
+      'UNCACHEABLE (400)',
     );
 
     // Move the entity to its draft moderation state.
@@ -3302,7 +3305,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->assertResourceResponse(200, $expected_document, $actual_response, $expected_cache_tags, $expected_cacheability->getCacheContexts(), NULL, TRUE);
     }
 
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
 
     // Ensures that PATCH and DELETE on individual resources with a
     // `resourceVersion` query parameter is not supported.
