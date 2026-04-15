@@ -43,8 +43,8 @@ abstract class AccessibilityTestBase extends WebDriverTestBase {
    * @param string|null $setup_callback
    *   (optional) Name of callback method to run page setup steps before
    *   executing Axe.
-   *   The method will receive $uri and $admin as arguments and must not
-   *   be private. Return values from the method are not used.
+   *   The method must not be private. Return values from the method are
+   *   not used.
    */
   #[DataProvider('provider')]
   public function testPages(string $uri, bool $admin = FALSE, array $axe_options = [], ?string $setup_callback = NULL): void {
@@ -63,7 +63,7 @@ abstract class AccessibilityTestBase extends WebDriverTestBase {
       ->responseNotContains('Access denied');
 
     if (is_callable([$this, $setup_callback])) {
-      $this->{$setup_callback}($uri, $admin);
+      $this->{$setup_callback}();
     }
 
     $this->executeAxe($axe_options);
