@@ -107,6 +107,7 @@ class StageEventsTest extends PackageManagerKernelTestBase implements EventSubsc
     $this->stage->create();
     $this->stage->require(['ext-json:*']);
     $this->stage->apply();
+    $this->stage->postApply();
     $this->stage->destroy();
 
     $this->assertSame($this->events, [
