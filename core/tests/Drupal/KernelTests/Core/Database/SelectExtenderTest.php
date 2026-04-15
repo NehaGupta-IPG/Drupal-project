@@ -13,12 +13,14 @@ use Drupal\Tests\Core\Database\Stub\StubPDO;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Select query extender classes.
  */
 #[CoversClass(Select::class)]
 #[Group('Database')]
+#[RunTestsInSeparateProcesses]
 class SelectExtenderTest extends KernelTestBase {
 
   /**
@@ -128,7 +130,7 @@ class SelectExtenderTest extends KernelTestBase {
     $additional_class_loader->addPsr4("Drupal\\core_fake\\Driver\\Database\\CoreFakeWithAllCustomClasses\\", __DIR__ . "/../../../../../tests/fixtures/database_drivers/module/core_fake/src/Driver/Database/CoreFakeWithAllCustomClasses");
     $additional_class_loader->register(TRUE);
 
-    $mock_pdo = $this->createMock(StubPDO::class);
+    $mock_pdo = $this->createStub(StubPDO::class);
     $connection = new StubConnection($mock_pdo, ['namespace' => $namespace]);
 
     // Tests the method \Drupal\Core\Database\Query\Select::extend().

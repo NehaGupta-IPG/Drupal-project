@@ -8,12 +8,14 @@ use Drupal\Core\Database\Database;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 // cspell:ignore extraday lundi
 /**
  * Tests for updating the interface translations of projects.
  */
 #[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocaleUpdateTest extends LocaleUpdateBase {
 
   use StringTranslationTrait;
@@ -353,7 +355,7 @@ class LocaleUpdateTest extends LocaleUpdateBase {
     // Check if the file data is removed from the database.
     $history = locale_translation_get_file_history();
     $this->assertFalse(isset($history['locale_test_translate']), 'Project removed from the file history');
-    $projects = locale_translation_get_projects();
+    $projects = \Drupal::service('locale.project')->getProjects();
     $this->assertFalse(isset($projects['locale_test_translate']), 'Project removed from the project list');
   }
 

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\Assertion;
 
 use Drupal\Component\Assertion\Inspector;
-use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -18,19 +17,15 @@ use PHPUnit\Framework\TestCase;
 #[Group('Assertion')]
 class InspectorTest extends TestCase {
 
-  use ExpectDeprecationTrait;
-
   /**
    * Tests asserting all members are strings.
-   *
-   * @legacy-covers ::assertAllStrings
    */
   #[DataProvider('providerTestAssertAllStrings')]
   public function testAssertAllStrings($input, $expected): void {
     $this->assertSame($expected, Inspector::assertAllStrings($input));
   }
 
-  public static function providerTestAssertAllStrings() {
+  public static function providerTestAssertAllStrings(): array {
     $data = [
       'empty-array' => [[], TRUE],
       'array-with-strings' => [['foo', 'bar'], TRUE],
@@ -58,8 +53,6 @@ class InspectorTest extends TestCase {
 
   /**
    * Tests asserting all members are strings or objects with __toString().
-   *
-   * @legacy-covers ::assertAllStringable
    */
   public function testAssertAllStringable(): void {
     $this->assertTrue(Inspector::assertAllStringable([]));
@@ -70,8 +63,6 @@ class InspectorTest extends TestCase {
 
   /**
    * Tests asserting all members are arrays.
-   *
-   * @legacy-covers ::assertAllArrays
    */
   public function testAssertAllArrays(): void {
     $this->assertTrue(Inspector::assertAllArrays([]));
@@ -81,8 +72,6 @@ class InspectorTest extends TestCase {
 
   /**
    * Tests asserting array is 0-indexed - the strict definition of array.
-   *
-   * @legacy-covers ::assertStrictArray
    */
   public function testAssertStrictArray(): void {
     $this->assertTrue(Inspector::assertStrictArray([]));
@@ -92,8 +81,6 @@ class InspectorTest extends TestCase {
 
   /**
    * Tests asserting all members are strict arrays.
-   *
-   * @legacy-covers ::assertAllStrictArrays
    */
   public function testAssertAllStrictArrays(): void {
     $this->assertTrue(Inspector::assertAllStrictArrays([]));
@@ -103,8 +90,6 @@ class InspectorTest extends TestCase {
 
   /**
    * Tests asserting all members have specified keys.
-   *
-   * @legacy-covers ::assertAllHaveKey
    */
   public function testAssertAllHaveKey(): void {
     $this->assertTrue(Inspector::assertAllHaveKey([]));
@@ -116,8 +101,6 @@ class InspectorTest extends TestCase {
 
   /**
    * Tests asserting all members are integers.
-   *
-   * @legacy-covers ::assertAllIntegers
    */
   public function testAssertAllIntegers(): void {
     $this->assertTrue(Inspector::assertAllIntegers([]));
@@ -128,8 +111,6 @@ class InspectorTest extends TestCase {
 
   /**
    * Tests asserting all members are floating point variables.
-   *
-   * @legacy-covers ::assertAllFloat
    */
   public function testAssertAllFloat(): void {
     $this->assertTrue(Inspector::assertAllFloat([]));
@@ -149,7 +130,7 @@ class InspectorTest extends TestCase {
       'strchr',
       [$this, 'callMe'],
       [__CLASS__, 'callMeStatic'],
-      function () {
+      function (): true {
         return TRUE;
       },
     ]));
@@ -158,7 +139,7 @@ class InspectorTest extends TestCase {
       'strchr',
       [$this, 'callMe'],
       [__CLASS__, 'callMeStatic'],
-      function () {
+      function (): true {
         return TRUE;
       },
       "I'm not callable",
@@ -177,8 +158,6 @@ class InspectorTest extends TestCase {
 
   /**
    * Tests asserting all arguments are numbers or strings castable to numbers.
-   *
-   * @legacy-covers ::assertAllNumeric
    */
   public function testAssertAllNumeric(): void {
     $this->assertTrue(Inspector::assertAllNumeric([1, '2', 3.14]));
@@ -187,8 +166,6 @@ class InspectorTest extends TestCase {
 
   /**
    * Tests asserting strstr() or stristr() match.
-   *
-   * @legacy-covers ::assertAllMatch
    */
   public function testAssertAllMatch(): void {
     $this->assertTrue(Inspector::assertAllMatch('f', ['fee', 'fi', 'fo']));
@@ -201,8 +178,6 @@ class InspectorTest extends TestCase {
 
   /**
    * Tests asserting regular expression match.
-   *
-   * @legacy-covers ::assertAllRegularExpressionMatch
    */
   public function testAssertAllRegularExpressionMatch(): void {
     $this->assertTrue(Inspector::assertAllRegularExpressionMatch('/f/i', ['fee', 'fi', 'fo']));
@@ -215,8 +190,6 @@ class InspectorTest extends TestCase {
 
   /**
    * Tests asserting all members are objects.
-   *
-   * @legacy-covers ::assertAllObjects
    */
   public function testAssertAllObjects(): void {
     $this->assertTrue(Inspector::assertAllObjects([new \ArrayObject(), new \ArrayObject()]));
@@ -231,14 +204,14 @@ class InspectorTest extends TestCase {
   /**
    * Defines a test method referenced by ::testAllCallable().
    */
-  public function callMe() {
+  public function callMe(): bool {
     return TRUE;
   }
 
   /**
    * Defines a test method referenced by ::testAllCallable().
    */
-  public static function callMeStatic() {
+  public static function callMeStatic(): bool {
     return TRUE;
   }
 
@@ -252,7 +225,7 @@ class StringObject {
   /**
    * {@inheritdoc}
    */
-  public function __toString() {
+  public function __toString(): string {
     return 'foo';
   }
 

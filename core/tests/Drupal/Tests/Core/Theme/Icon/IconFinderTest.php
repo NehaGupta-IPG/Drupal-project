@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Theme\Icon;
 
+// cspell:ignore corge grault garply quux plugh
+
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Theme\Icon\IconFinder;
 use Drupal\Tests\UnitTestCase;
-// cspell:ignore corge grault garply quux plugh
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -22,45 +23,6 @@ class IconFinderTest extends UnitTestCase {
 
   private const TEST_ICONS_PATH = 'core/modules/system/tests/modules/icon_test';
   private const TEST_RELATIVE_URL = 'foo/bar';
-
-  /**
-   * The file url generator instance.
-   *
-   * @var \Drupal\Core\File\FileUrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject
-   */
-  private FileUrlGeneratorInterface $fileUrlGenerator;
-
-  /**
-   * The logger service instance.
-   *
-   * @var \Psr\Log\LoggerInterface|\PHPUnit\Framework\MockObject\MockObject
-   */
-  private LoggerInterface $logger;
-
-  /**
-   * The IconFinder instance.
-   *
-   * @var \Drupal\Core\Theme\Icon\IconFinder
-   */
-  private IconFinder $iconFinder;
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp(): void {
-    parent::setUp();
-
-    $this->fileUrlGenerator = $this->getMockBuilder('Drupal\Core\File\FileUrlGeneratorInterface')
-      ->disableOriginalConstructor()
-      ->getMock();
-    $this->logger = $this->createMock(LoggerInterface::class);
-
-    $this->iconFinder = new IconFinder(
-      $this->fileUrlGenerator,
-      $this->logger,
-      DRUPAL_ROOT,
-    );
-  }
 
   /**
    * Data provider for ::testGetFilesFromSourcesUrl().
@@ -161,7 +123,12 @@ class IconFinderTest extends UnitTestCase {
    */
   #[DataProvider('providerGetFilesFromSourcesUrl')]
   public function testGetFilesFromSourcesUrl(array $sources, array $expected = []): void {
-    $result = $this->iconFinder->getFilesFromSources(
+    $iconFinder = new IconFinder(
+      $this->createStub(FileUrlGeneratorInterface::class),
+      $this->createStub(LoggerInterface::class),
+      DRUPAL_ROOT,
+    );
+    $result = $iconFinder->getFilesFromSources(
       $sources,
       // Relative path is not used for this test url.
       '',
@@ -611,14 +578,19 @@ class IconFinderTest extends UnitTestCase {
    */
   #[DataProvider('providerGetFilesFromSourcesPath')]
   public function testGetFilesFromSourcesPath(array $sources, array $expected = []): void {
-    $this->fileUrlGenerator
-      ->expects($this->any())
+    $fileUrlGenerator = $this->createStub(FileUrlGeneratorInterface::class);
+    $fileUrlGenerator
       ->method('generateString')
-      ->willReturnCallback(function ($uri) {
+      ->willReturnCallback(function (string $uri): string {
         return self::TEST_RELATIVE_URL . $uri;
       });
 
-    $result = $this->iconFinder->getFilesFromSources(
+    $iconFinder = new IconFinder(
+      $fileUrlGenerator,
+      $this->createStub(LoggerInterface::class),
+      DRUPAL_ROOT,
+    );
+    $result = $iconFinder->getFilesFromSources(
       $sources,
       self::TEST_ICONS_PATH,
     );
@@ -646,11 +618,17 @@ class IconFinderTest extends UnitTestCase {
   public function testGetFilesFromPathEmptyWarning(): void {
     $method = new \ReflectionMethod(IconFinder::class, 'getFilesFromPath');
 
-    $this->logger->expects($this->once())
+    $logger = $this->createMock(LoggerInterface::class);
+    $logger->expects($this->once())
       ->method('warning')
       ->with('Invalid icon path extension @filename.@extension in source: @source');
 
-    $method->invoke($this->iconFinder, self::TEST_ICONS_PATH . '/icons/flat/foo.webp', '');
+    $iconFinder = new IconFinder(
+      $this->createStub(FileUrlGeneratorInterface::class),
+      $logger,
+      DRUPAL_ROOT,
+    );
+    $method->invoke($iconFinder, self::TEST_ICONS_PATH . '/icons/flat/foo.webp', '');
   }
 
   /**
@@ -659,10 +637,16 @@ class IconFinderTest extends UnitTestCase {
   public function testGetFilesFromPathInvalidExtensionWarning(): void {
     $method = new \ReflectionMethod(IconFinder::class, 'getFilesFromPath');
 
-    $this->logger->expects($this->once())
+    $logger = $this->createMock(LoggerInterface::class);
+    $logger->expects($this->once())
       ->method('warning');
 
-    $method->invoke($this->iconFinder, self::TEST_ICONS_PATH . '/icons/empty/*.svg', '');
+    $iconFinder = new IconFinder(
+      $this->createStub(FileUrlGeneratorInterface::class),
+      $logger,
+      DRUPAL_ROOT,
+    );
+    $method->invoke($iconFinder, self::TEST_ICONS_PATH . '/icons/empty/*.svg', '');
   }
 
   /**
@@ -671,11 +655,17 @@ class IconFinderTest extends UnitTestCase {
   public function testGetFileFromUrlWarning(): void {
     $method = new \ReflectionMethod(IconFinder::class, 'getFileFromUrl');
 
-    $this->logger->expects($this->once())
+    $logger = $this->createMock(LoggerInterface::class);
+    $logger->expects($this->once())
       ->method('warning')
       ->with('Invalid icon source: @source');
 
-    $method->invoke($this->iconFinder, 'invalid_scheme', '', '');
+    $iconFinder = new IconFinder(
+      $this->createStub(FileUrlGeneratorInterface::class),
+      $logger,
+      DRUPAL_ROOT,
+    );
+    $method->invoke($iconFinder, 'invalid_scheme', '', '');
   }
 
   /**
@@ -684,11 +674,17 @@ class IconFinderTest extends UnitTestCase {
   public function testFindFilesWarning(): void {
     $method = new \ReflectionMethod(IconFinder::class, 'findFiles');
 
-    $this->logger->expects($this->once())
+    $logger = $this->createMock(LoggerInterface::class);
+    $logger->expects($this->once())
       ->method('warning')
       ->with('Invalid icon path in source: @source');
 
-    $method->invoke($this->iconFinder, 'invalid_path', '*');
+    $iconFinder = new IconFinder(
+      $this->createStub(FileUrlGeneratorInterface::class),
+      $logger,
+      DRUPAL_ROOT,
+    );
+    $method->invoke($iconFinder, 'invalid_path', '*');
   }
 
   /**
@@ -697,10 +693,16 @@ class IconFinderTest extends UnitTestCase {
   public function testFindFilesEmptyWarning(): void {
     $method = new \ReflectionMethod(IconFinder::class, 'findFiles');
 
-    $this->logger->expects($this->once())
+    $logger = $this->createMock(LoggerInterface::class);
+    $logger->expects($this->once())
       ->method('warning');
 
-    $method->invoke($this->iconFinder, self::TEST_ICONS_PATH . '/icons/empty', '*.svg');
+    $iconFinder = new IconFinder(
+      $this->createStub(FileUrlGeneratorInterface::class),
+      $logger,
+      DRUPAL_ROOT,
+    );
+    $method->invoke($iconFinder, self::TEST_ICONS_PATH . '/icons/empty', '*.svg');
   }
 
   /**
@@ -761,7 +763,12 @@ class IconFinderTest extends UnitTestCase {
   public function testExtractIconIdFromFilename(string $filename, string $filename_pattern, string $expected): void {
     $method = new \ReflectionMethod(IconFinder::class, 'extractIconIdFromFilename');
 
-    $this->assertEquals($expected, $method->invoke($this->iconFinder, $filename, $filename_pattern));
+    $iconFinder = new IconFinder(
+      $this->createStub(FileUrlGeneratorInterface::class),
+      $this->createStub(LoggerInterface::class),
+      DRUPAL_ROOT,
+    );
+    $this->assertEquals($expected, $method->invoke($iconFinder, $filename, $filename_pattern));
   }
 
   /**
@@ -770,14 +777,19 @@ class IconFinderTest extends UnitTestCase {
   public function testExtractIconIdFromFilenameWarning(): void {
     $method = new \ReflectionMethod(IconFinder::class, 'extractIconIdFromFilename');
 
-    // PHPUnit 10 cannot expect warnings, so we have to catch them ourselves.
+    // PHPUnit cannot expect warnings, so we have to catch them ourselves.
     // Thanks to: Drupal\Tests\Component\PhpStorage\FileStorageTest.
     $messages = [];
     set_error_handler(function (int $errno, string $errstr) use (&$messages): void {
       $messages[] = [$errno, $errstr];
     });
 
-    $method->invoke($this->iconFinder, 'foo*bar*baz', 'foo*{icon_id}*baz');
+    $iconFinder = new IconFinder(
+      $this->createStub(FileUrlGeneratorInterface::class),
+      $this->createStub(LoggerInterface::class),
+      DRUPAL_ROOT,
+    );
+    $method->invoke($iconFinder, 'foo*bar*baz', 'foo*{icon_id}*baz');
 
     restore_error_handler();
 
@@ -835,12 +847,17 @@ class IconFinderTest extends UnitTestCase {
    */
   #[DataProvider('providerGetFileContents')]
   public function testGetFileContents(string $uri, bool $expected): void {
+    $iconFinder = new IconFinder(
+      $this->createStub(FileUrlGeneratorInterface::class),
+      $this->createStub(LoggerInterface::class),
+      DRUPAL_ROOT,
+    );
     if ($expected) {
-      $result = $this->iconFinder->getFileContents($uri);
+      $result = $iconFinder->getFileContents($uri);
       $this->assertEquals(file_get_contents($uri), $result);
       return;
     }
-    $this->assertFalse($this->iconFinder->getFileContents($uri));
+    $this->assertFalse($iconFinder->getFileContents($uri));
   }
 
 }

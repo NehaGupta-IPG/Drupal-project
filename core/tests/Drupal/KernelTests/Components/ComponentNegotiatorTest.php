@@ -7,12 +7,14 @@ namespace Drupal\KernelTests\Components;
 use Drupal\Core\Theme\ComponentNegotiator;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the component negotiator.
  */
 #[CoversClass(ComponentNegotiator::class)]
 #[Group('sdc')]
+#[RunTestsInSeparateProcesses]
 class ComponentNegotiatorTest extends ComponentKernelTestBase {
 
   /**
@@ -34,8 +36,6 @@ class ComponentNegotiatorTest extends ComponentKernelTestBase {
 
   /**
    * Tests negotiate.
-   *
-   * @legacy-covers ::negotiate
    */
   public function testNegotiate(): void {
     $data = [
@@ -49,7 +49,7 @@ class ComponentNegotiatorTest extends ComponentKernelTestBase {
         ['invalid^component', NULL],
         ['', NULL],
     ];
-    array_walk($data, function ($test_input) {
+    array_walk($data, function (array $test_input): void {
       [$requested_id, $expected_id] = $test_input;
       $negotiated_id = $this->negotiator->negotiate(
         $requested_id,

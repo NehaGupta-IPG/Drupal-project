@@ -7,11 +7,13 @@ namespace Drupal\Tests\system\Functional\Update;
 use Drupal\Core\Database\Database;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the upgrade path for the router table update.
  */
 #[Group('Update')]
+#[RunTestsInSeparateProcesses]
 class RouteAliasUpdateTest extends UpdatePathTestBase {
 
   /**
@@ -20,6 +22,8 @@ class RouteAliasUpdateTest extends UpdatePathTestBase {
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-10.3.0.bare.standard.php.gz',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-history.php',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-contact.php',
     ];
   }
 

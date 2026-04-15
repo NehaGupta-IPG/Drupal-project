@@ -8,11 +8,13 @@ use Drupal\Core\Database\Database;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\views\Entity\View;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests some general functionality of editing views, like deleting a view.
  */
 #[Group('views_ui')]
+#[RunTestsInSeparateProcesses]
 class ViewEditTest extends UITestBase {
 
   /**
@@ -270,6 +272,18 @@ class ViewEditTest extends UITestBase {
     $edit = [];
     $this->drupalGet('admin/structure/views/nojs/handler/test_groupwise_term_ui/default/relationship/tid_representative');
     $this->submitForm($edit, 'Apply');
+  }
+
+  /**
+   * Tests the edit form HTML.
+   */
+  public function testEditForm(): void {
+    $this->drupalGet('admin/structure/views/view/test_view');
+
+    // Assert that the third column is a DIV.
+    $this->assertSession()->elementExists('xpath', '//div[contains(@class, "views-display-column first")]');
+    $this->assertSession()->elementExists('xpath', '//div[contains(@class, "views-display-column second")]');
+    $this->assertSession()->elementExists('xpath', '//div[contains(@class, "views-display-column third")]');
   }
 
 }

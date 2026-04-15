@@ -15,11 +15,13 @@ use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Field UI "Manage display" and "Manage form display" screens.
  */
 #[Group('field_ui')]
+#[RunTestsInSeparateProcesses]
 class ManageDisplayTest extends BrowserTestBase {
 
   use FieldUiTestTrait;
@@ -31,7 +33,6 @@ class ManageDisplayTest extends BrowserTestBase {
     'node',
     'field_ui',
     'taxonomy',
-    'search',
     'field_test',
     'field_third_party_test',
     'block',

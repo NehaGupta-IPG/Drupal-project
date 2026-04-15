@@ -61,82 +61,6 @@ use Drupal\Core\Utility\UpdateException;
  */
 
 /**
- * Defines one or more hooks that are exposed by a module.
- *
- * Only procedural implementations are supported for this hook.
- *
- * Support for this hook will be removed in Drupal 12.0.0.
- * This hook has intentionally not been deprecated since removing
- * implementations will break modules with code in $module.$group.inc files.
- *
- * $module.$group.inc themselves have been deprecated, so modules supporting
- * drupal 12.0.0 will have removed all code from $module.$group.inc files.
- *
- * Once a module requires 12.0.0 as a minimum version of Drupal the module can
- * safely remove hook_hook_info() implementations.
- *
- * @return array<string, array{group: string}>
- *   An associative array whose keys are hook names and whose values are an
- *   associative array containing:
- *   - group: A string defining the group to which the hook belongs. The module
- *     system will determine whether a file with the name $module.$group.inc
- *     exists, and automatically load it when required.
- */
-function hook_hook_info(): array {
-  $hooks['token_info'] = [
-    'group' => 'tokens',
-  ];
-  $hooks['tokens'] = [
-    'group' => 'tokens',
-  ];
-  return $hooks;
-}
-
-/**
- * Alter the registry of modules implementing a hook.
- *
- * This hook will be removed in 12.0.0. It is not deprecated in order to
- * support the "#[LegacyModuleImplementsAlter]" attribute, used for
- * compatibility with versions prior to Drupal 11.2.0.
- *
- * Only procedural implementations are supported for this hook.
- *
- * This hook is invoked in \Drupal::moduleHandler()->getImplementationInfo().
- * A module may implement this hook in order to reorder the implementing
- * modules, which are otherwise ordered by the module's system weight.
- *
- * Note that hooks invoked using \Drupal::moduleHandler->alter() can have
- * multiple variations(such as hook_form_alter() and hook_form_FORM_ID_alter()).
- * \Drupal::moduleHandler->alter() will call all such variants defined by a
- * single module in turn. For the purposes of hook_module_implements_alter(),
- * these variants are treated as a single hook. Thus, to ensure that your
- * implementation of hook_form_FORM_ID_alter() is called at the right time,
- * you will have to change the order of hook_form_alter() implementation in
- * hook_module_implements_alter().
- *
- * @param array<string, string|false> $implementations
- *   An array keyed by the module's name. The value of each item corresponds
- *   to a $group, which is usually FALSE, unless the implementation is in a
- *   file named $module.$group.inc.
- * @param string $hook
- *   The name of the module hook being implemented.
- *
- * @see \Drupal\Core\Hook\Attribute\LegacyModuleImplementsAlter
- */
-function hook_module_implements_alter(&$implementations, $hook) {
-  if ($hook == 'form_alter') {
-    // Move my_module_form_alter() to the end of the list.
-    // \Drupal::moduleHandler()->getImplementationInfo()
-    // iterates through $implementations with a foreach loop which PHP iterates
-    // in the order that the items were added, so to move an item to the end of
-    // the array, we remove it and then add it.
-    $group = $implementations['my_module'];
-    unset($implementations['my_module']);
-    $implementations['my_module'] = $group;
-  }
-}
-
-/**
  * Alter the information parsed from module and theme .info.yml files.
  *
  * This hook is invoked in \Drupal\Core\Extension\ExtensionList::doList(). A
@@ -786,6 +710,7 @@ function hook_install_tasks_alter(&$tasks, $install_state) {
  * @see https://www.drupal.org/node/2535316
  */
 // phpcs:enable
+// phpcs:ignore Drupal.Commenting.FunctionComment.Missing, Drupal.Commenting.FunctionComment.MissingReturnComment
 function hook_update_N(&$sandbox) {
   // For non-batch updates, the signature can simply be:
   // "function hook_update_N() {".
@@ -852,7 +777,8 @@ function hook_update_N(&$sandbox) {
  * a THEME.post_update.php file.
  *
  * These updates are executed after all hook_update_N() implementations. At this
- * stage Drupal is already fully repaired so you can use any API as you wish.
+ * stage Drupal is already fully bootstrapped so you can use any API as you
+ * wish.
  *
  * NAME can be arbitrary machine names. In contrast to hook_update_N() the
  * alphanumeric naming of functions in the file is the only thing which ensures
@@ -902,6 +828,7 @@ function hook_update_N(&$sandbox) {
  * @see hook_removed_post_updates()
  */
 // phpcs:enable
+// phpcs:ignore Drupal.Commenting.FunctionComment.Missing
 function hook_post_update_NAME(&$sandbox) {
   // Example of updating some content.
   $node = \Drupal\node\Entity\Node::load(123);
@@ -922,6 +849,8 @@ function hook_post_update_NAME(&$sandbox) {
 /**
  * Return an array of removed hook_post_update_NAME() function names.
  *
+ * Only procedural implementations are supported for this hook.
+ *
  * This should be used to indicate post-update functions that have existed in
  * some previous version of the module, but are no longer available.
  *
@@ -938,13 +867,16 @@ function hook_post_update_NAME(&$sandbox) {
 function hook_removed_post_updates(): array {
   return [
     'my_module_post_update_foo' => '8.x-2.0',
-    'my_module_post_update_bar' => '8.x-3.0',
-    'my_module_post_update_baz' => '8.x-3.0',
+    'my_module_post_update_bar' => '3.0.0',
+    'my_module_post_update_baz' => '4.0.0',
+    'my_module_post_update_qux' => '4.0.0',
   ];
 }
 
 /**
  * Return an array of information about module update dependencies.
+ *
+ * Only procedural implementations are supported for this hook.
  *
  * This can be used to indicate update functions from other modules that your
  * module's update functions depend on, or vice versa. It is used by the update
@@ -1017,76 +949,6 @@ function hook_update_last_removed(): int {
 }
 
 /**
- * Provide information on Updaters (classes that can update Drupal).
- *
- * Drupal\Core\Updater\Updater is a class that knows how to update various parts
- * of the Drupal file system, for example to update modules that have newer
- * releases.
- *
- * @return array
- *   An associative array of information about the updater(s) being provided.
- *   This array is keyed by a unique identifier for each updater, and the
- *   values are subarrays that can contain the following keys:
- *   - class: The name of the PHP class which implements this updater.
- *   - name: Human-readable name of this updater.
- *   - weight: Controls what order the Updater classes are consulted to decide
- *     which one should handle a given task. When an update task is being run,
- *     the system will loop through all the Updater classes defined in this
- *     registry in weight order and let each class respond to the task and
- *     decide if each Updater wants to handle the task. In general, this
- *     doesn't matter, but if you need to override an existing Updater, make
- *     sure your Updater has a lighter weight so that it comes first.
- *
- * @ingroup update_api
- *
- * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no
- *   replacement. Use composer to manage the code for your site.
- *
- * @see https://www.drupal.org/node/3512364
- * @see drupal_get_updaters()
- * @see hook_updater_info_alter()
- */
-function hook_updater_info(): array {
-  return [
-    'module' => [
-      'class' => 'Drupal\Core\Updater\Module',
-      'name' => t('Update modules'),
-      'weight' => 0,
-    ],
-    'theme' => [
-      'class' => 'Drupal\Core\Updater\Theme',
-      'name' => t('Update themes'),
-      'weight' => 0,
-    ],
-  ];
-}
-
-/**
- * Alter the Updater information array.
- *
- * An Updater is a class that knows how to update various parts of the Drupal
- * file system, for example to update modules that have newer releases.
- *
- * @param array $updaters
- *   Associative array of updaters as defined through hook_updater_info().
- *   Alter this array directly.
- *
- * @ingroup update_api
- *
- * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no
- *   replacement. Use composer to manage the code for your site.
- *
- * @see https://www.drupal.org/node/3512364
- * @see drupal_get_updaters()
- * @see hook_updater_info()
- */
-function hook_updater_info_alter(&$updaters) {
-  // Adjust weight so that the theme Updater gets a chance to handle a given
-  // update task before module updaters.
-  $updaters['theme']['weight'] = -1;
-}
-
-/**
  * Check installation requirements and do status reporting.
  *
  * This hook has three closely related uses, determined by the $phase argument:
@@ -1139,7 +1001,8 @@ function hook_updater_info_alter(&$updaters) {
  *     install phase, this should only be used for version numbers, do not set
  *     it if not applicable.
  *   - description: The description of the requirement/status.
- *     - REQUIREMENT_ERROR: The requirement failed with an error.
+ *     - \Drupal\Core\Extension\Requirement\RequirementSeverity::Error
+ *       The requirement failed with an error.
  *   - severity: The requirement's severity. Defaults to RequirementSeverity::OK
  *     when installing, or RequirementSeverity::Info otherwise.
  */

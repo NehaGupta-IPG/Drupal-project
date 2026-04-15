@@ -16,6 +16,7 @@ use Drupal\user\RoleInterface;
 use GuzzleHttp\RequestOptions;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Asserts external normalizers are handled as expected by the JSON:API module.
@@ -23,6 +24,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @see jsonapi.normalizers
  */
 #[Group('jsonapi')]
+#[RunTestsInSeparateProcesses]
 class ExternalNormalizersTest extends BrowserTestBase {
 
   use GetDocumentFromResponseTrait;
@@ -75,7 +77,7 @@ class ExternalNormalizersTest extends BrowserTestBase {
       ->grantPermission('create entity_test entity_test_with_bundle entities')
       ->save();
 
-    $this->config('jsonapi.settings')->set('read_only', FALSE)->save(TRUE);
+    $this->config('jsonapi.settings')->set('read_only', FALSE)->save();
 
     FieldStorageConfig::create([
       'field_name' => 'field_test',

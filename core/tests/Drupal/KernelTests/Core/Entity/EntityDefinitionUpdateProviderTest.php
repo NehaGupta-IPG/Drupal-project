@@ -12,13 +12,14 @@ use Drupal\Tests\system\Functional\Entity\Traits\EntityDefinitionTestTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests EntityDefinitionUpdateManager functionality.
  */
 #[CoversClass(EntityDefinitionUpdateManager::class)]
 #[Group('Entity')]
-#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class EntityDefinitionUpdateProviderTest extends EntityKernelTestBase {
 
   use EntityDefinitionTestTrait;
@@ -29,13 +30,6 @@ class EntityDefinitionUpdateProviderTest extends EntityKernelTestBase {
    * @var \Drupal\Core\Entity\EntityDefinitionUpdateManagerInterface
    */
   protected $entityDefinitionUpdateManager;
-
-  /**
-   * The entity field manager.
-   *
-   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
-   */
-  protected $entityFieldManager;
 
   /**
    * The database connection.
@@ -55,7 +49,6 @@ class EntityDefinitionUpdateProviderTest extends EntityKernelTestBase {
   protected function setUp(): void {
     parent::setUp();
     $this->entityDefinitionUpdateManager = $this->container->get('entity.definition_update_manager');
-    $this->entityFieldManager = $this->container->get('entity_field.manager');
     $this->database = $this->container->get('database');
 
     // Install every entity type's schema that wasn't installed in the parent
@@ -69,7 +62,7 @@ class EntityDefinitionUpdateProviderTest extends EntityKernelTestBase {
    * Tests deleting a base field when it has existing data.
    */
   #[DataProvider('baseFieldDeleteWithExistingDataTestCases')]
-  public function testBaseFieldDeleteWithExistingData($entity_type_id, $create_entity_revision, $base_field_revisionable, $create_entity_translation): void {
+  public function testBaseFieldDeleteWithExistingData(string $entity_type_id, bool $create_entity_revision, bool $base_field_revisionable, bool $create_entity_translation): void {
     // Enable an additional language.
     ConfigurableLanguage::createFromLangcode('ro')->save();
 
@@ -221,7 +214,7 @@ class EntityDefinitionUpdateProviderTest extends EntityKernelTestBase {
   /**
    * Test cases for ::testBaseFieldDeleteWithExistingData.
    */
-  public static function baseFieldDeleteWithExistingDataTestCases() {
+  public static function baseFieldDeleteWithExistingDataTestCases(): array {
     return [
       'Non-revisionable, non-translatable entity type' => [
         'entity_test_update',
@@ -290,7 +283,7 @@ class EntityDefinitionUpdateProviderTest extends EntityKernelTestBase {
    * Tests adding a base field with initial values inherited from another field.
    */
   #[DataProvider('initialValueFromFieldTestCases')]
-  public function testInitialValueFromField($default_initial_value, $expected_value): void {
+  public function testInitialValueFromField(string|array|null $default_initial_value, ?string $expected_value): void {
     $storage = \Drupal::entityTypeManager()->getStorage('entity_test_update');
     $db_schema = $this->database->schema();
 
@@ -340,7 +333,7 @@ class EntityDefinitionUpdateProviderTest extends EntityKernelTestBase {
   /**
    * Test cases for ::testInitialValueFromField.
    */
-  public static function initialValueFromFieldTestCases() {
+  public static function initialValueFromFieldTestCases(): array {
     return [
       'literal value' => [
         'test initial value',

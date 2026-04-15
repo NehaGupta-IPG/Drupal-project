@@ -12,12 +12,14 @@ use Drupal\link\LinkTitleVisibility;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\field_ui\Traits\FieldUiTestTrait;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests link field UI functionality.
  */
 #[Group('link')]
 #[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class LinkFieldUITest extends BrowserTestBase {
 
   use FieldUiTestTrait;
@@ -84,7 +86,7 @@ class LinkFieldUITest extends BrowserTestBase {
   /**
    * Provides test data for ::testFieldUI().
    */
-  protected function providerTestFieldUI() {
+  protected function providerTestFieldUI(): \Generator {
     // There are many combinations of field settings: where the description
     // should show: variation on internal, external, both; cardinality (where
     // the fieldset is hidden or used); and link text shown (required or

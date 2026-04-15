@@ -4,19 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\filter\Functional;
 
-use Drupal\Component\Utility\Html;
 use Drupal\Core\Url;
 use Drupal\filter\Entity\FilterFormat;
+use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\user\Entity\Role;
 use Drupal\user\RoleInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Thoroughly test the administrative interface of the filter module.
  */
 #[Group('filter')]
+#[RunTestsInSeparateProcesses]
 class FilterAdminTest extends BrowserTestBase {
 
   /**
@@ -204,8 +206,10 @@ class FilterAdminTest extends BrowserTestBase {
     $full = 'full_html';
     $plain = 'plain_text';
 
+    $format_repository = \Drupal::service(FilterFormatRepositoryInterface::class);
+
     // Check that the fallback format exists and cannot be disabled.
-    $this->assertSame($plain, filter_fallback_format(), 'The fallback format is set to plain text.');
+    $this->assertSame($plain, $format_repository->getFallbackFormatId(), 'The fallback format is set to plain text.');
     $this->drupalGet('admin/config/content/formats');
     $this->assertSession()->responseNotContains('admin/config/content/formats/manage/' . $plain . '/disable');
     $this->drupalGet('admin/config/content/formats/manage/' . $plain . '/disable');
@@ -245,7 +249,7 @@ class FilterAdminTest extends BrowserTestBase {
       }
     }
     // Ensure that the second filter is now before the first filter.
-    $this->assertEquals($filter_format->filters($second_filter)->weight + 1, $filter_format->filters($first_filter)->weight, 'Order confirmed in configuration.');
+    $this->assertEquals($filter_format->filters($second_filter)->weight + 1, $filter_format->filters($first_filter)->weight);
 
     // Add format.
     $edit = [];
@@ -259,7 +263,6 @@ class FilterAdminTest extends BrowserTestBase {
     $this->assertSession()->addressEquals('admin/config/content/formats');
     $this->assertSession()->statusMessageContains("Added text format {$edit['name']}.", 'status');
 
-    filter_formats_reset();
     $format = FilterFormat::load($edit['format']);
     $this->assertNotNull($format, 'Format found in database.');
     $this->drupalGet('admin/config/content/formats/manage/' . $format->id());
@@ -379,31 +382,6 @@ class FilterAdminTest extends BrowserTestBase {
     $this->drupalGet('admin/config/content/formats/manage/basic_html');
     $this->submitForm($edit, 'Save configuration');
     $this->assertSession()->statusMessageNotContains('The text format Basic HTML has been updated.');
-  }
-
-  /**
-   * Tests whether filter tips page is not HTML escaped.
-   */
-  public function testFilterTipHtmlEscape(): void {
-    $this->drupalLogin($this->adminUser);
-    global $base_url;
-
-    $site_name_with_markup = 'Filter test <script>alert(\'here\');</script> site name';
-    $this->config('system.site')->set('name', $site_name_with_markup)->save();
-
-    // It is not possible to test the whole filter tip page.
-    // Therefore we test only some parts.
-    $link = '<a href="' . $base_url . '">' . Html::escape($site_name_with_markup) . '</a>';
-    $ampersand = '&amp;';
-    $link_as_code = '<code>' . Html::escape($link) . '</code>';
-    $ampersand_as_code = '<code>' . Html::escape($ampersand) . '</code>';
-
-    $this->drupalGet('filter/tips');
-
-    $this->assertSession()->responseContains('<td class="type">' . $link_as_code . '</td>');
-    $this->assertSession()->responseContains('<td class="get">' . $link . '</td>');
-    $this->assertSession()->responseContains('<td class="type">' . $ampersand_as_code . '</td>');
-    $this->assertSession()->responseContains('<td class="get">' . $ampersand . '</td>');
   }
 
   /**

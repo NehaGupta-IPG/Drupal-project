@@ -6,11 +6,13 @@ namespace Drupal\Tests\system\Functional\System;
 
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests output on the status overview page.
  */
 #[Group('system')]
+#[RunTestsInSeparateProcesses]
 class TrustedHostsTest extends BrowserTestBase {
 
   /**
@@ -80,37 +82,6 @@ class TrustedHostsTest extends BrowserTestBase {
 
     $this->drupalGet('trusted-hosts-test/fake-request');
     $this->assertSession()->pageTextContains('Host: ' . $host);
-  }
-
-  /**
-   * Tests that shortcut module works together with host verification.
-   */
-  public function testShortcut(): void {
-    $this->container->get('module_installer')->install(['block', 'shortcut']);
-    $this->rebuildContainer();
-
-    /** @var \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager */
-    $entity_type_manager = $this->container->get('entity_type.manager');
-    $shortcut_storage = $entity_type_manager->getStorage('shortcut');
-
-    $shortcut = $shortcut_storage->create([
-      'title' => 'Test Shortcut Label',
-      'link' => 'internal:/admin/reports/status',
-      'shortcut_set' => 'default',
-    ]);
-    $shortcut_storage->save($shortcut);
-
-    // Grant the current user access to see the shortcuts.
-    $role_storage = $entity_type_manager->getStorage('user_role');
-    $roles = $this->loggedInUser->getRoles(TRUE);
-    /** @var \Drupal\user\RoleInterface $role */
-    $role = $role_storage->load(reset($roles));
-    $role->grantPermission('access shortcuts')->save();
-
-    $this->drupalPlaceBlock('shortcuts');
-
-    $this->drupalGet('');
-    $this->assertSession()->linkExists($shortcut->label());
   }
 
   /**

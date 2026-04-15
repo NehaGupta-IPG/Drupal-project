@@ -8,15 +8,17 @@ use Drupal\entity_test\Entity\EntityTest;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests deleting field storage when a module in uninstalled through the UI.
  *
  * @see \Drupal\field\ConfigImporterFieldPurger
- * @see field_config_import_steps_alter()
- * @see field_form_config_admin_import_form_alter()
+ * @see \Drupal\field\Hook\FieldHooks::configImportStepsAlter()
+ * @see \Drupal\field\Hook\FieldHooks::formConfigAdminImportFormAlter()
  */
 #[Group('field')]
+#[RunTestsInSeparateProcesses]
 class FieldImportDeleteUninstallUiTest extends FieldTestBase {
 
   /**

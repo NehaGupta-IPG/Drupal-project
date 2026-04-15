@@ -11,16 +11,19 @@ use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
+use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\field\Traits\EntityReferenceFieldCreationTrait;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the default views provided by views.
  */
 #[Group('views')]
+#[RunTestsInSeparateProcesses]
 class DefaultViewsTest extends ViewTestBase {
 
   use CommentTestTrait;
@@ -32,7 +35,6 @@ class DefaultViewsTest extends ViewTestBase {
   protected static $modules = [
     'views',
     'node',
-    'search',
     'comment',
     'taxonomy',
     'block',
@@ -166,7 +168,7 @@ class DefaultViewsTest extends ViewTestBase {
    * Returns a new term with random properties in vocabulary $vid.
    */
   public function createTerm($vocabulary) {
-    $filter_formats = filter_formats();
+    $filter_formats = \Drupal::service(FilterFormatRepositoryInterface::class)->getAllFormats();
     $format = array_pop($filter_formats);
     $term = Term::create([
       'name' => $this->randomMachineName(),

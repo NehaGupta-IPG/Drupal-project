@@ -6,24 +6,19 @@ namespace Drupal\KernelTests\Core\Entity;
 
 use Drupal\entity_test\EntityTestHelper;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests adding a custom bundle field.
  */
 #[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityBundleFieldTest extends EntityKernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = ['entity_schema_test', 'entity_test_update'];
-
-  /**
-   * The module handler.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
 
   /**
    * The database connection used.
@@ -39,7 +34,6 @@ class EntityBundleFieldTest extends EntityKernelTestBase {
     parent::setUp();
     $this->installSchema('user', ['users_data']);
     $this->installEntitySchema('entity_test_update');
-    $this->moduleHandler = $this->container->get('module_handler');
     $this->database = $this->container->get('database');
   }
 

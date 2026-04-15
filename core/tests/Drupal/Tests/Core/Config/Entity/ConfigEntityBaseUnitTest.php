@@ -4,15 +4,24 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Config\Entity;
 
+use Drupal\Component\Plugin\PluginBase;
 use Drupal\Component\Plugin\PluginManagerInterface;
+use Drupal\Component\Uuid\UuidInterface;
+use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Config\Entity\ConfigEntityStorageInterface;
+use Drupal\Core\Config\Entity\ConfigEntityTypeInterface;
 use Drupal\Core\Config\Schema\SchemaIncompleteException;
+use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\Query\QueryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Plugin\DefaultLazyPluginCollection;
+use Drupal\Core\Plugin\RemovableDependentPluginReturn;
 use Drupal\Core\Test\TestKernel;
 use Drupal\Tests\Core\Config\Entity\Fixtures\ConfigEntityBaseWithPluginCollections;
 use Drupal\Tests\Core\Plugin\Fixtures\TestConfigurablePlugin;
@@ -22,6 +31,9 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Prophecy\Argument;
 
 /**
@@ -34,23 +46,23 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
   /**
    * The entity under test.
    *
-   * @var \Drupal\Core\Config\Entity\ConfigEntityBase|\PHPUnit\Framework\MockObject\MockObject
+   * @var object
+   *   Could be StubConfigEntity or
+   *   ConfigEntityBaseWithPluginCollections&MockObject.
+   *
+   * @todo split the variable to allow proper type.
    */
   protected $entity;
 
   /**
    * The entity type used for testing.
-   *
-   * @var \Drupal\Core\Config\Entity\ConfigEntityTypeInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $entityType;
+  protected ConfigEntityTypeInterface&Stub $entityType;
 
   /**
    * The entity type manager used for testing.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface&Stub $entityTypeManager;
 
   /**
    * The ID of the type of the entity under test.
@@ -61,10 +73,8 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * The UUID generator used for testing.
-   *
-   * @var \Drupal\Component\Uuid\UuidInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $uuid;
+  protected UuidInterface&Stub $uuid;
 
   /**
    * The provider of the entity type.
@@ -73,10 +83,8 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * The language manager.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $languageManager;
+  protected LanguageManagerInterface&Stub $languageManager;
 
   /**
    * The entity ID.
@@ -86,18 +94,14 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
   protected $id;
 
   /**
-   * The mocked cache backend.
-   *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The cache backend.
    */
-  protected $cacheTagsInvalidator;
+  protected CacheTagsInvalidatorInterface&Stub $cacheTagsInvalidator;
 
   /**
-   * The mocked typed config manager.
-   *
-   * @var \Drupal\Core\Config\TypedConfigManagerInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The typed config manager.
    */
-  protected $typedConfigManager;
+  protected TypedConfigManagerInterface&Stub $typedConfigManager;
 
   /**
    * The module handler.
@@ -126,31 +130,29 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
       'uuid' => '3bb9ee60-bea5-4622-b89b-a63319d10b3a',
     ];
     $this->entityTypeId = $this->randomMachineName();
-    $this->entityType = $this->createMock('\Drupal\Core\Config\Entity\ConfigEntityTypeInterface');
-    $this->entityType->expects($this->any())
+    $this->entityType = $this->createStub(ConfigEntityTypeInterface::class);
+    $this->entityType
       ->method('getProvider')
       ->willReturn(static::PROVIDER);
-    $this->entityType->expects($this->any())
+    $this->entityType
       ->method('getConfigPrefix')
       ->willReturn('test_provider.' . $this->entityTypeId);
 
-    $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
-    $this->entityTypeManager->expects($this->any())
+    $this->entityTypeManager = $this->createStub(EntityTypeManagerInterface::class);
+    $this->entityTypeManager
       ->method('getDefinition')
-      ->with($this->entityTypeId)
       ->willReturn($this->entityType);
 
-    $this->uuid = $this->createMock('\Drupal\Component\Uuid\UuidInterface');
+    $this->uuid = $this->createStub(UuidInterface::class);
 
-    $this->languageManager = $this->createMock('\Drupal\Core\Language\LanguageManagerInterface');
-    $this->languageManager->expects($this->any())
+    $this->languageManager = $this->createStub(LanguageManagerInterface::class);
+    $this->languageManager
       ->method('getLanguage')
-      ->with('en')
       ->willReturn(new Language(['id' => 'en']));
 
-    $this->cacheTagsInvalidator = $this->createMock('Drupal\Core\Cache\CacheTagsInvalidatorInterface');
+    $this->cacheTagsInvalidator = $this->createStub(CacheTagsInvalidatorInterface::class);
 
-    $this->typedConfigManager = $this->createMock('Drupal\Core\Config\TypedConfigManagerInterface');
+    $this->typedConfigManager = $this->createStub(TypedConfigManagerInterface::class);
 
     $this->moduleHandler = $this->prophesize(ModuleHandlerInterface::class);
     $this->themeHandler = $this->prophesize(ThemeHandlerInterface::class);
@@ -165,10 +167,42 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
     $container->set('theme_handler', $this->themeHandler->reveal());
     \Drupal::setContainer($container);
 
-    $this->entity = $this->getMockBuilder(StubConfigEntity::class)
-      ->setConstructorArgs([$values, $this->entityTypeId])
-      ->onlyMethods([])
-      ->getMock();
+    $this->entity = new StubConfigEntity($values, $this->entityTypeId);
+  }
+
+  /**
+   * Reinitializes the entity type as a mock object.
+   */
+  protected function setUpMockEntityType(): void {
+    $this->entityType = $this->createMock(ConfigEntityTypeInterface::class);
+    $this->entityType
+      ->method('getProvider')
+      ->willReturn(static::PROVIDER);
+    $this->entityType
+      ->method('getConfigPrefix')
+      ->willReturn('test_provider.' . $this->entityTypeId);
+
+    $this->entityTypeManager = $this->createStub(EntityTypeManagerInterface::class);
+    $this->entityTypeManager
+      ->method('getDefinition')
+      ->willReturn($this->entityType);
+    \Drupal::getContainer()->set('entity_type.manager', $this->entityTypeManager);
+  }
+
+  /**
+   * Reinitializes the typed config manager as a mock object.
+   */
+  protected function setUpMockTypedConfigManager(): void {
+    $this->typedConfigManager = $this->createMock(TypedConfigManagerInterface::class);
+    \Drupal::getContainer()->set('config.typed', $this->typedConfigManager);
+  }
+
+  /**
+   * Reinitializes the UUID service as a mock object.
+   */
+  protected function setUpMockUuidService(): void {
+    $this->uuid = $this->createMock(UuidInterface::class);
+    \Drupal::getContainer()->set('uuid', $this->uuid);
   }
 
   /**
@@ -192,8 +226,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests pre save during sync.
-   *
-   * @legacy-covers ::preSave
    */
   public function testPreSaveDuringSync(): void {
     $this->moduleHandler->moduleExists('node')->willReturn(TRUE);
@@ -201,16 +233,16 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
     $query = $this->createMock('\Drupal\Core\Entity\Query\QueryInterface');
     $storage = $this->createMock('\Drupal\Core\Config\Entity\ConfigEntityStorageInterface');
 
-    $query->expects($this->any())
+    $query->expects($this->exactly(2))
       ->method('execute')
       ->willReturn([]);
-    $query->expects($this->any())
+    $query->expects($this->exactly(2))
       ->method('condition')
       ->willReturn($query);
-    $storage->expects($this->any())
+    $storage->expects($this->exactly(2))
       ->method('getQuery')
       ->willReturn($query);
-    $storage->expects($this->any())
+    $storage->expects($this->exactly(2))
       ->method('loadUnchanged')
       ->willReturn($this->entity);
 
@@ -229,8 +261,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests add dependency.
-   *
-   * @legacy-covers ::addDependency
    */
   public function testAddDependency(): void {
     $method = new \ReflectionMethod('\Drupal\Core\Config\Entity\ConfigEntityBase', 'addDependency');
@@ -343,6 +373,150 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
   }
 
   /**
+   * Test dependency removal on entities with plugin collections.
+   */
+  #[DataProvider('providerOnDependencyRemovalWithPluginCollections')]
+  public function testOnDependencyRemovalWithPluginCollections(
+    RemovableDependentPluginReturn $on_dependency_removal_status,
+    array $dependencies_after_removal,
+    bool $expectation,
+  ): void {
+    $dependencies = ['config' => ['bar', 'baz']];
+    // Create an entity with a plugin to test.
+    $instance = $this->getMockBuilder('Drupal\Tests\Core\Plugin\Fixtures\TestConfigurablePlugin')
+      ->setConstructorArgs([[], $this->randomMachineName(), ['provider' => 'foo']])
+      ->onlyMethods(['calculateDependencies', 'onCollectionDependencyRemoval'])
+      ->getMock();
+
+    // Make sure the plugin's onCollectionDependencyRemoval() method is invoked
+    // from $entity->onDependencyRemoval().
+    $instance
+      ->expects($this->exactly(1))
+      ->method('onCollectionDependencyRemoval')
+      ->willReturnCallback(
+        static fn (array $dependencies): RemovableDependentPluginReturn => $on_dependency_removal_status
+      );
+
+    // The calculateDependencies() method will be called before and after
+    // onCollectionDependencyRemoval(), so determine what
+    // calculateDependencies() should return based on when the call is made.
+    $before_on_dependency_removal = TRUE;
+
+    // If the plugin should be removed from the collection, then
+    // the plugin's calculateDependencies() should be called only once, when the
+    // entity's dependencies are calculated before the call to
+    // $entity->onDependencyRemoval(). Otherwise, if the plugin is not removed,
+    // the plugin's calculateDependencies() should be called before and after
+    // $entity->onDependencyRemoval().
+    $instance
+      ->expects($on_dependency_removal_status == RemovableDependentPluginReturn::Remove ? $this->once() : $this->exactly(2))
+      ->method('calculateDependencies')
+      ->willReturnCallback(static function () use (&$before_on_dependency_removal, $dependencies, $dependencies_after_removal): array {
+        return $before_on_dependency_removal ? $dependencies : $dependencies_after_removal;
+      });
+
+    // Confirm the calculated entity dependencies before removing dependencies.
+    $entity = $this->getMockEntityWithPluginCollection($instance);
+    $collections = $entity->getPluginCollections();
+    $collection = reset($collections);
+    $this->assertEquals(1, count($collection));
+    $entity->calculateDependencies();
+    $calculated_dependencies = $entity->getDependencies();
+    $this->assertEquals($dependencies, $calculated_dependencies);
+
+    // Confirm the calculated entity dependencies after removing dependencies.
+    $before_on_dependency_removal = FALSE;
+    $changed = $entity->onDependencyRemoval($dependencies);
+    $entity->calculateDependencies();
+    $recalculated_dependencies = $entity->getDependencies();
+    // If the plugin has been removed from the collection, then the collection
+    // should be empty. Otherwise, there should be one plugin instance in the
+    // collection.
+    $this->assertEquals($on_dependency_removal_status == RemovableDependentPluginReturn::Remove ? 0 : 1, count($collection));
+    $this->assertEquals($dependencies_after_removal, $recalculated_dependencies);
+    $this->assertEquals($expectation, $changed);
+  }
+
+  /**
+   * Data provider for testOnDependencyRemovalWithPluginCollections.
+   */
+  public static function providerOnDependencyRemovalWithPluginCollections(): array {
+    return [
+      // The plugin fixes all the dependencies.
+      [
+        // Plugin ::onCollectionDependencyRemoval() return.
+        RemovableDependentPluginReturn::Changed,
+        // Expected dependencies after ::onCollectionDependencyRemoval().
+        [],
+        // Expected return for ConfigEntityInterface::onDependencyRemoval().
+        TRUE,
+      ],
+      // The plugin is removed from the collection.
+      [
+        // Plugin ::onCollectionDependencyRemoval() return.
+        RemovableDependentPluginReturn::Remove,
+        // Expected dependencies after ::onCollectionDependencyRemoval().
+        [],
+        // Expected return for ConfigEntityInterface::onDependencyRemoval().
+        TRUE,
+      ],
+      // The plugin does not fix any dependencies.
+      [
+        // Plugin ::onCollectionDependencyRemoval() return.
+        RemovableDependentPluginReturn::Unchanged,
+        // Expected dependencies after ::onCollectionDependencyRemoval().
+        ['config' => ['bar', 'baz']],
+        // Expected return for ConfigEntityInterface::onDependencyRemoval().
+        FALSE,
+      ],
+      // The plugin partially fixes dependencies.
+      [
+        // Plugin ::onCollectionDependencyRemoval() return.
+        RemovableDependentPluginReturn::Changed,
+        // Expected dependencies after ::onCollectionDependencyRemoval().
+        ['config' => ['bar']],
+        // Expected return for ConfigEntityInterface::onDependencyRemoval().
+        TRUE,
+      ],
+    ];
+  }
+
+  /**
+   * Get a mock entity with a plugin collection.
+   *
+   * @param \Drupal\Component\Plugin\PluginBase $plugin
+   *   A plugin the entity will have a collection containing.
+   *
+   * @return \Drupal\Core\Config\Entity\ConfigEntityBase|\PHPUnit\Framework\MockObject\MockObject
+   *   A mock entity with a plugin collection containing the given plugin.
+   */
+  protected function getMockEntityWithPluginCollection(PluginBase $plugin): ConfigEntityBase|MockObject {
+    $values = [];
+    $entity = $this->getMockBuilder('\Drupal\Tests\Core\Config\Entity\Fixtures\ConfigEntityBaseWithPluginCollections')
+      ->setConstructorArgs([$values, $this->entityTypeId])
+      ->onlyMethods(['getPluginCollections'])
+      ->getMock();
+
+    // Create a plugin collection to contain the instance.
+    $pluginCollection = $this->getMockBuilder('\Drupal\Core\Plugin\DefaultLazyPluginCollection')
+      ->disableOriginalConstructor()
+      ->onlyMethods(['get'])
+      ->getMock();
+    $pluginCollection->expects($this->atLeastOnce())
+      ->method('get')
+      ->with($plugin->getPluginId())
+      ->willReturn($plugin);
+    $pluginCollection->addInstanceId($plugin->getPluginId());
+
+    // Return the mocked plugin collection.
+    $entity->expects($this->atLeastOnce())
+      ->method('getPluginCollections')
+      ->willReturn([$pluginCollection]);
+
+    return $entity;
+  }
+
+  /**
    * Tests calculate dependencies with third party settings.
    *
    * @legacy-covers ::calculateDependencies
@@ -350,10 +524,7 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
    * @legacy-covers ::onDependencyRemoval
    */
   public function testCalculateDependenciesWithThirdPartySettings(): void {
-    $this->entity = $this->getMockBuilder(StubConfigEntity::class)
-      ->setConstructorArgs([[], $this->entityTypeId])
-      ->onlyMethods([])
-      ->getMock();
+    $this->entity = new StubConfigEntity([], $this->entityTypeId);
     $this->entity->setThirdPartySetting('test_provider', 'test', 'test');
     $this->entity->setThirdPartySetting('test_provider2', 'test', 'test');
     $this->entity->setThirdPartySetting(static::PROVIDER, 'test', 'test');
@@ -383,7 +554,14 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
     $container = TestKernel::setContainerWithKernel();
     $container->set('plugin.manager.foo', $plugin_manager->reveal());
 
-    $entity_values = ['the_plugin_collection_config' => [$instance_id => ['id' => $instance_id, 'foo' => 'original_value']]];
+    $entity_values = [
+      'the_plugin_collection_config' => [
+        $instance_id => [
+          'id' => $instance_id,
+          'foo' => 'original_value',
+        ],
+      ],
+    ];
     $entity = new TestConfigEntityWithPluginCollections($entity_values, $this->entityTypeId);
     $entity->setPluginManager($plugin_manager->reveal());
 
@@ -431,8 +609,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests is new.
-   *
-   * @legacy-covers ::isNew
    */
   public function testIsNew(): void {
     $this->assertFalse($this->entity->isNew());
@@ -472,8 +648,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests enable.
-   *
-   * @legacy-covers ::enable
    */
   #[Depends('testSetStatus')]
   public function testEnable(): void {
@@ -484,8 +658,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests disable.
-   *
-   * @legacy-covers ::disable
    */
   #[Depends('testSetStatus')]
   public function testDisable(): void {
@@ -510,10 +682,9 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests create duplicate.
-   *
-   * @legacy-covers ::createDuplicate
    */
   public function testCreateDuplicate(): void {
+    $this->setUpMockEntityType();
     $this->entityType->expects($this->exactly(2))
       ->method('getKey')
       ->willReturnMap([
@@ -526,6 +697,7 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
       ->with('uuid')
       ->willReturn(TRUE);
 
+    $this->setUpMockUuidService();
     $new_uuid = '8607ef21-42bc-4913-978f-8c06207b0395';
     $this->uuid->expects($this->once())
       ->method('generate')
@@ -549,10 +721,9 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests sort.
-   *
-   * @legacy-covers ::sort
    */
   public function testSort(): void {
+    $this->setUpMockEntityType();
     $this->entityType->expects($this->atLeastOnce())
       ->method('getKey')
       ->with('label')
@@ -584,13 +755,13 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests to array.
-   *
-   * @legacy-covers ::toArray
    */
   public function testToArray(): void {
+    $this->setUpMockTypedConfigManager();
+
     $this->typedConfigManager->expects($this->never())
       ->method('getDefinition');
-    $this->entityType->expects($this->any())
+    $this->entityType
       ->method('getPropertiesToExport')
       ->willReturn(['id' => 'configId', 'dependencies' => 'dependencies']);
     $properties = $this->entity->toArray();
@@ -600,10 +771,11 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests to array id key.
-   *
-   * @legacy-covers ::toArray
    */
   public function testToArrayIdKey(): void {
+    $this->setUpMockEntityType();
+    $this->setUpMockTypedConfigManager();
+
     $entity = $this->getMockBuilder(StubConfigEntity::class)
       ->setConstructorArgs([[], $this->entityTypeId])
       ->onlyMethods(['id', 'get'])
@@ -617,7 +789,7 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
       ->willReturn([]);
     $this->typedConfigManager->expects($this->never())
       ->method('getDefinition');
-    $this->entityType->expects($this->any())
+    $this->entityType
       ->method('getPropertiesToExport')
       ->willReturn(['id' => 'configId', 'dependencies' => 'dependencies']);
     $this->entityType->expects($this->once())
@@ -667,14 +839,12 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests to array schema exception.
-   *
-   * @legacy-covers ::toArray
    */
   public function testToArraySchemaException(): void {
-    $this->entityType->expects($this->any())
+    $this->entityType
       ->method('getPropertiesToExport')
       ->willReturn(NULL);
-    $this->entityType->expects($this->any())
+    $this->entityType
       ->method('getClass')
       ->willReturn("FooConfigEntity");
     $this->expectException(SchemaIncompleteException::class);
@@ -684,8 +854,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests set with plugin collections.
-   *
-   * @legacy-covers ::set
    */
   #[DataProvider('providerTestSetAndPreSaveWithPluginCollections')]
   public function testSetWithPluginCollections(bool $syncing, string $expected_value): void {
@@ -700,7 +868,14 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
       $plugin_manager->createInstance($instance_id, Argument::any())->willReturn($instance);
     }
 
-    $entity_values = ['the_plugin_collection_config' => [$instance_id => ['id' => $instance_id, 'foo' => 'original_value']]];
+    $entity_values = [
+      'the_plugin_collection_config' => [
+        $instance_id => [
+          'id' => $instance_id,
+          'foo' => 'original_value',
+        ],
+      ],
+    ];
     $entity = new TestConfigEntityWithPluginCollections($entity_values, $this->entityTypeId);
     $entity->setSyncing($syncing);
     $entity->setPluginManager($plugin_manager->reveal());
@@ -713,8 +888,6 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
 
   /**
    * Tests pre save with plugin collections.
-   *
-   * @legacy-covers ::preSave
    */
   #[DataProvider('providerTestSetAndPreSaveWithPluginCollections')]
   public function testPreSaveWithPluginCollections(bool $syncing, string $expected_value): void {
@@ -729,7 +902,14 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
       $plugin_manager->createInstance($instance_id, Argument::any())->willReturn($instance);
     }
 
-    $entity_values = ['the_plugin_collection_config' => [$instance_id => ['id' => $instance_id, 'foo' => 'original_value']]];
+    $entity_values = [
+      'the_plugin_collection_config' => [
+        $instance_id => [
+          'id' => $instance_id,
+          'foo' => 'original_value',
+        ],
+      ],
+    ];
     $entity = new TestConfigEntityWithPluginCollections($entity_values, $this->entityTypeId);
     $entity->setSyncing($syncing);
     $entity->setPluginManager($plugin_manager->reveal());
@@ -737,19 +917,19 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
     // After creating the entity, change the plugin configuration.
     $instance->setConfiguration(['foo' => 'new_value']);
 
-    $query = $this->createMock('\Drupal\Core\Entity\Query\QueryInterface');
-    $storage = $this->createMock('\Drupal\Core\Config\Entity\ConfigEntityStorageInterface');
+    $query = $this->createStub(QueryInterface::class);
+    $storage = $this->createStub(ConfigEntityStorageInterface::class);
 
-    $query->expects($this->any())
+    $query
       ->method('execute')
       ->willReturn([]);
-    $query->expects($this->any())
+    $query
       ->method('condition')
       ->willReturn($query);
-    $storage->expects($this->any())
+    $storage
       ->method('getQuery')
       ->willReturn($query);
-    $storage->expects($this->any())
+    $storage
       ->method('loadUnchanged')
       ->willReturn($entity);
 
@@ -763,6 +943,17 @@ class ConfigEntityBaseUnitTest extends UnitTestCase {
       'Not syncing' => [FALSE, 'new_value'],
       'Syncing' => [TRUE, 'original_value'],
     ];
+  }
+
+  /**
+   * Tests trusted data deprecations.
+   */
+  #[IgnoreDeprecations]
+  public function testTrustDataDeprecations(): void {
+    $this->expectUserDeprecationMessage('Drupal\\Core\\Config\\Entity\\ConfigEntityBase::trustData() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. There is no replacement. See https://www.drupal.org/node/3348180');
+    $this->assertFalse($this->entity->hasTrustedData());
+    $this->entity->trustData();
+    $this->assertTrue($this->entity->hasTrustedData());
   }
 
 }
@@ -798,7 +989,7 @@ class TestConfigEntityWithPluginCollections extends ConfigEntityBaseWithPluginCo
   /**
    * {@inheritdoc}
    */
-  public function getPluginCollections() {
+  public function getPluginCollections(): array {
     if (!$this->pluginCollection) {
       $this->pluginCollection = new DefaultLazyPluginCollection($this->pluginManager, $this->the_plugin_collection_config);
     }

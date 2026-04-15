@@ -6,14 +6,16 @@ namespace Drupal\Tests\taxonomy\Functional;
 
 use Drupal\Core\Entity\Entity\EntityViewMode;
 use Drupal\taxonomy\Entity\Vocabulary;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests page variable deprecation.
  */
 #[Group('taxonomy_term')]
 #[IgnoreDeprecations]
+#[RunTestsInSeparateProcesses]
 class TaxonomyTermPageVariableDeprecationTest extends TaxonomyTestBase {
 
   /**
@@ -41,7 +43,7 @@ class TaxonomyTermPageVariableDeprecationTest extends TaxonomyTestBase {
    */
   public function testPageVariableDeprecation(): void {
     $term = $this->createTerm(Vocabulary::load('test_page_variable'));
-    $this->expectDeprecation("'page' is deprecated in drupal:11.3.0 and is removed in drupal:13.0.0. Use 'view_mode' instead. See https://www.drupal.org/node/3542527");
+    $this->expectUserDeprecationMessage("'page' is deprecated in drupal:11.3.0 and is removed in drupal:13.0.0. Use 'view_mode' instead. See https://www.drupal.org/node/3542527");
     $this->drupalGet($term->toUrl());
     $this->assertSession()->pageTextContains('The page variable is set');
 

@@ -7,11 +7,13 @@ namespace Drupal\Tests\system\Functional\Update;
 use Drupal\Core\Entity\Entity\EntityFormMode;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests update path for the entity form mode description value from '' to NULL.
  */
 #[Group('system')]
+#[RunTestsInSeparateProcesses]
 class EntityFormModeUpdatePathTest extends UpdatePathTestBase {
 
   /**
@@ -20,6 +22,9 @@ class EntityFormModeUpdatePathTest extends UpdatePathTestBase {
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-history.php',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-ban.php',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-contact.php',
       __DIR__ . '/../../../../../system/tests/fixtures/update/remove-description-from-user-register-form-mode.php',
     ];
   }

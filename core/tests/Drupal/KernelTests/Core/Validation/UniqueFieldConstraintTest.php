@@ -13,12 +13,14 @@ use Drupal\TestTools\Random;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the unique field value validation constraint.
  */
 #[CoversClass(UniqueFieldValueValidator::class)]
 #[Group('Validation')]
+#[RunTestsInSeparateProcesses]
 class UniqueFieldConstraintTest extends KernelTestBase {
 
   /**
@@ -70,7 +72,7 @@ class UniqueFieldConstraintTest extends KernelTestBase {
    * @legacy-covers ::validate
    */
   #[DataProvider('providerTestEntityWithStringIdWithViolation')]
-  public function testEntityWithStringIdWithViolation($id): void {
+  public function testEntityWithStringIdWithViolation(string|int|null $id): void {
     $this->installEntitySchema('entity_test_string_id');
 
     $value = $this->randomString();
@@ -102,7 +104,7 @@ class UniqueFieldConstraintTest extends KernelTestBase {
    *
    * @see self::testEntityWithStringIdWithViolation()
    */
-  public static function providerTestEntityWithStringIdWithViolation() {
+  public static function providerTestEntityWithStringIdWithViolation(): array {
     return [
       'without an id' => [NULL],
       'zero as integer' => [0],

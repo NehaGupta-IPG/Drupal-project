@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Functional\Plugin;
 
 use Drupal\Core\Url;
+use Drupal\filter\FilterFormatRepositoryInterface;
 use Drupal\Tests\Traits\Core\PathAliasTestTrait;
 use Drupal\Tests\views\Functional\ViewTestBase;
 use Drupal\views\Views;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the feed display plugin.
@@ -16,6 +18,7 @@ use PHPUnit\Framework\Attributes\Group;
  * @see \Drupal\views\Plugin\views\display\Feed
  */
 #[Group('views')]
+#[RunTestsInSeparateProcesses]
 class DisplayFeedTest extends ViewTestBase {
 
   use PathAliasTestTrait;
@@ -62,7 +65,7 @@ class DisplayFeedTest extends ViewTestBase {
       'body' => [
         0 => [
           'value' => 'A paragraph',
-          'format' => filter_default_format(),
+          'format' => \Drupal::service(FilterFormatRepositoryInterface::class)->getDefaultFormat()->id(),
         ],
       ],
     ]);
@@ -125,7 +128,7 @@ class DisplayFeedTest extends ViewTestBase {
       'body' => [
         0 => [
           'value' => 'A paragraph',
-          'format' => filter_default_format(),
+          'format' => \Drupal::service(FilterFormatRepositoryInterface::class)->getDefaultFormat()->id(),
         ],
       ],
     ]);

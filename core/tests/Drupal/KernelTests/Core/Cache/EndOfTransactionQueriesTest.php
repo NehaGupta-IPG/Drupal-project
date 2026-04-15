@@ -10,25 +10,27 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\DatabaseBackendFactory;
 use Drupal\Core\Database\Database;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\user\Entity\User;
+use Drupal\user\UserInterface;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Tests delaying of cache tag invalidation queries to the end of transactions.
  */
 #[Group('Cache')]
+#[RunTestsInSeparateProcesses]
 class EndOfTransactionQueriesTest extends KernelTestBase {
 
   /**
    * {@inheritdoc}
    */
   protected static $modules = [
-    'delay_cache_tags_invalidation',
     'entity_test',
-    'system',
     'user',
   ];
 
@@ -63,6 +65,9 @@ class EndOfTransactionQueriesTest extends KernelTestBase {
 
   /**
    * Tests an entity save.
+   *
+   * @see \Drupal\KernelTests\Core\Cache\EndOfTransactionQueriesTest::entityTestInsert()
+   * @see \Drupal\KernelTests\Core\Cache\EndOfTransactionQueriesTest::userInsert()
    */
   public function testEntitySave(): void {
     \Drupal::cache()->set('test_cache_pre-transaction_foobar', 'something', Cache::PERMANENT, ['foobar']);
@@ -123,6 +128,8 @@ class EndOfTransactionQueriesTest extends KernelTestBase {
 
   /**
    * Tests an entity save rollback.
+   *
+   * @see \Drupal\KernelTests\Core\Cache\EndOfTransactionQueriesTest::entityTestInsert()
    */
   public function testEntitySaveRollback(): void {
     \Drupal::cache()
@@ -156,6 +163,43 @@ class EndOfTransactionQueriesTest extends KernelTestBase {
   }
 
   /**
+   * Implements hook_ENTITY_TYPE_insert().
+   *
+   * @see \Drupal\KernelTests\Core\Cache\EndOfTransactionQueriesTest::testEntitySave()
+   * @see \Drupal\KernelTests\Core\Cache\EndOfTransactionQueriesTest::testEntitySaveRollback()
+   */
+  #[Hook('entity_test_insert')]
+  public function entityTestInsert(EntityTest $entity): void {
+    if (\Drupal::state()->get('delay_cache_tags_invalidation_exception')) {
+      throw new \Exception('Abort entity save to trigger transaction rollback.');
+    }
+    // Read the pre-transaction cache writes.
+    // @see \Drupal\KernelTests\Core\Cache\EndOfTransactionQueriesTest::testEntitySave()
+    \Drupal::state()->set('delay_cache_tags_invalidation_entity_test_insert__pre-transaction_foobar', \Drupal::cache()->get('test_cache_pre-transaction_foobar'));
+    \Drupal::state()->set('delay_cache_tags_invalidation_entity_test_insert__pre-transaction_entity_test_list', \Drupal::cache()->get('test_cache_pre-transaction_entity_test_list'));
+    // Write during the transaction.
+    \Drupal::cache()->set('delay_cache_tags_invalidation_entity_test_insert__during_transaction_foobar', 'something', Cache::PERMANENT, ['foobar']);
+    \Drupal::cache()->set('delay_cache_tags_invalidation_entity_test_insert__during_transaction_entity_test_list', 'something', Cache::PERMANENT, ['entity_test_list']);
+    // Trigger a nested entity save and hence a nested transaction.
+    User::create(['name' => 'john doe', 'status' => 1])->save();
+  }
+
+  /**
+   * Implements hook_ENTITY_TYPE_insert().
+   *
+   * @see \Drupal\KernelTests\Core\Cache\EndOfTransactionQueriesTest::testEntitySave()
+   */
+  #[Hook('user_insert')]
+  public function userInsert(UserInterface $entity): void {
+    if ($entity->getAccountName() === 'john doe') {
+      // Read the in-transaction cache writes.
+      // @see \Drupal\KernelTests\Core\Cache\EndOfTransactionQueriesTest::entityTestInsert()
+      \Drupal::state()->set('delay_cache_tags_invalidation_user_insert__during_transaction_foobar', \Drupal::cache()->get('delay_cache_tags_invalidation_entity_test_insert__during_transaction_foobar'));
+      \Drupal::state()->set('delay_cache_tags_invalidation_user_insert__during_transaction_entity_test_list', \Drupal::cache()->get('delay_cache_tags_invalidation_entity_test_insert__during_transaction_entity_test_list'));
+    }
+  }
+
+  /**
    * Filters statements by table name.
    *
    * @param string[] $statements
@@ -166,8 +210,8 @@ class EndOfTransactionQueriesTest extends KernelTestBase {
    * @return string[]
    *   Filtered statement list.
    */
-  protected function getStatementsForTable(array $statements, $table_name): array {
-    return array_filter($statements, function ($statement) use ($table_name) {
+  protected function getStatementsForTable(array $statements, string $table_name): array {
+    return array_filter($statements, function (string $statement) use ($table_name): bool {
       return $this->isStatementRelatedToTable($statement, $table_name);
     });
   }

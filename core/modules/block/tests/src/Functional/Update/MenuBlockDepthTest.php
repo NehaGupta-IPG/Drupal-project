@@ -7,11 +7,13 @@ namespace Drupal\Tests\block\Functional\Update;
 use Drupal\block\Entity\Block;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests update path for the `depth` setting of menu blocks.
  */
 #[Group('system')]
+#[RunTestsInSeparateProcesses]
 final class MenuBlockDepthTest extends UpdatePathTestBase {
 
   /**
@@ -20,6 +22,8 @@ final class MenuBlockDepthTest extends UpdatePathTestBase {
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-10.3.0.bare.standard.php.gz',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-history.php',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-contact.php',
       __DIR__ . '/../../../fixtures/update/add-menu-block-with-zero-depth.php',
     ];
   }
