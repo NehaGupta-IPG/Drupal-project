@@ -1,6 +1,6 @@
 ((Drupal, once) => {
   Drupal.behaviors.systemPerformanceAssetsValidate = {
-    attach: (context, settings) => {
+    attach: (context) => {
       const getAssetsValidationMessenger = () => {
         return new Drupal.Message(
           context.querySelector('[data-assets-validate-messages]'),
@@ -13,55 +13,44 @@
         }
         const validateUrl = el.dataset.performanceAssetsValidatePath;
         getAssetsValidationMessenger().clear();
-        try {
-          fetch(validateUrl)
-            .then((response) => {
-              if (response.status === 404) {
-                getAssetsValidationMessenger().add(
-                  Drupal.t(
-                    'Your server is not configured properly to access @name assets. Review Drupal server requirements.',
-                    {
-                      '@name': el.name,
-                    },
-                  ),
-                  {
-                    type: 'error',
-                  },
-                );
-              } else {
-                getAssetsValidationMessenger().add(
-                  Drupal.t(
-                    'Your server is configured properly to access @name assets.',
-                    {
-                      '@name': el.name,
-                    },
-                  ),
-                );
-              }
-            })
-            .catch((error) => {
+        fetch(validateUrl, { method: 'HEAD' })
+          .then((response) => {
+            if (response.ok) {
               getAssetsValidationMessenger().add(
                 Drupal.t(
-                  'Unable to check server requirements for @name assets.',
+                  'Your server is configured properly to access @name assets.',
+                  {
+                    '@name': el.name,
+                  },
+                ),
+              );
+            } else {
+              getAssetsValidationMessenger().add(
+                Drupal.t(
+                  'Your server is not configured properly to access @name assets. Review Drupal server requirements.',
                   {
                     '@name': el.name,
                   },
                 ),
                 {
-                  type: 'warning',
+                  type: 'error',
                 },
               );
-            });
-        } catch (err) {
-          getAssetsValidationMessenger().add(
-            Drupal.t('Unable to check server requirements for @name assets.', {
-              '@name': el.name,
-            }),
-            {
-              type: 'warning',
-            },
-          );
-        }
+            }
+          })
+          .catch(() => {
+            getAssetsValidationMessenger().add(
+              Drupal.t(
+                'Unable to check server requirements for @name assets.',
+                {
+                  '@name': el.name,
+                },
+              ),
+              {
+                type: 'warning',
+              },
+            );
+          });
       };
       once('performance-assets-validate', document.body).forEach(() => {
         context

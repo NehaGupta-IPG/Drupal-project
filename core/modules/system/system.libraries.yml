@@ -77,6 +77,5 @@ assets.validate:
   js:
     js/assets.validate.js: {}
   dependencies:
-    - core/drupalSettings
     - core/drupal.message
     - core/once

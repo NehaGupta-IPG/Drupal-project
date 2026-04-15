@@ -113,6 +113,15 @@ abstract class AssetControllerBase extends FileDownloadController {
    *   supplied.
    */
   public function deliver(Request $request, string $file_name) {
+    // Support HEAD requests for server configuration validation. If the
+    // request reached this controller, the web server is correctly configured
+    // to forward asset requests to PHP.
+    if ($request->isMethod('HEAD')) {
+      return new Response('', 200, [
+        'Cache-Control' => 'no-store',
+      ]);
+    }
+
     $uri = 'assets://' . $this->assetType . '/' . $file_name;
 
     // Check to see whether a file matching the $uri already exists, this can

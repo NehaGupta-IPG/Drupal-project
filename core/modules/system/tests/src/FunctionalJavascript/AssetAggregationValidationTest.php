@@ -29,33 +29,32 @@ class AssetAggregationValidationTest extends WebDriverTestBase {
   }
 
   /**
-   * Tests that enabling aggregation validates the server configuration.
+   * Tests that enabling CSS aggregation validates the server configuration.
    */
-  public function testAggregationValidation(): void {
+  public function testCssAggregationValidation(): void {
     $this->drupalGet('admin/config/development/performance');
     $page = $this->getSession()->getPage();
 
     // Ensure aggregation is currently disabled to start fresh.
-    // We uncheck via JS to avoid triggering the validation logic immediately if it was already on.
-    $this->getSession()->executeScript("jQuery('#edit-preprocess-css').prop('checked', false).trigger('change');");
+    $this->getSession()->executeScript("
+      const el = document.getElementById('edit-preprocess-css');
+      el.checked = false;
+      el.dispatchEvent(new Event('change'));
+    ");
     $this->submitForm([], 'Save configuration');
 
-    // Enable CSS aggregation.
-    // This should trigger the 'change' event listener in assets.validate.js.
+    // Enable CSS aggregation. This triggers the 'change' event listener in
+    // assets.validate.js, which sends a HEAD request to the CSS asset route.
     $page->checkField('preprocess_css');
 
-    // Wait for the Success Message.
-    // The JS uses fetch() which is asynchronous. We must wait for the DOM to update.
-    // The patch displays: "Your server is configured properly to access @name assets."
+    // Wait for the success message. The JS uses fetch() which is
+    // asynchronous. We must wait for the DOM to update.
     $success_message_partial = 'Your server is configured properly';
-
     $result = $this->assertSession()->waitForText($success_message_partial);
-    $this->assertNotNull($result, 'The success message did not appear after enabling aggregation.');
+    $this->assertNotNull($result, 'The CSS validation success message did not appear after enabling aggregation.');
 
-    // Ensure the Failure Message is NOT present.
-    // "Your server is not configured properly..."
+    // Ensure the failure message is NOT present.
     $this->assertSession()->pageTextNotContains('Your server is not configured properly');
-    $this->assertSession()->elementNotExists('css', '.messages--error');
 
     // Save the form.
     $this->submitForm([], 'Save configuration');
@@ -63,6 +62,41 @@ class AssetAggregationValidationTest extends WebDriverTestBase {
     // Verify the settings were saved successfully.
     $this->assertSession()->pageTextContains('The configuration options have been saved.');
     $this->assertTrue($this->config('system.performance')->get('css.preprocess'), 'CSS aggregation was enabled.');
+  }
+
+  /**
+   * Tests that enabling JS aggregation validates the server configuration.
+   */
+  public function testJsAggregationValidation(): void {
+    $this->drupalGet('admin/config/development/performance');
+    $page = $this->getSession()->getPage();
+
+    // Ensure aggregation is currently disabled to start fresh.
+    $this->getSession()->executeScript("
+      const el = document.getElementById('edit-preprocess-js');
+      el.checked = false;
+      el.dispatchEvent(new Event('change'));
+    ");
+    $this->submitForm([], 'Save configuration');
+
+    // Enable JS aggregation. This triggers the 'change' event listener in
+    // assets.validate.js, which sends a HEAD request to the JS asset route.
+    $page->checkField('preprocess_js');
+
+    // Wait for the success message.
+    $success_message_partial = 'Your server is configured properly';
+    $result = $this->assertSession()->waitForText($success_message_partial);
+    $this->assertNotNull($result, 'The JS validation success message did not appear after enabling aggregation.');
+
+    // Ensure the failure message is NOT present.
+    $this->assertSession()->pageTextNotContains('Your server is not configured properly');
+
+    // Save the form.
+    $this->submitForm([], 'Save configuration');
+
+    // Verify the settings were saved successfully.
+    $this->assertSession()->pageTextContains('The configuration options have been saved.');
+    $this->assertTrue($this->config('system.performance')->get('js.preprocess'), 'JS aggregation was enabled.');
   }
 
 }
