@@ -23,6 +23,7 @@ config:
       - system.action.media_publish_action
       - system.action.media_save_action
       - system.action.media_unpublish_action
+      - system.action.media_update_metadata
       - views.view.media
     image:
       - image.style.medium
