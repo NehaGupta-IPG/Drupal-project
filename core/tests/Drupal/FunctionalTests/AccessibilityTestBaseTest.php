@@ -36,11 +36,11 @@ class AccessibilityTestBaseTest extends AccessibilityTestBase {
   protected $failOnJavascriptConsoleErrors = FALSE;
 
   /**
-   * Prepare for failed assertion in AccessibilityTestBase::testPages.
+   * Setup function for 'Smoke test with Axe options' case.
+   *
+   * Prepares for failed assertion in AccessibilityTestBase::testPages.
    */
-  public function setUp():void {
-    parent::setUp();
-
+  protected function setupSmokeTestWithOptions(): void {
     global $base_url;
 
     $expected_message = <<<TEXT
@@ -57,13 +57,13 @@ TEXT;
 
     $this->expectException(AssertionFailedError::class);
     $this->expectExceptionMessage($expected_message);
-
   }
 
   /**
    * {@inheritdoc}
    */
   public static function provider(): array {
+    // @todo Add cases for testing 'admin' cases and callback arguments.
     return [
       'Smoke test with Axe options' => [
         'uri' => 'accessibility-test',
@@ -71,6 +71,7 @@ TEXT;
         'axe_options' => [
           'runOnly' => ['color-contrast'],
         ],
+        'setup_callback' => 'setupSmokeTestWithOptions',
       ],
     ];
   }

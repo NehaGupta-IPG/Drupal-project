@@ -40,15 +40,13 @@ abstract class AccessibilityTestBase extends WebDriverTestBase {
    *   (optional) Whether or not to log in as admin for the test.
    * @param array|null $axe_options
    *   (optional) Associative array of Axe options.
-   * @param array|null $browser_options
-   *   (optional) Associative array of browser options.
-   *   Possible values:
-   *   - 'resize_window': Width and height passed to Behat\Mink\Session::resizeWindow():
-   *     - 'width': Integer pixel width.
-   *     - 'height'  Integer pixel height.
+   * @param callable|null $setup_callback
+   *   (optional) Callback method to run page setup steps before executing Axe.
+   *   The method will receive $uri and $admin as arguments and must not
+   *   be private. Return values from the method are not used.
    */
   #[DataProvider('provider')]
-  public function testPages(string $uri, bool $admin = FALSE, array $axe_options = [], array $browser_options = []): void {
+  public function testPages(string $uri, bool $admin = FALSE, array $axe_options = [], ?string $setup_callback = NULL): void {
     if ($admin) {
       $this->drupalLogin($this->drupalCreateUser(admin: TRUE));
     }
@@ -63,11 +61,8 @@ abstract class AccessibilityTestBase extends WebDriverTestBase {
     $this->assertSession()
       ->responseNotContains('Access denied');
 
-    if (!empty($browser_options['resize_window'])) {
-      $this->getSession()->resizeWindow(
-        $browser_options['resize_window']['width'],
-        $browser_options['resize_window']['height']
-      );
+    if (is_callable([$this, $setup_callback])) {
+      $this->{$setup_callback}($uri, $admin);
     }
 
     $this->executeAxe($axe_options);
