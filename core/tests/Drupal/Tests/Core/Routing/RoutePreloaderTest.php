@@ -5,11 +5,15 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Routing;
 
 use Drupal\Component\EventDispatcher\Event;
+use Drupal\Core\Routing\PreloadableRouteProviderInterface;
 use Drupal\Core\Routing\RoutePreloader;
+use Drupal\Core\State\StateInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
@@ -21,18 +25,14 @@ use Symfony\Component\Routing\RouteCollection;
 class RoutePreloaderTest extends UnitTestCase {
 
   /**
-   * The mocked preloadable route provider.
-   *
-   * @var \Drupal\Core\Routing\PreloadableRouteProviderInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The preloadable route provider.
    */
-  protected $routeProvider;
+  protected PreloadableRouteProviderInterface $routeProvider;
 
   /**
    * The mocked state.
-   *
-   * @var \Drupal\Core\State\StateInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $state;
+  protected StateInterface&MockObject $state;
 
   /**
    * The tested preloader.
@@ -47,9 +47,18 @@ class RoutePreloaderTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->routeProvider = $this->createMock('Drupal\Core\Routing\PreloadableRouteProviderInterface');
+    $this->routeProvider = $this->createStub(PreloadableRouteProviderInterface::class);
     $this->state = $this->createMock('\Drupal\Core\State\StateInterface');
     $this->preloader = new RoutePreloader($this->routeProvider, $this->state);
+  }
+
+  /**
+   * Reinitializes the route provider as a mock object.
+   */
+  protected function setUpMockRouteProvider(): void {
+    $this->routeProvider = $this->createMock(PreloadableRouteProviderInterface::class);
+    $reflection = new \ReflectionProperty($this->preloader, 'routeProvider');
+    $reflection->setValue($this->preloader, $this->routeProvider);
   }
 
   /**
@@ -138,12 +147,11 @@ class RoutePreloaderTest extends UnitTestCase {
    * Tests onRequest on a non html request.
    */
   public function testOnRequestNonHtml(): void {
-    $event = $this->getMockBuilder('\Symfony\Component\HttpKernel\Event\KernelEvent')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $this->setUpMockRouteProvider();
+    $event = $this->createStub(KernelEvent::class);
     $request = new Request();
     $request->setRequestFormat('non-html');
-    $event->expects($this->any())
+    $event
       ->method('getRequest')
       ->willReturn($request);
 
@@ -159,12 +167,11 @@ class RoutePreloaderTest extends UnitTestCase {
    * Tests onRequest on a html request.
    */
   public function testOnRequestOnHtml(): void {
-    $event = $this->getMockBuilder('\Symfony\Component\HttpKernel\Event\KernelEvent')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $this->setUpMockRouteProvider();
+    $event = $this->createStub(KernelEvent::class);
     $request = new Request();
     $request->setRequestFormat('html');
-    $event->expects($this->any())
+    $event
       ->method('getRequest')
       ->willReturn($request);
 

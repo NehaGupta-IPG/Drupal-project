@@ -13,6 +13,8 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\locale\LocaleDefaultOptions;
 use Drupal\locale\LocaleFetch;
+use Drupal\locale\StreamWrapper\TranslationsStream;
+use Drupal\locale\File\LocaleFileManager;
 
 /**
  * Hook implementations for locale.
@@ -127,7 +129,7 @@ class LocaleHooks {
     \Drupal::service('locale.storage')->deleteTranslations(['language' => $language->id()]);
     // Remove interface translation files.
     \Drupal::moduleHandler()->loadInclude('locale', 'inc', 'locale.bulk');
-    locale_translate_delete_translation_files([], [$language->id()]);
+    \Drupal::service(LocaleFileManager::class)->deleteTranslationFiles([], [$language->id()]);
     // Remove translated configuration objects.
     \Drupal::service('locale.config_manager')->deleteLanguageTranslations($language->id());
     // Changing the language settings impacts the interface:
@@ -361,21 +363,14 @@ class LocaleHooks {
   #[Hook('form_system_file_system_settings_alter')]
   public function formSystemFileSystemSettingsAlter(&$form, FormStateInterface $form_state) : void {
     $form['translation_path'] = [
-      '#type' => 'textfield',
+      '#type' => 'item',
       '#title' => $this->t('Interface translations directory'),
-      '#default_value' => \Drupal::configFactory()->getEditable('locale.settings')->get('translation.path'),
-      '#maxlength' => 255,
-      '#description' => $this->t('A local file system path where interface translation files will be stored.'),
-      '#required' => TRUE,
-      '#after_build' => [
-        'system_check_directory',
-      ],
-      '#weight' => 10,
+      '#markup' => TranslationsStream::basePath(),
+      '#description' => $this->t('A local file system path where interface translation files will be stored. This must be changed in settings.php file as the "locale_translation_path" setting.'),
     ];
     if ($form['file_default_scheme']) {
       $form['file_default_scheme']['#weight'] = 20;
     }
-    $form['#submit'][] = 'locale_system_file_system_settings_submit';
   }
 
 }
