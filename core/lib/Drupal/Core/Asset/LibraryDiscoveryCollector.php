@@ -7,8 +7,10 @@ use Drupal\Core\Asset\Exception\InvalidLibrariesExtendSpecificationException;
 use Drupal\Core\Asset\Exception\InvalidLibrariesOverrideSpecificationException;
 use Drupal\Core\Cache\CacheCollector;
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Extension\Exception\UnknownExtensionException;
 use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * A CacheCollector implementation for building library extension info.
@@ -40,12 +42,18 @@ class LibraryDiscoveryCollector extends CacheCollector implements LibraryDiscove
    *   The library discovery parser.
    * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
    *   The theme manager.
+   * @param \Psr\Log\LoggerInterface|null $logger
+   *   The logger.
    */
-  public function __construct(CacheBackendInterface $cache, LockBackendInterface $lock, LibraryDiscoveryParser $discovery_parser, ThemeManagerInterface $theme_manager) {
+  public function __construct(CacheBackendInterface $cache, LockBackendInterface $lock, LibraryDiscoveryParser $discovery_parser, ThemeManagerInterface $theme_manager, protected ?LoggerInterface $logger = NULL) {
     $this->themeManager = $theme_manager;
     parent::__construct(NULL, $cache, $lock, ['library_info']);
 
     $this->discoveryParser = $discovery_parser;
+    if ($this->logger === NULL) {
+      $this->logger = \Drupal::service('logger.channel.default');
+      @trigger_error('Calling ' . __METHOD__ . '() without the $logger argument is deprecated in drupal:11.5.0 and will be required in drupal:13.0.0. See https://www.drupal.org/node/3603135', E_USER_DEPRECATED);
+    }
   }
 
   /**
@@ -84,7 +92,18 @@ class LibraryDiscoveryCollector extends CacheCollector implements LibraryDiscove
    * @throws \Drupal\Core\Asset\Exception\InvalidLibrariesOverrideSpecificationException
    */
   protected function getLibraryDefinitions($extension) {
-    $libraries = $this->discoveryParser->buildByExtension($extension);
+    try {
+      $libraries = $this->discoveryParser->buildByExtension($extension);
+    }
+    catch (UnknownExtensionException) {
+      // Client-supplied ajaxPageState libraries can reference unknown
+      // extensions, for example when a module or theme is uninstalled while a
+      // page referencing it is still cached. Treat the extension as having no
+      // libraries rather than failing the request, but log it so the unexpected
+      // reference is not silently swallowed.
+      $this->logger->warning('Could not load libraries for unknown extension %extension.', ['%extension' => $extension]);
+      return [];
+    }
     foreach ($libraries as $name => $definition) {
       // Handle libraries that are marked for override or removal.
       // @see \Drupal\Core\Asset\LibraryDiscoveryParser::applyLibrariesOverride()

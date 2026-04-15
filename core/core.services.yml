@@ -1783,7 +1783,7 @@ services:
     arguments: ['@file_system']
   library.discovery:
     class: Drupal\Core\Asset\LibraryDiscoveryCollector
-    arguments: ['@cache.discovery', '@lock', '@library.discovery.parser', '@theme.manager']
+    arguments: ['@cache.discovery', '@lock', '@library.discovery.parser', '@theme.manager', '@logger.channel.default']
     tags:
       - { name: needs_destruction }
   Drupal\Core\Asset\LibraryDiscoveryInterface: '@library.discovery'
