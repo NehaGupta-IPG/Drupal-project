@@ -6,4 +6,6 @@ accessibility_test.page:
   options:
     no_cache: TRUE
   requirements:
-    _access: 'TRUE'
+    # Restricted access for testing $admin parameter of
+    # AccessibilityTestBase::testPages.
+    _permission: 'administer site configuration'

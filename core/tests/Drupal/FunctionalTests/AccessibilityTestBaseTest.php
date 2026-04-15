@@ -67,7 +67,7 @@ TEXT;
     return [
       'Smoke test with Axe options' => [
         'uri' => 'accessibility-test',
-        'admin' => FALSE,
+        'admin' => TRUE,
         'axe_options' => [
           'runOnly' => ['color-contrast'],
         ],
