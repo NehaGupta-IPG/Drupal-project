@@ -3,6 +3,7 @@
 namespace Drupal\Component\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Argument\RewindableGenerator;
+use Symfony\Component\DependencyInjection\EnvVarProcessor;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -98,6 +99,16 @@ class Container implements ContainerInterface, ResetInterface {
   protected $frozen = TRUE;
 
   /**
+   * Cache for resolved environment variables.
+   */
+  protected array $envCache = [];
+
+  /**
+   * EnvVarProcessor instance.
+   */
+  protected EnvVarProcessor $envVarProcessor;
+
+  /**
    * Constructs a new Container instance.
    *
    * @param array $container_definition
@@ -119,6 +130,7 @@ class Container implements ContainerInterface, ResetInterface {
     $this->parameters = $container_definition['parameters'] ?? [];
     $this->serviceDefinitions = $container_definition['services'] ?? [];
     $this->frozen = $container_definition['frozen'] ?? FALSE;
+    $this->envVarProcessor = new EnvVarProcessor($this);
   }
 
   /**
@@ -205,6 +217,8 @@ class Container implements ContainerInterface, ResetInterface {
    */
   public function reset(): void {
     $this->services = [];
+    $this->envCache = [];
+    $this->envVarProcessor->reset();
   }
 
   /**
@@ -371,85 +385,42 @@ class Container implements ContainerInterface, ResetInterface {
     // Full match: the entire value is a single %env(...)% reference.
     // This preserves non-string types (int, bool) from env processors.
     if (preg_match('/^%env\(([^)]+)\)%$/', $value, $matches)) {
-      return $this->resolveEnvVar($matches[1]);
+      return $this->getEnv($matches[1]);
     }
     // Partial match: env references embedded in a larger string.
     return preg_replace_callback('/%env\(([^)]+)\)%/', function ($matches) {
-      return (string) $this->resolveEnvVar($matches[1]);
+      return (string) $this->getEnv($matches[1]);
     }, $value);
   }
 
   /**
-   * Resolves an environment variable specification.
+   * Resolves an environment variable using Symfony's EnvVarProcessor.
    *
-   * Handles processor prefixes like string:, int:, bool:, default:, resolve:.
+   * This follows the same pattern as Symfony's Container::getEnv(), delegating
+   * all prefix handling (string:, int:, bool:, default:, resolve:, etc.) to
+   * the EnvVarProcessor.
    *
-   * @param string $spec
+   * @param string $name
    *   The env var specification (e.g., 'FOO', 'int:FOO',
    *   'default:param:FOO').
    *
    * @return mixed
    *   The resolved value.
    */
-  protected function resolveEnvVar(string $spec): mixed {
-    $i = strpos($spec, ':');
-    if ($i !== FALSE) {
-      $prefix = substr($spec, 0, $i);
-      $rest = substr($spec, $i + 1);
-
-      return match ($prefix) {
-        'string' => (string) $this->resolveEnvVar($rest),
-        'int' => (int) $this->resolveEnvVar($rest),
-        'bool' => filter_var($this->resolveEnvVar($rest), FILTER_VALIDATE_BOOLEAN),
-        'default' => $this->resolveEnvDefault($rest),
-        'resolve' => $this->resolveEnvParameters($this->getEnvValue($rest)),
-        default => $this->getEnvValue($spec),
-      };
+  protected function getEnv(string $name): mixed {
+    if (\array_key_exists($name, $this->envCache)) {
+      return $this->envCache[$name];
     }
-    return $this->getEnvValue($spec);
-  }
 
-  /**
-   * Handles the default: env processor.
-   *
-   * @param string $rest
-   *   The specification after 'default:', e.g., 'param_name:ENV_VAR'.
-   *
-   * @return mixed
-   *   The env var value if set, otherwise the default parameter value.
-   */
-  protected function resolveEnvDefault(string $rest): mixed {
-    $colonPos = strpos($rest, ':');
-    $defaultParam = substr($rest, 0, $colonPos);
-    $envName = substr($rest, $colonPos + 1);
-    $envValue = $_ENV[$envName] ?? $_SERVER[$envName] ?? NULL;
-    if ($envValue !== NULL && $envValue !== '') {
-      return $envValue;
+    if (str_contains($name, ':')) {
+      [$prefix, $localName] = explode(':', $name, 2);
     }
-    return $this->getParameter($defaultParam);
-  }
+    else {
+      $prefix = '';
+      $localName = $name;
+    }
 
-  /**
-   * Gets the raw value of an environment variable.
-   *
-   * Checks $_ENV and $_SERVER, then falls back to env(NAME) parameters
-   * which serve as default values in the container definition.
-   *
-   * @param string $name
-   *   The environment variable name.
-   *
-   * @return mixed
-   *   The environment variable value, or NULL if not found.
-   */
-  protected function getEnvValue(string $name): mixed {
-    $value = $_ENV[$name] ?? $_SERVER[$name] ?? NULL;
-    if ($value === NULL) {
-      $envParamKey = 'env(' . $name . ')';
-      if (\array_key_exists($envParamKey, $this->parameters)) {
-        return $this->resolveEnvParameters($this->parameters[$envParamKey]);
-      }
-    }
-    return $value;
+    return $this->envCache[$name] = $this->envVarProcessor->getEnv($prefix, $localName, $this->getEnv(...));
   }
 
   /**
