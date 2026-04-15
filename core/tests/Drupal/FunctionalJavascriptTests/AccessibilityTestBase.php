@@ -36,12 +36,13 @@ abstract class AccessibilityTestBase extends WebDriverTestBase {
    *
    * @param string $uri
    *   The path to be tested.
-   * @param bool|null $admin
+   * @param bool $admin
    *   (optional) Whether or not to log in as admin for the test.
-   * @param array|null $axe_options
+   * @param array $axe_options
    *   (optional) Associative array of Axe options.
-   * @param callable|null $setup_callback
-   *   (optional) Callback method to run page setup steps before executing Axe.
+   * @param string|null $setup_callback
+   *   (optional) Name of callback method to run page setup steps before
+   *   executing Axe.
    *   The method will receive $uri and $admin as arguments and must not
    *   be private. Return values from the method are not used.
    */
