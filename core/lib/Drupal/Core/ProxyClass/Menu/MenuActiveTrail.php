@@ -70,6 +70,14 @@ namespace Drupal\Core\ProxyClass\Menu {
         /**
          * {@inheritdoc}
          */
+        public function destruct(): void
+        {
+            $this->lazyLoadItself()->destruct();
+        }
+
+        /**
+         * {@inheritdoc}
+         */
         public function getActiveTrailIds($menu_name)
         {
             return $this->lazyLoadItself()->getActiveTrailIds($menu_name);
@@ -129,14 +137,6 @@ namespace Drupal\Core\ProxyClass\Menu {
         public function clear()
         {
             return $this->lazyLoadItself()->clear();
-        }
-
-        /**
-         * {@inheritdoc}
-         */
-        public function destruct()
-        {
-            return $this->lazyLoadItself()->destruct();
         }
 
     }

@@ -99,6 +99,14 @@ namespace Drupal\Core\ProxyClass\Routing {
             return $this->lazyLoadItself()->destruct();
         }
 
+        /**
+         * {@inheritdoc}
+         */
+        public function __get(string $name): ?mixed
+        {
+            return $this->lazyLoadItself()->__get($name);
+        }
+
     }
 
 }
