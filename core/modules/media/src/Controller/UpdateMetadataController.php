@@ -3,6 +3,7 @@
 namespace Drupal\media\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\GeneratedUrl;
 use Drupal\Core\Url;
 use Drupal\media\MediaInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -36,7 +37,7 @@ class UpdateMetadataController extends ControllerBase {
   /**
    * Reloads the previous page or return to the media overview.
    */
-  protected function reloadPage() {
+  protected function reloadPage(): string|GeneratedUrl {
     if ($destination = $this->getRedirectDestination()->get()) {
       return $destination;
     }

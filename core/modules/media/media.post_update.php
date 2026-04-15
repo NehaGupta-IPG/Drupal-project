@@ -33,7 +33,7 @@ function media_post_update_media_author_views_filter_update(): void {
 /**
  * Install the 'Update metadata' action.
  */
-function media_post_update_install_update_metadata_action() {
+function media_post_update_install_update_metadata_action(): void {
   if (!Action::load('media_update_metadata')) {
     Action::create([
       'id' => 'media_update_metadata',

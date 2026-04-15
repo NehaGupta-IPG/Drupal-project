@@ -499,7 +499,7 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
    *   field values. If FALSE, values will be copied only if the mapped field is
    *   empty or if the media source field changed. Defaults to FALSE.
    */
-  protected function updateMappedMetadata(MediaInterface $translation, $overwrite_existing = FALSE) {
+  protected function updateMappedMetadata(MediaInterface $translation, $overwrite_existing = FALSE): void {
     $media_source = $this->getSource();
     foreach ($translation->bundle->entity->getFieldMap() as $metadata_attribute_name => $entity_field_name) {
       if (!$translation->hasField($entity_field_name)) {

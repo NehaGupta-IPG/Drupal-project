@@ -5,18 +5,20 @@ declare(strict_types=1);
 namespace Drupal\Tests\media\Kernel;
 
 use Drupal\media\Plugin\media\Source\File;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the update metadata method on Media entities.
- *
- * @group media
  */
+#[Group('media')]
+#[RunTestsInSeparateProcesses]
 class MediaUpdateMetadataTest extends MediaKernelTestBase {
 
   /**
    * Tests the update metadata operation.
    */
-  public function testUpdateMetadata() {
+  public function testUpdateMetadata(): void {
     $media_type = $this->createMediaType('file');
     $source_plugin = $media_type->getSource();
 

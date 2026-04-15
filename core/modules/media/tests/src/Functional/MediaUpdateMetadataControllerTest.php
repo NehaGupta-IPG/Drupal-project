@@ -7,12 +7,14 @@ namespace Drupal\Tests\media\Functional;
 use Drupal\file\Entity\File as FileEntity;
 use Drupal\media\Entity\Media;
 use Drupal\media\Plugin\media\Source\File;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the media "Update Metadata" controller.
- *
- * @group media
  */
+#[Group('media')]
+#[RunTestsInSeparateProcesses]
 class MediaUpdateMetadataControllerTest extends MediaFunctionalTestBase {
 
   /**
@@ -23,7 +25,7 @@ class MediaUpdateMetadataControllerTest extends MediaFunctionalTestBase {
   /**
    * Test that by going to the update metadata page, we update the metadata.
    */
-  public function testUpdateMetadataController() {
+  public function testUpdateMetadataController(): void {
     $assert_session = $this->assertSession();
 
     $media_type = $this->createMediaType('file');

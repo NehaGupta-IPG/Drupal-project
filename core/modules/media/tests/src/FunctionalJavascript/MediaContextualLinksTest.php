@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\media\FunctionalJavascript;
 
 use Drupal\media\Entity\Media;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests views contextual links on media items.
- *
- * @group media
  */
+#[Group('media')]
+#[RunTestsInSeparateProcesses]
 class MediaContextualLinksTest extends MediaJavascriptTestBase {
 
   /**
@@ -43,7 +45,7 @@ class MediaContextualLinksTest extends MediaJavascriptTestBase {
   /**
    * Tests contextual links.
    */
-  public function testMediaContextualLinks() {
+  public function testMediaContextualLinks(): void {
     // Create a media type.
     $mediaType = $this->createMediaType('test');
 

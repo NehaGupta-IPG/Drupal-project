@@ -2,6 +2,7 @@
 
 namespace Drupal\media;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityListBuilder;
@@ -163,11 +164,11 @@ class MediaListBuilder extends EntityListBuilder {
   /**
    * {@inheritdoc}
    */
-  protected function getDefaultOperations(EntityInterface $entity) {
-    $operations = parent::getDefaultOperations($entity);
+  protected function getDefaultOperations(EntityInterface $entity, ?CacheableMetadata $cacheability = NULL): array {
+    $operations = parent::getDefaultOperations($entity, $cacheability);
     if ($entity->access('update')) {
       $operations['update_metadata'] = [
-        'title' => t('Update metadata'),
+        'title' => $this->t('Update metadata'),
         'url' => $this->ensureDestination(new Url('media.update_metadata', [
           'media' => $entity->id(),
         ])),

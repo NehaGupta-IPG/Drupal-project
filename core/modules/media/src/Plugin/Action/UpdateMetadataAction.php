@@ -58,7 +58,7 @@ class UpdateMetadataAction extends ActionBase implements ContainerFactoryPluginI
   /**
    * {@inheritdoc}
    */
-  public function execute($entity = NULL) {
+  public function execute($entity = NULL): void {
     if ($entity) {
       /** @var \Drupal\media\MediaInterface $entity */
       $entity->enforceMetadataUpdate();
