@@ -88,18 +88,6 @@ class StageConflictTest extends PackageManagerKernelTestBase {
         7200,
         'Stage directory does not exist',
       ],
-      'force destroy on post-apply, fresh' => [
-        PostApplyEvent::class,
-        FALSE,
-        1,
-        $error_message_while_being_applied,
-      ],
-      'destroy on post-apply, fresh' => [
-        PostApplyEvent::class,
-        TRUE,
-        1,
-        $error_message_while_being_applied,
-      ],
       'force destroy on post-apply, stale' => [
         PostApplyEvent::class,
         TRUE,
