@@ -507,12 +507,14 @@ class Container implements ContainerInterface, ResetInterface {
             // because we already checked that the parameter is not set above.
           }
 
-          // Update argument, resolving any %env()% placeholders.
-          $argument = $arguments[$key] = $this->getParameter($name);
+          // Update argument.
+          $argument = $arguments[$key] = $this->parameters[$name];
 
           // In case there is not a machine readable value (e.g. a service)
-          // behind this resolved parameter, continue.
+          // behind this resolved parameter, resolve any %env()% placeholders
+          // and continue.
           if (!($argument instanceof \stdClass)) {
+            $arguments[$key] = $this->resolveEnvParameters($argument);
             continue;
           }
 
