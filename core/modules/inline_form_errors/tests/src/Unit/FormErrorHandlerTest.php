@@ -196,7 +196,7 @@ class FormErrorHandlerTest extends UnitTestCase {
         FALSE
       );
 
-    $this->renderer->expects($this->any())
+    $this->renderer->expects($this->once())
       ->method('renderInIsolation')
       ->willReturnCallback(function ($message) {
         return $message['message']['#markup'];
