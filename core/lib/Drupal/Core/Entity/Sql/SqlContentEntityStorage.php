@@ -8,6 +8,7 @@ use Drupal\Core\Database\Connection;
 use Drupal\Core\Database\DatabaseExceptionWrapper;
 use Drupal\Core\Database\SchemaException;
 use Drupal\Core\Database\Statement\FetchAs;
+use Drupal\Core\Database\TransactionOutOfOrderException;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\ContentEntityStorageBase;
 use Drupal\Core\Entity\ContentEntityTypeInterface;
@@ -458,6 +459,13 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       $field_names = array_unique(array_merge($field_names, $this->tableMapping->getFieldNames($this->revisionTable)));
     }
 
+    $field_columns = [];
+    $definition_columns = [];
+    foreach ($field_names as $field_name) {
+      $field_columns[$field_name] = $this->tableMapping->getColumnNames($field_name);
+      $definition_columns[$field_name] = $this->fieldStorageDefinitions[$field_name]->getColumns();
+    }
+
     $values = [];
     foreach ($records as $id => $record) {
       $values[$id] = [];
@@ -465,22 +473,20 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       // field assign the value as suiting. This avoids unnecessary array
       // hierarchies and saves memory here.
       foreach ($field_names as $field_name) {
-        $field_columns = $this->tableMapping->getColumnNames($field_name);
         // Handle field types that store several properties.
-        if (count($field_columns) > 1) {
-          $definition_columns = $this->fieldStorageDefinitions[$field_name]->getColumns();
-          foreach ($field_columns as $property_name => $column_name) {
+        if (count($field_columns[$field_name]) > 1) {
+          foreach ($field_columns[$field_name] as $property_name => $column_name) {
             if (property_exists($record, $column_name)) {
-              $values[$id][$field_name][LanguageInterface::LANGCODE_DEFAULT][$property_name] = !empty($definition_columns[$property_name]['serialize']) ? $this->handleNullableFieldUnserialize($record->{$column_name}) : $record->{$column_name};
+              $values[$id][$field_name][LanguageInterface::LANGCODE_DEFAULT][$property_name] = !empty($definition_columns[$field_name][$property_name]['serialize']) ? $this->handleNullableFieldUnserialize($record->{$column_name}) : $record->{$column_name};
               unset($record->{$column_name});
             }
           }
         }
         // Handle field types that store only one property.
         else {
-          $column_name = reset($field_columns);
+          $column_name = reset($field_columns[$field_name]);
           if (property_exists($record, $column_name)) {
-            $columns = $this->fieldStorageDefinitions[$field_name]->getColumns();
+            $columns = $definition_columns[$field_name];
             $column = reset($columns);
             $values[$id][$field_name][LanguageInterface::LANGCODE_DEFAULT] = !empty($column['serialize']) ? $this->handleNullableFieldUnserialize($record->{$column_name}) : $record->{$column_name};
             unset($record->{$column_name});
@@ -579,6 +585,15 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       }
 
       $result = $query->execute();
+
+      $field_definition_columns = [];
+      $field_columns = [];
+
+      foreach ($all_fields as $field_name) {
+        $field_definition_columns[$field_name] = $this->fieldStorageDefinitions[$field_name]->getColumns();
+        $field_columns[$field_name] = $table_mapping->getColumnNames($field_name);
+      }
+
       foreach ($result as $row) {
         $id = $row[$record_key];
 
@@ -589,9 +604,8 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         $translations[$id][$langcode] = TRUE;
 
         foreach ($all_fields as $field_name) {
-          $storage_definition = $this->fieldStorageDefinitions[$field_name];
-          $definition_columns = $storage_definition->getColumns();
-          $columns = $table_mapping->getColumnNames($field_name);
+          $definition_columns = $field_definition_columns[$field_name];
+          $columns = $field_columns[$field_name];
           // Do not key single-column fields by property name.
           if (count($columns) == 1) {
             $column_name = reset($columns);
@@ -751,13 +765,19 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     try {
       $transaction = $this->database->startTransaction();
       parent::delete($entities);
+      $transaction->commitOrRelease();
 
       // Ignore replica server temporarily.
       \Drupal::service('database.replica_kill_switch')->trigger();
     }
     catch (\Exception $e) {
       if (isset($transaction)) {
-        $transaction->rollBack();
+        try {
+          $transaction->rollBack();
+        }
+        catch (TransactionOutOfOrderException $rollbackException) {
+          Error::logException(\Drupal::logger($this->entityTypeId), $rollbackException);
+        }
       }
       Error::logException(\Drupal::logger($this->entityTypeId), $e);
       throw new EntityStorageException($e->getMessage(), $e->getCode(), $e);
@@ -802,6 +822,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     try {
       $transaction = $this->database->startTransaction();
       $return = parent::save($entity);
+      $transaction->commitOrRelease();
 
       // Ignore replica server temporarily.
       \Drupal::service('database.replica_kill_switch')->trigger();
@@ -809,7 +830,12 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
     }
     catch (\Exception $e) {
       if (isset($transaction)) {
-        $transaction->rollBack();
+        try {
+          $transaction->rollBack();
+        }
+        catch (TransactionOutOfOrderException $rollbackException) {
+          Error::logException(\Drupal::logger($this->entityTypeId), $rollbackException);
+        }
       }
       Error::logException(\Drupal::logger($this->entityTypeId), $e);
       throw new EntityStorageException($e->getMessage(), $e->getCode(), $e);
@@ -853,12 +879,19 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       // Insert the entity data in the dedicated tables.
       $this->saveToDedicatedTables($entity, FALSE, []);
 
+      $transaction->commitOrRelease();
+
       // Ignore replica server temporarily.
       \Drupal::service('database.replica_kill_switch')->trigger();
     }
     catch (\Exception $e) {
       if (isset($transaction)) {
-        $transaction->rollBack();
+        try {
+          $transaction->rollBack();
+        }
+        catch (TransactionOutOfOrderException $rollbackException) {
+          Error::logException(\Drupal::logger($this->entityTypeId), $rollbackException);
+        }
       }
       Error::logException(\Drupal::logger($this->entityTypeId), $e);
       throw new EntityStorageException($e->getMessage(), $e->getCode(), $e);
@@ -1229,8 +1262,12 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
 
     $single_cardinality_fields = [];
     $multiple_cardinality_fields = [];
+    $field_definition_columns = [];
+    $field_columns = [];
 
     foreach ($storage_definitions as $field_name => $storage_definition) {
+      $field_columns[$field_name] = $this->tableMapping->getColumnNames($field_name);
+      $field_definition_columns[$field_name] = $storage_definition->getColumns();
       if ($storage_definition->getCardinality() === 1) {
         $single_cardinality_fields[$field_name] = $storage_definition;
       }
@@ -1276,6 +1313,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
       $results = $query->execute();
 
       $is_not_null = fn($value) => !is_null($value);
+
       foreach ($results as $row) {
         $row = (array) $row;
         $value_key = $row[$base_id_key];
@@ -1288,7 +1326,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
 
         foreach ($single_cardinality_fields as $field_name => $storage_definition) {
           $bundle = $this->bundleKey ? $values[$value_key][$this->bundleKey][LanguageInterface::LANGCODE_DEFAULT] : $this->entityTypeId;
-          $field_values = array_intersect_key($row, array_flip($this->tableMapping->getColumnNames($field_name)));
+          $field_values = array_intersect_key($row, array_flip($field_columns[$field_name]));
 
           // If all the field values are null, then there was no result for this
           // field.
@@ -1307,7 +1345,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
               $item = [];
               // For each column declared by the field, populate the item from
               // the prefixed database column.
-              foreach ($storage_definition->getColumns() as $column => $attributes) {
+              foreach ($field_definition_columns[$field_name] as $column => $attributes) {
                 $column_name = $table_mapping->getFieldColumnName($storage_definition, $column);
                 // Unserialize the value if specified in the column schema.
                 $item[$column] = (!empty($attributes['serialize'])) ? $this->handleNullableFieldUnserialize($row[$column_name]) : $row[$column_name];
@@ -1332,7 +1370,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
         else {
           $query->leftJoin($table, $table, "[$table].[$id_key] = [$base_table].[$base_id_key] AND [$table].[deleted] = 0");
         }
-        $query->fields($table, $this->tableMapping->getColumnNames($field_name));
+        $query->fields($table, $field_columns[$field_name]);
         $delta_keys[$field_name] = $query->addField($table, 'delta', $field_name . '_delta');
       }
 
@@ -1368,7 +1406,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
               $item = [];
               // For each column declared by the field, populate the item from
               // the prefixed database column.
-              foreach ($storage_definition->getColumns() as $column => $attributes) {
+              foreach ($field_definition_columns[$field_name] as $column => $attributes) {
                 $column_name = $table_mapping->getFieldColumnName($storage_definition, $column);
                 // Unserialize the value if specified in the column schema.
                 $item[$column] = (!empty($attributes['serialize'])) ? $this->handleNullableFieldUnserialize($row[$column_name]) : $row[$column_name];
@@ -1813,7 +1851,7 @@ class SqlContentEntityStorage extends ContentEntityStorageBase implements SqlEnt
           $item_row['entity_type'] = $this->entityTypeId;
           // @todo Replace this by an entity object created via an entity
           //   factory. https://www.drupal.org/node/1867228.
-          $entities[$item_row['revision_id']] = _field_create_entity_from_ids((object) $item_row);
+          $entities[$item_row['revision_id']] = $this->createEntityFromIds($item_row);
         }
         $item = [];
         foreach ($column_map as $db_column => $field_column) {

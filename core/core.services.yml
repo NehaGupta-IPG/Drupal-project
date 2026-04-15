@@ -73,6 +73,11 @@ parameters:
       - json
     theme:
       - json
+  # Can be argon2i, argon2id or 2y (bcrypt). Setting to NULL (~) will use PASSWORD_DEFAULT.
+  # See https://www.php.net/password_hash
+  password.algorithm: argon2id
+  # Options passed to password_hash. See https://www.php.net/password_hash
+  password.options: []
 services:
   _defaults:
     autoconfigure: true
@@ -1169,11 +1174,17 @@ services:
   Drupal\Core\Routing\MatcherDumperInterface: '@router.dumper'
   router.builder:
     class: Drupal\Core\Routing\RouteBuilder
-    arguments: ['@router.dumper', '@lock', '@event_dispatcher', '@module_handler', '@controller_resolver', '@access_manager.check_provider']
+    arguments: ['@router.dumper', '@lock', '@event_dispatcher', '@access_manager.check_provider']
     lazy: true
     tags:
       - { name: needs_destruction }
   Drupal\Core\Routing\RouteBuilderInterface: '@router.builder'
+  router.builder.attributes:
+    class: Drupal\Core\Routing\AttributeRouteDiscovery
+    arguments: ['@container.namespaces']
+  router.builder.yaml:
+    class: Drupal\Core\Routing\YamlRouteDiscovery
+    arguments: ['@module_handler', '@controller_resolver']
   menu.rebuild_subscriber:
     class: Drupal\Core\EventSubscriber\MenuRouterRebuildSubscriber
     arguments: ['@lock', '@plugin.manager.menu.link', '@database', '@database.replica_kill_switch', '@logger.channel.menu']
@@ -1187,6 +1198,7 @@ services:
   Drupal\Core\Path\PathValidatorInterface: '@path.validator'
   password:
     class: Drupal\Core\Password\PhpPassword
+    arguments: ['%password.algorithm%', '%password.options%']
   Drupal\Core\Password\PasswordInterface: '@password'
   password_generator:
     class: Drupal\Core\Password\DefaultPasswordGenerator
@@ -1480,14 +1492,11 @@ services:
     class: Drupal\Core\EventSubscriber\EnforcedFormResponseSubscriber
   route_processor_manager:
     class: Drupal\Core\RouteProcessor\RouteProcessorManager
-    tags:
-      - { name: service_collector, tag: route_processor_outbound, call: addOutbound }
+    autowire: true
   Drupal\Core\RouteProcessor\OutboundRouteProcessorInterface: '@route_processor_manager'
   path_processor_manager:
     class: Drupal\Core\PathProcessor\PathProcessorManager
-    tags:
-      - { name: service_collector, tag: path_processor_inbound, call: addInbound }
-      - { name: service_collector, tag: path_processor_outbound, call: addOutbound }
+    autowire: true
   Drupal\Core\PathProcessor\InboundPathProcessorInterface: '@path_processor_manager'
   Drupal\Core\PathProcessor\OutboundPathProcessorInterface: '@path_processor_manager'
   path_processor_decode:
@@ -1718,7 +1727,7 @@ services:
   Drupal\Core\Session\WriteSafeSessionHandlerInterface: '@session_handler.write_safe'
   session_manager:
     class: Drupal\Core\Session\SessionManager
-    arguments: ['@request_stack', '@session_handler', '@session_manager.metadata_bag', '@session_configuration', '@datetime.time', '@Drupal\Core\Session\UserSessionRepositoryInterface']
+    arguments: ['@request_stack', '@session_handler', '@session_manager.metadata_bag', '@session_configuration', '@datetime.time']
   Drupal\Core\Session\SessionManagerInterface: '@session_manager'
   session_manager.metadata_bag:
     class: Drupal\Core\Session\MetadataBag
@@ -1801,6 +1810,9 @@ services:
     arguments: ['@plugin.manager.sdc', '@Drupal\Core\Theme\Component\ComponentValidator']
     tags:
       - { name: twig.extension, priority: 101 }
+  Twig\Extra\Html\HtmlExtension:
+    tags:
+      - { name: twig.extension, priority: 101 }
   Drupal\Core\Template\IconsTwigExtension:
     arguments: ['@plugin.manager.icon_pack']
     tags:
@@ -1848,16 +1860,12 @@ services:
   Drupal\Core\File\HtaccessWriterInterface: '@file.htaccess_writer'
   file.mime_type.guesser:
     class: Drupal\Core\File\MimeType\MimeTypeGuesser
-    arguments: ['@stream_wrapper_manager']
-    tags:
-      - { name: service_collector, tag: mime_type_guesser, call: addMimeTypeGuesser }
-    lazy: true
+    arguments: ['@stream_wrapper_manager', !tagged_iterator mime_type_guesser]
   file.mime_type.guesser.extension:
     class: Drupal\Core\File\MimeType\ExtensionMimeTypeGuesser
     arguments: ['@Drupal\Core\File\MimeType\MimeTypeMapInterface']
     tags:
       - { name: mime_type_guesser }
-    lazy: true
   Drupal\Core\File\MimeType\MimeTypeMapFactory:
     autowire: true
     public: false
@@ -1975,7 +1983,6 @@ services:
   Drupal\Core\Template\Loader\ComponentLoader:
     arguments:
       - '@plugin.manager.sdc'
-      - '@logger.channel.default'
     tags:
       - { name: twig.loader, priority: 5 }
   Drupal\Core\EventSubscriber\CsrfExceptionSubscriber: ~
@@ -1997,7 +2004,7 @@ services:
     class: Drupal\Core\Theme\Icon\IconExtractorPluginManager
     parent: default_plugin_manager
     arguments: ['@plugin_form.factory']
-  Drupal\Core\Theme\Icon\IconExtractorInterface: '@plugin.manager.icon_extractor'
+  Drupal\Core\Theme\Icon\IconExtractorPluginManager: '@plugin.manager.icon_extractor'
   Drupal\Core\Theme\Icon\IconFinder:
     autowire: true
     arguments:

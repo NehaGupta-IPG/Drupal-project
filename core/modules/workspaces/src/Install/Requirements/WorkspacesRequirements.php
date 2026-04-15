@@ -9,11 +9,18 @@ use Drupal\Core\Extension\Requirement\RequirementSeverity;
 
 /**
  * Install time requirements for the workspaces module.
+ *
+ * @phpstan-import-type RequirementInfo from \Drupal\Core\Extension\InstallRequirementsInterface
  */
 class WorkspacesRequirements implements InstallRequirementsInterface {
 
   /**
-   * {@inheritdoc}
+   * Check installation requirements.
+   *
+   * @return array{}|array{'workspace_incompatibility': RequirementInfo}
+   *   The module's requirements.
+   *
+   * @see \Drupal\Core\Extension\InstallRequirementsInterface::getRequirements()
    */
   public static function getRequirements(): array {
     $requirements = [];

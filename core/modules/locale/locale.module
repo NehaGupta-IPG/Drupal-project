@@ -19,6 +19,7 @@ use Drupal\locale\LocaleDefaultOptions;
 use Drupal\locale\LocaleEvent;
 use Drupal\locale\LocaleEvents;
 use Drupal\locale\LocaleFetch;
+use Drupal\locale\File\LocaleFileManager;
 use Drupal\locale\LocaleSource;
 
 /**
@@ -277,7 +278,7 @@ function locale_system_remove($components): void {
       locale_translation_file_history_delete($list);
 
       // Remove translation files.
-      locale_translate_delete_translation_files($list, []);
+      \Drupal::service(LocaleFileManager::class)->deleteTranslationFiles($list, []);
 
       // Remove translatable projects.
       // Follow-up issue https://www.drupal.org/node/1842362 to replace the
@@ -420,8 +421,14 @@ function locale_is_translatable($langcode) {
  * Clears the translation status when the Interface translations directory
  * changes. Without a translations directory local po files in the directory
  * should be ignored. The old translation status is no longer valid.
+ *
+ * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There is no
+ *   replacement.
+ *
+ * @see https://www.drupal.org/node/3571594
  */
 function locale_system_file_system_settings_submit(&$form, FormStateInterface $form_state): void {
+  @trigger_error(__FUNCTION__ . 'is deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3571594', E_USER_DEPRECATED);
   if ($form['translation_path']['#default_value'] != $form_state->getValue('translation_path')) {
     locale_translation_clear_status();
   }
@@ -443,7 +450,7 @@ function locale_translation_get_file_history() {
   if (empty($history)) {
     // Get file history from the database.
     $result = \Drupal::database()->select('locale_file')
-      ->fields('locale_file', ['project', 'langcode', 'filename', 'version', 'uri', 'timestamp', 'last_checked'])
+      ->fields('locale_file', ['project', 'langcode', 'filename', 'version', 'uri', 'timestamp', 'hash', 'last_checked'])
       ->execute()
       ->fetchAll();
     foreach ($result as $file) {
@@ -472,6 +479,7 @@ function locale_translation_update_file_history($file) {
     ->fields([
       'version' => $file->version,
       'timestamp' => $file->timestamp,
+      'hash' => $file->hash ?? '',
       'last_checked' => $file->last_checked,
     ])
     ->execute();
@@ -557,7 +565,6 @@ function locale_translation_status_save($project, $langcode, $type, $data): void
     $request_time = \Drupal::time()->getRequestTime();
     switch ($type) {
       case LOCALE_TRANSLATION_REMOTE:
-      case LOCALE_TRANSLATION_LOCAL:
         // Add the source data to the status array.
         $status[$project][$langcode]->files[$type] = $data;
 
@@ -572,9 +579,38 @@ function locale_translation_status_save($project, $langcode, $type, $data): void
         }
         break;
 
+      case LOCALE_TRANSLATION_LOCAL:
+        // Add the source data to the status array.
+        $status[$project][$langcode]->files[$type] = $data;
+
+        // Determine if the translation source has changed by comparing by
+        // content hash (mtime is unreliable).
+        $current_hash = $status[$project][$langcode]->hash ?? '';
+        if (!empty($current_hash)) {
+          if ($data->hash !== $current_hash) {
+            $status[$project][$langcode]->timestamp = $data->timestamp;
+            $status[$project][$langcode]->last_checked = $request_time;
+            $status[$project][$langcode]->type = $type;
+            $status[$project][$langcode]->hash = $data->hash;
+          }
+        }
+        // For legacy rows (pre-hash column being added), fall back to timestamp
+        // comparison. This may trigger a one-time re-import, after which a hash
+        // is stored and used for all future comparisons.
+        elseif (isset($data->timestamp) && $data->timestamp) {
+          if ($data->timestamp > $status[$project][$langcode]->timestamp) {
+            $status[$project][$langcode]->timestamp = $data->timestamp;
+            $status[$project][$langcode]->last_checked = $request_time;
+            $status[$project][$langcode]->type = $type;
+            $status[$project][$langcode]->hash = $data->hash;
+          }
+        }
+        break;
+
       case LOCALE_TRANSLATION_CURRENT:
         $data->last_checked = $request_time;
         $status[$project][$langcode]->timestamp = $data->timestamp;
+        $status[$project][$langcode]->hash = $data->hash ?? '';
         $status[$project][$langcode]->last_checked = $data->last_checked;
         $status[$project][$langcode]->type = $type;
         locale_translation_update_file_history($data);
