@@ -48,7 +48,7 @@ class FormErrorHandlerTest extends UnitTestCase {
     $container->set('messenger', $this->messenger);
     \Drupal::setContainer($container);
 
-    $this->formErrorHandler = new FormErrorHandler();
+    $this->formErrorHandler = new FormErrorHandler($this->renderer, $this->messenger);
   }
 
   /**
