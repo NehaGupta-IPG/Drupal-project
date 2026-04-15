@@ -406,6 +406,8 @@ class EntityLinkSuggestionTest extends KernelTestBase {
     $editor = Editor::load('test_format');
     $controller = EntityLinkSuggestionsController::create($this->container);
 
+    // Simulate an autocomplete request as sent by the CKEditor frontend.
+    // The URL path is irrelevant in a kernel test (no HTTP routing occurs).
     $request = Request::create('/irrelevant-in-kernel-test');
     $request->query->set('q', 'Test Node');
     $request->query->set('hostEntityTypeId', 'node');
