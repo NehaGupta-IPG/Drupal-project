@@ -327,7 +327,7 @@ class Container implements ContainerInterface, ResetInterface {
       throw new ParameterNotFoundException($name, NULL, NULL, NULL, $this->getParameterAlternatives($name));
     }
 
-    return $this->parameters[$name];
+    return $this->resolveEnvParameters($this->parameters[$name]);
   }
 
   /**
@@ -346,6 +346,110 @@ class Container implements ContainerInterface, ResetInterface {
     }
 
     $this->parameters[$name] = $value;
+  }
+
+  /**
+   * Resolves %env(...)% placeholders in a parameter value.
+   *
+   * @param mixed $value
+   *   The parameter value to resolve.
+   *
+   * @return mixed
+   *   The resolved value.
+   */
+  protected function resolveEnvParameters(mixed $value): mixed {
+    if (is_array($value)) {
+      $resolved = [];
+      foreach ($value as $k => $v) {
+        $resolved[$k] = $this->resolveEnvParameters($v);
+      }
+      return $resolved;
+    }
+    if (!is_string($value) || !str_contains($value, '%env(')) {
+      return $value;
+    }
+    // Full match: the entire value is a single %env(...)% reference.
+    // This preserves non-string types (int, bool) from env processors.
+    if (preg_match('/^%env\(([^)]+)\)%$/', $value, $matches)) {
+      return $this->resolveEnvVar($matches[1]);
+    }
+    // Partial match: env references embedded in a larger string.
+    return preg_replace_callback('/%env\(([^)]+)\)%/', function ($matches) {
+      return (string) $this->resolveEnvVar($matches[1]);
+    }, $value);
+  }
+
+  /**
+   * Resolves an environment variable specification.
+   *
+   * Handles processor prefixes like string:, int:, bool:, default:, resolve:.
+   *
+   * @param string $spec
+   *   The env var specification (e.g., 'FOO', 'int:FOO',
+   *   'default:param:FOO').
+   *
+   * @return mixed
+   *   The resolved value.
+   */
+  protected function resolveEnvVar(string $spec): mixed {
+    $i = strpos($spec, ':');
+    if ($i !== FALSE) {
+      $prefix = substr($spec, 0, $i);
+      $rest = substr($spec, $i + 1);
+
+      return match ($prefix) {
+        'string' => (string) $this->resolveEnvVar($rest),
+        'int' => (int) $this->resolveEnvVar($rest),
+        'bool' => filter_var($this->resolveEnvVar($rest), FILTER_VALIDATE_BOOLEAN),
+        'default' => $this->resolveEnvDefault($rest),
+        'resolve' => $this->resolveEnvParameters($this->getEnvValue($rest)),
+        default => $this->getEnvValue($spec),
+      };
+    }
+    return $this->getEnvValue($spec);
+  }
+
+  /**
+   * Handles the default: env processor.
+   *
+   * @param string $rest
+   *   The specification after 'default:', e.g., 'param_name:ENV_VAR'.
+   *
+   * @return mixed
+   *   The env var value if set, otherwise the default parameter value.
+   */
+  protected function resolveEnvDefault(string $rest): mixed {
+    $colonPos = strpos($rest, ':');
+    $defaultParam = substr($rest, 0, $colonPos);
+    $envName = substr($rest, $colonPos + 1);
+    $envValue = $_ENV[$envName] ?? $_SERVER[$envName] ?? NULL;
+    if ($envValue !== NULL && $envValue !== '') {
+      return $envValue;
+    }
+    return $this->getParameter($defaultParam);
+  }
+
+  /**
+   * Gets the raw value of an environment variable.
+   *
+   * Checks $_ENV and $_SERVER, then falls back to env(NAME) parameters
+   * which serve as default values in the container definition.
+   *
+   * @param string $name
+   *   The environment variable name.
+   *
+   * @return mixed
+   *   The environment variable value, or NULL if not found.
+   */
+  protected function getEnvValue(string $name): mixed {
+    $value = $_ENV[$name] ?? $_SERVER[$name] ?? NULL;
+    if ($value === NULL) {
+      $envParamKey = 'env(' . $name . ')';
+      if (\array_key_exists($envParamKey, $this->parameters)) {
+        return $this->resolveEnvParameters($this->parameters[$envParamKey]);
+      }
+    }
+    return $value;
   }
 
   /**
@@ -384,6 +488,11 @@ class Container implements ContainerInterface, ResetInterface {
 
     // Process the arguments.
     foreach ($arguments as $key => $argument) {
+      // Resolve %env(...)% placeholders in plain string arguments.
+      if (is_string($argument) && str_contains($argument, '%env(')) {
+        $arguments[$key] = $this->resolveEnvParameters($argument);
+        continue;
+      }
       // For this machine-optimized format, only \stdClass arguments are
       // processed and resolved. All other values are kept as is.
       if ($argument instanceof \stdClass) {
@@ -398,8 +507,8 @@ class Container implements ContainerInterface, ResetInterface {
             // because we already checked that the parameter is not set above.
           }
 
-          // Update argument.
-          $argument = $arguments[$key] = $this->parameters[$name];
+          // Update argument, resolving any %env()% placeholders.
+          $argument = $arguments[$key] = $this->getParameter($name);
 
           // In case there is not a machine readable value (e.g. a service)
           // behind this resolved parameter, continue.

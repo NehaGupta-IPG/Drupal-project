@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\DependencyInjection;
 
 use Drupal\container_env_test\TestService;
+use Drupal\Core\DrupalKernel;
 use Drupal\KernelTests\KernelTestBase;
+use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -59,6 +61,33 @@ class EnvironmentVariableTest extends KernelTestBase {
     $service = \Drupal::service(TestService::class);
     $this->assertInstanceOf(TestService::class, $service);
     $this->assertSame('test-variable', $service->parameter);
+  }
+
+  /**
+   * Tests container caching with environment variables.
+   */
+  public function testDumpedContainer(): void {
+    // Create a kernel suitable for testing.
+    $kernel = new DrupalKernel('test', $this->classLoader, TRUE, $this->root);
+    $kernel->setSitePath(vfsStream::url('root/sites/default'));
+    $kernel->boot();
+
+    $container = $kernel->getContainer();
+
+    $this->assertSame('test-variable', $container->getParameter('container_env_test'));
+
+    // Ensure the cached container does not contain the resolved environment
+    // variable.
+    $cached_definition = $kernel->getCachedContainerDefinition();
+    $this->assertSame('%env(CONTAINER_ENV_TEST)%', $cached_definition['parameters']['container_env_test']);
+
+    $_ENV['CONTAINER_ENV_TEST'] = 'another-variable';
+    $kernel = new DrupalKernel('test', $this->classLoader, TRUE, $this->root);
+    $kernel->setSitePath(vfsStream::url('root/sites/default'));
+    $kernel->boot();
+    $container = $kernel->getContainer();
+
+    $this->assertSame('another-variable', $container->getParameter('container_env_test'));
   }
 
 }

@@ -1040,6 +1040,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         $dumper = new $this->phpArrayDumperClass($container);
         $container_definition = $dumper->getArray();
       }
+      else {
+        $container->drupalResolveEnvParameters();
+      }
     }
 
     // The container was rebuilt successfully.
@@ -1537,7 +1540,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     $container->setParameter('app.root', $this->getAppRoot());
     $container->setParameter('site.path', $this->getSitePath());
 
-    $container->compile(TRUE);
+    $container->compile();
     return $container;
   }
 
