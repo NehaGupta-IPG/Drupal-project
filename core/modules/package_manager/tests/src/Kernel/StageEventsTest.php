@@ -79,7 +79,20 @@ class StageEventsTest extends PackageManagerKernelTestBase implements EventSubsc
       PreCreateEvent::class => 'handleEvent',
       PostCreateEvent::class => 'handleEvent',
       PreRequireEvent::class => 'handleEvent',
-      PostRequireEvent::class => 'handleEvent',StageEventsTest
+      PostRequireEvent::class => 'handleEvent',
+      PreApplyEvent::class => 'handleEvent',
+      PostApplyEvent::class => 'handleEvent',
+    ];
+  }
+
+  /**
+   * Handles a stage life cycle event.
+   *
+   * @param \Drupal\package_manager\Event\SandboxEvent $event
+   *   The event object.
+   */
+  public function handleEvent(SandboxEvent $event): void {
+    $this->events[] = get_class($event);
 
     // The event should have a reference to the stage which fired it.
     $this->assertSame($event->sandboxManager, $this->stage);
