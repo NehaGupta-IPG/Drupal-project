@@ -20,18 +20,22 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 class BundleConstraint extends SymfonyConstraint {
 
   /**
-   * The default violation message.
-   *
-   * @var string
-   */
-  public $message = 'The entity must be of bundle %bundle.';
-
-  /**
    * The bundle option.
    *
    * @var string|array
    */
   public $bundle;
+
+  public function __construct(
+    mixed $options = NULL,
+    string|array|null $bundle = NULL,
+    public $message = 'The entity must be of bundle %bundle.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct($options, $groups, $payload);
+    $this->bundle = $bundle ?? $this->bundle;
+  }
 
   /**
    * Gets the bundle option as array.

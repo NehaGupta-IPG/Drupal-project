@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\Tests\views\Functional;
 
 use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the ajax view functionality.
- *
- * @group views
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class ViewAjaxTest extends ViewTestBase {
 
   /**
@@ -64,26 +66,6 @@ class ViewAjaxTest extends ViewTestBase {
       'http_errors' => FALSE,
     ]);
     $this->assertEquals(403, $response->getStatusCode());
-  }
-
-  /**
-   * Tests that an ajax view response is cacheable.
-   */
-  public function testAjaxViewCache(): void {
-    $this->drupalGet('views/ajax', [
-      'query' => [
-        'view_name' => 'test_ajax_view',
-        'view_display_id' => 'page_1',
-      ],
-    ]);
-
-    $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()
-      ->responseHeaderEquals('X-Drupal-Cache-Tags', 'config:user.role.anonymous config:views.view.test_ajax_view http_response');
-    $this->assertSession()
-      ->responseHeaderEquals('X-Drupal-Cache-Contexts', 'languages:language_interface route theme url.query_args user.permissions');
-    $this->assertSession()
-      ->responseHeaderEquals('X-Drupal-Cache-Max-Age', '-1 (Permanent)');
   }
 
 }

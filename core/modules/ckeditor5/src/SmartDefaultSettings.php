@@ -76,7 +76,7 @@ final class SmartDefaultSettings {
   }
 
   /**
-   * Computes the closest possible equivalent settings for switching to CKEditor 5.
+   * Computes the closest equivalent settings for switching to CKEditor 5.
    *
    * @param \Drupal\editor\EditorInterface|null $text_editor
    *   The editor being reconfigured for CKEditor 5; infer the settings based on
@@ -765,7 +765,10 @@ final class SmartDefaultSettings {
         $plugin_definition = $this->pluginManager->getDefinition($plugin_id);
         assert($plugin_definition instanceof CKEditor5PluginDefinition);
         if ($plugin_definition->hasToolbarItems()) {
-          $prospective_editor_settings['toolbar']['items'] = [...$prospective_editor_settings['toolbar']['items'], ...array_keys($plugin_definition->getToolbarItems())];
+          $prospective_editor_settings['toolbar']['items'] = [
+            ...$prospective_editor_settings['toolbar']['items'],
+            ...array_keys($plugin_definition->getToolbarItems()),
+          ];
         }
         if ($plugin_definition->isConfigurable()) {
           $prospective_editor_settings['plugins'][$plugin_id] = $this->pluginManager->createInstance($plugin_id)->defaultConfiguration();
