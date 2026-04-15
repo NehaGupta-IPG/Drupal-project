@@ -41,10 +41,12 @@ use Drupal\field\FieldStorageConfigStorage;
   ],
   constraints: [
     'ImmutableProperties' => [
-      'id',
-      'entity_type',
-      'field_name',
-      'type',
+      'properties' => [
+        'id',
+        'entity_type',
+        'field_name',
+        'type',
+      ],
     ],
   ],
   config_export: [
@@ -780,7 +782,7 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
   /**
    * {@inheritdoc}
    */
-  public function getPropertyDefinition($name) {
+  public function getPropertyDefinition(string $name) {
     if (!isset($this->propertyDefinitions)) {
       $this->getPropertyDefinitions();
     }

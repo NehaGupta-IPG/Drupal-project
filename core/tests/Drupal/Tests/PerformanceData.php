@@ -59,7 +59,7 @@ class PerformanceData {
   /**
    * List of cids keyed by operation and bin.
    *
-   * @var string[][]
+   * @var string[][][]
    */
   protected array $cacheOperations = [];
 
@@ -138,7 +138,7 @@ class PerformanceData {
    * @param int $count
    *   The number of script requests recorded.
    */
-  public function setScriptCount(int $count) {
+  public function setScriptCount(int $count): void {
     $this->scriptCount = $count;
   }
 
@@ -226,7 +226,7 @@ class PerformanceData {
   /**
    * Sets the cache operations.
    *
-   * @param string[][] $cacheOperations
+   * @param string[][][] $cacheOperations
    *   List of cids keyed by operation and bin.
    *
    * @return void
@@ -253,7 +253,7 @@ class PerformanceData {
    *   Count of cache get operations keyed by bin.
    */
   public function getCacheGetCountByBin(): array {
-    return array_map(fn (array $cids) => count($cids), $this->cacheOperations['get'] ?? []);
+    return array_map(fn (array $cids): int => count($cids), $this->cacheOperations['get'] ?? []);
   }
 
   /**
@@ -263,7 +263,7 @@ class PerformanceData {
    *   Count of cache set operations keyed by bin.
    */
   public function getCacheSetCountByBin(): array {
-    return array_map(fn (array $cids) => count($cids), $this->cacheOperations['set'] ?? []);
+    return array_map(fn (array $cids): int => count($cids), $this->cacheOperations['set'] ?? []);
   }
 
   /**
@@ -273,7 +273,7 @@ class PerformanceData {
    *   Count of cache delete operations keyed by bin.
    */
   public function getCacheDeleteCountByBin(): array {
-    return array_map(fn (array $cids) => count($cids), $this->cacheOperations['delete'] ?? []);
+    return array_map(fn (array $cids): int => count($cids), $this->cacheOperations['delete'] ?? []);
   }
 
   /**
@@ -327,23 +327,6 @@ class PerformanceData {
   }
 
   /**
-   * Gets the cache tag checksum count.
-   *
-   * @return int
-   *   The number of cache tag checksum checks recorded.
-   *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is
-   *   no direct replacement.
-   *
-   * @see https://www.drupal.org/node/3511149
-   */
-  public function getCacheTagChecksumCount(): int {
-    @trigger_error(__METHOD__ . 'is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3511149', E_DEPRECATED);
-
-    return $this->cacheTagChecksumCount;
-  }
-
-  /**
    * Sets the cache tag isValid count.
    *
    * @param int $count
@@ -351,22 +334,6 @@ class PerformanceData {
    */
   public function setCacheTagIsValidCount(int $count): void {
     $this->cacheTagIsValidCount = $count;
-  }
-
-  /**
-   * Gets the cache tag isValid count.
-   *
-   * @return int
-   *   The number of cache tag isValid checks recorded.
-   *
-   * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is
-   * no direct replacement.
-   *
-   * @see https://www.drupal.org/node/3511149
-   */
-  public function getCacheTagIsValidCount(): int {
-    @trigger_error(__METHOD__ . 'is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no direct replacement. See https://www.drupal.org/node/3511149', E_DEPRECATED);
-    return $this->cacheTagIsValidCount;
   }
 
   /**

@@ -8,8 +8,8 @@
  * a cached page are instead located in bootstrap.inc.
  */
 
-use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Cache\CacheTagsPurgeInterface;
 use Drupal\Core\DrupalKernel;
 
 /**
@@ -52,16 +52,6 @@ const SAVED_NEW = 1;
  * Return status for saving which involved an update to an existing item.
  */
 const SAVED_UPDATED = 2;
-
-/**
- * Return status for saving which deleted an existing item.
- *
- * @deprecated in drupal:11.2.0 and is removed from drupal:12.0.0.
- *   There is no replacement.
- *
- * @see https://www.drupal.org/node/3328750
- */
-const SAVED_DELETED = 3;
 
 /**
  * The default aggregation group for CSS files added to the page.
@@ -418,6 +408,13 @@ function drupal_flush_all_caches($kernel = NULL): void {
   $module_handler = \Drupal::moduleHandler();
   // Flush all persistent caches.
   $module_handler->invokeAll('cache_flush');
+  // Purge cache tags immediately before flushing cache bins. If a cache tag is
+  // invalidated between the tags being purged and cache bins are flushed, then
+  // it will be included in the checksum of any new cache items, but still valid
+  // because the tag was written before the creation of cache item.
+  if (($invalidator = \Drupal::service('cache_tags.invalidator')) && ($invalidator instanceof CacheTagsPurgeInterface)) {
+    $invalidator->purge();
+  }
   foreach (Cache::getBins() as $cache_backend) {
     $cache_backend->deleteAll();
   }
@@ -433,9 +430,8 @@ function drupal_flush_all_caches($kernel = NULL): void {
   // Wipe the Twig PHP Storage cache.
   \Drupal::service('twig')->invalidate();
 
-  // Rebuild profile, profile, theme_engine and theme data.
+  // Rebuild profile and theme data.
   \Drupal::service('extension.list.profile')->reset();
-  \Drupal::service('extension.list.theme_engine')->reset();
   \Drupal::service('theme_handler')->refreshInfo();
   // In case the active theme gets requested later in the same request we need
   // to reset the theme manager.
@@ -471,52 +467,4 @@ function drupal_flush_all_caches($kernel = NULL): void {
     \Drupal::theme()->resetActiveTheme();
     drupal_maintenance_theme();
   }
-}
-
-/**
- * Assembles the Drupal Updater registry.
- *
- * An Updater is a class that knows how to update various parts of the Drupal
- * file system, for example to update modules that have newer releases, or to
- * install a new theme.
- *
- * @return array
- *   The Drupal Updater class registry.
- *
- * @see \Drupal\Core\Updater\Updater
- * @see hook_updater_info()
- * @see hook_updater_info_alter()
- */
-function drupal_get_updaters() {
-  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
-
-  $updaters = &drupal_static(__FUNCTION__);
-  if (!isset($updaters)) {
-    $updaters = \Drupal::moduleHandler()->invokeAllDeprecated('There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', 'updater_info');
-    \Drupal::moduleHandler()->alterDeprecated('There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', 'updater_info', $updaters);
-    uasort($updaters, [SortArray::class, 'sortByWeightElement']);
-  }
-  return $updaters;
-}
-
-/**
- * Assembles the Drupal FileTransfer registry.
- *
- * @return array
- *   The Drupal FileTransfer class registry.
- *
- * @see \Drupal\Core\FileTransfer\FileTransfer
- * @see hook_filetransfer_info()
- * @see hook_filetransfer_info_alter()
- */
-function drupal_get_filetransfer_info() {
-  @trigger_error(__METHOD__ . '() is deprecated in drupal:11.2.0 and is removed from drupal:12.0.0. There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', E_USER_DEPRECATED);
-
-  $info = &drupal_static(__FUNCTION__);
-  if (!isset($info)) {
-    $info = \Drupal::moduleHandler()->invokeAllDeprecated('There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', 'filetransfer_info');
-    \Drupal::moduleHandler()->alterDeprecated('There is no replacement. Use composer to manage the code for your site. See https://www.drupal.org/node/3512364', 'filetransfer_info', $info);
-    uasort($info, [SortArray::class, 'sortByWeightElement']);
-  }
-  return $info;
 }
