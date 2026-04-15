@@ -353,7 +353,7 @@ EOS;
     $function_name = $reflection_method->getName();
 
     if (!$reflection_method->isStatic()) {
-      if ($reflection_method->getReturnType() && $this->buildType($reflection_method->getReturnType(), $reflection_method->getDeclaringClass()) === 'void') {
+      if ($reflection_method->getReturnType() instanceof \ReflectionNamedType && $reflection_method->getReturnType()->getName() === 'void') {
         $output .= '    $this->lazyLoadItself()->' . $function_name . '(';
       }
       else {
