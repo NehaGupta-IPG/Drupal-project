@@ -2,6 +2,8 @@
 
 namespace Drupal\Component\Plugin\Attribute;
 
+use Drupal\Component\Plugin\Definition\PluginDefinitionInterface;
+
 /**
  * Provides a base class for classed attributes.
  */
@@ -91,6 +93,7 @@ abstract class AttributeBase implements AttributeInterface {
    * {@inheritdoc}
    */
   public function get(): array|object {
+  public function get(): array|PluginDefinitionInterface {
     return array_filter(get_object_vars($this) + [
       'class' => $this->getClass(),
       'provider' => $this->getProvider(),

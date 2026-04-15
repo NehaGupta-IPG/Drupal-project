@@ -356,26 +356,17 @@ class DefaultPluginManager extends PluginManagerBase implements PluginManagerInt
   /**
    * Extracts the provider from a plugin definition.
    *
-   * @param mixed $plugin_definition
-   *   The plugin definition. Usually either an array or an instance of
-   *   \Drupal\Component\Plugin\Definition\PluginDefinitionInterface.
+   * @param array|\Drupal\Component\Plugin\Definition\PluginDefinitionInterface $plugin_definition
+   *   The plugin definition.
    *
    * @return string|null
    *   The provider string, if it exists. NULL otherwise.
    */
-  protected function extractProviderFromDefinition($plugin_definition) {
+  protected function extractProviderFromDefinition(array|PluginDefinitionInterface $plugin_definition): ?string {
     if ($plugin_definition instanceof PluginDefinitionInterface) {
       return $plugin_definition->getProvider();
     }
-
-    // Attempt to convert the plugin definition to an array.
-    if (is_object($plugin_definition)) {
-      $plugin_definition = (array) $plugin_definition;
-    }
-
-    if (isset($plugin_definition['provider'])) {
-      return $plugin_definition['provider'];
-    }
+    return $plugin_definition['provider'] ?? NULL;
   }
 
   /**
