@@ -9,7 +9,7 @@ use Drupal\Tests\BrowserTestBase;
 /**
  * Validation test for inline_form_errors.
  *
- * @group inline_form_errors
+ * @phpstan-ignore testClass.missingAttribute.Group, testClass.missingAttribute.RunInSeparateProcesses
  */
 class InlineErrorFormTest extends BrowserTestBase {
 
