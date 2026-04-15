@@ -15,6 +15,7 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\image\ImageDerivativeUtilities;
 use Drupal\media\MediaAccessControlHandler;
 use Drupal\media\MediaForm;
 use Drupal\media\MediaInterface;
@@ -189,7 +190,7 @@ class Media extends EditorialContentEntityBase implements MediaInterface {
     $this->thumbnail->height = $this->getThumbnailHeight($from_queue);
 
     // Flush related image styles.
-    image_path_flush($thumbnail_uri);
+    \Drupal::service(ImageDerivativeUtilities::class)->pathFlush($thumbnail_uri);
 
     // Set the thumbnail alt.
     $media_source = $this->getSource();
