@@ -90,13 +90,13 @@ class StageConflictTest extends PackageManagerKernelTestBase {
       ],
       'force destroy on post-apply, fresh' => [
         PostApplyEvent::class,
-        TRUE,
+        FALSE,
         1,
         $error_message_while_being_applied,
       ],
       'destroy on post-apply, fresh' => [
         PostApplyEvent::class,
-        FALSE,
+        TRUE,
         1,
         $error_message_while_being_applied,
       ],
