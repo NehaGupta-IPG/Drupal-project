@@ -7,12 +7,14 @@ namespace Drupal\KernelTests\Core\DependencyInjection;
 use Drupal\container_env_test\TestEnum;
 use Drupal\container_env_test\TestService;
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests integration of the container with environment variables.
- *
- * @group DependencyInjection
  */
+#[Group('DependencyInjection')]
+#[RunTestsInSeparateProcesses]
 class EnvironmentVariableTest extends KernelTestBase {
 
   /**
@@ -20,6 +22,9 @@ class EnvironmentVariableTest extends KernelTestBase {
    */
   protected static $modules = ['container_env_test'];
 
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp(): void {
     $_ENV['CONTAINER_ENV_TEST'] = 'test-variable';
     $_ENV['CONTAINER_ENV_TEST_WITH_DEFAULT2'] = 'override-default';
@@ -30,6 +35,9 @@ class EnvironmentVariableTest extends KernelTestBase {
     parent::setUp();
   }
 
+  /**
+   * Tests the environment variable integration.
+   */
   public function testEnvironmentVariable(): void {
     $this->assertEquals('test-variable', $this->container->getParameter('container_env_test'));
     $this->assertEquals('some-test', $this->container->getParameter('container_env_test_with_default'));
