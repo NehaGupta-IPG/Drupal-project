@@ -10,12 +10,15 @@ namespace Drupal\Core\Render\Element;
  */
 trait CompositeFormElementTrait {
 
+  use ToggletipTrait;
+
   /**
    * Adds form element theming to an element if its title or description is set.
    *
    * This is used as a pre render function for checkboxes and radios.
    */
   public static function preRenderCompositeFormElement($element) {
+    $element = static::processToggletip($element);
     // Set the element's title attribute to show #title as a tooltip, if needed.
     if (isset($element['#title']) && $element['#title_display'] == 'attribute') {
       $element['#attributes']['title'] = $element['#title'];

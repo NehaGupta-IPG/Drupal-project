@@ -1,0 +1,49 @@
+{#
+/**
+ * @file
+ * Default theme implementation for a toggletip button and tip.
+ *
+ * Available variables:
+ * - element: An associative array containing the properties of the element.
+ *   Properties used: #button_text, #content, #toggle_id, #tip_id,
+ *   #description_id, #button_placement, #tip_placement, #on_hover.
+ * - attributes: HTML attributes for the button element.
+ *
+ * @ingroup themeable
+ */
+#}
+{% set button_attributes = attributes
+  .setAttribute('type', 'button')
+  .addClass('toggletip')
+  .setAttribute('id', element['#toggle_id'])
+  .setAttribute('data-drupal-tip-toggle-button', element['#content_filtered'])
+  .setAttribute('aria-expanded', 'false')
+  .setAttribute('aria-labelledby', element['#description_id'])
+  .setAttribute('aria-controls', element['#tip_id'])
+  .setAttribute('popovertarget', element['#tip_id'])
+%}
+{% if element['#button_placement'] %}
+  {% set button_attributes = button_attributes
+    .setAttribute('data-drupal-toggletip-positioned', element['#button_placement'])
+  %}
+{% endif %}
+{% if element['#tip_placement'] %}
+  {% set button_attributes = button_attributes.setAttribute('data-drupal-tip-placement', element['#tip_placement']) %}
+{% endif %}
+{% if element['#on_hover'] %}
+  {% set button_attributes = button_attributes.setAttribute('data-drupal-tip-on-hover', 'true') %}
+{% endif %}
+<button{{ button_attributes }}>
+  {{- element['#button_text'] -}}
+</button>
+<div
+  id="{{ element['#tip_id'] }}"
+  class="tip"
+  popover role="status"
+  tabindex="0"
+  data-drupal-tip
+>
+  <span class="visually-hidden" id="{{ element['#description_id'] }}">{{ element['#description'] }}</span>
+  {{ element['#content'] }}
+  <div class="tip__arrow"></div>
+</div>

@@ -106,6 +106,16 @@ libraries-override:
       component:
         misc/components/tablesort.module.css: css/core/components/tablesort.module.css
 
+  core/drupal.toggletip:
+    css:
+      component:
+        misc/toggletip.css: css/core/toggletip.css
+
+  core/drupal.tip:
+    css:
+      component:
+        misc/tip.css: css/core/tip.css
+
   core/drupal.vertical-tabs:
     css:
       component:

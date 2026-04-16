@@ -137,6 +137,18 @@ claro.tabledrag:
   js:
     js/tabledrag.js: { weight: -1 }
 
+toggletip:
+  version: VERSION
+  css:
+    component:
+      css/components/toggletip.css: {}
+
+tip:
+  version: VERSION
+  css:
+    component:
+      css/components/tip.css: {}
+
 drupal.node.preview:
   version: VERSION
   css:

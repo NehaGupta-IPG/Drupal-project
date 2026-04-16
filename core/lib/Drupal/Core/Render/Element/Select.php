@@ -198,6 +198,7 @@ class Select extends FormElementBase {
    * Prepares a select render element.
    */
   public static function preRenderSelect($element) {
+    $element = static::processToggletip($element);
     Element::setAttributes($element, ['id', 'name', 'size']);
     static::setAttributes($element, ['form-select']);
     return $element;

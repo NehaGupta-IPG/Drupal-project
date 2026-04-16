@@ -1,0 +1,16 @@
+/**
+ * @file
+ * Toggletips
+ */
+
+.toggletip {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: #55565b;
+  border: 1px solid #d3d4d9;
+  border-radius: 100%;
+  background: #fff;
+  box-shadow: 0 0.125rem 0.25rem rgb(0, 0, 0, 0.1);
+  padding-inline: 3.5px;
+  padding-block: 3px;
+}

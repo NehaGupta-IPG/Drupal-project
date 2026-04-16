@@ -1,0 +1,26 @@
+/**
+ * @file
+ * Tips
+ */
+
+.tip {
+  position: fixed;
+  right: auto;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: min(50rem, calc(100vw - var(--drupal-displace-offset-left, 0px) - var(--drupal-displace-offset-right, 0px)));
+  margin: 0;
+  background-color: #fff;
+}
+
+[data-drupal-tip][popover] {
+  overflow: visible;
+}
+
+.tip__arrow {
+  position: absolute;
+  z-index: 1;
+  width: 0.5rem;
+  height: 0.5rem;
+  transform: rotate(45deg);
+}

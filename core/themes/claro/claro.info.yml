@@ -117,6 +117,10 @@ libraries-extend:
     - claro/tableselect
   core/drupal.tablesort:
     - claro/drupal.tablesort
+  core/drupal.tip:
+    - claro/tip
+  core/drupal.toggletip:
+    - claro/toggletip
   core/drupal.vertical-tabs:
     - claro/vertical-tabs
   file/drupal.file:

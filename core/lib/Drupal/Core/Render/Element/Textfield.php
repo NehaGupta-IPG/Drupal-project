@@ -89,6 +89,7 @@ class Textfield extends FormElementBase {
    *   The $element with prepared variables ready for input.html.twig.
    */
   public static function preRenderTextfield($element) {
+    $element = static::processToggletip($element);
     $element['#attributes']['type'] = 'text';
     Element::setAttributes($element, ['id', 'name', 'value', 'size', 'maxlength', 'placeholder']);
     static::setAttributes($element, ['form-text']);

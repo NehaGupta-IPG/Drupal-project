@@ -93,6 +93,7 @@ class Email extends FormElementBase {
    *   The $element with prepared variables ready for input.html.twig.
    */
   public static function preRenderEmail($element) {
+    $element = static::processToggletip($element);
     $element['#attributes']['type'] = 'email';
     Element::setAttributes($element, ['id', 'name', 'value', 'size', 'maxlength', 'placeholder']);
     static::setAttributes($element, ['form-email']);

@@ -1,0 +1,29 @@
+/**
+ * @file
+ * Toggletips
+ */
+
+[data-drupal-toggletip-position] {
+  position: relative;
+}
+
+[data-drupal-tip-toggle-button]:not([data-drupal-toggletip-positioned]) {
+  margin-inline: 0.75rem;
+}
+
+[data-drupal-toggletip-positioned] {
+  position: absolute;
+}
+
+.toggletip {
+  display: inline-flex;
+  font-size: 1rem;
+}
+
+.toggletip:hover {
+  cursor: pointer;
+}
+
+.form-item__label:has(+ .toggletip) {
+  display: inline-block;
+}

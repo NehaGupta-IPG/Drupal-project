@@ -84,6 +84,8 @@ class HtmlTag extends RenderElementBase {
    *   The element, after the pre-rendering processing run.
    */
   public static function preRenderHtmlTag($element) {
+    $element = static::processToggletip($element);
+
     $attributes = isset($element['#attributes']) ? new Attribute($element['#attributes']) : '';
 
     // An HTML tag should not contain any special characters. Escape them to
