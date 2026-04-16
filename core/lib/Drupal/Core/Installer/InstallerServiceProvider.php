@@ -58,16 +58,6 @@ class InstallerServiceProvider extends NormalInstallerServiceProvider implements
     $twig_config = $container->getParameter('twig.config');
     $twig_config['cache'] = FALSE;
     $container->setParameter('twig.config', $twig_config);
-
-    // No service may persist when the early installer kernel is rebooted into
-    // the production environment.
-    // @todo The DrupalKernel reboot performed by drupal_install_system() is
-    //   actually not a "regular" reboot (like ModuleInstaller::install()), so
-    //   services are not actually persisted.
-    foreach ($container->findTaggedServiceIds('persist') as $id => $tags) {
-      $definition = $container->getDefinition($id);
-      $definition->clearTag('persist');
-    }
   }
 
 }
