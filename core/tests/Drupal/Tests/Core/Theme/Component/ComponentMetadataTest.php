@@ -4,25 +4,26 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\Theme\Component;
 
+use Drupal\Core\Render\Component\Exception\InvalidComponentException;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Theme\Component\ComponentMetadata;
-use Drupal\Core\Render\Component\Exception\InvalidComponentException;
-use Drupal\Tests\UnitTestCaseTest;
+use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Unit tests for the component metadata class.
- *
- * @coversDefaultClass \Drupal\Core\Theme\Component\ComponentMetadata
- * @group sdc
  */
-class ComponentMetadataTest extends UnitTestCaseTest {
+#[CoversClass(ComponentMetadata::class)]
+#[Group('sdc')]
+class ComponentMetadataTest extends UnitTestCase {
 
   /**
    * Tests that the correct data is returned for each property.
    */
   #[DataProvider('dataProviderMetadata')]
-  public function testMetadata(array $metadata_info, array $expectations): void {
+  public function testMetadata(array $metadata_info, array $expectations, bool $missing_schema): void {
     $metadata = new ComponentMetadata($metadata_info, 'foo/', FALSE);
     $this->assertSame($expectations['path'], $metadata->path);
     $this->assertSame($expectations['status'], $metadata->status);

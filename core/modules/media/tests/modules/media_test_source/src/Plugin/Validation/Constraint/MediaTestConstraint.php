@@ -18,11 +18,13 @@ use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 )]
 class MediaTestConstraint extends SymfonyConstraint {
 
-  /**
-   * The default violation message.
-   *
-   * @var string
-   */
-  public $message = 'Inappropriate text.';
+  public function __construct(
+    mixed $options = NULL,
+    public $message = 'Inappropriate text.',
+    ?array $groups = NULL,
+    mixed $payload = NULL,
+  ) {
+    parent::__construct($options, $groups, $payload);
+  }
 
 }

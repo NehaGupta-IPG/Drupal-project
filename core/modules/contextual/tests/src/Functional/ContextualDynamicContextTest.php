@@ -10,13 +10,15 @@ use Drupal\Core\Site\Settings;
 use Drupal\Core\Url;
 use Drupal\language\Entity\ConfigurableLanguage;
 use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use Psr\Http\Message\ResponseInterface;
 
 /**
  * Tests contextual link display on the front page based on permissions.
- *
- * @group contextual
  */
+#[Group('contextual')]
+#[RunTestsInSeparateProcesses]
 class ContextualDynamicContextTest extends BrowserTestBase {
 
   /**

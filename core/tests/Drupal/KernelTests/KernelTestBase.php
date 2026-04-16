@@ -16,18 +16,22 @@ use Drupal\Core\Entity\Sql\SqlEntityStorageInterface;
 use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
 use Drupal\Core\Language\Language;
+use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Test\EventSubscriber\FieldStorageCreateCheckSubscriber;
 use Drupal\Core\Test\TestDatabase;
+use Drupal\Tests\BrowserHtmlDebugTrait;
 use Drupal\Tests\ConfigTestTrait;
+use Drupal\Tests\DrupalTestCaseTrait;
 use Drupal\Tests\ExtensionListTestTrait;
+use Drupal\Tests\HttpKernelUiHelperTrait;
 use Drupal\Tests\RandomGeneratorTrait;
-use Drupal\Tests\PhpUnitCompatibilityTrait;
 use Drupal\Tests\TestRequirementsTrait;
 use Drupal\TestTools\Comparator\MarkupInterfaceComparator;
-use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 use Drupal\TestTools\Extension\Dump\DebugDump;
 use Drupal\TestTools\Extension\SchemaInspector;
+use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\visitor\vfsStreamPrintVisitor;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Attributes\BeforeClass;
 use PHPUnit\Framework\Exception;
@@ -36,9 +40,6 @@ use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
-use org\bovigo\vfs\vfsStream;
-use org\bovigo\vfs\visitor\vfsStreamPrintVisitor;
-use Drupal\Core\Routing\RouteObjectInterface;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\VarDumper\VarDumper;
 
@@ -96,39 +97,40 @@ use Symfony\Component\VarDumper\VarDumper;
  */
 abstract class KernelTestBase extends TestCase implements ServiceProviderInterface {
 
+  use DrupalTestCaseTrait;
   use AssertContentTrait;
   use RandomGeneratorTrait;
   use ConfigTestTrait;
   use ExtensionListTestTrait;
   use TestRequirementsTrait;
-  use PhpUnitCompatibilityTrait;
   use ProphecyTrait;
-  use ExpectDeprecationTrait;
+  use BrowserHtmlDebugTrait;
+  use HttpKernelUiHelperTrait;
 
   /**
-   * {@inheritdoc}
-   */
-  public function __construct(string $name) {
-    parent::__construct($name);
-    $this->setRunTestInSeparateProcess(TRUE);
-  }
-
-  /**
+   * The class loader.
+   *
    * @var \Composer\Autoload\Classloader
    */
   protected $classLoader;
 
   /**
+   * The relative path to the test site directory.
+   *
    * @var string
    */
   protected $siteDirectory;
 
   /**
+   * The test database prefix.
+   *
    * @var string
    */
   protected $databasePrefix;
 
   /**
+   * The test container.
+   *
    * @var \Drupal\Core\DependencyInjection\ContainerBuilder
    */
   protected $container;
@@ -155,6 +157,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   protected $vfsRoot;
 
   /**
+   * The configuration importer.
+   *
    * @var \Drupal\Core\Config\ConfigImporter
    *
    * @todo Move into Config test base class.
@@ -223,6 +227,10 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * {@inheritdoc}
    */
   protected function setUp(): void {
+    if ($this->valueObjectForEvents()->metadata()->isRunTestsInSeparateProcesses()->isEmpty()) {
+      throw new \Exception('Kernel test classes must specify the #[RunTestsInSeparateProcesses] attribute');
+    }
+
     parent::setUp();
 
     // Allow tests to compare MarkupInterface objects via assertEquals().
@@ -298,6 +306,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
   }
 
   /**
+   * Gets the database prefix used for test isolation.
+   *
    * @return string
    *   The database prefix string used to isolate test database tables.
    */
@@ -517,20 +527,23 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    *
    * @see \Drupal\KernelTests\KernelTestBase::bootKernel()
    */
-  public function register(ContainerBuilder $container) {
+  public function register(ContainerBuilder $container): void {
     // Keep the container object around for tests.
     $this->container = $container;
 
-    $container
-      ->register('datetime.time', 'Drupal\Component\Datetime\Time');
     $container
       ->register('flood', 'Drupal\Core\Flood\MemoryBackend')
       ->addArgument(new Reference('request_stack'));
     $container
       ->register('lock', 'Drupal\Core\Lock\NullLockBackend');
-    $container
-      ->register('cache_factory', 'Drupal\Core\Cache\MemoryBackendFactory')
-      ->addArgument(new Reference('datetime.time'));
+
+    // Explicitly configure all cache bins to use the memory backend.
+    foreach (array_keys($container->findTaggedServiceIds('cache.bin')) as $id) {
+      $definition = $container->getDefinition($id);
+      $tags = $definition->getTags();
+      $tags['cache.bin'][0]['default_backend'] = 'cache.backend.memory';
+      $definition->setTags($tags);
+    }
 
     // Disable the super user access policy so that we are sure our tests check
     // for the right permissions.
@@ -574,14 +587,11 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
       ->register('testing.field_storage_create_check', FieldStorageCreateCheckSubscriber::class)
       ->addArgument(new Reference('database'))
       ->addArgument(new Reference('entity_type.manager'))
-      ->addArgument($is_core_test)
       ->addTag('event_subscriber');
 
     // Relax the password hashing cost in tests to avoid performance issues.
-    if ($container->hasDefinition('password')) {
-      $container->getDefinition('password')
-        ->setArguments([PASSWORD_BCRYPT, ['cost' => 4]]);
-    }
+    $container->setParameter('password.algorithm', PASSWORD_BCRYPT);
+    $container->setParameter('password.options', ['cost' => 4]);
 
     // Add the on demand rebuild route provider service.
     $route_provider_service_name = 'router.route_provider';
@@ -602,6 +612,11 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     // Remove the stored configuration importer so if used again it will be
     // built with up-to-date services.
     $this->configImporter = NULL;
+
+    // Allow kernel tests to register hooks.
+    $definition = $container->register(static::class, static::class)->setSynthetic(TRUE);
+    $container->set(static::class, $this);
+    $container->addCompilerPass(new KernelTestCompilerPass($definition), priority: -100);
   }
 
   /**
@@ -647,7 +662,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * {@inheritdoc}
    */
   protected function tearDown(): void {
-    if ($this->container) {
+    if ($this->container?->get('request_stack')->getCurrentRequest() !== NULL) {
       // Clean up mock session started in DrupalKernel::preHandle().
       /** @var \Symfony\Component\HttpFoundation\Session\Session $session */
       $session = $this->container->get('request_stack')->getSession();
@@ -675,10 +690,12 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     }
 
     // If the test used the regular file system, remove any files created.
-    if (!str_starts_with($this->siteDirectory, 'vfs://')) {
+    if ($this->siteDirectory && !str_starts_with($this->siteDirectory, 'vfs://')) {
       // Delete test site directory.
-      $callback = function (string $path) {
-        @chmod($path, 0700);
+      $callback = function (string $path): void {
+        if (!is_link($path)) {
+          @chmod($path, 0700);
+        }
       };
       \Drupal::service('file_system')->deleteRecursive($this->siteDirectory, $callback);
     }
@@ -706,7 +723,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * Additional tear down method to close the connection at the end.
    */
   #[After]
-  public function tearDownCloseDatabaseConnection() {
+  public function tearDownCloseDatabaseConnection(): void {
     // Destroy the database connection, which for example removes the memory
     // from sqlite in memory.
     foreach (Database::getAllConnectionInfo() as $key => $targets) {
@@ -765,9 +782,6 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
     $schema = $this->container->get('database')->schema();
     $tables = (array) $tables;
     foreach ($tables as $table) {
-      if ($module === 'system' && $table === 'sequences') {
-        @trigger_error('Installing the table sequences with the method KernelTestBase::installSchema() is deprecated in drupal:10.2.0 and is removed from drupal:12.0.0. See https://www.drupal.org/node/3349345', E_USER_DEPRECATED);
-      }
       if (empty($specification[$table])) {
         throw new \LogicException("$module module does not define a schema for table '$table'.");
       }
@@ -987,7 +1001,7 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
    * @return array
    *   An array of modules to install.
    */
-  private static function getModulesToEnable($class) {
+  protected static function getModulesToEnable($class) {
     $modules = [];
     while ($class) {
       if (property_exists($class, 'modules')) {

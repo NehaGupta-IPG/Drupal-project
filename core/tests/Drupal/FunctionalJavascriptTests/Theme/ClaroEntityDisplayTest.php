@@ -7,6 +7,7 @@ namespace Drupal\FunctionalJavascriptTests\Theme;
 use Drupal\entity_test\EntityTestHelper;
 use Drupal\Tests\field_ui\FunctionalJavascript\EntityDisplayTest;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Runs EntityDisplayTest in Claro.
@@ -14,18 +15,8 @@ use PHPUnit\Framework\Attributes\Group;
  * @see \Drupal\Tests\field_ui\FunctionalJavascript\EntityDisplayTest.
  */
 #[Group('claro')]
+#[RunTestsInSeparateProcesses]
 class ClaroEntityDisplayTest extends EntityDisplayTest {
-
-  /**
-   * Modules to install.
-   *
-   * Install the shortcut module so that claro.settings has its schema checked.
-   * There's currently no way for Claro to provide a default and have valid
-   * configuration as themes cannot react to a module install.
-   *
-   * @var string[]
-   */
-  protected static $modules = ['shortcut'];
 
   /**
    * {@inheritdoc}

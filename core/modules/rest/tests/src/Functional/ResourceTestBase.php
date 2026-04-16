@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\rest\Functional;
 
+use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Url;
 use Drupal\rest\RestResourceConfigInterface;
 use Drupal\Tests\ApiRequestTrait;
@@ -149,7 +150,11 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @param string[] $methods
    *   The allowed methods for this resource.
    */
-  protected function provisionResource($formats = [], $authentication = [], array $methods = ['GET', 'POST', 'PATCH', 'DELETE']) {
+  protected function provisionResource(
+    $formats = [],
+    $authentication = [],
+    array $methods = ['GET', 'POST', 'PATCH', 'DELETE'],
+  ) {
     $this->resourceConfigStorage->create([
       'id' => static::$resourceConfigId,
       'granularity' => RestResourceConfigInterface::RESOURCE_GRANULARITY,
@@ -211,6 +216,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @param string $method
    *   The HTTP method for which to set up authentication.
    *
+   * @return void
+   *   Returns nothing.
+   *
    * @see ::grantPermissionsToAnonymousRole()
    * @see ::grantPermissionsToAuthenticatedRole()
    */
@@ -223,6 +231,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   HTTP method.
    * @param \Psr\Http\Message\ResponseInterface $response
    *   The response to assert.
+   *
+   * @return void
+   *   Returns nothing.
    */
   abstract protected function assertResponseWhenMissingAuthentication($method, ResponseInterface $response);
 
@@ -237,6 +248,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   URL to request.
    * @param array $request_options
    *   Request options to apply.
+   *
+   * @return void
+   *   Returns nothing.
    *
    * @see \GuzzleHttp\ClientInterface::request()
    */
@@ -254,6 +268,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * @param array $request_options
    *   Request options to apply.
    *
+   * @return void
+   *   Returns nothing.
+   *
    * @see \GuzzleHttp\ClientInterface::request()
    */
   abstract protected function assertAuthenticationEdgeCases($method, Url $url, array $request_options);
@@ -270,6 +287,9 @@ abstract class ResourceTestBase extends BrowserTestBase {
    * Initializes authentication.
    *
    * E.g. for cookie authentication, we first need to get a cookie.
+   *
+   * @return void
+   *   Returns nothing.
    */
   protected function initAuthentication() {}
 
@@ -396,7 +416,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
       $this->assertSame($expected_dynamic_page_cache_header_value, $response->getHeader('X-Drupal-Dynamic-Cache')[0]);
     }
     elseif ($response->hasHeader('X-Drupal-Dynamic-Cache')) {
-      $this->assertMatchesRegularExpression('#^UNCACHEABLE \(((no|poor) cacheability|(request|response) policy)\)$#', $response->getHeader('X-Drupal-Dynamic-Cache')[0]);
+      $this->assertMatchesRegularExpression('#^UNCACHEABLE \(((no|poor) cacheability|(request|response) policy|\d{3}(, sub-request: (HIT|MISS))?)\)$#', $response->getHeader('X-Drupal-Dynamic-Cache')[0]);
     }
   }
 
@@ -437,15 +457,7 @@ abstract class ResourceTestBase extends BrowserTestBase {
    *   An array to sort.
    */
   protected static function recursiveKSort(array &$array) {
-    // First, sort the main array.
-    ksort($array);
-
-    // Then check for child arrays.
-    foreach ($array as &$value) {
-      if (is_array($value)) {
-        static::recursiveKSort($value);
-      }
-    }
+    SortArray::sortByKeyRecursive($array);
   }
 
 }

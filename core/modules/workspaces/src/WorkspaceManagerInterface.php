@@ -18,8 +18,8 @@ interface WorkspaceManagerInterface {
   /**
    * Gets the active workspace.
    *
-   * @return \Drupal\workspaces\WorkspaceInterface
-   *   The active workspace entity object.
+   * @return \Drupal\workspaces\WorkspaceInterface|null
+   *   The active workspace entity, or NULL if there's no active workspace.
    */
   public function getActiveWorkspace();
 
@@ -28,7 +28,6 @@ interface WorkspaceManagerInterface {
    *
    * @param \Drupal\workspaces\WorkspaceInterface $workspace
    *   The workspace to set as active.
-   * phpcs:ignore
    * @param bool $persist
    *   (optional) Whether to persist this workspace in the first applicable
    *   negotiator. Defaults to TRUE.
@@ -38,7 +37,7 @@ interface WorkspaceManagerInterface {
    * @throws \Drupal\workspaces\WorkspaceAccessException
    *   Thrown when the current user doesn't have access to view the workspace.
    */
-  public function setActiveWorkspace(WorkspaceInterface $workspace, /* bool $persist = TRUE */);
+  public function setActiveWorkspace(WorkspaceInterface $workspace, bool $persist = TRUE);
 
   /**
    * Unsets the active workspace.
@@ -70,10 +69,5 @@ interface WorkspaceManagerInterface {
    *   The callable's return value.
    */
   public function executeOutsideWorkspace(callable $function);
-
-  /**
-   * Deletes the revisions associated with deleted workspaces.
-   */
-  public function purgeDeletedWorkspacesBatch();
 
 }

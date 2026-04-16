@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Drupal\Tests\locale\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\locale\LocaleSource;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests building the translatable project information.
- *
- * @group locale
  */
+#[Group('locale')]
+#[RunTestsInSeparateProcesses]
 class LocaleBuildTest extends KernelTestBase {
 
   /**
@@ -19,7 +22,6 @@ class LocaleBuildTest extends KernelTestBase {
   protected static $modules = [
     'locale',
     'locale_test',
-    'system',
   ];
 
   /**
@@ -41,7 +43,7 @@ class LocaleBuildTest extends KernelTestBase {
     $this->assertSame('all', $projects['locale_test']->core);
 
     $projects['locale_test']->langcode = 'de';
-    $this->assertSame('/all/locale_test/locale_test-1.2.de.po', locale_translation_build_server_pattern($projects['locale_test'], '/%core/%project/%project-%version.%language.po'));
+    $this->assertSame('/all/locale_test/locale_test-1.2.de.po', \Drupal::service(LocaleSource::class)->buildServerPattern($projects['locale_test'], '/%core/%project/%project-%version.%language.po'));
 
     // Alter both the name and core value of the project.
     \Drupal::state()->set('locale.test_system_info_alter_name_core', TRUE);
@@ -60,7 +62,7 @@ class LocaleBuildTest extends KernelTestBase {
     $this->assertSame('all', $projects['locale_test']->core);
 
     $projects['locale_test']->langcode = 'de';
-    $this->assertSame('/all/locale_test/locale_test-1.2.de.po', locale_translation_build_server_pattern($projects['locale_test'], '/%core/%project/%project-%version.%language.po'));
+    $this->assertSame('/all/locale_test/locale_test-1.2.de.po', \Drupal::service(LocaleSource::class)->buildServerPattern($projects['locale_test'], '/%core/%project/%project-%version.%language.po'));
   }
 
 }

@@ -4,18 +4,21 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\Entity\EntityTestBundle;
 use Drupal\entity_test\Entity\EntityTestNoBundleWithLabel;
 use Drupal\entity_test\Entity\EntityTestWithBundle;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the getBundleEntity() method.
- *
- * @coversDefaultClass \Drupal\Core\Entity\ContentEntityBase
- *
- * @group Entity
  */
+#[CoversClass(ContentEntityBase::class)]
+#[Group('Entity')]
+#[RunTestsInSeparateProcesses]
 class EntityBundleEntityTest extends EntityKernelTestBase {
 
   /**
@@ -37,7 +40,7 @@ class EntityBundleEntityTest extends EntityKernelTestBase {
   /**
    * Tests an entity type with config entities for bundles.
    *
-   * @covers ::getBundleEntity
+   * @legacy-covers ::getBundleEntity
    */
   public function testWithConfigBundleEntity(): void {
     $bundleEntity = EntityTestBundle::create([
@@ -59,7 +62,7 @@ class EntityBundleEntityTest extends EntityKernelTestBase {
    *
    * EntityTest doesn't have bundles, but does have the bundle entity key.
    *
-   * @covers ::getBundleEntity
+   * @legacy-covers ::getBundleEntity
    */
   public function testWithoutBundleEntity(): void {
     $entity = EntityTest::create([
@@ -72,7 +75,7 @@ class EntityBundleEntityTest extends EntityKernelTestBase {
   /**
    * Tests an entity type without the bundle entity key.
    *
-   * @covers ::getBundleEntity
+   * @legacy-covers ::getBundleEntity
    */
   public function testWithBundleKeyEntity(): void {
     $entity = EntityTestNoBundleWithLabel::create([

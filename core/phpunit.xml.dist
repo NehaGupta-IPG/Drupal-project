@@ -13,6 +13,8 @@
          beStrictAboutChangesToGlobalState="true"
          failOnRisky="true"
          failOnWarning="true"
+         failOnPhpunitWarning="true"
+         failOnPhpunitNotice="true"
          displayDetailsOnTestsThatTriggerErrors="true"
          displayDetailsOnTestsThatTriggerWarnings="true"
          displayDetailsOnTestsThatTriggerDeprecations="true"
@@ -138,7 +140,6 @@
       <directory>./lib</directory>
       <directory>./modules</directory>
       <directory>../modules</directory>
-      <directory>../sites</directory>
     </include>
     <exclude>
       <directory>./lib/Drupal/Component</directory>

@@ -8,16 +8,18 @@ use Drupal\Core\Path\CurrentPathStack;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Routing\Router;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
- * @coversDefaultClass \Drupal\Core\Routing\Router
- * @group Routing
- * @group legacy
+ * Tests Drupal\Core\Routing\Router.
  */
+#[CoversClass(Router::class)]
+#[Group('Routing')]
 class RouterUnsupportedTest extends UnitTestCase {
 
   /**
-   * @covers ::generate
+   * Tests generate unsupported.
    */
   public function testGenerateUnsupported(): void {
     $this->expectException(\BadMethodCallException::class);
