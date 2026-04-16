@@ -73,7 +73,16 @@
       'position',
     ];
     let adjustedOptions = {};
-    let windowHeight = $(window).height();
+    // Use visualViewport.height when available (e.g. iOS Safari with soft
+    // keyboard open), falling back to window.innerHeight, then jQuery's
+    // $(window).height() as a last resort. $(window).height() returns the
+    // layout viewport height and does not shrink when a virtual keyboard
+    // appears, causing modal content to be obscured on mobile devices.
+    // @see https://www.drupal.org/project/drupal/issues/3027366
+    let windowHeight =
+      (window.visualViewport && window.visualViewport.height) ||
+      window.innerHeight ||
+      $(window).height();
     let option;
     let optionValue;
     let adjustedValue;
@@ -118,6 +127,9 @@
       );
   }
 
+  // Store visualViewport resize handlers so they can be removed on close.
+  const visualViewportHandlers = new WeakMap();
+
   window.addEventListener('dialog:aftercreate', (e) => {
     const autoResize = debounce(resetSize, 20);
     const $element = $(e.target);
@@ -137,11 +149,30 @@
         eventData,
         autoResize,
       );
+      // Listen to visualViewport resize events so the dialog repositions when
+      // a virtual keyboard appears or disappears on mobile devices (e.g. iOS
+      // Safari). The standard window resize event is not reliably fired in
+      // that scenario.
+      // @see https://www.drupal.org/project/drupal/issues/3027366
+      if (window.visualViewport) {
+        const visualViewportHandler = autoResize.bind(null, {
+          data: eventData,
+        });
+        visualViewportHandlers.set(e.target, visualViewportHandler);
+        window.visualViewport.addEventListener('resize', visualViewportHandler);
+      }
     }
   });
 
-  window.addEventListener('dialog:beforeclose', () => {
+  window.addEventListener('dialog:beforeclose', (e) => {
     $(window).off('.dialogResize');
     $(document).off('.dialogResize');
+    if (window.visualViewport) {
+      const handler = visualViewportHandlers.get(e.target);
+      if (handler) {
+        window.visualViewport.removeEventListener('resize', handler);
+        visualViewportHandlers.delete(e.target);
+      }
+    }
   });
 })(jQuery, Drupal, drupalSettings, Drupal.debounce, Drupal.displace);
