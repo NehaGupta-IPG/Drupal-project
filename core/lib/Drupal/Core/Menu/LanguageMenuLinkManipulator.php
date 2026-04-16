@@ -9,7 +9,7 @@ use Drupal\Core\Language\LanguageManagerInterface;
  */
 class LanguageMenuLinkManipulator {
 
-  public function __construct(protected LanguageManagerInterface $language_manager) {
+  public function __construct(protected LanguageManagerInterface $languageManager) {
   }
 
   /**
