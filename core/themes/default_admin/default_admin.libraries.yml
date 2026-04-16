@@ -518,6 +518,18 @@ tabs:
     component:
       migration/css/components/tabs.css: { minified: false, weight: 99 }
 
+toggletip:
+  version: VERSION
+  css:
+    component:
+      css/components/toggletip.css: {}
+
+tip:
+  version: VERSION
+  css:
+    component:
+      css/components/tip.css: {}
+
 tooltip:
   css:
     component:
