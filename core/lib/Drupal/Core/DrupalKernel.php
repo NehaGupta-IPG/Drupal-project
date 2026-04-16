@@ -941,7 +941,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   protected function getContainerCacheKey() {
     $parts = [
-      'service_container',
+      'service_container_hash',
       $this->environment,
       class_exists(DrupalInstalled::class) ? DrupalInstalled::VERSIONS_HASH : \Drupal::VERSION,
       Settings::get('deployment_identifier'),
@@ -1023,7 +1023,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
       if (isset($phpStorage) && empty($this->moduleList) && !$this->containerNeedsRebuild) {
         $sentinel = $this->bootstrapContainer->get('cache.container')->get($cacheKey);
-        if ($sentinel && is_string($sentinel->data) && $hash = $sentinel->data) {
+        if ($sentinel && $hash = $sentinel->data) {
           $containerClass = 'DrupalContainer_' . $hash;
           if (!class_exists($containerClass, FALSE)) {
             $phpStorage->load($containerClass . '.php');
