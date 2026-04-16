@@ -57,12 +57,12 @@ class UrlHelperTest extends TestCase {
       [
         ['a' => 'foo:bar'],
         'a=foo:bar',
-        'Colon in value is decoded for readability.'
+        'Colon in value is decoded for readability.',
       ],
       [
         ['foo:bar' => 'a'],
         'foo%3Abar=a',
-        'Colon in key is not decoded.'
+        'Colon in key is not decoded.',
       ],
     ];
   }
