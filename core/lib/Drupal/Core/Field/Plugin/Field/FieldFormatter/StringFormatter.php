@@ -169,6 +169,21 @@ class StringFormatter extends FormatterBase {
     // 'canonical'.
     // @see \Drupal\Core\Entity\EntityBase::toUrl()
     $rel = $entity->getEntityType()->hasLinkTemplate('revision') ? 'revision' : 'canonical';
+
+    // If this is not the default revision and is the latest translation
+    // affected revision, then show a URL pointing to the latest version.
+    if ($rel === 'revision'
+      && !$entity->isDefaultRevision()
+      && $entity->isLatestTranslationAffectedRevision()
+      && $entity->hasLinkTemplate('latest-version')) {
+
+      $url = $entity->toUrl('latest-version');
+      if ($url->access()) {
+        $rel = 'latest-version';
+      }
+      // Else keep $rel as 'revision'.
+    }
+
     return $entity->toUrl($rel);
   }
 
