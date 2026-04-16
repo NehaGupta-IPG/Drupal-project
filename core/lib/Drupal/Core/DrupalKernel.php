@@ -1051,6 +1051,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
           'class' => 'DrupalContainer',
           'base_class' => $baseClass,
         ]);
+
+        // Hash the built container code to generate a unique class name and
+        // cache key. This ensures that changes in the container definition
+        // will result in a different class name but that can be loaded in the
+        // same request.
         $hash = hash('xxh128', $code);
         $containerClass = 'DrupalContainer_' . $hash;
         $filename = $containerClass . '.php';
