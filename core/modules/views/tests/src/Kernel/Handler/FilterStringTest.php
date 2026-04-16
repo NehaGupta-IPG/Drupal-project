@@ -7,19 +7,15 @@ namespace Drupal\Tests\views\Kernel\Handler;
 use Drupal\Core\Database\Database;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Views;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the core Drupal\views\Plugin\views\filter\StringFilter handler.
- *
- * @group views
- * @group #slow
  */
+#[Group('views')]
+#[RunTestsInSeparateProcesses]
 class FilterStringTest extends ViewsKernelTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  protected static $modules = ['system'];
 
   /**
    * Views used by this test.
@@ -367,7 +363,7 @@ class FilterStringTest extends ViewsKernelTestBase {
     $view = Views::getView('test_view');
     $view->setDisplay();
 
-    // Change the filtering to a sting containing only illegal characters.
+    // Change the filtering to a sting containing only invalid characters.
     $view->displayHandlers->get('default')->overrideOption('filters', [
       'description' => [
         'id' => 'description',

@@ -32,10 +32,12 @@ trait BodyFieldCreationTrait {
     if (!$fieldStorage) {
       FieldStorageConfig::create([
         'field_name' => $fieldName,
-        'type' => 'text_with_summary',
+        'type' => 'text_long',
         'entity_type' => $entityType,
         'cardinality' => $cardinality,
+        'persist_with_no_fields' => TRUE,
       ])->save();
+      $fieldStorage = FieldStorageConfig::loadByName($entityType, $fieldName);
     }
     if (!FieldConfig::loadByName($entityType, $bundle, $fieldName)) {
       FieldConfig::create([
@@ -43,7 +45,6 @@ trait BodyFieldCreationTrait {
         'bundle' => $bundle,
         'label' => $fieldLabel,
         'settings' => [
-          'display_summary' => TRUE,
           'allowed_formats' => [],
         ],
       ])->save();
@@ -54,7 +55,7 @@ trait BodyFieldCreationTrait {
       // Assign widget settings for the default form mode.
       $display_repository->getFormDisplay($entityType, $bundle)
         ->setComponent('body', [
-          'type' => 'text_textarea_with_summary',
+          'type' => 'text_textarea',
         ])
         ->save();
 
@@ -73,7 +74,7 @@ trait BodyFieldCreationTrait {
         $display_repository->getViewDisplay($entityType, $bundle, 'teaser')
           ->setComponent('body', [
             'label' => 'hidden',
-            'type' => 'text_summary_or_trimmed',
+            'type' => 'text_trimmed',
           ])
           ->save();
       }

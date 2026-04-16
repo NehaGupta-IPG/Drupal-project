@@ -6,12 +6,14 @@ namespace Drupal\Tests\node\Functional\Update;
 
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests creating base field overrides for the promote field on node types.
- *
- * @group Update
  */
+#[Group('Update')]
+#[RunTestsInSeparateProcesses]
 class ChangePromotedDefaultTest extends UpdatePathTestBase {
 
   /**
@@ -20,11 +22,15 @@ class ChangePromotedDefaultTest extends UpdatePathTestBase {
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
       __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-10.3.0.bare.standard.php.gz',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-history.php',
+      __DIR__ . '/../../../../../system/tests/fixtures/update/uninstall-contact.php',
     ];
   }
 
   /**
-   * @covers node_post_update_create_promote_base_field_overrides
+   * Tests run updates.
+   *
+   * @legacy-covers node_post_update_create_promote_base_field_overrides
    */
   public function testRunUpdates(): void {
     /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $entityFieldManager */

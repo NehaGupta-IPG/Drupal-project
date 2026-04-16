@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Drupal\node\Hook;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Extension\ThemeSettingsProvider;
 use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\Core\Link;
 use Drupal\Core\Render\Element;
@@ -15,7 +16,7 @@ use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
 
 /**
- * Hook implementations for the node module.
+ * Theme hook implementations for the node module.
  */
 class NodeThemeHooks {
 
@@ -23,6 +24,7 @@ class NodeThemeHooks {
     protected readonly RouteMatchInterface $routeMatch,
     protected readonly RendererInterface $renderer,
     protected readonly EntityTypeManagerInterface $entityTypeManager,
+    protected readonly ThemeSettingsProvider $themeSettingsProvider,
   ) {
 
   }
@@ -132,15 +134,6 @@ class NodeThemeHooks {
   public function preprocessNode(&$variables): void {
     $variables['view_mode'] = $variables['elements']['#view_mode'];
 
-    // The teaser variable is deprecated.
-    $variables['deprecations']['teaser'] = "'teaser' is deprecated in drupal:11.1.0 and is removed in drupal:12.0.0. Use 'view_mode' instead. See https://www.drupal.org/node/3458185";
-    $variables['teaser'] = $variables['view_mode'] == 'teaser';
-
-    // The 'metadata' variable was originally added to support RDF, which has
-    // now been moved to contrib. It was needed because it is not possible to
-    // extend the markup of the 'submitted' variable generically.
-    $variables['deprecations']['metadata'] = "'metadata' is deprecated in drupal:11.1.0 and is removed in drupal:12.0.0. There is no replacement. See https://www.drupal.org/node/3458638";
-
     $variables['node'] = $variables['elements']['#node'];
     /** @var \Drupal\node\NodeInterface $node */
     $node = $variables['node'];
@@ -166,10 +159,18 @@ class NodeThemeHooks {
 
     $variables['url'] = !$node->isNew() ? $node->toUrl('canonical')->toString() : NULL;
 
+    // The page variable is deprecated.
+    $variables['deprecations']['page'] = "'page' is deprecated in drupal:11.3.0 and is removed in drupal:13.0.0. Use 'view_mode' instead. See https://www.drupal.org/node/3458593";
     // The 'page' variable is set to TRUE in two occasions:
     // - The view mode is 'full' and we are on the 'node.view' route.
     // - The node is in preview and view mode is either 'full' or 'default'.
-    $variables['page'] = ($variables['view_mode'] == 'full' && (node_is_page($node)) || (isset($node->in_preview) && in_array($node->preview_view_mode, ['full', 'default'])));
+    $variables['page'] = FALSE;
+    if ($variables['view_mode'] == 'full'
+      && ($this->routeMatch->getRouteName() == 'entity.node.canonical'
+        && $this->routeMatch->getRawParameter('node') == $node->id() || (isset($node->in_preview)
+          && in_array($node->preview_view_mode, ['full', 'default'])))) {
+      $variables['page'] = TRUE;
+    }
 
     // Helpful $content variable for templates.
     $variables += ['content' => []];
@@ -186,21 +187,19 @@ class NodeThemeHooks {
       $node_type = $node->type->entity;
       $variables['author_attributes'] = new Attribute();
       $variables['display_submitted'] = $node_type->displaySubmitted();
-      if ($variables['display_submitted']) {
-        if (theme_get_setting('features.node_user_picture')) {
-          // To change user picture settings (e.g. image style), edit the
-          // 'compact' view mode on the User entity. Note that the 'compact'
-          // view mode might not be configured, so remember to always check the
-          // theme setting first.
-          if ($node_owner = $node->getOwner()) {
-            $variables['author_picture'] = $this->entityTypeManager
-              ->getViewBuilder('user')
-              ->view($node_owner, 'compact');
-          }
+      if ($variables['display_submitted'] && $this->themeSettingsProvider->getSetting('features.node_user_picture')) {
+        // To change user picture settings (e.g. image style), edit the
+        // 'compact' view mode on the User entity. Note that the 'compact'
+        // view mode might not be configured, so remember to always check the
+        // theme setting first.
+        $node_owner = $node->getOwner();
+        if ($node_owner) {
+          $variables['author_picture'] = $this->entityTypeManager
+            ->getViewBuilder('user')
+            ->view($node_owner, 'compact');
         }
       }
     }
-
   }
 
   /**
@@ -220,7 +219,7 @@ class NodeThemeHooks {
       foreach ($variables['content'] as $type) {
         $variables['types'][$type->id()] = [
           'type' => $type->id(),
-          'add_link' => Link::fromTextAndUrl($type->label(), Url::fromRoute('node.add', ['node_type' => $type->id()]))->toString(),
+          'add_link' => Link::fromTextAndUrl($type->label(), Url::fromRoute('entity.node.add_form', ['node_type' => $type->id()]))->toString(),
           'description' => [
             '#markup' => $type->getDescription(),
           ],
@@ -239,20 +238,6 @@ class NodeThemeHooks {
     if (($node = $this->routeMatch->getParameter('node')) || ($node = $this->routeMatch->getParameter('node_preview'))) {
       if ($node instanceof NodeInterface) {
         $variables['node_type'] = $node->getType();
-      }
-    }
-  }
-
-  /**
-   * Implements hook_preprocess_HOOK() for block templates.
-   */
-  #[Hook('preprocess_block')]
-  public function preprocessBlock(&$variables): void {
-    if ($variables['configuration']['provider'] == 'node') {
-      switch ($variables['elements']['#plugin_id']) {
-        case 'node_syndicate_block':
-          $variables['attributes']['role'] = 'complementary';
-          break;
       }
     }
   }

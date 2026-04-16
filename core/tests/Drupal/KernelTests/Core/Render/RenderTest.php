@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\Render;
 
 use Drupal\KernelTests\KernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Performs functional tests on \Drupal::service('renderer')->render().
- *
- * @group Common
  */
+#[Group('Common')]
+#[RunTestsInSeparateProcesses]
 class RenderTest extends KernelTestBase {
 
   /**
@@ -61,7 +63,7 @@ class RenderTest extends KernelTestBase {
   }
 
   /**
-   * Tests that we get an exception when we try to attach an illegal type.
+   * Tests that we get an exception when we try to attach an invalid type.
    */
   public function testProcessAttached(): void {
     // Specify invalid attachments in a render array.
@@ -70,17 +72,6 @@ class RenderTest extends KernelTestBase {
     $renderer = $this->container->get('bare_html_page_renderer');
     $this->expectException(\LogicException::class);
     $renderer->renderBarePage($build, '', 'maintenance_page');
-  }
-
-  /**
-   * Tests the deprecation of \Drupal\Core\Render\Renderer::renderPlain()
-   *
-   * @group legacy
-   */
-  public function testDeprecateRenderPlain(): void {
-    $message = ['#markup' => 'Test'];
-    \Drupal::service('renderer')->renderPlain($message);
-    $this->expectDeprecation('Renderer::renderPlain() is deprecated in drupal:10.3.0 and is removed from drupal:12.0.0. Instead, you should use ::renderInIsolation(). See https://www.drupal.org/node/3407994');
   }
 
 }
