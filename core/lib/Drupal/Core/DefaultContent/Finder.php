@@ -28,7 +28,11 @@ final class Finder {
    */
   public readonly array $data;
 
-  public function __construct(string $path) {
+  public function __construct(string $path, ?array $preloadedData = NULL) {
+    if ($preloadedData !== NULL) {
+      $this->data = $preloadedData;
+      return;
+    }
     try {
       // Scan for all YAML and JSON files in the content directory.
       $finder = SymfonyFinder::create()
