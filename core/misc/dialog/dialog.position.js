@@ -73,12 +73,7 @@
       'position',
     ];
     let adjustedOptions = {};
-    // Use visualViewport.height when available (e.g. iOS Safari with soft
-    // keyboard open), falling back to window.innerHeight, then jQuery's
-    // $(window).height() as a last resort. $(window).height() returns the
-    // layout viewport height and does not shrink when a virtual keyboard
-    // appears, causing modal content to be obscured on mobile devices.
-    // @see https://www.drupal.org/project/drupal/issues/3027366
+    // Use visualViewport.height when available
     let windowHeight =
       (window.visualViewport && window.visualViewport.height) ||
       window.innerHeight ||
@@ -149,11 +144,6 @@
         eventData,
         autoResize,
       );
-      // Listen to visualViewport resize events so the dialog repositions when
-      // a virtual keyboard appears or disappears on mobile devices (e.g. iOS
-      // Safari). The standard window resize event is not reliably fired in
-      // that scenario.
-      // @see https://www.drupal.org/project/drupal/issues/3027366
       if (window.visualViewport) {
         const visualViewportHandler = autoResize.bind(null, {
           data: eventData,
