@@ -34,6 +34,8 @@ class UrlHelperTest extends TestCase {
       [['a' => '1', 'b' => '2', 'c' => '3'], 'a=1&b=2&c=3', 'Multiple values were properly concatenated.'],
       [['a' => ['b' => '2', 'c' => '3'], 'd' => 'foo'], 'a%5Bb%5D=2&a%5Bc%5D=3&d=foo', 'Nested array was properly encoded.'],
       [['foo' => NULL], 'foo', 'Simple parameters are properly added.'],
+      [['a' => 'foo:bar'], 'a=foo:bar', 'Colon in value is decoded for readability.'],
+      [['foo:bar' => 'a'], 'foo%3Abar=a', 'Colon in key is not decoded.'],
     ];
   }
 
