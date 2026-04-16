@@ -116,7 +116,6 @@ class StageEventsTest extends PackageManagerKernelTestBase implements EventSubsc
       PreRequireEvent::class,
       PostRequireEvent::class,
       PreApplyEvent::class,
-      PostApplyEvent::class,
     ]);
   }
 

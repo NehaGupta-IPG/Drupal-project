@@ -991,112 +991,67 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   protected function initializeContainer() {
     $this->containerNeedsDumping = FALSE;
-    $session_started = FALSE;
-    $all_messages = [];
+
+    // Capture config sync state before the container is replaced, as this is
+    // often set when modules or themes are installed which triggers a
+    // container rebuild.
     $config_is_syncing = FALSE;
     $source_storage = NULL;
     if (isset($this->container)) {
-      // Save the id of the currently logged in user.
-      if ($this->container->initialized('current_user')) {
-        $current_user_id = $this->container->get('current_user')->id();
-      }
-      // After rebuilding the container some objects will have stale services.
-      // Record a map of objects to service IDs prior to rebuilding the
-      // container in order to ensure
-      // \Drupal\Core\DependencyInjection\DependencySerializationTrait works as
-      // expected.
-      $this->container->get(ReverseContainer::class)->recordContainer();
-
-      // If there is a session, close and save it.
-      if ($this->container->initialized('session')) {
-        $session = $this->container->get('session');
-        if ($session->isStarted()) {
-          $session_started = TRUE;
-          $session->save();
-        }
-        unset($session);
-      }
-
-      $all_messages = $this->container->get('messenger')->all();
       $config_is_syncing = $this->container->get('config.installer')->isSyncing();
       $source_storage = $this->container->get('config.installer')->getSourceStorage();
     }
 
-    // If the module list hasn't already been set in updateModules and we are
-    // not forcing a rebuild, then try and load the container from the cache.
-    if (empty($this->moduleList) && !$this->containerNeedsRebuild) {
-      $container_definition = $this->getCachedContainerDefinition();
-    }
-
-    // If there is no cached container definition, build a new container from
-    // scratch.
-    if (!isset($container_definition)) {
-      $container = $this->compileContainer();
-
-      // Only dump the container if dumping is allowed. This is useful for
-      // KernelTestBase, which never wants to use the real container, but always
-      // the container builder.
-      if ($this->allowDumping) {
-        $dumper = new $this->phpArrayDumperClass($container);
-        $container_definition = $dumper->getArray();
+    $container_definition = NULL;
+    $this->preserveContainerServices(function () use (&$container_definition) {
+      // If the module list hasn't already been set in updateModules and we
+      // are not forcing a rebuild, then try and load the container from the
+      // cache.
+      if (empty($this->moduleList) && !$this->containerNeedsRebuild) {
+        $container_definition = $this->getCachedContainerDefinition();
       }
-    }
 
-    // The container was rebuilt successfully.
-    $this->containerNeedsRebuild = FALSE;
+      // If there is no cached container definition, build a new container
+      // from scratch.
+      if (!isset($container_definition)) {
+        $container = $this->compileContainer();
 
-    // Only create a new class if we have a container definition.
-    if (isset($container_definition)) {
-      // Drupal provides two dynamic parameters to access specific paths that
-      // are determined from the request.
-      $container_definition['parameters']['app.root'] = $this->getAppRoot();
-      $container_definition['parameters']['site.path'] = $this->getSitePath();
-      $class = Settings::get('container_base_class', '\Drupal\Core\DependencyInjection\Container');
-      $container = new $class($container_definition);
-    }
-
-    $this->attachSynthetic($container);
-
-    $this->container = $container;
-    if ($session_started) {
-      $this->container->get('session')->start();
-    }
-
-    // The request stack is preserved across container rebuilds. Re-inject the
-    // new session into the main request if one was present before.
-    if (($request_stack = $this->container->get('request_stack', ContainerInterface::NULL_ON_INVALID_REFERENCE))) {
-      if ($request = $request_stack->getMainRequest()) {
-        $subrequest = TRUE;
-        $request->setSession($this->container->get('session'));
+        // Only dump the container if dumping is allowed. This is useful for
+        // KernelTestBase, which never wants to use the real container, but
+        // always the container builder.
+        if ($this->allowDumping) {
+          $dumper = new $this->phpArrayDumperClass($container);
+          $container_definition = $dumper->getArray();
+        }
       }
-    }
 
-    if (!empty($current_user_id)) {
-      $this->container->get('current_user')->setInitialAccountId($current_user_id);
-    }
+      // The container was rebuilt successfully.
+      $this->containerNeedsRebuild = FALSE;
 
-    // Re-add messages.
-    foreach ($all_messages as $type => $messages) {
-      foreach ($messages as $message) {
-        $this->container->get('messenger')->addMessage($message, $type);
+      // Only create a new class if we have a container definition.
+      if (isset($container_definition)) {
+        // Drupal provides two dynamic parameters to access specific paths
+        // that are determined from the request.
+        $container_definition['parameters']['app.root'] = $this->getAppRoot();
+        $container_definition['parameters']['site.path'] = $this->getSitePath();
+        $class = Settings::get('container_base_class', '\Drupal\Core\DependencyInjection\Container');
+        $container = new $class($container_definition);
       }
-    }
 
-    // Restore syncing flag, as this is often set when modules or themes
-    // are installed which triggers a container rebuild.
+      // All namespaces must be registered before we attempt to use any
+      // service from the container.
+      $this->classLoaderAddMultiplePsr4($container->getParameter('container.namespaces'));
+
+      $this->container = $container;
+      \Drupal::setContainer($this->container);
+    });
+
+    // Restore syncing flag.
     if ($config_is_syncing) {
       $this->container->get('config.installer')->setSyncing(TRUE);
       if ($source_storage) {
         $this->container->get('config.installer')->setSourceStorage($source_storage);
       }
-    }
-
-    \Drupal::setContainer($this->container);
-
-    // Allow other parts of the codebase to react on container initialization in
-    // subrequest.
-    if (!empty($subrequest)) {
-      $this->container->get('event_dispatcher')->dispatch(new Event(), self::CONTAINER_INITIALIZE_SUBREQUEST_FINISHED);
     }
 
     // If needs dumping flag was set, dump the container.
@@ -1249,69 +1204,30 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   }
 
   /**
-   * Returns service instances to persist from an old container to a new one.
+   * Saves container service state, calls $work, then restores state.
+   *
+   * The closure must perform whatever container swap or reset is needed.
+   * After it returns, synthetic services and saved state (current user,
+   * session, messages, request stack) are restored on $this->container.
+   *
+   * @param \Closure $work
+   *   A closure that resets or replaces $this->container.
    */
-  protected function getServicesToPersist(ContainerInterface $container) {
-    $persist = [];
-    foreach ($container->getParameter('persist_ids') as $id) {
-      // It's pointless to persist services not yet initialized.
-      if ($container->initialized($id)) {
-        $persist[$id] = $container->get($id);
-      }
+  protected function preserveContainerServices(\Closure $work): void {
+    // If no container exists yet, just run the work and set synthetics.
+    if (!isset($this->container)) {
+      $work();
+      $this->container->set('kernel', $this);
+      $this->container->set('class_loader', $this->classLoader);
+      return;
     }
-    return $persist;
-  }
 
-  /**
-   * Moves persistent service instances into a new container.
-   */
-  protected function persistServices(ContainerInterface $container, array $persist) {
-    foreach ($persist as $id => $object) {
-      // Do not override services already set() on the new container, for
-      // example 'service_container', always replace the request stack.
-      if (!$container->initialized($id) || $id === 'request_stack') {
-        $container->set($id, $object);
-      }
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function rebuildContainer() {
-    // Empty module properties and for them to be reloaded from scratch.
-    $this->moduleList = NULL;
-    $this->moduleData = [];
-    $this->themeList = NULL;
-    $this->themeExtensions = [];
-    $this->containerNeedsRebuild = TRUE;
-    $container = $this->initializeContainer();
-    // ThemeManager::render() fails without this. Normally ::preHandle() has
-    // a ->loadAll() call.
-    $container->get('module_handler')->loadAll();
-    return $container;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function resetContainer(): ContainerInterface {
     $session_started = FALSE;
     $subrequest = FALSE;
-    $reload_module_handler = FALSE;
-    $stream_wrappers_registered = FALSE;
 
     // Save the id of the currently logged in user.
     if ($this->container->initialized('current_user')) {
       $current_user_id = $this->container->get('current_user')->id();
-    }
-
-    if ($this->container->initialized('module_handler') && $this->container->get('module_handler')->isLoaded()) {
-      $reload_module_handler = TRUE;
-    }
-
-    if ($this->container->initialized('stream_wrapper_manager') && !empty($this->container->get('stream_wrapper_manager')->getWrappers())) {
-      $stream_wrappers_registered = TRUE;
     }
 
     // After rebuilding the container some objects will have stale services.
@@ -1333,22 +1249,24 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     $all_messages = $this->container->get('messenger')->all();
 
-    $persist = $this->getServicesToPersist($this->container);
-    $this->container->reset();
-    $this->persistServices($this->container, $persist);
-
-    $this->container->set('kernel', $this);
-
-    // Set the class loader which was registered as a synthetic service.
-    $this->container->set('class_loader', $this->classLoader);
-
-    if ($stream_wrappers_registered) {
-      // Re-register the stream wrappers with the manager service.
-      $this->container->get('stream_wrapper_manager')->register();
+    // Persist initialized synthetic services (which cannot be automatically
+    // re-instantiated) and the request stack (so in-flight requests survive).
+    $persisted_services = [];
+    foreach ($this->container->getParameter('persist_ids') as $id) {
+      if ($this->container->initialized($id)) {
+        $persisted_services[$id] = $this->container->get($id);
+      }
+    }
+    if ($this->container->initialized('request_stack')) {
+      $persisted_services['request_stack'] = $this->container->get('request_stack');
     }
 
-    if ($reload_module_handler) {
-      $this->container->get('module_handler')->reload();
+    // Perform the container swap or reset.
+    $work();
+
+    // Reattach persisted services.
+    foreach ($persisted_services as $id => $service) {
+      $this->container->set($id, $service);
     }
 
     if ($session_started) {
@@ -1375,10 +1293,46 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       }
     }
 
-    // Allow other parts of the codebase to react on container reset in
-    // subrequest.
-    if (!empty($subrequest)) {
+    // Allow other parts of the codebase to react on container
+    // initialization in subrequest.
+    if ($subrequest) {
       $this->container->get('event_dispatcher')->dispatch(new Event(), self::CONTAINER_INITIALIZE_SUBREQUEST_FINISHED);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function rebuildContainer() {
+    // Empty module properties and for them to be reloaded from scratch.
+    $this->moduleList = NULL;
+    $this->moduleData = [];
+    $this->themeList = NULL;
+    $this->themeExtensions = [];
+    $this->containerNeedsRebuild = TRUE;
+    $container = $this->initializeContainer();
+    // ThemeManager::render() fails without this. Normally ::preHandle() has
+    // a ->loadAll() call.
+    $container->get('module_handler')->loadAll();
+    return $container;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function resetContainer(): ContainerInterface {
+    $reload_module_handler = $this->container->initialized('module_handler') && $this->container->get('module_handler')->isLoaded();
+    $stream_wrappers_registered = $this->container->initialized('stream_wrapper_manager') && !empty($this->container->get('stream_wrapper_manager')->getWrappers());
+
+    $this->preserveContainerServices(function () {
+      $this->container->reset();
+    });
+
+    if ($stream_wrappers_registered) {
+      $this->container->get('stream_wrapper_manager')->register();
+    }
+    if ($reload_module_handler) {
+      $this->container->get('module_handler')->reload();
     }
 
     return $this->container;
@@ -1400,33 +1354,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     // Also remove the container definition from the cache backend.
     $this->bootstrapContainer->get('cache.container')->deleteAll();
-  }
-
-  /**
-   * Attach synthetic values on to kernel.
-   *
-   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
-   *   Container object.
-   *
-   * @return \Symfony\Component\DependencyInjection\ContainerInterface
-   *   The container object with the kernel and the class loader added.
-   */
-  protected function attachSynthetic(ContainerInterface $container) {
-    $persist = [];
-    if (isset($this->container)) {
-      $persist = $this->getServicesToPersist($this->container);
-    }
-    $this->persistServices($container, $persist);
-
-    // All namespaces must be registered before we attempt to use any service
-    // from the container.
-    $this->classLoaderAddMultiplePsr4($container->getParameter('container.namespaces'));
-
-    $container->set('kernel', $this);
-
-    // Set the class loader which was registered as a synthetic service.
-    $container->set('class_loader', $this->classLoader);
-    return $container;
   }
 
   /**
@@ -1520,15 +1447,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       }
     }
 
-    // Identify all services whose instances should be persisted when rebuilding
-    // the container during the lifetime of the kernel (e.g., during a kernel
-    // reboot). Include synthetic services, because by definition, they cannot
-    // be automatically re-instantiated. Also include services tagged to
-    // persist.
+    // Identify synthetic services whose instances must be persisted across
+    // container rebuilds, since they cannot be automatically re-instantiated.
     $persist_ids = [];
     foreach ($container->getDefinitions() as $id => $definition) {
-      // It does not make sense to persist the container itself, exclude it.
-      if ($id !== 'service_container' && ($definition->isSynthetic() || $definition->getTag('persist'))) {
+      if ($id !== 'service_container' && $definition->isSynthetic()) {
         $persist_ids[] = $id;
       }
     }
