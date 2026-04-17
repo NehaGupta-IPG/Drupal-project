@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\text\Kernel;
 
+use Drupal\Core\TypedData\Exception\ReadOnlyException;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\filter\Entity\FilterFormat;
@@ -95,6 +96,27 @@ class TextFormatterTest extends EntityKernelTestBase {
       $this->assertSame("<p>Hello, world!</p>\n", (string) $build[0]['#markup']);
       $this->assertEquals(FilterFormat::load('my_text_format')->getCacheTags(), $build[0]['#cache']['tags'], "The $formatter formatter has the expected cache tags when formatting a formatted text field.");
     }
+  }
+
+  /**
+   * Tests that denormalization with a processed value does not crash.
+   */
+  public function testDenormalizationSkipsProcessedProperty(): void {
+    $entity = $this->container->get('entity_type.manager')
+      ->getStorage($this->entityType)
+      ->create(['name' => $this->randomMachineName()]);
+
+    // Demoralized values.
+    $entity->formatted_text = [
+      'value' => 'Hello, world!',
+      'format' => 'my_text_format',
+      'processed' => '<p>Injected value</p>',
+    ];
+    $entity->save();
+
+    // The processed value should be computed from value + format, not the
+    // injected string.
+    $this->assertSame("<p>Hello, world!</p>\n", (string) $entity->get('formatted_text')->first()->get('processed')->getValue());
   }
 
 }
