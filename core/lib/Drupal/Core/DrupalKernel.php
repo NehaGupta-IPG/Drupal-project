@@ -1062,13 +1062,13 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         $containerClass = 'DrupalContainer_' . $hash;
         $filename = $containerClass . '.php';
 
+        $code = str_replace(
+          "class DrupalContainer extends \\$baseClass\n{",
+          "class $containerClass extends \\$baseClass\n{",
+          $code,
+        );
+        $phpStorage->save($filename, $code);
         if (!class_exists($containerClass, FALSE)) {
-          $code = str_replace(
-            "class DrupalContainer extends \\$baseClass\n{",
-            "class $containerClass extends \\$baseClass\n{",
-            $code,
-          );
-          $phpStorage->save($filename, $code);
           $phpStorage->load($filename);
         }
 
