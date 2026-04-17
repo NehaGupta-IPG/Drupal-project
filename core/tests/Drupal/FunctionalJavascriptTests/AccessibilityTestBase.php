@@ -54,6 +54,10 @@ abstract class AccessibilityTestBase extends WebDriverTestBase {
 
     $this->drupalGet($uri);
 
+    if (is_callable([$this, $setup_callback])) {
+      $this->{$setup_callback}();
+    }
+
     // Missing modules or routes and access issues can cause a 403 or 404,
     // which means the wrong page is being tested and will likely result in
     // falsely-passing tests.
@@ -61,10 +65,6 @@ abstract class AccessibilityTestBase extends WebDriverTestBase {
       ->responseNotContains('Page not found');
     $this->assertSession()
       ->responseNotContains('Access denied');
-
-    if (is_callable([$this, $setup_callback])) {
-      $this->{$setup_callback}();
-    }
 
     $this->executeAxe($axe_options);
   }
