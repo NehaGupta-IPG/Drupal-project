@@ -233,7 +233,7 @@ EOS;
     if ($reflection_method->hasReturnType()) {
       $signature_line .= ': ';
       $return_type = $reflection_method->getReturnType();
-      if ($return_type->allowsNull()) {
+      if ($return_type->allowsNull() && $return_type->getName() !== 'mixed') {
         $signature_line .= '?';
       }
       if (!$return_type->isBuiltin()) {
