@@ -143,7 +143,6 @@ class MediaLibraryHooks {
   public function viewsPostRender(ViewExecutable $view, &$output, CachePluginBase $cache): void {
     if ($view->id() === 'media_library') {
       $output['#attached']['library'][] = 'media_library/view';
-      $output['#attached']['library'][] = 'core/drupal.tableselect';
       if (str_starts_with($view->current_display, 'widget')) {
         try {
           $query = MediaLibraryState::fromRequest($view->getRequest())->all();

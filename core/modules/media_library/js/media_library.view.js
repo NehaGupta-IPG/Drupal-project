@@ -39,9 +39,7 @@
             Drupal.announce(announcement);
           },
         );
-        const $label = $(
-          '<label class="media-library-select-all select-all"></label>',
-        );
+        const $label = $('<label class="media-library-select-all"></label>');
         $label[0].textContent = Drupal.t('Select all media');
         $label.prepend($checkbox);
         $view.find('.js-media-library-item').first().before($label);
