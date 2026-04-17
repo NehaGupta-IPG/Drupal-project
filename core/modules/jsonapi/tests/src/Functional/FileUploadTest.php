@@ -726,7 +726,7 @@ class FileUploadTest extends ResourceTestBase {
       'field_name' => 'field_rest_image_test',
       'bundle' => 'entity_test',
       'settings' => [
-        'file_directory' => 'barfoo',
+        'file_directory' => 'field_rest_image_test',
         'file_extensions' => '',
         'max_filesize' => '',
       ],
@@ -742,7 +742,7 @@ class FileUploadTest extends ResourceTestBase {
     // Test using a masked exploit file.
     $response = $this->fileRequest($uri, $php_string, ['Content-Disposition' => 'filename="example.png"']);
     $this->assertSame(422, $response->getStatusCode());
-    $this->assertFileDoesNotExist('public://barfoo/example.png');
+    $this->assertFileDoesNotExist('public://field_rest_image_test/example.png');
   }
 
   /**
