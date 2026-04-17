@@ -102,7 +102,7 @@ router_test.16:
 router_test.17:
   path: '/router_test/test17'
   defaults:
-    _controller: '\Drupal\router_test\TestControllers::test10'
+    _controller: 'Drupal\router_test\TestControllers::test10'
   requirements:
     _access: 'TRUE'
 
@@ -151,7 +151,7 @@ router_test.23:
 router_test.24:
   path: '/router_test/test24'
   defaults:
-    _controller: '\Drupal\router_test\TestControllers::test24'
+    _controller: 'Drupal\router_test\TestControllers::test24'
   requirements:
     _access: 'TRUE'
 
