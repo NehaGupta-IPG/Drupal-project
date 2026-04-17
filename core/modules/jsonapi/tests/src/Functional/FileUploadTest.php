@@ -700,7 +700,7 @@ class FileUploadTest extends ResourceTestBase {
   }
 
   /**
-   * Tests using the file upload POST route with malicious extensions.
+   * Tests using the image upload POST route with a malicious image.
    */
   public function testImageUploadMaliciousContent(): void {
     $this->container->get('module_installer')->install(['image']);
