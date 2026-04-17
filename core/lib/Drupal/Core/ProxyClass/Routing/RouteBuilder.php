@@ -10,7 +10,7 @@ namespace Drupal\Core\ProxyClass\Routing {
     /**
      * Provides a proxy class for \Drupal\Core\Routing\RouteBuilder.
      *
-     * @see \Drupal\Component\ProxyBuilder\ProxyBuilder
+     * @see \Drupal\Component\ProxyBuilder
      */
     class RouteBuilder implements \Drupal\Core\Routing\RouteBuilderInterface, \Drupal\Core\DestructableInterface
     {
@@ -97,14 +97,6 @@ namespace Drupal\Core\ProxyClass\Routing {
         public function destruct()
         {
             return $this->lazyLoadItself()->destruct();
-        }
-
-        /**
-         * {@inheritdoc}
-         */
-        public function __get(string $name): mixed
-        {
-            return $this->lazyLoadItself()->__get($name);
         }
 
     }
