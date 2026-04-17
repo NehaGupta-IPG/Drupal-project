@@ -43,7 +43,7 @@ abstract class AccessibilityTestBase extends WebDriverTestBase {
    * @param string|null $setup_callback
    *   (optional) Name of callback method to run page setup steps before
    *   executing Axe.
-   *   The method must not be private. Return values from the method are
+   *   The method must non-private and non-static. Return values from the method are
    *   not used.
    */
   #[DataProvider('provider')]
