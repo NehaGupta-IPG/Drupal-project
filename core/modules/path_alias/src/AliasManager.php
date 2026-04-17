@@ -92,7 +92,12 @@ class AliasManager implements AliasManagerInterface {
 
     // Look for path in storage.
     if ($path_alias = $this->pathAliasRepository->lookupByAlias($alias, $langcode)) {
-      $this->lookupMap[$langcode][$path_alias['path']] = $path_alias['alias'];
+      // Store the canonical alias rather than the requested alias
+      // so that getAliasByPath() returns the canonical form. This allows the
+      // Redirect module's RouteNormalizerRequestSubscriber to detect
+      // non-canonical aliases and issue a 301 redirect to the canonical URL.
+      $canonical = $this->pathAliasRepository->lookupBySystemPath($path_alias['path'], $langcode);
+      $this->lookupMap[$langcode][$path_alias['path']] = $canonical ? $canonical['alias'] : $path_alias['alias'];
       return $path_alias['path'];
     }
 
