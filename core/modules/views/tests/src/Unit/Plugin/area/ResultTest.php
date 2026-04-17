@@ -10,6 +10,7 @@ use Drupal\Tests\UnitTestCase;
 use Drupal\views\Entity\View;
 use Drupal\views\Plugin\views\area\Result;
 use Drupal\views\Plugin\views\pager\PagerPluginBase;
+use Drupal\views\Plugin\views\style\StylePluginBase;
 use Drupal\views\Plugin\ViewsPluginManager;
 use Drupal\views\ViewExecutable;
 use Drupal\views\ViewsData;
@@ -136,7 +137,7 @@ class ResultTest extends UnitTestCase {
       ->shouldBeCalledTimes(1);
 
     $this->view->pager = $pager->reveal();
-    $this->view->style_plugin = new \stdClass();
+    $this->view->style_plugin = $this->createStub(StylePluginBase::class);
     $this->view->total_rows = 100;
     $this->view->result = [1, 2, 3, 4, 5];
   }
