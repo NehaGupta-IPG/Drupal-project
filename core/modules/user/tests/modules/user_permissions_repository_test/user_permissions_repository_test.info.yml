@@ -1,0 +1,5 @@
+name: 'User permission repository tests'
+type: module
+description: 'Support module for user permission repository testing.'
+package: Testing
+version: VERSION
