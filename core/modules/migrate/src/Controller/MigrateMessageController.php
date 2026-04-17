@@ -220,8 +220,9 @@ class MigrateMessageController extends ControllerBase {
       }
       $new_row['level'] = $levels[$message_row->level];
       $new_row['message'] = $message_row->message;
-      $new_row['last_imported'] = !empty($message_row->last_imported)
-        ? $this->dateFormatter->format($message_row->last_imported, 'short')
+      $timestamp = $message_row->last_imported ?? NULL;
+      $new_row['last_imported'] = $timestamp
+        ? $this->dateFormatter->format($timestamp, 'short')
         : $this->t('Not available');
       $rows[] = $new_row;
     }
