@@ -15,8 +15,8 @@ return Rector\Config\RectorConfig::configure()
       __DIR__ . '/vendor/palantirnet/drupal-rector/config/drupal-phpunit-bootstrap-file.php',
   ])
   ->withPaths([
-    __DIR__ . '/core/tests',
-    __DIR__ . '/modules/**/tests/src',
+    '/core/tests',
+    '/core/modules/**/tests/src',
   ])
   ->withSkip([
     '*/*ixture*/*',
