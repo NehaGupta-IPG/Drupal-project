@@ -179,6 +179,8 @@ class AssetResolver implements AssetResolverInterface {
    * {@inheritdoc}
    */
   public function getCssAssets(AttachedAssetsInterface $assets, $optimize, ?LanguageInterface $language = NULL) {
+    $js_assets = $this->getJsAssets($assets, $optimize);
+
     if (!$assets->getLibraries()) {
       return [];
     }
@@ -188,6 +190,12 @@ class AssetResolver implements AssetResolverInterface {
     if (!$libraries_to_load) {
       return [];
     }
+
+    if (!empty($js_assets)) {
+      $libraries_to_load[] = 'system/js-show-hide';
+      $libraries_to_load = array_unique($libraries_to_load);
+    }
+
     if (!isset($language)) {
       $language = $this->languageManager->getCurrentLanguage();
     }

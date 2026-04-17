@@ -71,3 +71,7 @@ drupal.system.date:
     - core/drupalSettings
     - core/once
     - core/drupal.form
+js-show-hide:
+  css:
+    component:
+      css/js-show-hide/js-show-hide.css: {}
