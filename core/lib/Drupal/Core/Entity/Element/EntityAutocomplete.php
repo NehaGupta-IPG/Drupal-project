@@ -423,16 +423,17 @@ class EntityAutocomplete extends Textfield {
     // Take "label (entity id)', match the ID from inside the parentheses.
     // @todo Add support for entities containing parentheses in their ID.
     // @see https://www.drupal.org/node/2520416
-    if (preg_match("/.+\s\(([^\)]+)\)\z/", $input, $matches)) {
+    $id_group = 2;
+    if (preg_match('/^("*).+ \\(([^)]+)\\)\\1$/', $input, $matches)) {
       if ($target_type_id === NULL) {
-        return static::matchNumeric($matches[1]) ? $matches[1] : NULL;
+        return static::matchNumeric($matches[$id_group]) ? $matches[$id_group] : NULL;
       }
 
       $target_type = \Drupal::entityTypeManager()->getDefinition($target_type_id);
       if ($target_type instanceof ConfigEntityTypeInterface) {
         // XXX: Config entities do not provide any means to typify their
         // properties, so let us assume that config entity IDs are strings.
-        return static::matchString($matches[1]) ? $matches[1] : NULL;
+        return static::matchString($matches[$id_group]) ? $matches[$id_group] : NULL;
       }
       if ($target_type->entityClassImplements(FieldableEntityInterface::class)) {
         /** @var \Drupal\Core\Entity\EntityFieldManagerInterface $field_manager */
@@ -442,11 +443,11 @@ class EntityAutocomplete extends Textfield {
           'string' => static::matchString(...),
           default => static::matchNumeric(...),
         };
-        return $matcher($matches[1]) ? $matches[1] : NULL;
+        return $matcher($matches[$id_group]) ? $matches[$id_group] : NULL;
       }
 
       // Fallback to base numeric check.
-      return static::matchNumeric($matches[1]) ? $matches[1] : NULL;
+      return static::matchNumeric($matches[$id_group]) ? $matches[$id_group] : NULL;
     }
   }
 
