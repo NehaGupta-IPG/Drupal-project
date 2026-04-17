@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\KernelTests\Core\Entity;
 
+use Drupal\Core\Database\Query\AlterableInterface;
+use Drupal\Core\Hook\Attribute\Hook;
 use Drupal\entity_test\Entity\EntityTest;
 use Drupal\entity_test\EntityTestHelper;
 use PHPUnit\Framework\Attributes\Group;
@@ -25,7 +27,7 @@ class EntityQueryCacheabilityTest extends EntityKernelTestBase {
       'name' => $this->randomString(),
       'type' => 'test_bundle',
     ])->save();
-    \Drupal::keyValue('entity_test')->set('query_access', TRUE);
+
     $query = \Drupal::entityTypeManager()->getStorage('entity_test')
       ->getQuery()
       ->condition('type', 'test_bundle')
@@ -45,6 +47,24 @@ class EntityQueryCacheabilityTest extends EntityKernelTestBase {
     // the ['entity_test.test_tag'] tags added in query alter hook.
     // @see Drupal\entity_test\Entity\EntityTestHooks::queryEntityTestAccessAlter()
     $this->assertEquals(['entity_test_list', 'entity_test.test_tag'], $query->getCacheTags());
+  }
+
+  /**
+   * Implements hook_query_TAG_alter().
+   */
+  #[Hook('query_entity_test_access_alter')]
+  public function queryEntityTestAccessAlter(AlterableInterface $query): void {
+    // Add user.permissions cache context, since adding query condition is
+    // based on permission.
+    $query->addCacheContexts(['user.permissions']);
+    /** @var \Drupal\Core\Database\Query\Select|\Drupal\Core\Database\Query\AlterableInterface $query */
+    if (!\Drupal::currentUser()->hasPermission('administer entity_test content')) {
+      $query->condition('entity_test.name', 'published entity');
+    }
+
+    // Add cache metadata for cacheability test assertions.
+    $query->addCacheTags(['entity_test.test_tag'])
+      ->mergeCacheMaxAge(60);
   }
 
 }

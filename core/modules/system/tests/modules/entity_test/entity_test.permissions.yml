@@ -14,6 +14,8 @@ administer entity_test_with_bundle content:
   description: 'administer entity_test_with_bundle content'
 administer entity_test_bundle content:
   title: 'administer entity_test_bundle content'
+view all entity_test_query_access entities:
+  title: 'view all entity_test_query_access entities'
 edit own entity_test content:
   title: 'Edit own entity_test content'
 create entity_test entity_test_with_bundle entities:

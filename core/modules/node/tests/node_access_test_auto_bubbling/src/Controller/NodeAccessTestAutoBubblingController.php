@@ -6,8 +6,6 @@ namespace Drupal\node_access_test_auto_bubbling\Controller;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\DependencyInjection\AutowireTrait;
-use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\RendererInterface;
@@ -17,9 +15,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 /**
  * Returns a node ID listing.
  */
-class NodeAccessTestAutoBubblingController extends ControllerBase implements ContainerInjectionInterface {
-
-  use AutowireTrait;
+class NodeAccessTestAutoBubblingController extends ControllerBase {
 
   public function __construct(
     #[Autowire(service: 'keyvalue')]
