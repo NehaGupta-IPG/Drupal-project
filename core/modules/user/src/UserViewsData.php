@@ -25,6 +25,7 @@ class UserViewsData extends EntityViewsData {
       'name table' => 'users_field_data',
       'name field' => 'name',
       'empty field name' => \Drupal::config('user.settings')->get('anonymous'),
+      'entity_type' => 'user',
     ];
     $data['users_field_data']['uid']['filter']['id'] = 'user_name';
     $data['users_field_data']['uid']['filter']['title'] = $this->t('Name (autocomplete)');

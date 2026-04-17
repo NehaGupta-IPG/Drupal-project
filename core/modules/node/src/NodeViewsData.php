@@ -78,6 +78,7 @@ class NodeViewsData extends EntityViewsData {
       'name field' => 'title',
       'numeric' => TRUE,
       'validate type' => 'nid',
+      'entity_type' => 'node',
     ];
 
     $data['node_field_data']['title']['field']['default_formatter_settings'] = ['link_to_entity' => TRUE];
@@ -268,6 +269,7 @@ class NodeViewsData extends EntityViewsData {
     $data['node_field_revision']['nid']['argument'] = [
       'id' => 'node_nid',
       'numeric' => TRUE,
+      'entity_type' => 'node',
     ];
     // @todo the NID field needs different behavior on revision/non-revision
     //   tables. It would be neat if this could be encoded in the base field

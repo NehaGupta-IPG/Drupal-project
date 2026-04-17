@@ -25,6 +25,7 @@ class FileViewsData extends EntityViewsData {
       // The field to display in the summary.
       'name field' => 'filename',
       'numeric' => TRUE,
+      'entity_type' => 'file',
     ];
     $data['file_managed']['fid']['relationship'] = [
       'title' => $this->t('File usage'),

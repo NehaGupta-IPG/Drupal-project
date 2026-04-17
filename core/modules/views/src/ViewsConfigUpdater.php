@@ -187,7 +187,21 @@ class ViewsConfigUpdater {
       if (isset($display['display_options']['arguments'])) {
         foreach ($display['display_options']['arguments'] as $argument_id => $argument) {
           $plugin_id = $argument['plugin_id'] ?? '';
-          if ($plugin_id === 'numeric') {
+          $plugin_id_mapping = [
+            'file_fid' => 'file',
+            'node_nid' => 'node',
+            'taxonomy' => 'taxonomy_term',
+            'vocabulary_vid' => 'taxonomy_vocabulary',
+            'user_uid' => 'user',
+          ];
+          if (isset($plugin_id_mapping[$plugin_id])) {
+            if (!isset($argument['entity_type'])) {
+              $argument['entity_type'] = $plugin_id_mapping[$plugin_id];
+              $display['display_options']['arguments'][$argument_id] = $argument;
+              $changed = TRUE;
+            }
+          }
+          elseif ($plugin_id === 'numeric') {
             $argument_table_data = $this->viewsData->get($argument['table']);
             $argument_definition = $argument_table_data[$argument['field']]['argument'] ?? [];
             if (isset($argument_definition['id']) && $argument_definition['id'] === 'entity_target_id') {
