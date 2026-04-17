@@ -93,8 +93,10 @@ class Map extends TypedData implements \IteratorAggregate, ComplexDataInterface 
       // Some computed properties are computed only because they have custom
       // storage (e.g. path aliases); setting a value on these is necessary. But
       // read-only computed properties don't ever need writing to.
-      // @see path_entity_base_field_info()
+      // @see \Drupal\path\Hook\PathHooks::entityBaseFieldInfo()
       if ($data_definition->isReadOnly() && $data_definition->isComputed()) {
+        // Unset the item so it doesn't try and get processed.
+        unset($this->values[$name]);
         continue;
       }
 
