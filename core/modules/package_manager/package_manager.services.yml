@@ -56,9 +56,13 @@ services:
   Drupal\package_manager\ComposerInspector: {}
 
   # Validators.
-  Drupal\package_manager\Validator\EnvironmentSupportValidator: {}
+  Drupal\package_manager\Validator\EnvironmentSupportValidator:
+    tags:
+      - { name: container.public }
   Drupal\package_manager\Validator\ComposerValidator: {}
-  Drupal\package_manager\Validator\DiskSpaceValidator: {}
+  Drupal\package_manager\Validator\DiskSpaceValidator:
+    tags:
+      - { name: container.public }
   Drupal\package_manager\Validator\PendingUpdatesValidator:
     arguments:
       - '%app.root%'
@@ -69,7 +73,9 @@ services:
       $keyValueFactory: '@keyvalue'
     tags:
       - { name: container.public }
-  Drupal\package_manager\Validator\WritableFileSystemValidator: {}
+  Drupal\package_manager\Validator\WritableFileSystemValidator:
+    tags:
+      - { name: container.public }
   Drupal\package_manager\Validator\ComposerMinimumStabilityValidator: {}
   Drupal\package_manager\Validator\MultisiteValidator: {}
   Drupal\package_manager\Validator\SymlinkValidator: {}
@@ -98,7 +104,9 @@ services:
   Drupal\package_manager\Validator\RsyncValidator: {}
   Drupal\package_manager\Validator\ComposerPluginsValidator: {}
   Drupal\package_manager\Validator\ComposerPatchesValidator: {}
-  Drupal\package_manager\Validator\BaseRequirementsFulfilledValidator: {}
+  Drupal\package_manager\Validator\BaseRequirementsFulfilledValidator:
+    tags:
+      - { name: container.public }
   Drupal\package_manager\Validator\SupportedReleaseValidator: {}
   Drupal\package_manager\Validator\SandboxDirectoryValidator: {}
   Drupal\package_manager\Validator\PhpExtensionsValidator: {}
