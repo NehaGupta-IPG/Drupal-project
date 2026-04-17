@@ -55,8 +55,6 @@ services:
     calls:
       - ['setVariationCache', ['@variation_cache.jsonapi_normalizations']]
       - ['setRequestStack', ['@request_stack']]
-    tags:
-      - { name: container.public }
   serializer.normalizer.content_entity.jsonapi:
     class: Drupal\jsonapi\Normalizer\ContentEntityDenormalizer
     tags:

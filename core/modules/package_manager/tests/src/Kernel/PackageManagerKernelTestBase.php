@@ -17,9 +17,14 @@ use Drupal\package_manager\Event\PreApplyEvent;
 use Drupal\package_manager\Event\SandboxValidationEvent;
 use Drupal\package_manager\Exception\SandboxEventException;
 use Drupal\package_manager\FailureMarker;
+use Drupal\package_manager\PathExcluder\SiteConfigurationExcluder;
 use Drupal\package_manager\PathLocator;
 use Drupal\package_manager\StatusCheckTrait;
+use Drupal\package_manager\Validator\BaseRequirementsFulfilledValidator;
 use Drupal\package_manager\Validator\DiskSpaceValidator;
+use Drupal\package_manager\Validator\EnvironmentSupportValidator;
+use Drupal\package_manager\Validator\LockFileValidator;
+use Drupal\package_manager\Validator\WritableFileSystemValidator;
 use Drupal\package_manager\SandboxManagerBase;
 use Drupal\Tests\package_manager\Traits\AssertPreconditionsTrait;
 use Drupal\Tests\package_manager\Traits\ComposerStagerTestTrait;
@@ -163,6 +168,18 @@ abstract class PackageManagerKernelTestBase extends KernelTestBase {
     // rebuild.
     // @see ::createTestProject()
     $container->getDefinition(DiskSpaceValidator::class)->addTag('persist');
+
+    // Allow tests to fetch event subscribers directly from the container.
+    foreach ([
+      BaseRequirementsFulfilledValidator::class,
+      DiskSpaceValidator::class,
+      EnvironmentSupportValidator::class,
+      LockFileValidator::class,
+      SiteConfigurationExcluder::class,
+      WritableFileSystemValidator::class,
+    ] as $service_id) {
+      $container->getDefinition($service_id)->addTag('container.public');
+    }
 
     // Ensure that our failure logger will survive container rebuilds.
     $container->getDefinition('logger.channel.package_manager')
