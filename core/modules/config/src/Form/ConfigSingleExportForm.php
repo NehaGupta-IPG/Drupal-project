@@ -10,7 +10,6 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Htmx\Htmx;
 use Drupal\Core\Serialization\Yaml;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -26,21 +25,14 @@ class ConfigSingleExportForm extends FormBase {
    *
    * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityTypeManager;
+  protected EntityTypeManagerInterface $entityTypeManager;
 
   /**
    * The config storage.
    *
    * @var \Drupal\Core\Config\StorageInterface
    */
-  protected $configStorage;
-
-  /**
-   * Tracks the valid config entity type definitions.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeInterface[]
-   */
-  protected $definitions = [];
+  protected StorageInterface $configStorage;
 
   /**
    * Constructs a new ConfigSingleImportForm.
@@ -50,7 +42,10 @@ class ConfigSingleExportForm extends FormBase {
    * @param \Drupal\Core\Config\StorageInterface $config_storage
    *   The config storage.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, StorageInterface $config_storage) {
+  public function __construct(
+    EntityTypeManagerInterface $entity_type_manager,
+    StorageInterface $config_storage
+  ) {
     $this->entityTypeManager = $entity_type_manager;
     $this->configStorage = $config_storage;
   }
@@ -58,7 +53,7 @@ class ConfigSingleExportForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container) {
+  public static function create(ContainerInterface $container): static {
     return new static(
       $container->get('entity_type.manager'),
       $container->get('config.storage')
@@ -68,159 +63,170 @@ class ConfigSingleExportForm extends FormBase {
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId(): string {
     return 'config_single_export_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state, string $config_type = '', string $config_name = '') {
-    foreach ($this->entityTypeManager->getDefinitions() as $entity_type => $definition) {
-      if ($definition->entityClassImplements(ConfigEntityInterface::class)) {
-        $this->definitions[$entity_type] = $definition;
-      }
-    }
-    $entity_types = array_map(function (EntityTypeInterface $definition) {
-      return $definition->getLabel();
-    }, $this->definitions);
-    // Sort the entity types by label, then add the simple config to the top.
-    uasort($entity_types, 'strnatcasecmp');
-    $config_types = [
-      'system.simple' => $this->t('Simple configuration'),
-    ] + $entity_types;
+  public function buildForm(
+    array $form,
+    FormStateInterface $form_state,
+    string $config_type = '',
+    string $config_name = ''
+  ): array {
+
+    $request = \Drupal::request();
+
+    // Single source of truth:
+    // 1. POST (HTMX)
+    // 2. Route params
+    $type = (string) (
+      $request->request->get('config_type')
+      ?? $config_type
+    );
+
+    $name = (string) (
+      $request->request->get('config_name')
+      ?? $config_name
+    );
+
+    // HTMX + Form API: no cache.
+    $form['#cache']['max-age'] = 0;
+
+    $form['#attributes']['id'] = 'config-export-form';
+
+    /* ------------------------------------------------------------------
+     * URL to push (PATH-BASED)
+     * ------------------------------------------------------------------ */
+
+    $route_params = array_filter([
+      'config_type' => $type ?: NULL,
+      'config_name' => $name ?: NULL,
+    ]);
+
+    $push_url = Url::fromRoute('config.export_single', $route_params)
+      ->toString();
+
+    /* ------------------------------------------------------------------
+     * CONFIG TYPE
+     * ------------------------------------------------------------------ */
+
+    $configTypeOptions = $this->getConfigTypeOptions();
+
     $form['config_type'] = [
       '#title' => $this->t('Configuration type'),
       '#type' => 'select',
-      '#options' => $config_types,
-      '#default_value' => $config_type,
+      '#options' => $configTypeOptions,
+      '#default_value' => $type,
+      '#attributes' => [
+        'hx-post' => Url::fromRoute('config.export_single')->toString(),
+        'hx-trigger' => 'change',
+        'hx-include' => 'closest form',
+        'hx-target' => '#config-export-form',
+        'hx-select' => '#config-export-form',
+        'hx-swap' => 'outerHTML'
+      ],
     ];
-    // The config_name element depends on the value of config_type.
-    // Select and replace the wrapper element of the <select> tag
-    $form_url = Url::fromRoute('config.export_single', ['config_type' => $config_type, 'config_name' => $config_name]);
-    (new Htmx())
-      ->post($form_url)
-      ->onlyMainContent()
-      ->select('*:has(>select[name="config_name"])')
-      ->target('*:has(>select[name="config_name"])')
-      ->swap('outerHTML')
-      ->applyTo($form['config_type']);
 
-    $default_type = $form_state->getValue('config_type', $config_type);
+    /* ------------------------------------------------------------------
+     * CONFIG NAME
+     * ------------------------------------------------------------------ */
+
+    $configNameOptions = $type ? $this->findConfiguration($type) : [];
+
+    // If name is not valid for current type → reset.
+    if ($name && !isset($configNameOptions[$name])) {
+      $name = '';
+    }
+
     $form['config_name'] = [
       '#title' => $this->t('Configuration name'),
       '#type' => 'select',
-      '#options' => $this->findConfiguration($default_type),
+      '#options' => $configNameOptions,
       '#empty_option' => $this->t('- Select -'),
-      '#default_value' => $config_name,
+      '#default_value' => $name,
+      '#attributes' => [
+        'hx-post' => Url::fromRoute('config.export_single')->toString(),
+        'hx-trigger' => 'change',
+        'hx-include' => 'closest form',
+        'hx-target' => '#config-export-form',
+        'hx-select' => '#config-export-form',
+        'hx-swap' => 'outerHTML'
+      ],
     ];
-    // The export element depends on the value of config_type and config_name.
-    // Select and replace the wrapper element of the export textarea.
-    (new Htmx())
-      ->post($form_url)
-      ->onlyMainContent()
-      ->select('[data-export-wrapper]')
-      ->target('[data-export-wrapper]')
-      ->swap('outerHTML')
-      ->applyTo($form['config_name']);
+
+    /* ------------------------------------------------------------------
+     * EXPORT
+     * ------------------------------------------------------------------ */
 
     $form['export'] = [
       '#title' => $this->t('Here is your configuration:'),
       '#type' => 'textarea',
       '#rows' => 24,
-      '#wrapper_attributes' => [
-        'data-export-wrapper' => TRUE,
-      ],
+      '#value' => '',
     ];
 
-    $pushUrl = FALSE;
-    $trigger = $this->getHtmxTriggerName();
-    if ($trigger == 'config_type') {
-      $form = $this->updateConfigurationType($form, $form_state);
-      // Also update the empty export element "out of band".
-      (new Htmx())
-        ->swapOob('outerHTML:[data-export-wrapper]')
-        ->applyTo($form['export'], '#wrapper_attributes');
-      $pushUrl = Url::fromRoute('config.export_single', ['config_type' => $default_type, 'config_name' => '']);
+    if ($type && $name) {
+      $filename = $this->findFilename($type, $name);
+      $form['export']['#value'] = $this->loadYaml($filename);
+      $form['export']['#description'] = $filename;
     }
-    elseif ($trigger == 'config_name') {
-      // A name is selected.
-      $default_name = $form_state->getValue('config_name', $config_name);
-      $form['export'] = $this->updateExport($form, $default_type, $default_name);
-      // Update the url in the browser location bar.
-      $pushUrl = Url::fromRoute('config.export_single', ['config_type' => $default_type, 'config_name' => $default_name]);
-    }
-    elseif ($config_type && $config_name) {
-      // We started with values, update the export using those.
-      $form['export'] = $this->updateExport($form, $config_type, $config_name);
-    }
-    if ($pushUrl) {
-      (new Htmx())
-        ->pushUrlHeader($pushUrl)
-        ->applyTo($form);
-    }
+
+    $route_params = array_filter([
+      'config_type' => $type ?: NULL,
+      'config_name' => $name ?: NULL,
+    ]);
+
+    $push_url = Url::fromRoute('config.export_single', $route_params);
+
+    (new Htmx())
+      ->pushUrlHeader($push_url)
+      ->applyTo($form);
+
     return $form;
   }
 
-  /**
-   * Handles switching the configuration type selector.
-   */
-  public function updateConfigurationType($form, FormStateInterface $form_state) {
-    $form['config_name']['#options'] = $this->findConfiguration($form_state->getValue('config_type'));
-    $form['export']['#value'] = NULL;
-    return $form;
-  }
+  /* ------------------------------------------------------------------
+   * Helpers
+   * ------------------------------------------------------------------ */
 
-  /**
-   * Handles switching the export textarea.
-   */
-  public function updateExport($form, string $config_type, string $config_name) {
-    // Determine the full config name for the selected config entity.
-    // Calling this in the main form build requires accounting for not yet
-    // having input.
-    if (!empty($config_type) && $config_type !== 'system.simple') {
-      $definition = $this->entityTypeManager->getDefinition($config_type);
-      $name = $definition->getConfigPrefix() . '.' . $config_name;
-    }
-    // The config name is used directly for simple configuration.
-    else {
-      $name = $config_name;
-    }
-    // Read the raw data for this config name, encode it, and display it.
-    $exists = $this->configStorage->exists($name);
-    $form['export']['#value'] = !$exists ? NULL : Yaml::encode($this->configStorage->read($name));
-    $form['export']['#description'] = !$exists ? NULL : $this->t('Filename: %name', ['%name' => $name . '.yml']);
-    return $form['export'];
-  }
+  protected function getConfigTypeOptions(): array {
+    $options = [
+      'system.simple' => $this->t('Simple configuration'),
+    ];
 
-  /**
-   * Handles switching the configuration type selector.
-   */
-  protected function findConfiguration($config_type) {
-    $names = [];
-    // For a given entity type, load all entities.
-    if ($config_type && $config_type !== 'system.simple') {
-      $entity_storage = $this->entityTypeManager->getStorage($config_type);
-      foreach ($entity_storage->loadMultiple() as $entity) {
-        $entity_id = $entity->id();
-        if ($label = $entity->label()) {
-          $names[$entity_id] = new TranslatableMarkup('@id (@label)', ['@label' => $label, '@id' => $entity_id]);
-        }
-        else {
-          $names[$entity_id] = $entity_id;
-        }
+    foreach ($this->entityTypeManager->getDefinitions() as $id => $definition) {
+      if ($definition->entityClassImplements(ConfigEntityInterface::class)) {
+        $options[$id] = $definition->getLabel()." (".$definition->id().")";
       }
     }
+
+    return $options;
+  }
+
+  /**
+   * Handles switching the configuration type selector.
+   */
+  protected function findConfiguration(string $type): array {
     // Handle simple configuration.
-    else {
-      // Gather the config entity prefixes.
+    if ($type === 'system.simple') {
+      $all = $this->configStorage->listAll();
+      $names = array_combine($all, $all);
+      $options = [];
+
+      foreach ($this->entityTypeManager->getDefinitions() as $entity_type => $definition) {
+        if ($definition->entityClassImplements(ConfigEntityInterface::class)) {
+          $options[$entity_type] = $definition;
+        }
+      }
+
       $config_prefixes = array_map(function (EntityTypeInterface $definition) {
         return $definition->getConfigPrefix() . '.';
-      }, $this->definitions);
+      }, $options);
 
       // Find all config, and then filter our anything matching a config prefix.
-      $names += $this->configStorage->listAll();
-      $names = array_combine($names, $names);
       foreach ($names as $config_name) {
         foreach ($config_prefixes as $config_prefix) {
           if (str_starts_with($config_name, $config_prefix)) {
@@ -228,14 +234,49 @@ class ConfigSingleExportForm extends FormBase {
           }
         }
       }
+      return $names;
     }
+
+    // Config entities.
+    $names = [];
+    $storage = $this->entityTypeManager->getStorage($type);
+
+    // For a given entity type, load all entities.
+    foreach ($storage->loadMultiple() as $entity) {
+      $names[$entity->id()] = $entity->label() ? $entity->label()." (".$entity->id().")" : $entity->id();
+    }
+
     return $names;
   }
 
   /**
-   * {@inheritdoc}
+   * Loads configuration data (yaml) for a given item.
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  protected function loadYaml(string $filename): string {
+    if (!$this->configStorage->exists($filename)) {
+      return '';
+    }
+
+    return Yaml::encode($this->configStorage->read($filename));
+  }
+
+  /**
+   * Returns the filename of a configuration item.
+   */
+  protected function findFilename(string $type, string $name): string {
+    if ($type !== 'system.simple') {
+      $definition = $this->entityTypeManager->getDefinition($type);
+      $name = $definition->getConfigPrefix() . '.' . $name;
+    }
+
+    if (!$this->configStorage->exists($name)) {
+      return '';
+    }
+
+    return $name;
+  }
+
+  public function submitForm(array &$form, FormStateInterface $form_state): void {
     // Nothing to submit.
   }
 
