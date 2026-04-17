@@ -35,9 +35,10 @@ class MediaCreationTest extends MediaKernelTestBase {
     $this->assertSame('Test type', $test_media_type->get('label'), 'Could not assure the correct type name.');
     $this->assertSame('Test type.', $test_media_type->get('description'), 'Could not assure the correct type description.');
     $this->assertSame('test', $test_media_type->get('source'), 'Could not assure the correct media source.');
-    // Source field is not set on the media source, but it should never
-    // be created automatically when a config is being imported.
-    $this->assertSame(['source_field' => '', 'test_config_value' => 'Foo'], $test_media_type->get('source_configuration'), 'Could not assure the correct media source configuration.');
+    // Source fields should also be provisioned for media types installed from
+    // configuration.
+    $this->assertSame(['source_field' => 'field_media_test_1', 'test_config_value' => 'Foo'], $test_media_type->get('source_configuration'), 'Could not assure the correct media source configuration.');
+    $this->assertNotNull($test_media_type->getSource()->getSourceFieldDefinition($test_media_type));
     $this->assertSame(['metadata_attribute' => 'field_attribute_config_test'], $test_media_type->get('field_map'), 'Could not assure the correct field map.');
     // Check the Media Type access handler behavior.
     // We grant access to the 'view label' operation to all users having
