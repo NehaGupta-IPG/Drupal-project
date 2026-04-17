@@ -102,7 +102,7 @@ namespace Drupal\Core\ProxyClass\Routing {
         /**
          * {@inheritdoc}
          */
-        public function __get(string $name): ?mixed
+        public function __get(string $name): mixed
         {
             return $this->lazyLoadItself()->__get($name);
         }
