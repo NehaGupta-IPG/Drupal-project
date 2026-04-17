@@ -12,7 +12,7 @@ use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromStrictSetUpRector;
 
 return Rector\Config\RectorConfig::configure()
   ->withBootstrapFiles([
-      __DIR__ . '/vendor/palantirnet/drupal-rector/config/drupal-phpunit-bootstrap-file.php',
+     'vendor/palantirnet/drupal-rector/config/drupal-phpunit-bootstrap-file.php',
   ])
   ->withPaths([
     'core/tests',
@@ -23,20 +23,20 @@ return Rector\Config\RectorConfig::configure()
     '*/Annotation/Doctrine/*',
     'core/tests/Drupal/Tests/TestTools/ErrorHandler/DrupalDebugClassLoaderTest.php'
   ])
-/*  ->withSets([
+#  ->withSets([
 #    PHPUnitSetList::PHPUNIT_100,
-    PHPUnitSetList::PHPUNIT_110,
-    PHPUnitSetList::PHPUNIT_120,
+#    PHPUnitSetList::PHPUNIT_110,
+#    PHPUnitSetList::PHPUNIT_120,
 #    PHPUnitSetList::PHPUNIT_CODE_QUALITY,
-  ])*/
+#  ])
   ->withPreparedSets(typeDeclarations: true)
-/*  ->withSkip([
+  ->withSkip([
     TypedPropertyFromCreateMockAssignRector::class,
-    TypedPropertyFromDocblockSetUpDefinedRector::class,
-    TypedPropertyFromAssignsRector::class,
-    TypedPropertyFromStrictConstructorRector::class,
-    TypedPropertyFromStrictSetUpRector::class,
-  ])*/
+#    TypedPropertyFromDocblockSetUpDefinedRector::class,
+#    TypedPropertyFromAssignsRector::class,
+#    TypedPropertyFromStrictConstructorRector::class,
+#    TypedPropertyFromStrictSetUpRector::class,
+  ])
   ->withImportNames(
     importDocBlockNames: false,
     importShortClasses: false,
