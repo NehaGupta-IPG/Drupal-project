@@ -120,10 +120,7 @@ abstract class TextItemBase extends FieldItemBase {
     foreach ($this->definition->getPropertyDefinitions() as $property => $definition) {
       if ($definition->getClass() == '\Drupal\text\TextProcessed') {
         if ($property_name == 'format' || ($definition->getSetting('text source') == $property_name)) {
-          // The processed property is read-only and computed, so we cannot
-          // use writePropertyValue(). Instead, unset the property object so
-          // it will be re-created with a fresh computed value on next access.
-          unset($this->properties[$property]);
+          $this->writePropertyValue($property, NULL);
         }
       }
     }
