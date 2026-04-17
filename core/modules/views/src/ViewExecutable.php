@@ -4,11 +4,17 @@ namespace Drupal\views;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Component\Utility\Tags;
+use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Logger\LoggerChannelTrait;
 use Drupal\Core\Routing\RouteProviderInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Url;
+use Drupal\views\Plugin\views\display\DisplayPluginInterface;
 use Drupal\views\Plugin\views\display\DisplayRouterInterface;
+use Drupal\views\Plugin\views\pager\PagerPluginInterface;
 use Drupal\views\Plugin\views\query\QueryPluginBase;
+use Drupal\views\Plugin\views\row\RowPluginBase;
+use Drupal\views\Plugin\views\style\StylePluginInterface;
 use Drupal\views\Plugin\ViewsPluginManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,7 +42,7 @@ class ViewExecutable {
    *
    * @var \Drupal\views\Entity\View
    */
-  public $storage;
+  public ViewEntityInterface $storage;
 
   /**
    * Whether or not the view has been built.
@@ -45,7 +51,7 @@ class ViewExecutable {
    *
    * @todo Group with other static properties.
    */
-  public $built = FALSE;
+  public bool $built = FALSE;
 
   /**
    * Whether the view has been executed/query has been run.
@@ -54,14 +60,14 @@ class ViewExecutable {
    *
    * @todo Group with other static properties.
    */
-  public $executed = FALSE;
+  public bool $executed = FALSE;
 
   /**
    * Any arguments that have been passed into the view.
    *
    * @var array
    */
-  public $args = [];
+  public array $args = [];
 
   /**
    * An array of build info.
@@ -69,14 +75,14 @@ class ViewExecutable {
    * @var array
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $build_info = [];
+  public array $build_info = [];
 
   /**
    * Whether this view uses AJAX.
    *
    * @var bool
    */
-  protected $ajaxEnabled = FALSE;
+  protected bool $ajaxEnabled = FALSE;
 
   /**
    * The plugin name.
@@ -97,7 +103,7 @@ class ViewExecutable {
    *
    * @var \Drupal\views\ResultRow[]
    */
-  public $result = [];
+  public array $result = [];
 
   // May be used to override the current pager info.
 
@@ -107,7 +113,7 @@ class ViewExecutable {
    * @var int
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  protected $current_page = NULL;
+  protected ?int $current_page = NULL;
 
   /**
    * The number of items per page.
@@ -115,7 +121,7 @@ class ViewExecutable {
    * @var int
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  protected $items_per_page = NULL;
+  protected ?int $items_per_page = NULL;
 
   /**
    * The pager offset.
@@ -123,7 +129,7 @@ class ViewExecutable {
    * @var int
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  protected $offset = NULL;
+  protected ?int $offset = NULL;
 
   /**
    * The total number of rows returned from the query.
@@ -131,7 +137,7 @@ class ViewExecutable {
    * @var int
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $total_rows = NULL;
+  public ?int $total_rows = NULL;
 
   /**
    * Attachments to place before the view.
@@ -139,7 +145,7 @@ class ViewExecutable {
    * @var array
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $attachment_before = [];
+  public array $attachment_before = [];
 
   /**
    * Attachments to place after the view.
@@ -147,7 +153,7 @@ class ViewExecutable {
    * @var array
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $attachment_after = [];
+  public array $attachment_after = [];
 
   /**
    * Feed icons attached to the view.
@@ -155,7 +161,7 @@ class ViewExecutable {
    * @var array
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $feedIcons = [];
+  public array $feedIcons = [];
 
   // Exposed widget input.
 
@@ -165,7 +171,7 @@ class ViewExecutable {
    * @var array
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $exposed_data = [];
+  public array $exposed_data = [];
 
   /**
    * An array of input values from exposed forms.
@@ -173,7 +179,7 @@ class ViewExecutable {
    * @var array
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  protected $exposed_input = [];
+  protected array $exposed_input = [];
 
   /**
    * Exposed widget input directly from the $form_state->getValues().
@@ -181,7 +187,7 @@ class ViewExecutable {
    * @var array
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $exposed_raw_input = [];
+  public array $exposed_raw_input = [];
 
   /**
    * Used to store views that were previously running if we recurse.
@@ -189,7 +195,7 @@ class ViewExecutable {
    * @var \Drupal\views\ViewExecutable[]
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $old_view = [];
+  public array $old_view = [];
 
   /**
    * To avoid recursion in views embedded into areas.
@@ -197,7 +203,7 @@ class ViewExecutable {
    * @var \Drupal\views\ViewExecutable[]
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $parent_views = [];
+  public array $parent_views = [];
 
   /**
    * Whether this view is an attachment to another view.
@@ -205,7 +211,7 @@ class ViewExecutable {
    * @var bool
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $is_attachment = NULL;
+  public ?bool $is_attachment = NULL;
 
   /**
    * Identifier of the current display.
@@ -213,7 +219,7 @@ class ViewExecutable {
    * @var string
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $current_display;
+  public ?string $current_display = NULL;
 
   /**
    * Where the $query object will reside.
@@ -228,7 +234,7 @@ class ViewExecutable {
    * @var \Drupal\views\Plugin\views\pager\PagerPluginBase
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $pager = NULL;
+  public ?PagerPluginInterface $pager = NULL;
 
   /**
    * The current used display plugin.
@@ -236,7 +242,7 @@ class ViewExecutable {
    * @var \Drupal\views\Plugin\views\display\DisplayPluginBase
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $display_handler;
+  public ?DisplayPluginInterface $display_handler = NULL;
 
   /**
    * The list of used displays of the view.
@@ -246,7 +252,7 @@ class ViewExecutable {
    *
    * @var \Drupal\views\DisplayPluginCollection
    */
-  public $displayHandlers;
+  public ?DisplayPluginCollection $displayHandlers = NULL;
 
   /**
    * The current used style plugin.
@@ -254,14 +260,14 @@ class ViewExecutable {
    * @var \Drupal\views\Plugin\views\style\StylePluginBase
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $style_plugin;
+  public ?StylePluginInterface $style_plugin = NULL;
 
   /**
    * The current used row plugin, if the style plugin supports row plugins.
    *
    * @var \Drupal\views\Plugin\views\row\RowPluginBase
    */
-  public $rowPlugin;
+  public ?RowPluginBase $rowPlugin = NULL;
 
   /**
    * Stores the current active row while rendering.
@@ -269,7 +275,7 @@ class ViewExecutable {
    * @var int
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $row_index;
+  public int $row_index = 0;
 
   /**
    * Allow to override the \Drupal\Core\Url of the current view.
@@ -277,7 +283,7 @@ class ViewExecutable {
    * @var \Drupal\Core\Url
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $override_url;
+  public ?Url $override_url = NULL;
 
 
   /**
@@ -286,7 +292,7 @@ class ViewExecutable {
    * @var string
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $override_path = NULL;
+  public ?string $override_path = NULL;
 
   /**
    * Allow to override the used database which is used for this query.
@@ -294,7 +300,7 @@ class ViewExecutable {
    * @var string|null
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $base_database = NULL;
+  public ?string $base_database = NULL;
 
   // Handlers which are active on this view.
 
@@ -303,49 +309,49 @@ class ViewExecutable {
    *
    * @var \Drupal\views\Plugin\views\field\FieldPluginBase[]
    */
-  public $field;
+  public array $field = [];
 
   /**
    * Stores the argument handlers which are initialized on this view.
    *
    * @var \Drupal\views\Plugin\views\argument\ArgumentPluginBase[]
    */
-  public $argument;
+  public array $argument = [];
 
   /**
    * Stores the sort handlers which are initialized on this view.
    *
    * @var \Drupal\views\Plugin\views\sort\SortPluginBase[]
    */
-  public $sort;
+  public array $sort = [];
 
   /**
    * Stores the filter handlers which are initialized on this view.
    *
    * @var \Drupal\views\Plugin\views\filter\FilterPluginBase[]
    */
-  public $filter;
+  public array $filter = [];
 
   /**
    * Stores the relationship handlers which are initialized on this view.
    *
    * @var \Drupal\views\Plugin\views\relationship\RelationshipPluginBase[]
    */
-  public $relationship;
+  public array $relationship = [];
 
   /**
    * Stores the area handlers for the header which are initialized on this view.
    *
    * @var \Drupal\views\Plugin\views\area\AreaPluginBase[]
    */
-  public $header;
+  public array $header = [];
 
   /**
    * Stores the area handlers for the footer which are initialized on this view.
    *
    * @var \Drupal\views\Plugin\views\area\AreaPluginBase[]
    */
-  public $footer;
+  public array $footer = [];
 
   /**
    * The area handlers for the empty text which are initialized on this view.
@@ -354,21 +360,21 @@ class ViewExecutable {
    *
    * @var \Drupal\views\Plugin\views\area\AreaPluginBase[]
    */
-  public $empty;
+  public array $empty = [];
 
   /**
    * Stores the current response object.
    *
    * @var \Symfony\Component\HttpFoundation\Response
    */
-  protected $response = NULL;
+  protected ?Response $response = NULL;
 
   /**
    * Stores the current request object.
    *
    * @var \Symfony\Component\HttpFoundation\Request
    */
-  protected $request;
+  protected ?Request $request = NULL;
 
   /**
    * Does this view already have loaded its handlers.
@@ -377,7 +383,7 @@ class ViewExecutable {
    *
    * @todo Group with other static properties.
    */
-  public $inited;
+  public bool $inited = FALSE;
 
   /**
    * The render array for the exposed form.
@@ -388,14 +394,14 @@ class ViewExecutable {
    * @var array
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $exposed_widgets;
+  public array $exposed_widgets = [];
 
   /**
    * If this view has been previewed.
    *
    * @var bool
    */
-  public $preview;
+  public bool $preview = FALSE;
 
   /**
    * Force the query to calculate the total number of results.
@@ -405,7 +411,7 @@ class ViewExecutable {
    * @todo Move to the query.
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $get_total_rows;
+  public ?bool $get_total_rows = NULL;
 
   /**
    * Indicates if the sorts have been built.
@@ -415,7 +421,7 @@ class ViewExecutable {
    * @todo Group with other static properties.
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $build_sort;
+  public bool $build_sort = FALSE;
 
   /**
    * Stores the many-to-one tables for performance.
@@ -423,7 +429,7 @@ class ViewExecutable {
    * @var array
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $many_to_one_tables;
+  public array $many_to_one_tables = [];
 
   /**
    * A unique identifier which allows to update multiple views output via js.
@@ -431,7 +437,7 @@ class ViewExecutable {
    * @var string
    */
   // phpcs:ignore Drupal.NamingConventions.ValidVariableName.LowerCamelName
-  public $dom_id;
+  public ?string $dom_id = NULL;
 
   /**
    * A render array container to store render related information.
@@ -444,7 +450,7 @@ class ViewExecutable {
    *
    * @see \Drupal\Core\Render\AttachmentsResponseProcessorInterface::processAttachments()
    */
-  public $element = [
+  public array $element = [
     '#attached' => [
       'library' => ['views/views.module'],
       'drupalSettings' => [],
@@ -457,42 +463,42 @@ class ViewExecutable {
    *
    * @var \Drupal\Core\Session\AccountInterface
    */
-  protected $user;
+  protected AccountInterface $user;
 
   /**
    * Should the admin links be shown on the rendered view.
    *
    * @var bool
    */
-  protected $showAdminLinks;
+  protected ?bool $showAdminLinks = NULL;
 
   /**
    * The views data.
    *
    * @var \Drupal\views\ViewsData
    */
-  protected $viewsData;
+  protected ViewsData $viewsData;
 
   /**
    * The route provider.
    *
    * @var \Drupal\Core\Routing\RouteProviderInterface
    */
-  protected $routeProvider;
+  protected RouteProviderInterface $routeProvider;
 
   /**
    * The entity type of the base table, if available.
    *
    * @var \Drupal\Core\Entity\EntityTypeInterface|false
    */
-  protected $baseEntityType;
+  protected EntityTypeInterface|false|null $baseEntityType = NULL;
 
   /**
    * Holds all necessary data for proper unserialization.
    *
    * @var array
    */
-  protected $serializationData;
+  protected array $serializationData;
 
   /**
    * Constructs a new ViewExecutable object.
