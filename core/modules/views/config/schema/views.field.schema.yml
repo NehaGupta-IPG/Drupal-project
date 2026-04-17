@@ -84,6 +84,15 @@ views.field.links:
 views.field.dropbutton:
   type: views.field.links
   label: 'Drop button'
+  mapping:
+    dropbutton_type:
+      type: string
+      label: 'Dropbutton type'
+      nullable: true
+      constraints:
+        Choice:
+          callback: \Drupal\views\Plugin\views\field\Dropbutton::getDropbuttonTypes
+          message: 'Invalid dropbutton_type value: %value. Possible choices: %choices.'
 
 views.field.machine_name:
   type: views_field

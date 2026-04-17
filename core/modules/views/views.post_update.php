@@ -124,6 +124,18 @@ function views_post_update_block_items_per_page(?array &$sandbox = NULL): void {
 }
 
 /**
+ * Adds a default dropbutton_type setting to Views using dropbutton fields.
+ */
+function views_post_update_dropbutton_type(?array &$sandbox = NULL): void {
+  /** @var \Drupal\views\ViewsConfigUpdater $view_config_updater */
+  $view_config_updater = \Drupal::service(ViewsConfigUpdater::class);
+  $view_config_updater->setDeprecationsEnabled(FALSE);
+  \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'view', function (ViewEntityInterface $view) use ($view_config_updater): bool {
+    return $view_config_updater->needsDropbuttonFieldUpdate($view);
+  });
+}
+
+/**
  * Clear cache to add new date default arguments.
  */
 function views_post_update_add_date_default_arguments(): void {
