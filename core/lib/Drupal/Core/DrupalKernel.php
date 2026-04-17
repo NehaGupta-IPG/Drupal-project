@@ -941,9 +941,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    */
   protected function getContainerCacheKey() {
     $parts = [
-      'service_container_hash',
+      'container_hash',
       $this->environment,
       class_exists(DrupalInstalled::class) ? DrupalInstalled::VERSIONS_HASH : \Drupal::VERSION,
+      $this->getAppRoot(),
+      $this->getSitePath(),
       Settings::get('deployment_identifier'),
       PHP_OS,
       serialize(Settings::get('container_yamls')),
