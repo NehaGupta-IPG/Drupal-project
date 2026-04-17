@@ -201,7 +201,7 @@ class FieldBlockTest extends EntityKernelTestBase {
    *
    * @param \Prophecy\Prophecy\ProphecyInterface $entity_prophecy
    *   An entity prophecy for use as an entity context value.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   A configuration array containing information about the plugin instance.
    * @param array $plugin_definition
    *   The plugin implementation definition.

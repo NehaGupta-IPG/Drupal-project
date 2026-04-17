@@ -73,7 +73,7 @@ interface BlockInterface extends ConfigEntityInterface {
    *
    * @param string $instance_id
    *   The condition instance ID.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The condition configuration.
    *
    * @return $this

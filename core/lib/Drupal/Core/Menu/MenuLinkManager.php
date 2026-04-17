@@ -183,7 +183,7 @@ class MenuLinkManager implements MenuLinkManagerInterface {
    *
    * @param string $plugin_id
    *   The ID of the plugin being instantiated.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   An array of configuration relevant to the plugin instance.
    *
    * @return \Drupal\Core\Menu\MenuLinkInterface

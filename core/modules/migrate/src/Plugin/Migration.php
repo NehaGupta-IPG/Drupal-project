@@ -295,7 +295,7 @@ class Migration extends PluginBase implements MigrationInterface, RequirementsIn
   /**
    * Constructs a Migration.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   Plugin configuration.
    * @param string $plugin_id
    *   The plugin ID.

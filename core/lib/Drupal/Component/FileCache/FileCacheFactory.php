@@ -87,7 +87,7 @@ class FileCacheFactory {
   /**
    * Sets the configuration to use for constructing future file cache objects.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The configuration to use.
    */
   public static function setConfiguration($configuration) {

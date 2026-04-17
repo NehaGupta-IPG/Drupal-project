@@ -79,7 +79,7 @@ abstract class MigrateSqlSourceTestBase extends MigrateSourceTestBase {
    *   The result rows the plugin is expected to return.
    * @param int $expected_count
    *   (optional) How many rows the source plugin is expected to return.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   (optional) Configuration for the source plugin.
    * @param mixed $high_water
    *   (optional) The value of the high water field.

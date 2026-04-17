@@ -94,7 +94,7 @@ class PhpStorageFactoryTest extends KernelTestBase {
    *
    * @param string $name
    *   The storage bin name to set.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   An array of configuration to set. Will be merged with default values.
    */
   protected function setSettings($name = 'default', array $configuration = []): void {

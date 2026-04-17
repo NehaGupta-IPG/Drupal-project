@@ -29,7 +29,7 @@ interface FilterFormatInterface extends ConfigEntityInterface {
    *
    * @param string $instance_id
    *   The ID of a filter plugin to set the configuration for.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The filter plugin configuration to set.
    */
   public function setFilterConfig($instance_id, array $configuration);

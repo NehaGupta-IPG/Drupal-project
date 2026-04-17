@@ -21,7 +21,7 @@ abstract class FileProcessBase extends ProcessPluginBase {
   /**
    * Constructs a file process plugin.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The plugin configuration.
    * @param string $plugin_id
    *   The plugin ID.

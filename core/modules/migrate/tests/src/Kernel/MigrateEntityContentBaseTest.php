@@ -100,7 +100,7 @@ class MigrateEntityContentBaseTest extends KernelTestBase {
   /**
    * Create the destination plugin to test.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The plugin configuration.
    */
   protected function createDestination(array $configuration): void {

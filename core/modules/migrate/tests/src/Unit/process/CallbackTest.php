@@ -80,7 +80,7 @@ class CallbackTest extends MigrateProcessTestCase {
    *
    * @param string $message
    *   The expected exception message.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The plugin configuration being tested.
    * @param string $class
    *   (optional) The expected exception class.

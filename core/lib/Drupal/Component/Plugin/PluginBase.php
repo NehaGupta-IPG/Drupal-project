@@ -36,14 +36,14 @@ abstract class PluginBase implements PluginInspectionInterface, DerivativeInspec
    * Plugin configuration is optional, so plugin implementations must provide
    * their own setters and getters.
    *
-   * @var array
+   * @var mixed[]
    */
   protected $configuration;
 
   /**
    * Constructs a \Drupal\Component\Plugin\PluginBase object.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
    *   The plugin ID for the plugin instance.

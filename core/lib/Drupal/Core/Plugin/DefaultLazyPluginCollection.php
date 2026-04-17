@@ -54,7 +54,7 @@ class DefaultLazyPluginCollection extends LazyPluginCollection {
    *
    * @param \Drupal\Component\Plugin\PluginManagerInterface $manager
    *   The manager to be used for instantiating plugins.
-   * @param array $configurations
+   * @param mixed[] $configurations
    *   (optional) An associative array containing the initial configuration for
    *   each plugin in the collection, keyed by plugin instance ID.
    */
@@ -169,7 +169,7 @@ class DefaultLazyPluginCollection extends LazyPluginCollection {
    *
    * @param string $instance_id
    *   The ID of a plugin to set the configuration for.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The plugin configuration to set.
    */
   public function setInstanceConfiguration($instance_id, array $configuration) {

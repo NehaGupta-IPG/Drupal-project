@@ -50,7 +50,7 @@ class Node extends WizardPluginBase {
   /**
    * Node constructor.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The plugin configuration.
    * @param string $plugin_id
    *   The plugin ID.

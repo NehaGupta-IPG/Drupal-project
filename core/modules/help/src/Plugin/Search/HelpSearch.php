@@ -120,7 +120,7 @@ class HelpSearch extends SearchPluginBase implements AccessibleInterface, Search
   /**
    * Constructs a \Drupal\help_search\Plugin\Search\HelpSearch object.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   Configuration for the plugin.
    * @param string $plugin_id
    *   The plugin ID for the plugin instance.

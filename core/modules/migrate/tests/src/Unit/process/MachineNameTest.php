@@ -21,7 +21,7 @@ class MachineNameTest extends MigrateProcessTestCase {
    *
    * @param string $human_name
    *   The human-readable name that will be converted in the test.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The plugin configuration.
    * @param string $expected_result
    *   The expected result of the transformation.

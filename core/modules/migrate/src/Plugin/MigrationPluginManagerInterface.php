@@ -16,7 +16,7 @@ interface MigrationPluginManagerInterface extends PluginManagerInterface {
    *   Either the plugin ID or the base plugin ID of the plugins being
    *   instantiated. Also accepts an array of plugin IDs and an empty array to
    *   load all plugins.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   An array of configuration relevant to the plugin instances. Keyed by the
    *   plugin ID.
    *

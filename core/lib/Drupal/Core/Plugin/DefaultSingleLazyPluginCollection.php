@@ -47,7 +47,7 @@ class DefaultSingleLazyPluginCollection extends LazyPluginCollection {
    *   The manager to be used for instantiating plugins.
    * @param string $instance_id
    *   The ID of the plugin instance.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   An array of configuration.
    */
   public function __construct(PluginManagerInterface $manager, $instance_id, array $configuration) {

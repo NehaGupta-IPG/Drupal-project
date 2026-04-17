@@ -268,7 +268,7 @@ class TestSqlBase extends SqlBase {
   /**
    * Overrides the constructor so we can create one easily.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The plugin instance configuration.
    * @param \Drupal\migrate\Plugin\MigrationInterface $migration
    *   (optional) The migration being run.

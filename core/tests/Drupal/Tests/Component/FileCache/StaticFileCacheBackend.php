@@ -28,7 +28,7 @@ class StaticFileCacheBackend implements FileCacheBackendInterface {
   /**
    * Constructs a PHP Storage FileCache backend.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   (optional) Configuration used to configure this object.
    */
   public function __construct(array $configuration) {

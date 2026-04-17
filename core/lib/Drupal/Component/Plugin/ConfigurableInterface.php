@@ -20,7 +20,7 @@ interface ConfigurableInterface {
   /**
    * Sets the configuration for this plugin instance.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   An associative array containing the plugin's configuration.
    */
   public function setConfiguration(array $configuration);

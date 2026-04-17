@@ -39,7 +39,7 @@ class Language extends ConditionPluginBase implements ContainerFactoryPluginInte
    *
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    *   The language manager.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The plugin configuration, i.e. an array with configuration values keyed
    *   by configuration option name. The special key 'context' may be used to
    *   initialize the defined contexts by setting it to an array of context

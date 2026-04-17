@@ -184,7 +184,7 @@ class ContentEntityTest extends KernelTestBase {
    *
    * @param \Drupal\migrate\Plugin\MigrateSourceInterface $source
    *   The source plugin.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The source plugin configuration (Nope, no getter available).
    *
    * @internal
@@ -448,7 +448,7 @@ class ContentEntityTest extends KernelTestBase {
    *
    * @param string $plugin_id
    *   The plugin id.
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The plugin configuration.
    *
    * @return array

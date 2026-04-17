@@ -39,7 +39,7 @@ class UserLoginBlock extends BlockBase implements ContainerFactoryPluginInterfac
   /**
    * Constructs a new UserLoginBlock instance.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The plugin configuration, i.e. an array with configuration values keyed
    *   by configuration option name. The special key 'context' may be used to
    *   initialize the defined contexts by setting it to an array of context

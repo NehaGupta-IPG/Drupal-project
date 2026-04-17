@@ -158,7 +158,7 @@ class Sql extends PluginBase implements MigrateIdMapInterface, ContainerFactoryP
    *
    * Sets up the tables and builds the maps,
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   The configuration.
    * @param string $plugin_id
    *   The plugin ID for the migration process to do.

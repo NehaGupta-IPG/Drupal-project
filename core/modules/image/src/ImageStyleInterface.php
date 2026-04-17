@@ -166,7 +166,7 @@ interface ImageStyleInterface extends ConfigEntityInterface {
   /**
    * Saves an image effect for this style.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   An array of image effect configuration.
    *
    * @return string

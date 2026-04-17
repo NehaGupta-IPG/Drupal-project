@@ -44,7 +44,7 @@ class Entity extends ArgumentValidatorPluginBase {
   /**
    * Constructs a \Drupal\views\Plugin\views\argument_validator\Entity object.
    *
-   * @param array $configuration
+   * @param mixed[] $configuration
    *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
    *   The plugin ID for the plugin instance.
