@@ -22,3 +22,9 @@ views.responsive-grid:
   css:
     layout:
       css/views-responsive-grid.css: {}
+
+views.bulk_form:
+  version: VERSION
+  css:
+    component:
+      css/views.bulk_form.css: {}

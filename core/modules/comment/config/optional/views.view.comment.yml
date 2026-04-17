@@ -75,6 +75,9 @@ display:
           selected_actions:
             - comment_delete_action
             - comment_unpublish_action
+          actions_order:
+            - comment_unpublish_action
+            - comment_delete_action
         subject:
           id: subject
           table: comment_field_data
@@ -958,6 +961,9 @@ display:
           selected_actions:
             - comment_delete_action
             - comment_publish_action
+          actions_order:
+            - comment_publish_action
+            - comment_delete_action
         subject:
           id: subject
           table: comment_field_data

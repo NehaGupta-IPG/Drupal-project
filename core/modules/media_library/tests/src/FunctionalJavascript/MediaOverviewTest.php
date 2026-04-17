@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\media_library\FunctionalJavascript;
 
+use Behat\Mink\Element\NodeElement;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -69,6 +70,18 @@ class MediaOverviewTest extends MediaLibraryTestBase {
     // Visit the administration page.
     $this->drupalGet('admin/content/media');
 
+    // Tests that actions are sorted according to the view configured order.
+    $actual_actions = $this->xpath('//select[@id="edit-action"]//option');
+    $expected_actions = [
+      'media_publish_action',
+      'media_unpublish_action',
+      'media_save_action',
+      'media_delete_action',
+    ];
+    $this->assertSame($expected_actions, array_values(array_filter(array_map(function (NodeElement $action): string {
+      return $action->getValue();
+    }, $actual_actions))));
+
     // There should be links to both the grid and table displays.
     $assert_session->linkExists('Grid');
     $assert_session->linkExists('Table');
@@ -119,6 +132,7 @@ class MediaOverviewTest extends MediaLibraryTestBase {
 
     // This tests that anchor tags clicked inside the preview are suppressed.
     $this->getSession()->executeScript('jQuery(".js-click-to-select-trigger a")[4].click()');
+    $this->getSession()->getPage()->selectFieldOption('Action', 'Delete media');
     $this->submitForm([], 'Apply to selected items');
     $assert_session->pageTextContains('Dog');
     $assert_session->pageTextNotContains('Cat');
