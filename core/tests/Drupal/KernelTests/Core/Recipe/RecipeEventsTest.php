@@ -40,7 +40,7 @@ class RecipeEventsTest extends KernelTestBase implements EventSubscriberInterfac
    * Handles a recipe apply event for testing.
    */
   public function onRecipeApply(RecipeAppliedEvent $event): void {
-    $this->recipesApplied[] = $event->recipe->name;
+    $this->recipesApplied[] = (string) $event->recipe->name;
   }
 
   /**

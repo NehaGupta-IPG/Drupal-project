@@ -5,6 +5,7 @@ namespace Drupal\Component\Serialization;
 use Drupal\Component\Serialization\Exception\InvalidDataTypeException;
 use Symfony\Component\Yaml\Dumper;
 use Symfony\Component\Yaml\Parser;
+use Symfony\Component\Yaml\Tag\TaggedValue;
 use Symfony\Component\Yaml\Yaml as SymfonyYaml;
 
 /**
@@ -49,6 +50,44 @@ class Yaml implements SerializationInterface {
    */
   public static function getFileExtension() {
     return 'yml';
+  }
+
+  /**
+   * Decodes custom YAML tags.
+   *
+   * Tag objects will be replaced by their raw value or, if a class exists for
+   * that tag, it will be used to construct an object from the value. For
+   * example:
+   * @code
+   *   Yaml::decodeTags($data, ['translate' => TranslatableMarkup::class]);
+   * @endcode
+   * will replace any values tagged with 'translate' with a TranslatableMarkup
+   * object.
+   *
+   * @param array $data
+   *   Parsed YAML data.
+   * @param class-string[] $tag_classes
+   *   Optional classes to use to construct from tag values, indexed by tag.
+   *
+   * @return array
+   *   Parsed data with decoded tag values.
+   */
+  public static function decodeTags(array $data, array $tag_classes = []): array {
+    foreach ($data as $key => $value) {
+      if ($value instanceof TaggedValue) {
+        if (isset($tag_classes[$value->getTag()])) {
+          $data_value = (array) $value->getValue();
+          $data[$key] = new ($tag_classes[$value->getTag()])(...$data_value);
+        }
+        else {
+          $data[$key] = $value->getValue();
+        }
+      }
+      elseif (is_array($value)) {
+        $data[$key] = static::decodeTags($value, $tag_classes);
+      }
+    }
+    return $data;
   }
 
 }

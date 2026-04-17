@@ -37,10 +37,10 @@ class RecipeTest extends KernelTestBase {
   #[TestWith(["install_two_modules", "Install two modules", "Content type", ["filter", "text", "node"], ""])]
   public function testCreateFromDirectory2(string $recipe_name, string $expected_name, string $expected_type, array $expected_modules, string $expected_description): void {
     $recipe = Recipe::createFromDirectory('core/tests/fixtures/recipes/' . $recipe_name);
-    $this->assertSame($expected_name, $recipe->name);
+    $this->assertSame($expected_name, (string) $recipe->name);
     $this->assertSame($expected_type, $recipe->type);
     $this->assertSame($expected_modules, $recipe->install->modules);
-    $this->assertSame($expected_description, $recipe->description);
+    $this->assertSame($expected_description, (string) $recipe->description);
   }
 
   /**

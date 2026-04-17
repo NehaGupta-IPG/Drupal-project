@@ -89,4 +89,47 @@ class YamlTest extends YamlTestBase {
     Yaml::decode($yaml);
   }
 
+  /**
+   * Tests decoding tags with no tag classes.
+   *
+   * @legacy-covers ::decodeTags
+   */
+  public function testDecodeTagsNoTagClasses(): void {
+    $yaml = <<<YAML
+    test: !test test
+    message: !test {string: 'Your message has been sent.', options: {context: 'Contact form'}}
+    YAML;
+
+    $data = Yaml::decodeTags(Yaml::decode($yaml));
+    $this->assertSame('test', $data['test']);
+    $this->assertSame(['string' => 'Your message has been sent.', 'options' => ['context' => 'Contact form']], $data['message']);
+  }
+
+  /**
+   * Tests decoding tags with tag classes.
+   *
+   * @legacy-covers ::decodeTags
+   */
+  public function testDecodeTagsWithTagClasses(): void {
+    $test_class = new class {
+
+      public function __construct(public readonly string $string = '', public readonly array $options = []) {
+      }
+
+    };
+
+    $yaml = <<<YAML
+    test: !test test
+    message: !test {string: 'Your message has been sent.', options: {context: 'Contact form'}}
+    YAML;
+
+    $data = Yaml::decodeTags(Yaml::decode($yaml), ['test' => get_class($test_class)]);
+    $this->assertInstanceOf(get_class($test_class), $data['test']);
+    $this->assertInstanceOf(get_class($test_class), $data['message']);
+    $this->assertSame('test', $data['test']->string);
+    $this->assertSame([], $data['test']->options);
+    $this->assertSame('Your message has been sent.', $data['message']->string);
+    $this->assertSame('Contact form', $data['message']->options['context']);
+  }
+
 }

@@ -11,6 +11,7 @@ use Drupal\Core\Extension\ModuleExtensionList;
 use Drupal\Core\Extension\ThemeExtensionList;
 use Drupal\Component\Serialization\Yaml;
 use Drupal\Core\Render\Element;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\Core\TypedData\PrimitiveInterface;
 use Drupal\Core\Validation\Plugin\Validation\Constraint\RegexConstraint;
 use Symfony\Component\Validator\Constraints\All;
@@ -22,6 +23,7 @@ use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\IdenticalTo;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotIdenticalTo;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Required;
@@ -29,6 +31,7 @@ use Symfony\Component\Validator\Constraints\Sequentially;
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Validation;
+use Symfony\Component\Yaml\Tag\TaggedValue;
 
 /**
  * @internal
@@ -39,9 +42,9 @@ final class Recipe {
   const COMPOSER_PROJECT_TYPE = 'drupal-recipe';
 
   /**
-   * @param string $name
+   * @param string|\Drupal\Core\StringTranslation\TranslatableMarkup $name
    *   The human-readable name of the recipe.
-   * @param string $description
+   * @param string|\Drupal\Core\StringTranslation\TranslatableMarkup $description
    *   A short description of the recipe.
    * @param string $type
    *   The recipe type.
@@ -65,8 +68,8 @@ final class Recipe {
    *   Any extra information to expose to specific modules.
    */
   public function __construct(
-    public readonly string $name,
-    public readonly string $description,
+    public readonly string|TranslatableMarkup $name,
+    public readonly string|TranslatableMarkup $description,
     public readonly string $type,
     public readonly RecipeConfigurator $recipes,
     public readonly InstallConfigurator $install,
@@ -124,10 +127,32 @@ final class Recipe {
     // @see ::validateConfigActions()
     $include_path = dirname($file, 2);
 
+    $translatable_string_constraint = new AtLeastOneOf(
+      [
+        new Sequentially([
+          new NotNull(),
+          new Type('string'),
+          new NotBlank(),
+        ]),
+        new Sequentially([
+          new NotNull(),
+          new Type(TranslatableMarkup::class),
+          new Callback(
+            callback: function (TranslatableMarkup $value, ExecutionContextInterface $context) {
+              if (trim($value->getUntranslatedString()) === '') {
+                $context->addViolation('This value should not be blank.');
+              }
+            },
+          ),
+        ]),
+      ],
+      message: 'This value must be a string or a string tagged with !translate and cannot be blank.',
+      includeInternalMessages: FALSE,
+    );
+
     $constraints = new Collection([
       'name' => new Required([
-        new Type('string'),
-        new NotBlank(),
+        $translatable_string_constraint,
         // Matching `type: label` in core.data_types.schema.yml.
         new RegexConstraint(
           pattern: '/([^\PC])/u',
@@ -136,7 +161,7 @@ final class Recipe {
         ),
       ]),
       'description' => new Optional([
-        new NotBlank(),
+        $translatable_string_constraint,
         // Matching `type: text` in core.data_types.schema.yml.
         new RegexConstraint(
           pattern: '/([^\PC\x09\x0a\x0d])/u',
@@ -191,8 +216,7 @@ final class Recipe {
             fields: [
               // Every input definition must have a description.
               'description' => [
-                new Type('string'),
-                new NotBlank(),
+                $translatable_string_constraint,
               ],
               // There can be an optional set of constraints, which is an
               // associative array of arrays, as in config schema.
@@ -316,6 +340,25 @@ final class Recipe {
     ]);
 
     $recipe_data = Yaml::decode($recipe_contents);
+
+    // Description and name can be extracted by POTX without a !translate tag so
+    // we need to convert them to tagged values so that can be translated.
+    if (isset($recipe_data['description']) && is_string($recipe_data['description'])) {
+      $recipe_data['description'] = new TaggedValue('translate', $recipe_data['description']);
+    }
+    if (isset($recipe_data['name']) && is_string($recipe_data['name'])) {
+      $recipe_data['name'] = new TaggedValue('translate', $recipe_data['name']);
+    }
+
+    $tag_classes = [];
+    // @todo Add comment explaining this temporary code and linking to follow-up
+    //   issue to resolve this.
+    if (\Drupal::hasContainer() && count(\Drupal::languageManager()->getLanguages()) < 2) {
+      $tag_classes = ['translate' => TranslatableMarkup::class];
+    }
+    // Replace 'translate' tags with proper translations.
+    $recipe_data = Yaml::decodeTags($recipe_data, $tag_classes);
+
     /** @var \Symfony\Component\Validator\ConstraintViolationList $violations */
     $violations = Validation::createValidator()->validate($recipe_data, $constraints);
     if (count($violations) > 0) {
@@ -329,6 +372,7 @@ final class Recipe {
       'config' => [],
       'content' => [],
     ];
+
     return $recipe_data;
   }
 

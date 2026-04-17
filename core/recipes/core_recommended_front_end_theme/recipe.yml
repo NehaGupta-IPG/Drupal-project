@@ -31,7 +31,7 @@ config:
         plugin: system_messages_block
         settings:
           id: system_messages_block
-          label: 'Status messages'
+          label: !translate 'Status messages'
           label_display: '0'
           provider: system
       setRegion: highlighted
@@ -43,7 +43,7 @@ config:
         plugin: page_title_block
         settings:
           id: page_title_block
-          label: 'Page title'
+          label: !translate 'Page title'
           label_display: '0'
           provider: core
       setRegion: content_above

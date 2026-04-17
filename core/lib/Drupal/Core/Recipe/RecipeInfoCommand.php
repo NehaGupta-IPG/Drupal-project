@@ -50,7 +50,7 @@ final class RecipeInfoCommand extends Command {
 
     $recipe = Recipe::createFromDirectory($recipe_path);
     $io->section('Description');
-    $io->text($recipe->description);
+    $io->text((string) $recipe->description);
 
     $io->section('Inputs');
     $descriptions = $recipe->input->describeAll();

@@ -111,6 +111,7 @@ final class ConsoleInputCollector implements InputCollectorInterface {
     if (isset($arguments['default']) && !is_string($arguments['default']) && $method === 'ask') {
       $arguments['default'] = (string) $arguments['default'];
     }
+
     return $this->io->$method(...$arguments);
   }
 

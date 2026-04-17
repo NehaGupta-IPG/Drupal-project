@@ -37,7 +37,7 @@ class RecipeConfiguratorTest extends KernelTestBase {
     // Test methods.
     /** @var \Drupal\Core\Recipe\Recipe[] $recipes */
     $recipes = (array) $reflection->invoke($recipe_configurator);
-    $recipes_names = array_map(fn(Recipe $recipe): string => $recipe->name, $recipes);
+    $recipes_names = array_map(fn(Recipe $recipe): string => (string) $recipe->name, $recipes);
     $recipe_extensions = $recipe_configurator->listAllExtensions();
     $expected_recipes_names = [
       'Install two modules',
@@ -69,7 +69,7 @@ class RecipeConfiguratorTest extends KernelTestBase {
   #[TestWith(["recipe_include", "Recipe include"])]
   public function testIncludedRecipeLoader(string $recipe, string $name): void {
     $recipe = RecipeConfigurator::getIncludedRecipe('core/tests/fixtures/recipes', $recipe);
-    $this->assertSame($name, $recipe->name);
+    $this->assertSame($name, (string) $recipe->name);
   }
 
   /**

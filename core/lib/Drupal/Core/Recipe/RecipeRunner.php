@@ -347,8 +347,8 @@ final class RecipeRunner {
    *   The passed data, with placeholders replaced.
    */
   private static function replaceInputValues(mixed $data, array $replace): mixed {
-    if (is_string($data)) {
-      $data = str_replace(array_keys($replace), $replace, $data);
+    if (is_string($data) || $data instanceof \Stringable) {
+      $data = str_replace(array_keys($replace), $replace, (string) $data);
     }
     elseif (is_array($data)) {
       foreach ($data as $key => $value) {

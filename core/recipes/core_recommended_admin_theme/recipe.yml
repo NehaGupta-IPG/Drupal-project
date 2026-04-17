@@ -27,7 +27,7 @@ config:
         plugin: page_title_block
         settings:
           id: page_title_block
-          label: 'Page title'
+          label: !translate 'Page title'
           label_display: '0'
           provider: core
       setRegion: header
