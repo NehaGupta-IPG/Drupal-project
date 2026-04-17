@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests;
 
+use Behat\Mink\Exception\ExpectationException;
 use Drupal\FunctionalJavascriptTests\AccessibilityTestBase;
 use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -60,10 +61,31 @@ TEXT;
   }
 
   /**
+   * Setup function for 'Page not found check' case.
+   *
+   * Prepares for failed assertion in AccessibilityTestBase::testPages.
+   */
+  protected function setupPageNotFound(): void {
+    $expected_message = 'The string "Page not found" appears in the HTML response of this page, but it should not.';
+    $this->expectException(ExpectationException::class);
+    $this->expectExceptionMessage($expected_message);
+  }
+
+  /**
+   * Setup function for 'Access denied check ...' cases.
+   *
+   * Prepares for failed assertion in AccessibilityTestBase::testPages.
+   */
+  protected function setupAccessDenied(): void {
+    $expected_message = 'The string "Access denied" appears in the HTML response of this page, but it should not.';
+    $this->expectException(ExpectationException::class);
+    $this->expectExceptionMessage($expected_message);
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function provider(): array {
-    // @todo Add cases for testing 'admin' cases and callback arguments.
     return [
       'Smoke test with Axe options' => [
         'uri' => 'accessibility-test',
@@ -72,6 +94,19 @@ TEXT;
           'runOnly' => ['color-contrast'],
         ],
         'setup_callback' => 'setupSmokeTestWithOptions',
+      ],
+      'Page not found check' => [
+        'uri' => '123456',
+        'setup_callback' => 'setupPageNotFound',
+      ],
+      'Access denied check, with $admin argument default' => [
+        'uri' => 'admin',
+        'setup_callback' => 'setupAccessDenied',
+      ],
+      'Access denied check, with $admin argument FALSE' => [
+        'uri' => 'admin',
+        'admin' => FALSE,
+        'setup_callback' => 'setupAccessDenied',
       ],
     ];
   }
