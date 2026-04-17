@@ -383,4 +383,44 @@ class DrupalKernelTest extends KernelTestBase {
     $this->assertSame($utf8_string, escapeshellcmd($utf8_string));
   }
 
+  /**
+   * Tests that a new container is created when the site path changes.
+   */
+  public function testNewContainerOnSitePathChange(): void {
+    $class_loader = require $this->root . '/autoload.php';
+    $request = Request::createFromGlobals();
+
+    // Create a kernel that will dump the container to disk.
+    $kernel = DrupalKernel::createFromRequest($request, $class_loader, 'testing');
+    $this->setSetting('container_yamls', []);
+    $this->setSetting('hash_salt', $this->databasePrefix);
+    $this->setSetting('site_path', $this->siteDirectory);
+    $kernel->setSitePath($this->siteDirectory);
+    // Need at least one module to ensure container can be dumped.
+    $kernel->updateModules(['system' => 'system']);
+    $kernel->boot();
+    $this->assertSame($this->siteDirectory, $kernel->getContainer()->getParameter('site.path'));
+    $this->assertSame(['system'], array_keys($kernel->getContainer()->getParameter('container.modules')));
+
+    // Create a new kernel with the same site path but do not call
+    // $kernel->updateModules() to prove this one is loaded from the dumped
+    // container.
+    $kernel = DrupalKernel::createFromRequest($request, $class_loader, 'testing');
+    $this->setSetting('container_yamls', []);
+    $this->setSetting('hash_salt', $this->databasePrefix);
+    $kernel->setSitePath($this->siteDirectory);
+    $kernel->boot();
+    $this->assertSame($this->siteDirectory, $kernel->getContainer()->getParameter('site.path'));
+    $this->assertSame(['system'], array_keys($kernel->getContainer()->getParameter('container.modules')));
+
+    // Create a new kernel with a different site path. Modules are not injected
+    // to load the container from the dumped container.
+    $kernel = DrupalKernel::createFromRequest($request, $class_loader, 'testing');
+    $this->setSetting('container_yamls', []);
+    $this->setSetting('hash_salt', $this->databasePrefix);
+    $kernel->setSitePath($this->siteDirectory . '/different');
+    $kernel->boot();
+    $this->assertSame($this->siteDirectory . '/different', $kernel->getContainer()->getParameter('site.path'));
+  }
+
 }

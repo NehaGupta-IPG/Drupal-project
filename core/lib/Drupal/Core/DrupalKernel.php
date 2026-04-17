@@ -1462,7 +1462,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
       return;
     }
 
-    // Delete the timestamp to force a recompile on next request.
+    // Delete the cache entry to force a recompile on next request.
     $this->bootstrapContainer->get('cache.container')->deleteAll();
   }
 
