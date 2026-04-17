@@ -261,6 +261,7 @@ class MediaType extends ConfigEntityBundleBase implements MediaTypeInterface, En
    * {@inheritdoc}
    *
    * @return void
+   *   This method does not return a value.
    */
   public function preSave(EntityStorageInterface $storage) {
     $this->prepareSourceFieldConfiguration();
