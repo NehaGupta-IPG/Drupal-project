@@ -578,7 +578,8 @@ abstract class KernelTestBase extends TestCase implements ServiceProviderInterfa
         ->addArgument(new Reference('config.typed'))
         ->addArgument($this->getConfigSchemaExclusions())
         ->addArgument($is_core_test)
-        ->addTag('event_subscriber');
+        ->addTag('event_subscriber')
+        ->addTag('container.public');
     }
 
     // Add event subscriber to check that an entity schema is installed before

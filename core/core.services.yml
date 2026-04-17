@@ -1492,6 +1492,8 @@ services:
   exception.logger:
     class: Drupal\Core\EventSubscriber\ExceptionLoggingSubscriber
     arguments: ['@logger.factory']
+    tags:
+      - { name: container.public }
   exception.custom_page_html:
     class: Drupal\Core\EventSubscriber\CustomPageExceptionHtmlSubscriber
     arguments: ['@config.factory', '@http_kernel', '@logger.channel.php', '@redirect.destination', '@router.no_access_checks', '@access_manager']

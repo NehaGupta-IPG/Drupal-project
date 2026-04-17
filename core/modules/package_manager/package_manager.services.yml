@@ -45,7 +45,9 @@ services:
   Drupal\package_manager\PathLocator:
     arguments:
       $appRoot: '%app.root%'
-  Drupal\package_manager\FailureMarker: {}
+  Drupal\package_manager\FailureMarker:
+    tags:
+      - { name: container.public }
   Drupal\package_manager\EventSubscriber\UpdateDataSubscriber: {}
   Drupal\package_manager\EventSubscriber\ChangeLogger:
     calls:
@@ -65,6 +67,8 @@ services:
   Drupal\package_manager\Validator\LockFileValidator:
     arguments:
       $keyValueFactory: '@keyvalue'
+    tags:
+      - { name: container.public }
   Drupal\package_manager\Validator\WritableFileSystemValidator: {}
   Drupal\package_manager\Validator\ComposerMinimumStabilityValidator: {}
   Drupal\package_manager\Validator\MultisiteValidator: {}
@@ -84,6 +88,8 @@ services:
   Drupal\package_manager\PathExcluder\SiteConfigurationExcluder:
     arguments:
       $sitePath: '%site.path%'
+    tags:
+      - { name: container.public }
   Drupal\package_manager\PathExcluder\NodeModulesExcluder: {}
   Drupal\package_manager\PackageManagerUninstallValidator:
     arguments:
