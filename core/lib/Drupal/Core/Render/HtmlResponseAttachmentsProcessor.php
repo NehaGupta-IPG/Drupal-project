@@ -132,6 +132,28 @@ class HtmlResponseAttachmentsProcessor implements AttachmentsResponseProcessorIn
       $ajax_page_state = $this->requestStack->getCurrentRequest()->attributes->get('ajax_page_state');
       $assets->setAlreadyLoadedLibraries(isset($ajax_page_state) ? explode(',', $ajax_page_state['libraries']) : []);
       $variables = $this->processAssetLibraries($assets, $attachment_placeholders);
+
+      // Build the link header per https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/103
+      $links = [];
+      $map = [
+        'styles' => 'href',
+        'scripts' => 'src',
+        'scripts_bottom' => 'src',
+      ];
+      foreach ($map as $key => $attr) {
+        if (!empty($variables[$key])) {
+          foreach ($variables[$key] as $item) {
+            if (!empty($item['#attributes'][$attr])) {
+              $links[] = '<' . $item['#attributes'][$attr] . '>; rel=preload; as=' . ($attr === 'src' ? 'script' : 'style');
+            }
+          }
+        }
+      }
+      if (!empty($links)) {
+        $response->headers->set('Link', $links, FALSE);
+        $response->sendHeaders(103);
+      }
+
       // $variables now contains the markup to load the asset libraries. Update
       // $attached with the final list of libraries and JavaScript settings, so
       // that $response can be updated with those. Then the response object will
