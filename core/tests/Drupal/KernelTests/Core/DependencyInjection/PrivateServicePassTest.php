@@ -21,7 +21,7 @@ class PrivateServicePassTest extends KernelTestBase {
    */
   #[IgnoreDeprecations]
   public function testDirectAccessTriggersDeprecation(): void {
-    $this->expectDeprecation('Since drupal/core 11.4.0: Accessing the "main_content_view_subscriber" service directly from the container is deprecated, use dependency injection instead.');
+    $this->expectUserDeprecationMessage('Since drupal/core 11.4.0: Accessing the "main_content_view_subscriber" service directly from the container is deprecated, use dependency injection instead.');
     $this->container->get('main_content_view_subscriber');
   }
 
