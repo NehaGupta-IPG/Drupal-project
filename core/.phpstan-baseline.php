@@ -26806,12 +26806,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/text/src/Plugin/Field/FieldType/TextItemBase.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method Drupal\\\\text\\\\TextProcessed\\:\\:setValue\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/modules/text/src/TextProcessed.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\Tests\\\\text\\\\Kernel\\\\TextItemBaseTest\\:\\:providerTextFieldSampleValue\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,

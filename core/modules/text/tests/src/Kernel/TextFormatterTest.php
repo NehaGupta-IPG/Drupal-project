@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\text\Kernel;
 
-use Drupal\Core\TypedData\Exception\ReadOnlyException;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\filter\Entity\FilterFormat;
