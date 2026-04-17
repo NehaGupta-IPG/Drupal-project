@@ -71,3 +71,4 @@ filters:
         image: image
         remote_video: remote_video
         video: video
+      show_contextual_links: false

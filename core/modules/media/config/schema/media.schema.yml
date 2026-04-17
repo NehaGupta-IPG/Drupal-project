@@ -141,3 +141,6 @@ filter_settings.media_embed:
       sequence:
         type: string
         label: 'Media type'
+    show_contextual_links:
+      type: boolean
+      label: 'Show contextual links on embedded media to users with appropriate permissions if contextual module is enabled.'
