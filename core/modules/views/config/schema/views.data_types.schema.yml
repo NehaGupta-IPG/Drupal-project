@@ -467,6 +467,9 @@ views_exposed_form:
     submit_button:
       type: label
       label: 'Submit button text'
+    disable_ajax_submit:
+      type: boolean
+      label: 'Disable AJAX form submit'
     reset_button:
       type: boolean
       label: 'Include reset button'

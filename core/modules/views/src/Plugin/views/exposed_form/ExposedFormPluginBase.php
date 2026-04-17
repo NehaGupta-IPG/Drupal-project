@@ -6,6 +6,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableDependencyInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Render\Element;
 use Drupal\views\Plugin\views\PluginBase;
 
 /**
@@ -26,6 +27,7 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
   protected function defineOptions() {
     $options = parent::defineOptions();
     $options['submit_button'] = ['default' => $this->t('Apply')];
+    $options['disable_ajax_submit'] = ['default' => FALSE];
     $options['reset_button'] = ['default' => FALSE];
     $options['reset_button_label'] = ['default' => $this->t('Reset')];
     $options['exposed_sorts_label'] = ['default' => $this->t('Sort by')];
@@ -45,6 +47,14 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
       '#title' => $this->t('Submit button text'),
       '#default_value' => $this->options['submit_button'],
       '#required' => TRUE,
+    ];
+
+    $form['disable_ajax_submit'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Disable AJAX form submit'),
+      '#description' => $this->t('If disabled, then the exposed form will not be submitted with AJAX if the view is configured to "use ajax".'),
+      '#default_value' => $this->options['disable_ajax_submit'],
+      '#access' => $this->view->display_handler->ajaxEnabled(),
     ];
 
     $form['reset_button'] = [
@@ -265,6 +275,14 @@ abstract class ExposedFormPluginBase extends PluginBase implements CacheableDepe
       // Set the access to FALSE if there is no exposed input.
       if (!array_intersect_key($all_exposed, $this->view->getExposedInput())) {
         $form['actions']['reset']['#access'] = FALSE;
+      }
+    }
+
+    // Set attribute to disable AJAX form submit.
+    // See ajax_views.js::Drupal.views.ajaxView.prototype.attachExposedFormAjax.
+    if (!empty($this->options['disable_ajax_submit']) && $this->view->display_handler->ajaxEnabled()) {
+      foreach (Element::children($form['actions']) as $action_key) {
+        $form['actions'][$action_key]['#attributes']['data-views-ajax-submit-disabled'] = TRUE;
       }
     }
 

@@ -460,4 +460,40 @@ class ViewsConfigUpdater {
     return $changed;
   }
 
+  /**
+   * Add disable_ajax_submit option to all exposed forms.
+   *
+   * @param \Drupal\views\ViewEntityInterface $view
+   *   The view entity.
+   *
+   * @return bool
+   *   TRUE if the view has any displays that needed to be updated.
+   */
+  public function addExposedFormDisableAjaxSubmitOption(ViewEntityInterface $view): bool {
+    $changed = FALSE;
+    $displays = $view->get('display');
+    foreach ($displays as &$display) {
+      if (!empty($display['display_options']['exposed_form'])) {
+        if (!isset($display['display_options']['exposed_form']['options']['disable_ajax_submit'])) {
+          if (!isset($display['display_options']['exposed_form']['options'])) {
+            $display['display_options']['exposed_form']['options'] = [];
+          }
+          $options_before = array_intersect_key($display['display_options']['exposed_form']['options'], [
+            'submit_button' => 1,
+          ]);
+          $display['display_options']['exposed_form']['options'] = $options_before +
+            ['disable_ajax_submit' => FALSE] +
+            $display['display_options']['exposed_form']['options'];
+          $changed = TRUE;
+        }
+      }
+    }
+
+    if ($changed) {
+      $view->set('display', $displays);
+    }
+
+    return $changed;
+  }
+
 }

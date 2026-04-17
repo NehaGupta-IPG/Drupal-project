@@ -161,6 +161,7 @@
       this.$exposed_form,
     )
       .not('[data-drupal-selector=edit-reset]')
+      .not('[data-views-ajax-submit-disabled]')
       .each(function (index) {
         const selfSettings = $.extend({}, that.element_settings, {
           base: $(this).attr('id'),
