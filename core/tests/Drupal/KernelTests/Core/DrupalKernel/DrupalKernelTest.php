@@ -423,4 +423,17 @@ class DrupalKernelTest extends KernelTestBase {
     $this->assertSame($this->siteDirectory . '/different', $kernel->getContainer()->getParameter('site.path'));
   }
 
+  /**
+   * Tests that a container is dumped when the container is invalidated.
+   */
+  public function testInvalidationDoesNotCauseFurtherContainerBuildsToNotDump(): void {
+    $kernel = $this->getTestKernel(Request::createFromGlobals(), ['system' => 'system']);
+    $this->assertFileExists($kernel->getSitePath() . '/files/php/service_container');
+    $kernel->invalidateContainer();
+    $this->assertFileDoesNotExist($kernel->getSitePath() . '/files/php/service_container');
+    // This should cause the container to be dumped again.
+    $kernel->updateModules(['system' => 'system']);
+    $this->assertFileExists($kernel->getSitePath() . '/files/php/service_container');
+  }
+
 }
