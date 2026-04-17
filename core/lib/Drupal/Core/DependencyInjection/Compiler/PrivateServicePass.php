@@ -40,7 +40,7 @@ class PrivateServicePass implements CompilerPassInterface {
     foreach (static::AUTO_PRIVATE_TAGS as $source_tag => $attributes) {
       foreach ($container->findTaggedServiceIds($source_tag) as $service_id => $tags) {
         $definition = $container->getDefinition($service_id);
-        if (!$definition->hasTag('container.public') && !$definition->hasTag('container.private')) {
+        if (!$definition->hasTag('container.public') && !$definition->hasTag('container.private') && !$definition->isSynthetic()) {
           $definition->addTag('container.private', $attributes);
         }
       }
