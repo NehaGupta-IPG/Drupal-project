@@ -12,7 +12,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests access with argument validation.
- *
  */
 #[Group("views")]
 #[RunTestsInSeparateProcesses]
