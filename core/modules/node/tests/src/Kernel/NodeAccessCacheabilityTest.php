@@ -69,7 +69,6 @@ class NodeAccessCacheabilityTest extends NodeAccessTestBase {
       $this->assertInstanceOf(EarlyRenderingControllerWrapperSubscriber::class, $subscriber);
       \Drupal::service(EventDispatcherInterface::class)->removeSubscriber($subscriber);
     }
-    $this->assertNull(\Drupal::keyValue('node_access_test')->get('has_render_context'));
 
     for ($i = 0; $i < 4; $i++) {
       $this->createNode();
@@ -79,12 +78,16 @@ class NodeAccessCacheabilityTest extends NodeAccessTestBase {
     $this->setCurrentUser($anonymousUser);
     $this->drupalGet(new Url('node_access_test_auto_bubbling')->toString());
     $this->assertCacheContext('user.node_grants:view');
-    // The controller sets the 'has_render_context' value based on whether it
-    // runs within a render context. The render context is provided by the early
-    // rendering subscriber when it is enabled, and there is no render context
-    // when early rendering is disabled.
-    $this->assertSame(\Drupal::keyValue('node_access_test')->get('has_render_context'), !$disable_early_render);
-    \Drupal::keyValue('node_access_test')->delete('has_render_context');
+    // The controller includes markup indicating whether it ran within a render
+    // context. The render context is provided by the early rendering subscriber
+    // when it is enabled, and there is no render context when early rendering
+    // is disabled.
+    if (!$disable_early_render) {
+      $this->assertSession()->pageTextContains('Executed within a render context.');
+    }
+    else {
+      $this->assertSession()->pageTextNotContains('Executed within a render context.');
+    }
 
     // The user has the 'bypass node access' permission, which means the node
     // grants cache context is not added or bubbled to the response header.
@@ -93,8 +96,12 @@ class NodeAccessCacheabilityTest extends NodeAccessTestBase {
     $this->drupalGet(new Url('node_access_test_auto_bubbling')->toString());
     $this->assertNoCacheContext('user.node_grants:view');
     $this->setCurrentUser($anonymousUser);
-    $this->assertSame(\Drupal::keyValue('node_access_test')->get('has_render_context'), !$disable_early_render);
-    \Drupal::keyValue('node_access_test')->delete('has_render_context');
+    if (!$disable_early_render) {
+      $this->assertSession()->pageTextContains('Executed within a render context.');
+    }
+    else {
+      $this->assertSession()->pageTextNotContains('Executed within a render context.');
+    }
 
     // Uninstall the module with the only hook_node_grants() implementation.
     \Drupal::service(ModuleInstallerInterface::class)->uninstall(['node_access_test']);
@@ -104,8 +111,12 @@ class NodeAccessCacheabilityTest extends NodeAccessTestBase {
     $this->setCurrentUser($anonymousUser);
     $this->drupalGet(new Url('node_access_test_auto_bubbling')->toString());
     $this->assertNoCacheContext('user.node_grants:view');
-    $this->assertSame(\Drupal::keyValue('node_access_test')->get('has_render_context'), !$disable_early_render);
-    \Drupal::keyValue('node_access_test')->delete('has_render_context');
+    if (!$disable_early_render) {
+      $this->assertSession()->pageTextContains('Executed within a render context.');
+    }
+    else {
+      $this->assertSession()->pageTextNotContains('Executed within a render context.');
+    }
   }
 
 }

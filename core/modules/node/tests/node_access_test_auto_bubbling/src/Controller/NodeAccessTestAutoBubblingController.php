@@ -6,11 +6,9 @@ namespace Drupal\node_access_test_auto_bubbling\Controller;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\KeyValueStore\KeyValueFactoryInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\node\NodeInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * Returns a node ID listing.
@@ -18,8 +16,6 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 class NodeAccessTestAutoBubblingController extends ControllerBase {
 
   public function __construct(
-    #[Autowire(service: 'keyvalue')]
-    protected readonly KeyValueFactoryInterface $keyValueFactory,
     protected readonly RendererInterface $renderer,
   ) {}
 
@@ -30,16 +26,23 @@ class NodeAccessTestAutoBubblingController extends ControllerBase {
    *   A render array.
    */
   public function latest() {
-    // Set flag in key value storage to assert in tests when the query is
-    // executed outside a render context.
-    $this->keyValue('node_access_test')->set('has_render_context', $this->renderer->hasRenderContext());
+    // Add markup to the response indicating whether this method and the entity
+    // query is run within a render context. The render context is provided by
+    // the early rendering subscriber to capture cacheability at build time.
+    // Disabling that subscriber makes it possible to test that cacheability
+    // from the query properly bubbles to the response at actual render time.
+    // @see Drupal\Core\EventSubscriber\EarlyRenderingControllerWrapperSubscriber
+    // @see Drupal\node\Hook\NodeDatabaseHooks::queryNodeAccessAlter()
+    if ($this->renderer->hasRenderContext()) {
+      $build[] = ['#markup' => 'Executed within a render context.'];
+    }
     $query = $this->entityTypeManager()->getStorage('node')->getQuery()
       ->accessCheck(TRUE)
       ->condition('status', NodeInterface::PUBLISHED)
       ->sort('created', 'DESC')
       ->range(0, 3);
     $nids = $query->execute();
-    $build = ['#markup' => $this->t('The three latest nodes are: @nids.', ['@nids' => implode(', ', $nids)])];
+    $build[] = ['#markup' => $this->t('The three latest nodes are: @nids.', ['@nids' => implode(', ', $nids)])];
     BubbleableMetadata::createFromRenderArray($build)
       ->addCacheableDependency($query)
       ->applyTo($build);
