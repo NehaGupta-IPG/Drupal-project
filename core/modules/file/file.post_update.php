@@ -40,6 +40,15 @@ function file_post_update_add_playsinline(array &$sandbox = []): ?TranslatableMa
  */
 function file_post_update_description_required(array &$sandbox): void {
   \Drupal::classResolver(ConfigEntityUpdater::class)->update($sandbox, 'field_config', function (FieldConfigInterface $field_config): bool {
-    return $field_config->getType() === 'file';
+    if ($field_config->getType() !== 'file') {
+      return FALSE;
+    }
+    $settings = $field_config->getSettings();
+    if (array_key_exists('description_field_required', $settings)) {
+      return FALSE;
+    }
+    $settings['description_field_required'] = FALSE;
+    $field_config->setSettings($settings);
+    return TRUE;
   });
 }

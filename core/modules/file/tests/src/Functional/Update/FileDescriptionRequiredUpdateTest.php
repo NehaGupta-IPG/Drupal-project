@@ -21,8 +21,8 @@ class FileDescriptionRequiredUpdateTest extends UpdatePathTestBase {
    */
   protected function setDatabaseDumpFiles(): void {
     $this->databaseDumpFiles = [
-      // Using the 'filled' fixture as 'base' contains no file fields.
-      __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-10.3.0.filled.standard.php.gz',
+      // Using the 'filled' fixture as 'bare' contains no file fields.
+      __DIR__ . '/../../../../../system/tests/fixtures/update/drupal-11.3.0.filled.standard.php.gz',
     ];
   }
 
