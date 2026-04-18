@@ -78,8 +78,8 @@ trait AxeCoreTestTrait {
     // `@` avoids "Undefined array key" warning when assigning.
     @['results' => $results, 'err' => $error] = $axe_run;
 
-    $this->assertEmpty(
-      $error,
+    $this->assertSession()->assert(
+      empty($error),
       sprintf("Axe encountered errors\n\n%s", $error)
     );
 
@@ -88,8 +88,8 @@ trait AxeCoreTestTrait {
 
     // @todo Include `incomplete` results, as they are warnings that need review.
     // @see https://docs.deque.com/devtools-for-web/4/en/needs-review-incomplete
-    $this->assertEmpty(
-      $results['violations'],
+    $this->assertSession()->assert(
+      empty($results['violations']),
       $this->formatViolationsReport($results)
     );
   }

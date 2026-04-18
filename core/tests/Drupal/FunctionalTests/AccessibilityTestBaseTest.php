@@ -6,7 +6,6 @@ namespace Drupal\FunctionalTests;
 
 use Behat\Mink\Exception\ExpectationException;
 use Drupal\FunctionalJavascriptTests\AccessibilityTestBase;
-use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -52,11 +51,10 @@ Test URL: BASE_URL/admin/accessibility-test
 Axe rule: `color-contrast`
 Violating targets (1):
   * `#target-low-contrast`
-Failed asserting that an array is empty.
 TEXT;
     $expected_message = str_replace("BASE_URL", $base_url, $expected_message);
 
-    $this->expectException(AssertionFailedError::class);
+    $this->expectException(ExpectationException::class);
     $this->expectExceptionMessage($expected_message);
   }
 

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalJavascriptTests\Tests;
 
+use Behat\Mink\Exception\ExpectationException;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\AxeCoreTestTrait;
-use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -39,12 +39,11 @@ class AxeCoreTestTraitTest extends WebDriverTestBase {
 
     $this->drupalGet('accessibility-test');
 
-    $this->expectException(AssertionFailedError::class);
+    $this->expectException(ExpectationException::class);
     $this->expectExceptionMessage(<<<TEXT
 Axe encountered errors
 
 unknown rule `unknown-rule` in options.runOnly
-Failed asserting that a string is empty.
 TEXT
     );
 
@@ -64,7 +63,7 @@ TEXT
 
     $this->drupalGet('accessibility-test');
 
-    $this->expectException(AssertionFailedError::class);
+    $this->expectException(ExpectationException::class);
     $this->expectExceptionMessage(<<<TEXT
 Accessibility test failures (2 total)
 
@@ -79,7 +78,6 @@ Test URL: {$base_url}/accessibility-test
 Axe rule: `label`
 Violating targets (1):
   * `input`
-Failed asserting that an array is empty.
 TEXT
     );
 
@@ -95,7 +93,7 @@ TEXT
 
     $this->drupalGet('accessibility-test');
 
-    $this->expectException(AssertionFailedError::class);
+    $this->expectException(ExpectationException::class);
     $expected_message = str_replace("BASE_URL", $base_url, $expected_message);
     $this->expectExceptionMessage($expected_message);
     $this->executeAxe($axe_options);
@@ -113,7 +111,7 @@ TEXT
     try {
       $this->executeAxe();
     }
-    catch (AssertionFailedError $exception) {
+    catch (ExpectationException $exception) {
       // Test setup requires existence of violations from this run.
       $this->assertStringContainsString(
         'Accessibility test failures',
@@ -142,7 +140,7 @@ TEXT
         ],
       ]);
     }
-    catch (AssertionFailedError $exception) {
+    catch (ExpectationException $exception) {
       // Test setup requires existence of an error from this run.
       $this->assertStringContainsStringIgnoringCase(
         'unknown rule `unknown-rule` in options.runOnly',
@@ -160,7 +158,7 @@ TEXT
         ],
       ]);
     }
-    catch (AssertionFailedError $exception) {
+    catch (ExpectationException $exception) {
       // If there is an assertion failure,
       // it should not contain prior error message.
       $this->assertStringNotContainsStringIgnoringCase(
@@ -193,7 +191,6 @@ Test URL: BASE_URL/accessibility-test
 Axe rule: `label`
 Violating targets (1):
   * `input`
-Failed asserting that an array is empty.
 TEXT
     ];
 
@@ -209,7 +206,6 @@ Test URL: BASE_URL/accessibility-test
 Axe rule: `color-contrast`
 Violating targets (1):
   * `#target-low-contrast`
-Failed asserting that an array is empty.
 TEXT
     ];
 
@@ -228,7 +224,6 @@ Test URL: BASE_URL/accessibility-test
 Axe rule: `label`
 Violating targets (1):
   * `input`
-Failed asserting that an array is empty.
 TEXT
     ];
   }
