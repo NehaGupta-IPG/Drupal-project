@@ -1,4 +1,4 @@
-accessibility_test.page:
+accessibility_test.default:
   path: '/accessibility-test'
   defaults:
     _title: 'Accessibility test'
@@ -6,6 +6,16 @@ accessibility_test.page:
   options:
     no_cache: TRUE
   requirements:
-    # Restricted access for testing $admin parameter of
-    # AccessibilityTestBase::testPages.
+    _access: 'TRUE'
+
+# Same controller with restricted access for testing $admin argument of
+# AccessibilityTestBase::testPages.
+accessibility_test.admin:
+  path: '/admin/accessibility-test'
+  defaults:
+    _title: 'Accessibility test'
+    _controller: '\Drupal\accessibility_test\Controller\AccessibilityTestController::page'
+  options:
+    no_cache: TRUE
+  requirements:
     _permission: 'administer site configuration'

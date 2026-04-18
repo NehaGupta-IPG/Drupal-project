@@ -48,7 +48,7 @@ class AccessibilityTestBaseTest extends AccessibilityTestBase {
 Accessibility test failures (1 total)
 
 1. [serious] Elements must meet minimum color contrast ratio thresholds
-Test URL: BASE_URL/accessibility-test
+Test URL: BASE_URL/admin/accessibility-test
 Axe rule: `color-contrast`
 Violating targets (1):
   * `#target-low-contrast`
@@ -88,7 +88,7 @@ TEXT;
   public static function provider(): array {
     return [
       'Smoke test with Axe options' => [
-        'uri' => 'accessibility-test',
+        'uri' => 'admin/accessibility-test',
         'admin' => TRUE,
         'axe_options' => [
           'runOnly' => ['color-contrast'],
