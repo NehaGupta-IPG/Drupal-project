@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace Drupal\Tests\file\Functional\Update;
 
 use Drupal\FunctionalTests\Update\UpdatePathTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests adding the file field 'required description' setting.
- *
- * @group file
- * @group legacy
  */
+#[Group('file')]
+#[Group('legacy')]
+#[RunTestsInSeparateProcesses]
 class FileDescriptionRequiredUpdateTest extends UpdatePathTestBase {
 
   /**
