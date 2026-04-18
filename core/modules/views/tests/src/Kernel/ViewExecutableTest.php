@@ -33,7 +33,6 @@ use Symfony\Component\HttpFoundation\Response;
  * @see \Drupal\views\ViewExecutable
  */
 #[Group('views')]
-#[Group('#slow')]
 #[RunTestsInSeparateProcesses]
 class ViewExecutableTest extends ViewsKernelTestBase {
 
@@ -56,22 +55,6 @@ class ViewExecutableTest extends ViewsKernelTestBase {
    * @var array
    */
   public static $testViews = ['test_destroy', 'test_executable_displays', 'test_argument_dependency'];
-
-  /**
-   * Properties that should be stored in the configuration.
-   *
-   * @var array
-   */
-  protected $configProperties = [
-    'disabled',
-    'name',
-    'description',
-    'tag',
-    'base_table',
-    'label',
-    'core',
-    'display',
-  ];
 
   /**
    * Properties that should be stored in the executable.

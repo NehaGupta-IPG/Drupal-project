@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\TempStore;
 
+use Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface;
+use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\TempStore\Lock;
 use Drupal\Core\TempStore\SharedTempStore;
@@ -12,6 +14,7 @@ use Drupal\Core\Test\TestKernel;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -24,18 +27,14 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 class SharedTempStoreTest extends UnitTestCase {
 
   /**
-   * The mock key value expirable backend.
-   *
-   * @var \Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface|\PHPUnit\Framework\MockObject\MockObject
+   * The key value expirable backend.
    */
-  protected $keyValue;
+  protected KeyValueStoreExpirableInterface&Stub $keyValue;
 
   /**
    * The mock lock backend.
-   *
-   * @var \Drupal\Core\Lock\LockBackendInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $lock;
+  protected LockBackendInterface&Stub $lock;
 
   /**
    * The temp store.
@@ -78,14 +77,14 @@ class SharedTempStoreTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $this->keyValue = $this->createMock('Drupal\Core\KeyValueStore\KeyValueStoreExpirableInterface');
-    $this->lock = $this->createMock('Drupal\Core\Lock\LockBackendInterface');
+    $this->keyValue = $this->createStub(KeyValueStoreExpirableInterface::class);
+    $this->lock = $this->createStub(LockBackendInterface::class);
     $this->requestStack = new RequestStack();
     $request = Request::createFromGlobals();
-    $session = $this->createMock(SessionInterface::class);
+    $session = $this->createStub(SessionInterface::class);
     $request->setSession($session);
     $this->requestStack->push($request);
-    $current_user = $this->createMock(AccountProxyInterface::class);
+    $current_user = $this->createStub(AccountProxyInterface::class);
 
     $this->tempStore = new SharedTempStore($this->keyValue, $this->lock, $this->owner, $this->requestStack, $current_user, 604800);
 
@@ -101,11 +100,29 @@ class SharedTempStoreTest extends UnitTestCase {
   }
 
   /**
+   * Reinitializes the current user as a mock object.
+   */
+  protected function setUpMockKeyValue(): void {
+    $this->keyValue = $this->createMock(KeyValueStoreExpirableInterface::class);
+    $reflection = new \ReflectionProperty($this->tempStore, 'storage');
+    $reflection->setValue($this->tempStore, $this->keyValue);
+  }
+
+  /**
+   * Reinitializes the lock backend as a mock object.
+   */
+  protected function setUpMockLock(): void {
+    $this->lock = $this->createMock(LockBackendInterface::class);
+    $reflection = new \ReflectionProperty($this->tempStore, 'lockBackend');
+    $reflection->setValue($this->tempStore, $this->lock);
+  }
+
+  /**
    * Tests get.
-   *
-   * @legacy-covers ::get
    */
   public function testGet(): void {
+    $this->setUpMockKeyValue();
+
     $calls = ['test_2', 'test'];
     $this->keyValue->expects($this->exactly(count($calls)))
       ->method('get')
@@ -123,10 +140,10 @@ class SharedTempStoreTest extends UnitTestCase {
 
   /**
    * Tests the getIfOwner() method.
-   *
-   * @legacy-covers ::getIfOwner
    */
   public function testGetIfOwner(): void {
+    $this->setUpMockKeyValue();
+
     $calls = ['test_2', 'test', 'test'];
     $this->keyValue->expects($this->exactly(count($calls)))
       ->method('get')
@@ -146,10 +163,11 @@ class SharedTempStoreTest extends UnitTestCase {
 
   /**
    * Tests the set() method with no lock available.
-   *
-   * @legacy-covers ::set
    */
   public function testSetWithNoLockAvailable(): void {
+    $this->setUpMockKeyValue();
+    $this->setUpMockLock();
+
     $this->lock->expects($this->exactly(2))
       ->method('acquire')
       ->with('test')
@@ -167,10 +185,11 @@ class SharedTempStoreTest extends UnitTestCase {
 
   /**
    * Tests a successful set() call.
-   *
-   * @legacy-covers ::set
    */
   public function testSet(): void {
+    $this->setUpMockKeyValue();
+    $this->setUpMockLock();
+
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('test')
@@ -190,10 +209,10 @@ class SharedTempStoreTest extends UnitTestCase {
 
   /**
    * Tests the setIfNotExists() methods.
-   *
-   * @legacy-covers ::setIfNotExists
    */
   public function testSetIfNotExists(): void {
+    $this->setUpMockKeyValue();
+
     $this->keyValue->expects($this->once())
       ->method('setWithExpireIfNotExists')
       ->with('test', $this->ownObject, 604800)
@@ -204,10 +223,10 @@ class SharedTempStoreTest extends UnitTestCase {
 
   /**
    * Tests the setIfOwner() method when no key exists.
-   *
-   * @legacy-covers ::setIfOwner
    */
   public function testSetIfOwnerWhenNotExists(): void {
+    $this->setUpMockKeyValue();
+
     $this->keyValue->expects($this->once())
       ->method('setWithExpireIfNotExists')
       ->willReturn(TRUE);
@@ -217,10 +236,10 @@ class SharedTempStoreTest extends UnitTestCase {
 
   /**
    * Tests the setIfOwner() method when a key already exists but no object.
-   *
-   * @legacy-covers ::setIfOwner
    */
   public function testSetIfOwnerNoObject(): void {
+    $this->setUpMockKeyValue();
+
     $this->keyValue->expects($this->once())
       ->method('setWithExpireIfNotExists')
       ->willReturn(FALSE);
@@ -235,10 +254,11 @@ class SharedTempStoreTest extends UnitTestCase {
 
   /**
    * Tests the setIfOwner() method with matching and non matching owners.
-   *
-   * @legacy-covers ::setIfOwner
    */
   public function testSetIfOwner(): void {
+    $this->setUpMockKeyValue();
+    $this->setUpMockLock();
+
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('test')
@@ -259,10 +279,10 @@ class SharedTempStoreTest extends UnitTestCase {
 
   /**
    * Tests the getMetadata() method.
-   *
-   * @legacy-covers ::getMetadata
    */
   public function testGetMetadata(): void {
+    $this->setUpMockKeyValue();
+
     $this->keyValue->expects($this->exactly(2))
       ->method('get')
       ->with('test')
@@ -279,10 +299,11 @@ class SharedTempStoreTest extends UnitTestCase {
 
   /**
    * Tests the delete() method.
-   *
-   * @legacy-covers ::delete
    */
   public function testDelete(): void {
+    $this->setUpMockKeyValue();
+    $this->setUpMockLock();
+
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('test')
@@ -302,10 +323,11 @@ class SharedTempStoreTest extends UnitTestCase {
 
   /**
    * Tests the delete() method with no lock available.
-   *
-   * @legacy-covers ::delete
    */
   public function testDeleteWithNoLockAvailable(): void {
+    $this->setUpMockKeyValue();
+    $this->setUpMockLock();
+
     $this->lock->expects($this->exactly(2))
       ->method('acquire')
       ->with('test')
@@ -323,10 +345,11 @@ class SharedTempStoreTest extends UnitTestCase {
 
   /**
    * Tests the deleteIfOwner() method.
-   *
-   * @legacy-covers ::deleteIfOwner
    */
   public function testDeleteIfOwner(): void {
+    $this->setUpMockKeyValue();
+    $this->setUpMockLock();
+
     $this->lock->expects($this->once())
       ->method('acquire')
       ->with('test_2')

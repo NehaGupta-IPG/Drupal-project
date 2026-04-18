@@ -23,8 +23,6 @@ class MigrationLookupTest extends MigrationLookupTestCase {
 
   /**
    * Tests transform with stub skipping.
-   *
-   * @legacy-covers ::transform
    */
   public function testTransformWithStubSkipping(): void {
     $migration_plugin = $this->prophesize(MigrationInterface::class);
@@ -54,8 +52,6 @@ class MigrationLookupTest extends MigrationLookupTestCase {
 
   /**
    * Tests transform with stubbing.
-   *
-   * @legacy-covers ::transform
    */
   #[DataProvider('providerTestTransformWithStubbing')]
   public function testTransformWithStubbing($exception_class, $exception_message, $expected_message): void {
@@ -311,13 +307,13 @@ class MigrationLookupTest extends MigrationLookupTestCase {
     $row1 = $this->row;
     $row2 = clone $this->row;
 
-    $row1->expects($this->any())
+    $row1
       ->method('getMultiple')
       ->willReturn([1, 2]);
     $result = $migration->transform([1], $this->migrateExecutable, $row1, '');
     $this->assertEquals(2, $result);
 
-    $row2->expects($this->any())
+    $row2
       ->method('getMultiple')
       ->willReturn([3, 4]);
     $result = $migration->transform([2], $this->migrateExecutable, $row2, '');

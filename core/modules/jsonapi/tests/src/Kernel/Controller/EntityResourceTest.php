@@ -91,13 +91,6 @@ class EntityResourceTest extends JsonapiKernelTestBase {
   protected Node $node4;
 
   /**
-   * A fake request.
-   *
-   * @var \Symfony\Component\HttpFoundation\Request
-   */
-  protected $request;
-
-  /**
    * The EntityResource under test.
    *
    * @var \Drupal\jsonapi\Controller\EntityResource
@@ -238,7 +231,7 @@ class EntityResourceTest extends JsonapiKernelTestBase {
     $request->query = new InputBag(['filter' => ['id' => 'invalid']]);
 
     // Get the response.
-    $resource_type = new ResourceType('node', 'article', NULL);
+    $resource_type = new ResourceType('node', 'article', Node::class);
     $response = $this->entityResource->getCollection($resource_type, $request);
 
     // Assertions.

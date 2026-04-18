@@ -44,20 +44,6 @@ class RelatedResourceTypesTest extends JsonapiKernelTestBase {
   protected $resourceTypeRepository;
 
   /**
-   * The JSON:API resource type for `node--foo`.
-   *
-   * @var \Drupal\jsonapi\ResourceType\ResourceType
-   */
-  protected $fooType;
-
-  /**
-   * The JSON:API resource type for `node--bar`.
-   *
-   * @var \Drupal\jsonapi\ResourceType\ResourceType
-   */
-  protected $barType;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
@@ -118,8 +104,6 @@ class RelatedResourceTypesTest extends JsonapiKernelTestBase {
 
   /**
    * Tests get relatable resource types.
-   *
-   * @legacy-covers ::getRelatableResourceTypes
    */
   #[DataProvider('getRelatableResourceTypesProvider')]
   public function testGetRelatableResourceTypes($resource_type_name, $relatable_type_names): void {
@@ -173,8 +157,6 @@ class RelatedResourceTypesTest extends JsonapiKernelTestBase {
 
   /**
    * Tests get relatable resource types by field.
-   *
-   * @legacy-covers ::getRelatableResourceTypesByField
    */
   #[DataProvider('getRelatableResourceTypesByFieldProvider')]
   public function testGetRelatableResourceTypesByField($entity_type_id, $bundle, $field): void {
