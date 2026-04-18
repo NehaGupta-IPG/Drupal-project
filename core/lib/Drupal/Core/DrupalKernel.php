@@ -280,6 +280,11 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   protected $root;
 
   /**
+   * The hash of the loaded container.
+   */
+  protected ?string $loadedContainerHash = NULL;
+
+  /**
    * Create a DrupalKernel object from a request.
    *
    * @param \Symfony\Component\HttpFoundation\Request $request
@@ -1031,6 +1036,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
             $phpStorage->load($containerClass . '.php');
           }
           if (class_exists($containerClass, FALSE)) {
+            $this->loadedContainerHash = $hash;
             $container = new $containerClass();
           }
         }
@@ -1059,17 +1065,22 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         // will result in a different class name but that can be loaded in the
         // same request.
         $hash = hash('xxh128', $code);
-        $containerClass = 'DrupalContainer_' . $hash;
-        $filename = $containerClass . '.php';
 
-        $code = str_replace(
-          "class DrupalContainer extends \\$baseClass\n{",
-          "class $containerClass extends \\$baseClass\n{",
-          $code,
-        );
-        $phpStorage->save($filename, $code);
-        if (!class_exists($containerClass, FALSE)) {
+        $containerClass = 'DrupalContainer_' . $hash;
+        if ($hash !== $this->loadedContainerHash && !class_exists($containerClass, FALSE)) {
+          if ($this->loadedContainerHash) {
+            $phpStorage->delete('DrupalContainer_' . $this->loadedContainerHash . '.php');
+          }
+          $filename = $containerClass . '.php';
+
+          $code = str_replace(
+            "class DrupalContainer extends \\$baseClass\n{",
+            "class $containerClass extends \\$baseClass\n{",
+            $code,
+          );
+          $phpStorage->save($filename, $code);
           $phpStorage->load($filename);
+          $this->loadedContainerHash = $hash;
         }
 
         $container = new $containerClass();
@@ -1451,9 +1462,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   public function invalidateContainer() {
     // An invalidated container needs a rebuild.
     $this->containerNeedsRebuild = TRUE;
-
-    // Delete compiled container PHP files from PhpStorage.
-    PhpStorageFactory::get('service_container')->deleteAll();
 
     // If we have not yet booted, settings or bootstrap services might not yet
     // be available. In that case the container will not be loaded from cache
