@@ -429,11 +429,32 @@ class DrupalKernelTest extends KernelTestBase {
   public function testInvalidationDoesNotCauseFurtherContainerBuildsToNotDump(): void {
     $kernel = $this->getTestKernel(Request::createFromGlobals(), ['system' => 'system']);
     $this->assertFileExists($kernel->getSitePath() . '/files/php/service_container');
+    $container = $kernel->getContainer();
+    $container_file = (new \ReflectionClass($container))->getFileName();
     $kernel->invalidateContainer();
-    $this->assertFileDoesNotExist($kernel->getSitePath() . '/files/php/service_container');
+    $this->assertFileExists($kernel->getSitePath() . '/files/php/service_container');
     // This should cause the container to be dumped again.
     $kernel->updateModules(['system' => 'system']);
     $this->assertFileExists($kernel->getSitePath() . '/files/php/service_container');
+    // Containers should be different objects.
+    $this->assertNotSame($container, $kernel->getContainer());
+    $this->assertSame($container::class, $kernel->getContainer()::class);
+    // The containers have the same hash, so should use the same file.
+    $this->assertSame($container_file, (new \ReflectionClass($kernel->getContainer()))->getFileName());
+
+    $kernel->invalidateContainer();
+    // This should cause the container to be dumped again but with new modules
+    // resulting in a new hash.
+    $kernel->updateModules(['system' => 'system', 'user' => 'user']);
+    $this->assertFileExists($kernel->getSitePath() . '/files/php/service_container');
+    $this->assertNotSame($container, $kernel->getContainer());
+    $this->assertNotSame($container::class, $kernel->getContainer()::class);
+    // The containers have different hashes, so should use different files.
+    $new_container_file = (new \ReflectionClass($kernel->getContainer()))->getFileName();
+    $this->assertNotSame($container_file, $new_container_file);
+    $this->assertFileExists($new_container_file);
+    // The old container file should be deleted.
+    $this->assertFileDoesNotExist($container_file);
   }
 
 }
