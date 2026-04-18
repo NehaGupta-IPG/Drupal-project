@@ -31,7 +31,7 @@ class Date extends NumericFilter {
   /**
    * {@inheritdoc}
    */
-  public function defaultExposeOptions() {
+  public function defaultExposeOptions(): void {
     parent::defaultExposeOptions();
     $this->options['expose']['min_label'] = $this->t('Start date');
     $this->options['expose']['max_label'] = $this->t('End date');
