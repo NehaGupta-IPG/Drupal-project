@@ -7,12 +7,15 @@ namespace Drupal\Tests\views\Kernel\Plugin;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use Drupal\Tests\user\Traits\UserCreationTrait;
 use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests access with argument validation.
  *
- * @group views
  */
+#[Group("views")]
+#[RunTestsInSeparateProcesses]
 class ArgumentValidatorAccessTest extends ViewsKernelTestBase {
 
   use UserCreationTrait;
