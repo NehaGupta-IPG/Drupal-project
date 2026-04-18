@@ -37,8 +37,8 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
     $options['expose']['contains']['placeholder'] = ['default' => ''];
     $options['expose']['contains']['min_placeholder'] = ['default' => ''];
     $options['expose']['contains']['max_placeholder'] = ['default' => ''];
-    $options['expose']['contains']['min_label'] = ['default' => $this->t('Min')];
-    $options['expose']['contains']['max_label'] = ['default' => $this->t('Max')];
+    $options['expose']['contains']['min_label'] = ['default' => $this->t('Minimum')];
+    $options['expose']['contains']['max_label'] = ['default' => $this->t('Maximum')];
 
     return $options;
   }
@@ -51,8 +51,8 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
     $this->options['expose']['min_placeholder'] = NULL;
     $this->options['expose']['max_placeholder'] = NULL;
     $this->options['expose']['placeholder'] = NULL;
-    $this->options['expose']['min_label'] = $this->t('Min');
-    $this->options['expose']['max_label'] = $this->t('Max');
+    $this->options['expose']['min_label'] = $this->t('Minimum');
+    $this->options['expose']['max_label'] = $this->t('Maximum');
   }
 
   /**
@@ -78,15 +78,13 @@ class NumericFilter extends FilterPluginBase implements FilterOperatorsInterface
     $form['expose']['min_label'] = [
       '#type' => 'textfield',
       '#default_value' => $this->options['expose']['min_label'],
-      '#description' => $this->t('Title for the Min field.'),
-      '#title' => $this->t('Min label'),
+      '#title' => $this->t('Minimum value label'),
       '#size' => 40,
     ];
     $form['expose']['max_label'] = [
       '#type' => 'textfield',
       '#default_value' => $this->options['expose']['max_label'],
-      '#description' => $this->t('Title for the Max field.'),
-      '#title' => $this->t('Max label'),
+      '#title' => $this->t('Maximum value label'),
       '#size' => 40,
     ];
     // Setup #states for all operators with two value.
