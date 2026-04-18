@@ -327,7 +327,7 @@ class SystemRequirementsHooks {
       else {
         $requirements['php_opcache']['value'] = $this->t('Enabled');
 
-        // Check if the container file is opcached.
+        // Check if the container file is cached in opcache.
         $container_reflection = new \ReflectionClass(\Drupal::getContainer());
         $container_file = $container_reflection->getFileName();
         if ($container_file && opcache_is_script_cached($container_file)) {
@@ -340,7 +340,7 @@ class SystemRequirementsHooks {
           $requirements['php_opcache_container'] = [
             'value' => $this->t('Not cached'),
             'severity' => RequirementSeverity::Warning,
-            'description' => $this->t('The service container PHP file is not cached by OPcache. This can happen if <code>opcache.max_accelerated_files</code>, <code>opcache.max_file_size</code>, or <code>opcache.memory_consumption</code> are too low. Ensuring the container file is opcached will improve performance.'),
+            'description' => $this->t('The service container PHP file is not cached by OPcache. This can happen if <code>opcache.max_accelerated_files</code>, <code>opcache.max_file_size</code>, or <code>opcache.memory_consumption</code> are too low. Ensuring the container file can be cached by OPcache will improve performance.'),
           ];
         }
         $requirements['php_opcache_container']['title'] = $this->t('PHP OPcode container');
