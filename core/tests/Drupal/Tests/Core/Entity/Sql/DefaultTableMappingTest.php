@@ -594,7 +594,7 @@ class DefaultTableMappingTest extends UnitTestCase {
       ->method('isTranslatable')
       ->willReturn(array_key_exists('data', $table_names) || array_key_exists('revision_data', $table_names));
 
-    $table_mapping = new TestDefaultTableMapping($this->entityType, [], 'simpletest');
+    $table_mapping = new TestDefaultTableMapping($this->entityType, [], 'simpletest_');
     $this->assertSame($expected, $table_mapping->{$table_getter}());
   }
 
@@ -609,22 +609,22 @@ class DefaultTableMappingTest extends UnitTestCase {
       'base table falls back when NULL' => [
         'getBaseTable',
         ['base' => NULL],
-        'simpletestentity_test',
+        'simpletest_entity_test',
       ],
       'revision table falls back when NULL' => [
         'getRevisionTable',
         ['base' => 'entity_test', 'revision' => NULL],
-        'simpletestentity_test_revision',
+        'simpletest_entity_test_revision',
       ],
       'revision table falls back when empty string' => [
         'getRevisionTable',
         ['base' => 'entity_test', 'revision' => ''],
-        'simpletestentity_test_revision',
+        'simpletest_entity_test_revision',
       ],
       'data table falls back when NULL' => [
         'getDataTable',
         ['base' => 'entity_test', 'data' => NULL],
-        'simpletestentity_test_field_data',
+        'simpletest_entity_test_field_data',
       ],
       'revision data table falls back when NULL' => [
         'getRevisionDataTable',
@@ -634,7 +634,7 @@ class DefaultTableMappingTest extends UnitTestCase {
           'data' => 'entity_test_field_data',
           'revision_data' => NULL,
         ],
-        'simpletestentity_test_field_revision',
+        'simpletest_entity_test_field_revision',
       ],
     ];
   }
