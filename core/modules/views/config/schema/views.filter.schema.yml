@@ -98,10 +98,10 @@ views.filter.numeric:
           label: 'Placeholder'
         min_label:
           type: label
-          label: 'Min label'
+          label: 'Minimum value label'
         max_label:
           type: label
-          label: 'Max label'
+          label: 'Maximum value label'
 
 views.filter_value.numeric:
   type: mapping

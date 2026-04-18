@@ -119,8 +119,8 @@ class FilterNumericWebTest extends UITestBase {
     $max_label_name = 'options[expose][max_label]';
     $this->assertSession()->fieldExists($min_label_name);
     $this->assertSession()->fieldExists($max_label_name);
-    $this->assertSession()->fieldValueEquals($min_label_name, 'Min');
-    $this->assertSession()->fieldValueEquals($max_label_name, 'Max');
+    $this->assertSession()->fieldValueEquals($min_label_name, 'Minimum');
+    $this->assertSession()->fieldValueEquals($max_label_name, 'Maximum');
 
     $edit = [];
     $edit['options[expose][label]'] = 'Age between';
@@ -137,8 +137,8 @@ class FilterNumericWebTest extends UITestBase {
     // Check the field (wrapper) label.
     $this->assertSession()->elementTextContains('css', 'fieldset#edit-age-wrapper legend', 'Age between');
     // Check the min/max labels.
-    $this->assertSession()->elementsCount('xpath', '//fieldset[contains(@id, "edit-age-wrapper")]//label[contains(@for, "edit-age-min") and contains(text(), "Min")]', 1);
-    $this->assertSession()->elementsCount('xpath', '//fieldset[contains(@id, "edit-age-wrapper")]//label[contains(@for, "edit-age-max") and contains(text(), "Max")]', 1);
+    $this->assertSession()->elementsCount('xpath', '//fieldset[contains(@id, "edit-age-wrapper")]//label[contains(@for, "edit-age-min") and contains(text(), "Minimum")]', 1);
+    $this->assertSession()->elementsCount('xpath', '//fieldset[contains(@id, "edit-age-wrapper")]//label[contains(@for, "edit-age-max") and contains(text(), "Maximum")]', 1);
     // Check that the description is shown in the right place.
     $this->assertEquals('Description of the exposed filter', trim($this->cssSelect('#edit-age-wrapper--description')[0]->getText()));
 
