@@ -115,7 +115,7 @@ class TextFormatterTest extends EntityKernelTestBase {
 
     // The processed value should be computed from value + format, not the
     // injected string.
-    $this->assertSame("<p>Hello, world!</p>\n", $entity->get('formatted_text')->first()->get('processed')->getValue());
+    $this->assertSame("<p>Hello, world!</p>\n", (string) $entity->get('formatted_text')->first()->get('processed')->getValue());
   }
 
 }
