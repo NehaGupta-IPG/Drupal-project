@@ -24,7 +24,10 @@ class RendererRecursionTest extends RendererTestBase {
           'test:complex_child',
         ],
       ],
-      '#lazy_builder' => ['Drupal\Tests\Core\Render\PlaceholdersTest::callback', [$this->getRandomGenerator()->string()]],
+      '#lazy_builder' => [
+        'Drupal\Tests\Core\Render\PlaceholdersTest::callback',
+        [$this->getRandomGenerator()->string()],
+      ],
       '#create_placeholder' => TRUE,
     ];
 
@@ -44,7 +47,7 @@ class RendererRecursionTest extends RendererTestBase {
     $this->setUpRequest();
 
     $complex_child = $complex_child_template;
-    $callable = function () use ($renderer, $complex_child) {
+    $callable = function () use ($renderer, $complex_child): void {
       $this->expectException(\LogicException::class);
       $renderer->renderRoot($complex_child);
     };
@@ -109,7 +112,7 @@ class RendererRecursionTest extends RendererTestBase {
 
     $complex_child = $complex_child_template;
 
-    $callable = function ($elements) use ($renderer, $complex_child) {
+    $callable = function (array $elements) use ($renderer, $complex_child): array {
       $elements['#markup'] = $renderer->renderInIsolation($complex_child);
       $this->assertEquals('<p>This is a rendered placeholder!</p>', $elements['#markup'], 'Rendered complex child output as expected, with the placeholder replaced.');
       return $elements;

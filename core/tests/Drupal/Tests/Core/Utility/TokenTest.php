@@ -5,16 +5,22 @@ declare(strict_types=1);
 namespace Drupal\Tests\Core\Utility;
 
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Cache\Context\CacheContextsManager;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\Core\Render\Markup;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Utility\Token;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
 
 /**
  * Tests Drupal\Core\Utility\Token.
@@ -25,31 +31,23 @@ class TokenTest extends UnitTestCase {
 
   /**
    * The cache used for testing.
-   *
-   * @var \Drupal\Core\Cache\CacheBackendInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $cache;
+  protected CacheBackendInterface&Stub $cache;
 
   /**
    * The language manager used for testing.
-   *
-   * @var \Drupal\Core\Language\LanguageManagerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $languageManager;
+  protected LanguageManagerInterface&Stub $languageManager;
 
   /**
    * The module handler service used for testing.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $moduleHandler;
+  protected ModuleHandlerInterface&Stub $moduleHandler;
 
   /**
    * The language interface used for testing.
-   *
-   * @var \Drupal\Core\Language\LanguageInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $language;
+  protected LanguageInterface&Stub $language;
 
   /**
    * The token service under test.
@@ -60,10 +58,8 @@ class TokenTest extends UnitTestCase {
 
   /**
    * The cache tags invalidator.
-   *
-   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $cacheTagsInvalidator;
+  protected CacheTagsInvalidatorInterface&Stub $cacheTagsInvalidator;
 
   /**
    * The cache contexts manager.
@@ -73,31 +69,22 @@ class TokenTest extends UnitTestCase {
   protected $cacheContextManager;
 
   /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\RendererInterface|\PHPUnit\Framework\MockObject\MockObject
-   */
-  protected $renderer;
-
-  /**
    * {@inheritdoc}
    */
   protected function setUp(): void {
     parent::setUp();
 
-    $this->cache = $this->createMock('\Drupal\Core\Cache\CacheBackendInterface');
+    $this->cache = $this->createStub(CacheBackendInterface::class);
 
-    $this->languageManager = $this->createMock('Drupal\Core\Language\LanguageManagerInterface');
+    $this->languageManager = $this->createStub(LanguageManagerInterface::class);
 
-    $this->moduleHandler = $this->createMock('\Drupal\Core\Extension\ModuleHandlerInterface');
+    $this->moduleHandler = $this->createStub(ModuleHandlerInterface::class);
 
-    $this->language = $this->createMock('\Drupal\Core\Language\LanguageInterface');
+    $this->language = $this->createStub(LanguageInterface::class);
 
-    $this->cacheTagsInvalidator = $this->createMock('\Drupal\Core\Cache\CacheTagsInvalidatorInterface');
+    $this->cacheTagsInvalidator = $this->createStub(CacheTagsInvalidatorInterface::class);
 
-    $this->renderer = $this->createMock('Drupal\Core\Render\RendererInterface');
-
-    $this->token = new Token($this->moduleHandler, $this->cache, $this->languageManager, $this->cacheTagsInvalidator, $this->renderer);
+    $this->token = new Token($this->moduleHandler, $this->cache, $this->languageManager, $this->cacheTagsInvalidator, $this->createStub(RendererInterface::class));
 
     $container = new ContainerBuilder();
     $this->cacheContextManager = new CacheContextsManager($container, [
@@ -109,11 +96,49 @@ class TokenTest extends UnitTestCase {
   }
 
   /**
+   * Reinitializes the cache as a mock object.
+   */
+  protected function setUpMockCache(): void {
+    $this->cache = $this->createMock(CacheBackendInterface::class);
+    $reflection = new \ReflectionProperty($this->token, 'cache');
+    $reflection->setValue($this->token, $this->cache);
+  }
+
+  /**
+   * Reinitializes the cache tags invalidator as a mock object.
+   */
+  protected function setUpMockCacheTagsInvalidator(): void {
+    $this->cacheTagsInvalidator = $this->createMock(CacheTagsInvalidatorInterface::class);
+    $reflection = new \ReflectionProperty($this->token, 'cacheTagsInvalidator');
+    $reflection->setValue($this->token, $this->cacheTagsInvalidator);
+  }
+
+  /**
+   * Reinitializes the language manager as a mock object.
+   */
+  protected function setUpMockLanguageManager(): void {
+    $this->languageManager = $this->createMock(LanguageManagerInterface::class);
+    $reflection = new \ReflectionProperty($this->token, 'languageManager');
+    $reflection->setValue($this->token, $this->languageManager);
+  }
+
+  /**
+   * Reinitializes the module handler as a mock object.
+   */
+  protected function setUpMockModuleHandler(): void {
+    $this->moduleHandler = $this->createMock(ModuleHandlerInterface::class);
+    $reflection = new \ReflectionProperty($this->token, 'moduleHandler');
+    $reflection->setValue($this->token, $this->moduleHandler);
+  }
+
+  /**
    * Tests get info.
-   *
-   * @legacy-covers ::getInfo
    */
   public function testGetInfo(): void {
+    $this->setUpMockCache();
+    $this->setUpMockLanguageManager();
+    $this->setUpMockModuleHandler();
+
     $token_info = [
       'types' => [
         'foo' => [
@@ -122,6 +147,7 @@ class TokenTest extends UnitTestCase {
       ],
     ];
 
+    $this->language = $this->createMock(LanguageInterface::class);
     $this->language->expects($this->atLeastOnce())
       ->method('getId')
       ->willReturn($this->randomMachineName());
@@ -158,11 +184,9 @@ class TokenTest extends UnitTestCase {
 
   /**
    * Tests replace with bubbleable metadata object.
-   *
-   * @legacy-covers ::replace
    */
   public function testReplaceWithBubbleableMetadataObject(): void {
-    $this->moduleHandler->expects($this->any())
+    $this->moduleHandler
       ->method('invokeAll')
       ->willReturn(['[node:title]' => 'hello world']);
 
@@ -189,13 +213,11 @@ class TokenTest extends UnitTestCase {
 
   /**
    * Tests replace with hook tokens with bubbleable metadata.
-   *
-   * @legacy-covers ::replace
    */
   public function testReplaceWithHookTokensWithBubbleableMetadata(): void {
-    $this->moduleHandler->expects($this->any())
+    $this->moduleHandler
       ->method('invokeAll')
-      ->willReturnCallback(function ($hook_name, $args) {
+      ->willReturnCallback(function ($hook_name, $args): array {
         $cacheable_metadata = $args[4];
         $cacheable_metadata->addCacheContexts(['custom_context']);
         $cacheable_metadata->addCacheTags(['node:1']);
@@ -231,13 +253,13 @@ class TokenTest extends UnitTestCase {
    * @legacy-covers ::replace
    */
   public function testReplaceWithHookTokensAlterWithBubbleableMetadata(): void {
-    $this->moduleHandler->expects($this->any())
+    $this->moduleHandler
       ->method('invokeAll')
       ->willReturn([]);
 
-    $this->moduleHandler->expects($this->any())
+    $this->moduleHandler
       ->method('alter')
-      ->willReturnCallback(function ($hook_name, array &$replacements, array $context, BubbleableMetadata $bubbleable_metadata) {
+      ->willReturnCallback(function ($hook_name, array &$replacements, array $context, BubbleableMetadata $bubbleable_metadata): void {
         $replacements['[node:title]'] = 'hello world';
         $bubbleable_metadata->addCacheContexts(['custom_context']);
         $bubbleable_metadata->addCacheTags(['node:1']);
@@ -266,10 +288,10 @@ class TokenTest extends UnitTestCase {
 
   /**
    * Tests reset info.
-   *
-   * @legacy-covers ::resetInfo
    */
   public function testResetInfo(): void {
+    $this->setUpMockCacheTagsInvalidator();
+
     $this->cacheTagsInvalidator->expects($this->once())
       ->method('invalidateTags')
       ->with(['token_info']);
@@ -279,12 +301,10 @@ class TokenTest extends UnitTestCase {
 
   /**
    * Tests replace escaping.
-   *
-   * @legacy-covers ::replace
    */
   #[DataProvider('providerTestReplaceEscaping')]
   public function testReplaceEscaping($string, array $tokens, $expected): void {
-    $this->moduleHandler->expects($this->any())
+    $this->moduleHandler
       ->method('invokeAll')
       ->willReturnCallback(function ($type, $args) {
         return $args[2]['tokens'];
@@ -295,7 +315,7 @@ class TokenTest extends UnitTestCase {
     $this->assertEquals($expected, $result);
   }
 
-  public static function providerTestReplaceEscaping() {
+  public static function providerTestReplaceEscaping(): array {
     $data = [];
 
     // No tokens. The first argument to Token::replace() should not be escaped.
@@ -303,7 +323,11 @@ class TokenTest extends UnitTestCase {
     $data['html-in-string'] = ['<h1>Giraffe</h1>', [], '<h1>Giraffe</h1>'];
     $data['html-in-string-quote'] = ['<h1>Giraffe"</h1>', [], '<h1>Giraffe"</h1>'];
 
-    $data['simple-placeholder-with-plain-text'] = ['<h1>[token:meh]</h1>', ['[token:meh]' => 'Giraffe"'], '<h1>' . Html::escape('Giraffe"') . '</h1>'];
+    $data['simple-placeholder-with-plain-text'] = [
+      '<h1>[token:meh]</h1>',
+      ['[token:meh]' => 'Giraffe"'],
+      '<h1>' . Html::escape('Giraffe"') . '</h1>',
+    ];
 
     $data['simple-placeholder-with-safe-html'] = [
       '<h1>[token:meh]</h1>',
@@ -316,8 +340,6 @@ class TokenTest extends UnitTestCase {
 
   /**
    * Tests replace plain.
-   *
-   * @legacy-covers ::replacePlain
    */
   public function testReplacePlain(): void {
     $this->setupSiteTokens();
@@ -359,7 +381,7 @@ class TokenTest extends UnitTestCase {
       '[site:slogan]' => Markup::create('We are <b>best</b>'),
     ];
 
-    $this->moduleHandler->expects($this->any())
+    $this->moduleHandler
       ->method('invokeAll')
       ->willReturn($tokens);
   }

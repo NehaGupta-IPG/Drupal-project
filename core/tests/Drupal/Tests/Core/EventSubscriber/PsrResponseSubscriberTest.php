@@ -8,6 +8,9 @@ use Drupal\Core\EventSubscriber\PsrResponseSubscriber;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\MockObject\Stub;
+use Psr\Http\Message\ResponseInterface;
+use Symfony\Bridge\PsrHttpMessage\HttpFoundationFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
@@ -29,10 +32,8 @@ class PsrResponseSubscriberTest extends UnitTestCase {
 
   /**
    * The tested path root subscriber.
-   *
-   * @var \Symfony\Bridge\PsrHttpMessage\HttpFoundationFactoryInterface|\PHPUnit\Framework\MockObject\MockObject
    */
-  protected $httpFoundationFactoryMock;
+  protected HttpFoundationFactoryInterface&Stub $httpFoundationFactoryMock;
 
   /**
    * {@inheritdoc}
@@ -40,13 +41,10 @@ class PsrResponseSubscriberTest extends UnitTestCase {
   protected function setUp(): void {
     parent::setUp();
 
-    $factory = $this->getMockBuilder('Symfony\Bridge\PsrHttpMessage\HttpFoundationFactoryInterface')
-      ->disableOriginalConstructor()
-      ->getMock();
+    $factory = $this->createStub(HttpFoundationFactoryInterface::class);
     $factory
-      ->expects($this->any())
       ->method('createResponse')
-      ->willReturn($this->createMock('Symfony\Component\HttpFoundation\Response'));
+      ->willReturn($this->createStub(Response::class));
 
     $this->httpFoundationFactoryMock = $factory;
 
@@ -59,7 +57,7 @@ class PsrResponseSubscriberTest extends UnitTestCase {
    * @legacy-covers ::onKernelView
    */
   public function testConvertsControllerResult(): void {
-    $event = $this->createEvent($this->createMock('Psr\Http\Message\ResponseInterface'));
+    $event = $this->createEvent($this->createStub(ResponseInterface::class));
     $this->psrResponseSubscriber->onKernelView($event);
     $this->assertInstanceOf(Response::class, $event->getResponse());
   }
@@ -88,10 +86,10 @@ class PsrResponseSubscriberTest extends UnitTestCase {
    * @return \Symfony\Component\HttpKernel\Event\ViewEvent
    *   A ViewEvent object to test.
    */
-  protected function createEvent($controller_result) {
+  protected function createEvent($controller_result): ViewEvent {
     return new ViewEvent(
-      $this->createMock(HttpKernelInterface::class),
-      $this->createMock(Request::class),
+      $this->createStub(HttpKernelInterface::class),
+      $this->createStub(Request::class),
       HttpKernelInterface::MAIN_REQUEST,
       $controller_result
     );

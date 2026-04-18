@@ -76,19 +76,17 @@ class IFrameUrlHelperTest extends UnitTestCase {
    *   The base URL to compare $url against.
    * @param bool $secure
    *   The expected result of isSecure().
-   *
-   * @legacy-covers ::isSecure
    */
   #[DataProvider('providerIsSecure')]
   public function testIsSecure($url, $base_url, $secure): void {
-    $request_context = $this->createMock(RequestContext::class);
-    $request_context->expects($this->any())
+    $request_context = $this->createStub(RequestContext::class);
+    $request_context
       ->method('getCompleteBaseUrl')
       ->willReturn($base_url);
 
     $url_helper = new IFrameUrlHelper(
       $request_context,
-      $this->createMock(PrivateKey::class)
+      $this->createStub(PrivateKey::class)
     );
 
     $this->assertSame($secure, $url_helper->isSecure($url));

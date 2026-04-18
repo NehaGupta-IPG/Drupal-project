@@ -24,13 +24,9 @@ class NodeAccessGrantsCacheContext extends UserCacheContextBase implements Calcu
 
   public function __construct(
     AccountInterface $user,
-    protected ?EntityTypeManagerInterface $entityTypeManager = NULL,
+    protected EntityTypeManagerInterface $entityTypeManager,
   ) {
     parent::__construct($user);
-    if (!$entityTypeManager) {
-      @trigger_error('Calling NodeAccessGrantsCacheContext::__construct() without the $entityTypeManager argument is deprecated in drupal:11.3.0 and the $entityTypeManager argument will be required in drupal:12.0.0. See https://www.drupal.org/node/3038909', E_USER_DEPRECATED);
-      $this->entityTypeManager = \Drupal::entityTypeManager();
-    }
   }
 
   /**
@@ -44,6 +40,10 @@ class NodeAccessGrantsCacheContext extends UserCacheContextBase implements Calcu
    * {@inheritdoc}
    */
   public function getContext($operation = NULL) {
+    // If there are no grants at all, then always return all.
+    if (!\Drupal::moduleHandler()->hasImplementations('node_grants')) {
+      return 'all';
+    }
     // If the current user either can bypass node access then we don't need to
     // determine the exact node grants for the current user.
     if ($this->user->hasPermission('bypass node access')) {

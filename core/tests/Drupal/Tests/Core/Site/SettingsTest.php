@@ -55,8 +55,6 @@ class SettingsTest extends UnitTestCase {
 
   /**
    * Tests get.
-   *
-   * @legacy-covers ::get
    */
   public function testGet(): void {
     // Test stored settings.
@@ -70,8 +68,6 @@ class SettingsTest extends UnitTestCase {
 
   /**
    * Tests get all.
-   *
-   * @legacy-covers ::getAll
    */
   public function testGetAll(): void {
     $this->assertEquals($this->config, Settings::getAll());
@@ -79,8 +75,6 @@ class SettingsTest extends UnitTestCase {
 
   /**
    * Tests get instance.
-   *
-   * @legacy-covers ::getInstance
    */
   public function testGetInstance(): void {
     $singleton = $this->settings->getInstance();
@@ -89,8 +83,6 @@ class SettingsTest extends UnitTestCase {
 
   /**
    * Tests Settings::getHashSalt().
-   *
-   * @legacy-covers ::getHashSalt
    */
   public function testGetHashSalt(): void {
     $this->assertSame($this->config['hash_salt'], $this->settings->getHashSalt());
@@ -98,8 +90,6 @@ class SettingsTest extends UnitTestCase {
 
   /**
    * Tests Settings::getHashSalt() with no hash salt value.
-   *
-   * @legacy-covers ::getHashSalt
    */
   #[DataProvider('providerTestGetHashSaltEmpty')]
   public function testGetHashSaltEmpty(array $config): void {
@@ -115,7 +105,7 @@ class SettingsTest extends UnitTestCase {
    * @return array
    *   An array of settings arrays with no hash salt value.
    */
-  public static function providerTestGetHashSaltEmpty() {
+  public static function providerTestGetHashSaltEmpty(): array {
     return [
       [[]],
       [['hash_salt' => '']],
@@ -135,8 +125,6 @@ class SettingsTest extends UnitTestCase {
 
   /**
    * Tests Settings::getApcuPrefix().
-   *
-   * @legacy-covers ::getApcuPrefix
    */
   public function testGetApcuPrefix(): void {
     $settings = new Settings([
@@ -154,8 +142,6 @@ class SettingsTest extends UnitTestCase {
 
   /**
    * Tests that an exception is thrown when settings are not initialized yet.
-   *
-   * @legacy-covers ::getInstance
    */
   public function testGetInstanceReflection(): void {
     $settings = new Settings([]);
@@ -217,7 +203,7 @@ class SettingsTest extends UnitTestCase {
     $instance_property->setValue(NULL, $deprecated_settings);
 
     if ($expect_deprecation_message) {
-      $this->expectDeprecation($deprecated_setting['message']);
+      $this->expectUserDeprecationMessage($deprecated_setting['message']);
     }
 
     Settings::initialize(vfsStream::url('root'), 'sites', $class_loader);
@@ -296,8 +282,8 @@ class SettingsTest extends UnitTestCase {
    *   The expected deprecation message.
    */
   #[DataProvider('providerTestRealDeprecatedSettings')]
-  #[IgnoreDeprecations]
   public function testRealDeprecatedSettings(string $legacy_setting, string $expected_deprecation): void {
+    $this->markTestSkipped('No settings to test real deprecated settings with.');
 
     $settings_file_content = "<?php\n\$settings['$legacy_setting'] = 'foo';\n";
     $class_loader = NULL;
@@ -307,7 +293,7 @@ class SettingsTest extends UnitTestCase {
       ->at($sites_directory)
       ->setContent($settings_file_content);
 
-    $this->expectDeprecation($expected_deprecation);
+    $this->expectUserDeprecationMessage($expected_deprecation);
 
     // Presence of the old name in settings.php is enough to trigger messages.
     Settings::initialize(vfsStream::url('root'), 'sites', $class_loader);
@@ -319,8 +305,8 @@ class SettingsTest extends UnitTestCase {
   public static function providerTestRealDeprecatedSettings(): array {
     return [
       [
-        'state_cache',
-        'The "state_cache" setting is deprecated in drupal:11.0.0. This setting should be removed from the settings file, since its usage has been removed. See https://www.drupal.org/node/3177901.',
+        '',
+        '',
       ],
     ];
   }
@@ -379,26 +365,134 @@ class SettingsTest extends UnitTestCase {
    */
   public static function providerTestDatabaseInfoInitialization(): array {
     return [
-      ['mysql', NULL, NULL, 'Drupal\\mysql\\Driver\\Database\\mysql', 'core/modules/mysql/src/Driver/Database/mysql/'],
-      ['mysql', '', NULL, 'Drupal\\mysql\\Driver\\Database\\mysql', 'core/modules/mysql/src/Driver/Database/mysql/'],
-      ['mysql', 'Drupal\\Core\\Database\\Driver\\mysql', NULL, 'Drupal\\mysql\\Driver\\Database\\mysql', 'core/modules/mysql/src/Driver/Database/mysql/'],
-      ['mysql', 'Drupal\\mysql\\Driver\\Database\\mysql', NULL, 'Drupal\\mysql\\Driver\\Database\\mysql', 'core/modules/mysql/src/Driver/Database/mysql/'],
-      ['mysql', 'Drupal\\Driver\\Database\\mysql', NULL, 'Drupal\\Driver\\Database\\mysql', NULL],
-      ['mysql', 'Drupal\\mysql\\Driver\\Database\\mysql', 'modules/custom/mysql/src/Driver/Database/mysql/', 'Drupal\\mysql\\Driver\\Database\\mysql', 'modules/custom/mysql/src/Driver/Database/mysql/'],
+      [
+        'mysql',
+        NULL,
+        NULL,
+        'Drupal\\mysql\\Driver\\Database\\mysql',
+        'core/modules/mysql/src/Driver/Database/mysql/',
+      ],
+      [
+        'mysql',
+        '',
+        NULL,
+        'Drupal\\mysql\\Driver\\Database\\mysql',
+        'core/modules/mysql/src/Driver/Database/mysql/',
+      ],
+      [
+        'mysql',
+        'Drupal\\Core\\Database\\Driver\\mysql',
+        NULL,
+        'Drupal\\mysql\\Driver\\Database\\mysql',
+        'core/modules/mysql/src/Driver/Database/mysql/',
+      ],
+      [
+        'mysql',
+        'Drupal\\mysql\\Driver\\Database\\mysql',
+        NULL,
+        'Drupal\\mysql\\Driver\\Database\\mysql',
+        'core/modules/mysql/src/Driver/Database/mysql/',
+      ],
+      [
+        'mysql',
+        'Drupal\\Driver\\Database\\mysql',
+        NULL,
+        'Drupal\\Driver\\Database\\mysql',
+        NULL,
+      ],
+      [
+        'mysql',
+        'Drupal\\mysql\\Driver\\Database\\mysql',
+        'modules/custom/mysql/src/Driver/Database/mysql/',
+        'Drupal\\mysql\\Driver\\Database\\mysql',
+        'modules/custom/mysql/src/Driver/Database/mysql/',
+      ],
 
-      ['pgsql', NULL, NULL, 'Drupal\\pgsql\\Driver\\Database\\pgsql', 'core/modules/pgsql/src/Driver/Database/pgsql/'],
-      ['pgsql', '', NULL, 'Drupal\\pgsql\\Driver\\Database\\pgsql', 'core/modules/pgsql/src/Driver/Database/pgsql/'],
-      ['pgsql', 'Drupal\\Core\\Database\\Driver\\pgsql', NULL, 'Drupal\\pgsql\\Driver\\Database\\pgsql', 'core/modules/pgsql/src/Driver/Database/pgsql/'],
-      ['pgsql', 'Drupal\\pgsql\\Driver\\Database\\pgsql', NULL, 'Drupal\\pgsql\\Driver\\Database\\pgsql', 'core/modules/pgsql/src/Driver/Database/pgsql/'],
-      ['pgsql', 'Drupal\\Driver\\Database\\pgsql', NULL, 'Drupal\\Driver\\Database\\pgsql', NULL],
-      ['pgsql', 'Drupal\\pgsql\\Driver\\Database\\pgsql', 'modules/custom/pgsql/src/Driver/Database/pgsql/', 'Drupal\\pgsql\\Driver\\Database\\pgsql', 'modules/custom/pgsql/src/Driver/Database/pgsql/'],
+      [
+        'pgsql',
+        NULL,
+        NULL,
+        'Drupal\\pgsql\\Driver\\Database\\pgsql',
+        'core/modules/pgsql/src/Driver/Database/pgsql/',
+      ],
+      [
+        'pgsql',
+        '',
+        NULL,
+        'Drupal\\pgsql\\Driver\\Database\\pgsql',
+        'core/modules/pgsql/src/Driver/Database/pgsql/',
+      ],
+      [
+        'pgsql',
+        'Drupal\\Core\\Database\\Driver\\pgsql',
+        NULL,
+        'Drupal\\pgsql\\Driver\\Database\\pgsql',
+        'core/modules/pgsql/src/Driver/Database/pgsql/',
+      ],
+      [
+        'pgsql',
+        'Drupal\\pgsql\\Driver\\Database\\pgsql',
+        NULL,
+        'Drupal\\pgsql\\Driver\\Database\\pgsql',
+        'core/modules/pgsql/src/Driver/Database/pgsql/',
+      ],
+      [
+        'pgsql',
+        'Drupal\\Driver\\Database\\pgsql',
+        NULL,
+        'Drupal\\Driver\\Database\\pgsql',
+        NULL,
+      ],
+      [
+        'pgsql',
+        'Drupal\\pgsql\\Driver\\Database\\pgsql',
+        'modules/custom/pgsql/src/Driver/Database/pgsql/',
+        'Drupal\\pgsql\\Driver\\Database\\pgsql',
+        'modules/custom/pgsql/src/Driver/Database/pgsql/',
+      ],
 
-      ['sqlite', NULL, NULL, 'Drupal\\sqlite\\Driver\\Database\\sqlite', 'core/modules/sqlite/src/Driver/Database/sqlite/'],
-      ['sqlite', '', NULL, 'Drupal\\sqlite\\Driver\\Database\\sqlite', 'core/modules/sqlite/src/Driver/Database/sqlite/'],
-      ['sqlite', 'Drupal\\Core\\Database\\Driver\\sqlite', NULL, 'Drupal\\sqlite\\Driver\\Database\\sqlite', 'core/modules/sqlite/src/Driver/Database/sqlite/'],
-      ['sqlite', 'Drupal\\sqlite\\Driver\\Database\\sqlite', NULL, 'Drupal\\sqlite\\Driver\\Database\\sqlite', 'core/modules/sqlite/src/Driver/Database/sqlite/'],
-      ['sqlite', 'Drupal\\Driver\\Database\\sqlite', NULL, 'Drupal\\Driver\\Database\\sqlite', NULL],
-      ['sqlite', 'Drupal\\sqlite\\Driver\\Database\\sqlite', 'modules/custom/sqlite/src/Driver/Database/sqlite/', 'Drupal\\sqlite\\Driver\\Database\\sqlite', 'modules/custom/sqlite/src/Driver/Database/sqlite/'],
+      [
+        'sqlite',
+        NULL,
+        NULL,
+        'Drupal\\sqlite\\Driver\\Database\\sqlite',
+        'core/modules/sqlite/src/Driver/Database/sqlite/',
+      ],
+      [
+        'sqlite',
+        '',
+        NULL,
+        'Drupal\\sqlite\\Driver\\Database\\sqlite',
+        'core/modules/sqlite/src/Driver/Database/sqlite/',
+      ],
+      [
+        'sqlite',
+        'Drupal\\Core\\Database\\Driver\\sqlite',
+        NULL,
+        'Drupal\\sqlite\\Driver\\Database\\sqlite',
+        'core/modules/sqlite/src/Driver/Database/sqlite/',
+      ],
+      [
+        'sqlite',
+        'Drupal\\sqlite\\Driver\\Database\\sqlite',
+        NULL,
+        'Drupal\\sqlite\\Driver\\Database\\sqlite',
+        'core/modules/sqlite/src/Driver/Database/sqlite/',
+      ],
+      [
+        'sqlite',
+        'Drupal\\Driver\\Database\\sqlite',
+        NULL,
+        'Drupal\\Driver\\Database\\sqlite',
+        NULL,
+      ],
+      [
+        'sqlite',
+        'Drupal\\sqlite\\Driver\\Database\\sqlite',
+        'modules/custom/sqlite/src/Driver/Database/sqlite/',
+        'Drupal\\sqlite\\Driver\\Database\\sqlite',
+        'modules/custom/sqlite/src/Driver/Database/sqlite/',
+      ],
     ];
   }
 
