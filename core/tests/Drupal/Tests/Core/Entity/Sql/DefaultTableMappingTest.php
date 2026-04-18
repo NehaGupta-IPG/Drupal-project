@@ -562,6 +562,84 @@ class DefaultTableMappingTest extends UnitTestCase {
   }
 
   /**
+   * Tests constructor table-name fallbacks with a prefix.
+   *
+   * @param string $table_getter
+   *   The table getter to assert against.
+   * @param array $table_names
+   *   Entity type table names keyed by base, revision, data, and revision_data.
+   * @param string $expected
+   *   The expected table name.
+   *
+   * @legacy-covers ::__construct
+   */
+  #[DataProvider('providerTestConstructorTableNameFallbacks')]
+  public function testConstructorTableNameFallbacks(string $table_getter, array $table_names, string $expected): void {
+    $this->entityType
+      ->method('getBaseTable')
+      ->willReturn($table_names['base'] ?? NULL);
+    $this->entityType
+      ->method('getRevisionTable')
+      ->willReturn($table_names['revision'] ?? NULL);
+    $this->entityType
+      ->method('getDataTable')
+      ->willReturn($table_names['data'] ?? NULL);
+    $this->entityType
+      ->method('getRevisionDataTable')
+      ->willReturn($table_names['revision_data'] ?? NULL);
+    $this->entityType
+      ->method('isRevisionable')
+      ->willReturn(array_key_exists('revision', $table_names) || array_key_exists('revision_data', $table_names));
+    $this->entityType
+      ->method('isTranslatable')
+      ->willReturn(array_key_exists('data', $table_names) || array_key_exists('revision_data', $table_names));
+
+    $table_mapping = new TestDefaultTableMapping($this->entityType, [], 'simpletest');
+    $this->assertSame($expected, $table_mapping->{$table_getter}());
+  }
+
+  /**
+   * Provides test data for constructor table-name fallbacks.
+   *
+   * @return array[]
+   *   A nested array of getter name, entity type table names, and expectation.
+   */
+  public static function providerTestConstructorTableNameFallbacks(): array {
+    return [
+      'base table falls back when NULL' => [
+        'getBaseTable',
+        ['base' => NULL],
+        'simpletestentity_test',
+      ],
+      'revision table falls back when NULL' => [
+        'getRevisionTable',
+        ['base' => 'entity_test', 'revision' => NULL],
+        'simpletestentity_test_revision',
+      ],
+      'revision table falls back when empty string' => [
+        'getRevisionTable',
+        ['base' => 'entity_test', 'revision' => ''],
+        'simpletestentity_test_revision',
+      ],
+      'data table falls back when NULL' => [
+        'getDataTable',
+        ['base' => 'entity_test', 'data' => NULL],
+        'simpletestentity_test_field_data',
+      ],
+      'revision data table falls back when NULL' => [
+        'getRevisionDataTable',
+        [
+          'base' => 'entity_test',
+          'revision' => 'entity_test_revision',
+          'data' => 'entity_test_field_data',
+          'revision_data' => NULL,
+        ],
+        'simpletestentity_test_field_revision',
+      ],
+    ];
+  }
+
+  /**
    * Sets up a field storage definition for the test.
    *
    * @param string $name
