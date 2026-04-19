@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\DrupalKernel;
 
 use Composer\Autoload\ClassLoader;
 use Drupal\Core\Config\ConfigInstallerInterface;
+use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\DependencyInjection\DumpedContainer;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\DrupalKernelInterface;
@@ -423,6 +424,76 @@ class DrupalKernelTest extends KernelTestBase {
     $kernel->setSitePath($this->siteDirectory . '/different');
     $kernel->boot();
     $this->assertSame($this->siteDirectory . '/different', $kernel->getContainer()->getParameter('site.path'));
+  }
+
+  /**
+   * Builds a kernel that uses the legacy PHP array container.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   A request object to use in booting the kernel.
+   * @param array|null $modules_enabled
+   *   A list of modules to install on the kernel.
+   *
+   * @return \Drupal\Core\DrupalKernel
+   *   New kernel for testing.
+   */
+  protected function getTestKernelWithArrayContainer(Request $request, ?array $modules_enabled = NULL): DrupalKernel {
+    $class_loader = require $this->root . '/autoload.php';
+    $kernel = DrupalKernel::createFromRequest($request, $class_loader, 'testing');
+    $this->setSetting('container_yamls', []);
+    $this->setSetting('hash_salt', $this->databasePrefix);
+    $this->setSetting('container_base_class', Container::class);
+    if (isset($modules_enabled)) {
+      $kernel->updateModules($modules_enabled);
+    }
+    $kernel->boot();
+
+    return $kernel;
+  }
+
+  /**
+   * Tests DIC compilation using the legacy PHP array container.
+   */
+  public function testCompileDICWithArrayContainer(): void {
+    $modules_enabled = [
+      'system' => 'system',
+      'user' => 'user',
+    ];
+
+    $request = Request::createFromGlobals();
+    $kernel = $this->getTestKernelWithArrayContainer($request, $modules_enabled);
+    $container = $kernel->getContainer();
+
+    // The container should be an instance of the legacy Container class.
+    $this->assertInstanceOf(Container::class, $container);
+    $this->assertNotInstanceOf(DumpedContainer::class, $container);
+
+    // Verify the container definition is cached via the cache backend.
+    $this->assertNotNull($kernel->getCachedContainerDefinition());
+
+    // No PhpStorage files should be created for the array container.
+    $this->assertDirectoryDoesNotExist($kernel->getSitePath() . '/files/php/service_container');
+
+    // Boot a second time and verify we load from the cached definition.
+    $kernel2 = $this->getTestKernelWithArrayContainer($request);
+    $container2 = $kernel2->getContainer();
+
+    $this->assertInstanceOf(Container::class, $container2);
+    $this->assertNotInstanceOf(DumpedContainer::class, $container2);
+
+    // The container should not be a ContainerBuilder.
+    $refClass = new \ReflectionClass($container2);
+    $this->assertFalse($refClass->isSubclassOf('Symfony\Component\DependencyInjection\ContainerBuilder'));
+
+    // Verify that the list of modules is the same for the initial and the
+    // cached container.
+    $module_list = array_keys($container2->get('module_handler')->getModuleList());
+    $this->assertEquals(array_values($modules_enabled), $module_list);
+
+    // Test that our synthetic services are there.
+    $class_loader = $container2->get('class_loader');
+    $refClass = new \ReflectionClass($class_loader);
+    $this->assertTrue($refClass->hasMethod('loadClass'), 'Container has a class loader');
   }
 
   /**
