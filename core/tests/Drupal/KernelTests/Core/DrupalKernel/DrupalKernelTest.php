@@ -468,8 +468,9 @@ class DrupalKernelTest extends KernelTestBase {
     $this->assertInstanceOf(Container::class, $container);
     $this->assertNotInstanceOf(DumpedContainer::class, $container);
 
-    // Verify the container definition is cached via the cache backend.
-    $this->assertNotNull($kernel->getCachedContainerDefinition());
+    // The container should not be a ContainerBuilder.
+    $refClass = new \ReflectionClass($container);
+    $this->assertFalse($refClass->isSubclassOf('Symfony\Component\DependencyInjection\ContainerBuilder'));
 
     // No PhpStorage files should be created for the array container.
     $this->assertDirectoryDoesNotExist($kernel->getSitePath() . '/files/php/service_container');
