@@ -17,6 +17,18 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 class AccessibilityTest extends AccessibilityTestBase {
 
   /**
+   * Setup callback for 'Manage text format, mobile' test case.
+   */
+  protected function setupManageTextFormatMobile(): void {
+    $session = $this->getSession();
+
+    $session->resizeWindow(
+      500,
+      823
+    );
+  }
+
+  /**
    * {@inheritdoc}
    */
   public static function provider(): array {
@@ -81,14 +93,7 @@ class AccessibilityTest extends AccessibilityTestBase {
             ],
           ],
         ],
-        'browser_options' => [
-          'resize_window' => [
-            // Minimum window size seems to be 500px.
-            'width' => 500,
-            // Height used by Lighthouse for mobile.
-            'height' => 823,
-          ],
-        ],
+        'setupManageTextFormatMobile',
       ],
     ];
   }
