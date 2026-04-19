@@ -86,7 +86,7 @@ TEXT;
   public static function provider(): array {
     return [
       'Smoke test with Axe options' => [
-        'uri' => 'admin/accessibility-test',
+        'path' => 'admin/accessibility-test',
         'admin' => TRUE,
         'axe_options' => [
           'runOnly' => ['color-contrast'],
@@ -94,15 +94,15 @@ TEXT;
         'setup_callback' => 'setupSmokeTestWithOptions',
       ],
       'Page not found check' => [
-        'uri' => '123456',
+        'path' => '123456',
         'setup_callback' => 'setupPageNotFound',
       ],
       'Access denied check, with $admin argument default' => [
-        'uri' => 'admin',
+        'path' => 'admin',
         'setup_callback' => 'setupAccessDenied',
       ],
       'Access denied check, with $admin argument FALSE' => [
-        'uri' => 'admin',
+        'path' => 'admin',
         'admin' => FALSE,
         'setup_callback' => 'setupAccessDenied',
       ],

@@ -51,7 +51,7 @@ class AccessibilityTest extends AccessibilityTestBase {
         TRUE,
       ],
       'Claro page, mobile, sidebar open' => [
-        'uri' => '/admin',
+        'path' => '/admin',
         'admin' => TRUE,
         'setup_callback' => 'setupClaroPageMobileSidebarOpen',
       ],

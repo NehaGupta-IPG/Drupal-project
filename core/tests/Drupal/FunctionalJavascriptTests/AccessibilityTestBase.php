@@ -34,7 +34,7 @@ abstract class AccessibilityTestBase extends WebDriverTestBase {
   /**
    * Test some pages.
    *
-   * @param string $uri
+   * @param string $path
    *   The path to be tested.
    * @param bool $admin
    *   (optional) Whether or not to log in as admin for the test.
@@ -47,12 +47,12 @@ abstract class AccessibilityTestBase extends WebDriverTestBase {
    *   not used.
    */
   #[DataProvider('provider')]
-  public function testPages(string $uri, bool $admin = FALSE, array $axe_options = [], ?string $setup_callback = NULL): void {
+  public function testPages(string $path, bool $admin = FALSE, array $axe_options = [], ?string $setup_callback = NULL): void {
     if ($admin) {
       $this->drupalLogin($this->drupalCreateUser(admin: TRUE));
     }
 
-    $this->drupalGet($uri);
+    $this->drupalGet($path);
 
     if (is_callable([$this, $setup_callback])) {
       $this->{$setup_callback}();
