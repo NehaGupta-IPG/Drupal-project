@@ -130,7 +130,7 @@ class ContextualDynamicContextTest extends BrowserTestBase {
       'title' => $this->randomString(),
       'promote' => TRUE,
     ])->save();
-    $id = 'node:node=' . $node3->id() . ':changed=' . $node3->getChangedTime() . '&langcode=it';
+    $id = 'node:node=' . $node3->id() . ':changed=' . $node3->getChangedTime() . '&langcode=it&admin_langcode=en';
     $this->drupalGet('node', ['language' => ConfigurableLanguage::createFromLangcode('it')]);
     $this->assertContextualLinkPlaceHolder($id);
 
