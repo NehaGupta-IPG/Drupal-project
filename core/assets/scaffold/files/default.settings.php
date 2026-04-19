@@ -730,6 +730,24 @@ $settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
 $settings['container_base_class'] = \Drupal\Core\DependencyInjection\DumpedContainer::class;
 
 /**
+ * Override the container storage class.
+ *
+ * The container storage controls how compiled service containers are loaded,
+ * dumped, and invalidated. By default, the storage is auto-detected from the
+ * 'container_base_class' setting: DumpedContainer uses
+ * PhpDumperContainerStorage (compiled PHP via PhpStorage), and the legacy
+ * Container class uses CacheContainerStorage (serialized array via the cache
+ * backend).
+ *
+ * Set this to a class implementing
+ * \Drupal\Core\DependencyInjection\ContainerStorageInterface to use a custom
+ * storage strategy.
+ *
+ * @see \Drupal\Core\DependencyInjection\ContainerStorageInterface
+ */
+# $settings['container_storage_class'] = \Drupal\Core\DependencyInjection\ContainerStorage\PhpDumperContainerStorage::class;
+
+/**
  * Trusted host configuration.
  *
  * Drupal core can use the Symfony trusted host mechanism to prevent HTTP Host
