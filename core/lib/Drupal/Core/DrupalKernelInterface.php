@@ -70,6 +70,11 @@ interface DrupalKernelInterface extends HttpKernelInterface {
    *
    * @return array|null
    *   The cached container definition or NULL if not found in cache.
+   *
+   * @deprecated in drupal:11.4.0 and is removed from drupal:12.0.0. Container
+   *   loading is now handled by ContainerStorageInterface::load().
+   *
+   * @see https://www.drupal.org/node/3585642
    */
   public function getCachedContainerDefinition();
 

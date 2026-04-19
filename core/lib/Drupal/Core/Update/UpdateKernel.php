@@ -2,6 +2,8 @@
 
 namespace Drupal\Core\Update;
 
+use Drupal\Core\DependencyInjection\ContainerStorage\NullContainerStorage;
+use Drupal\Core\DependencyInjection\ContainerStorageInterface;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\Core\Site\Settings;
@@ -46,10 +48,10 @@ class UpdateKernel extends DrupalKernel {
   /**
    * {@inheritdoc}
    */
-  protected function cacheDrupalContainer(array $container_definition) {
+  protected function getContainerStorage(): ContainerStorageInterface {
     // Don't save this particular container to cache, so it does not leak into
     // the main site at all.
-    return FALSE;
+    return new NullContainerStorage();
   }
 
   /**
