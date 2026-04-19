@@ -74,6 +74,6 @@ abstract class AccessibilityTestBase extends WebDriverTestBase {
   /**
    * Data provider for testPages.
    */
-  abstract public static function provider(): array;
+  abstract public static function provider(): iterable;
 
 }
