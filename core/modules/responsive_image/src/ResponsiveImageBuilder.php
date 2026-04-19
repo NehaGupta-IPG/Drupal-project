@@ -25,7 +25,7 @@ class ResponsiveImageBuilder {
   }
 
   /**
-   * Helper function for template_preprocess_responsive_image().
+   * Helper function for \Drupal\responsive_image\Hook\ResponsiveImageThemeHooks::preprocessResponsiveImage().
    *
    * Builds an array of attributes for <source> tags to be used in a <picture>
    * tag. In other words, this function provides the attributes for each
@@ -217,7 +217,8 @@ class ResponsiveImageBuilder {
           // source will be used. We multiply it by 100 so multipliers with up
           // to two decimals can be used.
           $srcset[intval(mb_substr($multiplier, 0, -1) * 100)] = $this->getImageStyleUrl($image_style_mapping['image_mapping'], $variables['uri']) . ' ' . $multiplier;
-          $dimensions = $this->getImageDimensions($image_style_mapping['image_mapping'], ['width' => $width, 'height' => $height], $variables['uri']);
+          $dimensions = $this->getImageDimensions($image_style_mapping['image_mapping'],
+            ['width' => $width, 'height' => $height], $variables['uri']);
           break;
       }
     }

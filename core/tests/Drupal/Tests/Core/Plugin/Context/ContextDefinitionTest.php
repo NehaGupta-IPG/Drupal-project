@@ -6,6 +6,7 @@ namespace Drupal\Tests\Core\Plugin\Context;
 
 use Drupal\Component\Plugin\Context\ContextDefinitionInterface;
 use Drupal\Core\Plugin\Context\ContextDefinition;
+use Drupal\Core\TypedData\ListDataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataManagerInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -35,7 +36,7 @@ class ContextDefinitionTest extends UnitTestCase {
    * Tests get data definition.
    */
   #[DataProvider('providerGetDataDefinition')]
-  public function testGetDataDefinition($is_multiple): void {
+  public function testGetDataDefinition(bool $is_multiple): void {
     $data_type = 'valid';
     $mock_data_definition = $this->createMock(ContextDefinitionInterface::class);
     $mock_data_definition->expects($this->once())
@@ -107,11 +108,10 @@ class ContextDefinitionTest extends UnitTestCase {
    * Tests get data definition invalid type.
    */
   #[DataProvider('providerGetDataDefinition')]
-  public function testGetDataDefinitionInvalidType($is_multiple): void {
+  public function testGetDataDefinitionInvalidType(bool $is_multiple): void {
     // Since we're trying to make getDataDefinition() throw an exception in
     // isolation, we use a data type which is not valid.
     $data_type = 'not_valid';
-    $mock_data_definition = $this->createMock('\Drupal\Core\TypedData\ListDataDefinitionInterface');
 
     // Follow code paths for both multiple and non-multiple definitions.
     $create_definition_method = 'createDataDefinition';
@@ -125,7 +125,7 @@ class ContextDefinitionTest extends UnitTestCase {
       ->method($create_definition_method)
       ->willReturnMap([
         ['not_valid', NULL],
-        ['valid', $mock_data_definition],
+        ['valid', $this->createStub(ListDataDefinitionInterface::class)],
       ]);
 
     // Mock a ContextDefinition object with expectations for only the methods
@@ -172,7 +172,7 @@ class ContextDefinitionTest extends UnitTestCase {
    * Tests get constraint.
    */
   #[DataProvider('providerGetConstraint')]
-  public function testGetConstraint($expected, $constraint_array, $constraint): void {
+  public function testGetConstraint(?string $expected, array $constraint_array, string $constraint): void {
     $mock_context_definition = $this->getMockBuilder('Drupal\Core\Plugin\Context\ContextDefinition')
       ->disableOriginalConstructor()
       ->onlyMethods([
