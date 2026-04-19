@@ -46,6 +46,15 @@ class UpdateKernel extends DrupalKernel {
   /**
    * {@inheritdoc}
    */
+  protected function cacheDrupalContainer(array $container_definition) {
+    // Don't save this particular container to cache, so it does not leak into
+    // the main site at all.
+    return FALSE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function handle(Request $request, $type = self::MAIN_REQUEST, $catch = TRUE): Response {
     try {
       static::bootEnvironment();

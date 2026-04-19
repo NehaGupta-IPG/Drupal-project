@@ -64,6 +64,16 @@ interface DrupalKernelInterface extends HttpKernelInterface {
   public function getContainer();
 
   /**
+   * Returns the cached container definition - if any.
+   *
+   * This also allows inspecting a built container for debugging purposes.
+   *
+   * @return array|null
+   *   The cached container definition or NULL if not found in cache.
+   */
+  public function getCachedContainerDefinition();
+
+  /**
    * Set the current site path directory.
    *
    * Format: "folder-name/child-folder" usually uses "sites/default".
