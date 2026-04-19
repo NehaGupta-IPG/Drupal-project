@@ -35,7 +35,7 @@ abstract class AccessibilityTestBase extends WebDriverTestBase {
    * Test some pages.
    *
    * @param string $path
-   *   The path to be tested.
+   *   The path to be tested. This will be passed to $this->drupalGet().
    * @param bool $admin
    *   (optional) Whether or not to log in as admin for the test.
    * @param array $axe_options
@@ -45,6 +45,8 @@ abstract class AccessibilityTestBase extends WebDriverTestBase {
    *   executing Axe.
    *   The method must non-private and non-static. Return values from the method are
    *   not used.
+   *
+   * @see \Drupal\Tests\UiHelperTrait::drupalGet()
    */
   #[DataProvider('provider')]
   public function testPages(string $path, bool $admin = FALSE, array $axe_options = [], ?string $setup_callback = NULL): void {
