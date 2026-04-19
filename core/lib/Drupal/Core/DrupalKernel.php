@@ -1013,17 +1013,15 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
    *   The container storage service.
    */
   protected function getContainerStorage(): ContainerStorageInterface {
-    if (!$this->containerStorage) {
-      if (!$this->allowDumping) {
-        $this->containerStorage = new NullContainerStorage();
-      }
-      else {
-        $this->containerStorage = ContainerStorageFactory::create(
-          $this->bootstrapContainer->get('cache.container'),
-          $this->getAppRoot(),
-          $this->getSitePath(),
-        );
-      }
+    if (!$this->allowDumping) {
+      return new NullContainerStorage();
+    }
+    elseif (!$this->containerStorage) {
+      $this->containerStorage = ContainerStorageFactory::create(
+        $this->bootstrapContainer->get('cache.container'),
+        $this->getAppRoot(),
+        $this->getSitePath(),
+      );
     }
     return $this->containerStorage;
   }
@@ -1096,11 +1094,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     // If no container was loaded, build a new one from scratch.
     if (!$container) {
       $container = $this->compileContainer();
-      // compileContainer() may call discoverServiceProviders() which can
-      // change $this->allowDumping. Use getContainerStorageForDump() to
-      // ensure the correct storage is used for persisting the container.
-      $dumpStorage = $this->allowDumping ? $this->getContainerStorage() : new NullContainerStorage();
-      $container = $dumpStorage->dump($container, $suffix);
+      $container = $this->getContainerStorage()->dump($container, $suffix);
     }
 
     // The container was rebuilt successfully.
