@@ -6,6 +6,7 @@ namespace Drupal\KernelTests\Core\DrupalKernel;
 
 use Composer\Autoload\ClassLoader;
 use Drupal\Core\Config\ConfigInstallerInterface;
+use Drupal\Core\DependencyInjection\DumpedContainer;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\DrupalKernelInterface;
 use Drupal\KernelTests\KernelTestBase;
@@ -67,6 +68,7 @@ class DrupalKernelTest extends KernelTestBase {
     $kernel = DrupalKernel::createFromRequest($request, $class_loader, 'testing');
     $this->setSetting('container_yamls', []);
     $this->setSetting('hash_salt', $this->databasePrefix);
+    $this->setSetting('container_base_class', DumpedContainer::class);
     if (isset($modules_enabled)) {
       $kernel->updateModules($modules_enabled);
     }

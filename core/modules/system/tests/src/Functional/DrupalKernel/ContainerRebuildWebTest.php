@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\DrupalKernel;
 
+use Drupal\Core\DependencyInjection\DumpedContainer;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
@@ -55,6 +56,13 @@ class ContainerRebuildWebTest extends BrowserTestBase {
   public function testContainerInvalidation(): void {
     $assert = $this->assertSession();
 
+    // Verify that the default installation uses the PhpDumper-based container
+    // and that the compiled container file exists on disk.
+    $container = \Drupal::getContainer();
+    $this->assertInstanceOf(DumpedContainer::class, $container);
+    $container_file = (new \ReflectionClass($container))->getFileName();
+    $this->assertFileExists($container_file);
+
     // Ensure that parameter is not set.
     $this->drupalGet('<front>');
     $assert->responseHeaderEquals('container_rebuild_test_parameter', NULL);
@@ -77,6 +85,9 @@ class ContainerRebuildWebTest extends BrowserTestBase {
     \Drupal::service('kernel')->invalidateContainer();
     $this->drupalGet('<front>');
     $assert->responseHeaderEquals('container_rebuild_test_parameter', 'rebuild_me');
+
+    $container_file = (new \ReflectionClass(\Drupal::getContainer()))->getFileName();
+    $this->assertFileExists($container_file);
   }
 
 }
