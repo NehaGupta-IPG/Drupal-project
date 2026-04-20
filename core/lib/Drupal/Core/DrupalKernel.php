@@ -129,8 +129,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         'arguments' => [
           '@cache.container',
           '@settings',
-          '%app.root%',
-          '%site.path%',
+          '@kernel',
         ],
       ],
       'container_storage.php_dumper' => [
@@ -572,8 +571,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         $definition['services'][$service] = $this->defaultBootstrapContainerDefinition['services'][$service];
       }
     }
-    $definition['parameters']['app.root'] = $this->getAppRoot();
-    $definition['parameters']['site.path'] = $this->getSitePath();
     $this->bootstrapContainer = new $this->bootstrapContainerClass($definition);
     $this->bootstrapContainer->set('kernel', $this);
 

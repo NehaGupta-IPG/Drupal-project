@@ -9,6 +9,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ContainerStorage\CacheContainerStorage;
+use Drupal\Core\DrupalKernelInterface;
 use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -35,11 +36,14 @@ class CacheContainerStorageTest extends UnitTestCase {
       'container_dumper_class' => OptimizedPhpArrayDumper::class,
     ]);
 
+    $kernel = $this->createStub(DrupalKernelInterface::class);
+    $kernel->method('getAppRoot')->willReturn('/app/root');
+    $kernel->method('getSitePath')->willReturn('sites/default');
+
     return new CacheContainerStorage(
       $cache,
       Settings::getInstance(),
-      '/app/root',
-      'sites/default',
+      $kernel,
     );
   }
 
