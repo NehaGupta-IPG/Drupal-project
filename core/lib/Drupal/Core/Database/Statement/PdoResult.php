@@ -31,6 +31,18 @@ class PdoResult extends ResultBase {
   }
 
   /**
+   * Returns the client-level database PDO statement object.
+   *
+   * This method should normally be used only within database driver code.
+   *
+   * @return \PDOStatement
+   *   The client-level database PDO statement.
+   */
+  public function getClientStatement(): \PDOStatement {
+    return $this->clientStatement;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function rowCount(): ?int {
@@ -54,12 +66,6 @@ class PdoResult extends ResultBase {
   public function fetch(FetchAs $mode, array $fetchOptions): array|object|int|float|string|bool|NULL {
     if (!empty($fetchOptions)) {
       $this->setFetchMode($mode, $fetchOptions);
-    }
-    if (isset($fetchOptions['cursor_orientation'])) {
-      if (isset($fetchOptions['cursor_offset'])) {
-        return $this->clientFetch($mode, $fetchOptions['cursor_orientation'], $fetchOptions['cursor_offset']);
-      }
-      return $this->clientFetch($mode, $fetchOptions['cursor_orientation']);
     }
     return $this->clientFetch($mode);
   }

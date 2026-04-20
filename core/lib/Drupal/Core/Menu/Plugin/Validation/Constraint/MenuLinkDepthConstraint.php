@@ -19,10 +19,13 @@ use Drupal\Core\Validation\Plugin\Validation\Constraint\RangeConstraint;
 class MenuLinkDepthConstraint extends RangeConstraint {
 
   /**
-   * The initial level of menu items that are being exposed (zero-based).
-   *
-   * @var string|int
+   * @param string|int $baseLevel
+   *   The initial level of menu items that are being exposed (zero-based).
+   * @param array<string, mixed> $args
+   *   Additional arguments to pass to parent constructor.
    */
-  public string|int $baseLevel = 0;
+  public function __construct(public readonly string|int $baseLevel = 0, ...$args) {
+    parent::__construct(...$args);
+  }
 
 }

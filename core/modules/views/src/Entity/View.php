@@ -153,7 +153,7 @@ class View extends ConfigEntityBase implements ViewEntityInterface {
       return FALSE;
     }
 
-    $plugin = Views::pluginManager('display')->getDefinition($plugin_id);
+    $plugin = \Drupal::service('plugin.manager.views.display')->getDefinition($plugin_id);
 
     if (empty($plugin)) {
       $plugin['title'] = $this->t('Broken');
@@ -301,7 +301,7 @@ class View extends ConfigEntityBase implements ViewEntityInterface {
     // Calculating the cacheability metadata is only needed when the view is
     // saved through the UI or API. It should not be done when we are syncing
     // configuration or installing modules.
-    if (!$this->isSyncing() && !$this->hasTrustedData()) {
+    if (!$this->isSyncing()) {
       $this->addCacheMetadata();
     }
   }
@@ -481,7 +481,7 @@ class View extends ConfigEntityBase implements ViewEntityInterface {
    * {@inheritdoc}
    */
   public function onDependencyRemoval(array $dependencies) {
-    $changed = FALSE;
+    $changed = parent::onDependencyRemoval($dependencies);
 
     // Don't intervene if the views module is removed.
     if (isset($dependencies['module']) && in_array('views', $dependencies['module'])) {

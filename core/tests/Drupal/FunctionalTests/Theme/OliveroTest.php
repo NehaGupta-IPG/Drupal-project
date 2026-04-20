@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace Drupal\FunctionalTests\Theme;
 
-use Drupal\Tests\BrowserTestBase;
 use Drupal\menu_link_content\Entity\MenuLinkContent;
+use Drupal\Tests\BrowserTestBase;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Olivero theme.
- *
- * @group olivero
  */
+#[Group('olivero')]
+#[RunTestsInSeparateProcesses]
 class OliveroTest extends BrowserTestBase {
 
   /**
@@ -130,6 +132,7 @@ class OliveroTest extends BrowserTestBase {
     $this->drupalGet('admin/appearance');
     $this->cssSelect('a[title="Install <strong>Test theme</strong> as default theme"]')[0]->click();
     $this->cssSelect('a[title="Uninstall Olivero theme"]')[0]->click();
+    $this->submitForm([], 'Uninstall');
     $this->assertSession()->pageTextContains('The Olivero theme has been uninstalled.');
   }
 

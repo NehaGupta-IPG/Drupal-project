@@ -6,21 +6,24 @@ namespace Drupal\Tests\Core\Cache\Context;
 
 use Drupal\Core\Cache\Context\CookiesCacheContext;
 use Drupal\Tests\UnitTestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * @coversDefaultClass \Drupal\Core\Cache\Context\CookiesCacheContext
- * @group Cache
+ * Tests Drupal\Core\Cache\Context\CookiesCacheContext.
  */
+#[CoversClass(CookiesCacheContext::class)]
+#[Group('Cache')]
 class CookieCacheContextTest extends UnitTestCase {
 
   /**
-   * @covers ::getContext
-   *
-   * @dataProvider providerTestGetContext
+   * Tests get context.
    */
-  public function testGetContext($cookies, $cookie_name, $context): void {
+  #[DataProvider('providerTestGetContext')]
+  public function testGetContext(array $cookies, ?string $cookie_name, int|string $context): void {
     $request_stack = new RequestStack();
     $request = Request::create('/', 'GET');
     foreach ($cookies as $cookie => $value) {
@@ -34,7 +37,7 @@ class CookieCacheContextTest extends UnitTestCase {
   /**
    * Provides a list of cookies and expected cache contexts.
    */
-  public static function providerTestGetContext() {
+  public static function providerTestGetContext(): array {
     return [
       [['foo' => 1, 'bar' => 2, 'baz' => 3], 'foo', 1],
       // Context is ordered by cookie name.

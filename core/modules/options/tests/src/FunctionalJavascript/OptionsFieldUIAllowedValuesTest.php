@@ -8,13 +8,16 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\FunctionalJavascriptTests\WebDriverTestBase;
 use Drupal\Tests\field_ui\Traits\FieldUiJSTestTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Tests the Options field allowed values UI functionality.
- *
- * @group options
- * @group #slow
  */
+#[Group('options')]
+#[Group('#slow')]
+#[RunTestsInSeparateProcesses]
 class OptionsFieldUIAllowedValuesTest extends WebDriverTestBase {
 
   use FieldUiJSTestTrait;
@@ -84,9 +87,8 @@ class OptionsFieldUIAllowedValuesTest extends WebDriverTestBase {
 
   /**
    * Tests option types allowed values.
-   *
-   * @dataProvider providerTestOptionsAllowedValues
    */
+  #[DataProvider('providerTestOptionsAllowedValues')]
   public function testOptionsAllowedValues($option_type, $options, $is_string_option, string $add_row_method): void {
     $assert = $this->assertSession();
     $this->fieldName = 'field_options_text';
@@ -321,13 +323,7 @@ JS;
       ],
       'List string' => [
         'list_string',
-        ['first' => 'First', 'second' => 'Second', 'third' => 'Third'],
-        TRUE,
-      ],
-      // Example with empty key and label values like string '0'.
-      'List string with 0 value' => [
-        'list_string',
-        ['0' => '0', '1' => '1', '2' => '2'],
+        ['0' => '0', '1' => '1', 'two' => 'two'],
         TRUE,
       ],
     ];
