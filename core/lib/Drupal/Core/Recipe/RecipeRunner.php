@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Core\Recipe;
 
+use Drupal;
 use Drupal\Core\Config\Action\ConfigActionException;
 use Drupal\Core\Config\ConfigManagerInterface;
 use Drupal\Core\Config\FileStorage;
@@ -116,6 +117,11 @@ final class RecipeRunner {
     // the config.import section that does not exist.
     $config_installer->installRecipeConfig($config);
 
+    // This is our chance to apply configuration translations before any 
+    // configuration actions are applied.
+    if (\Drupal::moduleHandler()->moduleExists('locale')) {
+      static::processConfigTranslations($recipe);
+    }
     if (!empty($config->config['actions'])) {
       $values = $recipe->input->getValues();
       // Wrap the replacement strings with `${` and `}`, which is a fairly
@@ -139,6 +145,34 @@ final class RecipeRunner {
         }
       }
     }
+  }
+
+    /**
+   * Updates default language and translations for the recipe configuratio.
+   *
+   * @param Recipe $recipe
+   * @return void
+   */
+  protected static function processConfigTranslations(Recipe $recipe): void {
+    /** @var \Drupal\locale\LocaleConfigManager $locale_config_manager */
+    $locale_config_manager = \Drupal::service('locale.config_manager');
+    
+    // Replace the default config storage with one that reads from the recipe, 
+    // so that locale system picks up the recipe's config when determining 
+    // translatability and fetching translatable data.
+    $default_config_storage = $locale_config_manager->getDefaultConfigStorage();
+    $recipe_config_storage = new RecipeDefaultConfigStorage($recipe->config->getConfigStorage(), $default_config_storage);
+    $locale_config_manager->setDefaultConfigStorage($recipe_config_storage);
+
+    $names = $recipe_config_storage->listAll();
+    $langcodes = array_keys(\Drupal::languageManager()->getLanguages());
+
+    $locale_config_manager->updateDefaultConfigLangcodes($names);
+    
+    $locale_config_manager->updateConfigTranslations($names, $langcodes);
+
+    // Reset to the original default config storage.
+    $locale_config_manager->setDefaultConfigStorage($default_config_storage);
   }
 
   /**

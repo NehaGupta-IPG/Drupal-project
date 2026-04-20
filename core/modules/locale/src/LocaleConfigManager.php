@@ -12,6 +12,7 @@ use Drupal\Core\TypedData\TraversableTypedDataInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\language\ConfigurableLanguageManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Drupal\Core\Config\DefaultConfigStorageInterface;
 
 /**
  * Manages configuration supported in part by interface translation.
@@ -58,9 +59,29 @@ class LocaleConfigManager {
     protected TypedConfigManagerInterface $typedConfigManager,
     #[Autowire(service: 'language_manager')]
     protected ConfigurableLanguageManagerInterface $languageManager,
-    protected LocaleDefaultConfigStorage $defaultConfigStorage,
+    protected DefaultConfigStorageInterface $defaultConfigStorage,
     protected ConfigManagerInterface $configManager,
   ) {}
+
+  /**
+   * Gets the current default config storage.
+   *
+   * @return \Drupal\Core\Config\DefaultConfigStorageInterface
+   *   The default config storage.
+   */ 
+  public function getDefaultConfigStorage(): DefaultConfigStorageInterface {
+    return $this->defaultConfigStorage;
+  }
+
+  /**
+   * Sets default config storage.
+   *
+   * @param \Drupal\Core\Config\DefaultConfigStorageInterface $default_config_storage
+   *   The default config storage.
+   */
+  public function setDefaultConfigStorage(DefaultConfigStorageInterface $default_config_storage): void {
+    $this->defaultConfigStorage = $default_config_storage;
+  }
 
   /**
    * Gets array of translated strings for Locale translatable configuration.
@@ -242,6 +263,7 @@ class LocaleConfigManager {
         $names = array_merge($names, $this->defaultConfigStorage->getComponentNames($type, $list));
       }
       return $names;
+
     }
     else {
       return $this->defaultConfigStorage->listAll();
@@ -599,8 +621,15 @@ class LocaleConfigManager {
 
   /**
    * Updates default configuration when new modules or themes are installed.
+   *
+   * @param array $names
+   *   Optional configuration names to update. If not provided, all
+   *   configuration names from the provided components will be updated.
+   * @param array $components
+   *   Optional list of components to update. If not provided, all
+   *   components will be updated.
    */
-  public function updateDefaultConfigLangcodes() {
+  public function updateDefaultConfigLangcodes(array $names = [], array $components = []) {
     $this->isUpdatingFromLocale = TRUE;
     // Need to rewrite some default configuration language codes if the default
     // site language is not English.
@@ -611,7 +640,7 @@ class LocaleConfigManager {
       // shipped with the components just installed, because installing a
       // component such as views may bring in default configuration from prior
       // components.
-      $names = $this->getComponentNames();
+      $names = $names ?: $this->getComponentNames($components);
       foreach ($names as $name) {
         $config = $this->configFactory->reset($name)->getEditable($name);
         // Should only update if still exists in active configuration. If locale

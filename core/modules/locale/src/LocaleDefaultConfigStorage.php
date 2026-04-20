@@ -5,6 +5,7 @@ namespace Drupal\locale;
 use Drupal\Core\Config\ExtensionInstallStorage;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Config\DefaultConfigStorageInterface;
 
 /**
  * Provides access to default configuration for locale integration.
@@ -19,7 +20,7 @@ use Drupal\Core\Language\LanguageManagerInterface;
  * with them for translation. Their translatable source strings are exposed
  * for interface translation and participate in remote translation updates.
  */
-class LocaleDefaultConfigStorage {
+class LocaleDefaultConfigStorage implements DefaultConfigStorageInterface {
 
   /**
    * The storage instance for reading configuration data.
