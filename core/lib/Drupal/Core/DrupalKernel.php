@@ -129,7 +129,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         'arguments' => [
           '@cache.container',
           '@settings',
-          '@kernel',
         ],
       ],
       'container_storage.php_dumper' => [
