@@ -319,16 +319,6 @@ class ModuleInstaller implements ModuleInstallerInterface {
     // Update the kernel to include it.
     $this->updateKernel($module_filenames);
 
-    if (!InstallerKernel::installationAttempted()) {
-      // Mark the routing table as stale so that the first route lookup during
-      // install hooks rebuilds routes against the new module list, rather
-      // than returning data cached for the previous one.
-      $route_provider = \Drupal::service('router.route_provider');
-      if ($route_provider instanceof RouteProviderLazyBuilder) {
-        $route_provider->markStale();
-      }
-    }
-
     foreach ($module_list as $module) {
       // Load the module's .module and .install files. Do this for all modules
       // prior to calling hook_module_preinstall() in order to not pollute the
@@ -588,14 +578,6 @@ class ModuleInstaller implements ModuleInstallerInterface {
       // Remove all configuration belonging to the module.
       \Drupal::service('config.manager')->uninstall('module', $module);
 
-      // Mark the routing table as stale so that any route lookup during the
-      // rest of this module's uninstall rebuilds against the reduced module
-      // list.
-      $route_provider = \Drupal::service('router.route_provider');
-      if ($route_provider instanceof RouteProviderLazyBuilder) {
-        $route_provider->markStale();
-      }
-
       // Notify interested components that this module's entity types are being
       // deleted. For example, a SQL-based storage handler can use this as an
       // opportunity to drop the corresponding database tables.
@@ -756,6 +738,13 @@ class ModuleInstaller implements ModuleInstallerInterface {
     $this->moduleHandler = $container->get('module_handler');
     $this->connection = $container->get('database');
     $this->updateRegistry = $container->get('update.update_hook_registry');
+
+    // Mark the routing table as stale so that any future route lookup
+    // rebuilds against the updated module list.
+    $route_provider = $container->get('router.route_provider');
+    if ($route_provider instanceof RouteProviderLazyBuilder) {
+      $route_provider->markStale();
+    }
   }
 
   /**
