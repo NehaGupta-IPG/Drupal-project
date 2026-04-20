@@ -331,8 +331,7 @@ class SystemRequirementsHooks {
         // Check if the container file is cached in OPcache.
         $container = \Drupal::getContainer();
         if ($container instanceof PhpContainer) {
-          $container_reflection = new \ReflectionClass(\Drupal::getContainer());
-          $container_file = $container_reflection->getFileName();
+          $container_file = (new \ReflectionClass($container))->getFileName();
           if ($container_file && opcache_is_script_cached($container_file)) {
             $requirements['php_opcache_container'] = [
               'value' => $this->t('Cached'),

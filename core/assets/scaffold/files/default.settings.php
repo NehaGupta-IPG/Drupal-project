@@ -721,7 +721,7 @@ $settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
  * \Drupal\Core\DependencyInjection\PhpContainer (or a subclass) switches
  * to Symfony's PhpDumper, which generates a compiled PHP class stored via
  * PhpStorage. The compiled container benefits from OPcache and can improve
- * performance. Existing sites default to the PHP array container for backwards
+ * performance. Existing sites default to the array-based container for backwards
  * compatibility.
  */
 $settings['container_base_class'] = \Drupal\Core\DependencyInjection\PhpContainer::class;

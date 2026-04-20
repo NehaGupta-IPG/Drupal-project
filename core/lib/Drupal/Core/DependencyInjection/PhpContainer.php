@@ -16,6 +16,7 @@ class PhpContainer extends Container implements ContainerInterface {
   public function set(string $id, ?object $service): void {
     // Symfony prevents replacing already-initialized services. Drupal allows
     // this; ModuleInstaller swaps the route provider during module install.
+    // @todo Remove in https://www.drupal.org/project/drupal/issues/3585728
     unset($this->services[$id]);
     parent::set($id, $service);
   }
