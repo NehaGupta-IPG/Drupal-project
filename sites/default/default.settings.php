@@ -723,9 +723,6 @@ $settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
  * PhpStorage. The compiled container benefits from OPcache and can improve
  * performance. Existing sites default to the PHP array container for backwards
  * compatibility.
- *
- * This setting is also useful for testing a service container with an error
- * condition or to test a service container that throws an exception.
  */
 $settings['container_base_class'] = \Drupal\Core\DependencyInjection\PhpContainer::class;
 
