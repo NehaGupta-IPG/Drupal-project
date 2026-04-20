@@ -83,6 +83,7 @@ class AdminLanguageRender implements TrustedCallbackInterface {
    * @return array
    *   A renderable array.
    */
+  #[TrustedCallback]
   public function switchToUserAdminLanguage(array $element) {
     $userAdminLangcode = $this->currentUser->getPreferredAdminLangcode(FALSE);
 
@@ -112,6 +113,7 @@ class AdminLanguageRender implements TrustedCallbackInterface {
    * @return \Drupal\Core\Render\Markup
    *   Rendered markup.
    */
+  #[TrustedCallback]
   public function restoreLanguage($content, $element) {
     if (isset($element['#original_langcode'])) {
       $langcode = $element['#original_langcode'];
@@ -122,13 +124,6 @@ class AdminLanguageRender implements TrustedCallbackInterface {
     }
 
     return $content;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function trustedCallbacks() {
-    return ['switchToUserAdminLanguage', 'restoreLanguage'];
   }
 
 }

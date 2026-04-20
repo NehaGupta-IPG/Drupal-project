@@ -25,9 +25,7 @@ class AccountAdminLanguageCacheContext implements CacheContextInterface {
    * @param \Drupal\Core\Session\AccountProxyInterface $current_user
    *   The current user.
    */
-  public function __construct(AccountProxyInterface $current_user) {
-    $this->currentUser = $current_user;
-  }
+  public function __construct(protected AccountProxyInterface $current_user) {}
 
   /**
    * {@inheritdoc}
