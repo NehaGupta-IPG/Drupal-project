@@ -4,7 +4,7 @@ namespace Drupal\language;
 
 use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Security\TrustedCallbackInterface;
+use Drupal\Core\Security\Attribute\TrustedCallback;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\StringTranslation\TranslationManager;
 
