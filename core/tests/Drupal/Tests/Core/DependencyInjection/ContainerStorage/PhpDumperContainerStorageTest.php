@@ -105,9 +105,9 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
   }
 
   /**
-   * Tests that load() returns NULL when no cache sentinel exists.
+   * Tests that load() returns NULL when no hash exists in the cache.
    */
-  public function testLoadReturnsNullWhenNoSentinel(): void {
+  public function testLoadReturnsNullWhenNoCache(): void {
     $cache = $this->createMock(CacheBackendInterface::class);
     $cache->expects($this->once())
       ->method('get')
@@ -119,15 +119,14 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
   }
 
   /**
-   * Tests that load() returns NULL when sentinel exists but file is missing.
+   * Tests load() returns NULL when hash exists in cache but file is missing.
    */
   public function testLoadReturnsNullWhenFileMissing(): void {
     $cache = $this->createMock(CacheBackendInterface::class);
-    $sentinel = (object) ['data' => 'abc123'];
     $cache->expects($this->once())
       ->method('get')
       ->with('container_hash:test_suffix')
-      ->willReturn($sentinel);
+      ->willReturn((object) ['data' => 'abc123']);
 
     $storage = new PhpDumperContainerStorage($cache, $this->createPhpStorage(), DumpedContainer::class);
     $this->assertNull($storage->load('test_suffix', $this->createKernelStub()));
@@ -136,7 +135,7 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
   /**
    * Tests that dump() saves the compiled container and returns an instance.
    */
-  public function testDumpCreatesFileAndSetsSentinel(): void {
+  public function testDumpCreatesFileAndSetsHashInCache(): void {
     $cache = $this->createMock(CacheBackendInterface::class);
     $savedFiles = [];
     $phpStorage = $this->createPhpStorage($savedFiles);
