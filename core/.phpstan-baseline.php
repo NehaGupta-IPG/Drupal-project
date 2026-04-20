@@ -16946,6 +16946,30 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/modules/layout_builder/src/Entity/LayoutBuilderEntityViewDisplay.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\layout_builder\\\\Event\\\\SectionBuildRegionsRenderArrayEvent\\:\\:addCacheableDependency\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/layout_builder/src/Event/SectionBuildRegionsRenderArrayEvent.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\layout_builder\\\\Event\\\\SectionBuildRegionsRenderArrayEvent\\:\\:getCacheableMetadata\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/layout_builder/src/Event/SectionBuildRegionsRenderArrayEvent.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\layout_builder\\\\Event\\\\SectionBuildRenderArrayEvent\\:\\:addCacheableDependency\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/layout_builder/src/Event/SectionBuildRenderArrayEvent.php',
+];
+$ignoreErrors[] = [
+	'message' => '#^Method Drupal\\\\layout_builder\\\\Event\\\\SectionBuildRenderArrayEvent\\:\\:getCacheableMetadata\\(\\) has no return type specified\\.$#',
+	'identifier' => 'missingType.return',
+	'count' => 1,
+	'path' => __DIR__ . '/modules/layout_builder/src/Event/SectionBuildRenderArrayEvent.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Method Drupal\\\\layout_builder\\\\Event\\\\SectionComponentBuildRenderArrayEvent\\:\\:addCacheableDependency\\(\\) has no return type specified\\.$#',
 	'identifier' => 'missingType.return',
 	'count' => 1,

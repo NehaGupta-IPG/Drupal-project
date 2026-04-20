@@ -30,6 +30,9 @@ class SectionThirdPartyIntegrationTest extends KernelTestBase {
     'user',
   ];
 
+  /**
+   * Tests third party integration.
+   */
   public function testThirdPartyIntegration(): void {
     $section_data = [
       new Section(
