@@ -1144,16 +1144,17 @@ services:
     class: Drupal\Core\Routing\AdminContext
     arguments: ['@current_route_match']
   Drupal\Core\Routing\AdminContext: '@router.admin_context'
-  router.route_provider:
+  router.route_provider.storage:
     class: Drupal\Core\Routing\RouteProvider
     arguments: ['@database', '@state', '@path.current', '@cache.data', '@path_processor_manager', '@cache_tags.invalidator', '@cache.routes', 'router', '@language_manager']
     tags:
       - { name: backend_overridable }
-  Drupal\Core\Routing\RouteProviderInterface: '@router.route_provider'
-  router.route_provider.lazy_builder:
+  router.route_provider.lazy_builder_subscriber:
+    class: Drupal\Core\Routing\RouteProviderLazyBuilderSubscriber
+  router.route_provider:
     class: Drupal\Core\Routing\RouteProviderLazyBuilder
-    decorates: router.route_provider
-    arguments: ['@.inner', '@router.builder']
+    arguments: ['@router.route_provider.storage', '@router.builder', '@router.route_provider.lazy_builder_subscriber']
+  Drupal\Core\Routing\RouteProviderInterface: '@router.route_provider'
   url_generator.non_bubbling:
     class: Drupal\Core\Routing\UrlGenerator
     arguments: ['@router.route_provider', '@path_processor_manager', '@route_processor_manager', '@request_stack', '%filter_protocols%']
