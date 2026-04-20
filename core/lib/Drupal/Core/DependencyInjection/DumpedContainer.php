@@ -20,4 +20,12 @@ class DumpedContainer extends Container implements ContainerInterface {
     parent::set($id, $service);
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function __sleep(): array {
+    assert(FALSE, 'The container was serialized.');
+    return array_keys(get_object_vars($this));
+  }
+
 }
