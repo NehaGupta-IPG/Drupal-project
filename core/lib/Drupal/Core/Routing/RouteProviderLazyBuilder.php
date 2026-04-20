@@ -29,7 +29,7 @@ class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface, Eve
    *
    * @var bool
    */
-  protected $rebuilt = FALSE;
+  protected $rebuilt = TRUE;
 
   /**
    * Flag to determine if router is currently being rebuilt.
@@ -127,6 +127,17 @@ class RouteProviderLazyBuilder implements PreloadableRouteProviderInterface, Eve
    */
   public function hasRebuilt() {
     return $this->rebuilt;
+  }
+
+  /**
+   * Marks the routing table as stale so the next lookup triggers a rebuild.
+   *
+   * ModuleInstaller calls this when the set of installed modules is about to
+   * change, so that any route lookups performed during install/uninstall hooks
+   * see routes for the new module list.
+   */
+  public function markStale(): void {
+    $this->rebuilt = FALSE;
   }
 
   /**

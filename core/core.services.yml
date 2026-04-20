@@ -1152,7 +1152,8 @@ services:
   Drupal\Core\Routing\RouteProviderInterface: '@router.route_provider'
   router.route_provider.lazy_builder:
     class: Drupal\Core\Routing\RouteProviderLazyBuilder
-    arguments: ['@router.route_provider', '@router.builder']
+    decorates: router.route_provider
+    arguments: ['@.inner', '@router.builder']
   url_generator.non_bubbling:
     class: Drupal\Core\Routing\UrlGenerator
     arguments: ['@router.route_provider', '@path_processor_manager', '@route_processor_manager', '@request_stack', '%filter_protocols%']

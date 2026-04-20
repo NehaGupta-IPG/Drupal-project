@@ -13,6 +13,7 @@ use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Extension\Exception\ObsoleteExtensionException;
 use Drupal\Core\Installer\InstallerKernel;
+use Drupal\Core\Routing\RouteProviderLazyBuilder;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\Update\Attribute\MarkFutureUpdateEquivalent;
 use Drupal\Core\Update\UpdateHookRegistry;
@@ -236,12 +237,8 @@ class ModuleInstaller implements ModuleInstallerInterface {
       $installed_modules = $extension_config->get('module') ?: [];
     }
     if (!InstallerKernel::installationAttempted()) {
-      // If the container was rebuilt during hook_install() it might not have
-      // the 'router.route_provider.old' service.
-      if (\Drupal::hasService('router.route_provider.old')) {
-        \Drupal::getContainer()->set('router.route_provider', \Drupal::service('router.route_provider.old'));
-      }
-      if (!\Drupal::service('router.route_provider.lazy_builder')->hasRebuilt()) {
+      $route_provider = \Drupal::service('router.route_provider');
+      if ($route_provider instanceof RouteProviderLazyBuilder && !$route_provider->hasRebuilt()) {
         // Rebuild routes after installing module. This is done here on top of
         // \Drupal\Core\Routing\RouteBuilder::destruct to not run into errors on
         // fastCGI which executes ::destruct() after the module installation
@@ -323,16 +320,13 @@ class ModuleInstaller implements ModuleInstallerInterface {
     $this->updateKernel($module_filenames);
 
     if (!InstallerKernel::installationAttempted()) {
-      // Replace the route provider service with a version that will rebuild
-      // if routes are used during installation. This ensures that a module's
-      // routes are available during installation. This has to occur before
-      // any services that depend on it are instantiated otherwise those
-      // services will have the old route provider injected. Note that, since
-      // the container is rebuilt by updating the kernel, the route provider
-      // service is the regular one even though we are in a loop and might
-      // have replaced it before.
-      \Drupal::getContainer()->set('router.route_provider.old', \Drupal::service('router.route_provider'));
-      \Drupal::getContainer()->set('router.route_provider', \Drupal::service('router.route_provider.lazy_builder'));
+      // Mark the routing table as stale so that the first route lookup during
+      // install hooks rebuilds routes against the new module list, rather
+      // than returning data cached for the previous one.
+      $route_provider = \Drupal::service('router.route_provider');
+      if ($route_provider instanceof RouteProviderLazyBuilder) {
+        $route_provider->markStale();
+      }
     }
 
     foreach ($module_list as $module) {
@@ -594,9 +588,13 @@ class ModuleInstaller implements ModuleInstallerInterface {
       // Remove all configuration belonging to the module.
       \Drupal::service('config.manager')->uninstall('module', $module);
 
-      // In order to make uninstalling transactional if anything uses routes.
-      \Drupal::getContainer()->set('router.route_provider.old', \Drupal::service('router.route_provider'));
-      \Drupal::getContainer()->set('router.route_provider', \Drupal::service('router.route_provider.lazy_builder'));
+      // Mark the routing table as stale so that any route lookup during the
+      // rest of this module's uninstall rebuilds against the reduced module
+      // list.
+      $route_provider = \Drupal::service('router.route_provider');
+      if ($route_provider instanceof RouteProviderLazyBuilder) {
+        $route_provider->markStale();
+      }
 
       // Notify interested components that this module's entity types are being
       // deleted. For example, a SQL-based storage handler can use this as an
