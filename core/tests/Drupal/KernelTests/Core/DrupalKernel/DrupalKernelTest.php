@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Drupal\KernelTests\Core\DrupalKernel;
 
 use Composer\Autoload\ClassLoader;
+use Drupal\Core\Cache\DatabaseBackend;
 use Drupal\Core\Config\ConfigInstallerInterface;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\DependencyInjection\PhpContainer;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\DrupalKernelInterface;
+use Drupal\Core\Site\Settings;
 use Drupal\KernelTests\KernelTestBase;
 use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -526,6 +528,62 @@ class DrupalKernelTest extends KernelTestBase {
     $this->assertFileExists($new_container_file);
     // The old container file should be deleted.
     $this->assertFileDoesNotExist($container_file);
+  }
+
+  /**
+   * Tests bootstrap_container_definition is merged.
+   */
+  public function testBootstrapContainerDefinitionMissingServices(): void {
+    $kernel = $this->getTestKernel(Request::createFromGlobals(), ['system' => 'system']);
+
+    // Set a custom bootstrap_container_definition that only has the legacy
+    // services (missing all new container storage services).
+    $settings = Settings::getAll();
+    $settings['bootstrap_container_definition'] = [
+      'parameters' => [],
+      'services' => [
+        'database' => [
+          'class' => 'Drupal\Core\Database\Connection',
+          'factory' => 'Drupal\Core\Database\Database::getConnection',
+          'arguments' => ['default'],
+        ],
+        'cache.container' => [
+          'class' => '\Drupal\Core\Cache\DatabaseBackend',
+          'arguments' => [
+            '@database',
+            '@cache_tags_provider.container',
+            'container',
+            '@serialization.phpserialize',
+            '@datetime.time',
+            DatabaseBackend::MAXIMUM_NONE,
+          ],
+        ],
+        'cache_tags_provider.container' => [
+          'class' => 'Drupal\Core\Cache\DatabaseCacheTagsChecksum',
+          'arguments' => ['@database'],
+        ],
+        'serialization.phpserialize' => [
+          'class' => '\Drupal\Component\Serialization\PhpSerialize',
+        ],
+        'request_stack' => [
+          'class' => 'Symfony\Component\HttpFoundation\RequestStack',
+        ],
+        'datetime.time' => [
+          'class' => 'Drupal\Component\Datetime\Time',
+          'arguments' => ['@request_stack'],
+        ],
+      ],
+    ];
+    new Settings($settings);
+
+    // Shutdown the existing kernel and re-boot it. This triggers boot() which
+    // reads the bootstrap_container_definition from our settings.
+    $kernel->shutdown();
+    $kernel->boot();
+
+    $container = $kernel->getContainer();
+    $this->assertInstanceOf(PhpContainer::class, $container);
+    $this->assertNotNull($container->get('settings')->get('bootstrap_container_definition'));
   }
 
 }
