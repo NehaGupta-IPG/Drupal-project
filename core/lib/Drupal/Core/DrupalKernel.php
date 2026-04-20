@@ -553,24 +553,9 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
     FileCacheFactory::setConfiguration($configuration);
     FileCacheFactory::setPrefix(Settings::getApcuPrefix('file_cache', $this->root));
 
-    $definition = Settings::get('bootstrap_container_definition', $this->defaultBootstrapContainerDefinition);
-    // Provide backwards compatibility for custom bootstrap container
-    // definitions that do not declare the new container storage services.
-    $requiredServices = [
-      'kernel',
-      'settings',
-      'container_storage',
-      'container_storage.cache',
-      'container_storage.php_dumper',
-      'php_storage.service_container',
-    ];
-    $missingServices = array_diff($requiredServices, array_keys($definition['services'] ?? []));
-    if ($missingServices && Settings::get('bootstrap_container_definition') !== NULL) {
-      @trigger_error(sprintf('The bootstrap_container_definition setting is missing the following services: %s. These services will be added automatically but this is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Update your bootstrap_container_definition in settings.php to include these services. See https://www.drupal.org/node/3585642', implode(', ', $missingServices)), E_USER_DEPRECATED);
-      foreach ($missingServices as $service) {
-        $definition['services'][$service] = $this->defaultBootstrapContainerDefinition['services'][$service];
-      }
-    }
+    $definition = Settings::get('bootstrap_container_definition', []);
+    $definition['services'] = array_merge($definition['services'] ?? [], $this->defaultBootstrapContainerDefinition['services']);
+
     $this->bootstrapContainer = new $this->bootstrapContainerClass($definition);
     $this->bootstrapContainer->set('kernel', $this);
 
