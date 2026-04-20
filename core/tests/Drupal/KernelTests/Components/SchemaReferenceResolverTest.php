@@ -82,10 +82,8 @@ class SchemaReferenceResolverTest extends ComponentKernelTestBase {
     }
     $path = \Drupal::root() . '/' . $extensionList->getPath($extension) . '/' . $path;
     $content = file_get_contents($path);
-    if ($content) {
-      return json_decode($content, flags: JSON_OBJECT_AS_ARRAY);
-    }
-    return [];
+    \assert(\is_string($content));
+    return \json_decode($content, flags: JSON_OBJECT_AS_ARRAY);
   }
 
 }
