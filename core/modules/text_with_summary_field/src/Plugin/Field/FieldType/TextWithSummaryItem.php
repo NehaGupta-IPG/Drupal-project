@@ -15,12 +15,12 @@ use Drupal\text\Plugin\Field\FieldType\TextItemBase;
  */
 #[FieldType(
   id: "text_with_summary",
-  label: new TranslatableMarkup("Text (formatted, long, with summary)"),
+  label: new TranslatableMarkup("Long text with summary"),
   description: [
-    new TranslatableMarkup("Ideal for longer texts, like body or description with a summary"),
-    new TranslatableMarkup("Allows specifying a summary for the text"),
-    new TranslatableMarkup("Supports long text without specifying a maximum length"),
-    new TranslatableMarkup("May use more storage and be slower for searching and sorting"),
+    new TranslatableMarkup("Extends Long text"),
+    new TranslatableMarkup("Uses separate text areas (multiple rows) for input and summary"),
+    new TranslatableMarkup("Summary defaults to a trimmed value of the long text"),
+    new TranslatableMarkup("Recommended for content types that will be displayed in cards or teasers"),
   ],
   category: "formatted_text",
   default_widget: "text_textarea_with_summary",
@@ -34,9 +34,9 @@ class TextWithSummaryItem extends TextItemBase {
    */
   public static function defaultFieldSettings() {
     return [
-      'display_summary' => 0,
-      'required_summary' => FALSE,
-    ] + parent::defaultFieldSettings();
+        'display_summary' => 0,
+        'required_summary' => FALSE,
+      ] + parent::defaultFieldSettings();
   }
 
   /**
@@ -123,9 +123,11 @@ class TextWithSummaryItem extends TextItemBase {
     if ($this->getSetting('required_summary')) {
       $manager = $this->getTypedDataManager()->getValidationConstraintManager();
       $constraints[] = $manager->create('ComplexData', [
-        'summary' => [
-          'NotNull' => [
-            'message' => $this->t('The summary field is required for @name', ['@name' => $this->getFieldDefinition()->getLabel()]),
+        'properties' => [
+          'summary' => [
+            'NotNull' => [
+              'message' => $this->t('The summary field is required for @name', ['@name' => $this->getFieldDefinition()->getLabel()]),
+            ],
           ],
         ],
       ]);
