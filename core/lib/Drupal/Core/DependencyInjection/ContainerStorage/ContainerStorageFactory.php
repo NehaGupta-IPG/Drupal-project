@@ -6,7 +6,7 @@ use Drupal\Component\DependencyInjection\Dumper\OptimizedPhpArrayDumper;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\DependencyInjection\ContainerStorageInterface;
-use Drupal\Core\DependencyInjection\DumpedContainer;
+use Drupal\Core\DependencyInjection\PhpContainer;
 use Drupal\Core\PhpStorage\PhpStorageFactory;
 use Drupal\Core\Site\Settings;
 
@@ -39,7 +39,7 @@ class ContainerStorageFactory {
 
     $baseClass = Settings::get('container_base_class', Container::class);
 
-    if (is_a($baseClass, DumpedContainer::class, TRUE)) {
+    if (is_a($baseClass, PhpContainer::class, TRUE)) {
       try {
         $phpStorage = PhpStorageFactory::get('service_container');
       }

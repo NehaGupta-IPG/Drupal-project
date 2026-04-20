@@ -39,7 +39,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
    * @param \Drupal\Component\PhpStorage\PhpStorageInterface $phpStorage
    *   The PHP storage for compiled container files.
    * @param string $baseClass
-   *   The base class for the dumped container.
+   *   The base class for the PHP dumped container.
    */
   public function __construct(
     protected readonly CacheBackendInterface $cache,

@@ -16,7 +16,7 @@ use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ContainerStorage\ContainerStorageFactory;
 use Drupal\Core\DependencyInjection\ContainerStorage\NullContainerStorage;
 use Drupal\Core\DependencyInjection\ContainerStorageInterface;
-use Drupal\Core\DependencyInjection\DumpedContainer;
+use Drupal\Core\DependencyInjection\PhpContainer;
 use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Core\DependencyInjection\ServiceModifierInterface;
 use Drupal\Core\DependencyInjection\ServiceProviderInterface;
@@ -972,7 +972,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   protected function getContainerCacheKey() {
     @trigger_error(__METHOD__ . '() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use getContainerCacheKeySuffix() instead. The cache key prefix is now managed by ContainerStorageInterface implementations. See https://www.drupal.org/node/3585642', E_USER_DEPRECATED);
     $baseClass = Settings::get('container_base_class', Container::class);
-    $prefix = is_a($baseClass, DumpedContainer::class, TRUE) ? 'container_hash' : 'service_container';
+    $prefix = is_a($baseClass, PhpContainer::class, TRUE) ? 'container_hash' : 'service_container';
     return $prefix . ':' . $this->getContainerCacheKeySuffix();
   }
 

@@ -7,7 +7,7 @@ namespace Drupal\KernelTests\Core\DrupalKernel;
 use Composer\Autoload\ClassLoader;
 use Drupal\Core\Config\ConfigInstallerInterface;
 use Drupal\Core\DependencyInjection\Container;
-use Drupal\Core\DependencyInjection\DumpedContainer;
+use Drupal\Core\DependencyInjection\PhpContainer;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\DrupalKernelInterface;
 use Drupal\KernelTests\KernelTestBase;
@@ -69,7 +69,7 @@ class DrupalKernelTest extends KernelTestBase {
     $kernel = DrupalKernel::createFromRequest($request, $class_loader, 'testing');
     $this->setSetting('container_yamls', []);
     $this->setSetting('hash_salt', $this->databasePrefix);
-    $this->setSetting('container_base_class', DumpedContainer::class);
+    $this->setSetting('container_base_class', PhpContainer::class);
     if (isset($modules_enabled)) {
       $kernel->updateModules($modules_enabled);
     }
@@ -417,7 +417,7 @@ class DrupalKernelTest extends KernelTestBase {
     $this->assertSame(['system'], array_keys($kernel->getContainer()->getParameter('container.modules')));
 
     // Create a new kernel with a different site path. Modules are not injected
-    // to load the container from the dumped container.
+    // to load the container from the PHP dumped container.
     $kernel = DrupalKernel::createFromRequest($request, $class_loader, 'testing');
     $this->setSetting('container_yamls', []);
     $this->setSetting('hash_salt', $this->databasePrefix);
@@ -466,7 +466,7 @@ class DrupalKernelTest extends KernelTestBase {
 
     // The container should be an instance of the legacy Container class.
     $this->assertInstanceOf(Container::class, $container);
-    $this->assertNotInstanceOf(DumpedContainer::class, $container);
+    $this->assertNotInstanceOf(PhpContainer::class, $container);
 
     // The container should not be a ContainerBuilder.
     $refClass = new \ReflectionClass($container);
@@ -480,7 +480,7 @@ class DrupalKernelTest extends KernelTestBase {
     $container2 = $kernel2->getContainer();
 
     $this->assertInstanceOf(Container::class, $container2);
-    $this->assertNotInstanceOf(DumpedContainer::class, $container2);
+    $this->assertNotInstanceOf(PhpContainer::class, $container2);
 
     // The container should not be a ContainerBuilder.
     $refClass = new \ReflectionClass($container2);

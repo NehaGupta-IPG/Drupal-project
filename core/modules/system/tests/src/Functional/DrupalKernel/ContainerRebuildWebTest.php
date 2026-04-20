@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Drupal\Tests\system\Functional\DrupalKernel;
 
 use Drupal\Component\DependencyInjection\Container;
-use Drupal\Core\DependencyInjection\DumpedContainer;
+use Drupal\Core\DependencyInjection\PhpContainer;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
 use PHPUnit\Framework\Attributes\Group;
@@ -62,7 +62,7 @@ class ContainerRebuildWebTest extends BrowserTestBase {
     // Verify that the default installation uses the PhpDumper-based container
     // and that the compiled container file exists on disk.
     $container = \Drupal::getContainer();
-    $this->assertInstanceOf(DumpedContainer::class, $container);
+    $this->assertInstanceOf(PhpContainer::class, $container);
     $container_file = (new \ReflectionClass($container))->getFileName();
     $this->assertFileExists($container_file);
 
@@ -108,9 +108,9 @@ class ContainerRebuildWebTest extends BrowserTestBase {
     $admin_user = $this->drupalCreateUser(['administer site configuration']);
     $this->drupalLogin($admin_user);
 
-    // Ensure the container is a DumpedContainer with a file on disk.
+    // Ensure the container is a PhpContainer with a file on disk.
     $container = \Drupal::getContainer();
-    $this->assertInstanceOf(DumpedContainer::class, $container);
+    $this->assertInstanceOf(PhpContainer::class, $container);
     $container_file = (new \ReflectionClass($container))->getFileName();
     $this->assertFileExists($container_file);
 
@@ -119,7 +119,7 @@ class ContainerRebuildWebTest extends BrowserTestBase {
     $this->assertSession()->statusCodeEquals(200);
     // The page should contain the PHP OPcode caching section.
     $this->assertSession()->pageTextContains('PHP OPcode caching');
-    // The OPcode container check should be present for DumpedContainer.
+    // The OPcode container check should be present for PhpContainer.
     $this->assertSession()->pageTextContains('PHP OPcode container');
 
     // Switch to the legacy array container.

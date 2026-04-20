@@ -8,7 +8,7 @@ use Symfony\Component\DependencyInjection\Container;
 /**
  * Base class for Symfony PhpDumper-generated containers in Drupal.
  */
-class DumpedContainer extends Container implements ContainerInterface {
+class PhpContainer extends Container implements ContainerInterface {
 
   /**
    * {@inheritdoc}
