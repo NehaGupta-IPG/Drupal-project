@@ -83,15 +83,10 @@ class NormalInstallerServiceProvider implements ServiceProviderInterface {
     $container->getDefinition('cache_tags.invalidator.checksum')
       ->clearTag('cache_tags_invalidator');
 
-    // Don't register the lazy route provider in the super early installer.
+    // Don't swap in the installer route provider in the super early installer.
     if (static::class === NormalInstallerServiceProvider::class) {
-      $lazy_route_provider = $container->register('router.route_provider.installer');
-      $lazy_route_provider
-        ->setClass(InstallerRouteProviderLazyBuilder::class)
-        ->setDecoratedService('router.route_provider')
-        ->addArgument(new Reference('router.route_provider.installer.inner'))
-        ->addArgument(new Reference('router.builder'))
-        ->addTag('event_subscriber');
+      $container->getDefinition('router.route_provider')
+        ->setClass(InstallerRouteProviderLazyBuilder::class);
     }
 
     $pass_config = $container->getCompilerPassConfig();

@@ -2,23 +2,21 @@
 
 namespace Drupal\Core\Installer;
 
-use Drupal\Core\Routing\RouteBuilderInterface;
-use Drupal\Core\Routing\RouteProviderInterface;
-use Drupal\Core\Routing\RouteProviderLazyBuilder;
+use Drupal\Core\Routing\RouteProvider;
 use Symfony\Component\Routing\Route;
 
 /**
  * A Route Provider front-end for use during the installer.
  */
-class InstallerRouteProviderLazyBuilder extends RouteProviderLazyBuilder {
+class InstallerRouteProviderLazyBuilder extends RouteProvider {
 
-  public function __construct(RouteProviderInterface $route_provider, RouteBuilderInterface $route_builder) {
-    parent::__construct($route_provider, $route_builder);
-
-    // The installer cannot rely on the routing table being populated; the
-    // first lookup must trigger a rebuild.
-    $this->markStale();
-  }
+  /**
+   * {@inheritdoc}
+   *
+   * The installer cannot rely on the routing table being populated, so the
+   * first lookup must trigger a rebuild.
+   */
+  protected bool $rebuilt = FALSE;
 
   /**
    * {@inheritdoc}

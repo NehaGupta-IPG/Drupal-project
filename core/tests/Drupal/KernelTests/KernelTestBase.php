@@ -22,7 +22,6 @@ use Drupal\Core\Extension\ExtensionDiscovery;
 use Drupal\Core\KeyValueStore\KeyValueMemoryFactory;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Routing\RouteObjectInterface;
-use Symfony\Component\DependencyInjection\Definition;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Test\EventSubscriber\FieldStorageCreateCheckSubscriber;
 use Drupal\Core\Test\TestDatabase;
@@ -40,6 +39,7 @@ use org\bovigo\vfs\visitor\vfsStreamPrintVisitor;
 use PHPUnit\Framework\Attributes\After;
 use PHPUnit\Framework\Exception;
 use Prophecy\PhpUnit\ProphecyTrait;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Route;
@@ -553,19 +553,21 @@ abstract class KernelTestBase extends DrupalTestCase implements ServiceProviderI
     $container->setParameter('password.algorithm', PASSWORD_BCRYPT);
     $container->setParameter('password.options', ['cost' => 4]);
 
-    // Replace the storage-backed route provider that sits behind the
-    // RouteProviderLazyBuilder with a test wrapper that rebuilds routes on
-    // first use. The wrapper re-resolves services through \Drupal::getContainer()
-    // so it remains valid after container rebuilds triggered by module
-    // installation during a test.
-    $storage_service_name = 'router.route_provider.storage';
-    $definition = $container->getDefinition($storage_service_name);
+    // Add the on demand rebuild route provider service.
+    $route_provider_service_name = 'router.route_provider';
+    // While $container->get() does a recursive resolve, getDefinition() does
+    // not, so do it ourselves.
+    $id = $route_provider_service_name;
+    while ($container->hasAlias($id)) {
+      $id = (string) $container->getAlias($id);
+    }
+    $definition = $container->getDefinition($id);
     $definition->clearTag('needs_destruction');
-    $container->setDefinition("test.$storage_service_name", $definition);
+    $container->setDefinition("test.$route_provider_service_name", $definition);
 
     $route_provider_definition = new Definition(RouteProvider::class);
     $route_provider_definition->setPublic(TRUE);
-    $container->setDefinition($storage_service_name, $route_provider_definition);
+    $container->setDefinition($id, $route_provider_definition);
 
     // Remove the stored configuration importer so if used again it will be
     // built with up-to-date services.

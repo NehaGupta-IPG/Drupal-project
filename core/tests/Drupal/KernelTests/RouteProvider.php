@@ -32,7 +32,7 @@ class RouteProvider implements PreloadableRouteProviderInterface {
   protected function lazyLoadItself(): RouteProviderBase {
     if (!isset($this->service)) {
       $container = \Drupal::getContainer();
-      $this->service = $container->get('test.router.route_provider.storage');
+      $this->service = $container->get('test.router.route_provider');
       $container->get('router.builder')->rebuild();
     }
 

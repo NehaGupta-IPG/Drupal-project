@@ -1144,17 +1144,16 @@ services:
     class: Drupal\Core\Routing\AdminContext
     arguments: ['@current_route_match']
   Drupal\Core\Routing\AdminContext: '@router.admin_context'
-  router.route_provider.storage:
+  router.route_provider:
     class: Drupal\Core\Routing\RouteProvider
-    arguments: ['@database', '@state', '@path.current', '@cache.data', '@path_processor_manager', '@cache_tags.invalidator', '@cache.routes', 'router', '@language_manager']
+    arguments: ['@database', '@state', '@path.current', '@cache.data', '@path_processor_manager', '@cache_tags.invalidator', '@cache.routes', 'router', '@language_manager', '@router.builder']
     tags:
       - { name: backend_overridable }
-  router.route_provider.lazy_builder_subscriber:
-    class: Drupal\Core\Routing\RouteProviderLazyBuilderSubscriber
-  router.route_provider:
-    class: Drupal\Core\Routing\RouteProviderLazyBuilder
-    arguments: ['@router.route_provider.storage', '@router.builder', '@router.route_provider.lazy_builder_subscriber']
   Drupal\Core\Routing\RouteProviderInterface: '@router.route_provider'
+  router.route_provider.lazy_builder:
+    class: Drupal\Core\Routing\RouteProviderLazyBuilder
+    arguments: ['@router.route_provider', '@router.builder']
+    deprecated: 'The "%service_id%" service is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. The router.route_provider service now rebuilds routes on demand itself. See https://www.drupal.org/node/9999999'
   url_generator.non_bubbling:
     class: Drupal\Core\Routing\UrlGenerator
     arguments: ['@router.route_provider', '@path_processor_manager', '@route_processor_manager', '@request_stack', '%filter_protocols%']

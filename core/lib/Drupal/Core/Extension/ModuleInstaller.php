@@ -13,7 +13,7 @@ use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Extension\Exception\ObsoleteExtensionException;
 use Drupal\Core\Installer\InstallerKernel;
-use Drupal\Core\Routing\RouteProviderLazyBuilder;
+use Drupal\Core\Routing\RouteProvider;
 use Drupal\Core\Serialization\Yaml;
 use Drupal\Core\Update\Attribute\MarkFutureUpdateEquivalent;
 use Drupal\Core\Update\UpdateHookRegistry;
@@ -238,7 +238,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
     }
     if (!InstallerKernel::installationAttempted()) {
       $route_provider = \Drupal::service('router.route_provider');
-      if ($route_provider instanceof RouteProviderLazyBuilder && !$route_provider->hasRebuilt()) {
+      if ($route_provider instanceof RouteProvider && !$route_provider->hasRebuilt()) {
         // Rebuild routes after installing module. This is done here on top of
         // \Drupal\Core\Routing\RouteBuilder::destruct to not run into errors on
         // fastCGI which executes ::destruct() after the module installation
@@ -742,7 +742,7 @@ class ModuleInstaller implements ModuleInstallerInterface {
     // Mark the routing table as stale so that any future route lookup
     // rebuilds against the updated module list.
     $route_provider = $container->get('router.route_provider');
-    if ($route_provider instanceof RouteProviderLazyBuilder) {
+    if ($route_provider instanceof RouteProvider) {
       $route_provider->markStale();
     }
   }
