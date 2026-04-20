@@ -19,31 +19,33 @@ class AccessibilityTest extends AccessibilityTestBase {
   /**
    * {@inheritdoc}
    */
-  public static function provider(): array {
-    return [
-      'Homepage' => [
-        '<front>',
-        FALSE,
+  public static function provider(): \Generator {
+
+    yield 'Homepage' => [
+      '<front>',
+      FALSE,
           // @todo remove the disabled 'region' rule in https://drupal.org/i/3318396.
           [
             'rules' => [
               'region' => ['enabled' => FALSE],
             ],
           ],
-      ],
-      'Login' => [
-        '/user/login',
-        FALSE,
+    ];
+
+    yield 'Login' => [
+      '/user/login',
+      FALSE,
           // @todo remove the disabled 'region' rule in https://drupal.org/i/3318396.
           [
             'rules' => [
               'region' => ['enabled' => FALSE],
             ],
           ],
-      ],
-      'Search' => [
-        '/search/node',
-        FALSE,
+    ];
+
+    yield 'Search' => [
+      '/search/node',
+      FALSE,
           // @todo remove the heading and duplicate id rules below in
           //   https://drupal.org/i/3318398.
           [
@@ -52,7 +54,6 @@ class AccessibilityTest extends AccessibilityTestBase {
               'duplicate-id-aria' => ['enabled' => FALSE],
             ],
           ],
-      ],
     ];
   }
 

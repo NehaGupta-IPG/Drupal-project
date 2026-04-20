@@ -83,29 +83,31 @@ TEXT;
   /**
    * {@inheritdoc}
    */
-  public static function provider(): array {
-    return [
-      'Smoke test with Axe options' => [
-        'path' => 'admin/accessibility-test',
-        'admin' => TRUE,
-        'axe_options' => [
-          'runOnly' => ['color-contrast'],
-        ],
-        'setup_callback' => 'setupSmokeTestWithOptions',
+  public static function provider(): \Generator {
+
+    yield 'Smoke test with Axe options' => [
+      'path' => 'admin/accessibility-test',
+      'admin' => TRUE,
+      'axe_options' => [
+        'runOnly' => ['color-contrast'],
       ],
-      'Page not found check' => [
-        'path' => '123456',
-        'setup_callback' => 'setupPageNotFound',
-      ],
-      'Access denied check, with $admin argument default' => [
-        'path' => 'admin',
-        'setup_callback' => 'setupAccessDenied',
-      ],
-      'Access denied check, with $admin argument FALSE' => [
-        'path' => 'admin',
-        'admin' => FALSE,
-        'setup_callback' => 'setupAccessDenied',
-      ],
+      'setup_callback' => 'setupSmokeTestWithOptions',
+    ];
+
+    yield 'Page not found check' => [
+      'path' => '123456',
+      'setup_callback' => 'setupPageNotFound',
+    ];
+
+    yield 'Access denied check, with $admin argument default' => [
+      'path' => 'admin',
+      'setup_callback' => 'setupAccessDenied',
+    ];
+
+    yield 'Access denied check, with $admin argument FALSE' => [
+      'path' => 'admin',
+      'admin' => FALSE,
+      'setup_callback' => 'setupAccessDenied',
     ];
   }
 

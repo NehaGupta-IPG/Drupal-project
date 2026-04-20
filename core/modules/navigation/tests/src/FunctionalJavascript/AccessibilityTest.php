@@ -44,17 +44,17 @@ class AccessibilityTest extends AccessibilityTestBase {
   /**
    * {@inheritdoc}
    */
-  public static function provider(): array {
-    return [
-      'Claro page' => [
-        '/user/1/edit',
-        TRUE,
-      ],
-      'Claro page, mobile, sidebar open' => [
-        'path' => '/admin',
-        'admin' => TRUE,
-        'setup_callback' => 'setupClaroPageMobileSidebarOpen',
-      ],
+  public static function provider(): \Generator {
+
+    yield 'Claro page' => [
+      '/user/1/edit',
+      TRUE,
+    ];
+
+    yield 'Claro page, mobile, sidebar open' => [
+      'path' => '/admin',
+      'admin' => TRUE,
+      'setup_callback' => 'setupClaroPageMobileSidebarOpen',
     ];
   }
 

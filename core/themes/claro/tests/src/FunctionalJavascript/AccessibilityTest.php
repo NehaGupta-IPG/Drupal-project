@@ -31,40 +31,47 @@ class AccessibilityTest extends AccessibilityTestBase {
   /**
    * {@inheritdoc}
    */
-  public static function provider(): array {
-    return [
-      'User Edit' => [
-        '/user/1/edit',
-        TRUE,
-      ],
-      'Create Article' => [
-        '/node/add/article',
-        TRUE,
-      ],
-      'Create Page' => [
-        '/node/add/page',
-        TRUE,
-      ],
-      'Content Page' => [
-        '/admin/content',
-        TRUE,
-      ],
-      'Structure Page' => [
-        '/admin/structure',
-        TRUE,
-      ],
-      'Add content type' => [
-        '/admin/structure/types/add',
-        TRUE,
-      ],
-      'Add vocabulary' => [
-        '/admin/structure/taxonomy/add',
-        TRUE,
-      ],
-      // @todo remove the skipped rules below in https://drupal.org/i/3318394.
-      'Structure | Block' => [
-        '/admin/structure/block',
-        TRUE,
+  public static function provider(): \Generator {
+
+    yield 'User Edit' => [
+      '/user/1/edit',
+      TRUE,
+    ];
+
+    yield 'Create Article' => [
+      '/node/add/article',
+      TRUE,
+    ];
+
+    yield 'Create Page' => [
+      '/node/add/page',
+      TRUE,
+    ];
+
+    yield 'Content Page' => [
+      '/admin/content',
+      TRUE,
+    ];
+
+    yield 'Structure Page' => [
+      '/admin/structure',
+      TRUE,
+    ];
+
+    yield 'Add content type' => [
+      '/admin/structure/types/add',
+      TRUE,
+    ];
+
+    yield 'Add vocabulary' => [
+      '/admin/structure/taxonomy/add',
+      TRUE,
+    ];
+
+    // @todo remove the skipped rules below in https://drupal.org/i/3318394.
+    yield 'Structure | Block' => [
+      '/admin/structure/block',
+      TRUE,
         [
           'rules' => [
             'color-contrast' => ['enabled' => FALSE],
@@ -72,11 +79,12 @@ class AccessibilityTest extends AccessibilityTestBase {
             'region' => ['enabled' => FALSE],
           ],
         ],
-      ],
-      // Tests long breadcrumb for https://drupal.org/i/3223147.
-      'Manage text format, mobile' => [
-        '/admin/config/content/formats/manage/restricted_html',
-        TRUE,
+    ];
+
+    // Tests long breadcrumb for https://drupal.org/i/3223147.
+    yield 'Manage text format, mobile' => [
+      '/admin/config/content/formats/manage/restricted_html',
+      TRUE,
         [
           // This is the only way to add WCAG 2.2 tags to defaults.
           // See https://github.com/dequelabs/axe-core/issues/4717.
@@ -93,8 +101,7 @@ class AccessibilityTest extends AccessibilityTestBase {
             ],
           ],
         ],
-        'setupManageTextFormatMobile',
-      ],
+      'setupManageTextFormatMobile',
     ];
   }
 
