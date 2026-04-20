@@ -343,7 +343,10 @@ class SystemRequirementsHooks {
             $requirements['php_opcache_container'] = [
               'value' => $this->t('Not cached'),
               'severity' => RequirementSeverity::Warning,
-              'description' => $this->t('The service container PHP file is not cached by OPcache. This can happen if <code>opcache.max_accelerated_files</code>, <code>opcache.max_file_size</code>, or <code>opcache.memory_consumption</code> are too low. Ensuring the container file can be cached by OPcache will improve performance.'),
+              'description' => $this->t(
+                'The service container PHP file is not cached by OPcache. This can happen if the <code>opcache.max_accelerated_files</code>, <code>opcache.max_file_size</code>, or <code>opcache.memory_consumption</code> settings in the php.ini are too low. Ensuring the container file can be cached by OPcache will improve performance. See the <a href=":drupal-php">system requirements</a> page for more information.',
+                [':drupal-php' => 'https://www.drupal.org/docs/system-requirements/php-requirements']
+              ),
             ];
           }
           $requirements['php_opcache_container']['title'] = $this->t('PHP OPcode container');
