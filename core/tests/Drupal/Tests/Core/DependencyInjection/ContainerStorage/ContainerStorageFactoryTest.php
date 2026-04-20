@@ -10,7 +10,7 @@ use Drupal\Core\DependencyInjection\ContainerStorage\CacheContainerStorage;
 use Drupal\Core\DependencyInjection\ContainerStorage\ContainerStorageFactory;
 use Drupal\Core\DependencyInjection\ContainerStorage\NullContainerStorage;
 use Drupal\Core\DependencyInjection\ContainerStorage\PhpDumperContainerStorage;
-use Drupal\Core\DependencyInjection\DumpedContainer;
+use Drupal\Core\DependencyInjection\PhpContainer;
 use Drupal\Core\Site\Settings;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -43,12 +43,12 @@ class ContainerStorageFactoryTest extends UnitTestCase {
   }
 
   /**
-   * Tests that PhpDumperContainerStorage is created for DumpedContainer base.
+   * Tests that PhpDumperContainerStorage is created for PhpContainer base.
    */
-  public function testCreatesPhpDumperStorageForDumpedContainerBase(): void {
+  public function testCreatesPhpDumperStorageForPhpContainerBase(): void {
     new Settings([
       'hash_salt' => 'test_hash_salt',
-      'container_base_class' => DumpedContainer::class,
+      'container_base_class' => PhpContainer::class,
     ]);
 
     $cache = $this->createStub(CacheBackendInterface::class);
@@ -62,7 +62,7 @@ class ContainerStorageFactoryTest extends UnitTestCase {
   public function testFallsBackToNullOnPhpStorageFailure(): void {
     // Without hash_salt, PhpStorageFactory::get() throws a RuntimeException.
     new Settings([
-      'container_base_class' => DumpedContainer::class,
+      'container_base_class' => PhpContainer::class,
     ]);
 
     $cache = $this->createStub(CacheBackendInterface::class);

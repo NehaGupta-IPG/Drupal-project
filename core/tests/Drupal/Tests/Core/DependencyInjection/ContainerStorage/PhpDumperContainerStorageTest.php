@@ -8,7 +8,7 @@ use Drupal\Component\PhpStorage\PhpStorageInterface;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ContainerStorage\PhpDumperContainerStorage;
-use Drupal\Core\DependencyInjection\DumpedContainer;
+use Drupal\Core\DependencyInjection\PhpContainer;
 use Drupal\Core\DrupalKernelInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -114,7 +114,7 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
       ->with('container_hash:test_suffix')
       ->willReturn(FALSE);
 
-    $storage = new PhpDumperContainerStorage($cache, $this->createPhpStorage(), DumpedContainer::class);
+    $storage = new PhpDumperContainerStorage($cache, $this->createPhpStorage(), PhpContainer::class);
     $this->assertNull($storage->load('test_suffix', $this->createKernelStub()));
   }
 
@@ -128,7 +128,7 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
       ->with('container_hash:test_suffix')
       ->willReturn((object) ['data' => 'abc123']);
 
-    $storage = new PhpDumperContainerStorage($cache, $this->createPhpStorage(), DumpedContainer::class);
+    $storage = new PhpDumperContainerStorage($cache, $this->createPhpStorage(), PhpContainer::class);
     $this->assertNull($storage->load('test_suffix', $this->createKernelStub()));
   }
 
@@ -150,10 +150,10 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
         $this->assertNotEmpty($hash);
       });
 
-    $storage = new PhpDumperContainerStorage($cache, $phpStorage, DumpedContainer::class);
+    $storage = new PhpDumperContainerStorage($cache, $phpStorage, PhpContainer::class);
     $result = $storage->dump($container, 'test_suffix', $this->createKernelStub());
 
-    $this->assertInstanceOf(DumpedContainer::class, $result);
+    $this->assertInstanceOf(PhpContainer::class, $result);
     $this->assertCount(1, $savedFiles);
     $this->assertStringStartsWith('DrupalContainer_', $savedFiles[0]);
     $this->assertStringEndsWith('.php', $savedFiles[0]);
@@ -172,10 +172,10 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
       ->method('set')
       ->willThrowException(new \Exception('Cache table does not exist'));
 
-    $storage = new PhpDumperContainerStorage($cache, $this->createPhpStorage(), DumpedContainer::class);
+    $storage = new PhpDumperContainerStorage($cache, $this->createPhpStorage(), PhpContainer::class);
     // Should not throw despite cache exception.
     $result = $storage->dump($container, 'test_suffix', $this->createKernelStub());
-    $this->assertInstanceOf(DumpedContainer::class, $result);
+    $this->assertInstanceOf(PhpContainer::class, $result);
   }
 
   /**
@@ -189,12 +189,12 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $container = new ContainerBuilder();
     $container->compile();
 
-    $storage = new PhpDumperContainerStorage($cache, $phpStorage, DumpedContainer::class);
+    $storage = new PhpDumperContainerStorage($cache, $phpStorage, PhpContainer::class);
     $result1 = $storage->dump($container, 'test_suffix', $this->createKernelStub());
     $result2 = $storage->dump($container, 'test_suffix', $this->createKernelStub());
 
-    // Both should return a DumpedContainer of the same class.
-    $this->assertInstanceOf(DumpedContainer::class, $result1);
+    // Both should return a PhpContainer of the same class.
+    $this->assertInstanceOf(PhpContainer::class, $result1);
     $this->assertSame($result1::class, $result2::class);
     // save() should only have been called once.
     $this->assertCount(1, $savedFiles);
@@ -219,7 +219,7 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $container2->setParameter('test_param', 'value2');
     $container2->compile();
 
-    $storage = new PhpDumperContainerStorage($cache, $phpStorage, DumpedContainer::class);
+    $storage = new PhpDumperContainerStorage($cache, $phpStorage, PhpContainer::class);
     $result1 = $storage->dump($container1, 'test_suffix', $this->createKernelStub());
     $result2 = $storage->dump($container2, 'test_suffix', $this->createKernelStub());
 
@@ -282,7 +282,7 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $container1->setParameter('test_param', 'value1');
     $container1->compile();
 
-    $storage = new PhpDumperContainerStorage($cache, $phpStorage, DumpedContainer::class);
+    $storage = new PhpDumperContainerStorage($cache, $phpStorage, PhpContainer::class);
     $storage->dump($container1, 'test_suffix', $this->createKernelStub());
 
     // Reset operations log before the second dump.
@@ -316,7 +316,7 @@ class PhpDumperContainerStorageTest extends UnitTestCase {
     $cache->expects($this->once())
       ->method('deleteAll');
 
-    $storage = new PhpDumperContainerStorage($cache, $this->createPhpStorage(), DumpedContainer::class);
+    $storage = new PhpDumperContainerStorage($cache, $this->createPhpStorage(), PhpContainer::class);
     $storage->invalidate();
   }
 

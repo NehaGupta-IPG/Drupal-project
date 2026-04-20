@@ -7,7 +7,7 @@ use Drupal\Component\Utility\Environment;
 use Drupal\Component\Utility\OpCodeCache;
 use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Database\Database;
-use Drupal\Core\DependencyInjection\DumpedContainer;
+use Drupal\Core\DependencyInjection\PhpContainer;
 use Drupal\Core\DrupalKernel;
 use Drupal\Core\Extension\ExtensionLifecycle;
 use Drupal\Core\Extension\Requirement\RequirementSeverity;
@@ -330,7 +330,7 @@ class SystemRequirementsHooks {
 
         // Check if the container file is cached in OPcache.
         $container = \Drupal::getContainer();
-        if ($container instanceof DumpedContainer) {
+        if ($container instanceof PhpContainer) {
           $container_reflection = new \ReflectionClass(\Drupal::getContainer());
           $container_file = $container_reflection->getFileName();
           if ($container_file && opcache_is_script_cached($container_file)) {

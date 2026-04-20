@@ -718,7 +718,7 @@ $settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
  *
  * When this is not set, the container uses the PHP array-based container
  * (\Drupal\Core\DependencyInjection\Container). Setting this to
- * \Drupal\Core\DependencyInjection\DumpedContainer (or a subclass) switches
+ * \Drupal\Core\DependencyInjection\PhpContainer (or a subclass) switches
  * to Symfony's PhpDumper, which generates a compiled PHP class stored via
  * PhpStorage. The compiled container benefits from OPcache and can improve
  * performance. Existing sites default to the PHP array container for backwards
@@ -727,14 +727,14 @@ $settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
  * This setting is also useful for testing a service container with an error
  * condition or to test a service container that throws an exception.
  */
-$settings['container_base_class'] = \Drupal\Core\DependencyInjection\DumpedContainer::class;
+$settings['container_base_class'] = \Drupal\Core\DependencyInjection\PhpContainer::class;
 
 /**
  * Override the container storage class.
  *
  * The container storage controls how compiled service containers are loaded,
  * dumped, and invalidated. By default, the storage is auto-detected from the
- * 'container_base_class' setting: DumpedContainer uses
+ * 'container_base_class' setting: PhpContainer uses
  * PhpDumperContainerStorage (compiled PHP via PhpStorage), and the legacy
  * Container class uses CacheContainerStorage (serialized array via the cache
  * backend).
