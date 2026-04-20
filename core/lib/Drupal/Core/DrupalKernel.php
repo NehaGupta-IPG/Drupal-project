@@ -84,9 +84,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
   protected $defaultBootstrapContainerDefinition = [
     'parameters' => [],
     'services' => [
-      'kernel' => [
-        'synthetic' => TRUE,
-      ],
       'database' => [
         'class' => 'Drupal\Core\Database\Connection',
         'factory' => 'Drupal\Core\Database\Database::getConnection',
@@ -556,9 +553,7 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
 
     $definition = Settings::get('bootstrap_container_definition', []);
     $definition['services'] = array_merge($definition['services'] ?? [], $this->defaultBootstrapContainerDefinition['services']);
-
     $this->bootstrapContainer = new $this->bootstrapContainerClass($definition);
-    $this->bootstrapContainer->set('kernel', $this);
 
     // Initialize the container.
     $this->initializeContainer();
