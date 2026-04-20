@@ -17,6 +17,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class CacheContainerStorage implements ContainerStorageInterface {
 
   /**
+   * The cache prefix used to store container definitions.
+   */
+  protected const string CACHE_PREFIX = 'service_container:';
+
+  /**
    * Constructs a CacheContainerStorage.
    *
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
@@ -42,7 +47,7 @@ class CacheContainerStorage implements ContainerStorageInterface {
    * {@inheritdoc}
    */
   public function load(string $suffix): ?ContainerInterface {
-    $cache = $this->cache->get('service_container:' . $suffix);
+    $cache = $this->cache->get(static::CACHE_PREFIX . $suffix);
     if ($cache) {
       $container_definition = $cache->data;
       $container_definition['parameters']['app.root'] = $this->appRoot;
@@ -63,7 +68,7 @@ class CacheContainerStorage implements ContainerStorageInterface {
     $container_definition = $dumper->getArray();
 
     try {
-      $this->cache->set('service_container:' . $suffix, $container_definition);
+      $this->cache->set(static::CACHE_PREFIX . $suffix, $container_definition);
     }
     catch (\Exception) {
       // The cache table may not exist yet (e.g., during install).
