@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\system\Functional\DrupalKernel;
 
+use Drupal\Component\DependencyInjection\Container;
 use Drupal\Core\DependencyInjection\DumpedContainer;
 use Drupal\Core\Url;
 use Drupal\Tests\BrowserTestBase;
@@ -125,7 +126,7 @@ class ContainerRebuildWebTest extends BrowserTestBase {
     $this->writeSettings([
       'settings' => [
         'container_base_class' => (object) [
-          'value' => '\Drupal\Core\DependencyInjection\Container',
+          'value' => Container::class,
           'required' => TRUE,
         ],
       ],

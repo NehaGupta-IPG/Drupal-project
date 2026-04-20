@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\Core\DependencyInjection\ContainerStorage;
 
+use Drupal\Component\DependencyInjection\Container;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\ContainerStorage\CacheContainerStorage;
 use Drupal\Core\DependencyInjection\ContainerStorage\ContainerStorageFactory;
@@ -33,7 +34,7 @@ class ContainerStorageFactoryTest extends UnitTestCase {
   public function testCreatesCacheStorageForLegacyBaseClass(): void {
     new Settings([
       'hash_salt' => 'test_hash_salt',
-      'container_base_class' => '\Drupal\Core\DependencyInjection\Container',
+      'container_base_class' => Container::class,
     ]);
 
     $cache = $this->createStub(CacheBackendInterface::class);
