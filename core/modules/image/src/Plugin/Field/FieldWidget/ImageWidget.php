@@ -307,7 +307,6 @@ class ImageWidget extends FileWidget {
     $dependencies = parent::calculateDependencies();
     $style_id = $this->getSetting('preview_image_style');
     if ($style_id && $style = ImageStyle::load($style_id)) {
-      /** @var \Drupal\image\ImageStyleInterface $style */
       // If this widget uses a valid image style to display the preview of the
       // uploaded image, add that image style configuration entity as dependency
       // of this widget.

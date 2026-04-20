@@ -244,7 +244,6 @@ class CommentDefaultFormatter extends FormatterBase {
     if ($mode = $this->getSetting('view_mode')) {
       if ($bundle = $this->getFieldSetting('comment_type')) {
         if ($display = EntityViewDisplay::load("comment.$bundle.$mode")) {
-          /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display */
           $dependencies[$display->getConfigDependencyKey()][] = $display->getConfigDependencyName();
         }
       }

@@ -245,7 +245,6 @@ class ImageFormatter extends ImageFormatterBase {
     $dependencies = parent::calculateDependencies();
     $style_id = $this->getSetting('image_style');
     if ($style_id && $style = ImageStyle::load($style_id)) {
-      /** @var \Drupal\image\ImageStyleInterface $style */
       // If this formatter uses a valid image style to display the image, add
       // the image style configuration entity as dependency of this formatter.
       $dependencies[$style->getConfigDependencyKey()][] = $style->getConfigDependencyName();
@@ -260,7 +259,6 @@ class ImageFormatter extends ImageFormatterBase {
     $changed = parent::onDependencyRemoval($dependencies);
     $style_id = $this->getSetting('image_style');
     if ($style_id && $style = ImageStyle::load($style_id)) {
-      /** @var \Drupal\image\ImageStyleInterface $style */
       if (!empty($dependencies[$style->getConfigDependencyKey()][$style->getConfigDependencyName()])) {
         $replacement_id = $this->imageStyleStorage->getReplacementId($style_id);
         // If a valid replacement has been provided in the storage, replace the
