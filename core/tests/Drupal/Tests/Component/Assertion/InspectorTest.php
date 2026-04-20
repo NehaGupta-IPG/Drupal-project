@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Drupal\Tests\Component\Assertion;
 
 use Drupal\Component\Assertion\Inspector;
-use Drupal\TestTools\Extension\DeprecationBridge\ExpectDeprecationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -17,8 +16,6 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Inspector::class)]
 #[Group('Assertion')]
 class InspectorTest extends TestCase {
-
-  use ExpectDeprecationTrait;
 
   /**
    * Tests asserting all members are strings.
@@ -133,7 +130,7 @@ class InspectorTest extends TestCase {
       'strchr',
       [$this, 'callMe'],
       [__CLASS__, 'callMeStatic'],
-      function () {
+      function (): true {
         return TRUE;
       },
     ]));
@@ -142,7 +139,7 @@ class InspectorTest extends TestCase {
       'strchr',
       [$this, 'callMe'],
       [__CLASS__, 'callMeStatic'],
-      function () {
+      function (): true {
         return TRUE;
       },
       "I'm not callable",
@@ -228,7 +225,7 @@ class StringObject {
   /**
    * {@inheritdoc}
    */
-  public function __toString() {
+  public function __toString(): string {
     return 'foo';
   }
 
