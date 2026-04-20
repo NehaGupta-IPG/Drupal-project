@@ -11,9 +11,9 @@ use Drupal\Core\Site\Settings;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Container storage using the PHP array dumper and cache backend.
+ * Container storage using the array dumper and cache backend.
  *
- * Serializes the container definition as a PHP array using
+ * Serializes the container definition as an array using
  * OptimizedPhpArrayDumper and stores it in the cache backend. On load, the
  * definition is retrieved from cache and used to instantiate the container.
  */
