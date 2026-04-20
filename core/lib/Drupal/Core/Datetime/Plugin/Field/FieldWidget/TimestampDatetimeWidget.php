@@ -30,7 +30,7 @@ class TimestampDatetimeWidget extends WidgetBase {
     $element['value'] = $element + [
       '#type' => 'datetime',
       '#default_value' => $default_value,
-      '#date_year_range' => '1:+100',
+      '#date_year_range' => '1000:+100',
     ];
 
     $element['value']['#description'] = $element['#description'] !== ''
