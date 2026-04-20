@@ -16,8 +16,8 @@ use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
  *
  * Compiles the container into a PHP class that benefits from opcache. The
  * compiled file is stored via PhpStorage (typically MTimeProtectedFileStorage)
- * and a sentinel hash is kept in the cache backend to map the cache key suffix
- * to the correct container class.
+ * and a hash is kept in the cache backend to map the cache key suffix to the
+ * correct container class.
  */
 class PhpDumperContainerStorage implements ContainerStorageInterface {
 
@@ -35,7 +35,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
    * Constructs a PhpDumperContainerStorage.
    *
    * @param \Drupal\Core\Cache\CacheBackendInterface $cache
-   *   The cache backend for storing the container hash sentinel.
+   *   The cache backend for storing the container hash.
    * @param \Drupal\Component\PhpStorage\PhpStorageInterface $phpStorage
    *   The PHP storage for compiled container files.
    * @param string $baseClass
@@ -51,8 +51,8 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
    * {@inheritdoc}
    */
   public function load(string $suffix, DrupalKernelInterface $kernel): ?ContainerInterface {
-    $sentinel = $this->cache->get(static::CACHE_PREFIX . $suffix);
-    if ($sentinel && $hash = $sentinel->data) {
+    $cache = $this->cache->get(static::CACHE_PREFIX . $suffix);
+    if ($cache && $hash = $cache->data) {
       $containerClass = 'DrupalContainer_' . $hash;
       if (!class_exists($containerClass, FALSE)) {
         $this->phpStorage->load($containerClass . '.php');
