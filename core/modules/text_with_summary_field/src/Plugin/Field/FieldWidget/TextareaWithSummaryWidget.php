@@ -24,11 +24,11 @@ class TextareaWithSummaryWidget extends TextareaWidget {
    */
   public static function defaultSettings() {
     return [
-        'rows' => '9',
-        'summary_rows' => '3',
-        'placeholder' => '',
-        'show_summary' => FALSE,
-      ] + parent::defaultSettings();
+      'rows' => '9',
+      'summary_rows' => '3',
+      'placeholder' => '',
+      'show_summary' => FALSE,
+    ] + parent::defaultSettings();
   }
 
   /**

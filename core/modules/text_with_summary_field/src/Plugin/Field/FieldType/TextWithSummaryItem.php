@@ -34,9 +34,9 @@ class TextWithSummaryItem extends TextItemBase {
    */
   public static function defaultFieldSettings() {
     return [
-        'display_summary' => 0,
-        'required_summary' => FALSE,
-      ] + parent::defaultFieldSettings();
+      'display_summary' => 0,
+      'required_summary' => FALSE,
+    ] + parent::defaultFieldSettings();
   }
 
   /**

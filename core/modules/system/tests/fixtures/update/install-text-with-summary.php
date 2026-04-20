@@ -40,4 +40,3 @@ $connection->merge('key_value')
     'value' => serialize(8000),
   ])
   ->execute();
-
