@@ -9,6 +9,7 @@ use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ContainerStorage\CacheContainerStorage;
+use Drupal\Core\DrupalKernelInterface;
 use Drupal\Tests\UnitTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
@@ -19,6 +20,16 @@ use PHPUnit\Framework\Attributes\Group;
 #[CoversClass(CacheContainerStorage::class)]
 #[Group('DependencyInjection')]
 class CacheContainerStorageTest extends UnitTestCase {
+
+  /**
+   * Creates a kernel stub that returns the given app root and site path.
+   */
+  protected function createKernelStub(string $appRoot = '/app/root', string $sitePath = 'sites/default'): DrupalKernelInterface {
+    $kernel = $this->createStub(DrupalKernelInterface::class);
+    $kernel->method('getAppRoot')->willReturn($appRoot);
+    $kernel->method('getSitePath')->willReturn($sitePath);
+    return $kernel;
+  }
 
   /**
    * Tests that load() returns NULL on cache miss.
@@ -34,10 +45,8 @@ class CacheContainerStorageTest extends UnitTestCase {
       $cache,
       Container::class,
       OptimizedPhpArrayDumper::class,
-      '/app/root',
-      'sites/default',
     );
-    $this->assertNull($storage->load('test_suffix'));
+    $this->assertNull($storage->load('test_suffix', $this->createKernelStub()));
   }
 
   /**
@@ -63,10 +72,8 @@ class CacheContainerStorageTest extends UnitTestCase {
       $cache,
       Container::class,
       OptimizedPhpArrayDumper::class,
-      '/app/root',
-      'sites/default',
     );
-    $container = $storage->load('test_suffix');
+    $container = $storage->load('test_suffix', $this->createKernelStub());
 
     $this->assertInstanceOf(Container::class, $container);
     $this->assertSame('/app/root', $container->getParameter('app.root'));
@@ -95,10 +102,8 @@ class CacheContainerStorageTest extends UnitTestCase {
       $cache,
       Container::class,
       OptimizedPhpArrayDumper::class,
-      '/app/root',
-      'sites/default',
     );
-    $result = $storage->dump($container, 'test_suffix');
+    $result = $storage->dump($container, 'test_suffix', $this->createKernelStub());
 
     $this->assertInstanceOf(Container::class, $result);
     // The cached data should not contain app.root and site.path (those are
@@ -127,12 +132,10 @@ class CacheContainerStorageTest extends UnitTestCase {
       $cache,
       Container::class,
       OptimizedPhpArrayDumper::class,
-      '/app/root',
-      'sites/default',
     );
 
     // Should not throw despite cache exception.
-    $result = $storage->dump($container, 'test_suffix');
+    $result = $storage->dump($container, 'test_suffix', $this->createKernelStub());
     $this->assertInstanceOf(Container::class, $result);
   }
 
@@ -148,8 +151,6 @@ class CacheContainerStorageTest extends UnitTestCase {
       $cache,
       Container::class,
       OptimizedPhpArrayDumper::class,
-      '/app/root',
-      'sites/default',
     );
     $storage->invalidate();
   }

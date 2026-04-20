@@ -2,6 +2,7 @@
 
 namespace Drupal\Core\DependencyInjection;
 
+use Drupal\Core\DrupalKernelInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -29,11 +30,13 @@ interface ContainerStorageInterface {
    * @param string $suffix
    *   A hash suffix identifying the container version, computed by the kernel
    *   from the environment, service providers, module filenames, etc.
+   * @param \Drupal\Core\DrupalKernelInterface $kernel
+   *   The kernel, which can be used to obtain the app root, site path, etc.
    *
    * @return \Symfony\Component\DependencyInjection\ContainerInterface|null
    *   The loaded container, or NULL if no valid cached container exists.
    */
-  public function load(string $suffix): ?ContainerInterface;
+  public function load(string $suffix, DrupalKernelInterface $kernel): ?ContainerInterface;
 
   /**
    * Dumps a compiled container to persistent storage.
@@ -42,13 +45,15 @@ interface ContainerStorageInterface {
    *   The compiled container builder.
    * @param string $suffix
    *   A hash suffix identifying this container version.
+   * @param \Drupal\Core\DrupalKernelInterface $kernel
+   *   The kernel, which can be used to obtain the app root, site path, etc.
    *
    * @return \Symfony\Component\DependencyInjection\ContainerInterface
    *   The container instance to use at runtime. This may be a new container
    *   instantiated from the dumped representation, or the original
    *   ContainerBuilder if dumping is not possible.
    */
-  public function dump(ContainerBuilder $container, string $suffix): ContainerInterface;
+  public function dump(ContainerBuilder $container, string $suffix, DrupalKernelInterface $kernel): ContainerInterface;
 
   /**
    * Invalidates all stored containers.

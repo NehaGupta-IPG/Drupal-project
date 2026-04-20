@@ -4,6 +4,7 @@ namespace Drupal\Core\DependencyInjection\ContainerStorage;
 
 use Drupal\Core\DependencyInjection\ContainerBuilder;
 use Drupal\Core\DependencyInjection\ContainerStorageInterface;
+use Drupal\Core\DrupalKernelInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -18,14 +19,14 @@ class NullContainerStorage implements ContainerStorageInterface {
   /**
    * {@inheritdoc}
    */
-  public function load(string $suffix): ?ContainerInterface {
+  public function load(string $suffix, DrupalKernelInterface $kernel): ?ContainerInterface {
     return NULL;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function dump(ContainerBuilder $container, string $suffix): ContainerInterface {
+  public function dump(ContainerBuilder $container, string $suffix, DrupalKernelInterface $kernel): ContainerInterface {
     return $container;
   }
 
