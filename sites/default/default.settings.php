@@ -716,7 +716,7 @@ $settings['container_yamls'][] = $app_root . '/' . $site_path . '/services.yml';
 /**
  * Override the default service container class.
  *
- * By default, the container uses the PHP array-based container
+ * When this is not set, the container uses the PHP array-based container
  * (\Drupal\Core\DependencyInjection\Container). Setting this to
  * \Drupal\Core\DependencyInjection\DumpedContainer (or a subclass) switches
  * to Symfony's PhpDumper, which generates a compiled PHP class stored via
