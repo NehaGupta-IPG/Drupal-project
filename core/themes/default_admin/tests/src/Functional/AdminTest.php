@@ -19,10 +19,6 @@ class AdminTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
-  // Install the shortcut module so that default_admin.settings has its schema checked.
-  // There's currently no way for Default Admin to provide a default and have valid
-  // configuration as themes cannot react to a module install.
-    'shortcut',
     'toolbar',
     'node',
   ];
@@ -55,7 +51,7 @@ class AdminTest extends BrowserTestBase {
   }
 
   /**
-   * Tests that the Default Admin theme always adds its message CSS and Classy's.
+   * Tests that Default Admin always adds its message CSS and Classy's.
    */
   public function testDefaultAdminSettings(): void {
     $response = $this->drupalGet('/admin/content');
