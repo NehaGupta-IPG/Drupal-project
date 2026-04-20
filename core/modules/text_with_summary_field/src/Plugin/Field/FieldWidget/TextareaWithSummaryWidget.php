@@ -90,7 +90,7 @@ class TextareaWithSummaryWidget extends TextareaWidget {
 
     if (!$this->getSetting('show_summary') && !$required) {
       $element['summary']['#attributes']['class'][] = 'js-text-summary';
-      $element['summary']['#attached']['library'][] = 'text/drupal.text';
+      $element['summary']['#attached']['library'][] = 'text_with_summary_field/drupal.text';
     }
 
     return $element;
