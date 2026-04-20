@@ -1056,8 +1056,6 @@ class ContainerTest extends TestCase {
 
 /**
  * Helper interface to test Container::get() with configurator.
- *
- * @group DependencyInjection
  */
 interface MockConfiguratorInterface {
 
@@ -1074,15 +1072,13 @@ interface MockConfiguratorInterface {
 
 /**
  * Helper class to test Container::get() method for varying number of parameters.
- *
- * @group DependencyInjection
  */
 class MockInstantiationService {
 
   /**
    * @var mixed[]
    */
-  protected $arguments;
+  protected array $arguments;
 
   /**
    * Construct a mock instantiation service.
@@ -1097,7 +1093,7 @@ class MockInstantiationService {
    * @return mixed[]
    *   Return the passed arguments.
    */
-  public function getArguments() {
+  public function getArguments(): array {
     return $this->arguments;
   }
 
@@ -1106,8 +1102,6 @@ class MockInstantiationService {
 
 /**
  * Helper class to test Container::get() method.
- *
- * @group DependencyInjection
  */
 class MockService {
 

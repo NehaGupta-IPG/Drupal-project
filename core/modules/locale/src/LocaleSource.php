@@ -5,11 +5,17 @@ namespace Drupal\locale;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManager;
+use Drupal\locale\File\LocaleFile;
 
 /**
  * Provides the locale source services.
  */
 class LocaleSource {
+
+  /**
+   * The hash algorithm used to calculate the hash of the local file.
+   */
+  public const string LOCAL_FILE_HASH_ALGO = 'xxh128';
 
   public function __construct(
     protected readonly LocaleProjectStorageInterface $projectStorage,
@@ -109,6 +115,7 @@ class LocaleSource {
           $file = current($files);
           $source_file->uri = $file->uri;
           $source_file->timestamp = filemtime($file->uri);
+          $source_file->hash = hash_file(self::LOCAL_FILE_HASH_ALGO, $file->uri);
           return $source_file;
         }
       }
@@ -169,6 +176,7 @@ class LocaleSource {
     $source->langcode = $langcode;
     $source->type = '';
     $source->timestamp = 0;
+    $source->hash = '';
     $source->last_checked = 0;
 
     $filename = $filename ?: $this->configFactory->get('locale.settings')->get('translation.default_filename');
@@ -179,34 +187,27 @@ class LocaleSource {
     // file path we will only check for a file in the local file system.
     $files = [];
     if ($this->fileIsRemote($source->server_pattern)) {
-      $files[LOCALE_TRANSLATION_REMOTE] = (object) [
-        'project' => $project->name,
-        'langcode' => $langcode,
-        'version' => $project->version,
-        'type' => LOCALE_TRANSLATION_REMOTE,
-        'filename' => $this->buildServerPattern($source, basename($source->server_pattern)),
-        'uri' => $this->buildServerPattern($source, $source->server_pattern),
-      ];
-      $files[LOCALE_TRANSLATION_LOCAL] = (object) [
-        'project' => $project->name,
-        'langcode' => $langcode,
-        'version' => $project->version,
-        'type' => LOCALE_TRANSLATION_LOCAL,
-        'filename' => $this->buildServerPattern($source, $filename),
-        'directory' => 'translations://',
-      ];
-      $files[LOCALE_TRANSLATION_LOCAL]->uri = $files[LOCALE_TRANSLATION_LOCAL]->directory . $files[LOCALE_TRANSLATION_LOCAL]->filename;
+      $remote_filename = $this->buildServerPattern($source, basename($source->server_pattern));
+      $remote_uri = $this->buildServerPattern($source, $source->server_pattern);
+      $remote_file = new LocaleFile($remote_filename, $remote_uri, '', NULL, $langcode, $project->name, $project->version);
+      $remote_file->type = LOCALE_TRANSLATION_REMOTE;
+      $files[LOCALE_TRANSLATION_REMOTE] = $remote_file;
+
+      $local_filename = $this->buildServerPattern($source, $filename);
+      $local_uri = 'translations://' . $local_filename;
+      $local_file = new LocaleFile($local_filename, $local_uri, '', NULL, $langcode, $project->name, $project->version);
+      $local_file->type = LOCALE_TRANSLATION_LOCAL;
+      $local_file->directory = 'translations://';
+      $files[LOCALE_TRANSLATION_LOCAL] = $local_file;
     }
     else {
-      $files[LOCALE_TRANSLATION_LOCAL] = (object) [
-        'project' => $project->name,
-        'langcode' => $langcode,
-        'version' => $project->version,
-        'type' => LOCALE_TRANSLATION_LOCAL,
-        'filename' => $this->buildServerPattern($source, basename($source->server_pattern)),
-        'directory' => $this->buildServerPattern($source, $this->fileSystem->dirname($source->server_pattern)),
-      ];
-      $files[LOCALE_TRANSLATION_LOCAL]->uri = $files[LOCALE_TRANSLATION_LOCAL]->directory . '/' . $files[LOCALE_TRANSLATION_LOCAL]->filename;
+      $local_directory = $this->buildServerPattern($source, $this->fileSystem->dirname($source->server_pattern));
+      $local_filename = $this->buildServerPattern($source, basename($source->server_pattern));
+      $local_uri = $local_directory . '/' . $local_filename;
+      $local_file = new LocaleFile($local_filename, $local_uri, '', NULL, $langcode, $project->name, $project->version);
+      $local_file->type = LOCALE_TRANSLATION_LOCAL;
+      $local_file->directory = $local_directory;
+      $files[LOCALE_TRANSLATION_LOCAL] = $local_file;
     }
     $source->files = $files;
 
@@ -218,6 +219,7 @@ class LocaleSource {
       $source->files[LOCALE_TRANSLATION_CURRENT] = $history[$project->name][$langcode];
       $source->type = LOCALE_TRANSLATION_CURRENT;
       $source->timestamp = $history[$project->name][$langcode]->timestamp;
+      $source->hash = $history[$project->name][$langcode]->hash;
       $source->last_checked = $history[$project->name][$langcode]->last_checked;
     }
     else {

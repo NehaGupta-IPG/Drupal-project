@@ -28,14 +28,11 @@ class SqlContentEntityStorageTest extends KernelTestBase {
     $ids = [1, 2, 3];
 
     // Create a dummy field storage definition.
-    $dummy_storage_definition = $this->getMockBuilder(FieldStorageDefinitionInterface::class)
-      ->disableOriginalConstructor()
-      ->getMock();
+    $dummy_storage_definition = $this->createStub(FieldStorageDefinitionInterface::class);
     $fieldStorageDefinitions = [$dummy_storage_definition];
 
     // Create a dummy entity type that is revisionable.
-    $entityType = $this->getMockBuilder(EntityTypeInterface::class)
-      ->getMock();
+    $entityType = $this->createStub(EntityTypeInterface::class);
     $entityType->method('isRevisionable')
       ->willReturn(TRUE);
 
@@ -99,10 +96,10 @@ class SqlContentEntityStorageTest extends KernelTestBase {
     $logger->end('default');
 
     // Filter queries to include only DELETE queries over each table.
-    $dedicatedTableDeleteQueries = array_filter($queries, static function ($query) {
+    $dedicatedTableDeleteQueries = array_filter($queries, static function (array $query): int|false {
       return preg_match('/^DELETE FROM ".*dedicated_table"/', $query['query']);
     });
-    $dedicatedRevisionTableDeleteQueries = array_filter($queries, static function ($query) {
+    $dedicatedRevisionTableDeleteQueries = array_filter($queries, static function (array $query): int|false {
       return preg_match('/^DELETE FROM ".*dedicated_revision_table"/', $query['query']);
     });
 
