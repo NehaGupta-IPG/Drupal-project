@@ -11,7 +11,7 @@ use Drupal\Core\StringTranslation\TranslationManager;
 /**
  * The admin language render class.
  */
-class AdminLanguageRender implements TrustedCallbackInterface {
+class AdminLanguageRender {
 
   /**
    * The language manager.
