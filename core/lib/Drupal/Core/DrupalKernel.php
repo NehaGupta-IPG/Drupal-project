@@ -6,6 +6,7 @@ use Composer\Autoload\ClassLoader;
 use Drupal\Component\DependencyInjection\ReverseContainer;
 use Drupal\Component\EventDispatcher\Event;
 use Drupal\Component\FileCache\FileCacheFactory;
+use Drupal\Component\PhpStorage\PhpStorageInterface;
 use Drupal\Component\Serialization\PhpSerialize;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Cache\DatabaseBackend;
@@ -30,6 +31,7 @@ use Drupal\Core\Http\TrustedHostsRequestFactory;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\Core\Installer\InstallerRedirectTrait;
 use Drupal\Core\Language\Language;
+use Drupal\Core\PhpStorage\PhpStorageFactory;
 use Drupal\Core\Security\RequestSanitizer;
 use Drupal\Core\Site\Settings;
 use Drupal\Core\Test\TestDatabase;
@@ -116,8 +118,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         'class' => PhpSerialize::class,
       ],
       'settings' => [
-        'class' => 'Drupal\Core\Site\Settings',
-        'factory' => 'Drupal\Core\Site\Settings::getInstance',
+        'class' => Settings::class,
+        'factory' => [Settings::class, 'getInstance'],
       ],
       'container_storage' => [
         'class' => ContainerStorageInterface::class,
@@ -140,8 +142,8 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         ],
       ],
       'php_storage.service_container' => [
-        'class' => 'Drupal\Component\PhpStorage\PhpStorageInterface',
-        'factory' => 'Drupal\Core\PhpStorage\PhpStorageFactory::get',
+        'class' => PhpStorageInterface::class,
+        'factory' => [PhpStorageFactory::class, 'get'],
         'arguments' => ['service_container'],
       ],
     ],
