@@ -93,7 +93,7 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
     $hash = hash('xxh128', $code);
 
     $containerClass = 'DrupalContainer_' . $hash;
-    if ($hash !== $this->loadedContainerHash || !class_exists($containerClass, FALSE)) {
+    if ($hash !== $this->loadedContainerHash) {
       if ($this->loadedContainerHash) {
         $old_container_hash = $this->loadedContainerHash;
       }
@@ -104,8 +104,19 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
         "class $containerClass extends \\$baseClass\n{",
         $code,
       );
+      // Always save the file so it exists on disk for future requests.
       $this->phpStorage->save($filename, $code);
-      $this->phpStorage->load($filename);
+      // Only include the file if the class is not already defined. The class
+      // may already exist in memory from an earlier load() or dump() in the
+      // same request (e.g., when a container is rebuilt multiple times during
+      // module installation and a later rebuild produces the same hash as an
+      // earlier one). Re-including via phpStorage->load() would use a
+      // different file path (MTimeProtectedFileStorage creates a new mtime
+      // directory on save), causing include_once to treat it as a new file
+      // and triggering a "Cannot redeclare class" fatal error.
+      if (!class_exists($containerClass, FALSE)) {
+        $this->phpStorage->load($filename);
+      }
       $this->loadedContainerHash = $hash;
     }
 
