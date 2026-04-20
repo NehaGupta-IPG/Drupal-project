@@ -39,7 +39,8 @@ class DrupalKernelDeprecationTest extends KernelTestBase {
     $this->expectUserDeprecationMessage('Drupal\Core\DrupalKernel::getContainerCacheKey() is deprecated in drupal:11.4.0 and is removed from drupal:13.0.0. Use getContainerCacheKeySuffix() instead. The cache key prefix is now managed by ContainerStorageInterface implementations. See https://www.drupal.org/node/3585642');
     $kernel = $this->container->get('kernel');
     $method = new \ReflectionMethod($kernel, 'getContainerCacheKey');
-    $method->invoke($kernel);
+    $key = $method->invoke($kernel);
+    $this->assertStringStartsWith('service_container:', $key);
   }
 
   /**
