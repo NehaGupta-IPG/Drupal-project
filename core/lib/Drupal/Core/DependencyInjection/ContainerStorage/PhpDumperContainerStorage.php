@@ -65,7 +65,9 @@ class PhpDumperContainerStorage implements ContainerStorageInterface {
    */
   public function dump(ContainerBuilder $container, string $suffix): ContainerInterface {
     // Ensure FileLoader::ANONYMOUS_ID_REGEXP is available for PhpDumper.
-    if (!class_exists('Symfony\Component\Config\Loader\FileLoader')) {
+    // Check both the real dependency (symfony/config FileLoader) and the alias
+    // target to avoid "Cannot redeclare class" warnings on repeated dumps.
+    if (!class_exists('Symfony\Component\Config\Loader\FileLoader') && !class_exists('Symfony\Component\DependencyInjection\Loader\FileLoader', FALSE)) {
       class_alias(FileLoaderStub::class, 'Symfony\Component\DependencyInjection\Loader\FileLoader');
     }
 

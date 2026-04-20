@@ -8,13 +8,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Interface for loading, dumping, and invalidating service containers.
  *
  * Implementations of this interface handle the persistence of compiled service
- * containers. The DrupalKernel uses a container storage service from the
- * bootstrap container to load cached containers, dump newly compiled ones, and
- * invalidate stale containers.
+ * containers. The DrupalKernel uses a container storage instance created by
+ * ContainerStorageFactory to load cached containers, dump newly compiled ones,
+ * and invalidate stale containers.
  *
- * This interface is registered as the 'container.storage' bootstrap service,
- * making it swappable via settings.php. For example, a site could ship a
- * pre-built container in Git by providing a custom implementation.
+ * The implementation is swappable via the 'container_storage_class' setting in
+ * settings.php, or auto-detected from the 'container_base_class' setting. For
+ * example, a site could ship a pre-built container in Git by providing a
+ * custom implementation.
  *
  * @see \Drupal\Core\DependencyInjection\ContainerStorage\PhpDumperContainerStorage
  * @see \Drupal\Core\DependencyInjection\ContainerStorage\CacheContainerStorage
